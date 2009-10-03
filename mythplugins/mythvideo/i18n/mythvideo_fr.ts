@@ -24,10 +24,6 @@
         <translation>Interdit aux moins de 16 ans</translation>
     </message>
     <message>
-        <source>Cover download stopped.</source>
-        <translation>Téléchargement de l&apos;affiche arrêté.</translation>
-    </message>
-    <message>
         <source>Error writing data to file %1.</source>
         <translation>Erreur en écrivant les données dans le fichier %1.</translation>
     </message>
@@ -36,40 +32,20 @@
         <translation>Erreur : erreur de fichier « %1 » pour le fichier %2</translation>
     </message>
     <message>
-        <source>Fanart download stopped.</source>
-        <translation>Téléchargement d&apos;illustration arrêté.</translation>
-    </message>
-    <message>
         <source>No command to run.</source>
         <translation>Aucune commande à exécuter.</translation>
-    </message>
-    <message>
-        <source>Screenshot download stopped.</source>
-        <translation>Téléchargement de la capture d&apos;écran arrêté.</translation>
-    </message>
-    <message>
-        <source>Banner download stopped.</source>
-        <translation>Téléchargement de la bannière arrêté.</translation>
     </message>
     <message>
         <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
         <translation>Tentative d&apos;enregistrer %1, mais il semble que ce soit une redirection HTML (taille de fichier %2).</translation>
     </message>
     <message>
-        <source>Error writing Coverart to file %1.</source>
-        <translation>Erreur lors de l&apos;enregistrement de l&apos;affiche dans le fichier %1.</translation>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation type="unfinished">Il est préférable d&apos;inscrire une valeur numérique dans ce champ.</translation>
     </message>
     <message>
-        <source>Error writing Screenshot to file %1.</source>
-        <translation>Erreur lors de l&apos;enregistrement de la copie d&apos;écran dans le fichier %1.</translation>
-    </message>
-    <message>
-        <source>Error writing Fanart to file %1.</source>
-        <translation>Erreur lors de l&apos;enregistrement du fanart dans le fichier %1.</translation>
-    </message>
-    <message>
-        <source>Error writing Banner to file %1.</source>
-        <translation>Erreur lors de l&apos;enregistrement de la bannière dans le fichier %1.</translation>
+        <source>Error writing image to file %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -544,10 +520,6 @@
         <translation>vidéos</translation>
     </message>
     <message>
-        <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation>Il est préférable d&apos;inscrire une valeur numérique dans ce champ.</translation>
-    </message>
-    <message>
         <source>Parental Level 4 PIN</source>
         <translation>Code d&apos;accès du niveau parental 4</translation>
     </message>
@@ -834,6 +806,18 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     <message>
         <source>Season %1</source>
         <translation>Saison %1</translation>
+    </message>
+    <message>
+        <source>Error: failed to add new file type &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Pin:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Groups</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1277,24 +1261,6 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
         <translation>Échec de suppression du fichier</translation>
     </message>
     <message>
-        <source>Poster download finished: %1 %2</source>
-        <translation>Téléchargement du poster terminé : %1 %2</translation>
-    </message>
-    <message>
-        <source>A poster exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>Un poster existe pour cet élément mais n&apos;a pu être récupéré dans le temps imparti.</translation>
-    </message>
-    <message>
-        <source>Fanart download finished: %1 %2</source>
-        <translation>Téléchargement d&apos;illustration terminé : %1 %2</translation>
-    </message>
-    <message>
-        <source>Fanart exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>Une illustration existe pour cet élément mais n&apos;a pu être récupérée dans le temps imparti.</translation>
-    </message>
-    <message>
         <source>No matches were found.</source>
         <translation>Aucune correspondance trouvée.</translation>
     </message>
@@ -1425,24 +1391,6 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
 %1</translation>
     </message>
     <message>
-        <source>Screenshot download finished: %1 %2</source>
-        <translation>Téléchargement de capture d&apos;écran terminé : %1 %2</translation>
-    </message>
-    <message>
-        <source>Screenshot exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>Une capture d&apos;écran existe pour cet élément mais n&apos;a pu être récupérée dans le délai imparti.</translation>
-    </message>
-    <message>
-        <source>Banner download finished: %1 %2</source>
-        <translation>Téléchargement de la bannière terminé : %1 %2</translation>
-    </message>
-    <message>
-        <source>Banner exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>Une bannière existe pour cet élément mais n&apos;a pu être récupérée dans le délai imparti.</translation>
-    </message>
-    <message>
         <source>Season</source>
         <translation>Saison</translation>
     </message>
@@ -1453,6 +1401,21 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     <message>
         <source>TV/Movies</source>
         <translation>TV/Films</translation>
+    </message>
+    <message>
+        <source>Video Options
+%1
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 download finished: %2 %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1494,64 +1457,6 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     <message>
         <source>Updating video database</source>
         <translation>Mise à jour de la base de données des vidéos</translation>
-    </message>
-</context>
-<context>
-    <name>video_settings_xml</name>
-    <message>
-        <source>General Settings</source>
-        <translation>Réglages généraux</translation>
-    </message>
-    <message>
-        <source>Player Settings</source>
-        <translation>Réglages du lecteur</translation>
-    </message>
-    <message>
-        <source>File Types</source>
-        <translation>Types de fichier</translation>
-    </message>
-    <message>
-        <source>Rip Settings</source>
-        <translation>Réglages d&apos;extraction</translation>
-    </message>
-</context>
-<context>
-    <name>videomenu_xml</name>
-    <message>
-        <source>Browse Videos</source>
-        <translation>Parcourir les vidéos</translation>
-    </message>
-    <message>
-        <source>Video List</source>
-        <translation>Liste des vidéos</translation>
-    </message>
-    <message>
-        <source>Video Gallery</source>
-        <translation>Galerie vidéo</translation>
-    </message>
-    <message>
-        <source>Video Manager</source>
-        <translation>Gestionaire de vidéos</translation>
-    </message>
-    <message>
-        <source>Play DVD</source>
-        <translation>Lire un DVD</translation>
-    </message>
-    <message>
-        <source>Play VCD</source>
-        <translation>Lire un VCD</translation>
-    </message>
-    <message>
-        <source>Rip DVD</source>
-        <translation>Extraire un DVD</translation>
-    </message>
-    <message>
-        <source>Eject media</source>
-        <translation>Éjecter un média</translation>
-    </message>
-    <message>
-        <source>Videos Settings</source>
-        <translation>Réglages Vidéos</translation>
     </message>
 </context>
 </TS>

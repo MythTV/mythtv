@@ -28,16 +28,8 @@
         <translation type="unfinished">R:NC 17</translation>
     </message>
     <message>
-        <source>Cover download stopped.</source>
-        <translation>Cover download gestopt.</translation>
-    </message>
-    <message>
         <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
         <translation>Getracht %1 op te slaan, maar het lijkt een HTML redirect te zijn (bestandsgrootte %2).</translation>
-    </message>
-    <message>
-        <source>Error writing Coverart to file %1.</source>
-        <translation>Fout bij opslaan van Coverart naar bestand %1.</translation>
     </message>
     <message>
         <source>Error writing data to file %1.</source>
@@ -48,32 +40,16 @@
         <translation>Fout: bestandsfout &apos;%1&apos; voor bestand %2</translation>
     </message>
     <message>
-        <source>Screenshot download stopped.</source>
-        <translation>Schermafbeelding download gestopt.</translation>
-    </message>
-    <message>
-        <source>Error writing Screenshot to file %1.</source>
-        <translation>Fout bij schrijven van schermafbeelding naar bestand %1.</translation>
-    </message>
-    <message>
-        <source>Fanart download stopped.</source>
-        <translation>Fanar download gestopt.</translation>
-    </message>
-    <message>
-        <source>Error writing Fanart to file %1.</source>
-        <translation>Fout bij schrijven van fanart naar bestand %1.</translation>
-    </message>
-    <message>
-        <source>Banner download stopped.</source>
-        <translation>Banner download gestopt.</translation>
-    </message>
-    <message>
-        <source>Error writing Banner to file %1.</source>
-        <translation>Fout bij schrijven van banner naar bestand %1.</translation>
-    </message>
-    <message>
         <source>No command to run.</source>
         <translation>Geen opdracht uit te voeren.</translation>
+    </message>
+    <message>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation type="unfinished">Deze waarde op alle getallen instellen maakt uw leven een stuk makkelijker.</translation>
+    </message>
+    <message>
+        <source>Error writing image to file %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -83,56 +59,20 @@
         <translation>De verbinding met MTD is verbroken. Dit is niet goed.</translation>
     </message>
     <message>
-        <source>Cannot connect to your Myth Transcoding Daemon. You can try hitting any number key to start it. If you still see this message, then something is really wrong.</source>
-        <translation type="obsolete">Kan geen verbinding maken met MTD. Probeer MTD te starten door op een nummertoets te drukken. Als dit bericht blijft staan is er iets ernstig fout.</translation>
-    </message>
-    <message>
-        <source>Attempting to connect to your mtd said host not found. This is unrecoverably bad. </source>
-        <translation type="obsolete">Kan geen verbinding maken met MTD. Host werd niet gevonden.</translation>
-    </message>
-    <message>
-        <source>Socket communication errors. This is unrecoverably bad. </source>
-        <translation type="obsolete">Netwerkfout (socket-communicatie).</translation>
-    </message>
-    <message>
-        <source>Something is wrong, but I don&apos;t know what.</source>
-        <translation type="obsolete">Onbekende fout.</translation>
-    </message>
-    <message>
         <source>Job %1 of %2</source>
         <translation>Taak %1 van %2</translation>
-    </message>
-    <message>
-        <source>No jobs and nothing else to do. You could hit 0 to rip a DVD.</source>
-        <translation type="obsolete">Geen taken. Op 0 om drukken een DVD te &quot;rippen&quot;.</translation>
     </message>
     <message>
         <source>No Jobs. Checking and/or waiting for DVD.</source>
         <translation>Geen taken. Bezig met controleren en/of wachten op DVD.</translation>
     </message>
     <message>
-        <source>No jobs and nothing else to do. You could hit 0 to rip a disc if you like.</source>
-        <translation type="obsolete">Geen taken. Op 0 drukken om een CD te &quot;rippen&quot;.</translation>
-    </message>
-    <message>
         <source>Cancelling ...</source>
         <translation>Bezig met annuleren...</translation>
     </message>
     <message>
-        <source>0 New Rip</source>
-        <translation type="obsolete">0 Nieuwe rip</translation>
-    </message>
-    <message>
-        <source>9 Cancel Job</source>
-        <translation type="obsolete">9 Taak annuleren</translation>
-    </message>
-    <message>
         <source>No jobs and nothing else to do. You could rip a DVD.</source>
         <translation>Geen taken. U kunt een DVD &quot;rippen&quot;.</translation>
-    </message>
-    <message>
-        <source>No jobs and nothing else to do. You could rip a disc if you like.</source>
-        <translation type="obsolete">Geen taken. U kunt en CD &quot;rippen&quot;.</translation>
     </message>
     <message>
         <source>New Rip</source>
@@ -170,32 +110,12 @@
         <translation>Geen</translation>
     </message>
     <message>
-        <source>No Cover</source>
-        <translation type="obsolete">Geen Cover</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">Klaar</translation>
-    </message>
-    <message>
         <source>Enter new category</source>
         <translation>Voer nieuwe categorie in</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
-    <message>
-        <source>Please enter the new extension:</source>
-        <translation type="obsolete">Nieuwe extensie:</translation>
-    </message>
-    <message>
-        <source>Create new extension</source>
-        <translation type="obsolete">Nieuwe extensie maken</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuleren</translation>
-    </message>
     <message>
         <source>Done</source>
         <translation>Klaar</translation>
@@ -216,14 +136,6 @@
 <context>
     <name>QObject</name>
     <message>
-        <source>Directory that holds videos</source>
-        <translation type="obsolete">Map voor videobestanden</translation>
-    </message>
-    <message>
-        <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation type="obsolete">Deze map moet bestaan en de gebruiker moet enkel leesbevoegdheid voor deze map hebben.</translation>
-    </message>
-    <message>
         <source>Starting Parental Level</source>
         <translation>Startniveau &apos;Parental Control&apos;</translation>
     </message>
@@ -240,10 +152,6 @@
         <translation>Dit is het niveau waarin MythVideo start. Alle films met een gelijk of lager niveau worden standaard getoond. De &apos;Parental Control&apos; PIN kan best zo ingesteld worden dat het niveau zo weinig mogelijk veranderd moet worden.</translation>
     </message>
     <message>
-        <source>Parental Control PIN</source>
-        <translation type="obsolete">&apos;Parental Control&apos; PIN</translation>
-    </message>
-    <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
         <translation>Indien ingesteld is het niet meer mogelijk naar dit scherm terug te keren om de PIN te resetten zonder de bestaande PIN in te voeren. U bent gewaarschuwd!</translation>
     </message>
@@ -256,20 +164,12 @@
         <translation>Indien geselecteerd worden alle bestanden in de MythVideo-map getoond tenzij de extensie expliciet ingesteld werd op negeren.</translation>
     </message>
     <message>
-        <source>Video List browses files</source>
-        <translation type="obsolete">Filmlijst bladert bestanden</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="obsolete">Indien geselecteerd worden alle relevante bestanden in de MythVideo-map getoond. Gescand of niet.</translation>
-    </message>
-    <message>
         <source>Player Settings</source>
         <translation>Instellingen voor het afspeelprogramma</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="obsolete">&apos;Parental PIN&apos;:</translation>
+        <translation type="unfinished">&apos;Parental PIN&apos;:</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -284,28 +184,12 @@
         <translation>Geen</translation>
     </message>
     <message>
-        <source>Unknown Rating</source>
-        <translation type="obsolete">Onbekende beoordeling</translation>
-    </message>
-    <message>
-        <source>Default Player</source>
-        <translation type="obsolete">Standaard afspeelprogramma</translation>
-    </message>
-    <message>
         <source>Newly scanned files are browsable by default</source>
         <translation>Nieuw gescande bestanden worden standaard getoond</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
         <translation>Indien geselecteerd worden nieuw gescande bestanden in de Video Manager gemarkeerd als &quot;bladerbaar&quot;.</translation>
-    </message>
-    <message>
-        <source>New category</source>
-        <translation type="obsolete">Nieuwe categorie</translation>
-    </message>
-    <message>
-        <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation type="obsolete">Deze PIN wordt gebruikt om het huidige &apos;Parental Control&apos; niveau te controleren. Als U dit wil instellen is het handig om enkel numerieke invoer te gebruiken.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
@@ -336,17 +220,6 @@
         <translation>Video Manager</translation>
     </message>
     <message>
-        <source>Could not retrieve poster</source>
-        <translation type="obsolete">Kan cover niet downloaden</translation>
-    </message>
-    <message>
-        <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
-</source>
-        <translation type="obsolete">Er bestaat een cover voor deze film maar die kan momenteel niet gedownload worden.
-
-</translation>
-    </message>
-    <message>
         <source>Default View</source>
         <translation>Standaard uiterlijk</translation>
     </message>
@@ -371,68 +244,12 @@
         <translation>Dit commando wordt gebruikt voor elk bestand met een niet gedefinieerde extensie. U kan ook de naam van een van de afspeel-plugins (bv. &apos;Internal&apos;) invoeren.</translation>
     </message>
     <message>
-        <source>Rows to display</source>
-        <translation type="obsolete">Getoond aantal rijen</translation>
-    </message>
-    <message>
-        <source>Columns to display</source>
-        <translation type="obsolete">Getoond aantal kolommen</translation>
-    </message>
-    <message>
-        <source>Show title below thumbnails</source>
-        <translation type="obsolete">Toon titel onder thumbnail</translation>
-    </message>
-    <message>
-        <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation type="obsolete">Indien geselecteerd zal de tekst de thumbnail kleiner maken.</translation>
-    </message>
-    <message>
-        <source>Maintain aspect ratio of thumbnails</source>
-        <translation type="obsolete">Verhouding van de thumbnails behouden</translation>
-    </message>
-    <message>
-        <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation type="obsolete">Indien geselecteerd zal de verhouding van de thumbnails behouden worden. Zo niet worden ze geschaald tot de afmeting van het achtergrondicoon.</translation>
-    </message>
-    <message>
-        <source>Video Gallery</source>
-        <translation type="obsolete">Video Gallerij</translation>
-    </message>
-    <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
         <translation>Het standaard uiterlijk van MythVideo. Andere zijn mogelijk via het popup-menu (MENU),</translation>
     </message>
     <message>
-        <source>Video Browser browses files</source>
-        <translation type="obsolete">Video Browser bladert bestanden</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="obsolete">Als dit is ingeschakeld, zal het Video Blader scherm alle relevante bestanden in de MythVideo map laten zien, zelfs als ze niet gescanned zijn.</translation>
-    </message>
-    <message>
-        <source>Video Gallery browses files</source>
-        <translation type="obsolete">Video Gallerij bladert in bestanden</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="obsolete">Als dit is ingeschakeld, zal het Video Gallerij scherm alle relevante bestanden in de MythVideo map laten zien, zelfs als ze niet gescanned zijn.</translation>
-    </message>
-    <message>
-        <source>General Settings (1/2)</source>
-        <translation type="obsolete">Globale Instellingen (1/2)</translation>
-    </message>
-    <message>
-        <source>General Settings (2/2)</source>
-        <translation type="obsolete">Globale Instellingen (2/2)</translation>
-    </message>
-    <message>
         <source>Video List Loads Video Meta Data</source>
         <translation>Video Lijst Laadt filmgegevens</translation>
-    </message>
-    <message>
-        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
-        <translation type="obsolete">Als dit is ingeschakeld samen met Blader Bestanden, zal de Video Lijst bekende metadata uit de database halen. Dit uitschakelen kan het maken van de Video Lijst enorm versnellen.</translation>
     </message>
     <message>
         <source>Sorting ignores case</source>
@@ -441,18 +258,6 @@
     <message>
         <source>If set, case is ignored when sorting entries in a view.</source>
         <translation>Indien ingesteld, zullen hoofdletters genegeerd worden tijdens het sorteren.</translation>
-    </message>
-    <message>
-        <source>If set, sub folders of your video directory will be shown in supported views.</source>
-        <translation type="obsolete">Indien ingesteld zullen submappen van uw videomap getoond worden in de ondersteunde weergaves.</translation>
-    </message>
-    <message>
-        <source>Image cache size</source>
-        <translation type="obsolete">Afbeelding cache grootte</translation>
-    </message>
-    <message>
-        <source>This setting determines the number of images MythVideo will cache for views.</source>
-        <translation type="obsolete">Deze instelling bepaald het aantal afbeeldingen dat Mythvideo zal opslaan voor de weergaves.</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -496,34 +301,8 @@
         <translation>Video ID</translation>
     </message>
     <message>
-        <source>
-
-You have no VCD Player command defined.</source>
-        <translation type="obsolete">
-        
-U heeft geen VCD-afspeelcommando gedefinieerd.
-</translation>
-    </message>
-    <message>
         <source>OK, I&apos;ll go run Setup</source>
         <translation>OK, ik ga naar het Instellingen-scherm</translation>
-    </message>
-    <message>
-        <source>
-
-You have no VCD Device defined.</source>
-        <translation type="obsolete">
-
-Er is geen VCD-apparaat ingesteld.</translation>
-    </message>
-    <message>
-        <source>
-
-You have no DVD Device defined.</source>
-        <translation type="obsolete">
-
-Er is geen DVD-apparaat ingesteld.
-</translation>
     </message>
     <message>
         <source>Location of VCD device</source>
@@ -538,16 +317,8 @@ Er is geen DVD-apparaat ingesteld.
         <translation>Path naar DVD-apparaat</translation>
     </message>
     <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Algemene instellingen</translation>
-    </message>
-    <message>
         <source>DVD Player Command</source>
         <translation>DVD-afspeelcommando</translation>
-    </message>
-    <message>
-        <source>This can be any command to launch a DVD player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="obsolete">Dit kan elke DVD-speler zijn (bv. MPlayer, ogle, xine, enz.). %d wordt vervangen door het hierboven ingestelde DVD-apparaat (bv. /dev/dvd).</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
@@ -556,14 +327,6 @@ Er is geen DVD-apparaat ingesteld.
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
         <translation>Dit kan elke VCD-speler zijn (bv. MPlayer, xine, enz). %d wordt vervangen door het hierboven ingestelde VCD-apparaat (bv. /dev/cdrom).</translation>
-    </message>
-    <message>
-        <source>DVD Player Settings</source>
-        <translation type="obsolete">DVD-afspeelinstellingen</translation>
-    </message>
-    <message>
-        <source>VCD Player Settings</source>
-        <translation type="obsolete">VCD-afspeelinstellingen</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
@@ -686,10 +449,6 @@ Er is geen DVD-apparaat ingesteld.
         <translation>Bezig met transcode ~</translation>
     </message>
     <message>
-        <source>Transcode is thinking </source>
-        <translation type="obsolete">Transcode denkt na </translation>
-    </message>
-    <message>
         <source>Simultaneous Transcode Jobs</source>
         <translation>Gelijktijdige transcode-taken</translation>
     </message>
@@ -734,14 +493,6 @@ Er is geen DVD-apparaat ingesteld.
         <translation>Standaard video afspeelprogramma</translation>
     </message>
     <message>
-        <source>Remove DVD Bookmarks Older then (days)</source>
-        <translation type="obsolete">Verwijder DVD bladwijzers ouder dan (dagen)</translation>
-    </message>
-    <message>
-        <source>Delete DVD Bookmarks that are older then the Number of days specified</source>
-        <translation type="obsolete">Verwijder DVD bladwijzers die ouder zijn dan het opgegeven aantal dagen</translation>
-    </message>
-    <message>
         <source>Enable DVD Bookmark Support</source>
         <translation>Activeer DVD bladwijzer ondersteuning</translation>
     </message>
@@ -779,46 +530,8 @@ Er is geen DVD-apparaat ingesteld.
         <translation>Films</translation>
     </message>
     <message>
-        <source>Searching for video files</source>
-        <translation type="obsolete">Zoeken naar video bestanden</translation>
-    </message>
-    <message>
-        <source>No to all</source>
-        <translation type="obsolete">Nee op alles</translation>
-    </message>
-    <message>
-        <source>Yes to all</source>
-        <translation type="obsolete">Ja op alles</translation>
-    </message>
-    <message>
-        <source>File Missing</source>
-        <translation type="obsolete">Bestand mist</translation>
-    </message>
-    <message>
-        <source>%1 appears to be missing.
-Remove it from the database?</source>
-        <translation type="obsolete">%1 blijkt te missen.
-Moet deze uit de database verwijderd worden?</translation>
-    </message>
-    <message>
-        <source>Updating video database</source>
-        <translation type="obsolete">Video database bijwerken</translation>
-    </message>
-    <message>
-        <source>Verifying video files</source>
-        <translation type="obsolete">Video bestanden verifiëren</translation>
-    </message>
-    <message>
         <source>No rating available.</source>
         <translation>Geen beoordeling beschikbaar.</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuten</translation>
-    </message>
-    <message>
-        <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation>Deze waarde op alle getallen instellen maakt uw leven een stuk makkelijker.</translation>
     </message>
     <message>
         <source>Parental Level 4 PIN</source>
@@ -865,10 +578,6 @@ Moet deze uit de database verwijderd worden?</translation>
         <translation>DVD speler snelheid</translation>
     </message>
     <message>
-        <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s</source>
-        <translation type="obsolete">Steld de DVD speler snelheid in tijdens het afspelen van DVD&apos;s. De snelheid is een meervoud van 177KB/s</translation>
-    </message>
-    <message>
         <source>Let transcode determine frame rate</source>
         <translation>Laat transcode de frame rate bepalen</translation>
     </message>
@@ -893,66 +602,8 @@ Moet deze uit de database verwijderd worden?</translation>
         <translation>Beoordelingen die deze teksten bevatten (gescheiden door:) zullen toegewezen worden aan Parental Level %1.</translation>
     </message>
     <message>
-        <source>Theme Error: browser/playwait has an invalid area.</source>
-        <translation type="obsolete">Thema fout: browser/playwait heeft een ongeldig gebied.</translation>
-    </message>
-    <message>
-        <source>Theme Error: browser/novideos_info has an invalid area.</source>
-        <translation type="obsolete">Thema fout: browser/novideos_info heeft een ongeldig gebied.</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video #</source>
-        <translation type="obsolete">Geef video # handmatig</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video Title</source>
-        <translation type="obsolete">Geef video titel handmatig</translation>
-    </message>
-    <message>
-        <source>Reset Entry</source>
-        <translation type="obsolete">Wis gegevens</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuleren</translation>
-    </message>
-    <message>
         <source>Command</source>
         <translation>Commando</translation>
-    </message>
-    <message>
-        <source>%1 failed</source>
-        <translation type="obsolete">%1 mislukt</translation>
-    </message>
-    <message>
-        <source>%1
-
-Check VideoManager Settings</source>
-        <translation type="obsolete">%1
-
-Controleer VideoManager instellingen</translation>
-    </message>
-    <message>
-        <source>Fetching poster for %1 (%2)</source>
-        <translation type="obsolete">Cover voor %1 (%2) ophalen</translation>
-    </message>
-    <message>
-        <source>A poster exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation type="obsolete">Er bestaat een cover voor deze film maar die kan momenteel niet gedownload worden.
-</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Theme Error: selected/playwait has an invalid area.</source>
-        <translation type="obsolete">Thema fout: selected/playwait heeft een ongeldig gebied.</translation>
-    </message>
-    <message>
-        <source>None defined</source>
-        <translation type="obsolete">Geen gedefinieerd</translation>
     </message>
     <message>
         <source>Transcode is thinking</source>
@@ -1173,6 +824,10 @@ Controleer VideoManager instellingen</translation>
         <source>Storage Groups</source>
         <translation>Opslag groepen</translation>
     </message>
+    <message>
+        <source>Error: failed to add new file type &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -1213,48 +868,8 @@ Controleer VideoManager instellingen</translation>
         <translation>Cover bestand:</translation>
     </message>
     <message>
-        <source>IMDB Num.:</source>
-        <translation>IMDBnr.:</translation>
-    </message>
-    <message>
-        <source>retrieving data...</source>
-        <translation>downloaden van gegevens ...</translation>
-    </message>
-    <message>
-        <source>[ looking for ]</source>
-        <translation>[ zoeken naar ]</translation>
-    </message>
-    <message>
-        <source>Enter IMDB #</source>
-        <translation>Geef IMDBnr.</translation>
-    </message>
-    <message>
-        <source>loading...</source>
-        <translation>bezig met inlezen ...</translation>
-    </message>
-    <message>
-        <source>No Videos Found</source>
-        <translation>Geen films gevonden</translation>
-    </message>
-    <message>
-        <source>1</source>
-        <translation>1</translation>
-    </message>
-    <message>
         <source>Directed by</source>
         <translation>Regie</translation>
-    </message>
-    <message>
-        <source>File:</source>
-        <translation>Bestand:</translation>
-    </message>
-    <message>
-        <source>Player:</source>
-        <translation>Afspeelprogramma:</translation>
-    </message>
-    <message>
-        <source>PL </source>
-        <translation>PL</translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
@@ -1349,22 +964,6 @@ Controleer VideoManager instellingen</translation>
         <translation>Sorteren op :</translation>
     </message>
     <message>
-        <source>Aucune video</source>
-        <translation>Geen video</translation>
-    </message>
-    <message>
-        <source>SELECT: Edit</source>
-        <translation>SELECTEER: Bewerk</translation>
-    </message>
-    <message>
-        <source>Parental</source>
-        <translation>&apos;Parental Control&apos;</translation>
-    </message>
-    <message>
-        <source>Level</source>
-        <translation>Niveau</translation>
-    </message>
-    <message>
         <source>Year</source>
         <translation>Jaar</translation>
     </message>
@@ -1375,18 +974,6 @@ Controleer VideoManager instellingen</translation>
     <message>
         <source>User Rating</source>
         <translation>Gebruikersbeoordeling</translation>
-    </message>
-    <message>
-        <source>INFO - Action Menu</source>
-        <translation>INFO - Actie Menu</translation>
-    </message>
-    <message>
-        <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation>Omhoog/Omlaag, Pagina Op/Neer: Blader  MENU: Opties INFO: Actie Menu</translation>
-    </message>
-    <message>
-        <source>Play File After This:</source>
-        <translation>Speel vervolgens dit bestand:</translation>
     </message>
     <message>
         <source>Rip/Transcode</source>
@@ -1432,6 +1019,114 @@ Controleer VideoManager instellingen</translation>
         <source>Title 1 of 1</source>
         <translation>Titel 1 van 1</translation>
     </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Directed by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Rating:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Klaar</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Afspelen</translation>
+    </message>
+    <message>
+        <source>Lowest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Num.:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Season:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item has been watched:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Banner:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trailer:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actor/Actress :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InetRef :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover File :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watched :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save as default</source>
+        <translation type="unfinished">Bewaar als standaard</translation>
+    </message>
 </context>
 <context>
     <name>TitleDialog</name>
@@ -1452,14 +1147,6 @@ Controleer VideoManager instellingen</translation>
         <translation>Titel %1 van %2</translation>
     </message>
     <message>
-        <source>0 Process Selected Title</source>
-        <translation type="obsolete">0 Geselecteerde titel verwerken</translation>
-    </message>
-    <message>
-        <source>0 Process Selected Titles</source>
-        <translation type="obsolete">0 Geselecteerde titels verwerken</translation>
-    </message>
-    <message>
         <source>ISO Image</source>
         <translation>ISO-kopie</translation>
     </message>
@@ -1470,45 +1157,6 @@ Controleer VideoManager instellingen</translation>
     <message>
         <source>Begin Ripping</source>
         <translation>Begin met rippen</translation>
-    </message>
-</context>
-<context>
-    <name>VideoBrowser</name>
-    <message>
-        <source>%1 of %2</source>
-        <translation type="obsolete">%1 van %2</translation>
-    </message>
-    <message>
-        <source>No Videos</source>
-        <translation type="obsolete">Geen Films</translation>
-    </message>
-    <message>
-        <source>No rating available.</source>
-        <translation type="obsolete">Geen beoordeling beschikbaar.</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuten</translation>
-    </message>
-    <message>
-        <source>Watch This Video</source>
-        <translation type="obsolete">Bekijk deze Film</translation>
-    </message>
-    <message>
-        <source>View Full Plot</source>
-        <translation type="obsolete">Beschrijving Inhoud</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filter weergave</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuleer</translation>
-    </message>
-    <message>
-        <source>View Cast</source>
-        <translation type="obsolete">Toon acteurs</translation>
     </message>
 </context>
 <context>
@@ -1524,22 +1172,6 @@ Controleer VideoManager instellingen</translation>
     <message>
         <source>Switch to List View</source>
         <translation>Lijstmodus</translation>
-    </message>
-    <message>
-        <source>Select action</source>
-        <translation type="obsolete">Kies actie</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">Ouderlijk toezicht Pincode:</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>No Videos Available</source>
@@ -1767,46 +1399,6 @@ Controleer VideoManager instellingen</translation>
         <translation>Bestand verwijderen mislukt</translation>
     </message>
     <message>
-        <source>Poster download finished: %1 %2</source>
-        <translation>Cover download gereed: %1 %2</translation>
-    </message>
-    <message>
-        <source>A poster exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>Er bestaat een cover voor deze film maar die kan momenteel niet gedownload worden.
-</translation>
-    </message>
-    <message>
-        <source>Fanart download finished: %1 %2</source>
-        <translation>Fanart download gereed: %1 %2</translation>
-    </message>
-    <message>
-        <source>Fanart exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>Er bestaat fanart voor deze film maar die kan momenteel niet gedownload worden.
-</translation>
-    </message>
-    <message>
-        <source>Screenshot download finished: %1 %2</source>
-        <translation>Schermafbeelding download gereed: %1 %2</translation>
-    </message>
-    <message>
-        <source>Screenshot exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>Er bestaat een schermafbeelding voor deze film maar die kan momenteel niet gedownload worden.
-</translation>
-    </message>
-    <message>
-        <source>Banner download finished: %1 %2</source>
-        <translation>Banner download gereed: %1 %2</translation>
-    </message>
-    <message>
-        <source>Banner exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>Er bestaat een banner voor deze film maar die kan momenteel niet gedownload worden.
-</translation>
-    </message>
-    <message>
         <source>No matches were found.</source>
         <translation>Geen overeenkomsten gevonden.</translation>
     </message>
@@ -1823,6 +1415,15 @@ Controleer VideoManager instellingen</translation>
         <source>TV/Movies</source>
         <translation>TV/Films</translation>
     </message>
+    <message>
+        <source>%1 download finished: %2 %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 exists for this item but could not be retrieved within the timeout period.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
@@ -1835,126 +1436,8 @@ Controleer VideoManager instellingen</translation>
         <translation>Resultaat van deze filer : Geen videos</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Onbekend</translation>
-    </message>
-    <message>
         <source>minutes</source>
         <translation>minuten</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="obsolete">Alle</translation>
-    </message>
-    <message>
-        <source>Save as default</source>
-        <translation type="obsolete">Bewaar als standaard</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">Klaar</translation>
-    </message>
-</context>
-<context>
-    <name>VideoGallery</name>
-    <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Gebruik Filterweergave</translation>
-    </message>
-    <message>
-        <source>Watch This Video</source>
-        <translation type="obsolete">Bekijk deze video</translation>
-    </message>
-    <message>
-        <source>View Full Plot</source>
-        <translation type="obsolete">Beschrijving Inhoud</translation>
-    </message>
-    <message>
-        <source>View Details</source>
-        <translation type="obsolete">Bekijk Details</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuleer</translation>
-    </message>
-    <message>
-        <source>View Cast</source>
-        <translation type="obsolete">Toon acteurs</translation>
-    </message>
-</context>
-<context>
-    <name>VideoManager</name>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuten</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation type="obsolete">Ja</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation type="obsolete">Neen</translation>
-    </message>
-    <message>
-        <source>No Cover</source>
-        <translation type="obsolete">Geen Cover</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Onbekend</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation type="obsolete">Geen</translation>
-    </message>
-    <message>
-        <source>NR</source>
-        <translation type="obsolete">Niet Beoordeeld</translation>
-    </message>
-    <message>
-        <source>delete failed</source>
-        <translation type="obsolete">wissen mislukt</translation>
-    </message>
-    <message>
-        <source>Select action:</source>
-        <translation type="obsolete">Kies bewerking:</translation>
-    </message>
-    <message>
-        <source>Edit Metadata</source>
-        <translation type="obsolete">Bewerk filmgegevens</translation>
-    </message>
-    <message>
-        <source>Search IMDB</source>
-        <translation type="obsolete">Zoek IMDB</translation>
-    </message>
-    <message>
-        <source>Manually Enter IMDB #</source>
-        <translation type="obsolete">Geef handmatig IMDBnr.</translation>
-    </message>
-    <message>
-        <source>Reset Metadata</source>
-        <translation type="obsolete">Wis gegevens</translation>
-    </message>
-    <message>
-        <source>Toggle Browseable</source>
-        <translation type="obsolete">In lijst ja/neen</translation>
-    </message>
-    <message>
-        <source>Remove Video</source>
-        <translation type="obsolete">Wis Film</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filter Weergave</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuleer</translation>
-    </message>
-    <message>
-        <source>Delete this file?</source>
-        <translation type="obsolete">Dit bestand wissen?</translation>
     </message>
 </context>
 <context>
@@ -1981,111 +1464,6 @@ Controleer VideoManager instellingen</translation>
     <message>
         <source>Updating video database</source>
         <translation>Video database bijwerken</translation>
-    </message>
-</context>
-<context>
-    <name>VideoSelected</name>
-    <message>
-        <source>No rating available.</source>
-        <translation type="obsolete">Geen beoordeling beschikbaar.</translation>
-    </message>
-    <message>
-        <source>minutes</source>
-        <translation type="obsolete">minuten</translation>
-    </message>
-</context>
-<context>
-    <name>VideoTree</name>
-    <message>
-        <source>Parental Pin:</source>
-        <translation type="obsolete">&apos;Parental Control&apos; PIN:</translation>
-    </message>
-    <message>
-        <source>Select action</source>
-        <translation type="obsolete">Kies Actie</translation>
-    </message>
-    <message>
-        <source>Watch This Video</source>
-        <translation type="obsolete">Bekijk Film</translation>
-    </message>
-    <message>
-        <source>View Full Plot</source>
-        <translation type="obsolete">Beschrijving Inhoud</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filter Weergave</translation>
-    </message>
-    <message>
-        <source>Switch to Browse View</source>
-        <translation type="obsolete">Ga naar Browsermodus</translation>
-    </message>
-    <message>
-        <source>Switch to Gallery View</source>
-        <translation type="obsolete">Ga naar Gallerijmodus</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuleer</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">Ok</translation>
-    </message>
-    <message>
-        <source>View Cast</source>
-        <translation type="obsolete">Toon acteurs</translation>
-    </message>
-</context>
-<context>
-    <name>mythvideo_videomanager::VideoManagerImp</name>
-    <message>
-        <source>Select action:</source>
-        <translation type="obsolete">Kies bewerking:</translation>
-    </message>
-    <message>
-        <source>Edit Metadata</source>
-        <translation type="obsolete">Bewerk filmgegevens</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation type="obsolete">Zoeken</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video #</source>
-        <translation type="obsolete">Geef video # handmatig</translation>
-    </message>
-    <message>
-        <source>Manually Enter Video Title</source>
-        <translation type="obsolete">Geef video titel handmatig</translation>
-    </message>
-    <message>
-        <source>Reset Metadata</source>
-        <translation type="obsolete">Wis gegevens</translation>
-    </message>
-    <message>
-        <source>Toggle Browseable</source>
-        <translation type="obsolete">In lijst ja/neen</translation>
-    </message>
-    <message>
-        <source>Remove Video</source>
-        <translation type="obsolete">Wis Film</translation>
-    </message>
-    <message>
-        <source>Filter Display</source>
-        <translation type="obsolete">Filter weergave</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Annuleren</translation>
-    </message>
-    <message>
-        <source>Delete this file?</source>
-        <translation type="obsolete">Dit bestand wissen?</translation>
-    </message>
-    <message>
-        <source>delete failed</source>
-        <translation type="obsolete">wissen mislukt</translation>
     </message>
 </context>
 </TS>

@@ -24,10 +24,6 @@
         <translation>R:NC-17</translation>
     </message>
     <message>
-        <source>Cover download stopped.</source>
-        <translation>Nerladdning av omslag stoppat.</translation>
-    </message>
-    <message>
         <source>Error writing data to file %1.</source>
         <translation>Misslyckades skriva data till fil %1.</translation>
     </message>
@@ -40,32 +36,16 @@
         <translation>Inget kommando att köra.</translation>
     </message>
     <message>
-        <source>Screenshot download stopped.</source>
-        <translation>Nerladdning av skärmbild stoppad.</translation>
-    </message>
-    <message>
-        <source>Fanart download stopped.</source>
-        <translation>Nerladdning av användarbild stoppad.</translation>
-    </message>
-    <message>
-        <source>Banner download stopped.</source>
-        <translation>Nerladdning av banderoll stoppad.</translation>
-    </message>
-    <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
         <translation>Att ställa in detta värde till bara siffror kommer att förenkla livet.</translation>
     </message>
     <message>
-        <source>Error writing Coverart to file %1.</source>
-        <translation>Fel vid skrivning av albumomslag i filen %1.</translation>
+        <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error writing Screenshot to file %1.</source>
-        <translation>Fel vid skrivning av skärmbild i filen %1.</translation>
-    </message>
-    <message>
-        <source>Error writing Fanart to file %1.</source>
-        <translation>Fel vid skrivning av användarbild i filen %1.</translation>
+        <source>Error writing image to file %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -180,14 +160,6 @@
         <translation>Om aktiverat, visas alla filer under Mythvideos katalog, såvida inte deras filändelse är explicit inställda att ignoreras.</translation>
     </message>
     <message>
-        <source>Video List browses files</source>
-        <translation>Videolistan bläddrar i filer</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Om aktiverat, gör det att videolistan visar alla relevanta filer under Mythvideos startkatalog, vare sig de har sökts upp eller inte.</translation>
-    </message>
-    <message>
         <source>Player Settings</source>
         <translation>Inställningar för spelare</translation>
     </message>
@@ -256,28 +228,8 @@
         <translation>Standardvy för Mythvideo. Andra vyer kan nås genom menyn tillgänglig via MENY-knappen.</translation>
     </message>
     <message>
-        <source>Video Browser browses files</source>
-        <translation>Videobläddraren visar filer</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Om aktiverat, gör det att videobläddraren visar alla relevanta filer under Mythvideos startkatalog, vare sig de har sökts upp eller inte.</translation>
-    </message>
-    <message>
-        <source>Video Gallery browses files</source>
-        <translation>Videogalleriet visar filer</translation>
-    </message>
-    <message>
-        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Om aktiverat, gör det att videogalleriet visar alla relevanta filer under Mythvideos startkatalog, vare sig de har sökts upp eller inte.</translation>
-    </message>
-    <message>
         <source>Video List Loads Video Meta Data</source>
         <translation>Videolistan laddar videometadata</translation>
-    </message>
-    <message>
-        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
-        <translation>Om aktiverat tillsammans med filbläddring, gör det att videolistan laddar alla kända videometadata från databasen. Att stänga av det kan i hög grad snabba upp tiden det tar att visa videolistan</translation>
     </message>
     <message>
         <source>Sorting ignores case</source>
@@ -713,10 +665,6 @@ Kontrollera videohanterarens inställningar</translation>
         <translation>Hemkatalog för video</translation>
     </message>
     <message>
-        <source>Show groups for database views</source>
-        <translation>Visa grupper för databasvyer</translation>
-    </message>
-    <message>
         <source>If set, metadata groupings of your video directory will be shown in supported views.  Default group is set below.</source>
         <translation>Om aktiverat, visas metadatagrupper av videokatalogen i vyer som stöder det. Standardgruppen ställs in nedan.</translation>
     </message>
@@ -811,6 +759,66 @@ Kontrollera videohanterarens inställningar</translation>
     <message>
         <source>Season/Episode</source>
         <translation>Säsong/avsnitt</translation>
+    </message>
+    <message>
+        <source>Error: failed to add new file type &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Metadata Browse Modes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV/Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Alternate Video Player</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, you can select an alternate player command for videos when the default choice fails.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alternate Player</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Season</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Pin:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Television</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Season %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Groups</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1250,16 +1258,6 @@ Kontrollera videohanterarens inställningar</translation>
         <translation>Misslyckades ta bort fil</translation>
     </message>
     <message>
-        <source>Poster download finished: %1 %2</source>
-        <translation>Färdigt nerladdat omslag: %1 %2</translation>
-    </message>
-    <message>
-        <source>A poster exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>En affisch finns för den här posten, men den kunde inte hämtas inom tidsgränsen.
-</translation>
-    </message>
-    <message>
         <source>No matches were found.</source>
         <translation>Inga träffar hittades.</translation>
     </message>
@@ -1390,34 +1388,31 @@ Kontrollera videohanterarens inställningar</translation>
 %1</translation>
     </message>
     <message>
-        <source>Fanart download finished: %1 %2</source>
-        <translation>Nerladdning av användarbild klar: %1 %2</translation>
+        <source>Season</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fanart exists for this item but could not be retrieved within the timeout period.
+        <source>Video Options
+%1
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play in Alternate Player</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV/Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 download finished: %2 %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation>Användarbilder finns för posten, men kunde inte hämtas inom tidsgränsen.
-</translation>
-    </message>
-    <message>
-        <source>Screenshot download finished: %1 %2</source>
-        <translation>Nerladdning av skärmbild klar: %1 %2</translation>
-    </message>
-    <message>
-        <source>Screenshot exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>En skärmbild finns för posten, men kunde inte hämtas inom tidsgränsen.
-</translation>
-    </message>
-    <message>
-        <source>Banner download finished: %1 %2</source>
-        <translation>Nerladdning av banderoll klar: %1 %2</translation>
-    </message>
-    <message>
-        <source>Banner exists for this item but could not be retrieved within the timeout period.
-</source>
-        <translation>En banderoll finns för posten, men kunde inte hämtas inom tidsgränsen.
-</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1459,64 +1454,6 @@ Kontrollera videohanterarens inställningar</translation>
     <message>
         <source>Updating video database</source>
         <translation>Uppdaterar video databas</translation>
-    </message>
-</context>
-<context>
-    <name>video_settings_xml</name>
-    <message>
-        <source>General Settings</source>
-        <translation>Allmänna inställningar</translation>
-    </message>
-    <message>
-        <source>Player Settings</source>
-        <translation>Inställningar för spelare</translation>
-    </message>
-    <message>
-        <source>File Types</source>
-        <translation>Filtyper</translation>
-    </message>
-    <message>
-        <source>Rip Settings</source>
-        <translation>Lagringsinställningar</translation>
-    </message>
-</context>
-<context>
-    <name>videomenu_xml</name>
-    <message>
-        <source>Browse Videos</source>
-        <translation>Bläddra i videor</translation>
-    </message>
-    <message>
-        <source>Video List</source>
-        <translation>Videolista</translation>
-    </message>
-    <message>
-        <source>Video Gallery</source>
-        <translation>Videogalleri</translation>
-    </message>
-    <message>
-        <source>Video Manager</source>
-        <translation>Videohanterare</translation>
-    </message>
-    <message>
-        <source>Play DVD</source>
-        <translation>Spela DVD</translation>
-    </message>
-    <message>
-        <source>Play VCD</source>
-        <translation>Spela VCD</translation>
-    </message>
-    <message>
-        <source>Rip DVD</source>
-        <translation>Lagra DVD</translation>
-    </message>
-    <message>
-        <source>Eject media</source>
-        <translation>Mata ut</translation>
-    </message>
-    <message>
-        <source>Videos Settings</source>
-        <translation>Videoinställningar</translation>
     </message>
 </context>
 </TS>
