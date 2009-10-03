@@ -99,6 +99,7 @@
         <alttext lang="ET">Salvestised</alttext>
         <alttext lang="PL">Oglądanie</alttext>
         <description>Play Recordings</description>
+        <description lang="DE"></description>
         <action>TV_WATCH_RECORDING</action>
     </button>
 
@@ -129,6 +130,7 @@
         <alttext lang="DE">Löschen</alttext>
         <alttext lang="PL">Kasowanie</alttext>
         <description>Remove television recordings</description>
+        <description lang="DE">TV-Aufnahmen löschen</description>
         <action>TV_DELETE</action>
     </button>
 

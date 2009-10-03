@@ -131,6 +131,7 @@
         <text lang="FR">NetFlix</text>
         <text lang="PL">Filmy z internetu</text>
         <description>Manage your NetFlix queue</description>
+        <description lang="DE"></description>
         <action>PLUGIN mythflix</action>
         <depends>mythflix</depends>
     </button>

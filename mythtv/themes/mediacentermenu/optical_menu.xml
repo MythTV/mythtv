@@ -24,6 +24,7 @@
         <text lang="PL">Oglądanie DVD</text>
         <text lang="HE">נגן DVD</text>
         <description>Play the video on a movie DVD</description>
+        <description lang="DE">Einen Spielfim auf DVD ansehen</description>
         <action>JUMP Play DVD</action>
         <depends>mythvideo</depends>
     </button>
@@ -52,6 +53,7 @@
         <text lang="PL">Oglądanie VCD</text>
         <text lang="HE">נגן VCD</text>
         <description>Play the video on a VCD</description>
+        <description lang="DE">Ein Video auf einer VCD ansehen</description>
         <action>JUMP Play VCD</action>
         <depends>mythvideo</depends>
     </button>
@@ -80,6 +82,7 @@
         <text lang="PL">Importowanie DVD</text>
         <text lang="HE">יבא DVD</text>
         <description>Import video from a movie DVD</description>
+        <description lang="DE">Einen Film von DVD importieren</description>
         <action>JUMP Rip DVD</action>
         <depends>mythvideo</depends>
     </button>
@@ -101,6 +104,7 @@
         <text lang="PL">Archiwalne pliki</text>
         <text lang="HE">צרוב CD/DVD</text>
         <description>Write video to a data DVD</description>
+        <description lang="DE">Ein Video auf Daten-DVD brennen</description>
         <action>PLUGIN mytharchive</action>
         <depends>mytharchive</depends>
     </button>
@@ -130,6 +134,7 @@
         <text lang="ET">Meedia väljastamine</text>
         <text lang="PL">Importowanie CD</text>
         <description>Import music from an audio CD</description>
+        <description lang="DE">Musik von einer Audio-CD importieren</description>
         <action>JUMP Rip CD</action>
         <depends>mythmusic</depends>
     </button>
@@ -149,6 +154,7 @@
         <text lang="FI">Poista Media</text>
         <text lang="DE">Medien auswerfen</text>
         <description>Eject CD or DVD from drive</description>
+        <description lang="DE">CD/DVD-Schublade öffnen</description>
         <action>EJECT</action>
     </button>
 

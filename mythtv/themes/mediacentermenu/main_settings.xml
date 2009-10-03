@@ -24,6 +24,7 @@
         <text lang="PL">Ogólne</text>
         <text lang="HE">כללי</text>
         <description>Core MythTV behavior and system settings</description>
+        <description lang="DE">MythTV- und Systemeinstellungen</description>
         <action>SETTINGS MAINGENERAL</action>
     </button>
 
@@ -51,6 +52,7 @@
         <text lang="PL">Ustaw wyglądy</text>
         <text lang="HE">מראה</text>
         <description>pick the theme, font, size, and locale</description>
+        <description lang="DE">GUI-Thema oder Zeichensatzgrößen wählen</description>
         <action>SETTINGS APPEARANCE</action>
     </button>
 
@@ -63,6 +65,7 @@
         <text lang="NB">Skjerm</text>
         <text lang="DE">Bildschirm einrichten</text>
         <description>Compensate for TVs with overscan</description>
+        <description lang="DE">Passen Sie das Bild an Ihren Fernseher an</description>
         <action>SCREENSETUPWIZARD</action>
     </button>
 
@@ -90,6 +93,7 @@
         <text lang="PL">Telewizja</text>
         <text lang="HE">הגדרות טלויזיה</text>
         <description>Settings for TV recording and playback</description>
+        <description lang="DE">Einstellungen für TV-Aufnahme und -Wiedergabe</description>
         <action>MENU tv_settings.xml</action>
     </button>
 
@@ -117,6 +121,7 @@
         <text lang="PL">Konfiguracja Media</text>
         <text lang="HE">הגדרות מדיה</text>
         <description>Settings for all non-TV media</description>
+        <description lang="DE">Einstellungen für alle anderen Medien</description>
         <action>MENU media_settings.xml</action>
         <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
     </button>
@@ -146,6 +151,7 @@
         <text lang="HE">הגדרות מרכז מידע</text>
         <alttext lang="DE">Infocenter</alttext>
         <description>Configure weather, news, movie info, web, and recipes</description>
+        <description lang="DE">Einstellungen der Plugins (Wetter, Nachrichten etc)</description>
         <action>MENU info_settings.xml</action>
         <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends>
     </button>
@@ -200,6 +206,7 @@
         <text lang="PL">Konfiguracja Telefonu</text>
         <text lang="HE">הגדרות טלפון</text>
         <description>Configure SIP-based VoIP phone</description>
+        <description lang="DE">Einstellungen des VoIP-Telefons</description>
         <action>CONFIGPLUGIN mythphone</action>
         <depends>mythphone</depends>
     </button>
@@ -212,7 +219,9 @@
         <text lang="DA">ZoneMinder</text>
         <text lang="PL">Ustaw strażnika</text>
         <text lang="FI">Zoneminder Asetukset</text>
+        <text lang="DE">Zoneminder</text>
         <description>Set up surveillance software</description>
+        <description lang="DE">Einstellungen der Überwachungssoftware</description>
         <action>CONFIGPLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
     </button>

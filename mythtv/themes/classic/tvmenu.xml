@@ -18,6 +18,7 @@
         <text lang="RU">Смотреть ТВ</text>
         <text lang="PL">Oglądanie TV</text>
         <description>Watch live television</description>
+        <description lang="DE">Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -55,6 +56,7 @@
         <alttext lang="RU">Расписание</alttext>
         <alttext lang="PL">Harmonogram</alttext>
         <description>Pick shows to record</description>
+        <description lang="DE">Eine neue Aufnahme planen</description>
         <action>MENU tv_schedule.xml</action>
     </button>
 
@@ -80,6 +82,7 @@
         <alttext lang="SV">Inspelningar</alttext>
         <alttext lang="PL">Oglądanie</alttext>
         <description>Play TV Recordings</description>
+        <description lang="DE"></description>
         <action>TV_WATCH_RECORDING</action>
     </button>
 
@@ -106,6 +109,7 @@
         <alttext lang="RU">Удалить</alttext>
         <alttext lang="PL">Kasowanie</alttext>
         <description>Remove television recordings</description>
+        <description lang="DE">TV-Aufnahmen löschen</description>
         <action>TV_DELETE</action>
     </button>
 
@@ -143,6 +147,7 @@
         <text lang="RU">Ранее записано</text>
         <text lang="PL">Poprzednio nagrane</text>
         <description>See what you have recorded before</description>
+        <description lang="DE">Was Sie bisher aufgenommen haben</description>
         <action>TV_PREVIOUS</action>
     </button>
 
@@ -163,6 +168,7 @@
         <text lang="RU">Состояние системы</text>
         <text lang="PL">Status systemu</text>
         <description>What your system is doing right now</description>
+        <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
 
@@ -184,6 +190,7 @@
         <text lang="PL">Konfiguracja TV</text>
         <text lang="RU">Настройка ТВ</text>
         <description>Settings for TV recording and playback</description>
+        <description lang="DE">Einstellungen für TV-Aufnahme und -Wiedergabe</description>
         <action>MENU tv_settings.xml</action>
     </button>
 

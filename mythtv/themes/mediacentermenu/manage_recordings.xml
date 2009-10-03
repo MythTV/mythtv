@@ -29,6 +29,7 @@
         <alttext lang="RU">Расписание</alttext>
         <alttext lang="PL">Harmonogram</alttext>
         <description>Pick shows to record</description>
+        <description lang="DE">Welche Sendung möchten Sie aufnehmen?</description>
         <action>MENU tv_schedule.xml</action>
     </button>
 
@@ -36,9 +37,11 @@
         <type>TV_RECORDING_RULES</type>
         <text>Recording Rules</text>
         <text lang="FR">Règles d&apos;enregistrement</text>
+        <text lang="DE">Aufnahmeregeln</text>
         <alttext>Manage Rules</alttext>
         <alttext lang="FR">Gérer les règles</alttext>
         <description>Edit or delete any recording rule</description>
+        <description lang="DE">Bearbeiten/Löschen der Aufnahmeregeln</description>
         <action>TV_MANAGE_RECORDING_RULES</action>
     </button>
 
@@ -67,6 +70,7 @@
         <text lang="HE">ההקלטות הבאות</text>
         <alttext lang="SV">Kommande</alttext>
         <description>See what will be recorded next</description>
+        <description lang="DE">Was wird als nächstes aufgenommen?</description>
         <action>TV_FIX_CONFLICTS</action>
     </button>
 
@@ -99,6 +103,7 @@
         <alttext lang="RU">Удалить</alttext>
         <alttext lang="PL">Kasowanie</alttext>
         <description>Remove television recordings</description>
+        <description lang="DE">TV-Aufnahmen löschen</description>
         <action>TV_DELETE</action>
     </button>
 
@@ -125,6 +130,7 @@
         <text lang="HE">הוקלט מקודם</text>
         <alttext lang="SV">Tidigare</alttext>
         <description>See what you have recorded before</description>
+        <description lang="DE">Was Sie bisher aufgenommen haben</description>
         <action>TV_PREVIOUS</action>
     </button>
 
@@ -150,6 +156,7 @@
         <text lang="PL">Ustaw priorytety</text>
         <text lang="HE">הגדרת קדימויות</text>
         <description>Prioritize some shows over others</description>
+        <description lang="DE">Welche Aufnahme ist Ihnen am wichtigsten?</description>
         <action>TV_SET_RECPRIORITIES</action>
     </button>
 

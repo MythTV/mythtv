@@ -30,6 +30,7 @@
         <alttext lang="PL">Priorytet nagrywania</alttext>
         <alttext lang="HE">קדימיות ההקלטות</alttext>
         <description>Settings to prioritize some shows over others</description>
+        <description lang="DE">Einstellungen um bestimmte Sendungen zu bevorzugen</description>
         <action>SETTINGS GENERALRECPRIORITIES</action>
     </button>
 
@@ -66,6 +67,7 @@
         <alttext lang="PL">Priorytet kanałów</alttext>
         <alttext lang="HE">קדימיות ההקלטות לערוץ</alttext>
         <description>Settings to prioritize some channels over others</description>
+        <description lang="DE">Einstellungen um bestimmte Sender zu bevorzugen</description>
         <action>SETTINGS CHANNELRECPRIORITIES</action>
     </button>
 

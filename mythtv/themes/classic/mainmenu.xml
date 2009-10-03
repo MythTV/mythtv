@@ -154,6 +154,7 @@
         <type>WEATHER</type>
         <text>Weather Station</text>
         <text lang="FR">Station météo</text>
+        <text lang="DE">Wetterstation</text>
         <action>PLUGIN mythwstation</action>
         <depends>mythwstation</depends>
     </button>
@@ -186,6 +187,8 @@
         <text lang="PT">Aluguer de Filmes</text>
         <text lang="ET">MythFlix</text>
         <text lang="PL">Filmy z internetu</text>
+        <text lang="DE">MythFlix</text>
+        <description lang="DE"></description>
         <action>PLUGIN mythflix</action>
         <depends>mythflix</depends>
     </button>
@@ -259,6 +262,7 @@
         <text lang="RU">Архив файлов</text>
         <text lang="DA">Arkivere filer</text>
         <text lang="PL">Archiwizuj pliki</text>
+        <text lang="DE">Dateien archivieren</text>
         <action>PLUGIN mytharchive</action>
         <depends>mytharchive</depends>
     </button>
@@ -269,6 +273,7 @@
         <text lang="FR">Zone Minder</text>
         <text lang="IT">Videosorveglianza</text>
         <text lang="PL">Strażnik</text>
+        <text lang="DE">Videoüberwachung</text>
         <action>PLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
     </button>
@@ -287,6 +292,7 @@
         <text lang="NL">Bioscoop Tijden</text>
         <text lang="PL">Repertuar Kin</text>
         <text lang="RU">Афиша кино</text>
+        <text lang="DE">Kinoprogramm</text>
         <action>PLUGIN mythmovies</action>
         <depends>mythmovies</depends>
     </button>
@@ -308,7 +314,8 @@
         <text lang="ET">Sätted</text>
         <text lang="PL">Ustawienia</text>
         <text lang="RU">Настройки</text>
-        <description>Settings for TV, Images, Music, Video, Weather, et c.</description>
+        <description>Settings for TV, Images, Music, Video, Weather, etc.</description>
+        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU main_settings.xml</action>
         <password>SetupPinCode</password>
     </button>

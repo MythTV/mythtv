@@ -9,7 +9,7 @@
         <text lang="CA">Guia de programes</text>
         <text lang="NL">Programmagids</text>
         <text lang="FR">Guide des programmes</text>
-        <text lang="DE">TV Programm</text>
+        <text lang="DE">Fernsehrogramm</text>
         <text lang="DA">Program Guide</text>
         <text lang="PT">Guia de Programação</text>
         <text lang="SV">Programguide</text>
@@ -38,6 +38,7 @@
         <alttext lang="PL">Program TV</alttext>
         <alttext lang="HE">מדריך</alttext>
         <description>Choose programs from a grid-style list</description>
+        <description lang="DE">Das aktuelle TV-Programm</description>
         <action>TV_SCHEDULE</action>
     </button>
 
@@ -77,6 +78,7 @@
         <alttext lang="PL">Znajdź</alttext>
         <alttext lang="HE">מוצא</alttext>
         <description>Choose programs from an alphabetical index</description>
+        <description lang="DE">Alle Sendungen in alphabetischer Reihenfolge</description>
         <action>TV_PROGFIND</action>
     </button>
 
@@ -109,6 +111,7 @@
         <alttext lang="PL">Szukaj</alttext>
         <alttext lang="HE">חיפוש</alttext>
         <description>Find programs matching search words</description>
+        <description lang="DE">Eine Sendung über Schlagwörter finden</description>
         <action>MENU tv_search.xml</action>
     </button>
 
@@ -130,6 +133,7 @@
         <text lang="PL">Dostosuj nagrywanie</text>
         <text lang="HE">התאמת הקלטה</text>
         <description>Advanced program finder</description>
+        <description lang="DE"></description>
         <action>TV_CUSTOM_RECORD</action>
     </button>
 
@@ -168,6 +172,7 @@
         <alttext lang="PL">Ręczny</alttext>
         <alttext lang="HE">תיז. יד.</alttext>
         <description>VCR-like recording scheduler</description>
+        <description lang="DE">Eine Aufnahme wie am Videorekorder programmieren</description>
         <action>TV_MANUALSCHEDULE</action>
     </button>
 
@@ -175,9 +180,11 @@
         <type>TV_RECORDING_RULES</type>
         <text>Recording Rules</text>
         <text lang="FR">Règles d&apos;enregistrement</text>
+        <text lang="DE">Aufnahmeregeln</text>
         <alttext>Manage Rules</alttext>
         <alttext lang="FR">Gérer les règles</alttext>
         <description>Edit or delete any recording rule</description>
+        <description lang="DE">Bearbeiten/Löschen der Aufnahmeregeln</description>
         <action>TV_MANAGE_RECORDING_RULES</action>
     </button>
 
@@ -206,6 +213,7 @@
         <alttext lang="ES">Conflictos</alttext>
         <alttext lang="PL">Konflikty</alttext>
         <description>VCR-like recording scheduler</description>
+        <description lang="DE">Was wird als nächstes aufgenommen?</description>
         <action>TV_FIX_CONFLICTS</action>
     </button>
 
@@ -239,6 +247,7 @@
         <alttext lang="PL">Priorytet</alttext>
         <alttext lang="HE">קדימויות</alttext>
         <description>Prioritize some shows over others</description>
+        <description lang="DE">Welche Aufnahme ist Ihnen am wichtigsten?</description>
         <action>TV_SET_RECPRIORITIES</action>
     </button>
 

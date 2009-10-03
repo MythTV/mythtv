@@ -33,6 +33,7 @@
         <alttext lang="RU">Записи</alttext>
         <alttext lang="PL">Nagrania</alttext>
         <description>Settings to prioritize some shows over others</description>
+        <description lang="DE">Einstellungen um bestimmte Sendungen zu bevorzugen</description>
         <action>SETTINGS GENERALRECPRIORITIES</action>
     </button>
 
@@ -70,6 +71,7 @@
         <alttext lang="RU">Каналы</alttext>
         <alttext lang="PL">Kanały</alttext>
         <description>Settings to prioritize some channels over others</description>
+        <description lang="DE">Einstellungen um bestimmte Sender zu bevorzugen</description>
         <action>SETTINGS CHANNELRECPRIORITIES</action>
     </button>
 

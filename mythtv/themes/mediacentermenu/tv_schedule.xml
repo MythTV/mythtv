@@ -44,6 +44,7 @@
         <alttext lang="PL">Program TV</alttext>
         <alttext lang="HE">מדריך</alttext>
         <description>Choose programs from a grid-style list</description>
+        <description lang="DE">Das aktuelle TV-Programm</description>
         <action>TV_SCHEDULE</action>
     </button>
 
@@ -91,6 +92,7 @@
         <alttext lang="PL">Znajdź</alttext>
         <alttext lang="HE">מציאה</alttext>
         <description>Choose programs from an alphabetical index</description>
+        <description lang="DE">Alle Sendungen in alphabetischer Reihenfolge</description>
         <action>TV_PROGFIND</action>
     </button>
 
@@ -133,6 +135,7 @@
         <alttext lang="PL">Słowa</alttext>
         <alttext lang="HE">חיפוש</alttext>
         <description>Find programs matching search words</description>
+        <description lang="DE">Eine Sendung über Schlagwörter finden</description>
         <action>MENU tv_search.xml</action>
     </button>
 
@@ -173,6 +176,7 @@
         <alttext lang="RU">Списки</alttext>
         <alttext lang="HE">חיפוש</alttext>
         <description>Pick a program to record from a set of lists</description>
+        <description lang="DE">Eine Sendung in versch. Listen finden</description>
         <action>MENU tv_lists.xml</action>
     </button>
 
@@ -199,6 +203,7 @@
         <text lang="PL">Dostosuj nagrywanie</text>
         <text lang="HE">הקלטה לפי כללים</text>
         <description>Advanced program finder</description>
+        <description lang="DE"></description>
         <action>TV_CUSTOM_RECORD</action>
     </button>
 
@@ -247,6 +252,7 @@
         <alttext lang="PL">Ręcznie</alttext>
         <alttext lang="HE">הקלטה ידנית</alttext>
         <description>VCR-like recording scheduler</description>
+        <description lang="DE">Eine Aufnahme wie am Videorekorder programmieren</description>
         <action>TV_MANUALSCHEDULE</action>
     </button>
 

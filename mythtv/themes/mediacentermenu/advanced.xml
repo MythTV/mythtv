@@ -31,6 +31,7 @@
         <alttext lang="RU">Записи</alttext>
         <alttext lang="AR">التسجيلات</alttext>
         <description>Pick and prioritize shows to record</description>
+        <description lang="DE">Planen Sie Ihre Aufnahmen</description>
         <action>MENU manage_recordings.xml</action>
     </button>
 
@@ -59,6 +60,7 @@
         <text lang="PL">Dyski optyczne</text>
         <text lang="HE">דיסקים אופטים</text>
         <description>Play or import audio or video CDs or DVDs</description>
+        <description lant="DE">Abspielen/Importieren von CDs und DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>
@@ -86,6 +88,7 @@
         <text lang="PL">Status systemu</text>
         <text lang="HE">מצב מערכת</text>
         <description>What your system is doing right now</description>
+        <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
 
@@ -112,6 +115,7 @@
         <text lang="PL">Narzędzia muzyczne</text>
         <text lang="HE">כלי מוסיקה</text>
         <description>Select, import, or play music</description>
+        <description lang="DE">Musik auswählen, importieren oder hören</description>
         <action>PLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
@@ -137,6 +141,7 @@
         <text lang="PL">Edytuj klawisze</text>
         <text lang="HE">עריכת מקשים</text>
         <description>Change mythtv key bindings.</description>
+        <description lang="DE">Tastaturbelegung anpassen</description>
         <action>SETUP_KEYS</action>
     </button>
 
@@ -164,6 +169,7 @@
         <text lang="PL">Ustawienia</text>
         <text lang="HE">הגדרה</text>
         <description>Configure MythTV and plugins</description>
+        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU main_settings.xml</action>
         <password>SetupPinCode</password>
     </button>

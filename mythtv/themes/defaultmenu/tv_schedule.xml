@@ -204,6 +204,7 @@
         <text lang="PL">Dostosuj nagrywanie</text>
         <text lang="HE">הקלטה לפי כללים</text>
         <description>Advanced program finder</description>
+        <description lang="DE"></description>
         <action>TV_CUSTOM_RECORD</action>
     </button>
 

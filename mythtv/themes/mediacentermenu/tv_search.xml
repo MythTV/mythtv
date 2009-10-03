@@ -23,6 +23,7 @@
         <text lang="PL">Tytuły</text>
         <text lang="HE">כותרים</text>
         <description>Find a program based on title</description>
+        <description lang="DE">Alle Sendungen mit einem bestimmten Titel finden</description>
         <action>TV_SEARCH_TITLE</action>
     </button>
   
@@ -49,6 +50,7 @@
         <text lang="PL">Słowa kluczowe</text>
         <text lang="HE">מילות מפתח</text>
         <description>Find a program matching a keyword</description>
+        <description lang="DE">Alle Sendungen mit einem Schlüsselwort finden</description>
         <action>TV_SEARCH_KEYWORD</action>
     </button>
   
@@ -74,6 +76,7 @@
         <text lang="PL">Osoby</text>
         <text lang="HE">אנשים</text>
         <description>Find a program including a given person</description>
+        <description lang="DE">Alle Sendungen mit einer bestimmten Person finden</description>
         <action>TV_SEARCH_PEOPLE</action>
     </button>
   
@@ -102,6 +105,7 @@
         <alttext lang="ET">Muud</alttext>
         <alttext lang="PT">Avançada</alttext>
         <description>Combine more than one word search</description>
+        <description lang="DE">Mehrere Suchanfragen kombinieren</description>
         <action>TV_SEARCH_POWER</action>
     </button>
 
@@ -114,6 +118,7 @@
         <text lang="FI">Tallennetut Haut</text>
         <text lang="DE">Gespeicherte Suche</text>
         <description>Results of searches you have saved</description>
+        <description lang="DE">ältere Suchabfragen</description>
         <action>TV_SEARCH_STORED</action>
     </button>
 

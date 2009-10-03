@@ -158,7 +158,7 @@
         <alttext lang="NL">Beheer</alttext>
         <alttext lang="ET">Sätted</alttext>
         <alttext lang="RU">Настройки</alttext>
-        <description>Settings for TV, Images, Music, Video, Weather, et c.</description>
+        <description>Settings for TV, Images, Music, Video, Weather, etc.</description>
         <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU util_menu.xml</action>
     </button>

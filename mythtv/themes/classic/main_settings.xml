@@ -24,6 +24,7 @@
         <text lang="PL">Ustawienia</text>
         <text lang="HE">כללי</text>
         <description>Core MythTV behavior and system settings</description>
+        <description lang="DE">MythTV- und Systemeinstellungen</description>
         <action>SETTINGS MAINGENERAL</action>
     </button>
 
@@ -51,6 +52,7 @@
         <text lang="PL">Ustaw wyglądy</text>
         <text lang="HE">מראה</text>
         <description>pick the theme, font, size, and locale</description>
+        <description lang="DE">GUI-Thema oder Zeichensatzgrößen wählen</description>
         <action>SETTINGS APPEARANCE</action>
     </button>
 
@@ -63,6 +65,7 @@
         <text lang="NB">Skjerm</text>
         <text lang="DE">Bildschirm einrichten</text>
         <description>Compensate for TVs with overscan</description>
+        <description lang="DE">Passen Sie das Bild an Ihren Fernseher an</description>
         <action>SCREENSETUPWIZARD</action>
     </button>
 
@@ -88,6 +91,7 @@
         <text lang="PL">Ustaw klawisze</text>
         <text lang="HE">עריכת מקשים</text>
         <description>Change mythtv key bindings.</description>
+        <description lang="DE">Tastaturbelegung anpassen</description>
         <action>SETUP_KEYS</action>
     </button>
 
@@ -115,6 +119,7 @@
         <text lang="PL">Konfiguracja TV</text>
         <text lang="HE">הגדרות טלויזיה</text>
         <description>Settings for TV recording and playback</description>
+        <description lang="DE">Einstellungen für TV-Aufnahme und -Wiedergabe</description>
         <action>MENU tv_settings.xml</action>
     </button>
 
@@ -143,6 +148,7 @@
         <text lang="PL">Konfiguracja Muzyki</text>
         <text lang="HE">הגדרות מוסיקה</text>
         <description>Configure playback and CD ripping</description>
+        <description lang="DE">CD-Wiedergabe und Import einrichten</description>
         <action>CONFIGPLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
@@ -172,6 +178,7 @@
         <text lang="PL">Ustaw Filmy</text>
         <text lang="HE">הגדרות וידאו</text>
         <description>Configure playback and DVD ripping</description>
+        <description lang="DE">DVD-Wiedergabe und Import einrichten</description>
         <action>CONFIGPLUGIN mythvideo</action>
         <depends>mythvideo</depends>
     </button>
@@ -198,6 +205,7 @@
         <text lang="PL">Konfiguracja Radia</text>
         <text lang="HE">הגדרות רדיו</text>
         <description></description>
+        <description lang="DE">Radio einrichten</description>
         <action>CONFIGPLUGIN mythFM</action>
         <depends>mythFM</depends>
     </button>
@@ -239,6 +247,7 @@
         <text lang="PL">Konfiguracja Galerii</text>
         <text lang="HE">הגדרות תמונות</text>
         <description>Configure display of image gallery</description>
+        <description lang="DE">Bildergallerie einrichten</description>
         <action>CONFIGPLUGIN mythgallery</action>
         <depends>mythgallery</depends>
     </button>
@@ -267,6 +276,7 @@
         <text lang="PL">Konfiguracja Gier</text>
         <text lang="HE">הגדרות משחק</text>
         <description>Configure playback of games</description>
+        <description lang="DE">Videospiele einrichten</description>
         <action>CONFIGPLUGIN mythgame</action>
         <depends>mythgame</depends>
     </button>
@@ -296,6 +306,7 @@
         <text lang="PL">Konfiguracja Pogody</text>
         <text lang="HE">הגדרות מזג האויר</text>
         <description>Weather locale and sources</description>
+        <description lang="DE">Standort und Datenquelle einrichten</description>
         <action>CONFIGPLUGIN mythweather</action>
         <depends>mythweather</depends>
     </button>
@@ -336,6 +347,7 @@
         <text lang="PL">Ustaw Wiadomości</text>
         <text lang="HE">הגדרות חדשות</text>
         <description>Choose which news sources interest you</description>
+        <description lang="DE">Wählen Sie Ihre Nachrichtenquellen</description>
         <action>CONFIGPLUGIN mythnews</action>
         <depends>mythnews</depends>
     </button>
@@ -364,6 +376,7 @@
         <text lang="PL">Konfiguracja przegladarki WWW</text>
         <text lang="HE">הגדרות אינטרנט</text>
         <description>Manage web bookmarks</description>
+        <description lang="DE">Verwalten Sie Ihre Bookmarks</description>
         <action>CONFIGPLUGIN mythbrowser</action>
         <depends>mythbrowser</depends>
     </button>
@@ -393,6 +406,7 @@
         <alttext lang="ET">Retseptid</alttext>
         <alttext lang="PT">Receitas</alttext>
         <description></description>
+        <description lang="DE">Rezeptsammlung einrichten</description>
         <action>CONFIGPLUGIN mythRecipe</action>
         <depends>mythRecipe</depends>
     </button>
@@ -419,6 +433,7 @@
         <text lang="PL">Konfiguracja Telefonu</text>
         <text lang="HE">הגדרות טלפון</text>
         <description>Configure SIP-based VoIP phone</description>
+        <description lang="DE">Einstellungen des VoIP-Telefons</description>
         <action>CONFIGPLUGIN mythphone</action>
         <depends>mythphone</depends>
     </button>
@@ -444,6 +459,7 @@
         <text lang="PL">Konfiguracja MovieTime</text>
         <text lang="HE">הגדרות Movie Times</text>
         <description>Select local movie theaters</description>
+        <description lang="DE">Wählen Sie ihr lokales Kino</description>
         <action>CONFIGPLUGIN mythmovies</action>
         <depends>mythmovies</depends>
     </button>
@@ -515,6 +531,7 @@
         <text lang="FI">Arkistointiasetukset</text>
         <text lang="DE">Archivieren</text>
         <description>Configure how to archive video to DVD</description>
+        <description lang="DE">Archivieren auf DVD einrichten</description>
         <action>CONFIGPLUGIN mytharchive</action>
         <depends>mytharchive</depends>
     </button>
@@ -527,7 +544,9 @@
         <text lang="DA">ZoneMinder</text>
         <text lang="PL">Ustaw straĹźnika</text>
         <text lang="FI">Zoneminder Asetukset</text>
+        <text lang="DE">Zoneminder</text>
         <description>Set up surveillance software</description>
+        <description lang="DE">Einstellungen der Überwachungssoftware</description>
         <action>CONFIGPLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
     </button>

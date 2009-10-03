@@ -28,6 +28,7 @@
         <alttext lang="RU">Записи</alttext>
         <alttext lang="PL">Nagrania</alttext>
         <description>Play recordings</description>
+        <description lang="DE"></description>
         <action>TV_WATCH_RECORDING</action>
     </button>
 
@@ -59,6 +60,7 @@
         <alttext lang="RU">Фильмы</alttext>
         <alttext lang="PL">Filmy</alttext>
         <description>Play videos</description>
+        <description lang="DE"></description>
         <action>JUMP MythVideo</action>
         <depends>mythvideo</depends>
     </button>
@@ -87,6 +89,7 @@
         <text lang="PL">Oglądanie DVD</text>
         <text lang="HE">נגן DVD</text>
         <description>Play the video on a movie DVD</description>
+        <description lang="DE">Einen Spielfim auf DVD ansehen</description>
         <action>JUMP Play DVD</action>
         <depends>mythvideo</depends>
     </button>
@@ -116,6 +119,7 @@
         <text lang="PL">Oglądanie TV</text>
         <text lang="HE">צפיה בטלויזיה</text>
         <description>Watch live television</description>
+        <description lang="DE">Jetzt Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -153,6 +157,7 @@
         <text lang="PL">Odtwarzaj muzykę</text>
         <text lang="HE">האזנה למוסיקה</text>
         <description></description>
+        <description lang="DE"></description>
         <action>JUMP Play music</action>
         <depends>mythmusic</depends>
     </button>
@@ -162,6 +167,7 @@
         <text>Plugins</text>
         <text lang="FR">Greffons</text>
         <description>Other Plugins</description>
+        <description lang="DE">Weitere Plugins</description>
         <action>MENU plugin_menu.xml</action>
     </button>
 
@@ -169,7 +175,9 @@
         <type>MENU_ADVANCED</type>
         <text>Advanced</text>
         <text lang="FR">Avancé</text>
+        <text lang="DE">Erweitert</text>
         <description>Advanced Options</description>
+        <description lang="DE">Weitere Optionen</description>
         <action>MENU advanced.xml</action>
     </button>
 

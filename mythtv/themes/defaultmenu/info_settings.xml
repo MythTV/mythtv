@@ -111,6 +111,7 @@
         <text lang="PL">Ustaw Filmy z internetu</text>
         <text lang="HE">הגדרות NetFlix</text>
         <description>Choose the genres that interest you</description>
+        <description lang="DE"></description>
         <action>CONFIGPLUGIN mythflix</action>
         <depends>mythflix</depends>
     </button>
