@@ -38,6 +38,26 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythweather/main.cpp" line="31"/>
+        <source>Weather forecasts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/main.cpp" line="33"/>
+        <source>Pause current page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/main.cpp" line="35"/>
+        <location filename="../mythweather/main.cpp" line="37"/>
+        <location filename="../mythweather/main.cpp" line="39"/>
+        <source>Search List</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../mythweather/weatherUtils.cpp" line="15"/>

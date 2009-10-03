@@ -70,6 +70,29 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythgame/main.cpp" line="93"/>
+        <source>Game frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/main.cpp" line="96"/>
+        <source>Toggle the current game as a favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/main.cpp" line="98"/>
+        <source>Show incremental search dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgame/main.cpp" line="100"/>
+        <source>Incremental search find next match</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythGamePlayerEditor</name>
     <message>
         <location filename="../mythgame/gamesettings.cpp" line="271"/>

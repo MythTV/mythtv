@@ -344,6 +344,44 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="294"/>
+        <source>Toggle use cut list state for selected program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="297"/>
+        <source>Create DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="299"/>
+        <source>Create Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="301"/>
+        <source>Import Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="303"/>
+        <source>View Archive Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="305"/>
+        <source>Play Created DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/main.cpp" line="307"/>
+        <source>Burn DVD</source>
+        <translation type="unfinished">DVD brennen</translation>
+    </message>
+</context>
+<context>
     <name>ProfileDialog</name>
     <message>
         <location filename="../mytharchive/mythburn.cpp" line="1090"/>

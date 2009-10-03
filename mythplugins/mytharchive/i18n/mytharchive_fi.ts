@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ylin valikko</translation>
     </message>
     <message>
         <source>The selected item is not a valid archive file!</source>
@@ -207,11 +207,11 @@
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lisää nauhoitus</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lisää video</translation>
     </message>
     <message>
         <source>Add File</source>
@@ -231,7 +231,7 @@
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tarvitaan ainakin yksi tiedosto.</translation>
     </message>
     <message>
         <source>Retrieving File Information. Please Wait...</source>
@@ -272,6 +272,37 @@
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation type="unfinished">Ei voitu luoda DVD:tä.  Virhe komentotiedoston ajossa</translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Toggle use cut list state for selected program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Archive Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Created DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

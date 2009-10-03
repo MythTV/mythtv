@@ -164,6 +164,97 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>Image viewer / slideshow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start/Stop Slideshow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the first image in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the last image in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Slideshow in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Random Slideshow in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate image right 90 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate image left 90 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom image out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom image in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll image up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll image left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll image right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll image down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recenter image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full-size (un-zoom) image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the upper-left corner of the image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the lower-right corner of the image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle scale to fullscreen/scale to fit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Media Handler 1/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Media Handler 2/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Directory that holds images</source>

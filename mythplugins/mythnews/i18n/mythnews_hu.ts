@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythnews/main.cpp" line="27"/>
+        <source>RSS News feed reader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="31"/>
+        <source>Update news items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="33"/>
+        <source>Force update news items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="35"/>
+        <source>Cancel news item updating</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythNews</name>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="125"/>

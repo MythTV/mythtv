@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="nl">
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythflix/main.cpp" line="105"/>
+        <source>Browse Netflix titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythflix/main.cpp" line="107"/>
+        <source>Administer Netflix Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythflix/main.cpp" line="109"/>
+        <source>View Netflix History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythflix/main.cpp" line="112"/>
+        <source>Moves movie to top of queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythFlix</name>
     <message>
         <location filename="../mythflix/mythflix.cpp" line="406"/>

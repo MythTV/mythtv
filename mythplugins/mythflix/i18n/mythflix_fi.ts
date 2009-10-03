@@ -2,6 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>Browse Netflix titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Administer Netflix Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Netflix History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moves movie to top of queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythFlix</name>
     <message>
         <source>Browse Options</source>

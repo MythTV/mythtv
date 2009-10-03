@@ -2,6 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>RSS News feed reader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update news items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force update news items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel news item updating</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythNews</name>
     <message>
         <source>Updated</source>

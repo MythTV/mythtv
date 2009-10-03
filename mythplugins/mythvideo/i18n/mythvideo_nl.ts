@@ -134,6 +134,89 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>The MythVideo default view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MythVideo video manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MythVideo video browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MythVideo video listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The MythVideo video gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play selected item in alternate player</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open video filter dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change browsable in video manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase Parental Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease Parental Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Incremental Search Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download metadata for current item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Item Detail Popup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the first video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the last video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play a DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythDVD DVD Media Handler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play a VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythDVD VCD Media Handler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import a DVD into your MythVideo database</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Starting Parental Level</source>

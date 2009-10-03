@@ -275,6 +275,37 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>Toggle use cut list state for selected program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Archive Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Created DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished">Bränn DVD</translation>
+    </message>
+</context>
+<context>
     <name>ProfileDialog</name>
     <message>
         <source>Ok</source>

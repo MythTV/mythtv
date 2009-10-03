@@ -204,6 +204,119 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="63"/>
+        <source>Image viewer / slideshow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="66"/>
+        <source>Start/Stop Slideshow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="68"/>
+        <source>Go to the first image in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="70"/>
+        <source>Go to the last image in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="72"/>
+        <source>Start Slideshow in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="74"/>
+        <source>Start Random Slideshow in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="77"/>
+        <source>Rotate image right 90 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="79"/>
+        <source>Rotate image left 90 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="81"/>
+        <source>Zoom image out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="83"/>
+        <source>Zoom image in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="85"/>
+        <source>Scroll image up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="87"/>
+        <source>Scroll image left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="89"/>
+        <source>Scroll image right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="91"/>
+        <source>Scroll image down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="93"/>
+        <source>Recenter image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="95"/>
+        <source>Full-size (un-zoom) image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="97"/>
+        <source>Go to the upper-left corner of the image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="99"/>
+        <source>Go to the lower-right corner of the image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="101"/>
+        <source>Mark image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="103"/>
+        <source>Toggle scale to fullscreen/scale to fit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="105"/>
+        <source>MythGallery Media Handler 1/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="108"/>
+        <source>MythGallery Media Handler 2/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="17"/>

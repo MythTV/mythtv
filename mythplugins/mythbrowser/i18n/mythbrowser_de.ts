@@ -199,6 +199,24 @@ Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufüge
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="47"/>
+        <source>Move to next browser tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="49"/>
+        <source>Move to previous browser tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/main.cpp" line="52"/>
+        <source>Internal Web Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>

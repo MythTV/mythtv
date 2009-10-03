@@ -10,6 +10,24 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythzoneminder/main.cpp" line="41"/>
+        <source>ZoneMinder Console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/main.cpp" line="43"/>
+        <source>ZoneMinder Live View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythzoneminder/main.cpp" line="45"/>
+        <source>ZoneMinder Events</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../mythzoneminder/zmsettings.cpp" line="17"/>

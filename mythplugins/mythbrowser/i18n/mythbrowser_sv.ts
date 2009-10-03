@@ -160,6 +160,21 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>Move to next browser tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to previous browser tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Internal Web Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ThemeUI</name>
     <message>
         <source>Bookmark Manager</source>

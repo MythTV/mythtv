@@ -401,6 +401,117 @@ Could not copy file to: %1</source>
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>Play music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select music playlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation type="unfinished">Rippuj CD</translation>
+    </message>
+    <message>
+        <source>Scan music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Music Miniplayer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to the next track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to the previous track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause/Start playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle visualizer mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blank screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh music tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter All My Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show incremental search dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incremental search find next match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase Play Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease Play Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythMusic Media Handler 1/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythMusic Media Handler 2/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>

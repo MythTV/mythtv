@@ -53,6 +53,25 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>Game frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the current game as a favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show incremental search dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incremental search find next match</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythGamePlayerEditor</name>
     <message>
         <source>Game Player Menu</source>

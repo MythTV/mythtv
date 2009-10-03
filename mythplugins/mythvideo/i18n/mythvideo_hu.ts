@@ -161,6 +161,109 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="344"/>
+        <source>The MythVideo default view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="346"/>
+        <source>The MythVideo video manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="348"/>
+        <source>The MythVideo video browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="350"/>
+        <source>The MythVideo video listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="352"/>
+        <source>The MythVideo video gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="355"/>
+        <source>Play selected item in alternate player</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="358"/>
+        <source>Open video filter dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="361"/>
+        <source>Change browsable in video manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="363"/>
+        <source>Increase Parental Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="365"/>
+        <source>Decrease Parental Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="368"/>
+        <source>Show Incremental Search Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="370"/>
+        <source>Download metadata for current item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="372"/>
+        <source>Display Item Detail Popup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="375"/>
+        <source>Go to the first video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="377"/>
+        <source>Go to the last video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="381"/>
+        <source>Play a DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="383"/>
+        <source>MythDVD DVD Media Handler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="387"/>
+        <source>Play a VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="389"/>
+        <source>MythDVD VCD Media Handler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/main.cpp" line="393"/>
+        <source>Import a DVD into your MythVideo database</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../mtd/dvdprobe.cpp" line="416"/>
@@ -915,7 +1018,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythvideo/main.cpp" line="427"/>
+        <location filename="../mythvideo/main.cpp" line="440"/>
         <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
         <translation type="unfinished"></translation>
     </message>

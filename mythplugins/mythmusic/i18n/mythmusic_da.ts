@@ -510,6 +510,144 @@ Could not copy file to: %1</source>
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="376"/>
+        <source>Play music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="378"/>
+        <source>Select music playlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="380"/>
+        <source>Rip CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="382"/>
+        <source>Scan music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="384"/>
+        <source>Show Music Miniplayer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="387"/>
+        <source>Move to the next track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="389"/>
+        <source>Move to the previous track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="391"/>
+        <source>Fast forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="393"/>
+        <source>Rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="395"/>
+        <source>Pause/Start playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="397"/>
+        <source>Start playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="399"/>
+        <source>Stop playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="401"/>
+        <source>Volume down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="403"/>
+        <source>Volume up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="405"/>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="407"/>
+        <source>Cycle visualizer mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="409"/>
+        <source>Blank screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="411"/>
+        <source>Increase rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="413"/>
+        <source>Decrease rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="415"/>
+        <source>Refresh music tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="417"/>
+        <source>Filter All My Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="419"/>
+        <source>Show incremental search dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="421"/>
+        <source>Incremental search find next match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="423"/>
+        <source>Increase Play Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="425"/>
+        <source>Decrease Play Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="428"/>
+        <source>MythMusic Media Handler 1/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythmusic/main.cpp" line="431"/>
+        <source>MythMusic Media Handler 2/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="123"/>

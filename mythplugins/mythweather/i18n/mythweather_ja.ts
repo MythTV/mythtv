@@ -32,6 +32,21 @@
     </message>
 </context>
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>Weather forecasts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause current page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search List</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
