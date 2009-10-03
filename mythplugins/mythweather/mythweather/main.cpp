@@ -28,11 +28,16 @@ int  RunWeather();
 
 void setupKeys()
 {
-    REG_JUMP("MythWeather", "Weather forecasts", "", runWeather);
-    REG_KEY("Weather", "PAUSE", "Pause current page", "P");
-    REG_KEY("Weather", "SEARCH", "Search List", "/");
-    REG_KEY("Weather", "NEXTSEARCH", "Search List", "n");
-    REG_KEY("Weather", "UPDATE", "Search List", "u");
+    REG_JUMP("MythWeather", QT_TRANSLATE_NOOP("MythControls",
+        "Weather forecasts"), "", runWeather);
+    REG_KEY("Weather", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
+        "Pause current page"), "P");
+    REG_KEY("Weather", "SEARCH", QT_TRANSLATE_NOOP("MythControls",
+        "Search List"), "/");
+    REG_KEY("Weather", "NEXTSEARCH", QT_TRANSLATE_NOOP("MythControls",
+        "Search List"), "n");
+    REG_KEY("Weather", "UPDATE", QT_TRANSLATE_NOOP("MythControls",
+        "Search List"), "u");
 }
 
 int mythplugin_init(const char *libversion)

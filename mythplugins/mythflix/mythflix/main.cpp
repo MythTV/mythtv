@@ -102,11 +102,15 @@ int runMenu()
 
 void setupKeys(void)
 {
-    REG_JUMP("Netflix Browser", "Browse Netflix titles", "", browse);
-    REG_JUMP("Netflix Queue", "Administer Netflix Queue", "", queue);
-    REG_JUMP("Netflix History", "View Netflix History", "", history);
+    REG_JUMP("Netflix Browser", QT_TRANSLATE_NOOP("MythControls",
+        "Browse Netflix titles"), "", browse);
+    REG_JUMP("Netflix Queue", QT_TRANSLATE_NOOP("MythControls",
+        "Administer Netflix Queue"), "", queue);
+    REG_JUMP("Netflix History", QT_TRANSLATE_NOOP("MythControls",
+        "View Netflix History"), "", history);
 
-    REG_KEY("NetFlix", "MOVETOTOP", "Moves movie to top of queue", "1");
+    REG_KEY("NetFlix", "MOVETOTOP", QT_TRANSLATE_NOOP("MythControls",
+        "Moves movie to top of queue"), "1");
 
     //REG_JUMP("MythFlix", "NetFlix", "", runNews);
 

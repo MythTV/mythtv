@@ -341,44 +341,57 @@ namespace
 
     void setupKeys()
     {
-        REG_JUMP(JUMP_VIDEO_DEFAULT, "The MythVideo default view", "",
-                    jumpScreenVideoDefault);
-        REG_JUMP(JUMP_VIDEO_MANAGER, "The MythVideo video manager", "",
-                    jumpScreenVideoManager);
-        REG_JUMP(JUMP_VIDEO_BROWSER, "The MythVideo video browser", "",
-                    jumpScreenVideoBrowser);
-        REG_JUMP(JUMP_VIDEO_TREE, "The MythVideo video listings", "",
-                    jumpScreenVideoTree);
-        REG_JUMP(JUMP_VIDEO_GALLERY, "The MythVideo video gallery", "",
-                    jumpScreenVideoGallery);
+        REG_JUMP(JUMP_VIDEO_DEFAULT, QT_TRANSLATE_NOOP("MythControls",
+            "The MythVideo default view"), "", jumpScreenVideoDefault);
+        REG_JUMP(JUMP_VIDEO_MANAGER, QT_TRANSLATE_NOOP("MythControls",
+            "The MythVideo video manager"), "", jumpScreenVideoManager);
+        REG_JUMP(JUMP_VIDEO_BROWSER, QT_TRANSLATE_NOOP("MythControls",
+            "The MythVideo video browser"), "", jumpScreenVideoBrowser);
+        REG_JUMP(JUMP_VIDEO_TREE, QT_TRANSLATE_NOOP("MythControls",
+            "The MythVideo video listings"), "", jumpScreenVideoTree);
+        REG_JUMP(JUMP_VIDEO_GALLERY, QT_TRANSLATE_NOOP("MythControls",
+            "The MythVideo video gallery"), "", jumpScreenVideoGallery);
 
-        REG_KEY("Video","PLAYALT","Play selected item in alternate "
-                                  "player","ALT+P");
+        REG_KEY("Video","PLAYALT", QT_TRANSLATE_NOOP("MythControls",
+            "Play selected item in alternate player"), "ALT+P");
 
-        REG_KEY("Video","FILTER","Open video filter dialog","F");
+        REG_KEY("Video","FILTER", QT_TRANSLATE_NOOP("MythControls",
+            "Open video filter dialog"), "F");
 
-        REG_KEY("Video","BROWSE","Change browsable in video manager","B");
-        REG_KEY("Video","INCPARENT","Increase Parental Level","],},F11");
-        REG_KEY("Video","DECPARENT","Decrease Parental Level","[,{,F10");
+        REG_KEY("Video","BROWSE", QT_TRANSLATE_NOOP("MythControls",
+            "Change browsable in video manager"), "B");
+        REG_KEY("Video","INCPARENT", QT_TRANSLATE_NOOP("MythControls",
+            "Increase Parental Level"), "],},F11");
+        REG_KEY("Video","DECPARENT", QT_TRANSLATE_NOOP("MythControls",
+            "Decrease Parental Level"), "[,{,F10");
 
-        REG_KEY("Video","INCSEARCH","Show Incremental Search Dialog","Ctrl+S");
-        REG_KEY("Video","DOWNLOADDATA","Download metadata for current item","W");
-        REG_KEY("Video","ITEMDETAIL","Display Item Detail Popup", "");
+        REG_KEY("Video","INCSEARCH", QT_TRANSLATE_NOOP("MythControls",
+            "Show Incremental Search Dialog"), "Ctrl+S");
+        REG_KEY("Video","DOWNLOADDATA", QT_TRANSLATE_NOOP("MythControls",
+            "Download metadata for current item"), "W");
+        REG_KEY("Video","ITEMDETAIL", QT_TRANSLATE_NOOP("MythControls",
+            "Display Item Detail Popup"), "");
 
-        REG_KEY("Video","HOME","Go to the first video","Home");
-        REG_KEY("Video","END","Go to the last video","End");
+        REG_KEY("Video","HOME", QT_TRANSLATE_NOOP("MythControls",
+            "Go to the first video"), "Home");
+        REG_KEY("Video","END", QT_TRANSLATE_NOOP("MythControls",
+            "Go to the last video"), "End");
 
         // MythDVD
-        REG_JUMP("Play DVD", "Play a DVD", "", playDVD);
-        REG_MEDIA_HANDLER("MythDVD DVD Media Handler", "", "", handleDVDMedia,
-                            MEDIATYPE_DVD, QString::null);
+        REG_JUMP("Play DVD", QT_TRANSLATE_NOOP("MythControls",
+            "Play a DVD"), "", playDVD);
+        REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+            "MythDVD DVD Media Handler"), "", "", handleDVDMedia,
+            MEDIATYPE_DVD, QString::null);
 
-        REG_JUMP("Play VCD", "Play a VCD", "", playVCD);
-        REG_MEDIA_HANDLER("MythDVD VCD Media Handler", "", "", handleVCDMedia,
-                            MEDIATYPE_VCD, QString::null);
+        REG_JUMP("Play VCD", QT_TRANSLATE_NOOP("MythControls",
+            "Play a VCD"), "", playVCD);
+        REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+            "MythDVD VCD Media Handler"), "", "", handleVCDMedia,
+            MEDIATYPE_VCD, QString::null);
 
-        REG_JUMP("Rip DVD", "Import a DVD into your MythVideo database", "",
-                    startDVDRipper);
+        REG_JUMP("Rip DVD", QT_TRANSLATE_NOOP("MythControls",
+            "Import a DVD into your MythVideo database"), "", startDVDRipper);
     }
 
     class RunSettingsCompletion : public QObject

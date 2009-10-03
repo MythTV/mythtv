@@ -902,24 +902,38 @@ void getScreenShot(void)
 
 void InitJumpPoints(void)
 {
-    REG_JUMP("Reload Theme", "", "", reloadTheme_void);
-    REG_JUMP("Main Menu", "", "", gotoMainMenu);
-    REG_JUMPLOC("Program Guide", "", "", startGuide, "GUIDE");
-    REG_JUMPLOC("Program Finder", "", "", startFinder, "FINDER");
-    //REG_JUMP("Search Listings", "", "", startSearch);
-    REG_JUMPLOC("Manage Recordings / Fix Conflicts", "", "",
-                startManaged, "VIEWSCHEDULED");
-    REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
-    REG_JUMP("Manage Recording Rules", "", "", startManageRecordingRules);
-    REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);
-    REG_JUMP("TV Recording Playback", "", "", startPlayback);
-    REG_JUMP("TV Recording Deletion", "", "", startDelete);
-    REG_JUMP("Live TV", "", "", startTVNormal);
-    REG_JUMP("Live TV In Guide", "", "", startTVInGuide);
-    REG_JUMP("Status Screen", "", "", showStatus);
-    REG_JUMP("Previously Recorded", "", "", startPrevious);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Reload Theme"),
+         "", "", reloadTheme_void);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Main Menu"),
+         "", "", gotoMainMenu);
+     REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Program Guide"),
+         "", "", startGuide, "GUIDE");
+     REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Program Finder"),
+         "", "", startFinder, "FINDER");
+     //REG_JUMP("Search Listings", "", "", startSearch);
+     REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Manage Recordings / "
+         "Fix Conflicts"), "", "", startManaged, "VIEWSCHEDULED");
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Program Recording "
+         "Priorities"), "", "", startProgramRecPriorities);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Manage Recording Rules"),
+         "", "", startManageRecordingRules);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Channel Recording "
+         "Priorities"), "", "", startChannelRecPriorities);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "TV Recording Playback"),
+         "", "", startPlayback);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "TV Recording Deletion"),
+         "", "", startDelete);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV"),
+         "", "", startTVNormal);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV In Guide"),
+         "", "", startTVInGuide);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Status Screen"),
+         "", "", showStatus);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
+         "", "", startPrevious);
 
-    REG_JUMPEX("ScreenShot","","",getScreenShot,false);
+     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "ScreenShot"),
+         "", "", getScreenShot, false);
 
     TV::InitKeys();
 
@@ -949,8 +963,8 @@ void signal_USR2_handler(int)
 
 int internal_media_init()
 {
-    REG_MEDIAPLAYER("Internal", "MythTV's native media player.",
-                    internal_play_media);
+    REG_MEDIAPLAYER("Internal", QT_TRANSLATE_NOOP("MythControls",
+        "MythTV's native media player."), internal_play_media);
     return 0;
 }
 

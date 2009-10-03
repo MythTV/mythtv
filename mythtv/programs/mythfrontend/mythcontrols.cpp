@@ -400,7 +400,7 @@ void MythControls::RefreshKeyInformation(void)
     const QString action  = GetCurrentAction();
 
     QString desc = m_bindings->GetActionDescription(context, action);
-    m_description->SetText(desc);
+    m_description->SetText(tr(desc.toAscii().constData()));
 
     QStringList keys = m_bindings->GetActionKeys(context, action);
     for (int i = 0; (i < keys.count()) &&

@@ -373,39 +373,66 @@ void handleMedia(MythMediaDevice *cd)
 
 void setupKeys(void)
 {
-    REG_JUMP("Play music",             "", "", runMusicPlayback);
-    REG_JUMP("Select music playlists", "", "", runMusicSelection);
-    REG_JUMP("Rip CD",                 "", "", runRipCD);
-    REG_JUMP("Scan music",             "", "", runScan);
-    REG_JUMPEX("Show Music Miniplayer","", "", showMiniPlayer, false);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Play music"),
+        "", "", runMusicPlayback);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Select music playlists"),
+        "", "", runMusicSelection);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Rip CD"),
+        "", "", runRipCD);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Scan music"),
+        "", "", runScan);
+    REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "Show Music Miniplayer"),
+        "", "", showMiniPlayer, false);
 
-    REG_KEY("Music", "NEXTTRACK",  "Move to the next track",     ">,.,Z,End");
-    REG_KEY("Music", "PREVTRACK",  "Move to the previous track", ",,<,Q,Home");
-    REG_KEY("Music", "FFWD",       "Fast forward",               "PgDown");
-    REG_KEY("Music", "RWND",       "Rewind",                     "PgUp");
-    REG_KEY("Music", "PAUSE",      "Pause/Start playback",       "P");
-    REG_KEY("Music", "PLAY",       "Start playback",             "");
-    REG_KEY("Music", "STOP",       "Stop playback",              "O");
-    REG_KEY("Music", "VOLUMEDOWN", "Volume down",       "[,{,F10,Volume Down");
-    REG_KEY("Music", "VOLUMEUP",   "Volume up",         "],},F11,Volume Up");
-    REG_KEY("Music", "MUTE",       "Mute",              "|,\\,F9,Volume Mute");
-    REG_KEY("Music", "CYCLEVIS",   "Cycle visualizer mode",      "6");
-    REG_KEY("Music", "BLANKSCR",   "Blank screen",               "5");
-    REG_KEY("Music", "THMBUP",     "Increase rating",            "9");
-    REG_KEY("Music", "THMBDOWN",   "Decrease rating",            "7");
-    REG_KEY("Music", "REFRESH",    "Refresh music tree",         "8");
-    REG_KEY("Music", "FILTER",     "Filter All My Music",        "F");
-    REG_KEY("Music", "INCSEARCH",     "Show incremental search dialog",     "Ctrl+S");
-    REG_KEY("Music", "INCSEARCHNEXT", "Incremental search find next match", "Ctrl+N");
-    REG_KEY("Music", "SPEEDUP",    "Increase Play Speed",   "W");
-    REG_KEY("Music", "SPEEDDOWN",  "Decrease Play Speed",   "X");
+    REG_KEY("Music", "NEXTTRACK",  QT_TRANSLATE_NOOP("MythControls",
+        "Move to the next track"),     ">,.,Z,End");
+    REG_KEY("Music", "PREVTRACK",  QT_TRANSLATE_NOOP("MythControls",
+        "Move to the previous track"), ",,<,Q,Home");
+    REG_KEY("Music", "FFWD",       QT_TRANSLATE_NOOP("MythControls",
+        "Fast forward"),               "PgDown");
+    REG_KEY("Music", "RWND",       QT_TRANSLATE_NOOP("MythControls",
+        "Rewind"),                     "PgUp");
+    REG_KEY("Music", "PAUSE",      QT_TRANSLATE_NOOP("MythControls",
+        "Pause/Start playback"),       "P");
+    REG_KEY("Music", "PLAY",       QT_TRANSLATE_NOOP("MythControls",
+        "Start playback"),             "");
+    REG_KEY("Music", "STOP",       QT_TRANSLATE_NOOP("MythControls",
+        "Stop playback"),              "O");
+    REG_KEY("Music", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
+        "Volume down"),       "[,{,F10,Volume Down");
+    REG_KEY("Music", "VOLUMEUP",   QT_TRANSLATE_NOOP("MythControls",
+        "Volume up"),         "],},F11,Volume Up");
+    REG_KEY("Music", "MUTE",       QT_TRANSLATE_NOOP("MythControls",
+        "Mute"),              "|,\\,F9,Volume Mute");
+    REG_KEY("Music", "CYCLEVIS",   QT_TRANSLATE_NOOP("MythControls",
+        "Cycle visualizer mode"),      "6");
+    REG_KEY("Music", "BLANKSCR",   QT_TRANSLATE_NOOP("MythControls",
+        "Blank screen"),               "5");
+    REG_KEY("Music", "THMBUP",     QT_TRANSLATE_NOOP("MythControls",
+        "Increase rating"),            "9");
+    REG_KEY("Music", "THMBDOWN",   QT_TRANSLATE_NOOP("MythControls",
+        "Decrease rating"),            "7");
+    REG_KEY("Music", "REFRESH",    QT_TRANSLATE_NOOP("MythControls",
+        "Refresh music tree"),         "8");
+    REG_KEY("Music", "FILTER",     QT_TRANSLATE_NOOP("MythControls",
+        "Filter All My Music"),        "F");
+    REG_KEY("Music", "INCSEARCH",     QT_TRANSLATE_NOOP("MythControls",
+        "Show incremental search dialog"),     "Ctrl+S");
+    REG_KEY("Music", "INCSEARCHNEXT", QT_TRANSLATE_NOOP("MythControls",
+        "Incremental search find next match"), "Ctrl+N");
+    REG_KEY("Music", "SPEEDUP",    QT_TRANSLATE_NOOP("MythControls",
+        "Increase Play Speed"),   "W");
+    REG_KEY("Music", "SPEEDDOWN",  QT_TRANSLATE_NOOP("MythControls",
+        "Decrease Play Speed"),   "X");
 
-    REG_MEDIA_HANDLER("MythMusic Media Handler 1/2", "", "", handleMedia,
-                      MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
-    REG_MEDIA_HANDLER("MythMusic Media Handler 2/2", "", "", handleMedia,
-                      MEDIATYPE_MMUSIC, "mp3,mp2,ogg,oga,flac,wma,wav,ac3,"
-                                        "oma,omg,atp,ra,dts,aac,m4a,aa3,tta,"
-                                        "mka,aiff,swa,wv");
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythMusic Media Handler 1/2"), "", "", handleMedia,
+        MEDIATYPE_AUDIO | MEDIATYPE_MIXED, QString::null);
+    REG_MEDIA_HANDLER(QT_TRANSLATE_NOOP("MythControls",
+        "MythMusic Media Handler 2/2"), "", "", handleMedia,
+        MEDIATYPE_MMUSIC, "mp3,mp2,ogg,oga,flac,wma,wav,ac3,"
+                          "oma,omg,atp,ra,dts,aac,m4a,aa3,tta,"
+                          "mka,aiff,swa,wv");
 }
 
 int mythplugin_init(const char *libversion)

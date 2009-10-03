@@ -291,14 +291,21 @@ int runMenu(QString which_menu)
 
 void initKeys(void)
 {
-    REG_KEY("Archive", "TOGGLECUT", "Toggle use cut list state for selected program", "C");
+    REG_KEY("Archive", "TOGGLECUT", QT_TRANSLATE_NOOP("MythControls",
+        "Toggle use cut list state for selected program"), "C");
 
-    REG_JUMP("Create DVD",       "", "", runCreateDVD);
-    REG_JUMP("Create Archive",   "", "", runCreateArchive);
-    REG_JUMP("Import Archive",   "", "", runImportVideo);
-    REG_JUMP("View Archive Log", "", "", runShowLog);
-    REG_JUMP("Play Created DVD", "", "", runTestDVD);
-    REG_JUMP("Burn DVD",         "", "", runBurnDVD);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Create DVD"),
+        "", "", runCreateDVD);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Create Archive"),
+        "", "", runCreateArchive);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Import Archive"),
+        "", "", runImportVideo);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "View Archive Log"),
+        "", "", runShowLog);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Play Created DVD"),
+        "", "", runTestDVD);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Burn DVD"),
+        "", "", runBurnDVD);
 }
 
 int mythplugin_init(const char *libversion)
