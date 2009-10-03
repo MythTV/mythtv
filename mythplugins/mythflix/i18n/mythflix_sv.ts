@@ -88,20 +88,9 @@
         <source>Default</source>
         <translation>Standard</translation>
     </message>
-</context>
-<context>
-    <name>netflix_menu_xml</name>
     <message>
-        <source>View Queue</source>
-        <translation>Visa kö</translation>
-    </message>
-    <message>
-        <source>Browse Movies</source>
-        <translation>Bläddra bland filmer</translation>
-    </message>
-    <message>
-        <source>Rental History</source>
-        <translation>Hyrhistorik</translation>
+        <source>Queue Name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

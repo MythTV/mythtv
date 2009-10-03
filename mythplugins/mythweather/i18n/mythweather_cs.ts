@@ -2,6 +2,36 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>GlobalSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocationDialog</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Complete. Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
@@ -29,6 +59,127 @@
     </message>
     <message>
         <source>Animated Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScreenSetup</name>
+    <message>
+        <source>Active Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Units: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>English Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SI Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press SELECT to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change location; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change units; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>move screen up or down; or remove screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manipulate Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceManager</name>
+    <message>
+        <source>Searching for scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Author: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -568,18 +719,6 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>loading...</source>
-        <translation type="unfinished">načítám ...</translation>
-    </message>
-    <message>
-        <source>[ retrieving weather data ... ]</source>
-        <translation type="unfinished">[ přijímám data o počasí ...]</translation>
-    </message>
-    <message>
-        <source>current conditions</source>
-        <translation type="unfinished">současné podmínky</translation>
-    </message>
-    <message>
         <source>Humidity</source>
         <translation type="unfinished">Vlhkost</translation>
     </message>
@@ -588,96 +727,8 @@
         <translation type="unfinished">Tlak</translation>
     </message>
     <message>
-        <source>Wind</source>
-        <translation type="unfinished">Vítr</translation>
-    </message>
-    <message>
         <source>Visibility</source>
         <translation type="unfinished">Viditelnost</translation>
-    </message>
-    <message>
-        <source>Wind Chill</source>
-        <translation type="unfinished">Teplota se započítáním větru</translation>
-    </message>
-    <message>
-        <source>UV Index</source>
-        <translation type="unfinished">UV Index</translation>
-    </message>
-    <message>
-        <source>extended forecast</source>
-        <translation type="unfinished">rozšířená předpověď</translation>
-    </message>
-    <message>
-        <source>LO</source>
-        <translation type="unfinished">nejnižsí</translation>
-    </message>
-    <message>
-        <source>HI</source>
-        <translation type="unfinished">nejvyšší</translation>
-    </message>
-    <message>
-        <source>today&apos;s forecast</source>
-        <translation type="unfinished">Dnešní předpověď</translation>
-    </message>
-    <message>
-        <source>tomorrow&apos;s outlook</source>
-        <translation type="unfinished">Zítřejší výhled</translation>
-    </message>
-    <message>
-        <source>Forecast for</source>
-        <translation type="unfinished">Předpověď pro</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation type="unfinished">Dopplerův radar</translation>
-    </message>
-    <message>
-        <source>Map Unavailable</source>
-        <translation type="unfinished">Mapa není k dispozici</translation>
-    </message>
-    <message>
-        <source>RAIN</source>
-        <translation type="unfinished">Dešťové</translation>
-    </message>
-    <message>
-        <source>MIX/ICE</source>
-        <translation type="unfinished">Smíšené/led</translation>
-    </message>
-    <message>
-        <source>SNOW</source>
-        <translation type="unfinished">Sněhové</translation>
-    </message>
-    <message>
-        <source>LIGHT</source>
-        <translation type="unfinished">Lehké</translation>
-    </message>
-    <message>
-        <source>HEAVY</source>
-        <translation type="unfinished">Těžké</translation>
-    </message>
-    <message>
-        <source>COLD</source>
-        <translation type="unfinished">Studené</translation>
-    </message>
-    <message>
-        <source>COLDEST</source>
-        <translation type="unfinished">Nejstudenější</translation>
-    </message>
-    <message>
-        <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished">Teplota mraků</translation>
-    </message>
-    <message>
-        <source>Enter Zip Code</source>
-        <translation type="unfinished">Zadejte směrovací číslo</translation>
-    </message>
-    <message>
-        <source>weather setup</source>
-        <translation type="unfinished">Nastavení počasí</translation>
-    </message>
-    <message>
-        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
-        <translation type="unfinished">Pro uložení stiskněte &apos;i&apos; - pro zrušení stiskněte escape</translation>
     </message>
     <message>
         <source>Wind(Gust)</source>
@@ -723,13 +774,37 @@
         <source>Source Update Timeout (seconds):</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Weather Alerts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>
-    <message>
-        <source>No Screens defined; Entering Screen Setup.</source>
-        <translation type="obsolete">Nejsou definovány žádné obrazovky, spouštím setup.</translation>
-    </message>
     <message>
         <source>Paused</source>
         <translation type="unfinished"></translation>

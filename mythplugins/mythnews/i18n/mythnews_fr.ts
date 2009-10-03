@@ -39,6 +39,72 @@
         <source>Options</source>
         <translation>Options</translation>
     </message>
+    <message>
+        <source>%1 of %2 (%3 percent)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythNewsEditor</name>
+    <message>
+        <source>Edit Site Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Site Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Podcast:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+</context>
+<context>
+    <name>NewsSite</name>
+    <message>
+        <source>Retrieve Failed. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to retrieve news</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to read downloaded file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XML-file is not valid RSS-feed</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>MythNews</name>
     <message>
@@ -15,6 +16,12 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="444"/>
         <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
+        <location filename="../mythnews/mythnews.cpp" line="714"/>
+        <source>%1 of %2 (%3 percent)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -92,6 +99,41 @@
     </message>
 </context>
 <context>
+    <name>NewsSite</name>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="218"/>
+        <source>Retrieve Failed. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="225"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="243"/>
+        <source>Failed to retrieve news</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <source>No Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <source>Failed to read downloaded file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <source>Showing Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="274"/>
+        <source>XML-file is not valid RSS-feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="687"/>
@@ -103,7 +145,12 @@
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Minutes</source>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -2,6 +2,36 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 <context>
+    <name>GlobalSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocationDialog</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Complete. Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
@@ -30,6 +60,127 @@
     <message>
         <source>Animated Map</source>
         <translation>Carte animée</translation>
+    </message>
+</context>
+<context>
+    <name>ScreenSetup</name>
+    <message>
+        <source>Active Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Units: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>English Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SI Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press SELECT to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change location; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change units; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>move screen up or down; or remove screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manipulate Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceManager</name>
+    <message>
+        <source>Searching for scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Author: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -688,21 +839,6 @@
     <message>
         <source>Saturday</source>
         <translation>Samedi</translation>
-    </message>
-</context>
-<context>
-    <name>weather_settings_xml</name>
-    <message>
-        <source>Global Settings</source>
-        <translation>Réglages globaux</translation>
-    </message>
-    <message>
-        <source>Screen Settings</source>
-        <translation>Réglages d&apos;écran</translation>
-    </message>
-    <message>
-        <source>Source Settings</source>
-        <translation>Réglages des sources</translation>
     </message>
 </context>
 </TS>

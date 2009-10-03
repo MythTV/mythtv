@@ -88,20 +88,9 @@
         <source>Default</source>
         <translation>Par défaut</translation>
     </message>
-</context>
-<context>
-    <name>netflix_menu_xml</name>
     <message>
-        <source>View Queue</source>
-        <translation>Voir la file d&apos;attente</translation>
-    </message>
-    <message>
-        <source>Browse Movies</source>
-        <translation>Parcourir les films</translation>
-    </message>
-    <message>
-        <source>Rental History</source>
-        <translation>Historique de location</translation>
+        <source>Queue Name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

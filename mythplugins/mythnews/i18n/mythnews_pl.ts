@@ -39,6 +39,10 @@
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Nie podano polecenia przeglądarki! Należy zainstalować MythBrowser.</translation>
     </message>
+    <message>
+        <source>%1 of %2 (%3 percent)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythNewsEditor</name>
@@ -76,6 +80,33 @@
     </message>
 </context>
 <context>
+    <name>NewsSite</name>
+    <message>
+        <source>Retrieve Failed. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to retrieve news</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to read downloaded file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Showing Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XML-file is not valid RSS-feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Downloading media...</source>
@@ -85,8 +116,12 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>Minutes</source>
-        <translation>Minuty</translation>
+        <source>Cancel</source>
+        <translation type="unfinished">Anuluj</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 </TS>

@@ -1,144 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="395"/>
+        <location filename="../mythnews/mythnews.cpp" line="437"/>
         <source>Updated</source>
         <translation>Обновлено</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="402"/>
+        <location filename="../mythnews/mythnews.cpp" line="444"/>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
-        <source>Edit Site Details</source>
-        <translation type="obsolete">Редактировать настройки сайта</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>Enter Site Details</source>
-        <translation type="obsolete">Войти в настройки сайта</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>Name:</source>
-        <translation type="obsolete">Название:</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>Icon:</source>
-        <translation type="obsolete">Значок:</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="810"/>
+        <location filename="../mythnews/mythnews.cpp" line="917"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="807"/>
+        <location filename="../mythnews/mythnews.cpp" line="913"/>
         <source>Edit News Site</source>
         <translation>Редактировать сайты</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="125"/>
+        <source>You haven&apos;t configured MythNews to use any sites.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
+        <location filename="../mythnews/mythnews.cpp" line="714"/>
+        <source>%1 of %2 (%3 percent)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="786"/>
+        <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="914"/>
         <source>Add News Site</source>
         <translation>Добавить сайт</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="809"/>
+        <location filename="../mythnews/mythnews.cpp" line="916"/>
         <source>Delete News Site</source>
         <translation>Удалить сайт</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="795"/>
+        <location filename="../mythnews/mythnews.cpp" line="899"/>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>MythNewsConfig</name>
+    <name>MythNewsEditor</name>
     <message>
-        <location filename="" line="97"/>
-        <source>Press MENU to set the update frequency.</source>
-        <translation type="obsolete">Нажмите &apos;МЕНЮ&apos; для установки частоты обновления.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <source>Edit Site Details</source>
+        <translation type="unfinished">Редактировать настройки сайта</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
-        <source>Set update frequency by using the up/down arrows.
-The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Установите частоту обновления используя стрелки вверх/вниз.
-Минимальное значение 30 минут.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <source>Enter Site Details</source>
+        <translation type="unfinished">Войти в настройки сайта</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
-        <source>Press MENU to return to feed selection.</source>
-        <translation type="obsolete">Нажмите &apos;МЕНЮ&apos; для возврата к выбору ленты.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
+        <source>Name:</source>
+        <translation type="unfinished">Название:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewsconfig.cpp" line="204"/>
-        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
+        <source>Icon:</source>
+        <translation type="unfinished">Значок:</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
+        <source>Podcast:</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
     </message>
 </context>
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="219"/>
+        <location filename="../mythnews/newssite.cpp" line="225"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="243"/>
         <source>Failed to retrieve news</source>
         <translation>Не удается загрузить новости.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="199"/>
+        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <source>No Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <source>Failed to read downloaded file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <source>Showing Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="274"/>
+        <source>XML-file is not valid RSS-feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="218"/>
         <source>Retrieve Failed. </source>
         <translation>Загрузка не удалась. </translation>
-    </message>
-    <message>
-        <location filename="../mythnews/newsengine.cpp" line="208"/>
-        <source>No Cached News</source>
-        <translation>Нет кешированных новостей.</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/newsengine.cpp" line="221"/>
-        <source>Failed to read downloaded file</source>
-        <translation>Не удается прочитать загруженый файл.</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/newsengine.cpp" line="227"/>
-        <source>Showing Cached News</source>
-        <translation>Показываются кешированные новости.</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="" line="97"/>
-        <source>MythNews</source>
-        <translation type="obsolete">MythNews</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>Are you sure you want to delete this news site
-
-%1</source>
-        <translation type="obsolete">Вы действительно хотите удалить сайт
-
-%1</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="608"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Downloading media...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -147,8 +145,13 @@ The minimum allowed value is 30 Minutes.</source>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Minutes</source>
-        <translation>Минуты</translation>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

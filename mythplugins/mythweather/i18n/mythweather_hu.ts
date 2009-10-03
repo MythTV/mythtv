@@ -1,5 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
+<context>
+    <name>GlobalSetup</name>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="56"/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocationDialog</name>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="944"/>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="955"/>
+        <source>Searching ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="977"/>
+        <source>Searching ... Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="1025"/>
+        <source>Search Complete. Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="1046"/>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>QObject</name>
     <message>
@@ -35,6 +72,159 @@
     <message>
         <location filename="../mythweather/weatherUtils.cpp" line="27"/>
         <source>Animated Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScreenSetup</name>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="151"/>
+        <source>Active Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="155"/>
+        <source>Inactive Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="176"/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="233"/>
+        <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="236"/>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="252"/>
+        <source>Units: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="254"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="600"/>
+        <source>English Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="254"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="601"/>
+        <source>SI Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="260"/>
+        <source>Location: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="261"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="264"/>
+        <source>Not Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="263"/>
+        <source>Source: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="267"/>
+        <source>Press SELECT to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="269"/>
+        <source>change location; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="271"/>
+        <source>change units; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="272"/>
+        <source>move screen up or down; or remove screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="507"/>
+        <source>Manipulate Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="521"/>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="522"/>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="523"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="524"/>
+        <source>Change Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="526"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="587"/>
+        <source>Change Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="527"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceManager</name>
+    <message>
+        <location filename="../mythweather/sourceManager.cpp" line="91"/>
+        <source>Searching for scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/sourceManager.cpp" line="299"/>
+        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceSetup</name>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="770"/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="884"/>
+        <source>Author: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="886"/>
+        <source>Email: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythweather/weatherSetup.cpp" line="887"/>
+        <source>Version: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -104,6 +294,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="strings.h" line="39"/>
         <location filename="strings.h" line="131"/>
         <source>Rain</source>
         <translation type="unfinished"></translation>
@@ -194,6 +385,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="strings.h" line="57"/>
         <location filename="strings.h" line="134"/>
         <source>Partly Cloudy/Windy</source>
         <translation type="unfinished"></translation>
@@ -344,6 +536,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="strings.h" line="87"/>
         <location filename="strings.h" line="98"/>
         <source>PM Rain/Snow/Wind</source>
         <translation type="unfinished"></translation>
@@ -389,6 +582,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="strings.h" line="96"/>
         <location filename="strings.h" line="132"/>
         <source>Hvy Rain/Freezing Rain</source>
         <translation type="unfinished"></translation>
@@ -706,197 +900,107 @@
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="3"/>
-        <source>[ retrieving weather data ... ]</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="4"/>
-        <source>current conditions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="5"/>
         <source>Humidity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="6"/>
+        <location filename="themestrings.h" line="3"/>
         <source>Pressure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="7"/>
-        <source>Wind</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="8"/>
+        <location filename="themestrings.h" line="6"/>
         <source>Visibility</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="9"/>
-        <source>Wind Chill</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="10"/>
-        <source>UV Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="11"/>
+        <location filename="themestrings.h" line="4"/>
         <source>Wind(Gust)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="12"/>
+        <location filename="themestrings.h" line="5"/>
         <source>Wind Direction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="13"/>
+        <location filename="themestrings.h" line="7"/>
         <source>Feels Like</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="14"/>
-        <source>extended forecast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="15"/>
-        <source>LO</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="16"/>
-        <source>HI</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="17"/>
-        <source>today&apos;s forecast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="18"/>
-        <source>tomorrow&apos;s outlook</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="19"/>
-        <source>Forecast for</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="20"/>
-        <source>doppler radar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="21"/>
-        <source>Map Unavailable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="22"/>
-        <source>RAIN</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="23"/>
-        <source>MIX/ICE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="24"/>
-        <source>SNOW</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="25"/>
-        <source>LIGHT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="26"/>
-        <source>HEAVY</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="27"/>
-        <source>COLD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="28"/>
-        <source>COLDEST</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="29"/>
-        <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="30"/>
-        <source>Enter Zip Code</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="31"/>
-        <source>weather setup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="32"/>
-        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="33"/>
+        <location filename="themestrings.h" line="9"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="34"/>
+        <location filename="themestrings.h" line="8"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="36"/>
+        <location filename="themestrings.h" line="10"/>
+        <source>Weather Alerts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Precip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
         <source>Global Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="37"/>
+        <location filename="themestrings.h" line="14"/>
         <source>Seconds to display each page:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="38"/>
+        <location filename="themestrings.h" line="15"/>
         <source>Retrieve data in the background:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="40"/>
+        <location filename="themestrings.h" line="16"/>
+        <source>Screen Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
         <source>Source Setup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="41"/>
+        <location filename="themestrings.h" line="18"/>
         <source>Data Retrieval Interval (minutes):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="42"/>
+        <location filename="themestrings.h" line="19"/>
         <source>Source Update Timeout (seconds):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Location Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="22"/>
+        <source>Enter Location:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>MythFlix</name>
     <message>
@@ -79,6 +80,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythflix/newsengine.cpp" line="214"/>
+        <location filename="../mythflix/newsengine.cpp" line="220"/>
         <location filename="../mythflix/newsengine.cpp" line="226"/>
         <source>Failed to retrieve news</source>
         <translation type="unfinished"></translation>
@@ -106,12 +109,9 @@
         <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
-        <source>Minutes</source>
+        <location filename="../mythflix/flixutil.cpp" line="29"/>
+        <source>Queue Name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

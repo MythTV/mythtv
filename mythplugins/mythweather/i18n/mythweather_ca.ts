@@ -2,6 +2,36 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>GlobalSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocationDialog</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Complete. Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
@@ -29,6 +59,127 @@
     </message>
     <message>
         <source>Animated Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScreenSetup</name>
+    <message>
+        <source>Active Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Units: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>English Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SI Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press SELECT to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change location; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change units; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>move screen up or down; or remove screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manipulate Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceManager</name>
+    <message>
+        <source>Searching for scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Author: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -568,18 +719,6 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>loading...</source>
-        <translation>Carregant...</translation>
-    </message>
-    <message>
-        <source>[ retrieving weather data ... ]</source>
-        <translation>[ recuperant dades meteorològiques ... ]</translation>
-    </message>
-    <message>
-        <source>current conditions</source>
-        <translation>dades actuals</translation>
-    </message>
-    <message>
         <source>Humidity</source>
         <translation>Humitat</translation>
     </message>
@@ -588,96 +727,8 @@
         <translation>Pressió</translation>
     </message>
     <message>
-        <source>Wind</source>
-        <translation>Vent</translation>
-    </message>
-    <message>
         <source>Visibility</source>
         <translation>Visibilitat</translation>
-    </message>
-    <message>
-        <source>Wind Chill</source>
-        <translation>Sensació</translation>
-    </message>
-    <message>
-        <source>UV Index</source>
-        <translation>Radiació solar (UV)</translation>
-    </message>
-    <message>
-        <source>extended forecast</source>
-        <translation>propers dies</translation>
-    </message>
-    <message>
-        <source>LO</source>
-        <translation>MIN</translation>
-    </message>
-    <message>
-        <source>HI</source>
-        <translation>MAX</translation>
-    </message>
-    <message>
-        <source>today&apos;s forecast</source>
-        <translation>previsió per a avui</translation>
-    </message>
-    <message>
-        <source>tomorrow&apos;s outlook</source>
-        <translation>previsió per demà</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation>Imatge del radar</translation>
-    </message>
-    <message>
-        <source>Map Unavailable</source>
-        <translation>Mapa no disponible</translation>
-    </message>
-    <message>
-        <source>RAIN</source>
-        <translation>PLUJA</translation>
-    </message>
-    <message>
-        <source>MIX/ICE</source>
-        <translation>GELADA</translation>
-    </message>
-    <message>
-        <source>SNOW</source>
-        <translation>NEU</translation>
-    </message>
-    <message>
-        <source>LIGHT</source>
-        <translation>SUAU</translation>
-    </message>
-    <message>
-        <source>HEAVY</source>
-        <translation>FORTA</translation>
-    </message>
-    <message>
-        <source>Enter Zip Code</source>
-        <translation>Còdi Postal</translation>
-    </message>
-    <message>
-        <source>weather setup</source>
-        <translation>Configuració de &quot;El Temps&quot;</translation>
-    </message>
-    <message>
-        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
-        <translation>Per a guardar, premi &apos;i&apos; - per cancel-lar, surti</translation>
-    </message>
-    <message>
-        <source>Forecast for</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>COLD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>COLDEST</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Wind(Gust)</source>
@@ -723,265 +774,37 @@
         <source>Source Update Timeout (seconds):</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Weather Alerts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>
-    <message>
-        <source> is invalid)</source>
-        <translation type="obsolete">es invàlid)</translation>
-    </message>
-    <message>
-        <source>   No Location Set, Please read the README</source>
-        <translation type="obsolete">No hi ha una estació definida, llegeixi el README</translation>
-    </message>
-    <message>
-        <source>Configuring MythWeather...</source>
-        <translation type="obsolete">Configurant MythWeather...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select unit conversion...</source>
-        <translation type="obsolete">Utilitzi fletxa dreta per a escollir la unitat de conversió...</translation>
-    </message>
-    <message>
-        <source>Weather Units</source>
-        <translation type="obsolete">Unitats </translation>
-    </message>
-    <message>
-        <source>Location</source>
-        <translation type="obsolete">Estació</translation>
-    </message>
-    <message>
-        <source>Aggressiveness</source>
-        <translation type="obsolete">Tipus de connexió</translation>
-    </message>
-    <message>
-        <source>Configuration Saved...</source>
-        <translation type="obsolete">Congiguració guardada...</translation>
-    </message>
-    <message>
-        <source>Retrieving weather data...</source>
-        <translation type="obsolete">Obtenint dades del temps...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select your location...</source>
-        <translation type="obsolete">Esculli la estació amb la fletxa dreta...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation type="obsolete">Esculli el tipus de connexió amb la fletxa dreta...</translation>
-    </message>
-    <message>
-        <source> 1  High Speed Connection</source>
-        <translation type="obsolete">1  Connexió d&apos;alta velocitat</translation>
-    </message>
-    <message>
-        <source> 8  Medium Speed Connection</source>
-        <translation type="obsolete">8  Connexió de velocitat mitjana</translation>
-    </message>
-    <message>
-        <source> 15 Low Speed Connection</source>
-        <translation type="obsolete">15 Connexió de baixa velocitat</translation>
-    </message>
-    <message>
-        <source>Obtaining initial weather data...</source>
-        <translation type="obsolete">Obtenint dades inicials del temps...</translation>
-    </message>
-    <message>
-        <source>Updating weather data...</source>
-        <translation type="obsolete">Actualitzant informació del temps...</translation>
-    </message>
-    <message>
-        <source>Calm</source>
-        <translation type="obsolete">Calma</translation>
-    </message>
-    <message>
-        <source> at </source>
-        <translation type="obsolete"> a </translation>
-    </message>
-    <message>
-        <source>Unlimited</source>
-        <translation type="obsolete">ilimitada</translation>
-    </message>
-    <message>
-        <source> (minimal)</source>
-        <translation type="obsolete">(mínima)</translation>
-    </message>
-    <message>
-        <source> (moderate)</source>
-        <translation type="obsolete">(moderada)</translation>
-    </message>
-    <message>
-        <source> (high)</source>
-        <translation type="obsolete">(alta)</translation>
-    </message>
-    <message>
-        <source> (extreme)</source>
-        <translation type="obsolete">(extrema)</translation>
-    </message>
-    <message>
-        <source>Today a high of </source>
-        <translation type="obsolete">Avui una màxima de </translation>
-    </message>
-    <message>
-        <source> and a low of </source>
-        <translation type="obsolete"> i una mínima de </translation>
-    </message>
-    <message>
-        <source>. Currently there is a humidity of </source>
-        <translation type="obsolete">. Actualment hi ha una humitat de </translation>
-    </message>
-    <message>
-        <source>% and the winds are</source>
-        <translation type="obsolete">% i un vent </translation>
-    </message>
-    <message>
-        <source> calm.</source>
-        <translation type="obsolete">calmat. </translation>
-    </message>
-    <message>
-        <source> coming in at </source>
-        <translation type="obsolete"> bufant a </translation>
-    </message>
-    <message>
-        <source> mph from the </source>
-        <translation type="obsolete">mph des del </translation>
-    </message>
-    <message>
-        <source> Km/h from the </source>
-        <translation type="obsolete"> Qm/h des del  </translation>
-    </message>
-    <message>
-        <source> Visibility will be unlimited for today.</source>
-        <translation type="obsolete"> Visibilitat il.limitada per a avui. </translation>
-    </message>
-    <message>
-        <source> Visibility conditions are unknown.</source>
-        <translation type="obsolete"> No es coneixen les condicions de visibilitat.</translation>
-    </message>
-    <message>
-        <source> There will be a visibility of </source>
-        <translation type="obsolete"> Hi haurà una visibilitat de  </translation>
-    </message>
-    <message>
-        <source> miles.</source>
-        <translation type="obsolete"> milles.</translation>
-    </message>
-    <message>
-        <source> km.</source>
-        <translation type="obsolete"> Qm.</translation>
-    </message>
-    <message>
-        <source>SUN</source>
-        <translation type="obsolete">DIU</translation>
-    </message>
-    <message>
-        <source>Sunday</source>
-        <translation type="obsolete">Diumenge</translation>
-    </message>
-    <message>
-        <source>MON</source>
-        <translation type="obsolete">DIL</translation>
-    </message>
-    <message>
-        <source>Monday</source>
-        <translation type="obsolete">Dilluns</translation>
-    </message>
-    <message>
-        <source>TUE</source>
-        <translation type="obsolete">DIM</translation>
-    </message>
-    <message>
-        <source>Tuesday</source>
-        <translation type="obsolete">Dimarts</translation>
-    </message>
-    <message>
-        <source>WED</source>
-        <translation type="obsolete">DMC</translation>
-    </message>
-    <message>
-        <source>Wednesday</source>
-        <translation type="obsolete">Dimecres</translation>
-    </message>
-    <message>
-        <source>THU</source>
-        <translation type="obsolete">DIJ</translation>
-    </message>
-    <message>
-        <source>Thursday</source>
-        <translation type="obsolete">Dijous</translation>
-    </message>
-    <message>
-        <source>FRI</source>
-        <translation type="obsolete">DIV</translation>
-    </message>
-    <message>
-        <source>Friday</source>
-        <translation type="obsolete">Divendres</translation>
-    </message>
-    <message>
-        <source>SAT</source>
-        <translation type="obsolete">DIS</translation>
-    </message>
-    <message>
-        <source>Saturday</source>
-        <translation type="obsolete">Dissabte</translation>
-    </message>
-    <message>
-        <source>Date Error</source>
-        <translation type="obsolete">Error de data</translation>
-    </message>
-    <message>
-        <source>Tomorrow expect a high of </source>
-        <translation type="obsolete">Demà s&apos;espera una màxima de </translation>
-    </message>
-    <message>
-        <source>Expected conditions: </source>
-        <translation type="obsolete">Condicions previstes: </translation>
-    </message>
-    <message>
-        <source>Weather data from: </source>
-        <translation type="obsolete">Dades meteorològiques de: </translation>
-    </message>
-    <message>
-        <source>Updating...</source>
-        <translation type="obsolete">Actualitzant...</translation>
-    </message>
-    <message>
-        <source> (Not All Information Available)</source>
-        <translation type="obsolete">(No tota la informació està disponible)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation type="obsolete">*** Area Invàlida *** Entri una àrea vàlida.</translation>
-    </message>
-    <message>
-        <source>Weather Data Not Available</source>
-        <translation type="obsolete">Informació meteorològica no disponible</translation>
-    </message>
-    <message>
-        <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation type="obsolete">Temps d&apos;espera excedit !!! Canvii el tipus de connexió.</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID or Server Error ***</source>
-        <translation type="obsolete">*** Identificació d&apos;àrea desconegut o error del servidor ***</translation>
-    </message>
-    <message>
-        <source>.</source>
-        <translation type="obsolete">.</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Desconegut</translation>
-    </message>
-    <message>
-        <source> - PAUSED -</source>
-        <translation type="obsolete">- PAUSAT -</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation type="obsolete">Imatge del radar</translation>
-    </message>
     <message>
         <source>Paused</source>
         <translation type="unfinished"></translation>

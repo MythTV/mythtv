@@ -99,25 +99,21 @@ Kontrollera Mythmovies inställningar</translation>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <location filename="themestrings.h" line="6"/>
         <source>Theater name</source>
         <translation>Biografnamn</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
-        <location filename="themestrings.h" line="7"/>
         <source>Rating:</source>
         <translation>Betyg:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
-        <location filename="themestrings.h" line="8"/>
         <source>Running Time:</source>
         <translation>Speltid:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
-        <location filename="themestrings.h" line="9"/>
         <source>Show Times:</source>
         <translation>Visningstider:</translation>
     </message>

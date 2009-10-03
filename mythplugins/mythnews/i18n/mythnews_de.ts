@@ -4,22 +4,22 @@
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="439"/>
+        <location filename="../mythnews/mythnews.cpp" line="437"/>
         <source>Updated</source>
         <translation>Aktualisiert</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="446"/>
+        <location filename="../mythnews/mythnews.cpp" line="444"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="919"/>
+        <location filename="../mythnews/mythnews.cpp" line="917"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="915"/>
+        <location filename="../mythnews/mythnews.cpp" line="913"/>
         <source>Edit News Site</source>
         <translation>Newsfeed bearbeiten</translation>
     </message>
@@ -29,28 +29,28 @@
         <translation>Sie haben noch keine Nachrichtenseiten (Newsfeeds) eingerichtet.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="457"/>
-        <location filename="../mythnews/mythnews.cpp" line="716"/>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
+        <location filename="../mythnews/mythnews.cpp" line="714"/>
         <source>%1 of %2 (%3 percent)</source>
         <translation>%1 von %2 (%3%)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="788"/>
+        <location filename="../mythnews/mythnews.cpp" line="786"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
         <translation>Es ist kein Webbrowser definiert! Für MythNews muss MythBrowser installiert sein.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="916"/>
+        <location filename="../mythnews/mythnews.cpp" line="914"/>
         <source>Add News Site</source>
         <translation>Neuer Newsfeed</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="918"/>
+        <location filename="../mythnews/mythnews.cpp" line="916"/>
         <source>Delete News Site</source>
         <translation>Newsfeed löschen</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="901"/>
+        <location filename="../mythnews/mythnews.cpp" line="899"/>
         <source>Options</source>
         <translation>Optionen</translation>
     </message>
@@ -136,7 +136,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="689"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Downloading media...</source>
         <translation>Lade Medien...</translation>
     </message>
@@ -145,8 +145,13 @@
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Minutes</source>
-        <translation>Minuten</translation>
+        <source>Cancel</source>
+        <translation type="unfinished">Abbrechen</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 </TS>
