@@ -17,6 +17,7 @@
      <text lang="ES">1. General</text>
      <text lang="CS">1. Obecný</text>
      <text lang="RU">1. Общие</text>
+     <text lang="HU">1. Általános</text>
      <action>GENERAL</action>
    </button>
 
@@ -37,6 +38,7 @@
      <text lang="ES">2. Capturadoras</text>
      <text lang="CS">2. Zachytávací karty</text>
      <text lang="RU">2. Карты захвата</text>
+     <text lang="HU">2. Vevőkártyák</text>
      <action>CAPTURE CARDS</action>
    </button>
 
@@ -57,6 +59,7 @@
      <text lang="ES">3. Fuentes de Vídeo</text>
      <text lang="CS">3. Zdroje obrazu</text>
      <text lang="RU">3. Видео источники</text>
+     <text lang="HU">3. Video források</text>
      <action>VIDEO SOURCES</action>
    </button>
 
@@ -77,6 +80,7 @@
      <text lang="ES">4. Conexiones</text>
      <text lang="CS">4. Připojení vstupů</text>
      <text lang="RU">4. Соединение входов</text>
+     <text lang="HU">4. Bemeneti kapcsolatok</text>
      <action>CARD INPUTS</action>
    </button>
 
@@ -96,6 +100,7 @@
      <text lang="ES">5. Editor Canales</text>
      <text lang="CS">5. Editor kanálů</text>
      <text lang="RU">5. Редактор каналов</text>
+     <text lang="HU">5. Csatorna szerkesztő</text>
      <action>CHANNEL EDITOR</action>
    </button>
 
@@ -107,6 +112,7 @@
      <text lang="FI">Tallennusryhmät</text>
      <text lang="SV">6. Lagringsgrupper</text>
      <text lang="DE">6. Speicherplatz</text>
+     <text lang="HU">6. Tárhelyek</text>
      <action>STORAGE GROUPS</action>
    </button>
 
