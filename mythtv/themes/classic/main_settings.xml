@@ -23,6 +23,7 @@
         <text lang="RU">Общее</text>
         <text lang="PL">Ustawienia</text>
         <text lang="HE">כללי</text>
+        <text lang="HU">Általános</text>
         <description>Core MythTV behavior and system settings</description>
         <description lang="DE">MythTV- und Systemeinstellungen</description>
         <action>SETTINGS MAINGENERAL</action>
@@ -51,6 +52,7 @@
         <text lang="RU">Внешний вид</text>
         <text lang="PL">Ustaw wyglądy</text>
         <text lang="HE">מראה</text>
+        <text lang="HU">Megjelenés</text>
         <description>pick the theme, font, size, and locale</description>
         <description lang="DE">GUI-Thema oder Zeichensatzgrößen wählen</description>
         <action>SETTINGS APPEARANCE</action>
@@ -64,6 +66,7 @@
         <text lang="FI">Kuvavelho</text>
         <text lang="NB">Skjerm</text>
         <text lang="DE">Bildschirm einrichten</text>
+        <text lang="HU">Képernyő beállítás varázsló</text>
         <description>Compensate for TVs with overscan</description>
         <description lang="DE">Passen Sie das Bild an Ihren Fernseher an</description>
         <action>SCREENSETUPWIZARD</action>
@@ -90,6 +93,7 @@
         <text lang="SL">Urejanje tipk</text>
         <text lang="PL">Ustaw klawisze</text>
         <text lang="HE">עריכת מקשים</text>
+        <text lang="HU">Billentyűzet beállítása</text>
         <description>Change mythtv key bindings.</description>
         <description lang="DE">Tastaturbelegung anpassen</description>
         <action>SETUP_KEYS</action>
@@ -118,6 +122,7 @@
         <text lang="RU">Настройка ТВ</text>
         <text lang="PL">Konfiguracja TV</text>
         <text lang="HE">הגדרות טלויזיה</text>
+        <text lang="HU">TV beállítások</text>
         <description>Settings for TV recording and playback</description>
         <description lang="DE">Einstellungen für TV-Aufnahme und -Wiedergabe</description>
         <action>MENU tv_settings.xml</action>
@@ -147,6 +152,7 @@
         <text lang="RU">Настройка музыки</text>
         <text lang="PL">Konfiguracja Muzyki</text>
         <text lang="HE">הגדרות מוסיקה</text>
+        <text lang="HU">Zenei beállítások</text>
         <description>Configure playback and CD ripping</description>
         <description lang="DE">CD-Wiedergabe und Import einrichten</description>
         <action>CONFIGPLUGIN mythmusic</action>
@@ -177,6 +183,7 @@
         <text lang="RU">Настройка фильмов</text>
         <text lang="PL">Ustaw Filmy</text>
         <text lang="HE">הגדרות וידאו</text>
+        <text lang="HU">Video beállítások</text>
         <description>Configure playback and DVD ripping</description>
         <description lang="DE">DVD-Wiedergabe und Import einrichten</description>
         <action>CONFIGPLUGIN mythvideo</action>
@@ -204,6 +211,7 @@
         <text lang="RU">Настройка радио</text>
         <text lang="PL">Konfiguracja Radia</text>
         <text lang="HE">הגדרות רדיו</text>
+        <text lang="HU">FM rádió beállítások</text>
         <description></description>
         <description lang="DE">Radio einrichten</description>
         <action>CONFIGPLUGIN mythFM</action>
@@ -217,6 +225,7 @@
         <text lang="FR">Réglages MythStream</text>
         <text lang="SL">Nastavitve Mythstream</text>
         <text lang="HE">הגדרות MythStream</text>
+        <text lang="HU">Online folyam beállítások</text>
         <description></description>
         <action>CONFIGPLUGIN mythstream</action>
         <depends>mythstream</depends>
@@ -246,6 +255,7 @@
         <text lang="RU">Настройка изображений</text>
         <text lang="PL">Konfiguracja Galerii</text>
         <text lang="HE">הגדרות תמונות</text>
+        <text lang="HU">Képgaléria beállítások</text>
         <description>Configure display of image gallery</description>
         <description lang="DE">Bildergallerie einrichten</description>
         <action>CONFIGPLUGIN mythgallery</action>
@@ -275,6 +285,7 @@
         <text lang="RU">Настройка игр</text>
         <text lang="PL">Konfiguracja Gier</text>
         <text lang="HE">הגדרות משחק</text>
+        <text lang="HU">Játék beállítások</text>
         <description>Configure playback of games</description>
         <description lang="DE">Videospiele einrichten</description>
         <action>CONFIGPLUGIN mythgame</action>
@@ -305,6 +316,7 @@
         <text lang="RU">Настройка погоды</text>
         <text lang="PL">Konfiguracja Pogody</text>
         <text lang="HE">הגדרות מזג האויר</text>
+        <text lang="HU">Időjárás-jelentés bellítások</text>
         <description>Weather locale and sources</description>
         <description lang="DE">Standort und Datenquelle einrichten</description>
         <action>CONFIGPLUGIN mythweather</action>
@@ -346,6 +358,7 @@
         <text lang="RU">Настройка новостей</text>
         <text lang="PL">Ustaw Wiadomości</text>
         <text lang="HE">הגדרות חדשות</text>
+        <text lang="HU">Hírcsatorna beállítása</text>
         <description>Choose which news sources interest you</description>
         <description lang="DE">Wählen Sie Ihre Nachrichtenquellen</description>
         <action>CONFIGPLUGIN mythnews</action>
@@ -375,6 +388,7 @@
         <text lang="RU">Настройка браузера</text>
         <text lang="PL">Konfiguracja przegladarki WWW</text>
         <text lang="HE">הגדרות אינטרנט</text>
+        <text lang="HU">Weboldal beállítások</text>
         <description>Manage web bookmarks</description>
         <description lang="DE">Verwalten Sie Ihre Bookmarks</description>
         <action>CONFIGPLUGIN mythbrowser</action>
@@ -403,6 +417,7 @@
         <text lang="RU">Настройка рецептов</text>
         <text lang="PL">Ustaw Przepisy</text>>
         <text lang="HE">הגדרות מתכונים</text>
+        <text lang="HU">Receptek beállítása</text>
         <alttext lang="ET">Retseptid</alttext>
         <alttext lang="PT">Receitas</alttext>
         <description></description>
@@ -432,6 +447,7 @@
         <text lang="RU">Настройка телефона</text>
         <text lang="PL">Konfiguracja Telefonu</text>
         <text lang="HE">הגדרות טלפון</text>
+        <text lang="HU">Telefon beállítások</text>
         <description>Configure SIP-based VoIP phone</description>
         <description lang="DE">Einstellungen des VoIP-Telefons</description>
         <action>CONFIGPLUGIN mythphone</action>
@@ -458,6 +474,7 @@
         <text lang="RU">Настройка афиши кино</text>
         <text lang="PL">Konfiguracja MovieTime</text>
         <text lang="HE">הגדרות Movie Times</text>
+        <text lang="HU">Moziműsor beállítások</text>
         <description>Select local movie theaters</description>
         <description lang="DE">Wählen Sie ihr lokales Kino</description>
         <action>CONFIGPLUGIN mythmovies</action>
@@ -487,6 +504,7 @@
         <text lang="RU">Настройка Xbox</text>
         <text lang="PL">Konfiguracja Xbox</text>
         <text lang="HE">הגדרות Xbox</text>
+        <text lang="HU">XBOX beállítások</text>
         <description></description>
         <action>SETTINGS XBOXSETTINGS</action>
         <dependssetting>EnableXbox</dependssetting>
@@ -510,6 +528,7 @@
         <text lang="SL">NetFlix nastavitve</text>
         <text lang="PL">Konfiguracja NetFlix</text>
         <text lang="HE">הגדרות NetFlix</text>
+        <text lang="HU">Netflix beállítások</text>
         <description>Choose the genres that interest you</description>
         <action>CONFIGPLUGIN mythflix</action>
         <depends>mythflix</depends>
@@ -531,6 +550,7 @@
         <text lang="HE">הגדרות ארכיון קבצים</text>
         <text lang="FI">Arkistointiasetukset</text>
         <text lang="DE">Archivieren</text>
+        <text lang="HU">Archíválási beállítások</text>
         <description>Configure how to archive video to DVD</description>
         <description lang="DE">Archivieren auf DVD einrichten</description>
         <action>CONFIGPLUGIN mytharchive</action>

@@ -24,6 +24,7 @@
         <text lang="RU">Смотреть записи</text>
         <text lang="PL">Oglądanie nagrań</text>
         <text lang="HE">צפיה בהקלטות</text>
+        <text lang="HU">Felvételek lejátszása</text>
         <alttext lang="SV">Inspelningar</alttext>
         <alttext lang="ET">Salvestised</alttext>
         <alttext lang="RU">Записи</alttext>
@@ -56,6 +57,7 @@
         <text lang="RU">Смотреть фильмы</text>
         <text lang="PL">Oglądanie filmów</text>
         <text lang="HE">צפיה בוידאו</text>
+        <text lang="HU">Video lejátszása</text>
         <alttext lang="SV">Filmer</alttext>
         <alttext lang="ET">Video</alttext>
         <alttext lang="RU">Фильмы</alttext>
@@ -89,6 +91,7 @@
         <text lang="RU">Слушать музыку</text>
         <text lang="PL">Odtwarzaj muzykę</text>
         <text lang="HE">האזנה למוסיקה</text>
+        <text lang="HU">Zene lejátszás</text>
         <description></description>
         <description lang="DE"></description>
         <action>JUMP Play music</action>
@@ -116,6 +119,7 @@
         <text lang="RU">Слушать радио</text>
         <text lang="PL">Słuchaj radia</text>
         <text lang="HE">האזנה לרדיו</text>
+        <text lang="HU">Rádióhallgatás</text>
         <alttext lang="SV">Radio</alttext>
         <alttext lang="PT">Rádio</alttext>
         <alttext lang="ET">Raadio</alttext>
@@ -132,6 +136,7 @@
         <text lang="DE">Internetstreams</text>
         <text lang="FR">Lire des flux en ligne</text>
         <text lang="HE">נגן מדיה מכוונת</text>
+        <text lang="HU">Online folyam lejátszása</text>
         <description></description>
         <description lang="DE"></description>
         <action>PLUGIN mythstream</action>
@@ -161,6 +166,7 @@
         <text lang="RU">Изображения</text>
         <text lang="PL">Galeria zdjęć</text>
         <text lang="HE">גלרית תמונות</text>
+        <text lang="HU">Kép galéria</text>
         <description>Look at Pictures</description>
         <description lang="DE"></description>
         <action>PLUGIN mythgallery</action>
@@ -190,6 +196,7 @@
         <text lang="RU">Играть в игры</text>
         <text lang="PL">Graj w gry</text>
         <text lang="HE">לשחק משחקים</text>
+        <text lang="HU">Játékok</text>
         <description>Play video games</description>
         <description lang="DE">Videospiele spielen</description>
         <action>PLUGIN mythgame</action>

@@ -24,6 +24,7 @@
         <text lang="RU">Настройки погоды</text>
         <text lang="PL">Ustaw Pogodę</text>
         <text lang="HE">הגדרות מזג האויר</text>
+        <text lang="HU">Időjárás-jelentés beállítások</text>
         <description>Weather locale and sources</description>
         <description lang="DE">Standort und Datenquelle einrichten</description>
         <action>CONFIGPLUGIN mythweather</action>
@@ -63,6 +64,7 @@
         <text lang="RU">Настройки новостей</text>
         <text lang="PL">Ustaw wiadomości</text>
         <text lang="HE">הגדרות חדשות</text>
+        <text lang="HU">Hírcsatrona beállítások</text>
         <description>Choose which news sources interest you</description>
         <description lang="DE">Wählen Sie Ihre Nachrichtenquellen</description>
         <action>CONFIGPLUGIN mythnews</action>
@@ -88,6 +90,7 @@
         <text lang="RU">Настройки афиши кино</text>
         <text lang="PL">Ustaw repertuar kin</text>
         <text lang="HE">הגדרות Movie Times</text>
+        <text lang="HU">Moziműsor beállítások</text>
         <description>Select local movie theaters</description>
         <description lang="DE">Wählen Sie ihr lokales Kino</description>
         <action>CONFIGPLUGIN mythmovies</action>
@@ -111,6 +114,7 @@
         <text lang="SL">NetFlix nastavitve</text>
         <text lang="PL">Ustaw Filmy z internetu</text>
         <text lang="HE">הגדרות NetFlix</text>
+        <text lang="HU">Netflix beállítások</text>
         <description>Choose the genres that interest you</description>
         <description lang="DE"></description>
         <action>CONFIGPLUGIN mythflix</action>
@@ -139,6 +143,7 @@
         <text lang="RU">Настройки браузера</text>
         <text lang="PL">Ustaw zakładki WWW</text>
         <text lang="HE">הגדרות אינטרנט</text>
+        <text lang="HU">Weboldal beállítások</text>
         <action>CONFIGPLUGIN mythbrowser</action>
         <description>Manage web bookmarks</description>
         <description lang="DE">Verwalten Sie Ihre Bookmarks</description>
@@ -166,6 +171,7 @@
         <text lang="RU">Настройки рецептов</text>
         <text lang="PL">Ustaw przepisy</text>
         <text lang="HE">הגדרות מתכונים</text>
+        <text lang="HU">Recept beállítások</text>
         <alttext lang="ET">Retseptid</alttext>
         <alttext lang="PT">Receitas</alttext>
         <description></description>

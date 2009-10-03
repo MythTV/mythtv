@@ -14,6 +14,7 @@
         <text lang="NL">Opnameprioriteit Instellen</text>
         <text lang="JA">録画優先順位設定</text>
         <text lang="RU">Установить приоритет записей</text>
+        <text lang="HU">Felvételi prioritások beállítása</text>
         <alttext>Recording Priorities</alttext>
         <alttext lang="FR">Priorités d&apos;enresgitrement</alttext>
         <alttext lang="DE">Aufnahmen</alttext>
@@ -44,6 +45,7 @@
         <text lang="ES">Ajustar Prioridades de Canales</text>
         <text lang="NL">Opnameprioriteit Per Zender</text>
         <text lang="RU">Установить приоритет каналов</text>
+        <text lang="HU">Csatorna prioritások beállítása</text>
         <alttext>Channel Priorities</alttext>
         <alttext lang="FR">Priorités de chaîne</alttext>
         <alttext lang="SV">Kanal</alttext>
@@ -64,6 +66,7 @@
         <type>TV_RECPRIORITIES_CUSTOM</type>
         <text>Custom Priority</text>
         <text lang="FR">Priorité personnalisée</text>
+        <text lang="HU">Egyéni prioritások</text>
         <alttext>Custom Priority</alttext>
         <description></description>
         <action>SETTINGS CUSTOMPRIORITY</action>

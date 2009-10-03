@@ -24,6 +24,7 @@
         <text lang="RU">Смотреть ТВ</text>
         <text lang="PL">Oglądanie TV</text>
         <text lang="HE">צפיה בטלויזיה</text>
+        <text lang="HU">TV nézés</text>
         <description>Watch live television</description>
         <description lang="DE">Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
@@ -52,6 +53,7 @@
         <text lang="RU">Расписание записей</text>
         <text lang="PL">Harmonogram</text>
         <text lang="HE">תזמון הקלטות</text>
+        <text lang="HU">Felvétel ütemezése</text>
         <alttext>Schedule</alttext>
         <alttext lang="FR">Programmation</alttext>
         <alttext lang="ES">Temporizadores</alttext>
@@ -96,6 +98,7 @@
         <text lang="RU">Смотреть записи</text>
         <text lang="PL">Oglądanie nagrań</text>
         <text lang="HE">צפיה בהקלטות</text>
+        <text lang="HU">Felvételek lejátszása</text>
         <alttext lang="ET">Salvestised</alttext>
         <alttext lang="PL">Oglądanie</alttext>
         <description>Play Recordings</description>
@@ -126,6 +129,7 @@
         <text lang="RU">Удалить записи</text>
         <text lang="PL">Kasowanie nagrań</text>
         <text lang="HE">מחיקת הקלטות</text>
+        <text lang="HU">Felvételek törlése</text>
         <alttext lang="ET">Kustutamine</alttext>
         <alttext lang="DE">Löschen</alttext>
         <alttext lang="PL">Kasowanie</alttext>
@@ -148,6 +152,7 @@
         <text lang="ET">TV läbilase</text>
         <text lang="PT">Televisão Directa</text>
         <text lang="NL">TV Direct</text>
+        <text lang="HU">Közvetlen TV adás</text>
         <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
     </button>
 -->
@@ -172,7 +177,8 @@
         <text lang="CS">Stav systému</text>
         <text lang="RU">Состояние системы</text>
         <text lang="PL">Status systemu</text>
-        <text lang="HE">מצב מערכת</text>     
+        <text lang="HE">מצב מערכת</text>
+        <text lang="HU">Rendszer állapot</text>
         <description>What your system is doing right now</description>
         <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>

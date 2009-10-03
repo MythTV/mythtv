@@ -16,6 +16,7 @@
         <text lang="ET">Üldine</text>
         <text lang="RU">Общие</text>
         <text lang="PL">Ogólne</text>
+        <text lang="HU">Általános</text>
         <description>TV navigation and recording preferences</description>
         <description lang="DE">TV-Navigation und Aufnahme-Voreinstellungen</description>
         <action>SETTINGS GENERAL</action>
@@ -39,6 +40,7 @@
         <text lang="ET">Telekava</text>
         <text lang="RU">Программа передач</text>
         <text lang="PL">Przewodnik programowy</text>
+        <text lang="HU">Műsorújság</text>
         <alttext lang="DE">EPG</alttext>
         <alttext lang="ET">Kava</alttext>
         <alttext lang="RU">Программа</alttext>
@@ -65,6 +67,7 @@
         <text lang="ET">Mahamängimine</text>
         <text lang="RU">Воспроизведение</text>
         <text lang="PL">Odtwarzanie</text>
+        <text lang="HU">Lejátszás</text>
         <description>Settings for viewing and playing TV</description>
         <description lang="DE">Einstellungen zur TV-Wiedergabe</description>
         <action>SETTINGS PLAYBACK</action>
@@ -75,6 +78,7 @@
         <text>Playback OSD</text>
         <text lang="DE">Wiedergabe-OSD</text>
         <text lang="FR">Incrustation de lecture</text>
+        <text lang="HU">OSD</text>
         <description>Theme and settings for OSD</description>
         <description lang="DE">Einstellungen für das On-Screen-Display</description>
         <action>SETTINGS OSD</action>
@@ -83,6 +87,7 @@
     <button>
         <type>TV_SETTINGS_OSD_MENU_EDITOR</type>
         <text>OSD Menu Editor</text>
+        <text lang="HU">OSD menu szerkesztő</text>
         <text lang="FR">Éditeur de menu d&apos;incrustation</text>
         <text lang="DE">OSD-Menü anpassen</text>
         <description lang="DE">Welche Menüpunkte sollen im OSD-Menü erscheinen?</description>
@@ -136,6 +141,7 @@
         <text lang="ET">Salvestamisprofiilid</text>
         <text lang="RU">Профили записи</text>
         <text lang="PL">Profile nagrywania</text>
+        <text lang="HU">Felvételek profiljai</text>
         <alttext lang="SV">Inspelning</alttext>
         <alttext lang="DE">Profile</alttext>
         <alttext lang="ET">Profiilid</alttext>
@@ -163,6 +169,7 @@
         <text lang="NL">Opnameprioriteiten</text>
         <text lang="RU">Приоритеты записей</text>
         <text lang="PL">Priorytety nagrywania</text>
+        <text lang="HU">Felvételi prioritások</text>
         <alttext lang="ET">Prioriteedid</alttext>
         <alttext lang="PT">Prioridades</alttext>
         <alttext lang="RU">Приоритеты</alttext>

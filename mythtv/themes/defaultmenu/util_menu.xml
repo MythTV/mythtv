@@ -23,6 +23,7 @@
         <text lang="RU">Работа с музыкой</text>
         <text lang="PL">Narzędzia muzyczne</text>
         <text lang="HE">כלי מוסיקה</text>
+        <text lang="HU">Zenei eszközök</text>
         <description>Select, import, or play music</description>
         <description lang="DE">Musik auswählen, importieren oder hören</description>
         <action>PLUGIN mythmusic</action>
@@ -52,6 +53,7 @@
         <text lang="RU">Управление фильмами</text>
         <text lang="PL">Zarządca Filmów</text>
         <text lang="HE">מנהל וידאו</text>
+        <text lang="HU">Video kezelő</text>
         <description>Scan for new videos, edit metadata, or delete</description>
         <description lang="DE">Videos suchen oder löschen und Metadaten bearbeiten</description>
         <action>JUMP Video Manager</action>
@@ -78,6 +80,7 @@
         <text lang="SL">Urejanje tipk</text>
         <text lang="PL">Edytuj klawisze</text>
         <text lang="HE">עריכת מקשים</text>
+        <text lang="HU">Billentyűzet beállítások</text>
         <description>Change mythtv key bindings.</description>
         <description lang="DE">Tastaturbelegung anpassen</description>
         <action>SETUP_KEYS</action>
@@ -106,6 +109,7 @@
         <text lang="RU">Настройки</text>
         <text lang="PL">Ustawienia</text>
         <text lang="HE">הגדרה</text>
+        <text lang="HU">Beállítások</text>
         <description>Configure MythTV and plugins</description>
         <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU main_settings.xml</action>

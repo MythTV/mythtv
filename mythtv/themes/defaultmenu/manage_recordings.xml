@@ -24,6 +24,7 @@
         <text lang="RU">Расписание записей</text>
         <text lang="PL">Harmonogram nagrań</text>
         <text lang="HE">תיזמון הקלטות</text>
+        <text lang="HU">Felvétel ütemezése</text>
         <alttext lang="SV">Schemalägg</alttext>
         <alttext lang="DE">Planung</alttext>
         <alttext lang="ET">Plaanimine</alttext>
@@ -39,6 +40,7 @@
         <text>Recording Rules</text>
         <text lang="DE">Aufnahmeregeln</text>
         <text lang="FR">Règles d&apos;enregistrement</text>
+        <text lang="HU">Felvételi szabályok</text>
         <alttext>Manage Rules</alttext>
         <alttext lang="FR">Gérer les règles</alttext>
         <description>Edit or delete any recording rule</description>
@@ -69,6 +71,7 @@
         <text lang="RU">Будущие записи</text>
         <text lang="PL">Zaplanowane nagrania</text>
         <text lang="HE">ההקלטות הבאות</text>
+        <text lang="HU">Ütemezett felvételek</text>
         <alttext lang="SV">Kommande</alttext>
         <description>See what will be recorded next</description>
         <description lang="DE">Was wird als nächstes aufgenommen?</description>
@@ -98,6 +101,7 @@
         <text lang="RU">Удалить записи</text>
         <text lang="PL">Kasowanie nagrań</text>
         <text lang="HE">מחיקת הקלטות</text>
+        <text lang="HU">Felvételek törlése</text>
         <alttext lang="SV">Radera</alttext>
         <alttext lang="DE">Löschen</alttext>
         <alttext lang="ET">Kustutamine</alttext>
@@ -129,6 +133,7 @@
         <text lang="RU">Ранее записанное</text>
         <text lang="PL">Poprzednio nagrane</text>
         <text lang="HE">הוקלט מקודם</text>
+        <text lang="HU">Korábbi felvételek</text>
         <alttext lang="SV">Tidigare</alttext>
         <description>See what you have recorded before</description>
         <description lang="DE">Was Sie bisher aufgenommen haben</description>
@@ -156,6 +161,7 @@
         <text lang="RU">Установка приоритетов</text>
         <text lang="PL">Ustaw priorytety</text>
         <text lang="HE">הגדרת קדימויות</text>
+        <text lang="HU">Prioritások beállítása</text>
         <description>Prioritize some shows over others</description>
         <description lang="DE">Welche Aufnahme ist Ihnen am wichtigsten?</description>
         <action>TV_SET_RECPRIORITIES</action>

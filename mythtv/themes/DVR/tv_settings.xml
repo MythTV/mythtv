@@ -18,6 +18,7 @@
         <text lang="SL">Splošno</text>
         <text lang="ET">Üldine</text>
         <text lang="RU">Общие</text>
+        <text lang="HU">Általános</text>
         <description>TV navigation and recording preferences</description>
         <description lang="DE">TV-Navigation und Aufnahme-Voreinstellungen</description>
         <action>SETTINGS GENERAL</action>
@@ -41,6 +42,7 @@
         <text lang="SL">Programski vodič</text>
         <text lang="ET">Telekava</text>
         <text lang="RU">Программа передач</text>
+        <text lang="HU">Műsorfüzet</text>
         <alttext lang="DE">EPG</alttext>
         <alttext lang="ET">Kava</alttext>
         <alttext lang="RU">Программа</alttext>
@@ -67,6 +69,7 @@
         <text lang="SL">Predvajanje</text>
         <text lang="ET">Mahamängimine</text>
         <text lang="RU">Воспроизведение</text>
+        <text lang="HU">Lejátszás</text>
         <alttext lang="RU">Группы</alttext>
         <description>Settings for viewing and playing TV</description>
         <description lang="DE">Einstellungen zur TV-Wiedergabe</description>
@@ -78,6 +81,7 @@
         <text>Playback OSD</text>
         <text lang="DE">Wiedergabe-OSD</text>
         <text lang="FR">Incrustation de lecture</text>
+        <text lang="HU">OSD</text>
         <description>Theme and settings for OSD</description>
         <description lang="DE">Einstellungen für das On-Screen-Display</description>
         <action>SETTINGS OSD</action>
@@ -88,7 +92,8 @@
         <text>OSD Menu Editor</text>
         <text lang="DE">OSD-Menü anpassen</text>
         <text lang="FR">Éditeur de menu d&apos;incrustation</text>
-        <description lang="DE">Welche Menüpunkte sollen im OSD erscheinen?</description>
+        <text lang="HU">OSD menu szerkesztő</text>
+        <description lang="DE">Welche Men�punkte sollen im OSD erscheinen?</description>
         <action>OSDMENUEDITOR</action>
     </button>
 
@@ -103,6 +108,7 @@
         <text lang="NL">Afspeelgroepen</text>
         <text lang="JA">プレイバックグループ</text>
         <text lang="RU">Группы воспроизведения</text>
+        <text lang="HU">Lejátszási csoport</text>
         <description>Adjust settings for different playback styles</description>
         <description lang="DE">Einstellungen für die Sendergruppen</description>
         <action>SETTINGS PLAYGROUP</action>
@@ -113,6 +119,7 @@
       <text>Channel Groups</text>
       <text lang="DE">Sendergruppen</text>
       <text lang="FR">Groupes de chaînes</text>
+      <text lang="HU">Csatorna csoport</text>
       <description lang="DE">Gruppieren Sie Ihre Lieblingssender</description>
       <action>SETTINGS CHANNELGROUPS</action>
     </button>
@@ -135,6 +142,7 @@
         <text lang="SL">Snemalni profili</text>
         <text lang="ET">Salvestamisprofiilid</text>
         <text lang="RU">Профили записи</text>
+        <text lang="HU">Felvételi profilok</text>
         <alttext lang="SV">Inspelning</alttext>
         <alttext lang="DE">Profile</alttext>
         <alttext lang="ET">Profiilid</alttext>
@@ -161,6 +169,7 @@
         <text lang="ES">Prioridades de Grabación</text>
         <text lang="NL">Opnameproriteiten</text>
         <text lang="RU">Приоритеты записей</text>
+        <text lang="HU">Felvételi prioritások</text>
         <alttext lang="DE">Prioritäten</alttext>
         <alttext lang="ET">Prioriteedid</alttext>
         <alttext lang="PT">Prioridades</alttext>

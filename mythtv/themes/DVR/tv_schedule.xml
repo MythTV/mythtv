@@ -18,6 +18,7 @@
         <text lang="SL">Programski vodič</text>
         <text lang="ET">Telekava</text>
         <text lang="RU">Программа передач</text>
+        <text lang="HU">Műsorfüzet</text>
         <alttext>Guide</alttext>
         <alttext lang="FR">Guide</alttext>
         <alttext lang="ES">Guía</alttext>
@@ -55,6 +56,7 @@
         <text lang="SL">Iskalec programov</text>
         <text lang="ET">Programmiotsija</text>
         <text lang="RU">Поиск программы</text>
+        <text lang="HU">Műsorkereső</text>
         <alttext>Finder</alttext>
         <alttext lang="FR">Recherche</alttext>
         <alttext lang="ES">Buscar</alttext>
@@ -90,6 +92,7 @@
         <text lang="PT">Pesquisar Palavras</text>
         <text lang="ES">Palabras</text>
         <text lang="RU">Поиск слов</text>
+        <text lang="HU">Kulcsszó keresése</text>
         <alttext>Search</alttext>
         <alttext lang="FR">Rechercher</alttext>
         <alttext lang="NL">Zoeken</alttext>
@@ -120,6 +123,7 @@
         <text lang="PT">Pesquisar Listas</text>
         <text lang="ES">Listados</text>
         <text lang="RU">Поиск по списку</text>
+        <text lang="HU">Találati lista</text>
         <alttext>Lists</alttext>
         <alttext lang="DE">Listen</alttext>
         <alttext lang="SV">Listor</alttext>
@@ -150,6 +154,7 @@
         <text lang="PT">Regras de Gravação</text>
         <text lang="ES">Avanzada</text>
         <text lang="RU">Дополнительно</text>
+        <text lang="HU">Egyéni felvétel</text>
         <description>Advanced program finder</description>
         <description lang="DE"></description>
         <action>TV_CUSTOM_RECORD</action>
@@ -172,6 +177,7 @@
         <text lang="SL">Ročno snemanje</text>
         <text lang="ET">Käsitsi salvestamine</text>
         <text lang="RU">Ручная запись</text>
+        <text lang="HU">Kézi ütemezés</text>
         <alttext>Man. Sched.</alttext>
         <alttext lang="ES">Manual</alttext>
         <alttext lang="CA">Programar</alttext>

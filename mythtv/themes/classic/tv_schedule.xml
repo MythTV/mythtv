@@ -19,6 +19,7 @@
         <text lang="RU">Программа передач</text>
         <text lang="PL">Przewodnik programowy</text>
         <text lang="HE">מדריך תוכניות</text>
+        <text lang="HU">Műsorújság</text>
         <alttext>Guide</alttext>
         <alttext lang="IT">Guida</alttext>
         <alttext lang="FR">Guide</alttext>
@@ -61,6 +62,7 @@
         <text lang="RU">Поиск программы</text>
         <text lang="PL">Znajdź program</text>
         <text lang="HE">מוצא התוכניות</text>
+        <text lang="HU">Műsor keresés</text>
         <alttext>Finder</alttext>
         <alttext lang="IT">Ricerca</alttext>
         <alttext lang="FR">Recherche</alttext>
@@ -99,6 +101,7 @@
         <text lang="RU">Поиск по списку</text>
         <text lang="PL">Listy wyszukiwania</text>
         <text lang="HE">חיפוש ברשימות</text>
+        <text lang="HU">Találati lista</text>
         <alttext>Search</alttext>
         <alttext lang="FR">Rechercher</alttext>
         <alttext lang="SV">Sök tablå</alttext>
@@ -132,6 +135,7 @@
         <text lang="RU">Дополнительно</text>
         <text lang="PL">Dostosuj nagrywanie</text>
         <text lang="HE">התאמת הקלטה</text>
+        <text lang="HU">Egyéni felvétel ütemezése</text>
         <description>Advanced program finder</description>
         <description lang="DE"></description>
         <action>TV_CUSTOM_RECORD</action>
@@ -155,6 +159,7 @@
         <text lang="RU">Ручная запись</text>
         <text lang="PL">Dodaj ręcznie</text>
         <text lang="HE">תיזמון ידני</text>
+        <text lang="HU">Kézi ütemezés</text>
         <alttext>Man. Sched.</alttext>
         <alttext lang="FR">Prog. man.</alttext>
         <alttext lang="IT">Manuale</alttext>
@@ -208,6 +213,7 @@
         <text lang="RU">Будущие записи</text>
         <text lang="PL">Rozwiąż konflikty</text>
         <text lang="HE">ההקלטות הבאות</text>
+        <text lang="HU">Ütemezett felvételek</text>
         <alttext lang="SV">Kommande</alttext>
         <alttext lang="ET">Tulevased</alttext>
         <alttext lang="ES">Conflictos</alttext>
@@ -233,6 +239,7 @@
         <text lang="RU">Приоритеты записей</text>
         <text lang="PL">Priorytet nagrywania</text>
         <text lang="HE">קדימויות ההקלטות</text>
+        <text lang="HU">Felvételi prioritások</text>
         <alttext>Priorities</alttext>
         <alttext lang="FR">Priorités</alttext>
         <alttext lang="IT">Priorità</alttext>

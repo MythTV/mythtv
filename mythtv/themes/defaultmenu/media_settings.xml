@@ -24,6 +24,7 @@
         <text lang="RU">Настройки музыки</text>
         <text lang="PL">Ustaw muzykę</text>
         <text lang="HE">הגדרות מוסיקה</text>
+        <text lang="HU">Zenei beállítások</text>
         <description>Configure playback and CD ripping</description>
         <description lang="DE">CD-Wiedergabe und Import einrichten</description>
         <action>CONFIGPLUGIN mythmusic</action>
@@ -53,6 +54,7 @@
         <text lang="RU">Настройки фильмов</text>
         <text lang="PL">Ustaw filmy</text>
         <text lang="HE">הגדרות וידאו</text>
+        <text lang="HU">Video bellítások</text>
         <description>Configure playback and DVD ripping</description>
         <description lang="DE">DVD-Wiedergabe und Import einrichten</description>
         <action>CONFIGPLUGIN mythvideo</action>
@@ -82,6 +84,7 @@
         <text lang="RU">Настройки изображений</text>
         <text lang="PL">Ustaw zdjęcia</text>
         <text lang="HE">הגדרות תמונות</text>
+        <text lang="HU">Galéria Beállítások</text>
         <description>Configure display of image gallery</description>
         <description lang="DE">Bildergallerie einrichten</description>
         <action>CONFIGPLUGIN mythgallery</action>
@@ -110,6 +113,7 @@
         <text lang="RU">Настройки игр</text>
         <text lang="PL">Ustaw gry</text>
         <text lang="HE">הגדרות משחק</text>
+        <text lang="HU">Játék beállítások</text>
         <description>Configure playback of games</description>
         <description lang="DE">Videospiele einrichten</description>
         <action>CONFIGPLUGIN mythgame</action>
@@ -136,6 +140,7 @@
         <text lang="RU">Настройки радио</text>
         <text lang="PL">Ustaw radio</text>
         <text lang="HE">הגדרות רדיו</text>
+        <text lang="HU">Rádió beállítások</text>
         <description></description>
         <description lang="DE">Radio einrichten</description>
         <action>CONFIGPLUGIN mythfm</action>
@@ -148,6 +153,7 @@
         <text lang="FR">Réglages MythStream</text>
         <text lang="SL">Nastavitve Mythstream</text>
         <text lang="HE">הגדרות MythStream</text>
+        <text lang="HU">Online folyam beállítások</text>
         <text lang="DE">MythStream</text>
         <description></description>
         <description lang="DE">MythStream einrichten</description>
@@ -170,6 +176,7 @@
         <text lang="HE">הגדרות ארכיון קבצים</text>
         <text lang="FI">Arkistointiasetukset</text>
         <text lang="DE">Archivieren</text>
+        <text lang="HU">Archíválási beállítások</text>
         <description>Configure how to archive video to DVD</description>
         <description lang="DE">Archivieren auf DVD einrichten</description>
         <action>CONFIGPLUGIN mytharchive</action>

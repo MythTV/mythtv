@@ -16,6 +16,7 @@
         <text lang="SL">Gledanje TV</text>
         <text lang="ET">Vaata telerit</text>
         <text lang="RU">Смотреть ТВ</text>
+        <text lang="HU">TV nézés</text>
         <description>Watch live television</description>
         <description lang="DE">Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
@@ -37,6 +38,7 @@
         <text lang="SL">Brisanje Snemanj</text>
         <text lang="ET">Salvestiste kustutamine</text>
         <text lang="RU">Удалить записи</text>
+        <text lang="HU">Felvételek törlése</text>
         <alttext lang="DE">Löschen</alttext>
         <alttext lang="ET">Kustutamine</alttext>
         <alttext lang="SV">Radera</alttext>
@@ -60,6 +62,7 @@
         <text lang="JA">パススルーモード</text>
         <text lang="ET">Otse-TV</text>
         <text lang="NL">TV Direct</text>
+        <text lang="HU">Közvetlen TV adás</text>
         <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
     </button>
 -->
@@ -79,6 +82,7 @@
         <text lang="NL">Eerder Opgenomen</text>
         <text lang="JA">録画履歴</text>
         <text lang="RU">Ранее записано</text>
+        <text lang="HU">Korábbi felvételek</text>
         <description>See what you have recorded before</description>
         <action>TV_PREVIOUS</action>
     </button>

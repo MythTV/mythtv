@@ -25,6 +25,7 @@
         <text lang="RU">Программа передач</text>
         <text lang="PL">Przewodnik programowy</text>
         <text lang="HE">מדריך שידורים</text>
+        <text lang="HU">Műsorújság</text>
         <alttext>Guide</alttext>
         <alttext lang="IT">Guida</alttext>
         <alttext lang="FR">Guide</alttext>
@@ -73,6 +74,7 @@
         <text lang="RU">Поиск программы</text>
         <text lang="PL">Znajdź program</text>
         <text lang="HE">מציאת תכניות</text>
+        <text lang="HU">Műsor kereső</text>
         <alttext>Finder</alttext>
         <alttext lang="IT">Ricerca</alttext>
         <alttext lang="FR">Recherche</alttext>
@@ -119,6 +121,7 @@
         <text lang="RU">Поиск по словам</text>
         <text lang="PL">Szukaj słów</text>
         <text lang="HE">חיפוש מילים</text>
+        <text lang="HU">Szavak keresése</text>
         <alttext>Search</alttext>
         <alttext lang="IT">Ricerca</alttext>
         <alttext lang="FR">Rechercher</alttext>
@@ -161,6 +164,7 @@
         <text lang="RU">Поиск по спискам</text>
         <text lang="PL">Szukaj***listy</text>
         <text lang="HE">חיפוש רשימות</text>
+        <text lang="HU">Találati lista</text>
         <alttext>Lists</alttext>
         <alttext lang="IT">Liste</alttext>
         <alttext lang="DE">Listen</alttext>
@@ -203,6 +207,7 @@
         <text lang="RU">Дополнительно</text>
         <text lang="PL">Dostosuj nagrywanie</text>
         <text lang="HE">הקלטה לפי כללים</text>
+        <text lang="HU">Egyéni felvétel</text>
         <description>Advanced program finder</description>
         <description lang="DE"></description>
         <action>TV_CUSTOM_RECORD</action>
@@ -232,6 +237,7 @@
         <text lang="RU">Ручное планирование</text>
         <text lang="PL">Dodaj ręcznie</text>
         <text lang="HE">הקלטה ידנית</text>
+        <text lang="HU">Kézi ütemezés</text>
         <alttext>Man. Sched.</alttext>
         <alttext lang="IT">Manuale</alttext>
         <alttext lang="ES">Programar</alttext>

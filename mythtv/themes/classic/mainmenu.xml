@@ -15,6 +15,7 @@
         <text lang="NL">TV</text>
         <text lang="PL">Telewizja</text>
         <text lang="RU">ТВ</text>
+        <text lang="HU">TV</text>
         <action>MENU tvmenu.xml</action>
     </button>
 
@@ -35,6 +36,7 @@
         <text lang="ET">Muusika</text>
         <text lang="PL">Muzyka</text>
         <text lang="RU">Музыка</text>
+        <text lang="HU">Zene</text>
         <action>PLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
@@ -56,6 +58,7 @@
         <text lang="ET">Video</text>
         <text lang="PL">Filmy</text>
         <text lang="RU">Фильмы</text>
+        <text lang="HU">Video</text>
         <action>PLUGIN mythvideo</action>
         <depends>mythvideo</depends>
     </button>
@@ -75,6 +78,7 @@
         <text lang="NL">Radio</text>
         <text lang="PL">Radio</text>
         <text lang="RU">Радио</text>
+        <text lang="HU">Rádió</text>
         <action>PLUGIN mythFM</action>
         <depends>mythFM</depends>
     </button>
@@ -83,6 +87,7 @@
         <type>STREAM</type>
         <text>Play Online Streams</text>
         <text lang="FR">Lire les flux en ligne</text>
+        <text lang="HU">Online folyam</text>
         <action>PLUGIN mythstream</action>
         <depends>mythstream</depends>
     </button>
@@ -104,6 +109,7 @@
         <text lang="ET">Galerii</text>
         <text lang="PL">Zdjęcia</text>
         <text lang="RU">Изображения</text>
+        <text lang="HU">Galéria</text>
         <action>PLUGIN mythgallery</action>
         <depends>mythgallery</depends>
     </button>
@@ -125,6 +131,7 @@
         <text lang="ET">Mängud</text>
         <text lang="PL">Gry</text>
         <text lang="RU">Игры</text>
+        <text lang="HU">Játékok</text>
         <action>PLUGIN mythgame</action>
         <depends>mythgame</depends>
     </button>
@@ -146,6 +153,7 @@
         <text lang="ET">Ilm</text>
         <text lang="PL">Pogoda</text>
         <text lang="RU">Погода</text>
+        <text lang="HU">Időjárás</text>
         <action>PLUGIN mythweather</action>
         <depends>mythweather</depends>
     </button>
@@ -176,6 +184,7 @@
         <text lang="PT">Notícias</text>
         <text lang="PL">Wiadomości</text>
         <text lang="RU">Новости</text>
+        <text lang="HU">Friss ħírek</text>
         <action>PLUGIN mythnews</action>
         <depends>mythnews</depends>
     </button>
@@ -209,6 +218,7 @@
         <text lang="NL">Internet</text>
         <text lang="PL">Internet WWW</text>
         <text lang="RU">WWW</text>
+        <text lang="HU">Web</text>
         <action>PLUGIN mythbrowser</action>
         <depends>mythbrowser</depends>
     </button>
@@ -229,6 +239,7 @@
         <text lang="PL">Telefon</text>
         <text lang="JA">電話</text>
         <text lang="RU">Телефон</text>
+        <text lang="HU">Telefon</text>
         <action>PLUGIN mythphone</action>
         <depends>mythphone</depends>
     </button>
@@ -247,6 +258,7 @@
         <text lang="NL">Recepten</text>
         <text lang="PL">Przepisy</text>
         <text lang="RU">Рецепты</text>
+        <text lang="HU">Receptek</text>
         <action>PLUGIN mythRecipe</action>
         <depends>mythRecipe</depends>
     </button>

@@ -17,6 +17,7 @@
         <text lang="ET">Vaata telerit</text>
         <text lang="RU">Смотреть ТВ</text>
         <text lang="PL">Oglądanie TV</text>
+        <text lang="HU">TV nézés</text>
         <description>Watch live television</description>
         <description lang="DE">Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
@@ -39,6 +40,7 @@
         <text lang="ET">Salvestamise plaanimine</text>
         <text lang="RU">Расписание записи</text>
         <text lang="PL">Harmonogram nagrywania</text>
+        <text lang="HU">Felvétel ütemezése</text>
         <alttext>Schedule</alttext>
         <alttext lang="IT">Pianifica</alttext>
         <alttext lang="FR">Programmation</alttext>
@@ -77,6 +79,7 @@
         <text lang="ET">Salvestiste vaatamine</text>
         <text lang="RU">Смотреть записи</text>
         <text lang="PL">Odtwarzanie nagrań</text>
+        <text lang="HU">Felvételek lejátszása</text>
         <alttext lang="DE">Wiedergabe</alttext>
         <alttext lang="ET">Salvestised</alttext>
         <alttext lang="SV">Inspelningar</alttext>
@@ -103,6 +106,7 @@
         <text lang="ET">Salvestiste kustutamine</text>
         <text lang="RU">Удалить записи</text>
         <text lang="PL">Kasowanie nagrań</text>
+        <text lang="HU">Felvételek törlése</text>
         <alttext lang="DE">Löschen</alttext>
         <alttext lang="ET">Kustuta</alttext>
         <alttext lang="SV">Radera</alttext>
@@ -126,6 +130,7 @@
         <text lang="JA">パススルーモード</text>
         <text lang="ET">Otse-TV</text>
         <text lang="NL">TV Direct</text>
+        <text lang="HU">Közvetlen TV adás</text>
         <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
     </button>
 -->
@@ -146,6 +151,7 @@
         <text lang="JA">録画履歴</text>
         <text lang="RU">Ранее записано</text>
         <text lang="PL">Poprzednio nagrane</text>
+        <text lang="HU">Korábbi felvételek</text>
         <description>See what you have recorded before</description>
         <description lang="DE">Was Sie bisher aufgenommen haben</description>
         <action>TV_PREVIOUS</action>
@@ -167,6 +173,7 @@
         <text lang="NL">Systeemstatus</text>
         <text lang="RU">Состояние системы</text>
         <text lang="PL">Status systemu</text>
+        <text lang="HU">Rendszer állapot</text>
         <description>What your system is doing right now</description>
         <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
@@ -189,6 +196,7 @@
         <text lang="ET">TV sätted</text>
         <text lang="PL">Konfiguracja TV</text>
         <text lang="RU">Настройка ТВ</text>
+        <text lang="HU">TV beállítások</text>
         <description>Settings for TV recording and playback</description>
         <description lang="DE">Einstellungen für TV-Aufnahme und -Wiedergabe</description>
         <action>MENU tv_settings.xml</action>

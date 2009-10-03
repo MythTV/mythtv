@@ -23,6 +23,7 @@
         <text lang="RU">Новые заголовки</text>
         <text lang="PL">Nowe tytuły</text>
         <text lang="HE">כותרים חדשים</text>
+        <text lang="HU">Új címek</text>
         <description>Pick a program to record for a list of new titles</description>
         <description lang="DE">Wählen Sie eine Sendung aus verschiedenen Listen</description>
         <action>TV_SEARCH_NEW</action>
@@ -51,6 +52,7 @@
         <text lang="RU">Фильмы</text>
         <text lang="PL">Filmy</text>
         <text lang="HE">סרטים</text>
+        <text lang="HU">Filmek</text>
         <description>Pick a movie to record</description>
         <description lang="DE">Wählen Sie einen Film zum aufnehmen</description>
         <action>TV_SEARCH_MOVIE</action>
@@ -78,6 +80,7 @@
         <text lang="RU">Категории</text>
         <text lang="PL">Kategorie</text>
         <text lang="HE">קטגוריות</text>
+        <text lang="HU">Kategóriák</text>
         <description>Pick a program based on category</description>
         <description lang="DE">Wählen Sie eine Sendung nach Genre</description>
         <action>TV_SEARCH_CATEGORY</action>
@@ -105,6 +108,7 @@
         <text lang="RU">Каналы</text>
         <text lang="PL">Kanały</text>
         <text lang="HE">ערוצים</text>
+        <text lang="HU">Csatornák</text>
         <description>Pick a program on a given channel</description>
         <description lang="DE">Wählen Sie eine Sendung auf einem best. Sender</description>
         <action>TV_SEARCH_CHANNEL</action>
@@ -132,6 +136,7 @@
         <text lang="RU">Время</text>
         <text lang="PL">Czas</text>
         <text lang="HE">זמן</text>
+        <text lang="HU">Óra</text>
         <description>Pick a program based on time</description>
         <description lang="DE">Wählen Sie eine Sendung nach ihrer Sendezeit</description>
         <action>TV_SEARCH_TIME</action>

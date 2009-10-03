@@ -16,6 +16,7 @@
         <text lang="SL">Predvajanje snemanj</text>
         <text lang="ET">Salvestiste vaatamine</text>
         <text lang="RU">Просмотр записей</text>
+        <text lang="HU">Felvételek lejátszása</text>
         <alttext lang="DE">Wiedergabe</alttext>
         <alttext lang="ET">Salvestised</alttext>
         <alttext lang="SV">Inspelningar</alttext>
@@ -41,6 +42,7 @@
         <text lang="SL">Prihajajoča snemanja</text>
         <text lang="ET">Tulevased salvestamised</text>
         <text lang="RU">Будущие записи</text>
+        <text lang="HU">Ütemezett felvételek</text>
         <alttext lang="SV">Kommande</alttext>
         <alttext lang="ET">Tulevased</alttext>
         <description>See what will be recorded next</description>
@@ -64,6 +66,7 @@
         <text lang="SL">Plan snemanj</text>
         <text lang="ET">Salvestamise plaanimine</text>
         <text lang="RU">Расписание записей</text>
+        <text lang="HU">Felvétel ütemezése</text>
         <alttext>Schedule</alttext>
         <alttext lang="IT">Pianifica</alttext>
         <alttext lang="FR">Programmation</alttext>
@@ -98,6 +101,7 @@
         <text lang="PT">Prioridades de Gravações</text>
         <text lang="ES">Prioridades Grabaciones</text>
         <text lang="RU">Приоритеты записей</text>
+        <text lang="HU">Felvételi prioritás</text>
         <alttext>Priorities</alttext>
         <alttext lang="FR">Priorités</alttext>
         <alttext lang="IT">Priorità</alttext>
@@ -130,6 +134,7 @@
         <text lang="ES">Estado Sistema</text>
         <text lang="NL">Systeemstatus</text>
         <text lang="RU">Состояние системы</text>
+        <text lang="HU">Rendszer állapot</text>
         <description>What your system is doing right now</description>
         <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
@@ -153,6 +158,7 @@
         <text lang="SL">Nastavitve</text>
         <text lang="ET">Utiliidid / sätted</text>
         <text lang="RU">Утилиты / Настройки</text>
+        <text lang="HU">Eszközök / Beállítások</text>
         <alttext lang="DE">Verschiedenes</alttext>
         <alttext lang="SV">Inställningar</alttext>
         <alttext lang="NL">Beheer</alttext>
@@ -175,6 +181,7 @@
         <text lang="PT">Desligar</text>
         <text lang="NL">Afsluiten</text>
         <text lang="RU">Завершение работы</text>
+        <text lang="HU">Kikapcsolás</text>
         <action>SHUTDOWN</action>
     </button> -->
 

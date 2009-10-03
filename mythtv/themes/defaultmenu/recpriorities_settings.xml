@@ -21,6 +21,7 @@
         <text lang="RU">Установить приоритеты записей</text>
         <text lang="PL">Ustaw priorytety nagrań</text>
         <text lang="HE">הגדרת קדימויות הקלטה</text>
+        <text lang="HU">Felvételi prioritások beállításai</text>
         <alttext>Recording Priorities</alttext>
         <alttext lang="FR">Priorités d&apos;enresgitrement</alttext>
         <alttext lang="IT">Priorità</alttext>
@@ -58,6 +59,7 @@
         <text lang="RU">Установить приоритеты каналов</text>
         <text lang="PL">Ustaw priorytety kanałów</text>
         <text lang="HE">הגדרת קדימויות הקלטת ערוץ</text>
+        <text lang="HU">Csatorna felvételi prioritások beállítása</text>
         <alttext>Channel Priorities</alttext>
         <alttext lang="IT">Canali</alttext>
         <alttext lang="FR">Priorités de chaîne</alttext>
@@ -82,6 +84,7 @@
         <text lang="IT">Personalizzate</text>
         <text lang="SL">Poljubne prioritete</text>
         <text lang="FI">Muokatut Prioriteetit</text>
+        <text lang="HU">Egyéni prioritások</text>
         <alttext>Custom Priority</alttext>
         <alttext lang="FR">Priorité personnalisée</alttext>
         <description></description>

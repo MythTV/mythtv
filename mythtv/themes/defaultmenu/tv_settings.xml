@@ -24,6 +24,7 @@
         <text lang="RU">Общее</text>
         <text lang="PL">Ogólne</text>
         <text lang="HE">כללי</text>
+        <text lang="HU">Általános</text>
         <description>TV navigation and recording preferences</description>
         <description lang="DE">TV-Navigation und Aufnahme-Voreinstellungen</description>
         <action>SETTINGS GENERAL</action>
@@ -53,6 +54,7 @@
         <text lang="RU">Программа передач</text>
         <text lang="PL">Przewodnik programowy</text>
         <text lang="HE">מדריך התכניות</text>
+        <text lang="HU">Műsorújság</text>
         <alttext lang="DE">EPG</alttext>
         <alttext lang="ET">Kava</alttext>
         <alttext lang="PL">Program TV</alttext>
@@ -83,6 +85,7 @@
         <text lang="CS">Přehrávání</text>
         <text lang="RU">Воспроизведение</text>
         <text lang="HE">הסרטה</text>
+        <text lang="HU">Lejátszás</text>
         <description>Settings for viewing and playing TV</description>
         <description lang="DE">Einstellungen zur TV-Wiedergabe</description>
         <action>SETTINGS PLAYBACK</action>
@@ -96,6 +99,7 @@
         <text lang="HE">תצוגה בזמן הסרטה</text>
         <text lang="FI">OSD Asetukset</text>
         <text lang="DE">Wiedergabe-OSD</text>
+        <text lang="HU">OSD</text>
         <description>Theme and settings for OSD</description>
         <description lang="DE">Einstellungen für das On-Screen-Display</description>
         <action>SETTINGS OSD</action>
@@ -106,7 +110,8 @@
         <text>OSD Menu Editor</text>
         <text lang="DE">OSD-Menü anpassen</text>
         <text lang="FR">Éditeur de menu d&apos;incrustation</text>
-        <description lang="DE">Welche Menüpunkte sollen im OSD-Menü erscheinen?</description>
+        <text lang="HU">OSD menu szerkesztő</text>
+        <description lang="DE">Welche Men�punkte sollen im OSD-Men� erscheinen?</description>
         <action>OSDMENUEDITOR</action>
   </button>
     <button>
@@ -127,6 +132,7 @@
         <text lang="PL">Grupy odtwarzania</text>
         <text lang="HE">קבוצות הסרטה</text>
         <text lang="FI">Toistoryhmät</text>
+        <text lang="HU">Lejátszási csoport</text>
         <description>Adjust settings for different playback styles</description>
         <description lang="DE">Einstellungen für die Wiedergabegruppen</description>
         <action>SETTINGS PLAYGROUP</action>
@@ -137,7 +143,8 @@
       <text>Channel Groups</text>
       <text lang="DE">Sendergruppen</text>
       <text lang="FR">Groupes de chaînes</text>
-      <description lang="DE">Einstellungen für die Sendergruppen</description>
+      <text lang="HU">Csatorna csoport</text>
+      <description lang="DE">Einstellungen f�r die Sendergruppen</description>
       <action>SETTINGS CHANNELGROUPS</action>
     </button>
 
@@ -164,6 +171,7 @@
         <text lang="RU">Профили записей</text>
         <text lang="PL">Profil nagrywania</text>
         <text lang="HE">פרופילים להקלטה</text>
+        <text lang="HU">Felvételek profiljai</text>
         <alttext lang="SV">Inspelning</alttext>
         <alttext lang="DE">Profile</alttext>
         <alttext lang="ET">Profiilid</alttext>
@@ -196,6 +204,7 @@
         <text lang="RU">Приоритеты записей</text>
         <text lang="PL">Priorytety nagrań</text>
         <text lang="HE">קדימויות הקלטה</text>
+        <text lang="HU">Felvételek proiritása</text>
         <alttext lang="DE">Prioritäten</alttext>
         <alttext lang="ET">Prioriteedid</alttext>
         <alttext lang="ES">Prioridades</alttext>

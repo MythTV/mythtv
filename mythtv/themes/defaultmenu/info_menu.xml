@@ -22,6 +22,7 @@
         <text lang="RU">Телефон</text>
         <text lang="PL">Telefon</text>
         <text lang="HE">טלפון</text>
+        <text lang="HU">Telefon</text>
         <description>Make or accept a VoIP call</description>
         <description lang="DE">Über VoIP telefonieren</description>
         <action>PLUGIN mythphone</action>
@@ -51,6 +52,7 @@
         <text lang="RU">Новости</text>
         <text lang="PL">Wiadomości</text>
         <text lang="HE">חדשות</text>
+        <text lang="HU">Friss hírek</text>
         <description>Keep up with the news</description>
         <description lang="DE">Was passiert in der Welt?</description>
         <action>PLUGIN mythnews</action>
@@ -74,6 +76,7 @@
         <text lang="RU">Афиша кино</text>
         <text lang="PL">Repertuar kin</text>
         <text lang="HE">זמני הקרנת סרטים</text>
+        <text lang="HU">Moziműsor</text>
         <description>See when local movies are playing</description>
         <description lang="DE">Was läuft im Kino?</description>
         <action>PLUGIN mythmovies</action>
@@ -103,6 +106,7 @@
         <text lang="RU">Погода</text>
         <text lang="PL">Pogoda</text>
         <text lang="HE">מזג האויר</text>
+        <text lang="HU">Időjárás-jelentés</text>
         <action>PLUGIN mythweather</action>
         <description>Local weather forecast</description>
         <description lang="DE">Wie wird das Wetter?</description>
@@ -114,6 +118,7 @@
         <text>Weather Station</text>
         <text lang="FR">Station météo</text>
         <text lang="DE">Wetterstation</text>
+        <text lang="HU">Időjárás-mérő állomás</text>
         <description></description>
         <action>PLUGIN mythwstation</action>
         <depends>mythwstation</depends>
@@ -131,6 +136,7 @@
         <text lang="SL">MythFlix</text>
         <text lang="FR">NetFlix</text>
         <text lang="PL">Filmy z internetu</text>
+        <text lang="HU">Netflix</text>
         <description>Manage your NetFlix queue</description>
         <description lang="DE"></description>
         <action>PLUGIN mythflix</action>
@@ -159,6 +165,7 @@
         <text lang="RU">WWW</text>
         <text lang="PL">Internet WWW</text>
         <text lang="HE">אינטרנט</text>
+        <text lang="HU">Web</text>
         <description>Browse the web</description>
         <description lang="DE">Surfen Sie im Netz</description>
         <action>PLUGIN mythbrowser</action>
@@ -187,6 +194,7 @@
         <text lang="RU">Рецепты</text>
         <text lang="PL">Przepisy</text>
         <text lang="HE">מתכונים</text>
+        <text lang="HU">Receptek</text>
         <description>Start cooking!</description>
         <description lang="DE">Was wollen Sie heute Kochen?</description>
         <action>PLUGIN mythRecipe</action>
@@ -214,7 +222,8 @@
         <text lang="CS">Stav systému</text>
         <text lang="RU">Состояние системы</text>
         <text lang="PL">Status systemu</text>
-        <text lang="HE">מצב מערכת</text>
+        <text lang="HE">מב מערכת</text>
+        <text lang="HU">Rendszer állapot</text>
         <description>What your system is doing right now</description>
         <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
@@ -227,6 +236,7 @@
         <text lang="IT">Videosorveglianza</text>
         <text lang="PL">Strażnik</text>
         <text lang="FI">ZoneMinder</text>
+        <text lang="HU">Video megfigyelő rendszer</text>
         <text lang="DE">Videoüberwachung</text>
         <description>Home surveillance</description>
         <description lang="DE">Videoüberwachung</description>
@@ -239,6 +249,7 @@
         <text>Hardware profile</text>
         <text lang="DE">Geräteprofil</text>
         <text lang="FR">Profil matériel</text>
+        <text lang="HU">Hardver profil</text>
         <description>Tell us what hardware you have so we can support it</description>
         <description lang="DE">Sagen Sie uns welche Geräte Sie verwenden</description>
         <action>PLUGIN mythsmolt</action>

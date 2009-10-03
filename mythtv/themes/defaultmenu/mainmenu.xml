@@ -24,6 +24,7 @@
         <text lang="AR">مكتبة الوسائط</text>
         <text lang="PL">Biblioteka media***</text>
         <text lang="HE">ספרית המדיה</text>
+        <text lang="HU">Média könyvtár</text>
         <alttext lang="SV">Bibliotek</alttext>
         <alttext lang="ET">Kataloog</alttext>
         <alttext lang="PT">Galeria</alttext>
@@ -58,6 +59,7 @@
         <text lang="AR">أدر التسجيلات</text>
         <text lang="PL">Zarządzaj nagraniami</text>
         <text lang="HE">ניהול הקלטות</text>
+        <text lang="HU">Felvételek kezelése</text>
         <alttext lang="DE">Verwaltung</alttext>
         <alttext lang="SV">Hantera</alttext>
         <alttext lang="ES">Programar</alttext>
@@ -93,6 +95,7 @@
         <text lang="RU">Центр информации</text>
         <text lang="AR">مركز المعلومات</text>
         <text lang="HE">מרכז מידע</text>
+        <text lang="HU">Információk</text>
         <alttext lang="ES">Información</alttext>
         <alttext lang="DE">Infocenter</alttext>
         <alttext lang="DA">Infocenter</alttext>
@@ -132,6 +135,7 @@
         <text lang="AR">تشغيل إسطوانات</text>
         <text lang="PL">Dyski optyczne</text>
         <text lang="HE">דיסקים אופטים</text>
+        <text lang="HU">CD/DVD</text>
         <description>Play or import CDs and DVDs</description>
         <description lant="DE">Abspielen/Importieren von CDs und DVDs</description>
         <action>MENU optical_menu.xml</action>
@@ -162,6 +166,7 @@
         <text lang="AR">شاهد التلفاز</text>
         <text lang="PL">Oglądanie TV</text>
         <text lang="HE">צפיה בטלויזיה</text>
+        <text lang="HU">TV nézés</text>
         <description>Watch live television</description>
         <description lang="DE">Jetzt Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
@@ -191,6 +196,7 @@
         <text lang="AR">تضبيطات</text>
         <text lang="PL">Narzędzia / ustawienia</text>
         <text lang="HE">עזרים / הגדרות</text>
+        <text lang="HU">Eszközök / Beállítások</text>
         <alttext lang="DE">Verschiedenes</alttext>
         <alttext lang="SV">Inställningar</alttext>
         <alttext lang="ET">Sätted</alttext>
@@ -215,6 +221,7 @@
         <text lang="RU">Завершение работы</text>
         <text lang="PL">Zamknij system</text>
         <text lang="HE">כיבוי</text>
+        <text lang="HU">Leállítás</text>
         <action>SHUTDOWN</action>
     </button> -->
 
