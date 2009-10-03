@@ -4,6 +4,7 @@
 // QT
 #include <QTimer>
 #include <QDomDocument>
+#include <QApplication>
 
 // Myth headers
 #include "mythverbose.h"
@@ -245,7 +246,8 @@ bool MythUIButton::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "value")
     {
-        m_ValueText = getFirstText(element);
+        m_ValueText = qApp->translate(
+            "ThemeUI", getFirstText(element).toLatin1().constData());
     }
     else
         return MythUIType::ParseElement(element);

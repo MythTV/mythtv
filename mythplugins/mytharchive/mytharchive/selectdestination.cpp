@@ -84,7 +84,7 @@ bool SelectDestination::Create(void)
     for (int x = 0; x < ArchiveDestinationsCount; x++)
     {
         MythUIButtonListItem *item = new 
-                MythUIButtonListItem(m_destinationSelector, ArchiveDestinations[x].name);
+            MythUIButtonListItem(m_destinationSelector, tr(ArchiveDestinations[x].name));
         item->SetData(qVariantFromValue(ArchiveDestinations[x].type));
     }
     m_findButton->SetText(tr("Find..."));
@@ -233,7 +233,7 @@ void SelectDestination::setDestination(MythUIButtonListItem* item)
     if (itemNo < 0 || itemNo > ArchiveDestinationsCount - 1)
         itemNo = 0;
 
-    m_destinationText->SetText(ArchiveDestinations[itemNo].description);
+    m_destinationText->SetText(tr(ArchiveDestinations[itemNo].description));
 
     m_archiveDestination = ArchiveDestinations[itemNo];
 
@@ -278,7 +278,7 @@ void SelectDestination::setDestination(MythUIButtonListItem* item)
     }
     else
     {
-        m_freespaceText->SetText("Unknown");
+        m_freespaceText->SetText(tr("Unknown"));
         m_freeSpace = 0;
     }
 
@@ -334,7 +334,7 @@ void SelectDestination::filenameEditLostFocus()
     }
     else
     {
-        m_freespaceText->SetText("Unknown");
+        m_freespaceText->SetText(tr("Unknown"));
         m_freeSpace = 0;
     }
 }

@@ -2379,7 +2379,7 @@ static HostComboBox *LetterboxingColour()
         QObject::tr(
             "By default MythTV uses black letterboxing to match broadcaster "
             "letterboxing, but those with plasma screens may prefer gray "
-            "to minimize burn-in.") +
+            "to minimize burn-in. ") +
         QObject::tr("Currently only works with XVideo video renderer."));
     return gc;
 }

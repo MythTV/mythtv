@@ -25,8 +25,8 @@ Q_DECLARE_METATYPE (ARCHIVEDESTINATION);
 typedef struct ArchiveDestination
 {
     ARCHIVEDESTINATION type;
-    QString name;
-    QString description;
+    const char *name;
+    const char *description;
     long long freeSpace;
 }_ArchiveDestination;
 

@@ -39,10 +39,10 @@ namespace
         if (err.isEmpty())
             return false;
 
-        QString tempPurpose = purpose.isEmpty() ? "Command" : purpose;
+        QString tempPurpose = purpose.isEmpty() ? QObject::tr("Command") : purpose;
 
         VERBOSE(VB_IMPORTANT, err);
-        ShowOkPopup(tempPurpose + " failed\n" + err + "\n\nCheck MythMovies Settings");
+        ShowOkPopup(QObject::tr("%1 failed\n%2\n\nCheck MythMovies Settings").arg(tempPurpose).arg(err));
 
         return true;
     }
@@ -67,13 +67,13 @@ namespace
 
         if (!info.exists())
         {
-            err = QString("\"%1\" failed: does not exist").arg(program);
+            err = QObject::tr("\"%1\" failed: does not exist").arg(program);
             HandleError(err, purpose);
             return "#ERROR";
         }
         else if (!info.isExecutable())
         {
-            err = QString("\"%1\" failed: not executable").arg(program);
+            err = QObject::tr("\"%1\" failed: not executable").arg(program);
             HandleError(err, purpose);
             return "#ERROR";
         }
@@ -82,7 +82,7 @@ namespace
 
         if (!proc.waitForStarted())
         {
-            err = QString("\"%1\" failed: Could not start process")
+            err = QObject::tr("\"%1\" failed: Could not start process")
                 .arg(program);
             HandleError(err, purpose);
             return "#ERROR";
@@ -113,8 +113,8 @@ namespace
             {
                 if (proc.exitCode())
                 {
-                    err = QString("\"%1\" failed: Process exited "
-                                  "abnormally").arg(program);
+                    err = QObject::tr("\"%1\" failed: Process exited "
+                                      "abnormally").arg(program);
                 }
 
                 break;
@@ -214,7 +214,7 @@ void MoviesUI::updateMovieTimes()
     {
         QString program = args[0];
         args.pop_front();
-        ret = ExecuteExternal(program, args, "MythMovies Data Grabber");
+        ret = ExecuteExternal(program, args, QObject::tr("MythMovies Data Grabber"));
     }
 
     VERBOSE(VB_IMPORTANT, "Grabber Finished. Processing Data.");
@@ -222,7 +222,7 @@ void MoviesUI::updateMovieTimes()
         gContext->SaveSetting("MythMovies.LastGrabDate", currentDate);
     else
     {
-        ShowOkPopup(tr("Failed to process the grabber data!"));
+        ShowOkPopup(QObject::tr("Failed to process the grabber data!"));
         VERBOSE(VB_IMPORTANT, "Failed to process the grabber data!");
     }
 
@@ -341,8 +341,8 @@ void MoviesUI::showMenu()
 
     menuPopup->SetReturnEvent(this, "action");
 
-    menuPopup->AddButton(tr("Update Movie Times"), SLOT(slotUpdateMovieTimes()));
-    menuPopup->AddButton(tr("Cancel"));
+    menuPopup->AddButton(QObject::tr("Update Movie Times"), SLOT(slotUpdateMovieTimes()));
+    menuPopup->AddButton(QObject::tr("Cancel"));
 }
 
 void MoviesUI::slotUpdateMovieTimes()

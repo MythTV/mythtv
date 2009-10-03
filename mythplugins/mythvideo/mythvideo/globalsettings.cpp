@@ -47,8 +47,8 @@ HostComboBox *VideoDefaultView()
     return gc;
 }
 
-const QString password_clue =
-    QObject::tr("Setting this value to all numbers will make your life "
+const char *password_clue =
+    QT_TR_NOOP("Setting this value to all numbers will make your life "
                 "much easier.");
 
 HostLineEdit *VideoAdminPassword()
@@ -58,7 +58,7 @@ HostLineEdit *VideoAdminPassword()
     gc->setHelpText(QString("%1 %2")
         .arg(QObject::tr("This PIN is used to enter Parental Control "
                          "Level 4 as well as the Video Manager."))
-        .arg(password_clue));
+        .arg(QObject::tr(password_clue)));
     return gc;
 }
 
@@ -68,7 +68,7 @@ HostLineEdit *VideoAdminPasswordThree()
     gc->setLabel(QObject::tr("Parental Level 3 PIN"));
     gc->setHelpText(QString("%1 %2")
         .arg(QObject::tr("This PIN is used to enter Parental Control Level 3."))
-        .arg(password_clue));
+        .arg(QObject::tr(password_clue)));
     return gc;
 }
 
@@ -78,7 +78,7 @@ HostLineEdit *VideoAdminPasswordTwo()
     gc->setLabel(QObject::tr("Parental Level 2 PIN"));
     gc->setHelpText(QString("%1 %2")
         .arg(QObject::tr("This PIN is used to enter Parental Control Level 2."))
-        .arg(password_clue));
+        .arg(QObject::tr(password_clue)));
     return gc;
 }
 

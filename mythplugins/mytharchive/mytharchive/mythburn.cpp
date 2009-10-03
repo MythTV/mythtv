@@ -801,7 +801,7 @@ void MythBurn::showMenu()
 
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythDialogBox *menuPopup = new MythDialogBox("Menu",
+    MythDialogBox *menuPopup = new MythDialogBox(tr("Menu"),
                                                  popupStack, "actionmenu");
 
     if (menuPopup->Create())
@@ -1149,7 +1149,7 @@ void BurnMenu::start(void)
     }
 
     // ask the user what type of disk to burn to
-    QString title = "Burn DVD";
+    QString title = QObject::tr("Burn DVD");
     QString msg   = QObject::tr("\nPlace a blank DVD in the"
                                 " drive and select an option below.");
     MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
