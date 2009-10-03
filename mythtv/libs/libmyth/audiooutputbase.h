@@ -155,6 +155,10 @@ class AudioOutputBase : public AudioOutput, public QThread
     AudioOutputDigitalEncoder *encoder;
     FreeSurround              *upmixer;
 
+    void *MonoToStereo(void *s1, void *s2, int samples);
+    template <class AudioDataType>
+        void *_MonoToStereo(AudioDataType *s1, AudioDataType *s2, int samples);
+
     int source_audio_channels;
     int source_audio_bytes_per_sample;
     bool needs_upmix;

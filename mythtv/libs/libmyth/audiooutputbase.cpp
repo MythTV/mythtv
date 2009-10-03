@@ -210,7 +210,15 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         cchannels = ((AVCodecContext*)audio_codec)->channels;
     }
 
-    if ((configured_audio_channels == 6) &&
+    if ((configured_audio_channels == 2) &&
+        !(settings.codec || audio_codec) &&
+        (settings.channels == 1))
+    {
+        settings.channels = configured_audio_channels;
+        lneeds_upmix = true;
+        VERBOSE(VB_AUDIO,LOC + "Needs Mono->Stereo upmix");
+    }
+    else if ((configured_audio_channels == 6) &&
         !(settings.codec || audio_codec))
     {
         settings.channels = configured_audio_channels;
@@ -331,7 +339,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         need_resampler = true;
     }
 
-    if (needs_upmix)
+    if (needs_upmix &&
+        !(settings.channels == 2))
     {
         VERBOSE(VB_AUDIO, LOC + QString("create upmixer"));
         if (configured_audio_channels == 6)
@@ -819,6 +828,27 @@ int AudioOutputBase::WaitForFreeSpace(int samples)
     return len;
 }
 
+void *AudioOutputBase::MonoToStereo(void *s1, void *s2, int samples)
+{
+    if (audio_bits == 8)
+        return _MonoToStereo((unsigned char *)s1, (unsigned char *)s2, samples);
+    else if (audio_bits == 16)
+        return _MonoToStereo((short *)s1, (short *)s2, samples);
+    else
+        return NULL; // 0
+}
+
+template <class AudioDataType>
+void *AudioOutputBase::_MonoToStereo(AudioDataType *s1, AudioDataType *s2, int samples)
+{
+    for (int i = 0; i < samples; i++)
+    {
+        *s1++ = *s2;
+        *s1++ = *s2++;
+    }
+    return s2;
+}
+
 void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
                                   long long timecode)
 {
@@ -841,11 +871,30 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
             .arg(kAudioRingBufferSize-afree).arg(afree).arg(timecode)
             .arg(needs_upmix));
 
-    if (upmixer && needs_upmix)
+    len = WaitForFreeSpace(samples);
+
+    if (needs_upmix &&
+        configured_audio_channels == 2 &&
+        source_audio_channels == 1)
+    {
+            // We're converting mono to stereo
+        int bdiff = kAudioRingBufferSize - org_waud;
+        if (bdiff < len)
+        {
+            int bdiff_samples = bdiff / abps;
+            void *buffer2 = MonoToStereo(audiobuffer + org_waud, buffer, bdiff_samples);
+            MonoToStereo(audiobuffer, buffer2, samples - bdiff_samples);
+        }
+        else
+            MonoToStereo(audiobuffer + org_waud, buffer, samples);
+
+        org_waud = (org_waud + len) % kAudioRingBufferSize;
+    }
+    else if (upmixer && needs_upmix)
     {
         int out_samples = 0;
         int step = (interleaved)?source_audio_channels:1;
-        len = WaitForFreeSpace(samples);    // test
+
         for (int itemp = 0; itemp < samples; )
         {
             // just in case it does a processing cycle, release the lock
@@ -901,8 +950,6 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     }
     else
     {
-        len = WaitForFreeSpace(samples);
-
         if (interleaved)
         {
             char *mybuf = (char*)buffer;
