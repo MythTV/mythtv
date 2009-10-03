@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>GLSingleView</name>
     <message>
@@ -11,7 +12,7 @@
 <context>
     <name>IconView</name>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="129"/>
+        <location filename="../mythgallery/iconview.cpp" line="128"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -31,7 +32,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="533"/>
+        <location filename="../mythgallery/iconview.cpp" line="532"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -146,6 +147,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythgallery/iconview.cpp" line="918"/>
         <location filename="../mythgallery/iconview.cpp" line="1245"/>
         <source>Rename</source>
         <translation type="unfinished"></translation>
@@ -166,7 +168,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1168"/>
+        <location filename="../mythgallery/iconview.cpp" line="1167"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -209,7 +211,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="24"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="23"/>
         <source>This directory must exist and MythGallery needs to have read permission.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -229,7 +231,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="46"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="45"/>
         <source>This is the sort order for the displayed picture thumbnails.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -239,7 +241,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="56"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="55"/>
         <source>This command is executed whenever a movie file is selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -249,7 +251,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="66"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="65"/>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -259,7 +261,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="77"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="75"/>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -269,7 +271,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="89"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="88"/>
         <source>Check this to enable OpenGL based slideshow transitions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -279,7 +281,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="109"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="108"/>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -294,7 +296,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="143"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="142"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -304,7 +306,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="156"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="155"/>
         <source>This is the type of background for each picture in single view mode.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -314,7 +316,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="166"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="165"/>
         <source>This is the number of seconds to display each picture.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -324,7 +326,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="175"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="174"/>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -339,10 +341,66 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/main.cpp" line="44"/>
+        <location filename="../mythgallery/main.cpp" line="39"/>
         <source>MythGallery cannot find its start directory.
 %1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="127"/>
+        <source>Folder: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="128"/>
+        <source>Created: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="129"/>
+        <source>Modified: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="131"/>
+        <source>Bytes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="132"/>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="133"/>
+        <location filename="../mythgallery/thumbview.cpp" line="135"/>
+        <source>pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="134"/>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="136"/>
+        <source>Pixel Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="137"/>
+        <source>megapixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="139"/>
+        <source>Rotation Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="140"/>
+        <source>degrees</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

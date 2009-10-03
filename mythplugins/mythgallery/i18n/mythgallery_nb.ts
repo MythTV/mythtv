@@ -15,10 +15,6 @@
         <translation>Feil</translation>
     </message>
     <message>
-        <source>Sorry: OpenGL support not available</source>
-        <translation type="obsolete">OpenGL er ikke tilgjengelig</translation>
-    </message>
-    <message>
         <source>SlideShow</source>
         <translation>Lysbildevisning</translation>
     </message>
@@ -43,26 +39,6 @@
         <translation>Innstillinger</translation>
     </message>
     <message>
-        <source>Import pictures?</source>
-        <translation type="obsolete">Importere bilder?</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation type="obsolete">Nei</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation type="obsolete">Ja</translation>
-    </message>
-    <message>
-        <source>Nothing found to import</source>
-        <translation type="obsolete">Ingenting å importere</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Slett</translation>
     </message>
@@ -71,28 +47,8 @@
         <translation>Myth-galleris katalog «%1» finnes ikke eller er utilgjengelig.</translation>
     </message>
     <message>
-        <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="obsolete">Myth-galleri klarte ikke laste tema, se i konsollet for detaljer.</translation>
-    </message>
-    <message>
         <source>The selected device is no longer available</source>
         <translation>Den valgte enheten er ikke lenger tilgjengelig</translation>
-    </message>
-    <message>
-        <source>Meta Data...</source>
-        <translation type="obsolete">Metadata . . .</translation>
-    </message>
-    <message>
-        <source>Marking...</source>
-        <translation type="obsolete">Merker . . .</translation>
-    </message>
-    <message>
-        <source>File...</source>
-        <translation type="obsolete">Fil . . .</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation type="obsolete">Tilbake</translation>
     </message>
     <message>
         <source>Clear Marked</source>
@@ -129,10 +85,6 @@
     <message>
         <source>Deleting 1 image.</source>
         <translation>Sletter ett bilde.</translation>
-    </message>
-    <message>
-        <source>Delete Marked Files</source>
-        <translation type="obsolete">Slett markerte filer</translation>
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
@@ -294,14 +246,6 @@
         <translation>Aktiver dette for å la lysbildevisningen gå inn i underkataloger.</translation>
     </message>
     <message>
-        <source>MythGallery Settings</source>
-        <translation type="obsolete">Innstillinger for MythGallery</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
         <source>Overlay caption</source>
         <translation>Overskrift oppå</translation>
     </message>
@@ -336,6 +280,50 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>MythGallery kan ikke finne oppstartsmappen.
 %1
 Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</translation>
+    </message>
+    <message>
+        <source>Folder: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Created: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modified: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bytes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pixel Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>megapixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotation Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>degrees</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -154,6 +154,14 @@
         <source>Failed to rename file</source>
         <translation>Échec de renommage du fichier</translation>
     </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery Home</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -272,6 +280,50 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>MythGallery ne peut trouver son répertoire de départ.
 %1
 Vérifiez que le répertoire existe, est accessible en lecture et que les réglages sont corrects sur la page de réglages de MythGallery.</translation>
+    </message>
+    <message>
+        <source>Folder: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Created: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modified: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bytes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pixel Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>megapixels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotation Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>degrees</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

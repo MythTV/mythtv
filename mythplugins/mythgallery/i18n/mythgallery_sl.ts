@@ -1,257 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>GLSingleView</name>
     <message>
-        <location filename="" line="81"/>
-        <source>Folder: </source>
-        <translation type="obsolete">Mapa:</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Created: </source>
-        <translation type="obsolete">Ustvarjena:</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Modified: </source>
-        <translation type="obsolete">Spremenjena:</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Bytes</source>
-        <translation type="obsolete">Bajti</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Width</source>
-        <translation type="obsolete">Širina</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>pixels</source>
-        <translation type="obsolete">piksli</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Height</source>
-        <translation type="obsolete">Višina</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Pixel Count</source>
-        <translation type="obsolete">Število pikslov</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>megapixels</source>
-        <translation type="obsolete">megapiksli</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Kot zasuka</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>degrees</source>
-        <translation type="obsolete">stopinje</translation>
+        <location filename="../mythgallery/glsingleview.cpp" line="239"/>
+        <source>Press SELECT to play again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>IconView</name>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="472"/>
+        <location filename="../mythgallery/iconview.cpp" line="532"/>
         <source>Error</source>
         <translation>Napaka</translation>
     </message>
     <message>
-        <location filename="" line="81"/>
-        <source>Sorry: OpenGL support not available</source>
-        <translation type="obsolete">Oprostite: OpenGL podpora ni na voljo</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="147"/>
+        <location filename="../mythgallery/iconview.cpp" line="851"/>
         <source>SlideShow</source>
         <translation>Prezentacija</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="727"/>
+        <location filename="../mythgallery/iconview.cpp" line="881"/>
         <source>Rotate CW</source>
         <translation>Desno</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="730"/>
+        <location filename="../mythgallery/iconview.cpp" line="882"/>
         <source>Rotate CCW</source>
         <translation>Levo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="770"/>
+        <location filename="../mythgallery/iconview.cpp" line="913"/>
         <source>Import</source>
         <translation>Uvozi</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="157"/>
+        <location filename="../mythgallery/iconview.cpp" line="856"/>
         <source>Settings</source>
         <translation>Nastavitve</translation>
     </message>
     <message>
-        <location filename="" line="81"/>
-        <source>Import pictures?</source>
-        <translation type="obsolete">Uvoz slik?</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>No</source>
-        <translation type="obsolete">Ne</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Yes</source>
-        <translation type="obsolete">Da</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Nothing found to import</source>
-        <translation type="obsolete">Za uvoz nisem najdel nič</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>OK</source>
-        <translation type="obsolete">Vredu</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="149"/>
+        <location filename="../mythgallery/iconview.cpp" line="852"/>
         <source>Random</source>
         <translation>Naključno</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="779"/>
+        <location filename="../mythgallery/iconview.cpp" line="916"/>
         <source>Delete</source>
         <translation>Izbriši</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="88"/>
+        <location filename="../mythgallery/iconview.cpp" line="128"/>
         <source>MythGallery Directory &apos;%1&apos; does not exist or is unreadable.</source>
         <translation>MythGalerija mapa &apos;%1&apos; ne obstaja ali pa ni berljiva.</translation>
     </message>
     <message>
-        <location filename="" line="81"/>
-        <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="obsolete">MathGalerija ni uspela naložiti téme. Za podrobnosti poglejte v konzolo.</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="473"/>
+        <location filename="../mythgallery/iconview.cpp" line="533"/>
         <source>The selected device is no longer available</source>
         <translation>Izbrana naprava ni več na voljo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="151"/>
-        <source>Meta Data...</source>
-        <translation>Zasuk...</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="153"/>
-        <source>Marking...</source>
-        <translation>Oznake...</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="155"/>
-        <source>File...</source>
-        <translation>Slika...</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="764"/>
-        <source>Return</source>
-        <translation>Nazaj</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="747"/>
+        <location filename="../mythgallery/iconview.cpp" line="896"/>
         <source>Clear Marked</source>
         <translation>Odstrani označene</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="750"/>
+        <location filename="../mythgallery/iconview.cpp" line="897"/>
         <source>Select All</source>
         <translation>Izberi vse</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="767"/>
+        <location filename="../mythgallery/iconview.cpp" line="911"/>
         <source>Show Devices</source>
         <translation>Naprave</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="773"/>
+        <location filename="../mythgallery/iconview.cpp" line="914"/>
         <source>Copy here</source>
         <translation>Kopiraj</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="776"/>
+        <location filename="../mythgallery/iconview.cpp" line="915"/>
         <source>Move here</source>
         <translation>Premakni</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="782"/>
+        <location filename="../mythgallery/iconview.cpp" line="917"/>
         <source>Create Dir</source>
         <translation>Ustvari mapo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="838"/>
+        <location filename="../mythgallery/iconview.cpp" line="968"/>
         <source>Delete Current File or Folder</source>
         <translation>Izbriši trenutno mapo ali datoteko</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="840"/>
+        <location filename="../mythgallery/iconview.cpp" line="970"/>
         <source>Deleting 1 folder, including any subfolders and files.</source>
         <translation>Brisanje ene mape z vsemi podmapami in datotekami.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="841"/>
+        <location filename="../mythgallery/iconview.cpp" line="971"/>
         <source>Deleting 1 image.</source>
         <translation>Brisanje ene slike.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1034"/>
-        <source>Delete Marked Files</source>
-        <translation>Brisanje označenih datotek</translation>
-    </message>
-    <message>
-        <location filename="../mythgallery/iconview.cpp" line="1036"/>
+        <location filename="../mythgallery/iconview.cpp" line="1167"/>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Brisanje %1 slik in map, vključno z vsemi podmapami in datotekami.</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1080"/>
+        <location filename="../mythgallery/iconview.cpp" line="1214"/>
         <source>New Folder</source>
         <translation>Nova mapa</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1084"/>
+        <location filename="../mythgallery/iconview.cpp" line="1216"/>
         <source>Create New Folder</source>
         <translation>Ustvari novo mapo</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1191"/>
+        <location filename="../mythgallery/iconview.cpp" line="1332"/>
         <source>Moving marked images...</source>
         <translation>Premikanje označenih slik...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1191"/>
+        <location filename="../mythgallery/iconview.cpp" line="1332"/>
         <source>Copying marked images...</source>
         <translation>Kopiranje označenih slik...</translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1108"/>
+        <location filename="../mythgallery/iconview.cpp" line="918"/>
+        <location filename="../mythgallery/iconview.cpp" line="1245"/>
         <source>Rename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1119"/>
+        <location filename="../mythgallery/iconview.cpp" line="184"/>
+        <source>No images found in this directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="375"/>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="386"/>
+        <source>Gallery Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="838"/>
+        <source>Gallery Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="853"/>
+        <source>Meta Data Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="854"/>
+        <source>Marking Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="855"/>
+        <source>File Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="872"/>
+        <source>Metadata Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="887"/>
+        <source>Marking Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="902"/>
+        <source>File Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="912"/>
+        <source>Eject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/iconview.cpp" line="1271"/>
         <source>Failed to rename directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythgallery/iconview.cpp" line="1121"/>
+        <location filename="../mythgallery/iconview.cpp" line="1273"/>
         <source>Failed to rename file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -264,7 +211,7 @@
         <translation>Mapa s slikami</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="24"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="23"/>
         <source>This directory must exist and MythGallery needs to have read permission.</source>
         <translation>Ta mapa mora obstajati in uporabnik mora imeti bralne pravice.</translation>
     </message>
@@ -274,7 +221,7 @@
         <translation>Pot za uvoz slik</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="77"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="75"/>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
         <translation>Z dvopičjem ločen seznam poti. Če je pot na seznamu mapa, se bo kopirala njena vsebina. Če je datoteka zagonska, se bo zagnala.</translation>
     </message>
@@ -284,7 +231,7 @@
         <translation>Uporabi OpenGL prehode</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="89"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="88"/>
         <source>Check this to enable OpenGL based slideshow transitions</source>
         <translation>Omogoči OpenGL prehode v prezentacijah</translation>
     </message>
@@ -294,7 +241,7 @@
         <translation>Tip OpenGL prehoda</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="109"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="108"/>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
         <translation>Tip OpenGL prehoda uporabljenega med slikami med prezentacijo.</translation>
     </message>
@@ -304,7 +251,7 @@
         <translation>Tip prehoda</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="143"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="142"/>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
         <translation>Tip prehoda uporabljenega med slikami med prezentacijo.</translation>
     </message>
@@ -314,7 +261,7 @@
         <translation>Tip ozadja</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="156"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="155"/>
         <source>This is the type of background for each picture in single view mode.</source>
         <translation>Tip ozadja za vsako sliko v enojnem pogledu.</translation>
     </message>
@@ -324,24 +271,9 @@
         <translation>Zakasnitev prezentacije</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="166"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="165"/>
         <source>This is the number of seconds to display each picture.</source>
         <translation>Število sekund za prikaz vsake slike.</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>MythGallery Settings</source>
-        <translation type="obsolete">MythGallery nastavitve</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="obsolete">Mapa z slikami ne obstaja ali pa ni bralna.</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Ok</source>
-        <translation type="obsolete">Vredu</translation>
     </message>
     <message>
         <location filename="../mythgallery/gallerysettings.cpp" line="53"/>
@@ -349,7 +281,7 @@
         <translation>Ukaz za prikaz video datotek</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="56"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="55"/>
         <source>This command is executed whenever a movie file is selected</source>
         <translation>Ta ukaz se bo izvedel kadarkoli bo izbrana video datoteka</translation>
     </message>
@@ -369,7 +301,7 @@
         <translation>V vse mape</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="175"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="174"/>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
         <translation>Če omogočeno, se bodo predvajale slike iz vseh podmap.</translation>
     </message>
@@ -379,7 +311,7 @@
         <translation>Ime čez sliko</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="66"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="65"/>
         <source>This is the number of seconds to show a caption on top of a full size picture.</source>
         <translation>Za koliko sekund se bo pojavilo ime datoteke čez celozaslonsko sliko.</translation>
     </message>
@@ -389,7 +321,7 @@
         <translation>Vrstni red med brskanjem</translation>
     </message>
     <message>
-        <location filename="../mythgallery/gallerysettings.cpp" line="46"/>
+        <location filename="../mythgallery/gallerysettings.cpp" line="45"/>
         <source>This is the sort order for the displayed picture thumbnails.</source>
         <translation>Vrstni red prikaza slik.</translation>
     </message>
@@ -408,63 +340,76 @@
         <source>MythGallery Settings (General)</source>
         <translation>MythGalerija nastavitve (splošno)</translation>
     </message>
+    <message>
+        <location filename="../mythgallery/main.cpp" line="39"/>
+        <source>MythGallery cannot find its start directory.
+%1
+Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="127"/>
+        <source>Folder: </source>
+        <translation type="unfinished">Mapa:</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="128"/>
+        <source>Created: </source>
+        <translation type="unfinished">Ustvarjena:</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="129"/>
+        <source>Modified: </source>
+        <translation type="unfinished">Spremenjena:</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="131"/>
+        <source>Bytes</source>
+        <translation type="unfinished">Bajti</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="132"/>
+        <source>Width</source>
+        <translation type="unfinished">Širina</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="133"/>
+        <location filename="../mythgallery/thumbview.cpp" line="135"/>
+        <source>pixels</source>
+        <translation type="unfinished">piksli</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="134"/>
+        <source>Height</source>
+        <translation type="unfinished">Višina</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="136"/>
+        <source>Pixel Count</source>
+        <translation type="unfinished">Število pikslov</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="137"/>
+        <source>megapixels</source>
+        <translation type="unfinished">megapiksli</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="139"/>
+        <source>Rotation Angle</source>
+        <translation type="unfinished">Kot zasuka</translation>
+    </message>
+    <message>
+        <location filename="../mythgallery/thumbview.cpp" line="140"/>
+        <source>degrees</source>
+        <translation type="unfinished">stopinje</translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>
     <message>
-        <location filename="" line="81"/>
-        <source>Folder: </source>
-        <translation type="obsolete">Mapa:</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Created: </source>
-        <translation type="obsolete">Ustvarjena:</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Modified: </source>
-        <translation type="obsolete">Spremenjena:</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Bytes</source>
-        <translation type="obsolete">Bajti</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Width</source>
-        <translation type="obsolete">Širina</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>pixels</source>
-        <translation type="obsolete">piksli</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Height</source>
-        <translation type="obsolete">Višina</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Pixel Count</source>
-        <translation type="obsolete">Število pikslov</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>megapixels</source>
-        <translation type="obsolete">megapiksli</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Kot zasuka</translation>
-    </message>
-    <message>
-        <location filename="" line="81"/>
-        <source>degrees</source>
-        <translation type="obsolete">stopinje</translation>
+        <location filename="../mythgallery/singleview.cpp" line="222"/>
+        <source>Press SELECT to play again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
