@@ -306,7 +306,7 @@
         <text>Weather Station Settings</text>
         <text lang="FR">Réglages Station météo</text>
         <text lang="DE">Wetterstation</text>
-        <description>???</description>
+        <description></description>
         <action>CONFIGPLUGIN mythwstation</action>
         <depends>mythwstation</depends>
     </button>

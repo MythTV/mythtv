@@ -65,7 +65,7 @@
         <text>Custom Priority</text>
         <text lang="FR">Priorité personnalisée</text>
         <alttext>Custom Priority</alttext>
-        <description>???</description>
+        <description></description>
         <action>SETTINGS CUSTOMPRIORITY</action>
     </button>
 

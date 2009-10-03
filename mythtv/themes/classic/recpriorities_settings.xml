@@ -77,7 +77,7 @@
         <text lang="PL">Dostosuj priorytety</text>
         <alttext>Custom Priority</alttext>
         <alttext lang="FR">Priorité personnalisée</alttext>
-        <description>???</description>
+        <description></description>
         <action>SETTINGS CUSTOMPRIORITY</action>
     </button>
 
