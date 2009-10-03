@@ -1,7 +1,5 @@
-SOURCES += ../mythgame/gamehandler.cpp
-SOURCES += ../mythgame/gamesettings.cpp
-SOURCES += ../mythgame/gamesettings.h
-SOURCES += ../mythgame/gametree.cpp
+SOURCES += ../mythgame/*.cpp
+SOURCES += ../mythgame/*.h
 SOURCES += ./themestrings.h
 
 TRANSLATIONS  = mythgame_it.ts mythgame_es.ts mythgame_ca.ts

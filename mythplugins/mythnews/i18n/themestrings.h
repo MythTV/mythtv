@@ -1,3 +1,4 @@
 void strings_null() {
-    ThemeUI::tr("Minutes");
+    ThemeUI::tr("Cancel");
+    ThemeUI::tr("Ok");
 }

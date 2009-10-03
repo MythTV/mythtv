@@ -1,7 +1,6 @@
-SOURCES += ../mythbrowser/bookmarkeditor.cpp
-SOURCES += ../mythbrowser/bookmarkmanager.cpp
-SOURCES += ../mythbrowser/webpage.cpp
-SOURCES += ../mythbrowser/mythbrowser.cpp
+SOURCES += ../mythbrowser/*.cpp
+SOURCES += ../mythbrowser/*.h
+SOURCES += ./themestrings.h
 
 TRANSLATIONS  = mythbrowser_de.ts mythbrowser_sl.ts mythbrowser_fr.ts
 TRANSLATIONS += mythbrowser_sv.ts mythbrowser_nl.ts mythbrowser_nb.ts

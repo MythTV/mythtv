@@ -1,6 +1,5 @@
-SOURCES += ../mythnews/mythnewsconfig.cpp
-SOURCES += ../mythnews/mythnews.cpp
-SOURCES += ../mythnews/mythnewseditor.cpp
+SOURCES += ../mythnews/*.cpp
+SOURCES += ../mythnews/*.h
 SOURCES += ./themestrings.h
 
 TRANSLATIONS  = mythnews_it.ts mythnews_es.ts mythnews_ca.ts

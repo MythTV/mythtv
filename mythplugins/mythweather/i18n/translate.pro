@@ -1,6 +1,5 @@
-SOURCES += ../mythweather/weather.cpp
-SOURCES += ../mythweather/weatherScreen.cpp
-SOURCES += ../mythweather/weatherUtils.cpp
+SOURCES += ../mythweather/*.cpp
+SOURCES += ../mythweather/*.h
 SOURCES += ./strings.h
 SOURCES += ./themestrings.h
 
