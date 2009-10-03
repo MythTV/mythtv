@@ -84,57 +84,6 @@ Bruk &apos;Legg til bokmerker&apos; menyvalget for å legge til nye bokmerker</t
     </message>
 </context>
 <context>
-    <name>Bookmarks</name>
-    <message>
-        <source>MythBrowser: Select group or single site to view</source>
-        <translation type="obsolete">MythBrowser: velg gruppe eller enslig side å vise</translation>
-    </message>
-</context>
-<context>
-    <name>BookmarksConfig</name>
-    <message>
-        <source>MythBrowser Bookmarks Settings</source>
-        <translation type="obsolete">Bokmerkeinnstillinger for MythBrowser</translation>
-    </message>
-    <message>
-        <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
-Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-        <translation type="obsolete">Trykk på &apos;Nytt bokmerke&apos;-knappen for å legge til en side/gruppe. Trykk mellomrom/enter får å fjerne den valgte oppføringen fra listevisningen.</translation>
-    </message>
-    <message>
-        <source>Zoom [%]:</source>
-        <translation type="obsolete">Forstørr (%):</translation>
-    </message>
-    <message>
-        <source>Browser:</source>
-        <translation type="obsolete">Nettleser:</translation>
-    </message>
-    <message>
-        <source>Hide Scrollbars</source>
-        <translation type="obsolete">Skjul rullefelt</translation>
-    </message>
-    <message>
-        <source>Scroll Page</source>
-        <translation type="obsolete">Rull side</translation>
-    </message>
-    <message>
-        <source>Scroll Speed:</source>
-        <translation type="obsolete">Rullefart:</translation>
-    </message>
-    <message>
-        <source>&amp;New Bookmark</source>
-        <translation type="obsolete">&amp;Nytt bokmerke</translation>
-    </message>
-    <message>
-        <source>Add a new Website</source>
-        <translation type="obsolete">Legg til en internettside</translation>
-    </message>
-    <message>
-        <source>&amp;Finish</source>
-        <translation type="obsolete">&amp;Ferdig</translation>
-    </message>
-</context>
-<context>
     <name>BrowserConfig</name>
     <message>
         <source>MythBrowser Settings</source>
@@ -213,89 +162,58 @@ Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
     </message>
 </context>
 <context>
-    <name>PopupBox</name>
+    <name>ThemeUI</name>
     <message>
-        <source>Add New Website</source>
-        <translation type="obsolete">Legg til internettside</translation>
+        <source>Bookmark Manager</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Group:</source>
-        <translation type="obsolete">Gruppe:</translation>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beskrivelse:</translation>
+        <source>[x]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find...</source>
+        <translation type="unfinished">Finn...</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-    <message>
-        <source>&amp;Ok</source>
-        <translation type="obsolete">&amp;OK</translation>
-    </message>
-</context>
-<context>
-    <name>TabView</name>
-    <message>
-        <source>MythBrowser Menu</source>
-        <translation type="obsolete">MythBrowser-meny</translation>
-    </message>
-    <message>
-        <source>Save Link in Bookmarks</source>
-        <translation type="obsolete">Lagre kobling som bokmerke</translation>
-    </message>
-    <message>
-        <source>Enter URL</source>
-        <translation type="obsolete">Skriv inn URL</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <translation type="unfinished">URL:</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Avbryt</translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
     <message>
-        <source>Back</source>
-        <translation type="obsolete">Tilbake</translation>
+        <source>Ok</source>
+        <translation type="unfinished">OK</translation>
     </message>
     <message>
-        <source>Next Tab</source>
-        <translation type="obsolete">Neste fane</translation>
+        <source>Browser Command:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Prev Tab</source>
-        <translation type="obsolete">Forrige fane</translation>
-    </message>
-    <message>
-        <source>Remove Tab</source>
-        <translation type="obsolete">Fjern fane</translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation type="obsolete">Reduser størrelse</translation>
-    </message>
-    <message>
-        <source>Zoom In</source>
-        <translation type="obsolete">Øk størrelse</translation>
-    </message>
-    <message>
-        <source>Add New Bookmark</source>
-        <translation type="obsolete">Legg til bokmerke</translation>
-    </message>
-    <message>
-        <source>Group:</source>
-        <translation type="obsolete">Gruppe:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beskrivelse:</translation>
-    </message>
-    <message>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
+        <source>Text Size:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

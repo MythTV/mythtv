@@ -160,6 +160,61 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     </message>
 </context>
 <context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Bookmark Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[x]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find...</source>
+        <translation type="unfinished">Trouver...</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuler</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Browser Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text Size:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>WebPage</name>
     <message>
         <source>Loading...</source>

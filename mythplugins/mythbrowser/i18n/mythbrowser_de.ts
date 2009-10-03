@@ -46,111 +46,59 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 Im &apos;Lesezeichen anlegen&apos; Menü können Sie neue Lesezeichen hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="273"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="268"/>
         <source>Actions</source>
         <translation>Aktionen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
         <source>Add Bookmark</source>
         <translation>Lesezeichen anlegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="292"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
         <source>Edit Bookmark</source>
         <translation>Lesezeichen bearbeiten</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="293"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
         <source>Delete Bookmark</source>
         <translation>Lesezeichen löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="289"/>
         <source>Show Bookmark</source>
         <translation>Lesezeichen anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="299"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
         <source>Delete Marked</source>
         <translation>Alle markierten löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="300"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
         <source>Show Marked</source>
         <translation>Alle markierten anzeigen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="301"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="296"/>
         <source>Clear Marked</source>
         <translation>Markierungen löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="304"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="299"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="481"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="476"/>
         <source>Are you sure you want to delete the selected bookmark</source>
         <translation>Möchten Sie das markierte Lesezeichen wirklich löschen?</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="525"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="520"/>
         <source>Are you sure you want to delete the marked bookmarks</source>
         <translation>Möchten Sie die markierten Lesezeichen wirklich löschen?</translation>
-    </message>
-</context>
-<context>
-    <name>Bookmarks</name>
-    <message>
-        <source>MythBrowser: Select group or single site to view</source>
-        <translation type="obsolete">MythBrowser: Gruppe oder einzelne Webseite auswählen</translation>
-    </message>
-</context>
-<context>
-    <name>BookmarksConfig</name>
-    <message>
-        <source>MythBrowser Bookmarks Settings</source>
-        <translation type="obsolete">MythBrowser Einstellungen</translation>
-    </message>
-    <message>
-        <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
-Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-        <translation type="obsolete">&apos;Neuer Eintrag&apos; fügt eine Gruppe oder Webpage hinzu.
-SPACE/Enter löscht den selektierten Eintrag.</translation>
-    </message>
-    <message>
-        <source>Zoom [%]:</source>
-        <translation type="obsolete">Zoom [%]:</translation>
-    </message>
-    <message>
-        <source>Browser:</source>
-        <translation type="obsolete">Browser:</translation>
-    </message>
-    <message>
-        <source>Hide Scrollbars</source>
-        <translation type="obsolete">Ohne Scrollbalken</translation>
-    </message>
-    <message>
-        <source>Scroll Page</source>
-        <translation type="obsolete">Seite scrollen</translation>
-    </message>
-    <message>
-        <source>Scroll Speed:</source>
-        <translation type="obsolete">Geschw.:</translation>
-    </message>
-    <message>
-        <source>&amp;New Bookmark</source>
-        <translation type="obsolete">&amp;Neuer Eintrag</translation>
-    </message>
-    <message>
-        <source>Add a new Website</source>
-        <translation type="obsolete">Webseite hinzufügen</translation>
-    </message>
-    <message>
-        <source>&amp;Finish</source>
-        <translation type="obsolete">&amp;Fertig</translation>
     </message>
 </context>
 <context>
@@ -194,166 +142,128 @@ SPACE/Enter löscht den selektierten Eintrag.</translation>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="106"/>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="104"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>Enter URL</source>
         <translation>URL eingeben</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="243"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="240"/>
         <source>Loading...</source>
         <translation>Lade...</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="346"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="336"/>
         <source>Actions</source>
         <translation>Aktionen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
         <source>Back</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="365"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="355"/>
         <source>Forward</source>
         <translation>Vorwärts</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="367"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Zoom In</source>
         <translation>Hinein-Zoomen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="368"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
         <source>Zoom Out</source>
         <translation>Heraus-Zoomen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="369"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
         <source>New Tab</source>
         <translation>Neuer Tab</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="372"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Delete Tab</source>
         <translation>Tab löschen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="374"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
         <source>Add Bookmark</source>
         <translation>Lesezeichen anlegen</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="376"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
 </context>
 <context>
-    <name>PopupBox</name>
+    <name>ThemeUI</name>
     <message>
-        <source>&amp;Ok</source>
-        <translation type="obsolete">&amp;Ok</translation>
+        <location filename="themestrings.h" line="2"/>
+        <source>Bookmark Manager</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add New Website</source>
-        <translation type="obsolete">Neue Webseite</translation>
+        <location filename="themestrings.h" line="3"/>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Group:</source>
-        <translation type="obsolete">Gruppe:</translation>
+        <location filename="themestrings.h" line="4"/>
+        <source>[x]</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beschreibung:</translation>
+        <location filename="themestrings.h" line="5"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Find...</source>
+        <translation type="unfinished">Suchen...</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
         <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-</context>
-<context>
-    <name>TabView</name>
-    <message>
-        <source>         Back         </source>
-        <translation type="obsolete">Zurück</translation>
+        <translation type="unfinished">URL:</translation>
     </message>
     <message>
-        <source>       Next Tab       </source>
-        <translation type="obsolete">Nächste Seite</translation>
-    </message>
-    <message>
-        <source>       Prev Tab       </source>
-        <translation type="obsolete">Vorherige Seite</translation>
-    </message>
-    <message>
-        <source>Save Link in Bookmarks</source>
-        <translation type="obsolete">In Bookmarks speichern</translation>
-    </message>
-    <message>
-        <source>       zoom Out       </source>
-        <translation type="obsolete">Schrift kleiner</translation>
-    </message>
-    <message>
-        <source>       zoom In        </source>
-        <translation type="obsolete">Schrift grösser</translation>
-    </message>
-    <message>
-        <source>MythBrowser Menu</source>
-        <translation type="obsolete">MythBrowser Menü</translation>
-    </message>
-    <message>
-        <source>Enter URL</source>
-        <translation type="obsolete">URL eingeben</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
+        <location filename="themestrings.h" line="11"/>
         <source>Cancel</source>
-        <translation type="obsolete">Abbrechen</translation>
+        <translation type="unfinished">Abbrechen</translation>
     </message>
     <message>
-        <source>Back</source>
-        <translation type="obsolete">Zurück</translation>
+        <location filename="themestrings.h" line="12"/>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
     <message>
-        <source>Next Tab</source>
-        <translation type="obsolete">Nächster Tab</translation>
+        <location filename="themestrings.h" line="13"/>
+        <source>Browser Command:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Prev Tab</source>
-        <translation type="obsolete">Vorh. Tab</translation>
-    </message>
-    <message>
-        <source>Remove Tab</source>
-        <translation type="obsolete">Tab entfernen</translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation type="obsolete">Heraus-Zoomen</translation>
-    </message>
-    <message>
-        <source>Zoom In</source>
-        <translation type="obsolete">Hinein-Zoomen</translation>
-    </message>
-    <message>
-        <source>Add New Bookmark</source>
-        <translation type="obsolete">Neues Lesezeichen hinzufügen</translation>
-    </message>
-    <message>
-        <source>Group:</source>
-        <translation type="obsolete">Gruppe:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beschreibung:</translation>
-    </message>
-    <message>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
+        <location filename="themestrings.h" line="14"/>
+        <source>Text Size:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

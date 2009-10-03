@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>BookmarkEditor</name>
     <message>
@@ -36,7 +37,7 @@
 <context>
     <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="159"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="158"/>
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
@@ -116,12 +117,12 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="117"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="115"/>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/bookmarkmanager.cpp" line="122"/>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="119"/>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -139,6 +140,7 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
 <context>
     <name>MythBrowser</name>
     <message>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="104"/>
         <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>Enter URL</source>
         <translation type="unfinished"></translation>
@@ -191,6 +193,74 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <location filename="themestrings.h" line="2"/>
+        <source>Bookmark Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>[x]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Find...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>URL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Browser Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Text Size:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
