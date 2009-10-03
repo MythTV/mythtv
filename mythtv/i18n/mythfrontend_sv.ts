@@ -199,20 +199,12 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Cancel</source>
-        <translation>Avbryt</translation>
-    </message>
-    <message>
         <source>Download all icons..</source>
         <translation>Ladda ner alla ikoner..</translation>
     </message>
     <message>
         <source>Rescan for missing icons..</source>
         <translation>Sök efter saknade ikoner..</translation>
-    </message>
-    <message>
-        <source>Download icon for </source>
-        <translation>Ladda ner ikon för</translation>
     </message>
     <message>
         <source>Add some channels first!</source>
@@ -282,6 +274,14 @@
         <source>Delete all channels on %1?</source>
         <translation>Ta bort alla kanaler på %1?</translation>
     </message>
+    <message>
+        <source>Icon Import Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download icon for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelGroupEditor</name>
@@ -337,22 +337,57 @@
     </message>
 </context>
 <context>
+    <name>ChannelScannerGUIScanPane</name>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="unfinished">Sökförlopp</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished">Justerar</translation>
+    </message>
+    <message>
+        <source>Rotor Movement</source>
+        <translation type="unfinished">Rotorrörelse</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="unfinished">Signalstyrka</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="unfinished">Signal/brus</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished">Sökning</translation>
+    </message>
+    <message>
+        <source>Stop Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished">Låst</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished">Inget lås</translation>
+    </message>
+</context>
+<context>
     <name>CustomEdit</name>
     <message>
         <source>stored example</source>
         <translation>lagrat exempel</translation>
     </message>
     <message>
-        <source>Edit Rule</source>
-        <translation>Redigera regel</translation>
-    </message>
-    <message>
         <source>&lt;New rule&gt;</source>
         <translation>&lt;Ny regel&gt;</translation>
-    </message>
-    <message>
-        <source>Rule Name</source>
-        <translation>Regelnamn</translation>
     </message>
     <message>
         <source>Match an exact title</source>
@@ -479,18 +514,6 @@
         <translation>Första avsnitt (fullständigt exempel för Data Direct)</translation>
     </message>
     <message>
-        <source>Additional Tables</source>
-        <translation>Ytterligare tabeller</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation>Testa</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation>Spela in</translation>
-    </message>
-    <message>
         <source>Store</source>
         <translation>Lagra</translation>
     </message>
@@ -523,10 +546,6 @@
         <translation>lagrad sökning</translation>
     </message>
     <message>
-        <source>Add</source>
-        <translation>Lägg Till</translation>
-    </message>
-    <message>
         <source>Match this series</source>
         <translation>Matcha denna serie</translation>
     </message>
@@ -541,6 +560,50 @@
     <message>
         <source>Exclude H.264 encoded streams (EIT only)</source>
         <translation>Uteslut H.264 kodade strömmar (endast EIT)</translation>
+    </message>
+    <message>
+        <source>Only shows with in-vision signing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only shows with in-vision subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Example</source>
+        <translation type="unfinished">Aktuellt exempel</translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished">Ersätt</translation>
+    </message>
+    <message>
+        <source>as a search</source>
+        <translation type="unfinished">som sökning</translation>
+    </message>
+    <message>
+        <source>as an example</source>
+        <translation type="unfinished">som exempel</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Ta bort</translation>
+    </message>
+    <message>
+        <source>Power Search rules no longer reqiure a leading &quot;AND&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power Search rules can not include semicolon ( ; ) </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>statement terminators.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -1167,6 +1230,10 @@
         <source>Recording Options</source>
         <translation>Inspelningsinställningar</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Beskrivning</translation>
+    </message>
 </context>
 <context>
     <name>HDHomeRunDeviceID</name>
@@ -1303,10 +1370,6 @@
         <translation>Hoppa över</translation>
     </message>
     <message>
-        <source>Channel icon for %1 was downloaded successfully.</source>
-        <translation>Kanalikon för %1 laddades ner med lyckat resultat.</translation>
-    </message>
-    <message>
         <source>Failed to download the icon for %1.</source>
         <translation>Misslyckades ladda ner ikon för %1.</translation>
     </message>
@@ -1333,6 +1396,14 @@
     <message>
         <source>Icon choices submitted successfully.</source>
         <translation>Ikonval inskickade med lyckat resultat.</translation>
+    </message>
+    <message>
+        <source>No matches found for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon for %1 was downloaded successfully.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1547,33 +1618,6 @@
     </message>
 </context>
 <context>
-    <name>MythContext</name>
-    <message>
-        <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation>Kunde inte ansluta till huvudinspelningsservern: är den startad? Är dess IP-adress riktigt angiven i inställningsprogrammet?</translation>
-    </message>
-    <message>
-        <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation>Förbindelsen till huvudinspelningsservern har brutits av någon anledning. Är den startad?</translation>
-    </message>
-    <message>
-        <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
-        <translation>Servern använder nätverksprotokoll version %1, men den här klienten förstår endast version %2. Försäkra dig om att du kör kompatibla versioner av inspelningsserver och uppspelningsklient.</translation>
-    </message>
-    <message>
-        <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
-        <translation>Programmet är inte kompatibelt med installerade MythTV-bibliotek. Kompilera om det efter &apos;make distclean&apos;</translation>
-    </message>
-    <message>
-        <source>Could not connect to the master backend server -- is it running? Is the IP address set for it in the setup program correct?</source>
-        <translation>Kunde inte ansluta till huvudinspelningsservern: är den startad? Är dess IP-adress riktigt angiven i inställningsprogrammet?</translation>
-    </message>
-    <message>
-        <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
-        <translation>Insticksprogrammet %1 är inte kompatibelt med installerade MythTV-bibliotek. Kompilera om insticksprogrammet efter &apos;make distclean&apos;</translation>
-    </message>
-</context>
-<context>
     <name>MythControls</name>
     <message>
         <source>Modify Action</source>
@@ -1651,6 +1695,790 @@
         <source>Bind Key</source>
         <translation>Skapa genväg för tangent</translation>
     </message>
+    <message>
+        <source>Page Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle recording status of current program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide back one day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide forward one day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the current channel as a favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse the channel order in the program guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the Program Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the Program Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle through channel groups and all channels in the program guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch channels without exiting guide in Live TV mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase program or channel rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease program or channel rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show program details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Capture Card view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Custom Record Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished">Ändra inspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished">Ändra gruppvy</translation>
+    </message>
+    <message>
+        <source>Clear OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished">Gör paus</translation>
+    </message>
+    <message>
+        <source>Fast Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind</source>
+        <translation type="unfinished">Spola tillbaka</translation>
+    </message>
+    <message>
+        <source>Arbitrary Seek</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the next favorite channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the previous channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump ahead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Forward (Sticky) or Forward one frame while paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind (Sticky) or Rewind one frame while paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Video Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Video Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Commercial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Commercial (Reverse)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the start of the recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle channel browse mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Picture-in-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Picture-by-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Picture-in-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Picture-by-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle active PIP/PBP window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap PBP/PIP Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change PxP view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the video aspect ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Preconfigured Zoom mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle any captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext Captions</source>
+        <translation type="unfinished">Växla Text-TV-textning</translation>
+    </message>
+    <message>
+        <source>Toggle Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle VBI CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle ATSC CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext Menu</source>
+        <translation type="unfinished">Växla Text-TV-meny</translation>
+    </message>
+    <message>
+        <source>Play audio track 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play audio track 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display subtitle 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display subtitle 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next subtitle track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous subtitle track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next VBI CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous VBI CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next ATSC CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous ATSC CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next of any captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next video scan overidemode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queue the current recording for transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase the playback speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease the playback speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on time stretch control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on audio sync adjustment controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback picture adjustments</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording picture adjustments for this channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording picture adjustments for this recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle Commercial Skip mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the Sleep Timer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Spela upp</translation>
+    </message>
+    <message>
+        <source>Jump to previously played recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display menu of recorded programs to jump to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display scheduled recording list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor Signal Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the DVD Root Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit Show without any prompts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save screenshot of current video frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu EPG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear editing cut points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert Begin/End cut points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load cut list from commercial skips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the next cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the previous cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump back 10x the normal amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump forward 10x the normal amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Subpage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Subpage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu White</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reveal hidden Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to next widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to preview widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished">Välj</translation>
+    </message>
+    <message>
+        <source>Backspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Escape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pop-up menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Ta bort</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished">Redigera</translation>
+    </message>
+    <message>
+        <source>Page to top of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page to middle of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page to bottom of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject Removable Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom in on browser window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom out on browser window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle where keyboard input goes to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse Left button click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll down half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll up half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll left half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll right half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection to next link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection to previous link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow selected link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go back to previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go forward to previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reload Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished">Huvudmeny</translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished">Programguide</translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation type="unfinished">Sök program</translation>
+    </message>
+    <message>
+        <source>Manage Recordings / Fix Conflicts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished">Programinspelningsprioriteter</translation>
+    </message>
+    <message>
+        <source>Manage Recording Rules</source>
+        <translation type="unfinished">Hantera inspelningsregler</translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished">Kanalinspelningsprioriteter</translation>
+    </message>
+    <message>
+        <source>TV Recording Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Recording Deletion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV In Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Tidigare inspelningar</translation>
+    </message>
+    <message>
+        <source>ScreenShot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV&apos;s native media player.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contexts</source>
+        <translation type="unfinished">Sammanhang</translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation type="unfinished">Åtgärder</translation>
+    </message>
+    <message>
+        <source>Keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open an Xterm window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Mythshutdown settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Mythtv-Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythPopupBox</name>
@@ -1661,6 +2489,10 @@
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -1994,14 +2826,6 @@ Gren: %2
         <translation>Lägg till denna inspelning i spellistan</translation>
     </message>
     <message>
-        <source>There are %1 items in the playlist.</source>
-        <translation>Det finns %1 poster i spellistan.</translation>
-    </message>
-    <message>
-        <source>There is %1 item in the playlist.</source>
-        <translation>Det finns %1 post i spellistan.</translation>
-    </message>
-    <message>
         <source>Clear Playlist</source>
         <translation>Rensa spellista</translation>
     </message>
@@ -2208,10 +3032,6 @@ Are you sure you want to delete:</source>
         <translation>Denna inspelning är ännu inte tillgänglig.</translation>
     </message>
     <message>
-        <source>Actions affect all items in the playlist</source>
-        <translation>Åtgärder påverkar alla objekt i spellistan</translation>
-    </message>
-    <message>
         <source>Toggle playlist for this Group</source>
         <translation>Växla spellista för denna grupp</translation>
     </message>
@@ -2262,6 +3082,13 @@ Are you sure you want to delete:</source>
     <message>
         <source>Recordings</source>
         <translation>Inspelningar</translation>
+    </message>
+    <message numerus="yes">
+        <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2328,6 +3155,13 @@ Are you sure you want to delete:</source>
     </message>
 </context>
 <context>
+    <name>PostProcEditor</name>
+    <message>
+        <source>Run &apos;%1&apos;</source>
+        <translation type="unfinished">Kör &apos;%1&apos;</translation>
+    </message>
+</context>
+<context>
     <name>PowerSearchPopup</name>
     <message>
         <source>Select Search</source>
@@ -2351,62 +3185,7 @@ Are you sure you want to delete:</source>
     </message>
 </context>
 <context>
-    <name>PreviousList</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation>Tidigare inspelningar</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation>Välj sorteringsordning</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation>Omvänd tid</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation>Omvänd titel</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation>Observera: borttagning av poster från denna lista tar inte bort några inspelningar.</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation>Ta bort detta avsnitt från listan</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation>Ta bort alla avsnitt för denna titel</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Allow this episode to re-record</source>
-        <translation>Tillåt återinspelning av detta avsnitt</translation>
-    </message>
-    <message>
-        <source>Never record this episode</source>
-        <translation>Spela aldrig in detta avsnitt</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation>Tid</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation>Titel</translation>
-    </message>
-</context>
-<context>
     <name>ProgDetails</name>
-    <message>
-        <source>Sorry, this screen requires Qt 4.4 or greater</source>
-        <translation>Tyvärr kräver den här skärmen Qt 4.4 eller senare</translation>
-    </message>
     <message>
         <source>Options</source>
         <translation>Inställningar</translation>
@@ -2426,6 +3205,255 @@ Are you sure you want to delete:</source>
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">Titel</translation>
+    </message>
+    <message>
+        <source>Title Pronounce</source>
+        <translation type="unfinished">Titeluttal</translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation type="unfinished">Del %1 av %2,</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n star(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n stjärna</numerusform>
+            <numerusform>%n stjärnor</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation type="unfinished">Mono</translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished">Stereo</translation>
+    </message>
+    <message>
+        <source>Surround Sound</source>
+        <translation type="unfinished">Surround-ljud</translation>
+    </message>
+    <message>
+        <source>Dolby Sound</source>
+        <translation type="unfinished">Dolby-ljud</translation>
+    </message>
+    <message>
+        <source>Audio for Hearing Impaired</source>
+        <translation type="unfinished">Ljudspår för hörselskadade</translation>
+    </message>
+    <message>
+        <source>Audio for Visually Impaired</source>
+        <translation type="unfinished">Ljudspår för synskadade</translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation type="unfinished">HDTV</translation>
+    </message>
+    <message>
+        <source>Widescreen</source>
+        <translation type="unfinished">Bredbildsformat</translation>
+    </message>
+    <message>
+        <source>AVC/H.264</source>
+        <translation type="unfinished">AVC/H.264</translation>
+    </message>
+    <message>
+        <source>720p Resolution</source>
+        <translation type="unfinished">Upplösning 720p</translation>
+    </message>
+    <message>
+        <source>1080i/p Resolution</source>
+        <translation type="unfinished">Upplösning 1080i/p</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Closed Captioned</comment>
+        <translation type="unfinished">Textning</translation>
+    </message>
+    <message>
+        <source>Subtitles Available</source>
+        <translation type="unfinished">Det finns undertexter</translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation type="unfinished">Textat</translation>
+    </message>
+    <message>
+        <source>Deaf Signing</source>
+        <translation type="unfinished">Teckenspråk</translation>
+    </message>
+    <message>
+        <source>Unidentified Episode</source>
+        <translation type="unfinished">Oidentifierat avsnitt</translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation type="unfinished">Upprepa</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Beskrivning</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished">Kategori</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation type="unfinished">Typ</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation type="unfinished">Avsnitt</translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation type="unfinished">Ursprungligt visningsdatum</translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation type="unfinished">Program-ID</translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation type="unfinished">Skådespelare</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation type="unfinished">Regissör</translation>
+    </message>
+    <message>
+        <source>Producer</source>
+        <translation type="unfinished">Producent</translation>
+    </message>
+    <message>
+        <source>Executive Producer</source>
+        <translation type="unfinished">Exekutiv producent</translation>
+    </message>
+    <message>
+        <source>Writer</source>
+        <translation type="unfinished">Författare</translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation type="unfinished">Gäst</translation>
+    </message>
+    <message>
+        <source>Host</source>
+        <translation type="unfinished">Värd</translation>
+    </message>
+    <message>
+        <source>Adapter</source>
+        <translation type="unfinished">Anpassad av</translation>
+    </message>
+    <message>
+        <source>Presenter</source>
+        <translation type="unfinished">Presentatör</translation>
+    </message>
+    <message>
+        <source>Commentator</source>
+        <translation type="unfinished">Kommentator</translation>
+    </message>
+    <message>
+        <source>Guest</source>
+        <translation type="unfinished">Gäst</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n timme</numerusform>
+            <numerusform>%n timmar</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Auto-expire off</source>
+        <translation type="unfinished">Radera automatiskt av</translation>
+    </message>
+    <message>
+        <source>Marked as &apos;watched&apos;</source>
+        <translation type="unfinished">Markera som &apos;sedd&apos;</translation>
+    </message>
+    <message>
+        <source>Not the earliest episode</source>
+        <translation type="unfinished">Ej det första avsnittet</translation>
+    </message>
+    <message>
+        <source>Recently deleted episode</source>
+        <translation type="unfinished">Nyligen borttaget avsnitt</translation>
+    </message>
+    <message>
+        <source>Recording Rule</source>
+        <translation type="unfinished">Inspelningsregel</translation>
+    </message>
+    <message>
+        <source>Last Recorded</source>
+        <translation type="unfinished">Senast inspelad</translation>
+    </message>
+    <message>
+        <source>Next Recording</source>
+        <translation type="unfinished">Nästa inspelning</translation>
+    </message>
+    <message>
+        <source>Average Time Shift</source>
+        <translation type="unfinished">Tidsförskjutning i medeltal</translation>
+    </message>
+    <message>
+        <source>Watch List Score</source>
+        <translation type="unfinished">Bevakningslistpoäng</translation>
+    </message>
+    <message>
+        <source>Watch List Status</source>
+        <translation type="unfinished">Bevakningsliststatus</translation>
+    </message>
+    <message>
+        <source>Search Phrase</source>
+        <translation type="unfinished">Sökfras</translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation type="unfinished">Hitta ID</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <comment>GigaBytes</comment>
+        <translation type="unfinished">GiB</translation>
+    </message>
+    <message>
+        <source>Recording Host</source>
+        <translation type="unfinished">Inspelningsvärddator</translation>
+    </message>
+    <message>
+        <source>Recorded File Name</source>
+        <translation type="unfinished">Inspelat filnamn</translation>
+    </message>
+    <message>
+        <source>Recorded File Size</source>
+        <translation type="unfinished">Sparad filstorlek</translation>
+    </message>
+    <message>
+        <source>Recording Profile</source>
+        <translation type="unfinished">Inspelningsprofil</translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished">Inspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Storage Group</source>
+        <translation type="unfinished">Lagringsgrupp</translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation type="unfinished">Uppspelningsgrupp</translation>
     </message>
 </context>
 <context>
@@ -2690,10 +3718,6 @@ Are you sure you want to delete:</source>
         <translation>Ta bort regel</translation>
     </message>
     <message>
-        <source>Delete Old Recorded</source>
-        <translation>Ta bort tidigare inspelat</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -2753,224 +3777,17 @@ Are you sure you want to delete:</source>
         <source>Program List</source>
         <translation>Programlistning</translation>
     </message>
-</context>
-<context>
-    <name>ProgListerQt</name>
     <message>
-        <source>Program Listings</source>
-        <translation>Programlistning</translation>
+        <source>Delete Episode</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New Title Search</source>
-        <translation>Ny titelsökning</translation>
+        <source>Delete this episode of &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Title Search</source>
-        <translation>Sök titel</translation>
-    </message>
-    <message>
-        <source>Keyword Search</source>
-        <translation>Sök nyckelord</translation>
-    </message>
-    <message>
-        <source>People Search</source>
-        <translation>Sök person</translation>
-    </message>
-    <message>
-        <source>Stored Search</source>
-        <translation>Lagrad sökning</translation>
-    </message>
-    <message>
-        <source>Power Search</source>
-        <translation>Avancerad sökning</translation>
-    </message>
-    <message>
-        <source>Rule Search</source>
-        <translation>Regelsökning</translation>
-    </message>
-    <message>
-        <source>Category Search</source>
-        <translation>Kategorisökning</translation>
-    </message>
-    <message>
-        <source>Channel Search</source>
-        <translation>Kanalsökning</translation>
-    </message>
-    <message>
-        <source>Movie Search</source>
-        <translation>Filmsökning</translation>
-    </message>
-    <message>
-        <source>Time Search</source>
-        <translation>Tidsökning</translation>
-    </message>
-    <message>
-        <source>Unknown Search</source>
-        <translation>Okänd sökning</translation>
-    </message>
-    <message>
-        <source>Select Rating</source>
-        <translation>Välj betyg</translation>
-    </message>
-    <message>
-        <source>Select Channel</source>
-        <translation>Välj kanal</translation>
-    </message>
-    <message>
-        <source>Select Category</source>
-        <translation>Välj kategori</translation>
-    </message>
-    <message>
-        <source>Select List</source>
-        <translation>Välj lista</translation>
-    </message>
-    <message>
-        <source>Select a search stored from</source>
-        <translation>Välj en lagrad sökning från</translation>
-    </message>
-    <message>
-        <source>Custom Record</source>
-        <translation>Avancerat</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation>Välj</translation>
-    </message>
-    <message>
-        <source>0 .. 9 moves to Nx10 percent in list</source>
-        <translation>0 .. 9 går till N x 10 procent i listan</translation>
-    </message>
-    <message>
-        <source>Select Phrase</source>
-        <translation>Välj fras</translation>
-    </message>
-    <message>
-        <source>&lt;New Phrase&gt;</source>
-        <translation>&lt;Ny fras&gt;</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Ta bort</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation>Spela in</translation>
-    </message>
-    <message>
-        <source>Select Search</source>
-        <translation>Välj sökning</translation>
-    </message>
-    <message>
-        <source>&lt;New Search&gt;</source>
-        <translation>&lt;Ny sökning&gt;</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation>Redigera</translation>
-    </message>
-    <message>
-        <source>Select Time</source>
-        <translation>Välj tid</translation>
-    </message>
-    <message>
-        <source>Edit Power Search Fields</source>
-        <translation>Redigera avancerade sökfält</translation>
-    </message>
-    <message>
-        <source>Optional title phrase:</source>
-        <translation>Valfri titelfras:</translation>
-    </message>
-    <message>
-        <source>Optional subtitle phrase:</source>
-        <translation>Valfri undertitelfras:</translation>
-    </message>
-    <message>
-        <source>Optional description phrase:</source>
-        <translation>Valfri beskrivningsfras:</translation>
-    </message>
-    <message>
-        <source>(Any Program Type)</source>
-        <translation>(Vilken programtyp som helst)</translation>
-    </message>
-    <message>
-        <source>Movies</source>
-        <translation>Filmer</translation>
-    </message>
-    <message>
-        <source>Series</source>
-        <translation>Serier</translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation>Show</translation>
-    </message>
-    <message>
-        <source>Sports</source>
-        <translation>Sport</translation>
-    </message>
-    <message>
-        <source>(Any Genre)</source>
-        <translation>(Vilken genre som helst)</translation>
-    </message>
-    <message>
-        <source>(Any Station)</source>
-        <translation>(Vilken station som helst)</translation>
-    </message>
-    <message>
-        <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation>Ta bort &apos;%1&apos; %2 regel?</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>Alla</translation>
-    </message>
-    <message>
-        <source>Premieres</source>
-        <translation>Premiärer</translation>
-    </message>
-    <message>
-        <source>Specials</source>
-        <translation>Specialprogram</translation>
-    </message>
-    <message>
-        <source>Unrated</source>
-        <translation>Utan betyg</translation>
-    </message>
-    <message>
-        <source>At least ***/</source>
-        <translation>Åtminstone ***/</translation>
-    </message>
-    <message>
-        <source>At least ***</source>
-        <translation>Åtminstone ***</translation>
-    </message>
-    <message>
-        <source>At least **/</source>
-        <translation>Åtminstone **/</translation>
-    </message>
-    <message>
-        <source>At least **</source>
-        <translation>Åtminstone **</translation>
-    </message>
-    <message>
-        <source>At least */</source>
-        <translation>Åtminstone */</translation>
-    </message>
-    <message>
-        <source>At least *</source>
-        <translation>Åtminstone *</translation>
-    </message>
-    <message>
-        <source>At least /</source>
-        <translation>Åtminstone /</translation>
-    </message>
-    <message>
-        <source>Power Recording Rule</source>
-        <translation>Avancerad inspelningsregel</translation>
+        <source>Delete all episodes of &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4432,10 +5249,6 @@ Are you sure you want to delete:</source>
         <translation>detta avsnitt kommer att spelas in vid en tidigare tidpunkt istället.</translation>
     </message>
     <message>
-        <source>Clear Override</source>
-        <translation>Rensa specifika</translation>
-    </message>
-    <message>
         <source>30m</source>
         <translation>30 min</translation>
     </message>
@@ -4732,34 +5545,6 @@ Are you sure you want to delete:</source>
         <translation>Spela inte in</translation>
     </message>
     <message>
-        <source>Reactivate</source>
-        <translation>Återaktivera</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record</source>
-        <translation>Spela inte in</translation>
-    </message>
-    <message>
-        <source>Never record</source>
-        <translation>Spela aldrig in</translation>
-    </message>
-    <message>
-        <source>Edit Options</source>
-        <translation>Ändra inställningar</translation>
-    </message>
-    <message>
-        <source>Add Override</source>
-        <translation>Lägg till specifika</translation>
-    </message>
-    <message>
-        <source>Edit Override</source>
-        <translation>Redigera specifika</translation>
-    </message>
-    <message>
-        <source>Record anyway</source>
-        <translation>Spela in ändå</translation>
-    </message>
-    <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
         <translation>Externt program eller skript att köra när LIRC tar emot en tangenttryckning.</translation>
     </message>
@@ -4837,50 +5622,12 @@ Are you sure you want to delete:</source>
         <translation>detta avsnitt kommer att spelas in vid ett senare tillfälle.</translation>
     </message>
     <message>
-        <source> The following programs will be recorded instead:
-</source>
-        <translation>Följande program kommer att spelas in istället:
-</translation>
-    </message>
-    <message>
-        <source>Forget Previous</source>
-        <translation>Glöm föregående</translation>
-    </message>
-    <message>
         <source>Any</source>
         <translation>Alla</translation>
     </message>
     <message>
         <source>Record using the &quot;%1&quot; profile</source>
         <translation>Spela in med profilen &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>Scheduling Options</source>
-        <translation>Schemaläggninginställningar</translation>
-    </message>
-    <message>
-        <source>Storage Options</source>
-        <translation>Lagringsinställningar</translation>
-    </message>
-    <message>
-        <source>Create New Recording Group</source>
-        <translation>Skapa ny inspelningsgrupp</translation>
-    </message>
-    <message>
-        <source>Select Recording Schedule</source>
-        <translation>Välj inspelningsschema</translation>
-    </message>
-    <message>
-        <source>Select Recording Group</source>
-        <translation>Välj inspelningsgrupp</translation>
-    </message>
-    <message>
-        <source>Create a new recording group</source>
-        <translation>Skapa ny inspelningsgrupp</translation>
-    </message>
-    <message>
-        <source>Program details</source>
-        <translation>Programinformation</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
@@ -5087,10 +5834,6 @@ Are you sure you want to delete:</source>
         <translation>Denna och följande inställning avgör när mythfilldatabase tillåts köra. Om exempelvis Min sätts till 11 och Max till 13 körs programmet bara mellan 11.00 och 12.59.</translation>
     </message>
     <message>
-        <source>Save these settings</source>
-        <translation>Spara dessa inställningar</translation>
-    </message>
-    <message>
         <source>Show group summary</source>
         <translation>Visa gruppsammanfattning</translation>
     </message>
@@ -5103,152 +5846,8 @@ Are you sure you want to delete:</source>
         <translation>Regi</translation>
     </message>
     <message>
-        <source>Do not record this program</source>
-        <translation>Spela inte in detta program</translation>
-    </message>
-    <message>
-        <source>Record only this showing</source>
-        <translation>Spela endast in denna visning</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation>Spela in denna tid varje vecka</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation>Spela in denna tid varje dag</translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation>Spela in vilken tid som helst på denna kanal</translation>
-    </message>
-    <message>
-        <source>Record at any time on any channel</source>
-        <translation>Spela in vilken tid som helst på alla kanaler</translation>
-    </message>
-    <message>
-        <source>Record this showing with normal options</source>
-        <translation>Spela in visning med vanliga inställningar</translation>
-    </message>
-    <message>
-        <source>Record this showing with override options</source>
-        <translation>Spela in visning med specifika inställningar</translation>
-    </message>
-    <message>
-        <source>Do not allow this showing to be recorded</source>
-        <translation>Tillåt inte denna visning att spelas in</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minutes late</source>
-        <translation>Börja spela in %1 minuter senare</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minute late</source>
-        <translation>Börja spela in %1 minut senare</translation>
-    </message>
-    <message>
-        <source>Start recording on time</source>
-        <translation>Börja spela in i tid</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minute early</source>
-        <translation>Börja spela in %1 minut tidigare</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minutes early</source>
-        <translation>Börja spela in %1 minuter tidigare</translation>
-    </message>
-    <message>
-        <source>End recording %1 minutes early</source>
-        <translation>Sluta spela in %1 minuter tidigare</translation>
-    </message>
-    <message>
-        <source>End recording %1 minute early</source>
-        <translation>Sluta spela in %1 minut tidigare</translation>
-    </message>
-    <message>
-        <source>End recording on time</source>
-        <translation>Sluta spela in i tid</translation>
-    </message>
-    <message>
-        <source>End recording %1 minute late</source>
-        <translation>Sluta spela in %1 minut senare</translation>
-    </message>
-    <message>
-        <source>End recording %1 minutes late</source>
-        <translation>Sluta spela in %1 minuter senare</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current and previous recordings</source>
-        <translation>Sök dubbletter i nuvarande och tidigare inspelningar</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current recordings only</source>
-        <translation>Sök dubbletter endast i nuvarande inspelningar</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in previous recordings only</source>
-        <translation>Sök dubbletter endast i tidigare inspelningar</translation>
-    </message>
-    <message>
-        <source>[ Match duplicates with ]</source>
-        <translation>[ Matcha dubbletter med ]</translation>
-    </message>
-    <message>
-        <source>Record new episodes only</source>
-        <translation>Spela endast in nya avsnitt</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle &amp; description</source>
-        <translation>Matcha dubbletter mot undertitel &amp; beskrivning</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle</source>
-        <translation>Matcha dubbletter mot undertitel</translation>
-    </message>
-    <message>
-        <source>Match duplicates using description</source>
-        <translation>Matcha dubbletter mot beskrivning</translation>
-    </message>
-    <message>
-        <source>Don&apos;t match duplicates</source>
-        <translation>Matcha inte dubbletter</translation>
-    </message>
-    <message>
-        <source>[ Select recording Profile ]</source>
-        <translation>[ Välj inspelningsprofil ]</translation>
-    </message>
-    <message>
-        <source>Allow auto expire</source>
-        <translation>Tillåt automatisk radering</translation>
-    </message>
-    <message>
-        <source>Don&apos;t allow auto expire</source>
-        <translation>Tillåt inte automatisk radering</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation>Spela inte in om max antal avsnitt överskrids</translation>
-    </message>
-    <message>
-        <source>No episode limit</source>
-        <translation>Ingen begränsning av antal avsnitt</translation>
-    </message>
-    <message>
-        <source>Keep only one episode.</source>
-        <translation>Behåll endast ett avsnitt.</translation>
-    </message>
-    <message>
-        <source>Keep at most %1 episodes</source>
-        <translation>Behåll som mest %1 avsnitt</translation>
-    </message>
-    <message>
         <source>Show the program guide when starting Live TV</source>
         <translation>Visa programguiden när TV-läge startas</translation>
-    </message>
-    <message>
-        <source>Post Recording Processing</source>
-        <translation>Efterinspelningsbearbetning</translation>
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
@@ -5399,85 +5998,12 @@ Are you sure you want to delete:</source>
         <translation>Detta gör att MythTV följer symboliska länkar när inspelningar och tillhörande filer tas bort, i stället för att ta bort den symboliska länken och lämna kvar själva filen.</translation>
     </message>
     <message>
-        <source>Stop recording</source>
-        <translation>Stoppa inspelning</translation>
-    </message>
-    <message>
-        <source>Commercial Flag new recordings</source>
-        <translation>Markera reklam i nya inspelningar</translation>
-    </message>
-    <message>
-        <source>Do not Commercial Flag new recordings</source>
-        <translation>Markera inte reklam i nya inspelningar</translation>
-    </message>
-    <message>
-        <source>Run &apos;%1&apos;</source>
-        <translation>Kör &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation>Kör inte &apos;%1&apos; för nya inspelningar</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation>Titel</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation>Beskrivning</translation>
-    </message>
-    <message>
-        <source>Part %1 of %2, </source>
-        <translation>Del %1 av %2,</translation>
-    </message>
-    <message>
-        <source>HDTV</source>
-        <translation>HDTV</translation>
-    </message>
-    <message>
-        <source>Subtitled</source>
-        <translation>Textat</translation>
-    </message>
-    <message>
         <source>Stereo</source>
         <translation>Stereo</translation>
     </message>
     <message>
-        <source>Category</source>
-        <translation>Kategori</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <comment>category_type</comment>
-        <translation>Typ</translation>
-    </message>
-    <message>
-        <source>Episode Number</source>
-        <translation>Avsnitt</translation>
-    </message>
-    <message>
-        <source>Original Airdate</source>
-        <translation>Ursprungligt visningsdatum</translation>
-    </message>
-    <message>
         <source>Program ID</source>
         <translation>Program-ID</translation>
-    </message>
-    <message>
-        <source>Actors</source>
-        <translation>Skådespelare</translation>
-    </message>
-    <message>
-        <source>Guest Star</source>
-        <translation>Gäst</translation>
-    </message>
-    <message>
-        <source>Director</source>
-        <translation>Regissör</translation>
-    </message>
-    <message>
-        <source>Recording Group</source>
-        <translation>Inspelningsgrupp</translation>
     </message>
     <message>
         <source>Uptime</source>
@@ -5560,18 +6086,6 @@ Are you sure you want to delete:</source>
         <translation>Om markerat, korrigerar QuickTime bildens gammavärde för att motsvara bildskärmen. Att stänga av det kan spara några processorcykler.</translation>
     </message>
     <message>
-        <source>Recording Host</source>
-        <translation>Inspelningsvärddator</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title</source>
-        <translation>Spela in en visning av denna titel</translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceed the max episodes</source>
-        <translation>Ta bort äldsta om maximalt antal avsnitt överskrids</translation>
-    </message>
-    <message>
         <source>All</source>
         <translation>Alla</translation>
     </message>
@@ -5620,18 +6134,6 @@ Are you sure you want to delete:</source>
         <translation>Nuvarande inspelningar</translation>
     </message>
     <message>
-        <source>Find ID</source>
-        <translation>Hitta ID</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every week</source>
-        <translation>Spela in en visning av denna titel varje vecka</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every day</source>
-        <translation>Spela in en visning av denna titel varje dag</translation>
-    </message>
-    <message>
         <source>HD Ringbuffer size (KB)</source>
         <translation>HDTV ringbuffertstorlek (KiB)</translation>
     </message>
@@ -5658,14 +6160,6 @@ Are you sure you want to delete:</source>
     <message>
         <source>this recording rule is inactive.</source>
         <translation>detta inspelningsschema är inaktivt.</translation>
-    </message>
-    <message>
-        <source>This recording rule is inactive</source>
-        <translation>Detta inspelningsschema är inaktivt</translation>
-    </message>
-    <message>
-        <source>This recording rule is active</source>
-        <translation>Detta inspelningsschema är aktivt</translation>
     </message>
     <message>
         <source>6 MHz</source>
@@ -6015,14 +6509,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
         <translation>Utmatning</translation>
     </message>
     <message>
-        <source>Default refresh rate when watching a video.</source>
-        <translation>Förvald uppdateringsfrekvens när video visas.</translation>
-    </message>
-    <message>
-        <source>Refresh rate when watching a video at a specific resolution.</source>
-        <translation>Uppdateringsfrekvens när video visas med en specifik upplösning.</translation>
-    </message>
-    <message>
         <source>Rate</source>
         <translation>Frekvens</translation>
     </message>
@@ -6189,10 +6675,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
         <translation>Omkoda med &quot;%1&quot;</translation>
     </message>
     <message>
-        <source>[ Select transcoder ]</source>
-        <translation>[ Välj omkodare ]</translation>
-    </message>
-    <message>
         <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
         <translation>Detta är det förvalda värdet för inställningen &apos;Omkoda nya inspelningar&apos; när en ny schemalagd inspelning skapas.</translation>
     </message>
@@ -6227,14 +6709,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
     <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
         <translation>%1 totalt, %2 använt, %3 (%4%) ledigt.</translation>
-    </message>
-    <message>
-        <source>Transcode new recordings</source>
-        <translation>Omkoda nya inspelningar</translation>
-    </message>
-    <message>
-        <source>Do not Transcode new recordings</source>
-        <translation>Omkoda inte nya inspelningar</translation>
     </message>
     <message>
         <source>Autodetect</source>
@@ -6374,10 +6848,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
     <message>
         <source>This showing was not recorded because it was manually cancelled.</source>
         <translation>Denna visning spelades inte in eftersom den avbröts manuellt.</translation>
-    </message>
-    <message>
-        <source>Change Ending Time</source>
-        <translation>Ändra sluttid</translation>
     </message>
     <message>
         <source>Signal Timeout (msec)</source>
@@ -6692,10 +7162,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
         <translation>Maximal tid att vänta på programinformation på en digitalkanal innan sökningen går vidare till nästa kanal.</translation>
     </message>
     <message>
-        <source>Status</source>
-        <translation>Status</translation>
-    </message>
-    <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
         <translation>Detta fungerar vanligtvis endast med ATSC- eller DVB-kanaler,</translation>
     </message>
@@ -6764,14 +7230,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
         <translation>Bild i bild</translation>
     </message>
     <message>
-        <source>Schedule Information</source>
-        <translation>Schemainformation</translation>
-    </message>
-    <message>
-        <source>Preview schedule changes</source>
-        <translation>Förhandsgranska schemaändringar</translation>
-    </message>
-    <message>
         <source>The following programs will be recorded instead:</source>
         <translation>Följande program kommer att spelas in i stället:</translation>
     </message>
@@ -6800,60 +7258,12 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
         <translation>Ursprungligt uppspelningstempo med justerat ljud. Använd 100 för normalt tempo, 50 för halvt tempo och 200 för dubbelt tempo.</translation>
     </message>
     <message>
-        <source>Playback Group</source>
-        <translation>Uppspelningsgrupp</translation>
-    </message>
-    <message>
-        <source>Select Playback Group</source>
-        <translation>Välj uppspelningsgrupp</translation>
-    </message>
-    <message>
         <source>Daily Wakeup/ShutDown Period</source>
         <translation>Daglig uppvaknings- och avstängningsperiod</translation>
     </message>
     <message>
-        <source>Use &quot;%1&quot; playback group settings</source>
-        <translation>Använd uppspelningsgrupp &quot;%1&quot;</translation>
-    </message>
-    <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
         <translation>Om aktiverat, kommer MythTV automatiskt att spola tillbaka så här många sekunder efter ett reklamhopp.</translation>
-    </message>
-    <message>
-        <source>Unidentified Episode</source>
-        <translation>Oidentifierat avsnitt</translation>
-    </message>
-    <message>
-        <source>Producer</source>
-        <translation>Producent</translation>
-    </message>
-    <message>
-        <source>Executive Producer</source>
-        <translation>Exekutiv producent</translation>
-    </message>
-    <message>
-        <source>Writer</source>
-        <translation>Författare</translation>
-    </message>
-    <message>
-        <source>Host</source>
-        <translation>Värd</translation>
-    </message>
-    <message>
-        <source>Adapter</source>
-        <translation>Anpassad av</translation>
-    </message>
-    <message>
-        <source>Presenter</source>
-        <translation>Presentatör</translation>
-    </message>
-    <message>
-        <source>Commentator</source>
-        <translation>Kommentator</translation>
-    </message>
-    <message>
-        <source>Guest</source>
-        <translation>Gäst</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
@@ -6898,30 +7308,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
     <message>
         <source>Run mythfilldatabase at time suggested by the grabber.</source>
         <translation>Kör mythfilldatabase på tider som föreslås av tablåhämtaren.</translation>
-    </message>
-    <message>
-        <source>Recording Profile</source>
-        <translation>Inspelningsprofil</translation>
-    </message>
-    <message>
-        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation>Ange gruppnamn eller tryck på SELECT för att skriva in text med det virtuella tangentbordet</translation>
-    </message>
-    <message>
-        <source>Title Pronounce</source>
-        <translation>Titeluttal</translation>
-    </message>
-    <message>
-        <source>Recording Rule</source>
-        <translation>Inspelningsregel</translation>
-    </message>
-    <message>
-        <source>Search Phrase</source>
-        <translation>Sökfras</translation>
-    </message>
-    <message>
-        <source>Recorded File Size</source>
-        <translation>Sparad filstorlek</translation>
     </message>
     <message>
         <source>Allows the transcoder to resize the video during transcoding.</source>
@@ -7068,11 +7454,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
     <message>
         <source>the backend recorder is off-line.</source>
         <translation>inspelningsserverns inspelningsfunktion är nerkopplad.</translation>
-    </message>
-    <message>
-        <source>CC</source>
-        <comment>Closed Captioned</comment>
-        <translation>Textad</translation>
     </message>
     <message>
         <source>Use DishNet Long-term EIT Data</source>
@@ -7487,18 +7868,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
         <translation>Använd ett positivt tal om du vill att denna kanal ska favoriseras, ett negativt tal för att låta andra kanaler gå före.</translation>
     </message>
     <message>
-        <source>Current Example</source>
-        <translation>Aktuellt exempel</translation>
-    </message>
-    <message>
-        <source>Store</source>
-        <translation>Lagra</translation>
-    </message>
-    <message>
-        <source>Replace</source>
-        <translation>Ersätt</translation>
-    </message>
-    <message>
         <source>Track</source>
         <translation>Spår</translation>
     </message>
@@ -7582,18 +7951,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
     <message>
         <source>Cable IRC</source>
         <translation>Kabel-IRC</translation>
-    </message>
-    <message>
-        <source>Use any available input</source>
-        <translation>Använd tillgänglig ingång</translation>
-    </message>
-    <message>
-        <source>Prefer input %1</source>
-        <translation>Föredra ingång %1</translation>
-    </message>
-    <message>
-        <source>Select Preferred Input</source>
-        <translation>Välj föredragen ingång</translation>
     </message>
     <message>
         <source>UNKNOWN%1</source>
@@ -7814,18 +8171,6 @@ De flesta kort känner av detta automatiskt nu, ändra endast om det ej fungerar
         <translation>Valet att söka endast &quot;Höga&quot; frekvenser är användbart eftersom de flesta digitala kanaler ligger på de högre frekvenserna.</translation>
     </message>
     <message>
-        <source>Upcoming episodes for this title</source>
-        <translation>Kommande visningar för denna titel</translation>
-    </message>
-    <message>
-        <source>Upcoming episodes for this rule</source>
-        <translation>Kommande visningar för denna regel</translation>
-    </message>
-    <message>
-        <source>Previously scheduled episodes</source>
-        <translation>Tidigare schemalagda avsnitt</translation>
-    </message>
-    <message>
         <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
         <translation>Välj den modell som liknar din digitalbox bäst. Beroende på revision av fast program kan SA4200HD fungera bättre för en SA3250HD.</translation>
     </message>
@@ -7983,42 +8328,6 @@ Frekvensen för denna kanal i</translation>
         <translation>Annan visning</translation>
     </message>
     <message>
-        <source>Last Recorded</source>
-        <translation>Senast inspelad</translation>
-    </message>
-    <message>
-        <source>Next Recording</source>
-        <translation>Nästa inspelning</translation>
-    </message>
-    <message>
-        <source>Watch List Score</source>
-        <translation>Bevakningslistpoäng</translation>
-    </message>
-    <message>
-        <source>Auto-expire off</source>
-        <translation>Radera automatiskt av</translation>
-    </message>
-    <message>
-        <source>Marked as &apos;watched&apos;</source>
-        <translation>Markera som &apos;sedd&apos;</translation>
-    </message>
-    <message>
-        <source>Not the earliest episode</source>
-        <translation>Ej det första avsnittet</translation>
-    </message>
-    <message>
-        <source>Recently deleted episode</source>
-        <translation>Nyligen borttaget avsnitt</translation>
-    </message>
-    <message>
-        <source>Watch List Status</source>
-        <translation>Bevakningsliststatus</translation>
-    </message>
-    <message>
-        <source>Storage Group</source>
-        <translation>Lagringsgrupp</translation>
-    </message>
-    <message>
         <source>SAP/Bilingual</source>
         <translation>SAP/Tvåspråkig</translation>
     </message>
@@ -8051,30 +8360,6 @@ Frekvensen för denna kanal i</translation>
         <translation>Höjd att använda för kodning. Notera: PVR-x50-kort med ivtv före 0.4.0 kan ge skuggbild om höjden inte är satt till 480 (NTSC) eller 576 (PAL).</translation>
     </message>
     <message>
-        <source>Include in the &quot;%1&quot; recording group</source>
-        <translation>Inkludera i inspelningsgruppen &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes</source>
-        <translation>Undanta oidentifierade avsnitt</translation>
-    </message>
-    <message>
-        <source>Exclude old episodes</source>
-        <translation>Undanta gamla avsnitt</translation>
-    </message>
-    <message>
-        <source>Select Storage Group</source>
-        <translation>Välj lagringsgrupp</translation>
-    </message>
-    <message>
-        <source>Store in the &quot;%1&quot; storage group</source>
-        <translation>Lagra i lagringsgrupp &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>LiveTV</source>
-        <translation>Direktsändning</translation>
-    </message>
-    <message>
         <source>Listings grabber</source>
         <translation>Tablåhämtare</translation>
     </message>
@@ -8101,22 +8386,6 @@ Frekvensen för denna kanal i</translation>
     <message>
         <source>Network Recorder</source>
         <translation>Nätverksinspelare</translation>
-    </message>
-    <message>
-        <source>Unencrypted channels only</source>
-        <translation>Endast okrypterade kanaler</translation>
-    </message>
-    <message>
-        <source>If set, only unencrypted channels will be tuned to by MythTV or not be ignored by the MythTV channel scanner.</source>
-        <translation>Om aktiverat, kommer bara okrypterade kanaler att ställas in av MythTV eller inte ignoreras av MythTV:s kanalsökare.</translation>
-    </message>
-    <message>
-        <source>Allow audio only channels</source>
-        <translation>Tillåt kanaler med endast ljud</translation>
-    </message>
-    <message>
-        <source>If set, audio only channels will not be ignored by the MythTV channel scanner.</source>
-        <translation>Om aktiverat, kommer kanaler med bara ljud inte ignoreras av MythTV:s kanalsökare.</translation>
     </message>
     <message>
         <source>Use quick tuning</source>
@@ -8255,10 +8524,6 @@ Frekvensen för denna kanal i</translation>
         <translation>Format på tidssträngen som anges som argument till kommandot för att ställa in väckningstid som $time. Se QT::QDateTime.toString() för detaljer. Ställ in till &apos;time_t&apos; för sekunder sedan epok (använd time_t för nvram_wakeup).</translation>
     </message>
     <message>
-        <source>Match duplicates using subtitle then description</source>
-        <translation>Matcha dubbletter med undertitel och sedan beskrivning</translation>
-    </message>
-    <message>
         <source>Commercial Flagging Method</source>
         <translation>Reklammarkeringsmetod</translation>
     </message>
@@ -8375,14 +8640,6 @@ Frekvensen för denna kanal i</translation>
         <translation>Kanalalternativ</translation>
     </message>
     <message>
-        <source>as a search</source>
-        <translation>som sökning</translation>
-    </message>
-    <message>
-        <source>as an example</source>
-        <translation>som exempel</translation>
-    </message>
-    <message>
         <source>Title %1 chapter %2</source>
         <translation>titel %1 kapitel %2</translation>
     </message>
@@ -8411,48 +8668,8 @@ Frekvensen för denna kanal i</translation>
         <translation>detta avsnitt kommer att spelas in på en annan kanal vid denna tidpunkt.</translation>
     </message>
     <message>
-        <source>Mono</source>
-        <translation>Mono</translation>
-    </message>
-    <message>
-        <source>Surround Sound</source>
-        <translation>Surround-ljud</translation>
-    </message>
-    <message>
-        <source>Dolby Sound</source>
-        <translation>Dolby-ljud</translation>
-    </message>
-    <message>
-        <source>Audio for Hearing Impaired</source>
-        <translation>Ljudspår för hörselskadade</translation>
-    </message>
-    <message>
-        <source>Audio for Visually Impaired</source>
-        <translation>Ljudspår för synskadade</translation>
-    </message>
-    <message>
         <source>Widescreen</source>
         <translation>Bredbildsformat</translation>
-    </message>
-    <message>
-        <source>AVC/H.264</source>
-        <translation>AVC/H.264</translation>
-    </message>
-    <message>
-        <source>Subtitles Available</source>
-        <translation>Det finns undertexter</translation>
-    </message>
-    <message>
-        <source>Deaf Signing</source>
-        <translation>Teckenspråk</translation>
-    </message>
-    <message>
-        <source>Average Time Shift</source>
-        <translation>Tidsförskjutning i medeltal</translation>
-    </message>
-    <message>
-        <source>Recorded File Name</source>
-        <translation>Inspelat filnamn</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
@@ -8479,10 +8696,6 @@ De flesta DVB-S transpondrar sänder 27,5 millioner symboler per sekund.</transl
     <message>
         <source>Tuning to %1 mplexid(%2)</source>
         <translation>Ställer in till %1 mplexid(%2)</translation>
-    </message>
-    <message>
-        <source>Record new episode first showings</source>
-        <translation>Spela in nytt avsnitt vid premiärer</translation>
     </message>
     <message>
         <source>DVB Transport</source>
@@ -8587,10 +8800,6 @@ De flesta DVB-S transpondrar sänder 27,5 millioner symboler per sekund.</transl
     <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
         <translation>Denna videoåtergivare använder DirectFB för skalning och färgkonvertering. Den är inte lika egenskapsrik som den normala videoåtergivaren, men kan köras på Linux-system utan X11-server.</translation>
-    </message>
-    <message>
-        <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
-        <translation>Windows videoåtergivare baserad på överlagring. Inte kompatibel med Vista Aero Glass.</translation>
     </message>
     <message>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
@@ -9131,42 +9340,6 @@ De flesta DVB-S transpondrar sänder 27,5 millioner symboler per sekund.</transl
     <message>
         <source>Default group filter to apply on the View Recordings screen.</source>
         <translation>Gruppfilter som normalt ska användas i översikten &quot;Titta på Inspelningar&quot;.</translation>
-    </message>
-    <message>
-        <source>Default View</source>
-        <translation>Standardöversikt</translation>
-    </message>
-    <message>
-        <source>Show Titles only</source>
-        <translation>Visa endast titlar</translation>
-    </message>
-    <message>
-        <source>Show Titles and Categories</source>
-        <translation>Visa titlar och kategorier</translation>
-    </message>
-    <message>
-        <source>Show Titles, Categories, and Recording Groups</source>
-        <translation>Visa titlar, kategorier och inspelningsgrupper</translation>
-    </message>
-    <message>
-        <source>Show Titles and Recording Groups</source>
-        <translation>Visa titlar och inspelningsgrupper</translation>
-    </message>
-    <message>
-        <source>Show Categories only</source>
-        <translation>Visa endast kategorier</translation>
-    </message>
-    <message>
-        <source>Show Categories and Recording Groups</source>
-        <translation>Visa kategorier och inspelningsgrupper</translation>
-    </message>
-    <message>
-        <source>Show Recording Groups only</source>
-        <translation>Visa endast inspelningsgrupper</translation>
-    </message>
-    <message>
-        <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation>Välj vilken typ av gruppering som ska visas i översikten &quot;Titta på inspelningar&quot;.</translation>
     </message>
     <message>
         <source>Run commercial flagger</source>
@@ -10788,22 +10961,6 @@ Du kanske måste använda utmatningsknappen under brickan.</translation>
         <translation>Ogiltigt enhets-ID eller adress.</translation>
     </message>
     <message>
-        <source>Model: %1</source>
-        <translation>Modell: %1</translation>
-    </message>
-    <message>
-        <source>, Firmware: %2</source>
-        <translation>, fast program: %2</translation>
-    </message>
-    <message>
-        <source>, ID %1</source>
-        <translation>, ID %1</translation>
-    </message>
-    <message>
-        <source>, at address %1.%2.%3.%4</source>
-        <translation>, på adress %1.%2.%3.%4</translation>
-    </message>
-    <message>
         <source>All Channels</source>
         <translation>Alla kanaler</translation>
     </message>
@@ -10878,14 +11035,6 @@ Du kanske måste använda utmatningsknappen under brickan.</translation>
     <message>
         <source>Parsing Channel #%1 : %2 : %3</source>
         <translation>Tolkar kanal nr %1 : %2 : %3</translation>
-    </message>
-    <message>
-        <source>720p Resolution</source>
-        <translation>Upplösning 720p</translation>
-    </message>
-    <message>
-        <source>1080i/p Resolution</source>
-        <translation>Upplösning 1080i/p</translation>
     </message>
     <message>
         <source>Kernel (2x)</source>
@@ -11079,18 +11228,6 @@ huvudinspelningsservern (t.ex. sudo /etc/init.d/mythtv-backend start).</translat
         <translation>Ingen ändring</translation>
     </message>
     <message>
-        <source>Reduce priority by %1</source>
-        <translation>Minska prioritet med %1</translation>
-    </message>
-    <message>
-        <source>Normal recording priority</source>
-        <translation>Normal inspelningsprioritet</translation>
-    </message>
-    <message>
-        <source>Raise priority by %1</source>
-        <translation>Öka prioritet med %1</translation>
-    </message>
-    <message>
         <source>libmpeg2 is slower on almost all processors than ffmpeg and breaks caption decoding. Use at your own risk!</source>
         <translation>Biblioteket libmpeg2 är långsammare än ffmpeg på nästan alla processorer, och hanterar inte avkodning av textning riktigt. Använd på egen risk!</translation>
     </message>
@@ -11115,10 +11252,6 @@ huvudinspelningsservern (t.ex. sudo /etc/init.d/mythtv-backend start).</translat
         <translation>Inställningen styr hur schemaläggningskoden för lagringsgrupper balanserar nya inspelningar över kataloger. Den rekommenderade metoden för de flesta användare är &apos;Balansera ledigt utrymme&apos;.</translation>
     </message>
     <message>
-        <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in. </source>
-        <translation>Normalt använder MythTV svart för utfyllnad i över- och underkant vid brevlådeformat, men för en plasma-tv kanske grått är att föredra för att minska risken för inbränning.</translation>
-    </message>
-    <message>
         <source>Live TV idle timeout</source>
         <translation>Tidsgräns för oanvänt TV-läge</translation>
     </message>
@@ -11126,24 +11259,150 @@ huvudinspelningsservern (t.ex. sudo /etc/init.d/mythtv-backend start).</translat
         <source>Exit LiveTV automatically if left idle for the specified number of minutes. 0 disables the timeout.</source>
         <translation>Avsluta TV-läget automatisk om det lämnas oanvänt under angivet antal minuter. 0 inaktiverar tidsgränsen.</translation>
     </message>
-</context>
-<context>
-    <name>RecOptDialog</name>
     <message>
-        <source>Missing Element</source>
-        <translation>Saknat element</translation>
+        <source>Could not find specified tuner (%1).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
-        <translation>Temat du använder innehåller inte &apos;recording_options&apos; elementet.  Kontakta temats upphovsmän och be dem att uppdatera temat.&lt;br&gt;&lt;br&gt;Nästa bild kommer att vara tom.  Tryck på EXIT för att gå tillbaka till menyn.</translation>
+        <source>Specified tuner (%1) is already in use.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown Element</source>
-        <translation>Okänt element</translation>
+        <source>All tuners are currently in use. If you want to watch TV, you can cancel one of the in-progress recordings from the delete menu</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation>Temat som används innehåller ett okänt element (&apos;%1&apos;) som kommer att ignoreras</translation>
+        <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
+        <translation type="unfinished">Kunde inte ansluta till huvudinspelningsservern: är den startad? Är dess IP-adress riktigt angiven i inställningsprogrammet?</translation>
+    </message>
+    <message>
+        <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
+        <translation type="unfinished">Servern använder nätverksprotokoll version %1, men den här klienten förstår endast version %2. Försäkra dig om att du kör kompatibla versioner av inspelningsserver och uppspelningsklient.</translation>
+    </message>
+    <message>
+        <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
+        <translation type="unfinished">Programmet är inte kompatibelt med installerade MythTV-bibliotek. Kompilera om det efter &apos;make distclean&apos;</translation>
+    </message>
+    <message>
+        <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
+        <translation type="unfinished">Förbindelsen till huvudinspelningsservern har brutits av någon anledning. Är den startad?</translation>
+    </message>
+    <message>
+        <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
+        <translation type="unfinished">Insticksprogrammet %1 är inte kompatibelt med installerade MythTV-bibliotek. Kompilera om insticksprogrammet efter &apos;make distclean&apos;</translation>
+    </message>
+    <message>
+        <source>Pre &amp; Post Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, firmware: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found %1 off-air channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found %1 unused transports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set all invisible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%1 or later) %3</source>
+        <comment>e.g. (Sunday or later) program subtitle</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Detect (Default Off)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Detect (Default Half)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>By default MythTV uses black letterboxing to match broadcaster letterboxing, but those with plasma screens may prefer gray to minimize burn-in.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video. Leave at &quot;Any&quot; to automatically use the best available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Any&quot; to automatically use the best available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Widescreen Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sign Language Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having in-vision sign language.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In-vision Subtitles Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles/CC Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard of Hearing Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Described Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as being Audio Described.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accessibility Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have a Video Storage Group, but have not set up all Image Groups.  If you continue, video image downloads will be saved in your Videos Storage Group.  Do you want to store them in their own groups?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for icons for channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMLTV Grabber Configuration</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11176,49 +11435,6 @@ huvudinspelningsservern (t.ex. sudo /etc/init.d/mythtv-backend start).</translat
     <message>
         <source>Country</source>
         <translation>Land</translation>
-    </message>
-</context>
-<context>
-    <name>ScanProgressPopup</name>
-    <message>
-        <source>Scan Progress</source>
-        <translation>Sökförlopp</translation>
-    </message>
-    <message>
-        <source>Tuning</source>
-        <translation>Justerar</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Avbryt</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation>Status</translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation>Sökning</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation>Signalstyrka</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation>Signal/brus</translation>
-    </message>
-    <message>
-        <source>Locked</source>
-        <translation>Låst</translation>
-    </message>
-    <message>
-        <source>No Lock</source>
-        <translation>Inget lås</translation>
-    </message>
-    <message>
-        <source>Rotor Movement</source>
-        <translation>Rotorrörelse</translation>
     </message>
 </context>
 <context>
@@ -11271,10 +11487,206 @@ huvudinspelningsservern (t.ex. sudo /etc/init.d/mythtv-backend start).</translat
     </message>
 </context>
 <context>
-    <name>ScheduledRecording</name>
+    <name>SchedOptEditor</name>
     <message>
-        <source>or later</source>
-        <translation>eller senare</translation>
+        <source>Use any available input</source>
+        <translation type="unfinished">Använd tillgänglig ingång</translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished">Föredra ingång %1</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle &amp; description</source>
+        <translation type="unfinished">Matcha dubbletter mot undertitel &amp; beskrivning</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
+        <translation type="unfinished">Matcha dubbletter med undertitel och sedan beskrivning</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle</source>
+        <translation type="unfinished">Matcha dubbletter mot undertitel</translation>
+    </message>
+    <message>
+        <source>Match duplicates using description</source>
+        <translation type="unfinished">Matcha dubbletter mot beskrivning</translation>
+    </message>
+    <message>
+        <source>Don&apos;t match duplicates</source>
+        <translation type="unfinished">Matcha inte dubbletter</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current and previous recordings</source>
+        <translation type="unfinished">Sök dubbletter i nuvarande och tidigare inspelningar</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current recordings only</source>
+        <translation type="unfinished">Sök dubbletter endast i nuvarande inspelningar</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in previous recordings only</source>
+        <translation type="unfinished">Sök dubbletter endast i tidigare inspelningar</translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
+        <translation type="unfinished">Uteslut oidentifierade avsnitt</translation>
+    </message>
+    <message>
+        <source>Exclude old episodes</source>
+        <translation type="unfinished">Undanta gamla avsnitt</translation>
+    </message>
+    <message>
+        <source>Record new episodes only</source>
+        <translation type="unfinished">Spela endast in nya avsnitt</translation>
+    </message>
+    <message>
+        <source>Record new episode first showings</source>
+        <translation type="unfinished">Spela in nytt avsnitt vid premiärer</translation>
+    </message>
+</context>
+<context>
+    <name>ScheduleCommon</name>
+    <message>
+        <source>Reactivate</source>
+        <translation type="unfinished">Återaktivera</translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">Stoppa inspelning</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record</source>
+        <translation type="unfinished">Spela inte in</translation>
+    </message>
+    <message>
+        <source>Never record</source>
+        <translation type="unfinished">Spela aldrig in</translation>
+    </message>
+    <message>
+        <source>Change Ending Time</source>
+        <translation type="unfinished">Ändra sluttid</translation>
+    </message>
+    <message>
+        <source>Edit Options</source>
+        <translation type="unfinished">Ändra inställningar</translation>
+    </message>
+    <message>
+        <source>Add Override</source>
+        <translation type="unfinished">Lägg till specifika</translation>
+    </message>
+    <message>
+        <source>Edit Override</source>
+        <translation type="unfinished">Redigera specifika</translation>
+    </message>
+    <message>
+        <source>Clear Override</source>
+        <translation type="unfinished">Rensa specifika</translation>
+    </message>
+    <message>
+        <source> The following programs will be recorded instead:
+</source>
+        <translation type="unfinished">Följande program kommer att spelas in istället:
+</translation>
+    </message>
+    <message>
+        <source>Record anyway</source>
+        <translation type="unfinished">Spela in ändå</translation>
+    </message>
+    <message>
+        <source>Forget Previous</source>
+        <translation type="unfinished">Glöm föregående</translation>
+    </message>
+</context>
+<context>
+    <name>ScheduleEditor</name>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished">Spela in visning med vanliga inställningar</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished">Spela in visning med specifika inställningar</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished">Tillåt inte denna visning att spelas in</translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished">Spela inte in detta program</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished">Spela endast in denna visning</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished">Spela in en visning av denna titel</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished">Spela in denna tid varje vecka</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished">Spela in en visning av denna titel varje vecka</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished">Spela in denna tid varje dag</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished">Spela in en visning av denna titel varje dag</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished">Spela in vilken tid som helst på denna kanal</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished">Spela in vilken tid som helst på alla kanaler</translation>
+    </message>
+    <message>
+        <source>Power Search</source>
+        <translation type="unfinished">Avancerad sökning</translation>
+    </message>
+    <message>
+        <source>Title Search</source>
+        <translation type="unfinished">Sök titel</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished">Sök nyckelord</translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished">Sök person</translation>
+    </message>
+    <message>
+        <source>Unknown Search</source>
+        <translation type="unfinished">Okänd sökning</translation>
+    </message>
+    <message>
+        <source>Schedule Information</source>
+        <translation type="unfinished">Schemainformation</translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished">Programinformation</translation>
+    </message>
+    <message>
+        <source>Upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously scheduled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11344,10 +11756,6 @@ placerad i %2</translation>
         <translation>Detta går inte att ångra, så att ha en säkerhetskopia av databasen vore en god idé.</translation>
     </message>
     <message>
-        <source>Database schema is old. Waiting to see if DB is being upgraded.</source>
-        <translation>Databasschemat är gammalt. Väntar för att se om databasen håller på att uppgraderas.</translation>
-    </message>
-    <message>
         <source>Exit</source>
         <translation>Avsluta</translation>
     </message>
@@ -11364,6 +11772,10 @@ placerad i %2</translation>
 Database Name: %2</source>
         <translation>Databasvärddator: %1
 Databasnamn: %2</translation>
+    </message>
+    <message>
+        <source>%1 database schema is old. Waiting to see if DB is being upgraded.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11837,6 +12249,53 @@ Från lagringsgrupp?</translation>
     <message>
         <source>(Create %1 group)</source>
         <translation>(Skapa %1 grupp)</translation>
+    </message>
+    <message>
+        <source>(from remote hosts)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(from all hosts</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StoreOptEditor</name>
+    <message>
+        <source>Record using the %1 profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create a new recording group</source>
+        <translation type="unfinished">Skapa ny inspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Include in the &quot;%1&quot; recording group</source>
+        <translation type="unfinished">Inkludera i inspelningsgruppen &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">Standard</translation>
+    </message>
+    <message>
+        <source>Store in the &quot;%1&quot; storage group</source>
+        <translation type="unfinished">Lagra i lagringsgrupp &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use &quot;%1&quot; playback group settings</source>
+        <translation type="unfinished">Använd uppspelningsgrupp &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record if this would exceed the max episodes</source>
+        <translation type="unfinished">Spela inte in om max antal avsnitt överskrids</translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation type="unfinished">Ta bort äldsta om maximalt antal avsnitt överskrids</translation>
     </message>
 </context>
 <context>
@@ -12703,6 +13162,10 @@ Välj en pågående inspelning</translation>
         <source>All Channels</source>
         <translation>Alla kanaler</translation>
     </message>
+    <message>
+        <source>Auto Detect</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -12771,10 +13234,6 @@ Välj en pågående inspelning</translation>
         <translation>Programlistning</translation>
     </message>
     <message>
-        <source>No listings found for this program. </source>
-        <translation>Inga visningar funna av detta program. </translation>
-    </message>
-    <message>
         <source>(1) All  (2) Important</source>
         <translation>(1) Alla  (2) Viktiga</translation>
     </message>
@@ -12807,28 +13266,12 @@ Välj en pågående inspelning</translation>
         <translation>(1) Titel  (2) Prioritet  (4) Typ</translation>
     </message>
     <message>
-        <source>Select a recording to permanently erase</source>
-        <translation>Välj en inspelning att radera</translation>
-    </message>
-    <message>
-        <source>Select a recording to watch</source>
-        <translation>Välj en inspelning att visa</translation>
-    </message>
-    <message>
         <source>Select a recording to permanently erase:</source>
         <translation>Välj en inspelning att radera permanent:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
         <translation>Välj en inspelning att visa:</translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently erase.</source>
-        <translation>Välj en inspelning att radera permanent.</translation>
-    </message>
-    <message>
-        <source>Select a recording to watch.</source>
-        <translation>Välj en inspelning att visa.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
@@ -12919,30 +13362,6 @@ Välj en pågående inspelning</translation>
         <translation>DATUM: %caller_date% TID: %caller_time%</translation>
     </message>
     <message>
-        <source>Please Wait...</source>
-        <translation>Vänta...</translation>
-    </message>
-    <message>
-        <source>Track Information</source>
-        <translation>Spårinformation</translation>
-    </message>
-    <message>
-        <source>Compilation:</source>
-        <translation>Samling:</translation>
-    </message>
-    <message>
-        <source>Comp. Artist:</source>
-        <translation>Samlingsartist:</translation>
-    </message>
-    <message>
-        <source>Artist:</source>
-        <translation>Artist:</translation>
-    </message>
-    <message>
-        <source>Album:</source>
-        <translation>Album:</translation>
-    </message>
-    <message>
         <source>Title:</source>
         <translation>Titel:</translation>
     </message>
@@ -12955,104 +13374,12 @@ Välj en pågående inspelning</translation>
         <translation>År:</translation>
     </message>
     <message>
-        <source>Track No.:</source>
-        <translation>Spår nr:</translation>
-    </message>
-    <message>
-        <source>Rating:</source>
-        <translation>Betyg:</translation>
-    </message>
-    <message>
-        <source>Play Count:</source>
-        <translation>Antal spelningar:</translation>
-    </message>
-    <message>
-        <source>Last Play:</source>
-        <translation>Senaste spelning:</translation>
-    </message>
-    <message>
         <source>Filename:</source>
         <translation>Filnamn:</translation>
     </message>
     <message>
-        <source>Album Art</source>
-        <translation>Omslagsbild</translation>
-    </message>
-    <message>
-        <source>No Album Art Found</source>
-        <translation>Inget omslag hittades</translation>
-    </message>
-    <message>
-        <source>Type:</source>
-        <translation>Typ:</translation>
-    </message>
-    <message>
-        <source>Please select a quality level and check the album information below:</source>
-        <translation>Välj en kvailtetsnivå och kontrollera albuminformationen nedan:</translation>
-    </message>
-    <message>
-        <source>Quality:</source>
-        <translation>Kvalitet:</translation>
-    </message>
-    <message>
-        <source>Multi-Artist:</source>
-        <translation>Flera artister:</translation>
-    </message>
-    <message>
-        <source>Track</source>
-        <translation>Spår</translation>
-    </message>
-    <message>
         <source>Title</source>
         <translation>Titel</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation>Artist</translation>
-    </message>
-    <message>
-        <source>Length</source>
-        <translation>Längd</translation>
-    </message>
-    <message>
-        <source>Rip CD</source>
-        <translation>Lagra CD</translation>
-    </message>
-    <message>
-        <source>Importing CD</source>
-        <translation>Importerar CD</translation>
-    </message>
-    <message>
-        <source>Encoding Track</source>
-        <translation>Kodar spår</translation>
-    </message>
-    <message>
-        <source>Import Music</source>
-        <translation>Importera musik</translation>
-    </message>
-    <message>
-        <source>Location:</source>
-        <translation>Plats:</translation>
-    </message>
-    <message>
-        <source>123 of 345</source>
-        <translation>123 av 345</translation>
-    </message>
-    <message>
-        <source>All ready in database</source>
-        <translation>Allt klart i databas</translation>
-    </message>
-    <message>
-        <source>/some/file/goes/here/test.mp3</source>
-        <translation>/någon/fil/placeras/här/test.mp3</translation>
-    </message>
-    <message>
-        <source>Compilation Artist</source>
-        <translation>Samlingsartist</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation>Album</translation>
     </message>
     <message>
         <source>Genre</source>
@@ -13061,26 +13388,6 @@ Välj en pågående inspelning</translation>
     <message>
         <source>Year</source>
         <translation>År</translation>
-    </message>
-    <message>
-        <source>Directory Finder</source>
-        <translation>Katalogsökning</translation>
-    </message>
-    <message>
-        <source>Import Cover Art</source>
-        <translation>Importera omslagsbild</translation>
-    </message>
-    <message>
-        <source>File:</source>
-        <translation>Fil:</translation>
-    </message>
-    <message>
-        <source>Destination:</source>
-        <translation>Mål:</translation>
-    </message>
-    <message>
-        <source>Image Type:</source>
-        <translation>Bildtyp:</translation>
     </message>
     <message>
         <source>%SUBTITLE%%BR%%DESCRIPTION%</source>
@@ -13177,10 +13484,6 @@ Välj en pågående inspelning</translation>
     <message>
         <source>Info Centre</source>
         <translation>Informationscenter</translation>
-    </message>
-    <message>
-        <source>Photo Gallery</source>
-        <translation>Fotogalleri</translation>
     </message>
     <message>
         <source>P</source>
@@ -13443,16 +13746,8 @@ Välj en pågående inspelning</translation>
         <translation>Spelarkommando:</translation>
     </message>
     <message>
-        <source>/path/to/the/thing.jpg</source>
-        <translation>/sökväg/till/bilden.jpg</translation>
-    </message>
-    <message>
         <source>Directed by:</source>
         <translation>Regi:</translation>
-    </message>
-    <message>
-        <source>User Rating:</source>
-        <translation>Användarbetyg:</translation>
     </message>
     <message>
         <source>Play</source>
@@ -13723,10 +14018,6 @@ Välj en pågående inspelning</translation>
         <translation>Infomeny</translation>
     </message>
     <message>
-        <source>%TITLE% (%STARTTIME% %LENMINS%)</source>
-        <translation>%TITLE% (%STARTTIME% %LENMINS%)</translation>
-    </message>
-    <message>
         <source>System Status</source>
         <translation>Systemstatus</translation>
     </message>
@@ -13827,20 +14118,12 @@ Välj en pågående inspelning</translation>
         <translation>Stäng</translation>
     </message>
     <message>
-        <source>Search For: </source>
-        <translation>Sök efter: </translation>
-    </message>
-    <message>
         <source>Sort Mode:</source>
         <translation>Sorteringsläge:</translation>
     </message>
     <message>
         <source>Video Source:</source>
         <translation>Videokälla:</translation>
-    </message>
-    <message>
-        <source>%LONGREPEAT%%STARS%%DESCRIPTION%</source>
-        <translation>%LONGREPEAT%%STARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <source>[</source>
@@ -13851,26 +14134,12 @@ Välj en pågående inspelning</translation>
         <translation>]</translation>
     </message>
     <message>
-        <source>]  = </source>
-        <translation>]  = </translation>
-    </message>
-    <message>
         <source>%STARS%%DESCRIPTION%</source>
         <translation>%STARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
-To schedule a recording, exit this screen andSelect &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation>Du har inte schemalagt några program att spela in
-För att schemalägga en inspelning, lämna det här fönstret och välj &apos;Programguide&apos; eller &apos;Sök program&apos;</translation>
-    </message>
-    <message>
         <source>%SUBTITLE|&quot;|&quot;%</source>
         <translation>%SUBTITLE|&quot;|&quot;%</translation>
-    </message>
-    <message>
-        <source>%SUBTITLE|&quot;|&quot;%%STARS%%DESCRIPTION%</source>
-        <translation>%SUBTITLE|&quot;|&quot;%%STARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <source>%SUBTITLE|&quot;|&quot; %%STARS%%DESCRIPTION%</source>
@@ -13891,8 +14160,975 @@ För att schemalägga en inspelning, lämna det här fönstret och välj &apos;P
 %YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
-        <source>%SUBTITLE|&quot;|&quot;%%REPEAT%%STARS%%DESCRIPTION%</source>
-        <translation>%SUBTITLE|&quot;|&quot;%%REPEAT%%STARS%%DESCRIPTION%</translation>
+        <source>1. General</source>
+        <translation type="unfinished">1. Allmänt</translation>
+    </message>
+    <message>
+        <source>2. Capture cards</source>
+        <translation type="unfinished">2. TV-kort</translation>
+    </message>
+    <message>
+        <source>3. Video sources</source>
+        <translation type="unfinished">3. Videokällor</translation>
+    </message>
+    <message>
+        <source>4. Input connections</source>
+        <translation type="unfinished">4. Anslutningar</translation>
+    </message>
+    <message>
+        <source>5. Channel Editor</source>
+        <translation type="unfinished">5. Kanaleditor</translation>
+    </message>
+    <message>
+        <source>6. Storage Directories</source>
+        <translation type="unfinished">6. Lagringsgrupper</translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Allmänt</translation>
+    </message>
+    <message>
+        <source>Core MythTV behavior and system settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished">Utseende</translation>
+    </message>
+    <message>
+        <source>pick the theme, font, size, and locale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Setup Wizards</source>
+        <translation type="unfinished">Bildskärm</translation>
+    </message>
+    <message>
+        <source>Compensate for TVs with overscan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Settings</source>
+        <translation type="unfinished">TV</translation>
+    </message>
+    <message>
+        <source>Settings for TV recording and playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Settings</source>
+        <translation type="unfinished">Musik</translation>
+    </message>
+    <message>
+        <source>Configure playback and CD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos Settings</source>
+        <translation type="unfinished">Video</translation>
+    </message>
+    <message>
+        <source>Configure playback and DVD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio Settings</source>
+        <translation type="unfinished">Radio</translation>
+    </message>
+    <message>
+        <source>Images Settings</source>
+        <translation type="unfinished">Bilder</translation>
+    </message>
+    <message>
+        <source>Configure display of image gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Settings</source>
+        <translation type="unfinished">Spel</translation>
+    </message>
+    <message>
+        <source>Configure playback of games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather Settings</source>
+        <translation type="unfinished">Väder</translation>
+    </message>
+    <message>
+        <source>Weather locale and sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>News Settings</source>
+        <translation type="unfinished">Nyheter</translation>
+    </message>
+    <message>
+        <source>Choose which news sources interest you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Settings</source>
+        <translation type="unfinished">Webb</translation>
+    </message>
+    <message>
+        <source>Manage web bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recipe Settings</source>
+        <translation type="unfinished">Recept</translation>
+    </message>
+    <message>
+        <source>Phone Settings</source>
+        <translation type="unfinished">Telefon</translation>
+    </message>
+    <message>
+        <source>Configure SIP-based VoIP phone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie Time Settings</source>
+        <translation type="unfinished">Biotider</translation>
+    </message>
+    <message>
+        <source>Select local movie theaters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Xbox Settings</source>
+        <translation type="unfinished">Xbox</translation>
+    </message>
+    <message>
+        <source>NetFlix Settings</source>
+        <translation type="unfinished">Nätfilmer</translation>
+    </message>
+    <message>
+        <source>Choose the genres that interest you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Files Settings</source>
+        <translation type="unfinished">Filarkivering</translation>
+    </message>
+    <message>
+        <source>Configure how to archive video to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ZoneMinder Settings</source>
+        <translation type="unfinished">Övervakning</translation>
+    </message>
+    <message>
+        <source>Set up surveillance software</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming Recordings</source>
+        <translation type="unfinished">Kommande Inspelningar</translation>
+    </message>
+    <message>
+        <source>See what will be recorded next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Recordings</source>
+        <translation type="unfinished">Schemalägg inspelningar</translation>
+    </message>
+    <message>
+        <source>Pick shows to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prioritize some shows over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What your system is doing right now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Utilities / Setup</source>
+        <translation type="unfinished">Verktyg / Inställningar</translation>
+    </message>
+    <message>
+        <source>Settings for TV, Images, Music, Video, Weather, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Recording Priorities</source>
+        <translation type="unfinished">Inspelningsprioriteter</translation>
+    </message>
+    <message>
+        <source>Settings to prioritize some shows over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Channel Recording Priorities</source>
+        <translation type="unfinished">Kanalprioriteter</translation>
+    </message>
+    <message>
+        <source>Settings to prioritize some channels over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Priority</source>
+        <translation type="unfinished">Egna prioriteter</translation>
+    </message>
+    <message>
+        <source>Most used DVR options are found on the main menu. Plugin options are in the utilities menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Titles</source>
+        <translation type="unfinished">Nya titlar</translation>
+    </message>
+    <message>
+        <source>Pick a program to record for a list of new titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movies</source>
+        <translation type="unfinished">Filmer</translation>
+    </message>
+    <message>
+        <source>Pick a movie to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Categories</source>
+        <translation type="unfinished">Kategorier</translation>
+    </message>
+    <message>
+        <source>Pick a program based on category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation type="unfinished">Kanal</translation>
+    </message>
+    <message>
+        <source>Pick a program on a given channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished">Tid</translation>
+    </message>
+    <message>
+        <source>Pick a program based on time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose programs from a grid-style list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation type="unfinished">Sök program</translation>
+    </message>
+    <message>
+        <source>Choose programs from an alphabetical index</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Words</source>
+        <translation type="unfinished">Sök ord</translation>
+    </message>
+    <message>
+        <source>Find programs matching search words</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Lists</source>
+        <translation type="unfinished">Sök listor</translation>
+    </message>
+    <message>
+        <source>Pick a program to record from a set of lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Record</source>
+        <translation type="unfinished">Avancerat</translation>
+    </message>
+    <message>
+        <source>Advanced program finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Schedule</source>
+        <translation type="unfinished">Manuell schemaläggning</translation>
+    </message>
+    <message>
+        <source>VCR-like recording scheduler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Titles</source>
+        <translation type="unfinished">Titel</translation>
+    </message>
+    <message>
+        <source>Find a program based on title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation type="unfinished">Nyckelord</translation>
+    </message>
+    <message>
+        <source>Find a program matching a keyword</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People</source>
+        <translation type="unfinished">Person</translation>
+    </message>
+    <message>
+        <source>Find a program including a given person</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished">Avancerad</translation>
+    </message>
+    <message>
+        <source>Combine more than one word search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stored Searches</source>
+        <translation type="unfinished">Lagrade sökningar</translation>
+    </message>
+    <message>
+        <source>Results of searches you have saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV navigation and recording preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide appearance and behavior</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback</source>
+        <translation type="unfinished">Uppspelning</translation>
+    </message>
+    <message>
+        <source>Settings for viewing and playing TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback OSD</source>
+        <translation type="unfinished">Infovisning</translation>
+    </message>
+    <message>
+        <source>Theme and settings for OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Groups</source>
+        <translation type="unfinished">Uppspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Adjust settings for different playback styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Groups</source>
+        <translation type="unfinished">Kanalgrupper</translation>
+    </message>
+    <message>
+        <source>Recording Profiles</source>
+        <translation type="unfinished">Inspelningsprofiler</translation>
+    </message>
+    <message>
+        <source>Global recording priority and scheduling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch TV</source>
+        <translation type="unfinished">Se på TV</translation>
+    </message>
+    <message>
+        <source>Watch live television</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Recordings</source>
+        <translation type="unfinished">Radera inspelningar</translation>
+    </message>
+    <message>
+        <source>Remove television recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Tidigare inspelningar</translation>
+    </message>
+    <message>
+        <source>See what you have recorded before</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Utilities</source>
+        <translation type="unfinished">TV</translation>
+    </message>
+    <message>
+        <source>Radio</source>
+        <translation type="unfinished">Radio</translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation type="unfinished">Bilder</translation>
+    </message>
+    <message>
+        <source>News Feeds</source>
+        <translation type="unfinished">Nyheter</translation>
+    </message>
+    <message>
+        <source>Web</source>
+        <translation type="unfinished">Webb</translation>
+    </message>
+    <message>
+        <source>Phone</source>
+        <translation type="unfinished">Telefon</translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished">Skriv DVD</translation>
+    </message>
+    <message>
+        <source>Recipes</source>
+        <translation type="unfinished">Recept</translation>
+    </message>
+    <message>
+        <source>Archive Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zone Minder</source>
+        <translation type="unfinished">Övervakning</translation>
+    </message>
+    <message>
+        <source>Movie Times</source>
+        <translation type="unfinished">Biotider</translation>
+    </message>
+    <message>
+        <source>NetFlix</source>
+        <translation type="unfinished">Nätfilmer</translation>
+    </message>
+    <message>
+        <source>Edit Keys</source>
+        <translation type="unfinished">Ändra knappar</translation>
+    </message>
+    <message>
+        <source>A blue theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  =</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show:  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title  (2) Sort by Priority  (4) Sort by Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>] =</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot;% %STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(4) Program Guide  (6) Program Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a letter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then press SELECT or the right arrow.</source>
+        <translation type="unfinished">Välj den bokstav som programmet börjar med och tryck sedan på SELECT eller högerpil.</translation>
+    </message>
+    <message>
+        <source>Select a program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Programs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Time    (2) Sort by Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Ja</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Nej</translation>
+    </message>
+    <message>
+        <source>CD/DVD Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
+ To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current View:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the recording rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Options</source>
+        <translation type="unfinished">Lagringsinställningar</translation>
+    </message>
+    <message>
+        <source>Post Processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce priority by %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal recording priority</source>
+        <translation type="unfinished">Normal inspelningsprioritet</translation>
+    </message>
+    <message>
+        <source>Raise priority by %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording %n minute(s) late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording on time</source>
+        <translation type="unfinished">Börja spela in i tid</translation>
+    </message>
+    <message>
+        <source>Start recording %n minute(s) early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording %n minute(s) early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording on time</source>
+        <translation type="unfinished">Sluta spela in i tid</translation>
+    </message>
+    <message>
+        <source>End recording %n minute(s) late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Rule Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No episode limit</source>
+        <translation type="unfinished">Ingen begränsning av antal avsnitt</translation>
+    </message>
+    <message>
+        <source>Keep at most %n episode(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow recordings to expire?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Processing Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flag new recordings</source>
+        <translation type="unfinished">Markera reklam i nya inspelningar</translation>
+    </message>
+    <message>
+        <source>Transcode new recordings</source>
+        <translation type="unfinished">Omkoda nya inspelningar</translation>
+    </message>
+    <message>
+        <source>123</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search For:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot; %%REPEAT%%STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change mythtv key bindings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythStream Settings</source>
+        <translation type="unfinished">Strömmar</translation>
+    </message>
+    <message>
+        <source>Weather Station Settings</source>
+        <translation type="unfinished">Väderstation</translation>
+    </message>
+    <message>
+        <source>TV</source>
+        <translation type="unfinished">TV</translation>
+    </message>
+    <message>
+        <source>Play Online Streams</source>
+        <translation type="unfinished">Spela nätströmmar</translation>
+    </message>
+    <message>
+        <source>Weather Station</source>
+        <translation type="unfinished">Väderstation</translation>
+    </message>
+    <message>
+        <source>A long menu which breaks down the options by their category. TV, Music, Video etc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Listings</source>
+        <translation type="unfinished">Sök i TV-tablå</translation>
+    </message>
+    <message>
+        <source>Recording Rules</source>
+        <translation type="unfinished">Inspelningsregler</translation>
+    </message>
+    <message>
+        <source>Edit or delete any recording rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play TV Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
+ To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;%
+%LONGREPEAT%%STARS| %%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Record Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional Tables:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Spela in</translation>
+    </message>
+    <message>
+        <source>Store</source>
+        <translation type="unfinished">Lagra</translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User job #2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make or accept a VoIP call</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep up with the news</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>See when local movies are playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local weather forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage your NetFlix queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse the web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start cooking!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home surveillance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware profile</source>
+        <translation type="unfinished">Hårdvaruprofil</translation>
+    </message>
+    <message>
+        <source>Tell us what hardware you have so we can support it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Videos</source>
+        <translation type="unfinished">Visa filmer</translation>
+    </message>
+    <message>
+        <source>Play videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listen to Music</source>
+        <translation type="unfinished">Spela musik</translation>
+    </message>
+    <message>
+        <source>Listen to the radio</source>
+        <translation type="unfinished">Lyssna på radio</translation>
+    </message>
+    <message>
+        <source>Image Gallery</source>
+        <translation type="unfinished">Visa bilder</translation>
+    </message>
+    <message>
+        <source>Look at Pictures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play video games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Settings</source>
+        <translation type="unfinished">Media</translation>
+    </message>
+    <message>
+        <source>Settings for all non-TV media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info Center Settings</source>
+        <translation type="unfinished">Informationscenter</translation>
+    </message>
+    <message>
+        <source>Configure weather, news, movie info, web, and recipes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play any of your media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage Recordings</source>
+        <translation type="unfinished">Hantera inspelningar</translation>
+    </message>
+    <message>
+        <source>Pick and prioritize shows to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information Center</source>
+        <translation type="unfinished">Informationscenter</translation>
+    </message>
+    <message>
+        <source>Information and Communications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optical Disks</source>
+        <translation type="unfinished">Optiska skivor</translation>
+    </message>
+    <message>
+        <source>Play or import CDs and DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abspielen/Importieren von CDs und DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure MythTV and plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Priorities</source>
+        <translation type="unfinished">Prioriteter</translation>
+    </message>
+    <message>
+        <source>Play DVD</source>
+        <translation type="unfinished">Spela DVD</translation>
+    </message>
+    <message>
+        <source>Play the video on a movie DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play VCD</source>
+        <translation type="unfinished">Spela VCD</translation>
+    </message>
+    <message>
+        <source>Play the video on a VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import DVD</source>
+        <translation type="unfinished">Importera DVD</translation>
+    </message>
+    <message>
+        <source>Import video from a movie DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write video to a data DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import CD</source>
+        <translation type="unfinished">Importera CD</translation>
+    </message>
+    <message>
+        <source>Import music from an audio CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject media</source>
+        <translation type="unfinished">Mata ut</translation>
+    </message>
+    <message>
+        <source>Eject CD or DVD from drive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Tools</source>
+        <translation type="unfinished">Musikverktyg</translation>
+    </message>
+    <message>
+        <source>Select, import, or play music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for new videos, edit metadata, or delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A simple transparent black and white theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play or import audio or video CDs or DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch A DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Online Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A &quot;Media Center&quot; menu theme. This menu theme is basically meant to bring the common &quot;media player/DVR&quot; functionality to the forefront, organize the plugins, and to make some of myth&apos;s more daunting options a little more subtle. Places the common media items on the top level (Recordings, Videos, TV, DVD, Music), places all informational plugins in &quot;Plugins.&quot; Puts all setup and scheduling in &quot;Advanced.&quot; The top two menu levels will seem new, the ones beneath Advanced-&gt;Setup are as in the default menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -14048,6 +15284,10 @@ För att schemalägga en inspelning, lämna det här fönstret och välj &apos;P
     <message>
         <source>OK</source>
         <translation>Ok</translation>
+    </message>
+    <message>
+        <source>The following programs will be recorded instead:</source>
+        <translation type="unfinished">Följande program kommer att spelas in i stället:</translation>
     </message>
 </context>
 <context>
@@ -14245,790 +15485,6 @@ För att schemalägga en inspelning, lämna det här fönstret och välj &apos;P
     <message>
         <source>Run xmltv configure command.</source>
         <translation>Kör xmltv-konfigurationskommando.</translation>
-    </message>
-</context>
-<context>
-    <name>info_menu_xml</name>
-    <message>
-        <source>Phone</source>
-        <translation>Telefon</translation>
-    </message>
-    <message>
-        <source>News Feeds</source>
-        <translation>Nyheter</translation>
-    </message>
-    <message>
-        <source>Movie Times</source>
-        <translation>Biotider</translation>
-    </message>
-    <message>
-        <source>Weather</source>
-        <translation>Väder</translation>
-    </message>
-    <message>
-        <source>Weather Station</source>
-        <translation>Väderstation</translation>
-    </message>
-    <message>
-        <source>NetFlix</source>
-        <translation>Nätfilmer</translation>
-    </message>
-    <message>
-        <source>Web</source>
-        <translation>Webb</translation>
-    </message>
-    <message>
-        <source>Recipes</source>
-        <translation>Recept</translation>
-    </message>
-    <message>
-        <source>System Status</source>
-        <translation>Systemstatus</translation>
-    </message>
-    <message>
-        <source>Zone Minder</source>
-        <translation>Övervakning</translation>
-    </message>
-    <message>
-        <source>Hardware profile</source>
-        <translation>Hårdvaruprofil</translation>
-    </message>
-</context>
-<context>
-    <name>info_settings_xml</name>
-    <message>
-        <source>Weather Settings</source>
-        <translation>Väder</translation>
-    </message>
-    <message>
-        <source>Weather Station Settings</source>
-        <translation>Väderstation</translation>
-    </message>
-    <message>
-        <source>News Settings</source>
-        <translation>Nyheter</translation>
-    </message>
-    <message>
-        <source>Movie Time Settings</source>
-        <translation>Biotider</translation>
-    </message>
-    <message>
-        <source>NetFlix Settings</source>
-        <translation>Nätfilmer</translation>
-    </message>
-    <message>
-        <source>Web Settings</source>
-        <translation>Webb</translation>
-    </message>
-    <message>
-        <source>Recipe Settings</source>
-        <translation>Recept</translation>
-    </message>
-</context>
-<context>
-    <name>library_xml</name>
-    <message>
-        <source>Watch Recordings</source>
-        <translation>Visa inspelningar</translation>
-    </message>
-    <message>
-        <source>Watch Videos</source>
-        <translation>Visa filmer</translation>
-    </message>
-    <message>
-        <source>Listen to Music</source>
-        <translation>Spela musik</translation>
-    </message>
-    <message>
-        <source>Listen to the radio</source>
-        <translation>Lyssna på radio</translation>
-    </message>
-    <message>
-        <source>Play Online Streams</source>
-        <translation>Spela nätströmmar</translation>
-    </message>
-    <message>
-        <source>Image Gallery</source>
-        <translation>Visa bilder</translation>
-    </message>
-    <message>
-        <source>Play Games</source>
-        <translation>Spela spel</translation>
-    </message>
-</context>
-<context>
-    <name>main_settings_xml</name>
-    <message>
-        <source>General</source>
-        <translation>Allmänt</translation>
-    </message>
-    <message>
-        <source>Appearance</source>
-        <translation>Utseende</translation>
-    </message>
-    <message>
-        <source>Screen Setup Wizards</source>
-        <translation>Bildskärm</translation>
-    </message>
-    <message>
-        <source>TV Settings</source>
-        <translation>TV</translation>
-    </message>
-    <message>
-        <source>Music Settings</source>
-        <translation>Musik</translation>
-    </message>
-    <message>
-        <source>Videos Settings</source>
-        <translation>Video</translation>
-    </message>
-    <message>
-        <source>Radio Settings</source>
-        <translation>Radio</translation>
-    </message>
-    <message>
-        <source>Images Settings</source>
-        <translation>Bilder</translation>
-    </message>
-    <message>
-        <source>Game Settings</source>
-        <translation>Spel</translation>
-    </message>
-    <message>
-        <source>Weather Settings</source>
-        <translation>Väder</translation>
-    </message>
-    <message>
-        <source>News Settings</source>
-        <translation>Nyheter</translation>
-    </message>
-    <message>
-        <source>Web Settings</source>
-        <translation>Webb</translation>
-    </message>
-    <message>
-        <source>Recipe Settings</source>
-        <translation>Recept</translation>
-    </message>
-    <message>
-        <source>Phone Settings</source>
-        <translation>Telefon</translation>
-    </message>
-    <message>
-        <source>Movie Time Settings</source>
-        <translation>Biotider</translation>
-    </message>
-    <message>
-        <source>Xbox Settings</source>
-        <translation>Xbox</translation>
-    </message>
-    <message>
-        <source>NetFlix Settings</source>
-        <translation>Nätfilmer</translation>
-    </message>
-    <message>
-        <source>Archive Files Settings</source>
-        <translation>Filarkivering</translation>
-    </message>
-    <message>
-        <source>ZoneMinder Settings</source>
-        <translation>Övervakning</translation>
-    </message>
-    <message>
-        <source>Edit Keys</source>
-        <translation>Ändra knappar</translation>
-    </message>
-    <message>
-        <source>MythStream Settings</source>
-        <translation>Strömmar</translation>
-    </message>
-    <message>
-        <source>Weather Station Settings</source>
-        <translation>Väderstation</translation>
-    </message>
-    <message>
-        <source>Media Settings</source>
-        <translation>Media</translation>
-    </message>
-    <message>
-        <source>Info Center Settings</source>
-        <translation>Informationscenter</translation>
-    </message>
-</context>
-<context>
-    <name>mainmenu_xml</name>
-    <message>
-        <source>Watch Recordings</source>
-        <translation>Visa inspelningar</translation>
-    </message>
-    <message>
-        <source>Upcoming Recordings</source>
-        <translation>Kommande</translation>
-    </message>
-    <message>
-        <source>Schedule Recordings</source>
-        <translation>Schemalägg</translation>
-    </message>
-    <message>
-        <source>Recording Priorities</source>
-        <translation>Inspelningsprioriteter</translation>
-    </message>
-    <message>
-        <source>System Status</source>
-        <translation>Systemstatus</translation>
-    </message>
-    <message>
-        <source>Utilities / Setup</source>
-        <translation>Verktyg / Inställningar</translation>
-    </message>
-    <message>
-        <source>Shutdown</source>
-        <translation>Avstängning</translation>
-    </message>
-    <message>
-        <source>TV</source>
-        <translation>TV</translation>
-    </message>
-    <message>
-        <source>Music</source>
-        <translation>Musik</translation>
-    </message>
-    <message>
-        <source>Videos</source>
-        <translation>Video</translation>
-    </message>
-    <message>
-        <source>Radio</source>
-        <translation>Radio</translation>
-    </message>
-    <message>
-        <source>Play Online Streams</source>
-        <translation>Spela nätströmmar</translation>
-    </message>
-    <message>
-        <source>Images</source>
-        <translation>Bilder</translation>
-    </message>
-    <message>
-        <source>Games</source>
-        <translation>Spel</translation>
-    </message>
-    <message>
-        <source>Weather</source>
-        <translation>Väder</translation>
-    </message>
-    <message>
-        <source>Weather Station</source>
-        <translation>Väderstation</translation>
-    </message>
-    <message>
-        <source>News Feeds</source>
-        <translation>Nyheter</translation>
-    </message>
-    <message>
-        <source>NetFlix</source>
-        <translation>Nätfilmer</translation>
-    </message>
-    <message>
-        <source>Web</source>
-        <translation>Webb</translation>
-    </message>
-    <message>
-        <source>Phone</source>
-        <translation>Telefon</translation>
-    </message>
-    <message>
-        <source>Recipes</source>
-        <translation>Recept</translation>
-    </message>
-    <message>
-        <source>Archive Files</source>
-        <translation>Filarkivering</translation>
-    </message>
-    <message>
-        <source>Zone Minder</source>
-        <translation>Övervakning</translation>
-    </message>
-    <message>
-        <source>Movie Times</source>
-        <translation>Biotider</translation>
-    </message>
-    <message>
-        <source>Setup</source>
-        <translation>Inställningar</translation>
-    </message>
-    <message>
-        <source>Media Library</source>
-        <translation>Mediabibliotek</translation>
-    </message>
-    <message>
-        <source>Manage Recordings</source>
-        <translation>Hantera inspelningar</translation>
-    </message>
-    <message>
-        <source>Information Center</source>
-        <translation>Informationscenter</translation>
-    </message>
-    <message>
-        <source>Optical Disks</source>
-        <translation>Optiska skivor</translation>
-    </message>
-    <message>
-        <source>Watch TV</source>
-        <translation>Se på TV</translation>
-    </message>
-    <message>
-        <source>Schedule</source>
-        <translation>Schemalägg</translation>
-    </message>
-    <message>
-        <source>Priorities</source>
-        <translation>Prioriteter</translation>
-    </message>
-</context>
-<context>
-    <name>manage_recordings_xml</name>
-    <message>
-        <source>Schedule Recordings</source>
-        <translation>Schemalägg inspelningar</translation>
-    </message>
-    <message>
-        <source>Set Priorities</source>
-        <translation>Prioriteter</translation>
-    </message>
-    <message>
-        <source>Upcoming Recordings</source>
-        <translation>Kommande Inspelningar</translation>
-    </message>
-    <message>
-        <source>Delete Recordings</source>
-        <translation>Radera inspelningar</translation>
-    </message>
-    <message>
-        <source>Previously Recorded</source>
-        <translation>Tidigare inspelningar</translation>
-    </message>
-    <message>
-        <source>Recording Rules</source>
-        <translation>Inspelningsregler</translation>
-    </message>
-    <message>
-        <source>Manage Rules</source>
-        <translation>Hantera regler</translation>
-    </message>
-</context>
-<context>
-    <name>media_settings_xml</name>
-    <message>
-        <source>Music Settings</source>
-        <translation>Musik</translation>
-    </message>
-    <message>
-        <source>Videos Settings</source>
-        <translation>Video</translation>
-    </message>
-    <message>
-        <source>Images Settings</source>
-        <translation>Bilder</translation>
-    </message>
-    <message>
-        <source>Game Settings</source>
-        <translation>Spel</translation>
-    </message>
-    <message>
-        <source>Radio Settings</source>
-        <translation>Radio</translation>
-    </message>
-    <message>
-        <source>MythStream Settings</source>
-        <translation>Strömmar</translation>
-    </message>
-    <message>
-        <source>Archive Files Settings</source>
-        <translation>Filarkivering</translation>
-    </message>
-</context>
-<context>
-    <name>optical_menu_xml</name>
-    <message>
-        <source>Play DVD</source>
-        <translation>Spela DVD</translation>
-    </message>
-    <message>
-        <source>Play VCD</source>
-        <translation>Spela VCD</translation>
-    </message>
-    <message>
-        <source>Import DVD</source>
-        <translation>Importera DVD</translation>
-    </message>
-    <message>
-        <source>Archive Files</source>
-        <translation>Arkivera filer</translation>
-    </message>
-    <message>
-        <source>Import CD</source>
-        <translation>Importera CD</translation>
-    </message>
-    <message>
-        <source>Eject media</source>
-        <translation>Mata ut</translation>
-    </message>
-</context>
-<context>
-    <name>recpriorities_settings_xml</name>
-    <message>
-        <source>Set Recording Priorities</source>
-        <translation>Inspelningsprioriteter</translation>
-    </message>
-    <message>
-        <source>Set Channel Recording Priorities</source>
-        <translation>Kanalprioriteter</translation>
-    </message>
-    <message>
-        <source>Custom Priority</source>
-        <translation>Egna prioriteter</translation>
-    </message>
-    <message>
-        <source>Recording Priorities</source>
-        <translation>Inspelning</translation>
-    </message>
-    <message>
-        <source>Channel Priorities</source>
-        <translation>Kanal</translation>
-    </message>
-</context>
-<context>
-    <name>setup_xml</name>
-    <message>
-        <source>1. General</source>
-        <translation>1. Allmänt</translation>
-    </message>
-    <message>
-        <source>2. Capture cards</source>
-        <translation>2. TV-kort</translation>
-    </message>
-    <message>
-        <source>3. Video sources</source>
-        <translation>3. Videokällor</translation>
-    </message>
-    <message>
-        <source>4. Input connections</source>
-        <translation>4. Anslutningar</translation>
-    </message>
-    <message>
-        <source>5. Channel Editor</source>
-        <translation>5. Kanaleditor</translation>
-    </message>
-    <message>
-        <source>6. Storage Directories</source>
-        <translation>6. Lagringsgrupper</translation>
-    </message>
-</context>
-<context>
-    <name>tv_lists_xml</name>
-    <message>
-        <source>New Titles</source>
-        <translation>Nya titlar</translation>
-    </message>
-    <message>
-        <source>Movies</source>
-        <translation>Filmer</translation>
-    </message>
-    <message>
-        <source>Categories</source>
-        <translation>Kategori</translation>
-    </message>
-    <message>
-        <source>Channels</source>
-        <translation>Kanal</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation>Tid</translation>
-    </message>
-</context>
-<context>
-    <name>tv_schedule_xml</name>
-    <message>
-        <source>Program Guide</source>
-        <translation>Programguide</translation>
-    </message>
-    <message>
-        <source>Program Finder</source>
-        <translation>Sök program</translation>
-    </message>
-    <message>
-        <source>Search Words</source>
-        <translation>Sök ord</translation>
-    </message>
-    <message>
-        <source>Search Lists</source>
-        <translation>Sök listor</translation>
-    </message>
-    <message>
-        <source>Custom Record</source>
-        <translation>Avancerat</translation>
-    </message>
-    <message>
-        <source>Manual Schedule</source>
-        <translation>Manuell schemaläggning</translation>
-    </message>
-    <message>
-        <source>Search Listings</source>
-        <translation>Sök i TV-tablå</translation>
-    </message>
-    <message>
-        <source>Recording Priorities</source>
-        <translation>Inspelningsprioriteter</translation>
-    </message>
-    <message>
-        <source>Upcoming Recordings</source>
-        <translation>Kommande Inspelningar</translation>
-    </message>
-    <message>
-        <source>Guide</source>
-        <translation>Guide</translation>
-    </message>
-    <message>
-        <source>Finder</source>
-        <translation>Sök</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation>Ord</translation>
-    </message>
-    <message>
-        <source>Lists</source>
-        <translation>Listor</translation>
-    </message>
-    <message>
-        <source>Man. Sched.</source>
-        <translation>Manuell</translation>
-    </message>
-    <message>
-        <source>Priorities</source>
-        <translation>Prioriteter</translation>
-    </message>
-    <message>
-        <source>Recording Rules</source>
-        <translation>Inspelningsregler</translation>
-    </message>
-    <message>
-        <source>Manage Rules</source>
-        <translation>Hantera regler</translation>
-    </message>
-</context>
-<context>
-    <name>tv_search_xml</name>
-    <message>
-        <source>Titles</source>
-        <translation>Titel</translation>
-    </message>
-    <message>
-        <source>Keywords</source>
-        <translation>Nyckelord</translation>
-    </message>
-    <message>
-        <source>People</source>
-        <translation>Person</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation>Avancerad</translation>
-    </message>
-    <message>
-        <source>Stored Searches</source>
-        <translation>Lagrade sökningar</translation>
-    </message>
-    <message>
-        <source>New Titles</source>
-        <translation>Nya titlar</translation>
-    </message>
-    <message>
-        <source>Movies</source>
-        <translation>Filmer</translation>
-    </message>
-    <message>
-        <source>Categories</source>
-        <translation>Kategori</translation>
-    </message>
-    <message>
-        <source>Channels</source>
-        <translation>Kanal</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation>Tid</translation>
-    </message>
-</context>
-<context>
-    <name>tv_settings_xml</name>
-    <message>
-        <source>General</source>
-        <translation>Allmänt</translation>
-    </message>
-    <message>
-        <source>Program Guide</source>
-        <translation>Programguide</translation>
-    </message>
-    <message>
-        <source>Playback</source>
-        <translation>Uppspelning</translation>
-    </message>
-    <message>
-        <source>Playback OSD</source>
-        <translation>Infovisning</translation>
-    </message>
-    <message>
-        <source>OSD Menu Editor</source>
-        <translation>Infomeny</translation>
-    </message>
-    <message>
-        <source>Playback Groups</source>
-        <translation>Uppspelningsgrupper</translation>
-    </message>
-    <message>
-        <source>Channel Groups</source>
-        <translation>Kanalgrupper</translation>
-    </message>
-    <message>
-        <source>Recording Profiles</source>
-        <translation>Inspelningsprofiler</translation>
-    </message>
-    <message>
-        <source>Recording Priorities</source>
-        <translation>Inspelningsprioriteter</translation>
-    </message>
-</context>
-<context>
-    <name>tvmenu_xml</name>
-    <message>
-        <source>Watch TV</source>
-        <translation>Se på TV</translation>
-    </message>
-    <message>
-        <source>Delete Recordings</source>
-        <translation>Radera inspelningar</translation>
-    </message>
-    <message>
-        <source>Passthrough Mode</source>
-        <translation>TV direkt</translation>
-    </message>
-    <message>
-        <source>Previously Recorded</source>
-        <translation>Tidigare inspelningar</translation>
-    </message>
-    <message>
-        <source>Schedule Recordings</source>
-        <translation>Schemalägg inspelningar</translation>
-    </message>
-    <message>
-        <source>Watch Recordings</source>
-        <translation>Visa inspelningar</translation>
-    </message>
-    <message>
-        <source>System Status</source>
-        <translation>Systemstatus</translation>
-    </message>
-    <message>
-        <source>TV Settings</source>
-        <translation>TV</translation>
-    </message>
-    <message>
-        <source>Schedule</source>
-        <translation>Schemalägg</translation>
-    </message>
-</context>
-<context>
-    <name>util_menu_xml</name>
-    <message>
-        <source>TV Utilities</source>
-        <translation>TV</translation>
-    </message>
-    <message>
-        <source>Music</source>
-        <translation>Musik</translation>
-    </message>
-    <message>
-        <source>Videos</source>
-        <translation>Video</translation>
-    </message>
-    <message>
-        <source>Radio</source>
-        <translation>Radio</translation>
-    </message>
-    <message>
-        <source>Images</source>
-        <translation>Bilder</translation>
-    </message>
-    <message>
-        <source>Games</source>
-        <translation>Spel</translation>
-    </message>
-    <message>
-        <source>Weather</source>
-        <translation>Väder</translation>
-    </message>
-    <message>
-        <source>News Feeds</source>
-        <translation>Nyheter</translation>
-    </message>
-    <message>
-        <source>Web</source>
-        <translation>Webb</translation>
-    </message>
-    <message>
-        <source>Phone</source>
-        <translation>Telefon</translation>
-    </message>
-    <message>
-        <source>Burn DVD</source>
-        <translation>Skriv DVD</translation>
-    </message>
-    <message>
-        <source>Recipes</source>
-        <translation>Recept</translation>
-    </message>
-    <message>
-        <source>Archive Files</source>
-        <translation>Arkivera filer</translation>
-    </message>
-    <message>
-        <source>Zone Minder</source>
-        <translation>Övervakning</translation>
-    </message>
-    <message>
-        <source>Movie Times</source>
-        <translation>Biotider</translation>
-    </message>
-    <message>
-        <source>NetFlix</source>
-        <translation>Nätfilmer</translation>
-    </message>
-    <message>
-        <source>Edit Keys</source>
-        <translation>Ändra knappar</translation>
-    </message>
-    <message>
-        <source>Setup</source>
-        <translation>Inställningar</translation>
-    </message>
-    <message>
-        <source>Shutdown</source>
-        <translation>Avstängning</translation>
-    </message>
-    <message>
-        <source>Music Tools</source>
-        <translation>Musikverktyg</translation>
-    </message>
-    <message>
-        <source>Video Manager</source>
-        <translation>Filmhanterare</translation>
-    </message>
-    <message>
-        <source>Save or Restore settings</source>
-        <translation>Spara eller återställ</translation>
     </message>
 </context>
 </TS>

@@ -90,6 +90,10 @@
         <source>Shall I attempt to connect to this host with default database parameters?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Backend uses a PIN. </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CaptureCardEditor</name>
@@ -195,38 +199,6 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Are you sure you would like to delete this channel?</source>
-        <translation>Haluatko varmasti poistaa tämän kanavan?</translation>
-    </message>
-    <message>
-        <source>Yes, delete the channel</source>
-        <translation>Kyllä, poista kanava</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation>Ei, älä poista</translation>
-    </message>
-    <message>
-        <source>Yes, delete the channels</source>
-        <translation>Kyllä, poista kanavat</translation>
-    </message>
-    <message>
-        <source>Are you sure you would like to delete ALL channels?</source>
-        <translation>Haluatko varmasti poistaa kaikki kanavat?</translation>
-    </message>
-    <message>
-        <source>Are you sure you would like to delete all unassigned channels?</source>
-        <translation>Haluatko varmasti poistaa kaikki käyttämättömät kanavat?</translation>
-    </message>
-    <message>
-        <source>Are you sure you would like to delete the channels on %1?</source>
-        <translation>Haluatko varmasti poistaa kaikki kanavat palvelimelta %1?</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Peruuta</translation>
-    </message>
-    <message>
         <source>Download all icons..</source>
         <translation>Lataa kaikki kuvakkeet..</translation>
     </message>
@@ -237,10 +209,6 @@
     <message>
         <source>Rescan for missing icons..</source>
         <translation>Etsi puuttuvia kuvakkeita..</translation>
-    </message>
-    <message>
-        <source>Download icon for </source>
-        <translation>Lataa kuvake kanavalle</translation>
     </message>
     <message>
         <source>Channel Name</source>
@@ -290,6 +258,30 @@
         <source>Delete</source>
         <translation>Poista</translation>
     </message>
+    <message>
+        <source>Delete channel &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete ALL channels?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete all unassigned channels?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete all channels on %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon Import Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download icon for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChannelGroupEditor</name>
@@ -303,7 +295,7 @@
     </message>
     <message>
         <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Anna ryhmän nimi tai paina SELECT-näppäintä syöttääksesi sen virtuaalinäppäimistöllä</translation>
     </message>
     <message>
         <source>Delete &apos;%1&apos; Channel group?</source>
@@ -345,22 +337,57 @@
     </message>
 </context>
 <context>
+    <name>ChannelScannerGUIScanPane</name>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="unfinished">Etsinnän tila</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Tila</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished">Viritetään</translation>
+    </message>
+    <message>
+        <source>Rotor Movement</source>
+        <translation type="unfinished">Kääntömoottorin liike</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="unfinished">Signaalin voimakkuus</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="unfinished">Signaali/kohina</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished">Etsi</translation>
+    </message>
+    <message>
+        <source>Stop Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished">Lukittu</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished">Ei lukitusta</translation>
+    </message>
+</context>
+<context>
     <name>CustomEdit</name>
     <message>
         <source>stored example</source>
         <translation>tallennettu esimerkki</translation>
     </message>
     <message>
-        <source>Edit Rule</source>
-        <translation>Muokkaa sääntöä</translation>
-    </message>
-    <message>
         <source>&lt;New rule&gt;</source>
         <translation>&lt;Uusi sääntö&gt;</translation>
-    </message>
-    <message>
-        <source>Rule Name</source>
-        <translation>Säännön nimi</translation>
     </message>
     <message>
         <source>Match an exact title</source>
@@ -479,18 +506,6 @@
         <translation>Ensimmäiset jaksot (esimerkki)</translation>
     </message>
     <message>
-        <source>Additional Tables</source>
-        <translation>Lisävaihtoehdot</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation>Kokeile</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation>Nauhoita</translation>
-    </message>
-    <message>
         <source>Store</source>
         <translation>Tallenna</translation>
     </message>
@@ -523,10 +538,6 @@
         <translation>tallennettu haku</translation>
     </message>
     <message>
-        <source>Add</source>
-        <translation>Lisää</translation>
-    </message>
-    <message>
         <source>Match this series</source>
         <translation>Vastaa tätä sarjaa</translation>
     </message>
@@ -549,6 +560,50 @@
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
         <translation>Movie of the Week (täydellinen esimerkki - käytä FindWeekly)</translation>
+    </message>
+    <message>
+        <source>Only shows with in-vision signing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only shows with in-vision subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Example</source>
+        <translation type="unfinished">Esimerkki</translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished">Korvaa</translation>
+    </message>
+    <message>
+        <source>as a search</source>
+        <translation type="unfinished">niin kuin hakuna</translation>
+    </message>
+    <message>
+        <source>as an example</source>
+        <translation type="unfinished">niin kuin esimerkkinä</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Poista</translation>
+    </message>
+    <message>
+        <source>Power Search rules no longer reqiure a leading &quot;AND&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power Search rules can not include semicolon ( ; ) </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>statement terminators.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -1175,6 +1230,10 @@
         <source>Recording Options</source>
         <translation type="unfinished">Nauhoitusasetukset</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Kuvaus</translation>
+    </message>
 </context>
 <context>
     <name>HDHomeRunDeviceID</name>
@@ -1311,10 +1370,6 @@
         <translation>Ohita</translation>
     </message>
     <message>
-        <source>Channel icon for %1 was downloaded successfully.</source>
-        <translation>Kanavaikoni kohteelle %1 ladattiin onnistuneesti.</translation>
-    </message>
-    <message>
         <source>Failed to download the icon for %1.</source>
         <translation>Ikonin lataus epäonnistui kohteelle %1.</translation>
     </message>
@@ -1341,6 +1396,14 @@
     <message>
         <source>Icon choices submitted successfully.</source>
         <translation>Ikonien lähetys onnistui.</translation>
+    </message>
+    <message>
+        <source>No matches found for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon for %1 was downloaded successfully.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1555,33 +1618,6 @@
     </message>
 </context>
 <context>
-    <name>MythContext</name>
-    <message>
-        <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation>Ei saatu yhteyttä nauhoituspalvelimeen. Tarkista että palvelin on käynnissä ja että sen verkko-osoite on määritetty oikein.</translation>
-    </message>
-    <message>
-        <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation>Yhteys nauhoituspalvelimeen on katkennut. Tarkista että palvelin on käynnissä.</translation>
-    </message>
-    <message>
-        <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
-        <translation>Palvelin käyttää verkostoprotokolan verrsiota %1, mutta tämä asiakasohjelma ymmärtää vain versiota %2.  Varmista ohjelmistoversioiden yhteensopivuus.</translation>
-    </message>
-    <message>
-        <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
-        <translation>Tämä ohjelma ei ole yhteensopiva asennettujen MythTV -kirjastojen kanssa. Uudelleenkoosta distcleanin jälkeen</translation>
-    </message>
-    <message>
-        <source>Could not connect to the master backend server -- is it running? Is the IP address set for it in the setup program correct?</source>
-        <translation type="unfinished">Ei saatu yhteyttä nauhoituspalvelimeen. Tarkista että palvelin on käynnissä ja että sen verkko-osoite on määritetty oikein.</translation>
-    </message>
-    <message>
-        <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
-        <translation>Liitännäinen %1 ei ole yhteensopiva asennettujen MythTV -kirjastojen kanssa. Uudelleenkompiloi liitännäinen distcleanin jälkeen</translation>
-    </message>
-</context>
-<context>
     <name>MythControls</name>
     <message>
         <source>Modify Action</source>
@@ -1659,6 +1695,790 @@
         <source>Bind Key</source>
         <translation>Saseta näppäin</translation>
     </message>
+    <message>
+        <source>Page Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle recording status of current program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide back one day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide forward one day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the current channel as a favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse the channel order in the program guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the Program Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the Program Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle through channel groups and all channels in the program guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch channels without exiting guide in Live TV mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase program or channel rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease program or channel rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show program details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Capture Card view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Custom Record Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished">Vaihda nauhoitusryhmää</translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished">Vaihda ryhmänäkymää</translation>
+    </message>
+    <message>
+        <source>Clear OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished">Tauko</translation>
+    </message>
+    <message>
+        <source>Fast Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind</source>
+        <translation type="unfinished">Taaksepäin</translation>
+    </message>
+    <message>
+        <source>Arbitrary Seek</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the next favorite channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the previous channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump ahead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Forward (Sticky) or Forward one frame while paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind (Sticky) or Rewind one frame while paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Video Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Video Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Commercial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Commercial (Reverse)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the start of the recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle channel browse mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Picture-in-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Picture-by-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Picture-in-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Picture-by-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle active PIP/PBP window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap PBP/PIP Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change PxP view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the video aspect ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Preconfigured Zoom mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle any captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext Captions</source>
+        <translation type="unfinished">Päälle/pois tekstitys</translation>
+    </message>
+    <message>
+        <source>Toggle Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle VBI CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle ATSC CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext Menu</source>
+        <translation type="unfinished">Päälle/pois tekstitelevisio</translation>
+    </message>
+    <message>
+        <source>Play audio track 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play audio track 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display subtitle 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display subtitle 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next subtitle track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous subtitle track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next VBI CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous VBI CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next ATSC CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous ATSC CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next of any captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next video scan overidemode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queue the current recording for transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase the playback speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease the playback speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on time stretch control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on audio sync adjustment controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback picture adjustments</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording picture adjustments for this channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording picture adjustments for this recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle Commercial Skip mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the Sleep Timer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Toista</translation>
+    </message>
+    <message>
+        <source>Jump to previously played recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display menu of recorded programs to jump to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display scheduled recording list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor Signal Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the DVD Root Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit Show without any prompts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save screenshot of current video frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu EPG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear editing cut points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert Begin/End cut points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load cut list from commercial skips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the next cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the previous cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump back 10x the normal amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump forward 10x the normal amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Subpage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Subpage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu White</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reveal hidden Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to next widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to preview widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished">Valitse</translation>
+    </message>
+    <message>
+        <source>Backspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Escape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pop-up menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Poista</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished">Muokkaa</translation>
+    </message>
+    <message>
+        <source>Page to top of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page to middle of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page to bottom of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject Removable Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom in on browser window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom out on browser window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle where keyboard input goes to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse Left button click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll down half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll up half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll left half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll right half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection to next link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection to previous link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow selected link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go back to previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go forward to previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reload Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished">Ohjelmaopas</translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation type="unfinished">Ohjelmahaku</translation>
+    </message>
+    <message>
+        <source>Manage Recordings / Fix Conflicts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished">Ohjelmanauhoitusten tärkeysjärjestykset</translation>
+    </message>
+    <message>
+        <source>Manage Recording Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished">Kanavanauhoitusten tärkeysjärjestykset</translation>
+    </message>
+    <message>
+        <source>TV Recording Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Recording Deletion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV</source>
+        <translation type="unfinished">Katso televisiota</translation>
+    </message>
+    <message>
+        <source>Live TV In Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Aiemmin nauhoitettu</translation>
+    </message>
+    <message>
+        <source>ScreenShot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV&apos;s native media player.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contexts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open an Xterm window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Mythshutdown settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Mythtv-Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythPopupBox</name>
@@ -1669,6 +2489,10 @@
     <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -1735,6 +2559,10 @@ Palataan edelliseen valikkoon.</translation>
     <message>
         <source>Ok</source>
         <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Enter password:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1996,14 +2824,6 @@ Palataan edelliseen valikkoon.</translation>
         <translation>Lisää tämä nauhoitus soittolistaan</translation>
     </message>
     <message>
-        <source>There are %1 items in the playlist.</source>
-        <translation>Soittolistassa on %1 nauhoitusta.</translation>
-    </message>
-    <message>
-        <source>There is %1 item in the playlist.</source>
-        <translation>Soittalistassa on %1 nauhoitus.</translation>
-    </message>
-    <message>
         <source>Clear Playlist</source>
         <translation>Tyhjennä soittolista</translation>
     </message>
@@ -2192,10 +3012,6 @@ Palataan edelliseen valikkoon.</translation>
         <translation>Tämä nauhoitus ei ole vielä saatavilla.</translation>
     </message>
     <message>
-        <source>Actions affect all items in the playlist</source>
-        <translation>Toiminnot vaikuttavat kaikkiin kohteisiin soittolistassa</translation>
-    </message>
-    <message>
         <source>Transcoding profiles</source>
         <translation>Jälkikäsittelyprofiilit</translation>
     </message>
@@ -2265,6 +3081,12 @@ Haluatko varmasti poistaa:</translation>
         <source>Recordings</source>
         <translation type="unfinished">Nauhoitukset</translation>
     </message>
+    <message numerus="yes">
+        <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>PlaybackProfileItemConfig</name>
@@ -2330,6 +3152,13 @@ Haluatko varmasti poistaa:</translation>
     </message>
 </context>
 <context>
+    <name>PostProcEditor</name>
+    <message>
+        <source>Run &apos;%1&apos;</source>
+        <translation type="unfinished">Aja toiminto &apos;%1&apos;</translation>
+    </message>
+</context>
+<context>
     <name>PowerSearchPopup</name>
     <message>
         <source>Select Search</source>
@@ -2353,62 +3182,7 @@ Haluatko varmasti poistaa:</translation>
     </message>
 </context>
 <context>
-    <name>PreviousList</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation>Aiemmin nauhoitetut</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation>Valitse järjestämistapa</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation>Lähetysajalla päinvastoin</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation>Nimikkeellä päinvastoin</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation>Huomio: tietueen poisto ei tuhoa nauhoituksia.</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation>Poista jakso listasta</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation>Poista kaikki tämän nimikkeen jaksot listasta</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Allow this episode to re-record</source>
-        <translation>Salli tämän jakson uudelleennauhoitus</translation>
-    </message>
-    <message>
-        <source>Never record this episode</source>
-        <translation>Älä nauhoita tätä jaksoa uudelleen</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation>Aika</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation>Nimike</translation>
-    </message>
-</context>
-<context>
     <name>ProgDetails</name>
-    <message>
-        <source>Sorry, this screen requires Qt 4.4 or greater</source>
-        <translation>Tämä näyttö vaatii Qt 4.4 tai uudemman</translation>
-    </message>
     <message>
         <source>Options</source>
         <translation type="unfinished">Asetukset</translation>
@@ -2428,6 +3202,255 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title Pronounce</source>
+        <translation type="unfinished">Nimikkeen tiedotus</translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation type="unfinished">Osa %1/%2, </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n star(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n tähteä
+        </numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation type="unfinished">Mono</translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished">Stereo</translation>
+    </message>
+    <message>
+        <source>Surround Sound</source>
+        <translation type="unfinished">Surround Sound</translation>
+    </message>
+    <message>
+        <source>Dolby Sound</source>
+        <translation type="unfinished">Dolby Sound</translation>
+    </message>
+    <message>
+        <source>Audio for Hearing Impaired</source>
+        <translation type="unfinished">Ääni huonokuuloisille</translation>
+    </message>
+    <message>
+        <source>Audio for Visually Impaired</source>
+        <translation type="unfinished">Ääni huononäköisille</translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation type="unfinished">HDTV</translation>
+    </message>
+    <message>
+        <source>Widescreen</source>
+        <translation type="unfinished">Laajakuva</translation>
+    </message>
+    <message>
+        <source>AVC/H.264</source>
+        <translation type="unfinished">AVC/H.264</translation>
+    </message>
+    <message>
+        <source>720p Resolution</source>
+        <translation type="unfinished">Resoluutio 720p</translation>
+    </message>
+    <message>
+        <source>1080i/p Resolution</source>
+        <translation type="unfinished">Resoluutio 1080i/p</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Closed Captioned</comment>
+        <translation type="unfinished">CC-tekstitys</translation>
+    </message>
+    <message>
+        <source>Subtitles Available</source>
+        <translation type="unfinished">Tekstitys saatavilla</translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation type="unfinished">Tekstitetty</translation>
+    </message>
+    <message>
+        <source>Deaf Signing</source>
+        <translation type="unfinished">Viittomakieli</translation>
+    </message>
+    <message>
+        <source>Unidentified Episode</source>
+        <translation type="unfinished">Tuntematon jakso</translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation type="unfinished">Toista</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Kuvaus</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished">Luokka</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation type="unfinished">Tyyppi</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation type="unfinished">Jakson numero</translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation type="unfinished">Alkuperäinen lähetysaika</translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation type="unfinished">Ohjelman tunnus</translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation type="unfinished">Näyttelijät</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation type="unfinished">Ohjaaja</translation>
+    </message>
+    <message>
+        <source>Producer</source>
+        <translation type="unfinished">Tuottaja</translation>
+    </message>
+    <message>
+        <source>Executive Producer</source>
+        <translation type="unfinished">Johtava tuottaja</translation>
+    </message>
+    <message>
+        <source>Writer</source>
+        <translation type="unfinished">Käsikirjoittaja</translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation type="unfinished">Vierailevat tähdet</translation>
+    </message>
+    <message>
+        <source>Host</source>
+        <translation type="unfinished">Isäntä</translation>
+    </message>
+    <message>
+        <source>Adapter</source>
+        <translation type="unfinished">Muokkaaja</translation>
+    </message>
+    <message>
+        <source>Presenter</source>
+        <translation type="unfinished">Esittäjä</translation>
+    </message>
+    <message>
+        <source>Commentator</source>
+        <translation type="unfinished">Kommentaattori</translation>
+    </message>
+    <message>
+        <source>Guest</source>
+        <translation type="unfinished">Vieras</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Tila</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n tuntia
+        </numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Auto-expire off</source>
+        <translation type="unfinished">Automaattinen vanhentuminen pois</translation>
+    </message>
+    <message>
+        <source>Marked as &apos;watched&apos;</source>
+        <translation type="unfinished">Merkitty katsotuksi</translation>
+    </message>
+    <message>
+        <source>Not the earliest episode</source>
+        <translation type="unfinished">Ei aikaisin lähetys</translation>
+    </message>
+    <message>
+        <source>Recently deleted episode</source>
+        <translation type="unfinished">Viimeiseksi poistettu jakso</translation>
+    </message>
+    <message>
+        <source>Recording Rule</source>
+        <translation type="unfinished">Nauhoitussääntö</translation>
+    </message>
+    <message>
+        <source>Last Recorded</source>
+        <translation type="unfinished">Viimeisin nauhoitus</translation>
+    </message>
+    <message>
+        <source>Next Recording</source>
+        <translation type="unfinished">Seuraava nauhoitus</translation>
+    </message>
+    <message>
+        <source>Average Time Shift</source>
+        <translation type="unfinished">Keskimääräinen aikasiirtymä</translation>
+    </message>
+    <message>
+        <source>Watch List Score</source>
+        <translation type="unfinished">Katselulistan pisteet</translation>
+    </message>
+    <message>
+        <source>Watch List Status</source>
+        <translation type="unfinished">Katselulistan tila</translation>
+    </message>
+    <message>
+        <source>Search Phrase</source>
+        <translation type="unfinished">Hakulause</translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation type="unfinished">Etsi tunnus</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <comment>GigaBytes</comment>
+        <translation type="unfinished">Gt</translation>
+    </message>
+    <message>
+        <source>Recording Host</source>
+        <translation type="unfinished">Nauhoitusisäntä</translation>
+    </message>
+    <message>
+        <source>Recorded File Name</source>
+        <translation type="unfinished">Nauhoituksen tiedostonimi</translation>
+    </message>
+    <message>
+        <source>Recorded File Size</source>
+        <translation type="unfinished">Nauhoituksen tiedostokoko</translation>
+    </message>
+    <message>
+        <source>Recording Profile</source>
+        <translation type="unfinished">Nauhoitusprofiili</translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished">Nauhoitusryhmä</translation>
+    </message>
+    <message>
+        <source>Storage Group</source>
+        <translation type="unfinished">Tallennusryhmä</translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation type="unfinished">Toistoryhmä</translation>
     </message>
 </context>
 <context>
@@ -2657,7 +3680,7 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Aiemmin nauhoitettu</translation>
     </message>
     <message>
         <source>Time</source>
@@ -2693,10 +3716,6 @@ Haluatko varmasti poistaa:</translation>
     </message>
     <message>
         <source>Delete Rule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete Old Recorded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2755,224 +3774,17 @@ Haluatko varmasti poistaa:</translation>
         <source>Program List</source>
         <translation type="unfinished">Televisio ohjelmisto</translation>
     </message>
-</context>
-<context>
-    <name>ProgListerQt</name>
     <message>
-        <source>Program Listings</source>
-        <translation>Ohjelmat</translation>
+        <source>Delete Episode</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New Title Search</source>
-        <translation>Uusien nimikkeiden haku</translation>
+        <source>Delete this episode of &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Title Search</source>
-        <translation>Nimikehaku</translation>
-    </message>
-    <message>
-        <source>Keyword Search</source>
-        <translation>Avainsanahaku</translation>
-    </message>
-    <message>
-        <source>People Search</source>
-        <translation>Henkilöhaku</translation>
-    </message>
-    <message>
-        <source>Stored Search</source>
-        <translation>Tallennettu haku</translation>
-    </message>
-    <message>
-        <source>Power Search</source>
-        <translation>Tehohaku</translation>
-    </message>
-    <message>
-        <source>Rule Search</source>
-        <translation>Sääntöhaku</translation>
-    </message>
-    <message>
-        <source>Category Search</source>
-        <translation>Kategoriahaku</translation>
-    </message>
-    <message>
-        <source>Channel Search</source>
-        <translation>Kanavahaku</translation>
-    </message>
-    <message>
-        <source>Movie Search</source>
-        <translation>Elokuvahaku</translation>
-    </message>
-    <message>
-        <source>Time Search</source>
-        <translation>Esitysaikahaku</translation>
-    </message>
-    <message>
-        <source>Unknown Search</source>
-        <translation>Yleishaku</translation>
-    </message>
-    <message>
-        <source>Select Rating</source>
-        <translation>Valitse arvosteluasteikko</translation>
-    </message>
-    <message>
-        <source>Select Channel</source>
-        <translation>Valitse kanava</translation>
-    </message>
-    <message>
-        <source>Select Category</source>
-        <translation>Valitse kategoria</translation>
-    </message>
-    <message>
-        <source>Select List</source>
-        <translation>Valitse leuttelo</translation>
-    </message>
-    <message>
-        <source>Select a search stored from</source>
-        <translation>Valitse tallennettu haku kohteesta</translation>
-    </message>
-    <message>
-        <source>Custom Record</source>
-        <translation>Muokattu nauhoitus</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation>Valitse</translation>
-    </message>
-    <message>
-        <source>0 .. 9 moves to Nx10 percent in list</source>
-        <translation>0 .. 9 siirtää Nx10 prosenttia listassa</translation>
-    </message>
-    <message>
-        <source>Select Phrase</source>
-        <translation>Valitse hakulause</translation>
-    </message>
-    <message>
-        <source>&lt;New Phrase&gt;</source>
-        <translation>&lt;Uusi hakulause&gt;</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Poista</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation>Nauhoita</translation>
-    </message>
-    <message>
-        <source>Select Search</source>
-        <translation>Valitse haku</translation>
-    </message>
-    <message>
-        <source>&lt;New Search&gt;</source>
-        <translation>&lt;Uusi haku&gt;</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation>Muokkaa</translation>
-    </message>
-    <message>
-        <source>Select Time</source>
-        <translation>Valitse esitysaika</translation>
-    </message>
-    <message>
-        <source>Edit Power Search Fields</source>
-        <translation>Muokkaa tehohaun kenttiä</translation>
-    </message>
-    <message>
-        <source>Optional title phrase:</source>
-        <translation>Valinnainen nimike:</translation>
-    </message>
-    <message>
-        <source>Optional subtitle phrase:</source>
-        <translation>Valinnainen teksti:</translation>
-    </message>
-    <message>
-        <source>Optional description phrase:</source>
-        <translation>Valinnainen kuvaus:</translation>
-    </message>
-    <message>
-        <source>(Any Program Type)</source>
-        <translation>(Mikä tahansa ohjelmatyyppi)</translation>
-    </message>
-    <message>
-        <source>Movies</source>
-        <translation>Elokuvat</translation>
-    </message>
-    <message>
-        <source>Series</source>
-        <translation>Sarjat</translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation>Esitys</translation>
-    </message>
-    <message>
-        <source>Sports</source>
-        <translation>Urheilu</translation>
-    </message>
-    <message>
-        <source>(Any Genre)</source>
-        <translation>(Mikä tahansa tyylilaji)</translation>
-    </message>
-    <message>
-        <source>(Any Station)</source>
-        <translation>(Mikä tahansa TV-asema)</translation>
-    </message>
-    <message>
-        <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation>Haluatko varmasti poistaa säännön &apos;%1&apos; %2?</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>Kaikki</translation>
-    </message>
-    <message>
-        <source>Premieres</source>
-        <translation>Ensiesitykset</translation>
-    </message>
-    <message>
-        <source>Specials</source>
-        <translation>Erikoislähetykset</translation>
-    </message>
-    <message>
-        <source>Unrated</source>
-        <translation>Arvostelemattomat</translation>
-    </message>
-    <message>
-        <source>At least ***/</source>
-        <translation>Yli kolme tähteä</translation>
-    </message>
-    <message>
-        <source>At least ***</source>
-        <translation>Vähintään kolme tähteä</translation>
-    </message>
-    <message>
-        <source>At least **/</source>
-        <translation>Yli kaksi tähteä</translation>
-    </message>
-    <message>
-        <source>At least **</source>
-        <translation>Vähintään kaksi tähteä</translation>
-    </message>
-    <message>
-        <source>At least */</source>
-        <translation>Yli yksi tähti</translation>
-    </message>
-    <message>
-        <source>At least *</source>
-        <translation>Vähintään yksi tähti</translation>
-    </message>
-    <message>
-        <source>At least /</source>
-        <translation>Ei rajaa</translation>
-    </message>
-    <message>
-        <source>Power Recording Rule</source>
-        <translation>Tehohaun sääntö</translation>
+        <source>Delete all episodes of &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3068,6 +3880,14 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>Schedule Priorities</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">Oletus</translation>
+    </message>
+    <message>
+        <source>Any</source>
+        <translation type="unfinished">Mikä tahansa</translation>
     </message>
 </context>
 <context>
@@ -4233,10 +5053,6 @@ Haluatko varmasti poistaa:</translation>
         <translation>Tätä asetusta muutettaessa alhaalla oleva teksti tulisi muuttua kortin nimeksi ja numeroksi. Jos korttia ei pystytä avaamaan, virheviesti näytetään sen sijasta.</translation>
     </message>
     <message>
-        <source>Status</source>
-        <translation>Tila</translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
         <translation>Nauhoittimen asetukset</translation>
     </message>
@@ -4439,10 +5255,6 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>this episode will be recorded at an earlier time instead.</source>
         <translation>tämä jakso tullaan nauhoittamaan aikaisemmin.</translation>
-    </message>
-    <message>
-        <source>Clear Override</source>
-        <translation>Tyhjennä ohitus</translation>
     </message>
     <message>
         <source>30m</source>
@@ -4741,34 +5553,6 @@ Haluatko varmasti poistaa:</translation>
         <translation>Älä nauhoita</translation>
     </message>
     <message>
-        <source>Reactivate</source>
-        <translation>Uudelleenaktivoi</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record</source>
-        <translation>Älä nauhoita</translation>
-    </message>
-    <message>
-        <source>Never record</source>
-        <translation>Älä koskaan nauhoita</translation>
-    </message>
-    <message>
-        <source>Edit Options</source>
-        <translation>Muokkaa asetuksia</translation>
-    </message>
-    <message>
-        <source>Add Override</source>
-        <translation>Lisää ohitus</translation>
-    </message>
-    <message>
-        <source>Edit Override</source>
-        <translation>Muokkaa ohitusta</translation>
-    </message>
-    <message>
-        <source>Record anyway</source>
-        <translation>Nauhoita kuitenkin</translation>
-    </message>
-    <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
         <translation>Ulkoinen komento tai komentorivi joka ajetaan, kun näppäimen painallus on havaittu LIRC:llä.</translation>
     </message>
@@ -4846,54 +5630,12 @@ Haluatko varmasti poistaa:</translation>
         <translation>tämä jakso nauhoitetaan myöhemmin.</translation>
     </message>
     <message>
-        <source> The following programs will be recorded instead:
-</source>
-        <translation>Seuraavat ohjelmat tullaan nauhoittamaan tämän sijasta:
-</translation>
-    </message>
-    <message>
-        <source>Forget Previous</source>
-        <translation>Unohda edelliset</translation>
-    </message>
-    <message>
         <source>Any</source>
         <translation>Mikä tahansa</translation>
     </message>
     <message>
         <source>Record using the &quot;%1&quot; profile</source>
         <translation>Nauhoita käyttäen profiilia %1</translation>
-    </message>
-    <message>
-        <source>Scheduling Options</source>
-        <translation>Ajastetun nauhoituksen asetukset</translation>
-    </message>
-    <message>
-        <source>Storage Options</source>
-        <translation>Tallennusasetukset</translation>
-    </message>
-    <message>
-        <source>Create New Recording Group</source>
-        <translation>Luo uusi nauhoitusryhmä</translation>
-    </message>
-    <message>
-        <source>Select Recording Schedule</source>
-        <translation>Valitse nauhoituksen ajastus</translation>
-    </message>
-    <message>
-        <source>Select Recording Group</source>
-        <translation>Valitse nauhoitusryhmä</translation>
-    </message>
-    <message>
-        <source>Create a new recording group</source>
-        <translation>Luo uusi nauhoitusryhmä</translation>
-    </message>
-    <message>
-        <source>Program details</source>
-        <translation>Ohjelmatiedot</translation>
-    </message>
-    <message>
-        <source>Save these settings</source>
-        <translation>Tallenna asetukset</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
@@ -5112,172 +5854,8 @@ Haluatko varmasti poistaa:</translation>
         <translation>Ohjannut</translation>
     </message>
     <message>
-        <source>Stop recording</source>
-        <translation>Lopeta nauhoitus</translation>
-    </message>
-    <message>
         <source>Power Search</source>
         <translation>Tehohaku</translation>
-    </message>
-    <message>
-        <source>Post Recording Processing</source>
-        <translation>Nauhoituksen jälkeiset toimet</translation>
-    </message>
-    <message>
-        <source>Do not record this program</source>
-        <translation>Älä nauhoita tätä ohjelmaa</translation>
-    </message>
-    <message>
-        <source>Record only this showing</source>
-        <translation>Nauhoita vain tämä esitys</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation>Nauhoita joka viikko tähän aikaan</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation>Nauhoita joka päivä tähän aikaan</translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation>Nauhoita tällä kanavalla mihin aikaan tahansa</translation>
-    </message>
-    <message>
-        <source>Record at any time on any channel</source>
-        <translation>Nauhoita tällä kanavalla mihin aikaan tahansa</translation>
-    </message>
-    <message>
-        <source>Record this showing with normal options</source>
-        <translation>Nauhoita kyseinen ohjelma tavallisin valinnoin</translation>
-    </message>
-    <message>
-        <source>Record this showing with override options</source>
-        <translation>Nauhoita kyseinen ohjelma syrjäytys-valinnoin</translation>
-    </message>
-    <message>
-        <source>Do not allow this showing to be recorded</source>
-        <translation>Älä nauhoita tätä jaksoa</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minutes late</source>
-        <translation>Aloita nauhoitus %1 minuuttia myöhässä</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minute late</source>
-        <translation>Aloita nauhoitus %1 minuutti myöhässä</translation>
-    </message>
-    <message>
-        <source>Start recording on time</source>
-        <translation>Aloita nauhoitus ajallaan</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minute early</source>
-        <translation>Aloita nauhoitus %1 minuutti aikaisemmin</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minutes early</source>
-        <translation>Aloita nauhoitus %1 minuuttia aikaisemmin</translation>
-    </message>
-    <message>
-        <source>End recording %1 minutes early</source>
-        <translation>Lopeta nauhoitus %1 minuuttia aikaisemmin</translation>
-    </message>
-    <message>
-        <source>End recording %1 minute early</source>
-        <translation>Lopeta nauhoitus %1 minuutti aikaisemmin</translation>
-    </message>
-    <message>
-        <source>End recording on time</source>
-        <translation>Lopeta nauhoitus ajallaan</translation>
-    </message>
-    <message>
-        <source>End recording %1 minute late</source>
-        <translation>Lopeta nauhoitus %1 minuutti myöhemmin</translation>
-    </message>
-    <message>
-        <source>End recording %1 minutes late</source>
-        <translation>Lopeta nauhoitus %1 minuuttia myöhemmin</translation>
-    </message>
-    <message>
-        <source>Record new episodes only</source>
-        <translation>Nauhoita vain uudet jaksot</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current and previous recordings</source>
-        <translation>Etsi kaksoiskappaleita nykyisistä ja aiemmista nauhoituksista</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current recordings only</source>
-        <translation>Etsi kaksoiskappaleita nykyisistä nauhoituksista</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in previous recordings only</source>
-        <translation>Etsi kaksoiskappaleita aiemmista nauhoituksista</translation>
-    </message>
-    <message>
-        <source>[ Match duplicates with ]</source>
-        <translation>[ Sovita kaksoiskappaleet ]</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle &amp; description</source>
-        <translation>Sovita kaksoiskappaleet ohjelman nimikkeellä ja kuvauksella</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle</source>
-        <translation>Sovita kaksoiskappaleet ohjelman nimikkeellä</translation>
-    </message>
-    <message>
-        <source>Match duplicates using description</source>
-        <translation>Sovita kaksoiskappaleet ohjelman kuvauksella</translation>
-    </message>
-    <message>
-        <source>Don&apos;t match duplicates</source>
-        <translation>Ei kaksoiskappaleiden sovitusta</translation>
-    </message>
-    <message>
-        <source>[ Select recording Profile ]</source>
-        <translation>[ Valitse nauhoitusprofiili ]</translation>
-    </message>
-    <message>
-        <source>Commercial Flag new recordings</source>
-        <translation>Tunnista mainoskatkot uusille nauhoituksille</translation>
-    </message>
-    <message>
-        <source>Do not Commercial Flag new recordings</source>
-        <translation>Älä tunnista mainoksia uusille nauhoituksille</translation>
-    </message>
-    <message>
-        <source>Run &apos;%1&apos;</source>
-        <translation>Aja toiminto &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation>Älä aja toimintoa &apos;%1&apos; uusille nauhoituksille</translation>
-    </message>
-    <message>
-        <source>Allow auto expire</source>
-        <translation>Anna ohjelman vanheta automaattisesti</translation>
-    </message>
-    <message>
-        <source>Don&apos;t allow auto expire</source>
-        <translation>Älä anna ohjelman vanheta automaattisesti</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation>Älä nauhoita mikäli nauhoitettuja jaksoja on jo liikaa</translation>
-    </message>
-    <message>
-        <source>No episode limit</source>
-        <translation>Ei jaksorajaa</translation>
-    </message>
-    <message>
-        <source>Keep only one episode.</source>
-        <translation>Säilytä vain yksi jakso.</translation>
-    </message>
-    <message>
-        <source>Keep at most %1 episodes</source>
-        <translation>Säilytä korkeintaan %1 jaksoa</translation>
     </message>
     <message>
         <source>Default size is 12.</source>
@@ -5348,65 +5926,12 @@ Haluatko varmasti poistaa:</translation>
         <translation>Työjono (yleinen)</translation>
     </message>
     <message>
-        <source>Title</source>
-        <translation>Nimi</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation>Kuvaus</translation>
-    </message>
-    <message>
-        <source>Part %1 of %2, </source>
-        <translation>Osa %1/%2, </translation>
-    </message>
-    <message>
-        <source>HDTV</source>
-        <translation>HDTV</translation>
-    </message>
-    <message>
-        <source>Subtitled</source>
-        <translation>Tekstitetty</translation>
-    </message>
-    <message>
         <source>Stereo</source>
         <translation>Stereo</translation>
     </message>
     <message>
-        <source>Category</source>
-        <translation>Luokka</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <comment>category_type</comment>
-        <translation>Tyyppi</translation>
-    </message>
-    <message>
-        <source>Episode Number</source>
-        <translation>Jakson numero</translation>
-    </message>
-    <message>
-        <source>Original Airdate</source>
-        <translation>Alkuperäinen lähetysaika</translation>
-    </message>
-    <message>
         <source>Program ID</source>
         <translation>Ohjelman tunnus</translation>
-    </message>
-    <message>
-        <source>Actors</source>
-        <translation>Näyttelijät</translation>
-    </message>
-    <message>
-        <source>Guest Star</source>
-        <translation>Vierailevat tähdet</translation>
-    </message>
-    <message>
-        <source>Director</source>
-        <translation>Ohjaaja</translation>
-    </message>
-    <message>
-        <source>Recording Group</source>
-        <translation>Nauhoitusryhmä</translation>
     </message>
     <message>
         <source>Uptime</source>
@@ -5451,10 +5976,6 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>Enable gamma correction for video</source>
         <translation>Käytä gamman korjausta videolle</translation>
-    </message>
-    <message>
-        <source>Recording Host</source>
-        <translation>Nauhoitusisäntä</translation>
     </message>
     <message>
         <source>Use on air guide</source>
@@ -5513,10 +6034,6 @@ Haluatko varmasti poistaa:</translation>
         <translation>tämä nauhoitussääntö ei ole käytössä.</translation>
     </message>
     <message>
-        <source>Find ID</source>
-        <translation>Etsi tunnus</translation>
-    </message>
-    <message>
         <source>6 MHz</source>
         <translation>6 MHz</translation>
     </message>
@@ -5527,30 +6044,6 @@ Haluatko varmasti poistaa:</translation>
     <message>
         <source>8 MHz</source>
         <translation>8 MHz</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title</source>
-        <translation>Nauhoita vain yksi jakso ohjelmasta</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every week</source>
-        <translation>Nauhoita vain yksi jakso ohjelmasta joka viikko</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every day</source>
-        <translation>Nauhoita vain yksi jakso ohjelmasta joka päivä</translation>
-    </message>
-    <message>
-        <source>This recording rule is inactive</source>
-        <translation>Tämä nauhoitussääntö ei ole käytössä</translation>
-    </message>
-    <message>
-        <source>This recording rule is active</source>
-        <translation>Tämä nauhoitussääntö on käytössä</translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceed the max episodes</source>
-        <translation>Poista vanhin mikäli nauhoitettuja jaksoja on jo liikaa</translation>
     </message>
     <message>
         <source>All</source>
@@ -5873,14 +6366,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Ulostulo</translation>
     </message>
     <message>
-        <source>Default refresh rate when watching a video.</source>
-        <translation>Näytön päivitysnopeus kun katsotaan videota.</translation>
-    </message>
-    <message>
-        <source>Refresh rate when watching a video at a specific resolution.</source>
-        <translation>Näytön päivitysnopeus kun katsotaan videota tietyllä resoluutiolla.</translation>
-    </message>
-    <message>
         <source>Rate</source>
         <translation>Nopeus</translation>
     </message>
@@ -5966,56 +6451,12 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Jälkikäsittele käyttäen &quot;%1&quot;:sta</translation>
     </message>
     <message>
-        <source>Transcode new recordings</source>
-        <translation>Jälkikäsittele uudet nauhoitukset</translation>
-    </message>
-    <message>
-        <source>Do not Transcode new recordings</source>
-        <translation>Älä jälkikäsittele uusia nauhoituksia</translation>
-    </message>
-    <message>
-        <source>[ Select transcoder ]</source>
-        <translation>[ Valitse jälkikäsittelyohjelma ]</translation>
-    </message>
-    <message>
         <source>Default group filter to apply</source>
         <translation>Käytettävä oletusryhmäsuodin</translation>
     </message>
     <message>
         <source>Save current group filter when changed</source>
         <translation>Tallenna nykyisen ryhmäsuotimen muutokset </translation>
-    </message>
-    <message>
-        <source>Default View</source>
-        <translation>Oletusnäkymä</translation>
-    </message>
-    <message>
-        <source>Show Titles only</source>
-        <translation>Näytä vain nimikkeet</translation>
-    </message>
-    <message>
-        <source>Show Titles and Categories</source>
-        <translation>Näytä nimikkeet ja luokat</translation>
-    </message>
-    <message>
-        <source>Show Titles, Categories, and Recording Groups</source>
-        <translation>Näyt nimikkeet, luokat ja nauhoitusryhmät</translation>
-    </message>
-    <message>
-        <source>Show Titles and Recording Groups</source>
-        <translation>Näytä nimikkeet ja nauhoitusryhmät</translation>
-    </message>
-    <message>
-        <source>Show Categories only</source>
-        <translation>Näytä vain luokat</translation>
-    </message>
-    <message>
-        <source>Show Categories and Recording Groups</source>
-        <translation>Näytä luokat ja nauhoitusryhmät</translation>
-    </message>
-    <message>
-        <source>Show Recording Groups only</source>
-        <translation>Näytä vain nauhoitusryhmät</translation>
     </message>
     <message>
         <source>Show filter name instead of &quot;All Programs&quot;</source>
@@ -6157,10 +6598,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     <message>
         <source>This showing was not recorded because it was manually cancelled.</source>
         <translation>Ajastettua nauhoitusta ei tehty, koska käyttäjä peruutti nauhoituksen.</translation>
-    </message>
-    <message>
-        <source>Change Ending Time</source>
-        <translation>Muuta lopetusaikaa</translation>
     </message>
     <message>
         <source>Signal Timeout (msec)</source>
@@ -6459,14 +6896,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Kuva kuvassa -tila</translation>
     </message>
     <message>
-        <source>Schedule Information</source>
-        <translation>Ajastustietoja</translation>
-    </message>
-    <message>
-        <source>Preview schedule changes</source>
-        <translation>Esikatsele ajastuksen muutoksia</translation>
-    </message>
-    <message>
         <source>The following programs will be recorded instead:</source>
         <translation>Seuraavat ohjelmat tullaan nauhoittamaan tämän sijasta:
 </translation>
@@ -6488,72 +6917,8 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Ajan säätö (nopeus x 100)</translation>
     </message>
     <message>
-        <source>Playback Group</source>
-        <translation>Toistoryhmä</translation>
-    </message>
-    <message>
         <source>Daily Wakeup/ShutDown Period</source>
         <translation>Päivittäinen heräämis/sammutusaika</translation>
-    </message>
-    <message>
-        <source>Use &quot;%1&quot; playback group settings</source>
-        <translation>Käytä toistoryhmän &quot;%1&quot; asetuksia</translation>
-    </message>
-    <message>
-        <source>Title Pronounce</source>
-        <translation>Nimikkeen tiedotus</translation>
-    </message>
-    <message>
-        <source>Unidentified Episode</source>
-        <translation>Tuntematon jakso</translation>
-    </message>
-    <message>
-        <source>Producer</source>
-        <translation>Tuottaja</translation>
-    </message>
-    <message>
-        <source>Executive Producer</source>
-        <translation>Johtava tuottaja</translation>
-    </message>
-    <message>
-        <source>Writer</source>
-        <translation>Käsikirjoittaja</translation>
-    </message>
-    <message>
-        <source>Host</source>
-        <translation>Isäntä</translation>
-    </message>
-    <message>
-        <source>Adapter</source>
-        <translation>Muokkaaja</translation>
-    </message>
-    <message>
-        <source>Presenter</source>
-        <translation>Esittäjä</translation>
-    </message>
-    <message>
-        <source>Commentator</source>
-        <translation>Kommentaattori</translation>
-    </message>
-    <message>
-        <source>Guest</source>
-        <translation>Vieras</translation>
-    </message>
-    <message>
-        <source>Recording Rule</source>
-        <translation>Nauhoitussääntö</translation>
-    </message>
-    <message>
-        <source>Search Phrase</source>
-        <translation>Hakulause</translation>
-    </message>
-    <message>
-        <source>Recorded File Size</source>
-        <translation>Nauhoituksen tiedostokoko</translation>
-    </message>
-    <message>
-        <source>Recording Profile</source>
-        <translation>Nauhoitusprofiili</translation>
     </message>
     <message>
         <source>Allows the transcoder to resize the video during transcoding.</source>
@@ -6562,10 +6927,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     <message>
         <source>Lossless transcoding</source>
         <translation>Häviötön jälkikäsittely</translation>
-    </message>
-    <message>
-        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation>Anna ryhmän nimi tai paina SELECT-näppäintä syöttääksesi sen virtuaalisen näppäimistön kautta</translation>
     </message>
     <message>
         <source>Display Name (optional)</source>
@@ -7013,18 +7374,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Prioriteetti</translation>
     </message>
     <message>
-        <source>Current Example</source>
-        <translation>Esimerkki</translation>
-    </message>
-    <message>
-        <source>Store</source>
-        <translation>Tallenna</translation>
-    </message>
-    <message>
-        <source>Replace</source>
-        <translation>Korvaa</translation>
-    </message>
-    <message>
         <source>Track</source>
         <translation>Raita</translation>
     </message>
@@ -7088,18 +7437,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Kaapeli-IRC</translation>
     </message>
     <message>
-        <source>Use any available input</source>
-        <translation>Mikä tahansa sisääntulo</translation>
-    </message>
-    <message>
-        <source>Prefer input %1</source>
-        <translation>Ensisijaisesti sisääntulo %1</translation>
-    </message>
-    <message>
-        <source>Select Preferred Input</source>
-        <translation>Valitse ensisijainen sisääntulo</translation>
-    </message>
-    <message>
         <source>UNKNOWN%1</source>
         <comment>Synthesized callsign</comment>
         <translation>Tuntematon%1</translation>
@@ -7119,18 +7456,6 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     <message>
         <source>^(The |A |An )</source>
         <translation>^(The |A |An )</translation>
-    </message>
-    <message>
-        <source>Upcoming episodes for this title</source>
-        <translation>Tulevat jaksot tälle nimikkeelle</translation>
-    </message>
-    <message>
-        <source>Upcoming episodes for this rule</source>
-        <translation>Tulevat jaksot tälle säännölle</translation>
-    </message>
-    <message>
-        <source>Previously scheduled episodes</source>
-        <translation>Aikaisemmin nauhoitetut jaksot</translation>
     </message>
     <message>
         <source>channel number</source>
@@ -7190,42 +7515,6 @@ Check if the video exists</source>
         <translation>Toiset näytökset</translation>
     </message>
     <message>
-        <source>Last Recorded</source>
-        <translation>Viimeisin nauhoitus</translation>
-    </message>
-    <message>
-        <source>Next Recording</source>
-        <translation>Seuraava nauhoitus</translation>
-    </message>
-    <message>
-        <source>Watch List Score</source>
-        <translation>Katselulistan pisteet</translation>
-    </message>
-    <message>
-        <source>Auto-expire off</source>
-        <translation>Automaattinen vanhentuminen pois</translation>
-    </message>
-    <message>
-        <source>Marked as &apos;watched&apos;</source>
-        <translation>Merkitty katsotuksi</translation>
-    </message>
-    <message>
-        <source>Not the earliest episode</source>
-        <translation>Ei aikaisin lähetys</translation>
-    </message>
-    <message>
-        <source>Recently deleted episode</source>
-        <translation>Viimeiseksi poistettu jakso</translation>
-    </message>
-    <message>
-        <source>Watch List Status</source>
-        <translation>Katselulistan tila</translation>
-    </message>
-    <message>
-        <source>Storage Group</source>
-        <translation>Tallennusryhmä</translation>
-    </message>
-    <message>
         <source>SAP/Bilingual</source>
         <translation>SAP/Monikielinen</translation>
     </message>
@@ -7236,30 +7525,6 @@ Check if the video exists</source>
     <message>
         <source>SAP Language</source>
         <translation>SAP-Kieli</translation>
-    </message>
-    <message>
-        <source>Include in the &quot;%1&quot; recording group</source>
-        <translation>Sisällytä nauhoitusryhmään &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes</source>
-        <translation>Poissulje tuntemattomat jaksot</translation>
-    </message>
-    <message>
-        <source>Exclude old episodes</source>
-        <translation>Poissulje vanhat jaksot</translation>
-    </message>
-    <message>
-        <source>Select Storage Group</source>
-        <translation>Valitse tallennusryhmä</translation>
-    </message>
-    <message>
-        <source>Store in the &quot;%1&quot; storage group</source>
-        <translation>Tallenna tallennusryhmään &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>LiveTV</source>
-        <translation>LiveTV</translation>
     </message>
     <message>
         <source>Listings grabber</source>
@@ -7274,20 +7539,12 @@ Check if the video exists</source>
         <translation>800Mbps</translation>
     </message>
     <message>
-        <source>Allow audio only channels</source>
-        <translation>Salli vain ääni -kanavat</translation>
-    </message>
-    <message>
         <source>Never</source>
         <translation>Ei koskaan</translation>
     </message>
     <message>
         <source>Always</source>
         <translation>Aina</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle then description</source>
-        <translation>Sovita kaksoiskappaleet ohjelman nimikkeellä ja kuvauksella</translation>
     </message>
     <message>
         <source>Commercial Flagging Method</source>
@@ -7308,14 +7565,6 @@ Check if the video exists</source>
     <message>
         <source>Subtitle</source>
         <translation>Jakson kuvaus</translation>
-    </message>
-    <message>
-        <source>as a search</source>
-        <translation>niin kuin hakuna</translation>
-    </message>
-    <message>
-        <source>as an example</source>
-        <translation>niin kuin esimerkkinä</translation>
     </message>
     <message>
         <source>Title %1 chapter %2</source>
@@ -7342,28 +7591,8 @@ Check if the video exists</source>
         <translation>tämä jakso tullaan nauhoittamaan eri kanavalla.</translation>
     </message>
     <message>
-        <source>Audio for Hearing Impaired</source>
-        <translation>Ääni huonokuuloisille</translation>
-    </message>
-    <message>
-        <source>Audio for Visually Impaired</source>
-        <translation>Ääni huononäköisille</translation>
-    </message>
-    <message>
         <source>Widescreen</source>
         <translation>Laajakuva</translation>
-    </message>
-    <message>
-        <source>Subtitles Available</source>
-        <translation>Tekstitys saatavilla</translation>
-    </message>
-    <message>
-        <source>Average Time Shift</source>
-        <translation>Keskimääräinen aikasiirtymä</translation>
-    </message>
-    <message>
-        <source>Recorded File Name</source>
-        <translation>Nauhoituksen tiedostonimi</translation>
     </message>
     <message>
         <source>Could not open tuner device</source>
@@ -7380,10 +7609,6 @@ Check if the video exists</source>
     <message>
         <source>Tuning to %1 mplexid(%2)</source>
         <translation>Viritetään taajuudelle %1 (kanavanippu: %2)</translation>
-    </message>
-    <message>
-        <source>Record new episode first showings</source>
-        <translation>Nauhoita uuden jakson ensiesitys</translation>
     </message>
     <message>
         <source>MythTV wants to record these programs in %d seconds:</source>
@@ -8156,31 +8381,6 @@ Seuraava kuva on tyhjä. Poistu siitä ja palaa valikkoon.</translation>
         <translation>taustanauhoittaja ei ole saatavilla.</translation>
     </message>
     <message>
-        <source>Mono</source>
-        <translation>Mono</translation>
-    </message>
-    <message>
-        <source>Surround Sound</source>
-        <translation>Surround Sound</translation>
-    </message>
-    <message>
-        <source>Dolby Sound</source>
-        <translation>Dolby Sound</translation>
-    </message>
-    <message>
-        <source>AVC/H.264</source>
-        <translation>AVC/H.264</translation>
-    </message>
-    <message>
-        <source>CC</source>
-        <comment>Closed Captioned</comment>
-        <translation>CC-tekstitys</translation>
-    </message>
-    <message>
-        <source>Deaf Signing</source>
-        <translation>Viittomakieli</translation>
-    </message>
-    <message>
         <source>Dual</source>
         <translation>Dual</translation>
     </message>
@@ -8259,10 +8459,6 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
 Useimmat dvb-s transponderit lähettävät 27.5 miljoonaa symbolia sekunnissa.</translation>
     </message>
     <message>
-        <source>Select Playback Group</source>
-        <translation>Valitse toistoryhmä</translation>
-    </message>
-    <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are video source, modulation, frequency, and when relevant symbol rate, network id, and transport id.</source>
         <translation>Tämä osio sisältää kaikki lähetysvirrat, jotka MythTV tuntee tällä hetkellä. Näytettävät kentät ovat videolähde, modulaatio, taajuus, ja kun aiheellista, symbolitaajuus, verkkotunnus ja lähetystunnus.</translation>
     </message>
@@ -8323,14 +8519,6 @@ Taajuus tälle kanavalle %1:ssa</translation>
     <message>
         <source>Standard will use ffmpeg library.</source>
         <translation>Standardi käyttää ffmpeg -kirjastoa.</translation>
-    </message>
-    <message>
-        <source>libmpeg2 will use mpeg2 library; this is faster on some 32 bit AMD processors.</source>
-        <translation>libmpeg2 käyttää mpeg2 kirjastoa; tämä on nopeampi joillakin 32 bittisillä AMD -prosessoreilla.</translation>
-    </message>
-    <message>
-        <source>Note: Closed caption decoding will not work with libmpeg2.</source>
-        <translation>Huom! Valinnanvaraisen tekstityksen koodinpurku ei toimi libmpeg2:n kanssa.</translation>
     </message>
     <message>
         <source>Standard XvMC will use XvMC API 1.0 to play back video; this is fast, but does not work well with HDTV sized frames.</source>
@@ -8457,10 +8645,6 @@ Taajuus tälle kanavalle %1:ssa</translation>
     <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
         <translation>Tämä videorenderoija käyttää DirectFB:tä skaalaukseen ja värienmuokkaukseen. Sillä ei ole yhtä laajat ominaisuudet kuin standardi videorenderoijalla, mutta se voi käyttää Linux -ohjelmistoa ilman X11 -palvelinta.</translation>
-    </message>
-    <message>
-        <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
-        <translation>Windows videorenderoija, joka perustuu peittotasoihin. Yhteensopimaton Vista Aero Glassin kanssa.</translation>
     </message>
     <message>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
@@ -8659,18 +8843,6 @@ Taajuus tälle kanavalle %1:ssa</translation>
         <translation>Jätä &apos;Yleiseksi&apos;, paitsi jos tämä sisääntulo on jaettu toisen laitteen kanssa. Vain yhden sisääntulon sallitaan nauhoittaa sisääntulojoukossa kerrallaan.</translation>
     </message>
     <message>
-        <source>Unencrypted channels only</source>
-        <translation>Vain salaamattomat kanavat</translation>
-    </message>
-    <message>
-        <source>If set, only unencrypted channels will be tuned to by MythTV or not be ignored by the MythTV channel scanner.</source>
-        <translation>Jos asetettu, MythTV virittyy vain salaamattomiin kanaviin ja MythTV:n kanavaetsin lisää myös nämä kanavat kanavalistan.</translation>
-    </message>
-    <message>
-        <source>If set, audio only channels will not be ignored by the MythTV channel scanner.</source>
-        <translation>Jos asetettu, MythTV:n kanavaetsin lisää vain ääntä sisältävät kanavat kanavalistaan.</translation>
-    </message>
-    <message>
         <source>Use quick tuning</source>
         <translation>Käytä pikaviritystä</translation>
     </message>
@@ -8769,10 +8941,6 @@ Taajuus tälle kanavalle %1:ssa</translation>
     <message>
         <source>Remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
         <translation>Muista viimeinen valittu suodatin sen sijaan, että näyttäisit vakiosuodattimen kun astut toistovalikkoon.</translation>
-    </message>
-    <message>
-        <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation>Valitse minkätyyppisen vakioryhmityksen näytät Katso nauhoituksia valikossa.</translation>
     </message>
     <message>
         <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
@@ -10731,14 +10899,6 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         </numerusform>
         </translation>
     </message>
-    <message>
-        <source>720p Resolution</source>
-        <translation>Resoluutio 720p</translation>
-    </message>
-    <message>
-        <source>1080i/p Resolution</source>
-        <translation>Resoluutio 1080i/p</translation>
-    </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
         <translation type="unfinished">
@@ -10812,22 +10972,6 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
     <message>
         <source>Invalid Device ID or address.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Model: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>, Firmware: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>, ID %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>, at address %1.%2.%3.%4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11076,24 +11220,182 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <source>XMLTV Grabber Configuration</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>RecOptDialog</name>
     <message>
-        <source>Missing Element</source>
-        <translation>Käyttöliittymäelementti puuttuu</translation>
+        <source>Go Back</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
-        <translation>Käytössä oleva teema ei sisällä &apos;recording_options&apos;-käyttöliittymäelementtiä. Ota yhteys teeman tekijään ja kysy päivitystä.&lt;br&gt;&lt;br&gt;Seuraava ruutu on tyhjä. Paina EXIT-painiketta palataksesi valikkoon.</translation>
+        <source>No Change</source>
+        <translation type="unfinished">Ei muutoksia</translation>
     </message>
     <message>
-        <source>Unknown Element</source>
-        <translation>Tuntematon käyttöliittymäelementti</translation>
+        <source>Could not find specified tuner (%1).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation>Käytössä oleva teema sisältää tuntemattoman käyttöliittymäelementin (%1).  Kyseinen elementti ohitetaan</translation>
+        <source>Specified tuner (%1) is already in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All tuners are currently in use. If you want to watch TV, you can cancel one of the in-progress recordings from the delete menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
+        <translation type="unfinished">Ei saatu yhteyttä nauhoituspalvelimeen. Tarkista että palvelin on käynnissä ja että sen verkko-osoite on määritetty oikein.</translation>
+    </message>
+    <message>
+        <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
+        <translation type="unfinished">Palvelin käyttää verkostoprotokolan verrsiota %1, mutta tämä asiakasohjelma ymmärtää vain versiota %2.  Varmista ohjelmistoversioiden yhteensopivuus.</translation>
+    </message>
+    <message>
+        <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
+        <translation type="unfinished">Tämä ohjelma ei ole yhteensopiva asennettujen MythTV -kirjastojen kanssa. Uudelleenkoosta distcleanin jälkeen</translation>
+    </message>
+    <message>
+        <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
+        <translation type="unfinished">Yhteys nauhoituspalvelimeen on katkennut. Tarkista että palvelin on käynnissä.</translation>
+    </message>
+    <message>
+        <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
+        <translation type="unfinished">Liitännäinen %1 ei ole yhteensopiva asennettujen MythTV -kirjastojen kanssa. Uudelleenkompiloi liitännäinen distcleanin jälkeen</translation>
+    </message>
+    <message>
+        <source>Pre &amp; Post Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, firmware: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found %1 off-air channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found %1 unused transports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set all invisible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%1 or later) %3</source>
+        <comment>e.g. (Sunday or later) program subtitle</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>libmpeg2 is slower on almost all processors than ffmpeg and breaks caption decoding. Use at your own risk!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Detect (Default Off)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Detect (Default Half)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV idle timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit LiveTV automatically if left idle for the specified number of minutes. 0 disables the timeout.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video. Leave at &quot;Any&quot; to automatically use the best available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Any&quot; to automatically use the best available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Widescreen Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sign Language Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having in-vision sign language.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In-vision Subtitles Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles/CC Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard of Hearing Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Described Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as being Audio Described.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accessibility Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Group Disk Scheduler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balanced Free Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balanced Disk I/O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls how the Storage Group scheduling code will balance new recordings across directories.  &apos;Balanced Free Space&apos; is the recommended method for most users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have a Video Storage Group, but have not set up all Image Groups.  If you continue, video image downloads will be saved in your Videos Storage Group.  Do you want to store them in their own groups?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for icons for channel %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11122,46 +11424,10 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
 </context>
 <context>
-    <name>ScanProgressPopup</name>
+    <name>ScanNetwork</name>
     <message>
-        <source>Scan Progress</source>
-        <translation>Etsinnän tila</translation>
-    </message>
-    <message>
-        <source>Tuning</source>
-        <translation>Viritetään</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Peruuta</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation>Tila</translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation>Etsi</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation>Signaalin voimakkuus</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation>Signaali/kohina</translation>
-    </message>
-    <message>
-        <source>Locked</source>
-        <translation>Lukittu</translation>
-    </message>
-    <message>
-        <source>No Lock</source>
-        <translation>Ei lukitusta</translation>
-    </message>
-    <message>
-        <source>Rotor Movement</source>
-        <translation>Kääntömoottorin liike</translation>
+        <source>Country</source>
+        <translation type="unfinished">Maa</translation>
     </message>
 </context>
 <context>
@@ -11214,7 +11480,131 @@ Käytä Eject-nappia aseman alareunassa.</translation>
     </message>
 </context>
 <context>
-    <name>ScheduleRecording</name>
+    <name>SchedOptEditor</name>
+    <message>
+        <source>Use any available input</source>
+        <translation type="unfinished">Mikä tahansa sisääntulo</translation>
+    </message>
+    <message>
+        <source>Prefer input %1</source>
+        <translation type="unfinished">Ensisijaisesti sisääntulo %1</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle &amp; description</source>
+        <translation type="unfinished">Sovita kaksoiskappaleet ohjelman nimikkeellä ja kuvauksella</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
+        <translation type="unfinished">Sovita kaksoiskappaleet ohjelman nimikkeellä ja kuvauksella</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle</source>
+        <translation type="unfinished">Sovita kaksoiskappaleet ohjelman nimikkeellä</translation>
+    </message>
+    <message>
+        <source>Match duplicates using description</source>
+        <translation type="unfinished">Sovita kaksoiskappaleet ohjelman kuvauksella</translation>
+    </message>
+    <message>
+        <source>Don&apos;t match duplicates</source>
+        <translation type="unfinished">Ei kaksoiskappaleiden sovitusta</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current and previous recordings</source>
+        <translation type="unfinished">Etsi kaksoiskappaleita nykyisistä ja aiemmista nauhoituksista</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current recordings only</source>
+        <translation type="unfinished">Etsi kaksoiskappaleita nykyisistä nauhoituksista</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in previous recordings only</source>
+        <translation type="unfinished">Etsi kaksoiskappaleita aiemmista nauhoituksista</translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
+        <translation type="unfinished">Poissulje tunnistamattomat jaksot</translation>
+    </message>
+    <message>
+        <source>Exclude old episodes</source>
+        <translation type="unfinished">Poissulje vanhat jaksot</translation>
+    </message>
+    <message>
+        <source>Record new episodes only</source>
+        <translation type="unfinished">Nauhoita vain uudet jaksot</translation>
+    </message>
+    <message>
+        <source>Record new episode first showings</source>
+        <translation type="unfinished">Nauhoita uuden jakson ensiesitys</translation>
+    </message>
+</context>
+<context>
+    <name>ScheduleCommon</name>
+    <message>
+        <source>Reactivate</source>
+        <translation type="unfinished">Uudelleenaktivoi</translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">Lopeta nauhoitus</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record</source>
+        <translation type="unfinished">Älä nauhoita</translation>
+    </message>
+    <message>
+        <source>Never record</source>
+        <translation type="unfinished">Älä koskaan nauhoita</translation>
+    </message>
+    <message>
+        <source>Change Ending Time</source>
+        <translation type="unfinished">Muuta lopetusaikaa</translation>
+    </message>
+    <message>
+        <source>Edit Options</source>
+        <translation type="unfinished">Muokkaa asetuksia</translation>
+    </message>
+    <message>
+        <source>Add Override</source>
+        <translation type="unfinished">Lisää ohitus</translation>
+    </message>
+    <message>
+        <source>Edit Override</source>
+        <translation type="unfinished">Muokkaa ohitusta</translation>
+    </message>
+    <message>
+        <source>Clear Override</source>
+        <translation type="unfinished">Tyhjennä ohitus</translation>
+    </message>
+    <message>
+        <source> The following programs will be recorded instead:
+</source>
+        <translation type="unfinished">Seuraavat ohjelmat tullaan nauhoittamaan tämän sijasta:
+</translation>
+    </message>
+    <message>
+        <source>Record anyway</source>
+        <translation type="unfinished">Nauhoita kuitenkin</translation>
+    </message>
+    <message>
+        <source>Forget Previous</source>
+        <translation type="unfinished">Unohda edelliset</translation>
+    </message>
+</context>
+<context>
+    <name>ScheduleEditor</name>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished">Nauhoita kyseinen ohjelma tavallisin valinnoin</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished">Nauhoita kyseinen ohjelma syrjäytys-valinnoin</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished">Älä nauhoita tätä jaksoa</translation>
+    </message>
     <message>
         <source>Do not record this program</source>
         <translation type="unfinished">Älä nauhoita tätä ohjelmaa</translation>
@@ -11252,31 +11642,44 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <translation type="unfinished">Nauhoita tällä kanavalla mihin aikaan tahansa</translation>
     </message>
     <message>
-        <source>Record this showing with normal options</source>
-        <translation type="unfinished">Nauhoita kyseinen ohjelma tavallisin valinnoin</translation>
+        <source>Power Search</source>
+        <translation type="unfinished">Tehohaku</translation>
     </message>
     <message>
-        <source>Record this showing with override options</source>
-        <translation type="unfinished">Nauhoita kyseinen ohjelma syrjäytys-valinnoin</translation>
+        <source>Title Search</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not allow this showing to be recorded</source>
-        <translation type="unfinished">Älä nauhoita tätä jaksoa</translation>
+        <source>Keyword Search</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Prefer input %1</source>
-        <translation type="unfinished">Ensisijaisesti sisääntulo %1</translation>
+        <source>People Search</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use any available input</source>
-        <translation type="unfinished">Mikä tahansa sisääntulo</translation>
+        <source>Unknown Search</source>
+        <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScheduledRecording</name>
     <message>
-        <source>or later</source>
-        <translation>tai myöhemmin</translation>
+        <source>Schedule Information</source>
+        <translation type="unfinished">Ajastustietoja</translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished">Tietoa ohjelmasta</translation>
+    </message>
+    <message>
+        <source>Upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously scheduled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11358,12 +11761,12 @@ löytyy %2</translation>
         <translation>Käytä nykyistä tietokantakaaviota</translation>
     </message>
     <message>
-        <source>Database schema is old. Waiting to see if DB is being upgraded.</source>
-        <translation>Tietokantakaavio on vanha.Tarkistaaaa jos tietokannan voisi päivittää.</translation>
-    </message>
-    <message>
         <source>Database Host: %1
 Database Name: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 database schema is old. Waiting to see if DB is being upgraded.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -11833,6 +12236,53 @@ Directory From Storage Group?</source>
     <message>
         <source>(Create %1 group)</source>
         <translation>(Luo %1 ryhmä)</translation>
+    </message>
+    <message>
+        <source>(from remote hosts)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(from all hosts</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StoreOptEditor</name>
+    <message>
+        <source>Record using the %1 profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create a new recording group</source>
+        <translation type="unfinished">Luo uusi nauhoitusryhmä</translation>
+    </message>
+    <message>
+        <source>Include in the &quot;%1&quot; recording group</source>
+        <translation type="unfinished">Sisällytä nauhoitusryhmään &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">Oletus</translation>
+    </message>
+    <message>
+        <source>Store in the &quot;%1&quot; storage group</source>
+        <translation type="unfinished">Tallenna tallennusryhmään &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished">Katso televisiota</translation>
+    </message>
+    <message>
+        <source>Use &quot;%1&quot; playback group settings</source>
+        <translation type="unfinished">Käytä toistoryhmän &quot;%1&quot; asetuksia</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record if this would exceed the max episodes</source>
+        <translation type="unfinished">Älä nauhoita mikäli nauhoitettuja jaksoja on jo liikaa</translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation type="unfinished">Poista vanhin mikäli nauhoitettuja jaksoja on jo liikaa</translation>
     </message>
 </context>
 <context>
@@ -12699,6 +13149,10 @@ Valitse nykyinen nauhoitus</translation>
         <source>All Channels</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Auto Detect</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -12791,10 +13245,6 @@ Valitse nykyinen nauhoitus</translation>
         <translation>Ohjelmat</translation>
     </message>
     <message>
-        <source>No listings found for this program. </source>
-        <translation>Ei tietoa kyseisestä ohjelmasta.</translation>
-    </message>
-    <message>
         <source>Source:</source>
         <translation>Lähde:</translation>
     </message>
@@ -12803,28 +13253,12 @@ Valitse nykyinen nauhoitus</translation>
         <translation>(1) Nimikkeellä   (2) Prioriteetilla   (4) Tyypillä</translation>
     </message>
     <message>
-        <source>Select a recording to permanently erase</source>
-        <translation>Nauhoitus, joka poistetaan pysyvästi</translation>
-    </message>
-    <message>
-        <source>Select a recording to watch</source>
-        <translation>Nauhoitus, jota katsotaan</translation>
-    </message>
-    <message>
         <source>Select a recording to permanently erase:</source>
         <translation>Nauhoitus, joka poistetaan pysyvästi:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
         <translation>Nauhoitus, jota katsotaan:</translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently erase.</source>
-        <translation>Valitse nauhoitus, joka poistetaan pysyvästi.</translation>
-    </message>
-    <message>
-        <source>Select a recording to watch.</source>
-        <translation>Valitse nauhoitus, jota haluat katsoa.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
@@ -12841,10 +13275,6 @@ Valitse nykyinen nauhoitus</translation>
     <message>
         <source>Description:</source>
         <translation>Kuvaus:</translation>
-    </message>
-    <message>
-        <source>System Status - Select a category to view the status</source>
-        <translation>Järjestelmän tila - valitse luokka</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
@@ -12897,6 +13327,1794 @@ Valitse nykyinen nauhoitus</translation>
     <message>
         <source>WARNING: There are conflicting scheduled recordings!</source>
         <translation>Huomio: Havaittiin ristiriitoja ajoituksissa.</translation>
+    </message>
+    <message>
+        <source>1. General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2. Capture cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3. Video sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4. Input connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5. Channel Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6. Storage Directories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%alert_text%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LINE #%caller_line%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NAME: %caller_name%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NUM : %caller_number%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DATE: %caller_date% TIME : %caller_time%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Yleiset</translation>
+    </message>
+    <message>
+        <source>Core MythTV behavior and system settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pick the theme, font, size, and locale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Setup Wizards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compensate for TVs with overscan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings for TV recording and playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback and CD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback and DVD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure display of image gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback of games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather locale and sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>News Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose which news sources interest you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage web bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recipe Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure SIP-based VoIP phone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie Time Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select local movie theaters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Xbox Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NetFlix Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the genres that interest you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Files Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure how to archive video to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ZoneMinder Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set up surveillance software</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming Recordings</source>
+        <translation type="unfinished">Tulevat nauhoitukset</translation>
+    </message>
+    <message>
+        <source>See what will be recorded next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Recordings</source>
+        <translation type="unfinished">Ajasta nauhoituksia</translation>
+    </message>
+    <message>
+        <source>Pick shows to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prioritize some shows over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What your system is doing right now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Utilities / Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings for TV, Images, Music, Video, Weather, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings to prioritize some shows over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Channel Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings to prioritize some channels over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most used DVR options are found on the main menu. Plugin options are in the utilities menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick a program to record for a list of new titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movies</source>
+        <translation type="unfinished">Elokuvat</translation>
+    </message>
+    <message>
+        <source>Pick a movie to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Categories</source>
+        <translation type="unfinished">Luokat</translation>
+    </message>
+    <message>
+        <source>Pick a program based on category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick a program on a given channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished">Aika</translation>
+    </message>
+    <message>
+        <source>Pick a program based on time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished">Ohjelmaopas</translation>
+    </message>
+    <message>
+        <source>Choose programs from a grid-style list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation type="unfinished">Ohjelmahaku</translation>
+    </message>
+    <message>
+        <source>Choose programs from an alphabetical index</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Words</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find programs matching search words</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick a program to record from a set of lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Record</source>
+        <translation type="unfinished">Muokattu ajastus</translation>
+    </message>
+    <message>
+        <source>Advanced program finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCR-like recording scheduler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find a program based on title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find a program matching a keyword</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find a program including a given person</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combine more than one word search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stored Searches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Results of searches you have saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV navigation and recording preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide appearance and behavior</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings for viewing and playing TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme and settings for OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSD Menu Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Groups</source>
+        <translation type="unfinished">Toistoryhmät</translation>
+    </message>
+    <message>
+        <source>Adjust settings for different playback styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Profiles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global recording priority and scheduling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch live television</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove television recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Aiemmin nauhoitettu</translation>
+    </message>
+    <message>
+        <source>See what you have recorded before</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Utilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music</source>
+        <translation type="unfinished">Musiikki</translation>
+    </message>
+    <message>
+        <source>Videos</source>
+        <translation type="unfinished">Videot</translation>
+    </message>
+    <message>
+        <source>Radio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather</source>
+        <translation type="unfinished">Sää</translation>
+    </message>
+    <message>
+        <source>News Feeds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recipes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zone Minder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie Times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NetFlix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A blue theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot;%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot; %%STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  =</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No listings found for this program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show:  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title  (2) Sort by Priority  (4) Sort by Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>] =</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot;% %STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(4) Program Guide  (6) Program Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a letter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then press SELECT or the right arrow.</source>
+        <translation type="unfinished">Valitse kirjain, jolla ohjelma alkaa ja paina SELECT tai oikeaa nuolinäppäintä.</translation>
+    </message>
+    <message>
+        <source>Select a program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Programs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Time    (2) Sort by Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>0%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback starting ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon Importer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search terms:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Haku</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <translation type="unfinished">Ohita</translation>
+    </message>
+    <message>
+        <source>Channel Editor</source>
+        <translation type="unfinished">Kanavamuokkain</translation>
+    </message>
+    <message>
+        <source>List Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Channels without channel number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Transports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Valmis</translation>
+    </message>
+    <message>
+        <source>Play Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System:</source>
+        <translation type="unfinished">Järjestelmä:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Kyllä</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Ei</translation>
+    </message>
+    <message>
+        <source>Television</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programme Searches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD/DVD Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info Centre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P</source>
+        <translation type="unfinished">P</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation type="unfinished">S</translation>
+    </message>
+    <message>
+        <source>Playing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Ei mikään</translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;% %DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Displayed Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Watch List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Searches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Watched Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Tallenna</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>Edit Recording Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
+        <translation type="unfinished">Jakson kuvaus</translation>
+    </message>
+    <message>
+        <source>Manual Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title (Optional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date, or day of week:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedules Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First Conflict:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
+ To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Channel (2) Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Final</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Final Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Title (2) Priority (4) Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Priority Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Existing Rules:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority Change:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clause from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Clause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Poista</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">Kokeile</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phrase</source>
+        <translation type="unfinished">Hakulause</translation>
+    </message>
+    <message>
+        <source>Select Time</source>
+        <translation type="unfinished">Valitse esitysaika</translation>
+    </message>
+    <message>
+        <source>Select Search</source>
+        <translation type="unfinished">Valitse haku</translation>
+    </message>
+    <message>
+        <source>Edit Power Search Fields</source>
+        <translation type="unfinished">Muokkaa tehohaun kenttiä</translation>
+    </message>
+    <message>
+        <source>Optional title phrase:</source>
+        <translation type="unfinished">Valinnainen nimike:</translation>
+    </message>
+    <message>
+        <source>Optional subtitle phrase:</source>
+        <translation type="unfinished">Valinnainen teksti:</translation>
+    </message>
+    <message>
+        <source>Optional description phrase:</source>
+        <translation type="unfinished">Valinnainen kuvaus:</translation>
+    </message>
+    <message>
+        <source>List Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current View:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the recording rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Options</source>
+        <translation type="unfinished">Tallennusasetukset</translation>
+    </message>
+    <message>
+        <source>Post Processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce priority by %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal recording priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raise priority by %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording %n minute(s) late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording on time</source>
+        <translation type="unfinished">Aloita nauhoitus ajallaan</translation>
+    </message>
+    <message>
+        <source>Start recording %n minute(s) early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording %n minute(s) early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording on time</source>
+        <translation type="unfinished">Lopeta nauhoitus ajallaan</translation>
+    </message>
+    <message>
+        <source>End recording %n minute(s) late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Rule Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No episode limit</source>
+        <translation type="unfinished">Ei jaksorajaa</translation>
+    </message>
+    <message>
+        <source>Keep at most %n episode(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow recordings to expire?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Processing Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flag new recordings</source>
+        <translation type="unfinished">Tunnista mainoskatkot uusille nauhoituksille</translation>
+    </message>
+    <message>
+        <source>Transcode new recordings</source>
+        <translation type="unfinished">Jälkikäsittele uudet nauhoitukset</translation>
+    </message>
+    <message>
+        <source>123</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search For:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot; %%REPEAT%%STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cast Members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full Plot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video List Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished">Luokka</translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country</source>
+        <translation type="unfinished">Maa</translation>
+    </message>
+    <message>
+        <source>Actor/Actress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InetRef</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Director:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished">Alhainen</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="unfinished">Keskimääräinen</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished">Korkea</translation>
+    </message>
+    <message>
+        <source>Rated:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browsable:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runtime:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover File:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IMDB ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos - Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos - Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video File Associations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extension:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use default player:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Video Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Season:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Control:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File to Always Play Next:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include while Browsing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item has been Watched:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Banner:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trailer:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unique Player Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directed by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Toista</translation>
+    </message>
+    <message>
+        <source>Change mythtv key bindings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythStream Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather Station Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Online Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather Station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A long menu which breaks down the options by their category. TV, Music, Video etc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit or delete any recording rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play TV Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Appearance Wizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1280 x 720</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 x 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 pixel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished">Koti</translation>
+    </message>
+    <message>
+        <source>Please Wait....</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contexts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change View</source>
+        <translation type="unfinished">Muuta näkymää</translation>
+    </message>
+    <message>
+        <source>Show Watched Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status Icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;%
+%YEARSTARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
+ To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage Recording Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <translation type="unfinished">Kanava</translation>
+    </message>
+    <message>
+        <source>Last Recorded</source>
+        <translation type="unfinished">Viimeisin nauhoitus</translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Profile:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Search Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;%
+%LONGREPEAT%%STARS| %%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Record Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional Tables:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Nauhoita</translation>
+    </message>
+    <message>
+        <source>Store</source>
+        <translation type="unfinished">Tallenna</translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User job #2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make or accept a VoIP call</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep up with the news</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>See when local movies are playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local weather forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage your NetFlix queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse the web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start cooking!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home surveillance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tell us what hardware you have so we can support it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listen to Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listen to the radio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Look at Pictures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play video games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings for all non-TV media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info Center Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure weather, news, movie info, web, and recipes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play any of your media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick and prioritize shows to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information and Communications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optical Disks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play or import CDs and DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abspielen/Importieren von CDs und DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure MythTV and plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play the video on a movie DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play the video on a VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import video from a movie DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write video to a data DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import music from an audio CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject CD or DVD from drive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select, import, or play music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for new videos, edit metadata, or delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE%%BR%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%STARTDATE%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign</source>
+        <translation type="unfinished">Nimike</translation>
+    </message>
+    <message>
+        <source>Channel #</source>
+        <translation type="unfinished">Kanava #</translation>
+    </message>
+    <message>
+        <source>Channel Name</source>
+        <translation type="unfinished">Kanavan nimi</translation>
+    </message>
+    <message>
+        <source>XMLTV ID</source>
+        <translation type="unfinished">XMLTV-tunnus</translation>
+    </message>
+    <message>
+        <source>[P]robe</source>
+        <translation type="unfinished">[P]Selaa</translation>
+    </message>
+    <message>
+        <source>[O]k</source>
+        <translation type="unfinished">[O]k</translation>
+    </message>
+    <message>
+        <source>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%CALLSIGN% - %CHANNUM%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A simple transparent black and white theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play or import audio or video CDs or DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch A DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Online Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A &quot;Media Center&quot; menu theme. This menu theme is basically meant to bring the common &quot;media player/DVR&quot; functionality to the forefront, organize the plugins, and to make some of myth&apos;s more daunting options a little more subtle. Places the common media items on the top level (Recordings, Videos, TV, DVD, Music), places all informational plugins in &quot;Plugins.&quot; Puts all setup and scheduling in &quot;Advanced.&quot; The top two menu levels will seem new, the ones beneath Advanced-&gt;Setup are as in the default menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13048,6 +15266,15 @@ Valitse nykyinen nauhoitus</translation>
     <message>
         <source>All</source>
         <translation>Kaikki</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>The following programs will be recorded instead:</source>
+        <translation type="unfinished">Seuraavat ohjelmat tullaan nauhoittamaan tämän sijasta:
+</translation>
     </message>
 </context>
 <context>

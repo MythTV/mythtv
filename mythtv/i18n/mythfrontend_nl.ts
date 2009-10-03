@@ -90,6 +90,10 @@
         <source>Shall I attempt to connect to this host with default database parameters?</source>
         <translation>Zal ik proberen met deze machine te verbinden met de standaard waarden?</translation>
     </message>
+    <message>
+        <source>Backend uses a PIN. </source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CaptureCardEditor</name>
@@ -195,48 +199,12 @@
 <context>
     <name>ChannelEditor</name>
     <message>
-        <source>Are you sure you would like to delete this channel?</source>
-        <translation>Bent u er zeker van dat u deze zender wil verwijderen?</translation>
-    </message>
-    <message>
-        <source>Yes, delete the channel</source>
-        <translation>Ja, deze zender verwijderen</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation>Nee, niet doen</translation>
-    </message>
-    <message>
-        <source>Yes, delete the channels</source>
-        <translation>Ja, zenders verwijderen</translation>
-    </message>
-    <message>
-        <source>Are you sure you would like to delete ALL channels?</source>
-        <translation>Bent u zeker van het verwijderen van ALLE zenders?</translation>
-    </message>
-    <message>
-        <source>Are you sure you would like to delete all unassigned channels?</source>
-        <translation>Bent u zeker van het verwijderen van ALLE niet toegewezen zenders?</translation>
-    </message>
-    <message>
-        <source>Are you sure you would like to delete the channels on %1?</source>
-        <translation>Bent u zeker van het verwijderen van ALLE zenders op %1?</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuleren</translation>
-    </message>
-    <message>
         <source>Download all icons..</source>
         <translation>Download alle iconen..</translation>
     </message>
     <message>
         <source>Rescan for missing icons..</source>
         <translation>Opnieuw zoeken naar ontbrekende iconen..</translation>
-    </message>
-    <message>
-        <source>Download icon for </source>
-        <translation>Download icoon voor </translation>
     </message>
     <message>
         <source>Add some channels first!</source>
@@ -290,6 +258,30 @@
     <message>
         <source>Delete</source>
         <translation>Verwijderen</translation>
+    </message>
+    <message>
+        <source>Delete channel &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete ALL channels?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete all unassigned channels?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete all channels on %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon Import Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download icon for %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -346,22 +338,57 @@
     </message>
 </context>
 <context>
+    <name>ChannelScannerGUIScanPane</name>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="unfinished">Scan voortgang</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="unfinished">Aan het tunen</translation>
+    </message>
+    <message>
+        <source>Rotor Movement</source>
+        <translation type="unfinished">Rotor beweging</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="unfinished">Signaalsterkte</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="unfinished">Signaal/Ruis</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished">Scan</translation>
+    </message>
+    <message>
+        <source>Stop Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished">Vergrendeld</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished">Kan niet vergrendelen</translation>
+    </message>
+</context>
+<context>
     <name>CustomEdit</name>
     <message>
         <source>stored example</source>
         <translation>opgeslagen voorbeeld</translation>
     </message>
     <message>
-        <source>Edit Rule</source>
-        <translation>Opnameregel bewerken</translation>
-    </message>
-    <message>
         <source>&lt;New rule&gt;</source>
         <translation>&lt;Nieuwe opnameregel&gt;</translation>
-    </message>
-    <message>
-        <source>Rule Name</source>
-        <translation>Naam opnameregel</translation>
     </message>
     <message>
         <source>Match an exact title</source>
@@ -488,18 +515,6 @@
         <translation>Eerste afleveringen (compleet voorbeeld voor US)</translation>
     </message>
     <message>
-        <source>Additional Tables</source>
-        <translation>Aanvullende tabellen</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation>Test</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation>Opnemen</translation>
-    </message>
-    <message>
         <source>Store</source>
         <translation>Opslaan</translation>
     </message>
@@ -532,10 +547,6 @@
         <translation>Opgeslagen zoekopdracht</translation>
     </message>
     <message>
-        <source>Add</source>
-        <translation>Voeg toe</translation>
-    </message>
-    <message>
         <source>Match this series</source>
         <translation>Zoek deze series</translation>
     </message>
@@ -550,6 +561,50 @@
     <message>
         <source>Exclude H.264 encoded streams (EIT only)</source>
         <translation>H.264 gecodeerde &apos;stromen&apos; uitsluiten</translation>
+    </message>
+    <message>
+        <source>Only shows with in-vision signing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only shows with in-vision subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Example</source>
+        <translation type="unfinished">Huidig Voorbeeld</translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation type="unfinished">Vervangen</translation>
+    </message>
+    <message>
+        <source>as a search</source>
+        <translation type="unfinished">als een zoekopdracht</translation>
+    </message>
+    <message>
+        <source>as an example</source>
+        <translation type="unfinished">als een voorbeeld</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Verwijderen</translation>
+    </message>
+    <message>
+        <source>Power Search rules no longer reqiure a leading &quot;AND&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Power Search rules can not include semicolon ( ; ) </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>statement terminators.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -1178,6 +1233,10 @@
         <source>Recording Options</source>
         <translation>Opname opties</translation>
     </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Beschrijving</translation>
+    </message>
 </context>
 <context>
     <name>HDHomeRunDeviceID</name>
@@ -1314,10 +1373,6 @@
         <translation>Overslaan</translation>
     </message>
     <message>
-        <source>Channel icon for %1 was downloaded successfully.</source>
-        <translation>Zender icoon voor %1 is succesvol gedownload.</translation>
-    </message>
-    <message>
         <source>Failed to download the icon for %1.</source>
         <translation>Kan icoon voor %1 niet downloaden.</translation>
     </message>
@@ -1344,6 +1399,14 @@
     <message>
         <source>Icon choices submitted successfully.</source>
         <translation>Icoonkeuzes succesvol ingegeven,</translation>
+    </message>
+    <message>
+        <source>No matches found for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon for %1 was downloaded successfully.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1558,33 +1621,6 @@
     </message>
 </context>
 <context>
-    <name>MythContext</name>
-    <message>
-        <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation>Kan geen verbinding maken met de backend server -- staat die aan? Staat het juiste ip-adres ingesteld?</translation>
-    </message>
-    <message>
-        <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation>De verbinding met de backend server is verbroken... Staat die aan?</translation>
-    </message>
-    <message>
-        <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
-        <translation>Deze toepassing is niet compatibel met de geïnstalleerde MythTV bibliotheken. Hercompileer na een make distclean.</translation>
-    </message>
-    <message>
-        <source>Could not connect to the master backend server -- is it running? Is the IP address set for it in the setup program correct?</source>
-        <translation>Kan geen verbinding maken met de backend server -- staat die aan? Staat het juiste ip-adres ingesteld?</translation>
-    </message>
-    <message>
-        <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
-        <translation>De server gebruikt netwerk protocol versien %1, maar deze client begrijpt alleen versie %2. Zorg voor compatibele versies van het backend en frontend.</translation>
-    </message>
-    <message>
-        <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
-        <translation>Plugin %1 is niet compatibel met de geïnstalleerde MythTV bibliotheken. Hercompileer na een make distclean.</translation>
-    </message>
-</context>
-<context>
     <name>MythControls</name>
     <message>
         <source>Modify Action</source>
@@ -1662,6 +1698,790 @@
         <source>Bind Key</source>
         <translation>Koppel toets</translation>
     </message>
+    <message>
+        <source>Page Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle recording status of current program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide back one day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide forward one day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page the program guide right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the current channel as a favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reverse the channel order in the program guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the Program Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the Program Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle through channel groups and all channels in the program guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch channels without exiting guide in Live TV mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase program or channel rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease program or channel rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show program details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch Capture Card view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Custom Record Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Group</source>
+        <translation type="unfinished">Opnamegroep wijzigen</translation>
+    </message>
+    <message>
+        <source>Change Group View</source>
+        <translation type="unfinished">Weergave groepen wijzigen</translation>
+    </message>
+    <message>
+        <source>Clear OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished">Pauze</translation>
+    </message>
+    <message>
+        <source>Fast Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind</source>
+        <translation type="unfinished">Achteruitspoelen</translation>
+    </message>
+    <message>
+        <source>Arbitrary Seek</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the next favorite channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to the previous channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump ahead</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast Forward (Sticky) or Forward one frame while paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind (Sticky) or Rewind one frame while paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Video Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Video Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Commercial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip Commercial (Reverse)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the start of the recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle channel browse mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Picture-in-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Picture-by-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Picture-in-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Picture-by-Picture view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle active PIP/PBP window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap PBP/PIP Windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change PxP view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the video aspect ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Preconfigured Zoom mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle any captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext Captions</source>
+        <translation type="unfinished">Teletekst Ondetiteling Aan/Uit</translation>
+    </message>
+    <message>
+        <source>Toggle Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle VBI CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle ATSC CC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext Menu</source>
+        <translation type="unfinished">Teletekst Menu Aan/Uit</translation>
+    </message>
+    <message>
+        <source>Play audio track 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play audio track 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display subtitle 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display subtitle 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display VBI CC4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display ATSC CC4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous audio track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next subtitle track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous subtitle track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next VBI CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous VBI CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next ATSC CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous ATSC CC track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next of any captions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next video scan overidemode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Queue the current recording for transcoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase the playback speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease the playback speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on time stretch control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle time stretch speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on audio sync adjustment controls</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback picture adjustments</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording picture adjustments for this channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording picture adjustments for this recorder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle Commercial Skip mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the Sleep Timer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Afspelen</translation>
+    </message>
+    <message>
+        <source>Jump to previously played recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display menu of recorded programs to jump to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display scheduled recording list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor Signal Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the DVD Root Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit Show without any prompts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save screenshot of current video frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Red</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Green</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Yellow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Blue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu EPG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear editing cut points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invert Begin/End cut points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load cut list from commercial skips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the next cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to the previous cut point</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump back 10x the normal amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump forward 10x the normal amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Subpage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Subpage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Teletext</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu White</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reveal hidden Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Down Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Left Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Right Arrow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to next widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to preview widget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select</source>
+        <translation type="unfinished">Selecteer</translation>
+    </message>
+    <message>
+        <source>Backspace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Escape</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pop-up menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>More information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Verwijderen</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished">Bewerken</translation>
+    </message>
+    <message>
+        <source>Page to top of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page to middle of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Page to bottom of list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject Removable Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom in on browser window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom out on browser window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle where keyboard input goes to</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move mouse pointer right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mouse Left button click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll down half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll up half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll left half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll right half a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection to next link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move selection to previous link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow selected link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go back to previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go forward to previous page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reload Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished">Programmagids</translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation type="unfinished">Programma Zoeker</translation>
+    </message>
+    <message>
+        <source>Manage Recordings / Fix Conflicts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation type="unfinished">Opnameprioriteit</translation>
+    </message>
+    <message>
+        <source>Manage Recording Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Recording Priorities</source>
+        <translation type="unfinished">Opnameprioriteit per zender</translation>
+    </message>
+    <message>
+        <source>TV Recording Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Recording Deletion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV</source>
+        <translation type="unfinished">Live TV</translation>
+    </message>
+    <message>
+        <source>Live TV In Guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Eerder opgenomen</translation>
+    </message>
+    <message>
+        <source>ScreenShot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV&apos;s native media player.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contexts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open an Xterm window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Mythshutdown settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Mythtv-Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MythPopupBox</name>
@@ -1672,6 +2492,10 @@
     <message>
         <source>Cancel</source>
         <translation>Annuleren</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
     </message>
 </context>
 <context>
@@ -1741,6 +2565,10 @@ Terug naar het vorige menu.</translation>
     <message>
         <source>Ok</source>
         <translation>Ok</translation>
+    </message>
+    <message>
+        <source>Enter password:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2002,14 +2830,6 @@ Terug naar het vorige menu.</translation>
         <translation>Voeg deze opname toe aan de afspeellijst</translation>
     </message>
     <message>
-        <source>There are %1 items in the playlist.</source>
-        <translation>Afspeellijst bevat %1 items.</translation>
-    </message>
-    <message>
-        <source>There is %1 item in the playlist.</source>
-        <translation>Afspeellijst bevat %1 item.</translation>
-    </message>
-    <message>
         <source>Clear Playlist</source>
         <translation>Afspeellijst leegmaken</translation>
     </message>
@@ -2216,10 +3036,6 @@ Bent u zeker van het verwijderen van:</translation>
         <translation>Deze opname is nog niet beschikbaar.</translation>
     </message>
     <message>
-        <source>Actions affect all items in the playlist</source>
-        <translation>Acties beïnvloeden alle items in de afspeellijst</translation>
-    </message>
-    <message>
         <source>Toggle playlist for this Group</source>
         <translation>Afspeellijst aan/uit voor deze Groep</translation>
     </message>
@@ -2270,6 +3086,13 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>Recordings</source>
         <translation>Opnames</translation>
+    </message>
+    <message numerus="yes">
+        <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2336,6 +3159,13 @@ Bent u zeker van het verwijderen van:</translation>
     </message>
 </context>
 <context>
+    <name>PostProcEditor</name>
+    <message>
+        <source>Run &apos;%1&apos;</source>
+        <translation type="unfinished">&apos;%1&apos; uitvoeren</translation>
+    </message>
+</context>
+<context>
     <name>PowerSearchPopup</name>
     <message>
         <source>Select Search</source>
@@ -2359,62 +3189,7 @@ Bent u zeker van het verwijderen van:</translation>
     </message>
 </context>
 <context>
-    <name>PreviousList</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation>Eerder opgenomen</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation>Sorteervolgorde kiezen</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation>Tijd omgekeerd</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation>Titels omgekeerd</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation>OPMERKING: items uit deze lijst weghalen zal geen opnames wissen.</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation>Deze aflevering uit de lijst verwijderen</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation>Alle afleveringen van dit programma verwijderen</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
-    <message>
-        <source>Allow this episode to re-record</source>
-        <translation>Deze aflevering opnieuw opnemen toestaan</translation>
-    </message>
-    <message>
-        <source>Never record this episode</source>
-        <translation>Deze aflevering nooit opnemen</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation>Tijd</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation>Titel</translation>
-    </message>
-</context>
-<context>
     <name>ProgDetails</name>
-    <message>
-        <source>Sorry, this screen requires Qt 4.4 or greater</source>
-        <translation>Sorry, dit scherm vereist Qt 4.4 of later</translation>
-    </message>
     <message>
         <source>Options</source>
         <translation>Opties</translation>
@@ -2434,6 +3209,255 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>Cancel</source>
         <translation>Annuleren</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">Titel</translation>
+    </message>
+    <message>
+        <source>Title Pronounce</source>
+        <translation type="unfinished">Titel Uitspraak</translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation type="unfinished">Deel %1 van %2,</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n star(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n ster(ren)</numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Mono</source>
+        <translation type="unfinished">Mono</translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation type="unfinished">Stereo</translation>
+    </message>
+    <message>
+        <source>Surround Sound</source>
+        <translation type="unfinished">Surround Sound</translation>
+    </message>
+    <message>
+        <source>Dolby Sound</source>
+        <translation type="unfinished">Dolby Sound</translation>
+    </message>
+    <message>
+        <source>Audio for Hearing Impaired</source>
+        <translation type="unfinished">Audio voor slechthorenden</translation>
+    </message>
+    <message>
+        <source>Audio for Visually Impaired</source>
+        <translation type="unfinished">Audio voor slechtzienden</translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation type="unfinished">HDTV</translation>
+    </message>
+    <message>
+        <source>Widescreen</source>
+        <translation type="unfinished">Breedbeeld</translation>
+    </message>
+    <message>
+        <source>AVC/H.264</source>
+        <translation type="unfinished">AVC/H.264</translation>
+    </message>
+    <message>
+        <source>720p Resolution</source>
+        <translation type="unfinished">720p resolutie</translation>
+    </message>
+    <message>
+        <source>1080i/p Resolution</source>
+        <translation type="unfinished">1080i/p resolutie</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Closed Captioned</comment>
+        <translation type="unfinished">OND</translation>
+    </message>
+    <message>
+        <source>Subtitles Available</source>
+        <translation type="unfinished">Ondertiteling beschikbaar</translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation type="unfinished">Ondertiteld</translation>
+    </message>
+    <message>
+        <source>Deaf Signing</source>
+        <translation type="unfinished">Met gebarentolk</translation>
+    </message>
+    <message>
+        <source>Unidentified Episode</source>
+        <translation type="unfinished">Niet geïdentificeerde aflevering</translation>
+    </message>
+    <message>
+        <source>Repeat</source>
+        <translation type="unfinished">Herhaling</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished">Beschrijving</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished">Categorie</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation type="unfinished">Type</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation type="unfinished">Aflevering nummer</translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation type="unfinished">Oorspronkelijke uitzenddatum</translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation type="unfinished">Programma-ID</translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation type="unfinished">Acteurs</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation type="unfinished">Regisseur</translation>
+    </message>
+    <message>
+        <source>Producer</source>
+        <translation type="unfinished">Regisseur</translation>
+    </message>
+    <message>
+        <source>Executive Producer</source>
+        <translation type="unfinished">Executive producer</translation>
+    </message>
+    <message>
+        <source>Writer</source>
+        <translation type="unfinished">Schrijver</translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation type="unfinished">Gastrol</translation>
+    </message>
+    <message>
+        <source>Host</source>
+        <translation type="unfinished">Gastheer</translation>
+    </message>
+    <message>
+        <source>Adapter</source>
+        <translation type="unfinished">Adapter</translation>
+    </message>
+    <message>
+        <source>Presenter</source>
+        <translation type="unfinished">Presentator</translation>
+    </message>
+    <message>
+        <source>Commentator</source>
+        <translation type="unfinished">Commentator</translation>
+    </message>
+    <message>
+        <source>Guest</source>
+        <translation type="unfinished">Gast</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n uur</numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Auto-expire off</source>
+        <translation type="unfinished">Automatisch vervallen uit</translation>
+    </message>
+    <message>
+        <source>Marked as &apos;watched&apos;</source>
+        <translation type="unfinished">Gemarkeerd als &apos;Gezien&apos;</translation>
+    </message>
+    <message>
+        <source>Not the earliest episode</source>
+        <translation type="unfinished">Niet de eerste aflevering</translation>
+    </message>
+    <message>
+        <source>Recently deleted episode</source>
+        <translation type="unfinished">Recent verwijderde aflevering</translation>
+    </message>
+    <message>
+        <source>Recording Rule</source>
+        <translation type="unfinished">Opnameregel</translation>
+    </message>
+    <message>
+        <source>Last Recorded</source>
+        <translation type="unfinished">Laatst opgenomen</translation>
+    </message>
+    <message>
+        <source>Next Recording</source>
+        <translation type="unfinished">Volgende opname</translation>
+    </message>
+    <message>
+        <source>Average Time Shift</source>
+        <translation type="unfinished">Gemiddelde tijdsverschuiving</translation>
+    </message>
+    <message>
+        <source>Watch List Score</source>
+        <translation type="unfinished">Nog niet gezien score</translation>
+    </message>
+    <message>
+        <source>Watch List Status</source>
+        <translation type="unfinished">Nog niet gezien status</translation>
+    </message>
+    <message>
+        <source>Search Phrase</source>
+        <translation type="unfinished">Zin zoeken</translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation type="unfinished">ID vinden</translation>
+    </message>
+    <message>
+        <source>GB</source>
+        <comment>GigaBytes</comment>
+        <translation type="unfinished">GB</translation>
+    </message>
+    <message>
+        <source>Recording Host</source>
+        <translation type="unfinished">Opnametoestel</translation>
+    </message>
+    <message>
+        <source>Recorded File Name</source>
+        <translation type="unfinished">Naam van het opgenomen bestand</translation>
+    </message>
+    <message>
+        <source>Recorded File Size</source>
+        <translation type="unfinished">Grootte van opgenomen bestand</translation>
+    </message>
+    <message>
+        <source>Recording Profile</source>
+        <translation type="unfinished">Opnameprofiel</translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished">Opnamegroep</translation>
+    </message>
+    <message>
+        <source>Storage Group</source>
+        <translation type="unfinished">Opslaggroep</translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation type="unfinished">Afspeelgroep</translation>
     </message>
 </context>
 <context>
@@ -2698,10 +3722,6 @@ Bent u zeker van het verwijderen van:</translation>
         <translation>Opnameregel verwijderen</translation>
     </message>
     <message>
-        <source>Delete Old Recorded</source>
-        <translation>Oude opnames verwijderen</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
@@ -2761,224 +3781,17 @@ Bent u zeker van het verwijderen van:</translation>
         <source>Program List</source>
         <translation>Programmalijst</translation>
     </message>
-</context>
-<context>
-    <name>ProgListerQt</name>
     <message>
-        <source>Program Listings</source>
-        <translation>Programmaoverzicht</translation>
+        <source>Delete Episode</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New Title Search</source>
-        <translation>Nieuwe Zoekopdracht op titel</translation>
+        <source>Delete this episode of &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Title Search</source>
-        <translation>Op titel zoeken</translation>
-    </message>
-    <message>
-        <source>Keyword Search</source>
-        <translation>Op kernwoorden zoeken</translation>
-    </message>
-    <message>
-        <source>People Search</source>
-        <translation>Op personen zoeken</translation>
-    </message>
-    <message>
-        <source>Stored Search</source>
-        <translation>Opgeslagen zoekopdracht</translation>
-    </message>
-    <message>
-        <source>Power Search</source>
-        <translation>Geavanceerd zoeken</translation>
-    </message>
-    <message>
-        <source>Rule Search</source>
-        <translation>Regel zoeken</translation>
-    </message>
-    <message>
-        <source>Category Search</source>
-        <translation>Op categorie zoeken</translation>
-    </message>
-    <message>
-        <source>Channel Search</source>
-        <translation>Op kanaal zoeken</translation>
-    </message>
-    <message>
-        <source>Movie Search</source>
-        <translation>Film zoeken</translation>
-    </message>
-    <message>
-        <source>Time Search</source>
-        <translation>Op tijd zoeken</translation>
-    </message>
-    <message>
-        <source>Unknown Search</source>
-        <translation>Onbekende zoekopdracht</translation>
-    </message>
-    <message>
-        <source>Select Rating</source>
-        <translation>Selecteer classificatie</translation>
-    </message>
-    <message>
-        <source>Select Channel</source>
-        <translation>Selecteer kanaal</translation>
-    </message>
-    <message>
-        <source>Select Category</source>
-        <translation>Selecteer categorie</translation>
-    </message>
-    <message>
-        <source>Select List</source>
-        <translation>Selecteer lijst</translation>
-    </message>
-    <message>
-        <source>Select a search stored from</source>
-        <translation>Selecteer een opgeslagen zoekopdracht</translation>
-    </message>
-    <message>
-        <source>Custom Record</source>
-        <translation>Aangepaste opname</translation>
-    </message>
-    <message>
-        <source>Select</source>
-        <translation>Selecteer</translation>
-    </message>
-    <message>
-        <source>0 .. 9 moves to Nx10 percent in list</source>
-        <translation>0..9 verplaatst naar Nx10 procent in lijst</translation>
-    </message>
-    <message>
-        <source>Select Phrase</source>
-        <translation>Selecteer zin</translation>
-    </message>
-    <message>
-        <source>&lt;New Phrase&gt;</source>
-        <translation>&lt;Nieuwe Zin&gt;</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Verwijderen</translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation>Opnemen</translation>
-    </message>
-    <message>
-        <source>Select Search</source>
-        <translation>Selecteer Zoekopdracht</translation>
-    </message>
-    <message>
-        <source>&lt;New Search&gt;</source>
-        <translation>&lt;Nieuwe Zoekopdracht&gt;</translation>
-    </message>
-    <message>
-        <source>Edit</source>
-        <translation>Bewerken</translation>
-    </message>
-    <message>
-        <source>Select Time</source>
-        <translation>Selecteer tijd</translation>
-    </message>
-    <message>
-        <source>Edit Power Search Fields</source>
-        <translation>Pas geavanceerde zoekopdracht aan</translation>
-    </message>
-    <message>
-        <source>Optional title phrase:</source>
-        <translation>Optionele titel zin:</translation>
-    </message>
-    <message>
-        <source>Optional subtitle phrase:</source>
-        <translation>Optionele afleveringstitel:</translation>
-    </message>
-    <message>
-        <source>Optional description phrase:</source>
-        <translation>Optionele beschrijving:</translation>
-    </message>
-    <message>
-        <source>(Any Program Type)</source>
-        <translation>(Elk programma type)</translation>
-    </message>
-    <message>
-        <source>Movies</source>
-        <translation>Films</translation>
-    </message>
-    <message>
-        <source>Series</source>
-        <translation>Series</translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation>Uitzending</translation>
-    </message>
-    <message>
-        <source>Sports</source>
-        <translation>Sport</translation>
-    </message>
-    <message>
-        <source>(Any Genre)</source>
-        <translation>(elk genre)</translation>
-    </message>
-    <message>
-        <source>(Any Station)</source>
-        <translation>(elke zender)</translation>
-    </message>
-    <message>
-        <source>Delete &apos;%1&apos; %2 rule?</source>
-        <translation>Verwijder regel &apos;%1&apos; %2?</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>Alle</translation>
-    </message>
-    <message>
-        <source>Premieres</source>
-        <translation>Premieres</translation>
-    </message>
-    <message>
-        <source>Specials</source>
-        <translation>Specials</translation>
-    </message>
-    <message>
-        <source>Unrated</source>
-        <translation>Ongeclassificeerd</translation>
-    </message>
-    <message>
-        <source>At least ***/</source>
-        <translation>Minstens ***/</translation>
-    </message>
-    <message>
-        <source>At least ***</source>
-        <translation>Minstens ***</translation>
-    </message>
-    <message>
-        <source>At least **/</source>
-        <translation>Minstens **/</translation>
-    </message>
-    <message>
-        <source>At least **</source>
-        <translation>Minstens **</translation>
-    </message>
-    <message>
-        <source>At least */</source>
-        <translation>Minstens */</translation>
-    </message>
-    <message>
-        <source>At least *</source>
-        <translation>Minstens *</translation>
-    </message>
-    <message>
-        <source>At least /</source>
-        <translation>Minstens /</translation>
-    </message>
-    <message>
-        <source>Power Recording Rule</source>
-        <translation>Geavanceerde opnameregel</translation>
+        <source>Delete all episodes of &apos;%1&apos;?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3074,6 +3887,14 @@ Bent u zeker van het verwijderen van:</translation>
     <message>
         <source>Schedule Priorities</source>
         <translation>Plan prioriteiten</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">Standaard</translation>
+    </message>
+    <message>
+        <source>Any</source>
+        <translation type="unfinished">Elke</translation>
     </message>
 </context>
 <context>
@@ -4231,10 +5052,6 @@ Bent u zeker van het verwijderen van:</translation>
         <translation>Wanneer u deze instelling verandert, zou de tekst hieronder moeten veranderen in de naam en type van uw kaart. Als de kaart niet geopend kan worden verschijnt er een foutmelding.</translation>
     </message>
     <message>
-        <source>Status</source>
-        <translation>Status</translation>
-    </message>
-    <message>
         <source>Recorder Options</source>
         <translation>Recorder Opties</translation>
     </message>
@@ -4440,10 +5257,6 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     <message>
         <source>this episode will be recorded at an earlier time instead.</source>
         <translation>deze aflevering zal op een vroeger tijdstip opgenomen worden.</translation>
-    </message>
-    <message>
-        <source>Clear Override</source>
-        <translation>Aanpassing wissen</translation>
     </message>
     <message>
         <source>30m</source>
@@ -4744,34 +5557,6 @@ Wordt niet gebruikt bij hardware-encoder TV-kaarten.</translation>
         <translation>Niet opnemen</translation>
     </message>
     <message>
-        <source>Reactivate</source>
-        <translation>Opnieuw activeren</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record</source>
-        <translation>Niet opnemen</translation>
-    </message>
-    <message>
-        <source>Never record</source>
-        <translation>Nooit opnemen</translation>
-    </message>
-    <message>
-        <source>Edit Options</source>
-        <translation>Opties bewerken</translation>
-    </message>
-    <message>
-        <source>Add Override</source>
-        <translation>Aanpassing toevoegen</translation>
-    </message>
-    <message>
-        <source>Edit Override</source>
-        <translation>Aanpassing bewerken</translation>
-    </message>
-    <message>
-        <source>Record anyway</source>
-        <translation>Toch opnemen</translation>
-    </message>
-    <message>
         <source>External application or script to run when a keypress is received by LIRC.</source>
         <translation>Externe toepassing of script dat uitgevoerd wordt wanneer een druk op de toets ontvangen wordt door LIRC.</translation>
     </message>
@@ -4850,50 +5635,12 @@ Vul niets in om optie uit te schakelen.</translation>
         <translation>deze aflevering op een later tijdstip opgenomen wordt opgenomen.</translation>
     </message>
     <message>
-        <source> The following programs will be recorded instead:
-</source>
-        <translation> De volgende programma &apos;s worden wel opgenomen:
-</translation>
-    </message>
-    <message>
-        <source>Forget Previous</source>
-        <translation>Vergeet voorgaande</translation>
-    </message>
-    <message>
         <source>Any</source>
         <translation>Elke</translation>
     </message>
     <message>
         <source>Record using the &quot;%1&quot; profile</source>
         <translation>Met &quot;%1&quot; opnameprofiel opnemen</translation>
-    </message>
-    <message>
-        <source>Scheduling Options</source>
-        <translation>Programmeer opties</translation>
-    </message>
-    <message>
-        <source>Storage Options</source>
-        <translation>Opslag opties</translation>
-    </message>
-    <message>
-        <source>Create New Recording Group</source>
-        <translation>Maak nieuwe opnamegroep</translation>
-    </message>
-    <message>
-        <source>Select Recording Schedule</source>
-        <translation>Opnameschema kiezen</translation>
-    </message>
-    <message>
-        <source>Select Recording Group</source>
-        <translation>Opnamegroep kiezen</translation>
-    </message>
-    <message>
-        <source>Create a new recording group</source>
-        <translation>Nieuwe opnamegroep maken</translation>
-    </message>
-    <message>
-        <source>Program details</source>
-        <translation>Programmadetails</translation>
     </message>
     <message>
         <source>If specified, this command will be run to change the channel for inputs which have an external tuner device such as a cable box. The first argument will be the channel number.</source>
@@ -5106,10 +5853,6 @@ Wanneer bureaubladstijl wordt geselecteerd zal MythTV de huidige instellingen va
         <translation>Deze instelling en de vorige bepalen een tijdsperiode waarin mythfilldatabase uitgevoerd mag worden. Bv. start op 11 instellen en einde op 13 betekent dat mythfilldatabase mag uitgevoerd worden van 11.00 tot 13.00.</translation>
     </message>
     <message>
-        <source>Save these settings</source>
-        <translation>Deze instellingen opslaan</translation>
-    </message>
-    <message>
         <source>Show group summary</source>
         <translation>Samenvatting groep tonen</translation>
     </message>
@@ -5122,152 +5865,8 @@ Wanneer bureaubladstijl wordt geselecteerd zal MythTV de huidige instellingen va
         <translation>Regie:</translation>
     </message>
     <message>
-        <source>Do not record this program</source>
-        <translation>Dit programma niet opnemen</translation>
-    </message>
-    <message>
-        <source>Record only this showing</source>
-        <translation>Enkel deze aflevering opnemen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation>Elke week op dit tijdstip opnemen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation>Dagelijks op dit tijdstip opnemen</translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation>Altijd op deze zender opnemen</translation>
-    </message>
-    <message>
-        <source>Record at any time on any channel</source>
-        <translation>Altijd op elke zender opnemen</translation>
-    </message>
-    <message>
-        <source>Record this showing with normal options</source>
-        <translation>Deze aflevering met normale opties opnemen</translation>
-    </message>
-    <message>
-        <source>Record this showing with override options</source>
-        <translation>Deze aflevering met aangepaste opties opnemen</translation>
-    </message>
-    <message>
-        <source>Do not allow this showing to be recorded</source>
-        <translation>Deze uitzending verhinderen van opgenomen worden</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minutes late</source>
-        <translation>Opname %1 minuten later beginnen</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minute late</source>
-        <translation>Opname %1 minuut later beginnen</translation>
-    </message>
-    <message>
-        <source>Start recording on time</source>
-        <translation>Opname op tijd beginnen</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minute early</source>
-        <translation>Opname %1 minuut eerder beginnen</translation>
-    </message>
-    <message>
-        <source>Start recording %1 minutes early</source>
-        <translation>Opname %1 minuten eerder beginnen</translation>
-    </message>
-    <message>
-        <source>End recording %1 minutes early</source>
-        <translation>Opname %1 minuten eerder stoppen</translation>
-    </message>
-    <message>
-        <source>End recording %1 minute early</source>
-        <translation>Opname %1 minuut eerder stoppen</translation>
-    </message>
-    <message>
-        <source>End recording on time</source>
-        <translation>Opname op tijd stoppen</translation>
-    </message>
-    <message>
-        <source>End recording %1 minute late</source>
-        <translation>Opname %1 minuut later stoppen</translation>
-    </message>
-    <message>
-        <source>End recording %1 minutes late</source>
-        <translation>Opname %1 minuten later stoppen</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current and previous recordings</source>
-        <translation>Dubbels in huidige en al verwijderde opnames zoeken</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in current recordings only</source>
-        <translation>Dubbels enkel in huidige opnames zoeken</translation>
-    </message>
-    <message>
-        <source>Look for duplicates in previous recordings only</source>
-        <translation>Dubbels enkel in al verwijderde opnames zoeken</translation>
-    </message>
-    <message>
-        <source>[ Match duplicates with ]</source>
-        <translation>[ Dubbels detecteren door ]</translation>
-    </message>
-    <message>
-        <source>Record new episodes only</source>
-        <translation>Enkel nieuwe afleveringen opnemen</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle &amp; description</source>
-        <translation>Dubbel via beschrijving en afleveringstitel detecteren</translation>
-    </message>
-    <message>
-        <source>Match duplicates using subtitle</source>
-        <translation>Dubbel via afleveringstitel detecteren</translation>
-    </message>
-    <message>
-        <source>Match duplicates using description</source>
-        <translation>Dubbel via beschrijving detecteren</translation>
-    </message>
-    <message>
-        <source>Don&apos;t match duplicates</source>
-        <translation>Dubbels niet detecteren</translation>
-    </message>
-    <message>
-        <source>[ Select recording Profile ]</source>
-        <translation>[ Opnameprofiel kiezen ]</translation>
-    </message>
-    <message>
-        <source>Allow auto expire</source>
-        <translation>Automatisch vervallen toestaan</translation>
-    </message>
-    <message>
-        <source>Don&apos;t allow auto expire</source>
-        <translation>Automatisch vervallen niet toestaan</translation>
-    </message>
-    <message>
-        <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation>Niet opnemen indien meer afleveringen dan max. toegelaten</translation>
-    </message>
-    <message>
-        <source>No episode limit</source>
-        <translation>Geen beperking op aantal afleveringen</translation>
-    </message>
-    <message>
-        <source>Keep only one episode.</source>
-        <translation>Enkel één aflevering bewaren</translation>
-    </message>
-    <message>
-        <source>Keep at most %1 episodes</source>
-        <translation>Maximaal %1 afleveringen bewaren</translation>
-    </message>
-    <message>
         <source>Show the program guide when starting Live TV</source>
         <translation>Programmagids bij starten LiveTV</translation>
-    </message>
-    <message>
-        <source>Post Recording Processing</source>
-        <translation>Processing na opname</translation>
     </message>
     <message>
         <source>The horizontal offset the GUI will be displayed at.  May only work if run in a window.</source>
@@ -5327,89 +5926,16 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
         <translation>Taakrij (globaal)</translation>
     </message>
     <message>
-        <source>Title</source>
-        <translation>Titel</translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation>Beschrijving</translation>
-    </message>
-    <message>
-        <source>Part %1 of %2, </source>
-        <translation>Deel %1 van %2,</translation>
-    </message>
-    <message>
-        <source>HDTV</source>
-        <translation>HDTV</translation>
-    </message>
-    <message>
-        <source>Subtitled</source>
-        <translation>Ondertiteld</translation>
-    </message>
-    <message>
         <source>Stereo</source>
         <translation>Stereo</translation>
-    </message>
-    <message>
-        <source>Category</source>
-        <translation>Categorie</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <comment>category_type</comment>
-        <translation>Type</translation>
-    </message>
-    <message>
-        <source>Episode Number</source>
-        <translation>Aflevering nummer</translation>
-    </message>
-    <message>
-        <source>Original Airdate</source>
-        <translation>Oorspronkelijke uitzenddatum</translation>
     </message>
     <message>
         <source>Program ID</source>
         <translation>Programma-ID</translation>
     </message>
     <message>
-        <source>Actors</source>
-        <translation>Acteurs</translation>
-    </message>
-    <message>
-        <source>Guest Star</source>
-        <translation>Gastrol</translation>
-    </message>
-    <message>
-        <source>Director</source>
-        <translation>Regisseur</translation>
-    </message>
-    <message>
-        <source>Recording Group</source>
-        <translation>Opnamegroep</translation>
-    </message>
-    <message>
-        <source>Stop recording</source>
-        <translation>Opnemen stoppen</translation>
-    </message>
-    <message>
         <source>Power Search</source>
         <translation>Geavanceerd zoeken</translation>
-    </message>
-    <message>
-        <source>Commercial Flag new recordings</source>
-        <translation>Reclameblokken markeren bij nieuwe opnames</translation>
-    </message>
-    <message>
-        <source>Do not Commercial Flag new recordings</source>
-        <translation>Reclameblokken NIET markeren bij nieuwe opnames</translation>
-    </message>
-    <message>
-        <source>Run &apos;%1&apos;</source>
-        <translation>&apos;%1&apos; uitvoeren</translation>
-    </message>
-    <message>
-        <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation>&apos;%1&apos; niet uitvoeren bij nieuwe opnames</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -5580,10 +6106,6 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
         <translation>Indien geselecteerd zal QuickTime de gamma van video aanpassen aan uw monitor. Uitschakelen kan CPU-kracht sparen.</translation>
     </message>
     <message>
-        <source>Recording Host</source>
-        <translation>Opnametoestel</translation>
-    </message>
-    <message>
         <source>Use on air guide</source>
         <translation>EPG gebruiken</translation>
     </message>
@@ -5640,10 +6162,6 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
         <translation>dit opnameschema in niet actief.</translation>
     </message>
     <message>
-        <source>Find ID</source>
-        <translation>ID vinden</translation>
-    </message>
-    <message>
         <source>6 MHz</source>
         <translation>6 MHz</translation>
     </message>
@@ -5654,30 +6172,6 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     <message>
         <source>8 MHz</source>
         <translation>8 MHz</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title</source>
-        <translation>Eén aflevering op van dit programma opnemen</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every week</source>
-        <translation>Elke week één aflevering op van dit programma opnemen</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every day</source>
-        <translation>Elke dag één aflevering van dit programma opnemen</translation>
-    </message>
-    <message>
-        <source>This recording rule is inactive</source>
-        <translation>Dit opnameschema is niet actief</translation>
-    </message>
-    <message>
-        <source>This recording rule is active</source>
-        <translation>Dit opnameschema is actief</translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceed the max episodes</source>
-        <translation>Oudste wissen indien meer dan max. toegelaten</translation>
     </message>
     <message>
         <source>All</source>
@@ -6043,14 +6537,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>Uitgaand</translation>
     </message>
     <message>
-        <source>Default refresh rate when watching a video.</source>
-        <translation>Standaard verversingssnelheid wanneer er een video wordt gekeken.</translation>
-    </message>
-    <message>
-        <source>Refresh rate when watching a video at a specific resolution.</source>
-        <translation>Verversingssnelheid wanneer er een video wordt gekeken op een bepaalde resolutie.</translation>
-    </message>
-    <message>
         <source>Rate</source>
         <translation>Snelheid</translation>
     </message>
@@ -6136,18 +6622,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>Transcode met &quot;%1&quot;</translation>
     </message>
     <message>
-        <source>Transcode new recordings</source>
-        <translation>Transcode uitvoeren bij nieuwe opnames</translation>
-    </message>
-    <message>
-        <source>Do not Transcode new recordings</source>
-        <translation>Transcode niet uitvoeren bij nieuwe opnames</translation>
-    </message>
-    <message>
-        <source>[ Select transcoder ]</source>
-        <translation>[ Selecteer transcoder ]</translation>
-    </message>
-    <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the sound card.  Note: Do not set this too low.</source>
         <translation>Initieel volume voor de Mastermixer.  Dit beïnvloedt al het geluid van de geluidskaart. Let op: niet te laag instellen.</translation>
     </message>
@@ -6166,42 +6640,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>Remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
         <translation>Laatst geselecteerde filter onthouden in plaats het standaard filter, wanneer u het afspeelscherm opent.</translation>
-    </message>
-    <message>
-        <source>Default View</source>
-        <translation>Standaard weergave</translation>
-    </message>
-    <message>
-        <source>Show Titles only</source>
-        <translation>Enkel titels laten zien</translation>
-    </message>
-    <message>
-        <source>Show Titles and Categories</source>
-        <translation>Titels en categorieën laten zien</translation>
-    </message>
-    <message>
-        <source>Show Titles, Categories, and Recording Groups</source>
-        <translation>Titels, categorieën en opnamegroepen laten zien</translation>
-    </message>
-    <message>
-        <source>Show Titles and Recording Groups</source>
-        <translation>Titels en opnamegroepen laten zien</translation>
-    </message>
-    <message>
-        <source>Show Categories only</source>
-        <translation>Enkel categorieën laten zien</translation>
-    </message>
-    <message>
-        <source>Show Categories and Recording Groups</source>
-        <translation>Categorieën en opnamegroepen laten zien</translation>
-    </message>
-    <message>
-        <source>Show Recording Groups only</source>
-        <translation>Enkel opnamegroepen laten zien</translation>
-    </message>
-    <message>
-        <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
-        <translation>Standaard type groepering dat het &apos;Opnames bekijken&apos; scherm zal gebruiken.</translation>
     </message>
     <message>
         <source>Show filter name instead of &quot;All Programs&quot;</source>
@@ -6428,10 +6866,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>This showing was not recorded because it was manually cancelled.</source>
         <translation>Dit programma werd niet opgenomen omdat het manueel geannuleerd werd.</translation>
-    </message>
-    <message>
-        <source>Change Ending Time</source>
-        <translation>Eindtijd veranderen</translation>
     </message>
     <message>
         <source>Signal Timeout (msec)</source>
@@ -6814,14 +7248,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>&apos;PIP&apos;</translation>
     </message>
     <message>
-        <source>Schedule Information</source>
-        <translation>Tijdschema informatie</translation>
-    </message>
-    <message>
-        <source>Preview schedule changes</source>
-        <translation>Tijdschemaveranderingen bekijken</translation>
-    </message>
-    <message>
         <source>The following programs will be recorded instead:</source>
         <translation>De volgende uitzendingen zullen worden opgenomen:</translation>
     </message>
@@ -6850,64 +7276,12 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>Beginsnelheid voor afspelen met aangepast geluid. Gebruik 100 voor normale snelheid, 50 voor halve snelheid en 200 voor dubbele snelheid.</translation>
     </message>
     <message>
-        <source>Playback Group</source>
-        <translation>Afspeelgroep</translation>
-    </message>
-    <message>
-        <source>Select Playback Group</source>
-        <translation>Afspeelgroep selecteren</translation>
-    </message>
-    <message>
         <source>Daily Wakeup/ShutDown Period</source>
         <translation>Dagelijkse ontwaak-/uitschakeltijd</translation>
     </message>
     <message>
-        <source>Use &quot;%1&quot; playback group settings</source>
-        <translation>&quot;%1&quot; afspeelgroepinstellingen gebruiken</translation>
-    </message>
-    <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
         <translation>MythTV zal automatisch dit aantal seconden terugspoelen na het overslaan van een reclameblok.</translation>
-    </message>
-    <message>
-        <source>Unidentified Episode</source>
-        <translation>Niet geïdentificeerde aflevering</translation>
-    </message>
-    <message>
-        <source>Producer</source>
-        <translation>Regisseur</translation>
-    </message>
-    <message>
-        <source>Executive Producer</source>
-        <translation>Executive producer</translation>
-    </message>
-    <message>
-        <source>Writer</source>
-        <translation>Schrijver</translation>
-    </message>
-    <message>
-        <source>Host</source>
-        <translation>Gastheer</translation>
-    </message>
-    <message>
-        <source>Adapter</source>
-        <translation>Adapter</translation>
-    </message>
-    <message>
-        <source>Presenter</source>
-        <translation>Presentator</translation>
-    </message>
-    <message>
-        <source>Commentator</source>
-        <translation>Commentator</translation>
-    </message>
-    <message>
-        <source>Guest</source>
-        <translation>Gast</translation>
-    </message>
-    <message>
-        <source>Recording Profile</source>
-        <translation>Opnameprofiel</translation>
     </message>
     <message>
         <source>Allows the transcoder to resize the video during transcoding.</source>
@@ -6920,10 +7294,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>Only reencode where absolutely needed (normally only around cutpoints).  Otherwise keep audio and video formats identical to the source.  This should result in the highest quality, but won&apos;t save as much space.</source>
         <translation>Enkel opnieuw coderen waar absoluut nodig (meestal enkel rondom knippunten). Op andere plaatsen video en audio identiek aan het origineel houden. Dit resulteert in de hoogste kwaliteit, maar zal niet zoveel plaats besparen.</translation>
-    </message>
-    <message>
-        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
-        <translation>Voer groepsnaam in of druk op &apos;SELECTEER&apos; om tekst via het &apos;On Screen Keyboard&apos; in te voeren.</translation>
     </message>
     <message>
         <source>Display Name (optional)</source>
@@ -6986,22 +7356,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <source>N</source>
         <comment>RecStatusChar rsNotListed</comment>
         <translation>N</translation>
-    </message>
-    <message>
-        <source>Title Pronounce</source>
-        <translation>Titel Uitspraak</translation>
-    </message>
-    <message>
-        <source>Recording Rule</source>
-        <translation>Opnameregel</translation>
-    </message>
-    <message>
-        <source>Search Phrase</source>
-        <translation>Zin zoeken</translation>
-    </message>
-    <message>
-        <source>Recorded File Size</source>
-        <translation>Grootte van opgenomen bestand</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
@@ -7127,11 +7481,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>the backend recorder is off-line.</source>
         <translation>het backend opname apparaat is niet bereikbaar.</translation>
-    </message>
-    <message>
-        <source>CC</source>
-        <comment>Closed Captioned</comment>
-        <translation>OND</translation>
     </message>
     <message>
         <source>Use DishNet Long-term EIT Data</source>
@@ -7546,18 +7895,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>Gebruik een positief getal als u dit een voorkeurs kanaal wilt laten zijn, anders een negatief getal.</translation>
     </message>
     <message>
-        <source>Current Example</source>
-        <translation>Huidig Voorbeeld</translation>
-    </message>
-    <message>
-        <source>Store</source>
-        <translation>Opslaan</translation>
-    </message>
-    <message>
-        <source>Replace</source>
-        <translation>Vervangen</translation>
-    </message>
-    <message>
         <source>Track</source>
         <translation>Spoor</translation>
     </message>
@@ -7641,18 +7978,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
     <message>
         <source>Cable IRC</source>
         <translation>Kabel IRC</translation>
-    </message>
-    <message>
-        <source>Use any available input</source>
-        <translation>Gebruik elke aanwezige ingang</translation>
-    </message>
-    <message>
-        <source>Prefer input %1</source>
-        <translation>Prefereer ingang %1</translation>
-    </message>
-    <message>
-        <source>Select Preferred Input</source>
-        <translation>Selecteer de voorkeurs Ingang</translation>
     </message>
     <message>
         <source>UNKNOWN%1</source>
@@ -7873,18 +8198,6 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat op auto staan, ten
         <translation>De optie om alleen &quot;Hoge&quot; frequencie kanalen te scannen is handig omdat de meeste digitale kanalen op de hogere frequenties zitten.</translation>
     </message>
     <message>
-        <source>Upcoming episodes for this title</source>
-        <translation>Volgende afleveringen van deze titel</translation>
-    </message>
-    <message>
-        <source>Upcoming episodes for this rule</source>
-        <translation>Volgende afleveringen voor deze regel</translation>
-    </message>
-    <message>
-        <source>Previously scheduled episodes</source>
-        <translation>Vantevoren geplande afleveringen</translation>
-    </message>
-    <message>
         <source>Choose the model that most closely resembles your set top box. Depending on firmware revision SA4200HD may work better for a SA3250HD box.</source>
         <translation>Kies het model dat het dichtst bij uw settop box ligt. Afhankelijk van de firmware kan het zijn dat revisie SA4200HD beter werkt voor een SA3250HD apparaat.</translation>
     </message>
@@ -8041,42 +8354,6 @@ The frequency for this channel in</source>
         <translation>Andere uitzendingen</translation>
     </message>
     <message>
-        <source>Last Recorded</source>
-        <translation>Laatst opgenomen</translation>
-    </message>
-    <message>
-        <source>Next Recording</source>
-        <translation>Volgende opname</translation>
-    </message>
-    <message>
-        <source>Watch List Score</source>
-        <translation>Nog niet gezien score</translation>
-    </message>
-    <message>
-        <source>Auto-expire off</source>
-        <translation>Automatisch vervallen uit</translation>
-    </message>
-    <message>
-        <source>Marked as &apos;watched&apos;</source>
-        <translation>Gemarkeerd als &apos;Gezien&apos;</translation>
-    </message>
-    <message>
-        <source>Not the earliest episode</source>
-        <translation>Niet de eerste aflevering</translation>
-    </message>
-    <message>
-        <source>Recently deleted episode</source>
-        <translation>Recent verwijderde aflevering</translation>
-    </message>
-    <message>
-        <source>Watch List Status</source>
-        <translation>Nog niet gezien status</translation>
-    </message>
-    <message>
-        <source>Storage Group</source>
-        <translation>Opslaggroep</translation>
-    </message>
-    <message>
         <source>SAP/Bilingual</source>
         <translation>SAP/Tweetalig</translation>
     </message>
@@ -8109,30 +8386,6 @@ The frequency for this channel in</source>
         <translation>Hoogte die gebruikt wordt tijdens encoden. Opmerking: PVR-x50 kaarten kunnen ghosting produceren indien dit niet op 480 ingesteld voor NTSC of 576 voor PAL.</translation>
     </message>
     <message>
-        <source>Include in the &quot;%1&quot; recording group</source>
-        <translation>Toevoegen aan de &apos;%1&apos; opnamegroep</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes</source>
-        <translation>Niet geïdentificeerde afleveringen uitsluiten</translation>
-    </message>
-    <message>
-        <source>Exclude old episodes</source>
-        <translation>Oude aflevering uitsluiten</translation>
-    </message>
-    <message>
-        <source>Select Storage Group</source>
-        <translation>Opslag groep kiezen</translation>
-    </message>
-    <message>
-        <source>Store in the &quot;%1&quot; storage group</source>
-        <translation>In de &quot;%1&quot; opslaggroep bewaren</translation>
-    </message>
-    <message>
-        <source>LiveTV</source>
-        <translation>Live TV</translation>
-    </message>
-    <message>
         <source>Listings grabber</source>
         <translation>TV-gids grabber</translation>
     </message>
@@ -8159,22 +8412,6 @@ The frequency for this channel in</source>
     <message>
         <source>Network Recorder</source>
         <translation>Netwerk recorder</translation>
-    </message>
-    <message>
-        <source>Unencrypted channels only</source>
-        <translation>Enkel vrij toegankelijke zenders</translation>
-    </message>
-    <message>
-        <source>If set, only unencrypted channels will be tuned to by MythTV or not be ignored by the MythTV channel scanner.</source>
-        <translation>Indien geselecteerd zullen alleen vrije zenders gebruikt worden door MythTV en de MythTV zenderscanner.</translation>
-    </message>
-    <message>
-        <source>Allow audio only channels</source>
-        <translation>Zenders die alleen geluid bevatten toestaan</translation>
-    </message>
-    <message>
-        <source>If set, audio only channels will not be ignored by the MythTV channel scanner.</source>
-        <translation>Indien geselecteerd zullen kanalen die alleen geluid bevatten niet genegeerd worden door de MythTV zenderscanner.</translation>
     </message>
     <message>
         <source>Use quick tuning</source>
@@ -8313,10 +8550,6 @@ The frequency for this channel in</source>
         <translation>Het formaat van de tijd string die aan het &apos;Set Wakeup Time Command&apos; wordt doorgegeven als $time. Zie QT::QDateTime.toString() voor details. Zet op &apos;t_time&apos; voor het aantal seconden sinds epoch (1-1-1970) (gebruik &apos;time_t&apos; voor nvram_wakeup).</translation>
     </message>
     <message>
-        <source>Match duplicates using subtitle then description</source>
-        <translation>Dubbel via afleveringstitel detecteren, daarna via beschrijving</translation>
-    </message>
-    <message>
         <source>Commercial Flagging Method</source>
         <translation>Reclame Detectie methode</translation>
     </message>
@@ -8429,14 +8662,6 @@ The frequency for this channel in</source>
         <translation>Nieuwe ingang</translation>
     </message>
     <message>
-        <source>as a search</source>
-        <translation>als een zoekopdracht</translation>
-    </message>
-    <message>
-        <source>as an example</source>
-        <translation>als een voorbeeld</translation>
-    </message>
-    <message>
         <source>Title %1 chapter %2</source>
         <translation>Titel %1 hoofdstuk %2</translation>
     </message>
@@ -8465,48 +8690,8 @@ The frequency for this channel in</source>
         <translation>Deze aflevering zal op een ander kanaal in dit tijdslot opgenomen worden.</translation>
     </message>
     <message>
-        <source>Mono</source>
-        <translation>Mono</translation>
-    </message>
-    <message>
-        <source>Surround Sound</source>
-        <translation>Surround Sound</translation>
-    </message>
-    <message>
-        <source>Dolby Sound</source>
-        <translation>Dolby Sound</translation>
-    </message>
-    <message>
-        <source>Audio for Hearing Impaired</source>
-        <translation>Audio voor slechthorenden</translation>
-    </message>
-    <message>
-        <source>Audio for Visually Impaired</source>
-        <translation>Audio voor slechtzienden</translation>
-    </message>
-    <message>
         <source>Widescreen</source>
         <translation>Breedbeeld</translation>
-    </message>
-    <message>
-        <source>AVC/H.264</source>
-        <translation>AVC/H.264</translation>
-    </message>
-    <message>
-        <source>Subtitles Available</source>
-        <translation>Ondertiteling beschikbaar</translation>
-    </message>
-    <message>
-        <source>Deaf Signing</source>
-        <translation>Met gebarentolk</translation>
-    </message>
-    <message>
-        <source>Average Time Shift</source>
-        <translation>Gemiddelde tijdsverschuiving</translation>
-    </message>
-    <message>
-        <source>Recorded File Name</source>
-        <translation>Naam van het opgenomen bestand</translation>
     </message>
     <message>
         <source>If set, the bitrate specified will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
@@ -8535,10 +8720,6 @@ De meeste dvb-s transponders zenden met 27,5 millioen symbolen per seconde.</tra
         <translation>Afstemmen op %1 mplexid(%2)</translation>
     </message>
     <message>
-        <source>Record new episode first showings</source>
-        <translation>Neem eerste uitzending van nieuwe aflevering op</translation>
-    </message>
-    <message>
         <source>MythTV wants to record these programs in %d seconds:</source>
         <translation>MythTV wil deze programma&apos;s in %d seconden opnemen:</translation>
     </message>
@@ -8557,14 +8738,6 @@ De meeste dvb-s transponders zenden met 27,5 millioen symbolen per seconde.</tra
     <message>
         <source>PVR-350 decoder</source>
         <translation>PVR-350 decoder</translation>
-    </message>
-    <message>
-        <source>libmpeg2 will use mpeg2 library; this is faster on some 32 bit AMD processors.</source>
-        <translation>libmpeg2 zal de mpeg2 library gebruiken; dit is sneller op sommige 32bit AMD processors.</translation>
-    </message>
-    <message>
-        <source>Note: Closed caption decoding will not work with libmpeg2.</source>
-        <translation>Opmerking: ondertiteling kan niet gedecodeerd worden met libmpeg2.</translation>
     </message>
     <message>
         <source>Kernel</source>
@@ -8645,10 +8818,6 @@ De meeste dvb-s transponders zenden met 27,5 millioen symbolen per seconde.</tra
     <message>
         <source>This video renderer uses DirectFB for scaling and color conversion. It is not as feature rich as the standard video renderer, but can run on Linux hardware without an X11 server.</source>
         <translation>Deze video renderer gebruikt DirectFB om te schalen en voor color conversion. Het is niet zo volledig qua features als de standaard video renderer, maar het draait wel op Linux hardware zonder een X11 server.</translation>
-    </message>
-    <message>
-        <source>Windows video renderer based on overlays. Not compatible with Vista Aero Glass.</source>
-        <translation>Windows video renderer gebaseerd op overlays. Niet compatible met VistaAero Glass.</translation>
     </message>
     <message>
         <source>Windows video renderer based on Direct3D. Requires video card compatible with Direct3D 9. This is the preferred renderer for current Windows systems.</source>
@@ -10789,22 +10958,6 @@ Wilt u doorgaan met kijken?</translation>
         <translation>Ongeldig apparaat ID of adres.</translation>
     </message>
     <message>
-        <source>Model: %1</source>
-        <translation>Model: %1</translation>
-    </message>
-    <message>
-        <source>, Firmware: %2</source>
-        <translation>, Firmware: %2</translation>
-    </message>
-    <message>
-        <source>, ID %1</source>
-        <translation>, ID %1</translation>
-    </message>
-    <message>
-        <source>, at address %1.%2.%3.%4</source>
-        <translation>, bij adres %1 %2 %3 %4</translation>
-    </message>
-    <message>
         <source>All Channels</source>
         <translation>Alle zenders</translation>
     </message>
@@ -10901,14 +11054,6 @@ Wilt u doorgaan met kijken?</translation>
     <message>
         <source>Parsing Channel #%1 : %2 : %3</source>
         <translation>Verwerk Kanaal #%1 : %2 : %3</translation>
-    </message>
-    <message>
-        <source>720p Resolution</source>
-        <translation>720p resolutie</translation>
-    </message>
-    <message>
-        <source>1080i/p Resolution</source>
-        <translation>1080i/p resolutie</translation>
     </message>
     <message>
         <source>Kernel (2x)</source>
@@ -11100,24 +11245,182 @@ Wilt u doorgaan met kijken?</translation>
         <source>XMLTV Grabber Configuration</source>
         <translation>XMLTV grabber configuratie</translation>
     </message>
-</context>
-<context>
-    <name>RecOptDialog</name>
     <message>
-        <source>Missing Element</source>
-        <translation>Ontbrekend element</translation>
+        <source>Go Back</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The theme you are using does not contain a &apos;recording_options&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Press EXIT to return to the menu.</source>
-        <translation>Het thema dat u gebruikt, bevat geen &quot;recording_options&quot; element.  Neem contact op met de maker van het thema en vraag of dit aangepast kan worden.&lt;br&gt;&lt;br&gt;Het volgende scherm zal leeg zijn.  Ga terug om het menu opnieuw weer te geven.</translation>
+        <source>No Change</source>
+        <translation type="unfinished">Geen wijziging</translation>
     </message>
     <message>
-        <source>Unknown Element</source>
-        <translation>Onbekend element</translation>
+        <source>Could not find specified tuner (%1).</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
-        <translation>Het thema dat u gebruikt bevat een onbekend element (&apos;%1&apos;).  Het wordt genegeerd</translation>
+        <source>Specified tuner (%1) is already in use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All tuners are currently in use. If you want to watch TV, you can cancel one of the in-progress recordings from the delete menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
+        <translation type="unfinished">Kan geen verbinding maken met de backend server -- staat die aan? Staat het juiste ip-adres ingesteld?</translation>
+    </message>
+    <message>
+        <source>The server uses network protocol version %1, but this client only understands version %2.  Make sure you are running compatible versions of the backend and frontend.</source>
+        <translation type="unfinished">De server gebruikt netwerk protocol versien %1, maar deze client begrijpt alleen versie %2. Zorg voor compatibele versies van het backend en frontend.</translation>
+    </message>
+    <message>
+        <source>This application is not compatible with the installed MythTV libraries. Please recompile after a make distclean</source>
+        <translation type="unfinished">Deze toepassing is niet compatibel met de geïnstalleerde MythTV bibliotheken. Hercompileer na een make distclean.</translation>
+    </message>
+    <message>
+        <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
+        <translation type="unfinished">De verbinding met de backend server is verbroken... Staat die aan?</translation>
+    </message>
+    <message>
+        <source>Plugin %1 is not compatible with the installed MythTV libraries. Please recompile the plugin after a make distclean</source>
+        <translation type="unfinished">Plugin %1 is niet compatibel met de geïnstalleerde MythTV bibliotheken. Hercompileer na een make distclean.</translation>
+    </message>
+    <message>
+        <source>Pre &amp; Post Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, firmware: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found %1 off-air channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found %1 unused transports.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set all invisible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%1 or later) %3</source>
+        <comment>e.g. (Sunday or later) program subtitle</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>libmpeg2 is slower on almost all processors than ffmpeg and breaks caption decoding. Use at your own risk!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Detect (Default Off)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Detect (Default Half)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Live TV idle timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit LiveTV automatically if left idle for the specified number of minutes. 0 disables the timeout.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video. Leave at &quot;Any&quot; to automatically use the best available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution. Leave at &quot;Any&quot; to automatically use the best available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Widescreen Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sign Language Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having in-vision sign language.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In-vision Subtitles Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having in-vision subtitles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitles/CC Recording Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having subtitles or closed captioning (CC) available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard of Hearing Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as having support for viewers with impaired hearing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Described Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional priority when a showing is marked as being Audio Described.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accessibility Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Group Disk Scheduler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balanced Free Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balanced Disk I/O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls how the Storage Group scheduling code will balance new recordings across directories.  &apos;Balanced Free Space&apos; is the recommended method for most users.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have a Video Storage Group, but have not set up all Image Groups.  If you continue, video image downloads will be saved in your Videos Storage Group.  Do you want to store them in their own groups?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching for icons for channel %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11146,46 +11449,10 @@ Wilt u doorgaan met kijken?</translation>
     </message>
 </context>
 <context>
-    <name>ScanProgressPopup</name>
+    <name>ScanNetwork</name>
     <message>
-        <source>Scan Progress</source>
-        <translation>Scan voortgang</translation>
-    </message>
-    <message>
-        <source>Tuning</source>
-        <translation>Aan het tunen</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuleren</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation>Status</translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation>Scan</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation>Signaalsterkte</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation>Signaal/Ruis</translation>
-    </message>
-    <message>
-        <source>No Lock</source>
-        <translation>Niet vergrendeld</translation>
-    </message>
-    <message>
-        <source>Locked</source>
-        <translation>Vergrendeld</translation>
-    </message>
-    <message>
-        <source>Rotor Movement</source>
-        <translation>Rotor beweging</translation>
+        <source>Country</source>
+        <translation type="unfinished">Land</translation>
     </message>
 </context>
 <context>
@@ -11238,77 +11505,210 @@ Wilt u doorgaan met kijken?</translation>
     </message>
 </context>
 <context>
-    <name>ScheduleRecording</name>
+    <name>SchedOptEditor</name>
     <message>
-        <source>Do not record this program</source>
-        <translation>Dit programma niet opnemen</translation>
-    </message>
-    <message>
-        <source>Record only this showing</source>
-        <translation>Enkel deze aflevering opnemen</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title</source>
-        <translation>Eén aflevering op van dit programma opnemen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every week</source>
-        <translation>Elke week op dit tijdstip opnemen</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every week</source>
-        <translation>Elke week één aflevering op van dit programma opnemen</translation>
-    </message>
-    <message>
-        <source>Record in this timeslot every day</source>
-        <translation>Dagelijks op dit tijdstip opnemen</translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every day</source>
-        <translation>Elke dag één aflevering van dit programma opnemen</translation>
-    </message>
-    <message>
-        <source>Record at any time on this channel</source>
-        <translation>Altijd op deze zender opnemen</translation>
-    </message>
-    <message>
-        <source>Record at any time on any channel</source>
-        <translation>Altijd op elke zender opnemen</translation>
-    </message>
-    <message>
-        <source>Record this showing with normal options</source>
-        <translation>Deze aflevering met normale opties opnemen</translation>
-    </message>
-    <message>
-        <source>Record this showing with override options</source>
-        <translation>Deze aflevering met aangepaste opties opnemen</translation>
-    </message>
-    <message>
-        <source>Do not allow this showing to be recorded</source>
-        <translation>Deze uitzending verhinderen van opgenomen worden</translation>
+        <source>Use any available input</source>
+        <translation type="unfinished">Gebruik elke aanwezige ingang</translation>
     </message>
     <message>
         <source>Prefer input %1</source>
-        <translation>Prefereer ingang %1</translation>
+        <translation type="unfinished">Prefereer ingang %1</translation>
     </message>
     <message>
-        <source>Use any available input</source>
-        <translation>Gebruik elke aanwezige ingang</translation>
+        <source>Match duplicates using subtitle &amp; description</source>
+        <translation type="unfinished">Dubbel via beschrijving en afleveringstitel detecteren</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle then description</source>
+        <translation type="unfinished">Dubbel via afleveringstitel detecteren, daarna via beschrijving</translation>
+    </message>
+    <message>
+        <source>Match duplicates using subtitle</source>
+        <translation type="unfinished">Dubbel via afleveringstitel detecteren</translation>
+    </message>
+    <message>
+        <source>Match duplicates using description</source>
+        <translation type="unfinished">Dubbel via beschrijving detecteren</translation>
+    </message>
+    <message>
+        <source>Don&apos;t match duplicates</source>
+        <translation type="unfinished">Dubbels niet detecteren</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current and previous recordings</source>
+        <translation type="unfinished">Dubbels in huidige en al verwijderde opnames zoeken</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in current recordings only</source>
+        <translation type="unfinished">Dubbels enkel in huidige opnames zoeken</translation>
+    </message>
+    <message>
+        <source>Look for duplicates in previous recordings only</source>
+        <translation type="unfinished">Dubbels enkel in al verwijderde opnames zoeken</translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
+        <translation type="unfinished">Niet geïdentificeerde afleveringen uitsluiten</translation>
+    </message>
+    <message>
+        <source>Exclude old episodes</source>
+        <translation type="unfinished">Oude aflevering uitsluiten</translation>
+    </message>
+    <message>
+        <source>Record new episodes only</source>
+        <translation type="unfinished">Enkel nieuwe afleveringen opnemen</translation>
+    </message>
+    <message>
+        <source>Record new episode first showings</source>
+        <translation type="unfinished">Neem eerste uitzending van nieuwe aflevering op</translation>
     </message>
 </context>
 <context>
-    <name>ScheduledRecording</name>
+    <name>ScheduleCommon</name>
     <message>
-        <source>or later</source>
-        <translation>of later</translation>
+        <source>Reactivate</source>
+        <translation type="unfinished">Opnieuw activeren</translation>
+    </message>
+    <message>
+        <source>Stop recording</source>
+        <translation type="unfinished">Opnemen stoppen</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record</source>
+        <translation type="unfinished">Niet opnemen</translation>
+    </message>
+    <message>
+        <source>Never record</source>
+        <translation type="unfinished">Nooit opnemen</translation>
+    </message>
+    <message>
+        <source>Change Ending Time</source>
+        <translation type="unfinished">Eindtijd veranderen</translation>
+    </message>
+    <message>
+        <source>Edit Options</source>
+        <translation type="unfinished">Opties bewerken</translation>
+    </message>
+    <message>
+        <source>Add Override</source>
+        <translation type="unfinished">Aanpassing toevoegen</translation>
+    </message>
+    <message>
+        <source>Edit Override</source>
+        <translation type="unfinished">Aanpassing bewerken</translation>
+    </message>
+    <message>
+        <source>Clear Override</source>
+        <translation type="unfinished">Aanpassing wissen</translation>
+    </message>
+    <message>
+        <source> The following programs will be recorded instead:
+</source>
+        <translation type="unfinished"> De volgende programma &apos;s worden wel opgenomen:
+</translation>
+    </message>
+    <message>
+        <source>Record anyway</source>
+        <translation type="unfinished">Toch opnemen</translation>
+    </message>
+    <message>
+        <source>Forget Previous</source>
+        <translation type="unfinished">Vergeet voorgaande</translation>
+    </message>
+</context>
+<context>
+    <name>ScheduleEditor</name>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation type="unfinished">Deze aflevering met normale opties opnemen</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation type="unfinished">Deze aflevering met aangepaste opties opnemen</translation>
+    </message>
+    <message>
+        <source>Do not allow this showing to be recorded</source>
+        <translation type="unfinished">Deze uitzending verhinderen van opgenomen worden</translation>
+    </message>
+    <message>
+        <source>Do not record this program</source>
+        <translation type="unfinished">Dit programma niet opnemen</translation>
+    </message>
+    <message>
+        <source>Record only this showing</source>
+        <translation type="unfinished">Enkel deze aflevering opnemen</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation type="unfinished">Eén aflevering op van dit programma opnemen</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every week</source>
+        <translation type="unfinished">Elke week op dit tijdstip opnemen</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation type="unfinished">Elke week één aflevering op van dit programma opnemen</translation>
+    </message>
+    <message>
+        <source>Record in this timeslot every day</source>
+        <translation type="unfinished">Dagelijks op dit tijdstip opnemen</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation type="unfinished">Elke dag één aflevering van dit programma opnemen</translation>
+    </message>
+    <message>
+        <source>Record at any time on this channel</source>
+        <translation type="unfinished">Altijd op deze zender opnemen</translation>
+    </message>
+    <message>
+        <source>Record at any time on any channel</source>
+        <translation type="unfinished">Altijd op elke zender opnemen</translation>
+    </message>
+    <message>
+        <source>Power Search</source>
+        <translation type="unfinished">Geavanceerd zoeken</translation>
+    </message>
+    <message>
+        <source>Title Search</source>
+        <translation type="unfinished">Op titel zoeken</translation>
+    </message>
+    <message>
+        <source>Keyword Search</source>
+        <translation type="unfinished">Op kernwoorden zoeken</translation>
+    </message>
+    <message>
+        <source>People Search</source>
+        <translation type="unfinished">Op personen zoeken</translation>
+    </message>
+    <message>
+        <source>Unknown Search</source>
+        <translation type="unfinished">Onbekende zoekopdracht</translation>
+    </message>
+    <message>
+        <source>Schedule Information</source>
+        <translation type="unfinished">Tijdschema informatie</translation>
+    </message>
+    <message>
+        <source>Program Details</source>
+        <translation type="unfinished">Programmadetails</translation>
+    </message>
+    <message>
+        <source>Upcoming episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously scheduled</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SchemaUpgradeWizard</name>
-    <message>
-        <source>Database schema is old. Waiting to see if DB is being upgraded.</source>
-        <translation>Database schema is oud. Afwachten of DB een upgrade krijgt.</translation>
-    </message>
     <message>
         <source>Exit</source>
         <translation>Stoppen</translation>
@@ -11390,6 +11790,10 @@ bevind zich in %2</translation>
 Database Name: %2</source>
         <translation>Database Host: %1
 Database Name: %2</translation>
+    </message>
+    <message>
+        <source>%1 database schema is old. Waiting to see if DB is being upgraded.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -11863,6 +12267,53 @@ map uit de opslag groep?</translation>
     <message>
         <source>(Create %1 group)</source>
         <translation>(Maak groep %1)</translation>
+    </message>
+    <message>
+        <source>(from remote hosts)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(from all hosts</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StoreOptEditor</name>
+    <message>
+        <source>Record using the %1 profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create a new recording group</source>
+        <translation type="unfinished">Nieuwe opnamegroep maken</translation>
+    </message>
+    <message>
+        <source>Include in the &quot;%1&quot; recording group</source>
+        <translation type="unfinished">Toevoegen aan de &apos;%1&apos; opnamegroep</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">Standaard</translation>
+    </message>
+    <message>
+        <source>Store in the &quot;%1&quot; storage group</source>
+        <translation type="unfinished">In de &quot;%1&quot; opslaggroep bewaren</translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished">Live TV</translation>
+    </message>
+    <message>
+        <source>Use &quot;%1&quot; playback group settings</source>
+        <translation type="unfinished">&quot;%1&quot; afspeelgroepinstellingen gebruiken</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record if this would exceed the max episodes</source>
+        <translation type="unfinished">Niet opnemen indien meer afleveringen dan max. toegelaten</translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation type="unfinished">Oudste wissen indien meer dan max. toegelaten</translation>
     </message>
 </context>
 <context>
@@ -12729,6 +13180,10 @@ Selecteer een huidige opname</translation>
         <source>All Channels</source>
         <translation>Alle zenders</translation>
     </message>
+    <message>
+        <source>Auto Detect</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -12817,10 +13272,6 @@ Selecteer een huidige opname</translation>
         <translation>Programmaoverzicht</translation>
     </message>
     <message>
-        <source>No listings found for this program. </source>
-        <translation>Dit programma komt niet voor in de gids. </translation>
-    </message>
-    <message>
         <source>Source:</source>
         <translation>Bron:</translation>
     </message>
@@ -12829,28 +13280,12 @@ Selecteer een huidige opname</translation>
         <translation>(1) Titel   (2) Prioriteit  (4) Type</translation>
     </message>
     <message>
-        <source>Select a recording to permanently erase</source>
-        <translation>Opname kiezen om te verwijderen</translation>
-    </message>
-    <message>
-        <source>Select a recording to watch</source>
-        <translation>Opname kiezen om te bekijken</translation>
-    </message>
-    <message>
         <source>Select a recording to permanently erase:</source>
         <translation>Opname kiezen om te verwijderen:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
         <translation>Opname kiezen om te bekijken:</translation>
-    </message>
-    <message>
-        <source>Select a recording to permanently erase.</source>
-        <translation>Opname kiezen om te verwijderen.</translation>
-    </message>
-    <message>
-        <source>Select a recording to watch.</source>
-        <translation>Opname kiezen om te bekijken.</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
@@ -12867,10 +13302,6 @@ Selecteer een huidige opname</translation>
     <message>
         <source>Description:</source>
         <translation>Beschrijving:</translation>
-    </message>
-    <message>
-        <source>System Status - Select a category to view the status</source>
-        <translation>Systeemstatus - Categorie kiezen om de status te zien</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
@@ -12927,6 +13358,1794 @@ Selecteer een huidige opname</translation>
     <message>
         <source>(1) Channel    (2) Priority</source>
         <translation>(1) Kanaal    (2) Prioriteit</translation>
+    </message>
+    <message>
+        <source>1. General</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2. Capture cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>3. Video sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4. Input connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>5. Channel Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>6. Storage Directories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%alert_text%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LINE #%caller_line%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NAME: %caller_name%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NUM : %caller_number%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DATE: %caller_date% TIME : %caller_time%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General</source>
+        <translation type="unfinished">Algemeen</translation>
+    </message>
+    <message>
+        <source>Core MythTV behavior and system settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Appearance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pick the theme, font, size, and locale</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Setup Wizards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compensate for TVs with overscan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings for TV recording and playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback and CD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback and DVD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Radio Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure display of image gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback of games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather locale and sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>News Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose which news sources interest you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage web bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recipe Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure SIP-based VoIP phone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie Time Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select local movie theaters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Xbox Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NetFlix Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the genres that interest you</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Files Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure how to archive video to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ZoneMinder Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set up surveillance software</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upcoming Recordings</source>
+        <translation type="unfinished">Toekomstige opnames</translation>
+    </message>
+    <message>
+        <source>See what will be recorded next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Recordings</source>
+        <translation type="unfinished">Plan Opnames</translation>
+    </message>
+    <message>
+        <source>Pick shows to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prioritize some shows over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What your system is doing right now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Utilities / Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings for TV, Images, Music, Video, Weather, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings to prioritize some shows over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Channel Recording Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings to prioritize some channels over others</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most used DVR options are found on the main menu. Plugin options are in the utilities menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick a program to record for a list of new titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movies</source>
+        <translation type="unfinished">Films</translation>
+    </message>
+    <message>
+        <source>Pick a movie to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Categories</source>
+        <translation type="unfinished">Categorieën</translation>
+    </message>
+    <message>
+        <source>Pick a program based on category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick a program on a given channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time</source>
+        <translation type="unfinished">Tijd</translation>
+    </message>
+    <message>
+        <source>Pick a program based on time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished">Programmagids</translation>
+    </message>
+    <message>
+        <source>Choose programs from a grid-style list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Finder</source>
+        <translation type="unfinished">Programma Zoeker</translation>
+    </message>
+    <message>
+        <source>Choose programs from an alphabetical index</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Words</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find programs matching search words</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick a program to record from a set of lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Record</source>
+        <translation type="unfinished">Aangepaste opname</translation>
+    </message>
+    <message>
+        <source>Advanced program finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VCR-like recording scheduler</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find a program based on title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keywords</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find a program matching a keyword</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>People</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find a program including a given person</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combine more than one word search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stored Searches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Results of searches you have saved</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV navigation and recording preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide appearance and behavior</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings for viewing and playing TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme and settings for OSD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OSD Menu Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Groups</source>
+        <translation type="unfinished">Afspeelgroep</translation>
+    </message>
+    <message>
+        <source>Adjust settings for different playback styles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Profiles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global recording priority and scheduling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch live television</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove television recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Eerder opgenomen</translation>
+    </message>
+    <message>
+        <source>See what you have recorded before</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV Utilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music</source>
+        <translation type="unfinished">Muziek</translation>
+    </message>
+    <message>
+        <source>Videos</source>
+        <translation type="unfinished">Videos</translation>
+    </message>
+    <message>
+        <source>Radio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Images</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather</source>
+        <translation type="unfinished">Weer</translation>
+    </message>
+    <message>
+        <source>News Feeds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recipes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zone Minder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Movie Times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>NetFlix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A blue theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot;%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot; %%STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]  =</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No listings found for this program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show:  (1) All  (2) Important</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Title  (2) Sort by Priority  (4) Sort by Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>] =</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot;% %STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(4) Program Guide  (6) Program Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a letter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick the letter in which the show starts with, then press SELECT or the right arrow.</source>
+        <translation type="unfinished">Letter kiezen waarmee het programma begint, vervolgens OK of rechtse pijl.</translation>
+    </message>
+    <message>
+        <source>Select a program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Programs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Sort by Time    (2) Sort by Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Heading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Annuleren</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished">Ok</translation>
+    </message>
+    <message>
+        <source>0%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback starting ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon Importer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search terms:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Zoeken</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <translation type="unfinished">Overslaan</translation>
+    </message>
+    <message>
+        <source>Channel Editor</source>
+        <translation type="unfinished">Kanaal bewerker</translation>
+    </message>
+    <message>
+        <source>List Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort By:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Channels without channel number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Icon Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Transports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Klaar</translation>
+    </message>
+    <message>
+        <source>Play Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System:</source>
+        <translation type="unfinished">Systeem:</translation>
+    </message>
+    <message>
+        <source>Year:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Favorite:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Ja</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Nee</translation>
+    </message>
+    <message>
+        <source>Television</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Programme Searches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CD/DVD Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Library</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info Centre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P</source>
+        <translation type="unfinished">P</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <translation type="unfinished">S</translation>
+    </message>
+    <message>
+        <source>Playing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">Geen</translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;% %DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Displayed Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Watch List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Searches</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Watched Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished">Opslaan</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Edit Recording Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">Titel</translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
+        <translation type="unfinished">Ondertitel</translation>
+    </message>
+    <message>
+        <source>Manual Recording Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title (Optional):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date, or day of week:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scheduled Recordings</source>
+        <translation type="unfinished">Geplande opnames</translation>
+    </message>
+    <message>
+        <source>Schedules Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First Conflict:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
+ To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Channel (2) Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Priorities</source>
+        <translation type="unfinished">Plan prioriteiten</translation>
+    </message>
+    <message>
+        <source>Final</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Final Priority:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1) Title (2) Priority (4) Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Priority Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Existing Rules:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Priority Change:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a clause from the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Clause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Verwijderen</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation type="unfinished">Test</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phrase</source>
+        <translation type="unfinished">Zin</translation>
+    </message>
+    <message>
+        <source>Select Time</source>
+        <translation type="unfinished">Selecteer tijd</translation>
+    </message>
+    <message>
+        <source>Select Search</source>
+        <translation type="unfinished">Selecteer Zoekopdracht</translation>
+    </message>
+    <message>
+        <source>Edit Power Search Fields</source>
+        <translation type="unfinished">Pas geavanceerde zoekopdracht aan</translation>
+    </message>
+    <message>
+        <source>Optional title phrase:</source>
+        <translation type="unfinished">Optionele titel zin:</translation>
+    </message>
+    <message>
+        <source>Optional subtitle phrase:</source>
+        <translation type="unfinished">Optionele afleveringstitel:</translation>
+    </message>
+    <message>
+        <source>Optional description phrase:</source>
+        <translation type="unfinished">Optionele beschrijving:</translation>
+    </message>
+    <message>
+        <source>List Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current View:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Position:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rule Overview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the recording rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Options</source>
+        <translation type="unfinished">Opslag opties</translation>
+    </message>
+    <message>
+        <source>Post Processing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce priority by %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normal recording priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Raise priority by %n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording %n minute(s) late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start recording on time</source>
+        <translation type="unfinished">Opname op tijd beginnen</translation>
+    </message>
+    <message>
+        <source>Start recording %n minute(s) early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording %n minute(s) early</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End recording on time</source>
+        <translation type="unfinished">Opname op tijd stoppen</translation>
+    </message>
+    <message>
+        <source>End recording %n minute(s) late</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Rule Active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No episode limit</source>
+        <translation type="unfinished">Geen beperking op aantal afleveringen</translation>
+    </message>
+    <message>
+        <source>Keep at most %n episode(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow recordings to expire?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Post-Processing Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flag new recordings</source>
+        <translation type="unfinished">Reclameblokken markeren bij nieuwe opnames</translation>
+    </message>
+    <message>
+        <source>Transcode new recordings</source>
+        <translation type="unfinished">Transcode uitvoeren bij nieuwe opnames</translation>
+    </message>
+    <message>
+        <source>123</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search For:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE|&quot;|&quot; %%REPEAT%%STARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cast Members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full Plot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video List Filters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Text Filter:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation type="unfinished">Categorie</translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country</source>
+        <translation type="unfinished">Land</translation>
+    </message>
+    <message>
+        <source>Actor/Actress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runtime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InetRef</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watched</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Director:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowest</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished">Laag</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="unfinished">Gemiddeld</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished">Hoog</translation>
+    </message>
+    <message>
+        <source>Rated:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browsable:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Runtime:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover File:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IMDB ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Browser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos - Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos - Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video File Associations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extension:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use default player:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Video Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Season:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parental Control:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File to Always Play Next:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Include while Browsing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Item has been Watched:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Banner:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trailer:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unique Player Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directed by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished">Afspelen</translation>
+    </message>
+    <message>
+        <source>Change mythtv key bindings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythStream Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather Station Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Online Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Weather Station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A long menu which breaks down the options by their category. TV, Music, Video etc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Listings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit or delete any recording rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play TV Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Appearance Wizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1280 x 720</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 x 0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 pixel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Up Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished">Huis</translation>
+    </message>
+    <message>
+        <source>Please Wait....</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Source:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contexts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change View</source>
+        <translation type="unfinished">Weergave wijzigen</translation>
+    </message>
+    <message>
+        <source>Show Watched Programs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status Icons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;%
+%YEARSTARS%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
+ To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage Recording Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <translation type="unfinished">Zender</translation>
+    </message>
+    <message>
+        <source>Last Recorded</source>
+        <translation type="unfinished">Laatst opgenomen</translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage Group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Profile:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Search Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;%
+%LONGREPEAT%%STARS| %%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Record Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional Tables:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation type="unfinished">Opnemen</translation>
+    </message>
+    <message>
+        <source>Store</source>
+        <translation type="unfinished">Opslaan</translation>
+    </message>
+    <message>
+        <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User job #2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make or accept a VoIP call</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep up with the news</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>See when local movies are playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local weather forecast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage your NetFlix queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse the web</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start cooking!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Home surveillance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tell us what hardware you have so we can support it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listen to Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Listen to the radio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Look at Pictures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play video games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Media Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings for all non-TV media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info Center Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure weather, news, movie info, web, and recipes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play any of your media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pick and prioritize shows to record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Information and Communications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optical Disks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play or import CDs and DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abspielen/Importieren von CDs und DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure MythTV and plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Priorities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play the video on a movie DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play the video on a VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import video from a movie DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write video to a data DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import music from an audio CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject CD or DVD from drive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Tools</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select, import, or play music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for new videos, edit metadata, or delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%SUBTITLE%%BR%%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%DESCRIPTION%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%STARTDATE%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign</source>
+        <translation type="unfinished">Zender</translation>
+    </message>
+    <message>
+        <source>Channel #</source>
+        <translation type="unfinished">Kanaal #</translation>
+    </message>
+    <message>
+        <source>Channel Name</source>
+        <translation type="unfinished">Zendernaam</translation>
+    </message>
+    <message>
+        <source>XMLTV ID</source>
+        <translation type="unfinished">XMLTV-ID</translation>
+    </message>
+    <message>
+        <source>[P]robe</source>
+        <translation type="unfinished">Onderzoek [P]</translation>
+    </message>
+    <message>
+        <source>[O]k</source>
+        <translation type="unfinished">[O]k</translation>
+    </message>
+    <message>
+        <source>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%CALLSIGN% - %CHANNUM%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A simple transparent black and white theme.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play or import audio or video CDs or DVDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch A DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Live TV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watch Online Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Other Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Advanced Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A &quot;Media Center&quot; menu theme. This menu theme is basically meant to bring the common &quot;media player/DVR&quot; functionality to the forefront, organize the plugins, and to make some of myth&apos;s more daunting options a little more subtle. Places the common media items on the top level (Recordings, Videos, TV, DVD, Music), places all informational plugins in &quot;Plugins.&quot; Puts all setup and scheduling in &quot;Advanced.&quot; The top two menu levels will seem new, the ones beneath Advanced-&gt;Setup are as in the default menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -13078,6 +15297,14 @@ Selecteer een huidige opname</translation>
     <message>
         <source>All</source>
         <translation>Alle</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>The following programs will be recorded instead:</source>
+        <translation type="unfinished">De volgende uitzendingen zullen worden opgenomen:</translation>
     </message>
 </context>
 <context>
