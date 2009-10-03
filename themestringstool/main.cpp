@@ -56,7 +56,24 @@ void parseElement(QDomElement &element)
                     laststring = getFirstText(info);
                     if (!laststring.trimmed().isEmpty())
                     {
-                        laststring.replace(QRegExp("\""), QString("\\\""));
+                        // Escape quotes
+                        laststring.replace("\"", QString("\\\""));
+                        // Escape xml-escaped newline
+                        laststring.replace("\\n", QString("<newline>"));
+
+                        // Remove newline whitespace added by
+                        // xml formatting
+                        QStringList lines = laststring.split('\n');
+                        QStringList::iterator lineIt;
+                        for (lineIt = lines.begin(); lineIt != lines.end();
+                             ++lineIt)
+                        {
+                            (*lineIt) = (*lineIt).trimmed();
+                        }
+                        laststring = lines.join(" ");
+
+                        laststring.replace(QString("<newline>"), QString("\\n"));
+                        
                         if (!strings.contains(laststring))
                             strings << laststring;
                         ++stringCount;
@@ -114,16 +131,14 @@ void parseDirectory(QString dir)
     {
         if ((*it).isDir())
         {
-            if ((themeDir.dirName() != "default") &&
-                (themeDir.dirName() != "default-wide") &&
-                !themeDir.exists("themeinfo.xml"))
-            {
-                parseDirectory((*it).filePath());
-                continue;
-            }
-            else
-                continue;
+            parseDirectory((*it).filePath());
+            continue;
         }
+
+        if ((themeDir.dirName() != "default") &&
+            (themeDir.dirName() != "default-wide") &&
+            !themeDir.exists("themeinfo.xml"))
+            return;
 
         if ((*it).suffix() != "xml")
             continue;
