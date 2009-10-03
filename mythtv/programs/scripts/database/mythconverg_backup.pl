@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.5';
+    $VERSION        = '1.0.6';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -759,12 +759,81 @@ EOF
                                             $timeData[1], $timeData[0]);
     }
 
+    sub check_backup_directory
+    {
+        my $result = 0;
+        if ($backup_conf{'directory'})
+        {
+            $result = 1;
+        }
+        elsif (check_database)
+    # If DBI is available, query the DB for the backup directory
+        {
+            verbose($verbose_level_debug,
+                    '', 'No DBBackupDirectory specified, querying database.');
+            my $query = 'SELECT dirname, hostname FROM storagegroup '.
+                        ' WHERE groupname = ?';
+            if (defined($dbh))
+            {
+                my $directory;
+                my $sth = $dbh->prepare($query);
+                if ($sth->execute('DB Backups'))
+                {
+                # We don't know the hostname associated with this host, and
+                # since it's not worth parsing the mysql.txt/config.xml
+                # LocalHostName (unique identifier), with fallback to the
+                # system hostname, and handling issues along the way, just look
+                # for any available DB Backups directory and, if none are
+                # usable, look for a Default group directory
+                    while (my @data = $sth->fetchrow_array)
+                    {
+                        $directory = $data[0];
+                        if (-d $directory && -w $directory)
+                        {
+                            $backup_conf{'directory'} = $directory;
+                            verbose($verbose_level_debug,
+                                    "Found DB Backups directory:".
+                                    " $backup_conf{'directory'}.");
+                            $result = 1;
+                            $sth->finish;
+                            last;
+                        }
+                    }
+                }
+                if ($result == 0 && $sth->execute('Default'))
+                {
+                    while (my @data = $sth->fetchrow_array)
+                    {
+                        $directory = $data[0];
+                        if (-d $directory && -w $directory)
+                        {
+                            $backup_conf{'directory'} = $directory;
+                            verbose($verbose_level_debug,
+                                    "Found Default directory:".
+                                    " $backup_conf{'directory'}.");
+                            $result = 1;
+                            $sth->finish;
+                            last;
+                        }
+                    }
+                }
+            }
+            if ($result == 0)
+            {
+                verbose($verbose_level_debug,
+                        "Unable to retrieve DBBackupDirectory from".
+                        " database.");
+            }
+        }
+        return $result;
+    }
+
     sub check_config
     {
         verbose($verbose_level_debug,
                 '', 'Checking configuration.');
     # Check directory/filename
-        if (!$backup_conf{'directory'})
+        if (!check_backup_directory)
         {
             print_configuration;
             die("\nERROR: DBBackupDirectory not specified, stopped");
