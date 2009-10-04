@@ -45,12 +45,12 @@ class ImageLoadEvent : public QEvent
     const QString GetFilename() const { return m_filename; }
     const int GetNumber() const { return m_number; }
 
-    private:
-        MythUIImage *m_parent;
-        MythImage *m_image;
-        QString m_basefile;
-        QString m_filename;
-        int m_number;
+  private:
+    MythUIImage     *m_parent;
+    MythImage       *m_image;
+    QString          m_basefile;
+    QString          m_filename;
+    int              m_number;
 };
 
 /*!
@@ -58,25 +58,25 @@ class ImageLoadEvent : public QEvent
 */
 class ImageLoadThread : public QRunnable
 {
-    public:
-        ImageLoadThread(MythUIImage *parent, const QString &basefile,
-                        const QString &filename, int number)
-            : m_parent(parent), m_basefile(basefile),
-              m_filename(filename), m_number(number) { };
+  public:
+    ImageLoadThread(MythUIImage *parent, const QString &basefile,
+                    const QString &filename, int number)
+                  : m_parent(parent), m_basefile(basefile),
+                    m_filename(filename), m_number(number) { };
 
-        void run()
-        {
-            MythImage *image = m_parent->LoadImage(m_filename, m_number);
-            ImageLoadEvent *le = new ImageLoadEvent(m_parent, image, m_basefile,
-                                                    m_filename, m_number);
-            QCoreApplication::postEvent(m_parent, le);
-        }
+    void run()
+    {
+        MythImage *image = m_parent->LoadImage(m_filename, m_number);
+        ImageLoadEvent *le = new ImageLoadEvent(m_parent, image, m_basefile,
+                                                m_filename, m_number);
+        QCoreApplication::postEvent(m_parent, le);
+    }
 
-    private:
-        MythUIImage *m_parent;
-        QString m_basefile;
-        QString m_filename;
-        int m_number;
+  private:
+    MythUIImage *m_parent;
+    QString      m_basefile;
+    QString      m_filename;
+    int          m_number;
 };
 
 /////////////////////////////////////////////////////////////////
