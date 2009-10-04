@@ -2225,8 +2225,8 @@ Do you want to remove the existing track?</source>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="46"/>
-        <source>Please Wait ...</source>
+        <location filename="themestrings.h" line="2"/>
+        <source>Please Wait...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2260,23 +2260,18 @@ Do you want to remove the existing track?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="11"/>
-        <source>Track No.:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="9"/>
         <source>Genre:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="2"/>
-        <source>Please Wait...</source>
+        <location filename="themestrings.h" line="10"/>
+        <source>Year:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="10"/>
-        <source>Year:</source>
+        <location filename="themestrings.h" line="11"/>
+        <source>Track No.:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2323,11 +2318,6 @@ Do you want to remove the existing track?</source>
         <location filename="themestrings.h" line="20"/>
         <source>Done</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="21"/>
-        <source></source>
-        <translation></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -2507,6 +2497,11 @@ Do you want to remove the existing track?</source>
     <message>
         <location filename="themestrings.h" line="44"/>
         <source>Image Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="46"/>
+        <source>Please Wait ...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

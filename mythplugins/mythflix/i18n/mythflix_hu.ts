@@ -128,13 +128,13 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="156"/>
-        <source>Default</source>
+        <location filename="../mythflix/flixutil.cpp" line="29"/>
+        <source>Queue Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythflix/flixutil.cpp" line="29"/>
-        <source>Queue Name</source>
+        <location filename="../mythflix/mythflixqueue.cpp" line="156"/>
+        <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

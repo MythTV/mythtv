@@ -4,6 +4,11 @@
 <context>
     <name></name>
     <message>
+        <location filename="../mythvideo/globalsettings.cpp" line="51"/>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../mythvideo/globalsettings.cpp" line="742"/>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
@@ -51,11 +56,6 @@
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="368"/>
         <source>No command to run.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/globalsettings.cpp" line="51"/>
-        <source>Setting this value to all numbers will make your life much easier.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -334,6 +334,11 @@
     <message>
         <location filename="../mtd/jobthread.cpp" line="1453"/>
         <source>Transcode is thinking</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythvideo/dbcheck.cpp" line="36"/>
+        <source>Error: failed to add new file type &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1038,6 +1043,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../mythvideo/parentalcontrols.cpp" line="306"/>
+        <source>Parental Pin:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../mythvideo/videodlg.cpp" line="310"/>
         <source>Command</source>
         <translation type="unfinished"></translation>
@@ -1158,27 +1168,67 @@ Check VideoManager Settings</source>
         <source>No rating available.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../mythvideo/dbcheck.cpp" line="36"/>
-        <source>Error: failed to add new file type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../mythvideo/parentalcontrols.cpp" line="306"/>
-        <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="21"/>
-        <source>Director:</source>
+        <location filename="themestrings.h" line="2"/>
+        <source>Rip/Transcode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="16"/>
-        <source>Year:</source>
+        <location filename="themestrings.h" line="3"/>
+        <source>Job 1 of 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>Length:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>Select:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Audio Track:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>AC3 Audio:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Subtitles:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>View:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>0:00:00</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Title 1 of 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1192,8 +1242,18 @@ Check VideoManager Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Year:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="17"/>
         <source>User Rating:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>Runtime:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1204,6 +1264,11 @@ Check VideoManager Settings</source>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>Director:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1242,11 +1307,6 @@ Check VideoManager Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="18"/>
-        <source>Runtime:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="themestrings.h" line="29"/>
         <source>Plot:</source>
         <translation type="unfinished"></translation>
@@ -1262,13 +1322,13 @@ Check VideoManager Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="33"/>
-        <source>Directed by</source>
+        <location filename="themestrings.h" line="32"/>
+        <source>Video Num.:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="themestrings.h" line="35"/>
-        <source>Year</source>
+        <location filename="themestrings.h" line="33"/>
+        <source>Directed by</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1277,8 +1337,18 @@ Check VideoManager Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="themestrings.h" line="35"/>
+        <source>Year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="36"/>
         <source>User Rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="37"/>
+        <source>Parental Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1309,21 +1379,6 @@ Check VideoManager Settings</source>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Edit Video Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="6"/>
-        <source>Name:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="32"/>
-        <source>Video Num.:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="37"/>
-        <source>Parental Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1554,61 +1609,6 @@ Check VideoManager Settings</source>
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="2"/>
-        <source>Rip/Transcode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="3"/>
-        <source>Job 1 of 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="4"/>
-        <source>Length:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="5"/>
-        <source>Select:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="7"/>
-        <source>Quality:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="8"/>
-        <source>Audio Track:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="9"/>
-        <source>AC3 Audio:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="10"/>
-        <source>Subtitles:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="11"/>
-        <source>View:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="12"/>
-        <source>0:00:00</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="themestrings.h" line="13"/>
-        <source>Title 1 of 1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

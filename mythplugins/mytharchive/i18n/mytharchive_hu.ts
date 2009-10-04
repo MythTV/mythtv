@@ -761,15 +761,15 @@ The last run failed to create a DVD.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1153"/>
-        <source>
-Place a blank DVD in the drive and select an option below.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../mytharchive/mythburn.cpp" line="1152"/>
         <location filename="../mytharchive/mythburn.cpp" line="1164"/>
         <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mytharchive/mythburn.cpp" line="1153"/>
+        <source>
+Place a blank DVD in the drive and select an option below.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
