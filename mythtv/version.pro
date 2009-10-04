@@ -19,3 +19,5 @@ version.commands = sh \"$$SVNTREEDIR/version.sh\" \"$$SVNTREEDIR\" \"$$SVNREPOPA
 
 QMAKE_EXTRA_UNIX_TARGETS += version
 mingw: QMAKE_EXTRA_WIN_TARGETS += version
+
+QMAKE_DISTCLEAN += version.cpp
