@@ -2152,82 +2152,82 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="905"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="914"/>
         <source>Reload Theme</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="907"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="916"/>
         <source>Main Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="909"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="918"/>
         <source>Program Guide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="911"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="920"/>
         <source>Program Finder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="914"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="923"/>
         <source>Manage Recordings / Fix Conflicts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="916"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="925"/>
         <source>Program Recording Priorities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="918"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="927"/>
         <source>Manage Recording Rules</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="920"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="929"/>
         <source>Channel Recording Priorities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="922"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="931"/>
         <source>TV Recording Playback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="924"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="933"/>
         <source>TV Recording Deletion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="926"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="935"/>
         <source>Live TV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="928"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="937"/>
         <source>Live TV In Guide</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="930"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="939"/>
         <source>Status Screen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="932"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="941"/>
         <source>Previously Recorded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="935"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="944"/>
         <source>ScreenShot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="966"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="975"/>
         <source>MythTV&apos;s native media player.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5002,6 +5002,11 @@ Are you sure you want to delete:</source>
 </context>
 <context>
     <name>QObject</name>
+    <message>
+        <location filename="../programs/mythfrontend/main.cpp" line="797"/>
+        <source>DVD/Video contains a bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="584"/>
         <source>Searching for icons for channel %1</source>
@@ -14393,22 +14398,17 @@ Check if the video exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="782"/>
-        <source>DVD contains a bookmark</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="783"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="798"/>
         <source>Play from bookmark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="784"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="799"/>
         <source>Play from beginning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/main.cpp" line="1442"/>
+        <location filename="../programs/mythfrontend/main.cpp" line="1451"/>
         <source>MythTV Frontend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -18256,50 +18256,68 @@ Select a Current Recording</source>
         <source>Preview</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../themes/themestrings.h" line="295"/>
         <source>Reduce priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="296"/>
         <source>Normal recording priority</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../themes/themestrings.h" line="297"/>
         <source>Raise priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../themes/themestrings.h" line="298"/>
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="299"/>
         <source>Start recording on time</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../themes/themestrings.h" line="300"/>
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../themes/themestrings.h" line="301"/>
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="302"/>
         <source>End recording on time</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../themes/themestrings.h" line="303"/>
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="304"/>
@@ -18316,10 +18334,13 @@ Select a Current Recording</source>
         <source>No episode limit</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <location filename="../themes/themestrings.h" line="307"/>
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="308"/>

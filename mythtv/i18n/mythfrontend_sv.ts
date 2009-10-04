@@ -9835,10 +9835,6 @@ namnet &apos;%1&apos; är redan använt.</translation>
         <translation>Normala jobbköinställningar för nya schemalagda inspelningar</translation>
     </message>
     <message>
-        <source>DVD contains a bookmark</source>
-        <translation>Dvd:n har ett bokmärke</translation>
-    </message>
-    <message>
         <source>Play from bookmark</source>
         <translation>Spela upp från bokmärke</translation>
     </message>
@@ -11402,6 +11398,10 @@ huvudinspelningsservern (t.ex. sudo /etc/init.d/mythtv-backend start).</translat
     </message>
     <message>
         <source>XMLTV Grabber Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD/Video contains a bookmark</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14740,41 +14740,59 @@ Välj en pågående inspelning</translation>
         <source>Preview</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Reduce priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Normal recording priority</source>
         <translation type="unfinished">Normal inspelningsprioritet</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Raise priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Start recording on time</source>
         <translation type="unfinished">Börja spela in i tid</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>End recording on time</source>
         <translation type="unfinished">Sluta spela in i tid</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Recording Rule Active</source>
@@ -14788,9 +14806,12 @@ Välj en pågående inspelning</translation>
         <source>No episode limit</source>
         <translation type="unfinished">Ingen begränsning av antal avsnitt</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Allow recordings to expire?</source>

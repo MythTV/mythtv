@@ -9858,10 +9858,6 @@ naam mag niet leeg zijn.</translation>
         <translation>Standaard JobQueue instellingen voor een nieuwe geplande opname</translation>
     </message>
     <message>
-        <source>DVD contains a bookmark</source>
-        <translation>DVD bevat een bladwijzer</translation>
-    </message>
-    <message>
         <source>Play from bookmark</source>
         <translation>Vanaf bladwijzer afspelen</translation>
     </message>
@@ -11420,6 +11416,10 @@ Wilt u doorgaan met kijken?</translation>
     </message>
     <message>
         <source>Searching for icons for channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD/Video contains a bookmark</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14368,41 +14368,59 @@ Selecteer een huidige opname</translation>
         <source>Preview</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Reduce priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Normal recording priority</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Raise priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Start recording on time</source>
         <translation type="unfinished">Opname op tijd beginnen</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>End recording on time</source>
         <translation type="unfinished">Opname op tijd stoppen</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Recording Rule Active</source>
@@ -14416,9 +14434,12 @@ Selecteer een huidige opname</translation>
         <source>No episode limit</source>
         <translation type="unfinished">Geen beperking op aantal afleveringen</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Allow recordings to expire?</source>

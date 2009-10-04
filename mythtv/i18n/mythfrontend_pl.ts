@@ -9838,10 +9838,6 @@ name can not be blank.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DVD contains a bookmark</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Play from bookmark</source>
         <translation type="unfinished">Odtwarzaj od zakładki</translation>
     </message>
@@ -11396,6 +11392,10 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Searching for icons for channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD/Video contains a bookmark</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14340,41 +14340,65 @@ Select a Current Recording</source>
         <source>Preview</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Reduce priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Normal recording priority</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Raise priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Start recording on time</source>
         <translation type="unfinished">Rozpocznij nagrywanie o czasie</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>End recording on time</source>
         <translation type="unfinished">Zakończ nagrywanie o czasie</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Recording Rule Active</source>
@@ -14388,9 +14412,13 @@ Select a Current Recording</source>
         <source>No episode limit</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Allow recordings to expire?</source>

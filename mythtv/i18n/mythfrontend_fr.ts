@@ -9810,10 +9810,6 @@ de lecture ne peut pas être vide.</translation>
         <translation>Réglages de files des tâches par défaut pour les nouveaux enregistrements programmés</translation>
     </message>
     <message>
-        <source>DVD contains a bookmark</source>
-        <translation>Le DVD contient un signet</translation>
-    </message>
-    <message>
         <source>Play from bookmark</source>
         <translation>Jouer à partir d&apos;un signet</translation>
     </message>
@@ -11399,6 +11395,10 @@ Souhaitez-vous continuer à regarder ?</translation>
     </message>
     <message>
         <source>XMLTV Grabber Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD/Video contains a bookmark</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14749,41 +14749,59 @@ Sélectionnez un enregistrement en cours</translation>
         <source>Preview</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Reduce priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Normal recording priority</source>
         <translation type="unfinished">Priorité d&apos;enregistrement normale</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Raise priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Start recording on time</source>
         <translation type="unfinished">Démarrer l&apos;enregistrement à l&apos;heure</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>End recording on time</source>
         <translation type="unfinished">Arrêter l&apos;enregistrement à l&apos;heure</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Recording Rule Active</source>
@@ -14797,9 +14815,12 @@ Sélectionnez un enregistrement en cours</translation>
         <source>No episode limit</source>
         <translation type="unfinished">Pas de limite d&apos;épisodes</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Allow recordings to expire?</source>

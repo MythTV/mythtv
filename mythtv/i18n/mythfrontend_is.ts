@@ -9834,10 +9834,6 @@ name can not be blank.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DVD contains a bookmark</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Play from bookmark</source>
         <translation type="unfinished">Spila frá bókamerki</translation>
     </message>
@@ -11373,6 +11369,10 @@ Do you wish to continue watching?</source>
     </message>
     <message>
         <source>Searching for icons for channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD/Video contains a bookmark</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -14308,41 +14308,53 @@ Veldu núverandi upptöku</translation>
         <source>Preview</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Reduce priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Normal recording priority</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Raise priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Start recording on time</source>
         <translation type="unfinished">Hefja upptöku tímanlega</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>End recording on time</source>
         <translation type="unfinished">Enda upptöku tímanlega</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Recording Rule Active</source>
@@ -14356,9 +14368,11 @@ Veldu núverandi upptöku</translation>
         <source>No episode limit</source>
         <translation type="unfinished">Ekkert hámark upptaka</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Allow recordings to expire?</source>

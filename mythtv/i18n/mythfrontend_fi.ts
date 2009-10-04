@@ -8018,10 +8018,6 @@ name can not be blank.</source>
         <translation>Kyllä, poistu ja käynnistä uudelleen</translation>
     </message>
     <message>
-        <source>DVD contains a bookmark</source>
-        <translation>DVD sisältää kirjanmerkin</translation>
-    </message>
-    <message>
         <source>Play from bookmark</source>
         <translation>Toista kirjanmerkistä</translation>
     </message>
@@ -11397,6 +11393,10 @@ Käytä Eject-nappia aseman alareunassa.</translation>
         <source>Searching for icons for channel %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>DVD/Video contains a bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingProfileEditor</name>
@@ -14337,41 +14337,53 @@ Valitse nykyinen nauhoitus</translation>
         <source>Preview</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Reduce priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Normal recording priority</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Raise priority by %n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Start recording on time</source>
         <translation type="unfinished">Aloita nauhoitus ajallaan</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>End recording on time</source>
         <translation type="unfinished">Lopeta nauhoitus ajallaan</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Recording Rule Active</source>
@@ -14385,9 +14397,11 @@ Valitse nykyinen nauhoitus</translation>
         <source>No episode limit</source>
         <translation type="unfinished">Ei jaksorajaa</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Allow recordings to expire?</source>
