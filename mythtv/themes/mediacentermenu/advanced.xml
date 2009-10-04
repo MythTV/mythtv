@@ -60,7 +60,7 @@
         <text lang="PL">Dyski optyczne</text>
         <text lang="HE">דיסקים אופטים</text>
         <description>Play or import audio or video CDs or DVDs</description>
-        <description lant="DE">Abspielen/Importieren von CDs und DVDs</description>
+        <description lang="DE">Abspielen/Importieren von CDs und DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>

@@ -451,7 +451,6 @@ void strings_null() {
     ThemeUI::tr("Information and Communications");
     ThemeUI::tr("Optical Disks");
     ThemeUI::tr("Play or import CDs and DVDs");
-    ThemeUI::tr("Abspielen/Importieren von CDs und DVDs");
     ThemeUI::tr("Configure MythTV and plugins");
     ThemeUI::tr("Set Priorities");
     ThemeUI::tr("Play DVD");

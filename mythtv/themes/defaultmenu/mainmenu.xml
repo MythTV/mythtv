@@ -137,7 +137,7 @@
         <text lang="HE">דיסקים אופטים</text>
         <text lang="HU">CD/DVD</text>
         <description>Play or import CDs and DVDs</description>
-        <description lant="DE">Abspielen/Importieren von CDs und DVDs</description>
+        <description lang="DE">Abspielen/Importieren von CDs und DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>
