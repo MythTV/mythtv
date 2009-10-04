@@ -2,11 +2,12 @@
 #include <QDomDocument>
 #include <QString>
 #include <QMap>
+#include <QMultiMap>
 #include <QStringList>
 #include <QTextStream>
 #include <QFile>
 #include <QDir>
-#include <QRegExp>
+#include <QtGui>
 
 #include <iostream>
 #include <cstdlib>
@@ -27,11 +28,13 @@ QString getFirstText(QDomElement element)
 
 QString indir;
 QString outfilebase;
+QString outfile;
 QFile fstringout;
 QTextStream fdataout;
 QMap<QString, QFile *> transFiles;
+QMultiMap<QString, QString> translatedStrings;
 QString laststring;
-int totalstringCount = 0;
+int totalStringCount = 0;
 int stringCount = 0;
 QStringList strings;
 
@@ -77,37 +80,14 @@ void parseElement(QDomElement &element)
                         if (!strings.contains(laststring))
                             strings << laststring;
                         ++stringCount;
-                        ++totalstringCount;
+                        ++totalStringCount;
                     }
                 }
-//                 else
-//                 {
-//                     QString language = info.attribute("lang", "").toLower();
-// 
-//                     if (!transFiles.contains(language))
-//                     {
-//                         QFile *tmp = new QFile(outfilebase + '_' + language + ".ts");
-//                         if (!tmp->open(IO_WriteOnly))
-//                         {
-//                             cerr << "couldn't open language file\n";
-//                             exit(-1);
-//                         }
-// 
-//                         transFiles[language] = tmp;
-// 
-//                         QTextStream dstream(transFiles[language]);
-//                         dstream << "</context>\n"
-//                                 << "<context>\n"
-//                                 << "    <name>ThemeUI</name>\n";
-//                     }
-// 
-//                     QTextStream dstream(transFiles[language]);
-// 
-//                     dstream << "    <message>\n"
-//                             << "        <source>" << laststring.utf8() << "</source>\n"
-//                             << "        <translation>" << getFirstText(info).utf8() << "</translation>\n"
-//                             << "    </message>\n";
-//                 }
+                else
+                {
+                    QString language = info.attribute("lang", "").toLower();
+                    translatedStrings.insert(laststring, language + "{}" + getFirstText(info));
+                }
             }
             else
                 parseElement(info);
@@ -135,11 +115,6 @@ void parseDirectory(QString dir)
             continue;
         }
 
-//         if ((themeDir.dirName() != "default") &&
-//             (themeDir.dirName() != "default-wide") &&
-//             !themeDir.exists("themeinfo.xml"))
-//             return;
-
         if ((*it).suffix() != "xml")
             continue;
 
@@ -149,7 +124,7 @@ void parseDirectory(QString dir)
 
         if (!fin.open(QIODevice::ReadOnly))
         {
-            cerr << "can't open " << qPrintable((*it).absoluteFilePath()) << endl;
+            cerr << "Can't open " << qPrintable((*it).absoluteFilePath()) << endl;
             continue;
         }
 
@@ -217,13 +192,15 @@ int main(int argc, char *argv[])
         exit(-1);
     }
 
+    outfile = outfilebase + '/' + "themestrings.h";
+
     parseDirectory(indir);
 
-    fstringout.setFileName(outfilebase + '/' + "themestrings.h");
+    fstringout.setFileName(outfile);
 
     if (!fstringout.open(QIODevice::WriteOnly))
     {
-        cerr << "can't open " << qPrintable(outfilebase) << " for writing\n";
+        cerr << "can't open " << qPrintable(outfile) << " for writing\n";
         exit(-1);
     }
 
@@ -231,25 +208,67 @@ int main(int argc, char *argv[])
 
     fdataout << QString("void strings_null() {\n");
 
+    int lineCount = 2;
     QStringList::const_iterator strit;
     for (strit = strings.begin(); strit != strings.end(); ++strit)
     {
-        fdataout << QString("    ThemeUI::tr(\"%1\");\n")
-                            .arg((*strit).toUtf8().data());
+        QString string = (*strit);
+        if (string.contains("%n"))
+            fdataout << QString("    ThemeUI::tr(\"%1\", 0, 1);\n")
+                                .arg((*strit).toUtf8().data());
+        else
+            fdataout << QString("    ThemeUI::tr(\"%1\");\n")
+                                .arg((*strit).toUtf8().data());
+
+//         if (translatedStrings.contains(*strit))
+//         {
+//             QStringList prevSeenLanguages;
+//             QList<QString> values = translatedStrings.values(*strit);
+//             for (int i = 0; i < values.size(); ++i)
+//             {
+//                 QString language = values.at(i).section("{}", 0, 0);
+//                 if (prevSeenLanguages.contains(language))
+//                     continue;
+//                 prevSeenLanguages << language;
+//                 
+//                 QString translation = values.at(i).section("{}", 1, 1);
+//                 if (!transFiles.contains(language))
+//                 {
+//                     QFile *tmp = new QFile(outfile + '_' + language + ".ts");
+//                     if (!tmp->open(QIODevice::WriteOnly))
+//                     {
+//                         cerr << "couldn't open language file\n";
+//                         exit(-1);
+//                     }
+// 
+//                     transFiles[language] = tmp;
+//                 }
+// 
+//                 QTextStream dstream(transFiles[language]);
+//                 dstream.setCodec("UTF-8");
+// 
+//                 dstream << "    <message>\n"
+//                         << "        <location filename=\"" << qPrintable(outfile) << "\" line=\"" << lineCount << "\"/>\n"
+//                         << "        <source>" << Qt::escape(*strit).replace("\"", "&quot;") << "</source>\n"
+//                         << "        <translation>" << Qt::escape(translation).replace("\"", "&quot;") << "</translation>\n"
+//                         << "    </message>\n";
+//             }
+//         }
+        ++lineCount;
     }
     
     fdataout << QString("}\n");
     fstringout.close();
 
-//    QMap<QString, QFile *>::Iterator it;
-//    for (it = transFiles.begin(); it != transFiles.end(); ++it)
-//    {
-//        it.value()->close();
-//    }
+//     QMap<QString, QFile *>::Iterator it;
+//     for (it = transFiles.begin(); it != transFiles.end(); ++it)
+//     {
+//         it.value()->close();
+//     }
 
     cout << endl;
     cout << "---------------------------------------" << endl;
-    cout << "Found " << totalstringCount << " total strings" << endl;
+    cout << "Found " << totalStringCount << " total strings" << endl;
     cout << strings.count() << " unique" << endl;
 
     return 0;
