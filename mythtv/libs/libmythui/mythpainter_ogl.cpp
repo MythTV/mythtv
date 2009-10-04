@@ -93,6 +93,22 @@ void MythOpenGLPainter::Begin(QWidget *parent)
         return;
     }
 
+    if (m_textureDeleteList.size())
+    {
+        GLuint textures[1];
+
+        m_textureDeleteLock.lock();
+        while (m_textureDeleteList.size())
+        {
+            textures[0] = m_textureDeleteList.front();
+            m_textureDeleteList.pop_front();
+
+            glDeleteTextures(1, textures);
+        }
+        m_textureDeleteLock.unlock();
+    }
+
+
     realParent->makeCurrent();
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -156,10 +172,10 @@ void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
 {
     if (m_ImageIntMap.contains(im))
     {
-        GLuint textures[1];
-        textures[0] = m_ImageIntMap[im];
+        m_textureDeleteLock.lock();
+        m_textureDeleteList.push_back(m_ImageIntMap[im]);
+        m_textureDeleteLock.unlock();
 
-        glDeleteTextures(1, textures);
         m_ImageIntMap.remove(im);
 
         m_ImageExpireList.remove(im);

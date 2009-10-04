@@ -2,6 +2,7 @@
 #define MYTHPAINTER_OPENGL_H_
 
 #include <QMap>
+#include <QMutex>
 
 #include <list>
 
@@ -60,6 +61,9 @@ class MythOpenGLPainter : public MythPainter
 
     bool init_extensions;
     bool generate_mipmaps;
+
+    std::list<long long> m_textureDeleteList;
+    QMutex               m_textureDeleteLock;
 };
 
 #endif

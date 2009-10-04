@@ -9,6 +9,7 @@
 #include <QApplication>
 #include <QPixmap>
 #include <QPainter>
+#include <QMutex>
 #include <QX11Info>
 
 // Mythdb headers
@@ -86,6 +87,9 @@ class MythVDPAUPrivate
 
     int surfaceNum;
     bool initialized;
+
+    std::list<VdpBitmapSurface> m_surfaceDeleteList;
+    QMutex                      m_surfaceDeleteLock;
 
     VdpOutputSurface curOutput;
     VdpRect outRect;
@@ -376,6 +380,19 @@ void MythVDPAUPrivate::Begin(QWidget *parent)
         &dummy
     );
     CHECK_ST
+
+    if (m_surfaceDeleteList.size())
+    {
+        m_surfaceDeleteLock.lock();
+        while (m_surfaceDeleteList.size())
+        {
+            VdpBitmapSurface bitmap = m_surfaceDeleteList.front();
+            m_surfaceDeleteList.pop_front();
+
+            vdp_bitmap_surface_destroy(bitmap);
+        }
+        m_surfaceDeleteLock.unlock();
+    }
 }
 
 void MythVDPAUPainter::Begin(QWidget *parent)
@@ -411,8 +428,9 @@ void MythVDPAUPrivate::RemoveImageFromCache(MythImage *im)
 {
     if (m_ImageBitmapMap.contains(im))
     {
-        VdpBitmapSurface bitmap = m_ImageBitmapMap[im];
-        vdp_bitmap_surface_destroy(bitmap);
+        m_surfaceDeleteLock.lock();
+        m_surfaceDeleteList.push_back(m_ImageBitmapMap[im]);
+        m_surfaceDeleteLock.unlock();
 
         m_ImageBitmapMap.remove(im);
         m_ImageExpireList.remove(im);

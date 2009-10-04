@@ -309,9 +309,10 @@ class PlaybackBox : public ScheduleCommon
     QString getRecGroupPassword(const QString &recGroup);
     void fillRecGroupPasswordCache(void);
 
-    QString testImageFiles(QString &testDirectory,
-                           QString &seriesID, QString &titleIn,
-                           QString imagetype, QString host);
+    bool loadArtwork(QString artworkFile, MythUIImage *image, QTimer *timer,
+                     int delay = 500, bool resetImage = false);
+    QString findArtworkFile(QString &seriesID, QString &titleIn,
+                            QString imagetype, QString host);
 
     void updateGroupList();
     void updateIcons(const ProgramInfo *pginfo = NULL);

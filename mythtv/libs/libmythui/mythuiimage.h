@@ -2,11 +2,15 @@
 #define MYTHUI_IMAGE_H_
 
 #include <QDateTime>
+#include <QHash>
+#include <QMutex>
+#include <QWaitCondition>
 
 #include "mythuitype.h"
 #include "mythimage.h"
 
 class MythScreenType;
+class ImageLoadThread;
 
 /**
  * \class MythUIImage
@@ -21,6 +25,8 @@ class MPUBLIC MythUIImage : public MythUIType
     MythUIImage(const QString &filename, MythUIType *parent, const QString &name);
     MythUIImage(MythUIType *parent, const QString &name);
    ~MythUIImage();
+
+    QString GetFilename(void) { return m_Filename; }
 
     /** Must be followed by a call to Load() to load the image. */
     void SetFilename(const QString &filename);
@@ -43,7 +49,7 @@ class MPUBLIC MythUIImage : public MythUIType
     void SetDelay(int delayms);
 
     void Reset(void);
-    bool Load(void);
+    bool Load(bool allowLoadInBackground = true);
 
     bool IsGradient(void) const { return m_gradient; }
 
@@ -57,6 +63,8 @@ class MPUBLIC MythUIImage : public MythUIType
 
     void Init(void);
     void Clear(void);
+    MythImage* LoadImage(const QString &imFile, int imageNumber = 0);
+    void customEvent(QEvent *event);
 
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
@@ -70,13 +78,18 @@ class MPUBLIC MythUIImage : public MythUIType
     void SetCropRect(int x, int y, int width, int height);
     void SetCropRect(const MythRect &rect);
 
-    QString GenImageLabel(const QString &filename, int w, int h);
-    QString GenImageLabel(int w, int h);
+    QString GenImageLabel(const QString &filename, int w, int h) const;
+    QString GenImageLabel(int w, int h) const;
 
     QString m_Filename;
     QString m_OrigFilename;
 
-    QVector<MythImage *> m_Images;
+    QHash<int, MythImage *> m_Images;
+    QMutex                  m_ImagesLock;
+
+    static QHash<QString, int> m_loadingImages;
+    static QMutex              m_loadingImagesLock;
+    static QWaitCondition      m_loadingImagesCond;
 
     MythRect m_cropRect;
     QSize m_ForceSize;
@@ -110,10 +123,13 @@ class MPUBLIC MythUIImage : public MythUIType
 
     bool m_isGreyscale;
 
+    ImageLoadThread *m_imageLoadThread;
+
     friend class MythThemeBase;
     friend class MythUIButtonListItem;
     friend class MythUIProgressBar;
     friend class MythUITextEdit;
+    friend class ImageLoadThread;
 };
 
 #endif

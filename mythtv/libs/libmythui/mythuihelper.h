@@ -5,6 +5,7 @@
 #include <QString>
 #include <QFont>
 #include <QMutex>
+#include <QThreadPool>
 
 #include "mythexp.h"
 
@@ -64,7 +65,8 @@ class MPUBLIC MythUIHelper
 
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
-    MythImage *LoadCacheImage(QString srcfile, QString label);
+    MythImage *LoadCacheImage(QString srcfile, QString label,
+                              bool allowLoadFromDisk = true);
 
     void ThemeWidget(QWidget *widget);
 
@@ -113,6 +115,8 @@ class MPUBLIC MythUIHelper
     QString RemoveCurrentLocation(void);
     QString GetCurrentLocation(bool fullPath = false, bool mainStackOnly = true);
 
+    QThreadPool *GetImageThreadPool(void);
+
   protected:
     MythUIHelper();
    ~MythUIHelper();
@@ -125,8 +129,6 @@ class MPUBLIC MythUIHelper
     void RemoveCacheDir(const QString &dirname);
 
     MythUIHelperPrivate *d;
-
-    size_t m_cacheSize;
 
     QMutex m_locationLock;
     QStringList m_currentLocation;

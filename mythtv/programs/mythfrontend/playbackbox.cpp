@@ -541,15 +541,15 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     InfoMap infoMap;
     int countInGroup;
 
-    if (m_fanart)
-        m_fanart->SetVisible(false);
-
     if (groupname.isEmpty())
     {
         countInGroup = m_progLists[""].size();
         infoMap["title"] = m_groupDisplayName;
         infoMap["group"] = m_groupDisplayName;
         infoMap["show"]  = ProgramInfo::i18n("All Programs");
+
+        if (m_fanart)
+            m_fanart->Reset();
     }
     else
     {
@@ -561,30 +561,23 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
 
         if (m_fanart)
         {
-            m_fanart->Reset();
-            m_fanartTimer->stop();
-
-            QString fanartHost;
+            static int itemsPast = 0;
+            QString artworkHost;
             if (gContext->GetNumSetting("MasterBackendOverride", 0))
-                fanartHost = gContext->GetMasterHostName();
+                artworkHost = gContext->GetMasterHostName();
             else
-                fanartHost = (*(m_progLists[groupname].begin()))->hostname;
+                artworkHost = (*(m_progLists[groupname].begin()))->hostname;
 
-            QString fanartDir = gContext->GetSetting("mythvideo.fanartDir");
-            QString fanartTitle = groupname;
-            QString fanartSeriesID;
-            QString fanartFile = testImageFiles(fanartDir, fanartSeriesID,
-                                                fanartTitle, "fanart",
-                                                fanartHost);
-            if (!fanartFile.isEmpty())
-            {
-                m_fanart->SetFilename(fanartFile);
-
-                m_fanartTimer->setSingleShot(true);
-                m_fanartTimer->start(500);
-            }
+            QString artworkTitle = groupname;
+            QString artworkSeriesID;
+            QString artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
+                                                  "fanart", artworkHost);
+            if (loadArtwork(artworkFile, m_fanart, m_fanartTimer, 300,
+                            itemsPast > 2))
+                itemsPast++;
+            else
+                itemsPast = 0;
         }
-
     }
 
     if (countInGroup > 1)
@@ -615,13 +608,13 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         jobState->Reset();
 
     if (m_previewImage)
-        m_previewImage->SetVisible(false);
+        m_previewImage->Reset();
 
     if (m_banner)
-        m_banner->SetVisible(false);
+        m_banner->Reset();
 
     if (m_coverart)
-        m_coverart->SetVisible(false);
+        m_coverart->Reset();
 
     updateIcons();
 }
@@ -684,84 +677,47 @@ void PlaybackBox::UpdateProgramInfo(
         if (m_previewImage)
         {
             imagefile = (imagefile.isEmpty()) ? oldimgfile : imagefile;
-            m_previewImage->SetVisible(!imagefile.isEmpty());
             m_previewImage->SetFilename(imagefile);
             m_previewImage->Load();
         }
 
-        QString artworkHost;
-        if (gContext->GetNumSetting("MasterBackendOverride", 0))
-            artworkHost = gContext->GetMasterHostName();
-        else
-            artworkHost = pginfo->hostname;
-
-        if (m_fanart)
+        if (m_fanart || m_banner || m_coverart)
         {
-            m_fanartTimer->stop();
-            m_fanart->SetVisible(false);
-            m_fanart->Reset();
+            QString artworkHost;
+            QString artworkDir;
+            QString artworkFile;
+            QString artworkTitle = pginfo->title;
+            QString artworkSeriesID = pginfo->seriesid;
 
-            QString fanartDir = gContext->GetSetting("mythvideo.fanartDir");
-            QString fanartTitle = pginfo->title;
-            QString fanartSeriesID = pginfo->seriesid;
-            QString fanartFile = testImageFiles(fanartDir,
-                                                fanartSeriesID,
-                                                fanartTitle,
-                                                "fanart",
-                                                artworkHost);
-            if (!fanartFile.isEmpty())
+            if (gContext->GetNumSetting("MasterBackendOverride", 0))
+                artworkHost = gContext->GetMasterHostName();
+            else
+                artworkHost = pginfo->hostname;
+
+            if (m_fanart)
             {
-                m_fanart->SetFilename(fanartFile);
-
-                m_fanartTimer->stop();
-                m_fanartTimer->setSingleShot(true);
-                m_fanartTimer->start(500);
+                static int itemsPast = 0;
+                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
+                                              "fanart", artworkHost);
+                if (loadArtwork(artworkFile, m_fanart, m_fanartTimer, 300,
+                                itemsPast > 2))
+                    itemsPast++;
+                else
+                    itemsPast = 0;
             }
-        }
 
-        if (m_banner)
-        {
-            m_bannerTimer->stop();
-            m_banner->SetVisible(false);
-            m_banner->Reset();
-
-            QString bannerDir = gContext->GetSetting("mythvideo.bannerDir");
-            QString bannerTitle = pginfo->title;
-            QString bannerSeriesID = pginfo->seriesid;
-            QString bannerFile = testImageFiles(bannerDir,
-                                                bannerSeriesID,
-                                                bannerTitle,
-                                                "banner",
-                                                artworkHost);
-            if (!bannerFile.isEmpty())
+            if (m_banner)
             {
-                m_banner->SetFilename(bannerFile);
-
-                m_bannerTimer->setSingleShot(true);
-                m_bannerTimer->start(500);
+                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
+                                              "banner", artworkHost);
+                loadArtwork(artworkFile, m_banner, m_bannerTimer, 50);
             }
-        }
 
-        if (m_coverart)
-        {
-            m_coverartTimer->stop();
-            m_coverart->SetVisible(false);
-            m_coverart->Reset();
-
-            QString coverDir = gContext->GetSetting("VideoArtworkDir");
-            QString coverTitle = pginfo->title;
-            QString coverSeriesID = pginfo->seriesid;
-            QString coverFile = testImageFiles(coverDir,
-                                               coverSeriesID,
-                                               coverTitle,
-                                               "coverart",
-                                               artworkHost);
-            if (!coverFile.isEmpty())
+            if (m_coverart)
             {
-                m_coverart->SetFilename(coverFile);
-
-                m_coverartTimer->setSingleShot(true);
-                m_coverartTimer->start(500);
+                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
+                                              "coverart", artworkHost);
+                loadArtwork(artworkFile, m_coverart, m_coverartTimer, 50);
             }
         }
 
@@ -2020,24 +1976,57 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
 
 void PlaybackBox::fanartLoad(void)
 {
-    m_fanart->SetVisible(true);
     m_fanart->Load();
 }
 
 void PlaybackBox::bannerLoad(void)
 {
-    m_banner->SetVisible(true);
     m_banner->Load();
 }
 
 void PlaybackBox::coverartLoad(void)
 {
-    m_coverart->SetVisible(true);
     m_coverart->Load();
 }
 
-QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
-                                    QString &titleIn, QString imagetype, QString host)
+bool PlaybackBox::loadArtwork(QString artworkFile, MythUIImage *image, QTimer *timer,
+                              int delay, bool resetImage)
+{
+    bool wasActive = timer->isActive();
+
+    if (artworkFile.isEmpty())
+    {
+        if (wasActive)
+            timer->stop();
+
+        image->Reset();
+
+        return true;
+    }
+    else
+    {
+        if (artworkFile != image->GetFilename())
+        {
+            if (wasActive)
+                timer->stop();
+
+            if (resetImage)
+                image->Reset();
+
+            image->SetFilename(artworkFile);
+
+            timer->setSingleShot(true);
+            timer->start(delay);
+
+            return wasActive;
+        }
+    }
+
+    return false;
+}
+
+QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
+                                     QString imagetype, QString host)
 {
     static QHash <QString, QString>imageFileCache;
 
@@ -2049,13 +2038,23 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
 
     QString foundFile;
     QString sgroup;
+    QString localDir;
 
-    if (imagetype == "coverart")
-        sgroup = "Coverart";
     if (imagetype == "fanart")
+    {
         sgroup = "Fanart";
-    if (imagetype == "banner")
+        localDir = gContext->GetSetting("mythvideo.fanartDir");
+    }
+    else if (imagetype == "banner")
+    {
         sgroup = "Banners";
+        localDir = gContext->GetSetting("mythvideo.bannerDir");
+    }
+    else if (imagetype == "coverart")
+    {
+        sgroup = "Coverart";
+        localDir = gContext->GetSetting("VideoArtworkDir");
+    }
 
     // Attempts to match image file in specified directory.
     // Falls back like this:
@@ -2082,7 +2081,7 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
     //     or SeriesID.ext or Title.ext (without caring about cases,
     //     spaces, dashes, periods, or underscores)
 
-    QDir dir(testDirectory);
+    QDir dir(localDir);
     dir.setSorting(QDir::Name | QDir::Reversed | QDir::IgnoreCase);
 
     QStringList entries = dir.entryList();
@@ -2144,8 +2143,8 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
         if (foundFile.startsWith("myth://"))
             imageFileCache[cacheKey] = foundFile;
         else
-            imageFileCache[cacheKey] = QString("%1/%2")
-                               .arg(testDirectory).arg(foundFile);
+            imageFileCache[cacheKey] = QString("%1/%2").arg(localDir)
+                                               .arg(foundFile);
         return imageFileCache[cacheKey];
     }
     else
