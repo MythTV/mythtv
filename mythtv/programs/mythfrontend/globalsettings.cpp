@@ -836,9 +836,9 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
 
         cmp[i]->setLabel(tr("Match Criteria"));
         width[i]->setName(QString("w%1").arg(i));
-        width[i]->setLabel(tr("W"));
+        width[i]->setLabel(tr("W", "Width"));
         height[i]->setName(QString("h%1").arg(i));
-        height[i]->setLabel(tr("H"));
+        height[i]->setLabel(tr("H", "Height"));
 
         row[i]->addChild(cmp[i]);
         row[i]->addChild(width[i]);
