@@ -138,4 +138,22 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <location filename="themestrings.h" line="2"/>
+        <source>View Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Browse Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>Rental History</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

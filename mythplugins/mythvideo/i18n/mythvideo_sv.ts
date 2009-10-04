@@ -1202,6 +1202,62 @@ Kontrollera videohanterarens inställningar</translation>
         <source>Save as default</source>
         <translation>Spara som standard</translation>
     </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Player Settings</source>
+        <translation type="unfinished">Inställningar för spelare</translation>
+    </message>
+    <message>
+        <source>File Types</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Manager</source>
+        <translation type="unfinished">Videohanterare</translation>
+    </message>
+    <message>
+        <source>Play DVD</source>
+        <translation type="unfinished">Spela DVD</translation>
+    </message>
+    <message>
+        <source>Play VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip DVD</source>
+        <translation type="unfinished">Lagra DVD</translation>
+    </message>
+    <message>
+        <source>Eject media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback and DVD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TitleDialog</name>

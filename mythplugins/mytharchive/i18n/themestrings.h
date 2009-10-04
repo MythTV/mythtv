@@ -1,4 +1,8 @@
 void strings_null() {
+    ThemeUI::tr("A high quality profile giving approx. 1 hour of video on a single layer DVD");
+    ThemeUI::tr("A standard play profile giving approx. 2 hour of video on a single layer DVD");
+    ThemeUI::tr("A long play profile giving approx. 4 hour of video on a single layer DVD");
+    ThemeUI::tr("A extended play profile giving approx. 6 hour of video on a single layer DVD");
     ThemeUI::tr("Select Destination");
     ThemeUI::tr("description goes here.");
     ThemeUI::tr("Free Space:");
@@ -50,4 +54,12 @@ void strings_null() {
     ThemeUI::tr("Callsign:");
     ThemeUI::tr("Name:");
     ThemeUI::tr("Local Channel");
+    ThemeUI::tr("Create DVD");
+    ThemeUI::tr("Create Archive");
+    ThemeUI::tr("Encode Video File");
+    ThemeUI::tr("Import Archive");
+    ThemeUI::tr("Archive Utilities");
+    ThemeUI::tr("Show Log Viewer");
+    ThemeUI::tr("Play Created DVD");
+    ThemeUI::tr("Burn DVD");
 }

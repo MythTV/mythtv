@@ -112,4 +112,19 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>View Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rental History</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

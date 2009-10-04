@@ -73,4 +73,18 @@ void strings_null() {
     ThemeUI::tr("Watched :");
     ThemeUI::tr("Result");
     ThemeUI::tr("Save as default");
+    ThemeUI::tr("General Settings");
+    ThemeUI::tr("Player Settings");
+    ThemeUI::tr("File Types");
+    ThemeUI::tr("Rip Settings");
+    ThemeUI::tr("Browse Videos");
+    ThemeUI::tr("Video List");
+    ThemeUI::tr("Video Gallery");
+    ThemeUI::tr("Video Manager");
+    ThemeUI::tr("Play DVD");
+    ThemeUI::tr("Play VCD");
+    ThemeUI::tr("Rip DVD");
+    ThemeUI::tr("Eject media");
+    ThemeUI::tr("Videos Settings");
+    ThemeUI::tr("Configure playback and DVD ripping");
 }

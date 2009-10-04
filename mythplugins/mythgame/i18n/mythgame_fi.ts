@@ -456,5 +456,25 @@ Pelitietokannasta. Oletko Varma?</translation>
         <source>Game Information</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Players</source>
+        <translation type="unfinished">Emulaattorit</translation>
+    </message>
+    <message>
+        <source>Scan for Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Game Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

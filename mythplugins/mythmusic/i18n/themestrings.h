@@ -44,4 +44,15 @@ void strings_null() {
     ThemeUI::tr("Image Type:");
     ThemeUI::tr("Copy");
     ThemeUI::tr("Please Wait ...");
+    ThemeUI::tr("General Settings");
+    ThemeUI::tr("Player Settings");
+    ThemeUI::tr("Ripper Settings");
+    ThemeUI::tr("Play Music");
+    ThemeUI::tr("Select Music");
+    ThemeUI::tr("Import CD");
+    ThemeUI::tr("Import Files");
+    ThemeUI::tr("Scan for New Music");
+    ThemeUI::tr("Eject media");
+    ThemeUI::tr("Music Settings");
+    ThemeUI::tr("Configure playback and CD ripping");
 }

@@ -272,6 +272,21 @@
         <source>Monitor 4</source>
         <translation>Bildskärm 4</translation>
     </message>
+    <message>
+        <location filename="themestrings.h" line="39"/>
+        <source>Show Console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="40"/>
+        <source>Show Live View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="41"/>
+        <source>Show Events</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ZMClient</name>

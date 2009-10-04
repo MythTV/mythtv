@@ -1943,6 +1943,50 @@ Chcesz usunąć istniejący utwór?</translation>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Player Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ripper Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for New Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback and CD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VisualizationsEditor</name>

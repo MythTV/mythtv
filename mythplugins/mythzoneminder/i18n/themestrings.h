@@ -36,4 +36,7 @@ void strings_null() {
     ThemeUI::tr("Monitor 2");
     ThemeUI::tr("Monitor 3");
     ThemeUI::tr("Monitor 4");
+    ThemeUI::tr("Show Console");
+    ThemeUI::tr("Show Live View");
+    ThemeUI::tr("Show Events");
 }

@@ -463,127 +463,152 @@ want to do this?</source>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>System:</source>
+        <source>Games</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
-        <source>Year:</source>
+        <source>System:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
-        <source>Genre:</source>
+        <source>Year:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="5"/>
-        <source>Favorite:</source>
+        <source>Genre:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="6"/>
-        <source>No</source>
+        <source>Favorite:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="7"/>
-        <source>Yes</source>
+        <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="8"/>
-        <source>Edit Game Information</source>
+        <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="9"/>
-        <source>Game Name:</source>
+        <source>Edit Game Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="10"/>
-        <source>Country:</source>
+        <source>Game Name:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>
-        <source>Publisher:</source>
+        <source>Country:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
-        <source>Plot:</source>
+        <source>Publisher:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
-        <source>Screenshot:</source>
+        <source>Plot:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
-        <source>Fanart:</source>
+        <source>Screenshot:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
-        <source>Boxart:</source>
+        <source>Fanart:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>
-        <source>/path/to/the/thing.jpg</source>
+        <source>Boxart:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
-        <source>Done</source>
+        <source>/path/to/the/thing.jpg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="18"/>
-        <source>Game:</source>
+        <source>Done</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
-        <source>Type:</source>
+        <source>Game:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
-        <source>Filename:</source>
+        <source>Type:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
-        <source>Rompath:</source>
+        <source>Filename:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
-        <source>System(s):</source>
+        <source>Rompath:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="23"/>
-        <source>CRC:</source>
+        <source>System(s):</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="24"/>
-        <source>No Plot.</source>
+        <source>CRC:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
-        <source>Play</source>
+        <source>No Plot.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="27"/>
         <source>Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="28"/>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="29"/>
+        <source>Game Players</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="30"/>
+        <source>Scan for Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="31"/>
+        <source>Clear Game Data</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

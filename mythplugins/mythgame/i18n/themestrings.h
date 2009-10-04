@@ -1,4 +1,5 @@
 void strings_null() {
+    ThemeUI::tr("Games");
     ThemeUI::tr("System:");
     ThemeUI::tr("Year:");
     ThemeUI::tr("Genre:");
@@ -24,4 +25,8 @@ void strings_null() {
     ThemeUI::tr("No Plot.");
     ThemeUI::tr("Play");
     ThemeUI::tr("Game Information");
+    ThemeUI::tr("General Settings");
+    ThemeUI::tr("Game Players");
+    ThemeUI::tr("Scan for Games");
+    ThemeUI::tr("Clear Game Data");
 }

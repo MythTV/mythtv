@@ -950,6 +950,54 @@ Place a blank DVD in the drive and select an option below.</source>
         <source>Local Channel</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>A high quality profile giving approx. 1 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A standard play profile giving approx. 2 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A long play profile giving approx. 4 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A extended play profile giving approx. 6 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encode Video File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Utilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Log Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Created DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished">Graver un DVD</translation>
+    </message>
 </context>
 <context>
     <name>ThumbFinder</name>

@@ -1201,6 +1201,62 @@ Check VideoManager Settings</source>
         <source>Save as default</source>
         <translation type="unfinished">規定で保存</translation>
     </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Player Settings</source>
+        <translation type="unfinished">プレイヤー設定</translation>
+    </message>
+    <message>
+        <source>File Types</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Manager</source>
+        <translation type="unfinished">ビデオマネージャ</translation>
+    </message>
+    <message>
+        <source>Play DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play VCD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Videos Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback and DVD ripping</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TitleDialog</name>

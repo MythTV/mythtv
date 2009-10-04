@@ -457,5 +457,25 @@ tes-vous sûr de vouloir faire cela ?</translation>
         <source>Yes</source>
         <translation type="unfinished">Oui</translation>
     </message>
+    <message>
+        <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Players</source>
+        <translation type="unfinished">Émulateurs</translation>
+    </message>
+    <message>
+        <source>Scan for Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Game Data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
