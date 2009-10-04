@@ -329,7 +329,7 @@
         <text>Weather Station Settings</text>
         <text lang="FR">Réglages Station météo</text>
         <text lang="DE">Wetterstation</text>
-        <description></description>
+        <text lang="HU">Időjárás-mérő állomás beállítása</text>
         <action>CONFIGPLUGIN mythwstation</action>
         <depends>mythwstation</depends>
     </button>
@@ -565,6 +565,7 @@
         <text lang="DA">ZoneMinder</text>
         <text lang="PL">Ustaw straĹźnika</text>
         <text lang="FI">Zoneminder Asetukset</text>
+        <text lang="HU">Video megfigyelő beállítások</text>
         <text lang="DE">Zoneminder</text>
         <description>Set up surveillance software</description>
         <description lang="DE">Einstellungen der Überwachungssoftware</description>

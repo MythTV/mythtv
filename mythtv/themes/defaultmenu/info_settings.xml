@@ -36,6 +36,7 @@
         <text>Weather Station Settings</text>
         <text lang="FR">Réglages Station météo</text>
         <text lang="DE">Wetterstation</text>
+        <text lang="HU">Időjárás-mérő állomás beállítása</text>
         <description></description>
         <action>CONFIGPLUGIN mythwstation</action>
         <depends>mythwstation</depends>

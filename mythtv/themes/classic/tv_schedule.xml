@@ -185,6 +185,7 @@
         <type>TV_RECORDING_RULES</type>
         <text>Recording Rules</text>
         <text lang="FR">Règles d&apos;enregistrement</text>
+        <text lang="HU">Felvételi szabályok</text>
         <text lang="DE">Aufnahmeregeln</text>
         <alttext>Manage Rules</alttext>
         <alttext lang="FR">Gérer les règles</alttext>

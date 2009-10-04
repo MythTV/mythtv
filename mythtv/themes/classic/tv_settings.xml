@@ -107,6 +107,7 @@
         <text lang="JA">プレイバックグループ</text>
         <text lang="RU">Группы воспроизведения</text>
         <text lang="PL">Grupy odtwarzania</text>
+        <text lang="HU">Lejátszási csoport</text>
         <text lang="DE">Wiedergabegruppen</text>
         <alttext lang="RU">Группы</alttext>
         <alttext lang="PL">Grupy</alttext>
@@ -119,6 +120,7 @@
       <type>TV_SETTINGS_CHANNEL_GROUP</type>
       <text>Channel Groups</text>
       <text lang="FR">Groupes de chaînes</text>
+      <text lang="HU">Csatorna csoport</text>
       <text lang="DE">Sendergruppen</text>
       <description lang="DE">Einstellungen für die Sendergruppen</description>
       <action>SETTINGS CHANNELGROUPS</action>
