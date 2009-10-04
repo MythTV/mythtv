@@ -3958,7 +3958,6 @@ void PlaybackBox::showGroupFilter(void)
 
     uint items = 0;
     uint totalItems = 0;
-    QString itemStr;
 
     // Add the group entries
     displayNames.append(QString("------- %1 -------").arg(tr("Groups")));
@@ -3975,7 +3974,6 @@ void PlaybackBox::showGroupFilter(void)
         {
             dispGroup = query.value(0).toString();
             items     = query.value(1).toInt();
-            itemStr   = (items == 1) ? tr("item") : tr("items");
 
             if ((dispGroup != "LiveTV" || (m_viewMask & VIEW_LIVETVGRP)) &&
                 (dispGroup != "Deleted"))
@@ -3987,18 +3985,15 @@ void PlaybackBox::showGroupFilter(void)
             dispGroup = (dispGroup == "Deleted") ? tr("Deleted") : dispGroup;
             dispGroup = (dispGroup == "LiveTV")  ? tr("LiveTV")  : dispGroup;
 
-            displayNames.append(QString("%1 [%2 %3]").arg(dispGroup).arg(items)
-                                .arg(itemStr));
+            displayNames.append(tr("%1 [%n item(s)]", 0, items).arg(dispGroup));
 
             m_recGroupType[query.value(0).toString()] = "recgroup";
         }
     }
 
     // Create and add the "All Programs" entry
-    itemStr = (totalItems == 1) ? tr("item") : tr("items");
-    displayNames.prepend(QString("%1 [%2 %3]")
-                        .arg(ProgramInfo::i18n("All Programs"))
-                        .arg(totalItems).arg(itemStr));
+    displayNames.prepend(tr("%1 [%n item(s)]", 0, totalItems)
+                         .arg(ProgramInfo::i18n("All Programs")));
     groupNames.prepend("All Programs");
     m_recGroupType["All Programs"] = "recgroup";
 
@@ -4013,8 +4008,6 @@ void PlaybackBox::showGroupFilter(void)
         while (query.next())
         {
             items     = query.value(1).toInt();
-            itemStr   = (items == 1) ? tr("item") : tr("items");
-
             dispGroup = query.value(0).toString();
             if (dispGroup.isEmpty())
             {
@@ -4027,8 +4020,7 @@ void PlaybackBox::showGroupFilter(void)
             if ((!m_recGroupType.contains(dispGroup)) &&
                 (dispGroup != tr("Unknown")))
             {
-                displayGroups += QString("%1 [%2 %3]").arg(dispGroup)
-                                  .arg(items).arg(itemStr);
+                displayGroups += tr("%1 [%n item(s)]", 0, items).arg(dispGroup);
                 groups += dispGroup;
 
                 m_recGroupType[dispGroup] = "category";
@@ -4039,9 +4031,7 @@ void PlaybackBox::showGroupFilter(void)
         {
             dispGroup = tr("Unknown");
             items     = unknownCount;
-            itemStr   = (items == 1) ? tr("item") : tr("items");
-            displayGroups += QString("%1 [%2 %3]").arg(dispGroup)
-                              .arg(items).arg(itemStr);
+            displayGroups += tr("%1 [%n item(s)]", 0, items).arg(dispGroup);
             groups += dispGroup;
 
             m_recGroupType[dispGroup] = "category";
