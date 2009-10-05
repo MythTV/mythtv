@@ -146,7 +146,7 @@ bool VDPAUContext::Init(MythXDisplay *disp, Window win, QSize screen_size,
     if (!ok)
         return ok;
 
-    ok = InitFlipQueue(win, color_key);
+    XLOCK(disp, ok = InitFlipQueue(win, color_key));
     if (!ok)
         return ok;
 

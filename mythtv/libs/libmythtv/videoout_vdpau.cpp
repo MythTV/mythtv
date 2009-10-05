@@ -102,12 +102,19 @@ bool VideoOutputVDPAU::InitContext(void)
 void VideoOutputVDPAU::DeleteContext(void)
 {
     QMutexLocker locker(&m_lock);
+
+    if (m_disp)
+        m_disp->Lock();
+
     if (m_ctx)
     {
         m_ctx->Deinit();
         delete m_ctx;
     }
     m_ctx = NULL;
+
+    if (m_disp)
+        m_disp->Unlock();
 }
 
 bool VideoOutputVDPAU::InitBuffers(void)
