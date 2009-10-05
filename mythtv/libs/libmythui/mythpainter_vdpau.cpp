@@ -379,19 +379,14 @@ void MythVDPAUPrivate::Begin(QWidget *parent)
         curOutput,
         &dummy
     );
-    CHECK_ST
+    CHECK_ST;
 
-    if (m_surfaceDeleteList.size())
+    QMutexLocker locker(&m_surfaceDeleteLock);
+    while (!m_surfaceDeleteList.empty())
     {
-        m_surfaceDeleteLock.lock();
-        while (m_surfaceDeleteList.size())
-        {
-            VdpBitmapSurface bitmap = m_surfaceDeleteList.front();
-            m_surfaceDeleteList.pop_front();
-
-            vdp_bitmap_surface_destroy(bitmap);
-        }
-        m_surfaceDeleteLock.unlock();
+        VdpBitmapSurface bitmap = m_surfaceDeleteList.front();
+        m_surfaceDeleteList.pop_front();
+        vdp_bitmap_surface_destroy(bitmap);
     }
 }
 
