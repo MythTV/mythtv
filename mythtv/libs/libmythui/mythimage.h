@@ -4,6 +4,7 @@
 // Base class, inherited by painter-specific classes.
 
 #include <QImage>
+#include <QMutex>
 #include <QPixmap>
 
 #include "mythpainter.h"
@@ -21,7 +22,7 @@ class MPUBLIC MythImage : public QImage
     void UpRef(void);
     bool DownRef(void);
 
-    int RefCount(void) const { return m_RefCount; }
+    int RefCount(void);
 
     virtual void SetChanged(bool change = true) { m_Changed = change; }
     bool IsChanged() const { return m_Changed; }
@@ -74,7 +75,8 @@ class MPUBLIC MythImage : public QImage
     bool m_Changed;
     MythPainter *m_Parent;
 
-    int m_RefCount;
+    int    m_RefCount;
+    QMutex m_RefCountLock;
 
     bool m_isGradient;
     QColor m_gradBegin;

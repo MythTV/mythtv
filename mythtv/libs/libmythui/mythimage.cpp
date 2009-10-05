@@ -54,9 +54,9 @@ MythImage::~MythImage()
     m_Parent->DeleteFormatImage(this);
 }
 
-// these technically should be locked, but all deletion should be happening in the UI thread, and nowhere else.
 void MythImage::UpRef(void)
 {
+    QMutexLocker locker(&m_RefCountLock);
     if (m_ui && m_cached && m_RefCount == 1)
         m_ui->ExcludeFromCacheSize(this);
     m_RefCount++;
@@ -64,6 +64,7 @@ void MythImage::UpRef(void)
 
 bool MythImage::DownRef(void)
 {
+    QMutexLocker locker(&m_RefCountLock);
     m_RefCount--;
     if (m_ui && m_cached)
     {
@@ -81,8 +82,15 @@ bool MythImage::DownRef(void)
     return false;
 }
 
+int MythImage::RefCount(void)
+{
+    QMutexLocker locker(&m_RefCountLock);
+    return m_RefCount;
+}
+
 void MythImage::SetIsInCache(bool bCached)
 {
+    QMutexLocker locker(&m_RefCountLock);
     if (m_ui && m_RefCount == 1)
     {
         if (!m_cached && bCached)
@@ -95,6 +103,7 @@ void MythImage::SetIsInCache(bool bCached)
 
 void MythImage::Assign(const QImage &img)
 {
+    QMutexLocker locker(&m_RefCountLock);
     if (m_ui && m_RefCount == 1 && m_cached)
         m_ui->ExcludeFromCacheSize(this);
     *(static_cast<QImage *> (this)) = img;
