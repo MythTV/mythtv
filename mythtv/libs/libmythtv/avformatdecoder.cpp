@@ -2327,7 +2327,7 @@ void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
     else
     {
         VERBOSE(VB_IMPORTANT, LOC +
-                "render_slice_xvmc called with bad avctx or src");
+                "render_slice_vdpau called with bad avctx or src");
     }
 }
 
