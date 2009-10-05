@@ -5,8 +5,12 @@
 // Config header generated in base directory by configure
 #include "config.h"
 
-// C/C++ headers
-#include <math.h>
+// C headers
+#include <cmath>
+
+// C++ headers
+#include <vector>
+using namespace std;
 
 // QT headers
 #include <QApplication>
@@ -93,21 +97,16 @@ void MythOpenGLPainter::Begin(QWidget *parent)
         return;
     }
 
-    if (m_textureDeleteList.size())
+    vector<GLuint> textures;
     {
-        GLuint textures[1];
-
-        m_textureDeleteLock.lock();
-        while (m_textureDeleteList.size())
+        QMutexLocker locker(&m_textureDeleteLock);
+        while (!m_textureDeleteList.empty())
         {
-            textures[0] = m_textureDeleteList.front();
+            textures.push_back(m_textureDeleteList.front());
             m_textureDeleteList.pop_front();
-
-            glDeleteTextures(1, textures);
         }
-        m_textureDeleteLock.unlock();
     }
-
+    glDeleteTextures(textures.size(), &textures[0]);
 
     realParent->makeCurrent();
     glClearColor(0.0, 0.0, 0.0, 0.0);
