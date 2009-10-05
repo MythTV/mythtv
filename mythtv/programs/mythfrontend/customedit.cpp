@@ -15,7 +15,6 @@
 #include "mythuitextedit.h"
 #include "mythuibutton.h"
 #include "mythdialogbox.h"
-#include "mythdialogs.h"
 
 // libmythtv
 #include "recordingrule.h"
@@ -683,7 +682,6 @@ void CustomEdit::storeClicked(void)
                                       .arg(item->GetText());
             storediag->AddButton(str);
         }
-        storediag->AddButton(tr("Cancel"));
         mainStack->AddScreen(storediag);
     }
     else
@@ -730,13 +728,12 @@ bool CustomEdit::checkSyntax(void)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
-        MythDialogBox *checkSyntaxPopup =
-               new MythDialogBox(msg, popupStack, "checkSyntaxPopup");
+        MythConfirmationDialog *checkSyntaxPopup =
+               new MythConfirmationDialog(popupStack, msg, false);
 
         if (checkSyntaxPopup->Create())
         {
             checkSyntaxPopup->SetReturnEvent(this, "checkSyntaxPopup");
-            checkSyntaxPopup->AddButton(tr("Ok"));
             popupStack->AddScreen(checkSyntaxPopup);
         }
         else
@@ -831,7 +828,7 @@ void CustomEdit::customEvent(QEvent *event)
              {
                  deleteRule();
              }
-             else if (!resulttext.isEmpty() && resulttext != tr("Cancel"))
+             else if (!resulttext.isEmpty())
              {
                  storeRule(resulttext.contains(tr("as a search")),
                            !resulttext.startsWith(tr("Replace")));
