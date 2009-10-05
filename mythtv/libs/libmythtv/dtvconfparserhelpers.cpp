@@ -38,6 +38,13 @@ QString DTVParamHelper::toString(const char *strings[], int index,
     return strings[index];
 }
 
+const int DTVTunerType::kTunerTypeDVBS1   = 0x00;
+const int DTVTunerType::kTunerTypeDVBS2   = 0x20;
+const int DTVTunerType::kTunerTypeDVBC    = 0x01;
+const int DTVTunerType::kTunerTypeDVBT    = 0x02;
+const int DTVTunerType::kTunerTypeATSC    = 0x03;
+const int DTVTunerType::kTunerTypeUnknown = 0x80000000;
+
 static QMutex dtv_tt_canonical_str_lock;
 static QMap<int,QString> dtv_tt_canonical_str;
 void DTVTunerType::initStr(void)

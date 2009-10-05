@@ -73,41 +73,47 @@ class DTVTunerType : public DTVParamHelper
     static const DTVParamHelperStruct parseTable[];
 
   public:
-    typedef enum
-    {
-        //                           Modulations which may be supported
-        kTunerTypeDVBS1   = 0x00, // QPSK
-        kTunerTypeDVBS2   = 0x20, // QPSK, 8PSK, 16APSK, 32APSK
-        kTunerTypeDVBC    = 0x01, // QAM-64, QAM-256
-        kTunerTypeDVBT    = 0x02, // OFDM
-        kTunerTypeATSC    = 0x03, // 8-VSB, 16-VSB, QAM-16, QAM-64, QAM-256, QPSK
-        kTunerTypeUnknown = 0x80000000,
+    // WARNING: kTunerTypes can not be defined by a C++03 enum
+    // because gcc 4.3.3 will reportedly promote an enum inconsistently
+    // to int on IA-32 platforms. I don't know whether this is
+    // correct or not, it comes down to interpretation of section
+    // 7.2.5 and whether 0x80000000 should be considered to big
+    // for a 32 bit integer or not. Using an enum to represent int
+    // bitmasks is valid C code, but the C++03 standard was still a
+    // bit loosey gosey on this point. It looks like the breakage
+    // was caused by work in gcc to support C++0x which will allow
+    // one to specify things as exactly as C does. -- dtk 2009-10-05
 
-        // Note: Just because some cards sold in different regions support the same
-        // modulation scheme does not mean that they decode the same signals, there
-        // are also region specific FEC algorithms and the tuner which precedes the
-        // demodulator may be limited to frequencies used in that specific market.
-        // The tuner may also be bandwidth limited to 6 or 7 Mhz, so it could not
-        // support the 8 Mhz channels used in some contries, and/or the ADC which
-        // sits between the tuner and the demodulator may be bandwidth limited.
-        // While often the same hardware could physically support more than it
-        // is designed for the card/device maker does not write the firmware
-        // but licenses blocks of it and so only selects the pieces absolutely
-        // necessary for their market segment. Some ATSC cards only supported
-        // 8-VSB, newer cards don't support the unpopular 16-VSB, no consumer
-        // card supports the QAM-16 or QPSK used for USA Cable PSIP, etc.
-        // DVB-S cards also generally support DiSEqC signaling, and future
-        // ATSC cards may support similar but incompatible signalling for
-        // pointable antennas.
-        //
-        // Note 2: These values are keyed to the Linux DVB driver values, in
-        // reality some hardware does support multiple formats and this should
-        // be a mask. Also the transmission schemes used in Asia and South
-        // America are not represented here.
-    } my_enum;
+    //                                // Modulations which may be supported
+    static const int kTunerTypeDVBS1; // QPSK
+    static const int kTunerTypeDVBS2; // QPSK, 8PSK, 16APSK, 32APSK
+    static const int kTunerTypeDVBC;  // QAM-64, QAM-256
+    static const int kTunerTypeDVBT;  // OFDM
+    static const int kTunerTypeATSC;  // 8-VSB, 16-VSB,
+                                      // QAM-16, QAM-64, QAM-256, QPSK
+    static const int kTunerTypeUnknown;
 
-    bool operator==(const my_enum& v) const { return value == (int) v; }
-    bool operator!=(const my_enum& v) const { return value != (int) v; }
+    // Note: Just because some cards sold in different regions support the same
+    // modulation scheme does not mean that they decode the same signals, there
+    // are also region specific FEC algorithms and the tuner which precedes the
+    // demodulator may be limited to frequencies used in that specific market.
+    // The tuner may also be bandwidth limited to 6 or 7 Mhz, so it could not
+    // support the 8 Mhz channels used in some contries, and/or the ADC which
+    // sits between the tuner and the demodulator may be bandwidth limited.
+    // While often the same hardware could physically support more than it
+    // is designed for the card/device maker does not write the firmware
+    // but licenses blocks of it and so only selects the pieces absolutely
+    // necessary for their market segment. Some ATSC cards only supported
+    // 8-VSB, newer cards don't support the unpopular 16-VSB, no consumer
+    // card supports the QAM-16 or QPSK used for USA Cable PSIP, etc.
+    // DVB-S cards also generally support DiSEqC signaling, and future
+    // ATSC cards may support similar but incompatible signalling for
+    // pointable antennas.
+    //
+    // Note 2: These values are keyed to the Linux DVB driver values, in
+    // reality some hardware does support multiple formats and this should
+    // be a mask. Also the transmission schemes used in Asia and South
+    // America are not represented here.
 
     DTVTunerType(int _default = kTunerTypeUnknown)
         : DTVParamHelper(_default) { initStr(); }
