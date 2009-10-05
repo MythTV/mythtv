@@ -87,9 +87,9 @@ class MPUBLIC MythUIImage : public MythUIType
     QHash<int, MythImage *> m_Images;
     QMutex                  m_ImagesLock;
 
-    static QHash<QString, int> m_loadingImages;
-    static QMutex              m_loadingImagesLock;
-    static QWaitCondition      m_loadingImagesCond;
+    static QHash<QString, MythUIImage *> m_loadingImages;
+    static QMutex                        m_loadingImagesLock;
+    static QWaitCondition                m_loadingImagesCond;
 
     MythRect m_cropRect;
     QSize m_ForceSize;

@@ -81,9 +81,9 @@ class ImageLoadThread : public QRunnable
 
 /////////////////////////////////////////////////////////////////
 
-QHash<QString, int> MythUIImage::m_loadingImages;
-QMutex              MythUIImage::m_loadingImagesLock;
-QWaitCondition      MythUIImage::m_loadingImagesCond;
+QHash<QString, MythUIImage*> MythUIImage::m_loadingImages;
+QMutex                       MythUIImage::m_loadingImagesLock;
+QWaitCondition               MythUIImage::m_loadingImagesCond;
 
 MythUIImage::MythUIImage(const QString &filepattern,
                          int low, int high, int delayms,
@@ -512,17 +512,28 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber)
 {
     QString filename = imFile;
 
-    // Check to see if any other threads are loading the same exact image
     m_loadingImagesLock.lock();
 
+    // Check to see if the image is being loaded by us in another thread
+    if ((m_loadingImages.contains(filename)) &&
+        (m_loadingImages[filename] == this))
+    {
+        VERBOSE(VB_FILE+VB_EXTRA, QString("MythUIImage::LoadImage(%1), this "
+                "file is already being loaded by this same MythUIImage in "
+                "another thread.").arg(filename));
+        m_loadingImagesLock.unlock();
+        return NULL;
+    }
+
+    // Check to see if the exact same image is being loaded anywhere else
     while (m_loadingImages.contains(filename))
         m_loadingImagesCond.wait(&m_loadingImagesLock);
 
-    m_loadingImages[filename] = 1;
+    m_loadingImages[filename] = this;
     m_loadingImagesLock.unlock();
 
-    VERBOSE(VB_FILE, QString("MythUIImage::LoadImage(%1) Object %2").arg(filename)
-                                                .arg(objectName()));
+    VERBOSE(VB_FILE, QString("MythUIImage::LoadImage(%1, %2) Object %3")
+            .arg((long long)this).arg(filename).arg(objectName()));
 
     MythImage *image = NULL;
     bool bNeedLoad = false;
@@ -571,7 +582,8 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber)
         if (image)
         {
             image->UpRef();
-            VERBOSE(VB_FILE, QString("MythUIImage::LoadImage found in cache :%1:").arg(imagelabel));
+            VERBOSE(VB_FILE, QString("MythUIImage::LoadImage found in cache "
+                    ":%1: RefCount = %2").arg(imagelabel).arg(image->RefCount()));
             if (m_isReflected)
                 image->setIsReflected(true);
 
@@ -997,18 +1009,12 @@ void MythUIImage::customEvent(QEvent *event)
         m_ImagesLock.lock();
         if (m_Images.contains(number))
         {
-            // There should be no image at this location, if
-            // we find one then something is wrong.
-            VERBOSE(VB_IMPORTANT, QString("DEBUG Image Thread: "
-                    "Found image in m_Images position %1 where "
-                    "there should be none. Filename: %2")
-                    .arg(number).arg(filename));
-            image->DownRef();
+            // If we got to this point, it means this same MythUIImage
+            // was told to reload the same image, so we use the newest
+            // copy of the image.
+            m_Images[number]->DownRef(); // delete the original
         }
-        else
-        {
-            m_Images[number] = image;
-        }
+        m_Images[number] = image;
         m_ImagesLock.unlock();
 
         SetRedraw();
