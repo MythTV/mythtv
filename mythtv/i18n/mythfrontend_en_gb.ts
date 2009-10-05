@@ -253,19 +253,19 @@
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="279"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="326"/>
         <source>Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Channel Name</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="160"/>
         <source>Delete all channels on currently selected source(s).</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete all channels on currently selected source(s).</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="164"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="283"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="331"/>
         <source>Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Channel Number</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="171"/>
@@ -275,57 +275,57 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="183"/>
         <source>(Unassigned)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Unassigned)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="194"/>
         <source>Starts the channel scanner.</source>
-        <translation type="unfinished"></translation>
+        <translation>Starts the channel scanner.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="198"/>
         <source>Starts the icon downloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Starts the icon downloader</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="204"/>
         <source>Allows you to edit the transports directly. This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="unfinished"></translation>
+        <translation>Allows you to edit the transports directly. This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="256"/>
         <source>(Add New Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Add New Channel)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="409"/>
         <source>Delete channel &apos;%1&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete channel &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="433"/>
         <source>Delete ALL channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete ALL channels?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="434"/>
         <source>Delete all unassigned channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete all unassigned channels?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="435"/>
         <source>Delete all channels on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete all channels on %1?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="548"/>
         <source>Icon Import Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Icon Import Options</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="561"/>
         <source>Download icon for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Download icon for %1</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="473"/>
@@ -479,289 +479,278 @@
 <context>
     <name>CustomEdit</name>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="38"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="37"/>
         <source>stored example</source>
         <translation>stored example</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="107"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="106"/>
         <source>&lt;New rule&gt;</source>
         <translation>&lt;New rule&gt;</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="160"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="159"/>
         <source>Match an exact title</source>
         <translation>Match an exact title</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="221"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="220"/>
         <source>Match an exact episode</source>
         <translation>Match an exact episode</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="178"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="177"/>
         <source>Match words in the title</source>
         <translation>Match words in the title</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="229"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="228"/>
         <source>Match in any descriptive field</source>
         <translation>Match in any descriptive field</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="365"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="364"/>
         <source>Limit by category</source>
         <translation>Limit by category</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="375"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="374"/>
         <source>All matches for a genre (Data Direct)</source>
         <translation>All matches for a genre (Data Direct)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="387"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="386"/>
         <source>Limit by MPAA or VCHIP rating (Data Direct)</source>
         <translation>Limit by MPAA or VCHIP rating (Data Direct)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="237"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="236"/>
         <source>New episodes only</source>
         <translation>New episodes only</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="243"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="242"/>
         <source>Exclude unidentified episodes</source>
         <translation>Exclude unidentified episodes</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="396"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="395"/>
         <source>Category type</source>
         <translation>Category type</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="397"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="396"/>
         <source>or</source>
         <translation>or</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="403"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="402"/>
         <source>Limit movies by the year of release</source>
         <translation>Limit films by the year of release</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="410"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="409"/>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
         <translation>Minimum star rating (0.0 to 1.0 for films only)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="416"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="415"/>
         <source>Person named in the credits (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Person named in the credits (Data Direct)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="294"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="293"/>
         <source>Only on a specific station</source>
-        <translation type="unfinished"></translation>
+        <translation>Only on a specific channel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="304"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="303"/>
         <source>Exclude one station</source>
-        <translation type="unfinished"></translation>
+        <translation>Exclude one channel</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="310"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="309"/>
         <source>Match related callsigns</source>
-        <translation type="unfinished"></translation>
+        <translation>Match related callsigns</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="316"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="315"/>
         <source>Only on channels marked as favorites</source>
         <translation>Only on channels marked as favourites</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="322"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="321"/>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished"></translation>
+        <translation>Only channels from a specific video source</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="328"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="327"/>
         <source>Only channels marked as commercial free</source>
         <translation>Only channels marked as advert free</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="335"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="334"/>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Only shows marked as High Definition</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="261"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="260"/>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Anytime on a specific day of the week</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="268"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="267"/>
         <source>Only on weekdays (Monday through Friday)</source>
         <translation>Only on weekdays (Monday to Friday)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="274"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="273"/>
         <source>Only on weekends</source>
-        <translation type="unfinished"></translation>
+        <translation>Only on weekends</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="280"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="279"/>
         <source>Only in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>Only in primetime</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="287"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="286"/>
         <source>Not in primetime</source>
-        <translation type="unfinished"></translation>
+        <translation>Not in primetime</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="353"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="352"/>
         <source>Only shows with in-vision signing</source>
-        <translation type="unfinished"></translation>
+        <translation>Only shows with in-vision signing</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="359"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="358"/>
         <source>Only shows with in-vision subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Only shows with in-vision subtitles</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="437"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="436"/>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Multiple sports teams (complete example)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="445"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="444"/>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sci-fi B-movies (complete example)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="454"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="453"/>
         <source>SportsCenter Overnight (complete example - use FindDaily)</source>
         <translation>SportsCentre Overnight (complete example - use FindDaily)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="462"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="461"/>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
         <translation>Film of the Week (complete example - use FindWeekly)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="471"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="470"/>
         <source>First Episodes (complete example for Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>First Episodes (complete example for Data Direct)</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="648"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="647"/>
         <source>Current Example</source>
-        <translation type="unfinished"></translation>
+        <translation>Current Example</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="663"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="662"/>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Store</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="676"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="675"/>
         <source>as an example</source>
-        <translation type="unfinished"></translation>
+        <translation>as an example</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="739"/>
-        <source>Ok</source>
-        <translation>OK</translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="682"/>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="830"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="681"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="827"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="673"/>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="836"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="672"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="833"/>
         <source>as a search</source>
-        <translation type="unfinished"></translation>
+        <translation>as a search</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="665"/>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="837"/>
-        <source>Replace</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="686"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="664"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="834"/>
-        <source>Cancel</source>
-        <translation>Cancel</translation>
+        <source>Replace</source>
+        <translation>Replace</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="720"/>
+        <source>An error was found when checking</source>
+        <translation>An error was found when checking</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="701"/>
+        <source>Power Search rules no longer reqiure a leading &quot;AND&quot;.</source>
+        <translation>Power Search rules no longer reqiure a leading &quot;AND&quot;.</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="705"/>
+        <source>Power Search rules can not include semicolon ( ; ) </source>
+        <translation>Power Search rules can not include semicolon ( ; ) </translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="706"/>
+        <source>statement terminators.</source>
+        <translation>statement terminators.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="722"/>
-        <source>An error was found when checking</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="703"/>
-        <source>Power Search rules no longer reqiure a leading &quot;AND&quot;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="707"/>
-        <source>Power Search rules can not include semicolon ( ; ) </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="708"/>
-        <source>statement terminators.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="724"/>
         <source>The database error was</source>
-        <translation type="unfinished"></translation>
+        <translation>The database error was</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="204"/>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="211"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="203"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="210"/>
         <source>Match this episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Match this episode</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="249"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="248"/>
         <source>First showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>First showing of each episode</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="255"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="254"/>
         <source>Last showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Last showing of each episode</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="37"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="36"/>
         <source>stored search</source>
-        <translation type="unfinished"></translation>
+        <translation>stored search</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="170"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="169"/>
         <source>Match this series</source>
-        <translation type="unfinished"></translation>
+        <translation>Match this series</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="188"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="187"/>
         <source>Match words in the subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Match words in the subtitle</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="341"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="340"/>
         <source>Only shows marked as widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Only shows marked as widescreen</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/customedit.cpp" line="347"/>
+        <location filename="../programs/mythfrontend/customedit.cpp" line="346"/>
         <source>Exclude H.264 encoded streams (EIT only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Exclude H.264 encoded streams (EIT only)</translation>
     </message>
 </context>
 <context>
@@ -769,42 +758,42 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="106"/>
         <source>&lt;New priority rule&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;New priority rule&gt;</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="152"/>
         <source>Modify priority for an input (Input priority)</source>
-        <translation type="unfinished"></translation>
+        <translation>Modify priority for an input (Input priority)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="154"/>
         <source>Modify priority for all inputs on a card</source>
-        <translation type="unfinished"></translation>
+        <translation>Modify priority for all inputs on a card</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="156"/>
         <source>Modify priority for every card on a host</source>
-        <translation type="unfinished"></translation>
+        <translation>Modify priority for every card on a host</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="158"/>
         <source>Only one specific channel ID (Channel priority)</source>
-        <translation type="unfinished"></translation>
+        <translation>Only one specific channel ID (Channel priority)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="160"/>
         <source>Only a certain channel number</source>
-        <translation type="unfinished"></translation>
+        <translation>Only a certain channel number</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="162"/>
         <source>Only channels that carry a specific station</source>
-        <translation type="unfinished"></translation>
+        <translation>Only channels that carry a specific station</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="164"/>
         <source>Match related callsigns</source>
-        <translation type="unfinished"></translation>
+        <translation>Match related callsigns</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="166"/>
@@ -814,57 +803,57 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="169"/>
         <source>Modify priority for a station on an input</source>
-        <translation type="unfinished"></translation>
+        <translation>Modify priority for a station on an input</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="171"/>
         <source>Priority for all matching titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Priority for all matching titles</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="173"/>
         <source>Only shows marked as HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Only shows marked as High Definition</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="175"/>
         <source>Close Captioned priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Close Captioned priority</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="177"/>
         <source>New episodes only</source>
-        <translation type="unfinished">New episodes only</translation>
+        <translation>New episodes only</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="179"/>
         <source>Modify unidentified episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Modify unidentified episodes</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="181"/>
         <source>First showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>First showing of each episode</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="183"/>
         <source>Last showing of each episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Last showing of each episode</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="185"/>
         <source>Priority for any show with End Late time</source>
-        <translation type="unfinished"></translation>
+        <translation>Priority for any show with End Late time</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="187"/>
         <source>Priority for a category</source>
-        <translation type="unfinished"></translation>
+        <translation>Priority for a category</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="190"/>
         <source>Priority for a category type</source>
-        <translation type="unfinished"></translation>
+        <translation>Priority for a category type</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="192"/>
@@ -874,17 +863,17 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="195"/>
         <source>Priority when shown once (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Priority when shown once (complete example)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="197"/>
         <source>Prefer a host for a storage group (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Prefer a host for a storage group (complete example)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="200"/>
         <source>Priority for HD shows under two hours (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Priority for HD shows under two hours (complete example)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="204"/>
@@ -899,22 +888,22 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="211"/>
         <source>Prefer a host for live sports with overtime (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Prefer a host for live sports with overtime (complete example)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="216"/>
         <source>Avoid poor signal quality (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Avoid poor signal quality (complete example)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="364"/>
         <source>An error was found when checking</source>
-        <translation type="unfinished"></translation>
+        <translation>An error was found when checking</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="366"/>
         <source>The database error was</source>
-        <translation type="unfinished"></translation>
+        <translation>The database error was</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="449"/>
@@ -1022,7 +1011,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="149"/>
         <source>Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Tone</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="155"/>
@@ -1108,14 +1097,14 @@
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="392"/>
         <source>E</source>
         <comment>Eastern Hemisphere</comment>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="395"/>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="423"/>
         <source>W</source>
         <comment>Western Hemisphere</comment>
-        <translation type="unfinished"></translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="461"/>
@@ -1360,7 +1349,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="195"/>
         <source>The DiSEqC address of the switch.</source>
-        <translation type="unfinished"></translation>
+        <translation>The DiSEqC address of the switch.</translation>
     </message>
 </context>
 <context>
@@ -1605,89 +1594,89 @@
 <context>
     <name>HelpPopup</name>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4798"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4787"/>
         <source>Commercials are flagged</source>
         <translation>Adverts are flagged</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4799"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4788"/>
         <source>An editing cutlist is present</source>
-        <translation type="unfinished"></translation>
+        <translation>An editing cutlist is present</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4800"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4789"/>
         <source>The program is able to auto-expire</source>
         <translation>The programme is able to auto-expire</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4801"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4790"/>
         <source>Commercials are being flagged</source>
         <translation>Adverts are being flagged</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4802"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4791"/>
         <source>A bookmark is set</source>
-        <translation type="unfinished"></translation>
+        <translation>A bookmark is set</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4795"/>
+        <source>Recording is in Mono</source>
+        <translation>Recording is in Mono</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4796"/>
+        <source>Recording is in Stereo</source>
+        <translation>Recording is in Stereo</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4797"/>
+        <source>Recording is in Surround Sound</source>
+        <translation>Recording is in Surround Sound</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4798"/>
+        <source>Recording is in Dolby Surround Sound</source>
+        <translation>Recording is in Dolby Surround Sound</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4800"/>
+        <source>Recording is Closed Captioned</source>
+        <translation>Recording is Closed Captioned</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4801"/>
+        <source>Recording has Subtitles Available</source>
+        <translation>Recording has Subtitles Available</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4802"/>
+        <source>Recording is Subtitled</source>
+        <translation>Recording is Subtitled</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4804"/>
+        <source>Recording is in 1080i/p High Definition</source>
+        <translation>Recording is in 1080i/p High Definition</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4805"/>
+        <source>Recording is in 720p High Definition</source>
+        <translation>Recording is in 720p High Definition</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4806"/>
-        <source>Recording is in Mono</source>
-        <translation type="unfinished"></translation>
+        <source>Recording is in High Definition</source>
+        <translation>Recording is in High Definition</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4810"/>
+        <source>Recording has been watched</source>
+        <translation>Recording has been watched</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4807"/>
-        <source>Recording is in Stereo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4808"/>
-        <source>Recording is in Surround Sound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4809"/>
-        <source>Recording is in Dolby Surround Sound</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4811"/>
-        <source>Recording is Closed Captioned</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4812"/>
-        <source>Recording has Subtitles Available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4813"/>
-        <source>Recording is Subtitled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4815"/>
-        <source>Recording is in 1080i/p High Definition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4816"/>
-        <source>Recording is in 720p High Definition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4817"/>
-        <source>Recording is in High Definition</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4821"/>
-        <source>Recording has been watched</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4818"/>
         <source>Recording is Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Recording is Widescreen</translation>
     </message>
 </context>
 <context>
@@ -1736,42 +1725,42 @@
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="197"/>
         <source>Icon for %1 was downloaded successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Icon for %1 was downloaded successfully.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="203"/>
         <source>Failed to download the icon for %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to download the icon for %1.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="272"/>
         <source>Initialising, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Initializing, please wait...</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="333"/>
         <source>Downloading, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Downloading, please wait...</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="400"/>
         <source>Choose icon for channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Choose icon for channel %1</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="702"/>
         <source>You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</source>
-        <translation type="unfinished"></translation>
+        <translation>You now have the opportunity to transmit your choices  back to mythtv.org so that others can benefit from your selections.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="726"/>
         <source>Failed to submit icon choices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to submit icon choices.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="760"/>
         <source>Icon choices submitted successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Icon choices submitted successfully.</translation>
     </message>
 </context>
 <context>
@@ -2189,7 +2178,7 @@
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="929"/>
         <source>Channel Recording Priorities</source>
-        <translation type="unfinished">Channel Recording Priorities</translation>
+        <translation>Channel Recording Priorities</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="931"/>
@@ -2938,12 +2927,12 @@
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="370"/>
         <source>Delete</source>
-        <translation type="unfinished">Delete</translation>
+        <translation>Delete</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="372"/>
         <source>Edit</source>
-        <translation type="unfinished">Edit</translation>
+        <translation>Edit</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="379"/>
@@ -2978,157 +2967,157 @@
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="393"/>
         <source>Eject Removable Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Eject Removable Media</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="396"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="397"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="398"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation>2</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="399"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation>3</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="400"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation>4</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="401"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation>5</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="402"/>
         <source>6</source>
-        <translation type="unfinished"></translation>
+        <translation>6</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="403"/>
         <source>7</source>
-        <translation type="unfinished"></translation>
+        <translation>7</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="404"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation>8</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="405"/>
         <source>9</source>
-        <translation type="unfinished"></translation>
+        <translation>9</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="408"/>
         <source>Zoom in on browser window</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom in on browser window</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="410"/>
         <source>Zoom out on browser window</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom out on browser window</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="412"/>
         <source>Toggle where keyboard input goes to</source>
-        <translation type="unfinished"></translation>
+        <translation>Toggle where keyboard input goes to</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="415"/>
         <source>Move mouse pointer up</source>
-        <translation type="unfinished"></translation>
+        <translation>Move mouse pointer up</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="417"/>
         <source>Move mouse pointer down</source>
-        <translation type="unfinished"></translation>
+        <translation>Move mouse pointer down</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="419"/>
         <source>Move mouse pointer left</source>
-        <translation type="unfinished"></translation>
+        <translation>Move mouse pointer left</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="421"/>
         <source>Move mouse pointer right</source>
-        <translation type="unfinished"></translation>
+        <translation>Move mouse pointer right</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="423"/>
         <source>Mouse Left button click</source>
-        <translation type="unfinished"></translation>
+        <translation>Mouse Left button click</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="426"/>
         <source>Scroll down half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Scroll down half a page</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="428"/>
         <source>Scroll up half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Scroll up half a page</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="430"/>
         <source>Scroll left half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Scroll left half a page</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="432"/>
         <source>Scroll right half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Scroll right half a page</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="435"/>
         <source>Move selection to next link</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selection to next link</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="437"/>
         <source>Move selection to previous link</source>
-        <translation type="unfinished"></translation>
+        <translation>Move selection to previous link</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="439"/>
         <source>Follow selected link</source>
-        <translation type="unfinished"></translation>
+        <translation>Follow selected link</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="441"/>
         <source>Go back to previous page</source>
-        <translation type="unfinished"></translation>
+        <translation>Go back to previous page</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="443"/>
         <source>Go forward to previous page</source>
-        <translation type="unfinished"></translation>
+        <translation>Go forward to previous page</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="40"/>
         <source>Open an Xterm window</source>
-        <translation type="unfinished"></translation>
+        <translation>Open an Xterm window</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="42"/>
         <source>Show Mythshutdown settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Show Mythshutdown settings</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="44"/>
         <source>Start Mythtv-Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Start Mythtv-Setup</translation>
     </message>
 </context>
 <context>
@@ -3396,361 +3385,353 @@ Returning to the previous menu.</translation>
 <context>
     <name>PlaybackBox</name>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="591"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="584"/>
         <source>There are %1 recordings in this display group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="595"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="588"/>
         <source>There is one recording in this display group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="598"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="591"/>
         <source>There are no recordings in this display group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="906"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="862"/>
         <source>% used</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="910"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="866"/>
         <source>, %1 GB free</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1840"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1796"/>
         <source>Recording List Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1858"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1814"/>
         <source>Change Group Filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1861"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1817"/>
         <source>Change Group View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1865"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1821"/>
         <source>Change Group Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1870"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1826"/>
         <source>Playlist options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1877"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1833"/>
         <source>Add this Group to Playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1882"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1838"/>
         <source>Add this recording to Playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2205"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2204"/>
         <source>Are you sure you want to delete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2211"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2210"/>
         <source>Are you sure you want to stop:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2241"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2240"/>
         <source>Yes, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Yes, and allow re-record</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2249"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2253"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2248"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2252"/>
         <source>Yes, delete it</source>
-        <translation type="unfinished"></translation>
+        <translation>Yes, delete it</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2344"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2776"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2343"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2775"/>
         <source>Play</source>
         <translation>Play</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2345"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2344"/>
         <source>Shuffle Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Shuffle Play</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2346"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2345"/>
         <source>Clear Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear Playlist</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2351"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2350"/>
         <source>Toggle playlist for this Category/Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2358"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2357"/>
         <source>Toggle playlist for this recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2378"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2581"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2377"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2580"/>
         <source>Change Recording Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2380"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2584"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2379"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2583"/>
         <source>Change Playback Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2363"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2632"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2803"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2362"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2631"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2802"/>
         <source>Job Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Job Options</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2365"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2815"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2831"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2364"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2814"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2830"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2436"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2647"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2435"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2646"/>
         <source>Begin Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Begin Transcoding</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2439"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2644"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2438"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2643"/>
         <source>Stop Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop Transcoding</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2442"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2655"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2441"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2654"/>
         <source>Begin Commercial Flagging</source>
         <translation>Begin Advert Flagging</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2445"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2652"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2444"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2651"/>
         <source>Stop Commercial Flagging</source>
         <translation>Stop Advert Flagging</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2454"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2467"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2480"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2494"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2668"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2682"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2696"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2710"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2453"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2466"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2479"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2493"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2667"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2681"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2695"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2709"/>
         <source>Begin</source>
-        <translation type="unfinished"></translation>
+        <translation>Begin</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2457"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2470"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2483"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2498"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2665"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2679"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2693"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2707"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2456"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2469"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2482"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2497"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2664"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2678"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2692"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2706"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2569"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2568"/>
         <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Play from bookmark</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2570"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2569"/>
         <source>Play from beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Play from beginning</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2382"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2591"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2381"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2590"/>
         <source>Disable Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Disable Auto Expire</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="465"/>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Recordings</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2384"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2594"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2383"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2593"/>
         <source>Enable Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable Auto Expire</translation>
     </message>
     <message numerus="yes">
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2555"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2554"/>
         <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>There is %n item in the playlist. Actions affect all items in the playlist</numerusform>
+            <numerusform>There are %n items in the playlist. Actions affect all items in the playlist</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2566"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2565"/>
         <source>Play Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Play Options</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2598"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2597"/>
         <source>Do not preserve this episode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2601"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2600"/>
         <source>Preserve this episode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2611"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2610"/>
         <source>Scheduling Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Scheduling Options</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2614"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2613"/>
         <source>Edit Recording Schedule</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2620"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2829"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2619"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2828"/>
         <source>Show Program Details</source>
         <translation>Show Programme Details</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2623"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2622"/>
         <source>Change Recording Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2661"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2675"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2689"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2703"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2660"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2674"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2688"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2702"/>
         <source>User Job</source>
-        <translation type="unfinished"></translation>
+        <translation>User Job</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2773"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2772"/>
         <source>Play from...</source>
-        <translation type="unfinished"></translation>
+        <translation>Play from...</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2779"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2778"/>
         <source>Remove from Playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2782"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2781"/>
         <source>Add to Playlist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2791"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2790"/>
         <source>Stop Recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2361"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2578"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2799"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2360"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2577"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2798"/>
         <source>Storage Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Storage Options</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2751"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2801"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2750"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2800"/>
         <source>Recording Options</source>
         <translation>Recording Options</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3979"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3999"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4017"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4043"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4194"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4183"/>
         <source>item</source>
-        <translation type="unfinished"></translation>
+        <translation>item</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3979"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3999"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4017"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4043"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4196"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4185"/>
         <source>items</source>
-        <translation type="unfinished"></translation>
+        <translation>items</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2723"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3987"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4187"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4242"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4417"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2722"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3984"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4176"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4231"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4406"/>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1281"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1612"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3989"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4189"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1237"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1568"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3986"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4178"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation>LiveTV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="464"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3965"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3963"/>
         <source>Groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4053"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4042"/>
         <source>Categories</source>
         <translation>Categories</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2724"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2723"/>
         <source>Autodetect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2726"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2725"/>
         <source>High Quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2728"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2727"/>
         <source>Medium Quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2730"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2729"/>
         <source>Low Quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3760,67 +3741,67 @@ Returning to the previous menu.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1128"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1084"/>
         <source>There are no recordings in your current view</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1129"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1085"/>
         <source>There are no recordings available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2795"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2794"/>
         <source>Mark as Unwatched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2797"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2796"/>
         <source>Mark as Watched</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1251"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1207"/>
         <source>_NO_TITLE_</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1260"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4023"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4025"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4029"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4041"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1216"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4015"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4017"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4021"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4032"/>
         <source>Unknown</source>
         <translation>Unknown</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1887"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="1843"/>
         <source>Help (Status Icons)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2366"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2365"/>
         <source>Delete, and allow re-record</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2617"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2616"/>
         <source>Allow this program to re-record</source>
         <translation>Allow this programme to re-record</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2810"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2809"/>
         <source>Undelete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2811"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2810"/>
         <source>Delete Forever</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3988"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4191"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3985"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4180"/>
         <source>Deleted</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3830,119 +3811,130 @@ Returning to the previous menu.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2207"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2206"/>
         <source>Recording file does not exist.
 Are you sure you want to delete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2257"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2256"/>
         <source>Yes, stop recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Yes, stop recording</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2274"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2273"/>
         <source>No, keep it</source>
-        <translation type="unfinished"></translation>
+        <translation>No, keep it</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2278"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2277"/>
         <source>No, continue recording</source>
-        <translation type="unfinished"></translation>
+        <translation>No, continue recording</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2303"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2309"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2302"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2308"/>
         <source>Recording Available
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2304"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2303"/>
         <source>This recording is currently in use by:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2310"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2309"/>
         <source>This recording is currently Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2315"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2320"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2325"/>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2330"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2314"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2319"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2324"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2329"/>
         <source>Recording Unavailable
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2316"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2315"/>
         <source>This recording is currently being deleted and is unavailable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2321"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2320"/>
         <source>The file for this recording can not be found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2326"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2325"/>
         <source>The file for this recording is empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2331"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2330"/>
         <source>This recording is not yet available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2354"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2353"/>
         <source>Toggle playlist for this Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2720"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2719"/>
         <source>Transcoding profiles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2764"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2763"/>
         <source>Start As PIP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2766"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2765"/>
         <source>Start As PBP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2825"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="2824"/>
         <source>Recording file can not be found</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3988"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="3995"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4023"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4034"/>
+        <source>%1 [%n item(s)]</source>
+        <translation>
+            <numerusform>%1 [%n item]</numerusform>
+            <numerusform>%1 [%n items]</numerusform>
+        </translation>
+    </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4063"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4052"/>
         <source>Change Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Change Filter</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4174"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4163"/>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Add New</translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4206"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4195"/>
         <source>Select Recording Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4256"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4245"/>
         <source>Select Playback Group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4355"/>
+        <location filename="../programs/mythfrontend/playbackbox.cpp" line="4344"/>
         <source>New Recording Group</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3952,57 +3944,47 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="837"/>
         <source>Match Criteria</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="839"/>
-        <source>W</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../programs/mythfrontend/globalsettings.cpp" line="841"/>
-        <source>H</source>
-        <translation type="unfinished"></translation>
+        <translation>Match Criteria</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="853"/>
         <source>Decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Decoder</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="854"/>
         <source>Max CPUs</source>
-        <translation type="unfinished"></translation>
+        <translation>Max CPUs</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="855"/>
         <source>Video Renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Renderer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="856"/>
         <source>OSD Renderer</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD Renderer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="857"/>
         <source>OSD Fade</source>
-        <translation type="unfinished"></translation>
+        <translation>OSD Fade</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="858"/>
         <source>Primary Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Primary Deinterlacer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="859"/>
         <source>Fallback Deinterlacer</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallback Deinterlacer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="860"/>
         <source>Custom Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Custom Filters</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="865"/>
@@ -4022,7 +4004,19 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="863"/>
         <source>Maximum number of CPU cores used for video decoding and filtering.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum number of CPU cores used for video decoding and filtering.</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="839"/>
+        <source>W</source>
+        <comment>Width</comment>
+        <translation>W</translation>
+    </message>
+    <message>
+        <location filename="../programs/mythfrontend/globalsettings.cpp" line="841"/>
+        <source>H</source>
+        <comment>Height</comment>
+        <translation>H</translation>
     </message>
 </context>
 <context>
@@ -4033,7 +4027,7 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="987"/>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="995"/>
         <source>Run &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Run &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -4069,7 +4063,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="289"/>
         <source>Title</source>
-        <translation type="unfinished">Title</translation>
+        <translation>Title</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="291"/>
@@ -4079,12 +4073,12 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="298"/>
         <source>Part %1 of %2, </source>
-        <translation type="unfinished"></translation>
+        <translation>Part %1 of %2, </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/progdetails.cpp" line="308"/>
         <source>%n star(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n star</numerusform>
             <numerusform>%n stars</numerusform>
         </translation>
@@ -4092,47 +4086,47 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="314"/>
         <source>Mono</source>
-        <translation type="unfinished"></translation>
+        <translation>Mono</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="316"/>
         <source>Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>Stereo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="318"/>
         <source>Surround Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Surround Sound</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="320"/>
         <source>Dolby Sound</source>
-        <translation type="unfinished"></translation>
+        <translation>Dolby Sound</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="322"/>
         <source>Audio for Hearing Impaired</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio for Hearing Impaired</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="324"/>
         <source>Audio for Visually Impaired</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio for Visually Impaired</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="327"/>
         <source>HDTV</source>
-        <translation type="unfinished"></translation>
+        <translation>HDTV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="329"/>
         <source>Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Widescreen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="331"/>
         <source>AVC/H.264</source>
-        <translation type="unfinished"></translation>
+        <translation>AVC/H.264</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="333"/>
@@ -4148,17 +4142,17 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="338"/>
         <source>CC</source>
         <comment>Closed Captioned</comment>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="340"/>
         <source>Subtitles Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Subtitles Available</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="342"/>
         <source>Subtitled</source>
-        <translation type="unfinished"></translation>
+        <translation>Subtitled</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="344"/>
@@ -4173,7 +4167,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="349"/>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Repeat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="357"/>
@@ -4183,13 +4177,13 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="377"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Category</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="388"/>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation type="unfinished"></translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="390"/>
@@ -4269,7 +4263,7 @@ Are you sure you want to delete:</source>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/progdetails.cpp" line="583"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n hour</numerusform>
             <numerusform>%n hours</numerusform>
         </translation>
@@ -4409,7 +4403,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="90"/>
         <source>Starts With</source>
-        <translation type="unfinished"></translation>
+        <translation>Starts With</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="91"/>
@@ -4419,7 +4413,7 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="92"/>
         <source>Times</source>
-        <translation type="unfinished"></translation>
+        <translation>Times</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="223"/>
@@ -4430,19 +4424,19 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/progfind.cpp" line="233"/>
         <location filename="../programs/mythfrontend/progfind.cpp" line="280"/>
         <source>Clear Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear Search</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="234"/>
         <location filename="../programs/mythfrontend/progfind.cpp" line="288"/>
         <source>Edit Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Search</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="237"/>
         <location filename="../programs/mythfrontend/progfind.cpp" line="300"/>
         <source>Toggle Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Toggle Record</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="238"/>
@@ -4488,12 +4482,12 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="357"/>
         <source>Select a letter...</source>
-        <translation type="unfinished"></translation>
+        <translation>Select a letter...</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="359"/>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pick the letter in which the show starts with, then press SELECT or the right arrow.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="368"/>
@@ -4611,7 +4605,7 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/proglist.cpp" line="279"/>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1632"/>
         <source>Sort</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="281"/>
@@ -4659,19 +4653,19 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="308"/>
         <source>Sort Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort Options</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="317"/>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1667"/>
         <source>Reverse Sort Order</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reverse Sort Order</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="318"/>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1672"/>
         <source>Sort By Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort By Title</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="319"/>
@@ -4862,19 +4856,19 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="613"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="671"/>
         <source>Increase Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Increase Priority</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="614"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="675"/>
         <source>Decrease Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Decrease Priority</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="615"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="679"/>
         <source>Sort</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="616"/>
@@ -4909,60 +4903,60 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="632"/>
         <source>Sort Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort Options</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="641"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="705"/>
         <source>Reverse Sort Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Reverse Sort Order</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="642"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="710"/>
         <source>Sort By Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort By Title</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="643"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="721"/>
         <source>Sort By Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort By Priority</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="644"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="732"/>
         <source>Sort By Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort By Type</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="645"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="743"/>
         <source>Sort By Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort By Count</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="646"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="756"/>
         <source>Sort By Record Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort By Record Count</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="647"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="767"/>
         <source>Sort By Last Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort By Last Recorded</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="648"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="778"/>
         <source>Sort By Average Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort By Average Delay</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1202"/>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation>^(The |A |An )</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1426"/>
@@ -4980,12 +4974,12 @@ Are you sure you want to delete:</source>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1609"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1620"/>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Any</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1516"/>
         <source>Recording %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Recording %1 of %2</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="949"/>
@@ -4995,12 +4989,12 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="440"/>
         <source>Schedule Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Schedule Priorities</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1543"/>
         <source> + %1 automatic priority (%2hr)</source>
-        <translation type="unfinished"></translation>
+        <translation> + %1 automatic priority (%2hr)</translation>
     </message>
 </context>
 <context>
@@ -5008,29 +5002,29 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="584"/>
         <source>Searching for icons for channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Searching for icons for channel %1</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="227"/>
         <source>Failed to configure plugin %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Failed to configure plugin %1</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="235"/>
         <source>The plugin %1 has failed to run for some reason...</source>
-        <translation type="unfinished"></translation>
+        <translation>The plugin %1 has failed to run for some reason...</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="53"/>
         <location filename="../libs/libmyth/dbsettings.cpp" line="170"/>
         <source>Use custom identifier for frontend preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Use custom identifier for frontend preferences</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="83"/>
         <location filename="../libs/libmyth/dbsettings.cpp" line="167"/>
         <source>Database Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Database Configuration</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="89"/>
@@ -5134,17 +5128,17 @@ Are you sure you want to delete:</source>
     <message>
         <location filename="../libs/libmyth/settings.cpp" line="786"/>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Any</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="40"/>
         <source>Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Channel Name</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="50"/>
         <source>Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Channel Number</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="61"/>
@@ -5740,7 +5734,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <location filename="../libs/libmyth/programinfo.cpp" line="2900"/>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1427"/>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Repeat</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1853"/>
@@ -5796,7 +5790,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <location filename="../libs/libmyth/programinfo.cpp" line="2752"/>
         <source>W</source>
         <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation type="unfinished"></translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2754"/>
@@ -5920,7 +5914,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <location filename="../libs/libmyth/programinfo.cpp" line="2828"/>
         <source>E</source>
         <comment>RecStatusChar rsEarlierShowing</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">E</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2830"/>
@@ -6191,7 +6185,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="95"/>
         <source>Stereo</source>
-        <translation type="unfinished"></translation>
+        <translation>Stereo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1487"/>
@@ -6254,7 +6248,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="181"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="198"/>
@@ -7104,7 +7098,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="222"/>
         <source>Enable muting of just the left or right channel.  Useful if your broadcaster puts the original language on one channel, and a dubbed version of the program on the other one.  This modifies the behavior of the Mute key.</source>
-        <translation>Enable muting of just the left or right channel.  Useful if your broadcaster puts the original language on one channel, and a dubbed version of the programme on the other one.  This modifies the behavior of the Mute key.</translation>
+        <translation>Enable muting of just the left or right channel.  Useful if your broadcaster puts the original language on one channel, and a dubbed version of the programme on the other one.  This modifies the behaviour of the Mute key.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="233"/>
@@ -7129,7 +7123,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1018"/>
         <source>Custom Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Custom Filters</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="257"/>
@@ -8925,7 +8919,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4658"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>General</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4786"/>
@@ -10043,7 +10037,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1413"/>
         <source>Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Music</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cc608decoder.cpp" line="1414"/>
@@ -10250,7 +10244,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="106"/>
         <source>CC</source>
         <comment>EIA-608 closed captions</comment>
-        <translation type="unfinished"></translation>
+        <translation>CC</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="108"/>
@@ -10569,7 +10563,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="204"/>
         <source>^(The |A |An )</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">^(The |A |An )</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="292"/>
@@ -11216,7 +11210,7 @@ The frequency for this channel in</source>
     <message>
         <location filename="../libs/libmythtv/avformatdecoder.cpp" line="2895"/>
         <source>Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Subtitle</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/cardutil.cpp" line="1532"/>
@@ -11307,7 +11301,7 @@ The frequency for this channel in</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2900"/>
         <source>Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Widescreen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="540"/>
@@ -12404,7 +12398,7 @@ Most dvb-s transponders transmit at 27.5 million symbols per second.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1366"/>
         <source>Add New</source>
-        <translation type="unfinished"></translation>
+        <translation>Add New</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1403"/>
@@ -12963,12 +12957,12 @@ name can not be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="798"/>
         <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Play from bookmark</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="799"/>
         <source>Play from beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Play from beginning</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="14"/>
@@ -13134,13 +13128,13 @@ name can not be blank.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="366"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="365"/>
         <source>Tuner %1 is recording:
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="377"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="376"/>
         <source>Tuner %1 is not recording</source>
         <translation type="unfinished"></translation>
     </message>
@@ -13770,7 +13764,7 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmyth/programinfo.cpp" line="3441"/>
         <source>LiveTV</source>
         <comment>Recording Group LiveTV</comment>
-        <translation type="unfinished"></translation>
+        <translation>LiveTV</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3442"/>
@@ -13794,7 +13788,7 @@ You may have to use the eject button under its tray.</source>
         <location filename="../libs/libmyth/programinfo.cpp" line="3447"/>
         <source>LiveTV</source>
         <comment>Storage Group Name</comment>
-        <translation type="unfinished"></translation>
+        <translation>LiveTV</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3448"/>
@@ -14393,7 +14387,7 @@ Check if the video exists</source>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="729"/>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Recordings</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="730"/>
@@ -14479,7 +14473,7 @@ Check if the video exists</source>
         </translation>
     </message>
     <message>
-        <location filename="../libs/libmythtv/playercontext.cpp" line="833"/>
+        <location filename="../libs/libmythtv/playercontext.cpp" line="828"/>
         <source>Play</source>
         <translation>Play</translation>
     </message>
@@ -14602,6 +14596,11 @@ Check if the video exists</source>
         <source>No Change</source>
         <translation>No Change</translation>
     </message>
+    <message>
+        <location filename="../programs/mythtv-setup/xmltvconfig.cpp" line="44"/>
+        <source>XMLTV Grabber Configuration</source>
+        <translation>XMLTV Grabber Configuration</translation>
+    </message>
 </context>
 <context>
     <name>RecordingProfileEditor</name>
@@ -14650,7 +14649,7 @@ Check if the video exists</source>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="198"/>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="204"/>
         <source>Full Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Full Scan</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="148"/>
@@ -14661,7 +14660,7 @@ Check if the video exists</source>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="192"/>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="208"/>
         <source>Import existing scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Import existing scan</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="154"/>
@@ -14670,7 +14669,7 @@ Check if the video exists</source>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="178"/>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="200"/>
         <source>Full Scan (Tuned)</source>
-        <translation type="unfinished"></translation>
+        <translation>Full Scan (Tuned)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="156"/>
@@ -14680,22 +14679,22 @@ Check if the video exists</source>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="190"/>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="206"/>
         <source>Import channels.conf</source>
-        <translation type="unfinished"></translation>
+        <translation>Import channels.conf</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="225"/>
         <source>Scan of all existing transports</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan of all existing transports</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="227"/>
         <source>Scan of single existing transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan of single existing transport</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/scanwizardconfig.cpp" line="212"/>
         <source>M3U Import</source>
-        <translation type="unfinished"></translation>
+        <translation>M3U Import</translation>
     </message>
 </context>
 <context>
@@ -14725,72 +14724,72 @@ Check if the video exists</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="496"/>
         <source>Use any available input</source>
-        <translation type="unfinished"></translation>
+        <translation>Use any available input</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="510"/>
         <source>Prefer input %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Prefer input %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="527"/>
         <source>Match duplicates using subtitle &amp; description</source>
-        <translation type="unfinished"></translation>
+        <translation>Match duplicates using subtitle &amp; description</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="531"/>
         <source>Match duplicates using subtitle then description</source>
-        <translation type="unfinished"></translation>
+        <translation>Match duplicates using subtitle then description</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="535"/>
         <source>Match duplicates using subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Match duplicates using subtitle</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="538"/>
         <source>Match duplicates using description</source>
-        <translation type="unfinished"></translation>
+        <translation>Match duplicates using description</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="541"/>
         <source>Don&apos;t match duplicates</source>
-        <translation type="unfinished"></translation>
+        <translation>Don&apos;t match duplicates</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="549"/>
         <source>Look for duplicates in current and previous recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Look for duplicates in current and previous recordings</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="553"/>
         <source>Look for duplicates in current recordings only</source>
-        <translation type="unfinished"></translation>
+        <translation>Look for duplicates in current recordings only</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="557"/>
         <source>Look for duplicates in previous recordings only</source>
-        <translation type="unfinished"></translation>
+        <translation>Look for duplicates in previous recordings only</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="561"/>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished">Exclude unidentified episodes</translation>
+        <translation>Exclude unidentified episodes</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="566"/>
         <source>Exclude old episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Exclude old episodes</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="569"/>
         <source>Record new episodes only</source>
-        <translation type="unfinished"></translation>
+        <translation>Record new episodes only</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="572"/>
         <source>Record new episode first showings</source>
-        <translation type="unfinished"></translation>
+        <translation>Record new episode first showings</translation>
     </message>
 </context>
 <context>
@@ -14801,13 +14800,13 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="429"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="468"/>
         <source>Reactivate</source>
-        <translation type="unfinished"></translation>
+        <translation>Reactivate</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="183"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="470"/>
         <source>Stop recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop recording</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="194"/>
@@ -14815,7 +14814,7 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="439"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="481"/>
         <source>Don&apos;t record</source>
-        <translation type="unfinished"></translation>
+        <translation>Don&apos;t record</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="213"/>
@@ -14823,14 +14822,14 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="441"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="483"/>
         <source>Never record</source>
-        <translation type="unfinished"></translation>
+        <translation>Never record</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="223"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="245"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="492"/>
         <source>Change Ending Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Change Ending Time</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="228"/>
@@ -14838,7 +14837,7 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="451"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="504"/>
         <source>Edit Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Options</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="234"/>
@@ -14846,7 +14845,7 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="455"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="508"/>
         <source>Add Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Add Override</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="250"/>
@@ -14854,7 +14853,7 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="450"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="503"/>
         <source>Edit Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Override</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="252"/>
@@ -14862,7 +14861,7 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="448"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="490"/>
         <source>Clear Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Clear Override</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="285"/>
@@ -14875,13 +14874,13 @@ Check if the video exists</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="342"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="431"/>
         <source>Record anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Record anyway</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="347"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="437"/>
         <source>Forget Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Forget Previous</translation>
     </message>
 </context>
 <context>
@@ -14989,12 +14988,12 @@ Check if the video exists</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="323"/>
         <source>Upcoming recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Upcoming recordings</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="324"/>
         <source>Previously scheduled</source>
-        <translation type="unfinished"></translation>
+        <translation>Previously scheduled</translation>
     </message>
 </context>
 <context>
@@ -15002,7 +15001,7 @@ Check if the video exists</source>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="130"/>
         <source>%1 database schema is old. Waiting to see if DB is being upgraded.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="197"/>
@@ -15017,7 +15016,7 @@ Check if the video exists</source>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="201"/>
         <source>Use current schema</source>
-        <translation type="unfinished"></translation>
+        <translation>Use current schema</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="277"/>
@@ -15027,72 +15026,77 @@ Check if the video exists</source>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="280"/>
         <source>Error: This version of Myth%1 requires MySQL %2.%3.%4 or later.  You seem to be running MySQL version %5.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error: This version of Myth%1 requires MySQL %2.%3.%4 or later.  You seem to be running MySQL version %5.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="338"/>
         <source>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
 
 Please shut them down before upgrading.</source>
-        <translation type="unfinished"></translation>
+        <translation>Error: MythTV cannot upgrade the schema of this datatase because other clients are using it.
+
+Please shut them down before upgrading.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="345"/>
         <source>Warning: MythTV wants to upgrade your database,</source>
-        <translation type="unfinished"></translation>
+        <translation>Warning: MythTV wants to upgrade your database,</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="346"/>
         <source>for the %1 schema, from %2 to %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>for the %1 schema, from %2 to %3.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="349"/>
         <source>You can try using the old schema, but that may cause problems.</source>
-        <translation type="unfinished"></translation>
+        <translation>You can try using the old schema, but that may cause problems.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="360"/>
         <source>This version of MythTV requires an updated database. </source>
-        <translation type="unfinished"></translation>
+        <translation>This version of MythTV requires an updated database. </translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="361"/>
         <source>(schema is %1 versions behind)</source>
-        <translation type="unfinished"></translation>
+        <translation>(schema is %1 versions behind)</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="362"/>
         <source>Please run mythtv-setup or mythbackend to update your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Please run mythtv-setup or mythbackend to update your database.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="369"/>
         <source>Warning: MythTV database has newer %1 schema (%2) than expected (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation>Warning: MythTV database has newer %1 schema (%2) than expected (%3).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="373"/>
         <source>Error: MythTV database has newer %1 schema (%2) than expected (%3).</source>
-        <translation type="unfinished"></translation>
+        <translation>Error: MythTV database has newer %1 schema (%2) than expected (%3).</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="380"/>
         <source>MythTV was unable to backup your database.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV was unable to backup your database.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="387"/>
         <source>Database Host: %1
 Database Name: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Database Host: %1
+Database Name: %2</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="417"/>
         <source>If your system becomes unstable, a database backup file called
 %1
 is located in %2</source>
-        <translation type="unfinished"></translation>
+        <translation>If your system becomes unstable, a database backup file called
+%1
+is located in %2</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="422"/>
@@ -15105,37 +15109,37 @@ is located in %2</source>
     <message>
         <location filename="../programs/mythtv-setup/startprompt.cpp" line="72"/>
         <source>WARNING: The backend is currently running.</source>
-        <translation type="unfinished"></translation>
+        <translation>WARNING: The backend is currently running.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/startprompt.cpp" line="73"/>
         <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Changing existing card inputs, deleting anything, or scanning for channels may not work.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/startprompt.cpp" line="77"/>
         <source>Recording Status: RECORDING.</source>
-        <translation type="unfinished"></translation>
+        <translation>Recording Status: RECORDING.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/startprompt.cpp" line="78"/>
         <source>If you stop the backend now these recordings will be stopped!</source>
-        <translation type="unfinished"></translation>
+        <translation>If you stop the backend now these recordings will be stopped!</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/startprompt.cpp" line="82"/>
         <source>Recording Status: None.</source>
-        <translation type="unfinished"></translation>
+        <translation>Recording Status: None.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/startprompt.cpp" line="103"/>
         <source>Stop Backend and Continue</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop Backend and Continue</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/startprompt.cpp" line="105"/>
         <source>Continue</source>
-        <translation type="unfinished"></translation>
+        <translation>Continue</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/startprompt.cpp" line="106"/>
@@ -15676,12 +15680,12 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../libs/libmyth/storagegroup.cpp" line="942"/>
         <source>(from remote hosts)</source>
-        <translation type="unfinished"></translation>
+        <translation>(from remote hosts)</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroup.cpp" line="946"/>
         <source>(from all hosts</source>
-        <translation type="unfinished"></translation>
+        <translation>(from all hosts</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/storagegroup.cpp" line="953"/>
@@ -15707,17 +15711,17 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="700"/>
         <source>Record using the %1 profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Record using the %1 profile</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="719"/>
         <source>Create a new recording group</source>
-        <translation type="unfinished"></translation>
+        <translation>Create a new recording group</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="751"/>
         <source>Include in the &quot;%1&quot; recording group</source>
-        <translation type="unfinished"></translation>
+        <translation>Include in the &quot;%1&quot; recording group</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="752"/>
@@ -15733,27 +15737,27 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="781"/>
         <source>Store in the &quot;%1&quot; storage group</source>
-        <translation type="unfinished"></translation>
+        <translation>Store in the &quot;%1&quot; storage group</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="793"/>
         <source>LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation>LiveTV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="804"/>
         <source>Use &quot;%1&quot; playback group settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Use &quot;%1&quot; playback group settings</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="827"/>
         <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Don&apos;t record if this would exceed the max episodes</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="830"/>
         <source>Delete oldest if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete oldest if this would exceed the max episodes</translation>
     </message>
 </context>
 <context>
@@ -16102,12 +16106,12 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10154"/>
         <source>Stop Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop Transcoding</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10159"/>
         <source>Begin Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Begin Transcoding</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10176"/>
@@ -16305,7 +16309,7 @@ Directory From Storage Group?</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9353"/>
         <source>Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Channel Name</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="9354"/>
@@ -16842,12 +16846,12 @@ Select a Current Recording</source>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11327"/>
         <source>Yes, and allow re-record</source>
-        <translation type="unfinished"></translation>
+        <translation>Yes, and allow re-record</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11328"/>
         <source>Yes, delete it</source>
-        <translation type="unfinished"></translation>
+        <translation>Yes, delete it</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="11329"/>
@@ -16978,7 +16982,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="168"/>
         <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Select &apos;Schedule a Recording&apos; from the Main Menu</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="169"/>
@@ -16988,12 +16992,12 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="170"/>
         <source>Select a letter...</source>
-        <translation type="unfinished"></translation>
+        <translation>Select a letter...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="171"/>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pick the letter in which the show starts with, then press SELECT or the right arrow</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="172"/>
@@ -17023,22 +17027,22 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="177"/>
         <source>(1)Time (2)Title</source>
-        <translation type="unfinished"></translation>
+        <translation>(1)Time (2)Title</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="179"/>
         <source>Airdate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Airdate:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="181"/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Description:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="420"/>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished"></translation>
+        <translation>This screen displays the status of various system components</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="410"/>
@@ -17048,17 +17052,17 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="20"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>General</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="21"/>
         <source>Core MythTV behavior and system settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Core MythTV behaviour and system settings</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="22"/>
         <source>Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>Appearance</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="23"/>
@@ -17453,7 +17457,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="101"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Advanced</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="102"/>
@@ -17478,7 +17482,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="106"/>
         <source>Guide appearance and behavior</source>
-        <translation type="unfinished"></translation>
+        <translation>Guide appearance and behaviour</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="107"/>
@@ -17533,17 +17537,17 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="117"/>
         <source>Watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Watch TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="118"/>
         <source>Watch live television</source>
-        <translation type="unfinished"></translation>
+        <translation>Watch live television</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="119"/>
         <source>Delete Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Delete Recordings</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="120"/>
@@ -17568,7 +17572,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="124"/>
         <source>Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Music</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="125"/>
@@ -17583,7 +17587,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="127"/>
         <source>Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Images</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="128"/>
@@ -17608,7 +17612,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="132"/>
         <source>Phone</source>
-        <translation type="unfinished"></translation>
+        <translation>Phone</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="133"/>
@@ -17648,7 +17652,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="140"/>
         <source>Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Setup</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="141"/>
@@ -17723,7 +17727,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="188"/>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pick the letter in which the show starts with, then press SELECT or the right arrow.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="189"/>
@@ -17988,12 +17992,12 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="241"/>
         <source>Old Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Old Password</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="242"/>
         <source>New Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>New Password:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="243"/>
@@ -18013,7 +18017,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="246"/>
         <source>Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Subtitle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="247"/>
@@ -18028,27 +18032,27 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="249"/>
         <source>Date, or day of week:</source>
-        <translation type="unfinished"></translation>
+        <translation>Date, or day of week:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="250"/>
         <source>Start Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Start Time:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="251"/>
         <source>Hour</source>
-        <translation type="unfinished"></translation>
+        <translation>Hour</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="252"/>
         <source>Minute</source>
-        <translation type="unfinished"></translation>
+        <translation>Minute</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="253"/>
         <source>Duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>Duration:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="254"/>
@@ -18058,7 +18062,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="255"/>
         <source>Scheduled Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Scheduled Recordings</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="256"/>
@@ -18095,12 +18099,12 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="262"/>
         <source>Schedule Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Schedule Priorities</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="263"/>
         <source>Final</source>
-        <translation type="unfinished"></translation>
+        <translation>Final</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="264"/>
@@ -18155,12 +18159,12 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="274"/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Test</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="275"/>
         <source>Install</source>
-        <translation type="unfinished"></translation>
+        <translation>Install</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="276"/>
@@ -18220,7 +18224,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="287"/>
         <source>Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Schedule Editor</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="288"/>
@@ -18235,12 +18239,12 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="290"/>
         <source>Schedule Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Schedule Options</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="291"/>
         <source>Storage Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Storage Options</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="292"/>
@@ -18260,98 +18264,98 @@ Select a Current Recording</source>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="295"/>
         <source>Reduce priority by %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Reduce priority by %n</numerusform>
+            <numerusform>Reduce priority by %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="296"/>
         <source>Normal recording priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal recording priority</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="297"/>
         <source>Raise priority by %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Raise priority by %n</numerusform>
+            <numerusform>Raise priority by %n</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="298"/>
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Start recording %n minute late</numerusform>
+            <numerusform>Start recording %n minutes late</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="299"/>
         <source>Start recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Start recording on time</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="300"/>
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Start recording %n minute early</numerusform>
+            <numerusform>Start recording %n minutes early</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="301"/>
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>End recording %n minute early</numerusform>
+            <numerusform>End recording %n minutes early</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="302"/>
         <source>End recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>End recording on time</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="303"/>
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>End recording %n minute late</numerusform>
+            <numerusform>End recording %n minutes late</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="304"/>
         <source>Recording Rule Active</source>
-        <translation type="unfinished"></translation>
+        <translation>Recording Rule Active</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="305"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Back</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="306"/>
         <source>No episode limit</source>
-        <translation type="unfinished"></translation>
+        <translation>No episode limit</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="307"/>
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Keep at most %n episode</numerusform>
+            <numerusform>Keep at most %n episodes</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="308"/>
         <source>Allow recordings to expire?</source>
-        <translation type="unfinished"></translation>
+        <translation>Allow recordings to expire?</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="309"/>
         <source>Post-Processing Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Post-Processing Options</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="310"/>
@@ -18361,17 +18365,17 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="311"/>
         <source>Transcode new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Transcode new recordings</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="312"/>
         <source>123</source>
-        <translation type="unfinished"></translation>
+        <translation>123</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="313"/>
         <source>Search For:</source>
-        <translation type="unfinished"></translation>
+        <translation>Search For:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="314"/>
@@ -18381,37 +18385,37 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="315"/>
         <source>Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Search Results</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="316"/>
         <source>Cast Members</source>
-        <translation type="unfinished"></translation>
+        <translation>Cast Members</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="317"/>
         <source>Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Full Plot</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="318"/>
         <source>Video List Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Video List Filters</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="319"/>
         <source>Text Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Text Filter:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="320"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Category</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="321"/>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="322"/>
@@ -18421,52 +18425,52 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="323"/>
         <source>Actor/Actress</source>
-        <translation type="unfinished"></translation>
+        <translation>Actor/Actress</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="324"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Year</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="325"/>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Runtime</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="326"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>User Rating</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="327"/>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Browse</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="328"/>
         <source>InetRef</source>
-        <translation type="unfinished"></translation>
+        <translation>InetRef</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="329"/>
         <source>Cover File</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover File</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="330"/>
         <source>Sort by</source>
-        <translation type="unfinished"></translation>
+        <translation>Sort by</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="331"/>
         <source>Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Watched</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="332"/>
         <source>Make default</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="333"/>
@@ -18890,7 +18894,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="417"/>
         <source>Store</source>
-        <translation type="unfinished"></translation>
+        <translation>Store</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="418"/>
@@ -19175,7 +19179,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="475"/>
         <source>Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Channel Name</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="476"/>
@@ -19524,12 +19528,14 @@ Select a Current Recording</source>
     </message>
     <message>
         <location filename="../libs/libmythtv/viewschdiff.cpp" line="620"/>
+        <location filename="../programs/mythfrontend/viewschdiff.cpp" line="371"/>
         <source>All</source>
         <translation>All</translation>
     </message>
     <message>
+        <location filename="../programs/mythfrontend/viewschdiff.cpp" line="122"/>
         <source>The following programs will be recorded instead:</source>
-        <translation type="obsolete">The following programmes will be recorded instead:</translation>
+        <translation>The following programmes will be recorded instead:</translation>
     </message>
 </context>
 <context>
@@ -19553,12 +19559,12 @@ Select a Current Recording</source>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="91"/>
         <source>Scheduled Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Scheduled Recordings</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="101"/>
         <source>Group List</source>
-        <translation type="unfinished"></translation>
+        <translation>Group List</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="182"/>
@@ -19569,13 +19575,13 @@ Select a Current Recording</source>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="192"/>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="682"/>
         <source>Show Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Show Important</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="194"/>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="686"/>
         <source>Show All</source>
-        <translation type="unfinished"></translation>
+        <translation>Show All</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="195"/>
@@ -19605,13 +19611,13 @@ Select a Current Recording</source>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="199"/>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="706"/>
         <source>Show Cards</source>
-        <translation type="unfinished"></translation>
+        <translation>Show Cards</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="200"/>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="710"/>
         <source>Show Inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Show Inputs</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="201"/>
@@ -19642,136 +19648,136 @@ Select a Current Recording</source>
 <context>
     <name>WelcomeDialog</name>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="94"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="93"/>
         <source>Start Frontend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="349"/>
         <location filename="../programs/mythwelcome/welcomedialog.cpp" line="350"/>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="351"/>
         <source>Cannot connect to server!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="387"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="386"/>
         <source>There are no recordings currently taking place</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="421"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="420"/>
         <source>There are no scheduled recordings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="428"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="427"/>
         <source>Please Wait ...</source>
         <translation>Please Wait ...</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="538"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="537"/>
         <source>MythTV is about to start recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="543"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="542"/>
         <source>MythTV is busy recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="553"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="552"/>
         <source>MythTV is busy transcoding.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="555"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="554"/>
         <source>MythTV is busy flagging commercials.</source>
         <translation>MythTV is busy flagging adverts.</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="557"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="556"/>
         <source>MythTV is busy grabbing EPG data.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="559"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="558"/>
         <source>MythTV is locked by a user.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="563"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="562"/>
         <source>MythTV is in a daily wakeup/shutdown period.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="565"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="564"/>
         <source>MythTV is about to start a wakeup/shutdown period.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="570"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="569"/>
         <source>MythTV is idle and will shutdown in %1 seconds.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="573"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="572"/>
         <source>MythTV is idle.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="624"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="623"/>
         <source>Unlock Shutdown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="626"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="625"/>
         <source>Lock Shutdown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="628"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="627"/>
         <source>Run mythfilldatabase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="629"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="628"/>
         <source>Shutdown Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Shutdown Now</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="630"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="629"/>
         <source>Exit</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="631"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="630"/>
         <source>Cancel</source>
         <translation>Cancel</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="674"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="673"/>
         <source>Cannot shutdown because MythTV is currently recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="686"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="685"/>
         <source>Cannot shutdown because MythTV is about to start recording</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="700"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="699"/>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="373"/>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="412"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="372"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="411"/>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>to</translation>
     </message>
     <message>
-        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="561"/>
+        <location filename="../programs/mythwelcome/welcomedialog.cpp" line="560"/>
         <source>MythTV has running or pending jobs.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV has running or pending jobs.</translation>
     </message>
 </context>
 <context>
