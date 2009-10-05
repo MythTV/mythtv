@@ -275,12 +275,11 @@ bool getFileDetails(ArchiveItem *a)
 
 void showWarningDialog(const QString msg)
 {
-    MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
-    QString title = "MythArchive Warning";
-    MythConfirmationDialog *dialog = new MythConfirmationDialog(mainStack, msg, false);
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, msg, false);
 
     if (dialog->Create())
-        mainStack->AddScreen(dialog);
+        popupStack->AddScreen(dialog);
 }
 
 void recalcItemSize(ArchiveItem *item)
