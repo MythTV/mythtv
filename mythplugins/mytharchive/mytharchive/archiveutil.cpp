@@ -277,12 +277,10 @@ void showWarningDialog(const QString msg)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
     QString title = "MythArchive Warning";
-    MythDialogBox *dialog = new MythDialogBox(title, msg, mainStack, "warningdlg", true);
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(mainStack, msg, false);
 
     if (dialog->Create())
         mainStack->AddScreen(dialog);
-
-    dialog->AddButton(QObject::tr("OK"));
 }
 
 void recalcItemSize(ArchiveItem *item)
