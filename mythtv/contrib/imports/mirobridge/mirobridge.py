@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.4.3" 
+__version__=u"v0.4.4" 
 # 0.1.0 Initial development 
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -142,6 +142,8 @@ __version__=u"v0.4.3"
 #       of "CHANID_ISODATETIME.ext". This resolves an obsure bug that caused orphaned screen shot graphics and
 #       issues with Miro video deletions from the Watch Recordings screen if MiroBridge was run when the user
 #       had MythTV started and in the Watch Recordings screen.
+# 0.4.4 Fixed a unicode issue with data read from a subprocess call.
+#       Fixed an issue with the check for other instances of mirobridge.py running.
 
 
 examples_txt=u'''
@@ -370,21 +372,83 @@ def getlocationMythcommflag():
 	except:
 		return None
 	data = p.stdout.readline()
+	try:
+		data = unicode(data, 'utf8')
+	except (UnicodeEncodeError, TypeError):
+		pass
 	if data == u'mythcommflag:':
 		return None
 	else:
 		return data.replace(u'mythcommflag: ', u'').rstrip()
  #end getlocationMythcommflag()
 
-def isMirobridgeOrMiroRunning():
-	'''Check if Miro Bridge or Miro is already running. Only one can be running at the same time.
-	return True if Miro Bridge or Miro us already running
-	return False if Miro Bridge or Miro is NOT running
+
+class singleinstance(object):
 	'''
-	pid = str(os.getpid())
-	ppid = str(os.getppid())
+	singleinstance - based on Windows version by Dragan Jovelic this is a Linux
+					 version that accomplishes the same task: make sure that
+					 only a single instance of an application is running.
+	'''
+                        
+	def __init__(self, pidPath):
+		'''
+		pidPath - full path/filename where pid for running application is to be
+				  stored.  Often this is ./var/<pgmname>.pid
+		'''
+		from os import kill
+		self.pidPath=pidPath
+		#
+		# See if pidFile exists
+		#
+		if os.path.exists(pidPath):
+			#
+			# Make sure it is not a "stale" pidFile
+			#
+			try:
+				pid=int(open(pidPath, 'r').read().strip())
+				#
+				# Check list of running pids, if not running it is stale so
+				# overwrite
+				#
+				try:
+					kill(pid, 0)
+					pidRunning = 1
+				except OSError:
+					pidRunning = 0
+				if pidRunning:
+					self.lasterror=True
+				else:
+					self.lasterror=False
+			except:
+				self.lasterror=False
+		else:
+			self.lasterror=False
+
+		if not self.lasterror:
+			#
+			# Write my pid into pidFile to keep multiple copies of program from
+			# running.
+			#
+			fp=open(pidPath, 'w')
+			fp.write(str(os.getpid()))
+			fp.close()
+
+	def alreadyrunning(self):
+		return self.lasterror
+
+	def __del__(self):
+		if not self.lasterror:
+			import os
+			os.unlink(self.pidPath)
+	# end singleinstance()
+
+def isMiroRunning():
+	'''Check if Miro is running. Only one can be running at the same time.
+	return True if Miro us already running
+	return False if Miro is NOT running
+	'''
 	try:
-		p = subprocess.Popen(u'ps aux | grep "miro"', shell=True, bufsize=4096, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+		p = subprocess.Popen(u'ps aux | grep "miro.real"', shell=True, bufsize=4096, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
 	except:
 		return False
 
@@ -392,23 +456,20 @@ def isMirobridgeOrMiroRunning():
 		data = p.stdout.readline()
 		if not data:
 			return False
+		try:
+			data = unicode(data, 'utf8')
+		except (UnicodeEncodeError, TypeError):
+			pass
 		if data.find(u'grep') != -1:
 			continue
 
-
-		if data.find(pid) != -1 or data.find(ppid) != -1:
-			continue
-		if data.find(u'miro') != -1:
-			if data.find(u'mirobridge') != -1:
-				logger.critical(u"Miro Bridge is already running:")
- 				logger.critical(u"(%s)" % data)
-			else:
-				logger.critical(u"Miro is already running and therefore Miro Bridge cannot be run:")
-				logger.critical(u"(%s)" % data)
+		if data.find(u'miro.real') != -1:
+			logger.critical(u"Miro is already running and therefore Miro Bridge should not be run:")
+			logger.critical(u"(%s)" % data)
 			break
 
 	return True
- #end isMirobridgeOrMiroRunning()
+ #end isMiroRunning()
 
 
 # Two routines used for movie title search and matching
@@ -686,6 +747,10 @@ def getVideoDetails(videofilename, screenshot=False):
 		data = p.stderr.readline()
 		if data == '':
 			break
+		try:
+			data = unicode(data, 'utf8')
+		except (UnicodeEncodeError, TypeError):
+			pass
 		if data.endswith(u'command not found\n'):
 			ffmpeg_found = False
 			break
@@ -2168,8 +2233,8 @@ def main():
 	else:
 		test_environment = False
 
-	# Verify that neither Miro or another instance of Miro Bridge is currently running
-	if isMirobridgeOrMiroRunning():
+	# Verify that Miro is not currently running
+	if isMiroRunning():
 		sys.exit(False)
 
 	# Verify that only None or one of the mutually exclusive (-W), (-M) and (-N) options is being used
@@ -2686,7 +2751,7 @@ def main():
 			return True
 
 	if not len(watched):
-		displayMessage(u"There are no Miro watched video items to add as MythTV Recorded videos.")
+		displayMessage(u"There are no Miro watched items to add to MythVideo")
 	if not updateMythVideo(watched):
 		logger.critical(u"Updating MythVideo with Miro video files failed.")
 		sys.exit(False)
@@ -2696,6 +2761,14 @@ def main():
 # end main
 
 if __name__ == "__main__":
+	myapp = singleinstance(u'/tmp/mirobridge.pid')
+	#
+	# check is another instance of Miro Bridge running
+	#
+	if myapp.alreadyrunning():
+		print u'\nMiro Bridge is already running only one instance can run at a time\n\n'
+		sys.exit(False)
+
 	main()
 	displayMessage(u"Miro Bridge Processing completed")
 
