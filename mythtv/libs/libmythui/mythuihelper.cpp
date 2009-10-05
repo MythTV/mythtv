@@ -515,7 +515,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
            d->imageCache.size())
     {
         QMap<QString, MythImage*>::iterator it = d->imageCache.begin();
-        uint oldestTime = d->CacheTrack[it.key()];
+        uint oldestTime = QDateTime::currentDateTime().toTime_t();
         QString oldestKey = it.key();
 
         int count = 0;
