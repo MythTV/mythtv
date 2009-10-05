@@ -60,9 +60,13 @@ class ImageLoadThread : public QRunnable
 {
   public:
     ImageLoadThread(MythUIImage *parent, const QString &basefile,
-                    const QString &filename, int number)
-                  : m_parent(parent), m_basefile(basefile),
-                    m_filename(filename), m_number(number) { };
+                    const QString &filename, int number) :
+        m_parent(parent), m_basefile(basefile),
+        m_filename(filename), m_number(number)
+    {
+        m_basefile.detach();
+        m_filename.detach();
+    }
 
     void run()
     {
