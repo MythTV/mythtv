@@ -3015,7 +3015,7 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark) const
     ctx->LockDeleteNVP(__FILE__, line);
     if (ctx->nvp)
     {
-        if (bookmark_it)
+        if (bookmark_it && !(ctx->nvp->IsNearEnd()))
             ctx->nvp->SetBookmark();
         if (db_auto_set_watched)
             ctx->nvp->SetWatched();
