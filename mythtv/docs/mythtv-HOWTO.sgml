@@ -1495,7 +1495,7 @@ This can be done from the command line by typing:
 <sect2>Gentoo
 <p>After installing MySQL you need to initialize the database by running
 <bf>mysql_install_db</bf> as root.
-<sect1>Setting up the initial database
+<sect1>Setting up the initial database <label id="setupdb">
 <p>This step is only required on the system maintaining the database, which
 may or may not be one of your MythTV boxes.  If the database is on a
 non-MythTV machine you'll need to copy the <tt>database/mc.sql</tt> file to it.
@@ -6536,17 +6536,43 @@ so that objects will appear to be the same size as a normal overscanned TV
 picture.
 
 <sect1>Saving or restoring the database <label id="backupdb">
-<p>See the <bf>mysqldump</bf> manpage for more information.
+<p>MythTV includes one script for backing up the MythTV database and another
+for restoring it.  Generally, the scripts are easiest to use after configuring
+the backup directory in a backup resouce file:
 <tscreen><verb>
-$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
+$ echo "DBBackupDirectory=/home/mythtv" > $HOME/.mythtv/backuprc
+</verb></tscreen>
+changing the directory location as desired.
+
+Once the backup directory is configured, you may back up your database by
+simply running the backup script.  The backup and restore scripts will be
+installed in your MythTV share directory ($PREFIX/share/mythtv, where $PREFIX
+is usually either /usr or /usr/local).  Ensure you have a link to the scripts
+in an executable directory (such as /usr/local/bin) or use the entire path when
+executing the scripts.
+
+<tscreen><verb>
+$ mythconverg_backup.pl
 </verb></tscreen>
 
-To restore: (assuming that you've dropped the database)
+The script will compress and rotate backups.  For more information on usage and
+details, see the help output:
+
 <tscreen><verb>
-$ mysql -u root
-mysql>create database mythconverg;
-mysql>exit
-$ mysql -u mythtv -pmythtv mythconverg < mythtv_backup.sql
+$ mythconverg_backup.pl --help
+</verb></tscreen>
+
+To restore: (assuming that you've <ref id="dropdb" name="dropped the database">
+and <ref id="setupdb" name="created a new database">)
+<tscreen><verb>
+$ mythconverg_restore.pl --filename mythconverg-1214-20091010150513.sql.gz
+</verb></tscreen>
+
+For more information on usage and details of the restore script, see the help
+output:
+
+<tscreen><verb>
+$ mythconverg_restore.pl --help
 </verb></tscreen>
 
 You may need to alter the MySQL permissions if this database is being shared
@@ -6554,74 +6580,21 @@ with multiple systems.  See the <ref id="modify_perm_mysql" name="Modifying
 access to the MySQL database for multiple systems"> section for more
 information.
 
-<sect1>Deleting the MySQL database
+<sect1>Deleting the MySQL database <label id="dropdb">
 <p><figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
 <caption><bf>NOTE</bf>:  Performing this step will remove the entire database.
-You will lose all of your settings and will need to re-run the mc.sql script
-to setup the database structure before running the mythtv-setup program.
+You will lose all of your settings and will need to <ref id="setupdb"
+name="re-run the mc.sql script"> to setup the database structure before running
+the mythtv-setup program or performing a database restore.
 </caption>
 </figure>
 <tscreen><verb>
 $ mysql -u root
-mysql> drop database mythconverg;
+mysql> DROP DATABASE IF EXISTS mythconverg;
 mysql> quit
 </verb></tscreen>
-
-<sect1>Moving your data to new hardware
-<p>This assumes that you will be moving your data to newer / bigger hardware
-and don't want to lose your programs.
-
-The first step is to create a database backup as demonstrated in an earlier
-section.
-
-Next, you will extract only the data that is relevant to the programs:
-<tscreen><verb>
-$ grep "INSERT INTO record "          mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO recorded "        mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO oldrecorded "     mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedprogram " mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedrating "  mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedmarkup "  mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedseek "    mythtv_backup.sql >> restore.sql
-</verb></tscreen>
-
-<bf>NOTE</bf>:  Newer versions of <bf>mysqldump</bf> place backticks around
-the table names.  Backticks are not the same as apostrophes!  On a typical
-North American keyboard, backticks are located to the left of the "1" key,
-on the same key as the tilde.  Also, because the <bf>bash</bf> shell may try
-to interpret the backticks, make sure you use a \ before each one.
-
-If your <tt>restore.sql</tt> file is empty, you'll need to re-run the
-commands like this:
-<tscreen><verb>
-$ grep "INSERT INTO \`record\` "          mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO \`recorded\` "        mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`oldrecorded\` "     mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedprogram\` " mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedrating\` "  mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedmarkup\` "  mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedseek\` "    mythtv_backup.sql >> restore.sql
-</verb></tscreen>
-
-Note the space after the table name and the ">>" to append to the file for
-all but the first <bf>grep</bf>. "recordedmarkup" and "recordedseek" are
-huge and there may be hundreds of thousands of lines if you had lots of
-hours of recordings.
-
-After you have moved the data files to the new hardware, configure MythTV
-using the <bf>mythtv-setup</bf> program as you normally would with a
-standard MythTV installation.
-
-At this point we will restore the information about your programs back into
-the database:
-<tscreen><verb>
-$ mysql -u mythtv -pmythtv mythconverg < restore.sql
-</verb></tscreen>
-
-After successful insertion of the data you may delete the
-<tt>restore.sql</tt> file.
 
 <sect1>btaudio <label id="btaudio">
 <p>btaudio allows you to obtain the audio data from your tuner card directly
@@ -7200,51 +7173,35 @@ hostname in the current session, run:
 # hostname kidsroom
 </verb></tscreen>
 
-3.  Dump the database.
-<tscreen><verb>
-$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
-</verb></tscreen>
+3.  Back up the database in case something goes wrong.  See <ref id="backupdb"
+name="Saving or Restoring the database"> for instructions.
 
 4.  Rename the host in the database.  First, ensure that the new hostname
 you'll be using isn't already in the database.
 <tscreen><verb>
-$ grep kidsroom mythtv_backup.sql
+$ mysql -umythtv -p mythconverg -e "SELECT COUNT(*) FROM settings WHERE hostname LIKE '%kidsroom%';"
 </verb></tscreen>
+If the count is anything other than 0, you'll need to choose another hostname.
+
 Now we're actually going to change the name.  The following should all be
 typed on the same line:
 <tscreen><verb>
-$ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/g >> mythtv_restore.sql
+$ mythconverg_restore.pl --change_hostname --old_hostname="frontend1" --new_hostname="kidsroom"
 </verb></tscreen>
-If you don't feel comfortable using <bf>sed</bf>, you can open the
-<tt>mythtv_backup.sql</tt> file in a text editor and perform a global search
-and replace.  When saving the file, make sure you use the new name,
-<tt>mythtv_restore.sql</tt> or the rest of the steps below will fail.
-
-5.  Drop and recreate the database.
-<tscreen><verb>
-$ mysql -u root
-mysql>drop database mythconverg;
-mysql>create database mythconverg;
-mysql>exit
-</verb></tscreen>
-
-6.  Restore the database using your edited version.
-<tscreen><verb>
-$ mysql -u mythtv -pmythtv mythconverg < mythtv_restore.sql
-</verb></tscreen>
+See <ref id="backupdb" name="Saving or Restoring the database"> for information
+on configuring the script.
 
 If you are running slave backends or frontends, don't forget to re-enable
 access as detailed in <ref id="modify_perm_mysql" name="Modifying access to
 the MySQL database for multiple systems">.
 
-7.  Start the backends.  If you use init scripts, do the following, otherwise
+5.  Start the backends.  If you use init scripts, do the following, otherwise
 start them from terminal consoles.
 <tscreen><verb>
 # /etc/init.d/mythbackend start
 </verb></tscreen>
 
-8.  Quit and restart all frontends.  Delete the <tt>mythtv_backup.sql</tt>
-and <tt>mythtv_restore.sql</tt> files.
+6.  Quit and restart all frontends.
 
 <sect1>Can I run MythTV on my TiVo?
 <sect1>Can I run MythTV on my ReplayTV?
