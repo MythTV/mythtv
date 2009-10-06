@@ -1,82 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="da_DK">
 <context>
     <name></name>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="20"/>
         <source>Unknown</source>
-        <translation type="unfinished">Ukendt</translation>
+        <translation>Ukendt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="21"/>
         <source>Queued</source>
-        <translation type="unfinished">I kø</translation>
+        <translation>I kø</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="22"/>
         <source>Pending</source>
-        <translation type="unfinished">Afventer</translation>
+        <translation>Afventer</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="23"/>
         <source>Starting</source>
-        <translation type="unfinished">Starter</translation>
+        <translation>Starter</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="24"/>
         <source>Running</source>
-        <translation type="unfinished">Kører</translation>
+        <translation>Kører</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="25"/>
         <source>Stopping</source>
-        <translation type="unfinished">Stopper</translation>
+        <translation>Stopper</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="26"/>
         <source>Paused</source>
-        <translation type="unfinished">Pauset</translation>
+        <translation>Pauset</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="27"/>
         <source>Retrying</source>
-        <translation type="unfinished">Prøver igen</translation>
+        <translation>Prøver igen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="28"/>
         <source>Erroring</source>
-        <translation type="unfinished">Fejler</translation>
+        <translation>Fejler</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="29"/>
         <source>Aborting</source>
-        <translation type="unfinished">Afbryder</translation>
+        <translation>Afbryder</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="34"/>
         <source>Done (Invalid status!)</source>
-        <translation type="unfinished">Færdig (fejl status!)</translation>
+        <translation>Færdig (ugyldig status!)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="35"/>
         <source>Finished</source>
-        <translation type="unfinished">&gt;Færdig</translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="36"/>
         <source>Aborted</source>
-        <translation type="unfinished">Afbrudt</translation>
+        <translation>Afbrudt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="37"/>
         <source>Errored</source>
-        <translation type="unfinished">Fejlet</translation>
+        <translation>Fejlet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="38"/>
         <source>Cancelled</source>
-        <translation type="unfinished">Stoppet</translation>
+        <translation>Afbrudt</translation>
     </message>
 </context>
 <context>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="361"/>
         <source>Shall I attempt to connect to this host with default database parameters?</source>
-        <translation type="unfinished"></translation>
+        <translation>Skal jeg forsøge at forbinde til denne vært med standard database-parametre?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="190"/>
@@ -94,7 +94,7 @@
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="146"/>
         <source>Backend uses a PIN. </source>
-        <translation type="unfinished"></translation>
+        <translation>Backend kræver PIN-kode</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="193"/>
@@ -114,7 +114,7 @@
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="197"/>
         <source>Search</source>
-        <translation type="unfinished">Søg</translation>
+        <translation>Søg</translation>
     </message>
 </context>
 <context>
@@ -208,7 +208,7 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2628"/>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette bruger programoversigtdatakilden til at levere kanaler for denne indgang.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2709"/>
@@ -253,39 +253,39 @@
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="279"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="326"/>
         <source>Channel Name</source>
-        <translation type="unfinished">Kanal navn</translation>
+        <translation>Kanalnavn</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="160"/>
         <source>Delete all channels on currently selected source(s).</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet alle kanaler på de(n) valgte kilde(r)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="164"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="283"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="331"/>
         <source>Channel Number</source>
-        <translation type="unfinished">Kanal nummer</translation>
+        <translation>Kanalnummer</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="171"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="183"/>
         <source>(Unassigned)</source>
-        <translation type="unfinished">(Ikke tildelt)</translation>
+        <translation>(Ikke tildelt)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="194"/>
         <source>Starts the channel scanner.</source>
-        <translation type="unfinished">Starter kanal skanneren.</translation>
+        <translation>Starter kanalskanneren.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="198"/>
         <source>Starts the icon downloader</source>
-        <translation type="unfinished"></translation>
+        <translation>Starter ikon-downloaderen</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="204"/>
@@ -295,52 +295,52 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="256"/>
         <source>(Add New Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Tilføj ny kanal)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="409"/>
         <source>Delete channel &apos;%1&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet kanal &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="433"/>
         <source>Delete ALL channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet ALLE kanaler?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="434"/>
         <source>Delete all unassigned channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet alle ikke-tildelte kanaler?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="435"/>
         <source>Delete all channels on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet alle kanaler på %1?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="548"/>
         <source>Icon Import Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger for import af ikoner</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="561"/>
         <source>Download icon for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hent ikon for %1</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="473"/>
         <source>Channel Options</source>
-        <translation type="unfinished">Kanal-indstillinger</translation>
+        <translation>Kanalindstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="483"/>
         <source>Edit</source>
-        <translation type="unfinished">Redigér</translation>
+        <translation>Redigér</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="488"/>
         <source>Delete</source>
-        <translation type="unfinished">Slet</translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="558"/>
@@ -355,7 +355,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="527"/>
         <source>Add some channels first!</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj kanaler først!</translation>
     </message>
 </context>
 <context>
@@ -363,12 +363,12 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="134"/>
         <source>Channel Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalgrupper</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="148"/>
         <source>Create New Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Opret ny kanalgruppe</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="149"/>
@@ -378,22 +378,22 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="176"/>
         <source>Delete &apos;%1&apos; Channel group?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet kanalgruppe &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="181"/>
         <source>Yes, delete group</source>
-        <translation type="unfinished">Ja, slet gruppen</translation>
+        <translation>Ja, slet gruppen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="182"/>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">Nej, behold gruppen</translation>
+        <translation>Nej, behold gruppen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="228"/>
         <source>(Create new group)</source>
-        <translation type="unfinished">(Lav ny gruppe)</translation>
+        <translation>(Opret ny gruppe)</translation>
     </message>
 </context>
 <context>
@@ -401,12 +401,12 @@
     <message>
         <location filename="../programs/mythfrontend/channelrecpriority.cpp" line="174"/>
         <source>Channel Options</source>
-        <translation type="unfinished">Kanal-indstillinger</translation>
+        <translation>Kanalindstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/channelrecpriority.cpp" line="190"/>
         <source>Program List</source>
-        <translation type="unfinished"></translation>
+        <translation>Programliste</translation>
     </message>
 </context>
 <context>
@@ -414,12 +414,12 @@
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui.cpp" line="64"/>
         <source>Scanning</source>
-        <translation type="unfinished">Scanner</translation>
+        <translation>Scanner</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui.cpp" line="183"/>
         <source>ScanWizard</source>
-        <translation type="unfinished">Scanningsguide</translation>
+        <translation>Scanningsguide</translation>
     </message>
 </context>
 <context>
@@ -428,52 +428,52 @@
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="42"/>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="133"/>
         <source>Scan Progress</source>
-        <translation type="unfinished">Scanningsfremgang</translation>
+        <translation>Scanningsfremgang</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="47"/>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="48"/>
         <source>Tuning</source>
-        <translation type="unfinished">Tuning</translation>
+        <translation>Tuning</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="62"/>
         <source>Rotor Movement</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotorbevægelse</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="72"/>
         <source>Signal Strength</source>
-        <translation type="unfinished">Signal styrke</translation>
+        <translation>Signalstyrke</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="78"/>
         <source>Signal/Noise</source>
-        <translation type="unfinished">Signal/Støj</translation>
+        <translation>Signal/Støj</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="86"/>
         <source>Scan</source>
-        <translation type="unfinished">Skan</translation>
+        <translation>Skan</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="91"/>
         <source>Stop Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop skan</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="122"/>
         <source>Locked</source>
-        <translation type="unfinished">Låst</translation>
+        <translation>Låst</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="122"/>
         <source>No Lock</source>
-        <translation type="unfinished">Ingen lås</translation>
+        <translation>Ingen lås</translation>
     </message>
 </context>
 <context>
@@ -672,12 +672,12 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="648"/>
         <source>Current Example</source>
-        <translation type="unfinished">Aktuelt eksempel</translation>
+        <translation>Aktuelt eksempel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="739"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="663"/>
@@ -688,24 +688,24 @@
         <location filename="../programs/mythfrontend/customedit.cpp" line="665"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="837"/>
         <source>Replace</source>
-        <translation type="unfinished">Erstat</translation>
+        <translation>Erstat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="673"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="836"/>
         <source>as a search</source>
-        <translation type="unfinished">som en søgning</translation>
+        <translation>som en søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="676"/>
         <source>as an example</source>
-        <translation type="unfinished">som et eksempel</translation>
+        <translation>som et eksempel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="682"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="830"/>
         <source>Delete</source>
-        <translation type="unfinished">Slet</translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="686"/>
@@ -716,17 +716,17 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="703"/>
         <source>Power Search rules no longer reqiure a leading &quot;AND&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Power Search regler behøver ikke længere at begynde med &quot;AND&quot;.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="707"/>
         <source>Power Search rules can not include semicolon ( ; ) </source>
-        <translation type="unfinished"></translation>
+        <translation>Power Search regler må ikke indeholde semikolon ( ; ) </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="708"/>
         <source>statement terminators.</source>
-        <translation type="unfinished"></translation>
+        <translation>sætningsafsluttere.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="722"/>
@@ -756,12 +756,12 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="341"/>
         <source>Only shows marked as widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Kun udsendelser markeret som widescreen</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="347"/>
         <source>Exclude H.264 encoded streams (EIT only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Udelad H.264-kodede streams (kun EIT)</translation>
     </message>
 </context>
 <context>
@@ -769,22 +769,22 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="106"/>
         <source>&lt;New priority rule&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Ny prioritetsregel&gt;</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="152"/>
         <source>Modify priority for an input (Input priority)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ændr prioritet for en indgang (indgangsprioritet)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="154"/>
         <source>Modify priority for all inputs on a card</source>
-        <translation type="unfinished"></translation>
+        <translation>Ændr prioritet for alle indgange på et kort</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="156"/>
         <source>Modify priority for every card on a host</source>
-        <translation type="unfinished"></translation>
+        <translation>Ændr prioritet for alle kort på en vært</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="158"/>
@@ -834,7 +834,7 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="177"/>
         <source>New episodes only</source>
-        <translation type="unfinished">Kun nye episoder</translation>
+        <translation>Kun nye episoder</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="179"/>
@@ -844,12 +844,12 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="181"/>
         <source>First showing of each episode</source>
-        <translation type="unfinished">Første udsendelse af hver episode</translation>
+        <translation>Første udsendelse af hver episode</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="183"/>
         <source>Last showing of each episode</source>
-        <translation type="unfinished">Sidste udsendelse af hver episode</translation>
+        <translation>Sidste udsendelse af hver episode</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="185"/>
@@ -909,12 +909,12 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="364"/>
         <source>An error was found when checking</source>
-        <translation type="unfinished">Der blevet fundet en fejl</translation>
+        <translation>Der blev fundet en fejl under kontrol</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="366"/>
         <source>The database error was</source>
-        <translation type="unfinished">Database fejlen var</translation>
+        <translation>Database-fejlen var</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="449"/>
@@ -1345,7 +1345,7 @@
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="151"/>
         <source>Voltage</source>
-        <translation type="unfinished"></translation>
+        <translation>Spænding</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/diseqcsettings.cpp" line="153"/>
@@ -1368,42 +1368,42 @@
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2296"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2340"/>
         <source>(Any Program Type)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Alle programtyper)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2342"/>
         <source>Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Film</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2344"/>
         <source>Series</source>
-        <translation type="unfinished">Serier</translation>
+        <translation>Serier</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2346"/>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Show</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2348"/>
         <source>Sports</source>
-        <translation type="unfinished">Sport</translation>
+        <translation>Sport</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2354"/>
         <source>(Any Genre)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Alle genrer)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2381"/>
         <source>(Any Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Alle kanaler)</translation>
     </message>
 </context>
 <context>
@@ -1411,12 +1411,12 @@
     <message>
         <location filename="../programs/mythfrontend/exitprompt.cpp" line="91"/>
         <source>Do you really want to exit MythTV?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vil du virkelige afslutte MythTV?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/exitprompt.cpp" line="100"/>
         <source>No</source>
-        <translation type="unfinished">Nej</translation>
+        <translation>Nej</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="40"/>
@@ -1426,27 +1426,27 @@
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="51"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="71"/>
         <source>Do you want to go back and fix these problems?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vil du gå tilbage og rette disse problemer?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="73"/>
         <source>Do you want to go back and fix this problem?</source>
-        <translation type="unfinished"></translation>
+        <translation>Vil du gå tilbage og rette dette problem?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="83"/>
         <source>Yes please</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja tak</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/exitprompt.cpp" line="84"/>
         <source>No, I know what I am doing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej, jeg ved hvad jeg gør</translation>
     </message>
 </context>
 <context>
@@ -1462,31 +1462,31 @@
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="529"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="538"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1225"/>
         <source>Record</source>
-        <translation type="unfinished">Optag</translation>
+        <translation>Optag</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="539"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1229"/>
         <source>Edit Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigér planlægning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="540"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1233"/>
         <source>Program Details</source>
-        <translation type="unfinished">Program detaljer</translation>
+        <translation>Programdetaljer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="541"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1237"/>
         <source>Upcoming</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommende</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="542"/>
@@ -1498,7 +1498,7 @@
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="546"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1245"/>
         <source>Delete Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet regel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="548"/>
@@ -1510,19 +1510,19 @@
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="551"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1255"/>
         <source>Add To Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj til kanalgruppe</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="553"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1260"/>
         <source>Remove from Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern fra kanalgruppe</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="555"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1264"/>
         <source>Choose Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg kanalgruppe</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="557"/>
@@ -1530,17 +1530,17 @@
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1282"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1525"/>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1493"/>
         <source>You don&apos;t have any channel groups defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Du har ingen kanalgrupper defineret</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1507"/>
         <source>Select Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg kanalgruppe</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1923"/>
@@ -1553,12 +1553,12 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1744"/>
         <source>Recording Options</source>
-        <translation type="unfinished">Indstillinger for optagelse</translation>
+        <translation>Indstillinger for optagelse</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1729"/>
         <source>Description</source>
-        <translation type="unfinished">Beskrivelse</translation>
+        <translation>Beskrivelse</translation>
     </message>
 </context>
 <context>
@@ -1566,7 +1566,7 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1499"/>
         <source>Device ID</source>
-        <translation type="unfinished">Enheds-ID</translation>
+        <translation>Enheds-ID</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1500"/>
@@ -1581,7 +1581,7 @@
         <location filename="../libs/libmythtv/videosource.cpp" line="1637"/>
         <location filename="../libs/libmythtv/videosource.cpp" line="1645"/>
         <source>Manually Enter IP Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Indtast IP-adresse manuelt</translation>
     </message>
 </context>
 <context>
@@ -1589,17 +1589,17 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1987"/>
         <source>Probed info</source>
-        <translation type="unfinished">Indsamlet information</translation>
+        <translation>Indsamlet information</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2002"/>
         <source>Failed to open</source>
-        <translation type="unfinished">Kunne ikke åbnes</translation>
+        <translation>Kunne ikke åbnes</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="2008"/>
         <source>Failed to probe</source>
-        <translation type="unfinished">Kunne ikke testes</translation>
+        <translation>Kunne ikke testes</translation>
     </message>
 </context>
 <context>
@@ -1607,87 +1607,87 @@
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4798"/>
         <source>Commercials are flagged</source>
-        <translation type="unfinished">Reklamerne er markerede</translation>
+        <translation>Reklamerne er markerede</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4799"/>
         <source>An editing cutlist is present</source>
-        <translation type="unfinished">En redigérbar liste er tilgængelig</translation>
+        <translation>En redigérbar liste er tilgængelig</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4800"/>
         <source>The program is able to auto-expire</source>
-        <translation type="unfinished">Dette programme kan autoudløbe</translation>
+        <translation>Dette program kan autoudløbe</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4801"/>
         <source>Commercials are being flagged</source>
-        <translation type="unfinished">Reklame markering er i gang</translation>
+        <translation>Reklame markering er i gang</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4802"/>
         <source>A bookmark is set</source>
-        <translation type="unfinished">Et positionsmærke er sat</translation>
+        <translation>Et positionsmærke er sat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4806"/>
         <source>Recording is in Mono</source>
-        <translation type="unfinished">Optagelsen er i mono</translation>
+        <translation>Optagelsen er i mono</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4807"/>
         <source>Recording is in Stereo</source>
-        <translation type="unfinished">Optagelsen er i stereo</translation>
+        <translation>Optagelsen er i stereo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4808"/>
         <source>Recording is in Surround Sound</source>
-        <translation type="unfinished">Optagelsen er i Surround</translation>
+        <translation>Optagelsen er i Surround</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4809"/>
         <source>Recording is in Dolby Surround Sound</source>
-        <translation type="unfinished">Optagelsen er i Dolby Surround</translation>
+        <translation>Optagelsen er i Dolby Surround</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4811"/>
         <source>Recording is Closed Captioned</source>
-        <translation type="unfinished">Optagelsen indeholder undertekster</translation>
+        <translation>Optagelsen indeholder undertekster</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4812"/>
         <source>Recording has Subtitles Available</source>
-        <translation type="unfinished">Optagelsen har tilgængelige undertekster</translation>
+        <translation>Optagelsen har tilgængelige undertekster</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4813"/>
         <source>Recording is Subtitled</source>
-        <translation type="unfinished">Optagelsen har undertekster</translation>
+        <translation>Optagelsen har undertekster</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4815"/>
         <source>Recording is in 1080i/p High Definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelsen er i 1080i/p High Definition</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4816"/>
         <source>Recording is in 720p High Definition</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelsen er i 720p High Definition</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4817"/>
         <source>Recording is in High Definition</source>
-        <translation type="unfinished">Optagelsen er i HD-format</translation>
+        <translation>Optagelsen er i HD-format</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4821"/>
         <source>Recording has been watched</source>
-        <translation type="unfinished">Optagelsen er set</translation>
+        <translation>Optagelsen er set</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="4818"/>
         <source>Recording is Widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelsen er i Widescreen</translation>
     </message>
 </context>
 <context>
@@ -1695,7 +1695,7 @@
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="89"/>
         <source>Name of the icon file</source>
-        <translation type="unfinished"></translation>
+        <translation>Navn på ikonfilen</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="90"/>
@@ -1720,12 +1720,12 @@
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="122"/>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Afslut</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="124"/>
         <source>Skip</source>
-        <translation type="unfinished">Skip</translation>
+        <translation>Skip</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="156"/>
@@ -1807,17 +1807,17 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2108"/>
         <source>Commercial Flagging Starting</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklamemarkering startes</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2142"/>
         <source>Unable to find mythcommflag</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan ikke finde mythcommflag</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2148"/>
         <source>Aborted by user</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbrudt af bruger</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2154"/>
@@ -1832,7 +1832,8 @@
     <message numerus="yes">
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2166"/>
         <source>%n commercial break(s)</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>%n reklame(r)</numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1840,7 +1841,7 @@
         <location filename="../libs/libmythtv/jobqueue.cpp" line="2176"/>
         <source>Commercial Flagging %1</source>
         <comment>Job ID</comment>
-        <translation type="unfinished"></translation>
+        <translation>Reklamemarkering %1</translation>
     </message>
 </context>
 <context>
@@ -1848,32 +1849,32 @@
     <message>
         <location filename="../programs/mythfrontend/keygrabber.cpp" line="47"/>
         <source>Press A Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Tryk på en tast</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/keygrabber.cpp" line="48"/>
         <source>Waiting for key press</source>
-        <translation type="unfinished"></translation>
+        <translation>Venter på tastetryk</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/keygrabber.cpp" line="51"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/keygrabber.cpp" line="52"/>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/keygrabber.cpp" line="110"/>
         <source>Pressed key not recognized</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke genkende tasten</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/keygrabber.cpp" line="115"/>
         <source>Add key &apos;%1&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj tast &apos;%1&apos;?</translation>
     </message>
 </context>
 <context>
@@ -1882,12 +1883,12 @@
         <location filename="../programs/mythlcdserver/lcdprocclient.cpp" line="1869"/>
         <location filename="../programs/mythlcdserver/lcdprocclient.cpp" line="1957"/>
         <source>RECORDING</source>
-        <translation type="unfinished"></translation>
+        <translation>OPTAGER</translation>
     </message>
     <message>
         <location filename="../programs/mythlcdserver/lcdprocclient.cpp" line="1985"/>
         <source>RECORDING|</source>
-        <translation type="unfinished"></translation>
+        <translation>OPTAGER|</translation>
     </message>
 </context>
 <context>
@@ -1971,7 +1972,7 @@
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="842"/>
         <source>Select a CD writer</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg en CD-brænder</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="854"/>
@@ -2052,7 +2053,7 @@
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="277"/>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="651"/>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="224"/>
@@ -2083,7 +2084,7 @@
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="275"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="286"/>
@@ -3136,7 +3137,7 @@
         <location filename="../libs/libmyth/mythdialogs.cpp" line="759"/>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="793"/>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="731"/>
@@ -3149,7 +3150,7 @@
         <location filename="../libs/libmyth/mythcontext.cpp" line="1296"/>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1366"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -3194,48 +3195,50 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="308"/>
         <source>System Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemmenu</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="321"/>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="333"/>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="344"/>
         <source>Shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Luk ned</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="322"/>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="338"/>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="345"/>
         <source>Reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Genstart</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="352"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>Om</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="353"/>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="372"/>
         <source>Revision: %1
  Branch: %2
  %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Revision: %1
+ Branch: %2
+ %3</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="383"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="935"/>
         <source>Enter password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Indtast password:</translation>
     </message>
 </context>
 <context>
@@ -3243,7 +3246,7 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../libs/libmythui/mythprogressdialog.cpp" line="12"/>
         <source>Please Wait ...</source>
-        <translation type="unfinished">Vent venligst ...</translation>
+        <translation>Vent venligst ...</translation>
     </message>
 </context>
 <context>
@@ -3317,7 +3320,7 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1790"/>
         <source>Edit</source>
-        <translation type="unfinished">Redigér</translation>
+        <translation>Redigér</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1794"/>
@@ -3332,17 +3335,17 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1796"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1812"/>
         <source>Delete</source>
-        <translation type="unfinished">Slet</translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1813"/>
         <source>Record</source>
-        <translation type="unfinished">Optag</translation>
+        <translation>Optag</translation>
     </message>
 </context>
 <context>
@@ -3708,7 +3711,7 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2611"/>
         <source>Scheduling Options</source>
-        <translation type="unfinished">Planlægningsopsætning</translation>
+        <translation>Planlægningsopsætning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2620"/>
@@ -3809,12 +3812,12 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="465"/>
         <source>Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Optagelser</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="515"/>
         <source>Password for group &apos;%1&apos;:</source>
-        <translation type="unfinished"></translation>
+        <translation>Password for gruppe &apos;%1&apos;:</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2207"/>
@@ -14819,7 +14822,7 @@ Do you wish to continue watching?</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="245"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="492"/>
         <source>Change Ending Time</source>
-        <translation type="unfinished">Ændre slut tid.</translation>
+        <translation>Ændr sluttid</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="228"/>
@@ -14827,7 +14830,7 @@ Do you wish to continue watching?</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="451"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="504"/>
         <source>Edit Options</source>
-        <translation type="unfinished">Ændre opsætninger</translation>
+        <translation>Ændr opsætninger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="234"/>
@@ -14835,7 +14838,7 @@ Do you wish to continue watching?</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="455"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="508"/>
         <source>Add Override</source>
-        <translation type="unfinished">Tilføj tilsidesættelse</translation>
+        <translation>Tilføj tilsidesættelse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="250"/>
@@ -14843,7 +14846,7 @@ Do you wish to continue watching?</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="450"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="503"/>
         <source>Edit Override</source>
-        <translation type="unfinished">Ændre tilsidesættelse</translation>
+        <translation>Redigér tilsidesættelse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="252"/>
@@ -14851,26 +14854,26 @@ Do you wish to continue watching?</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="448"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="490"/>
         <source>Clear Override</source>
-        <translation type="unfinished">Fjern overordnede rettigheder</translation>
+        <translation>Fjern tilsidesættelse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="285"/>
         <source> The following programs will be recorded instead:
 </source>
-        <translation type="unfinished">Følgende program bliver optaget i stedet for:
+        <translation>Følgende programmer bliver optaget i stedet for:
 </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="342"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="431"/>
         <source>Record anyway</source>
-        <translation type="unfinished">Optag alligevel</translation>
+        <translation>Optag alligevel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="347"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="437"/>
         <source>Forget Previous</source>
-        <translation type="unfinished">Glem foregående</translation>
+        <translation>Glem foregående</translation>
     </message>
 </context>
 <context>
@@ -14878,112 +14881,112 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="155"/>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished">Optag denne udsendelse med normal opsætning</translation>
+        <translation>Optag denne udsendelse med normal opsætning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="158"/>
         <source>Record this showing with override options</source>
-        <translation type="unfinished">Optag denne udsendelse med overordnede opsætninger</translation>
+        <translation>Optag denne udsendelse med tilsidesætning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="161"/>
         <source>Do not allow this showing to be recorded</source>
-        <translation type="unfinished">Tillad ikke at denne udsendelse optages</translation>
+        <translation>Tillad ikke at denne udsendelse optages</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="169"/>
         <source>Do not record this program</source>
-        <translation type="unfinished">Optag ikke dette program</translation>
+        <translation>Optag ikke dette program</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="174"/>
         <source>Record only this showing</source>
-        <translation type="unfinished">Optag kun denne udsendelse</translation>
+        <translation>Optag kun denne udsendelse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="178"/>
         <source>Record one showing of this title</source>
-        <translation type="unfinished">Optag en enkelt udsendelse af denne titel</translation>
+        <translation>Optag en enkelt udsendelse af denne titel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="182"/>
         <source>Record in this timeslot every week</source>
-        <translation type="unfinished">Optag på dette tidspunkt hver uge</translation>
+        <translation>Optag på dette tidspunkt hver uge</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="186"/>
         <source>Record one showing of this title every week</source>
-        <translation type="unfinished">Optag en udsendelse af denne titel hver uge</translation>
+        <translation>Optag en udsendelse af denne titel hver uge</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="190"/>
         <source>Record in this timeslot every day</source>
-        <translation type="unfinished">Optag på dette tidspunkt hver dag</translation>
+        <translation>Optag på dette tidspunkt hver dag</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="194"/>
         <source>Record one showing of this title every day</source>
-        <translation type="unfinished">Optag en udsendelse af denne titel hver dag</translation>
+        <translation>Optag en udsendelse af denne titel hver dag</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="198"/>
         <source>Record at any time on this channel</source>
-        <translation type="unfinished">Optag altid på denne kanal</translation>
+        <translation>Optag altid på denne kanal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="202"/>
         <source>Record at any time on any channel</source>
-        <translation type="unfinished">Optag altid på hvilken som helst kanal</translation>
+        <translation>Optag altid på hvilken som helst kanal</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="216"/>
         <source>Power Search</source>
-        <translation type="unfinished">Super søgning</translation>
+        <translation>Super-søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="219"/>
         <source>Title Search</source>
-        <translation type="unfinished">Titel søgning</translation>
+        <translation>Titel-søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="222"/>
         <source>Keyword Search</source>
-        <translation type="unfinished">Stikords søgning</translation>
+        <translation>Stikords-søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="225"/>
         <source>People Search</source>
-        <translation type="unfinished">Person søgning</translation>
+        <translation>Person-søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="228"/>
         <source>Unknown Search</source>
-        <translation type="unfinished">Ukendt søgning</translation>
+        <translation>Ukendt søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="312"/>
         <source>Schedule Information</source>
-        <translation type="unfinished">Planlægningsinformation</translation>
+        <translation>Planlægningsinformation</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="321"/>
         <source>Program Details</source>
-        <translation type="unfinished">Program detaljer</translation>
+        <translation>Programdetaljer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="322"/>
         <source>Upcoming episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommende episoder</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="323"/>
         <source>Upcoming recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommende optagelser</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="324"/>
         <source>Previously scheduled</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidligere planlagt</translation>
     </message>
 </context>
 <context>
