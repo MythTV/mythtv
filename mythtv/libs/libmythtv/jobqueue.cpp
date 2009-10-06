@@ -2106,8 +2106,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     }
 
     QString msg = tr("Commercial Flagging Starting");
-    VERBOSE(VB_GENERAL, (LOC + QString("%1 for %2")
-            .arg(msg).arg(details.constData())));
+    VERBOSE(VB_GENERAL, LOC + "Commercial Flagging Starting for " + detailstr);
     gContext->LogEntry("commflag", LP_NOTICE, msg, detailstr);
 
     int breaksFound = 0;
