@@ -88,8 +88,17 @@ bool TitleDialog::Create()
         return false;
     }
 
-    m_nexttitleButton->SetVisible(false);
-    m_prevtitleButton->SetVisible(false);
+    if (m_dvdTitles->size() > 1)
+    {
+        m_nexttitleButton->SetVisible(true);
+        m_prevtitleButton->SetVisible(true);
+    }
+    else
+    {
+        m_nexttitleButton->SetVisible(false);
+        m_prevtitleButton->SetVisible(false);
+    }
+
     m_ripawayButton->SetText(tr("Begin Ripping"));
 
     if (!BuildFocusList())
