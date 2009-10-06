@@ -119,7 +119,7 @@ sub MoveFileToArchiveDir {
 
 	# don't like doing this this way, but this is an example script that
 	# people can enhance if they want
-	my( $cmd ) = sprintf( "mv %s %s && ln -s %s %s", $old, $new, $new, $old );
+	my( $cmd ) = sprintf( "mv %s %s", $old, $new );
 
 	#printf( "Archiving by running '%s'\n", $cmd );
 
