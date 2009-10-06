@@ -606,9 +606,14 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     if (CODEC_IS_MPEG(context->codec_id))
         frameseekadjust = maxkeyframedist+1;
 
+    long long ts = 0;
+    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+        ts = ic->start_time;
+
     // convert framenumber to normalized timestamp
-    long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE;
-    long long ts = (long long)( diff / fps );
+    long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE / fps;
+    ts += (long long)diff);
+
     if (av_seek_frame(ic, -1, ts, AVSEEK_FLAG_BACKWARD) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR
