@@ -612,7 +612,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     // convert framenumber to normalized timestamp
     long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE / fps;
-    ts += (long long)diff);
+    ts += (long long)diff;
 
     if (av_seek_frame(ic, -1, ts, AVSEEK_FLAG_BACKWARD) < 0)
     {
