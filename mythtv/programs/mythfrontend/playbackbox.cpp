@@ -745,12 +745,22 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconMap["watched"]     = FL_WATCHED;
     iconMap["preserved"]   = FL_PRESERVED;
 
-    MythUIImage *iconImage;
+    MythUIImage *iconImage = NULL;
+    MythUIStateType *iconState = NULL;
     for (it = iconMap.begin(); it != iconMap.end(); ++it)
     {
         iconImage = dynamic_cast<MythUIImage *>(GetChild(it.key()));
         if (iconImage)
             iconImage->SetVisible(flags & (*it));
+
+        iconState = dynamic_cast<MythUIStateType *>(GetChild(it.key()));
+        if (iconState)
+        {
+            if (flags & (*it))
+                iconState->DisplayState("on");
+            else
+                iconState->DisplayState("off");
+        }
     }
 
     iconMap.clear();
@@ -759,8 +769,8 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconMap["stereo"] = AUD_STEREO;
     iconMap["mono"] = AUD_MONO;
 
-    MythUIStateType *iconState;
     iconState = dynamic_cast<MythUIStateType *>(GetChild("audioprops"));
+    bool haveIcon = false;
     if (pginfo && iconState)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
@@ -768,13 +778,16 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo->audioproperties & (*it))
             {
                 if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
                     break;
+                }
             }
         }
     }
 
-    if (iconState && (!pginfo || it == iconMap.end()))
-        iconState->DisplayState("default");
+    if (iconState && !haveIcon)
+        iconState->Reset();
 
     iconMap.clear();
     iconMap["hd1080"] = VID_1080;
@@ -784,6 +797,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     //iconMap["avchd"] = VID_AVC;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
+    haveIcon = false;
     if (pginfo && iconState)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
@@ -791,13 +805,16 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo->videoproperties & (*it))
             {
                 if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
                     break;
+                }
             }
         }
     }
 
-    if (iconState && (!pginfo || it == iconMap.end()))
-        iconState->DisplayState("default");
+    if (iconState && !haveIcon)
+        iconState->Reset();
 
     iconMap.clear();
     iconMap["deafsigned"] = SUB_SIGNED;
@@ -806,6 +823,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconMap["cc"] = SUB_HARDHEAR;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("subtitletypes"));
+    haveIcon = false;
     if (pginfo && iconState)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
@@ -813,13 +831,16 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo->subtitleType & (*it))
             {
                 if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
                     break;
+                }
             }
         }
     }
 
-    if (iconState && (!pginfo || it == iconMap.end()))
-        iconState->DisplayState("default");
+    if (iconState && !haveIcon)
+        iconState->Reset();
 }
 
 void PlaybackBox::updateUsage()
@@ -3215,11 +3236,16 @@ void PlaybackBox::toggleAutoExpire()
         pginfo->SetAutoExpire(on, true);
 
         if (on)
+        {
             pginfo->programflags |= FL_AUTOEXP;
+            item->DisplayState("on", "autoexpire");
+        }
         else
+        {
             pginfo->programflags &= ~FL_AUTOEXP;
+            item->DisplayState("off", "autoexpire");
+        }
 
-        item->DisplayState("off", "expiry");
         updateIcons(pginfo);
     }
 }
@@ -3242,11 +3268,16 @@ void PlaybackBox::togglePreserveEpisode()
         pginfo->SetPreserveEpisode(on);
 
         if (on)
+        {
             pginfo->programflags |= FL_PRESERVED;
+            item->DisplayState("on", "preserve");
+        }
         else
+        {
             pginfo->programflags &= ~FL_PRESERVED;
+            item->DisplayState("off", "preserve");
+        }
 
-        item->DisplayState("on", "preserve");
         updateIcons(pginfo);
     }
 }
