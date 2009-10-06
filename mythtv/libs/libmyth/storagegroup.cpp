@@ -853,7 +853,8 @@ void StorageGroupEditor::Load(void)
     listbox->addSelection(tr("(Add New Directory)"),
         "__CREATE_NEW_STORAGE_DIRECTORY__");
 
-    listbox->setValue(lastValue);
+    if (!lastValue.isEmpty())
+        listbox->setValue(lastValue);
 }
 
 DialogCode StorageGroupEditor::exec(void)
