@@ -125,11 +125,11 @@ void ScheduleCommon::EditCustom(ProgramInfo *pginfo)
 /**
 *  \brief Creates a dialog for editing an override recording schedule
 */
-void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
+void ScheduleCommon::MakeOverride(RecordingInfo *recinfo, bool startActive)
 {
     if (!recinfo || recinfo->recordid <= 0)
         return;
-    
+
     RecordingRule *recrule = new RecordingRule();
     
     if (!recrule->LoadByProgram(static_cast<ProgramInfo*>(recinfo)))
@@ -141,7 +141,9 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
         delete recrule;
         return;
     }
-    
+    if (startActive)
+        recrule->m_type = kOverrideRecord;
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ScheduleEditor *schededit = new ScheduleEditor(mainStack, recrule);
     if (schededit->Create())
@@ -491,14 +493,12 @@ void ScheduleCommon::customEvent(QEvent *event)
                 recInfo.ApplyRecordStateChange(kNotRecording);
             else if (resulttext == tr("Change Ending Time"))
             {
-                if (recInfo.rectype != kSingleRecord &&
-                    recInfo.rectype != kOverrideRecord &&
-                    recInfo.rectype != kFindOneRecord)
-                {
-                    recInfo.ApplyRecordStateChange(kOverrideRecord, false);
-                }
-
-                EditScheduled(&recInfo);
+                if (recInfo.rectype == kSingleRecord ||
+                    recInfo.rectype == kOverrideRecord ||
+                    recInfo.rectype == kFindOneRecord)
+                    EditScheduled(&recInfo);
+                else
+                    MakeOverride(&recInfo, true);
             }
             else if (resulttext == tr("Edit Override") ||
                      resulttext == tr("Edit Options"))
