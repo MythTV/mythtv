@@ -1058,11 +1058,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
 
         dontSyncPositionMap = true;
+        ic->build_index = 1;
     }
-
-    // Don't build a seek index for MythTV files, the user needs to
-    // use mythcommflag to build a proper MythTV position map for these.
-    if (livetv || watchingrecording)
+    // we have a position map, disable libavformat's seek index
+    else
         ic->build_index = 0;
 
     dump_format(ic, 0, filename, 0);
