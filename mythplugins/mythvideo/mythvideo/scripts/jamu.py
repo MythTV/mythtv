@@ -369,9 +369,15 @@ class OutStreamEncoder(object):
 	def write(self, obj):
 		"""Wraps the output stream, encoding Unicode strings with the specified encoding"""
  		if isinstance(obj, unicode):
-			self.out.write(obj.encode(self.encoding))
+			try:
+				self.out.write(obj.encode(self.encoding))
+			except IOError:
+				pass
 		else:
-			self.out.write(obj)
+			try:
+				self.out.write(obj)
+			except IOError:
+				pass
 
 	def __getattr__(self, attr):
 		"""Delegate everything but write to the stream"""
