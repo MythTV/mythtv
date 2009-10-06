@@ -161,6 +161,7 @@ class VDPAUContext
     bool              needDeintRefs;
     QMutex            deintLock;
     uint8_t           skipChroma;
+    int               numRefs;
     float             denoise;
     float             sharpen;
 

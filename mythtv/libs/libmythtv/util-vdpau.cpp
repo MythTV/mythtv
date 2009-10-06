@@ -80,7 +80,7 @@ VDPAUContext::VDPAUContext()
     osdAlpha(0),            osdReady(false),      osdSize(QSize(0,0)),
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
     needDeintRefs(false),   deintLock(QMutex::Recursive), skipChroma(0),
-    denoise(0.0f),          sharpen(0.0f),
+    numRefs(0),             denoise(0.0f),          sharpen(0.0f),
     useColorControl(false), pipOutputSurface(0),
     pipAlpha(0),            pipBorder(0),
     pipClear(0),            pipReady(0),       pipNeedsClear(false),
@@ -1088,13 +1088,18 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     struct vdpau_render_state *render;
     VdpVideoSurface video_surface = 0;
 
+    // FIXME for 0.23. This should be triggered from AFD by a seek
+    if (frame && abs(frame->frameNumber - currentFrameNum) > 8)
+        ClearReferenceFrames();
+
     bool new_frame = true;
     bool deint = (deinterlacing && needDeintRefs && frame);
 
     if (deint)
     {
         new_frame = UpdateReferenceFrames(frame);
-        if (vdpauDecode && (referenceFrames.size() != NUM_REFERENCE_FRAMES))
+        if ((vdpauDecode && (referenceFrames.size() != NUM_REFERENCE_FRAMES)) ||
+           (!vdpauDecode && (numRefs != NUM_REFERENCE_FRAMES)))
             deint = false;
     }
 
@@ -1137,9 +1142,10 @@ void VDPAUContext::PrepareVideo(VideoFrame *frame, QRect video_rect,
     {
         deint = false;
         video_surface = pause_surface;
-        if (!video_surface)
-            video_surface = videoSurfaces[0].surface;
     }
+
+    if (!video_surface)
+        video_surface = videoSurfaces[0].surface;
 
     if (outRect.x1 != (uint)screen_size.width() ||
         outRect.y1 != (uint)screen_size.height())
@@ -1642,6 +1648,11 @@ bool VDPAUContext::UpdateReferenceFrames(VideoFrame *frame)
             referenceFrames.pop_front();
         referenceFrames.push_back(frame);
     }
+    else
+    {
+        if (numRefs < NUM_REFERENCE_FRAMES)
+            numRefs++;
+    }
 
     return true;
 }
@@ -1658,6 +1669,7 @@ void VDPAUContext::ClearReferenceFrames(void)
 {
     deintLock.lock();
     referenceFrames.clear();
+    numRefs = 0;
     deintLock.unlock();
 }
 
