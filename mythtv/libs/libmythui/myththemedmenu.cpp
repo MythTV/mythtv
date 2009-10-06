@@ -493,7 +493,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "text")
             {
-                if ((text.isNull() || text.isEmpty()) &&
+                if (text.isEmpty() &&
                     info.attribute("lang","").isEmpty())
                 {
                     text = qApp->translate("ThemeUI",
@@ -512,7 +512,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "alttext")
             {
-                if ((alttext.isNull() || alttext.isEmpty()) &&
+                if (alttext.isEmpty() &&
                     info.attribute("lang","").isEmpty())
                 {
                     alttext = qApp->translate("ThemeUI",
@@ -548,7 +548,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "description")
             {
-                if ((description.isNull() || description.isEmpty()) &&
+                if (description.isEmpty() &&
                     info.attribute("lang","").isEmpty())
                 {
                     description = qApp->translate("ThemeUI",
