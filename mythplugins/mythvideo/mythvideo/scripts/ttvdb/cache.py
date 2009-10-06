@@ -82,8 +82,10 @@ class CacheHandler(urllib2.BaseHandler):
         """The location of the cache directory"""
         self.max_age = max_age
         self.cache_location = cache_location
-        if not os.path.exists(self.cache_location):
+        try:
             os.mkdir(self.cache_location)
+        except OSError:
+            pass
 
     def default_open(self, request):
         """Handles GET requests, if the response is cached it returns it
