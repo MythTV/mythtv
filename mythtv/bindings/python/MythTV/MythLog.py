@@ -26,7 +26,7 @@ class MythLog:
 	def Msg(self, level, msg, *args, **kwargs):
 		self.log.log(level, msg, *args, **kwargs)
 
-class MythError:
+class MythError(Exception):
 	"""
 	A simple exception class
 	"""
