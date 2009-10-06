@@ -757,9 +757,9 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         if (iconState)
         {
             if (flags & (*it))
-                iconState->DisplayState("on");
+                iconState->DisplayState("yes");
             else
-                iconState->DisplayState("off");
+                iconState->DisplayState("no");
         }
     }
 
@@ -3238,12 +3238,12 @@ void PlaybackBox::toggleAutoExpire()
         if (on)
         {
             pginfo->programflags |= FL_AUTOEXP;
-            item->DisplayState("on", "autoexpire");
+            item->DisplayState("yes", "autoexpire");
         }
         else
         {
             pginfo->programflags &= ~FL_AUTOEXP;
-            item->DisplayState("off", "autoexpire");
+            item->DisplayState("no", "autoexpire");
         }
 
         updateIcons(pginfo);
@@ -3270,12 +3270,12 @@ void PlaybackBox::togglePreserveEpisode()
         if (on)
         {
             pginfo->programflags |= FL_PRESERVED;
-            item->DisplayState("on", "preserve");
+            item->DisplayState("yes", "preserve");
         }
         else
         {
             pginfo->programflags &= ~FL_PRESERVED;
-            item->DisplayState("off", "preserve");
+            item->DisplayState("no", "preserve");
         }
 
         updateIcons(pginfo);
