@@ -279,6 +279,8 @@ class PAThread : public QThread
 /// \returns true if successful
 bool pulseaudio_suspend(void)
 {
+    setenv("PULSE_INTERNAL", "1", 0);
+
     QThread *t = new PAThread();
     t->start();
 
