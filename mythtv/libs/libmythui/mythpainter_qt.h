@@ -43,6 +43,9 @@ class MythQtPainter : public MythPainter
 
     QPainter *painter;
     QRegion clipRegion;
+
+    std::list<QPixmap *> m_imageDeleteList;
+    QMutex               m_imageDeleteLock;
 };
 
 #endif

@@ -17,7 +17,7 @@ class MythQtImage : public MythImage
   public:
     MythQtImage(MythPainter *parent) : MythImage(parent),
                 m_Pixmap(NULL), m_bRegenPixmap(false) { }
-   ~MythQtImage() { if (m_Pixmap) delete m_Pixmap; }
+   ~MythQtImage() { }
 
     void SetChanged(bool change = true);
     QPixmap *GetPixmap(void) { return m_Pixmap; }
@@ -75,6 +75,14 @@ void MythQtPainter::Begin(QWidget *parent)
 
     painter = new QPainter(parent);
     clipRegion = QRegion(QRect(0, 0, 0, 0));
+
+    QMutexLocker locker(&m_imageDeleteLock);
+    while (!m_imageDeleteList.empty())
+    {
+        QPixmap *pm = m_imageDeleteList.front();
+        m_imageDeleteList.pop_front();
+        delete pm;
+    }
 }
 
 void MythQtPainter::End(void)
@@ -254,7 +262,12 @@ MythImage *MythQtPainter::GetFormatImage()
     return new MythQtImage(this);
 }
 
-void MythQtPainter::DeleteFormatImage(MythImage* /* im */)
+void MythQtPainter::DeleteFormatImage(MythImage *im)
 {
+    MythQtImage *qim = (MythQtImage *)im;
+
+    QMutexLocker locker(&m_imageDeleteLock);
+    if (qim->GetPixmap())
+        m_imageDeleteList.push_back(qim->GetPixmap());
 }
 

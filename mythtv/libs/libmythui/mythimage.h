@@ -18,6 +18,7 @@ class MPUBLIC MythImage : public QImage
 {
   public:
     MythImage(MythPainter *parent);
+    virtual ~MythImage();
 
     void UpRef(void);
     bool DownRef(void);
@@ -69,8 +70,6 @@ class MPUBLIC MythImage : public QImage
                              const QColor &end, int alpha,
                              bool drawBoundary=true,
                              FillDirection direction = FillTopToBottom);
-
-    virtual ~MythImage();
 
     bool m_Changed;
     MythPainter *m_Parent;

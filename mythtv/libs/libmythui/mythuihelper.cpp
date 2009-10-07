@@ -100,6 +100,7 @@ class MythUIHelperPrivate
     QMap<QString, uint> CacheTrack;
     QMutex *m_cacheLock;
     size_t m_cacheSize;
+    QMutex *m_cacheSizeLock;
 
     uint maxImageCacheSize;
 
@@ -144,6 +145,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
       m_cacheLock(new QMutex(QMutex::Recursive)), m_cacheSize(0),
+      m_cacheSizeLock(new QMutex(QMutex::Recursive)),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
       bigfontsize(0), mediumfontsize(0), smallfontsize(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
@@ -164,6 +166,8 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
     CacheTrack.clear();
 
+    delete m_cacheLock;
+    delete m_cacheSizeLock;
     delete m_imageThreadPool;
     delete m_qtThemeSettings;
     delete screensaver;
@@ -343,10 +347,10 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
     d->Init();
     d->callbacks = cbs;
 
-    d->m_cacheLock->lock();
+    d->m_cacheSizeLock->lock();
     d->maxImageCacheSize = GetMythDB()->GetNumSetting("UIImageCacheSize", 20)
                                 * 1024 * 1024;
-    d->m_cacheLock->unlock();
+    d->m_cacheSizeLock->unlock();
 
     VERBOSE(VB_GENERAL, QString("MythUI Image Cache size set to %1 bytes")
                         .arg(d->maxImageCacheSize));
@@ -445,7 +449,10 @@ void MythUIHelper::UpdateImageCache(void)
     }
 
     d->CacheTrack.clear();
+
+    d->m_cacheSizeLock->lock();
     d->m_cacheSize = 0;
+    d->m_cacheSizeLock->unlock();
 
     ClearOldImageCache();
 }
@@ -454,7 +461,10 @@ MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 {
     QMutexLocker locker(d->m_cacheLock);
     if (d->imageCache.contains(url))
+    {
+        d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
         return d->imageCache[url];
+    }
 
 /*
     if (QFileInfo(url).exists())
@@ -473,9 +483,9 @@ void MythUIHelper::IncludeInCacheSize(MythImage *im)
     if (!im)
         return;
 
-    d->m_cacheLock->lock();
+    d->m_cacheSizeLock->lock();
     d->m_cacheSize += im->numBytes();
-    d->m_cacheLock->unlock();
+    d->m_cacheSizeLock->unlock();
 }
 
 void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
@@ -483,9 +493,9 @@ void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
     if (!im)
         return;
 
-    d->m_cacheLock->lock();
+    d->m_cacheSizeLock->lock();
     d->m_cacheSize -= im->numBytes();
-    d->m_cacheLock->unlock();
+    d->m_cacheSizeLock->unlock();
 }
 
 MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
@@ -511,9 +521,11 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
     // delete the oldest cached images until we fall below threshold.
     QMutexLocker locker(d->m_cacheLock);
+    d->m_cacheSizeLock->lock();
     while (d->m_cacheSize + im->numBytes() >= d->maxImageCacheSize &&
            d->imageCache.size())
     {
+        d->m_cacheSizeLock->unlock();
         QMap<QString, MythImage*>::iterator it = d->imageCache.begin();
         uint oldestTime = QDateTime::currentDateTime().toTime_t();
         QString oldestKey = it.key();
@@ -541,10 +553,16 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
             d->imageCache[oldestKey]->DownRef();
             d->imageCache.remove(oldestKey);
             d->CacheTrack.remove(oldestKey);
+
+            d->m_cacheSizeLock->lock();
         }
         else
+        {
+            d->m_cacheSizeLock->lock();
             break;
+        }
     }
+    d->m_cacheSizeLock->unlock();
 
     QMap<QString, MythImage*>::iterator it = d->imageCache.find(url);
     if (it == d->imageCache.end())
@@ -1241,7 +1259,10 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
                                         bool allowLoadFromDisk)
 {
-    //VERBOSE(VB_GENERAL, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
+    //VERBOSE(VB_FILE+VB_EXTRA, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
+
+    if (srcfile.isEmpty() || label.isEmpty())
+        return NULL;
        
     QString cachefilepath = GetThemeCacheDir() + '/' + label;
     QFileInfo fi(cachefilepath);

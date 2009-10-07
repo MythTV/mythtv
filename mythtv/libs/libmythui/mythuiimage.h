@@ -9,6 +9,7 @@
 #include "mythuitype.h"
 #include "mythimage.h"
 
+class MythUIImagePrivate;
 class MythScreenType;
 class ImageLoadThread;
 
@@ -63,7 +64,8 @@ class MPUBLIC MythUIImage : public MythUIType
 
     void Init(void);
     void Clear(void);
-    MythImage* LoadImage(const QString &imFile, int imageNumber = 0);
+    MythImage* LoadImage(const QString &imFile, int imageNumber,
+                         QSize bForceSize);
     void customEvent(QEvent *event);
 
     virtual bool ParseElement(QDomElement &element);
@@ -123,7 +125,7 @@ class MPUBLIC MythUIImage : public MythUIType
 
     bool m_isGreyscale;
 
-    ImageLoadThread *m_imageLoadThread;
+    MythUIImagePrivate *d;
 
     friend class MythThemeBase;
     friend class MythUIButtonListItem;
