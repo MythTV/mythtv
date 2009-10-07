@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2009-09-25, v0.22.00
+<date>2009-10-07, v0.22.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -541,13 +541,14 @@ for each tuner.
 
 <sect3>Hauppauge HD PVR
 <p>Hauppuage makes a device called the HD PVR, which accepts component HDTV
-signals and performs a real-time encode into H.264.  See <url
+signals and TOSLINK / SPDIF audio and performs a real-time encode into
+H.264.  See <url
 url="http://www.hauppauge.com/site/products/data_hdpvr.html"
 name="http://www.hauppauge.com/site/products/data_hdpvr.html"> for
 additional information.
 
-<sect2>Playback of HDTV
-To playback HDTV content, plan on a powerful CPU if your video card does not
+<sect2>Playback of HDTV using CPU
+<p>To playback HDTV content, plan on a powerful CPU if your video card does not
 provide support for offloading video decode. (See below for a description of VDPAU)
 
 "How powerful?" depends on a number of factors, such as the capture
@@ -561,11 +562,17 @@ The Complicated Answer:
 
 For 720p content (1280x720), a 2.4GHz P4 should be sufficient.
 
-For 1920x1080i->1920x1080p with the better deinterlacing methods
-done in real time a 2.4GHz CPU is taxed, but should work if you use "Bob and
-Weave" deinterlacing, or if you have an NVIDIA card with MPEG-2 hardware
-acceleration.  If you enable the hardware acceleration, you may be able to
-use a 1.8GHz processor.
+For 1920x1080i->1920x1080p with the better deinterlacing methods done in
+real time a 2.4GHz CPU is taxed, but should work if you use "Bob and Weave"
+deinterlacing, or if you have an NVIDIA card with video decode acceleration. 
+
+<sect2>Playback of HDTV using VDPAU
+<p>NVIDIA now incorporates MPEG-2 and H.264 decode acceleration in their
+binary driver; this is now officially supported in MythTV 0.22.  Use of
+VDPAU offloads the decompression and deinterlacing of video to the video GPU
+rather than the CPU of the frontend, so the CPU requirements are drastically
+lowered.  A fanless frontend using an Intel Atom CPU running a single-core at
+1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264.
 
 <sect3>Firewire.
 <p>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
@@ -574,57 +581,48 @@ able to get any content.
 
 <sect3>DBoxII or other devices running Neutrino
 <p>You may use the Ethernet port of an DBoxII or a similar device to capture
-MPEG2. Your set top box has to be running the Neutrino GUI.
+MPEG-2. Your set top box has to be running the Neutrino GUI.
 
 <sect3>USB Capture Devices.
 <p>The Plextor ConvertX PVR devices are supported through Linux drivers
-available from <url
-url="http://www.plextor.com/english/support/LinuxSDK.htm"
-name="http://www.plextor.com/english/support/LinuxSDK.htm">. MythTV uses the
-Plextor to capture hardware encoded MPEG-4, so the host CPU requirements are low.
+available from <url url="http://go7007.imploder.org/"
+name="http://go7007.imploder.org/">.  MythTV uses the Plextor to capture
+hardware encoded MPEG-4, so the host CPU requirements are low.
 
-Hauppauge WinTV-PVR-USB2 (driver available at <url
-url="http://www.isely.net/pvrusb2/" name="http://www.isely.net/pvrusb2/">) emulates a PVR-x50
-card.
+Hauppauge WinTV-PVR-USB2 and variants are supported by the Linux Kernel as
+of 2.6.18.  Additional information is available at <url
+url="http://www.isely.net/pvrusb2/" name="http://www.isely.net/pvrusb2/">).
 
 <sect3>IP Recorder (RTSP, RTS, UDP)
-<p>MPEG-2, MPEG-4 and H.264 internet TS stream recording is supported using
-the IPTV recorder in MythTV. This recorder expects the channels to be supplied
-as a m3u playlist. If your DSL/Fiber provider supplies television service,
-but does not provide a m3u playlist for the channels, you can construct one
-for your own use. You do not need to download it from the same server as the
-streams themselves, and can also read it from a file if this is more convenient.
+<p>MPEG-2, MPEG-4 and H.264 stream recording is supported using the IPTV
+recorder in MythTV.  This recorder expects the channels to be supplied as a
+m3u playlist.  If your DSL/Fiber provider supplies television service, but
+does not provide a m3u playlist for the channels, you can construct one for
+your own use.  You do not need to download it from the same server as the
+streams themselves, and it can also be read from a file if this is more
+convenient.
 
 <bf>NOTE</bf>: Some DSL providers only allow you to use one recorder at a
 time, so you may need to limit yourself to one recorder in MythTV and turn
 off any set top box the cable provider sold or rented to you with your
 service. This limitation is independent of the bandwidth you have purchased.
 
-<sect2>Hardware known NOT to work and other issues
-<p>
-<itemize>
-<item>Hauppauge WinTV-D or -HD (no driver)
-<item>Hauppauge WinTV-USB series
-<item>Hauppauge WinTV-PVR-usb (model 602), or WinTV-PVR-PCI (model 880) cards (no driver - this is not the PVR-250/350
-series of cards supported by the IvyTV driver)
-<item>Hauppauge HVR-1600.  (no driver).  <bf>NOTE</bf>:  There have been
-reports (2006-12 timeframe) that Hauppauge is putting the HVR-1600 inside of
-the PVR-150 box; if you're purchasing a retail PVR-150, carefully examine
-the packaging - there should be some indication that the hardware inside is
-actually a HVR-1600 and not a PVR-150.  Check the Supported Hardware (<url
-url="http://www.ivtvdriver.org/index.php/Supported_hardware"
-name="http://www.ivtvdriver.org/index.php/Supported_hardware">) page of the
-ivtv driver for updated support information.
-<item>ATI All-in-Wonder series
-</itemize>
-
 <sect2>Sound card
 <p>The system needs a sound card or an on-board equivalent on the motherboard
-to play back and in most cases, to record sound. Any sound card that can be
+to play back and in some cases, to record sound. Any sound card that can be
 operated by the ALSA (Advanced Linux Sound Architecture) kernel modules will
 work with MythTV.  However, some cards and drivers will provide better
-quality or compatibility than others.  In particular, many audio
-devices included on motherboards can be problematic.
+quality or compatibility than others.
+
+<figure loc="here">
+<eps file="warning" height="1cm">
+<img src="warning.png">
+<caption><bf>NOTE</bf>:  Analog video capture cards are the only ones which
+require a sound card for capturing audio.  DVB, HDTV, and other hardware
+encoder cards all provide a combined audio / video stream.  If you're not
+using a V4L analog device, you may skip this section.
+</caption>
+</figure>
 
 The usual practice for capturing the audio associated with the video is to
 run a cable from an audio output on the video capture card to the Line input
@@ -636,15 +634,6 @@ will not need its own sound card.  Note that a separate sound card is still
 required for playback when using <tt>btaudio</tt>, and that often the audio
 recorded in this way will be mono only.  See the <ref id="btaudio"
 name="btaudio"> section for more information.
-
-<figure loc="here">
-<eps file="warning" height="1cm">
-<img src="warning.png">
-<caption><bf>NOTE</bf>:  Analog video capture cards are the only ones which
-require a soundcard for capturing audio.  DVB, HDTV, and other hardware
-encoder cards all provide a combined audio / video stream.
-</caption>
-</figure>
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -731,7 +720,9 @@ name="http://www.nvidia.com/object/unix.html"> for more information.
 <bf>NOTE</bf>:  It's strongly recommended that you use the proprietary
 NVIDIA drivers; they have excellent support for XvMC and ship with a good
 configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
-important if you want to display HDTV.
+important if you want to display HDTV.  VDPAU is another new feature and it
+provides an API for offloading MPEG-2 and H.264 to the GPU.
+
 
 <sect3>Hauppauge PVR-350 <label id="PVR-350">
 <p>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
@@ -7799,7 +7790,7 @@ then press the TAB key until you reach Finish, then press ENTER to save.
 You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
-v0.22.00, 2008-05-12.  Start prepping for 0.22.  Change required minimum
+v0.22.00, 2009-10-07.  Start prepping for 0.22.  Change required minimum
 MySQL to 5.0.15.  Change Qt to 4.3.
 
 -->
