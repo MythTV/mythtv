@@ -944,6 +944,7 @@ QWidget *MythMainWindow::currentWidget(void)
 
 void MythMainWindow::SetDrawEnabled(bool enable)
 {
+    setUpdatesEnabled(enable);
     d->m_drawEnabled = enable;
 }
 
