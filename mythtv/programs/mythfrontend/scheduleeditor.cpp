@@ -683,6 +683,9 @@ bool StoreOptEditor::Create()
     connect(m_maxepSpin, SIGNAL(itemSelected(MythUIButtonListItem *)),
                          SLOT(maxEpChanged(MythUIButtonListItem *)));
 
+    connect(m_recgroupList, SIGNAL(LosingFocus()),
+                            SLOT(PromptForRecgroup()));
+                         
     connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     BuildFocusList();
@@ -851,8 +854,59 @@ void StoreOptEditor::maxEpChanged(MythUIButtonListItem *item)
         m_maxbehaviourList->SetEnabled(true);
 }
 
+void StoreOptEditor::PromptForRecgroup()
+{
+    if (m_recgroupList->GetDataValue().toString() != "__NEW_GROUP__")
+        return;
+    
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    QString label = tr("Create New Recording Group. Enter group name: ");
+
+    MythTextInputDialog *textDialog = new MythTextInputDialog(popupStack, label,
+                         static_cast<InputFilter>(FilterSymbols | FilterPunct));
+
+    textDialog->SetReturnEvent(this, "newrecgroup");
+
+    if (textDialog->Create())
+        popupStack->AddScreen(textDialog, false);
+    return;
+}
+
+void StoreOptEditor::customEvent(QEvent *event)
+{
+    if (event->type() == kMythDialogBoxCompletionEventType)
+    {
+        DialogCompletionEvent *dce =
+                                dynamic_cast<DialogCompletionEvent*>(event);
+
+        QString resultid= dce->GetId();
+        QString resulttext  = dce->GetResultText();
+
+        if (resultid == "newrecgroup")
+        {
+            if (!resulttext.isEmpty())
+            {
+                QString label = tr("Include in the \"%1\" recording group");
+                MythUIButtonListItem *item =
+                                    new MythUIButtonListItem(m_recgroupList,
+                                                label.arg(resulttext),
+                                                qVariantFromValue(resulttext));
+                m_recgroupList->SetItemCurrent(item);
+            }
+            else
+                m_recgroupList->SetValueByData(m_recordingRule->m_recGroup);
+        }
+    }
+}
+
 void StoreOptEditor::Save()
 {
+    // If the user has selected 'Create a new regroup' but failed to enter a
+    // name when prompted, restore the original value
+    if (m_recgroupList->GetDataValue().toString() == "__NEW_GROUP__")
+        m_recgroupList->SetValueByData(m_recordingRule->m_recGroup);
+    
     // Recording Profile
     m_recordingRule->m_recProfile = m_recprofileList->GetDataValue().toString();
 

@@ -117,9 +117,11 @@ class StoreOptEditor : public MythScreenType
    ~StoreOptEditor();
 
     bool Create(void);
+    void customEvent(QEvent *event);
 
   protected slots:
     void maxEpChanged(MythUIButtonListItem *item);
+    void PromptForRecgroup(void);
     void Close(void);
 
   private:
