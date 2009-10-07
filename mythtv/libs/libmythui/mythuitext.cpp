@@ -266,14 +266,14 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                 m_CutMessage = m_CutMessage.toLower();
             break;
             case CaseCapitaliseFirst :
-                m_CutMessage = m_CutMessage.toLower();
+                //m_CutMessage = m_CutMessage.toLower();
                 templist = m_CutMessage.split(". ");
                 for (it = templist.begin(); it != templist.end(); ++it)
                     (*it).replace(0,1,(*it).left(1).toUpper());
                 m_CutMessage = templist.join(". ");
                 break;
             case CaseCapitaliseAll :
-                m_CutMessage = m_CutMessage.toLower();
+                //m_CutMessage = m_CutMessage.toLower();
                 templist = m_CutMessage.split(" ");
                 for (it = templist.begin(); it != templist.end(); ++it)
                     (*it).replace(0,1,(*it).left(1).toUpper());
