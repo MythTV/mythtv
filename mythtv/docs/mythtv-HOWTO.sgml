@@ -99,6 +99,9 @@ Fedora Core distribution.
 See <url url="http://www.mythbuntu.org/" name="http://www.mythbuntu.org/">
 for a distribution using a customized Ubuntu.
 
+See <url url="http://www.mythdora.com/" name="http://www.mythdora.com/"> for
+a distribution using a customized Fedora Core.
+
 There is a MythTV wiki at <url url="http://wiki.mythtv.org"
 name="http://wiki.mythtv.org">.
 
@@ -776,7 +779,7 @@ satisfying any prerequisites.
 <img src="warning.png">
 <caption><bf>NOTE</bf>: you must have the MySQL database software installed on a
 system to store the master database.  This does not necessarily mean that
-MySQL must run on one of the MythTV boxes.  The minimum MySQL version is 3.23.
+MySQL must run on one of the MythTV boxes.  The minimum MySQL version is 5.0.15.
 </caption></figure>
 
 <sect2>Pre-compiled packages <label id="precompiled">
@@ -801,7 +804,7 @@ additional configuration steps in this HOWTO.  The next logical step is
 <ref id="mysql" name="configuring MySQL">, which you may or may not have to
 perform.  See your package documentation.
 
-<sect3>Red Hat Linux / Fedora Core
+<sect3>Red Hat Linux / Fedora Core / MythDora
 <label id="atrpms">
 <p>The definitive documentation on installing MythTV on Red Hat Linux /
 Fedora Core can be found in Jarod Wilson's (<url
@@ -854,11 +857,6 @@ they set up your MythTV database. Check <url
 url="http://ATrpms.net/topic/multimedia/" name="http://ATrpms.net/topic/multimedia/"> for the drivers you
 need.
 
-<sect3>Mandriva
-<p>Thac has created RPMs for MythTV for Mandriva which may
-be obtained from <url url="http://rpm.nyvalls.se/"
-name="http://rpm.nyvalls.se/"> If you have problems with the RPMs, please
-send him email directly at <url url="thac@nyvalls.se" name="thac@nyvalls.se">.
 <sect3>Debian
 <p>Debian packages for MythTV and most of its add-on modules are maintained
 by Christian Marillat <url url="mailto:marillat@free.fr"
@@ -869,25 +867,11 @@ Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.
 
-If you have followed the instructions on the above page you should have added
-<tscreen><verb>
-deb-src http://www.debian-multimedia.org sid main
-</verb></tscreen>
+After adding the appropriate commands to your <tt>/etc/apt/sources.list</tt>
+file you can run <bf>apt-get update</bf> and then execute <bf>apt-get
+build-dep mythtv</bf> which should install all the pre-requisites required
+to compile MythTV.
 
-to your <tt>/etc/apt/sources.list</tt> file.  Running <bf>apt-get update</bf> and then
-executing <bf>apt-get build-dep mythtv</bf> should install all the
-pre-requisites required to compile MythTV.
-
-<p>The Debian packages are configured such that MythTV programs should be
-run as the <tt>mythtv</tt> user, which is automatically created during
-installation.  This user has access to write new recordings to disk in the
-default directory, read and write the database, access the audio and video
-devices, and everything else that MythTV needs to do.
-
-<p>See <tt>/usr/share/doc/<it>packagename</it>/README.Debian</tt> for more
-information, including copies of the MythTV documentation.  The
-<tt>mythtv-doc</tt> package contains a copy of this HOWTO in
-<tt>/usr/share/doc/mythtv-doc</tt>.
 <sect2>Manual installation
 <p>You may use the graphical tools that come with your distribution, or you
 can use command-line utilities.  Either system will get the job done, and it
@@ -903,9 +887,9 @@ going to need the <bf>cdialog</bf> package in order to compile
 <bf>perl</bf>.
 
 <code>
-NOTE:  Qt v4.3 or higher is required.
+NOTE:  Qt v4.4 or higher is required.
 
-NOTE:  If you are going to be using RPMs to install various
+NOTE:  If you are going to be using packages to install various
 components, you should be aware that not all packages include the necessary
 headers for compiling.  If you're having trouble compiling, ensure
 that you've installed the -devel version of a prerequisite.
@@ -915,29 +899,21 @@ that you've installed the -devel version of a prerequisite.
 <p> This section details the various methods for installing prerequisites
 from the command line.
 
-<sect3>Gentoo.
-<p>If Qt has not been installed on your system: Edit
-<tt>/etc/make.conf</tt> and locate the "USE" variable. If the line is
-commented out, remove the comment. The line should have at least:
+<sect3>Fedora / Mythdora
+<p>Assuming that you've configured ATrpms, you can execute:
 <tscreen><verb>
-USE="mysql alsa"
-</verb></tscreen>
-Next you need to build Qt. If you don't plan on using the ebuilds as
-described in the Gentoo section then you also need to install lame.
-<tscreen><verb>
-# emerge lame mysql qt
+# yum-builddep mythtv
 </verb></tscreen>
 
-If you have already installed Qt: you will need to rebuild because the
-default installation doesn't include MySQL support, a requirement for MythTV.
-To enable SQL support, add "mysql" to your USE variable in
-<tt>/etc/make.conf</tt> and rebuild Qt by running
-<tscreen><verb>
-# emerge qt
-</verb></tscreen>
+Alternatively, you may use the build script located in
+<tt>packaging/rpm</tt>, or install the "requires" found in the mythtv.spec
+file located in the same directory.
 
-All the necessary files will be downloaded and built. Even on a fast machine
-this may take a lot of time if you need to do a full Qt build.
+<sect3>Mythbuntu
+<p>You can run
+<tscreen><verb>
+$ sudo apt-get build-dep mythtv
+</verb></tscreen>
 
 <sect3>Debian.
 <p>Build-dependencies for MythTV can be satisfied by adding the following to
@@ -1034,48 +1010,6 @@ Also, check that there has been a link created in
 <tt>/usr/lib/qt3/mkspecs</tt> (<tt>/usr/share/qt3/mkspecs</tt> for Debian)
 called <tt>default</tt>. If not, you'll get errors during the compile. See
 the Troubleshooting Section for more information.
-<sect2>Distribution-Specific Notes
-<sect3>Mandriva
-<p>The following instructions work for Mandriva using
-<bf>bash</bf> as the shell, and may be applicable for a distribution which
-uses <tt>/etc/profile.d</tt>.
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  Mandriva 10 installs a <tt>/etc/profile.d/qtdir3.sh</tt>
-file, but it doesn't include the addition of the PATH variable.  If you're
-running Mandriva 10, don't create a <tt>mythtv.sh</tt> file as detailed
-below; edit the <tt>qtdir3.sh</tt> file and add the PATH statement within
-the if / fi block.
-</caption>
-</figure>
-As root, create the following file in <tt>/etc/profile.d</tt> The example
-filename is "mythtv.sh". Use what you feel is appropriate.
-
-Open a shell, and switch to superuser mode.
-
-<figure loc="here">
-<eps file="warning.eps" height="1cm">
-<img src="warning.png">
-<caption><bf>NOTE</bf>: ^D means press CTRL and d at the same time.
-</caption>
-</figure>
-<tscreen><verb>
-$ su
-# cd /etc/profile.d
-cat > mythtv.sh
-export QTDIR=/usr/lib/qt3
-export PATH=$PATH:/usr/lib/qt3/bin
-^D
-
-# chmod a+x mythtv.sh
-# exit
-$ exit
-</verb></tscreen>
-The last two commands are to exit out of the shell. This way, when you next
-open a shell your new commands
-will take effect.
 
 <sect2>Device Permissions <label id="devperms">
 <p>MythTV will need access to the video4linux devices on your system.  By
@@ -1098,6 +1032,7 @@ and replace it with
 
 What we're doing is allowing read and write access to the files in the
 video4linux directory.
+
 <sect>Downloading and compiling. <label id="DownloadAndCompile">
 <p>Get MythTV from the <url url="http://www.mythtv.org"
 name="http://www.mythtv.org"> web site.  There are two installation methods
@@ -1129,48 +1064,6 @@ or higher.
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.51).
 
-<code>
-NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
-next step and type:
-
-# urpmi libmp3lame0 libmp3lame0-devel
-
-After downloading, be sure to install both:
-# rpm -Uvh lame*
-
-</code>
-
-Get lame from <url url="http://lame.sourceforge.net/"
-name="http://lame.sourceforge.net/">.  Download the source code to v3.96.1
-by following the links from "Using" through "Download...".
-
-<sect1>Building LAME
-<p>Open a shell and switch to the directory where you saved lame.
-<tscreen><verb>
-$ tar -xzf lame-3.96.1.tar.gz
-$ cd lame-3.96.1
-$ ./configure
-$ make
-$ make test
-$ su
-# make install
-</verb></tscreen>
-Check that it worked:
-<tscreen><verb>
-# ls -l /usr/local/lib
--rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
--rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-libmp3lame.so.0.0.0*
-lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-libmp3lame.so.0.0.0*
--rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-libmp3lame.so.0.0.0*
-
-# exit
-$
-</verb></tscreen>
-
 <sect1>XMLTV
 <sect2>Red Hat Linux and Fedora Core:
 <p>RPMs for <bf>XMLTV</bf> and all of its dependencies can be obtained from
@@ -1183,65 +1076,11 @@ list of all the dependent packages you must download and install.
 
 If you install from this location you may skip to <ref id="manually_building_mythtv"
 name="Manually building MythTV">.
-<sect2>Mandriva
-<p>RPMs for <bf>XMLTV</bf> and all of its dependencies are located in
-Mandriva's "contrib".  If you have added a contrib mirror, try installing
-<bf>XMLTV</bf>:
-<tscreen><verb>
-# urpmi xmltv xmltv-grabbers
-</verb></tscreen>
-If this does not work, it is possible that contrib for your Mandriva version
-does not have <bf>XMLTV</bf>, so you may install the XMLTV prerequisites by typing:
-<tscreen><verb>
-# urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
-</verb></tscreen>
-
-and skip straight to the XMLTV compilation step.
-
-<sect2>Manual installation
-<p>
-<label id="untarring_xmltv">Untar the xmltv file:
-<tscreen><verb>
-$ tar -xjf xmltv-0.5.51.tar.bz2
-</verb></tscreen>
-Install the xmltv prerequisites.  The following prerequisites are the
-minimum required; when you actually start running the xmltv setup program it
-may alert you to other modules that are required.:
-
-<tscreen><verb>
-$ su
-# perl -MCPAN -e shell
-cpan> install XML::Twig
-cpan> install Date::Manip
-Date::Manip is up to date.
-cpan> install LWP
-cpan> install XML::Writer
-cpan> exit
-</verb></tscreen>
-
-Change to the XMLTV directory and compile it:
-<tscreen><verb>
-$ cd xmltv-0.5.51
-$ perl Makefile.PL
-</verb></tscreen>
-You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
-the grabber required for your location.
-
-You may get errors about modules not being installed.  You will need to
-resolve any missing dependencies at this point, or your grabber may not work
-correctly.
-<tscreen><verb>
-$ make
-$ make test
-$ su
-# make install
-# exit
-</verb></tscreen>
 
 <sect1>Configuring the Schedules Direct service <label id="ConfigureSD">
-<p>As of 2007-09-01, Tribune Media Services will no longer offer free guide
-data.  Schedules Direct is a non-profit organization which has licensed the
-data to make it available to users of Freeware and Open Source applications.
+<p>Schedules Direct is a non-profit organization which has licensed
+Television program data from Tribune Media Services and makes it
+available to users of Freeware and Open Source applications.
 
 If you wish to use Schedules Direct, you'll need to establish a user
 account.  Go to <url url="http://www.schedulesdirect.org"
@@ -1253,11 +1092,10 @@ your particular location and the channels that you have.  This configuration
 will be imported into MythTV when you first run the <bf>mythtv-setup</bf>
 program.
 
-
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV
 <p>If you are going to use <bf>subversion</bf>, execute the following
-instructions to obtain the latest version of MythTV:
+instructions to obtain the latest trunk version of MythTV:
 
 <tscreen><verb>
 $ mkdir mythtv
@@ -1267,17 +1105,17 @@ $ cd mythtv
 
 To use a release version, you can execute:
 <tscreen><verb>
-$ mkdir mythtv-release-0.21
-$ svn co http://svn.mythtv.org/svn/branches/release-0-21-fixes/ mythtv-release-0.21
-$ cd mythtv-release-0.21
+$ mkdir mythtv-release-0.22-fixes
+$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-release-0.22-fixes
+$ cd mythtv-release-0.22-fixes
 </verb></tscreen>
 
 <bf>NOTE</bf>:  Using a svn version of the code allows you to stay
-up-to-date with changes.  So, if there's an update to the 0.21 release and
+up-to-date with changes.  So, if there's an update to the 0.22 release and
 you originally obtained it using svn, you could enter the
-mythtv-release-0.21 directory and type "svn up", which will update your copy
+mythtv-release-0.22-fixes directory and type "svn up", which will update your copy
 with the fixed version from the website.  You would then recompile and
-install the updated 0.21 code.
+install the updated 0.22 code.
 
 If you are using the tarball, then unpack it:
 <tscreen><verb>
