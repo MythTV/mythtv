@@ -41,11 +41,11 @@
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="unfinished">Å velge alle tall her vil gjøre livet ditt mye enklere.</translation>
+        <translation>Å velge alle tall her vil gjøre livet ditt mye enklere.</translation>
     </message>
     <message>
         <source>Error writing image to file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Feil ved skriving av bilde til fil %1.</translation>
     </message>
 </context>
 <context>
@@ -133,83 +133,83 @@
     <name>MythControls</name>
     <message>
         <source>The MythVideo default view</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideo standardvisning</translation>
     </message>
     <message>
         <source>The MythVideo video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideo videobehandler</translation>
     </message>
     <message>
         <source>The MythVideo video browser</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideo videoutforsker</translation>
     </message>
     <message>
         <source>The MythVideo video listings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideo videoliste</translation>
     </message>
     <message>
         <source>The MythVideo video gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideo videogalleri</translation>
     </message>
     <message>
         <source>Play selected item in alternate player</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill valgt element i alternativ avspiller</translation>
     </message>
     <message>
         <source>Open video filter dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Åpne dialog for videofilter</translation>
     </message>
     <message>
         <source>Change browsable in video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Endre om video skal vises i videobehandler</translation>
     </message>
     <message>
         <source>Increase Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Øk aldersgrense</translation>
     </message>
     <message>
         <source>Decrease Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Senk aldersgrense</translation>
     </message>
     <message>
         <source>Show Incremental Search Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis dialog inkrementelt søk</translation>
     </message>
     <message>
         <source>Download metadata for current item</source>
-        <translation type="unfinished"></translation>
+        <translation>Last ned metadata for gjeldende element</translation>
     </message>
     <message>
         <source>Display Item Detail Popup</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis sprettopp for detaljer for element</translation>
     </message>
     <message>
         <source>Go to the first video</source>
-        <translation type="unfinished"></translation>
+        <translation>Gå til første video</translation>
     </message>
     <message>
         <source>Go to the last video</source>
-        <translation type="unfinished"></translation>
+        <translation>Gå til siste video</translation>
     </message>
     <message>
         <source>Play a DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill en DVD</translation>
     </message>
     <message>
         <source>MythDVD DVD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD DVD mediehåndterer</translation>
     </message>
     <message>
         <source>Play a VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill en VCD</translation>
     </message>
     <message>
         <source>MythDVD VCD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD VCD mediehåndterer</translation>
     </message>
     <message>
         <source>Import a DVD into your MythVideo database</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer en DVD inn i MythVideo database</translation>
     </message>
 </context>
 <context>
@@ -898,11 +898,11 @@ Undersøk instillingene for videobehandleren</translation>
     </message>
     <message>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Feil: kunne ikke legge til ny filtype &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Foreldrekontroll pin-kode:</translation>
     </message>
 </context>
 <context>
@@ -1097,167 +1097,167 @@ Undersøk instillingene for videobehandleren</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Directed by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regissert av:</translation>
     </message>
     <message>
         <source>User Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Brukerrangering:</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">Ferdig</translation>
+        <translation>Ferdig</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">Spill av</translation>
+        <translation>Spill av</translation>
     </message>
     <message>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>Lavest</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Lav</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Medium</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Høy</translation>
     </message>
     <message>
         <source>Video Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Nr:</translation>
     </message>
     <message>
         <source>Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Foreldernivå</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tittel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertekst:</translation>
     </message>
     <message>
         <source>Season:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sesong:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Episode:</translation>
     </message>
     <message>
         <source>Item has been watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>Element er sett:</translation>
     </message>
     <message>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Skjermbilde:</translation>
     </message>
     <message>
         <source>Banner:</source>
-        <translation type="unfinished"></translation>
+        <translation>Banner:</translation>
     </message>
     <message>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fanplakat:</translation>
     </message>
     <message>
         <source>Trailer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Trailer:</translation>
     </message>
     <message>
         <source>Text Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekst filter:</translation>
     </message>
     <message>
         <source>Actor/Actress :</source>
-        <translation type="unfinished"></translation>
+        <translation>Skuespille/-inne :</translation>
     </message>
     <message>
         <source>InetRef :</source>
-        <translation type="unfinished"></translation>
+        <translation>InetRef :</translation>
     </message>
     <message>
         <source>Cover File :</source>
-        <translation type="unfinished"></translation>
+        <translation>Plakatfil :</translation>
     </message>
     <message>
         <source>Watched :</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett :</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultat</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished">Sett som standard</translation>
+        <translation>Sett som standard</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Generelle innstillinger</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished">Innstillinger for avspiller</translation>
+        <translation>Innstillinger for avspiller</translation>
     </message>
     <message>
         <source>File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtyper</translation>
     </message>
     <message>
         <source>Rip Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for ripping</translation>
     </message>
     <message>
         <source>Browse Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Bla gjennom videoer</translation>
     </message>
     <message>
         <source>Video List</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoliste</translation>
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Videogalleri</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished">Videobehandler</translation>
+        <translation>Videobehandler</translation>
     </message>
     <message>
         <source>Play DVD</source>
-        <translation type="unfinished">Spill av DVD</translation>
+        <translation>Spill av DVD</translation>
     </message>
     <message>
         <source>Play VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill av VCD</translation>
     </message>
     <message>
         <source>Rip DVD</source>
-        <translation type="unfinished">Ripp DVD</translation>
+        <translation>Ripp DVD</translation>
     </message>
     <message>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Løs ut media</translation>
     </message>
     <message>
         <source>Videos Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoinnstillinger</translation>
     </message>
     <message>
         <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer avspilling og DVD ripping</translation>
     </message>
 </context>
 <context>
@@ -1549,12 +1549,12 @@ Undersøk instillingene for videobehandleren</translation>
     </message>
     <message>
         <source>%1 download finished: %2 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nedlasting ferdig: %2 %3</translation>
     </message>
     <message>
         <source>%1 exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 eksisterer for dette elementet men kunne ikke hentes innenfor tidsgrensen.</translation>
     </message>
 </context>
 <context>
