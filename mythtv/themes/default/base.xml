@@ -94,7 +94,6 @@
         <fill color="#43b038" alpha="200" />
     </shape>
 
-
     <buttonlist name="basebuttonlist">
         <area>0,0,300,250</area>
         <layout>vertical</layout>

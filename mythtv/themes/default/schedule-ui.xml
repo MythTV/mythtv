@@ -537,7 +537,7 @@
             <font>basemedium</font>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
-                Select 'Program Guide' or 'Program Finder'</value>
+                select 'Program Guide' or 'Program Finder'</value>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -640,7 +640,7 @@
             <font>basemedium</font>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
-                Select 'Program Guide' or 'Program Finder'</value>
+                select 'Program Guide' or 'Program Finder'</value>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -1483,7 +1483,7 @@
 
         <buttonlist name="rules" from="basewideselector">
             <position>250,75</position>
-            <wrapstyle>items</wrapstyle>
+            <wrapstyle>selection</wrapstyle>
         </buttonlist>
 
         <textarea name="titlelabel" from="ruleslabel">
@@ -1614,6 +1614,7 @@
     
         <buttonlist name="rules" from="basewideselector">
             <position>215,210</position>
+            <wrapstyle>selection</wrapstyle>
             <helptext>Select the recording rule</helptext>
         </buttonlist>
 
