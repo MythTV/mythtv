@@ -158,6 +158,11 @@ MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
 
 MythUIImage::~MythUIImage()
 {
+    // Wait until all image loading threads are complete or bad things
+    // may happen if this MythUIImage disappears when a queued thread
+    // needs it.
+    GetMythUI()->GetImageThreadPool()->waitForDone();
+
     Clear();
     if (m_maskImage)
         m_maskImage->DownRef();
@@ -731,7 +736,9 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
 
             if (x > 0 || y > 0)
                 imageArea.translate(x,y);
+            d->m_UpdateLock.lockForWrite();
             QImage mask = m_maskImage->copy(imageArea);
+            d->m_UpdateLock.unlock();
             image->setAlphaChannel(mask.alphaChannel());
         }
 
