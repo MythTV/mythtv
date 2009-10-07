@@ -165,77 +165,77 @@ Bruk &apos;Legg til bokmerker&apos; menyvalget for å legge til nye bokmerker</t
     <name>MythControls</name>
     <message>
         <source>Move to next browser tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt til neste fane</translation>
     </message>
     <message>
         <source>Move to previous browser tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt til forrige fane</translation>
     </message>
     <message>
         <source>Internal Web Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Intern webleser</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Bookmark Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Bokmerkebehandler</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori</translation>
     </message>
     <message>
         <source>[x]</source>
-        <translation type="unfinished"></translation>
+        <translation>[x]</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Navn</translation>
     </message>
     <message>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori:</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation type="unfinished">Finn...</translation>
+        <translation>Finn...</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Navn:</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Browser Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando for webleser:</translation>
     </message>
     <message>
         <source>Text Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekststørrelse:</translation>
     </message>
 </context>
 <context>
     <name>WebPage</name>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Laster...</translation>
+        <translation>Laster...</translation>
     </message>
 </context>
 </TS>
