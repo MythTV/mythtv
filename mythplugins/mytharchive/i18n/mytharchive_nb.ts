@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny</translation>
     </message>
 </context>
 <context>
@@ -188,7 +188,7 @@
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny</translation>
     </message>
 </context>
 <context>
@@ -271,38 +271,38 @@
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>meny</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Toggle use cut list state for selected program</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå av/på bruk av kuttliste for valgt program</translation>
     </message>
     <message>
         <source>Create DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag DVD</translation>
     </message>
     <message>
         <source>Create Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag arkiv</translation>
     </message>
     <message>
         <source>Import Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer arkiv</translation>
     </message>
     <message>
         <source>View Archive Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis arkivlogg</translation>
     </message>
     <message>
         <source>Play Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill DVD som er laget</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished">Brenn DVD</translation>
+        <translation>Brenn DVD</translation>
     </message>
 </context>
 <context>
@@ -672,7 +672,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny</translation>
     </message>
 </context>
 <context>
@@ -695,39 +695,39 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Single Layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkeltlags DVD</translation>
     </message>
     <message>
         <source>Single Layer DVD (4482Mb)</source>
-        <translation type="unfinished"></translation>
+        <translation>Enkeltlags DVD (4482Mb)</translation>
     </message>
     <message>
         <source>Dual Layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Dobbeltlags DVD</translation>
     </message>
     <message>
         <source>Dual Layer DVD (8964Mb)</source>
-        <translation type="unfinished"></translation>
+        <translation>Dobbeltlags DVD (8964Mb)</translation>
     </message>
     <message>
         <source>DVD +/- RW</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD +/- RW</translation>
     </message>
     <message>
         <source>Rewritable DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Rewritable DVD</translation>
     </message>
     <message>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Fil</translation>
     </message>
     <message>
         <source>Any file accessable from your filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enhver fil tilgjengelig i ditt filsystem.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukjent</translation>
     </message>
 </context>
 <context>
@@ -749,255 +749,255 @@ Place a blank DVD in the drive and select an option below.</source>
     <name>ThemeUI</name>
     <message>
         <source>Select Destination</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg destinasjon</translation>
     </message>
     <message>
         <source>description goes here.</source>
-        <translation type="unfinished"></translation>
+        <translation>beskrivelse her.</translation>
     </message>
     <message>
         <source>Free Space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ledig plass:</translation>
     </message>
     <message>
         <source>0.00Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>0.00Gb</translation>
     </message>
     <message>
         <source>Make ISO Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag ISO image</translation>
     </message>
     <message>
         <source>Burn to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Brenn til DVD</translation>
     </message>
     <message>
         <source>Force Overwrite of DVD-RW Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Tving overskriving av DVD RW medie</translation>
     </message>
     <message>
         <source>Select Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg opptak</translation>
     </message>
     <message>
         <source>Show Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis opptak</translation>
     </message>
     <message>
         <source>File Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Filfinner</translation>
     </message>
     <message>
         <source>Select Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg videoer</translation>
     </message>
     <message>
         <source>Video Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Videokategori</translation>
     </message>
     <message>
         <source>title goes here</source>
-        <translation type="unfinished"></translation>
+        <translation>tittel her</translation>
     </message>
     <message>
         <source>x.xx Gb</source>
-        <translation type="unfinished"></translation>
+        <translation>x.xx Gb</translation>
     </message>
     <message>
         <source>PL:</source>
-        <translation type="unfinished"></translation>
+        <translation>PL:</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>No videos available</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen videoer tilgjengelig</translation>
     </message>
     <message>
         <source>Log Viewer</source>
-        <translation type="unfinished">Loggviser</translation>
+        <translation>Loggviser</translation>
     </message>
     <message>
         <source>Change Encoding Profile</source>
-        <translation type="unfinished">Endre kodingsprofil</translation>
+        <translation>Endre kodingsprofil</translation>
     </message>
     <message>
         <source>12.34GB</source>
-        <translation type="unfinished"></translation>
+        <translation>12.34GB</translation>
     </message>
     <message>
         <source>DVD Menu Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD menytema</translation>
     </message>
     <message>
         <source>Select a theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et tema</translation>
     </message>
     <message>
         <source>Intro</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro</translation>
     </message>
     <message>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Hovedmeny</translation>
     </message>
     <message>
         <source>Chapter Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapittelmeny</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detaljer</translation>
     </message>
     <message>
         <source>Select Archive Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg arkivelementer</translation>
     </message>
     <message>
         <source>No files are selected for archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen filer er valgt for arkivet</translation>
     </message>
     <message>
         <source>xxxxx mb</source>
-        <translation type="unfinished"></translation>
+        <translation>xxxxx mb</translation>
     </message>
     <message>
         <source>0 mb</source>
-        <translation type="unfinished"></translation>
+        <translation>0 mb</translation>
     </message>
     <message>
         <source>Archive Item Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detaljer for arkivelement</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tittel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertekst:</translation>
     </message>
     <message>
         <source>Start Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Startdato:</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tid:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beskrivelse:</translation>
     </message>
     <message>
         <source>Thumb Image Selector</source>
-        <translation type="unfinished"></translation>
+        <translation>velger for miniatyrbilde</translation>
     </message>
     <message>
         <source>Current Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjeldende posisjon</translation>
     </message>
     <message>
         <source>0:00:00.00</source>
-        <translation type="unfinished"></translation>
+        <translation>0:00:00.00</translation>
     </message>
     <message>
         <source>Seek Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Søkemengde</translation>
     </message>
     <message>
         <source>Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Ramme</translation>
     </message>
     <message>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation type="unfinished"></translation>
+        <translation>sep 13, 2004 11:00 pm (1h 15m)</translation>
     </message>
     <message>
         <source>File Finder To Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Filfinner for importering</translation>
     </message>
     <message>
         <source>Start Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Starttid:</translation>
     </message>
     <message>
         <source>Select Associated Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg assosiert kanal</translation>
     </message>
     <message>
         <source>Archived Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Arkivert kanal</translation>
     </message>
     <message>
         <source>Chan. ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal ID:</translation>
     </message>
     <message>
         <source>Chan. No:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal Nr:</translation>
     </message>
     <message>
         <source>Callsign:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kallesignal:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Navn:</translation>
     </message>
     <message>
         <source>Local Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokal kanal</translation>
     </message>
     <message>
         <source>A high quality profile giving approx. 1 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>En profil med høy kvalitet som gir omtrent 1 time med video på en enkeltlags DVD</translation>
     </message>
     <message>
         <source>A standard play profile giving approx. 2 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>En profil med standard kvalitet som gir omtrent 2 timer med video på en enkeltlags DVD</translation>
     </message>
     <message>
         <source>A long play profile giving approx. 4 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>En profil med lang avspillingstid som gir omtrent 4 timer med video på en enkeltlags DVD</translation>
     </message>
     <message>
         <source>A extended play profile giving approx. 6 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>En profil med utvidet avspillingstid som gir omtrent 6 timer med video på en enkeltlags DVD</translation>
     </message>
     <message>
         <source>Create DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag DVD</translation>
     </message>
     <message>
         <source>Create Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag arkiv</translation>
     </message>
     <message>
         <source>Encode Video File</source>
-        <translation type="unfinished"></translation>
+        <translation>Kod videofil</translation>
     </message>
     <message>
         <source>Import Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer arkiv</translation>
     </message>
     <message>
         <source>Archive Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation>Arkiv-verktøy</translation>
     </message>
     <message>
         <source>Show Log Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis loggviser</translation>
     </message>
     <message>
         <source>Play Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill DVD som er laget</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished">Brenn DVD</translation>
+        <translation>Brenn DVD</translation>
     </message>
 </context>
 <context>
@@ -1020,7 +1020,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny</translation>
     </message>
 </context>
 <context>
@@ -1051,7 +1051,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny</translation>
     </message>
 </context>
 </TS>
