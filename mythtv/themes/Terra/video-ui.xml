@@ -506,6 +506,7 @@
 
         <textarea name="novideos" from="description">
             <align>allcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
     </window>
@@ -624,6 +625,11 @@
             <align>vcenter</align>
         </textarea>
 
+        <textarea name="novideos" from="description">
+            <align>allcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
+        </textarea>  
+
         <textarea name="year" from="basetextarea">
             <area>48,284,290,30</area>
         </textarea>
@@ -727,6 +733,7 @@
             <area>50,50,700,50</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
         <shape name="textbackground" from="basetextbackground">
@@ -820,6 +827,11 @@
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
         </textarea>
+
+        <textarea name="novideos" from="description">
+            <align>allcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
+        </textarea>  
 
         <textarea name="cast" from="basetextarea">
             <area>60,480,505,70</area>
