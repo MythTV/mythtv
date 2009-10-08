@@ -2001,16 +2001,19 @@ void VideoDialog::loadData()
         for (MGTreeChildList::const_iterator p = lchildren->begin();
                 p != lchildren->end(); ++p)
         {
-            MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_videoButtonList, QString(), 0,
-                            true, MythUIButtonListItem::NotChecked);
+            if (*p != NULL)
+            {
+                MythUIButtonListItem *item =
+                        new MythUIButtonListItem(m_videoButtonList, QString(), 0,
+                                true, MythUIButtonListItem::NotChecked);
 
-            item->SetData(qVariantFromValue(*p));
+                item->SetData(qVariantFromValue(*p));
 
-            UpdateItem(item);
+                UpdateItem(item);
 
-            if (*p == selectedNode)
-                m_videoButtonList->SetItemCurrent(item);
+                if (*p == selectedNode)
+                    m_videoButtonList->SetItemCurrent(item);
+            }
         }
     }
 
