@@ -7137,6 +7137,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
 {
     OSDSet *subtitleOSD;
     bool setVisible = false;
+    long long subtitles_start_at=0;
     VideoFrame *currentFrame = videoOutput->GetLastShownFrame();
 
     if (!osd || !currentFrame || !(subtitleOSD = osd->GetSet("subtitles")))
@@ -7224,6 +7225,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
 
                 subtitleOSD->AddType(image);
 
+                subtitles_start_at   = subtitlePage.start_display_time;
                 osdSubtitlesExpireAt = subtitlePage.end_display_time;
                 // fix subtitles that don't display for very long (if at all).
                 if (subtitlePage.end_display_time <=
@@ -7234,6 +7236,20 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                             nonDisplayedAVSubtitles.front().start_display_time;
                     else
                         osdSubtitlesExpireAt += MAX_SUBTITLE_DISPLAY_TIME_MS;
+                }
+                // fix delayed subtitles
+                else if (subtitles_start_at < currentFrame->timecode)
+                {
+                    VERBOSE(VB_PLAYBACK, LOC + QString("Delayed subtitle: %1ms late")
+                            .arg(currentFrame->timecode - subtitles_start_at));
+                    osdSubtitlesExpireAt = currentFrame->timecode
+                        + subtitlePage.end_display_time - subtitles_start_at;
+
+                    if (nonDisplayedAVSubtitles.size() > 0)
+                    {
+                        long long next_start = nonDisplayedAVSubtitles.front().start_display_time;
+                        osdSubtitlesExpireAt = min(osdSubtitlesExpireAt, next_start);
+                    }
                 }
 
                 setVisible = true;
@@ -7255,8 +7271,9 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
     {
         VERBOSE(VB_PLAYBACK,
                 QString("Setting subtitles visible, frame_timecode=%1 "
-                        "expires=%2")
-                .arg(currentFrame->timecode).arg(osdSubtitlesExpireAt));
+                        "starts=%2 expires=%3")
+                .arg(currentFrame->timecode).arg(subtitles_start_at)
+                .arg(osdSubtitlesExpireAt));
         osd->SetVisible(subtitleOSD, 0);
     }
 }

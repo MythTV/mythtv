@@ -4071,6 +4071,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         subtitle.start_display_time += pts;
                         subtitle.end_display_time += pts;
                         GetNVP()->AddAVSubtitle(subtitle);
+
+                        VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
+                                QString("subtl timecode %1 %2 %3 %4")
+                                .arg(pkt->pts).arg(pkt->dts)
+                                .arg(subtitle.start_display_time)
+                                .arg(subtitle.end_display_time));
                     }
 
                     break;
