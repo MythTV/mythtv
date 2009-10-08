@@ -7231,11 +7231,13 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                 if (subtitlePage.end_display_time <=
                     subtitlePage.start_display_time)
                 {
+                    osdSubtitlesExpireAt = subtitles_start_at + MAX_SUBTITLE_DISPLAY_TIME_MS;
+
                     if (nonDisplayedAVSubtitles.size() > 0)
-                        osdSubtitlesExpireAt =
-                            nonDisplayedAVSubtitles.front().start_display_time;
-                    else
-                        osdSubtitlesExpireAt += MAX_SUBTITLE_DISPLAY_TIME_MS;
+                    {
+                        long long next_start = nonDisplayedAVSubtitles.front().start_display_time;
+                        osdSubtitlesExpireAt = min(osdSubtitlesExpireAt, next_start);
+                    }
                 }
                 // fix delayed subtitles
                 else if (subtitles_start_at < currentFrame->timecode)
