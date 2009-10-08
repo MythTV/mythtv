@@ -571,7 +571,8 @@ bool MythUIImage::Load(bool allowLoadInBackground)
         // Only load in the background if allowed and the image is
         // not already in our mem cache
         if ((allowLoadInBackground) &&
-            (!GetMythUI()->LoadCacheImage(filename, imagelabel, false)))
+            (!GetMythUI()->LoadCacheImage(filename, imagelabel, false)) &&
+            (!getenv("DISABLETHREADEDMYTHUIIMAGE")))
         {
             VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("Load(), spawning "
                     "thread to load '%1'").arg(filename));
