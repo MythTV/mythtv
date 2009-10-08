@@ -9,6 +9,7 @@
 
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
+#include "xmlparsebase.h"
 
 MythFontProperties::MythFontProperties() :
     m_color(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
@@ -133,7 +134,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     QString name = element.attribute("name", "");
     if (name.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Font needs a name");
+        XML_ERROR(element, "Font needs a name");
         return NULL;
     }
 
@@ -158,9 +159,8 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 
         if (!tmp)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Specified base font '%1' does not "
-                            "exist for font %2").arg(base).arg(name));
+            XML_ERROR(element, QString("Specified base font '%1' does not "
+                                       "exist for font %2").arg(base).arg(name));
             return NULL;
         }
 
@@ -176,7 +176,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     {
         if (!fromBase)
         {
-            VERBOSE(VB_IMPORTANT, QString("Font '%1' needs a face").arg(name));
+            XML_ERROR(element, "Font needs a face");
             delete newFont;
             return NULL;
         }
@@ -345,9 +345,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("Unknown tag %1 in font '%2'")
-                                              .arg(info.tagName())
-                                              .arg(name));
+                XML_ERROR(info, QString("Unknown tag in font %1").arg(name));
                 return NULL;
             }
         }
@@ -355,7 +353,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 
     if (size <= 0 && pixelsize <= 0 && !fromBase)
     {
-        VERBOSE(VB_IMPORTANT, "Error, font size must be > 0");
+        XML_ERROR(element, "Error, font size must be > 0");
         return NULL;
     }
     else if (pixelsize > 0)
@@ -366,9 +364,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     newFont->Unfreeze();
 
     if (addToGlobal)
-    {
         GetGlobalFontMap()->AddFont(name, newFont);
-    }
 
     return newFont;
 }
