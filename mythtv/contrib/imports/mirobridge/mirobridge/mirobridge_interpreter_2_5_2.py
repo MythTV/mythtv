@@ -342,7 +342,7 @@ class MiroInterpreter(cmd.Cmd):
         """Removes an item from Miro by file name or Channel and title"""
         for it in item.Item.downloaded_view():
              if isinstance(args, list):
-                  if filter(self.is_not_punct_char, it.get_channel_title(True).lower()) == filter(self.is_not_punct_char, args[0].lower()) and filter(self.is_not_punct_char, it.get_title().lower()) == filter(self.is_not_punct_char, args[1].lower()):
+                  if filter(self.is_not_punct_char, it.get_channel_title(True).lower()) == filter(self.is_not_punct_char, args[0].lower()) and (filter(self.is_not_punct_char, it.get_title().lower())).startswith(filter(self.is_not_punct_char, args[1].lower())):
                      break
              elif filter(self.is_not_punct_char, it.get_filename().lower()) == filter(self.is_not_punct_char, args.lower()):
                  break

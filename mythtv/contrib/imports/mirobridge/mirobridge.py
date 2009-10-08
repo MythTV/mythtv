@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.4.4" 
+__version__=u"v0.4.5" 
 # 0.1.0 Initial development 
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -144,6 +144,9 @@ __version__=u"v0.4.4"
 #       had MythTV started and in the Watch Recordings screen.
 # 0.4.4 Fixed a unicode issue with data read from a subprocess call.
 #       Fixed an issue with the check for other instances of mirobridge.py running.
+# 0.4.5 Fixed a deletion issue when a Miro video subtitle contained more than 128 characters.
+#       Disabled seek table creation as a number of the Miro video types (e.g. mov) do not work in MythTV with
+#       seek tables.
 
 
 examples_txt=u'''
@@ -1941,7 +1944,7 @@ def updateMythRecorded(items):
 				setRecord(u'oldrecorded', records[2], channel_id, delete=False, id=None)
 				# Add a seek table
 				cmd = mythcommflag_recordings % (records[0][u'chanid'], records[0][u'starttime'])
-				subprocess.call(u'%s' % cmd, shell=True)
+				#subprocess.call(u'%s' % cmd, shell=True) # Seek table creation has been disabled
 		else:
 			logger.critical(u"Creation of recorded and recordedprogram records failed for (%s - %s)" % (item[u'channelTitle'], item[u'title'],))
 			sys.exit(False)
@@ -2152,7 +2155,7 @@ def updateMythVideo(items):
 					cmd = mythcommflag_videos % videometadata[u'filename']
 				elif videometadata[u'host'] and storagegroups[u'mythvideo']:
 					cmd = mythcommflag_videos % ((storagegroups[u'mythvideo']+videometadata[u'filename']))
-				subprocess.call(u'%s' % cmd, shell=True)
+				#subprocess.call(u'%s' % cmd, shell=True) # Seek table creation disabled
 				statistics[u'Miros_MythVideos_added']+=1
 				statistics[u'Total_Miro_expiring']+=1
 				statistics[u'Total_Miro_MythVideos']+=1
