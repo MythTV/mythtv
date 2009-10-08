@@ -434,29 +434,31 @@ void MythUIFileBrowser::updateFileList()
 
 void MythUIFileBrowser::updateRemoteFileList()
 {
+    QStringList sgdirlist;
+    QString     sgdir;
     QStringList slist;
     QString dirURL = QString("%1/%2").arg(m_baseDirectory)
                                      .arg(m_subDirectory);
+    if (!GetRemoteFileList(m_baseDirectory, sgdir, sgdirlist))
+    {
+        VERBOSE(VB_IMPORTANT, "GetRemoteFileList failed to get "
+                "Storage Group dirs");
+        return;
+    }
+
+    if ((sgdirlist.size() == 1) &&
+        (sgdirlist[0].startsWith("sgdir::")))
+    {
+        QStringList tokens = sgdirlist[0].split("::");
+
+        m_storageGroupDir = tokens[1];
+    }
+
     if (!GetRemoteFileList(dirURL, m_storageGroupDir, slist))
     {
         VERBOSE(VB_IMPORTANT, QString("GetRemoteFileList failed for "
                 "'%1' in '%2' SG dir").arg(dirURL).arg(m_storageGroupDir));
         return;
-    }
-
-    if ((slist.size() == 1) &&
-        (slist[0].startsWith("sgdir::")))
-    {
-        QStringList tokens = slist[0].split("::");
-
-        m_storageGroupDir = tokens[1];
-
-        if (!GetRemoteFileList(dirURL, m_storageGroupDir, slist))
-        {
-            VERBOSE(VB_IMPORTANT, QString("GetRemoteFileList failed for "
-                    "'%1' in '%2' SG dir").arg(dirURL).arg(m_storageGroupDir));
-            return;
-        }
     }
 
     m_locationEdit->SetText(dirURL);
@@ -465,7 +467,8 @@ void MythUIFileBrowser::updateRemoteFileList()
     QString dataName;
     QString type;
 
-    if (!m_storageGroupDir.isEmpty())
+    if ((sgdirlist.size() > 1 && !m_storageGroupDir.isEmpty()) ||
+        (!m_subDirectory.isEmpty()))
     {
         displayName = tr("Parent");
         type = "upfolder";
@@ -497,7 +500,10 @@ void MythUIFileBrowser::updateRemoteFileList()
         }
 
         item->SetData(qVariantFromValue(finfo));
+        m_backButton->SetEnabled(true);
     }
+    else
+        m_backButton->SetEnabled(false);
 
     QStringList::const_iterator it = slist.begin();
     while (it != slist.end())
@@ -586,6 +592,7 @@ void MythUIFileBrowser::updateLocalFileList()
     }
 
     QFileInfoList list = d.entryInfoList();
+    bool showBackButton = false;
 
     if (list.isEmpty())
     {
@@ -619,6 +626,7 @@ void MythUIFileBrowser::updateLocalFileList()
 
                 displayName = tr("Parent");
                 type = "upfolder";
+                showBackButton = true;
             }
             else if (finfo.isDir())
             {
@@ -651,6 +659,7 @@ void MythUIFileBrowser::updateLocalFileList()
         }
     }
 
+    m_backButton->SetEnabled(showBackButton);
     m_locationEdit->SetText(m_subDirectory);
 }
 
