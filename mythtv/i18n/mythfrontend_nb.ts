@@ -350,12 +350,12 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="548"/>
         <source>Icon Import Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for ikonimport</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="561"/>
         <source>Download icon for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Last ned ikon for %1</translation>
     </message>
 </context>
 <context>
@@ -646,7 +646,7 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="663"/>
         <source>Store</source>
-        <translation type="unfinished">Lagre</translation>
+        <translation>Lagre</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="686"/>
@@ -756,12 +756,12 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="648"/>
         <source>Current Example</source>
-        <translation type="unfinished">Gjeldende eksempel</translation>
+        <translation>Gjeldende eksempel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="676"/>
         <source>as an example</source>
-        <translation type="unfinished">som eksempel</translation>
+        <translation>som eksempel</translation>
     </message>
 </context>
 <context>
@@ -1467,7 +1467,7 @@
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="529"/>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="538"/>
@@ -1766,12 +1766,12 @@
         <location filename="../programs/mythtv-setup/importicons.cpp" line="156"/>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="402"/>
         <source>No matches found for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen treff for %1</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="197"/>
         <source>Icon for %1 was downloaded successfully.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nedlasting av ikon for %1 var vellykket.</translation>
     </message>
 </context>
 <context>
@@ -2008,7 +2008,7 @@
     <message>
         <location filename="../programs/mythfrontend/mythappearance.cpp" line="268"/>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythappearance.cpp" line="279"/>
@@ -2080,7 +2080,7 @@
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="262"/>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="275"/>
@@ -2090,7 +2090,7 @@
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="286"/>
         <source>Exiting, but there are unsaved changes.Which would you prefer?</source>
-        <translation>Lukker, men det er ulagrede instillinger. Hva velger du?</translation>
+        <translation>Lukker, men det er ulagrede innstillinger. Hva velger du?</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="300"/>
@@ -2155,980 +2155,980 @@
         <location filename="../libs/libmythtv/tv_play.cpp" line="428"/>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="375"/>
         <source>Page Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Page Up</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="430"/>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="377"/>
         <source>Page Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Page Down</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="432"/>
         <source>Play Program</source>
-        <translation type="unfinished"></translation>
+        <translation>Se program</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="434"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="526"/>
         <source>Toggle recording status of current program</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt opptaksstatus for gjeldende program</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="436"/>
         <source>Page the program guide back one day</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift til forrige dag i programoversikten</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="438"/>
         <source>Page the program guide forward one day</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift til neste dag i programoversikten</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="440"/>
         <source>Page the program guide left</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til venstre i programoversikten</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="442"/>
         <source>Page the program guide right</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til høyre i programoversikten</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="444"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="528"/>
         <source>Toggle the current channel as a favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt favorittstatus for geldende kanal</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="446"/>
         <source>Reverse the channel order in the program guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt om kanalrekkefølgen i programguiden</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="448"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="641"/>
         <source>Show the Program Guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis programoversikten</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="450"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="643"/>
         <source>Show the Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis programfinneren</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="452"/>
         <source>Cycle through channel groups and all channels in the program guide.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bla gjennom kanalgrupper og alle kanaler i programoversikten.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="455"/>
         <source>Switch channels without exiting guide in Live TV mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt kanaler uten å gå ut av programoversikten i Direkte TV modus.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="457"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="530"/>
         <source>Volume down</source>
-        <translation type="unfinished"></translation>
+        <translation>Volum ned</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="459"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="532"/>
         <source>Volume up</source>
-        <translation type="unfinished"></translation>
+        <translation>Volum opp</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="461"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="534"/>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillhet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="463"/>
         <source>Increase program or channel rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Øk program eller kanalranking</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="465"/>
         <source>Decrease program or channel rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Reduser program eller kanalranking</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="467"/>
         <source>List upcoming episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis kommende episoder</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="469"/>
         <source>Show program details</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis programdetaljer</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="471"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="473"/>
         <source>Switch Capture Card view</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt visning for TV-kort</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="475"/>
         <source>Edit Custom Record Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger regel for egendefinert opptak</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="477"/>
         <source>Change Recording Group</source>
-        <translation type="unfinished">Endre opptaksgruppe</translation>
+        <translation>Endre opptaksgruppe</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="479"/>
         <source>Change Group View</source>
-        <translation type="unfinished">Endre gruppens visning</translation>
+        <translation>Endre gruppens visning</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="482"/>
         <source>Clear OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern visning på skjermen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="484"/>
         <source>Pause</source>
-        <translation type="unfinished">Pause</translation>
+        <translation>Pause</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="486"/>
         <source>Fast Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol fremover</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="488"/>
         <source>Rewind</source>
-        <translation type="unfinished">Tilbake</translation>
+        <translation>Tilbake</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="490"/>
         <source>Arbitrary Seek</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilfeldig søk</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="492"/>
         <source>Channel up</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal opp</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="494"/>
         <source>Channel down</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal ned</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="496"/>
         <source>Switch to the next favorite channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til neste favorittkanal</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="498"/>
         <source>Switch to the previous channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til forrige kanal</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="500"/>
         <source>Jump ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp fremover</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="502"/>
         <source>Jump back</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp tilbake</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="504"/>
         <source>Jump to bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til bokmerke</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="506"/>
         <source>Fast Forward (Sticky) or Forward one frame while paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol fremover (fast) eller spol frem ett bilde når pauset</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="508"/>
         <source>Rewind (Sticky) or Rewind one frame while paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol bakover (fast) eller spol tilbake ett bilde når pauset</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="510"/>
         <source>Next Video Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste videokilde</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="512"/>
         <source>Previous Video Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige videokilde</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="514"/>
         <source>Next Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste inndata</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="516"/>
         <source>Next Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste kort</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="518"/>
         <source>Skip Commercial</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over reklame</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="520"/>
         <source>Skip Commercial (Reverse)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over reklame (revers)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="522"/>
         <source>Jump to the start of the recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til starten av opptaket.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="524"/>
         <source>Toggle channel browse mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt modus for kanalblaing</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="536"/>
         <source>Toggle Picture-in-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt visning for Bilde-i-bilde</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="538"/>
         <source>Toggle Picture-by-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt visning for Bilde-ved-bilde</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="540"/>
         <source>Create Picture-in-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag bilde-i-bilde visning</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="542"/>
         <source>Create Picture-by-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag bilde-ved-bilde visning</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="544"/>
         <source>Toggle active PIP/PBP window</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt aktivt BiB/BvB vindu</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="546"/>
         <source>Swap PBP/PIP Windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt BvB/BiB vinduer</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="548"/>
         <source>Change PxP view</source>
-        <translation type="unfinished"></translation>
+        <translation>Endre BxB visning</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="550"/>
         <source>Toggle the video aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt aspektforhold for video</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="552"/>
         <source>Next Preconfigured Zoom mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste prekonfigurerte forstørringsmodus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="554"/>
         <source>Toggle any captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Teksting av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="556"/>
         <source>Toggle Teletext Captions</source>
-        <translation type="unfinished">Teksting fra tekst-TV av/på</translation>
+        <translation>Teksting fra tekst-TV av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="558"/>
         <source>Toggle Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertekster av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="560"/>
         <source>Toggle VBI CC</source>
-        <translation type="unfinished"></translation>
+        <translation>VBI-undertekster av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="562"/>
         <source>Toggle ATSC CC</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC-undertekster av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="564"/>
         <source>Toggle Teletext Menu</source>
-        <translation type="unfinished">Tekst-TV-meny av/på</translation>
+        <translation>Tekst-TV-meny av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="567"/>
         <source>Play audio track 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill lydspor 1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="569"/>
         <source>Play audio track 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill lydspor 2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="571"/>
         <source>Display subtitle 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis undertekst 1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="573"/>
         <source>Display subtitle 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis undertekst 2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="575"/>
         <source>Display VBI CC1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis VBI-undertekst 1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="577"/>
         <source>Display VBI CC2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis VBI-undertekst 2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="579"/>
         <source>Display VBI CC3</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis VBI-undertekst 3</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="581"/>
         <source>Display VBI CC4</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis VBI-undertekst 4</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="583"/>
         <source>Display ATSC CC1</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis ATSC-undertekst 1</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="585"/>
         <source>Display ATSC CC2</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis ATSC-undertekst 2</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="587"/>
         <source>Display ATSC CC3</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis ATSC-undertekst 3</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="589"/>
         <source>Display ATSC CC4</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis ATSC-undertekst 4</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="592"/>
         <source>Next audio track</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste lydspor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="594"/>
         <source>Previous audio track</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige lydspor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="596"/>
         <source>Next subtitle track</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste tekstspor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="598"/>
         <source>Previous subtitle track</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige tekstspor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="600"/>
         <source>Next VBI CC track</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste VBI-undertekstspor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="602"/>
         <source>Previous VBI CC track</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige VBI-undertekstspor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="604"/>
         <source>Next ATSC CC track</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste ATSC-undertekstspor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="606"/>
         <source>Previous ATSC CC track</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige ATSC-undertekstspor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="608"/>
         <source>Next of any captions</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste teksting uansett type</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="611"/>
         <source>Next video scan overidemode</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste mode for overstyring av videoskanning</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="613"/>
         <source>Queue the current recording for transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett gjeldende opptak i kø for konvertering</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="615"/>
         <source>Increase the playback speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Øk avspillingshastighet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="617"/>
         <source>Decrease the playback speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Senk avspillingshastighet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="619"/>
         <source>Turn on time stretch control</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på kontroll for tidsstrekking</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="621"/>
         <source>Increase time stretch speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Øk tidsstrekkingshastighet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="623"/>
         <source>Decrease time stretch speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Senk tidsstrekkingshastighet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="625"/>
         <source>Toggle time stretch speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Hastighet for tidsstrekking av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="627"/>
         <source>Turn on audio sync adjustment controls</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på kontroller for lydsynkronisering</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="630"/>
         <source>Playback picture adjustments</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildejustering for avspilling</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="633"/>
         <source>Recording picture adjustments for this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Billedjustering for opptak på denne kanalen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="636"/>
         <source>Recording picture adjustments for this recorder</source>
-        <translation type="unfinished"></translation>
+        <translation>Billedjustering for opptak med dette TV-kortet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="639"/>
         <source>Cycle Commercial Skip mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Bla gjennom mode for reklamehopping</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="645"/>
         <source>Toggle the Sleep Timer</source>
-        <translation type="unfinished"></translation>
+        <translation>Timer for soving av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="647"/>
         <source>Play</source>
-        <translation type="unfinished">Spill av</translation>
+        <translation>Spill av</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="649"/>
         <source>Jump to previously played recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til forrige viste opptak</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="651"/>
         <source>Display menu of recorded programs to jump to</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis meny for å hoppe til opptak</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="653"/>
         <source>Display scheduled recording list</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis liste over planlagte opptak</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="655"/>
         <source>Monitor Signal Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Overvåk signalkvalitet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="658"/>
         <source>Jump to the DVD Root Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til DVD-rotmeny</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="660"/>
         <source>Exit Show without any prompts</source>
-        <translation type="unfinished"></translation>
+        <translation>Avslutt show uten bekreftelse</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="663"/>
         <source>Save screenshot of current video frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagre bilde av gjeldende videoramme</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="667"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="709"/>
         <source>Menu Red</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny Rød</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="669"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="711"/>
         <source>Menu Green</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny Grønn</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="671"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="713"/>
         <source>Menu Yellow</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny Gul</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="673"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="715"/>
         <source>Menu Blue</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny blå</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="675"/>
         <source>Menu Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny Avslutt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="677"/>
         <source>Menu Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny Tekst</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="679"/>
         <source>Menu EPG</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny EPG</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="683"/>
         <source>Clear editing cut points</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern redigeringskuttpunkt </translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="685"/>
         <source>Invert Begin/End cut points</source>
-        <translation type="unfinished"></translation>
+        <translation>Klippepunkt: inverter start/slutt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="687"/>
         <source>Load cut list from commercial skips</source>
-        <translation type="unfinished"></translation>
+        <translation>Last kuttliste fra reklamehopping</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="689"/>
         <source>Jump to the next cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til neste klippepunkt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="691"/>
         <source>Jump to the previous cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til forrige klippepunkt</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="693"/>
         <source>Jump back 10x the normal amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp tilbake 10x normal hoppemengde</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="695"/>
         <source>Jump forward 10x the normal amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp frem 10x normal hoppemengde</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="699"/>
         <source>Next Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste side</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="701"/>
         <source>Previous Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige side</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="703"/>
         <source>Next Subpage</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste underside</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="705"/>
         <source>Previous Subpage</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige underside</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="707"/>
         <source>Toggle Teletext</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekst-TV av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="717"/>
         <source>Menu White</source>
-        <translation type="unfinished"></translation>
+        <translation>Meny Hvit</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="720"/>
         <source>Toggle Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Bakgrunn av/på</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="721"/>
         <source>Reveal hidden Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis skjult tekst</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="348"/>
         <source>Up Arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pil opp</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="350"/>
         <source>Down Arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pil ned</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="352"/>
         <source>Left Arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pil venstre</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="354"/>
         <source>Right Arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Pil høyre</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="356"/>
         <source>Move to next widget</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt til neste skjermelement</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="358"/>
         <source>Move to preview widget</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt til skjermelement for forhåndsvisning</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="360"/>
         <source>Select</source>
-        <translation type="unfinished">Velg</translation>
+        <translation>Velg</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="362"/>
         <source>Backspace</source>
-        <translation type="unfinished"></translation>
+        <translation>Backspace</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="364"/>
         <source>Escape</source>
-        <translation type="unfinished"></translation>
+        <translation>Escape</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="366"/>
         <source>Pop-up menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprettopp meny</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="368"/>
         <source>More information</source>
-        <translation type="unfinished"></translation>
+        <translation>Mer informasjon</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="370"/>
         <source>Delete</source>
-        <translation type="unfinished">Slett</translation>
+        <translation>Slett</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="372"/>
         <source>Edit</source>
-        <translation type="unfinished">Rediger</translation>
+        <translation>Rediger</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="379"/>
         <source>Page to top of list</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt til toppen av listen</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="381"/>
         <source>Page to middle of list</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt til midten av listen</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="383"/>
         <source>Page to bottom of list</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt til bunnen av listen</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="386"/>
         <source>Previous View</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige visning</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="388"/>
         <source>Next View</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste visning</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="391"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Hjelp</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="393"/>
         <source>Eject Removable Media</source>
-        <translation type="unfinished"></translation>
+        <translation>Løs ut medie</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="396"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="397"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="398"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation>2</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="399"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation>3</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="400"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation>4</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="401"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation>5</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="402"/>
         <source>6</source>
-        <translation type="unfinished"></translation>
+        <translation>6</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="403"/>
         <source>7</source>
-        <translation type="unfinished"></translation>
+        <translation>7</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="404"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation>8</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="405"/>
         <source>9</source>
-        <translation type="unfinished"></translation>
+        <translation>9</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="408"/>
         <source>Zoom in on browser window</source>
-        <translation type="unfinished"></translation>
+        <translation>Forstørr i webleser vindu</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="410"/>
         <source>Zoom out on browser window</source>
-        <translation type="unfinished"></translation>
+        <translation>Forminsk i webleser vindu</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="412"/>
         <source>Toggle where keyboard input goes to</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå av/på hvor inndata fra tastatur går</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="415"/>
         <source>Move mouse pointer up</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt muspeker opp</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="417"/>
         <source>Move mouse pointer down</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt muspeker ned</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="419"/>
         <source>Move mouse pointer left</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt muspeker til venstre</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="421"/>
         <source>Move mouse pointer right</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt muspeker til høyre</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="423"/>
         <source>Mouse Left button click</source>
-        <translation type="unfinished"></translation>
+        <translation>Mus venstreklikk</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="426"/>
         <source>Scroll down half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Rull ned en halv side</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="428"/>
         <source>Scroll up half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Rull opp en halv side</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="430"/>
         <source>Scroll left half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Rull til venstre en halv side</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="432"/>
         <source>Scroll right half a page</source>
-        <translation type="unfinished"></translation>
+        <translation>Rull til høyre en halv side</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="435"/>
         <source>Move selection to next link</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt valg til neste link</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="437"/>
         <source>Move selection to previous link</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt valg til forrige link</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="439"/>
         <source>Follow selected link</source>
-        <translation type="unfinished"></translation>
+        <translation>Følg valgte link</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="441"/>
         <source>Go back to previous page</source>
-        <translation type="unfinished"></translation>
+        <translation>Gå til forrige side</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="443"/>
         <source>Go forward to previous page</source>
-        <translation type="unfinished"></translation>
+        <translation>Gå frem til forrige side</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="914"/>
         <source>Reload Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppdater tema</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="916"/>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Hovedmeny</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="918"/>
         <source>Program Guide</source>
-        <translation type="unfinished">Programoversikt</translation>
+        <translation>Programoversikt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="920"/>
         <source>Program Finder</source>
-        <translation type="unfinished">Programfinner</translation>
+        <translation>Programfinner</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="923"/>
         <source>Manage Recordings / Fix Conflicts</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandle opptak/fiks konflikter</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="925"/>
         <source>Program Recording Priorities</source>
-        <translation type="unfinished">Opptaksprioritet for programmer</translation>
+        <translation>Opptaksprioritet for programmer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="927"/>
         <source>Manage Recording Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandle opptaksregler</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="929"/>
         <source>Channel Recording Priorities</source>
-        <translation type="unfinished">Opptaksprioritet for kanaler</translation>
+        <translation>Opptaksprioritet for kanaler</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="931"/>
         <source>TV Recording Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Avspilling av TV opptak</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="933"/>
         <source>TV Recording Deletion</source>
-        <translation type="unfinished"></translation>
+        <translation>Sletting av TV opptak</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="935"/>
         <source>Live TV</source>
-        <translation type="unfinished">Direkte TV</translation>
+        <translation>Direkte TV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="937"/>
         <source>Live TV In Guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Direkte TV i programoversikt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="939"/>
         <source>Status Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Statusskjerm</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="941"/>
         <source>Previously Recorded</source>
-        <translation type="unfinished">Tatt opp tidligere</translation>
+        <translation>Tatt opp tidligere</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="944"/>
         <source>ScreenShot</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilde</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="975"/>
         <source>MythTV&apos;s native media player.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV sin innebygde mediespiller.</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="40"/>
         <source>Open an Xterm window</source>
-        <translation type="unfinished"></translation>
+        <translation>Åpne et Xterm vindu</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="42"/>
         <source>Show Mythshutdown settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis innstillinger for Mythshutdown</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/main.cpp" line="44"/>
         <source>Start Mythtv-Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Start Mythtv-Setup</translation>
     </message>
 </context>
 <context>
@@ -3928,7 +3928,7 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2566"/>
         <source>Play Options</source>
-        <translation>Avspillingsinstillinger</translation>
+        <translation>Avspillingsinnstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2611"/>
@@ -3943,9 +3943,9 @@ Er du sikker på at du vil slette:</translation>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2555"/>
         <source>There is %n item(s) in the playlist. Actions affect all items in the playlist</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Det er %n oppføring i spillelisten. Handlinger vil påvirke alle oppføringer i spillelisten</numerusform>
+            <numerusform>Det er %n oppføringer i spillelisten. Handlinger vil påvirke alle oppføringer i spillelisten</numerusform>
         </translation>
     </message>
 </context>
@@ -4071,7 +4071,7 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="710"/>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="719"/>
@@ -4099,22 +4099,22 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="289"/>
         <source>Title</source>
-        <translation type="unfinished">Tittel</translation>
+        <translation>Tittel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="291"/>
         <source>Title Pronounce</source>
-        <translation type="unfinished">Titteluttale</translation>
+        <translation>Titteluttale</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="298"/>
         <source>Part %1 of %2, </source>
-        <translation type="unfinished">Del %1 av %2, </translation>
+        <translation>Del %1 av %2, </translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/progdetails.cpp" line="308"/>
         <source>%n star(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n stjerne</numerusform>
             <numerusform>%n stjerner</numerusform>
         </translation>
@@ -4122,184 +4122,184 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="314"/>
         <source>Mono</source>
-        <translation type="unfinished">Mono</translation>
+        <translation>Mono</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="316"/>
         <source>Stereo</source>
-        <translation type="unfinished">Stereo</translation>
+        <translation>Stereo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="318"/>
         <source>Surround Sound</source>
-        <translation type="unfinished">Flere høyttalere</translation>
+        <translation>Flere høyttalere</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="320"/>
         <source>Dolby Sound</source>
-        <translation type="unfinished">Dolby Surround</translation>
+        <translation>Dolby Surround</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="322"/>
         <source>Audio for Hearing Impaired</source>
-        <translation type="unfinished">Lyd for hørselshemmede</translation>
+        <translation>Lyd for hørselshemmede</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="324"/>
         <source>Audio for Visually Impaired</source>
-        <translation type="unfinished">Lyd for synshemmede</translation>
+        <translation>Lyd for synshemmede</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="327"/>
         <source>HDTV</source>
-        <translation type="unfinished">HDTV</translation>
+        <translation>HDTV</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="329"/>
         <source>Widescreen</source>
-        <translation type="unfinished">Bredformat</translation>
+        <translation>Bredformat</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="331"/>
         <source>AVC/H.264</source>
-        <translation type="unfinished">AVC/H.264</translation>
+        <translation>AVC/H.264</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="333"/>
         <source>720p Resolution</source>
-        <translation type="unfinished">720p oppløsning</translation>
+        <translation>720p oppløsning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="335"/>
         <source>1080i/p Resolution</source>
-        <translation type="unfinished">1080i/p oppløsning</translation>
+        <translation>1080i/p oppløsning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="338"/>
         <source>CC</source>
         <comment>Closed Captioned</comment>
-        <translation type="unfinished">Tekstet</translation>
+        <translation>Tekstet</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="340"/>
         <source>Subtitles Available</source>
-        <translation type="unfinished">Teksting tilgjengelig</translation>
+        <translation>Teksting tilgjengelig</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="342"/>
         <source>Subtitled</source>
-        <translation type="unfinished">Undertekster</translation>
+        <translation>Undertekster</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="344"/>
         <source>Deaf Signing</source>
-        <translation type="unfinished">Teksting for døve</translation>
+        <translation>Teksting for døve</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="347"/>
         <source>Unidentified Episode</source>
-        <translation type="unfinished">Uidentifisert episode</translation>
+        <translation>Uidentifisert episode</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="349"/>
         <source>Repeat</source>
-        <translation type="unfinished">Gjenta</translation>
+        <translation>Gjenta</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="357"/>
         <source>Description</source>
-        <translation type="unfinished">Beskrivelse</translation>
+        <translation>Beskrivelse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="377"/>
         <source>Category</source>
-        <translation type="unfinished">Kategori</translation>
+        <translation>Kategori</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="388"/>
         <source>Type</source>
         <comment>category_type</comment>
-        <translation type="unfinished">Type</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="390"/>
         <source>Episode Number</source>
-        <translation type="unfinished">Episodenummer</translation>
+        <translation>Episodenummer</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="397"/>
         <source>Original Airdate</source>
-        <translation type="unfinished">Opprinnelig sendedato</translation>
+        <translation>Opprinnelig sendedato</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="399"/>
         <source>Program ID</source>
-        <translation type="unfinished">Program-ID</translation>
+        <translation>Program-ID</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="488"/>
         <source>Actors</source>
-        <translation type="unfinished">Skuespillere</translation>
+        <translation>Skuespillere</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="489"/>
         <source>Director</source>
-        <translation type="unfinished">Regissør</translation>
+        <translation>Regissør</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="490"/>
         <source>Producer</source>
-        <translation type="unfinished">Produsent</translation>
+        <translation>Produsent</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="491"/>
         <source>Executive Producer</source>
-        <translation type="unfinished">Eksekutiv produsent</translation>
+        <translation>Eksekutiv produsent</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="492"/>
         <source>Writer</source>
-        <translation type="unfinished">Forfatter</translation>
+        <translation>Forfatter</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="493"/>
         <source>Guest Star</source>
-        <translation type="unfinished">Gjesteopptreden</translation>
+        <translation>Gjesteopptreden</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="494"/>
         <source>Host</source>
-        <translation type="unfinished">Vert</translation>
+        <translation>Vert</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="495"/>
         <source>Adapter</source>
-        <translation type="unfinished">Tilpasser</translation>
+        <translation>Tilpasser</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="496"/>
         <source>Presenter</source>
-        <translation type="unfinished">Presentør</translation>
+        <translation>Presentør</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="497"/>
         <source>Commentator</source>
-        <translation type="unfinished">Kommentator</translation>
+        <translation>Kommentator</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="498"/>
         <source>Guest</source>
-        <translation type="unfinished">Gjest</translation>
+        <translation>Gjest</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="553"/>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
+        <translation>Status</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/progdetails.cpp" line="583"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n time</numerusform>
             <numerusform>%n timer</numerusform>
         </translation>
@@ -4307,103 +4307,103 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="596"/>
         <source>Auto-expire off</source>
-        <translation type="unfinished">Automatisk utløping av</translation>
+        <translation>Automatisk utløping av</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="599"/>
         <source>Marked as &apos;watched&apos;</source>
-        <translation type="unfinished">Markert som sett</translation>
+        <translation>Markert som sett</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="602"/>
         <source>Not the earliest episode</source>
-        <translation type="unfinished">Ikke den tidligste episoden</translation>
+        <translation>Ikke den tidligste episoden</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="605"/>
         <source>Recently deleted episode</source>
-        <translation type="unfinished">Nylig slettet episode</translation>
+        <translation>Nylig slettet episode</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="616"/>
         <source>Recording Rule</source>
-        <translation type="unfinished">Opptaksregel</translation>
+        <translation>Opptaksregel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="617"/>
         <source>Last Recorded</source>
-        <translation type="unfinished">Sist tatt opp</translation>
+        <translation>Sist tatt opp</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="618"/>
         <source>Next Recording</source>
-        <translation type="unfinished">Neste opptak</translation>
+        <translation>Neste opptak</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="619"/>
         <source>Average Time Shift</source>
-        <translation type="unfinished">Gjennomsnittlig tids-skift</translation>
+        <translation>Gjennomsnittlig tids-skift</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="620"/>
         <source>Watch List Score</source>
-        <translation type="unfinished">Skår for Se-liste</translation>
+        <translation>Skår for Se-liste</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="621"/>
         <source>Watch List Status</source>
-        <translation type="unfinished">Status for Se-liste</translation>
+        <translation>Status for Se-liste</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="622"/>
         <source>Search Phrase</source>
-        <translation type="unfinished">Søkeuttrykk</translation>
+        <translation>Søkeuttrykk</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="631"/>
         <source>Find ID</source>
-        <translation type="unfinished">Finn ID</translation>
+        <translation>Finn ID</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="646"/>
         <source>GB</source>
         <comment>GigaBytes</comment>
-        <translation type="unfinished">GB</translation>
+        <translation>GB</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="666"/>
         <source>Recording Host</source>
-        <translation type="unfinished">Opptaksvert</translation>
+        <translation>Opptaksvert</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="667"/>
         <source>Recorded File Name</source>
-        <translation type="unfinished">Oppført filnavn</translation>
+        <translation>Oppført filnavn</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="668"/>
         <source>Recorded File Size</source>
-        <translation type="unfinished">Oppført filstørrelse</translation>
+        <translation>Oppført filstørrelse</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="669"/>
         <source>Recording Profile</source>
-        <translation type="unfinished">Opptaksprofil</translation>
+        <translation>Opptaksprofil</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="670"/>
         <source>Recording Group</source>
-        <translation type="unfinished">Opptaksgruppe</translation>
+        <translation>Opptaksgruppe</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="671"/>
         <source>Storage Group</source>
-        <translation type="unfinished">Lagringsgruppe</translation>
+        <translation>Lagringsgruppe</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="672"/>
         <source>Playback Group</source>
-        <translation type="unfinished">Avspillingsgruppe</translation>
+        <translation>Avspillingsgruppe</translation>
     </message>
 </context>
 <context>
@@ -4423,7 +4423,7 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="223"/>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="233"/>
@@ -4701,7 +4701,7 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="269"/>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="278"/>
@@ -4761,7 +4761,7 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="308"/>
         <source>Sort Options</source>
-        <translation>Sorteringsinstillinger</translation>
+        <translation>Sorteringsinnstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="317"/>
@@ -4878,7 +4878,7 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="604"/>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="613"/>
@@ -4931,7 +4931,7 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="632"/>
         <source>Sort Options</source>
-        <translation>Sorteringsinstillinger</translation>
+        <translation>Sorteringsinnstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="641"/>
@@ -5011,7 +5011,7 @@ Er du sikker på at du vil slette:</translation>
         <location filename="../libs/libmyth/dbsettings.cpp" line="53"/>
         <location filename="../libs/libmyth/dbsettings.cpp" line="170"/>
         <source>Use custom identifier for frontend preferences</source>
-        <translation>Bruk egendefinert identifiserer for klientinnstillinger</translation>
+        <translation>Bruk egendefinert identifikator for klientinnstillinger</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="83"/>
@@ -5068,7 +5068,7 @@ Er du sikker på at du vil slette:</translation>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="182"/>
         <source>Custom identifier</source>
-        <translation>Egendefinert identifiserer</translation>
+        <translation>Egendefinert identifikator</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="183"/>
@@ -7641,7 +7641,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3607"/>
         <source>Enable realtime priority threads</source>
-        <translation>Slår på tråder med samtidsprioritet</translation>
+        <translation type="unfinished">Slår på tråder med sanntidsprioritet</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3608"/>
@@ -10418,7 +10418,7 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3217"/>
         <source>Default &apos;End Late&apos; minutes for new recording rules</source>
-        <translation>Standard «Slutt seint»-minutter for nye opptaksregler</translation>
+        <translation>Standard «Slutt sent»-minutter for nye opptaksregler</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3219"/>
@@ -10930,7 +10930,7 @@ Frekvensen for denne kanalen i</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3784"/>
         <source>Maximum days counted in the score</source>
-        <translation>maksimalt antall dager som telles inn i skår</translation>
+        <translation>Maksimalt antall dager som telles inn i skår</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3786"/>
@@ -11044,7 +11044,7 @@ Frekvensen for denne kanalen i</translation>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="196"/>
         <source>Enable Database Server Wakeup</source>
-        <translation>Slå på Wakeup for databasetjener</translation>
+        <translation>Slå på vekking for databasetjener</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/dbsettings.cpp" line="197"/>
@@ -12024,7 +12024,7 @@ De fleste DVB-S-sendere bruker 27,5 millioner symboler per sekund.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="470"/>
         <source>Deferral days for Auto-Transcode jobs</source>
-        <translation>Antall dager å utsette automatiske konverteringsjobber.</translation>
+        <translation>Antall dager å utsette automatiske konverteringsjobber</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="471"/>
@@ -12094,7 +12094,7 @@ De fleste DVB-S-sendere bruker 27,5 millioner symboler per sekund.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="611"/>
         <source>DeletedExpireOptions</source>
-        <translation>Instillinger for sletting og utløping</translation>
+        <translation>Innstillinger for sletting og utløping</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="644"/>
@@ -12397,7 +12397,7 @@ name can not be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2239"/>
         <source>By default, only remote frontends are shown the shutdown option on the exit menu. Here you can force specific shutdown and reboot options to be displayed.</source>
-        <translation>Standardverdien er at bare fjerne frontender viser Slå av valget på avlsutningsmenyen. Du kan her tvinge spesifikke instillinger for Slå av og Restart som skal vises.</translation>
+        <translation>Standardverdien er at bare fjerne frontender viser Slå av valget på avlsutningsmenyen. Du kan her tvinge spesifikke innstillinger for Slå av og Restart som skal vises.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2259"/>
@@ -12497,7 +12497,7 @@ name can not be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3016"/>
         <source>Allow live TV to move scheduled shows</source>
-        <translation>TIllat direkte TV å flytte planlagte opptak</translation>
+        <translation>Tillat direkte TV å flytte planlagte opptak</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3018"/>
@@ -13719,7 +13719,7 @@ Vil du fortsette å se?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2153"/>
         <source>Use HW Acceleration for live recording preview</source>
-        <translation>Bruk hardware akselerering for forhåndsvisning av direkteopptak</translation>
+        <translation>Bruk maskinvare akselerering for forhåndsvisning av direkteopptak</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2156"/>
@@ -14576,7 +14576,7 @@ Vil du fortsette å se?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="5027"/>
         <source>Accessibility Options</source>
-        <translation>Tilgjengelighetsinstillinger</translation>
+        <translation>Tilgjengelighetsinnstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="171"/>
@@ -14606,17 +14606,17 @@ Vil du fortsette å se?</translation>
     <message>
         <location filename="../programs/mythtv-setup/checksetup.cpp" line="155"/>
         <source>You have a Video Storage Group, but have not set up all Image Groups.  If you continue, video image downloads will be saved in your Videos Storage Group.  Do you want to store them in their own groups?</source>
-        <translation type="unfinished"></translation>
+        <translation>Du har en lagringsgruppe for video, men du har ikke satt opp alle gruppene for bilder. Hvis du fortsetter, vil billednedlastinger bli lagret i lagringsgruppen for videoer. Vil du lagre dem i deres egne grupper?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/importicons.cpp" line="584"/>
         <source>Searching for icons for channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Søker etter ikoner for kanal %1</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/main.cpp" line="797"/>
         <source>DVD/Video contains a bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD/video inneholder et bokmerke</translation>
     </message>
 </context>
 <context>
@@ -17107,2247 +17107,2251 @@ Velg et (pågående) opptak i stedet</translation>
     <message>
         <location filename="../themes/themestrings.h" line="2"/>
         <source>1. General</source>
-        <translation type="unfinished"></translation>
+        <translation>1. Generelt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="3"/>
         <source>2. Capture cards</source>
-        <translation type="unfinished"></translation>
+        <translation>2. TV-kort</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="4"/>
         <source>3. Video sources</source>
-        <translation type="unfinished"></translation>
+        <translation>3. Videokilder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="5"/>
         <source>4. Input connections</source>
-        <translation type="unfinished"></translation>
+        <translation>4. Inndataforbindelser</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="6"/>
         <source>5. Channel Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>5. Kanalredigerer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="7"/>
         <source>6. Storage Directories</source>
-        <translation type="unfinished"></translation>
+        <translation>6. Lagringsgrupper</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="8"/>
         <source>%alert_text%</source>
-        <translation type="unfinished"></translation>
+        <translation>%alert_text%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="9"/>
         <source>LINE #%caller_line%</source>
-        <translation type="unfinished"></translation>
+        <translation>Linje #%caller_line%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="10"/>
         <source>NAME: %caller_name%</source>
-        <translation type="unfinished"></translation>
+        <translation>Navn: %caller_name%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="11"/>
         <source>NUM : %caller_number%</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer : %caller_number%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="12"/>
         <source>DATE: %caller_date% TIME : %caller_time%</source>
-        <translation type="unfinished"></translation>
+        <translation>Dato: %caller_date% Tidspunkt : %caller_time%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="20"/>
         <source>General</source>
-        <translation type="unfinished">Generell</translation>
+        <translation>Generell</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="21"/>
         <source>Core MythTV behavior and system settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Generelle systeminnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="22"/>
         <source>Appearance</source>
-        <translation type="unfinished"></translation>
+        <translation>Utseende</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="23"/>
         <source>pick the theme, font, size, and locale</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg tema, skrifttyper, størrelse og språk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="24"/>
         <source>Screen Setup Wizards</source>
-        <translation type="unfinished"></translation>
+        <translation>Veiviser for skjerm</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="25"/>
         <source>Compensate for TVs with overscan</source>
-        <translation type="unfinished"></translation>
+        <translation>Kompenser for TV-er med overskanning</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="26"/>
         <source>TV Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>TV Innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="27"/>
         <source>Settings for TV recording and playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for opptak og avspilling</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="28"/>
         <source>Music Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Musikkinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="29"/>
         <source>Configure playback and CD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer avspilling og CD ripping</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="30"/>
         <source>Videos Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="31"/>
         <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer avspilling og DVD ripping</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="32"/>
         <source>Radio Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Radioinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="33"/>
         <source>Images Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Billedinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="34"/>
         <source>Configure display of image gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer visning av billedgalleri</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="35"/>
         <source>Game Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Spillinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="36"/>
         <source>Configure playback of games</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer spillene</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="37"/>
         <source>Weather Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Værinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="38"/>
         <source>Weather locale and sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Værlokasjoner og kilder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="39"/>
         <source>News Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyhetsinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="40"/>
         <source>Choose which news sources interest you</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg hvilke nyhetskilder som interesserer deg</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="41"/>
         <source>Web Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Web-innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="42"/>
         <source>Manage web bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandle web-bokmerker</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="43"/>
         <source>Recipe Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for matoppskrifter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="44"/>
         <source>Phone Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Telefoni-innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="45"/>
         <source>Configure SIP-based VoIP phone</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer SIP-basert VoIP telefoni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="46"/>
         <source>Movie Time Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for Movie Time</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="47"/>
         <source>Select local movie theaters</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg lokale kinoer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="48"/>
         <source>Xbox Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Xbox innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="49"/>
         <source>NetFlix Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Netflix innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="50"/>
         <source>Choose the genres that interest you</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg sjangrene som interesserer deg</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="51"/>
         <source>Archive Files Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for arkivering av filer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="52"/>
         <source>Configure how to archive video to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer hvordan video blir arkivert til DVD plater</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="53"/>
         <source>ZoneMinder Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for ZoneMinder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="54"/>
         <source>Set up surveillance software</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett opp programvare for overvåkning</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="55"/>
         <source>Watch Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="56"/>
         <source>Play Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="57"/>
         <source>Upcoming Recordings</source>
-        <translation type="unfinished">Kommende opptak</translation>
+        <translation>Kommende opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="58"/>
         <source>See what will be recorded next</source>
-        <translation type="unfinished"></translation>
+        <translation>Se hva som vil bli tatt opp</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="59"/>
         <source>Schedule Recordings</source>
-        <translation type="unfinished">Planlegg opptak</translation>
+        <translation>Planlegg opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="60"/>
         <source>Pick shows to record</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg sendinger som skal bli tatt opp</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="61"/>
         <source>Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriteter for opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="62"/>
         <source>Prioritize some shows over others</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioriter noen opptak fremfor andre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="63"/>
         <source>System Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemstatus</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="64"/>
         <source>What your system is doing right now</source>
-        <translation type="unfinished"></translation>
+        <translation>Oversikt over hva MythTV gjør akkurat nå</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="65"/>
         <source>Utilities / Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Verktøy/Oppsett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="66"/>
         <source>Settings for TV, Images, Music, Video, Weather, etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for TV, bilder, musikk, video, vær osv.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="67"/>
         <source>Set Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett prioriteter for opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="68"/>
         <source>Settings to prioritize some shows over others</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for å prioritere noen opptak fremfor andre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="69"/>
         <source>Set Channel Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett opptaks prioritet for kanaler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="70"/>
         <source>Settings to prioritize some channels over others</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for å prioritere noen kanaler fremfor andre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="71"/>
         <source>Custom Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Egendefinerte prioriteter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="72"/>
         <source>Most used DVR options are found on the main menu. Plugin options are in the utilities menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>De fleste DVR innstillingene finnes under hovedmenyen. Innstillinger for tillegg finnes under menyvalget Verktøy / Innstillinger.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="73"/>
         <source>New Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Nye titler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="74"/>
         <source>Pick a program to record for a list of new titles</source>
-        <translation type="unfinished"></translation>
+        <translation>velg et program som skal tas opp basert på en liste over nye titler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="75"/>
         <source>Movies</source>
-        <translation type="unfinished">Filmer</translation>
+        <translation>Filmer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="76"/>
         <source>Pick a movie to record</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg en film som skal tas opp</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="77"/>
         <source>Categories</source>
-        <translation type="unfinished">Kategorier</translation>
+        <translation>Kategorier</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="78"/>
         <source>Pick a program based on category</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et program basert på kategori</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="79"/>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="80"/>
         <source>Pick a program on a given channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et program fra en spesifikk kanal</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="81"/>
         <source>Time</source>
-        <translation type="unfinished">Tid</translation>
+        <translation>Tid</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="82"/>
         <source>Pick a program based on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et program basert på sendetidspunkt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="83"/>
         <source>Program Guide</source>
-        <translation type="unfinished">Programoversikt</translation>
+        <translation>Programoversikt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="84"/>
         <source>Choose programs from a grid-style list</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg programmer fra en rutenett-basert liste</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="85"/>
         <source>Program Finder</source>
-        <translation type="unfinished">Programfinner</translation>
+        <translation>Programfinner</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="86"/>
         <source>Choose programs from an alphabetical index</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg programmer fra en alfabetisk liste</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="87"/>
         <source>Search Words</source>
-        <translation type="unfinished"></translation>
+        <translation>Søkeord</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="88"/>
         <source>Find programs matching search words</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn programmer basert på søkeord</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="89"/>
         <source>Search Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Lister over søk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="90"/>
         <source>Pick a program to record from a set of lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et program å ta opp basert på et sett med lister</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="91"/>
         <source>Custom Record</source>
-        <translation type="unfinished">Egendefinert opptak</translation>
+        <translation>Egendefinert opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="92"/>
         <source>Advanced program finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Avansert programfinner</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="93"/>
         <source>Manual Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuell tidsplan</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="94"/>
         <source>VCR-like recording scheduler</source>
-        <translation type="unfinished"></translation>
+        <translation>VCR-aktig opptaksplanlegger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="95"/>
         <source>Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Titler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="96"/>
         <source>Find a program based on title</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn et program basert på tittel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="97"/>
         <source>Keywords</source>
-        <translation type="unfinished"></translation>
+        <translation>Nøkkelord</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="98"/>
         <source>Find a program matching a keyword</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn et program basert på nøkkelord</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="99"/>
         <source>People</source>
-        <translation type="unfinished"></translation>
+        <translation>Mennesker</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="100"/>
         <source>Find a program including a given person</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn et program der en gitt person deltar</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="101"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Avansert</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="102"/>
         <source>Combine more than one word search</source>
-        <translation type="unfinished"></translation>
+        <translation>Kombiner mer enn ett ord i søket</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="103"/>
         <source>Stored Searches</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagrede søk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="104"/>
         <source>Results of searches you have saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultater fra lagrede søk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="105"/>
         <source>TV navigation and recording preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>TV navigerings- og opptaksinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="106"/>
         <source>Guide appearance and behavior</source>
-        <translation type="unfinished"></translation>
+        <translation>Utseende og innstillinger for programoversikt </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="107"/>
         <source>Playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Avspilling</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="108"/>
         <source>Settings for viewing and playing TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for visning og avspilling av TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="109"/>
         <source>Playback OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Visning på skjermen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="110"/>
         <source>Theme and settings for OSD</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema og innstillinger for visning på skjermen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="111"/>
         <source>OSD Menu Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigering av skjermmeny</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="112"/>
         <source>Playback Groups</source>
-        <translation type="unfinished">Avspillingsgrupper</translation>
+        <translation>Avspillingsgrupper</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="113"/>
         <source>Adjust settings for different playback styles</source>
-        <translation type="unfinished"></translation>
+        <translation>Juster innstillingene for avspillingsstiler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="114"/>
         <source>Channel Groups</source>
-        <translation type="unfinished">Kanalgrupper</translation>
+        <translation>Kanalgrupper</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="115"/>
         <source>Recording Profiles</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksprofiler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="116"/>
         <source>Global recording priority and scheduling</source>
-        <translation type="unfinished"></translation>
+        <translation>Global opptaksprioritet og planlegging</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="117"/>
         <source>Watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="118"/>
         <source>Watch live television</source>
-        <translation type="unfinished"></translation>
+        <translation>Se Direkte TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="119"/>
         <source>Delete Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="120"/>
         <source>Remove television recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern TV opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="121"/>
         <source>Previously Recorded</source>
-        <translation type="unfinished">Tatt opp tidligere</translation>
+        <translation>Tatt opp tidligere</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="122"/>
         <source>See what you have recorded before</source>
-        <translation type="unfinished"></translation>
+        <translation>Se hva du har tatt opp tidligere</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="123"/>
         <source>TV Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation>TV Verktøy</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="124"/>
         <source>Music</source>
-        <translation type="unfinished">Musikk</translation>
+        <translation>Musikk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="125"/>
         <source>Videos</source>
-        <translation type="unfinished">Videoer</translation>
+        <translation>Videoer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="126"/>
         <source>Radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="127"/>
         <source>Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="128"/>
         <source>Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="129"/>
         <source>Weather</source>
-        <translation type="unfinished">Vær</translation>
+        <translation>Vær</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="130"/>
         <source>News Feeds</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyhetsfeeder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="131"/>
         <source>Web</source>
-        <translation type="unfinished"></translation>
+        <translation>Web</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="132"/>
         <source>Phone</source>
-        <translation type="unfinished"></translation>
+        <translation>Telefoni</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="133"/>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Brenn DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="134"/>
         <source>Recipes</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppskrifter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="135"/>
         <source>Archive Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Arkivering av filer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="136"/>
         <source>Zone Minder</source>
-        <translation type="unfinished"></translation>
+        <translation>Zone Minder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="137"/>
         <source>Movie Times</source>
-        <translation type="unfinished"></translation>
+        <translation>Movie Times</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="138"/>
         <source>NetFlix</source>
-        <translation type="unfinished"></translation>
+        <translation>NetFlix</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="139"/>
         <source>Edit Keys</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger tastetilordninger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="140"/>
         <source>Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppsett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="141"/>
         <source>A blue theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Et blått tema.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="142"/>
         <source>%SUBTITLE|&quot;|&quot;%</source>
-        <translation type="unfinished"></translation>
+        <translation>%SUBTITLE|&quot;|&quot;%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="143"/>
         <source>%STARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="147"/>
         <source>%SUBTITLE|&quot;|&quot; %%STARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%SUBTITLE|&quot;|&quot; %%STARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="162"/>
         <source>[</source>
-        <translation type="unfinished"></translation>
+        <translation>[</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="163"/>
         <source>]</source>
-        <translation type="unfinished"></translation>
+        <translation>]</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="164"/>
         <source>]  =</source>
-        <translation type="unfinished"></translation>
+        <translation>]  =</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="178"/>
         <source>No listings found for this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen programlister ble funnet for dette programmet.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="182"/>
         <source>Show:  (1) All  (2) Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis: (1) Alle (2) Viktige</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="183"/>
         <source>(1) Sort by Title  (2) Sort by Priority  (4) Sort by Type</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Sorter etter tittel  (2) Sorter etter prioritet  (4) Sorter etter type</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="184"/>
         <source>] =</source>
-        <translation type="unfinished"></translation>
+        <translation>] =</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="185"/>
         <source>%SUBTITLE|&quot;|&quot;% %STARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%SUBTITLE|&quot;|&quot;% %STARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="186"/>
         <source>(4) Program Guide  (6) Program Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>(4) Programoversikt  (6) Programfinner</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="187"/>
         <source>Select a letter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg en bokstav.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="188"/>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow.</source>
-        <translation type="unfinished">Velg bokstaven som programmet starter på, og trykk VELG eller høyre piltast.</translation>
+        <translation>Velg bokstaven som programmet starter på, og trykk VELG eller høyre piltast.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="189"/>
         <source>Select a program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et program.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="190"/>
         <source>No Programs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen programmer.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="191"/>
         <source>(1) Sort by Time    (2) Sort by Title</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Sorter etter klokkeslett    (2) Sorter etter tittel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="192"/>
         <source>Heading</source>
-        <translation type="unfinished"></translation>
+        <translation>Overskrift</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="193"/>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="194"/>
         <source>Ok</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="195"/>
         <source>0%</source>
-        <translation type="unfinished"></translation>
+        <translation>0%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="196"/>
         <source>Playback starting ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Starter avspilling ...</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="197"/>
         <source>Icon Importer</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikonimportering</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="198"/>
         <source>Search terms:</source>
-        <translation type="unfinished"></translation>
+        <translation>Søkevilkår:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="199"/>
         <source>Search</source>
-        <translation type="unfinished">Søk</translation>
+        <translation>Søk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="200"/>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="201"/>
         <source>Channel Editor</source>
-        <translation type="unfinished">Kanalredigerer</translation>
+        <translation>Kanalredigerer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="202"/>
         <source>List Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Listeinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="203"/>
         <source>Sort By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorter etter:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="204"/>
         <source>Hide Channels without channel number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skjul kanaler uten kanalnummer.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="205"/>
         <source>Delete All</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett alle</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="206"/>
         <source>Global Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Globale innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="207"/>
         <source>Channel Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalsøk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="208"/>
         <source>Icon Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Nedlasting av ikoner</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="209"/>
         <source>Edit Transports</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger transporter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="210"/>
         <source>Done</source>
-        <translation type="unfinished">Ferdig</translation>
+        <translation>Ferdig</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="211"/>
         <source>Play Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="212"/>
         <source>System:</source>
-        <translation type="unfinished">System:</translation>
+        <translation>System:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="213"/>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>År:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="214"/>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sjanger:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="215"/>
         <source>Favorite:</source>
-        <translation type="unfinished"></translation>
+        <translation>Favoritt:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="216"/>
         <source>Yes</source>
-        <translation type="unfinished">Ja</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="217"/>
         <source>No</source>
-        <translation type="unfinished">Nei</translation>
+        <translation>Nei</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="218"/>
         <source>Television</source>
-        <translation type="unfinished"></translation>
+        <translation>TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="219"/>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Hovedmeny</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="220"/>
         <source>Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Galleri</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="221"/>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsplan</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="222"/>
         <source>Programme Searches</source>
-        <translation type="unfinished"></translation>
+        <translation>Programsøk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="223"/>
         <source>CD/DVD Options</source>
-        <translation type="unfinished"></translation>
+        <translation>CD/DVD innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="224"/>
         <source>Media Library</source>
-        <translation type="unfinished"></translation>
+        <translation>Mediebibliotek</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="225"/>
         <source>Info Centre</source>
-        <translation type="unfinished"></translation>
+        <translation>Informasjonssenter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="226"/>
         <source>P</source>
-        <translation type="unfinished">F</translation>
+        <translation>F</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="227"/>
         <source>S</source>
-        <translation type="unfinished">E</translation>
+        <translation>E</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="228"/>
         <source>Playing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spiller:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="229"/>
         <source>None</source>
-        <translation type="unfinished">Ingen</translation>
+        <translation>Ingen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="230"/>
         <source>%|&quot;SUBTITLE|&quot;% %DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;% %DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="231"/>
         <source>Change Displayed Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Endre viste grupper</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="232"/>
         <source>Show Titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis titler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="233"/>
         <source>Show Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis kategorier</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="234"/>
         <source>Show Recording Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis opptaksgrupper</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="235"/>
         <source>Show Watch List</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis Se-liste</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="236"/>
         <source>Show Searches</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis søk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="237"/>
         <source>Show LiveTV</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis Direkte TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="238"/>
         <source>Show Watched Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis opptak som er sett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="239"/>
         <source>Save</source>
-        <translation type="unfinished">Lagre</translation>
+        <translation>Lagre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="240"/>
         <source>Change Recording Group Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Endre passord for opptaksgruppe</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="241"/>
         <source>Old Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Gammelt passord</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="242"/>
         <source>New Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nytt passord:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="243"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="244"/>
         <source>Edit Recording Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger metadata for opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="245"/>
         <source>Title</source>
-        <translation type="unfinished">Tittel</translation>
+        <translation>Tittel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="246"/>
         <source>Subtitle</source>
-        <translation type="unfinished">Undertittel</translation>
+        <translation>Undertittel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="247"/>
         <source>Manual Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuell opptaksplan</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="248"/>
         <source>Title (Optional):</source>
-        <translation type="unfinished"></translation>
+        <translation>Tittel (valgfri):</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="249"/>
         <source>Date, or day of week:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dato, eller dag:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="250"/>
         <source>Start Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Starttid:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="251"/>
         <source>Hour</source>
-        <translation type="unfinished"></translation>
+        <translation>Time</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="252"/>
         <source>Minute</source>
-        <translation type="unfinished"></translation>
+        <translation>Minutt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="253"/>
         <source>Duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>Varighet:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="254"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Neste</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="255"/>
         <source>Scheduled Recordings</source>
-        <translation type="unfinished">Planlagte opptak</translation>
+        <translation>Planlagte opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="256"/>
         <source>Schedules Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Oversikt over opptaksplaner</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="257"/>
         <source>First Conflict:</source>
-        <translation type="unfinished"></translation>
+        <translation>Første konflikt:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="258"/>
         <source>Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filter:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="259"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Du har ikke planlagt noen opptak
+ For å planlegge et opptak, gå ut av dette skjermbildet og velg &apos;Programoversikt&apos; eller &apos;Programfinner&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="260"/>
         <source>Callsign:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kallesignal:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="261"/>
         <source>(1) Channel (2) Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Kanal (2) Prioritet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="262"/>
         <source>Schedule Priorities</source>
-        <translation type="unfinished">Planlegg prioriteter</translation>
+        <translation>Planlegg prioriteter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="263"/>
         <source>Final</source>
-        <translation type="unfinished"></translation>
+        <translation>Endelig</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="264"/>
         <source>Type Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Type prioritet:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="265"/>
         <source>Final Priority:</source>
-        <translation type="unfinished"></translation>
+        <translation>Endelig prioritet:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="266"/>
         <source>(1) Title (2) Priority (4) Type</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Tittel (2) Prioritet (4) Type</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="267"/>
         <source>Custom Priority Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Regler for egendefinerte prioriteter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="268"/>
         <source>Existing Rules:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjeldende regler:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="269"/>
         <source>Rule Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regelnavn:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="270"/>
         <source>Priority Change:</source>
-        <translation type="unfinished"></translation>
+        <translation>Prioritetsendring:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="271"/>
         <source>Select a clause from the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg en klausul fra listen.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="272"/>
         <source>Add Clause</source>
-        <translation type="unfinished"></translation>
+        <translation>Legg til klausul</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="273"/>
         <source>Delete</source>
-        <translation type="unfinished">Slett</translation>
+        <translation>Slett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="274"/>
         <source>Test</source>
-        <translation type="unfinished">Test</translation>
+        <translation>Test</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="275"/>
         <source>Install</source>
-        <translation type="unfinished"></translation>
+        <translation>Installer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="276"/>
         <source>Phrase</source>
-        <translation type="unfinished">Frase</translation>
+        <translation>Frase</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="277"/>
         <source>Select Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg tidspunkt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="278"/>
         <source>Select Search</source>
-        <translation type="unfinished">Velg Søk</translation>
+        <translation>Velg Søk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="279"/>
         <source>Edit Power Search Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger felt for avansert søk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="280"/>
         <source>Optional title phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Valgfri tittelfrase:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="281"/>
         <source>Optional subtitle phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Valgfri undertittelfrase:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="282"/>
         <source>Optional description phrase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Valgfri beskrivelsesfrase:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="283"/>
         <source>List Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Oversikt over lister</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="284"/>
         <source>Current View:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjeldende visning:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="285"/>
         <source>Position:</source>
-        <translation type="unfinished"></translation>
+        <translation>Posisjon:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="287"/>
         <source>Schedule Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Planleggingsredigerer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="288"/>
         <source>Rule Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Regeloversikt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="289"/>
         <source>Select the recording rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg opptaksregel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="290"/>
         <source>Schedule Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for opptaksplan</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="291"/>
         <source>Storage Options</source>
-        <translation type="unfinished">Lagringsinnstillinger</translation>
+        <translation>Lagringsinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="292"/>
         <source>Post Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Etterprosessering</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="293"/>
         <source>Schedule Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Info om tidsplan</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="294"/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Forhåndsvisning</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="295"/>
         <source>Reduce priority by %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Reduser prioritet med %n</numerusform>
+            <numerusform>Reduser prioritet med %n</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="296"/>
         <source>Normal recording priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal opptaksprioritet</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="297"/>
         <source>Raise priority by %n</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Øk prioritet med %n</numerusform>
+            <numerusform>Øk prioritet med %n</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="298"/>
         <source>Start recording %n minute(s) late</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Start opptak %n minutt senere</numerusform>
+            <numerusform>Start opptak %n minutter senere</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="299"/>
         <source>Start recording on time</source>
-        <translation type="unfinished">Start opptaket ifølge sendeskjema</translation>
+        <translation>Start opptaket ifølge sendeskjema</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="300"/>
         <source>Start recording %n minute(s) early</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Start opptak %n minutt tidligere</numerusform>
+            <numerusform>Start opptak %n minutter tidligere</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="301"/>
         <source>End recording %n minute(s) early</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Stopp opptak %n minutt tidligere</numerusform>
+            <numerusform>Stopp opptak %n minutter tidligere</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="302"/>
         <source>End recording on time</source>
-        <translation type="unfinished">Stopp opptaket ifølge sendeskjema</translation>
+        <translation>Stopp opptaket ifølge sendeskjema</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="303"/>
         <source>End recording %n minute(s) late</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Stopp opptak %n minutt tidligere</numerusform>
+            <numerusform>Stopp opptak %n minutter tidligere</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="304"/>
         <source>Recording Rule Active</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksregel er aktiv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="305"/>
         <source>Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilbake</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="306"/>
         <source>No episode limit</source>
-        <translation type="unfinished">Ingen episodebegrensning</translation>
+        <translation>Ingen episodebegrensning</translation>
     </message>
     <message numerus="yes">
         <location filename="../themes/themestrings.h" line="307"/>
         <source>Keep at most %n episode(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Behold maksimalt %n episode</numerusform>
+            <numerusform>Behold maksimalt %n episoder</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="308"/>
         <source>Allow recordings to expire?</source>
-        <translation type="unfinished"></translation>
+        <translation>La opptak utløpe?</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="309"/>
         <source>Post-Processing Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for etterprosessering</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="310"/>
         <source>Commercial Flag new recordings</source>
-        <translation type="unfinished">Merk reklame i nye opptak</translation>
+        <translation>Merk reklame i nye opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="311"/>
         <source>Transcode new recordings</source>
-        <translation type="unfinished">Konverter nye opptak</translation>
+        <translation>Konverter nye opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="312"/>
         <source>123</source>
-        <translation type="unfinished"></translation>
+        <translation>123</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="313"/>
         <source>Search For:</source>
-        <translation type="unfinished"></translation>
+        <translation>Søk etter:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="314"/>
         <source>%SUBTITLE|&quot;|&quot; %%REPEAT%%STARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%SUBTITLE|&quot;|&quot; %%REPEAT%%STARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="315"/>
         <source>Search Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Søkeresultater</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="316"/>
         <source>Cast Members</source>
-        <translation type="unfinished"></translation>
+        <translation>Skuespillerliste</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="317"/>
         <source>Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Fullt plott</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="318"/>
         <source>Video List Filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtre for videoliste</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="319"/>
         <source>Text Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekstfilter:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="320"/>
         <source>Category</source>
-        <translation type="unfinished">Kategori</translation>
+        <translation>Kategori</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="321"/>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Sjanger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="322"/>
         <source>Country</source>
-        <translation type="unfinished">Land</translation>
+        <translation>Land</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="323"/>
         <source>Actor/Actress</source>
-        <translation type="unfinished"></translation>
+        <translation>Skuespiller/-inne</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="324"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>År</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="325"/>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjøretid</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="326"/>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Brukerrating</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="327"/>
         <source>Browse</source>
-        <translation type="unfinished"></translation>
+        <translation>Bla</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="328"/>
         <source>InetRef</source>
-        <translation type="unfinished"></translation>
+        <translation>InetRef</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="329"/>
         <source>Cover File</source>
-        <translation type="unfinished"></translation>
+        <translation>Coverfil</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="330"/>
         <source>Sort by</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorter etter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="331"/>
         <source>Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="332"/>
         <source>Make default</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett som standard</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="333"/>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Videobehandler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="334"/>
         <source>Director:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regissør:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="335"/>
         <source>Parental:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aldersgrense:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="336"/>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>Lavest</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="337"/>
         <source>Low</source>
-        <translation type="unfinished">Lav</translation>
+        <translation>Lav</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="338"/>
         <source>Medium</source>
-        <translation type="unfinished">Middels</translation>
+        <translation>Middels</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="339"/>
         <source>High</source>
-        <translation type="unfinished">Høy</translation>
+        <translation>Høy</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="340"/>
         <source>Rated:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rating:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="341"/>
         <source>Browsable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis under blaing:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="342"/>
         <source>Runtime:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjøretid:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="343"/>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filnavn:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="344"/>
         <source>Cover File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Coverfil:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="345"/>
         <source>IMDB ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>IMDB ID:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="346"/>
         <source>Video Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoutforsker</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="347"/>
         <source>Videos - Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoer - Galleri</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="348"/>
         <source>Videos - Tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoer - Tre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="349"/>
         <source>Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nivå for aldersgrense</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="350"/>
         <source>Video File Associations</source>
-        <translation type="unfinished"></translation>
+        <translation>Filassosieringer for videoer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="351"/>
         <source>Extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ending:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="352"/>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="353"/>
         <source>Use default player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruk standardavspiller:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="354"/>
         <source>Ignore:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorer:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="355"/>
         <source>Edit Video Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger metadata for video</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="356"/>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tittel:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="357"/>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertittel:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="358"/>
         <source>Season:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sesong:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="359"/>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Episode:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="360"/>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="361"/>
         <source>Parental Control:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontroll av aldersgrenser:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="362"/>
         <source>File to Always Play Next:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fil som alltid skal spilles etter:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="363"/>
         <source>Include while Browsing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkluder i bla-modus:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="364"/>
         <source>Item has been Watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppføring har blitt sett:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="365"/>
         <source>Cover Art:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cover bilder:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="366"/>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilde:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="367"/>
         <source>Banner:</source>
-        <translation type="unfinished"></translation>
+        <translation>Banner:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="368"/>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fanbilde:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="369"/>
         <source>Trailer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Trailer:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="370"/>
         <source>Unique Player Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Unik avspillingskommando:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="371"/>
         <source>Directed by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regissert av:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="372"/>
         <source>Play</source>
-        <translation type="unfinished">Spill av</translation>
+        <translation>Spill av</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="373"/>
         <source>Change mythtv key bindings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Endre tastetilordninger for MythTV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="374"/>
         <source>MythStream Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythStream innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="375"/>
         <source>Weather Station Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for værstasjon</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="376"/>
         <source>TV</source>
-        <translation type="unfinished"></translation>
+        <translation>TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="377"/>
         <source>Play Online Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill mediestrømmer fra internett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="378"/>
         <source>Weather Station</source>
-        <translation type="unfinished"></translation>
+        <translation>Værstasjon</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="379"/>
         <source>A long menu which breaks down the options by their category. TV, Music, Video etc</source>
-        <translation type="unfinished"></translation>
+        <translation>En lang meny som brekker ned innstillingene basert på kategori. TV, musikk, video osv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="380"/>
         <source>Search Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Søk i programoversikt</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="381"/>
         <source>Recording Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksregler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="382"/>
         <source>Edit or delete any recording rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger eller slett opptaksregler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="383"/>
         <source>Play TV Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på TV opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="384"/>
         <source>Appearance Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Veiviser for utseende</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="385"/>
         <source>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU for options and ESC to quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt den valgte pilen til hjørnet av TV skjermen. Trykk på VELG for å redigere den andre pilen.  Trykk på MENY for innstillinger og ESC for å avslutte.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="386"/>
         <source>1280 x 720</source>
-        <translation type="unfinished"></translation>
+        <translation>1280 x 720</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="387"/>
         <source>0 x 0</source>
-        <translation type="unfinished"></translation>
+        <translation>0 x 0</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="388"/>
         <source>1 pixel</source>
-        <translation type="unfinished"></translation>
+        <translation>1 piksel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="389"/>
         <source>Up Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Opp nivå</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="390"/>
         <source>Home</source>
-        <translation type="unfinished">Hjem</translation>
+        <translation>Hjem</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="391"/>
         <source>Please Wait....</source>
-        <translation type="unfinished"></translation>
+        <translation>Vennligst vent....</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="392"/>
         <source>Sort Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteringsmodus:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="393"/>
         <source>Video Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Videokilde:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="394"/>
         <source>Contexts</source>
-        <translation type="unfinished">Kontekster</translation>
+        <translation>Kontekster</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="395"/>
         <source>Actions</source>
-        <translation type="unfinished">Handlinger</translation>
+        <translation>Handlinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="396"/>
         <source>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;% %STARS% %DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="397"/>
         <source>Change View</source>
-        <translation type="unfinished">Endre visning</translation>
+        <translation>Endre visning</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="398"/>
         <source>Show Watched Programs</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis opptak som er sett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="399"/>
         <source>Old Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gammelt passord:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="400"/>
         <source>Status Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Statusikoner</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="401"/>
         <source>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="402"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %YEARSTARS%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;%
+%YEARSTARS%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="403"/>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded
  To schedule a recording, exit this screen and select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Du har ikke planlagt noen opptak
+ For å planlegge et opptak, gå ut av dette skjermbildet og velg &apos;Programoversikt&apos; eller &apos;Programfinner&apos;</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="404"/>
         <source>Manage Recording Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandle opptaksregler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="405"/>
         <source>Channel</source>
-        <translation type="unfinished">Kanal</translation>
+        <translation>Kanal</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="406"/>
         <source>Last Recorded</source>
-        <translation type="unfinished">Sist tatt opp</translation>
+        <translation>Sist tatt opp</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="407"/>
         <source>Recording Group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksgruppe:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="408"/>
         <source>Storage Group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagringsgruppe:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="409"/>
         <source>Recording Profile:</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksprofil:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="411"/>
         <source>Enter Search Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Skriv søketekst</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="412"/>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Lukk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="413"/>
         <source>%|&quot;SUBTITLE|&quot;%
 %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;%
+%LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="414"/>
         <source>Custom Record Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Regler for egendefinerte opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="415"/>
         <source>Additional Tables:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilleggstabeller:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="416"/>
         <source>Record</source>
-        <translation type="unfinished">Ta opp</translation>
+        <translation>Ta opp</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="417"/>
         <source>Store</source>
-        <translation type="unfinished">Lagre</translation>
+        <translation>Lagre</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="418"/>
         <source>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%|&quot;SUBTITLE|&quot;% %LONGREPEAT%%STARS| %%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="419"/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detaljer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="421"/>
         <source>Run User Job #1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjør brukerjobb #1</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="422"/>
         <source>Run User job #2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjør brukerjobb #2</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="423"/>
         <source>Run User Job #3</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjør brukerjobb #3</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="424"/>
         <source>Run User Job #4</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjør brukerjobb #4</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="425"/>
         <source>Make or accept a VoIP call</source>
-        <translation type="unfinished"></translation>
+        <translation>Foreta eller ta imot en VoIP telefonsamtale</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="426"/>
         <source>Keep up with the news</source>
-        <translation type="unfinished"></translation>
+        <translation>Følg med på nyhetene</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="427"/>
         <source>See when local movies are playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Se når filmer går på lokale kinoer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="428"/>
         <source>Local weather forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokal værmelding</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="429"/>
         <source>Manage your NetFlix queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandle NetFlix køen din</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="430"/>
         <source>Browse the web</source>
-        <translation type="unfinished"></translation>
+        <translation>Surf på internett</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="431"/>
         <source>Start cooking!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett igang matlagingen!</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="432"/>
         <source>Home surveillance</source>
-        <translation type="unfinished"></translation>
+        <translation>Overvåkning av hjemmet</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="433"/>
         <source>Hardware profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Maskinvareprofil</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="434"/>
         <source>Tell us what hardware you have so we can support it</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortell os hvilken maskinvare du har slik at vi kan støtte denne</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="435"/>
         <source>Play recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="436"/>
         <source>Watch Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Se videoer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="437"/>
         <source>Play videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis videoer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="438"/>
         <source>Listen to Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Hør på musikk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="439"/>
         <source>Listen to the radio</source>
-        <translation type="unfinished"></translation>
+        <translation>Hør på radio</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="440"/>
         <source>Image Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Billedgalleri</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="441"/>
         <source>Look at Pictures</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på bilder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="442"/>
         <source>Play video games</source>
-        <translation type="unfinished"></translation>
+        <translation>Videospill</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="443"/>
         <source>Media Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Medieinnstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="444"/>
         <source>Settings for all non-TV media</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for alt media unntatt TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="445"/>
         <source>Info Center Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for informasjonssenteret</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="446"/>
         <source>Configure weather, news, movie info, web, and recipes</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer været, nyheter, filminformasjon, internett og matoppskrifter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="447"/>
         <source>Play any of your media</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på opptak, videoer, bilder eller hør på musikk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="448"/>
         <source>Manage Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandle opptak</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="449"/>
         <source>Pick and prioritize shows to record</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg og prioriter programmer som skal tas opp</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="450"/>
         <source>Information Center</source>
-        <translation type="unfinished"></translation>
+        <translation>Informasjonssenter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="451"/>
         <source>Information and Communications</source>
-        <translation type="unfinished"></translation>
+        <translation>Informasjon og kommunikasjon</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="452"/>
         <source>Optical Disks</source>
-        <translation type="unfinished"></translation>
+        <translation>Optiske plater</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="453"/>
         <source>Play or import CDs and DVDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill eller importer CDer og DVDer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="454"/>
         <source>Configure MythTV and plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurer MythTV og MythTV-tillegg</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="455"/>
         <source>Set Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Sett prioriteter</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="456"/>
         <source>Play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="457"/>
         <source>Play the video on a movie DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="458"/>
         <source>Play VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på VCD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="459"/>
         <source>Play the video on a VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på VCD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="460"/>
         <source>Import DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="461"/>
         <source>Import video from a movie DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer video fra en film-DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="462"/>
         <source>Write video to a data DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Skriv en video til en DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="463"/>
         <source>Import CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer CD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="464"/>
         <source>Import music from an audio CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer musikk fra en audio-CD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="465"/>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Løs ut media</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="466"/>
         <source>Eject CD or DVD from drive</source>
-        <translation type="unfinished"></translation>
+        <translation>Løs ut CD eller DVD fra stasjonen</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="467"/>
         <source>Music Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Musikkverktøy</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="468"/>
         <source>Select, import, or play music</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg, importer eller spill musikk fra musikkbiblioteket</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="469"/>
         <source>Scan for new videos, edit metadata, or delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Søk etter nye videoer, rediger metadata eller slett videoer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="470"/>
         <source>%SUBTITLE%%BR%%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%SUBTITLE%%BR%%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="471"/>
         <source>%DESCRIPTION%</source>
-        <translation type="unfinished"></translation>
+        <translation>%DESCRIPTION%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="472"/>
         <source>%STARTDATE%</source>
-        <translation type="unfinished"></translation>
+        <translation>%STARTDATE%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="473"/>
         <source>Callsign</source>
-        <translation type="unfinished">Forkorting</translation>
+        <translation>Forkorting</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="474"/>
         <source>Channel #</source>
-        <translation type="unfinished">Kanalnr</translation>
+        <translation>Kanalnr</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="475"/>
         <source>Channel Name</source>
-        <translation type="unfinished">Kanalnavn</translation>
+        <translation>Kanalnavn</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="476"/>
         <source>XMLTV ID</source>
-        <translation type="unfinished"></translation>
+        <translation>XMLTV ID</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="477"/>
         <source>[P]robe</source>
-        <translation type="unfinished">[U]ndersøk</translation>
+        <translation>[U]ndersøk</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="478"/>
         <source>[O]k</source>
-        <translation type="unfinished">[O]k</translation>
+        <translation>[O]k</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="479"/>
         <source>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</source>
-        <translation type="unfinished"></translation>
+        <translation>%DESCRIPTION%%BR%(%STARTTIME% - %LENMINS%)</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="480"/>
         <source>%CALLSIGN% - %CHANNUM%</source>
-        <translation type="unfinished"></translation>
+        <translation>%CALLSIGN% - %CHANNUM%</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="481"/>
         <source>A simple transparent black and white theme.</source>
-        <translation type="unfinished"></translation>
+        <translation>Et enkelt gjennomsiktig tema i svart-hvitt.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="482"/>
         <source>Play or import audio or video CDs or DVDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill eller importer CDer og DVDer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="483"/>
         <source>Watch A DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Se en DVD</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="484"/>
         <source>Watch Live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på Direkte TV</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="485"/>
         <source>Watch Online Streams</source>
-        <translation type="unfinished"></translation>
+        <translation>Se på mediestrømmer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="486"/>
         <source>Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillegg</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="487"/>
         <source>Other Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation>Andre tillegg</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="488"/>
         <source>Advanced Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Avanserte innstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="489"/>
@@ -19590,7 +19594,7 @@ Velg et (pågående) opptak i stedet</translation>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="182"/>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="192"/>
