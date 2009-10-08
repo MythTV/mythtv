@@ -1605,6 +1605,9 @@ static HostComboBox *OSDFont()
     gc->setLabel(QObject::tr("OSD font"));
     QDir ttf(GetFontsDir(), GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
+    QString defaultOSDFont = "FreeSans.ttf";
+    if (gc->findSelection(defaultOSDFont) > -1)
+        gc->setValue(defaultOSDFont);
 
     return gc;
 }
