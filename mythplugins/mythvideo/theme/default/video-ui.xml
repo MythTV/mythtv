@@ -184,6 +184,7 @@
             <area>0,110,800,70</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
         <textarea name="title" from="basetextarea">
@@ -564,6 +565,7 @@
             <area>250,130,540,70</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
         <statetype name="parentallevel">
@@ -695,6 +697,7 @@
             <area>250,130,540,70</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
         <!-- <textarea name="breadcrumbs" from="basetextarea">
