@@ -297,27 +297,42 @@ void RecorderBase::SavePositionMap(bool force)
     bool needToSave = force;
     positionMapLock.lock();
 
-    // save on every 5th key frame if in the first few frames of a recording
-    needToSave |= (positionMap.size() < 30) && (positionMap.size() % 5 == 1);
-    // save every 30th key frame later on
-    needToSave |= positionMapDelta.size() >= 30;
+    uint delta_size = positionMapDelta.size();
+    uint pm_elapsed = positionMapTimer.elapsed();
+    // save on every 1.5 seconds if in the first few frames of a recording
+    needToSave |= (positionMap.size() < 30) &&
+        (delta_size >= 1) && (pm_elapsed >= 1500);
+    // save every 10 seconds later on
+    needToSave |= (delta_size >= 1) && (pm_elapsed >= 10000);
 
     if (curRecording && needToSave)
     {
-        // copy the delta map because most times we are called it will be in
-        // another thread and we don't want to lock the main recorder thread
-        // which is populating the delta map
-        QMap<long long, long long> deltaCopy(positionMapDelta);
-        positionMapDelta.clear();
-        positionMapLock.unlock();
+        positionMapTimer.start();
+        if (delta_size)
+        {
+            // copy the delta map because most times we are called it will be in
+            // another thread and we don't want to lock the main recorder thread
+            // which is populating the delta map
+            QMap<long long, long long> deltaCopy(positionMapDelta);
+            positionMapDelta.clear();
+            positionMapLock.unlock();
 
-        curRecording->SetPositionMapDelta(deltaCopy, positionMapType);
+            curRecording->SetPositionMapDelta(deltaCopy, positionMapType);
+        }
+        else
+        {
+            positionMapLock.unlock();
+        }
 
         if (ringBuffer)
+        {
             curRecording->SetFilesize(ringBuffer->GetWritePosition());
+        }
     }
     else
+    {
         positionMapLock.unlock();
+    }
 }
 
 void RecorderBase::AspectChange(uint aspect, long long frame)
