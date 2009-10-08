@@ -123,8 +123,7 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
 
 MythGenericTree::~MythGenericTree()
 {
-    while (!m_subnodes->isEmpty())
-        delete m_subnodes->takeFirst();
+    deleteAllChildren();
     delete m_subnodes;
     delete m_ordered_subnodes;
     delete m_flatenedSubnodes;
@@ -161,7 +160,7 @@ void MythGenericTree::removeNode(MythGenericTree *child)
     m_flatenedSubnodes->removeAll(child);
     m_subnodes->removeAll(child);
 
-    if (child->IsVisible())
+    if (child && child->IsVisible())
         DecVisibleCount();
 }
 
@@ -172,6 +171,7 @@ void MythGenericTree::deleteNode(MythGenericTree *child)
 
     removeNode(child);
     delete child;
+    child = NULL;
 }
 
 int MythGenericTree::calculateDepth(int start)
@@ -659,8 +659,13 @@ void MythGenericTree::deleteAllChildren()
     m_ordered_subnodes->clear();
     m_selected_subnode = NULL;
     m_currentOrderingIndex = -1;
+    MythGenericTree *child;
     while (!m_subnodes->isEmpty())
-        delete m_subnodes->takeFirst();
+    {
+        child = m_subnodes->takeFirst();
+        delete child;
+        child = NULL;
+    }
     m_subnodes->clear();
 }
 
