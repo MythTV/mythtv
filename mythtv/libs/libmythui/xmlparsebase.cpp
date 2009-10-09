@@ -548,6 +548,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
 bool XMLParseBase::LoadBaseTheme(void)
 {
+    bool ok = false;
     QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
     QList<QString>::iterator i;
     for (i = searchpath.begin(); i != searchpath.end(); ++i)
@@ -556,13 +557,13 @@ bool XMLParseBase::LoadBaseTheme(void)
         if (doLoad(QString(), GetGlobalObjectStore(), themefile, false))
         {
             VERBOSE(VB_GENERAL, "Loaded base theme from " + themefile);
-            return true;
+            ok = true;
         }
         else
             VERBOSE(VB_FILE+VB_EXTRA, "No theme file " + themefile);
     }
-
-    return false;
+    
+    return ok;
 }
 
 bool XMLParseBase::CopyWindowFromBase(const QString &windowname,
