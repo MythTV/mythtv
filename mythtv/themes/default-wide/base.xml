@@ -767,7 +767,6 @@
 
         <buttonlist name="itemlist" from="basebuttonlist">
             <area>12,150,470,270</area>
-            <align>left,vcenter</align>
             <showarrow>no</showarrow>
             <statetype name="buttonitem">
                 <state name="active">
