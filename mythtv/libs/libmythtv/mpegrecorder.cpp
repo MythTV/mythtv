@@ -1307,6 +1307,9 @@ bool MpegRecorder::ProcessTSPacket(const TSPacket &tspacket_real)
 
 bool MpegRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
 {
+    if (!ringBuffer)
+        return true;
+
     _buffer_packets = !FindH264Keyframes(&tspacket);
     if (!_seen_sps)
         return true;
@@ -1316,6 +1319,9 @@ bool MpegRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
 
 bool MpegRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
 {
+    if (!ringBuffer)
+        return true;
+
     _buffer_packets = !FindAudioKeyframes(&tspacket);
     return ProcessAVTSPacket(tspacket);
 }
