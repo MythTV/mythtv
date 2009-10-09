@@ -10,14 +10,16 @@ class ExitPrompter : public QObject
     Q_OBJECT
 
   public:
-    ExitPrompter();
-    ~ExitPrompter();
+    ExitPrompter(void);
+    ~ExitPrompter(void);
 
+    void customEvent(QEvent *event);
+    
   public slots:
-    void masterPromptExit();
-    void handleExit();
-    void quit();
-
+    void masterPromptExit(void);
+    void handleExit(void);
+    void quit(void);
+    
   private:
     ExitPrompter(const ExitPrompter &);
 
