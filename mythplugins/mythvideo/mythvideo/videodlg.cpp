@@ -1183,6 +1183,74 @@ namespace
         while (item && playing_time.elapsed() > WATCHED_WATERMARK);
     }
 
+    class FanartLoader: public QObject
+    {
+        Q_OBJECT
+
+      public:
+        FanartLoader() : itemsPast(0)
+        {
+            connect(&m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
+        }
+        
+       ~FanartLoader()
+        {
+            m_fanartTimer.disconnect(this);
+        }
+
+        void LoadImage(const QString &filename, MythUIImage *image)
+        {
+            bool wasActive = m_fanartTimer.isActive();
+            if (filename.isEmpty())
+            {
+                if (wasActive)
+                    m_fanartTimer.stop();
+
+                image->Reset();
+                itemsPast++;
+            }
+            else
+            {
+                QMutexLocker locker(&m_fanartLock);
+                m_fanart = image;
+                if (filename != m_fanart->GetFilename())
+                {
+                    if (wasActive)
+                        m_fanartTimer.stop();
+
+                    if (itemsPast > 2)
+                        m_fanart->Reset();
+
+                    m_fanart->SetFilename(filename);
+                    m_fanartTimer.setSingleShot(true);
+                    m_fanartTimer.start(300);
+
+                    if (wasActive)
+                        itemsPast++;
+                    else
+                        itemsPast = 0;
+                }
+                else
+                    itemsPast = 0;
+            }
+        }
+
+      protected slots:
+        void fanartLoad(void)
+        {
+            QMutexLocker locker(&m_fanartLock);
+            m_fanart->Load();
+        }
+
+      private:
+        int             itemsPast;
+        QMutex          m_fanartLock;
+        MythUIImage    *m_fanart;
+        QTimer          m_fanartTimer;
+    };
+
+    FanartLoader fanartLoader;
+
     struct CopyMetadataDestination
     {
         virtual void handleText(const QString &name, const QString &value) = 0;
@@ -1212,13 +1280,20 @@ namespace
             UIUtilW::Assign(m_screen, image, name);
             if (image)
             {
-                if (filename.size())
+                if (name != "fanart")
                 {
-                    image->SetFilename(filename);
-                    image->Load();
+                    if (filename.size())
+                    {
+                        image->SetFilename(filename);
+                        image->Load();
+                    }
+                    else
+                        image->Reset();
                 }
                 else
-                    image->Reset();
+                {
+                    fanartLoader.LoadImage(filename, image);
+                }
             }
         }
 
