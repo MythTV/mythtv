@@ -602,15 +602,16 @@ void MythControls::DeleteKey(void)
     MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-    m_menuPopup =
-            new MythDialogBox(label, popupStack, "mandatorydelete");
+    MythConfirmationDialog *confirmPopup =
+            new MythConfirmationDialog(popupStack, label, false);
 
-    if (m_menuPopup->Create())
-        popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "mandatorydelete");
-
-    m_menuPopup->AddButton(tr("Ok"));
+    if (confirmPopup->Create())
+    {
+        confirmPopup->SetReturnEvent(this, "mandatorydelete");
+        popupStack->AddScreen(confirmPopup);
+    }
+    else
+        delete confirmPopup;
 }
 
 /**
@@ -794,7 +795,8 @@ void MythControls::customEvent(QEvent *event)
             }
         }
 
-        m_menuPopup = NULL;
+        if (m_menuPopup)
+            m_menuPopup = NULL;
     }
 
 }
