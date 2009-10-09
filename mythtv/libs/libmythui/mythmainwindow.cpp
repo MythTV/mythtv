@@ -167,7 +167,7 @@ class MythMainWindowPrivate
     QWidget *oldpaintwin;
     MythPainter *oldpainter;
 
-    bool m_drawEnabled;
+    volatile bool m_drawEnabled;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -946,6 +946,11 @@ void MythMainWindow::SetDrawEnabled(bool enable)
 {
     setUpdatesEnabled(enable);
     d->m_drawEnabled = enable;
+
+    // TODO FIXME
+    // Sleep 50 ms to give any in progress draw a chance to finish.
+    // This should be replaced with something sane after MythTV 0.22
+    usleep(50 * 1000);
 }
 
 /* FIXME: end compatibility */
