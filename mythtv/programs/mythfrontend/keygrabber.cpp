@@ -48,8 +48,6 @@ bool KeyGrabPopupBox::Create(void)
                                        .arg(tr("Waiting for key press"));
 
     m_messageText->SetText(label);
-    m_okButton->SetText(tr("Ok"));
-    m_cancelButton->SetText(tr("Cancel"));
 
     connect(m_okButton, SIGNAL(Clicked()), SLOT(SendResult()));
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
