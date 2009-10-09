@@ -16,6 +16,13 @@ class QWidget;
 class Settings;
 class QPixmap;
 
+typedef enum ImageCacheMode
+{
+    kCacheNormal          = 0x0,
+    kCacheIgnoreDisk,
+    kCacheCheckMemoryOnly
+} ImageCacheMode;
+
 struct MPUBLIC MythUIMenuCallbacks
 {
     void (*exec_program)(const QString &cmd);
@@ -66,7 +73,7 @@ class MPUBLIC MythUIHelper
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
     MythImage *LoadCacheImage(QString srcfile, QString label,
-                              bool allowLoadFromDisk = true);
+                              ImageCacheMode cacheMode = kCacheNormal);
 
     void ThemeWidget(QWidget *widget);
 

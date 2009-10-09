@@ -560,6 +560,7 @@ bool MythUIImage::Load(bool allowLoadInBackground)
     }
 
     QString imagelabel;
+    ImageCacheMode cacheMode = kCacheCheckMemoryOnly;
 
     for (int i = m_LowNum; i <= m_HighNum; i++)
     {
@@ -570,8 +571,13 @@ bool MythUIImage::Load(bool allowLoadInBackground)
 
         // Only load in the background if allowed and the image is
         // not already in our mem cache
+        if (m_gradient)
+            cacheMode = kCacheIgnoreDisk;
+        else
+            cacheMode = kCacheCheckMemoryOnly;
+
         if ((allowLoadInBackground) &&
-            (!GetMythUI()->LoadCacheImage(filename, imagelabel, false)) &&
+            (!GetMythUI()->LoadCacheImage(filename, imagelabel, cacheMode)) &&
             (!getenv("DISABLETHREADEDMYTHUIIMAGE")))
         {
             VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("Load(), spawning "
@@ -639,24 +645,6 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
             .arg((long long)this).arg(filename).arg(objectName()));
 
     MythImage *image = NULL;
-    bool bNeedLoad = false;
-
-    if (m_gradient)
-    {
-        QSize gradsize;
-        if (!m_Area.isEmpty())
-            gradsize = m_Area.size();
-        else
-            gradsize = QSize(10, 10);
-
-        image = MythImage::Gradient(gradsize, m_gradientStart,
-                                    m_gradientEnd, m_gradientAlpha,
-                                    m_gradientDirection);
-        image->UpRef();
-    }
-    else
-        bNeedLoad = true;
-
 
     bool bForceResize = false;
     bool bFoundInCache = false;
@@ -677,26 +665,42 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
         bForceResize = true;
     }
 
-    if (bNeedLoad)
+    imagelabel = GenImageLabel(filename, w, h);
+
+    image = GetMythUI()->LoadCacheImage(filename, imagelabel);
+    if (image)
     {
-        imagelabel = GenImageLabel(filename, w, h);
+        image->UpRef();
+        VERBOSE(VB_FILE, QString("MythUIImage::LoadImage found in cache "
+                ":%1: RefCount = %2").arg(imagelabel).arg(image->RefCount()));
+        if (m_isReflected)
+            image->setIsReflected(true);
 
-        image = GetMythUI()->LoadCacheImage(filename, imagelabel);
-        if (image)
+        bFoundInCache = true;
+    }
+    else
+    {
+        if (m_gradient)
         {
-            image->UpRef();
-            VERBOSE(VB_FILE, QString("MythUIImage::LoadImage found in cache "
-                    ":%1: RefCount = %2").arg(imagelabel).arg(image->RefCount()));
-            if (m_isReflected)
-                image->setIsReflected(true);
+            VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Not Found in "
+                                     "cache. Creating Gradient :%1:")
+                                     .arg(filename));
+            QSize gradsize;
+            if (!m_Area.isEmpty())
+                gradsize = m_Area.size();
+            else
+                gradsize = QSize(10, 10);
 
-            bFoundInCache = true;
+            image = MythImage::Gradient(gradsize, m_gradientStart,
+                                        m_gradientEnd, m_gradientAlpha,
+                                        m_gradientDirection);
+            image->UpRef();
         }
         else
         {
             VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Not Found in "
-                                        "cache. Loading Directly :%1:")
-                                        .arg(filename));
+                                     "cache. Loading Directly :%1:")
+                                     .arg(filename));
             image = GetMythPainter()->GetFormatImage();
             image->UpRef();
             if (!image->Load(filename))
@@ -714,8 +718,6 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
             }
         }
     }
-    else
-        imagelabel = GenImageLabel(w,h);
 
     if (!bFoundInCache)
     {
@@ -750,9 +752,7 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
         if (m_isGreyscale)
             image->ToGreyscale();
 
-        // Save scaled copy to cache
-        if (bNeedLoad)
-            GetMythUI()->CacheImage(imagelabel, image);
+        GetMythUI()->CacheImage(imagelabel, image);
     }
 
     if (image->isNull())

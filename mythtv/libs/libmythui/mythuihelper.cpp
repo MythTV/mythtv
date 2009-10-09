@@ -573,7 +573,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
         im->SetIsInCache(true);
         VERBOSE(VB_FILE, QString("NOT IN RAM CACHE, Adding, and adding to size "
-                                 ":%1: :%2:").arg(url).arg(d->m_cacheSize));
+                                 ":%1: :%2:").arg(url).arg(im->numBytes()));
     }
 
     VERBOSE(VB_FILE, QString("MythUIHelper::CacheImage : Cache Count = :%1: "
@@ -1257,7 +1257,7 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 }
 
 MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
-                                        bool allowLoadFromDisk)
+                                        ImageCacheMode cacheMode)
 {
     //VERBOSE(VB_FILE+VB_EXTRA, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
 
@@ -1269,16 +1269,19 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
 
     MythImage *ret = NULL;
 
-    if (fi.exists())
+    if ((cacheMode == kCacheIgnoreDisk) || fi.exists())
     {
         // Now compare the time on the source versus our cached copy
-        FindThemeFile(srcfile);
+        if (cacheMode != kCacheIgnoreDisk)
+            FindThemeFile(srcfile);
+
         QFileInfo original(srcfile);
-        if (fi.lastModified() > original.lastModified())
+        if ((cacheMode == kCacheIgnoreDisk) ||
+            (fi.lastModified() > original.lastModified()))
         {
             // Check Memory Cache
             ret = GetImageFromCache(label);
-            if (!ret && allowLoadFromDisk)
+            if (!ret && (cacheMode == kCacheNormal))
             {
                 // Load file from disk cache to memory cache
                 ret = GetMythPainter()->GetFormatImage();
