@@ -13,6 +13,7 @@
       <text lang="SL">Ustvari DVD</text>
       <text lang="PL">Utwórz DVD</text>
       <text lang="FI">Luo DVD</text>
+      <text lang="NB">Lag DVD</text>
       <action>ARCHIVE_CREATE_DVD</action>
    </button>
 
@@ -29,6 +30,7 @@
       <text lang="SL">Ustvari izvorni arhiv</text>
       <text lang="PL">Utwórz archiwum</text>
       <text lang="FI">Luo Tiedosto</text>
+      <text lang="NB">Lag arkiv</text>
       <action>ARCHIVE_CREATE_ARCHIVE</action>
   </button>
 
@@ -45,6 +47,7 @@
        <text lang="SL">Kodiranje videa</text>
        <text lang="PL">Zakoduj plik wideo</text>
        <text lang="FI">Luo Video</text>
+       <text lang="NB">Kod videofiler</text>
        <action>ARCHIVE_ENCODE_VIDEO</action>
        <depends></depends>
    </button>
@@ -62,6 +65,7 @@
        <text lang="SL">Uvoz video datotek</text>
        <text lang="PL">Importuj pliki wideo</text>
        <text lang="FI">Tuo DVD</text>
+       <text lang="NB">Importer arkiv</text>
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 
@@ -71,6 +75,7 @@
        <text lang="FR">Utilitaires d&apos;archivage</text>
        <text lang="SL">Pripomočki za arhiviranje</text>
        <text lang="FI">Lisätoiminnot</text>
+       <text lang="NB">Arkiv-verktøy</text>
        <action>MENU archiveutils.xml</action>
    </button>
 

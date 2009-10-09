@@ -18,6 +18,7 @@
       <text lang="ET">Üldised sätted</text>
       <text lang="RU">Общие настройки</text>
       <text lang="PL">Ustawienia ogólne</text>
+      <text lang="NB">Generelle innstillinger</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -39,6 +40,7 @@
       <text lang="ET">Mängija sätted</text>
       <text lang="RU">Настройки проигрывателя</text>
       <text lang="PL">Ustaw odtwarzacz</text>
+      <text lang="NB"> Innstillinger for avpiller</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 
@@ -60,6 +62,7 @@
       <text lang="ET">Failitüübid</text>
       <text lang="RU">Типы файлов</text>
       <text lang="PL">Typy plików</text>
+      <text lang="NB">Filtyper</text>
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 
@@ -80,6 +83,7 @@
       <text lang="ET">Rippimise sätted</text>
       <text lang="RU">Настройки импорта</text>
       <text lang="PL">Ustaw zrzucanie DVD</text>
+      <text lang="NB">Innstillinger for import</text>
       <action>DVD_SETTINGS_RIP</action>
    </button>
 

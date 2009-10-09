@@ -18,6 +18,7 @@
       <text lang="ET">Muusika mängimine</text>
       <text lang="RU">Слушать музыку</text>
       <text lang="PL">Odtwarzaj muzykę</text>
+      <text lang="NB">Spill musikk</text>
       <action>MUSIC_PLAY</action>
    </button>
 
@@ -39,6 +40,7 @@
       <text lang="ET">Muusika valimine</text>
       <text lang="RU">Выбрать музыку</text>
       <text lang="PL">Lista odtwarzania</text>
+      <text lang="NB">Velg musikk</text>
       <action>MUSIC_CREATE_PLAYLIST</action>
    </button>
 
@@ -60,6 +62,7 @@
       <text lang="ET">CD importimine</text>
       <text lang="RU">Импортировать CD</text>
       <text lang="PL">Zrzucaj CD</text>
+      <text lang="NB">Importer CD</text>
       <action>MUSIC_RIP</action>
    </button>
 
@@ -72,6 +75,7 @@
        <text lang="PL">Importuj muzykę</text>
        <text lang="FI">Tuo Tiedostoja</text>
        <text lang="DE">Datei-Import</text>
+       <text lang="NB">Importer filer</text>
        <action>MUSIC_IMPORT</action>
    </button>
 
@@ -93,6 +97,7 @@
       <text lang="ET">Uue muusika skaneerimine</text>
       <text lang="RU">Искать новую музыку</text>
       <text lang="PL">Wyszukaj nową muzykę</text>
+      <text lang="NB">Søk etter musikk</text>
       <action>SETTINGS_SCAN</action>
    </button>
 
@@ -106,6 +111,7 @@
       <text lang="PL">Wysuń tackę</text>
       <text lang="FI">Poista Media</text>
       <text lang="DE">CD auswerfen</text>
+      <text lang="NB">Løs ut CD</text>
       <action>EJECT</action>
    </button>
 
@@ -134,6 +140,7 @@
      <text lang="PL">Konfiguracja Muzyki</text>
      <text lang="HE">הגדרות מוסיקה</text>
      <description>Configure playback and CD ripping</description>
+     <description lang="NB">Konfigurer avspilling og CD-ripping</description>
      <action>CONFIGPLUGIN mythmusic</action>
    </button>
 

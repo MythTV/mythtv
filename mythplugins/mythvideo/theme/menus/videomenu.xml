@@ -17,6 +17,7 @@
      <text lang="ET">Filmide brausimine</text>
      <text lang="RU">Браузер фильмов</text>
      <text lang="PL">Przeglądaj filmy</text>
+     <text lang="NB">Bla i videoer</text>
      <action>BROWSER</action>
    </button>
 
@@ -37,6 +38,7 @@
      <text lang="ET">Filmide nimekiri</text>
      <text lang="RU">Список фильмов</text>
      <text lang="PL">Lista filmów</text>
+     <text lang="NB">Videoliste</text>
      <action>LISTING</action>
    </button>
 
@@ -55,6 +57,7 @@
      <text lang="ET">Filmide galerii</text>
      <text lang="RU">Галерея фильмов</text>
      <text lang="PL">Galeria filmów</text>
+     <text lang="NB">Videogalleri</text>
      <action>GALLERY</action>
    </button>
 
@@ -75,6 +78,7 @@
      <text lang="ET">Filmihaldus</text>
      <text lang="RU">Менеджер фильмов</text>
      <text lang="PL">Zarządzaj filmami</text>
+     <text lang="NB">Videobehandler</text>
      <action>MANAGER</action>
    </button>
 
@@ -96,6 +100,7 @@
       <text lang="ET">DVD mängimine</text>
       <text lang="RU">Смотреть DVD</text>
       <text lang="PL">Odtwarzaj DVD</text>
+      <text lang="NB">Se på DVD</text>
       <action>DVD_PLAY</action>
    </button>
 
@@ -112,6 +117,7 @@
       <text lang="ET">VCD mängimine</text>
       <text lang="RU">Смотреть VCD</text>
       <text lang="PL">Odtwarzaj VCD</text>
+      <text lang="NB">Se på VCD</text>
       <action>VCD_PLAY</action>
    </button>
 
@@ -131,6 +137,7 @@
       <text lang="ET">DVD rippimine</text>
       <text lang="RU">Импортировать DVD</text>
       <text lang="PL">Zrzucaj DVD</text>
+      <text lang="NB">Importer DVD</text>
       <action>DVD_RIP</action>
    </button>
 
@@ -141,6 +148,7 @@
       <text lang="RU">Достать диск</text>
       <text lang="FR">Éjecter un média</text>
       <text lang="PL">Wysuń tackę</text>
+      <text lang="NB">Løs ut DVD</text>
       <action>EJECT</action>
    </button>
 
@@ -169,6 +177,7 @@
         <text lang="PL">Ustaw Filmy</text>
         <text lang="HE">הגדרות וידאו</text>
         <description>Configure playback and DVD ripping</description>
+        <description lang="NB">Konfigurer avspilling og DVD-ripping</description>
         <action>CONFIGPLUGIN mythvideo</action>
     </button>
 

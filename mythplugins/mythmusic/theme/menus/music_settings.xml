@@ -18,6 +18,7 @@
       <text lang="ET">Üldised sätted</text>
       <text lang="RU">Общие настройки</text>
       <text lang="PL">Ustawienia ogólne</text>
+      <text lang="NB">Generelle innstillinger</text>
       <action>MUSIC_SET_GENERAL</action>
    </button>
 
@@ -39,6 +40,7 @@
       <text lang="ET">Mängija sätted</text>
       <text lang="RU">Настройки проигрывателя</text>
       <text lang="PL">Ustaw odtwarzacz</text>
+      <text lang="NB">Innstillinger for avspiller</text>
       <action>MUSIC_SET_PLAYER</action>
    </button>
 
@@ -58,6 +60,7 @@
       <text lang="ET">Rippija sätted</text>
       <text lang="RU">Настройки импорта</text>
       <text lang="PL">Ustaw zrzucanie CD</text>
+      <text lang="NB">Innstiller for importering</text>
       <action>MUSIC_SET_RIPPER</action>
    </button>
 
