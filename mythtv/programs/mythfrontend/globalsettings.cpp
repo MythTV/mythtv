@@ -2930,6 +2930,8 @@ ThemeSelector::ThemeSelector(QString label):
 
     if (themetype & THEME_UI)
         setValue("Terra");
+    else if (themetype & THEME_OSD)
+        setValue("BlackCurves-OSD");
 }
 
 class StyleSetting: public HostComboBox {

@@ -655,21 +655,37 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
 
 QString OSD::FindTheme(QString name)
 {
-    QString testdir = GetConfDir() + "/osd/" + name;
-    
-    QDir dir(testdir);
-    if (dir.exists())
-        return testdir;
+    QString testdir;
+    QDir dir;
 
-    testdir = GetShareDir() + "themes/" + name;
+    if (!name.isEmpty())
+    {
+
+        testdir = GetConfDir() + "/osd/" + name;
+        dir.setPath(testdir);
+        if (dir.exists())
+            return testdir;
+
+        testdir = GetShareDir() + "themes/" + name;
+        dir.setPath(testdir);
+        if (dir.exists())
+            return testdir;
+
+        testdir = "../libNuppelVideo/" + name;
+        dir.setPath(testdir);
+        if (dir.exists())
+            return testdir;
+    }
+
+    testdir = GetShareDir() + "themes/BlackCurves-OSD";
     dir.setPath(testdir);
     if (dir.exists())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find OSD theme: %1. "
+                "Switching to default.").arg(gContext->GetSetting("OSDTheme")));
+        gContext->SaveSetting("OSDTheme", "BlackCurves-OSD");
         return testdir;
-
-    testdir = "../libNuppelVideo/" + name;
-    dir.setPath(testdir);
-    if (dir.exists())
-        return testdir;
+    }
 
     return "";
 }
