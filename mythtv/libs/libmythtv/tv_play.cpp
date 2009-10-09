@@ -3626,7 +3626,6 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
         BrowseDispInfo(ctx, BROWSE_FAVORITE);
     else if (has_action("SELECT", actions))
     {
-        CommitQueuedInput(ctx);
         BrowseEnd(ctx, true);
     }
     else if (has_action("CLEAROSD",     actions) ||
