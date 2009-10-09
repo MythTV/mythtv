@@ -99,6 +99,7 @@ void MythUIShape::DrawRect(const QRect &area,
     painter.end();
 
     m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image->UpRef();
     m_image->Assign(image);
 }
 
@@ -140,6 +141,7 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
     painter.end();
 
     m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image->UpRef();
     m_image->Assign(image);
 }
 
@@ -207,6 +209,9 @@ void MythUIShape::CopyFrom(MythUIType *base)
     }
 
     m_image = shape->m_image;
+    if (m_image)
+        m_image->UpRef();
+
     m_type = shape->m_type;
     m_fillColor = shape->m_fillColor;
     m_lineColor = shape->m_lineColor;
