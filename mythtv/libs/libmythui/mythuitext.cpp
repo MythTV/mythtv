@@ -90,16 +90,17 @@ void MythUIText::SetText(const QString &text)
     if (newtext == m_Message)
         return;
 
-    if (m_scrolling)
-    {
-        QFontMetrics fm(GetFontProperties()->face());
-        QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
-        SetDrawRectSize(stringSize.width(), m_Area.height());
-    }
-
     m_Message = newtext;
     m_CutMessage.clear();
     FillCutMessage();
+    
+    if (m_scrolling)
+    {
+        QFontMetrics fm(GetFontProperties()->face());
+        QSize stringSize = fm.size(Qt::TextSingleLine, m_CutMessage);
+        SetDrawRectSize(stringSize.width(), m_Area.height());
+    }
+
     SetRedraw();
 }
 
