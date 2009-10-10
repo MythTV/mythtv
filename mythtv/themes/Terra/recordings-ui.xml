@@ -178,9 +178,6 @@
                     </statetype>
                 </state>
                 <state name="inactive" from="active">
-                    <imagetype name="preview">
-                        <grayscale>true</grayscale>
-                    </imagetype>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
