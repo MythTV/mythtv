@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.4.5" 
+__version__=u"v0.4.6" 
 # 0.1.0 Initial development 
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -147,6 +147,9 @@ __version__=u"v0.4.5"
 # 0.4.5 Fixed a deletion issue when a Miro video subtitle contained more than 128 characters.
 #       Disabled seek table creation as a number of the Miro video types (e.g. mov) do not work in MythTV with
 #       seek tables.
+# 0.4.6 Changed "original air date" and "air date" to be Miro's item release date. This is more appropriate then
+#		using download date as was done previously. Download date is still the fall back of there is no 
+#		release date.
 
 
 examples_txt=u'''
@@ -1433,6 +1436,9 @@ def createRecordedRecords(item):
 	ffmpeg_details = getVideoDetails(item[u'videoFilename'])
 	start_end = getStartEndTimes(ffmpeg_details[u'duration'], item[u'downloadedTime'])
 
+	if item[u'releasedate'] == None: 
+		item[u'releasedate'] = item[u'downloadedTime']
+
 	# Create the recorded dictionary
 	tmp_recorded[u'chanid'] = channel_id
 	tmp_recorded[u'starttime'] = start_end[0]
@@ -1451,8 +1457,8 @@ def createRecordedRecords(item):
 	tmp_recorded[u'hostname'] = localhostname
 	tmp_recorded[u'lastmodified'] = tmp_recorded[u'endtime']
 	tmp_recorded[u'filesize'] = item[u'size']
-	if item[u'downloadedTime'] != None:
-		tmp_recorded[u'originalairdate'] = item[u'downloadedTime'].strftime(u'%Y-%m-%d')
+	if item[u'releasedate'] != None:
+		tmp_recorded[u'originalairdate'] = item[u'releasedate'].strftime(u'%Y-%m-%d')
 
 	basename = setSymbolic(item[u'videoFilename'], u'default', u"%s_%s" % (channel_id, start_end[2]), allow_symlink=True)
 	if basename != None:
@@ -1477,9 +1483,9 @@ def createRecordedRecords(item):
 
 	tmp_recordedprogram[u'category'] = u"Miro"
 	tmp_recordedprogram[u'category_type'] = u"series"
-	if item[u'downloadedTime'] != None:
-		tmp_recordedprogram[u'airdate'] = item[u'downloadedTime'].strftime(u'%Y')
-		tmp_recordedprogram[u'originalairdate'] = item[u'downloadedTime'].strftime(u'%Y-%m-%d')
+	if item[u'releasedate'] != None:
+		tmp_recordedprogram[u'airdate'] = item[u'releasedate'].strftime(u'%Y')
+		tmp_recordedprogram[u'originalairdate'] = item[u'releasedate'].strftime(u'%Y-%m-%d')
 	tmp_recordedprogram[u'stereo'] = ffmpeg_details[u'stereo']
 	tmp_recordedprogram[u'hdtv'] = ffmpeg_details[u'hdtv']
 	tmp_recordedprogram[u'audioprop'] = ffmpeg_details[u'audio']
@@ -1544,8 +1550,11 @@ def createVideometadataRecord(item):
 	for key in details.keys():
 		videometadata[key] = details[key]
 
-	if item[u'downloadedTime'] != None:
-		videometadata[u'year'] = item[u'downloadedTime'].strftime(u'%Y')
+	if item[u'releasedate'] == None: 
+		item[u'releasedate'] = item[u'downloadedTime']
+
+	if item[u'releasedate'] != None:
+		videometadata[u'year'] = item[u'releasedate'].strftime(u'%Y')
 	if u'episode' in fieldnames:
 		videometadata[u'season'] = 0
 		videometadata[u'episode'] = 0
@@ -2735,7 +2744,6 @@ def main():
 					watched.append(video)
 			unwatched = unwatched_copy
 
-	
 	statistics[u'Total_unwatched'] = len(unwatched)
 	if not len(unwatched):
 		displayMessage(u"There are no Miro unwatched video items to add as MythTV Recorded videos.")
