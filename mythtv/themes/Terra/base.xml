@@ -679,7 +679,7 @@
         </imagetype>
         <imagetype name="animation">
             <position>30,62</position>
-            <filepattern low="0" high="29" cycle="reverse">popups/busy_%1.png</filepattern>
+            <filepattern low="0" high="29" cycle="reverse">popups/busy/busy_%1.png</filepattern>
             <delay>40</delay>
         </imagetype>
         <imagetype name="overlay">
