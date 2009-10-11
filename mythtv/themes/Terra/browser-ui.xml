@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mythuitheme>
+
+    <window name="bookmarkmanager">
+
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Bookmark Manager</value>
+        </textarea>
+
+        <buttonlist name="bookmarklist">
+            <area>39,97,600,588</area>
+            <layout>vertical</layout>
+            <spacing>0</spacing>
+            <buttonarea>25,0,600,588</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,595,84</area>
+                <state name="active">
+                    <area>0,0,595,84</area>
+                    <imagetype name="frame">
+                        <filename>recordings/generallistbackground.png</filename>
+                    </imagetype>
+                    <textarea name="name" from="basetextarea">
+                        <area>35,10,517,42</area>
+                        <font>baselarge</font>
+                        <align>vcenter</align>
+                    </textarea>
+                    <textarea name="url" from="basetextarea">
+                        <area>35,58,450,30</area>
+                        <font>basesmallbrown</font>
+                        <align>vcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="frame">
+                        <position>-19,0</position>
+                        <filename>recordings/generallistselectedframe.png</filename>
+                    </imagetype>
+                    <textarea name="name">
+                        <area>37,10,530,42</area>
+                    </textarea>
+                    <textarea name="url">
+                        <position>37,58</position>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active">
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>0,5</position>
+                <state type="full">
+                    <imagetype name="up">
+                        <filename>shared/list_up_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>0,564</position>
+                <state type="full">
+                    <imagetype name="down">
+                        <filename>shared/list_down_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="groupframe">
+            <position>0,57</position>
+            <filename>recordings/groupframe.png</filename>
+        </imagetype>
+
+        <buttonlist name="grouplist">
+            <area>0,60,1280,40</area>
+            <spacing>15</spacing>
+            <scrollstyle>center</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <layout>horizontal</layout>
+            <buttonarea>12,0,1260,40</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,240,40</area>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>4,3,232,36</area>
+                        <align>allcenter</align>
+                        <cutdown>yes</cutdown>
+                        <font>basemedium</font>
+                        <alpha>220</alpha>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <textarea name="buttontext">
+                        <area>4,1,232,36</area>
+                        <font>basemediumbrown</font>
+                        <alpha>255</alpha>
+                    </textarea>
+                </state>
+                <state name="inactive" from="selected" />
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1264,0</position>
+                <state type="full">
+                    <imagetype name="right">
+                        <filename>shared/horizlist_internal_right_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>0,0</position>
+                <state type="full">
+                    <imagetype name="left">
+                        <filename>shared/horizlist_internal_left_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="messagetext" from="basetextarea">
+            <font>basemedium</font>
+            <area>40,230,720,290</area>
+            <align>allcenter</align>
+            <multiline>yes</multiline>
+        </textarea>
+
+    </window>
+
+</mythuitheme>
