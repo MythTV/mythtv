@@ -310,6 +310,10 @@
                     <textarea name="director">
                         <position>100,85</position>
                     </textarea>
+                    <textarea name="year" from="director">
+                        <area>497,85,75,25</area>
+                        <align>right</align>
+                    </textarea>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
