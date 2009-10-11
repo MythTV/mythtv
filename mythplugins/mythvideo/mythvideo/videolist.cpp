@@ -707,6 +707,16 @@ class VideoListImp
         return video_tree_root.get();
     }
 
+    void InvalidateCache() {
+        // Set the type to none to avoid refreshList thinking it doesn't
+        // need to.
+        m_metadata_list_type = VideoListImp::ltNone;
+
+        metadata_list ml;
+        MetadataListManager::loadAllFromDatabase(ml);
+        m_metadata.setList(ml);
+    }
+
   private:
     void sort_view_data(bool flat_list);
     void fillMetadata(metadata_list_type whence);
@@ -803,6 +813,11 @@ bool VideoList::Delete(int video_id)
 MythGenericTree *VideoList::GetTreeRoot()
 {
     return m_imp->GetTreeRoot();
+}
+
+void VideoList::InvalidateCache()
+{
+    return m_imp->InvalidateCache();
 }
 
 //////////////////////////////

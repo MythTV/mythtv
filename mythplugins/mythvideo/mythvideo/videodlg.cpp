@@ -2023,6 +2023,17 @@ void VideoDialog::refreshData()
         m_novideoText->SetVisible(!m_d->m_treeLoaded);
 }
 
+void VideoDialog::reloadAllData(bool dbChanged)
+{
+    delete m_d->m_scanner;
+    m_d->m_scanner = 0;
+
+    if (dbChanged) {
+        m_d->m_videoList->InvalidateCache();
+    }
+    reloadData();
+}
+
 /** \fn VideoDialog::reloadData()
  *  \brief Reloads the tree after having invalidated the data.
  *  \return void.                   
@@ -4950,7 +4961,7 @@ void VideoDialog::doVideoScan()
 {
     if (!m_d->m_scanner)
         m_d->m_scanner = new VideoScanner();
-    connect(m_d->m_scanner, SIGNAL(finished()), SLOT(reloadData()));
+    connect(m_d->m_scanner, SIGNAL(finished(bool)), SLOT(reloadAllData(bool)));
     m_d->m_scanner->doScan(GetVideoDirs());
 }
 

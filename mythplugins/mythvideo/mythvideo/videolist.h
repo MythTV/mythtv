@@ -49,6 +49,8 @@ class VideoList
 
     MythGenericTree *GetTreeRoot();
 
+    void InvalidateCache();
+
   private:
     class VideoListImp *m_imp;
 };
