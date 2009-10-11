@@ -1970,6 +1970,8 @@ bool VideoDialog::Create()
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
 
+    CheckedSet(m_novideoText, tr("Video dialog loading, or no videos available..."));
+
     if (m_d->m_type == DLG_TREE)
     {
         SetFocusWidget(m_videoButtonTree);
@@ -1999,8 +2001,6 @@ bool VideoDialog::Create()
 
 void VideoDialog::Init()
 {
-
-    CheckedSet(m_novideoText, tr("No Videos Available"));
 
     m_d->m_parentalLevel.SetLevel(ParentalLevel(gContext->
                     GetNumSetting("VideoDefaultParentalLevel",
