@@ -1100,7 +1100,6 @@
 
         <textarea name="coverart_text" from="basetextarea">
             <area>500,358,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="screenshot_button">
@@ -1127,7 +1126,6 @@
 
         <textarea name="screenshot_text" from="basetextarea">
             <area>500,387,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="banner_button">
@@ -1154,7 +1152,6 @@
 
         <textarea name="banner_text" from="basetextarea">
             <area>500,416,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="fanart_button">
@@ -1181,7 +1178,6 @@
 
         <textarea name="fanart_text" from="basetextarea">
             <area>500,445,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="trailer_button">
@@ -1208,7 +1204,6 @@
 
         <textarea name="trailer_text" from="basetextarea">
             <area>500,477,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
 

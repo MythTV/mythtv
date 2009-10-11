@@ -10,10 +10,6 @@
             <value>Watch Recordings</value>
         </textarea>
 
-        <!--        <progressbar name="usedbar" from="baseprogressbar">
-            <position>100,10</position>
-        </progressbar>-->
-
         <imagetype name="groupframe">
             <position>0,55</position>
             <filename>recordings/groupframe.png</filename>
@@ -177,8 +173,7 @@
                         <position>13,124</position>
                     </statetype>
                 </state>
-                <state name="inactive" from="active">
-                </state>
+                <state name="inactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>0,289</position>
@@ -198,114 +193,62 @@
             </statetype>
         </buttonlist>
 
-<!--
-        <imagetype name="autoexpire">
-            <filename>autoexpire.png</filename>
-            <position>878,493</position>
-        </imagetype>
-
-        <imagetype name="commflagged">
-            <filename>commflagged.png</filename>
-            <position>912,493</position>
-        </imagetype>
-
-        <imagetype name="bookmark">
-            <filename>bookmark.png</filename>
-            <position>946,493</position>
-        </imagetype>
-
-        <imagetype name="cutlist">
-            <filename>cutlist.png</filename>
-            <position>980,493</position>
-        </imagetype>
-
-        <statetype name="audioprops">
-            <position>1014,493</position>
-            <showempty>yes</showempty>
-            <state name="stereo">
-                <imagetype name="stereo">
-                    <filename>stereo.png</filename>
-                </imagetype>
-            </state>
-            <state name="surround">
-                <imagetype name="surround">
-                    <filename>surround.png</filename>
-                </imagetype>
-            </state>
-            <state name="dolby">
-                <imagetype name="dolby">
-                    <filename>dd.png</filename>
-                </imagetype>
-            </state>
-            <state name="mono">
-                <imagetype name="mono">
-                    <filename>mono.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-
-        <statetype name="subtitletypes">
-            <position>1048,493</position>
-            <showempty>yes</showempty>
-            <state name="cc">
-                <imagetype name="cc">
-                    <filename>cc.png</filename>
-                </imagetype>
-            </state>
-            <state name="subtitles">
-                <imagetype name="subtitles">
-                    <filename>subs.png</filename>
-                </imagetype>
-            </state>
-            <state name="onscreensub">
-                <imagetype name="onscreensub">
-                    <filename>subs_onscreen.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-
-        <statetype name="videoprops">
-            <position>1082,493</position>
-            <showempty>yes</showempty>
-            <state name="hdtv">
-                <imagetype name="hdtv">
-                    <filename>hd.png</filename>
-                </imagetype>
-            </state>
-            <state name="widescreen">
-                <imagetype name="widescreen">
-                    <filename>wide.png</filename>
-                </imagetype>
-            </state>
-        </statetype>
-
-        <imagetype name="watched">
-            <filename>watched.png</filename>
-            <position>1116,493</position>
-        </imagetype>
-
-        <imagetype name="processing">
-            <filename>processing.png</filename>
-            <position>1150,493</position>
-        </imagetype>
-
-        <textarea name="timedate" from="basetextarea">
-            <area>25,529,580,30</area>
-        </textarea>
-
-        <textarea name="channel" from="basetextarea">
-            <area>820,529,160,30</area>
-            <align>right</align>
-        </textarea>-->
-
         <shape name="textbackground" from="basetextbackground">
             <position>30,433</position>
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>48,438,980,35</area>
+            <area>48,438,810,35</area>
             <font>baselarge</font>
         </textarea>
+
+        <statetype name="cutlist">
+            <position>1018,442</position>
+            <state name="yes">
+                <imagetype name="on">
+                    <filename>shared/icons/cutlist.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <statetype name="commflagged">
+            <position>1063,442</position>
+            <state name="yes">
+                <imagetype name="on">
+                    <filename>shared/icons/commflagged.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <statetype name="bookmark">
+            <position>1094,442</position>
+            <state name="yes">
+                <imagetype name="on">
+                    <filename>shared/icons/bookmark.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+        <statetype name="autoexpire">
+            <position>1145,442</position>
+            <state name="yes">
+                <imagetype name="on">
+                    <filename>shared/icons/autoexpire.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+
+<!--
+        <textarea name="filesize_str" from="basetextarea">
+            <area>360,647,200,30</area>
+            <align>right</align>
+        </textarea>
+        
+        <textarea name="freereport" from="basetextarea">
+            <area>570,647,300,30</area>
+            <align>left</align>
+        </textarea>
+-->
 
         <statetype name="ratingstate" from="baserating">
             <position>1193,435</position>
@@ -321,8 +264,37 @@
             <area>48,647,290,30</area>
         </textarea>
 
+        <statetype name="videoprops">
+            <position>597,648</position>
+            <state name="default">
+            </state>
+            <state name="hd1080">
+                <imagetype name="hdtv">
+                    <filename>shared/icons/hd_1080.png</filename>
+                </imagetype>
+            </state>
+            <state name="hd720">
+                <imagetype name="hdtv">
+                    <position>4,0</position>
+                    <filename>shared/icons/hd_720.png</filename>
+                </imagetype>
+            </state>
+            <state name="hdtv">
+                <imagetype name="hdtv">
+                    <position>4,0</position>
+                    <filename>shared/icons/hdtv.png</filename>
+                </imagetype>
+            </state>
+            <state name="widescreen">
+                <imagetype name="widescreen">
+                    <position>5,1</position>
+                    <filename>shared/icons/16_9.png</filename>
+                </imagetype>
+            </state>
+        </statetype>
+        
         <textarea name="lentime" from="basetextarea">
-            <area>430,647,800,30</area>
+            <area>1030,647,200,30</area>
             <align>right</align>
         </textarea>
 
@@ -330,6 +302,7 @@
             <font>basemedium</font>
             <align>allcenter</align>
         </textarea>
+        
     </window>
 
     <window name="groupselector">
@@ -355,9 +328,8 @@
 
         <buttonlist name="groups">
             <area>900,248,364,307</area>
-            <buttonarea>0,0,378,300</buttonarea>
+            <buttonarea>0,0,364,300</buttonarea>
             <spacing>2</spacing>
-
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="buttonbackground">

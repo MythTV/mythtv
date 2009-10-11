@@ -27,22 +27,24 @@
                     <area>0,0,240,60</area>
                     <imagetype name="buttonbackground">
                         <area>0,0,240,60</area>
-                        <gradient start="#666666" end="#333333" alpha="200" />
+                        <gradient start="#a8ac93" end="#8a916f" alpha="255" />
                     </imagetype>
                     <imagetype name="icon">
                         <area>0,5,80,50</area>
                         <preserveaspect>true</preserveaspect>
+                        <mask></mask>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>100,5,130,50</area>
+                        <area>90,5,140,50</area>
                         <align>allcenter</align>
                         <multiline>yes</multiline>
+                        <font>basesmall</font>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#669966" end="#339933" alpha="200" />
-                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basesmallbrown</font>
+                    </textarea>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
@@ -68,7 +70,7 @@
         </button>
 
         <button name="skip" from="basebutton">
-            <position>740,605</position>
+            <position>1024,605</position>
             <value>Skip</value>
         </button>
 
@@ -85,14 +87,14 @@
         </textarea>
 
         <buttonlist name="channels" focusorder="0">
-            <area>64,97,600,610</area>
+            <area>39,97,600,588</area>
             <layout>vertical</layout>
             <spacing>0</spacing>
-            <buttonarea>0,0,580,610</buttonarea>
+            <buttonarea>25,0,600,588</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,580,84</area>
+                <area>0,0,595,84</area>
                 <state name="active">
-                    <area>0,0,580,84</area>
+                    <area>0,0,595,84</area>
                     <statetype name="status">
                         <position>4,4</position>
                         <state name="disabled">
@@ -204,15 +206,19 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>240,270</position>
-                <showempty>yes</showempty>
+                <position>0,5</position>
                 <state type="full">
+                    <imagetype name="up">
+                        <filename>shared/list_up_arrow.png</filename>
+                    </imagetype>
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>456,270</position>
-                <showempty>yes</showempty>
+                <position>0,564</position>
                 <state type="full">
+                    <imagetype name="down">
+                        <filename>shared/list_down_arrow.png</filename>
+                    </imagetype>
                 </state>
             </statetype>
         </buttonlist>
