@@ -337,7 +337,9 @@ void EditMetadataDialog::fillWidgets()
                     target_name.left((int)(length_compare * 0.75));
 
             if (caught_name_three_quarters == target_name_three_quarters &&
-                m_workingMetadata->GetChildID() == -1)
+                m_workingMetadata->GetChildID() == -1 &&
+                !(m_workingMetadata->GetSeason() > 0) &&
+                !(m_workingMetadata->GetEpisode() > 0))
             {
                 possible_starting_point = p->first;
                 m_workingMetadata->SetChildID(possible_starting_point);
