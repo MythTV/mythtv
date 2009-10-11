@@ -127,6 +127,10 @@ class MPUBLIC MythUIImage : public MythUIType
 
     MythUIImagePrivate *d;
 
+    enum AnimationCycle {kCycleStart, kCycleReverse};
+    AnimationCycle m_animationCycle;
+    bool m_animationReverse;
+    
     friend class MythThemeBase;
     friend class MythUIButtonListItem;
     friend class MythUIProgressBar;

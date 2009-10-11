@@ -234,6 +234,9 @@ void MythUIImage::Init(void)
     m_isGreyscale = false;
 
     m_preserveAspect = false;
+    
+    m_animationCycle = kCycleStart;
+    m_animationReverse = false;
 }
 
 /**
@@ -801,9 +804,28 @@ void MythUIImage::Pulse(void)
         unsigned int origPos = m_CurPos;
         do
         {
-            m_CurPos++;
-            if (m_CurPos >= (uint)m_Images.size())
-                m_CurPos = 0;
+             if (m_animationCycle == kCycleStart)
+             {
+                 ++m_CurPos;
+                 if (m_CurPos >= (uint)m_Images.size())
+                     m_CurPos = 0;
+             }
+             else if (m_animationCycle == kCycleReverse)
+             {
+                 if ((m_CurPos + 1) >= (uint)m_Images.size())
+                 {
+                     m_animationReverse = true;
+                 }
+                 else if (m_CurPos == 0)
+                 {
+                     m_animationReverse = false;
+                 }
+
+                 if (m_animationReverse)
+                     --m_CurPos;
+                 else
+                     ++m_CurPos;
+             }
         } while (!m_Images[m_CurPos] && m_CurPos != origPos);
         m_ImagesLock.unlock();
 
@@ -824,7 +846,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     if (m_Images.size() > 0)
     {
         d->m_UpdateLock.lockForWrite();
-        if (m_CurPos > (uint)m_Images.size())
+        if (m_CurPos >= (uint)m_Images.size())
             m_CurPos = 0;
         if (!m_Images[m_CurPos])
         {
@@ -924,6 +946,9 @@ bool MythUIImage::ParseElement(QDomElement &element)
         tmp = element.attribute("high");
         if (!tmp.isEmpty())
             m_HighNum = tmp.toInt();
+        tmp = element.attribute("cycle", "start");
+        if (tmp == "reverse")
+            m_animationCycle = kCycleReverse;
     }
     else if (element.tagName() == "gradient")
     {
@@ -1056,6 +1081,8 @@ void MythUIImage::CopyFrom(MythUIType *base)
     m_preserveAspect = im->m_preserveAspect;
 
     m_isGreyscale = im->m_isGreyscale;
+
+    m_animationCycle = im->m_animationCycle;
 
     //SetImages(im->m_Images);
 
