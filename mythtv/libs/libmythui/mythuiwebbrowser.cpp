@@ -337,12 +337,7 @@ void MythUIWebBrowser::SetActive(bool active)
  */
 void MythUIWebBrowser::ZoomIn(void)
 {
-    if (!m_browser)
-        return;
-
-    m_zoom += 0.1;
-    m_browser->setTextSizeMultiplier(m_zoom);
-    UpdateBuffer();
+    SetZoom(m_zoom + 0.1);
 }
 
 /** \fn MythUIWebBrowser::ZoomOut(void)
@@ -350,12 +345,7 @@ void MythUIWebBrowser::ZoomIn(void)
  */
 void MythUIWebBrowser::ZoomOut(void)
 {
-    if (!m_browser)
-        return;
-
-    m_zoom -= 0.1;
-    m_browser->setTextSizeMultiplier(m_zoom);
-    UpdateBuffer();
+    SetZoom(m_zoom - 0.1);
 }
 
 /** \fn MythUIWebBrowser::SetZoom(float)
@@ -368,7 +358,11 @@ void MythUIWebBrowser::SetZoom(float zoom)
         return;
 
     m_zoom = zoom;
+#if QT_VERSION >= 0x040500
+    m_browser->setZoomFactor(m_zoom);
+#else
     m_browser->setTextSizeMultiplier(m_zoom);
+#endif
     UpdateBuffer();
 }
 
