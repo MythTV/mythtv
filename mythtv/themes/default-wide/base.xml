@@ -454,8 +454,10 @@
                     <align>left,vcenter</align>
                 </textarea>
             </state>
-            <shape name="background" from="baseselectedwidgetshape" />
             <state name="inactive" from="active" />
+            <state name="selected" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+            </state>
         </statetype>
         <statetype name="downscrollarrow">
             <position>205,2</position>
