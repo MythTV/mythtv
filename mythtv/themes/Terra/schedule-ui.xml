@@ -475,104 +475,198 @@
 
     <window name="programrecpriority">
 
-        <textarea name="pagetitle" from="basetextarea">
-            <area>20,5,570,40</area>
-            <font>baselarge</font>
-            <value>Schedule Priorities</value>
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="sched" from="baseheading">
+            <value>Recording Rule Priorities</value>
         </textarea>
 
-        <imagetype name="filler">
-            <filename>cr-background.png</filename>
-            <area>0,39,1280,420</area>
-        </imagetype>
+        <shape name="titlecolumn">
+            <area>30,111,640,300</area>
+            <fill color="#767662" alpha="150" />
+        </shape>
 
-        <textarea name="prioritylabel" from="basetextarea">
-            <area>900,15,95,40</area>
-            <value>Priority</value>
-            <align>right</align>
-        </textarea>
+        <shape name="typecolumn" from="titlecolumn">
+            <area>760,111,200,300</area>
+        </shape>
 
-        <textarea name="finalrecprioritylabel" from="basetextarea">
-            <area>1090,15,95,40</area>
-            <value>Final</value>
-            <align>right</align>
-        </textarea>
+        <shape name="prioritycolumn" from="titlecolumn">
+            <area>1050,111,40,300</area>
+        </shape>
 
-        <buttonlist name="programs" from="basebuttonlist2">
-            <position>20,53</position>
+        <shape name="finalcolumn" from="prioritycolumn">
+            <position>1180,111</position>
+        </shape>        
+
+        <buttonlist name="programs">
+            <area>0,111,1280,310</area>
+            <buttonarea>0,0,1280,300</buttonarea>
+            <spacing>0</spacing>
             <statetype name="buttonitem">
                 <state name="active">
-                    <textarea name="rectype" from="buttontext">
-                        <area>30,1,20,24</area>
-                        <align>hcenter</align>
+                    <shape name="background" />
+                    <statetype name="status">
+                        <position>4,0</position>
+                        <state name="disabled">
+                            <shape name="status">
+                                <area>0,0,20,30</area>
+                                <fill color="#9e9e9e" />
+                            </shape>
+                        </state>
+                        <state name="error" from="disabled">
+                            <shape name="status">
+                                <fill color="#e43e3e" />
+                            </shape>
+                        </state>
+                        <state name="warning" from="disabled">
+                            <shape name="status">
+                                <fill color="#ff9147" />
+                            </shape>
+                        </state>
+                        <state name="normal" from="disabled">
+                            <shape name="status">
+                                <fill color="#066aff" />
+                            </shape>
+                        </state>
+                        <state name="running" from="disabled">
+                            <shape name="status">
+                                <fill color="#33bf33" />
+                            </shape>
+                        </state>
+                    </statetype>
+                    <textarea name="titlesubtitle" from="basetextarea">
+                        <area>40,2,620,28</area>
+                        <align>vcenter</align>
                     </textarea>
-                    <textarea name="title" from="buttontext">
-                        <area>60,1,850,24</area>
+                    <textarea name="rectype" from="titlesubtitle">
+                        <area>760,2,200,28</area>
+                        <align>allcenter</align>
                     </textarea>
-                    <textarea name="progpriority" from="buttontext">
-                        <area>935,1,40,24</area>
-                        <align>right</align>
+                    <textarea name="progpriority" from="titlesubtitle">
+                        <area>1050,2,40,28</area>
+                        <align>allcenter</align>
                     </textarea>
                     <textarea name="finalpriority" from="progpriority">
-                        <position>1130,1</position>
+                        <position>1180,2</position>
                     </textarea>
                 </state>
-                <state name="selected" from="active" />
+                <state name="selected" from="active">
+                    <shape name="background">
+                        <area>21,0,1218,32</area>
+                        <type>roundbox</type>
+                        <fill color="#92947E" alpha="215" />
+                        <line color="#a7ac93" width="4" />
+                    </shape>
+                    <textarea name="titlesubtitle">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                    <textarea name="rectype">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                    <textarea name="progpriority">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                    <textarea name="finalpriority">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                </state>
                 <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>1250,0</position>
+                <state type="full">
+                    <imagetype name="up">
+                        <filename>shared/list_up_arrow.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>1250,274</position>
+                <state type="full">
+                    <imagetype name="down">
+                        <filename>shared/list_down_arrow.png</filename>
+                    </imagetype>
+                </state>
             </statetype>
         </buttonlist>
 
+        <imagetype name="listframe">
+            <position>0,65</position>
+            <filename>schedule/generic_list_frame.png</filename>
+        </imagetype>
+
+        <textarea name="titlelabel" from="basetextarea">
+            <area>50,77,100,40</area>
+            <value>Title</value>
+            <align>left</align>
+        </textarea>
+
+        <textarea name="typelabel" from="titlelabel">
+            <position>810,77</position>
+            <value>Type</value>
+            <align>hcenter</align>
+        </textarea>
+
+        <textarea name="prioritylabel" from="typelabel">
+            <position>1030,77</position>
+            <value>Priority</value>
+        </textarea>
+
+        <textarea name="finalrecprioritylabel" from="typelabel">
+            <position>1160,77</position>
+            <value>Final</value>
+        </textarea>
+
+        <shape name="textbackground" from="basetextbackground">
+            <position>30,433</position>
+        </shape>
+
         <textarea name="title" from="basetextarea">
-            <area>230,450,740,40</area>
-            <font>basemedium</font>
+            <area>48,438,810,35</area>
+            <font>baselarge</font>
         </textarea>
 
         <textarea name="scheduleinfo" from="basetextarea">
-            <area>230,490,740,30</area>
+            <area>230,520,740,30</area>
         </textarea>
 
-        <textarea name="recordingtype" from="basetextarea">
-            <area>230,530,430,30</area>
+        <textarea name="rectype" from="basetextarea">
+            <area>230,560,430,30</area>
         </textarea>
 
         <textarea name="recprioritylabel" from="basetextarea">
-            <area>700,490,170,30</area>
+            <area>700,520,170,30</area>
             <value>Priority:</value>
         </textarea>
 
         <textarea name="recpriority" from="basetextarea">
-            <area>870,490,40,30</area>
+            <area>870,520,40,30</area>
             <align>right</align>
         </textarea>
 
         <textarea name="recpriorityB" from="recpriority">
-            <position>970,490</position>
+            <position>970,520</position>
         </textarea>
 
         <textarea name="rectypeprioritylabel" from="recprioritylabel">
-            <position>700,520</position>
+            <position>700,550</position>
             <value>Type Priority:</value>
         </textarea>
 
         <textarea name="rectypepriority" from="recpriority">
-            <position>870,520</position>
+            <position>870,550</position>
         </textarea>
 
         <textarea name="finalprioritylabel" from="recprioritylabel">
-            <position>700,550</position>
+            <position>700,580</position>
             <value>Final Priority:</value>
         </textarea>
 
         <textarea name="finalpriority" from="recpriority">
-            <position>870,550</position>
+            <position>870,580</position>
         </textarea>
-
-        <textarea name="keyinstr">
-            <area>0,660,1280,30</area>
-            <value>(1) Title (2) Priority (4) Type</value>
-            <align>allcenter</align>
-        </textarea>
-
     </window>
 
     <window name="custompriority">
@@ -1001,7 +1095,6 @@
                 </state>
             </statetype>
         </buttonlist>
-
 
         <imagetype name="groupframe">
             <position>0,57</position>

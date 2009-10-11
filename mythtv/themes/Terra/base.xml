@@ -562,7 +562,7 @@
 
         <imagetype name="backimg">
             <position>236,58</position>
-            <filename>menu/largemenubackground.png</filename>
+            <filename>popups/largemenubackground.png</filename>
         </imagetype>
 
         <textarea name="messagearea">
@@ -663,19 +663,29 @@
 
     <!-- Busy Dialog -->
     <window name="MythBusyDialog">
-        <area>-1,-1,580,165</area>
+        <area>-1,-1,619,92</area>
         <imagetype name="backimg">
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
-        <imagetype name="animation">
-            <position>40,40</position>
-            <filepattern low="0" high="24">busyimages/%1.png</filepattern>
-            <delay>250</delay>
+            <filename>popups/progress_dialog_background.png</filename>
         </imagetype>
         <textarea name="message" from="basetextarea">
-            <area>170,20,390,125</area>
+            <area>20,10,580,50</area>
             <align>allcenter</align>
+            <multiline>true</multiline>
         </textarea>
+
+        <imagetype name="background">
+            <position>30,62</position>
+            <filename>popups/progress_bar_background.png</filename>
+        </imagetype>
+        <imagetype name="animation">
+            <position>30,62</position>
+            <filepattern low="0" high="29" cycle="reverse">popups/busy_%1.png</filepattern>
+            <delay>40</delay>
+        </imagetype>
+        <imagetype name="overlay">
+            <position>30,62</position>
+            <filename>popups/progress_bar_overlay.png</filename>
+        </imagetype>
     </window>
 
     <!-- Progress Dialog -->
