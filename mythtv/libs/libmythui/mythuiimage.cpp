@@ -562,6 +562,7 @@ bool MythUIImage::Load(bool allowLoadInBackground)
     QString imagelabel;
     ImageCacheMode cacheMode = kCacheCheckMemoryOnly;
 
+    int j = 0;
     for (int i = m_LowNum; i <= m_HighNum; i++)
     {
         if (m_HighNum >= 1)
@@ -599,7 +600,7 @@ bool MythUIImage::Load(bool allowLoadInBackground)
                     SetSize(image->size());
 
                 m_ImagesLock.lock();
-                m_Images[i] = image;
+                m_Images[j] = image;
                 m_ImagesLock.unlock();
 
                 SetRedraw();
@@ -607,7 +608,14 @@ bool MythUIImage::Load(bool allowLoadInBackground)
                 m_LastDisplay = QTime::currentTime();
                 d->m_UpdateLock.unlock();
             }
+            else
+            {
+                m_ImagesLock.lock();
+                m_Images[j] = NULL;
+                m_ImagesLock.unlock();
+            }
         }
+        ++j;
     }
 
     return true;
@@ -796,7 +804,7 @@ void MythUIImage::Pulse(void)
             m_CurPos++;
             if (m_CurPos >= (uint)m_Images.size())
                 m_CurPos = 0;
-        } while (!m_Images.contains(m_CurPos) && m_CurPos != origPos);
+        } while (!m_Images[m_CurPos] && m_CurPos != origPos);
         m_ImagesLock.unlock();
 
         SetRedraw();
@@ -818,11 +826,11 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         d->m_UpdateLock.lockForWrite();
         if (m_CurPos > (uint)m_Images.size())
             m_CurPos = 0;
-        if (!m_Images.contains(m_CurPos))
+        if (!m_Images[m_CurPos])
         {
             unsigned int origPos = m_CurPos;
             m_CurPos++;
-            while (!m_Images.contains(m_CurPos) && m_CurPos != origPos)
+            while (!m_Images[m_CurPos] && m_CurPos != origPos)
             {
                 m_CurPos++;
                 if (m_CurPos >= (uint)m_Images.size())
@@ -1153,7 +1161,7 @@ void MythUIImage::customEvent(QEvent *event)
         d->m_UpdateLock.unlock();
 
         m_ImagesLock.lock();
-        if (m_Images.contains(number))
+        if (m_Images[number])
         {
             // If we got to this point, it means this same MythUIImage
             // was told to reload the same image, so we use the newest
