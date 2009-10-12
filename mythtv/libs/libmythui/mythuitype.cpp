@@ -718,6 +718,10 @@ bool MythUIType::ParseElement(QDomElement &element)
     {
         SetDeferLoad(parseBool(element));
     }
+    else if (element.tagName() == "helptext")
+    {
+        m_helptext = getFirstText(element);
+    }
     else
         return false;
 
