@@ -1256,7 +1256,7 @@
             <timeslots>4</timeslots>
             <solidcolor>#003256</solidcolor>
             <selector type="roundbox" linecolor="#a7ac93" />
-            <showcategories>yes</showcategories>
+            <showcategories>no</showcategories>
             <categoryalpha>150</categoryalpha>
             <recordingcolor>#00aa00</recordingcolor>
             <conflictingcolor>#ff6600</conflictingcolor>
