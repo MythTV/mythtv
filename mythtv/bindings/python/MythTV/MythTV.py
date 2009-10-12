@@ -14,7 +14,7 @@ import shlex
 import socket
 import code
 import re
-from datetime import datetime
+from datetime import datetime, tzinfo, timedelta
 from time import mktime
 
 from MythDB import *
@@ -482,6 +482,24 @@ class MythTV(object):
 		On error, 0000-00-00 00:00 is returned
 		"""
 		return self.backendCommand('QUERY_GUIDEDATATHROUGH')
+
+	def getTimeZone(self):
+		"""
+		Returns a tuple containing Zone ID, UTC offset, and ISO format date
+		"""
+		return tuple(self.backendCommand('QUERY_TIME_ZONE').split(BACKEND_SEP))
+
+	def getTime(self):
+		"""
+		Returns an "aware" datetime object of the backend's current time
+		"""
+		class tz(tzinfo):
+			def __init__(self,offs): self.offset = int(offs)
+			def tzname(self): return "GMT%d" % (self.offset/3600)
+			def dst(self,dt): return timedelta(0)
+			def utcoffset(self,dt): return timedelta(seconds=self.offset)
+		tup = self.getTimeZone()
+		return datetime.strptime(tup[2],"%Y-%m-%dT%H:%M:%S").replace(tzinfo=tz(tup[1]))
 
 	def joinInt(self,high,low):
 		"""
