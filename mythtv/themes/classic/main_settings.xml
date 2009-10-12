@@ -17,7 +17,6 @@
         <text lang="ZH_TW">一般設定</text>
         <text lang="SL">Splošno</text>
         <text lang="ET">Üldine</text>
-        <text lang="NB">Generelt</text>
         <text lang="CS">Obecné</text>
         <text lang="RU">Общее</text>
         <text lang="PL">Ustawienia</text>
@@ -45,7 +44,6 @@
         <text lang="ZH_TW">外觀設定</text>
         <text lang="SL">Vzgled</text>
         <text lang="ET">Kujundus</text>
-        <text lang="NB">Utseende</text>
         <text lang="CS">Vzhled</text>
         <text lang="RU">Внешний вид</text>
         <text lang="PL">Ustaw wyglądy</text>
@@ -61,7 +59,6 @@
         <text>Screen Setup Wizards</text>
         <text lang="HE">אשף הגדרות מסך</text>
         <text lang="FI">Kuvavelho</text>
-        <text lang="NB">Skjerm</text>
         <text lang="DE">Bildschirm einrichten</text>
         <text lang="HU">Képernyő beállítás varázsló</text>
         <description>Compensate for TVs with overscan</description>
@@ -110,7 +107,6 @@
         <text lang="ZH_TW">電視設定</text>
         <text lang="SL">TV nastavitve</text>
         <text lang="ET">TV sätted</text>
-        <text lang="NB">TV</text>
         <text lang="DA">TV Indstillinger</text>
         <text lang="PT">Configurar Televisão</text>
         <text lang="CS">Nastavení televize</text>
@@ -141,7 +137,6 @@
         <text lang="ZH_TW">音樂設定</text>
         <text lang="SL">Glasbene nastavitve</text>
         <text lang="ET">Muusika sätted</text>
-        <text lang="NB">Musikkinnstillinger</text>
         <text lang="CS">Nastavení muziky</text>
         <text lang="RU">Настройка музыки</text>
         <text lang="PL">Konfiguracja Muzyki</text>
@@ -171,7 +166,6 @@
         <text lang="ZH_TW">電影設定</text>
         <text lang="SL">Video nastavitve</text>
         <text lang="ET">Video sätted</text>
-        <text lang="NB">Videoinnstillinger</text>
         <text lang="CS">Nastavení videa</text>
         <text lang="RU">Настройка фильмов</text>
         <text lang="PL">Ustaw Filmy</text>
@@ -195,7 +189,6 @@
         <text lang="FI">Radioasetukset</text>
         <text lang="SL">Radio nastavitve</text>
         <text lang="ET">Raadio sätted</text>
-        <text lang="NB">Radioinnstillinger</text>
         <text lang="DA">Radio Indstillinger</text>
         <text lang="ES">Configurar Radio</text>
         <text lang="PT">Configurar Rádio</text>
@@ -240,7 +233,6 @@
         <text lang="ZH_TW">照相館設定</text>
         <text lang="SL">Nastavitve slik</text>
         <text lang="ET">Galerii sätted</text>
-        <text lang="NB">Bildeinnstillinger</text>
         <text lang="CS">Nastavení obrázků</text>
         <text lang="RU">Настройка изображений</text>
         <text lang="PL">Konfiguracja Galerii</text>
@@ -270,7 +262,6 @@
         <text lang="ZH_TW">遊戲設定</text>
         <text lang="SL">Nastavitve iger</text>
         <text lang="ET">Mängude sätted</text>
-        <text lang="NB">Spillinnstillinger</text>
         <text lang="RU">Настройка игр</text>
         <text lang="PL">Konfiguracja Gier</text>
         <text lang="HE">הגדרות משחק</text>
@@ -299,7 +290,6 @@
         <text lang="ZH_TW">天氣報告設定</text>
         <text lang="SL">Nastavitve vremena</text>
         <text lang="ET">Ilmateate sätted</text>
-        <text lang="NB">Innstillinger for vær</text>
         <text lang="CS">Nastavení počasí</text>
         <text lang="RU">Настройка погоды</text>
         <text lang="PL">Konfiguracja Pogody</text>
@@ -337,7 +327,6 @@
         <text lang="ZH_TW">網上新聞設定</text>
         <text lang="SL">Nastavitve novic</text>
         <text lang="ET">Uudiste sätted</text>
-        <text lang="NB">Innstillinger for nyheter</text>
         <text lang="DA">Nyheds Indstillingen</text>
         <text lang="PT">Configurar Notícias</text>
         <text lang="CS">Nastavení zpráv</text>
@@ -365,7 +354,6 @@
         <text lang="ZH_TW">互聯網設定</text>
         <text lang="SL">Spletne Nastavitve</text>
         <text lang="ET">Veebi sätted</text>
-        <text lang="NB">Innstilinger for nettleser</text>
         <text lang="DA">Web Indstillinger</text>
         <text lang="ES">Configurar Web</text>
         <text lang="PT">Configurar Navegação Web</text>
@@ -393,7 +381,6 @@
         <text lang="NL">Recepten Instellingen</text>
         <text lang="SL">Nastavitve receptov</text>
         <text lang="ET">Retseptide sätted</text>
-        <text lang="NB">Innstillinger for oppskrifter</text>
         <text lang="DA">Opskrifts Indstillinger</text>
         <text lang="ES">Configurar Recetas</text>
         <text lang="PT">Configurar Receitas</text>
@@ -421,7 +408,6 @@
         <text lang="FI">Puhelimen Asetukset</text>
         <text lang="SL">Telefonske Nastavitve</text>
         <text lang="ET">Telefoni sätted</text>
-        <text lang="NB">Telefon</text>
         <text lang="DA">Telefon Indstillinger</text>
         <text lang="ES">Configurar Teléfono</text>
         <text lang="PT">Configurar Telefone</text>
@@ -479,7 +465,6 @@
         <text lang="ZH_TW">Xbox設定</text>
         <text lang="SL">Nastavitve Xbox</text>
         <text lang="ET">Xbox-i sätted</text>
-        <text lang="NB">X-Box</text>
         <text lang="DA">Xbox Indstillinger</text>
         <text lang="CS">Nastavení XBOXu</text>
         <text lang="RU">Настройка Xbox</text>

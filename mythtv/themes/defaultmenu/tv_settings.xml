@@ -18,7 +18,6 @@
         <text lang="ZH_TW">一般</text>
         <text lang="SL">Splošno</text>
         <text lang="ET">Üldine</text>
-        <text lang="NB">Generelt</text>
         <text lang="CS">Obecné</text>
         <text lang="RU">Общее</text>
         <text lang="PL">Ogólne</text>
@@ -46,7 +45,6 @@
         <text lang="ZH_TW">節目表</text>
         <text lang="SL">Programski vodič</text>
         <text lang="ET">Telekava</text>
-        <text lang="NB">Programoversikt</text>
         <text lang="EN_GB">Programme Guide</text>
         <text lang="CS">Programový průvodce</text>
         <text lang="RU">Программа передач</text>
@@ -78,7 +76,6 @@
         <text lang="ZH_TW">重播</text>
         <text lang="SL">Predvajanje</text>
         <text lang="ET">Mahamängimine</text>
-        <text lang="NB">Avspilling</text>
         <text lang="CS">Přehrávání</text>
         <text lang="RU">Воспроизведение</text>
         <text lang="HE">הסרטה</text>
@@ -158,7 +155,6 @@
         <text lang="ZH_TW">錄影設定</text>
         <text lang="SL">Snemalni profili</text>
         <text lang="ET">Salvestamisprofiilid</text>
-        <text lang="NB">Opptaksprofiler</text>
         <text lang="CS">Nahrávací profily</text>
         <text lang="RU">Профили записей</text>
         <text lang="PL">Profil nagrywania</text>
@@ -186,7 +182,6 @@
         <text lang="ZH_TW">錄影優先次序</text>
         <text lang="SL">Snemalne prioritete</text>
         <text lang="ET">Salvestamisprioriteedid</text>
-        <text lang="NB">Opptaksprioriteter</text>
         <text lang="DA">Optagelselssprioriteter</text>
         <text lang="ES">Prioridades Grabación</text>
         <text lang="PT">Prioridades de Gravação</text>

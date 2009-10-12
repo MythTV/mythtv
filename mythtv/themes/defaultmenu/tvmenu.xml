@@ -18,7 +18,6 @@
         <text lang="ZH_TW">觀看電視</text>
         <text lang="SL">Gledanje TV</text>
         <text lang="ET">Vaata telerit</text>
-        <text lang="NB">Se på TV</text>
         <text lang="CS">Sledovat TV</text>
         <text lang="RU">Смотреть ТВ</text>
         <text lang="PL">Oglądanie TV</text>
@@ -46,7 +45,6 @@
         <text lang="ZH_TW">預設錄影</text>
         <text lang="SL">Plan snemanj</text>
         <text lang="ET">Salvestamiste plaanimine</text>
-        <text lang="NB">Planlegg opptak</text>
         <text lang="CS">Plánovat nahrávky</text>
         <text lang="RU">Расписание записей</text>
         <text lang="PL">Harmonogram</text>
@@ -65,7 +63,6 @@
         <alttext lang="ZH_TW">預錄</alttext>
         <alttext lang="SL">Plan</alttext>
         <alttext lang="ET">Plaanimine</alttext>
-        <alttext lang="NB">Planlegg</alttext>
         <alttext lang="RU">Расписание</alttext>
         <description>Pick shows to record</description>
         <description lang="DE">Eine neue Aufnahme planen</description>
@@ -89,7 +86,6 @@
         <text lang="ZH_TW">觀看預錄節目</text>
         <text lang="SL">Predvajanje snemanj</text>
         <text lang="ET">Salvestiste vaatamine</text>
-        <text lang="NB">Se på opptak</text>
         <text lang="CS">Sledovat nahrávky</text>
         <text lang="RU">Смотреть записи</text>
         <text lang="PL">Oglądanie nagrań</text>
@@ -119,7 +115,6 @@
         <text lang="ZH_TW">刪除錄影</text>
         <text lang="SL">Brisanje snemanj</text>
         <text lang="ET">Salvestiste kustutamine</text>
-        <text lang="NB">Slett opptak</text>
         <text lang="CS">Mazat nahrávky</text>
         <text lang="RU">Удалить записи</text>
         <text lang="PL">Kasowanie nagrań</text>
@@ -163,7 +158,6 @@
         <text lang="ZH_TW">系統狀態</text>
         <text lang="SL">Status sistema</text>
         <text lang="ET">Süsteemi olek</text>
-        <text lang="NB">Systemstatus</text>
         <text lang="ES">Estado Sistema</text>
         <text lang="DA">Systemstatus</text>
         <text lang="PT">Estado do Sistema</text>

@@ -13,7 +13,6 @@
         <text lang="SV">Telefon</text>
         <text lang="SL">Telefon</text>
         <text lang="ET">Telefon</text>
-        <text lang="NB">Telefon</text>
         <text lang="DA">Telefon</text>
         <text lang="ES">Teléfono</text>
         <text lang="PT">Telefone</text>
@@ -43,7 +42,6 @@
         <text lang="ZH_TW">網上新聞</text>
         <text lang="SL">Novice</text>
         <text lang="ET">Uudised</text>
-        <text lang="NB">Nyheter</text>
         <text lang="DA">Nyheder</text>
         <text lang="PT">Notícias</text>
         <text lang="CS">Novinky</text>
@@ -97,7 +95,6 @@
         <text lang="ZH_TW">天氣報告</text>
         <text lang="SL">Vreme</text>
         <text lang="ET">Ilmateade</text>
-        <text lang="NB">Været</text>
         <text lang="CS">Počasí</text>
         <text lang="RU">Погода</text>
         <text lang="PL">Pogoda</text>
@@ -149,7 +146,6 @@
         <text lang="ZH_TW">互聯網</text>
         <text lang="SL">Splet</text>
         <text lang="ET">Veeb</text>
-        <text lang="NB">Nettleser</text>
         <text lang="DA">Web</text>
         <text lang="ES">Web</text>
         <text lang="PT">Navegação Web</text>
@@ -178,7 +174,6 @@
         <text lang="FI">Reseptit</text>
         <text lang="SL">Recepti</text>
         <text lang="ET">Retseptid</text>
-        <text lang="NB">Oppskrifter</text>
         <text lang="DA">Opskrifter</text>
         <text lang="ES">Recetas</text>
         <text lang="PT">Receitas</text>
@@ -206,7 +201,6 @@
         <text lang="ZH_TW">系統狀態</text>
         <text lang="SL">Status sistema</text>
         <text lang="ET">Süsteemi olek</text>
-        <text lang="NB">Systemstatus</text>
         <text lang="DA">Systemstatus</text>
         <text lang="ES">Estado Sistema</text>
         <text lang="PT">Estado do Sistema</text>

@@ -18,7 +18,6 @@
         <text lang="ZH_TW">天氣報告設定</text>
         <text lang="SL">Nastavitve vremena</text>
         <text lang="ET">Ilmateate sätted</text>
-        <text lang="NB">Innstillinger for vær</text>
         <text lang="CS">Nastavení počasí</text>
         <text lang="RU">Настройки погоды</text>
         <text lang="PL">Ustaw Pogodę</text>
@@ -55,7 +54,6 @@
         <text lang="ZH_TW">網上新聞設定</text>
         <text lang="SL">Nastavitve novic</text>
         <text lang="ET">Uudiste sätted</text>
-        <text lang="NB">Innstillinger for nyheter</text>
         <text lang="DA">Nyheds Indstillingen</text>
         <text lang="PT">Configurar Notícias</text>
         <text lang="CS">Nastavení zpráv</text>
@@ -130,7 +128,6 @@
         <text lang="ZH_TW">互聯網設定</text>
         <text lang="SL">Spletne nastavitve</text>
         <text lang="ET">Veebi sätted</text>
-        <text lang="NB">Innstilinger for nettleser</text>
         <text lang="DA">Web-indstillinger</text>
         <text lang="ES">Configurar Web</text>
         <text lang="PT">Configurar Navegação Web</text>
@@ -157,7 +154,6 @@
         <text lang="NL">Recepten Instellingen</text>    
         <text lang="SL">Nastavitve receptov</text>
         <text lang="ET">Retseptide sätted</text>    
-        <text lang="NB">Innstillinger for oppskrifter</text>
         <text lang="DA">Opskrifts Indstillinger</text>
         <text lang="ES">Recetas</text>
         <text lang="PT">Configurar Receitas</text>

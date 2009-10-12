@@ -17,7 +17,6 @@
         <text lang="ZH_TW">一般設定</text>
         <text lang="SL">Splošno</text>
         <text lang="ET">Üldine</text>
-        <text lang="NB">Generelt</text>
         <text lang="CS">Obecné</text>
         <text lang="RU">Общие</text>
         <text lang="PL">Ogólne</text>
@@ -44,7 +43,6 @@
         <text lang="ZH_TW">外觀設定</text>
         <text lang="SL">Vzgled</text>
         <text lang="ET">Kujundus</text>
-        <text lang="NB">Utseende</text>
         <text lang="CS">Vzhled</text>
         <text lang="RU">Внешний вид</text>
         <text lang="PL">Ustaw wyglądy</text>
@@ -59,7 +57,6 @@
         <text>Screen Setup Wizards</text>
         <text lang="HE">אשף הגדרות מסך</text>
         <text lang="FI">Kuvavelho</text>
-        <text lang="NB">Skjerm</text>
         <text lang="DE">Bildschirm einrichten</text>
         <description>Compensate for TVs with overscan</description>
         <description lang="DE">Passen Sie das Bild an Ihren Fernseher an</description>
@@ -81,7 +78,6 @@
         <text lang="ZH_TW">電視設定</text>
         <text lang="SL">TV nastavitve</text>
         <text lang="ET">TV sätted</text>
-        <text lang="NB">TV</text>
         <text lang="DA">TV Indstillinger</text>
         <text lang="PT">Configurar Televisão</text>
         <text lang="CS">Nastavení televize</text>
@@ -107,7 +103,6 @@
         <text lang="ZH_TW">媒體設定</text>
         <text lang="SL">Media nastavitve</text>
         <text lang="ET">Andmekandja sätted</text>
-        <text lang="NB">Media</text>
         <text lang="DA">Medier Indstillinger</text>
         <text lang="ES">Configurar Medios</text>
         <text lang="PT">Configurar Multimédia</text>
@@ -134,7 +129,6 @@
         <text lang="ZH_TW">資訊中心設定</text>
         <text lang="SL">Nastavitve info centra</text>
         <text lang="ET">Infokeskuse sätted</text>
-        <text lang="NB">Informasjonssenter</text>
         <text lang="DA">Informationscenter</text>
         <text lang="ES">Centro Información</text>
         <text lang="EN_GB">Info Centre Settings</text>
@@ -166,7 +160,6 @@
         <text lang="ZH_TW">Xbox設定</text>
         <text lang="SL">Xbox nastavitve</text>
         <text lang="ET">Xbox-i sätted</text>
-        <text lang="NB">X-Box</text>
         <text lang="DA">Xbox Indstillinger</text>
         <text lang="CS">Nastavení XBOXu</text>
         <text lang="RU">Настройки Xbox</text>
@@ -188,7 +181,6 @@
         <text lang="FI">Puhelimen Asetukset</text>
         <text lang="SL">Nastavitve telefona</text>
         <text lang="ET">Telefoni sätted</text>
-        <text lang="NB">Telefon</text>
         <text lang="DA">Telefon Indstillinger</text>
         <text lang="ES">Configurar Teléfono</text>
         <text lang="PT">Configurar Telefone</text>

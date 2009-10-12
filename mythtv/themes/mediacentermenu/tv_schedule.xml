@@ -17,7 +17,6 @@
         <text lang="ZH_TW">節目表</text>
         <text lang="SL">Programski vodič</text>
         <text lang="ET">Telekava</text>
-        <text lang="NB">Programoversikt</text>
         <text lang="EN_GB">Programme Guide</text>
         <text lang="CS">Programový průvodce</text>
         <text lang="RU">Программа передач</text>
@@ -36,7 +35,6 @@
         <alttext lang="ZH_TW">節目</alttext>
         <alttext lang="SL">Vodič</alttext>
         <alttext lang="ET">Kava</alttext>
-        <alttext lang="NB">Oversikt</alttext>
         <alttext lang="PT">Guia</alttext>
         <alttext lang="RU">Программа</alttext>
         <alttext lang="PL">Program TV</alttext>
@@ -63,7 +61,6 @@
         <text lang="ZH_TW">搜尋節目</text>
         <text lang="SL">Iskalec programov</text>
         <text lang="ET">Programmiotsija</text>
-        <text lang="NB">Bla alfabetisk</text>
         <text lang="EN_GB">Programme Finder</text>
         <text lang="CS">Vyhledávač programů</text>
         <text lang="RU">Поиск программы</text>
@@ -83,7 +80,6 @@
         <alttext lang="ZH_TW">搜尋</alttext>
         <alttext lang="SL">Iskalec</alttext>
         <alttext lang="ET">Otsija</alttext>
-        <alttext lang="NB">Finner</alttext>
         <alttext lang="RU">Поиск</alttext>
         <alttext lang="PL">Znajdź</alttext>
         <alttext lang="HE">מציאה</alttext>
@@ -105,7 +101,6 @@
         <text lang="ZH_TW">關鍵字</text>
         <text lang="SL">Iskanje besed</text>
         <text lang="ET">Sõnade otsimine</text>
-        <text lang="NB">Søk etter ord</text>
         <text lang="DA">Søg efter ord</text>
         <text lang="ES">Buscar Palabras</text>
         <text lang="PT">Pesquisar Palavras</text>
@@ -121,7 +116,6 @@
         <alttext lang="DE">Wörter</alttext>
         <alttext lang="SL">Iskanje</alttext>
         <alttext lang="ET">Sõnad</alttext>
-        <alttext lang="NB">Søk</alttext>
         <alttext lang="DA">Søg</alttext>
         <alttext lang="ES">Palabras</alttext>
         <alttext lang="PT">Palavras</alttext>
@@ -145,7 +139,6 @@
         <text lang="FI">Etsi Oppaasta</text>
         <text lang="SL">Iskanje seznamov</text>
         <text lang="ET">Nimekirjade otsimine</text>
-        <text lang="NB">Søk i lister</text>
         <text lang="DA">Søg i lister</text>
         <text lang="ES">Buscar Listas</text>
         <text lang="PT">Pesquisar Listas</text>
@@ -161,7 +154,6 @@
         <alttext lang="NL">Lijsten</alttext>
         <alttext lang="SL">Seznami</alttext>
         <alttext lang="ET">Nimekirjad</alttext>
-        <alttext lang="NB">Lister</alttext>
         <alttext lang="DA">Lister</alttext>
         <alttext lang="ES">Listas</alttext>
         <alttext lang="PT">Listas</alttext>
@@ -185,7 +177,6 @@
         <text lang="FI">Edistyneet Valinnat</text>
         <text lang="SL">Poljubna snemanja</text>
         <text lang="ET">Kohandatud salvestamine</text>
-        <text lang="NB">Egendefinert opptak</text>
         <text lang="DA">Brugerstyret optagelse</text>
         <text lang="ES">Avanzada</text>
         <text lang="PT">Regras de Gravação</text>
@@ -215,7 +206,6 @@
         <text lang="ZH_TW">手動預錄</text>
         <text lang="SL">Ročno planiranje</text>
         <text lang="ET">Käsitsi salvestamine</text>
-        <text lang="NB">Manuelt opptak</text>
         <text lang="ES">Programación Manual</text>
         <text lang="CS">Ruční plánování</text>
         <text lang="RU">Ручное планирование</text>
@@ -235,7 +225,6 @@
         <alttext lang="ZH_TW">手動預錄</alttext>
         <alttext lang="SL">Roč. snem.</alttext>
         <alttext lang="ET">Käsitsi</alttext>
-        <alttext lang="NB">Manuelt</alttext>
         <alttext lang="ES">Manual</alttext>
         <alttext lang="RU">Вручную</alttext>
         <alttext lang="PL">Ręcznie</alttext>
