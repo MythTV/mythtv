@@ -160,6 +160,10 @@ bool MythUIGuideGrid::ParseElement(QDomElement &element)
         m_categoryAlpha = max(m_categoryAlpha, 1);
         m_categoryAlpha = min(m_categoryAlpha, 255);
     }
+    else if (element.tagName() == "showcategories")
+    {
+        m_drawCategoryText = parseBool(element);
+    }
     else if (element.tagName() == "cutdown")
     {
         m_cutdown = parseBool(element);
