@@ -253,19 +253,19 @@
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="279"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="326"/>
         <source>Channel Name</source>
-        <translation>Name</translation>
+        <translation>Sendername</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="160"/>
         <source>Delete all channels on currently selected source(s).</source>
-        <translation>Die Sender aller ausgewählten Quellen löschen.</translation>
+        <translation>Alle Sender der ausgewählten Quelle löschen.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="164"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="283"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="331"/>
         <source>Channel Number</source>
-        <translation>Platz</translation>
+        <translation>Senderplatz</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="171"/>
@@ -368,7 +368,7 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="148"/>
         <source>Create New Channel Group</source>
-        <translation>Neue Sendergruppe anlegen</translation>
+        <translation>Neue Sendergruppe erstellen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="149"/>
@@ -378,7 +378,7 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="176"/>
         <source>Delete &apos;%1&apos; Channel group?</source>
-        <translation>Lösche Sendergruppe &quot;%1&quot;?</translation>
+        <translation>Sendergruppe &quot;%1&quot; löschen?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="181"/>
@@ -864,7 +864,7 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="192"/>
         <source>Modify priority by star rating (0.0 to 1.0 for movies only)</source>
-        <translation>Priorität bei Sternchenbewertung ändern (0,0 - 1,0 - nur für Filme)</translation>
+        <translation>Priorität über Sternchenbewertung ändern (0,0 - 1,0 - nur für Filme)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="195"/>
@@ -874,7 +874,7 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="197"/>
         <source>Prefer a host for a storage group (complete example)</source>
-        <translation>Bevorzuge einen Rechner mit einer Speichergruppe (vollst. Beispiel)</translation>
+        <translation>Bevorzuge einen Rechner für eine Speichergruppe (vollst. Beispiel)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="200"/>
@@ -884,12 +884,12 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="204"/>
         <source>Priority for movies by the year of release (complete example)</source>
-        <translation>Priorität von Spielfilmen nach Erscheinungsjahr (vollst. Beispiel)</translation>
+        <translation>Priorität für Spielfilmen nach Erscheinungsjahr (vollst. Beispiel)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="208"/>
         <source>Prefer movies when shown at night (complete example)</source>
-        <translation>Bevorzuge Spielfilme die Abends ausgestrahlt werden (vollst. Beispiel)</translation>
+        <translation>Bevorzuge Spielfilme die abends ausgestrahlt werden (vollst. Beispiel)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="211"/>
