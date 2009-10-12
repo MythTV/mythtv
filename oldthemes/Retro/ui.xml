@@ -1781,7 +1781,7 @@
       <textarea name="msg" align="center" draworder="8">
          <area>0,110,800,70</area>
          <font>info</font>
-         <value>No listings found for this program. </value>
+         <value>No listings found for this program.</value>
          <multiline>yes</multiline>
       </textarea>
     </container>
