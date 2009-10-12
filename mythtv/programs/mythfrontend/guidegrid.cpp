@@ -1200,7 +1200,7 @@ void GuideGrid::customEvent(QEvent *event)
     else if (event->type() == kMythDialogBoxCompletionEventType)
     {
         DialogCompletionEvent *dce =
-        dynamic_cast<DialogCompletionEvent*>(event);
+                                    dynamic_cast<DialogCompletionEvent*>(event);
 
         QString resultid= dce->GetId();
         QString resulttext  = dce->GetResultText();

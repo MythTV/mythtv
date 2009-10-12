@@ -35,7 +35,7 @@ typedef vector<PixmapChannel>   pix_chan_list_t;
 typedef vector<pix_chan_list_t> pix_chan_list_list_t;
 
 class JumpToChannel;
-class MPUBLIC JumpToChannelListener
+class JumpToChannelListener
 {
   public:
     virtual void GoTo(int start, int cur_row) = 0;
@@ -44,7 +44,7 @@ class MPUBLIC JumpToChannelListener
                              bool exact = true) const = 0;
 };
 
-class MPUBLIC JumpToChannel : public QObject
+class JumpToChannel : public QObject
 {
     Q_OBJECT
 
@@ -75,7 +75,7 @@ class MPUBLIC JumpToChannel : public QObject
     static const uint kJumpToChannelTimeout = 3500; // ms
 };
 
-class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
+class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 {
     Q_OBJECT
 

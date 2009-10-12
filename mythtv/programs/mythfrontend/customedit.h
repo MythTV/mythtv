@@ -10,7 +10,7 @@ class MythUIButton;
 class MythUIButtonList;
 class MythUIButtonListItem;
 
-class MPUBLIC CustomEdit : public MythScreenType
+class CustomEdit : public MythScreenType
 {
     Q_OBJECT
   public:

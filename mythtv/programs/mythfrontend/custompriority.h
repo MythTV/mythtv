@@ -11,7 +11,7 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUISpinBox;
 
-class MPUBLIC CustomPriority : public MythScreenType
+class CustomPriority : public MythScreenType
 {
     Q_OBJECT
   public:

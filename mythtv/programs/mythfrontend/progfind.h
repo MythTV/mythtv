@@ -18,7 +18,7 @@ class TV;
 class MythUIText;
 class MythUIButtonList;
 
-MPUBLIC void RunProgramFinder(TV *player = NULL, bool embedVideo = false, bool allowEPG = true);
+void RunProgramFinder(TV *player = NULL, bool embedVideo = false, bool allowEPG = true);
 
 class ProgFinder : public ScheduleCommon
 {
@@ -123,7 +123,7 @@ class HeProgFinder : public ProgFinder
     int numberOfSearchChars;
 };
 
-class MPUBLIC SearchInputDialog : public MythTextInputDialog
+class SearchInputDialog : public MythTextInputDialog
 {
   Q_OBJECT
 
