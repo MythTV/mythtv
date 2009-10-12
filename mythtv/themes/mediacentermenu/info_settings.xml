@@ -17,7 +17,6 @@
         <text lang="ZH_TW">天氣報告設定</text>
         <text lang="SL">Nastavitve vremena</text>
         <text lang="ET">Ilmateate sätted</text>
-        <text lang="CS">Nastavení počasí</text>
         <text lang="RU">Настройки погоды</text>
         <text lang="PL">Ustaw Pogodę</text>
         <text lang="HE">הגדרות מזג האויר</text>
@@ -53,7 +52,6 @@
         <text lang="ET">Uudiste sätted</text>
         <text lang="DA">Nyheds Indstillingen</text>
         <text lang="PT">Configurar Notícias</text>
-        <text lang="CS">Nastavení zpráv</text>
         <text lang="RU">Настройки новостей</text>
         <text lang="PL">Ustaw wiadomości</text>
         <text lang="HE">הגדרות חדשות</text>
@@ -76,7 +74,6 @@
         <text lang="PT">Configurar Horários de Cinema</text>
         <text lang="DE">Kinoprogramm</text>
         <text lang="NL">Bioscoop Tijden</text>
-        <text lang="CS">Nastavení programů kin</text>
         <text lang="JA">ムービータイム設定</text>
         <text lang="RU">Настройки афиши кино</text>
         <text lang="PL">Ustaw repertuar kin</text>
@@ -124,7 +121,6 @@
         <text lang="DA">Web-indstillinger</text>
         <text lang="ES">Configurar Web</text>
         <text lang="PT">Configurar Navegação Web</text>
-        <text lang="CS">Nastavení webu</text>
         <text lang="RU">Настройки браузера</text>
         <text lang="PL">Ustaw zakładki WWW</text>
         <text lang="HE">הגדרות אינטרנט</text>
@@ -149,7 +145,6 @@
         <text lang="DA">Opskrifts Indstillinger</text>
         <text lang="ES">Recetas</text>
         <text lang="PT">Configurar Receitas</text>
-        <text lang="CS">Nastavení receptů</text>
         <text lang="RU">Настройки рецептов</text>
         <text lang="PL">Ustaw przepisy</text>
         <text lang="HE">הגדרות מתכונים</text>

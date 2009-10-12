@@ -13,7 +13,6 @@
      <text lang="ET">1. Üldine</text>
      <text lang="DA">1. Generelt</text>
      <text lang="ES">1. General</text>
-     <text lang="CS">1. Obecný</text>
      <text lang="RU">1. Общие</text>
      <text lang="HU">1. Általános</text>
      <action>GENERAL</action>
@@ -32,7 +31,6 @@
      <text lang="ET">2. TV-kaardid</text>
      <text lang="DA">2. TV-kort</text>
      <text lang="ES">2. Capturadoras</text>
-     <text lang="CS">2. Zachytávací karty</text>
      <text lang="RU">2. Карты захвата</text>
      <text lang="HU">2. Vevőkártyák</text>
      <action>CAPTURE CARDS</action>
@@ -51,7 +49,6 @@
      <text lang="ET">3. Videosisendid</text>
      <text lang="DA">3. Videokilder</text>
      <text lang="ES">3. Fuentes de Vídeo</text>
-     <text lang="CS">3. Zdroje obrazu</text>
      <text lang="RU">3. Видео источники</text>
      <text lang="HU">3. Video források</text>
      <action>VIDEO SOURCES</action>
@@ -70,7 +67,6 @@
      <text lang="ET">4. Sisendite ühendused</text>
      <text lang="DA">4. Indgange</text>
      <text lang="ES">4. Conexiones</text>
-     <text lang="CS">4. Připojení vstupů</text>
      <text lang="RU">4. Соединение входов</text>
      <text lang="HU">4. Bemeneti kapcsolatok</text>
      <action>CARD INPUTS</action>
@@ -88,7 +84,6 @@
      <text lang="ET">5. Kanaliredaktor</text>
      <text lang="DA">5. Kanal opsætning</text>
      <text lang="ES">5. Editor Canales</text>
-     <text lang="CS">5. Editor kanálů</text>
      <text lang="RU">5. Редактор каналов</text>
      <text lang="HU">5. Csatorna szerkesztő</text>
      <action>CHANNEL EDITOR</action>

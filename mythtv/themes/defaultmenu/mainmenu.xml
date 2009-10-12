@@ -17,7 +17,6 @@
         <text lang="DA">Mediebibliotek</text>
         <text lang="ES">Mediateca</text>
         <text lang="PT">Galeria Multimédia</text>
-        <text lang="CS">Multimediální katalog</text>
         <text lang="RU">Мультимедиа</text>
         <text lang="AR">مكتبة الوسائط</text>
         <text lang="PL">Biblioteka media***</text>
@@ -38,7 +37,6 @@
         <text>Manage Recordings</text>
         <text lang="IT">Programma Registrazioni</text>
         <text lang="ES">Programar Grabaciones</text>
-        <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Beheren</text>
         <text lang="DE">Aufnahmen verwalten</text>
         <text lang="DA">Optag udsendelse</text>
@@ -50,7 +48,6 @@
         <text lang="ZH_TW">管理電視錄影</text>
         <text lang="SL">Posnetki</text>
         <text lang="ET">Salvestamine</text>
-        <text lang="CS">Spravovat nahrávky</text>
         <text lang="RU">Управление записями</text>
         <text lang="AR">أدر التسجيلات</text>
         <text lang="PL">Zarządzaj nagraniami</text>
@@ -85,7 +82,6 @@
         <text lang="EN_GB">Information Centre</text>
         <text lang="PT">Centro de Informação</text>
         <text lang="PL">Centrum informacyjne</text>
-        <text lang="CS">Centrum informací</text>
         <text lang="RU">Центр информации</text>
         <text lang="AR">مركز المعلومات</text>
         <text lang="HE">מרכז מידע</text>
@@ -122,7 +118,6 @@
         <text lang="ES">CD/DVD</text>
         <text lang="EN_GB">CD/DVD</text>
         <text lang="PT">CD/DVD</text>
-        <text lang="CS">CD/DVD</text>
         <text lang="RU">CD/DVD</text>
         <text lang="AR">تشغيل إسطوانات</text>
         <text lang="PL">Dyski optyczne</text>
@@ -139,7 +134,6 @@
         <text>Watch TV</text>
         <text lang="IT">Guarda la TV</text>
         <text lang="ES">Ver la TV</text>
-        <text lang="CS">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
@@ -151,7 +145,6 @@
         <text lang="ZH_TW">觀看電視</text>
         <text lang="SL">Glej TV</text>
         <text lang="ET">Vaata telerit</text>
-        <text lang="CS">Sledovat TV</text>
         <text lang="RU">Смотреть ТВ</text>
         <text lang="AR">شاهد التلفاز</text>
         <text lang="PL">Oglądanie TV</text>
@@ -167,7 +160,6 @@
         <text>Utilities / Setup</text>
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configuración</text>
-        <text lang="CS">Configurar</text>
         <text lang="DE">Zubehör / Konfiguration</text>
         <text lang="DA">Tilbehør/Indstillinger</text>
         <text lang="IS">Uppsetning</text>
@@ -179,7 +171,6 @@
         <text lang="ZH_TW">工具/設定</text>
         <text lang="SL">Nastavitve</text>
         <text lang="ET">Utiliidid / sätted</text>
-        <text lang="CS">Pomůcky</text>
         <text lang="RU">Утилиты / Настройки</text>
         <text lang="AR">تضبيطات</text>
         <text lang="PL">Narzędzia / ustawienia</text>

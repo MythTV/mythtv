@@ -6,7 +6,6 @@
         <text>Program Guide</text>
         <text lang="IT">Guida Programmi</text>
         <text lang="ES">Guía de Programas</text>
-        <text lang="CS">Guia de programes</text>
         <text lang="NL">Programmagids</text>
         <text lang="DE">Fernsehprogramm</text>
         <text lang="DA">Programoversigt</text>
@@ -19,7 +18,6 @@
         <text lang="SL">Programski vodič</text>
         <text lang="ET">Telekava</text>
         <text lang="EN_GB">Programme Guide</text>
-        <text lang="CS">Programový průvodce</text>
         <text lang="RU">Программа передач</text>
         <text lang="PL">Przewodnik programowy</text>
         <text lang="HE">מדריך שידורים</text>
@@ -27,7 +25,6 @@
         <alttext>Guide</alttext>
         <alttext lang="IT">Guida</alttext>
         <alttext lang="ES">Guía</alttext>
-        <alttext lang="CS">Guia</alttext>
         <alttext lang="DE">EPG</alttext>
         <alttext lang="DA">Oversigt</alttext>
         <alttext lang="IS">Dagskrá</alttext>
@@ -51,7 +48,6 @@
         <text>Program Finder</text>
         <text lang="IT">Ricerca Programmi</text>
         <text lang="ES">Buscar Programas</text>
-        <text lang="CS">Cercar programes</text>
         <text lang="NL">Programma's Zoeken</text>
         <text lang="DE">Alphabetische Suche</text>
         <text lang="DA">Find program</text>
@@ -64,7 +60,6 @@
         <text lang="SL">Iskalec programov</text>
         <text lang="ET">Programmiotsija</text>
         <text lang="EN_GB">Programme Finder</text>
-        <text lang="CS">Vyhledávač programů</text>
         <text lang="RU">Поиск программы</text>
         <text lang="PL">Znajdź program</text>
         <text lang="HE">מציאת תכניות</text>
@@ -72,7 +67,6 @@
         <alttext>Finder</alttext>
         <alttext lang="IT">Ricerca</alttext>
         <alttext lang="ES">Buscar</alttext>
-        <alttext lang="CS">Cercar</alttext>
         <alttext lang="DE">ABC Suche</alttext>
         <alttext lang="DA">Find</alttext>
         <alttext lang="IS">Leit</alttext>
@@ -107,7 +101,6 @@
         <text lang="DA">Søg efter ord</text>
         <text lang="ES">Buscar Palabras</text>
         <text lang="PT">Pesquisar Palavras</text>
-        <text lang="CS">Hledat slova</text>
         <text lang="RU">Поиск по словам</text>
         <text lang="PL">Szukaj słów</text>
         <text lang="HE">חיפוש מילים</text>
@@ -146,7 +139,6 @@
         <text lang="DA">Søg i lister</text>
         <text lang="ES">Buscar Listas</text>
         <text lang="PT">Pesquisar Listas</text>
-        <text lang="CS">Hledat seznamy</text>
         <text lang="RU">Поиск по спискам</text>
         <text lang="PL">Szukaj***listy</text>
         <text lang="HE">חיפוש רשימות</text>
@@ -185,7 +177,6 @@
         <text lang="DA">Brugerstyret optagelse</text>
         <text lang="ES">Avanzada</text>
         <text lang="PT">Regras de Gravação</text>
-        <text lang="CS">Volné nahrávání</text>
         <text lang="RU">Дополнительно</text>
         <text lang="PL">Dostosuj nagrywanie</text>
         <text lang="HE">הקלטה לפי כללים</text>
@@ -200,7 +191,6 @@
         <text>Manual Schedule</text>
         <text lang="IT">Pianificazione Manuale</text>
         <text lang="ES">Programar Grabaciones</text>
-        <text lang="CS">Programar Gravacions</text>
         <text lang="DE">Manuelle Aufnahme</text>
         <text lang="DA">Manuel programmering</text>
         <text lang="IS">Handvirk upptaka</text>
@@ -213,7 +203,6 @@
         <text lang="SL">Ročno planiranje</text>
         <text lang="ET">Käsitsi salvestamine</text>
         <text lang="ES">Programación Manual</text>
-        <text lang="CS">Ruční plánování</text>
         <text lang="RU">Ручное планирование</text>
         <text lang="PL">Dodaj ręcznie</text>
         <text lang="HE">הקלטה ידנית</text>
@@ -221,7 +210,6 @@
         <alttext>Man. Sched.</alttext>
         <alttext lang="IT">Manuale</alttext>
         <alttext lang="ES">Programar</alttext>
-        <alttext lang="CS">Programar</alttext>
         <alttext lang="DE">Manuell</alttext>
         <alttext lang="DA">Manuel prog.</alttext>
         <alttext lang="IS">Handvirk tímasetning.</alttext>

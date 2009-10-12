@@ -17,7 +17,6 @@
         <text lang="ZH_TW">一般設定</text>
         <text lang="SL">Splošno</text>
         <text lang="ET">Üldine</text>
-        <text lang="CS">Obecné</text>
         <text lang="RU">Общее</text>
         <text lang="PL">Ustawienia</text>
         <text lang="HE">כללי</text>
@@ -44,7 +43,6 @@
         <text lang="ZH_TW">外觀設定</text>
         <text lang="SL">Vzgled</text>
         <text lang="ET">Kujundus</text>
-        <text lang="CS">Vzhled</text>
         <text lang="RU">Внешний вид</text>
         <text lang="PL">Ustaw wyglądy</text>
         <text lang="HE">מראה</text>
@@ -83,7 +81,6 @@
         <text lang="ET">TV sätted</text>
         <text lang="DA">TV Indstillinger</text>
         <text lang="PT">Configurar Televisão</text>
-        <text lang="CS">Nastavení televize</text>
         <text lang="RU">Настройка ТВ</text>
         <text lang="PL">Konfiguracja TV</text>
         <text lang="HE">הגדרות טלויזיה</text>
@@ -111,7 +108,6 @@
         <text lang="ZH_TW">音樂設定</text>
         <text lang="SL">Glasbene nastavitve</text>
         <text lang="ET">Muusika sätted</text>
-        <text lang="CS">Nastavení muziky</text>
         <text lang="RU">Настройка музыки</text>
         <text lang="PL">Konfiguracja Muzyki</text>
         <text lang="HE">הגדרות מוסיקה</text>
@@ -140,7 +136,6 @@
         <text lang="ZH_TW">電影設定</text>
         <text lang="SL">Video nastavitve</text>
         <text lang="ET">Video sätted</text>
-        <text lang="CS">Nastavení videa</text>
         <text lang="RU">Настройка фильмов</text>
         <text lang="PL">Ustaw Filmy</text>
         <text lang="HE">הגדרות וידאו</text>
@@ -195,7 +190,6 @@
         <text lang="ZH_TW">照相館設定</text>
         <text lang="SL">Nastavitve slik</text>
         <text lang="ET">Galerii sätted</text>
-        <text lang="CS">Nastavení obrázků</text>
         <text lang="RU">Настройка изображений</text>
         <text lang="PL">Konfiguracja Galerii</text>
         <text lang="HE">הגדרות תמונות</text>
@@ -252,7 +246,6 @@
         <text lang="ZH_TW">天氣報告設定</text>
         <text lang="SL">Nastavitve vremena</text>
         <text lang="ET">Ilmateate sätted</text>
-        <text lang="CS">Nastavení počasí</text>
         <text lang="RU">Настройка погоды</text>
         <text lang="PL">Konfiguracja Pogody</text>
         <text lang="HE">הגדרות מזג האויר</text>
@@ -281,7 +274,6 @@
         <text lang="ET">Uudiste sätted</text>
         <text lang="DA">Nyheds Indstillingen</text>
         <text lang="PT">Configurar Notícias</text>
-        <text lang="CS">Nastavení zpráv</text>
         <text lang="RU">Настройка новостей</text>
         <text lang="PL">Ustaw WiadomoĹci</text>
         <text lang="HE">הגדרות חדשות</text>
@@ -309,7 +301,6 @@
         <text lang="DA">Web Indstillinger</text>
         <text lang="ES">Configurar Web</text>
         <text lang="PT">Configurar Navegação Web</text>
-        <text lang="CS">Nastavení webu</text>
         <text lang="RU">Настройка браузера</text>
         <text lang="PL">Konfiguracja przegladarki WWW</text>
         <text lang="HE">הגדרות אינטרנט</text>
@@ -336,7 +327,6 @@
         <text lang="DA">Opskrifts Indstillinger</text>
         <text lang="ES">Configurar Recetas</text>
         <text lang="PT">Configurar Receitas</text>
-        <text lang="CS">Nastavení receptů</text>
         <text lang="RU">Настройка рецептов</text>
         <text lang="PL">Ustaw Przepisy</text>>
         <text lang="HE">הגדרות מתכונים</text>
@@ -363,7 +353,6 @@
         <text lang="DA">Telefon Indstillinger</text>
         <text lang="ES">Configurar Teléfono</text>
         <text lang="PT">Configurar Telefone</text>
-        <text lang="CS">Nastavení telefonu</text>
         <text lang="JA">電話設定</text>
         <text lang="RU">Настройка телефона</text>
         <text lang="PL">Konfiguracja Telefonu</text>
@@ -389,7 +378,6 @@
         <text lang="PT">Configurar Horários de Cinema</text>
         <text lang="DE">Kinoprogramm</text>
         <text lang="NL">Bioscoop Instellingen</text>
-        <text lang="CS">Nastavení programů kin</text>
         <text lang="JA">ムービータイム設定</text>
         <text lang="RU">Настройка афиши кино</text>
         <text lang="PL">Konfiguracja MovieTime</text>
@@ -418,7 +406,6 @@
         <text lang="SL">Nastavitve Xbox</text>
         <text lang="ET">Xbox-i sätted</text>
         <text lang="DA">Xbox Indstillinger</text>
-        <text lang="CS">Nastavení XBOXu</text>
         <text lang="RU">Настройка Xbox</text>
         <text lang="PL">Konfiguracja Xbox</text>
         <text lang="HE">הגדרות Xbox</text>

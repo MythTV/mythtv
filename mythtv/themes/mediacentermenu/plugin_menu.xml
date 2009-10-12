@@ -5,7 +5,6 @@
         <text>Image Gallery</text>
         <text lang="IT">Immagini</text>
         <text lang="ES">Fotos</text>
-        <text lang="CS">Imatges</text>
         <text lang="NL">Foto's</text>
         <text lang="DE">Bilder ansehen</text>
         <text lang="DA">Billeder</text>
@@ -17,7 +16,6 @@
         <text lang="ZH_TW">照相館</text>
         <text lang="SL">Gledanje slik</text>
         <text lang="ET">Pildialbum</text>
-        <text lang="CS">Galerie fotek</text>
         <text lang="RU">Изображения</text>
         <text lang="PL">Galeria zdjęć</text>
         <text lang="HE">גלרית תמונות</text>
@@ -32,7 +30,6 @@
         <text>Play Games</text>
         <text lang="IT">Giochi</text>
         <text lang="ES">Juegos</text>
-        <text lang="CS">Jocs</text>
         <text lang="NL">Spelen</text>
         <text lang="DE">Spielen</text>
         <text lang="DA">Spil</text>
@@ -44,7 +41,6 @@
         <text lang="ZH_TW">遊戲</text>
         <text lang="SL">Igranje iger</text>
         <text lang="ET">Mängud</text>
-        <text lang="CS">Hrát hry</text>
         <text lang="RU">Играть в игры</text>
         <text lang="PL">Graj w gry</text>
         <text lang="HE">לשחק משחקים</text>
@@ -59,7 +55,6 @@
         <text>News Feeds</text>
         <text lang="IT">Notizie</text>
         <text lang="DE">Nachrichten</text>
-        <text lang="CS">Notícies</text>
         <text lang="ES">Noticias</text>
         <text lang="IS">Fréttir</text>
         <text lang="NL">Nieuws</text>
@@ -71,7 +66,6 @@
         <text lang="ET">Uudised</text>
         <text lang="DA">Nyheder</text>
         <text lang="PT">Notícias</text>
-        <text lang="CS">Novinky</text>
         <text lang="RU">Новости</text>
         <text lang="PL">Wiadomości</text>
         <text lang="HE">חדשות</text>
@@ -92,7 +86,6 @@
         <text lang="PT">Horário de Cinema</text>
         <text lang="DE">Kinoprogramm</text>
         <text lang="NL">Bioscoop Tijden</text>
-        <text lang="CS">Programy kin</text>
         <text lang="JA">ムービータイム</text>
         <text lang="RU">Афиша кино</text>
         <text lang="PL">Repertuar kin</text>
@@ -108,7 +101,6 @@
         <text>Weather</text>
         <text lang="IT">Meteo</text>
         <text lang="ES">El Tiempo</text>
-        <text lang="CS">El Temps</text>
         <text lang="NL">Het Weer</text>
         <text lang="DE">Wetter</text>
         <text lang="DA">Vejret</text>
@@ -120,7 +112,6 @@
         <text lang="ZH_TW">天氣報告</text>
         <text lang="SL">Vreme</text>
         <text lang="ET">Ilmateade</text>
-        <text lang="CS">Počasí</text>
         <text lang="RU">Погода</text>
         <text lang="PL">Pogoda</text>
         <text lang="HE">מזג האויר</text>
@@ -162,7 +153,6 @@
         <text lang="ES">Web</text>
         <text lang="PT">Navegação Web</text>
         <text lang="NL">Internet</text>
-        <text lang="CS">Prohlížení webu</text>
         <text lang="RU">WWW</text>
         <text lang="PL">Internet WWW</text>
         <text lang="HE">אינטרנט</text>

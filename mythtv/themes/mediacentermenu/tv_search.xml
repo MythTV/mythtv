@@ -16,7 +16,6 @@
         <text lang="DA">Titler</text>
         <text lang="ES">Títulos</text>
         <text lang="PT">Por Títulos</text>
-        <text lang="CS">dle názvu</text>
         <text lang="RU">Заголовки</text>
         <text lang="PL">Tytuły</text>
         <text lang="HE">כותרים</text>
@@ -41,7 +40,6 @@
         <text lang="DA">Nøgleord</text>
         <text lang="ES">Claves</text>
         <text lang="PT">Por Palavras-Chave</text>
-        <text lang="CS">dle klíčových slov</text>
         <text lang="RU">Ключевые слова</text>
         <text lang="PL">Słowa kluczowe</text>
         <text lang="HE">מילות מפתח</text>
@@ -65,7 +63,6 @@
         <text lang="DA">Personer</text>
         <text lang="ES">Personas</text>
         <text lang="PT">Por Pessoas</text>
-        <text lang="CS">dle hereckého obsazení</text>
         <text lang="RU">Действующие лица</text>
         <text lang="PL">Osoby</text>
         <text lang="HE">אנשים</text>
@@ -89,7 +86,6 @@
         <text lang="DA">Avanceret</text>
         <text lang="ES">Avanzada</text>
         <text lang="PT">Pesquisa Avançada</text>
-        <text lang="CS">Pokročilé</text>
         <text lang="RU">Дополнительно</text>
         <text lang="PL">Zaawansowane</text>
         <text lang="HE">מתקדם</text>

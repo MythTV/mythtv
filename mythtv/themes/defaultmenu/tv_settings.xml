@@ -6,7 +6,6 @@
         <text>General</text>
         <text lang="IT">Generale</text>
         <text lang="ES">General</text>
-        <text lang="CS">General</text>
         <text lang="NL">Algemeen</text>
         <text lang="DE">Allgemeines</text>
         <text lang="DA">Generelt</text>
@@ -18,7 +17,6 @@
         <text lang="ZH_TW">一般</text>
         <text lang="SL">Splošno</text>
         <text lang="ET">Üldine</text>
-        <text lang="CS">Obecné</text>
         <text lang="RU">Общее</text>
         <text lang="PL">Ogólne</text>
         <text lang="HE">כללי</text>
@@ -33,7 +31,6 @@
         <text>Program Guide</text>
         <text lang="IT">Guida Programmi</text>
         <text lang="ES">Guía de Programas</text>
-        <text lang="CS">Guia de programes</text>
         <text lang="NL">Programmagids</text>
         <text lang="DE">Programmübersicht</text>
         <text lang="DA">Programguide</text>
@@ -46,7 +43,6 @@
         <text lang="SL">Programski vodič</text>
         <text lang="ET">Telekava</text>
         <text lang="EN_GB">Programme Guide</text>
-        <text lang="CS">Programový průvodce</text>
         <text lang="RU">Программа передач</text>
         <text lang="PL">Przewodnik programowy</text>
         <text lang="HE">מדריך התכניות</text>
@@ -64,7 +60,6 @@
         <text>Playback</text>
         <text lang="IT">Riproduzione</text>
         <text lang="ES">Reproducción</text>
-        <text lang="CS">Reproducció</text>
         <text lang="NL">Afspelen</text>
         <text lang="DE">Wiedergabe</text>
         <text lang="DA">Afspilning</text>
@@ -76,7 +71,6 @@
         <text lang="ZH_TW">重播</text>
         <text lang="SL">Predvajanje</text>
         <text lang="ET">Mahamängimine</text>
-        <text lang="CS">Přehrávání</text>
         <text lang="RU">Воспроизведение</text>
         <text lang="HE">הסרטה</text>
         <text lang="HU">Lejátszás</text>
@@ -116,7 +110,6 @@
         <text lang="ET">Mahamängimisgrupid</text>
         <text lang="ES">Grupos Reproducción</text>
         <text lang="NL">Afspeelgroepen</text>
-        <text lang="CS">Skupiny přehrávání</text>
         <text lang="JA">プレイバックグループ</text>
         <text lang="RU">Группы воспроизведения</text>
         <text lang="SL">Predvajalne skupine</text>
@@ -143,7 +136,6 @@
         <text>Recording Profiles</text>
         <text lang="IT">Registrazioni</text>
         <text lang="ES">Grabación</text>
-        <text lang="CS">Gravació</text>
         <text lang="NL">Opnameprofielen</text>
         <text lang="DE">Aufnahmeprofile</text>
         <text lang="DA">Optagelse</text>
@@ -155,7 +147,6 @@
         <text lang="ZH_TW">錄影設定</text>
         <text lang="SL">Snemalni profili</text>
         <text lang="ET">Salvestamisprofiilid</text>
-        <text lang="CS">Nahrávací profily</text>
         <text lang="RU">Профили записей</text>
         <text lang="PL">Profil nagrywania</text>
         <text lang="HE">פרופילים להקלטה</text>
@@ -186,7 +177,6 @@
         <text lang="ES">Prioridades Grabación</text>
         <text lang="PT">Prioridades de Gravação</text>
         <text lang="NL">Opnameprioriteiten</text>
-        <text lang="CS">Priority nahrávání</text>
         <text lang="RU">Приоритеты записей</text>
         <text lang="PL">Priorytety nagrań</text>
         <text lang="HE">קדימויות הקלטה</text>

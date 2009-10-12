@@ -6,7 +6,6 @@
         <text>Watch TV</text>
         <text lang="IT">Guarda la TV</text>
         <text lang="ES">Ver la TV</text>
-        <text lang="CS">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
@@ -18,7 +17,6 @@
         <text lang="ZH_TW">觀看電視</text>
         <text lang="SL">Gledanje TV</text>
         <text lang="ET">Vaata telerit</text>
-        <text lang="CS">Sledovat TV</text>
         <text lang="RU">Смотреть ТВ</text>
         <text lang="PL">Oglądanie TV</text>
         <text lang="HE">צפיה בטלויזיה</text>
@@ -33,7 +31,6 @@
         <text>Schedule Recordings</text>
         <text lang="IT">Pianifica Registrazioni</text>
         <text lang="ES">Programar Grabaciones</text>
-        <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
@@ -45,14 +42,12 @@
         <text lang="ZH_TW">預設錄影</text>
         <text lang="SL">Plan snemanj</text>
         <text lang="ET">Salvestamiste plaanimine</text>
-        <text lang="CS">Plánovat nahrávky</text>
         <text lang="RU">Расписание записей</text>
         <text lang="PL">Harmonogram</text>
         <text lang="HE">תזמון הקלטות</text>
         <text lang="HU">Felvétel ütemezése</text>
         <alttext>Schedule</alttext>
         <alttext lang="ES">Temporizadores</alttext>
-        <alttext lang="CS">Temporitzadors</alttext>
         <alttext lang="DA">Optagelser</alttext>
         <alttext lang="NL">Planning</alttext>
         <alttext lang="PT">Programar</alttext>
@@ -74,7 +69,6 @@
         <text>Watch Recordings</text>
         <text lang="IT">Guarda Registrazioni</text>
         <text lang="ES">Ver Grabaciones</text>
-        <text lang="CS">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
@@ -86,7 +80,6 @@
         <text lang="ZH_TW">觀看預錄節目</text>
         <text lang="SL">Predvajanje snemanj</text>
         <text lang="ET">Salvestiste vaatamine</text>
-        <text lang="CS">Sledovat nahrávky</text>
         <text lang="RU">Смотреть записи</text>
         <text lang="PL">Oglądanie nagrań</text>
         <text lang="HE">צפיה בהקלטות</text>
@@ -103,7 +96,6 @@
         <text>Delete Recordings</text>
         <text lang="IT">Elimina Registrazioni</text>
         <text lang="ES">Borrar Grabaciones</text>
-        <text lang="CS">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
@@ -115,7 +107,6 @@
         <text lang="ZH_TW">刪除錄影</text>
         <text lang="SL">Brisanje snemanj</text>
         <text lang="ET">Salvestiste kustutamine</text>
-        <text lang="CS">Mazat nahrávky</text>
         <text lang="RU">Удалить записи</text>
         <text lang="PL">Kasowanie nagrań</text>
         <text lang="HE">מחיקת הקלטות</text>
@@ -134,7 +125,6 @@
         <text>Passthrough Mode</text>
         <text lang="PT">Modo Directo de TV</text>
         <text lang="ES">TV directo</text>
-        <text lang="CS">TV directe</text>
         <text lang="DE">TV direkt</text>
         <text lang="SV">TV direkt</text>
         <text lang="JA">パススルーモード</text>
@@ -161,7 +151,6 @@
         <text lang="ES">Estado Sistema</text>
         <text lang="DA">Systemstatus</text>
         <text lang="PT">Estado do Sistema</text>
-        <text lang="CS">Stav systému</text>
         <text lang="RU">Состояние системы</text>
         <text lang="PL">Status systemu</text>
         <text lang="HE">מצב מערכת</text>

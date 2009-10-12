@@ -6,7 +6,6 @@
         <text>Schedule Recordings</text>
         <text lang="IT">Programma una registrazione</text>
         <text lang="ES">Programar Grabaciones</text>
-        <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
@@ -18,7 +17,6 @@
         <text lang="ZH_TW">預設錄影</text>
         <text lang="SL">Planiranje snemanj</text>
         <text lang="ET">Salvestamiste plaanimine</text>
-        <text lang="CS">Plánovat nahrávky</text>
         <text lang="RU">Расписание записей</text>
         <text lang="PL">Harmonogram nagrań</text>
         <text lang="HE">תיזמון הקלטות</text>
@@ -49,7 +47,6 @@
         <text>Upcoming Recordings</text>
         <text lang="IT">Correggi i conflitti</text>
         <text lang="ES">Resolver Conflictos</text>
-        <text lang="CS">Resoldre Conflictes</text>
         <text lang="NL">Geplande Opnames</text>
         <text lang="DE">Aufnahmeplan</text>
         <text lang="DA">Planlagte optagelser</text>
@@ -61,7 +58,6 @@
         <text lang="ZH_TW">修正預設錄影衝突</text>
         <text lang="SL">Prihajajoča snemanja</text>
         <text lang="ET">Tulevased salvestamised</text>
-        <text lang="CS">Nadcházející nahrávky</text>
         <text lang="RU">Будущие записи</text>
         <text lang="PL">Zaplanowane nagrania</text>
         <text lang="HE">ההקלטות הבאות</text>
@@ -77,7 +73,6 @@
         <text>Delete Recordings</text>
         <text lang="IT">Elimina una registrazione</text>
         <text lang="ES">Borrar Grabaciones</text>
-        <text lang="CS">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
@@ -89,7 +84,6 @@
         <text lang="ZH_TW">刪除錄影</text>
         <text lang="SL">Brisanje snemanj</text>
         <text lang="ET">Salvestiste kustutamine</text>
-        <text lang="CS">Smazat nahrávky</text>
         <text lang="RU">Удалить записи</text>
         <text lang="PL">Kasowanie nagrań</text>
         <text lang="HE">מחיקת הקלטות</text>
@@ -119,7 +113,6 @@
         <text lang="DA">Tidligere optagelser</text>
         <text lang="ES">Grabados Anteriormente</text>
         <text lang="PT">Gravações Feitas</text>
-        <text lang="CS">Dříve nahráno</text>
         <text lang="RU">Ранее записанное</text>
         <text lang="PL">Poprzednio nagrane</text>
         <text lang="HE">הוקלט מקודם</text>
@@ -145,7 +138,6 @@
         <text lang="DA">Sæt prioriteter</text>
         <text lang="ES">Fijar Prioridades</text>
         <text lang="PT">Definir Prioridades</text>
-        <text lang="CS">Nastavit priority</text>
         <text lang="RU">Установка приоритетов</text>
         <text lang="PL">Ustaw priorytety</text>
         <text lang="HE">הגדרת קדימויות</text>

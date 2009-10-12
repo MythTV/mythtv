@@ -6,7 +6,6 @@
         <text>Watch Recordings</text>
         <text lang="IT">Guarda Registrazioni</text>
         <text lang="ES">Ver Grabaciones</text>
-        <text lang="CS">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
@@ -18,7 +17,6 @@
         <text lang="ZH_TW">觀看預錄節目</text>
         <text lang="SL">Gledanje snemanj</text>
         <text lang="ET">Salvestiste vaatamine</text>
-        <text lang="CS">Sledování nahrávek</text>
         <text lang="RU">Смотреть записи</text>
         <text lang="PL">Oglądanie nagrań</text>
         <text lang="HE">צפיה בהקלטות</text>
@@ -37,7 +35,6 @@
         <text>Watch Videos</text>
         <text lang="IT">Guarda Video</text>
         <text lang="ES">Ver Videos</text>
-        <text lang="CS">Veure vídeos</text>
         <text lang="DE">Videos ansehen</text>
         <text lang="DA">Gennemse film</text>
         <text lang="IS">Horfa á myndir</text>
@@ -49,7 +46,6 @@
         <text lang="ZH_TW">播放電影</text>
         <text lang="SL">Gledanje filmov</text>
         <text lang="ET">Video vaatamine</text>
-        <text lang="CS">Sledovat filmy</text>
         <text lang="RU">Смотреть фильмы</text>
         <text lang="PL">Oglądanie filmów</text>
         <text lang="HE">צפיה בוידאו</text>
@@ -69,7 +65,6 @@
         <text>Listen to Music</text>
         <text lang="IT">Esegui Brani Musicali</text>
         <text lang="ES">Escuchar Música</text>
-        <text lang="CS">Escoltar Música</text>
         <text lang="DE">Musik hören</text>
         <text lang="DA">Afspil musik</text>
         <text lang="IS">Spila tónlist</text>
@@ -81,7 +76,6 @@
         <text lang="ZH_TW">播放音樂</text>
         <text lang="SL">Predvajanje glasbe</text>
         <text lang="ET">Kuula muusikat</text>
-        <text lang="CS">Poslouchat muziku</text>
         <text lang="RU">Слушать музыку</text>
         <text lang="PL">Odtwarzaj muzykę</text>
         <text lang="HE">האזנה למוסיקה</text>
@@ -107,7 +101,6 @@
         <text lang="DA">Hør radio</text>
         <text lang="ES">Escuchar Radio</text>
         <text lang="PT">Ouvir Rádio</text>
-        <text lang="CS">Poslouchat rádio</text>
         <text lang="RU">Слушать радио</text>
         <text lang="PL">Słuchaj radia</text>
         <text lang="HE">האזנה לרדיו</text>
@@ -139,7 +132,6 @@
         <text>Image Gallery</text>
         <text lang="IT">Immagini</text>
         <text lang="ES">Fotos</text>
-        <text lang="CS">Imatges</text>
         <text lang="NL">Foto's</text>
         <text lang="DE">Bilder ansehen</text>
         <text lang="DA">Billeder</text>
@@ -151,7 +143,6 @@
         <text lang="ZH_TW">照相館</text>
         <text lang="SL">Gledanje slik</text>
         <text lang="ET">Pildialbum</text>
-        <text lang="CS">Galerie fotek</text>
         <text lang="RU">Изображения</text>
         <text lang="PL">Galeria zdjęć</text>
         <text lang="HE">גלרית תמונות</text>
@@ -167,7 +158,6 @@
         <text>Play Games</text>
         <text lang="IT">Giochi</text>
         <text lang="ES">Juegos</text>
-        <text lang="CS">Jocs</text>
         <text lang="NL">Spelen</text>
         <text lang="DE">Spielen</text>
         <text lang="DA">Spil</text>
@@ -179,7 +169,6 @@
         <text lang="ZH_TW">遊戲</text>
         <text lang="SL">Igranje iger</text>
         <text lang="ET">Mängud</text>
-        <text lang="CS">Hrát hry</text>
         <text lang="RU">Играть в игры</text>
         <text lang="PL">Graj w gry</text>
         <text lang="HE">לשחק משחקים</text>

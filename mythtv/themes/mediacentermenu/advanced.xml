@@ -5,7 +5,6 @@
         <text>Manage Recordings</text>
         <text lang="IT">Programma Registrazioni</text>
         <text lang="ES">Programar Grabaciones</text>
-        <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Beheren</text>
         <text lang="DE">Aufnahmen verwalten</text>
         <text lang="DA">Optag udsendelse</text>
@@ -17,7 +16,6 @@
         <text lang="ZH_TW">管理電視錄影</text>
         <text lang="SL">Posnetki</text>
         <text lang="ET">Salvestamine</text>
-        <text lang="CS">Spravovat nahrávky</text>
         <text lang="RU">Управление записями</text>
         <text lang="AR">أدر التسجيلات</text>
         <text lang="PL">Zarządzaj nagraniami</text>
@@ -50,7 +48,6 @@
         <text lang="ES">CD/DVD</text>
         <text lang="EN_GB">CD/DVD</text>
         <text lang="PT">CD/DVD</text>
-        <text lang="CS">CD/DVD</text>
         <text lang="RU">CD/DVD</text>
         <text lang="AR">تشغيل إسطوانات</text>
         <text lang="PL">Dyski optyczne</text>
@@ -77,7 +74,6 @@
         <text lang="DA">Systemstatus</text>
         <text lang="ES">Estado Sistema</text>
         <text lang="PT">Estado do Sistema</text>
-        <text lang="CS">Stav systému</text>
         <text lang="RU">Состояние системы</text>
         <text lang="PL">Status systemu</text>
         <text lang="HE">מצב מערכת</text>
@@ -102,7 +98,6 @@
         <text lang="DA">Musikværktøjer</text>
         <text lang="ES">Gestionar Música</text>
         <text lang="PT">Gerir Música</text>
-        <text lang="CS">Hudební nástroje</text>
         <text lang="RU">Работа с музыкой</text>
         <text lang="PL">Narzędzia muzyczne</text>
         <text lang="HE">כלי מוסיקה</text>
@@ -125,7 +120,6 @@
         <text lang="PT">Configurar Teclas</text>
         <text lang="ET">Klahvide muutmine</text>
         <text lang="NL">Toetsen Aanpassen</text>
-        <text lang="CS">Editovat klávesy</text>
         <text lang="JA">キー設定</text>
         <text lang="RU">Редактировать клавиши</text>
         <text lang="SL">Urejanje tipk</text>
@@ -141,7 +135,6 @@
         <text>Setup</text>
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configurar</text>
-        <text lang="CS">Configurar</text>
         <text lang="DE">Konfiguration</text>
         <text lang="DA">Indstillinger</text>
         <text lang="IS">Stillingar</text>
@@ -153,7 +146,6 @@
         <text lang="ZH_TW">設定</text>
         <text lang="SL">Nastavitve</text>
         <text lang="ET">Sätted</text>
-        <text lang="CS">Nastavení</text>
         <text lang="RU">Настройки</text>
         <text lang="PL">Ustawienia</text>
         <text lang="HE">הגדרה</text>

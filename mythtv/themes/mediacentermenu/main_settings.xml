@@ -17,7 +17,6 @@
         <text lang="ZH_TW">一般設定</text>
         <text lang="SL">Splošno</text>
         <text lang="ET">Üldine</text>
-        <text lang="CS">Obecné</text>
         <text lang="RU">Общие</text>
         <text lang="PL">Ogólne</text>
         <text lang="HE">כללי</text>
@@ -43,7 +42,6 @@
         <text lang="ZH_TW">外觀設定</text>
         <text lang="SL">Vzgled</text>
         <text lang="ET">Kujundus</text>
-        <text lang="CS">Vzhled</text>
         <text lang="RU">Внешний вид</text>
         <text lang="PL">Ustaw wyglądy</text>
         <text lang="HE">מראה</text>
@@ -80,7 +78,6 @@
         <text lang="ET">TV sätted</text>
         <text lang="DA">TV Indstillinger</text>
         <text lang="PT">Configurar Televisão</text>
-        <text lang="CS">Nastavení televize</text>
         <text lang="RU">Настройки ТВ</text>
         <text lang="PL">Telewizja</text>
         <text lang="HE">הגדרות טלויזיה</text>
@@ -106,7 +103,6 @@
         <text lang="DA">Medier Indstillinger</text>
         <text lang="ES">Configurar Medios</text>
         <text lang="PT">Configurar Multimédia</text>
-        <text lang="CS">Nastavení multimédií</text>
         <text lang="RU">Настройки мультимедиа</text>
         <text lang="PL">Konfiguracja Media</text>
         <text lang="HE">הגדרות מדיה</text>
@@ -133,7 +129,6 @@
         <text lang="ES">Centro Información</text>
         <text lang="EN_GB">Info Centre Settings</text>
         <text lang="PT">Config. Centro de Info.</text>
-        <text lang="CS">Nastavení informačního centra</text>
         <text lang="RU">Настройки инфоцентра</text>
         <text lang="PL">Centrum informacyjne</text>
         <text lang="HE">הגדרות מרכז מידע</text>
@@ -161,7 +156,6 @@
         <text lang="SL">Xbox nastavitve</text>
         <text lang="ET">Xbox-i sätted</text>
         <text lang="DA">Xbox Indstillinger</text>
-        <text lang="CS">Nastavení XBOXu</text>
         <text lang="RU">Настройки Xbox</text>
         <text lang="PL">Konfiguracja Xbox</text>
         <text lang="HE">הגדרות Xbox</text>
@@ -184,7 +178,6 @@
         <text lang="DA">Telefon Indstillinger</text>
         <text lang="ES">Configurar Teléfono</text>
         <text lang="PT">Configurar Telefone</text>
-        <text lang="CS">Nastavení telefonu</text>
         <text lang="JA">電話設定</text>
         <text lang="RU">Настройки телефона</text>
         <text lang="PL">Konfiguracja Telefonu</text>
