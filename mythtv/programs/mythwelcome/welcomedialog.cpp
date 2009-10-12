@@ -30,7 +30,17 @@
 
 
 WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
-              :MythScreenType(parent, name)
+              :MythScreenType(parent, name),
+    m_status_text(NULL),          m_recording_text(NULL), m_scheduled_text(NULL),
+    m_warning_text(NULL),         m_time_text(NULL),      m_date_text(NULL),
+    m_startfrontend_button(NULL), m_menuPopup(NULL),
+    m_updateStatusTimer(new QTimer(this)),   m_updateScreenTimer(new QTimer(this)),
+    m_timeTimer(new QTimer(this)),                        m_isRecording(false),
+    m_hasConflicts(false),        m_bWillShutdown(false), m_secondsToShutdown(-1),
+    m_preRollSeconds(0),          m_idleWaitForRecordingTime(0),
+    m_screenTunerNo(0),           m_screenScheduledNo(0), m_statusListNo(0),
+    m_pendingRecListUpdate(false),m_pendingSchedUpdate(false)
+
 {
     gContext->addListener(this);
 
@@ -45,23 +55,17 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
 
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
     m_bWillShutdown = (gContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
-    m_secondsToShutdown = -1;
 
-    m_updateStatusTimer = new QTimer(this);
-    connect(m_updateStatusTimer, SIGNAL(timeout()), this,
-                                 SLOT(updateStatus()));
+    connect(m_updateStatusTimer, SIGNAL(timeout()),
+            this, SLOT(updateStatus()));
     m_updateStatusTimer->start(UPDATE_STATUS_INTERVAL);
 
-    m_updateScreenTimer = new QTimer(this);
-    connect(m_updateScreenTimer, SIGNAL(timeout()), this,
-                                 SLOT(updateScreen()));
+    connect(m_updateScreenTimer, SIGNAL(timeout()),
+            this, SLOT(updateScreen()));
 
-    m_timeTimer = new QTimer(this);
-    connect(m_timeTimer, SIGNAL(timeout()), this,
-                                 SLOT(updateTime()));
+    connect(m_timeTimer, SIGNAL(timeout()), 
+            this, SLOT(updateTime()));
     m_timeTimer->start(1000);
-
-    m_menuPopup = NULL;
 }
 
 bool WelcomeDialog::Create(void)
