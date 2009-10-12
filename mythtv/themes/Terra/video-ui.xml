@@ -115,7 +115,8 @@
     </window>
 
     <window name="filter">
-        <area>0,22,1280,555</area>
+        <area>0,42,1280,555</area>
+
         <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
@@ -124,14 +125,14 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>251,110,774,40</area>
+            <area>251,70,774,40</area>
             <value>Video List Filters</value>
             <align>hcenter,vcenter</align>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="numvideos_text" from="title">
-            <position>251,160</position>
+            <position>251,120</position>
             <align>allcenter</align>
             <font>basesmall</font>
         </textarea>
@@ -139,133 +140,133 @@
         <!-- Labels -->
 
         <textarea name="textfilter_text">
-            <area>419,236,180,30</area>
+            <area>419,196,180,30</area>
             <value>Text Filter:</value>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="category_text">
-            <area>269,272,220,30</area>
+            <area>269,232,220,30</area>
             <value>Category</value>
             <align>hcenter</align>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="genre_text" from="category_text">
-            <position>269,339</position>
+            <position>269,299</position>
             <value>Genre</value>
         </textarea>
 
         <textarea name="country_text" from="category_text">
-            <position>269,406</position>
+            <position>269,366</position>
             <value>Country</value>
         </textarea>
 
         <textarea name="cast_text" from="category_text">
-            <position>269,473</position>
+            <position>269,433</position>
             <value>Actor/Actress</value>
         </textarea>
 
         <textarea name="year_text" from="category_text">
-            <position>526,272</position>
+            <position>526,232</position>
             <value>Year</value>
         </textarea>
 
         <textarea name="runtime_text" from="category_text">
-            <position>526,339</position>
+            <position>526,299</position>
             <value>Runtime</value>
         </textarea>
 
         <textarea name="userrating_text" from="category_text">
-            <position>526,406</position>
+            <position>526,366</position>
             <value>User Rating</value>
         </textarea>
 
         <textarea name="browse_text" from="category_text">
-            <position>526,473</position>
+            <position>526,433</position>
             <value>Browse</value>
         </textarea>
 
         <textarea name="inetref_text" from="category_text">
-            <position>784,272</position>
+            <position>784,232</position>
             <value>InetRef</value>
         </textarea>
 
         <textarea name="coverfile_text" from="category_text">
-            <position>784,339</position>
+            <position>784,299</position>
             <value>Cover File</value>
         </textarea>
 
         <textarea name="orderby_text" from="category_text">
-            <position>784,406</position>
+            <position>784,366</position>
             <value>Sort by</value>
         </textarea>
 
         <textarea name="watched_text" from="category_text">
-            <position>784,473</position>
+            <position>784,433</position>
             <value>Watched</value>
         </textarea>
 
         <!-- Widgets -->
         <textedit name="textfilter_input" from="baseshorttextedit">
-            <position>545,225</position>
+            <position>545,185</position>
         </textedit>
 
         <buttonlist name="category_select" from="baseselector">
-            <position>269,299</position>
+            <position>269,259</position>
         </buttonlist>
 
         <buttonlist name="genre_select" from="baseselector">
-            <position>269,366</position>
+            <position>269,326</position>
         </buttonlist>
 
         <buttonlist name="country_select" from="baseselector">
-            <position>269,433</position>
+            <position>269,393</position>
         </buttonlist>
 
         <buttonlist name="cast_select" from="baseselector">
-            <position>269,500</position>
+            <position>269,460</position>
         </buttonlist>
 
         <buttonlist name="year_select" from="baseselector">
-            <position>526,299</position>
+            <position>526,259</position>
         </buttonlist>
 
         <buttonlist name="runtime_select" from="baseselector">
-            <position>526,366</position>
+            <position>526,326</position>
         </buttonlist>
 
         <buttonlist name="userrating_select" from="baseselector">
-            <position>526,433</position>
+            <position>526,393</position>
         </buttonlist>
 
         <buttonlist name="browse_select" from="baseselector">
-            <position>526,500</position>
+            <position>526,460</position>
         </buttonlist>
 
         <buttonlist name="inetref_select" from="baseselector">
-            <position>784,299</position>
+            <position>784,259</position>
         </buttonlist>
 
         <buttonlist name="coverfile_select" from="baseselector">
-            <position>784,366</position>
+            <position>784,326</position>
         </buttonlist>
 
         <buttonlist name="orderby_select" from="baseselector">
-            <position>784,433</position>
+            <position>784,393</position>
         </buttonlist>
 
         <buttonlist name="watched_select" from="baseselector">
-            <position>784,500</position>
+            <position>784,460</position>
         </buttonlist>
 
         <button name="done_button" from="basebutton">
-            <position>693,560</position>
+            <position>693,520</position>
             <value>Done</value>
         </button>
 
         <button name="save_button" from="basebutton">
-            <position>363,560</position>
+            <position>363,520</position>
             <value>Make default</value>
         </button>
 
