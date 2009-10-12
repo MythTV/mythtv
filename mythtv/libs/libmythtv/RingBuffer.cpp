@@ -1424,6 +1424,8 @@ long long RingBuffer::Seek(long long pos, int whence)
         return readpos;
     }
 
+    errno = 0; // clear errno, in case of remotefile error
+
     long long ret = -1;
     if (remotefile)
         ret = remotefile->Seek(pos, whence, readpos);
@@ -1431,6 +1433,7 @@ long long RingBuffer::Seek(long long pos, int whence)
     else if (dvdPriv)
     {
         dvdPriv->NormalSeek(pos);
+        ret = pos;
     }
 #endif // USING_FRONTEND
     else
@@ -1452,15 +1455,25 @@ long long RingBuffer::Seek(long long pos, int whence)
         }
     }
 
-    if (whence == SEEK_SET)
-        readpos = ret;
-    else if (whence == SEEK_CUR)
-        readpos += pos;
+    if (ret >= 0)
+    {
+        if (whence == SEEK_SET)
+            readpos = pos;
+        else if (whence == SEEK_CUR)
+            readpos += pos;
 
-    if (readaheadrunning)
-        ResetReadAhead(readpos);
+        if (readaheadrunning)
+            ResetReadAhead(readpos);
 
-    readAdjust = 0;
+        readAdjust = 0;
+    }
+    else
+    {
+        QString cmd = QString("Seek(%1, %2)").arg(pos)
+            .arg((SEEK_SET == whence) ? "SEEK_SET" :
+                 ((SEEK_CUR == whence) ?"SEEK_CUR" : "SEEK_END"));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + cmd + " Failed" + ENO);
+    }
 
     pthread_rwlock_unlock(&rwlock);
 
