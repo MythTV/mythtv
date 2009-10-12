@@ -578,7 +578,20 @@ bool ImportIconsWizard::search(const QString& strParam)
     {
         VERBOSE(VB_CHANNEL, QString("Icon Import: Working search : %1").arg(str));
         QStringList strSplit = str.split("\n");
-        
+
+        // HACK HACK HACK -- begin
+        // This is needed since the user can't escape out of the progress dialog
+        // and the result set may contain thousands of channels.
+        if (strSplit.size() > 24*3)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Warning: Result set contains %1 items, "
+                            "truncating to the first %2 results")
+                    .arg(strSplit.size()).arg(6*3));
+            while (strSplit.size() > 6*3) strSplit.removeLast();
+        }
+        // HACK HACK HACK -- end
+
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
         QString message = QObject::tr("Searching for icons for channel %1")
