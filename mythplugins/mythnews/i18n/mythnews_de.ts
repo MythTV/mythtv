@@ -6,22 +6,26 @@
     <message>
         <location filename="../mythnews/main.cpp" line="27"/>
         <source>RSS News feed reader</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS-Nachrichtenfeed</translation>
+    </message>
+    <message>
+        <source>News</source>
+        <translation type="obsolete">Nachrichten</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="31"/>
         <source>Update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachrichten aktualisieren</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="33"/>
         <source>Force update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisierung der Nachrichten forcieren</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="35"/>
         <source>Cancel news item updating</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisierung der Nachrichten abbrechen</translation>
     </message>
 </context>
 <context>
@@ -167,14 +171,18 @@
 <context>
     <name>ThemeUI</name>
     <message>
+        <source>Minutes</source>
+        <translation type="obsolete">Minuten</translation>
+    </message>
+    <message>
         <location filename="themestrings.h" line="2"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 </TS>

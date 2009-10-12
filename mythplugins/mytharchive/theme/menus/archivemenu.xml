@@ -71,6 +71,7 @@
        <text lang="SL">Pripomočki za arhiviranje</text>
        <text lang="FI">Lisätoiminnot</text>
        <text lang="NB">Arkiv-verktøy</text>
+       <text lang="DE">Zubehör</text>
        <action>MENU archiveutils.xml</action>
    </button>
 
