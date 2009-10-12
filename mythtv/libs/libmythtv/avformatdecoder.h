@@ -194,7 +194,7 @@ class AvFormatDecoder : public DecoderBase
 
     /// Update our position map, keyframe distance, and the like.
     /// Called for key frame packets.
-    void HandleGopStart(AVPacket *pkt);
+    void HandleGopStart(AVPacket *pkt, bool can_reliably_parse_keyframes);
 
     bool GenerateDummyVideoFrame(void);
     bool HasVideo(const AVFormatContext *ic);

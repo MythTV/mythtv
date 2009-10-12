@@ -2447,7 +2447,8 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
     }
 }
 
-void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
+void AvFormatDecoder::HandleGopStart(
+    AVPacket *pkt, bool can_reliably_parse_keyframes)
 {
     if (prevgoppos != 0 && keyframedist != 1)
     {
@@ -2499,7 +2500,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 
     lastKey = prevgoppos = framesRead - 1;
 
-    if (!hasFullPositionMap)
+    if (can_reliably_parse_keyframes &&
+        !hasFullPositionMap && !livetv && !watchingrecording)
     {
         long long last_frame = 0;
         {
@@ -2613,13 +2615,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             if (!seen_gop && seq_count > 1)
             {
-                HandleGopStart(pkt);
+                HandleGopStart(pkt, true);
                 pkt->flags |= PKT_FLAG_KEY;
             }
         }
         else if (GOP_START == start_code_state)
         {
-            HandleGopStart(pkt);
+            HandleGopStart(pkt, true);
             seen_gop = true;
             pkt->flags |= PKT_FLAG_KEY;
         }
@@ -2684,7 +2686,7 @@ void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             }
         }
 
-        HandleGopStart(pkt);
+        HandleGopStart(pkt, false);
         pkt->flags |= PKT_FLAG_KEY;
     }
 }
@@ -3508,7 +3510,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 if (pkt->flags & PKT_FLAG_KEY)
                 {
-                    HandleGopStart(pkt);
+                    HandleGopStart(pkt, false);
                     seen_gop = true;
                 }
                 else
@@ -3516,7 +3518,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     seq_count++;
                     if (!seen_gop && seq_count > 1)
                     {
-                        HandleGopStart(pkt);
+                        HandleGopStart(pkt, false);
                     }
                 }
             }
