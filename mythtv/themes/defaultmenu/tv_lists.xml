@@ -7,7 +7,6 @@
         <text lang="IT">Nuovi Titoli</text>
         <text lang="DE">Neue Sendungen</text>
         <text lang="IS">Nýjir titlar</text>
-        <text lang="FR">Nouveaux titres</text>
         <text lang="SV">Nya titlar</text>
         <text lang="JA">新タイトル</text>
         <text lang="NL">Nieuwe Titels</text>
@@ -36,7 +35,6 @@
         <text lang="DE">Spielfilme</text>
         <text lang="IS">Myndir</text>
         <text lang="SV">Filmer</text>
-        <text lang="FR">Films</text>
         <text lang="JA">映画</text>
         <text lang="NL">Films</text>
         <text lang="FI">Elokuvat</text>
@@ -65,7 +63,6 @@
         <text lang="DE">Kategorien</text>
         <text lang="IS">Flokkar</text>
         <text lang="SV">Kategori</text>
-        <text lang="FR">Catégories</text>
         <text lang="JA">カテゴリー</text>
         <text lang="NL">Categorie</text>
         <text lang="FI">Kategoriat</text>
@@ -93,7 +90,6 @@
         <text lang="DE">Sender</text>
         <text lang="IS">Stöðvar</text>
         <text lang="SV">Kanal</text>
-        <text lang="FR">Chaînes</text>
         <text lang="NL">Zenders</text>
         <text lang="JA">チャンネル</text>
         <text lang="FI">Kanavat</text>
@@ -120,7 +116,6 @@
         <text lang="IT">Ora</text>
         <text lang="NL">Tijdstip</text>
         <text lang="SV">Tid</text>
-        <text lang="FR">Date</text>
         <text lang="JA">時間</text>
         <text lang="DE">Sendezeit</text>
         <text lang="IS">Tími</text>

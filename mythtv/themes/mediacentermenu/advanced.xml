@@ -7,7 +7,6 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Beheren</text>
-        <text lang="FR">Gérer les enregistrements</text>
         <text lang="DE">Aufnahmen verwalten</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="IS">Upptaka útsendinga</text>
@@ -40,7 +39,6 @@
         <text>Optical Disks</text>
         <text lang="IT">CD/DVD</text>
         <text lang="DE">CD/DVD</text>
-        <text lang="FR">Disques optiques</text>
         <text lang="IS">Geisladiskar</text>
         <text lang="NL">DVD/CD</text>
         <text lang="SV">Optiska diskar</text>
@@ -70,7 +68,6 @@
         <text>System Status</text>
         <text lang="IT">Stato del Sistema</text>
         <text lang="DE">Systemstatus</text>
-        <text lang="FR">État système</text>
         <text lang="IS">Staða kerfis</text>
         <text lang="NL">Systeemstatus</text>
         <text lang="SV">Systemstatus</text>
@@ -100,7 +97,6 @@
         <text lang="IS">Tónlistartól</text>
         <text lang="NL">Muziek Beheren</text>
         <text lang="SV">Musikverktyg</text>
-        <text lang="FR">Outils musique</text>
         <text lang="JA">ミュージックツール</text>
         <text lang="FI">Musiikkityökalut</text>
         <text lang="ZH_TW">音樂工具</text>
@@ -124,7 +120,6 @@
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
         <text lang="IT">Modifica Tasti</text>
-        <text lang="FR">Éditer les touches</text>
         <text lang="IS">Stilla takka</text>
         <text lang="DE">Tastenbelegung ändern</text>
         <text lang="FI">Muokkaa Näppäimiä</text>
@@ -151,7 +146,6 @@
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configurar</text>
         <text lang="CS">Configurar</text>
-        <text lang="FR">Configuration</text>
         <text lang="DE">Konfiguration</text>
         <text lang="DA">Indstillinger</text>
         <text lang="IS">Stillingar</text>

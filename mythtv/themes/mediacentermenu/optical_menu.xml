@@ -11,7 +11,6 @@
         <text lang="SV">Spela DVD</text>
         <text lang="ES">Ver DVD</text>
         <text lang="CS">Veure DVD</text>
-        <text lang="FR">Lire un DVD</text>
         <text lang="NL">DVD Afspelen</text>
         <text lang="JA">DVD再生</text>
         <text lang="FI">Katso DVD</text>
@@ -40,7 +39,6 @@
         <text lang="SV">Spela VCD</text>
         <text lang="ES">Ver VCD</text>
         <text lang="CS">Veure VCD</text>
-        <text lang="FR">Lire un VCD</text>
         <text lang="NL">VCD Afspelen</text>
         <text lang="JA">VCD再生</text>
         <text lang="FI">Toista VCD</text>
@@ -70,7 +68,6 @@
         <text lang="NL">DVD Importeren</text>
         <text lang="PT">Importar DVD p/ Disco</text>
         <text lang="SV">Importera DVD</text>
-        <text lang="FR">Import de DVD</text>
         <text lang="JA">DVD取込</text>
         <text lang="FI">Kopioi DVD</text>
         <text lang="ZH_TW">輸入DVD</text>
@@ -90,7 +87,6 @@
     <button>
         <type>ARCHIVE</type>
         <text>Archive Files</text>
-        <text lang="FR">Archivage de fichiers</text>
         <text lang="FI">Arkistoi</text>
         <text lang="IT">Archivia Files</text>
         <text lang="SV">Arkivera filer</text>
@@ -121,7 +117,6 @@
         <text lang="NL">CD Importeren</text>
         <text lang="PT">Importar CD p/ Disco</text>
         <text lang="SV">Importera CD</text>
-        <text lang="FR">Import de CD</text>
         <text lang="JA">CD取込</text>
         <text lang="FI">Kopioi CD</text>
         <text lang="ZH_TW">輸入音樂CD</text>
@@ -144,7 +139,6 @@
         <text>Eject media</text>
         <text lang="IT">Espelli Media</text>
         <text lang="SV">Mata ut</text>
-        <text lang="FR">Éjecter un média</text>
         <text lang="ES">Expulsar medios</text>
         <text lang="RU">Достать диск</text>
         <text lang="DA">Skub ud</text>

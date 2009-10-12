@@ -10,7 +10,6 @@
         <text lang="SV">Titel</text>
         <text lang="JA">タイトル</text>
         <text lang="NL">Titels</text>
-        <text lang="FR">Titres</text>
         <text lang="FI">Nimikkeet</text>
         <text lang="ZH_TW">標題</text>
         <text lang="SL">Naslovi</text>
@@ -35,7 +34,6 @@
         <text lang="IT">Parole Chiavi</text>
         <text lang="DE">nach Inhalt</text>
         <text lang="IS">Leitarorð</text>
-        <text lang="FR">Mots-clés</text>
         <text lang="SV">Nyckelord</text>
         <text lang="NL">Beschrijving</text>     
         <text lang="JA">キーワード</text>
@@ -63,7 +61,6 @@
         <text lang="IT">Persone</text>
         <text lang="SV">Person</text>
         <text lang="NL">Personen</text>    
-        <text lang="FR">Personnes</text>
         <text lang="JA">人</text>
         <text lang="DE">nach Personen</text>
         <text lang="IS">Manneskjum</text>
@@ -91,7 +88,6 @@
         <text lang="SV">Avancerad</text>
         <text lang="NL">Geavanceerd</text>     
         <text lang="IS">Frekari</text>
-        <text lang="FR">Avancé</text>
         <text lang="JA">アドバンスト</text>
         <text lang="DE">Erweiterte Suche</text>
         <text lang="FI">Lisävalinnat</text>
@@ -117,7 +113,6 @@
     <button>
         <type>TV_SEARCH_STORED</type>
         <text>Stored Searches</text>
-        <text lang="FR">Recherches stockées</text>
         <text lang="SL">Shranjena iskanja</text>
         <text lang="HE">חיפושים שמורים</text>
         <text lang="FI">Tallennetut Haut</text>

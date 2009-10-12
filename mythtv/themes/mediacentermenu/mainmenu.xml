@@ -7,7 +7,6 @@
         <text lang="ES">Ver Grabaciones</text>
         <text lang="CS">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
-        <text lang="FR">Regarder les enregistrements</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
         <text lang="IS">Horfa á upptökur</text>
@@ -43,7 +42,6 @@
         <text lang="IS">Horfa á myndir</text>
         <text lang="PT">Ver Filmes</text>
         <text lang="SV">Visa filmer</text>
-        <text lang="FR">Regarder les vidéos</text>
         <text lang="NL">Films Bekijken</text>
         <text lang="JA">ビデオブラウズ</text>
         <text lang="FI">Katso Videoita</text>
@@ -76,7 +74,6 @@
         <text lang="SV">Spela DVD</text>
         <text lang="ES">Ver DVD</text>
         <text lang="CS">Veure DVD</text>
-        <text lang="FR">Regarder un DVD</text>
         <text lang="NL">DVD Afspelen</text>
         <text lang="JA">DVD再生</text>
         <text lang="FI">Katso DVD</text>
@@ -101,7 +98,6 @@
         <text lang="ES">Ver la TV</text>
         <text lang="CS">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
-        <text lang="FR">Regarder la TV en direct</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
         <text lang="IS">Horfa á sjónvarp</text>
@@ -126,7 +122,6 @@
     <button>
         <type>STREAM</type>
         <text>Watch Online Streams</text>
-        <text lang="FR">Regarder des flux en ligne</text>
         <text lang="HE">נגן מדיה מכוונת</text>
         <description></description>
         <action>PLUGIN mythstream</action>
@@ -145,7 +140,6 @@
         <text lang="NL">Muziek Afspelen</text>
         <text lang="PT">Tocar Músicas</text>
         <text lang="SV">Spela musik</text>
-        <text lang="FR">Écouter de la musique</text>
         <text lang="JA">ミュージック再生</text>
         <text lang="FI">Kuuntele Musiikkia</text>
         <text lang="ZH_TW">播放音樂</text>
@@ -165,7 +159,6 @@
     <button>
         <type>MENU_PLUGINS</type>
         <text>Plugins</text>
-        <text lang="FR">Greffons</text>
         <description>Other Plugins</description>
         <description lang="DE">Weitere Plugins</description>
         <action>MENU plugin_menu.xml</action>
@@ -174,7 +167,6 @@
     <button>
         <type>MENU_ADVANCED</type>
         <text>Advanced</text>
-        <text lang="FR">Avancé</text>
         <text lang="DE">Erweitert</text>
         <description>Advanced Options</description>
         <description lang="DE">Weitere Optionen</description>

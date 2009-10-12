@@ -4,7 +4,6 @@
         <type>TV</type>
         <text>TV Utilities</text>
         <text lang="PT">Televisão</text>
-        <text lang="FR">Utilitaires TV</text>
         <text lang="SV">TV</text>
         <text lang="DE">TV</text>
         <text lang="SL">TV</text>
@@ -25,7 +24,6 @@
         <text lang="ES">Música</text>
         <text lang="CA">Música</text>
         <text lang="NL">Muziek</text>
-        <text lang="FR">Musique</text>
         <text lang="DE">Musik</text>
         <text lang="DA">Musik</text>
         <text lang="PT">Música</text>
@@ -46,7 +44,6 @@
         <text lang="ES">Video</text>
         <text lang="CA">Vídeo</text>
         <text lang="NL">Films</text>
-        <text lang="FR">Vidéos</text>
         <text lang="DE">Videos</text>
         <text lang="DA">Film</text>
         <text lang="PT">Filmes</text>
@@ -63,7 +60,6 @@
     <button>
         <type>FM</type>
         <text>Radio</text>
-        <text lang="FR">Radio</text>
         <text lang="DE">Radio</text>
         <text lang="SL">Radio</text>
         <text lang="ET">Raadio</text>
@@ -86,7 +82,6 @@
         <text lang="ES">Fotos</text>
         <text lang="CA">Imatges</text>
         <text lang="NL">Foto 's</text>
-        <text lang="FR">Photos</text>
         <text lang="DE">Bilder</text>
         <text lang="DA">Billeder</text>
         <text lang="PT">Fotos</text>
@@ -107,7 +102,6 @@
         <text lang="ES">Juegos</text>
         <text lang="CA">Jocs</text>
         <text lang="NL">Spelen</text>
-        <text lang="FR">Jeux</text>
         <text lang="DE">Spiele</text>
         <text lang="DA">Spil</text>
         <text lang="PT">Jogos</text>
@@ -128,7 +122,6 @@
         <text lang="ES">El Tiempo</text>
         <text lang="CA">El Temps</text>
         <text lang="NL">Het Weer</text>
-        <text lang="FR">Météo</text>
         <text lang="DE">Wetter</text>
         <text lang="DA">Vejret</text>
         <text lang="PT">Meteorologia</text>
@@ -148,7 +141,6 @@
         <text lang="DE">Nachrichten</text>
         <text lang="CA">Notícies</text>
         <text lang="ES">Noticias</text>
-        <text lang="FR">Nouvelles</text>
         <text lang="NL">Nieuws</text>
         <text lang="SV">Nyheter</text>
         <text lang="JA">ニュース</text>
@@ -171,7 +163,6 @@
         <text lang="SL">Splet</text>
         <text lang="ET">Veeb</text>
         <text lang="DA">Web</text>
-        <text lang="FR">Web</text>
         <text lang="PT">Navegação na Web</text>
         <text lang="ES">Web</text>
         <text lang="NL">Internet</text>
@@ -190,7 +181,6 @@
         <text lang="SV">Telefon</text>
         <text lang="DA">Telefon</text>
         <text lang="PT">Telefone</text>
-        <text lang="FR">Téléphone</text>
         <text lang="ES">Teléfono</text>
         <text lang="NL">Telefoon</text>
         <text lang="JA">電話</text>
@@ -206,7 +196,6 @@
         <text lang="SV">Skriv DVD</text>
         <text lang="PT">Gravar DVD</text>
         <text lang="ES">Grabar DVD</text>
-        <text lang="FR">Gravure DVD</text>
         <text lang="NL">DVD Branden</text>
         <text lang="JA">DVD書込</text>
         <text lang="ET">DVD kirjutamine</text>
@@ -223,7 +212,6 @@
         <text lang="SL">Recepti</text>
         <text lang="ET">Retseptid</text>
         <text lang="SV">Recept</text>
-        <text lang="FR">Recettes</text>
         <text lang="DA">Opskrifter</text>
         <text lang="PT">Receitas</text>
         <text lang="ES">Recetas</text>
@@ -239,7 +227,6 @@
         <type>ARCHIVE</type>
         <text>Archive Files</text>
         <text lang="ET">Arhiveerimine</text>
-        <text lang="FR">Archivage de fichiers</text>
         <text lang="SV">Arkivera filer</text>
         <text lang="RU">Архив файлов</text>
         <text lang="HU">Archív fájlok</text>
@@ -250,7 +237,6 @@
     <button>
         <type>ZONEMINDER</type>
         <text>Zone Minder</text>
-        <text lang="FR">Zone Minder</text>
         <text lang="HU">Video megfigyelő rendszer</text>
         <action>PLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
@@ -263,7 +249,6 @@
         <text lang="SL">Čas filmov</text>
         <text lang="ET">Filmide ajad</text>
         <text lang="SV">Biotider</text>
-        <text lang="FR">Horaires de cinéma</text>
         <text lang="DA">Biograf</text>
         <text lang="PT">Horários de Cinema</text>
         <text lang="NL">Bioscoop Tijden</text>
@@ -280,7 +265,6 @@
         <text lang="SV">Nätfilmer</text>
         <text lang="PT">Aluguer de Filmes</text>
         <text lang="ET">MythFlix</text>
-        <text lang="FR">NetFlix</text>
         <text lang="HU">Netflix</text>
         <action>PLUGIN mythflix</action>
         <depends>mythflix</depends>
@@ -290,7 +274,6 @@
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
         <text lang="IT">Modifica Tasti</text>
-        <text lang="FR">Éditer les touches</text>
         <text lang="DE">Tastenbelegung ändern</text>
         <text lang="SV">Ändra knappar</text>
         <text lang="DA">Tasteopsætning</text>
@@ -311,7 +294,6 @@
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configurar</text>
         <text lang="CA">Configurar</text>
-        <text lang="FR">Configuration</text>
         <text lang="DE">Konfiguration</text>
         <text lang="DA">Konfiguration</text>
         <text lang="NL">Instellingen</text>
@@ -329,7 +311,6 @@
     <!-- <button>
         <type>SHUTDOWN</type>
         <text>Shutdown</text>
-        <text lang="FR">Éteindre</text>
         <text lang="SV">Avstängning</text>
         <text lang="DE">Beenden</text>
         <text lang="ET">Seiskamine</text>

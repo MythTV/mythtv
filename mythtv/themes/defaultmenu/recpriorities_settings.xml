@@ -6,7 +6,6 @@
         <text>Set Recording Priorities</text>
         <text lang="IT">Priorità Registrazione</text>
         <text lang="DE">Aufnahmen</text>
-        <text lang="FR">Fixer les priorités d&apos;enregistrement</text>
         <text lang="SV">Inspelningsprioriteter</text>
         <text lang="FI">Nauhoitusprioriteetit</text>
         <text lang="JA">録画優先順位設定</text>
@@ -23,7 +22,6 @@
         <text lang="HE">הגדרת קדימויות הקלטה</text>
         <text lang="HU">Felvételi prioritások beállításai</text>
         <alttext>Recording Priorities</alttext>
-        <alttext lang="FR">Priorités d&apos;enresgitrement</alttext>
         <alttext lang="IT">Priorità</alttext>
         <alttext lang="DE">Aufnahmen</alttext>
         <alttext lang="SV">Inspelning</alttext>
@@ -44,7 +42,6 @@
         <text lang="IT">Priorità Canali</text>
         <text lang="DE">Sender</text>
         <text lang="SV">Kanalprioriteter</text>
-        <text lang="FR">Fixer les priorités d&apos;enregistrement des chaînes</text>
         <text lang="JA">チャンネル録画優先順位設定</text>
         <text lang="FI">Kanavaprioriteetit</text>
         <text lang="NL">Prioriteit per Zender</text>
@@ -62,7 +59,6 @@
         <text lang="HU">Csatorna felvételi prioritások beállítása</text>
         <alttext>Channel Priorities</alttext>
         <alttext lang="IT">Canali</alttext>
-        <alttext lang="FR">Priorités de chaîne</alttext>
         <alttext lang="JA">チャンネル優先順位</alttext>
         <alttext lang="DE">Sender</alttext>
         <alttext lang="SV">Kanal</alttext>
@@ -80,13 +76,11 @@
     <button>
         <type>TV_RECPRIORITIES_CUSTOM</type>
         <text>Custom Priority</text>
-        <text lang="FR">Priorité personnalisée</text>
         <text lang="IT">Personalizzate</text>
         <text lang="SL">Poljubne prioritete</text>
         <text lang="FI">Muokatut Prioriteetit</text>
         <text lang="HU">Egyéni prioritások</text>
         <alttext>Custom Priority</alttext>
-        <alttext lang="FR">Priorité personnalisée</alttext>
         <description></description>
         <action>SETTINGS CUSTOMPRIORITY</action>
     </button>

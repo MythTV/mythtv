@@ -7,7 +7,6 @@
         <text lang="ES">Ver la TV</text>
         <text lang="CA">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
-        <text lang="FR">Regarder la TV</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
         <text lang="PT">Ver Televisão</text>
@@ -29,7 +28,6 @@
         <text lang="ES">Borrar Grabaciones</text>
         <text lang="CA">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
-        <text lang="FR">Supprimer les enregistrements</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
         <text lang="PT">Apagar Gravações</text>
@@ -56,7 +54,6 @@
         <text lang="PT">Modo Directo de TV</text>
         <text lang="ES">TV directo</text>
         <text lang="CA">TV directe</text>
-        <text lang="FR">Mode direct</text>
         <text lang="DE">TV direkt</text>
         <text lang="SV">TV direkt</text>
         <text lang="JA">パススルーモード</text>
@@ -71,7 +68,6 @@
         <type>TV_PREVIOUS</type>
         <text>Previously Recorded</text>
         <text lang="IT">Recentemente Registrati</text>
-        <text lang="FR">Déjà enregistré</text>
         <text lang="SV">Föregående</text>
         <text lang="DE">Alte Aufnahmen</text>
         <text lang="SL">Že posneto</text>

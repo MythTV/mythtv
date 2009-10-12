@@ -9,7 +9,6 @@
         <text lang="IS">Tónlistartól</text>
         <text lang="NL">Muziek Beheren</text>
         <text lang="SV">Musikverktyg</text>
-        <text lang="FR">Outils musique</text>
         <text lang="JA">ミュージックツール</text>
         <text lang="FI">Musiikkityökalut</text>
         <text lang="ZH_TW">音樂工具</text>
@@ -41,7 +40,6 @@
         <text lang="IS">Kvikmyndatól</text>
         <text lang="PT">Gerir Filmes</text>
         <text lang="SV">Filmhanterare</text>
-        <text lang="FR">Gestionnaire vidéo</text>
         <text lang="NL">Films Beheren</text>
         <text lang="JA">ビデオマネージャー</text>
         <text lang="FI">Videonhallinta</text>
@@ -64,7 +62,6 @@
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
         <text lang="IT">Modifica Tasti</text>
-        <text lang="FR">Éditer les touches</text>
         <text lang="IS">Stilla takka</text>
         <text lang="DE">Tastenbelegung ändern</text>
         <text lang="FI">Muokkaa Näppäimiä</text>
@@ -92,7 +89,6 @@
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configurar</text>
         <text lang="CS">Configurar</text>
-        <text lang="FR">Configuration</text>
         <text lang="DE">Konfiguration</text>
         <text lang="DA">Indstillinger</text>
         <text lang="IS">Stillingar</text>

@@ -6,7 +6,6 @@
         <text>Weather Settings</text>
         <text lang="IT">Impostazioni Meteo</text>
         <text lang="ES">Configurar El Tiempo</text>
-        <text lang="FR">Réglages Météo</text>
         <text lang="CA">Configurar El Temps</text>
         <text lang="DE">Wetter</text>
         <text lang="DA">Vejr Indstillinger</text>
@@ -34,7 +33,6 @@
     <button>
         <type>SETTINGS_WEATHER</type>
         <text>Weather Station Settings</text>
-        <text lang="FR">Réglages Station météo</text>
         <text lang="DE">Wetterstation</text>
         <text lang="HU">Időjárás-mérő állomás beállítása</text>
         <description></description>
@@ -50,7 +48,6 @@
         <text lang="CA">Configurar Notícies</text>
         <text lang="ES">Configurar Noticias</text>
         <text lang="NL">Nieuws Instellingen</text>
-        <text lang="FR">Réglages Nouvelles</text>
         <text lang="IS">Stillingar frétta</text>
         <text lang="SV">Nyheter</text>
         <text lang="JA">ニュース設定</text>
@@ -80,7 +77,6 @@
         <text lang="FI">Elokuvahaun Asetukset</text>
         <text lang="SL">Nastavitve kino programa</text>
         <text lang="ET">Filmiaegade sätted</text>
-        <text lang="FR">Réglages Horaires cinéma</text>
         <text lang="SV">Biotider</text>
         <text lang="DA">Biograf Indstillinger</text>
         <text lang="PT">Configurar Horários de Cinema</text>
@@ -106,7 +102,6 @@
         <text lang="FI">NetFlix Asetukset</text>
         <text lang="PT">Configurar Aluguer de Filmes</text>
         <text lang="DE">NetFlix</text>
-        <text lang="FR">Réglages NetFlix</text>
         <text lang="ES">NetFlix</text>
         <text lang="ET">NetFlix sätted</text>
         <text lang="NL">NetFlix Instellingen</text>
@@ -129,7 +124,6 @@
         <text lang="DE">WWW</text>
         <text lang="SV">Webb</text>
         <text lang="JA">Web設定</text>
-        <text lang="FR">Réglages Web</text>
         <text lang="IS">Stillingar vefs</text>
         <text lang="NL">Internet Instellingen</text>    
         <text lang="FI">Nettiasetukset</text>
@@ -158,7 +152,6 @@
         <text lang="SV">Recept</text>
         <text lang="JA">レシピ設定</text>
         <text lang="DE">Rezepte</text>
-        <text lang="FR">Réglages Recettes</text>
         <text lang="FI">Reseptiasetukset</text>
         <text lang="IS">Stillingar uppskrifta</text>
         <text lang="NL">Recepten Instellingen</text>    

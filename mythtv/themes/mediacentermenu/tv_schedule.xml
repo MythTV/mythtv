@@ -7,7 +7,6 @@
         <text lang="ES">Guía de Programas</text>
         <text lang="CS">Guia de programes</text>
         <text lang="NL">Programmagids</text>
-        <text lang="FR">Guide des programmes</text>
         <text lang="DE">Programmübersicht</text>
         <text lang="DA">Programoversigt</text>
         <text lang="IS">Dagskrá sjónvarps</text>
@@ -26,7 +25,6 @@
         <text lang="HE">מדריך שידורים</text>
         <alttext>Guide</alttext>
         <alttext lang="IT">Guida</alttext>
-        <alttext lang="FR">Guide</alttext>
         <alttext lang="ES">Guía</alttext>
         <alttext lang="CS">Guia</alttext>
         <alttext lang="DE">EPG</alttext>
@@ -55,7 +53,6 @@
         <text lang="ES">Buscar Programas</text>
         <text lang="CS">Cercar programes</text>
         <text lang="NL">Programma's Zoeken</text>
-        <text lang="FR">Recherche de programme</text>
         <text lang="DE">Alphabetische Suche</text>
         <text lang="DA">Find program</text>
         <text lang="IS">Dagsskrár leit</text>
@@ -74,7 +71,6 @@
         <text lang="HE">מציאת תכניות</text>
         <alttext>Finder</alttext>
         <alttext lang="IT">Ricerca</alttext>
-        <alttext lang="FR">Recherche</alttext>
         <alttext lang="ES">Buscar</alttext>
         <alttext lang="CS">Cercar</alttext>
         <alttext lang="DE">ABC Suche</alttext>
@@ -100,7 +96,6 @@
         <type>TV_SEARCH_WORDS</type>
         <text>Search Words</text>
         <text lang="IT">Ricerca Parole</text>
-        <text lang="FR">Rechercher des mots</text>
         <text lang="DE">Volltextsuche</text>
         <text lang="IS">Leita að orðum</text>
         <text lang="SV">Sök ord</text>
@@ -120,7 +115,6 @@
         <text lang="HE">חיפוש מילים</text>
         <alttext>Search</alttext>
         <alttext lang="IT">Ricerca</alttext>
-        <alttext lang="FR">Rechercher</alttext>
         <alttext lang="NL">Zoek</alttext>
         <alttext lang="SV">Ord</alttext>
         <alttext lang="IS">Orð</alttext>
@@ -145,7 +139,6 @@
         <text lang="IT">Ricerca Liste</text>
         <text lang="SV">Sök listor</text>
         <text lang="NL">Overzichtslijsten</text>
-        <text lang="FR">Rechercher dans les listes</text>
         <text lang="JA">リスト検索</text>
         <text lang="DE">Listensuche</text>
         <text lang="IS">Listaleit</text>
@@ -165,7 +158,6 @@
         <alttext lang="DE">Listen</alttext>
         <alttext lang="IS">Listar</alttext>
         <alttext lang="SV">Listor</alttext>
-        <alttext lang="FR">Listes</alttext>
         <alttext lang="NL">Lijsten</alttext>
         <alttext lang="SL">Seznami</alttext>
         <alttext lang="ET">Nimekirjad</alttext>
@@ -187,7 +179,6 @@
         <text lang="SV">Avancerad</text>
         <text lang="NL">Geavanceerd Opnameschema</text>
         <text lang="JA">カスタム録画</text>
-        <text lang="FR">Recherche Personnalisée</text>
         <text lang="DE">freie Planung</text>
         <text lang="IS">Sérsniðin upptaka</text>
         <text lang="NL">Opname op maat</text>
@@ -216,7 +207,6 @@
         <text lang="DE">Manuelle Aufnahme</text>
         <text lang="DA">Manuel programmering</text>
         <text lang="IS">Handvirk upptaka</text>
-        <text lang="FR">Programmation manuelle</text>
         <text lang="NL">Manuele Opname</text>
         <text lang="PT">Gravação Manual</text>
         <text lang="SV">Manuell schemaläggning</text>
@@ -236,7 +226,6 @@
         <alttext lang="ES">Programar</alttext>
         <alttext lang="CS">Programar</alttext>
         <alttext lang="DE">Manuell</alttext>
-        <alttext lang="FR">Prog. man.</alttext>
         <alttext lang="DA">Manuel prog.</alttext>
         <alttext lang="IS">Handvirk tímasetning.</alttext>
         <alttext lang="NL">Manueel</alttext>

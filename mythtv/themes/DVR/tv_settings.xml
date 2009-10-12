@@ -7,7 +7,6 @@
         <text lang="ES">General</text>
         <text lang="CA">General</text>
         <text lang="NL">Algemeen</text>
-        <text lang="FR">Général</text>
         <text lang="DE">Allgemeines</text>
         <text lang="DA">Generelt</text>
         <text lang="PT">Configurações Gerais</text>
@@ -31,7 +30,6 @@
         <text lang="ES">Guía de Programas</text>
         <text lang="CA">Guia de programes</text>
         <text lang="NL">Programmagids</text>
-        <text lang="FR">Guide des programmes</text>
         <text lang="DE">Programmübersicht</text>
         <text lang="DA">Program Guide</text>
         <text lang="PT">Configurar Guia de Programação</text>
@@ -58,7 +56,6 @@
         <text lang="ES">Reproducción</text>
         <text lang="CA">Reproducció</text>
         <text lang="NL">Afspelen</text>
-        <text lang="FR">Lecture</text>
         <text lang="DE">Wiedergabe</text>
         <text lang="DA">Afspilning</text>
         <text lang="PT">Configurar Reprodução</text>
@@ -80,7 +77,6 @@
         <type>TV_SETTINGS_PLAYBACK_OSD</type>
         <text>Playback OSD</text>
         <text lang="DE">Wiedergabe-OSD</text>
-        <text lang="FR">Incrustation de lecture</text>
         <text lang="HU">OSD</text>
         <description>Theme and settings for OSD</description>
         <description lang="DE">Einstellungen für das On-Screen-Display</description>
@@ -91,7 +87,6 @@
         <type>TV_SETTINGS_OSD_MENU_EDITOR</type>
         <text>OSD Menu Editor</text>
         <text lang="DE">OSD-Menü anpassen</text>
-        <text lang="FR">Éditeur de menu d&apos;incrustation</text>
         <text lang="HU">OSD menu szerkesztő</text>
         <description lang="DE">Welche Men�punkte sollen im OSD erscheinen?</description>
         <action>OSDMENUEDITOR</action>
@@ -102,7 +97,6 @@
         <text>Playback Groups</text>
         <text lang="SV">Uppspelningsgrupper</text>
         <text lang="PT">Grupos de Reprodução</text>
-        <text lang="FR">Groupes de lecture</text>
         <text lang="ES">Grupos de Reproducción</text>
         <text lang="ET">Mahamängimisgrupid</text>
         <text lang="NL">Afspeelgroepen</text>
@@ -118,7 +112,6 @@
       <type>TV_SETTINGS_CHANNEL_GROUP</type>
       <text>Channel Groups</text>
       <text lang="DE">Sendergruppen</text>
-      <text lang="FR">Groupes de chaînes</text>
       <text lang="HU">Csatorna csoport</text>
       <description lang="DE">Gruppieren Sie Ihre Lieblingssender</description>
       <action>SETTINGS CHANNELGROUPS</action>
@@ -131,7 +124,6 @@
         <text lang="ES">Perfiles Grabación</text>
         <text lang="CA">Gravació</text>
         <text lang="NL">Opnameprofielen</text>
-        <text lang="FR">Profils d&apos;enregistrement</text>
         <text lang="DE">Aufnahmeprofile</text>
         <text lang="DA">Optagelse</text>
         <text lang="PT">Perfis de Gravação</text>
@@ -156,7 +148,6 @@
     <button>
         <type>TV_SETTINGS_RECPRIORITIES</type>
         <text>Recording Priorities</text>
-        <text lang="FR">Priorités d&apos;enresgitrement</text>
         <text lang="DE">Prioritäten</text>
         <text lang="SV">Inspelningsprioriteter</text>
         <text lang="JA">録画優先順位</text>

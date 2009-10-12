@@ -7,7 +7,6 @@
         <text lang="ES">Ver la TV</text>
         <text lang="CA">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
-        <text lang="FR">Regarder la TV</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
         <text lang="PT">Ver Televisão</text>
@@ -30,7 +29,6 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="CA">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
-        <text lang="FR">Programmer les enregistrements</text>
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="PT">Programar Gravações</text>
@@ -43,7 +41,6 @@
         <text lang="HU">Felvétel ütemezése</text>
         <alttext>Schedule</alttext>
         <alttext lang="IT">Pianifica</alttext>
-        <alttext lang="FR">Programmation</alttext>
         <alttext lang="ES">Temporizadores</alttext>
         <alttext lang="CA">Temporitzadors</alttext>
         <alttext lang="DA">Optagelser</alttext>
@@ -69,7 +66,6 @@
         <text lang="ES">Ver Grabaciones</text>
         <text lang="CA">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
-        <text lang="FR">Regarder les enregistrements</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
         <text lang="PT">Ver Gravações</text>
@@ -96,7 +92,6 @@
         <text lang="ES">Borrar Grabaciones</text>
         <text lang="CA">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
-        <text lang="FR">Supprimer les enregistrements</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
         <text lang="PT">Apagar Gravações</text>
@@ -124,7 +119,6 @@
         <text lang="PT">Modo Directo de TV</text>
         <text lang="ES">TV directo</text>
         <text lang="CA">TV directe</text>
-        <text lang="FR">Mode direct</text>
         <text lang="DE">TV direkt</text>
         <text lang="SV">TV direkt</text>
         <text lang="JA">パススルーモード</text>
@@ -143,7 +137,6 @@
         <text lang="DE">Alte Aufnahmen</text>
         <text lang="SL">Že posneto</text>
         <text lang="ET">Varem salvestatud</text>
-        <text lang="FR">Déjà enregistré</text>
         <text lang="DA">Gamle optagelser</text>
         <text lang="PT">Gravações Feitas</text>
         <text lang="ES">Grabaciones Antiguas</text>
@@ -162,7 +155,6 @@
         <text>System Status</text>
         <text lang="IT">Stato del Sistema</text>
         <text lang="DE">Systemstatus</text>
-        <text lang="FR">État système</text>
         <text lang="SV">Systemstatus</text>
         <text lang="JA">システムステータス</text>
         <text lang="SL">Status sistema</text>
@@ -185,7 +177,6 @@
         <text lang="IT">Impostazioni TV</text>
         <text lang="CA">Configuració de TV</text>
         <text lang="ES">Configuración de TV</text>
-        <text lang="FR">Réglages TV</text>
         <text lang="DE">TV</text>
         <text lang="DA">TV Indstillinger</text>
         <text lang="NL">TV Instellingen</text>
