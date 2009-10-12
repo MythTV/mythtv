@@ -168,12 +168,14 @@ bool DecoderBase::PosMapFromDb(void)
         PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
         m_positionMap.push_back(e);
     }
+
+    if (!m_positionMap.empty() && !ringBuffer->isDVD())
+        indexOffset = m_positionMap[0].index;
+
     if (!m_positionMap.empty())
     {
         VERBOSE(VB_PLAYBACK, QString("Position map filled from DB to: %1")
                 .arg(m_positionMap.back().index));
-        if (!ringBuffer->isDVD())
-            indexOffset = m_positionMap[0].index;
     }
 
     return true;
@@ -207,12 +209,20 @@ bool DecoderBase::PosMapFromEnc(void)
 
     // append this new position map to class's
     m_positionMap.reserve(m_positionMap.size() + posMap.size());
+    long long last_index = m_positionMap.back().index;
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
          it != posMap.end(); it++) 
     {
+        if (it.key() <= last_index)
+            continue; // we released the m_positionMapLock for a few ms...
+
         PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
         m_positionMap.push_back(e);
     }
+
+    if (!m_positionMap.empty() && !ringBuffer->isDVD())
+        indexOffset = m_positionMap[0].index;
+
     if (!m_positionMap.empty())
     {
         VERBOSE(VB_PLAYBACK, LOC +
@@ -368,7 +378,9 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
             VERBOSE(VB_PLAYBACK, LOC +
                     QString("FindPosition(%1, search%2 adjusted)")
                     .arg(desired_value).arg((search_adjusted) ? "" : " not") +
-                    QString(" --> [%1(%2)]").arg(i).arg(m_positionMap[i].pos));
+                    QString(" --> [%1:%2(%3)]")
+                    .arg(i).arg(GetKey(m_positionMap[i]))
+                    .arg(m_positionMap[i].pos));
 
             return true;
         }
@@ -405,9 +417,11 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     VERBOSE(VB_PLAYBACK, LOC +
             QString("FindPosition(%1, search%3 adjusted)")
             .arg(desired_value).arg((search_adjusted) ? "" : " not") +
-            QString(" --> [%1(%2),%3(%4)]")
-            .arg(lower_bound).arg(m_positionMap[lower_bound].pos)
-            .arg(upper_bound).arg(m_positionMap[upper_bound].pos));
+            QString(" --> \n\t\t\t[%1:%2(%3),%4:%5(%6)]")
+            .arg(lower_bound).arg(GetKey(m_positionMap[lower_bound]))
+            .arg(m_positionMap[lower_bound].pos)
+            .arg(upper_bound).arg(GetKey(m_positionMap[upper_bound]))
+            .arg(m_positionMap[upper_bound].pos));
 
     return false;
 }
@@ -522,7 +536,7 @@ long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
     // not yet in out map and then check for last frame again.
     if ((desiredFrame >= 0) && (desiredFrame > last_frame))
     {
-        VERBOSE(VB_PLAYBACK, LOC + "DoFastForward: "
+        VERBOSE(VB_PLAYBACK, LOC + "GetLastFrameInPosMap: "
                 "Not enough info in positionMap," +
                 QString("\n\t\t\twe need frame %1 but highest we have is %2.")
                 .arg(desiredFrame).arg(last_frame));
@@ -537,7 +551,7 @@ long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
 
         if (desiredFrame > last_frame)
         {
-            VERBOSE(VB_PLAYBACK, LOC + "DoFastForward: "
+            VERBOSE(VB_PLAYBACK, LOC + "GetLastFrameInPosMap: "
                     "Still not enough info in positionMap after sync, " +
                     QString("\n\t\t\twe need frame %1 but highest we have "
                             "is %2. Will seek frame-by-frame")
