@@ -40,11 +40,6 @@
             <filename>popups/alt_menu_background.png</filename>
         </imagetype>
 
-        <imagetype name="listback">
-            <position>896,238</position>
-            <filename>recordings/filterlist_background.png</filename>
-        </imagetype>
-
         <textarea name="label" from="basetextarea">
             <area>889,93,378,125</area>
             <align>allcenter</align>
@@ -53,11 +48,42 @@
             <value>Cast Members</value>
         </textarea>
 
-        <buttonlist name="cast" from="basebuttonlist">
-            <area>900,248,364,307</area>
-            <buttonarea>0,0,378,300</buttonarea>
-            <spacing>2</spacing>
+        <buttonlist name="cast">
+            <area>900,238,364,307</area>
+            <buttonarea>0,0,378,350</buttonarea>
+            <spacing>3</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <statetype name="buttonitem">
+                <area>0,0,367,53</area>
+                <state name="active">
+                    <area>0,0,367,53</area>
+                    <imagetype name="buttonbackground">
+                        <filename>popups/menu_button.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>18,0,324,50</area>
+                        <align>allcenter</align>
+                        <font>basemedium</font>
+                    </textarea>
+                    <imagetype name="buttonarrow">
+                        <position>346,16</position>
+                        <filename>popups/submenu_arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active">
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="selecteditemarrow">
+                        <position>5,16</position>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basemediumbrown</font>
+                    </textarea>
+                </state>
+            </statetype>
         </buttonlist>
+
     </window>
 
     <window name="descriptionpopup">
