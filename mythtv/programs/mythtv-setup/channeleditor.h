@@ -10,7 +10,7 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIProgressDialog;
 
-class MPUBLIC ChannelEditor : public MythScreenType
+class ChannelEditor : public MythScreenType
 {
     Q_OBJECT
   public:
@@ -50,7 +50,7 @@ class MPUBLIC ChannelEditor : public MythScreenType
 
 class ChannelID;
 
-class MPUBLIC ChannelWizard : public QObject, public ConfigurationWizard
+class ChannelWizard : public QObject, public ConfigurationWizard
 {
     Q_OBJECT
   public:
