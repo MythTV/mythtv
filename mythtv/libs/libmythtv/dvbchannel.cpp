@@ -189,14 +189,22 @@ bool DVBChannel::Open(DVBChannel *who)
 
     QString devname = CardUtil::GetDeviceName(DVB_DEV_FRONTEND, device);
     QByteArray devn = devname.toAscii();
-    fd_frontend = open(devn.constData(), O_RDWR | O_NONBLOCK);
 
-    if (fd_frontend < 0)
+    for (int tries = 1; ; ++tries)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
+        fd_frontend = open(devn.constData(), O_RDWR | O_NONBLOCK);
+        if (fd_frontend >= 0)
+            break;
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
                 "Opening DVB frontend device failed." + ENO);
-
-        return false;
+        if (tries >= 20 || (errno != EBUSY && errno != EAGAIN))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Failed to open DVB frontend device due to "
+                            "fatal error or too many attempts."));
+            return false;
+        }
+        usleep(50000);
     }
 
     dvb_frontend_info info;
