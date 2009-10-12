@@ -779,7 +779,8 @@ void GuideGrid::fillChannelInfos(bool gotostartchannel)
         const uint_list_t &ndups = channum_to_index_map[channels[i].channum];
         for (uint j = 0; j < ndups.size(); ++j)
         {
-            if (channels[i].chanid != m_channelInfos[ndups[j]][0].chanid)
+            if (channels[i].chanid   != m_channelInfos[ndups[j]][0].chanid &&
+                channels[i].callsign == m_channelInfos[ndups[j]][0].callsign)
                 m_channelInfos[ndups[j]].push_back(channels[i]);
         }
 
