@@ -11,7 +11,6 @@
       <text lang="NL">Muziek Afspelen</text>
       <text lang="PT">Tocar Músicas</text>
       <text lang="SV">Spela musik</text>
-      <text lang="FR">Jouer la musique</text>
       <text lang="JA">ミュージック再生</text>
       <text lang="FI">Soita Musiikkia</text>
       <text lang="SL">Predvajaj glasbo</text>
@@ -33,7 +32,6 @@
       <text lang="NL">Muziek Kiezen</text>
       <text lang="PT">Escolher Músicas</text>
       <text lang="SV">Välj musik</text>
-      <text lang="FR">Sélectionner la musique</text>
       <text lang="JA">ミュージック選択</text>
       <text lang="FI">Valitse Musiikkia</text>
       <text lang="SL">Izberi glasbo</text>
@@ -55,7 +53,6 @@
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Importar CD para Disco</text>
       <text lang="SV">Importera CD</text>
-      <text lang="FR">Importer un CD</text>
       <text lang="JA">CD取込</text>
       <text lang="FI">Tuo CD</text>
       <text lang="SL">Uvozi CD</text>
@@ -69,7 +66,6 @@
    <button>
        <type>MUSIC_IMPORT</type>
        <text>Import Files</text>
-       <text lang="FR">Importer des fichiers</text>
        <text lang="DA">Importér filer</text>
        <text lang="SL">Uvoz datotek</text>
        <text lang="PL">Importuj muzykę</text>
@@ -90,7 +86,6 @@
       <text lang="NL">Muziek Zoeken</text>
       <text lang="PT">Refresc. Lista Músicas</text>
       <text lang="SV">Scanna efter ny musik</text>
-      <text lang="FR">Rechercher de nouvelles musiques</text>
       <text lang="JA">新しいミュージックを検索</text>
       <text lang="FI">Hae Uutta Musiikkia</text>
       <text lang="SL">Iskanje nove glasbe</text>
@@ -106,7 +101,6 @@
       <text>Eject media</text>
       <text lang="ET">Meedia väljastamine</text>
       <text lang="RU">Достать диск</text>
-      <text lang="FR">Éjecter le média</text>
       <text lang="SL">Izvrzi medij</text>
       <text lang="PL">Wysuń tackę</text>
       <text lang="FI">Poista Media</text>
@@ -121,7 +115,6 @@
      <text>Music Settings</text>
      <text lang="IT">Impostazioni Musica</text>
      <text lang="ES">Configurar Música</text>
-     <text lang="FR">Réglages Musique</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
      <text lang="DA">Musik Indstillinger</text>

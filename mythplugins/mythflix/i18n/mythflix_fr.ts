@@ -5,19 +5,19 @@
     <name>MythControls</name>
     <message>
         <source>Browse Netflix titles</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir les titres Netflix</translation>
     </message>
     <message>
         <source>Administer Netflix Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Gérer la liste d&apos;attente</translation>
     </message>
     <message>
         <source>View Netflix History</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher l&apos;historique de Netflix</translation>
     </message>
     <message>
         <source>Moves movie to top of queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Déplacer la vidéo en haut de la file d&apos;attente</translation>
     </message>
 </context>
 <context>
@@ -109,22 +109,22 @@
     </message>
     <message>
         <source>Queue Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom de la liste d&apos;attente</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>View Queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Voir la file d&apos;attente</translation>
     </message>
     <message>
         <source>Browse Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir les films</translation>
     </message>
     <message>
         <source>Rental History</source>
-        <translation type="unfinished"></translation>
+        <translation>Historique de location</translation>
     </message>
 </context>
 </TS>

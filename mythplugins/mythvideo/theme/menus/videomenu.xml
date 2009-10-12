@@ -9,7 +9,6 @@
      <text lang="DA">Gennemse film</text>
      <text lang="PT">Navegar na Biblioteca de Filmes</text>
      <text lang="SV">Bläddra bland filmer</text>
-     <text lang="FR">Parcourir les vidéos</text>
      <text lang="NL">Blader door videos</text>
      <text lang="JA">ビデオブラウズ</text>
      <text lang="SL">Iskanje filmov</text>
@@ -30,7 +29,6 @@
      <text lang="DE">Liste</text>
      <text lang="PT">Lista de Filmes</text>
      <text lang="SV">Filmlista</text>
-     <text lang="FR">Liste des vidéos</text>
      <text lang="NL">Video Verkenner</text>
      <text lang="JA">ビデオリスト</text>
      <text lang="SL">Seznam filmov</text>
@@ -45,11 +43,9 @@
    <button>
      <type>VIDEO_GALLERY</type>
      <text>Video Gallery</text>
-     <text lang="FR">Galerie vidéo</text>
      <text lang="DE">Galerie</text>
      <text lang="SL">Galerija filmov</text>
      <text lang="FI">Videogalleria</text>
-     <text lang="FR">Gallerie des vidéos</text>
      <text lang="DA">Film Galleri</text>
      <text lang="SV">Filmgalleri</text>
      <text lang="PT">Galeria de Filmes</text>
@@ -70,7 +66,6 @@
      <text lang="DE">Video-Manager</text>
      <text lang="PT">Gestor de Filmes</text>
      <text lang="SV">Filmhanterare</text>
-     <text lang="FR">Gestionaire de vidéos</text>
      <text lang="NL">Video's Beheren</text>
      <text lang="JA">ビデオマネージャー</text>
      <text lang="SL">Upravitelj filmov</text>
@@ -92,7 +87,6 @@
       <text lang="SV">Spela DVD</text>
       <text lang="ES">Ver DVD</text>
       <text lang="CA">Veure DVD</text>
-      <text lang="FR">Lire un DVD</text>
       <text lang="NL">DVD Afspelen</text>
       <text lang="JA">DVD再生</text>
       <text lang="NB">Spill av DVD</text>
@@ -108,7 +102,6 @@
       <type>VCD_PLAY</type>
       <text>Play VCD</text>
       <text lang="DA">Afspil VCD</text>
-      <text lang="FR">Lire un VCD</text>
       <text lang="PT">Ver VCD</text>
       <text lang="DE">VCD abspielen</text>
       <text lang="NL">VCD Afspelen</text>
@@ -130,7 +123,6 @@
       <text lang="SV">Kopiera DVD</text>
       <text lang="ES">"Ripear" DVD</text>
       <text lang="CA">Volcar DVD</text>
-      <text lang="FR">Extraire un DVD</text>
       <text lang="NL">DVD Rip</text>
       <text lang="JA">DVDリッピング</text>
       <text lang="FI">Kopioi DVD</text>
@@ -146,7 +138,6 @@
       <text>Eject media</text>
       <text lang="ET">Meedia väljastamine</text>
       <text lang="RU">Достать диск</text>
-      <text lang="FR">Éjecter un média</text>
       <text lang="PL">Wysuń tackę</text>
       <text lang="NB">Løs ut DVD</text>
       <action>EJECT</action>
@@ -159,7 +150,6 @@
         <text lang="IT">Impostazioni Video</text>
         <text lang="ES">Configurar Videos</text>
         <text lang="CA">Configurar Videos</text>
-        <text lang="FR">Réglages Vidéos</text>
         <text lang="DE">Videos</text>
         <text lang="DA">Video Indstillinger</text>
         <text lang="IS">Stillingar kvikmynda</text>

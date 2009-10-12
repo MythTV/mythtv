@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>Rotate CCW</source>
-        <translation>Tourner sens anti-horaire</translation>
+        <translation>Tourner sens antihoraire</translation>
     </message>
     <message>
         <source>Import</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation>Suppression de %1 images et dossiers, incluant tout sous-répertoire et fichier.</translation>
+        <translation>Suppression de %1 image(s) et dossier(s), incluant tout sous-répertoire et fichier.</translation>
     </message>
     <message>
         <source>New Folder</source>
@@ -156,102 +156,102 @@
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 sur %2</translation>
     </message>
     <message>
         <source>Gallery Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Accueil Galerie</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Image viewer / slideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Visionneuse d&apos;images / diaporama</translation>
     </message>
     <message>
         <source>Start/Stop Slideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer/arrêter le diaporama</translation>
     </message>
     <message>
         <source>Go to the first image in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>Atteindre la première image du mode miniature</translation>
     </message>
     <message>
         <source>Go to the last image in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>Atteindre la dernière image du mode miniature</translation>
     </message>
     <message>
         <source>Start Slideshow in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer le diaporama dans le mode miniature</translation>
     </message>
     <message>
         <source>Start Random Slideshow in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer le diaporama aléatoire dans le mode miniature</translation>
     </message>
     <message>
         <source>Rotate image right 90 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>Tourner l&apos;image à droite de 90 degrés</translation>
     </message>
     <message>
         <source>Rotate image left 90 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>Tourner l&apos;image à gauche de 90 degrés</translation>
     </message>
     <message>
         <source>Zoom image out</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le zoom</translation>
     </message>
     <message>
         <source>Zoom image in</source>
-        <translation type="unfinished"></translation>
+        <translation>Dé-activer le zoom</translation>
     </message>
     <message>
         <source>Scroll image up</source>
-        <translation type="unfinished"></translation>
+        <translation>Faire défiler les images vers le haut</translation>
     </message>
     <message>
         <source>Scroll image left</source>
-        <translation type="unfinished"></translation>
+        <translation>Faire défiler les images vers la gauche</translation>
     </message>
     <message>
         <source>Scroll image right</source>
-        <translation type="unfinished"></translation>
+        <translation>Faire défiler les images vers la droite</translation>
     </message>
     <message>
         <source>Scroll image down</source>
-        <translation type="unfinished"></translation>
+        <translation>Faire défiler les images vers le bas</translation>
     </message>
     <message>
         <source>Recenter image</source>
-        <translation type="unfinished"></translation>
+        <translation>Recenter l&apos;image</translation>
     </message>
     <message>
         <source>Full-size (un-zoom) image</source>
-        <translation type="unfinished"></translation>
+        <translation>Image taille maximale (sans zoom)</translation>
     </message>
     <message>
         <source>Go to the upper-left corner of the image</source>
-        <translation type="unfinished"></translation>
+        <translation>Aller dans le coin en haut à gauche de l&apos;image</translation>
     </message>
     <message>
         <source>Go to the lower-right corner of the image</source>
-        <translation type="unfinished"></translation>
+        <translation>Aller dans le coin en bas à droite de l&apos;image</translation>
     </message>
     <message>
         <source>Mark image</source>
-        <translation type="unfinished"></translation>
+        <translation>Marquer l&apos;image</translation>
     </message>
     <message>
         <source>Toggle scale to fullscreen/scale to fit</source>
-        <translation type="unfinished"></translation>
+        <translation>Basculer entre la taille réelle et la taille ajustée</translation>
     </message>
     <message>
         <source>MythGallery Media Handler 1/2</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurateur media de MythGallery 1/2</translation>
     </message>
     <message>
         <source>MythGallery Media Handler 2/2</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurateur media de MythGallery 2/2</translation>
     </message>
 </context>
 <context>
@@ -282,7 +282,7 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation>Liste des chemins d&apos;accès séparés par &apos;:&apos;. Si le chemin est un répertoire, son contenu sera copié. S&apos;il s&apos;agit d&apos;un exécutable. il sera exécuté.</translation>
+        <translation>Liste des chemins d&apos;accès séparés par « : ». Si le chemin est un répertoire, son contenu sera copié. S&apos;il s&apos;agit d&apos;un exécutable. il sera exécuté.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
@@ -374,47 +374,47 @@ Vérifiez que le répertoire existe, est accessible en lecture et que les régla
     </message>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Répertoire : </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished"></translation>
+        <translation>Créé par : </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished"></translation>
+        <translation>Modifié : </translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>Octets</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Largeur</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>pixels</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Hauteur</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished"></translation>
+        <translation>taille en pixels</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation>mégapixels</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Angle de rotation</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>degrés</translation>
     </message>
 </context>
 <context>

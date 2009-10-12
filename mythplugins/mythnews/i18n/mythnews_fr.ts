@@ -5,19 +5,19 @@
     <name>MythControls</name>
     <message>
         <source>RSS News feed reader</source>
-        <translation type="unfinished"></translation>
+        <translation>Lecture des nouvelles RSS</translation>
     </message>
     <message>
         <source>Update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Mettre à jour les pages de nouvelles</translation>
     </message>
     <message>
         <source>Force update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Forcer la mise à jour des pages de nouvelles</translation>
     </message>
     <message>
         <source>Cancel news item updating</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer la mise à jour les pages de nouvelles</translation>
     </message>
 </context>
 <context>
@@ -60,69 +60,69 @@
     </message>
     <message>
         <source>%1 of %2 (%3 percent)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 of %2 (%3 pourcent)</translation>
     </message>
 </context>
 <context>
     <name>MythNewsEditor</name>
     <message>
         <source>Edit Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Éditer les informations du site</translation>
     </message>
     <message>
         <source>Enter Site Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrer les informations sur le site</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL :</translation>
     </message>
     <message>
         <source>Icon:</source>
-        <translation type="unfinished"></translation>
+        <translation>Icône :</translation>
     </message>
     <message>
         <source>Podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation>Podcast :</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
     <name>NewsSite</name>
     <message>
         <source>Retrieve Failed. </source>
-        <translation type="unfinished"></translation>
+        <translation>La récupération a échouée</translation>
     </message>
     <message>
         <source>Failed to retrieve news</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec lors de la récupération des nouvelles</translation>
     </message>
     <message>
         <source>No Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas de nouvelles en mémoire</translation>
     </message>
     <message>
         <source>Failed to read downloaded file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de lire le fichier téléchargé</translation>
     </message>
     <message>
         <source>Showing Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Montrer les nouvelles en mémoire</translation>
     </message>
     <message>
         <source>XML-file is not valid RSS-feed</source>
-        <translation type="unfinished"></translation>
+        <translation>Le fichier XML ne correspond pas à un flux RSS</translation>
     </message>
 </context>
 <context>
@@ -140,7 +140,7 @@
     </message>
     <message>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation>Valider</translation>
     </message>
 </context>
 </TS>

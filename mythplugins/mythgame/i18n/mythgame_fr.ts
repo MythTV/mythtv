@@ -5,70 +5,70 @@
     <name>GameUI</name>
     <message>
         <source>All Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous les jeux</translation>
     </message>
     <message>
         <source>-   By Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Par genre</translation>
     </message>
     <message>
         <source>-   By Year</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Par années</translation>
     </message>
     <message>
         <source>-   By Name</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Par nom</translation>
     </message>
     <message>
         <source>-   By Publisher</source>
-        <translation type="unfinished"></translation>
+        <translation>-    Par éditeur</translation>
     </message>
     <message>
         <source>Choose System for</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisir le système pour</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Show Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher les informations</translation>
     </message>
     <message>
         <source>Remove Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer le statut de favori</translation>
     </message>
     <message>
         <source>Make Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Donner le statut de favori</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Éditer les méta-données</translation>
     </message>
     <message>
         <source>Game Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechercher un jeux</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Game frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Frontal du jeux</translation>
     </message>
     <message>
         <source>Toggle the current game as a favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Basculer entre le jeux actuel et un favori</translation>
     </message>
     <message>
         <source>Show incremental search dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher la page de recherche incrémentale</translation>
     </message>
     <message>
         <source>Incremental search find next match</source>
-        <translation type="unfinished"></translation>
+        <translation>Item suivant dans la recherche incrémentale</translation>
     </message>
 </context>
 <context>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Edit..</source>
-        <translation>diter..</translation>
+        <translation>Éditer..</translation>
     </message>
     <message>
         <source>Delete..</source>
@@ -87,7 +87,7 @@
     </message>
     <message>
         <source>Are you sure you want to delete this item?</source>
-        <translation>tes-vous sûr de vouloir supprimer cet élément ?</translation>
+        <translation>Étes-vous sûr de vouloir supprimer cet élément ?</translation>
     </message>
     <message>
         <source>Yes, delete It</source>
@@ -110,11 +110,11 @@
     </message>
     <message>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Ordre dans lequel les jeux sont triés - concerne tous les systèmes. Choix possibles : system, year, genre et gamename</translation>
+        <translation>Ordre dans lequel les jeux sont triés - concerne tous les systèmes. Choix disponibles : system, year, genre et gamename</translation>
     </message>
     <message>
         <source>Directory where Game Screenshots are stored</source>
-        <translation>Répertoire où sont stockées les photos d&apos;écrans des jeux</translation>
+        <translation>Répertoire de stockage des copies d&apos;écrans des jeux</translation>
     </message>
     <message>
         <source>MythGame Settings -- General</source>
@@ -134,11 +134,11 @@
     </message>
     <message>
         <source>Indepth Game Scan</source>
-        <translation>Scan en profondeur du jeu</translation>
+        <translation>Analyse en profondeur du jeu</translation>
     </message>
     <message>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Activer ceci provoque un scan du jeu pour rassembler les valeurs crc et tenter de trouver des informations détaillées sur le jeu. NOTE : ceci peut grandement augmenter le temps qu&apos;un scan des jeux peut prendre en fonction du nombre de jeux scannés.</translation>
+        <translation>Activer ceci provoque une analyse du jeu pour rassembler les valeurs crc et tenter de trouver des informations détaillées sur le jeu. NOTE : ceci peut grandement augmenter le temps qu&apos;une analyse des jeux peut prendre en fonction du nombre de jeux analysés.</translation>
     </message>
     <message>
         <source>Prompt for removal of deleted rom(s)</source>
@@ -146,7 +146,7 @@
     </message>
     <message>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>Active une invite pour la suppression les roms effacées de la base de données durant un scan des jeux</translation>
+        <translation>Active une invite pour la suppression des roms effacées de la base de données durant une analyse des jeux</translation>
     </message>
     <message>
         <source>Display Files Names in Game Tree</source>
@@ -158,19 +158,19 @@
     </message>
     <message>
         <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation>Ce répertoire sera l&apos;emplacement de navigation par défaut lors de l&apos;assignation des vignettes.</translation>
+        <translation>Ce répertoire sera l&apos;emplacement de navigation par défaut lors de l&apos;assignation des copies d&apos;écran.</translation>
     </message>
     <message>
         <source>Directory where Game Fanart is stored</source>
-        <translation>Répertoire où les posters des jeux sont stockés</translation>
+        <translation>Répertoire de stockage des affiches personnalisées des jeux</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation>Ce répertoire sera l&apos;emplacement de navigation par défaut lors de l&apos;assignation des posters.</translation>
+        <translation>Ce répertoire sera l&apos;emplacement de navigation par défaut lors de l&apos;assignation des affiches personnalisées.</translation>
     </message>
     <message>
         <source>Directory where Game Boxart is stored</source>
-        <translation>Répertoire où les pochettes des jeux sont stockées</translation>
+        <translation>Répertoire de sotockage des pochettes des jeux</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning boxart.</source>
@@ -210,7 +210,7 @@
     </message>
     <message>
         <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation>Répertoire vers lequel changer avant de lancer l&apos;émulateur. Laisser vide ne pose pas de souci en général</translation>
+        <translation>Répertoire à atteindre avant de lancer l&apos;émulateur. Laisser vide ne pose pas de souci en général</translation>
     </message>
     <message>
         <source>File Extensions</source>
@@ -308,7 +308,7 @@ L&apos;enlever de la base de données ?</translation>
     </message>
     <message>
         <source>Are you sure?</source>
-        <translation>tes-vous sûr ?</translation>
+        <translation>Étes-vous sûr ?</translation>
     </message>
     <message>
         <source>This will clear all Game Meta Data
@@ -316,7 +316,7 @@ from the database. Are you sure you
 want to do this?</source>
         <translation>Ceci supprimera toutes les metadonnées
 de jeu de la base de données.
-tes-vous sûr de vouloir faire cela ?</translation>
+Étes-vous sûr de vouloir faire cela ?</translation>
     </message>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
@@ -336,11 +336,11 @@ tes-vous sûr de vouloir faire cela ?</translation>
     </message>
     <message>
         <source>Verifying %1 files</source>
-        <translation>Vérifie %1 fichiers</translation>
+        <translation>Vérifie %1 fichier(s)</translation>
     </message>
     <message>
         <source>Scanning for %1 game(s)...</source>
-        <translation>Scan %1 jeu(x)...</translation>
+        <translation>Analyse %1 jeu(x)...</translation>
     </message>
     <message>
         <source>Hash filenames in display</source>
@@ -352,7 +352,7 @@ tes-vous sûr de vouloir faire cela ?</translation>
     </message>
     <message>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation>Paramètres binaires et optionnels. Plusieurs commandes séparées par ;;. Utilisez %s pour le nom de rom. %d1, %d2, %d3 et %d4 représentent les disques d&apos;un jeu multi disques. %s est automatiquement ajouté à la fin s&apos;il n&apos;est pas spécifié</translation>
+        <translation>Paramètres binaires et optionnels. Plusieurs commandes séparées par « ; ». Utilisez %s pour le nom de rom. %d1, %d2, %d3 et %d4 représentent les disques d&apos;un jeu multi disques. %s est automatiquement ajouté à la fin s&apos;il n&apos;est pas spécifié</translation>
     </message>
 </context>
 <context>
@@ -451,31 +451,31 @@ tes-vous sûr de vouloir faire cela ?</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished">Non</translation>
+        <translation>Non</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Oui</translation>
+        <translation>Oui</translation>
     </message>
     <message>
         <source>Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeux vidéo</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglages généraux</translation>
     </message>
     <message>
         <source>Game Players</source>
-        <translation type="unfinished">Émulateurs</translation>
+        <translation>Émulateurs</translation>
     </message>
     <message>
         <source>Scan for Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechercher des jeux</translation>
     </message>
     <message>
         <source>Clear Game Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer les données sur les jeux</translation>
     </message>
 </context>
 </TS>

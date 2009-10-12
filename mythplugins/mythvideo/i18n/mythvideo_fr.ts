@@ -6,7 +6,7 @@
     <message>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
-        <translation>Tous publics</translation>
+        <translation>Tout public</translation>
     </message>
     <message>
         <source>PG</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Error writing data to file %1.</source>
-        <translation>Erreur en écrivant les données dans le fichier %1.</translation>
+        <translation>Erreur lors de l&apos;enregistrement des données dans le fichier %1.</translation>
     </message>
     <message>
         <source>Error: file error &apos;%1&apos; for file %2</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="unfinished">Il est préférable d&apos;inscrire une valeur numérique dans ce champ.</translation>
+        <translation>Il est préférable d&apos;inscrire une valeur numérique dans ce champ.</translation>
     </message>
     <message>
         <source>Error writing image to file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de l&apos;enregistrement de l&apos;image du fichier %1</translation>
     </message>
 </context>
 <context>
@@ -88,7 +88,7 @@
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. Unable to recover.</source>
-        <translation>La tentative de connexion à votre mtd a indiqué un hôte non trouvé. Impossible de récupérer.</translation>
+        <translation>La tentative de connexion à votre mtd (Myth Transcoding Daemon) a indiqué &apos;ordinateur non trouvé&apos;. Impossible de récupérer.</translation>
     </message>
     <message>
         <source>Unknown connection error.</source>
@@ -126,90 +126,90 @@
     </message>
     <message>
         <source>Enter the new extension:</source>
-        <translation>Entrez la nouvelle extension :</translation>
+        <translation>Entrez la nouvelle extension : </translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>The MythVideo default view</source>
-        <translation type="unfinished"></translation>
+        <translation>La vue par défaut de MythVideo</translation>
     </message>
     <message>
         <source>The MythVideo video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Le gestionnaire de vidéo de MythVideo</translation>
     </message>
     <message>
         <source>The MythVideo video browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Le navigateur vidéo de MythVideo</translation>
     </message>
     <message>
         <source>The MythVideo video listings</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;explorateur vidéo de MythVideo</translation>
     </message>
     <message>
         <source>The MythVideo video gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Le mode galerie vidéo de MythVideo</translation>
     </message>
     <message>
         <source>Play selected item in alternate player</source>
-        <translation type="unfinished"></translation>
+        <translation>Jouer les items sélectionnés avec le lecteur alternatif</translation>
     </message>
     <message>
         <source>Open video filter dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir la fenêtre de filtrage vidéo</translation>
     </message>
     <message>
         <source>Change browsable in video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Changer l&apos;état &apos;parcourir&apos; dans le gestionnaire vidéo</translation>
     </message>
     <message>
         <source>Increase Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Augmenter le niveau du contrôle parental</translation>
     </message>
     <message>
         <source>Decrease Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Diminuer le niveau du contrôle parental</translation>
     </message>
     <message>
         <source>Show Incremental Search Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher la fenêtre de recherche incrémentale</translation>
     </message>
     <message>
         <source>Download metadata for current item</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger les méta-données pour l&apos;item sélectionné</translation>
     </message>
     <message>
         <source>Display Item Detail Popup</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche en sur-impression, les informations détaillées de l&apos;item</translation>
     </message>
     <message>
         <source>Go to the first video</source>
-        <translation type="unfinished"></translation>
+        <translation>Atteindre la première vidéo</translation>
     </message>
     <message>
         <source>Go to the last video</source>
-        <translation type="unfinished"></translation>
+        <translation>Atteindre la dernière vidéo</translation>
     </message>
     <message>
         <source>Play a DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Jouer un DVD</translation>
     </message>
     <message>
         <source>MythDVD DVD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurateur média DVD de MythDVD</translation>
     </message>
     <message>
         <source>Play a VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Jouer un VCD</translation>
     </message>
     <message>
         <source>MythDVD VCD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurateur média VCD de MythDVD</translation>
     </message>
     <message>
         <source>Import a DVD into your MythVideo database</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer un DVD dans la base de données</translation>
     </message>
 </context>
 <context>
@@ -220,11 +220,11 @@
     </message>
     <message>
         <source>4 - Highest</source>
-        <translation>4 - Laxiste</translation>
+        <translation>4 - Sévère</translation>
     </message>
     <message>
         <source>1 - Lowest</source>
-        <translation>1 - Sévère</translation>
+        <translation>1 - Laxiste</translation>
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
@@ -236,7 +236,7 @@
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation>Afficher les fichiers de types inconnus</translation>
+        <translation>Afficher les fichiers de type inconnu</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
@@ -292,7 +292,7 @@
     </message>
     <message>
         <source>Video Manager</source>
-        <translation>Gestionaire de vidéos</translation>
+        <translation>Gestionnaire de vidéos</translation>
     </message>
     <message>
         <source>Default View</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation>cette commande est utilisée four tous le fichiers dont l&apos;extension n&apos;est explicitement définie. Vous pouvez aussi entrer le nom de l&apos;un des plugins de lecture tels que &apos;internal&apos;.</translation>
+        <translation>Cette commande est utilisée pour tous les fichiers dont l&apos;extension n&apos;est explicitement définie. Vous pouvez aussi entrer le nom de l&apos;un des modules de lecture tel que &apos;internal&apos;.</translation>
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
@@ -336,7 +336,7 @@
     </message>
     <message>
         <source>^(The |A |An )</source>
-        <translation>^(Le |La |Les |Un |Une )</translation>
+        <translation>^(Le |La |Les |Un |Une |Des )</translation>
     </message>
     <message>
         <source>All</source>
@@ -376,7 +376,7 @@
     </message>
     <message>
         <source>OK, I&apos;ll go run Setup</source>
-        <translation>Ok, je vais lancer la configuration</translation>
+        <translation>OK, je vais lancer la configuration</translation>
     </message>
     <message>
         <source>Location of VCD device</source>
@@ -420,11 +420,11 @@
     </message>
     <message>
         <source>Subtitle arguments:</source>
-        <translation>Arguments de sous-titrage :</translation>
+        <translation>Arguments de sous-titrage:</translation>
     </message>
     <message>
         <source>If you choose any subtitles for ripping, this command is added to the end of the Title Play Command to allow previewing of subtitles. If  present %s will be set to the subtitle track. </source>
-        <translation>Si vous choisissez un sous-titre pour l&apos;encodage, cette commande est ajouté à la fin de la commande de lecture afin de prévisualiser le sous-titre. si %s est présent, il sera remplacé par le sous titre sélectionné.</translation>
+        <translation>Si vous choisissez un sous-titre pour l&apos;encodage, cette commande est ajoutée à la fin de la commande de lecture afin de prévisualiser le sous-titre. Si %s est présent, il sera remplacé par le sous titre sélectionné.</translation>
     </message>
     <message>
         <source>Base transcode command</source>
@@ -464,11 +464,11 @@
     </message>
     <message>
         <source>If set, mythdvd will use the (open, free) xvid codec rather than divx whenever possible.</source>
-        <translation>Si coché, mythdvd utilisera le format d&apos;encodage (ouvert et gratuit) xvid plutôt que divx lorsque cela est possible. </translation>
+        <translation>Si coché, MythDvd utilisera le format d&apos;encodage (ouvert et gratuit) xvid plutôt que divx lorsque cela est possible. </translation>
     </message>
     <message>
         <source>Nice level for MTD</source>
-        <translation>Niveau de priorité de MTD</translation>
+        <translation>Niveau de priorité du MTD</translation>
     </message>
     <message>
         <source>This determines the priority of the Myth Transcoding Daemon. Higher numbers mean lower priority (more CPU to other tasks).</source>
@@ -552,7 +552,7 @@
     </message>
     <message>
         <source>Display mythdvd menu</source>
-        <translation>Affiche le menu mythdvd</translation>
+        <translation>Affiche le menu MythDvd</translation>
     </message>
     <message>
         <source>ISO copy of %1</source>
@@ -684,11 +684,11 @@
     </message>
     <message>
         <source>Command to search for movie fanart</source>
-        <translation>Commande pour rechercher des illustrations de films</translation>
+        <translation>Commande pour rechercher des affiches personnalisées de films</translation>
     </message>
     <message>
         <source>Directory that holds movie screenshots</source>
-        <translation>Répertoire contenant les clichés de films</translation>
+        <translation>Répertoire contenant les copies d&apos;écran de films</translation>
     </message>
     <message>
         <source>Directory that holds movie/TV Banners</source>
@@ -696,7 +696,7 @@
     </message>
     <message>
         <source>Directory that holds movie fanart</source>
-        <translation>Répertoire contenant les illustrations de films</translation>
+        <translation>Répertoire contenant les affiches personnalisées de films</translation>
     </message>
     <message>
         <source>Directory that holds movie trailers</source>
@@ -732,7 +732,7 @@
     </message>
     <message>
         <source>The number of trailers to play before playing the film itself </source>
-        <translation>Le nombre de bandes annonce à jouer avabt de jouer le film proprement dit</translation>
+        <translation>Le nombre de bandes annonce à jouer avant de jouer le film proprement dit</translation>
     </message>
     <message>
         <source>Loading videos ...</source>
@@ -756,7 +756,7 @@ Check VideoManager Settings</source>
 
 %2
 
-Vérifiez les réglages du Gestionaire Vidéo</translation>
+Vérifiez les réglages du Gestionnaire Vidéo</translation>
     </message>
     <message>
         <source>Video Home</source>
@@ -812,11 +812,11 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Command to search for TV Season posters</source>
-        <translation>Commande pour rechercher les posters de saisons TV</translation>
+        <translation>Commande pour rechercher les affiches des saisons TV</translation>
     </message>
     <message>
         <source>Command to search for TV fanart</source>
-        <translation>Commande pour rechercher les fanarts TV</translation>
+        <translation>Commande pour rechercher les affiches personnalisées TV</translation>
     </message>
     <message>
         <source>Command to search for TV banners</source>
@@ -892,15 +892,15 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur : impossible d&apos;ajouter un nouveau type de fichier &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Code parental :</translation>
     </message>
     <message>
         <source>Storage Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Groupes de stockage</translation>
     </message>
 </context>
 <context>
@@ -915,7 +915,7 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Rated:</source>
-        <translation>Évalué :</translation>
+        <translation>Evalué :</translation>
     </message>
     <message>
         <source>Parental Level:</source>
@@ -967,7 +967,7 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Edit Video Information</source>
-        <translation>Éditer les informations de la vidéo</translation>
+        <translation>Editer les informations de la vidéo</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -1051,7 +1051,7 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation>Évaluation</translation>
+        <translation>Evaluation</translation>
     </message>
     <message>
         <source>Rip/Transcode</source>
@@ -1107,7 +1107,7 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>User Rating:</source>
-        <translation>Évaluation :</translation>
+        <translation>Evaluation :</translation>
     </message>
     <message>
         <source>Done</source>
@@ -1135,7 +1135,7 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Video Num.:</source>
-        <translation>Num. vidéo :</translation>
+        <translation>N° vidéo :</translation>
     </message>
     <message>
         <source>Parental Level</source>
@@ -1155,7 +1155,7 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation>Épisode :</translation>
+        <translation>Episode :</translation>
     </message>
     <message>
         <source>Item has been watched:</source>
@@ -1207,59 +1207,59 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglages généraux</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished">Configuration du lecteur</translation>
+        <translation>Réglages du lecteur</translation>
     </message>
     <message>
         <source>File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Types de fichier</translation>
     </message>
     <message>
         <source>Rip Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglages d&apos;extraction</translation>
     </message>
     <message>
         <source>Browse Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir les vidéos</translation>
     </message>
     <message>
         <source>Video List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste des vidéos</translation>
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Galerie vidéo</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished">Gestionaire de vidéos</translation>
+        <translation>Gestionnaire de vidéos</translation>
     </message>
     <message>
         <source>Play DVD</source>
-        <translation type="unfinished">Jouer le DVD</translation>
+        <translation>Lire un DVD</translation>
     </message>
     <message>
         <source>Play VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Lire un VCD</translation>
     </message>
     <message>
         <source>Rip DVD</source>
-        <translation type="unfinished">Importer le DVD</translation>
+        <translation>Extraire un DVD</translation>
     </message>
     <message>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Éjecter un média</translation>
     </message>
     <message>
         <source>Videos Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglages vidéos</translation>
     </message>
     <message>
         <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer la lecture et l&apos;extraction de DVD</translation>
     </message>
 </context>
 <context>
@@ -1393,7 +1393,7 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Enter Video Title:</source>
-        <translation>ENtrez le titre de la vidéo :</translation>
+        <translation>Entrez le titre de la vidéo :</translation>
     </message>
     <message>
         <source>Failed to delete file</source>
@@ -1405,17 +1405,17 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Video Search</source>
-        <translation>Recherche Vidéo</translation>
+        <translation>Recherche vidéo</translation>
     </message>
     <message>
         <source>Video Options
 %1</source>
-        <translation>Options Vidéo
+        <translation>Options vidéo
 %1</translation>
     </message>
     <message>
         <source>Video Options</source>
-        <translation>Options Vidéo</translation>
+        <translation>Options vidéo</translation>
     </message>
     <message>
         <source>Play...</source>
@@ -1435,7 +1435,7 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
     </message>
     <message>
         <source>Metadata Options</source>
-        <translation>Options Métadonnées</translation>
+        <translation>Options métadonnées</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1545,16 +1545,18 @@ Vérifiez les réglages du Gestionaire Vidéo</translation>
         <source>Video Options
 %1
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Options Vidéos
+%1
+%2</translation>
     </message>
     <message>
         <source>%1 download finished: %2 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 téléchargement terminé : %2 %3</translation>
     </message>
     <message>
         <source>%1 exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 a été abondonné pour cet item mais ne peut pas être relancer pendant sa période d&apos;attente d&apos;éxecution</translation>
     </message>
 </context>
 <context>

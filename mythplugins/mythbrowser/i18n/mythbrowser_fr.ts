@@ -12,18 +12,6 @@
         <translation>Entrer les détails du signet</translation>
     </message>
     <message>
-        <source>Ok</source>
-        <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Find...</source>
-        <translation>Trouver...</translation>
-    </message>
-    <message>
         <source>Select a category</source>
         <translation>Sélectionner une catégorie</translation>
     </message>
@@ -86,14 +74,6 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     <message>
         <source>MythBrowser Settings</source>
         <translation>Réglages MythBrowser</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation>Ok</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
     </message>
     <message>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
@@ -163,70 +143,70 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     <name>MythControls</name>
     <message>
         <source>Move to next browser tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Atteindre la prochaine adresse de navigation</translation>
     </message>
     <message>
         <source>Move to previous browser tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Atteindre le précédente adresse de navigation</translation>
     </message>
     <message>
         <source>Internal Web Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Navigateur Web interne</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Bookmark Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestionnaire des signets</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Catégorie</translation>
     </message>
     <message>
         <source>[x]</source>
-        <translation type="unfinished"></translation>
+        <translation>[x]</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Catégorie :</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation type="unfinished">Trouver...</translation>
+        <translation>Rechercher...</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL :</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Annuler</translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Valider</translation>
     </message>
     <message>
         <source>Browser Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Commande de navigation :</translation>
     </message>
     <message>
         <source>Text Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille du texte</translation>
     </message>
 </context>
 <context>
