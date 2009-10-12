@@ -176,8 +176,6 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     ProgramList GetProgramList(uint chanid) const;
     uint GetAlternateChannelIndex(uint chan_idx, bool with_same_channum) const;
 
-    virtual bool event(QEvent *e);
-
   private:
     bool  m_selectChangesChannel;
     int   m_selectRecThreshold;

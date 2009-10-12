@@ -1196,6 +1196,14 @@ void GuideGrid::customEvent(QEvent *event)
             fillProgramInfos();
             updateInfo();
         }
+        else if (message == "STOP_VIDEO_REFRESH_TIMER")
+        {
+            m_previewVideoRefreshTimer->stop();
+        }
+        else if (message == "START_VIDEO_REFRESH_TIMER")
+        {
+            m_previewVideoRefreshTimer->start(66);
+        }
     }
     else if (event->type() == kMythDialogBoxCompletionEventType)
     {
@@ -2044,28 +2052,6 @@ void GuideGrid::SetJumpToChannel(JumpToChannel *ptr)
 void GuideGrid::HideTVWindow(void)
 {
     GetMythMainWindow()->GetPaintWindow()->clearMask();
-}
-
-bool GuideGrid::event(QEvent *e)
-{
-    if ((MythEvent::Type)(e->type()) ==  MythEvent::MythEventMessage)
-    {
-        MythEvent *me = (MythEvent *)e;
-        QString message = me->Message();
-
-        if (message == "STOP_VIDEO_REFRESH_TIMER")
-        {
-            m_previewVideoRefreshTimer->stop();
-            return true;
-        }
-        else if (message == "START_VIDEO_REFRESH_TIMER")
-        {
-            m_previewVideoRefreshTimer->start(66);
-            return true;
-        }
-    }
-
-    return false;
 }
 
 void GuideGrid::EmbedTVWindow(void)
