@@ -642,9 +642,26 @@ uint GuideGrid::GetAlternateChannelIndex(
         if (!m_player->IsTunable(ctx, ciinfo->chanid, true))
             continue;
 
-        if (with_same_channum ||
-            (GetProgramList(chinfo->chanid) ==
-             GetProgramList(ciinfo->chanid)))
+        if (with_same_channum)
+        {
+            si = i;
+            break;
+        }
+
+        ProgramList proglist    = GetProgramList(chinfo->chanid);
+        ProgramList ch_proglist = GetProgramList(ciinfo->chanid);
+
+        if (proglist.empty() ||
+            proglist.size()  != ch_proglist.size())
+            continue;
+
+        bool isAlt = true;
+        for (uint j = 0; j < proglist.size(); ++j)
+        {
+            isAlt &= proglist[j]->IsSameProgramTimeslot(*ch_proglist[j]);
+        }
+
+        if (isAlt)
         {
             si = i;
             break;
@@ -716,11 +733,18 @@ DBChanList GuideGrid::GetSelection(void) const
     for (uint i = 1; i < sel.size(); ++i)
     {
         const PixmapChannel *ci = GetChannelInfo(sel[i]>>32, sel[i]&0xffff);
-        if (!ci)
+        const ProgramList ch_proglist = GetProgramList(ch->chanid);
+
+        if (!ci || proglist.size() != ch_proglist.size())
             continue;
 
-        ProgramList ch_proglist = GetProgramList(ch->chanid);
-        if (proglist == ch_proglist)
+        bool isAlt = true;
+        for (uint j = 0; j < proglist.size(); ++j)
+        {
+            isAlt &= proglist[j]->IsSameProgramTimeslot(*ch_proglist[j]);
+        }
+
+        if (isAlt)
             selected.push_back(*ci);
     }
 
