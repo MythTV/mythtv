@@ -12,7 +12,7 @@ WARNING = logging.WARNING
 INFO = logging.INFO
 DEBUG = logging.DEBUG
 
-class MythLog:
+class MythLog(object):
 	"""
 	A simple logging class
 	"""
