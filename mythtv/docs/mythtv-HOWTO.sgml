@@ -1805,24 +1805,11 @@ the IRDA device within a few feet of the box.
 <p>By this point, all of the compile-time prerequisites have been installed,
 <bf>mysql</bf> is running and has had its initial database setup.  It's now
 time to configure MythTV.
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  If you're running Debian unstable and you have compiled
-MythTV from source, you will need to install an additional package before
-you will be able to run MythTV.  Execute the following to install the MySQL
-driver for QT.
-</caption>
-</figure>
-<tscreen><verb>
-$ su -
-# apt-get install libqt3c102-mt-mysql
-# exit
-</verb></tscreen>
+
 <sect1>Configuring the Master backend system
 <p>Open a shell and decide where you will store your video files.  This may
 be one directory or multiple directories on the same or different
-filesystems. There is no default directory used for new recordings, you
+filesystems. There is no default directory used for new recordings, so you
 <bf>must</bf> create at least one storage directory and configure Myth to
 use it by running <bf>mythtv-setup</bf>.  If you do not do this, then MythTV
 will be unable to record anything.  The following example is specific for
@@ -1885,11 +1872,6 @@ The Master backend will always choose the first available tuner in the same
 order as you add cards through "mythtv-setup". In other words, the second
 card you add will only be used when there are two overlapping recordings,
 the third when there are three, and so on.
-<!-- Remove the next part once .21 is released --> Therefore, you will want to have
-the greatest amount of disk space on the Master backend because its tuner
-will always be the first choice. You will then want to add your <ref
-id="nonmaster_backend" name="other backends"> in the order of your
-preference for recording.
 
 <figure loc="here">
 <eps file="warning.eps" height="1cm">
@@ -1910,21 +1892,6 @@ going to be running on the same box, you can continue to the next step.  If
 not, you'll need to change the Host Name in the "Database Configuration"
 screen of the mythfrontend program.
 
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  Users that have been running the frontend and the backend on
-different machines have stated that they have been having issues with remote
-access to the MySQL database.  The following instructions may or may not
-work.  Add the following to <tt>/etc/my.cnf</tt> on the backend machine and
-restart MySQL.
-</caption>
-</figure>
-<tscreen><verb>
-skip-innodb
-set-variable=thread_stack=256k
-</verb></tscreen>
-
 Run the setup program:
 <tscreen><verb>
 $ mythtv-setup
@@ -1940,15 +1907,7 @@ that there are no surprises later.
 The next question will ask you if you wish to clear out your video source
 information.  You should answer "YES" to this as well.
 
-Once the graphical setup starts, you'll see that there are six choices
-
-<figure loc="here">
-<eps file="add.eps" height="1cm">
-<img src="add.png">
-<caption>
-The Storage Directories feature is available only in the SVN version of MythTV.
-</caption>
-</figure>
+Once the graphical setup starts, you'll see that there are six choices:
 
 <enum>
 <item>General
