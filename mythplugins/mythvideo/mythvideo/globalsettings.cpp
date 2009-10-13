@@ -152,7 +152,7 @@ HostCheckBox *VideoDBGroupView()
 HostComboBox *VideoTreeGroup() 
 { 
     HostComboBox *gc = new HostComboBox("mythvideo.db_group_type"); 
-    gc->setLabel(QObject::tr("Group based on"));
+    gc->setLabel(QObject::tr("Default Metadata View"));
     gc->addSelection(QObject::tr("Folder"),"0");
     gc->addSelection(QObject::tr("Genres"),"1");
     gc->addSelection(QObject::tr("Category"),"2");
@@ -162,7 +162,10 @@ HostComboBox *VideoTreeGroup()
     gc->addSelection(QObject::tr("User Rating"),"6");
     gc->addSelection(QObject::tr("Date Added"),"7");
     gc->addSelection(QObject::tr("TV/Movies"),"8");
-    gc->setHelpText(QObject::tr("Group videos in the tree")); 
+    gc->setHelpText(QObject::tr("Default metadata view contols "
+                                "the method used to build the tree. Folder "
+                                "mode (the default) displays the videos as "
+                                "they are found in the filesystem.")); 
     return gc; 
 } 
 
