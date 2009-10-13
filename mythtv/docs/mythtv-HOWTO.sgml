@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2009-10-07, v0.22.00
+<date>2009-10-12, v0.22.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -500,9 +500,6 @@ Here are some data points for decoding:
 <item>An Athlon 1GHz can decode a 720x480 16Mbps MPEG-2 file using 30-50%
 CPU, can decode a 480x480 16Mbps MPEG-2 using 30% CPU and approximately 30%
 for Live TV at 416x480.
-<item>A P3-550 can decode a 480x480 16Mbps MPEG-2 file with 55% CPU.
-<item>A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
-80% CPU.
 </itemize>
 
 <sect3>DVB capture cards.
@@ -532,15 +529,6 @@ work with Over The Air signals captured with an antenna (with 8VSB).
 perform any encoding; they merely allow your computer to save a copy of a
 HDTV stream which has already been converted to MPEG-2 at the broadcast
 facility.
-
-<bf>NOTE:</bf>: All of the cards listed above (except for the HD-2000 and
-HDHomeRun) should be configured as DVB cards. The HD-2000 can be configured
-as a pcHDTV card if you use the V4L drivers from <url
-url="http://www.pchdtv.com" name="http://www.pchdtv.com"> and use Linux
-kernel 2.6.9 or earlier.  With kernel 2.6.10 and higher it must be
-configured as a DVB card, but you lose access to the second antenna input in
-ATSC mode. The HDHomeRun should be configured as two HDHomeRun cards, one
-for each tuner.
 
 <sect3>Hauppauge HD PVR
 <p>Hauppuage makes a device called the HD PVR, which accepts component HDTV
@@ -728,26 +716,9 @@ provides an API for offloading MPEG-2 and H.264 to the GPU.
 
 
 <sect3>Hauppauge PVR-350 <label id="PVR-350">
-<p>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
-driver.
-
-The PVR-350 is unique amongst the Hauppauge PVR-x50 cards in that it also
-supports audio output, but you need to connect that audio output to
-something.  There are two courses of action you may take:
-<enum>
-<item>Take the audio output from the PVR-350 and plug it into an input on a
-sound card on your machine.  You may then use MythTV's internal audio
-controls.
-<item>Take the audio output from the PVR-350 and connect it directly to your
-television / audio system.  You must indicate that you are using external
-audio control on the PVR-350 setup page.
-</enum>
-
-<sect3>Other Options
-<p>Some devices with on-board TV-out capability, such as Xboxes converted to
-Linux and some laptops can be used as MythTV frontends to display on a
-television screen. Please consult the mythtv-users mailing list for messages
-that report the details of these special arrangements.
+<p>As of MythTV 0.22, the  TV-out and MPEG-2 decoder functions of the
+PVR-350 are no longer supported.  This functionality is currently
+unmaintained, and will be removed in MythTV 0.23.
 
 <sect2>External Adapters
 <p>External adapters convert standard VGA output to a form suitable for
