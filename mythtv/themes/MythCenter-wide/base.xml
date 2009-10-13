@@ -4,7 +4,6 @@
   <window name="backgroundwindow">
     <imagetype name="backimg">
       <filename>ui/background.png</filename>
-      <staticsize>-1,-1</staticsize>
     </imagetype>
 
     <font name="small" face="Trebuchet MS">
