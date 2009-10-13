@@ -413,9 +413,9 @@ your recordings. You will get corrupted recordings if you do.
 
 Because of the size of the MythTV files, it may be useful to plan for future
 expansion right from the beginning.  If your case and power supply have the
-capacity for additional hard drives, read through the <ref id="LVM"
-name="LVM"> and <ref id="advancedpartitionformatting" name="Advanced
-Partition Formatting"> sections for some pointers.
+capacity for additional hard drives, read through the <ref
+id="advancedpartitionformatting" name="Advanced Partition Formatting">
+sections for some pointers.
 
 <label id="video_capture_device">
 <sect2>Video Capture Device
@@ -1077,8 +1077,8 @@ install the updated 0.22 code.
 
 If you are using the tarball, then unpack it:
 <tscreen><verb>
-$ tar -xjf mythtv-0.21.tar.bz2
-$ cd mythtv-0.21
+$ tar -xjf mythtv-0.22.tar.bz2
+$ cd mythtv-0.22
 $ ./configure
 </verb></tscreen>
 
@@ -1595,7 +1595,7 @@ to control MythTV.  MythTV now includes native support for lirc and can
 interact directly with
 
 <tscreen><verb>
-$ cd ~/mythtv-0.21/contrib/configfiles
+$ cd ~/mythtv-0.22/contrib/configfiles
 $ cp lircrc.example ~/.lircrc
 </verb></tscreen>
 or
@@ -2256,7 +2256,7 @@ mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <tt>mythbackend -h</tt> for help.
 
-As of MythTV v0.21, the available options are:
+As of MythTV v0.22, the available options are:
 <tscreen><verb>
 $ mythbackend --help
 Valid options are:
@@ -3073,8 +3073,8 @@ can be modified by the user without re-compiling or altering the program
 functionality.  Download the MythThemes tarball from the website and untar it:
 
 <tscreen><verb>
-$ tar -xjf myththemes-0.21.tar.bz2
-$ cd ~/myththemes-0.21
+$ tar -xjf myththemes-0.22.tar.bz2
+$ cd ~/myththemes-0.22
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -3083,11 +3083,6 @@ $
 </verb</tscreen>
 
 The theme will now be available in the mythfrontend Appearance section.
-
-<sect1>Adding DishTV information to the database
-<p>A script for adding Pay Per View information into the MythTV database for
-DishTV subscribers is available at <url url="http://www.mythppv.com/"
-name="http://www.mythppv.com/">.
 
 <sect1>Adding support for an external tuner
 <p>MythTV supports changing the channel on an external tuner.  If you have
@@ -3146,19 +3141,22 @@ parameter.
 <item>the "pre Shutdown check-command" returns 0
 </itemize>
 
-If we get to this idle state the Master backend will set the wakeuptime using the "Set
-wakeuptime command", which is the same for WOL and BIOS wakeup. The Master backend will
-then shut down the Slave backends and itself using the "Server halt command".
+If we get to this idle state the Master backend will set the wakeuptime
+using the "Set wakeuptime command", which is the same for WOL and BIOS
+wakeup.  The Master backend will then shut down the Slave backends and
+itself using the "Server halt command".
 
-One caveat is that the scheduler tries to guess if the Master backend was started by a
-wakeup call or by the user. If it thinks it was woken up by a user, it
-blocks shutdown until a client connects to the Master backend, after which it will
-behave as described above. To disable this feature, unset "Block shutdown
-before client connected" in the mythfrontend Setup->Setup->General screen.
+One caveat is that the scheduler tries to guess if the Master backend was
+started by a wakeup call or by the user.  If it thinks it was woken up by a
+user, it blocks shutdown until a client connects to the Master backend,
+after which it will behave as described above.  To disable this feature,
+unset "Block shutdown before client connected" in the mythfrontend
+Setup->Setup->General screen.
 
-Once it is time to startup the system, the Master backend is woken up first and will
-wakeup the Slave backends using the "Wake command for slaves". At this time, there is
-no support for starting only the required Slave backend, so all Slave backends will startup.
+Once it is time to startup the system, the Master backend is woken up first
+and will wakeup the Slave backends using the "Wake command for slaves".  At
+this time, there is no support for starting only the required Slave backend,
+so all Slave backends will startup.
 
 <sect2>Setting up the MythTV side of this extension.
 <p>There are a number of options that are used to control the Shutdown /
@@ -3491,7 +3489,7 @@ id="Auto-Expire" name="Auto-Expire">, below).
 <sect2>Duplicates
 <p>Singles will record without regard to duplicate matching.
 
-<p>The standard recurring methods of All, Channel, Weekly and Daily use the
+The standard recurring methods of All, Channel, Weekly and Daily use the
 descriptive information in the TV listings to try to record only one showing
 of each unique episode. However, This goal is sometimes complicated by the
 fact that the stations may not include a description for a specific episode
@@ -4367,16 +4365,9 @@ Channel "750 CNN" at priority "-1" and HDTV broadcast priority at "+2":
 
 <sect2>Custom Priority <label id="Custom Priority">
 <p>
-<figure loc="here">
-<eps file="add.eps" height="1cm">
-<img src="add.png">
-<caption>
-New for MythTV 0.21</caption>
-</figure>
-
 While Input, Channel, and HDTV Priority can be used for indicating a
 preference for certain programs and inputs, there may be circumstances that
-cannot be resolved easily with these standard features. MythTV version 0.21
+cannot be resolved easily with these standard features. MythTV version 0.22
 includes a feature for "power priority". The Custom Priority editor in
 mythfrontend's "TV Settings" screen is similar to Custom Record, however,
 Custom Priority allows you to create specialized power priority factors to
@@ -4430,8 +4421,8 @@ examples that can be used or you can create your own to suit your needs.
 the tarball, untar it and run the <bf>configure</bf> script:
 
 <tscreen><verb>
-$ tar -xjf mythplugins-0.21.tar.bz2
-$ cd mythplugins-0.21
+$ tar -xjf mythplugins-0.22.tar.bz2
+$ cd mythplugins-0.22
 $ ./configure --help
 
 Usage:   configure [options]
@@ -4475,7 +4466,7 @@ MythWeather related options:
 </verb></tscreen>
 
 The sections detailing configuration of the plugins assume that you are
-already in the <tt>~/mythplugins-0.21/</tt> directory.
+already in the <tt>~/mythplugins-0.22/</tt> directory.
 
 Note that a single <bf>configure</bf> script now does configuration for all
 modules.  By default, it will compile all modules.  If you do not wish to
@@ -4491,7 +4482,7 @@ like to enable support for the opengl and FFT visualizations.  The command
 line would look like:
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.21
+$ cd ~/mythplugins-0.22
 $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
 $ qmake mythplugins.pro
 $ make
@@ -4535,7 +4526,7 @@ installation is quite simple.
 <sect1>Completing the installation
 <p>
 <tscreen><verb>
-$ cd ~/mythplugins-0.21/mythweb
+$ cd ~/mythplugins-0.22/mythweb
 $ su
 # mkdir /var/www/html/mythweb
 # cp -r . /var/www/html/mythweb
@@ -4597,7 +4588,7 @@ would perform the following command:
 </verb></tscreen>
 Once you have satisfied the prerequisites for your distribution, install the application:
 <tscreen><verb>
-$ cd ~/mythplugins-0.21
+$ cd ~/mythplugins-0.22
 $ ./configure --disable-all --enable-opengl --enable-mythgallery
 $ qmake mythplugins.pro
 $ make
@@ -4840,7 +4831,7 @@ section to obtain mythplugins.
 
 Switch to the mythplugins directory:
 <tscreen><verb>
-$ cd ~/mythplugins-0.21
+$ cd ~/mythplugins-0.22
 </verb></tscreen>
 
 Compile and install mythgame:
@@ -5062,7 +5053,7 @@ step.
 compiling MythMusic.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.21
+$ cd ~/mythplugins-0.22
 $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
 $ qmake mythplugins.pro
 $ make
@@ -5195,7 +5186,7 @@ id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.21
+$ cd ~/mythplugins-0.22
 $ ./configure --disable-all --enable-mythweather
 $ qmake mythplugins.pro
 $ make
@@ -5247,7 +5238,7 @@ MythVideo will allow you to use an external program to watch media files
 that are not directly supported by MythTV.
 
 <tscreen><verb>
-$ cd ~/mythplugins-0.21
+$ cd ~/mythplugins-0.22
 $ ./configure --disable-all --enable-mythvideo
 $ qmake mythplugins.pro
 $ make
@@ -5323,7 +5314,7 @@ mythbackend at system boot time"> to start mtd instead of mythbackend.
 id="mythplugins_" name="MythPlugins"> for instructions on downloading the
 tarball.  MythNews is a RSS reader.
 <tscreen><verb>
-$ cd ~/mythplugins-0.21
+$ cd ~/mythplugins-0.22
 $ ./configure --disable-all --enable-mythnews
 $ qmake mythplugins.pro
 $ make
@@ -6953,207 +6944,10 @@ to run the commercial flagger in a virtual machine environment such as
 VMWare.
 
 <sect>Example Configurations.
-<sect1>Logical Volume Manager (LVM) <label id="LVM">
-<!-- Contributed by Martin Smith martin at spamcop.net -->
-<!-- XXXXX REMOVE ME FOR 0.22 -->
-<p>LVM greatly increases the flexibility you have in managing your storage
-than traditional physical partitions. This section will provide some brief
-notes on how to use LVM to create storage space for your video files and how
-to add additional disk space in the future. There's lots more that can be
-done with LVM, so check the LVM HOWTO <url
-url="http://tldp.org/HOWTO/LVM-HOWTO/"
-name="http://tldp.org/HOWTO/LVM-HOWTO/"> document for details.
-
-<p><figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption>
-<bf>NOTE</bf>:  If you are running MythTV 0.21 and you are using LVM to
-create one large filesystem to store your recordings, it's no longer
-recommended that you go the LVM route. The preferred solution is to use <ref
-id="storagegroups" name="Storage Groups">.  They're more flexible and less
-likely to lose all of your recordings if you have a drive failure.
-</caption>
-</figure>
-
-If you don't understand how to partition a drive, or how to change the
-partition type you should stop and look at documentation on how to perform
-these steps.
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption>
-<bf>BIG FAT WARNING</bf>:  Using an incorrect parameter can make your files
-inaccessible, prevent your computer from booting, etc.  Be careful!
-</caption>
-</figure>
-
-Make sure your kernel configuration includes LVM support or that it's
-available as a module. Today, most vendors include this by default. You'll
-also want to ensure that you have a copy of the LVM utilities; check your
-distribution, or get the latest versions from <url
-url="http://www.sistina.com/products_lvm.htm"
-name="http://www.sistina.com/products_lvm.htm"> and build them manually.
-
-Check that the <bf>vgscan</bf> program is being run at some point during
-your boot sequence - most distributions do this by default. Look for a
-message during boot up that looks like this: <tt>vgscan -- reading all
-physical volumes (this may take a while...)</tt> If you don't see any
-messages during boot, you may need to install a LVM init script or confirm
-that you have all of the LVM packages installed from your distribution.
-
-LVM uses a few concepts you should be familiar with before starting.
-<itemize>
-<item>PV (Physical Volume).  The actual partition on the hard drive.
-<item>VG (Volume Group).  The aggregation of all the PVs make a VG.
-<item>LV (Logical Volume).  Subdivision of the pool of space available in
-the VG into individual chunks, like /usr, /var/video, etc.
-</itemize>
-
-The following example assumes that you want to create a LVM partition from a
-chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
-/var/video. You later decide to extend this filesystem by adding a new disk:
-/dev/hdb.
-
-You need to create at least one LVM partition for a physical volume. Use
-<bf>fdisk</bf> or your favorite partition editor to set the type to LVM
-(0x8e). If you're using an entire disk, create one big partition rather than
-using the device itself. e.g. use /dev/hdb1 not /dev/hdb.
-
-In the following example, you have a 15GB disk.  The first 6GB are set as
-your boot partition.  <tt>/dev/hda2</tt> was added as an extended partition,
-and within that partition you created the <tt>/dev/hda5</tt> linux (ext2)
-partition.
-
-<tscreen><verb>
-# fdisk /dev/hda
-
-The number of cylinders for this disk is set to 1823.
-There is nothing wrong with that, but this is larger than 1024,
-and could in certain setups cause problems with:
-1) software that runs at boot time (e.g., old versions of LILO)
-2) booting and partitioning software from other OSs
-   (e.g., DOS FDISK, OS/2 FDISK)
-
-Command (m for help): p
-
-Disk /dev/hda: 15.0 GB, 15000330240 bytes
-255 heads, 63 sectors/track, 1823 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-
-   Device Boot    Start       End    Blocks   Id  System
-/dev/hda1   *         1       764   6136798+  83  Linux
-/dev/hda2           765      1823   8506417+   5  Extended
-/dev/hda5           765      1823   8506417   83  Linux
-
-Command (m for help): t
-Partition number (1-6): 5
-Hex code (type L to list codes): 8e
-
-Command (m for help): p
-
-Disk /dev/hda: 15.0 GB, 15000330240 bytes
-255 heads, 63 sectors/track, 1823 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-
-   Device Boot    Start       End    Blocks   Id  System
-/dev/hda1   *         1       764   6136798+  83  Linux
-/dev/hda2           765      1823   8506417+   5  Extended
-/dev/hda5           765      1823   8506417   8e  Linux LVM
-
-Command (m for help): w
-
-#
-</verb></tscreen>
-
-Create the LVM physical volume from the partitions (repeat if you have
-multiple partitions to use):
-<tscreen><verb>
-# pvcreate /dev/hda5
-</verb></tscreen>
-Create a LVM volume group out of this physical volume called "VGforMyth" that is
-allocated in chunks that are a multiple of 64MB
-<tscreen><verb>
-# vgcreate VGforMyth -s 64m /dev/hda5
-</verb></tscreen>
-Create a logical volume of 5GB called "video" and then create the reiserfs
-filesystem and mount it:
-<tscreen><verb>
-# lvcreate --name video --size 5G VGforMyth
-# mkreiserfs /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</verb></tscreen>
-Now create a 3GB volume for mythmusic files if you like:
-<tscreen><verb>
-# lvcreate --name music --size 3G VGforMyth
-# mkreiserfs /dev/VGforMyth/music
-# mount /dev/VGforMyth/music /var/music
-</verb></tscreen>
-Display the volume group status:
-<tt># vgdisplay -v</tt>
-
-Now, lets suppose you want to add a 60GB hard disk to the system as hdb and
-allocate 50GB of it to video storage.
-
-First, create a single partition /dev/hdb1 covering the whole disk and make
-it type 0x8e using your partition editor.
-
-<tt># fdisk /dev/hdb</tt>
-.... create partition, set type, save and reboot if it says you have to
-
-Create the new LVM physical volume:
-
-<tt># pvcreate /dev/hdb1</tt>
-
-Add the new physical volume to the volume group:
-
-<tt># vgextend VGforMyth /dev/hdb1</tt>
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  You may get errors at this point stating that there are no
-physical volumes available for adding to the LV, even though you know for a
-fact that there are.  You may need to specify the physical volume in the
-<tt>/dev/ide/host/bus/target/lun/etc</tt> format.
-</caption>
-</figure>
-Once you've completed one of the following two procedures, use <bf>df</bf>
-to check that you've got more space.
-
-Make the logical volume used for video bigger:
-
-<tt># lvextend --size +50G /dev/VGforMyth/video</tt>
-<sect2>ReiserFS
-<p>Unmount, resize and remount the filesystem.  Technically, you don't need to
-unmount and remount the ReiserFS.
-<tscreen><verb>
-# umount /var/video
-# resize_reiserfs /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</verb></tscreen>
-
-<sect2>ext2 or ext3
-<p>LVM comes with a program called <bf>resize2fs</bf>.
-
-Unmount, resize and remount the filesystem.  The filesystem <em>must</em> be
-unmounted during this procedure.
-<tscreen><verb>
-# umount /var/video
-# resize2fs --size +50G /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</verb></tscreen>
-<sect2>xfs
-<p>XFS does not need to be unmounted to extend the size:
-<tscreen><verb>
-# xfs_growfs /var/video
-</verb></tscreen>
 <sect1>Advanced Partition Formatting <label
 id="advancedpartitionformatting">
 <p>The partitions that your distribution sets up for you may not be
-optimized for large files. Using LVM in conjunction with the following
-techniques can be quite useful.
+optimized for large files.
 
 Unlike a typical filesystem, a MythTV video partition is usually a very
 large filesystem filled with a fairly small number of large files.

@@ -132,7 +132,6 @@
         10.4.3 Currently Available Filters
         10.4.4 Usage Considerations
      10.5 Recording
-     10.6 Xbox Frontends
 
   11. Using MythTV.
      11.1 Keyboard commands
@@ -152,16 +151,15 @@
         11.1.14 Watch Recordings Screen
         11.1.15 Remote Controls
      11.2 Using themes with MythTV
-     11.3 Adding DishTV information to the database
-     11.4 Adding support for an external tuner
-     11.5 Using Shutdown/Wakeup
-        11.5.1 A deeper look into the operation
-        11.5.2 Setting up the MythTV side of this extension.
-           11.5.2.1 Using WOL to wake your Master backend.
-           11.5.2.2 Using BIOS wakeup to wake your Master backend.
-        11.5.3 Wakeup the MySQL server using WOL
-        11.5.4 Tips/Tricks:
-     11.6 Controlling the mythfrontend via telnet
+     11.3 Adding support for an external tuner
+     11.4 Using Shutdown/Wakeup
+        11.4.1 A deeper look into the operation
+        11.4.2 Setting up the MythTV side of this extension.
+           11.4.2.1 Using WOL to wake your Master backend.
+           11.4.2.2 Using BIOS wakeup to wake your Master backend.
+        11.4.3 Wakeup the MySQL server using WOL
+        11.4.4 Tips/Tricks:
+     11.5 Controlling the mythfrontend via telnet
 
   12. Scheduling Recordings.
      12.1 Record Types
@@ -212,6 +210,7 @@
      15.1 Installation and prerequisites
      15.2 Using MythGallery
      15.3 Importing Pictures
+
   16. MythGame.
      16.1 Setup Directory Structure
      16.2 Download and Install xmame
@@ -334,17 +333,13 @@
      23.24 Configuring one machine to flag all commercials
 
   24. Example Configurations.
-     24.1 Logical Volume Manager (LVM)
-        24.1.1 ReiserFS
-        24.1.2 ext2 or ext3
-        24.1.3 xfs
-     24.2 Advanced Partition Formatting
-        24.2.1 Ext2
-        24.2.2 Ext3
-        24.2.3 ReiserFS
-        24.2.4 JFS
-        24.2.5 XFS
-     24.3 Caching support for Schedules Direct
+     24.1 Advanced Partition Formatting
+        24.1.1 Ext2
+        24.1.2 Ext3
+        24.1.3 ReiserFS
+        24.1.4 JFS
+        24.1.5 XFS
+     24.2 Caching support for Schedules Direct
 
 
   ______________________________________________________________________
@@ -407,6 +402,7 @@
      automatically see content from your MythTV system.
 
      Other modules in MythTV include:
+
   +o  MythArchive, a tool to create DVDs
 
   +o  MythBrowser, a web browser
@@ -470,12 +466,12 @@
   See ``Saving or Restoring the database'' for instructions.
 
 
-
   11..44..  HHooww ttoo oobbttaaiinn tthhiiss ddooccuummeenntt // PPDDFF vveerrssiioonnss ooff tthhiiss ddooccuummeenntt
 
   This HOWTO document is maintained at the primary MythTV website:
   http://www.mythtv.org <http://www.mythtv.org> by Robert Kulagowski
   <mailto:rkulagow@rocketmail.com>.
+
 
   This document is available as a single-page HTML document at
   http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html
@@ -594,6 +590,7 @@
   information.
 
 
+
   11..1100..  CCoonnttrriibbuuttiinngg ttoo tthhiiss ddooccuummeenntt
 
   Contributions to the HOWTO are welcome, especially if you find a
@@ -657,6 +654,9 @@
   mailing list at http://www.gossamer-threads.com/lists/mythtv/
   <http://www.gossamer-threads.com/lists/mythtv/> or post a question to
   the list.
+
+
+
   33..11..11..  CCPPUU TTyyppee aanndd SSppeeeedd
 
   Selection of CPU type and speed is one of the trickiest elements of
@@ -791,8 +791,7 @@
   Because of the size of the MythTV files, it may be useful to plan for
   future expansion right from the beginning. If your case and power
   supply have the capacity for additional hard drives, read through the
-  ``LVM'' and ``Advanced Partition Formatting'' sections for some
-  pointers.
+  ``Advanced Partition Formatting'' sections for some pointers.
 
 
   33..11..55..  VViiddeeoo CCaappttuurree DDeevviiccee
@@ -842,8 +841,6 @@
   video controller". To get more detailed information about the card,
   use lspci -v or lspci -vv. Ensure that your system is loading the bttv
   modules by typing:
-
-
        # lsmod |grep bttv
 
 
@@ -909,7 +906,6 @@
   <http://www.linuxtv.org/> Some cards support capture of unencrypted
   digital cable TV (utilizing QAM256), others will only work with Over
   The Air signals captured with an antenna (with 8VSB).
-
   _N_o_n_e of the capture devices listed above perform any encoding; they
   merely allow your computer to save a copy of a HDTV stream which has
   already been converted to MPEG-2 at the broadcast facility.
@@ -969,7 +965,6 @@
 
   You may use the Ethernet port of an DBoxII or a similar device to
   capture MPEG-2. Your set top box has to be running the Neutrino GUI.
-
 
 
   33..11..77..33..  UUSSBB CCaappttuurree DDeevviicceess..
@@ -1037,7 +1032,6 @@
   http://www.tldp.org/HOWTO/MP3-HOWTO.html
   <http://www.tldp.org/HOWTO/MP3-HOWTO.html> for additional information.
 
-
   33..11..99..  VViiddeeoo DDiissppllaayy CCaarrdd
 
   MythTV will work with just about any video card. However, it is highly
@@ -1098,6 +1092,8 @@
   <http://gatos.sourceforge.net/watching_tv.php> for details. Also see
   http://www.retinalburn.net/linux/tvout.html
   <http://www.retinalburn.net/linux/tvout.html> for more information.
+
+
   33..11..1100..22..  NNVVIIDDIIAA
 
   Some NVIDIA cards with TV-out can be run using the standard nv driver
@@ -1227,10 +1223,9 @@
 
   Then run:
 
-
-       # apt-get update
-       # apt-get dist-upgrade
-       # apt-get update
+  # apt-get update
+  # apt-get dist-upgrade
+  # apt-get update
 
 
 
@@ -1541,8 +1536,8 @@
   If you are using the tarball, then unpack it:
 
 
-       $ tar -xjf mythtv-0.21.tar.bz2
-       $ cd mythtv-0.21
+       $ tar -xjf mythtv-0.22.tar.bz2
+       $ cd mythtv-0.22
        $ ./configure
 
 
@@ -2133,7 +2128,7 @@
 
 
 
-       $ cd ~/mythtv-0.21/contrib/configfiles
+       $ cd ~/mythtv-0.22/contrib/configfiles
        $ cp lircrc.example ~/.lircrc
 
 
@@ -2854,7 +2849,7 @@
   doing to the console. If you'd like to see the options that are
   available for mythbackend, type mythbackend -h for help.
 
-  As of MythTV v0.21, the available options are:
+  As of MythTV v0.22, the available options are:
 
 
        $ mythbackend --help
@@ -3315,25 +3310,29 @@
      http://ivtvdriver.org <http://ivtvdriver.org>
 
   +o  HDTV - pcHDTV cards; see http://pchdtv.com <http://pchdtv.com> and
-     the Air2PC-ATSC-PCI see
-     http://www.cyberestore.com/product_info.php?cPath=28&products_id=103
-     <http://www.cyberestore.com/product_info.php?cPath=28&products_id=103>
+     the Air2PC-ATSC-PCI
+
+  +o  H.264 - HD PVR
 
   +o  DVB - cards supporting DVB; see http://linuxtv.org
      <http://linuxtv.org>
 
-     For cards without hardware encoding capabilities (all cards
-     supported by V4L not listed above), Myth includes two methods for
-     software encoding: RTjpeg and MPEG-4. RTjpeg has significantly
-     fewer CPU demands than MPEG-4, but it generates larger files than
-     MPEG-4 for a given recording.
+  +o  HD Homerun
 
-  For DVB and HDTV cards, no further configuration is required after
-  setting up the card using the 'mythtv-setup' program.  For all other
-  cards, configuration is done through MythFrontend.  Selecting
-  'Recording Profiles' from the 'TV Settings' screen will list the
-  profiles currently available for the cards in your system.  Depending
-  on what types of cards you have installed you may see:
+  For cards without hardware encoding capabilities (all cards supported
+  by V4L not listed above), Myth includes two methods for software
+  encoding: RTjpeg and MPEG-4. RTjpeg has significantly fewer CPU
+  demands than MPEG-4, but it generates larger files than MPEG-4 for a
+  given recording.
+
+  Any cards which simply demodulate MPEG-2 which has been encoded by the
+  broadcaster will not offer much in the way of configuration because
+  the broadcaster will be choosing the bitrate, etc.
+
+  For all other cards, configuration is done through MythFrontend.
+  Selecting 'Recording Profiles' from the 'TV Settings' screen will list
+  the profiles currently available for the cards in your system.
+  Depending on what types of cards you have installed you may see:
 
 
        (Create new profile group)
@@ -3394,64 +3393,8 @@
   section for more information.
 
 
-  1100..66..  XXbbooxx FFrroonntteennddss
-
-  MythTV is able to control the LED on the Xbox to indicate backend
-  recording status.
-
-  To control the LED, you will need the bblliinnkk program from the xbox-
-  linux project, which is installed as /bin/led on GentooX. On Xebian
-  (the new Ed's Debian) you must install it yourself. On other
-  distributions it may or may not be installed as a program called bblliinnkk
-  and should be located in your path. (Type which blink to see if the
-  program is available.) If you do not have bblliinnkk, you may obtain it
-  from the Xbox-Linux project site at http://xbox-linux.sf.net/
-  <http://xbox-linux.sf.net/>. The program you need is part of the
-  eds_i2c_staff module in CVS. Note the spelling.
-
-
-  Once you have installed bblliinnkk you will need to set permissions.  bblliinnkk
-  needs write permission to the i2c device to function properly. There
-  are three methods to accomplish this. First, you could run
-  mythfrontend as root, which is the simplest method, but could
-  potentially be a security risk. Next, you may make the bblliinnkk binary
-  setuid root, which allows non-privileged users to run a program with
-  root capability. This is done by typing the command:
-
-
-       $ su
-       # chmod u+s /path/to/blink
-
-
-
-  The final technique would be to set the /dev/i2c/0 device read/write
-  for all users, but this is the least preferred method.
-
-  Now it's time to setup MythTV for Xbox hardware. Enter Setup ->
-  General.  On the second page check the 'Enable Xbox Hardware' option.
-  Upon reentering the settings, you should have a new option named
-  'Xbox'. Within this option you may select the distribution, LED colors
-  for recording and the update interval. If you select GentooX as the
-  distribution lleedd will be used as the bblliinnkk binary name, otherwise,
-  bblliinnkk is used.  Colors should be self explanatory. The update interval
-  determines how often the frontend should poll the backend to determine
-  if the status has changed.
-
-
   1111..  UUssiinngg MMyytthhTTVV..
 
-
-
-    NNOOTTEE ttoo RReedd HHaatt//FFeeddoorraa 44 uusseerrss: Red Hat Linux and Fedora Core ship
-  with Gnome as the default desktop environment. However, Gnome seems to
-  have issues with window focus and window switching which sometimes
-  cause mythfrontend to obscure the video. KDE does not seem to have any
-  such issues. Therefore you will need to switch to KDE by selecting
-  RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose
-  "KDE".  NNOOTTEE ttoo FFeeddoorraa CCoorree 55 aanndd 66 uusseerrss: Fedora 5 and 6 no longer
-  have this tool in the Menu. Use "switchdesk KDE" from a command line.
-  Read "man switchdesk" for further information about changing to other
-  desktop environments.
 
   1111..11..  KKeeyybbooaarrdd ccoommmmaannddss
 
@@ -3460,6 +3403,7 @@
   liking.
 
   1111..11..11..  mmyytthhffrroonntteenndd
+
 
 
    Arrow keys     used to move the highlight point around
@@ -3471,8 +3415,58 @@
             O     to list the upcoming episodes for the currently selected show on the EPG, "Program Finder", "Program Recording Priorities", "Fix Scheduling Conflicts" or search results screens
             I     edit recording options from the EPG, "Program Finder", "Program Recording Priorities", or "Fix Scheduling Conflicts" screens. From the Playback and Delete screens, 'I' presents options for recorded shows such as Auto Expire or Stop Recording. Pressing 'I' while on the Recording Options screen will take you to the Advanced Recording Options screen.
 
-
   1111..11..22..  WWaattcchhiinngg TTVV oorr aa rreeccoorrddiinngg
+
+
+  1111..11..33..  WWaattcchhiinngg TTVV oonnllyy
+
+
+  G     rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
+  H     Channel history. Each repeat steps back through the previous channels.
+  O     Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
+  Y     switch between multiple capture cards.  NNOOTTEE: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
+
+
+  1111..11..44..  LLiivveeTTVV BBrroowwssee MMooddee
+
+
+         Left     browse program prior to current listed program
+        Right     browse program following current listed program
+           Up     browse program on channel above current listed channel/program
+         Down     browse program on channel below current listed channel/program
+            /     browse program on next favorite channel
+          0-9     enter a channel number to browse
+  Space/Enter     change channel to channel of current listed program
+          R/r     Toggle recording of current program (cycles through types)
+        ESC/O     Exit Browse mode
+
+
+  1111..11..55..  PPllaayybbaacckk RReeccoorrddiinngg ZZoooomm MMooddee
+
+
+         Left     Move video to Left
+        Right     Move video to Right
+           Up     Move video Up
+         Down     Move video Down
+       PageUp     Zoom In
+     PageDown     Zoom Out
+  Space/Enter     Exit Zoom mode leaving picture at current size and position
+          ESC     Exit Zoom mode and return to original size
+
+
+  1111..11..66..  IIff yyoouu hhaavvee ttwwoo oorr mmoorree ttuunneerr ccaarrddss
+
+
+  V     toggle Picture-in-picture on or off
+  B     toggles the window focus (lets you change channels on the PiP window)
+  N     swaps the two channels by changing channels on both cards
+
+
+  1111..11..77..  WWaattcchhiinngg aa rreeccoorrddiinngg oonnllyy
+
+
+  1111..11..88..  EEPPGG
+
 
 
   Up or down     keys change the channel
@@ -3531,52 +3525,11 @@
        Right     advance 1 frame
            >     advance 1 second
 
-
-  1111..11..33..  WWaattcchhiinngg TTVV oonnllyy
-
+  1111..11..99..  SSeettttiinngg PPrrooggrraamm oorr CChhaannnneell RReeccoorrddiinngg PPrriioorriittiieess
 
 
-  G     rotate between the various Picture Adjustments (Colour, Hue, etc.) for recording. These values affect the look of the resulting .nuv file, and are independent of the playback picture settings. While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
-  H     Channel history. Each repeat steps back through the previous channels.
-  O     Turns on 'Browse' mode, allowing user to browse channels and program info while watching current show FullScreen.
-  Y     switch between multiple capture cards.  NNOOTTEE: you will lose your LiveTV buffer on your current card. Useful for different-sourced cards (such as Dish Network on one, HDTV over-the-air on another card.)
+  1111..11..1100..  VViieewwiinngg SScchheedduulleedd RReeccoorrddiinnggss//RReessoollvviinngg CCoonnfflliiccttss
 
-  1111..11..44..  LLiivveeTTVV BBrroowwssee MMooddee
-
-
-         Left     browse program prior to current listed program
-        Right     browse program following current listed program
-           Up     browse program on channel above current listed channel/program
-         Down     browse program on channel below current listed channel/program
-            /     browse program on next favorite channel
-          0-9     enter a channel number to browse
-  Space/Enter     change channel to channel of current listed program
-          R/r     Toggle recording of current program (cycles through types)
-        ESC/O     Exit Browse mode
-
-
-  1111..11..55..  PPllaayybbaacckk RReeccoorrddiinngg ZZoooomm MMooddee
-
-
-         Left     Move video to Left
-        Right     Move video to Right
-           Up     Move video Up
-         Down     Move video Down
-       PageUp     Zoom In
-     PageDown     Zoom Out
-  Space/Enter     Exit Zoom mode leaving picture at current size and position
-          ESC     Exit Zoom mode and return to original size
-
-
-  1111..11..66..  IIff yyoouu hhaavvee ttwwoo oorr mmoorree ttuunneerr ccaarrddss
-
-
-  V     toggle Picture-in-picture on or off
-  B     toggles the window focus (lets you change channels on the PiP window)
-  N     swaps the two channels by changing channels on both cards
-
-
-  1111..11..77..  WWaattcchhiinngg aa rreeccoorrddiinngg oonnllyy
 
 
       Space/Enter     set a bookmark at that point. Next time you start the recording, you will automatically jump forward to this point and clear the bookmark.
@@ -3597,10 +3550,6 @@
                 I     Inverts the cutlist
 
 
-  1111..11..88..  EEPPGG
-
-
-
            Arrows     are used to move the highlighted program point around
        A, D, S, W     perform the same as left, right, down and up
   PageUp/PageDown     move the channel list up or down a page
@@ -3617,8 +3566,6 @@
                 ?     mark/unmark the current channel as a "favorite"
            / or 4     toggle the guide listing between all channels and filtered "favorites"
 
-  1111..11..99..  SSeettttiinngg PPrrooggrraamm oorr CChhaannnneell RReeccoorrddiinngg PPrriioorriittiieess
-
 
                    Right     increases priority value
                     Left     decreases priority value
@@ -3629,15 +3576,11 @@
                      ESC     commits changes and exits
 
 
-  1111..11..1100..  VViieewwiinngg SScchheedduulleedd RReeccoorrddiinnggss//RReessoollvviinngg CCoonnfflliiccttss
-
-
                     1     show all recordings
                     2     show only important recordings
              Home/End     toggle show showing all/important
                     I     edit recording options
           Space/Enter     resolve conflict or override
-
 
   1111..11..1111..  VViieewwiinngg SSeeaarrcchh LLiissttiinnggss
 
@@ -3653,6 +3596,7 @@
   D     on a custom profile group displays a popup to delete the group
 
 
+
   1111..11..1133..  RReeccoorrddiinngg GGrroouuppss
 
   In the Watch Recordings screen, Recording Groups allow you to separate
@@ -3662,7 +3606,6 @@
 
        M     change the view or to set a group password
        I     move a program from one Recording Group to another
-
 
 
   1111..11..1144..  WWaattcchh RReeccoorrddiinnggss SSccrreeeenn
@@ -3713,13 +3656,13 @@
 
 
 
-       $ tar -xjf myththemes-0.21.tar.bz2
-       $ cd ~/myththemes-0.21
-       $ qmake myththemes.pro
-       $ su -
-       # make install
-       # exit
-       $
+  $ tar -xjf myththemes-0.22.tar.bz2
+  $ cd ~/myththemes-0.22
+  $ qmake myththemes.pro
+  $ su -
+  # make install
+  # exit
+  $
 
 
 
@@ -3727,15 +3670,7 @@
   section.
 
 
-
-  1111..33..  AAddddiinngg DDiisshhTTVV iinnffoorrmmaattiioonn ttoo tthhee ddaattaabbaassee
-
-  A script for adding Pay Per View information into the MythTV database
-  for DishTV subscribers is available at http://www.mythppv.com/
-  <http://www.mythppv.com/>.
-
-
-  1111..44..  AAddddiinngg ssuuppppoorrtt ffoorr aann eexxtteerrnnaall ttuunneerr
+  1111..33..  AAddddiinngg ssuuppppoorrtt ffoorr aann eexxtteerrnnaall ttuunneerr
 
   MythTV supports changing the channel on an external tuner. If you have
   an external tuner, such as a DirecTV or digital cable set top box, you
@@ -3756,7 +3691,7 @@
   pinouts.
 
 
-  1111..55..  UUssiinngg SShhuuttddoowwnn//WWaakkeeuupp
+  1111..44..  UUssiinngg SShhuuttddoowwnn//WWaakkeeuupp
 
   What does the MythTV Shutdown/Wakeup function do? The scheduler on the
   Master backend (MBE) keeps track of the idle status of the entire
@@ -3786,13 +3721,12 @@
      <http://www.malloc.de/tools/wakeup_clock.html>
 
 
-  1111..55..11..  AA ddeeeeppeerr llooookk iinnttoo tthhee ooppeerraattiioonn
+  1111..44..11..  AA ddeeeeppeerr llooookk iinnttoo tthhee ooppeerraattiioonn
 
   The scheduler keeps track of the idle status of the MythTV system. To
   determine whether or not the MythTV system is idle, the following
   conditions must be met for a period of time defined in the "Idle
   timeout (secs)" parameter.
-
 
   +o  no client is connected to the server
 
@@ -3822,7 +3756,7 @@
   required Slave backend, so all Slave backends will startup.
 
 
-  1111..55..22..  SSeettttiinngg uupp tthhee MMyytthhTTVV ssiiddee ooff tthhiiss eexxtteennssiioonn..
+  1111..44..22..  SSeettttiinngg uupp tthhee MMyytthhTTVV ssiiddee ooff tthhiiss eexxtteennssiioonn..
 
   There are a number of options that are used to control the Shutdown /
   Wakeup feature.
@@ -3851,6 +3785,7 @@
 
   +o  "Set wakeuptime command" is the command executed to set the new
      wakeuptime.
+
 
   +o  "Server Halt Command" is the command executed to shutdown the
      Master backend and the Slave backends.
@@ -3894,7 +3829,7 @@
      wakeup all Slave backend systems.
 
 
-  1111..55..22..11..  UUssiinngg WWOOLL ttoo wwaakkee yyoouurr MMaasstteerr bbaacckkeenndd..
+  1111..44..22..11..  UUssiinngg WWOOLL ttoo wwaakkee yyoouurr MMaasstteerr bbaacckkeenndd..
 
   To use WOL to wake your Master backend you will need a WOL capable
   Master backend, a machine that runs 24/7 which can execute an at-job
@@ -3915,6 +3850,7 @@
   my $SERVER I have (x)inetd listening on $PORT starting a little script
   which cares about setting the at-job. The following additions are nec-
   essary on the $SERVER:
+
 
   If you use iinneettdd:
 
@@ -3970,14 +3906,15 @@
   server!
 
 
-  1111..55..22..22..  UUssiinngg BBIIOOSS wwaakkeeuupp ttoo wwaakkee yyoouurr MMaasstteerr bbaacckkeenndd..
+  1111..44..22..22..  UUssiinngg BBIIOOSS wwaakkeeuupp ttoo wwaakkee yyoouurr MMaasstteerr bbaacckkeenndd..
 
   Since I don't use this, I cannot say much about this. If your
   motherboard supports any wakeup tool you have to call that tool as
   "Set wakeuptime command" with the "Wakeup time format" suitable for
   that tool.
 
-  1111..55..33..  WWaakkeeuupp tthhee MMyySSQQLL sseerrvveerr uussiinngg WWOOLL
+
+  1111..44..33..  WWaakkeeuupp tthhee MMyySSQQLL sseerrvveerr uussiinngg WWOOLL
 
   If your MySQL server and your Master backend are not on the same
   machine, you can have the Master backend wake your MySQL server using
@@ -3986,8 +3923,7 @@
   same as discussed in "The WakeOnLan settings" above.
 
 
-
-  1111..55..44..  TTiippss//TTrriicckkss::
+  1111..44..44..  TTiippss//TTrriicckkss::
 
   If, for example, one of the Slave backends is also your desktop
   computer, you could simply use a little script as 'server halt
@@ -4000,7 +3936,7 @@
   wakeuptime-script should stop the program that uses /dev/rtc before
   setting the wakeuptime.
 
-  1111..66..  CCoonnttrroolllliinngg tthhee mmyytthhffrroonntteenndd vviiaa tteellnneett
+  1111..55..  CCoonnttrroolllliinngg tthhee mmyytthhffrroonntteenndd vviiaa tteellnneett
 
   To use this feature you must first enable it in
   Settings>General>General
@@ -4118,6 +4054,7 @@
   +o  Channel Record -- records one showing of each unique episode from
      any of the times the title is listed on this station. This is
      perhaps the most common rule to use for most shows.
+
   +o  Record All -- records one showing of each unique episode from any
      of the times this title is listed on any channel. This can be
      useful if a station has sister stations where shows are rebroadcast
@@ -4174,6 +4111,7 @@
      shows on certain channels. This would give all shows on a channel
      an advantage by default.
 
+
   +o  Input priority -- in the "mythtv-setup" program, the "Input
      Connections" section allows you to add additional priority in the
      "Input priority".  This is simply another priority factor but has
@@ -4208,7 +4146,6 @@
 
   Singles will record without regard to duplicate matching.
 
-
   The standard recurring methods of All, Channel, Weekly and Daily use
   the descriptive information in the TV listings to try to record only
   one showing of each unique episode. However, This goal is sometimes
@@ -4238,6 +4175,7 @@
   where the standard recording rules may not work correctly.
 
 
+
   1122..22..33..  CCoonnfflliiccttss
 
   As you add more shows that you would like to record, the scheduler
@@ -4249,6 +4187,7 @@
   not "stuck" with the scheduler's choice. You can still tell the
   scheduler exactly which shows you do want to record and/or don't want
   to record in any situation.
+
 
   1122..22..44..  SScchheedduulliinngg ddeecciissiioonnss
 
@@ -4316,6 +4255,8 @@
      see if a scheduled show can be moved to another input or later
      matching showing without creating a new conflict so that the
      conflicting show can be scheduled to record.
+
+
   1122..22..55..  RReesscchheedduullee HHiigghheerr PPrriioorriittiieess
 
   Setup->TV Settings->Recording Priorities->General has a checkbox for
@@ -4448,6 +4389,8 @@
   This allows you to select any special "Storage Groups" you may have
   created to determine where recordings from this rule should be stored
   on your disks. The "Default" storage group is always available.
+
+
   1122..33..44..  PPllaayybbaacckk GGrroouupp
 
   This selects a set of pre-configured playback parameters which can be
@@ -4494,6 +4437,7 @@
   Settings->General.
 
 
+
   1122..44..22..  TTrraannssccooddiinngg
 
   Select whether or not to automatically transcode recordings to save
@@ -4512,7 +4456,6 @@
   +o  %DIR% - the directory component of the recording's filename
 
   +o  %FILE% - the filename component of the recording's filename
-
 
   +o  %TITLE% - the title of the recording (e.g., name of the series)
 
@@ -4561,7 +4504,6 @@
   level of scheduling customization will ever be available in any
   commercial DVR system.
 
-
   1122..55..22..  GGeettttiinngg SSttaarrtteedd
 
   Go to Schedule Recordings->Custom Record. This page, helps you build a
@@ -4580,6 +4522,8 @@
   examples but leave it on the default for now. Arrow down to "Add this
   example clause" and press SELECT (Enter or Space on a keyboard). The
   large text box should now show:
+
+
             program.title = 'Nova'
 
 
@@ -4640,7 +4584,6 @@
   Priorities" page, arrow down to the title, press Enter and change the
   the recording type to "Do not record this program" then "Save these
   settings".
-
 
 
   1122..55..33..  HHooww iitt WWoorrkkss
@@ -4708,6 +4651,8 @@
   their highest rated shows a dozen on more times per week. However, the
   scheduler only needs two or three choices to do a good job of making a
   flexible choice.
+
+
               program.title LIKE "Celebrity Fit Club%"
               AND DAYNAME(program.starttime) = "Sunday"
 
@@ -4772,6 +4717,7 @@
      date or if the show was marked as a repeat and did not have a date
      for the first airing. If this is "0" it usually means that this is
      a brand new show or a rebroadcast within the first two weeks.
+
   +o  "program.generic" is a column created by MythTV to try mark
      showings for a series where the specific episode information is not
      included. When these generic showings appear, it is impossible for
@@ -4816,9 +4762,9 @@
   present.  To see all of the available attribute names:
 
 
-       $ mysql -u mythtv -pmythtv mythconverg
-       mysql> SHOW COLUMNS FROM program LIKE '%prop'\G
-       mysql> SHOW COLUMNS FROM program LIKE 'subtitletypes'\G
+  $ mysql -u mythtv -pmythtv mythconverg
+  mysql> SHOW COLUMNS FROM program LIKE '%prop'\G
+  mysql> SHOW COLUMNS FROM program LIKE 'subtitletypes'\G
 
 
 
@@ -4836,6 +4782,7 @@
   more service providers, or video source, on one or more video input
   from each provider. Some inputs may not be allowed to record at the
   same time as each other while others may record simultaneously.
+
   A television station may be broadcast on more than one channel from
   one provider or may be available on channels from two or more
   providers. If a TV station is available from more than one source, the
@@ -4876,8 +4823,6 @@
        |=---=^=------------------------------=|        input 3 | Cable
        |                                      +-----||||||||||||
 
-
-
   Input 1 and input 2 receive content from the same set top box and the
   channels can not be tuned independently. Therefore only one of these
   two inputs should be used at any given time. The solution is to create
@@ -4893,7 +4838,6 @@
   appears as a separate device. DVB cards may be allowed to capture
   content from more than one channel at a time if the channels are in
   the same MUX.
-
 
 
   1122..66..22..  SSttaattiioonnss,, CChhaannnneellss aanndd VViiddeeoo SSoouurrcceess
@@ -4961,7 +4905,6 @@
   they carry the same station.
 
 
-
   1122..66..33..  OOrrddeerr ooff IInnppuuttss
 
   By default the scheduler chooses the first (lowest numbered) input
@@ -5012,7 +4955,6 @@
   record on 733. If, however, this HDTV input already had a higher
   priority show assigned to it in that time slot, "The Apprentice" would
   be assigned to KVBC channel 3 on input 2.
-
   Having two channels with the same callsign may affect how program
   information is shown in mythfrontend. If two sources have the same
   callsign and channel number, the program guide and program lists will
@@ -5071,8 +5013,6 @@
 
 
   Card 2 with input priority "-1":
-
-
 
         Time  Title     Priority  Card  Status
         8:00  The Apprentice  +3  1     Will Record
@@ -5171,14 +5111,10 @@
 
   1122..66..1100..  CCuussttoomm PPrriioorriittyy
 
-
-
-                           New for MythTV 0.21
-
   While Input, Channel, and HDTV Priority can be used for indicating a
   preference for certain programs and inputs, there may be circumstances
   that cannot be resolved easily with these standard features. MythTV
-  version 0.21 includes a feature for "power priority". The Custom
+  version 0.22 includes a feature for "power priority". The Custom
   Priority editor in mythfrontend's "TV Settings" screen is similar to
   Custom Record, however, Custom Priority allows you to create
   specialized power priority factors to influence scheduling decisions.
@@ -5241,8 +5177,8 @@
 
 
 
-  $ tar -xjf mythplugins-0.21.tar.bz2
-  $ cd mythplugins-0.21
+  $ tar -xjf mythplugins-0.22.tar.bz2
+  $ cd mythplugins-0.22
   $ ./configure --help
 
   Usage:   configure [options]
@@ -5287,7 +5223,7 @@
 
 
   The sections detailing configuration of the plugins assume that you
-  are already in the ~/mythplugins-0.21/ directory.
+  are already in the ~/mythplugins-0.22/ directory.
 
   Note that a single ccoonnffiigguurree script now does configuration for all
   modules. By default, it will compile all modules. If you do not wish
@@ -5304,7 +5240,7 @@
 
 
 
-  $ cd ~/mythplugins-0.21
+  $ cd ~/mythplugins-0.22
   $ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
   $ qmake mythplugins.pro
   $ make
@@ -5354,7 +5290,7 @@
 
 
 
-       $ cd ~/mythplugins-0.21/mythweb
+       $ cd ~/mythplugins-0.22/mythweb
        $ su
        # mkdir /var/www/html/mythweb
        # cp -r . /var/www/html/mythweb
@@ -5428,7 +5364,7 @@
   install the application:
 
 
-       $ cd ~/mythplugins-0.21
+       $ cd ~/mythplugins-0.22
        $ ./configure --disable-all --enable-opengl --enable-mythgallery
        $ qmake mythplugins.pro
        $ make
@@ -5624,7 +5560,6 @@
   you may need to remove and recreate xmamerc after upgrading since some
   of the default options may have changed.
 
-  Edit ~/.xmame/xmamerc to include your paths.
 
 
        ### Fileio Related ###
@@ -5714,7 +5649,7 @@
   Switch to the mythplugins directory:
 
 
-       $ cd ~/mythplugins-0.21
+       $ cd ~/mythplugins-0.22
 
 
 
@@ -5980,7 +5915,7 @@
 
 
 
-  $ cd ~/mythplugins-0.21
+  $ cd ~/mythplugins-0.22
   $ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
   $ qmake mythplugins.pro
   $ make
@@ -6125,7 +6060,7 @@
 
 
 
-       $ cd ~/mythplugins-0.21
+       $ cd ~/mythplugins-0.22
        $ ./configure --disable-all --enable-mythweather
        $ qmake mythplugins.pro
        $ make
@@ -6183,7 +6118,7 @@
 
 
 
-       $ cd ~/mythplugins-0.21
+       $ cd ~/mythplugins-0.22
        $ ./configure --disable-all --enable-mythvideo
        $ qmake mythplugins.pro
        $ make
@@ -6285,7 +6220,7 @@
   instructions on downloading the tarball. MythNews is a RSS reader.
 
 
-       $ cd ~/mythplugins-0.21
+       $ cd ~/mythplugins-0.22
        $ ./configure --disable-all --enable-mythnews
        $ qmake mythplugins.pro
        $ make
@@ -8175,222 +8110,10 @@
 
   2244..  EExxaammppllee CCoonnffiigguurraattiioonnss..
 
-  2244..11..  LLooggiiccaall VVoolluummee MMaannaaggeerr ((LLVVMM))
-
-  LVM greatly increases the flexibility you have in managing your
-  storage than traditional physical partitions. This section will
-  provide some brief notes on how to use LVM to create storage space for
-  your video files and how to add additional disk space in the future.
-  There's lots more that can be done with LVM, so check the LVM HOWTO
-  http://tldp.org/HOWTO/LVM-HOWTO/ <http://tldp.org/HOWTO/LVM-HOWTO/>
-  document for details.
-
-
-
-      NNOOTTEE: If you are running MythTV 0.21 and you are using LVM to
-  create one large filesystem to store your recordings, it's no longer
-  recommended that you go the LVM route. The preferred solution is to
-  use ``Storage Groups''. They're more flexible and less likely to lose
-  all of your recordings if you have a drive failure.
-
-  If you don't understand how to partition a drive, or how to change the
-  partition type you should stop and look at documentation on how to
-  perform these steps.
-
-
-
-    BBIIGG FFAATT WWAARRNNIINNGG: Using an incorrect parameter can make your files
-  inaccessible, prevent your computer from booting, etc. Be careful!
-
-  Make sure your kernel configuration includes LVM support or that it's
-  available as a module. Today, most vendors include this by default.
-  You'll also want to ensure that you have a copy of the LVM utilities;
-  check your distribution, or get the latest versions from
-  http://www.sistina.com/products_lvm.htm
-  <http://www.sistina.com/products_lvm.htm> and build them manually.
-  Check that the vvggssccaann program is being run at some point during your
-  boot sequence - most distributions do this by default. Look for a
-  message during boot up that looks like this: vgscan -- reading all
-  physical volumes (this may take a while...) If you don't see any
-  messages during boot, you may need to install a LVM init script or
-  confirm that you have all of the LVM packages installed from your
-  distribution.
-
-  LVM uses a few concepts you should be familiar with before starting.
-
-  +o  PV (Physical Volume). The actual partition on the hard drive.
-
-  +o  VG (Volume Group). The aggregation of all the PVs make a VG.
-
-  +o  LV (Logical Volume). Subdivision of the pool of space available in
-     the VG into individual chunks, like /usr, /var/video, etc.
-
-  The following example assumes that you want to create a LVM partition
-  from a chunk of space in /dev/hda5, using a reiserfs filesystem and
-  mounted on /var/video. You later decide to extend this filesystem by
-  adding a new disk: /dev/hdb.
-
-  You need to create at least one LVM partition for a physical volume.
-  Use ffddiisskk or your favorite partition editor to set the type to LVM
-  (0x8e). If you're using an entire disk, create one big partition
-  rather than using the device itself. e.g. use /dev/hdb1 not /dev/hdb.
-
-  In the following example, you have a 15GB disk. The first 6GB are set
-  as your boot partition. /dev/hda2 was added as an extended partition,
-  and within that partition you created the /dev/hda5 linux (ext2)
-  partition.
-
-
-
-  # fdisk /dev/hda
-
-  The number of cylinders for this disk is set to 1823.
-  There is nothing wrong with that, but this is larger than 1024,
-  and could in certain setups cause problems with:
-  1) software that runs at boot time (e.g., old versions of LILO)
-  2) booting and partitioning software from other OSs
-     (e.g., DOS FDISK, OS/2 FDISK)
-
-  Command (m for help): p
-
-  Disk /dev/hda: 15.0 GB, 15000330240 bytes
-  255 heads, 63 sectors/track, 1823 cylinders
-  Units = cylinders of 16065 * 512 = 8225280 bytes
-
-     Device Boot    Start       End    Blocks   Id  System
-  /dev/hda1   *         1       764   6136798+  83  Linux
-  /dev/hda2           765      1823   8506417+   5  Extended
-  /dev/hda5           765      1823   8506417   83  Linux
-
-  Command (m for help): t
-  Partition number (1-6): 5
-  Hex code (type L to list codes): 8e
-
-  Command (m for help): p
-
-  Disk /dev/hda: 15.0 GB, 15000330240 bytes
-  255 heads, 63 sectors/track, 1823 cylinders
-  Units = cylinders of 16065 * 512 = 8225280 bytes
-
-     Device Boot    Start       End    Blocks   Id  System
-  /dev/hda1   *         1       764   6136798+  83  Linux
-  /dev/hda2           765      1823   8506417+   5  Extended
-  /dev/hda5           765      1823   8506417   8e  Linux LVM
-
-  Command (m for help): w
-
-  #
-
-
-
-  Create the LVM physical volume from the partitions (repeat if you have
-  multiple partitions to use):
-
-
-       # pvcreate /dev/hda5
-
-
-
-  Create a LVM volume group out of this physical volume called
-  "VGforMyth" that is allocated in chunks that are a multiple of 64MB
-
-
-       # vgcreate VGforMyth -s 64m /dev/hda5
-
-
-
-  Create a logical volume of 5GB called "video" and then create the
-  reiserfs filesystem and mount it:
-
-
-
-  # lvcreate --name video --size 5G VGforMyth
-  # mkreiserfs /dev/VGforMyth/video
-  # mount /dev/VGforMyth/video /var/video
-
-
-
-  Now create a 3GB volume for mythmusic files if you like:
-
-
-       # lvcreate --name music --size 3G VGforMyth
-       # mkreiserfs /dev/VGforMyth/music
-       # mount /dev/VGforMyth/music /var/music
-
-
-
-  Display the volume group status: # vgdisplay -v
-
-  Now, lets suppose you want to add a 60GB hard disk to the system as
-  hdb and allocate 50GB of it to video storage.
-
-  First, create a single partition /dev/hdb1 covering the whole disk and
-  make it type 0x8e using your partition editor.
-
-  # fdisk /dev/hdb .... create partition, set type, save and reboot if
-  it says you have to
-
-  Create the new LVM physical volume:
-
-  # pvcreate /dev/hdb1
-
-  Add the new physical volume to the volume group:
-
-  # vgextend VGforMyth /dev/hdb1
-
-
-
-     NNOOTTEE: You may get errors at this point stating that there are no
-  physical volumes available for adding to the LV, even though you know
-  for a fact that there are. You may need to specify the physical volume
-  in the /dev/ide/host/bus/target/lun/etc format.  Once you've completed
-  one of the following two procedures, use ddff to check that you've got
-  more space.
-
-  Make the logical volume used for video bigger:
-
-  # lvextend --size +50G /dev/VGforMyth/video
-
-  2244..11..11..  RReeiisseerrFFSS
-
-  Unmount, resize and remount the filesystem. Technically, you don't
-  need to unmount and remount the ReiserFS.
-
-
-       # umount /var/video
-       # resize_reiserfs /dev/VGforMyth/video
-       # mount /dev/VGforMyth/video /var/video
-
-
-
-  2244..11..22..  eexxtt22 oorr eexxtt33
-
-  LVM comes with a program called rreessiizzee22ffss.
-
-  Unmount, resize and remount the filesystem. The filesystem _m_u_s_t be
-  unmounted during this procedure.
-
-
-       # umount /var/video
-       # resize2fs --size +50G /dev/VGforMyth/video
-       # mount /dev/VGforMyth/video /var/video
-
-
-
-  2244..11..33..  xxffss
-
-  XFS does not need to be unmounted to extend the size:
-
-
-       # xfs_growfs /var/video
-
-
-
-  2244..22..  AAddvvaanncceedd PPaarrttiittiioonn FFoorrmmaattttiinngg
+  2244..11..  AAddvvaanncceedd PPaarrttiittiioonn FFoorrmmaattttiinngg
 
   The partitions that your distribution sets up for you may not be
-  optimized for large files. Using LVM in conjunction with the following
-  techniques can be quite useful.
+  optimized for large files.
 
   Unlike a typical filesystem, a MythTV video partition is usually a
   very large filesystem filled with a fairly small number of large
@@ -8416,7 +8139,7 @@
   list.
 
 
-  2244..22..11..  EExxtt22
+  2244..11..11..  EExxtt22
 
   Ext2 was the defacto standard Linux filesystem for many years. It is
   stable, provides good I/O performance and can quickly delete large
@@ -8427,7 +8150,7 @@
 
 
 
-  2244..22..22..  EExxtt33
+  2244..11..22..  EExxtt33
 
   Ext3 is Ext2 with a journal, so your biggest gain is that in case of a
   crash and reboot you won't have to wait very long for your partition
@@ -8453,7 +8176,7 @@
   You can check on your filesystem using the dduummppee22ffss program. See the
   man page for details.
 
-  2244..22..33..  RReeiisseerrFFSS
+  2244..11..33..  RReeiisseerrFFSS
 
   The Reiser filesystem is another journaling filesystem commonly
   distributed with Linux. It is known to be an extremely efficient
@@ -8464,7 +8187,7 @@
   files.
 
 
-  2244..22..44..  JJFFSS
+  2244..11..44..  JJFFSS
 
   JFS (Journaling File System) is a journaling filesystem originally
   developed by IBM for AIX which was later released as open source.
@@ -8474,7 +8197,7 @@
   file in under one second, even files as large as 10 gigabytes.
 
 
-  2244..22..55..  XXFFSS
+  2244..11..55..  XXFFSS
 
   XFS is a journaling file system originally developed by SGI for Irix,
   and later released as open source. While not a part of the default
@@ -8490,7 +8213,7 @@
 
 
 
-  2244..33..  CCaacchhiinngg ssuuppppoorrtt ffoorr SScchheedduulleess DDiirreecctt
+  2244..22..  CCaacchhiinngg ssuuppppoorrtt ffoorr SScchheedduulleess DDiirreecctt
 
   MythTV 0.20.2 or later supports caching of downloaded information from
   Schedules Direct, so devices that share a common source do not require
