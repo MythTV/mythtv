@@ -1534,46 +1534,51 @@
     <window name="customedit">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,760,40</area>
+            <area>40,30,760,40</area>
             <font>baselarge</font>
             <value>Custom Record Rules</value>
         </textarea>
 
         <textarea name="ruleslabel" from="basetextarea">
-            <area>50,100,200,40</area>
+            <area>30,90,220,40</area>
             <font>basemedium</font>
             <align>right,vcenter</align>
             <value>Existing Rules:</value>
         </textarea>
 
         <buttonlist name="rules" from="basewideselector">
-            <position>300,100</position>
+            <position>300,90</position>
             <wrapstyle>selection</wrapstyle>
         </buttonlist>
 
         <textarea name="titlelabel" from="ruleslabel">
-            <area>50,150,200,40</area>
+            <area>30,140,220,40</area>
             <value>Rule Name:</value>
-            <align>right,vcenter</align>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>300,150</position>
+            <position>300,140</position>
         </textedit>
 
+        <textarea name="sampleslabel" from="ruleslabel">
+            <area>30,230,220,40</area>
+            <value>Sample Clauses:</value>
+        </textarea>
+
         <buttonlist name="clauses" from="basewideselector">
-            <position>100,230</position>
+            <position>300,230</position>
             <wrapstyle>items</wrapstyle>
         </buttonlist>
 
         <textarea name="clausetext" from="ruleslabel">
-            <area>520,230,660,40</area>
-            <align>left,vcenter</align>
+            <area>300,275,900,80</area>
+            <align>left,top</align>
+            <multiline>yes</multiline>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textedit name="description">
-            <area>100,320,1080,150</area>
+            <area>100,340,1080,150</area>
             <statetype name="background">
                 <state name="active">
                     <imagetype name="background">
@@ -1599,13 +1604,13 @@
         </textedit>
 
         <textarea name="subtitlelabel" from="ruleslabel">
-            <area>50,500,250,85</area>
+            <area>50,520,250,85</area>
             <value>Additional Tables:</value>
             <align>left,vcenter</align>
         </textarea>
 
         <textedit name="subtitle">
-            <area>300,500,880,85</area>
+            <area>300,520,880,85</area>
             <statetype name="background">
                 <state name="active">
                     <imagetype name="background">
@@ -1631,22 +1636,22 @@
         </textedit>
 
         <button name="test" from="basebutton">
-            <position>100,630</position>
+            <position>100,650</position>
             <value>Test</value>
         </button>
 
         <button name="record" from="basebutton">
-            <position>387,630</position>
+            <position>387,650</position>
             <value>Record</value>
         </button>
 
         <button name="store" from="basebutton">
-            <position>674,630</position>
+            <position>674,650</position>
             <value>Store</value>
         </button>
 
         <button name="cancel" from="basebutton">
-            <position>960,630</position>
+            <position>960,650</position>
             <value>Cancel</value>
         </button>
 
