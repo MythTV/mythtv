@@ -109,7 +109,11 @@ void ImportIconsWizard::Init()
     if (m_nMaxCount > 0)
     {
         m_missingIter = m_missingEntries.begin();
-        doLoad();
+        if (!doLoad())
+        {
+            if (!m_strMatches.isEmpty())
+                askSubmit(m_strMatches);
+        }
     }
 }
 
@@ -162,7 +166,12 @@ void ImportIconsWizard::skip()
     m_missingIter++;
 
     if (!doLoad())
-        Close();
+    {
+        if (!m_strMatches.isEmpty())
+            askSubmit(m_strMatches);
+        else
+            Close();
+    }
 }
 
 void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
@@ -209,7 +218,12 @@ void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
         m_missingCount++;
         m_missingIter++;
         if (!doLoad())
-            Close();
+        {
+            if (!m_strMatches.isEmpty())
+                askSubmit(m_strMatches);
+            else
+                Close();
+        }
     }
     else
     {
@@ -390,8 +404,6 @@ bool ImportIconsWizard::doLoad()
     {
         VERBOSE(VB_CHANNEL, "doLoad Icon search complete");
         enableControls(STATE_DISABLED);
-        if (!m_strMatches.isEmpty())
-            askSubmit(m_strMatches);
         return false;
     }
     else
