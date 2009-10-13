@@ -2065,7 +2065,7 @@ configure the "Starting channel" setting for this source->input connection.
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
 <caption><bf>NOTE</bf>:  If you have a Hauppauge PVR-500, you must think of
-it has two PVR-150's on a single PCI card.  For example, if you have a
+it as two PVR-150's on a single PCI card.  For example, if you have a
 single PVR-500 card, it will appear as <tt>/dev/video0</tt> and
 <tt>/dev/video1</tt>.  Each <tt>/dev/video</tt> device will have a Tuner input.
 </caption>
@@ -2095,22 +2095,14 @@ mythtv-setup and ran <bf>mythfilldatabase</bf> at least once to populate the
 database.
 
 <sect2>Storage Groups <label id="storagegroups">
-<p>
-<figure loc="here">
-<eps file="add.eps" height="1cm">
-<img src="add.png">
-<caption>
-New in MythTV 0.21
-</caption>
-</figure>
 <sect3>Introduction.
 <p>
 Storage Groups are lists of directories that are used to hold MythTV
-recording files giving you a flexible way to allow you to add capacity to
-your MythTV system without having to use exotic solutions such as LVM,
-filesystem expansion or RAID Online Capacity Expansion.  You can also use
-Storage Groups to organize recordings and to put recordings of a certain
-type into one subdirectory.
+recording files, giving you a flexible way to add capacity to your MythTV
+system without having to use exotic solutions such as LVM, filesystem
+expansion or RAID Online Capacity Expansion.  You can also use Storage
+Groups to organize recordings and to put recordings of a certain type into
+one subdirectory.
 
 Storage Groups do not offer redundancy in case of hard drive failure, but
 unlike LVM, if you lose a hard drive, you only lose the recordings that were
@@ -2148,18 +2140,6 @@ points (<tt>/mnt/store/d1/video</tt>, etc) into the "Default" Storage Group.
 At recording time, if there were four simultaneous recordings, MythTV would
 put one recording onto each drive.
 
-Or, say that you originally installed MythTV to a 80GB hard drive, and that
-hard drive is now filling up.  You could simply add a new drive to your
-system, mount it and update the Storage Group to add additional space.
-
-You may create additional Storage Groups to store specific recordings in
-their own directories.  Storage Groups are edited via the 'Storage
-Directories' section of mythtv-setup.
-
-You can also create multiple Storage Groups to group recordings together;
-recording schedules now have an option to specify which Storage Group to
-use.
-
 MythTV will balance concurrent recordings across the available directories
 in a Storage Group in order to spread out the file I/O load.  MythTV will
 prefer filesystems that are local to the backend over filesystems that are
@@ -2169,6 +2149,18 @@ filesystem.  The balancing method is based purely on I/O, Myth does not try
 to balance out disk space unless a filesystem is too low on free disk space
 in which case it will not be used except as a last resort.
 
+Or, say that you originally installed MythTV to a 750GB hard drive, and that
+hard drive is now filling up.  You could simply add a new drive to your
+system, mount it and update the Storage Group to add the additional space.
+
+You may create additional Storage Groups to store specific recordings in
+their own directories.  Storage Groups are edited via the 'Storage
+Directories' section of mythtv-setup.
+
+You can also create multiple Storage Groups to group recordings together;
+recording schedules now have an option to specify which Storage Group to
+use.
+
 Storage Groups are global, but can be overridden on a slave backend by
 creating a local Storage Group by running <bf>mythtv-setup</bf> on the
 slave.  If a problem occurs and the slave backend is unable to use the
@@ -2177,15 +2169,15 @@ the master's Storage Group.
 
 There's also a special 'LiveTV' Storage Group, but the directory list starts
 out empty.  If you add a directory to the Storage Group, it will be used
-instead of putting LiveTV recordings in the Default Storage Group.  This
-will allow you to put your LiveTV recordings on their own filesystem, which
-is similar to the old MythTV method which used a RingBuffer for LiveTV.  Of
-course, you don't have to do anything, and Live TV recordings will just go
-into the Default Storage Group where they'll be the first programs eligible
-for expiration if the system needs free space for recordings.
+instead of putting LiveTV recordings in the Default Storage Group and will
+allow you to put your LiveTV recordings on their own filesystem.
+
+Of course, you don't have to do anything, and Live TV recordings will just
+go into the Default Storage Group where they'll be the first programs
+eligible for expiration if the system needs free space for recordings.
 
 Usage information for all Storage Group directories is visible on the
-mythfrontend status screen as well as the mythbackend status webpage.
+mythfrontend status screen as well as the mythbackend status webpage. 
 MythTV is smart enough to determine which directories are on shared
 filesystems so it should not count free or used space multiple times if you
 have more than one directory on the same filesystem.
