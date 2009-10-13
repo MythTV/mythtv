@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Configuring Sound.</TITLE>
  <LINK HREF="mythtv-HOWTO-8.html" REL=next>
  <LINK HREF="mythtv-HOWTO-6.html" REL=previous>
@@ -114,7 +114,10 @@ to mute it.  You can now press ESC to exit out of the <B>alsamixer</B>
 program.  You can also have MythTV manage all volume and mute settings, but
 this will only affect the "Master" or PCM volume, not the capture volume.  See
 the mythfrontend setup page for options.</P>
-<P>Finally, if you've performed all of the above steps, and you still don't seem to have any sound, it's possible that your video capture device is muting the audio output.
+<P>Finally, if you've performed all of the above steps, and you still don't
+seem to have any sound, it's possible that your video capture device is
+muting the audio output.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ v4lctl -c /dev/video0 setattr mute off

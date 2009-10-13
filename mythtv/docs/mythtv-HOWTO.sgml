@@ -2685,18 +2685,21 @@ The following types of hardware encoding cards are supported:
 <item>MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see <url
 url="http://ivtvdriver.org" name="http://ivtvdriver.org">
 <item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com"> and
-the Air2PC-ATSC-PCI see <url
-url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
-name="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">
+the Air2PC-ATSC-PCI
+<item>H.264 - HD PVR
 <item>DVB - cards supporting DVB; see <url url="http://linuxtv.org" name="http://linuxtv.org">
+<item>HD Homerun
 </itemize>
+
 For cards without hardware encoding capabilities (all cards supported by
 V4L not listed above), Myth includes two methods for software encoding:
 RTjpeg and MPEG-4.  RTjpeg has significantly fewer CPU demands than MPEG-4,
 but it generates larger files than MPEG-4 for a given recording.
 
-For DVB and HDTV cards, no further configuration is required after
-setting up the card using the 'mythtv-setup' program.
+Any cards which simply demodulate MPEG-2 which has been encoded by the
+broadcaster will not offer much in the way of configuration because the
+broadcaster will be choosing the bitrate, etc.
+
 For all other cards, configuration is done through MythFrontend.
 Selecting 'Recording Profiles' from the 'TV Settings' screen will list
 the profiles currently available for the cards in your system.
@@ -2756,61 +2759,8 @@ default as-is until you're sure that MythTV is operational.
 See the <ref id="capture_resolution_" name="What capture resolution should I
 use? How does video work?"> section for more information.
 
-<sect1>Xbox Frontends
-<p>MythTV is able to control the LED on the Xbox to indicate backend
-recording status.
-
-To control the LED, you will need the <bf>blink</bf> program from the
-xbox-linux project, which is installed as <tt>/bin/led</tt> on GentooX.  On
-Xebian (the new Ed's Debian) you must install it yourself.  On other
-distributions it may or may not be installed as a program called
-<bf>blink</bf> and should be located in your path.  (Type <tt>which
-blink</tt> to see if the program is available.) If you do not have
-<bf>blink</bf>, you may obtain it from the Xbox-Linux project site at <url
-url="http://xbox-linux.sf.net/" name="http://xbox-linux.sf.net/">. The
-program you need is part of the <tt>eds_i2c_staff</tt> module in CVS.  Note
-the spelling.
-
-Once you have installed <bf>blink</bf> you will need to set permissions.
-<bf>blink</bf> needs write permission to the i2c device to function
-properly.  There are three methods to accomplish this.  First, you could run
-<tt>mythfrontend</tt> as root, which is the simplest method, but could
-potentially be a security risk.  Next, you may make the <bf>blink</bf>
-binary setuid root, which allows non-privileged users to run a program with
-root capability.  This is done by typing the command:
-<tscreen><verb>
-$ su
-# chmod u+s /path/to/blink
-</verb></tscreen>
-The final technique would be to set the <tt>/dev/i2c/0</tt> device read/write
-for all users, but this is the least preferred method.
-
-Now it's time to setup MythTV for Xbox hardware.  Enter Setup -> General.
-On the second page check the 'Enable Xbox Hardware' option.  Upon reentering
-the settings, you should have a new option named 'Xbox'.  Within this option
-you may select the distribution, LED colors for recording and the update
-interval.  If you select GentooX as the distribution <bf>led</bf> will be
-used as the <bf>blink</bf> binary name, otherwise, <bf>blink</bf> is used.
-Colors should be self explanatory.  The update interval determines how often
-the frontend should poll the backend to determine if the status has changed.
-
 <sect>Using MythTV.
-<p><figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption>
-<bf>NOTE to Red Hat/Fedora 4 users</bf>: Red Hat Linux and Fedora Core ship
-with Gnome as the default desktop environment.  However, Gnome seems to have
-issues with window focus and window switching which sometimes cause
-mythfrontend to obscure the video. KDE does not seem to have any such
-issues. Therefore you will need to switch to KDE by selecting
-RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose "KDE".
-
-<bf>NOTE to Fedora Core 5 and 6 users</bf>:  Fedora 5 and 6 no longer have
-this tool in the Menu. Use "switchdesk KDE" from a command line. Read "man
-switchdesk" for further information about changing to other desktop
-environments.
-</caption></figure>
+<p>
 <sect1>Keyboard commands
 <p>The <tt>keys.txt</tt> file describes what the various keyboard commands are.
 If you have loaded mythweb, you may change the default keys to your liking.
@@ -4813,7 +4763,7 @@ display toolkit you used. Also, you may need to remove and recreate
 <tt>xmamerc</tt> after upgrading since some of the default options may have
 changed.
 
-Edit <tt>~/.xmame/xmamerc</tt> to include your paths.
+
 <tscreen><verb>
 ### Fileio Related ###
 rompath                         /usr/local/share/xmame/roms

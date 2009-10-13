@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Example Configurations.</TITLE>
  <LINK HREF="mythtv-HOWTO-23.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc24" REL=contents>
@@ -302,33 +302,8 @@ results shown at (
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
-<P>
-<A NAME="migratingtoSD"></A> </P>
-<H2><A NAME="ss24.3">24.3</A> <A HREF="mythtv-HOWTO.html#toc24.3">Migrating from DataDirect Labs to Schedules Direct</A>
-</H2>
 
-<P>MythTV v0.20.2 or later is required to natively support Schedules Direct.
-Code has been included to make the transition as simple as possible.</P>
-<P><B>You do not need to delete your existing video sources or add new ones!</B></P>
-<P>The following steps should work for most users:
-<UL>
-<LI>Create a Schedules Direct account and use the same information as your
-existing lineups at Zap2It Labs.  Do not add or delete channels at this
-time.</LI>
-<LI>Shut down any running <B>mythfrontend</B> and <B>mythbackend</B> programs.</LI>
-<LI>Perform a backup of your existing database.  See 
-<A HREF="mythtv-HOWTO-23.html#backupdb">Saving or restoring the database</A> for instructions.</LI>
-<LI>Run <B>mythtv-setup</B> -> Video Sources.  Change the grabber to
-Schedules Direct, update the username and password fields with the account
-information you created at Schedules Direct and select "Retrieve Lineups".
-Click Finish.</LI>
-<LI>Exit <B>mythtv-setup</B> and run <B>mythfilldatabase</B>.  Check
-if there were any errors.</LI>
-<LI>Restart your <B>mythbackend</B> and <B>mythfrontend</B> programs.</LI>
-</UL>
-</P>
-
-<H2><A NAME="ss24.4">24.4</A> <A HREF="mythtv-HOWTO.html#toc24.4">Caching support for Schedules Direct</A>
+<H2><A NAME="ss24.3">24.3</A> <A HREF="mythtv-HOWTO.html#toc24.3">Caching support for Schedules Direct</A>
 </H2>
 
 <P>MythTV 0.20.2 or later supports caching of downloaded information from

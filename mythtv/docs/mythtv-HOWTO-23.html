@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Miscellaneous.</TITLE>
  <LINK HREF="mythtv-HOWTO-24.html" REL=next>
  <LINK HREF="mythtv-HOWTO-22.html" REL=previous>
@@ -111,7 +111,7 @@ $ cat vidout > video.yuv
 run a lightweight window manager, the <CODE>contrib/configfiles/</CODE> directory has an
 example of a <CODE>.twmrc</CODE> and <CODE>.fvwmrc</CODE> file you may use.</P>
 
-<H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">What capture resolution should I use?  How does video work?</A>
+<H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">What capture resolution should I use?  How does video work? </A>
 </H2>
 
 <P>While MythTV allows you to set various GUI and capture resolutions, not
@@ -234,20 +234,54 @@ picture.</P>
 <H2><A NAME="backupdb"></A> <A NAME="ss23.5">23.5</A> <A HREF="mythtv-HOWTO.html#toc23.5">Saving or restoring the database </A>
 </H2>
 
-<P>See the <B>mysqldump</B> manpage for more information.
+<P>MythTV includes one script for backing up the MythTV database and another
+for restoring it.  Generally, the scripts are easiest to use after configuring
+the backup directory in a backup resouce file:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
+$ echo "DBBackupDirectory=/home/mythtv" > $HOME/.mythtv/backuprc
+</PRE>
+</CODE></BLOCKQUOTE>
+
+changing the directory location as desired.</P>
+<P>Once the backup directory is configured, you may back up your database by
+simply running the backup script.  The backup and restore scripts will be
+installed in your MythTV share directory ($PREFIX/share/mythtv, where $PREFIX
+is usually either /usr or /usr/local).  Ensure you have a link to the scripts
+in an executable directory (such as /usr/local/bin) or use the entire path when
+executing the scripts.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythconverg_backup.pl
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>To restore: (assuming that you've dropped the database)
+<P>The script will compress and rotate backups.  For more information on usage and
+details, see the help output:</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mysql -u root
-mysql>create database mythconverg;
-mysql>exit
-$ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_backup.sql
+$ mythconverg_backup.pl --help
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To restore: (assuming that you've 
+<A HREF="#dropdb">dropped the database</A>
+and 
+<A HREF="mythtv-HOWTO-6.html#setupdb">created a new database</A>)
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythconverg_restore.pl --filename mythconverg-1214-20091010150513.sql.gz
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>For more information on usage and details of the restore script, see the help
+output:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythconverg_restore.pl --help
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -256,7 +290,7 @@ with multiple systems.  See the
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> section for more
 information.</P>
 
-<H2><A NAME="ss23.6">23.6</A> <A HREF="mythtv-HOWTO.html#toc23.6">Deleting the MySQL database</A>
+<H2><A NAME="dropdb"></A> <A NAME="ss23.6">23.6</A> <A HREF="mythtv-HOWTO.html#toc23.6">Deleting the MySQL database </A>
 </H2>
 
 <P>
@@ -264,77 +298,21 @@ information.</P>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  Performing this step will remove the entire database.
-You will lose all of your settings and will need to re-run the mc.sql script
-to setup the database structure before running the mythtv-setup program.</CAPTION>
+You will lose all of your settings and will need to 
+<A HREF="mythtv-HOWTO-6.html#setupdb">re-run the mc.sql script</A> to setup the database structure before running
+the mythtv-setup program or performing a database restore.</CAPTION>
 </FIGURE>
 
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root
-mysql> drop database mythconverg;
+mysql> DROP DATABASE IF EXISTS mythconverg;
 mysql> quit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss23.7">23.7</A> <A HREF="mythtv-HOWTO.html#toc23.7">Moving your data to new hardware</A>
-</H2>
-
-<P>This assumes that you will be moving your data to newer / bigger hardware
-and don't want to lose your programs.</P>
-<P>The first step is to create a database backup as demonstrated in an earlier
-section.</P>
-<P>Next, you will extract only the data that is relevant to the programs:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ grep "INSERT INTO record "          mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO recorded "        mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO oldrecorded "     mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedprogram " mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedrating "  mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedmarkup "  mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO recordedseek "    mythtv_backup.sql >> restore.sql
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P><B>NOTE</B>:  Newer versions of <B>mysqldump</B> place backticks around
-the table names.  Backticks are not the same as apostrophes!  On a typical
-North American keyboard, backticks are located to the left of the "1" key,
-on the same key as the tilde.  Also, because the <B>bash</B> shell may try
-to interpret the backticks, make sure you use a \ before each one.</P>
-<P>If your <CODE>restore.sql</CODE> file is empty, you'll need to re-run the
-commands like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ grep "INSERT INTO \`record\` "          mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO \`recorded\` "        mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`oldrecorded\` "     mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedprogram\` " mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedrating\` "  mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedmarkup\` "  mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO \`recordedseek\` "    mythtv_backup.sql >> restore.sql
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Note the space after the table name and the ">>" to append to the file for
-all but the first <B>grep</B>. "recordedmarkup" and "recordedseek" are
-huge and there may be hundreds of thousands of lines if you had lots of
-hours of recordings.</P>
-<P>After you have moved the data files to the new hardware, configure MythTV
-using the <B>mythtv-setup</B> program as you normally would with a
-standard MythTV installation.</P>
-<P>At this point we will restore the information about your programs back into
-the database:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u mythtv -pmythtv mythconverg &lt; restore.sql
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>After successful insertion of the data you may delete the
-<CODE>restore.sql</CODE> file.</P>
-
-<H2><A NAME="btaudio"></A> <A NAME="ss23.8">23.8</A> <A HREF="mythtv-HOWTO.html#toc23.8">btaudio </A>
+<H2><A NAME="btaudio"></A> <A NAME="ss23.7">23.7</A> <A HREF="mythtv-HOWTO.html#toc23.7">btaudio </A>
 </H2>
 
 <P>btaudio allows you to obtain the audio data from your tuner card directly
@@ -374,7 +352,7 @@ analog)</LI>
 <CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
 what's going on.</P>
 
-<H2><A NAME="ss23.9">23.9</A> <A HREF="mythtv-HOWTO.html#toc23.9">Removing unwanted channels</A>
+<H2><A NAME="ss23.8">23.8</A> <A HREF="mythtv-HOWTO.html#toc23.8">Removing unwanted channels</A>
 </H2>
 
 <P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
@@ -420,7 +398,7 @@ mysql> delete from program where chanid = 1015;
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss23.10">23.10</A> <A HREF="mythtv-HOWTO.html#toc23.10">NFS</A>
+<H2><A NAME="ss23.9">23.9</A> <A HREF="mythtv-HOWTO.html#toc23.9">NFS</A>
 </H2>
 
 <P>You may want to use a central server to store your files.</P>
@@ -453,7 +431,7 @@ directory and files.  See
 <A HREF="http://www.mythtv.org/wiki/index.php/Optimizing_Performance">http://www.mythtv.org/wiki/index.php/Optimizing_Performance</A> for
 additional information regarding performance optimization.</P>
 
-<H2><A NAME="ss23.11">23.11</A> <A HREF="mythtv-HOWTO.html#toc23.11">Automatically starting mythfrontend at system boot time</A>
+<H2><A NAME="ss23.10">23.10</A> <A HREF="mythtv-HOWTO.html#toc23.10">Automatically starting mythfrontend at system boot time</A>
 </H2>
 
 <P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
@@ -492,7 +470,7 @@ session.screen0.focusModel:     SloppyFocus
  in it.</P>
 <P>
 <A NAME="mythbackend_autostart"></A> </P>
-<H2><A NAME="ss23.12">23.12</A> <A HREF="mythtv-HOWTO.html#toc23.12">Automatically starting mythbackend at system boot time</A>
+<H2><A NAME="ss23.11">23.11</A> <A HREF="mythtv-HOWTO.html#toc23.11">Automatically starting mythbackend at system boot time</A>
 </H2>
 
 <H3>Red Hat And Mandriva</H3>
@@ -696,7 +674,7 @@ To stop mythbackend as a daemon:
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="advanced_backend_config"></A> <A NAME="ss23.13">23.13</A> <A HREF="mythtv-HOWTO.html#toc23.13">Advanced Backend Configurations </A>
+<H2><A NAME="advanced_backend_config"></A> <A NAME="ss23.12">23.12</A> <A HREF="mythtv-HOWTO.html#toc23.12">Advanced Backend Configurations </A>
 </H2>
 
 <P>MythTV is flexible in the way that you define multiple backend tuner
@@ -739,7 +717,7 @@ be used.</P>
 NFS and enabling the Master Backend Override setting will allow you to view
 content even if the slave backend that recorded a program is not available.</P>
 
-<H2><A NAME="ss23.14">23.14</A> <A HREF="mythtv-HOWTO.html#toc23.14">Using the transcoder</A>
+<H2><A NAME="ss23.13">23.13</A> <A HREF="mythtv-HOWTO.html#toc23.13">Using the transcoder</A>
 </H2>
 
 <P>MythTV's built-in transcoder re-encodes recordings from one codec to
@@ -897,7 +875,7 @@ mysql>
 run mythtranscode from the command line and explicitly specify the transcoder
 profile.  Run <CODE>mythtranscode --help</CODE> for usage information.</P>
 
-<H2><A NAME="ss23.15">23.15</A> <A HREF="mythtv-HOWTO.html#toc23.15">Changing your hostname</A>
+<H2><A NAME="ss23.14">23.14</A> <A HREF="mythtv-HOWTO.html#toc23.14">Changing your hostname</A>
 </H2>
 
 <P>If you need to change the name of the computers used with MythTV you'll
@@ -944,54 +922,32 @@ hostname in the current session, run:
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>3.  Dump the database.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>3.  Back up the database in case something goes wrong.  See 
+<A HREF="#backupdb">Saving or Restoring the database</A> for instructions.</P>
 <P>4.  Rename the host in the database.  First, ensure that the new hostname
 you'll be using isn't already in the database.
 <BLOCKQUOTE><CODE>
 <PRE>
-$ grep kidsroom mythtv_backup.sql
+$ mysql -umythtv -p mythconverg -e "SELECT COUNT(*) FROM settings WHERE hostname LIKE '%kidsroom%';"
 </PRE>
 </CODE></BLOCKQUOTE>
 
-Now we're actually going to change the name.  The following should all be
+If the count is anything other than 0, you'll need to choose another hostname.</P>
+<P>Now we're actually going to change the name.  The following should all be
 typed on the same line:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/g >> mythtv_restore.sql
+$ mythconverg_restore.pl --change_hostname --old_hostname="frontend1" --new_hostname="kidsroom"
 </PRE>
 </CODE></BLOCKQUOTE>
 
-If you don't feel comfortable using <B>sed</B>, you can open the
-<CODE>mythtv_backup.sql</CODE> file in a text editor and perform a global search
-and replace.  When saving the file, make sure you use the new name,
-<CODE>mythtv_restore.sql</CODE> or the rest of the steps below will fail.</P>
-<P>5.  Drop and recreate the database.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u root
-mysql>drop database mythconverg;
-mysql>create database mythconverg;
-mysql>exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>6.  Restore the database using your edited version.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_restore.sql
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+See 
+<A HREF="#backupdb">Saving or Restoring the database</A> for information
+on configuring the script.</P>
 <P>If you are running slave backends or frontends, don't forget to re-enable
 access as detailed in 
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A>.</P>
-<P>7.  Start the backends.  If you use init scripts, do the following, otherwise
+<P>5.  Start the backends.  If you use init scripts, do the following, otherwise
 start them from terminal consoles.
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -999,13 +955,12 @@ start them from terminal consoles.
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>8.  Quit and restart all frontends.  Delete the <CODE>mythtv_backup.sql</CODE>
-and <CODE>mythtv_restore.sql</CODE> files.</P>
+<P>6.  Quit and restart all frontends.</P>
 
-<H2><A NAME="ss23.16">23.16</A> <A HREF="mythtv-HOWTO.html#toc23.16">Can I run MythTV on my TiVo?</A>
+<H2><A NAME="ss23.15">23.15</A> <A HREF="mythtv-HOWTO.html#toc23.15">Can I run MythTV on my TiVo?</A>
 </H2>
 
-<H2><A NAME="ss23.17">23.17</A> <A HREF="mythtv-HOWTO.html#toc23.17">Can I run MythTV on my ReplayTV?</A>
+<H2><A NAME="ss23.16">23.16</A> <A HREF="mythtv-HOWTO.html#toc23.16">Can I run MythTV on my ReplayTV?</A>
 </H2>
 
 <P>No.</P>
@@ -1016,7 +971,7 @@ for the custom hardware contained within a TiVo.  TiVo is under no
 obligation to release the source code to their <EM>application</EM>.</P>
 <P>The ReplayTV runs VxWorks, a Real Time Operating System from Wind River
 Systems.</P>
-<H2><A NAME="ss23.18">23.18</A> <A HREF="mythtv-HOWTO.html#toc23.18">Can a wireless connection be used between the frontend and the backend?</A>
+<H2><A NAME="ss23.17">23.17</A> <A HREF="mythtv-HOWTO.html#toc23.17">Can a wireless connection be used between the frontend and the backend?</A>
 </H2>
 
 <P>Yes, assuming that your wireless connection has sufficient bandwidth to
@@ -1029,12 +984,12 @@ modes, or proprietary 802.11b "Turbo" schemes should be adequate.  Multiple
 wireless frontends, poor signal strength or other factors can severely
 impact the viewing experience on the frontend.</P>
 
-<H2><A NAME="ss23.19">23.19</A> <A HREF="mythtv-HOWTO.html#toc23.19">How can I burn shows that I have recorded to a DVD?</A>
+<H2><A NAME="ss23.18">23.18</A> <A HREF="mythtv-HOWTO.html#toc23.18">How can I burn shows that I have recorded to a DVD?</A>
 </H2>
 
 <P>Use the mytharchive plugin.</P>
 
-<H2><A NAME="ss23.20">23.20</A> <A HREF="mythtv-HOWTO.html#toc23.20">Using the DBoxII within MythTV</A>
+<H2><A NAME="ss23.19">23.19</A> <A HREF="mythtv-HOWTO.html#toc23.19">Using the DBoxII within MythTV</A>
 </H2>
 
 <P>The configuration of the DBoxII for use within MythTV is tricky (as of
@@ -1060,11 +1015,11 @@ Associate the channel with your new video source and repeat when needed.</LI>
 </P>
 <P>You may leave the Setup now and proceed as usual.</P>
 
-<H2><A NAME="ss23.21">23.21</A> <A HREF="mythtv-HOWTO.html#toc23.21">What do the icons on the Watch Recordings screen mean?</A>
+<H2><A NAME="ss23.20">23.20</A> <A HREF="mythtv-HOWTO.html#toc23.20">What do the icons on the Watch Recordings screen mean?</A>
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss23.22">23.22</A> <A HREF="mythtv-HOWTO.html#toc23.22">What do the letters mean when I change channels?</A>
+<H2><A NAME="ss23.21">23.21</A> <A HREF="mythtv-HOWTO.html#toc23.21">What do the letters mean when I change channels?</A>
 </H2>
 
 <P>These letters let you know what's going on with the backend as it tries
@@ -1081,7 +1036,7 @@ to tune to a channel.</P>
 <LI>s/S = SDT   : DVB only</LI>
 </UL>
 </P>
-<H2><A NAME="ss23.23">23.23</A> <A HREF="mythtv-HOWTO.html#toc23.23">What is the difference between the various Hauppauge PVR models?</A>
+<H2><A NAME="ss23.22">23.22</A> <A HREF="mythtv-HOWTO.html#toc23.22">What is the difference between the various Hauppauge PVR models?</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
@@ -1136,7 +1091,7 @@ versions of the PVR-500 should come with an adapter to allow you to connect
 a second S-Video or composite input, but this will take up a second PCI
 slot.  Early adopters may need to purchase this item separately.</P>
 
-<H2><A NAME="ss23.24">23.24</A> <A HREF="mythtv-HOWTO.html#toc23.24">Changing channels on an external Set Top Box</A>
+<H2><A NAME="ss23.23">23.23</A> <A HREF="mythtv-HOWTO.html#toc23.23">Changing channels on an external Set Top Box</A>
 </H2>
 
 <P>If you need to use an external Set Top Box (STB), such as for satellite
@@ -1157,7 +1112,7 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
-<H2><A NAME="ss23.25">23.25</A> <A HREF="mythtv-HOWTO.html#toc23.25">Configuring one machine to flag all commercials</A>
+<H2><A NAME="ss23.24">23.24</A> <A HREF="mythtv-HOWTO.html#toc23.24">Configuring one machine to flag all commercials</A>
 </H2>
 
 <P>Commercial flagging can be CPU intensive.  By default, the backend that
