@@ -935,7 +935,6 @@
 
         <buttonlist name="phrase_list" from="basebuttonlist">
             <area>20,60,450,270</area>
-            <align>left</align>
             <showarrow>no</showarrow>
             <statetype name="buttonitem">
                 <state name="active">
