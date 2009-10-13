@@ -1,17 +1,116 @@
+
+#include "mythuiimage.h"
+
+// C/C++
 #include <cstdlib>
 
+// QT
 #include <QFile>
 #include <QDir>
 #include <QDomDocument>
 #include <QImageReader>
+#include <QReadWriteLock>
+#include <QRunnable>
+#include <QEvent>
+#include <QCoreApplication>
 
+// Libmythdb
 #include "mythverbose.h"
 
-#include "mythuiimage.h"
+// Mythui
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
 #include "mythscreentype.h"
+
+class ImageLoadThread;
+
+const int kImageLoadEventType = 35112;
+
+#define LOC      QString("MythUIImage(%1): ").arg((long long)this)
+#define LOC_ERR  QString("MythUIImage(%1) ERROR: ").arg((long long)this)
+#define LOC_WARN QString("MythUIImage(%1) WARNING: ").arg((long long)this)
+
+/*!
+ * \class ImageLoadThread
+ */
+class ImageLoadEvent : public QEvent
+{
+  public:
+    ImageLoadEvent(MythUIImage *parent, MythImage *image,
+                   const QString &basefile, const QString &filename,
+                   int number)
+                 : QEvent((QEvent::Type)kImageLoadEventType),
+                   m_parent(parent), m_image(image), m_basefile(basefile),
+                   m_filename(filename), m_number(number) { }
+
+    MythUIImage *GetParent() const { return m_parent; }
+    MythImage *GetImage() const { return m_image; }
+    const QString GetBasefile() const { return m_basefile; }
+    const QString GetFilename() const { return m_filename; }
+    const int GetNumber() const { return m_number; }
+
+  private:
+    MythUIImage     *m_parent;
+    MythImage       *m_image;
+    QString          m_basefile;
+    QString          m_filename;
+    int              m_number;
+};
+
+/*!
+* \class ImageLoadThread
+*/
+class ImageLoadThread : public QRunnable
+{
+  public:
+    ImageLoadThread(MythUIImage *parent, const QString &basefile,
+                    const QString &filename, int number,
+                    QSize forceSize) :
+        m_parent(parent), m_basefile(basefile),
+        m_filename(filename), m_number(number),
+        m_ForceSize(forceSize)
+    {
+        m_basefile.detach();
+        m_filename.detach();
+    }
+
+    void run()
+    {
+        MythImage *image = m_parent->LoadImage(m_filename, m_number,
+                                               m_ForceSize);
+        ImageLoadEvent *le = new ImageLoadEvent(m_parent, image, m_basefile,
+                                                m_filename, m_number);
+        QCoreApplication::postEvent(m_parent, le);
+    }
+
+  private:
+    MythUIImage *m_parent;
+    QString      m_basefile;
+    QString      m_filename;
+    int          m_number;
+    QSize        m_ForceSize;
+};
+
+/////////////////////////////////////////////////////////////////
+class MythUIImagePrivate
+{
+  public:
+    MythUIImagePrivate(MythUIImage *p)
+        : m_parent(p), m_UpdateLock(QReadWriteLock::Recursive)
+          { };
+   ~MythUIImagePrivate() {};
+
+    MythUIImage *m_parent;
+
+    QReadWriteLock m_UpdateLock;
+};
+
+/////////////////////////////////////////////////////////////////
+
+QHash<QString, MythUIImage*> MythUIImage::m_loadingImages;
+QMutex                       MythUIImage::m_loadingImagesLock;
+QWaitCondition               MythUIImage::m_loadingImagesCond;
 
 MythUIImage::MythUIImage(const QString &filepattern,
                          int low, int high, int delayms,
@@ -23,6 +122,8 @@ MythUIImage::MythUIImage(const QString &filepattern,
     m_HighNum = high;
 
     m_Delay = delayms;
+
+    d = new MythUIImagePrivate(this);
 
     Init();
 }
@@ -38,6 +139,8 @@ MythUIImage::MythUIImage(const QString &filename, MythUIType *parent,
     m_HighNum = 0;
     m_Delay = -1;
 
+    d = new MythUIImagePrivate(this);
+
     Init();
 }
 
@@ -48,14 +151,24 @@ MythUIImage::MythUIImage(MythUIType *parent, const QString &name)
     m_HighNum = 0;
     m_Delay = -1;
 
+    d = new MythUIImagePrivate(this);
+
     Init();
 }
 
 MythUIImage::~MythUIImage()
 {
+    // Wait until all image loading threads are complete or bad things
+    // may happen if this MythUIImage disappears when a queued thread
+    // needs it.
+    GetMythUI()->GetImageThreadPool()->waitForDone();
+
     Clear();
     if (m_maskImage)
         m_maskImage->DownRef();
+
+    if (d)
+        delete d;
 }
 
 /**
@@ -63,10 +176,12 @@ MythUIImage::~MythUIImage()
  */
 void MythUIImage::Clear(void)
 {
+    QMutexLocker locker(&m_ImagesLock);
     while (!m_Images.isEmpty())
     {
-        m_Images.back()->DownRef();
-        m_Images.pop_back();
+        QHash<int, MythImage*>::iterator it = m_Images.begin();
+        (*it)->DownRef();
+        m_Images.remove(it.key());
     }
 }
 
@@ -75,11 +190,16 @@ void MythUIImage::Clear(void)
  */
 void MythUIImage::Reset(void)
 {
+    d->m_UpdateLock.lockForWrite();
     if (m_Filename != m_OrigFilename)
     {
         m_Filename = m_OrigFilename;
+        d->m_UpdateLock.unlock();
         Load();
     }
+    else
+        d->m_UpdateLock.unlock();
+
     MythUIType::Reset();
 }
 
@@ -114,6 +234,9 @@ void MythUIImage::Init(void)
     m_isGreyscale = false;
 
     m_preserveAspect = false;
+    
+    m_animationCycle = kCycleStart;
+    m_animationReverse = false;
 }
 
 /**
@@ -121,6 +244,7 @@ void MythUIImage::Init(void)
  */
 void MythUIImage::SetFilename(const QString &filename)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     m_Filename = filename;
 }
 
@@ -131,6 +255,7 @@ void MythUIImage::SetFilename(const QString &filename)
 void MythUIImage::SetFilepattern(const QString &filepattern, int low,
                                  int high)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     m_Filename = filepattern;
     m_LowNum = low;
     m_HighNum = high;
@@ -141,6 +266,7 @@ void MythUIImage::SetFilepattern(const QString &filepattern, int low,
  */
 void MythUIImage::SetImageCount(int low, int high)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     m_LowNum = low;
     m_HighNum = high;
 }
@@ -150,6 +276,7 @@ void MythUIImage::SetImageCount(int low, int high)
  */
 void MythUIImage::SetDelay(int delayms)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     m_Delay = delayms;
     m_LastDisplay = QTime::currentTime();
     m_CurPos = 0;
@@ -161,6 +288,7 @@ void MythUIImage::SetDelay(int delayms)
  */
 void MythUIImage::SetImage(MythImage *img)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     if (!img)
     {
         Reset();
@@ -190,7 +318,10 @@ void MythUIImage::SetImage(MythImage *img)
     if (m_ForceSize.isNull())
         SetSize(img->size());
 
-    m_Images.push_back(img);
+    m_ImagesLock.lock();
+    m_Images[0] = img;
+    m_ImagesLock.unlock();
+
     m_CurPos = 0;
     SetRedraw();
 }
@@ -206,12 +337,16 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
 
     // HACK: This is just a workaround for the buttonlist inheritance problem
     //       until the image cache is completed.
+    d->m_UpdateLock.lockForRead();
     if (m_gradient)
     {
+        d->m_UpdateLock.unlock();
         Load();
         return;
     }
+    d->m_UpdateLock.unlock();
 
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     QSize aSize = m_Area.size();
 
     QVector<MythImage *>::iterator it;
@@ -235,7 +370,9 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
         if (m_isGreyscale && !im->isGrayscale())
             im->ToGreyscale();
 
-        m_Images.push_back(im);
+        m_ImagesLock.lock();
+        m_Images[m_Images.size()] = im;
+        m_ImagesLock.unlock();
 
         aSize = aSize.expandedTo(im->size());
     }
@@ -255,26 +392,17 @@ void MythUIImage::ForceSize(const QSize &size)
     if (m_ForceSize == size)
         return;
 
+    d->m_UpdateLock.lockForWrite();
     m_ForceSize = size;
+    d->m_UpdateLock.unlock();
 
     if (size.isEmpty())
         return;
 
-    QSize aSize = m_Area.size();
-
-    QVector<MythImage *>::iterator it;
-    for (it = m_Images.begin(); it != m_Images.end(); ++it)
-    {
-        MythImage *im = (*it);
-
-        int w = (m_ForceSize.width() <= 0) ? im->width() : m_ForceSize.width();
-        int h = (m_ForceSize.height() <= 0) ? im->height() : m_ForceSize.height();
-
-        im->Resize(QSize(w, h), m_preserveAspect);
-        aSize = aSize.expandedTo(im->size());
-    }
-
     SetSize(m_ForceSize);
+
+    Load();
+    return;
 }
 
 /**
@@ -290,6 +418,7 @@ void MythUIImage::SetSize(int width, int height)
  */
 void MythUIImage::SetSize(const QSize &size)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     MythUIType::SetSize(size);
     m_NeedLoad = true;
 }
@@ -309,6 +438,7 @@ void MythUIImage::SetCropRect(int x, int y, int width, int height)
  */
 void MythUIImage::SetCropRect(const MythRect &rect)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     m_cropRect = rect;
     SetRedraw();
 }
@@ -317,8 +447,9 @@ void MythUIImage::SetCropRect(const MythRect &rect)
  *  \brief Generates a unique identifying string for this image which is used
  *         as a key in the image cache.
  */
-QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
+QString MythUIImage::GenImageLabel(const QString &filename, int w, int h) const
 {
+    QReadLocker updateLocker(&d->m_UpdateLock);
     QString imagelabel;
     QString s_Attrib;
 
@@ -336,7 +467,7 @@ QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
                           .arg(s_Attrib)
                           .arg(w)
                           .arg(h);
-    imagelabel.replace("/","-");
+    imagelabel.replace('/','-');
 
     return imagelabel;
 }
@@ -345,37 +476,226 @@ QString MythUIImage::GenImageLabel(const QString &filename, int w, int h)
  *  \brief Generates a unique identifying string for this image which is used
  *         as a key in the image cache.
  */
-QString MythUIImage::GenImageLabel(int w, int h)
+QString MythUIImage::GenImageLabel(int w, int h) const
 {
+    QReadLocker updateLocker(&d->m_UpdateLock);
     return GenImageLabel(m_Filename, w, h);
 }
 
 /**
- *  \brief Load the image(s)
+ *  \brief Load the image(s), wraps LoadImage()
  */
-bool MythUIImage::Load(void)
+bool MythUIImage::Load(bool allowLoadInBackground)
 {
+    d->m_UpdateLock.lockForRead();
+
+    QSize bForceSize = m_ForceSize;
+    QString bFilename = m_Filename;
+    bFilename.detach();
+
+    d->m_UpdateLock.unlock();
+
+    QString filename = bFilename;
+
+    if (bFilename.isEmpty() && (!m_gradient))
+    {
+        Clear();
+        SetRedraw();
+
+        return false;
+    }
+
     Clear();
 
-    SetRedraw();
+//    SetRedraw();
 
-//     if (!IsVisible(true))
-//         return false;
+//    if (!IsVisible(true))
+//        return false;
 
-    if (m_Filename.isEmpty() && (!m_gradient))
-        return false;
+    int w = -1;
+    int h = -1;
 
-    QSize newSize;
+    if (!bForceSize.isNull())
+    {
+        if (bForceSize.width() != -1)
+            w = bForceSize.width();
 
-    VERBOSE(VB_FILE, QString("MythUIImage::Load (%1) Object %2").arg(m_Filename).arg(objectName()));
+        if (bForceSize.height() != -1)
+            h = bForceSize.height();
+    }
 
+    if (m_gradient)
+    {
+        int gradWidth = 10;
+        int gradHeight = 10;
+
+        if (!m_Area.isEmpty())
+        {
+            gradWidth = m_Area.size().width();
+            gradHeight = m_Area.size().height();
+        }
+        else if ((w > 0) && (h > 0))
+        {
+            gradWidth = w;
+            gradHeight = h;
+        }
+
+        int sr, sg, sb;
+        m_gradientStart.getRgb(&sr, &sg, &sb);
+
+        int er, eg, eb;
+        m_gradientEnd.getRgb(&er, &eg, &eb);
+
+        d->m_UpdateLock.lockForWrite();
+        m_Filename =
+            QString("gradient-%1x%2-%3-%4-%5-%6-%7-%8-%9-%10")
+                    .arg(gradWidth).arg(gradHeight)
+                    .arg(sr).arg(sg).arg(sb).arg(er).arg(eg).arg(eb)
+                    .arg(m_gradientAlpha).arg(m_gradientDirection);
+        bFilename = m_Filename;
+        bFilename.detach();
+        d->m_UpdateLock.unlock();
+
+        filename = bFilename;
+
+        VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("Auto-generated gradient "
+                "filename of '%1'").arg(bFilename));
+    }
+
+    QString imagelabel;
+    ImageCacheMode cacheMode = kCacheCheckMemoryOnly;
+
+    int j = 0;
     for (int i = m_LowNum; i <= m_HighNum; i++)
     {
-        MythImage *image = NULL;
-        bool bNeedLoad = false;
+        if (m_HighNum >= 1)
+            filename = bFilename.arg(i);
 
+        imagelabel = GenImageLabel(filename, w, h);
+
+        // Only load in the background if allowed and the image is
+        // not already in our mem cache
+        if (m_gradient)
+            cacheMode = kCacheIgnoreDisk;
+        else
+            cacheMode = kCacheCheckMemoryOnly;
+
+        if ((allowLoadInBackground) &&
+            (!GetMythUI()->LoadCacheImage(filename, imagelabel, cacheMode)) &&
+            (!getenv("DISABLETHREADEDMYTHUIIMAGE")))
+        {
+            VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("Load(), spawning "
+                    "thread to load '%1'").arg(filename));
+            ImageLoadThread *bImgThread =
+                new ImageLoadThread(this, bFilename, filename, i,
+                                    bForceSize);
+            GetMythUI()->GetImageThreadPool()->start(bImgThread);
+        }
+        else
+        {
+            // Perform a blocking load
+            VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("Load(), loading "
+                    "'%1' in foreground").arg(filename));
+            MythImage *image = LoadImage(filename, i, bForceSize);
+            if (image)
+            {
+                if (bForceSize.isNull())
+                    SetSize(image->size());
+
+                m_ImagesLock.lock();
+                m_Images[j] = image;
+                m_ImagesLock.unlock();
+
+                SetRedraw();
+                d->m_UpdateLock.lockForWrite();
+                m_LastDisplay = QTime::currentTime();
+                d->m_UpdateLock.unlock();
+            }
+            else
+            {
+                m_ImagesLock.lock();
+                m_Images[j] = NULL;
+                m_ImagesLock.unlock();
+            }
+        }
+        ++j;
+    }
+
+    return true;
+}
+
+/**
+*  \brief Load an image
+*/
+MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
+                                  QSize bForceSize)
+{
+    QString filename = imFile;
+
+    m_loadingImagesLock.lock();
+
+    // Check to see if the image is being loaded by us in another thread
+    if ((m_loadingImages.contains(filename)) &&
+        (m_loadingImages[filename] == this))
+    {
+        VERBOSE(VB_FILE+VB_EXTRA, QString("MythUIImage::LoadImage(%1), this "
+                "file is already being loaded by this same MythUIImage in "
+                "another thread.").arg(filename));
+        m_loadingImagesLock.unlock();
+        return NULL;
+    }
+
+    // Check to see if the exact same image is being loaded anywhere else
+    while (m_loadingImages.contains(filename))
+        m_loadingImagesCond.wait(&m_loadingImagesLock);
+
+    m_loadingImages[filename] = this;
+    m_loadingImagesLock.unlock();
+
+    VERBOSE(VB_FILE, QString("MythUIImage::LoadImage(%1, %2) Object %3")
+            .arg((long long)this).arg(filename).arg(objectName()));
+
+    MythImage *image = NULL;
+
+    bool bForceResize = false;
+    bool bFoundInCache = false;
+
+    QString imagelabel;
+
+    int w = -1;
+    int h = -1;
+
+    if (!bForceSize.isNull())
+    {
+        if (bForceSize.width() != -1)
+            w = bForceSize.width();
+
+        if (bForceSize.height() != -1)
+            h = bForceSize.height();
+
+        bForceResize = true;
+    }
+
+    imagelabel = GenImageLabel(filename, w, h);
+
+    image = GetMythUI()->LoadCacheImage(filename, imagelabel);
+    if (image)
+    {
+        image->UpRef();
+        VERBOSE(VB_FILE, QString("MythUIImage::LoadImage found in cache "
+                ":%1: RefCount = %2").arg(imagelabel).arg(image->RefCount()));
+        if (m_isReflected)
+            image->setIsReflected(true);
+
+        bFoundInCache = true;
+    }
+    else
+    {
         if (m_gradient)
         {
+            VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Not Found in "
+                                     "cache. Creating Gradient :%1:")
+                                     .arg(filename));
             QSize gradsize;
             if (!m_Area.isEmpty())
                 gradsize = m_Area.size();
@@ -388,122 +708,87 @@ bool MythUIImage::Load(void)
             image->UpRef();
         }
         else
-            bNeedLoad = true;
-
-        int w = -1;
-        int h = -1;
-
-        bool bForceResize = false;
-        bool bFoundInCache = false;
-
-        QString imagelabel;
-
-        if (!m_ForceSize.isNull())
         {
-            if (m_ForceSize.width() != -1)
-                w = m_ForceSize.width();
-
-            if (m_ForceSize.height() != -1)
-                h = m_ForceSize.height();
-
-            bForceResize = true;
-        }
-
-        if (bNeedLoad)
-        {
-
-            QString filename = m_Filename;
-            if (m_HighNum >= 1)
-                filename = QString(m_Filename).arg(i);
-
-            imagelabel = GenImageLabel(filename, w, h);
-
-            image = GetMythUI()->LoadCacheImage(filename, imagelabel);
-            if (image)
+            VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Not Found in "
+                                     "cache. Loading Directly :%1:")
+                                     .arg(filename));
+            image = GetMythPainter()->GetFormatImage();
+            image->UpRef();
+            if (!image->Load(filename))
             {
-                image->UpRef();
-                VERBOSE(VB_FILE, QString("MythUIImage::Load found in cache :%1:").arg(imagelabel));
-                if (m_isReflected)
-                    image->setIsReflected(true);
+                VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Could not load "
+                                         ":%1:").arg(filename));
+                image->DownRef();
 
-                bFoundInCache = true;
+                m_loadingImagesLock.lock();
+                m_loadingImages.remove(filename);
+                m_loadingImagesCond.wakeAll();
+                m_loadingImagesLock.unlock();
+
+                return NULL;
             }
-            else
-            {
-                VERBOSE(VB_FILE, QString("MythUIImage::Load Not Found in "
-                                         "cache. Loading Directly :%1:")
-                                         .arg(filename));
-                image = GetMythPainter()->GetFormatImage();
-                image->UpRef();
-                if (!image->Load(filename))
-                {
-                    VERBOSE(VB_FILE, QString("MythUIImage::Load Could not load :%1:").arg(filename));
-                    image->DownRef();
-                    SetRedraw();
-                    return false;
-                }
-            }
-        }
-        else
-            imagelabel = GenImageLabel(w,h);
-
-        if (!bFoundInCache)
-        {
-            if (bForceResize)
-                image->Resize(QSize(w, h), m_preserveAspect);
-
-            if (m_isMasked)
-            {
-                QRect imageArea = image->rect();
-                QRect maskArea = m_maskImage->rect();
-
-                // Crop the mask to the image
-                int x = 0;
-                int y = 0;
-                if (maskArea.width() > imageArea.width())
-                    x = (maskArea.width() - imageArea.width()) / 2;
-                if (maskArea.height() > imageArea.height())
-                    y = (maskArea.height() - imageArea.height()) / 2;
-
-                if (x > 0 || y > 0)
-                    imageArea.translate(x,y);
-                QImage mask = m_maskImage->copy(imageArea);
-                image->setAlphaChannel(mask.alphaChannel());
-            }
-
-            if (m_isReflected)
-                image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
-                            m_reflectLength, m_reflectSpacing);
-
-            if (m_isGreyscale)
-                image->ToGreyscale();
-
-            // Save scaled copy to cache
-            if (bNeedLoad)
-                GetMythUI()->CacheImage(imagelabel, image);
-        }
-
-        if (!bForceResize)
-        {
-            newSize = newSize.expandedTo(image->size());
-            SetSize(newSize);
-        }
-
-        if (image->isNull())
-        {
-            VERBOSE(VB_FILE, QString("MythUIImage::Load Image is NULL :%1:").arg(m_Filename));
-            image->DownRef();
-        }
-        else
-        {
-            image->SetChanged();
-            m_Images.push_back(image);
         }
     }
 
-    m_LastDisplay = QTime::currentTime();
+    if (!bFoundInCache)
+    {
+        if (bForceResize)
+            image->Resize(QSize(w, h), m_preserveAspect);
 
-    return true;
+        if (m_isMasked)
+        {
+            QRect imageArea = image->rect();
+            QRect maskArea = m_maskImage->rect();
+
+            // Crop the mask to the image
+            int x = 0;
+            int y = 0;
+            if (maskArea.width() > imageArea.width())
+                x = (maskArea.width() - imageArea.width()) / 2;
+            if (maskArea.height() > imageArea.height())
+                y = (maskArea.height() - imageArea.height()) / 2;
+
+            if (x > 0 || y > 0)
+                imageArea.translate(x,y);
+            d->m_UpdateLock.lockForWrite();
+            QImage mask = m_maskImage->copy(imageArea);
+            d->m_UpdateLock.unlock();
+            image->setAlphaChannel(mask.alphaChannel());
+        }
+
+        if (m_isReflected)
+            image->Reflect(m_reflectAxis, m_reflectShear, m_reflectScale,
+                        m_reflectLength, m_reflectSpacing);
+
+        if (m_isGreyscale)
+            image->ToGreyscale();
+
+        GetMythUI()->CacheImage(imagelabel, image);
+    }
+
+    if (image->isNull())
+    {
+        VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Image is NULL :%1:")
+                                                            .arg(filename));
+        image->DownRef();
+        Reset();
+
+        m_loadingImagesLock.lock();
+        m_loadingImages.remove(filename);
+        m_loadingImagesCond.wakeAll();
+        m_loadingImagesLock.unlock();
+
+        return NULL;
+    }
+
+    image->SetChanged();
+
+    m_loadingImagesLock.lock();
+    m_loadingImages.remove(filename);
+    m_loadingImagesCond.wakeAll();
+    m_loadingImagesLock.unlock();
+
+    return image;
 }
 
 /**
@@ -511,12 +796,38 @@ bool MythUIImage::Load(void)
  */
 void MythUIImage::Pulse(void)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     if (m_Delay > 0 &&
         abs(m_LastDisplay.msecsTo(QTime::currentTime())) > m_Delay)
     {
-        m_CurPos++;
-        if (m_CurPos >= (uint)m_Images.size())
-            m_CurPos = 0;
+        m_ImagesLock.lock();
+        unsigned int origPos = m_CurPos;
+        do
+        {
+             if (m_animationCycle == kCycleStart)
+             {
+                 ++m_CurPos;
+                 if (m_CurPos >= (uint)m_Images.size())
+                     m_CurPos = 0;
+             }
+             else if (m_animationCycle == kCycleReverse)
+             {
+                 if ((m_CurPos + 1) >= (uint)m_Images.size())
+                 {
+                     m_animationReverse = true;
+                 }
+                 else if (m_CurPos == 0)
+                 {
+                     m_animationReverse = false;
+                 }
+
+                 if (m_animationReverse)
+                     --m_CurPos;
+                 else
+                     ++m_CurPos;
+             }
+        } while (!m_Images[m_CurPos] && m_CurPos != origPos);
+        m_ImagesLock.unlock();
 
         SetRedraw();
         m_LastDisplay = QTime::currentTime();
@@ -531,10 +842,23 @@ void MythUIImage::Pulse(void)
 void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                            int alphaMod, QRect clipRect)
 {
+    m_ImagesLock.lock();
     if (m_Images.size() > 0)
     {
-        if (m_CurPos > (uint)m_Images.size())
+        d->m_UpdateLock.lockForWrite();
+        if (m_CurPos >= (uint)m_Images.size())
             m_CurPos = 0;
+        if (!m_Images[m_CurPos])
+        {
+            unsigned int origPos = m_CurPos;
+            m_CurPos++;
+            while (!m_Images[m_CurPos] && m_CurPos != origPos)
+            {
+                m_CurPos++;
+                if (m_CurPos >= (uint)m_Images.size())
+                    m_CurPos = 0;
+            }
+        }
 
         QRect area = m_Area.toQRect();
         area.translate(xoffset, yoffset);
@@ -542,6 +866,11 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         int alpha = CalcAlpha(alphaMod);
 
         MythImage *currentImage = m_Images[m_CurPos];
+        currentImage->UpRef();
+        m_ImagesLock.unlock();
+        d->m_UpdateLock.unlock();
+        d->m_UpdateLock.lockForRead();
+
         QRect currentImageArea = currentImage->rect();
 
         if (!m_ForceSize.isNull())
@@ -566,7 +895,11 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             srcRect = currentImageArea;
 
         p->DrawImage(area, currentImage, srcRect, alpha);
+        currentImage->DownRef();
+        d->m_UpdateLock.unlock();
     }
+    else
+        m_ImagesLock.unlock();
 }
 
 /**
@@ -574,15 +907,16 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
  */
 bool MythUIImage::ParseElement(QDomElement &element)
 {
+    QWriteLocker updateLocker(&d->m_UpdateLock);
     if (element.tagName() == "filename")
     {
         m_OrigFilename = m_Filename = getFirstText(element);
-        if (m_Filename.endsWith("/"))
+        if (m_Filename.endsWith('/'))
         {
             QDir imageDir(m_Filename);
             if (!imageDir.exists())
             {
-                QString themeDir = GetMythUI()->GetThemeDir() + "/";
+                QString themeDir = GetMythUI()->GetThemeDir() + '/';
                 imageDir = themeDir + m_Filename;
             }
             QStringList imageTypes;
@@ -612,6 +946,9 @@ bool MythUIImage::ParseElement(QDomElement &element)
         tmp = element.attribute("high");
         if (!tmp.isEmpty())
             m_HighNum = tmp.toInt();
+        tmp = element.attribute("cycle", "start");
+        if (tmp == "reverse")
+            m_animationCycle = kCycleReverse;
     }
     else if (element.tagName() == "gradient")
     {
@@ -701,10 +1038,12 @@ bool MythUIImage::ParseElement(QDomElement &element)
  */
 void MythUIImage::CopyFrom(MythUIType *base)
 {
+    d->m_UpdateLock.lockForWrite();
     MythUIImage *im = dynamic_cast<MythUIImage *>(base);
     if (!im)
     {
         VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        d->m_UpdateLock.unlock();
         return;
     }
 
@@ -743,14 +1082,24 @@ void MythUIImage::CopyFrom(MythUIType *base)
 
     m_isGreyscale = im->m_isGreyscale;
 
+    m_animationCycle = im->m_animationCycle;
+
     //SetImages(im->m_Images);
 
     MythUIType::CopyFrom(base);
 
     m_NeedLoad = im->m_NeedLoad;
 
+    d->m_UpdateLock.unlock();
+
+    d->m_UpdateLock.lockForRead();
     if (m_NeedLoad)
+    {
+        d->m_UpdateLock.unlock();
         Load();
+    }
+    else
+        d->m_UpdateLock.unlock();
 }
 
 /**
@@ -758,6 +1107,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
  */
 void MythUIImage::CreateCopy(MythUIType *parent)
 {
+    QReadLocker updateLocker(&d->m_UpdateLock);
     MythUIImage *im = new MythUIImage(parent, objectName());
     im->CopyFrom(this);
 }
@@ -767,8 +1117,14 @@ void MythUIImage::CreateCopy(MythUIType *parent)
  */
 void MythUIImage::Finalize(void)
 {
+    d->m_UpdateLock.lockForRead();
     if (m_NeedLoad)
+    {
+        d->m_UpdateLock.unlock();
         Load();
+    }
+    else
+        d->m_UpdateLock.unlock();
 
     MythUIType::Finalize();
 }
@@ -778,12 +1134,74 @@ void MythUIImage::Finalize(void)
  */
 void MythUIImage::LoadNow(void)
 {
+    d->m_UpdateLock.lockForWrite();
     if (m_NeedLoad)
+    {
+        d->m_UpdateLock.unlock();
         return;
+    }
 
     m_NeedLoad = true;
-    Load();
+    d->m_UpdateLock.unlock();
+
+    Load(false);
 
     MythUIType::LoadNow();
 }
 
+/**
+*  \copydoc MythUIType::customEvent()
+*/
+void MythUIImage::customEvent(QEvent *event)
+{
+    if (event->type() == kImageLoadEventType)
+    {
+        ImageLoadEvent *le = dynamic_cast<ImageLoadEvent*>(event);
+
+        if (le->GetParent() != this)
+            return;
+
+        MythImage *image = le->GetImage();
+
+        if (!image)
+            return;
+
+        d->m_UpdateLock.lockForRead();
+        if (le->GetBasefile() != m_Filename)
+        {
+            d->m_UpdateLock.unlock();
+
+            //VERBOSE(VB_FILE+VB_EXTRA,QString("MythUIImage::customEvent(%1): "
+            //        "Expecting '%2', got '%3'").arg((long long)this)
+            //        .arg(m_Filename).arg(le->GetBasefile()));
+            image->DownRef();
+            return;
+        }
+        d->m_UpdateLock.unlock();
+
+        QString filename = le->GetFilename();
+        int number = le->GetNumber();
+
+        d->m_UpdateLock.lockForWrite();
+        if (m_ForceSize.isNull())
+            SetSize(image->size());
+        d->m_UpdateLock.unlock();
+
+        m_ImagesLock.lock();
+        if (m_Images[number])
+        {
+            // If we got to this point, it means this same MythUIImage
+            // was told to reload the same image, so we use the newest
+            // copy of the image.
+            m_Images[number]->DownRef(); // delete the original
+        }
+        m_Images[number] = image;
+        m_ImagesLock.unlock();
+
+        SetRedraw();
+
+        d->m_UpdateLock.lockForWrite();
+        m_LastDisplay = QTime::currentTime();
+        d->m_UpdateLock.unlock();
+    }
+}

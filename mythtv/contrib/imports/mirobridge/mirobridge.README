@@ -1,0 +1,71 @@
+Title: (mirobridge - Maintains Miro's Video files with MythTV);
+
+This python script is intended to synchronise Miro's video files with MythTV's "Watch Recordings" and MythVideo.
+
+The source of all video files are from those downloaded my Miro.
+The source of all meta data for the video files is from the Miro data base. 
+The source of all cover art and screen shots are from those downloaded and maintained by Miro. 
+Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
+
+For full instructions on using Miro Bridge with MythTV see the wiki page at:
+http://www.mythtv.org/wiki/MiroBridge
+
+
+
+Usage: mirobridge.py usage: mirobridge -huevstdociVHSCWM [parameters]
+
+Options:
+  -h, --help            show this help message and exit
+  -e, --examples        Display examples for executing the jamu script
+  -v, --version         Display version and author information
+  -s, --simulation      Simulation (dry run), no files are copied, symlinks
+                        created or MythTV data bases altered. If option (-n)
+                        is NOT specified Miro auto downloads WILL take place.
+                        See option (-n) help for details.
+  -t, --testenv         Test that the local environment can run all mirobridge
+                        functionality
+  -n, --no_autodownload
+                        Do not perform Miro Channel updates, video expiry and
+                        auto-downloadings. Default is to perform all perform
+                        all Channel maintenance features.
+  -o, --nosubdirs       Organise MythVideo's Miro directory WITHOUT Miro
+                        channel subdirectories. The default is to have Channel
+                        subdirectories.
+  -c CHANNEL_ID:CHANNEL_NUM, --channel=CHANNEL_ID:CHANNEL_NUM
+                        Specifies the channel id that is used for Miros
+                        unplayed recordings. Enter as "xxxx:yyy". Default is
+                        9999:999. Be warned that once you change the default
+                        channel_id "9999" you must always use this option!
+  -V, --verbose         Display verbose messages when processing
+  -H HOSTNAME, --hostname=HOSTNAME
+                        MythTV Backend hostname mirobridge is to up date
+  -S SLEEP_DELAY_SECONDS, --sleeptime=SLEEP_DELAY_SECONDS
+                        The amount of seconds to wait for an auto download to
+                        start. The default is 60 seconds, but this may need to
+                        be adjusted for slower Internet connections.
+  -C ICONFILE_PATH, --addchannel=ICONFILE_PATH
+                        Add a Miro Channel record to MythTV. This gets rid of
+                        the "#9999 #9999" on the Watch Recordings screen and
+                        replaces it with the usual the channel number and
+                        channel name. The default if not overridden by the
+                        (-c) option is channel number 999. If a filename and
+                        path is supplied it will be set as the channels icon.
+                        Make sure your override channel number is NOT one of
+                        your current MythTV channel numbers. This option is
+                        typically only used once as there can only be one Miro
+                        channel record at a time.
+  -N, --new_watch_copy  For ALL Miro Channels: Use the "Watch Recording"
+                        screen to watch new Miro downloads then once watched
+                        copy the videos, icons, screen shot and metadata to
+                        MythVideo. Once coping is complete delete the video
+                        from Miro. This option overrides any "mirobridge.conf"
+                        settings.
+  -W, --watch_only      For ALL Miro Channels: Only use "Watch Recording"
+                        never move any Miro videos to MythVideo. This option
+                        overrides any "mirobridge.conf" settings.
+  -M, --mythvideo_only  For ALL Miro Channel videos: Copy newly downloaded
+                        Miro videos to MythVideo and removed from Miro. These
+                        Miro videos never appear in the MythTV "Watch
+                        Recording" screen. This option overrides any
+                        "mirobridge.conf" settings.
+

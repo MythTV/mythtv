@@ -7,7 +7,6 @@
         <text lang="SV">Titel</text>
         <text lang="JA">タイトル</text>
         <text lang="NL">Titels</text>
-        <text lang="FR">Titres</text>
         <text lang="FI">Nimikkeet</text>
         <text lang="ZH_TW">標題</text>
         <text lang="SL">Naslovu</text>
@@ -16,7 +15,9 @@
         <text lang="PT">Por Títulos</text>
         <text lang="ES">Títulos</text>
         <text lang="RU">Заголовки</text>
+        <text lang="HU">Címek</text>
         <description>Find a program based on title</description>
+        <description lang="DE">Alle Sendungen mit einem bestimmten Titel finden</description>
         <action>TV_SEARCH_TITLE</action>
     </button>
  
@@ -24,7 +25,6 @@
         <type>TV_SEARCH_KEYWORDS</type>
         <text>Keywords</text>
         <text lang="DE">nach Inhalt</text>
-        <text lang="FR">Mots-clés</text>
         <text lang="SV">Nyckelord</text>
         <text lang="NL">Beschrijving</text>    
         <text lang="JA">キーワード</text>
@@ -36,7 +36,9 @@
         <text lang="PT">Por Palavras-Chave</text>
         <text lang="ES">Palabras</text>
         <text lang="RU">Ключевые слова</text>
+        <text lang="HU">Kulcsszavak</text>
         <description>Find a program matching a keyword</description>
+        <description lang="DE">Alle Sendungen mit einem Schlüsselwort finden</description>
         <action>TV_SEARCH_KEYWORD</action>
     </button>
  
@@ -45,7 +47,6 @@
         <text>People</text>
         <text lang="SV">Person</text>
         <text lang="NL">Personen</text>   
-        <text lang="FR">Personnes</text>
         <text lang="JA">人</text>
         <text lang="DE">nach Personen</text>
         <text lang="FI">Ihmiset</text>
@@ -55,7 +56,9 @@
         <text lang="PT">Por Pessoas</text>
         <text lang="ES">Personas</text>
         <text lang="RU">Действующие лица</text>
+        <text lang="HU">Személyek</text>
         <description>Find a program including a given person</description>
+        <description lang="DE">Alle Sendungen mit einer bestimmten Person finden</description>
         <action>TV_SEARCH_PEOPLE</action>
     </button>
  
@@ -64,7 +67,6 @@
         <text>Advanced</text>
         <text lang="SV">Avancerad</text>
         <text lang="NL">Geavanceerd</text>    
-        <text lang="FR">Avancé</text>
         <text lang="JA">アドバンスト</text>
         <text lang="DE">Erweiterte Suche</text>
         <text lang="FI">Lisävalinnat</text>
@@ -74,19 +76,22 @@
         <text lang="PT">Pesquisa Avançada</text>
         <text lang="ES">Avanzada</text>
         <text lang="RU">Дополнительно</text>
+        <text lang="HU">Továbbiak</text>
         <alttext lang="DE">Erweitert</alttext>
         <alttext lang="ET">Muud</alttext>
         <alttext lang="PT">Avançada</alttext>
         <description>Combine more than one word search</description>
+        <description lang="DE">Mehrere Suchanfragen kombinieren</description>
         <action>TV_SEARCH_POWER</action>
     </button>
 
     <button>
         <type>TV_SEARCH_STORED</type>
         <text>Stored Searches</text>
-        <text lang="FR">Recherches stockées</text>
         <text lang="SL">Shranjena iskanja</text>
+        <text lang="HU">Tárolt keresések</text>
         <description>Results of searches you have saved</description>
+        <description lang="DE">ältere Suchabfragen</description>
         <action>TV_SEARCH_STORED</action>
     </button>
 

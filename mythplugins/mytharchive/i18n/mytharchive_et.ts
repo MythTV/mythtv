@@ -2,11 +2,38 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
-    <name>EditMetadataDialog</name>
+    <name>ArchiveFileSelector</name>
     <message>
-        <source>Save</source>
-        <translation type="obsolete">Salvesta</translation>
+        <source>Find File To Import</source>
+        <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Järgmine</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Katkesta</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Eelmine</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished">Tagasi</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished">Algusesse</translation>
+    </message>
+    <message>
+        <source>The selected item is not a valid archive file!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditMetadataDialog</name>
     <message>
         <source>Cancel</source>
         <translation>Katkesta</translation>
@@ -50,60 +77,9 @@
         <source>You don&apos;t have any videos!</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ExportNativeWizard</name>
     <message>
-        <source>0 Mb</source>
-        <translation type="obsolete">0 Mb</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Järgmine</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Katkesta</translation>
-    </message>
-    <message>
-        <source>Choose File...</source>
-        <translation type="obsolete">Vali fail...</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth arhiveerija</translation>
-    </message>
-    <message>
-        <source>You need to select at least one item to archive!</source>
-        <translation type="obsolete">Arhiveerimiseks tuleb valida vähemalt üks element!</translation>
-    </message>
-    <message>
-        <source>Finish</source>
-        <translation type="obsolete">Lõpeta</translation>
-    </message>
-    <message>
-        <source>All Archive Items</source>
-        <translation type="obsolete">Kõik arhiivielemendid</translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Myth kirjutaja</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any items to archive!
-
-Click OK</source>
-        <translation type="obsolete">Sa pole midagi arhiveerimiseks valinud!
-
-Vajuta &quot;Valmis&quot;</translation>
-    </message>
-    <message>
-        <source>Remove Item</source>
-        <translation type="obsolete">Eemalda element</translation>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -125,14 +101,6 @@ Vajuta &quot;Valmis&quot;</translation>
         <translation>Algusesse</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth arhiveerija</translation>
-    </message>
-    <message>
-        <source>You need to select at least one file!</source>
-        <translation type="obsolete">Arhiveerimiseks tuleb valida vähemalt üks fail!</translation>
-    </message>
-    <message>
         <source>The selected item is not a directory!</source>
         <translation>valitud element pole kataloog!</translation>
     </message>
@@ -150,70 +118,46 @@ Vajuta &quot;Valmis&quot;</translation>
     </message>
 </context>
 <context>
-    <name>ImportNativeWizard</name>
+    <name>ImportNative</name>
     <message>
-        <source>Back</source>
-        <translation type="obsolete">Tagasi</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="obsolete">Algusesse</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Järgmine</translation>
+        <source>Finish</source>
+        <translation type="unfinished">Lõpeta</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
+        <translation type="unfinished">Eelmine</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Katkesta</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth arhiveerija</translation>
-    </message>
-    <message>
-        <source>You need to select a valid archive XML file!</source>
-        <translation type="obsolete">Valida tuleb sobiv arhiivi XML fail!</translation>
+        <translation type="unfinished">Katkesta</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="obsolete">Sa pead valima sobiva kanali!</translation>
+        <translation type="unfinished">Sa pead valima sobiva kanali!</translation>
     </message>
     <message>
-        <source>Finish</source>
-        <translation type="obsolete">Lõpeta</translation>
+        <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
+        <translation type="unfinished">Arhiivi importimine pole võimalik. mytharchivehelper-i töös tekkis viga</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation type="obsolete">Vali kanali ID</translation>
+        <translation type="unfinished">Vali kanali ID</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation type="obsolete">Vali kanali number</translation>
+        <translation type="unfinished">Vali kanali number</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation type="obsolete">Vali kanali nimi</translation>
+        <translation type="unfinished">Vali kanali nimi</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation type="obsolete">Vali kanali kutsung</translation>
+        <translation type="unfinished">Vali kanali kutsung</translation>
     </message>
 </context>
 <context>
     <name>LogViewer</name>
-    <message>
-        <source>Log Viewer</source>
-        <translation type="obsolete">Logivaataja</translation>
-    </message>
-    <message>
-        <source>Seconds</source>
-        <translation type="obsolete">sekundit</translation>
-    </message>
     <message>
         <source>Cancel</source>
         <translation>Katkesta</translation>
@@ -242,72 +186,130 @@ Vajuta &quot;Valmis&quot;</translation>
         <source>Auto Update</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
-    <name>MythburnWizard</name>
+    <name>MythBurn</name>
     <message>
-        <source>Next</source>
-        <translation type="obsolete">Järgmine</translation>
+        <source>Finish</source>
+        <translation type="unfinished">Lõpeta</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="obsolete">Eelmine</translation>
+        <translation type="unfinished">Eelmine</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Katkesta</translation>
+        <translation type="unfinished">Katkesta</translation>
     </message>
     <message>
-        <source>Choose File...</source>
-        <translation type="obsolete">Vali fail...</translation>
+        <source>Add Recording</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Don&apos;t re-encode</source>
-        <translation type="obsolete">Ära uuesti kodeeri</translation>
+        <source>Add Video</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New Size </source>
-        <translation type="obsolete">Uus suurus </translation>
+        <source>Add File</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Original Size </source>
-        <translation type="obsolete">Originaalsuurus </translation>
+        <source>Using Cutlist</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth arhiveerija</translation>
+        <source>Not Using Cutlist</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You need to select at least one item to archive!</source>
-        <translation type="obsolete">Arhiveerimiseks tuleb valida vähemalt üks element!</translation>
+        <source>No Cut List</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Finish</source>
-        <translation type="obsolete">Lõpeta</translation>
+        <source>You need to add at least one item to archive!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All Archive Items</source>
-        <translation type="obsolete">Kõik arhiivielemendid</translation>
+        <source>Retrieving File Information. Please Wait...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Myth kirjutaja</translation>
+        <source>Encoder: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You don&apos;t have any items to archive!
-
-Click OK</source>
-        <translation type="obsolete">Sa pole midagi arhiveerimiseks valinud!
-
-Vajuta &quot;Valmis&quot;</translation>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit Details</source>
-        <translation type="obsolete">Muuda üksikasju</translation>
+        <source>Don&apos;t Use Cutlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Cutlist</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="obsolete">Eemalda element</translation>
+        <translation type="unfinished">Eemalda element</translation>
+    </message>
+    <message>
+        <source>Edit Details</source>
+        <translation type="unfinished">Muuda üksikasju</translation>
+    </message>
+    <message>
+        <source>Change Encoding Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
+        <translation type="unfinished">DVD valmistamine pole võimalik.  Skriptide töös tekkis viga</translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Toggle use cut list state for selected program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Archive Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Created DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ProfileDialog</name>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -373,16 +375,8 @@ Vajuta &quot;Valmis&quot;</translation>
         <translation>Alati kasutatakse Mythtranscode&apos;i</translation>
     </message>
     <message>
-        <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems.</source>
-        <translation type="obsolete">Määramisel lastakse MPEG2 failid võimalike vigade parandamiseks alati läbi mythtranscode. See aitab parandada mõningaid heliga seotud probleeme.</translation>
-    </message>
-    <message>
         <source>Use FIFOs</source>
         <translation>Kasutatakse FIFO puhvreid</translation>
-    </message>
-    <message>
-        <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not supported on Windows platform</source>
-        <translation type="obsolete">Skript kasutab mplex-i väljundi dvdauthor-i sisendisse suunaiseks ajutiste failide asemel FIFO puhvreid. See säästab aega ning kettamahtu kuid pole Windowsis kasutatav</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
@@ -449,14 +443,6 @@ Vajuta &quot;Valmis&quot;</translation>
         <translation>Käsk tcrequant-i käivitamiseks (transcode paki osa). Pole kohustuslik - jäta tühjaks kui transcode pakki pole paigaldatud.</translation>
     </message>
     <message>
-        <source>png2yuv command</source>
-        <translation type="obsolete">png2yuv käsk</translation>
-    </message>
-    <message>
-        <source>Command to run png2yuv. Part of mjpegtools package</source>
-        <translation type="obsolete">Käsk png2yuv-i käivitamiseks (mjpegtools pakist)</translation>
-    </message>
-    <message>
         <source>spumux command</source>
         <translation>spumux käsk</translation>
     </message>
@@ -487,22 +473,6 @@ Vajuta &quot;Valmis&quot;</translation>
     <message>
         <source>MythArchive External Commands (2)</source>
         <translation>MythArchive välised käsud (2)</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth arhiveerija</translation>
-    </message>
-    <message>
-        <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation type="obsolete">DVD valmistamine pole võimalik.  Skriptide töös tekkis viga</translation>
-    </message>
-    <message>
-        <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="obsolete">Arhiivi importimine pole võimalik. mytharchivehelper-i töös tekkis viga</translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Myth kirjutaja</translation>
     </message>
     <message>
         <source>Background creation has been asked to stop.
@@ -603,10 +573,6 @@ Selleks võib kuluda mõni minut.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Video Selector</source>
-        <translation type="obsolete">Videovalija</translation>
-    </message>
-    <message>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
         <translation type="unfinished"></translation>
@@ -636,6 +602,40 @@ Removing stale lock file.</source>
         <source>Last run failed to create a DVD.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>You don&apos;t have any videos!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot burn a DVD.
+The last run failed to create a DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+Place a blank DVD in the drive and select an option below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD Rewritable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD Rewritable (Force Erase)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Katkesta</translation>
+    </message>
+    <message>
+        <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
@@ -656,27 +656,8 @@ Removing stale lock file.</source>
         <translation>Valmis</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth arhiveerija</translation>
-    </message>
-    <message>
-        <source>You need to select at least one recording!</source>
-        <translation type="obsolete">Sa pead valima vähemalt ühe salvestise!</translation>
-    </message>
-    <message>
         <source>All Recordings</source>
         <translation>Kõik salvestised</translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Myth kirjutaja</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any recordings!
-
-Click OK</source>
-        <translation type="obsolete">Sul pole ühtegi salvestist!
-Vali &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
@@ -684,6 +665,10 @@ Vali &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -705,6 +690,312 @@ Vali &quot;Valmis&quot;</translation>
         <source>Find...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Single Layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Layer DVD (4482Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual Layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual Layer DVD (8964Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD +/- RW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewritable DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any file accessable from your filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThemeSelector</name>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Järgmine</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Eelmine</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Katkesta</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Select Destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>description goes here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free Space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.00Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make ISO Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force Overwrite of DVD-RW Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>title goes here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x.xx Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No videos available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Viewer</source>
+        <translation type="unfinished">Logivaataja</translation>
+    </message>
+    <message>
+        <source>Change Encoding Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12.34GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Intro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chapter Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Archive Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No files are selected for archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>xxxxx mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Item Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Date:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thumb Image Selector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0:00:00.00</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seek Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sep 13, 2004 11:00 pm (1h 15m)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Finder To Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Associated Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chan. ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chan. No:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A high quality profile giving approx. 1 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A standard play profile giving approx. 2 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A long play profile giving approx. 4 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A extended play profile giving approx. 6 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encode Video File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Utilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Log Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Created DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThumbFinder</name>
@@ -722,6 +1013,10 @@ Vali &quot;Valmis&quot;</translation>
     </message>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -744,32 +1039,16 @@ Vali &quot;Valmis&quot;</translation>
         <translation>Valmis</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth arhiveerija</translation>
-    </message>
-    <message>
-        <source>You need to select at least one video file!</source>
-        <translation type="obsolete">Sa pead valima vähemalt ühe videofaili!</translation>
-    </message>
-    <message>
         <source>All Videos</source>
         <translation>Kõik videod</translation>
     </message>
     <message>
-        <source>Video Selector</source>
-        <translation type="obsolete">Videovalija</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any videos!
-
-Click OK</source>
-        <translation type="obsolete">Sul pole ühtegi videot!
-
-Vali &quot;Valmis&quot;</translation>
-    </message>
-    <message>
         <source>Parental Pin:</source>
         <translation>Lapsevanema PIN:</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

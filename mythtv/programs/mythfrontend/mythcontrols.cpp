@@ -5,7 +5,7 @@
  * @brief Main mythcontrols class.
  *
  * Note that the keybindings are fetched all at once, and cached for
- * this host.  This avoids pelting the database everytime the user
+ * this host.  This avoids pelting the database every time the user
  * changes their selection.  This makes a HUGE difference in delay.
  *
  * Copyright (C) 2005 Micah Galizia
@@ -26,6 +26,8 @@
  * 02111-1307, USA
  */
 
+#include "mythcontrols.h"
+
 // Qt headers
 #include <QStringList>
 #include <QApplication>
@@ -41,7 +43,6 @@
 #include <mythdialogbox.h>
 
 // MythControls headers
-#include "mythcontrols.h"
 #include "keygrabber.h"
 
 #define LOC QString("MythControls: ")
@@ -399,7 +400,7 @@ void MythControls::RefreshKeyInformation(void)
     const QString action  = GetCurrentAction();
 
     QString desc = m_bindings->GetActionDescription(context, action);
-    m_description->SetText(desc);
+    m_description->SetText(tr(desc.toAscii().constData()));
 
     QStringList keys = m_bindings->GetActionKeys(context, action);
     for (int i = 0; (i < keys.count()) &&
@@ -423,12 +424,12 @@ QString MythControls::GetCurrentContext(void)
         return m_leftList->GetItemCurrent()->GetText();
 
     if (GetFocusWidget() == m_leftList)
-        return QString::null;
+        return QString();
 
     QString desc = m_rightList->GetItemCurrent()->GetText();
     int loc = desc.indexOf(" => ");
     if (loc == -1)
-        return QString::null; // Should not happen
+        return QString(); // Should not happen
 
     if (m_rightListType == kContextList)
         return desc.left(loc);
@@ -453,14 +454,14 @@ QString MythControls::GetCurrentAction(void)
             tmp.detach();
             return tmp;
         }
-        return QString::null;
+        return QString();
     }
 
     if (GetFocusWidget() == m_leftList)
-        return QString::null;
+        return QString();
 
     if (!m_rightList || !m_rightList->GetItemCurrent())
-        return QString::null;
+        return QString();
 
     QString desc = m_rightList->GetItemCurrent()->GetText();
     if (kContextList == m_leftListType &&
@@ -472,14 +473,14 @@ QString MythControls::GetCurrentAction(void)
 
     int loc = desc.indexOf(" => ");
     if (loc == -1)
-        return QString::null; // should not happen..
+        return QString(); // should not happen..
 
     if (m_rightListType == kActionList)
         return desc.left(loc);
 
     QString rv = desc.mid(loc+4);
     if (rv == "<none>")
-        return QString::null;
+        return QString();
 
     return rv;
 }
@@ -514,7 +515,7 @@ QString MythControls::GetCurrentKey(void)
         return m_leftList->GetItemCurrent()->GetText();
 
     if (GetFocusWidget() == m_leftList)
-        return QString::null;
+        return QString();
 
     if ((m_leftListType == kContextList) && (m_rightListType == kActionList))
     {
@@ -526,13 +527,13 @@ QString MythControls::GetCurrentKey(void)
         if (b < (uint)keys.count())
             return keys[b];
 
-        return QString::null;
+        return QString();
     }
 
     QString desc = m_rightList->GetItemCurrent()->GetText();
     int loc = desc.indexOf(" => ");
     if (loc == -1)
-        return QString::null; // Should not happen
+        return QString(); // Should not happen
 
 
     if (m_rightListType == kKeyList)
@@ -601,15 +602,16 @@ void MythControls::DeleteKey(void)
     MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-    m_menuPopup =
-            new MythDialogBox(label, popupStack, "mandatorydelete");
+    MythConfirmationDialog *confirmPopup =
+            new MythConfirmationDialog(popupStack, label, false);
 
-    if (m_menuPopup->Create())
-        popupStack->AddScreen(m_menuPopup);
-
-    m_menuPopup->SetReturnEvent(this, "mandatorydelete");
-
-    m_menuPopup->AddButton(tr("Ok"));
+    if (confirmPopup->Create())
+    {
+        confirmPopup->SetReturnEvent(this, "mandatorydelete");
+        popupStack->AddScreen(confirmPopup);
+    }
+    else
+        delete confirmPopup;
 }
 
 /**
@@ -793,7 +795,8 @@ void MythControls::customEvent(QEvent *event)
             }
         }
 
-        m_menuPopup = NULL;
+        if (m_menuPopup)
+            m_menuPopup = NULL;
     }
 
 }

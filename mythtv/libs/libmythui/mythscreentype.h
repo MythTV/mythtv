@@ -46,7 +46,7 @@ class MPUBLIC MythScreenType : public MythUIType
     void ResetMap(QHash<QString, QString> &infoMap);
 
   public slots:
-    void Close();
+    virtual void Close();
 
   signals:
     void Exiting();

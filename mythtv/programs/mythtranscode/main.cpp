@@ -4,6 +4,7 @@
 // C++ headers
 #include <iostream>
 #include <fstream>
+#include <cerrno>
 using namespace std;
 
 // Qt headers
@@ -365,7 +366,7 @@ int main(int argc, char *argv[])
                 if(!strcmp(a.argv()[argpos + 1], "dvd"))
                     otype = REPLEX_DVD;
                 if(!strcmp(a.argv()[argpos + 1], "ts"))
-                    otype = REPLEX_HDTV;
+                    otype = REPLEX_TS_SD;
 
                 ++argpos;
             }

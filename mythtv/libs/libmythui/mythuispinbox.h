@@ -19,7 +19,7 @@ class MPUBLIC MythUISpinBox : public MythUIButtonList
     MythUISpinBox(MythUIType *parent, const QString &name);
     ~MythUISpinBox();
 
-    void SetRange(int low, int high, int step);
+    void SetRange(int low, int high, int step, uint pageMultiple = 5);
 
     void SetValue(int val) { SetValueByData(val); }
     void SetValue(const QString &val) { SetValueByData(val.toInt()); }
@@ -31,10 +31,15 @@ class MPUBLIC MythUISpinBox : public MythUIButtonList
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 
+    virtual bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0);
+    virtual bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0);
+    
     bool m_hasTemplate;
     QString m_negativeTemplate;
     QString m_zeroTemplate;
     QString m_positiveTemplate;
+
+    uint m_moveAmount;
 };
 
 #endif

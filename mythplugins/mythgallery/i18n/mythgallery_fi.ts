@@ -1,50 +1,8 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>GLSingleView</name>
-    <message>
-        <source>Folder: </source>
-        <translation type="obsolete">Kansio: </translation>
-    </message>
-    <message>
-        <source>Created: </source>
-        <translation type="obsolete">Luotu: </translation>
-    </message>
-    <message>
-        <source>Modified: </source>
-        <translation type="obsolete">Muokattu: </translation>
-    </message>
-    <message>
-        <source>Bytes</source>
-        <translation type="obsolete">Tavua</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation type="obsolete">Leveys</translation>
-    </message>
-    <message>
-        <source>pixels</source>
-        <translation type="obsolete">pikseliä</translation>
-    </message>
-    <message>
-        <source>Height</source>
-        <translation type="obsolete">Korkeus</translation>
-    </message>
-    <message>
-        <source>Pixel Count</source>
-        <translation type="obsolete">pikselimäärä</translation>
-    </message>
-    <message>
-        <source>megapixels</source>
-        <translation type="obsolete">megapikseliä</translation>
-    </message>
-    <message>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Käännöskulma</translation>
-    </message>
-    <message>
-        <source>degrees</source>
-        <translation type="obsolete">astetta</translation>
-    </message>
     <message>
         <source>Press SELECT to play again</source>
         <translation>Paina SELECT toistaaksesi uudelleen</translation>
@@ -53,32 +11,8 @@
 <context>
     <name>IconView</name>
     <message>
-        <source>Import pictures?</source>
-        <translation type="obsolete">Tuodaanko kuvat?</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation type="obsolete">Ei</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation type="obsolete">Kyllä</translation>
-    </message>
-    <message>
-        <source>Nothing found to import</source>
-        <translation type="obsolete">Ei löydetty mitään tuotavaksi</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
         <source>Error</source>
         <translation>Virhe</translation>
-    </message>
-    <message>
-        <source>Sorry: OpenGL support not available</source>
-        <translation type="obsolete">OpenGL-tukea ei ole saatavilla</translation>
     </message>
     <message>
         <source>SlideShow</source>
@@ -113,28 +47,8 @@
         <translation>MythGalleria kansio &apos;%1&apos; ei ole olemassa tai on lukukelvoton.</translation>
     </message>
     <message>
-        <source>MythGallery failed to load theme, see console for details.</source>
-        <translation type="obsolete">MythGalleria epäonnistui teeman lataamisessa, katso konsoli.</translation>
-    </message>
-    <message>
         <source>The selected device is no longer available</source>
         <translation>Valittu laite ei ole enää saatavilla</translation>
-    </message>
-    <message>
-        <source>Meta Data...</source>
-        <translation type="obsolete">Metadata...</translation>
-    </message>
-    <message>
-        <source>Marking...</source>
-        <translation type="obsolete">Merkitään...</translation>
-    </message>
-    <message>
-        <source>File...</source>
-        <translation type="obsolete">Tiedosto...</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <translation type="obsolete">Palaa</translation>
     </message>
     <message>
         <source>Clear Marked</source>
@@ -173,10 +87,6 @@
         <translation>Poistetaan 1 kuva.</translation>
     </message>
     <message>
-        <source>Delete Marked Files</source>
-        <translation type="obsolete">Poista Merkityt Tiedostot</translation>
-    </message>
-    <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
         <translation>Poistetaan %1 kuvaa ja kansiota, mukaanlukien kaikki alikansiot ja tiedostot.</translation>
     </message>
@@ -195,14 +105,6 @@
     <message>
         <source>Copying marked images...</source>
         <translation>Kopioidaan merkittyjä kuvia...</translation>
-    </message>
-    <message>
-        <source>Failed to mount device: </source>
-        <translation type="obsolete">Ei saatu liitettyä laitetta: </translation>
-    </message>
-    <message>
-        <source>Showing the default MythGallery directory.</source>
-        <translation type="obsolete">Näytetään oletus MythGalleria kansio.</translation>
     </message>
     <message>
         <source>Rename</source>
@@ -252,6 +154,105 @@
         <source>Eject</source>
         <translation>Eject</translation>
     </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gallery Home</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Image viewer / slideshow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start/Stop Slideshow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the first image in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the last image in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Slideshow in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Random Slideshow in thumbnail view</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate image right 90 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate image left 90 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom image out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom image in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll image up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll image left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll image right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll image down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recenter image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full-size (un-zoom) image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the upper-left corner of the image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to the lower-right corner of the image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle scale to fullscreen/scale to fit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Media Handler 1/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythGallery Media Handler 2/2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -292,10 +293,6 @@
         <translation>Näin monta sekuntia jokaista kuvaa näytetään.</translation>
     </message>
     <message>
-        <source>MythGallery Settings</source>
-        <translation type="obsolete">MythGallerian Asetukset</translation>
-    </message>
-    <message>
         <source>Slideshow Delay</source>
         <translation>Diaesityksen viive</translation>
     </message>
@@ -314,14 +311,6 @@
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
         <translation>Tämä on OpenGL -siirtymisen tyyppi, jota käytetään siirryttäessä kuvien ja diaesityksetilan välillä.</translation>
-    </message>
-    <message>
-        <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="obsolete">Kansiota ei ole tai se on lukukelvoton.</translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Command run to display movie files</source>
@@ -377,57 +366,57 @@
     </message>
     <message>
         <source>MythGallery cannot find its start directory.
+%1
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
-        <translation>MythGallery ei pysty löytämään aloitushakemistoaan. 
-Tarkista, että hakemisto on olemassa, luettavissa ja oikein MythGalleryn asetussivulla.</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder: </source>
+        <translation type="unfinished">Kansio: </translation>
+    </message>
+    <message>
+        <source>Created: </source>
+        <translation type="unfinished">Luotu: </translation>
+    </message>
+    <message>
+        <source>Modified: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bytes</source>
+        <translation type="unfinished">Tavua</translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation type="unfinished">Leveys</translation>
+    </message>
+    <message>
+        <source>pixels</source>
+        <translation type="unfinished">pikseliä</translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation type="unfinished">Korkeus</translation>
+    </message>
+    <message>
+        <source>Pixel Count</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>megapixels</source>
+        <translation type="unfinished">megapikseliä</translation>
+    </message>
+    <message>
+        <source>Rotation Angle</source>
+        <translation type="unfinished">Käännöskulma</translation>
+    </message>
+    <message>
+        <source>degrees</source>
+        <translation type="unfinished">astetta</translation>
     </message>
 </context>
 <context>
     <name>SingleView</name>
-    <message>
-        <source>Created: </source>
-        <translation type="obsolete">Luotu: </translation>
-    </message>
-    <message>
-        <source>Modified: </source>
-        <translation type="obsolete">Muokattu:</translation>
-    </message>
-    <message>
-        <source>Bytes</source>
-        <translation type="obsolete">Tavua</translation>
-    </message>
-    <message>
-        <source>Width</source>
-        <translation type="obsolete">Leveys</translation>
-    </message>
-    <message>
-        <source>pixels</source>
-        <translation type="obsolete">pikseliä</translation>
-    </message>
-    <message>
-        <source>Height</source>
-        <translation type="obsolete">Korkeus</translation>
-    </message>
-    <message>
-        <source>Pixel Count</source>
-        <translation type="obsolete">Pikselimäärä</translation>
-    </message>
-    <message>
-        <source>megapixels</source>
-        <translation type="obsolete">megapikseliä</translation>
-    </message>
-    <message>
-        <source>Rotation Angle</source>
-        <translation type="obsolete">Käännöskulma</translation>
-    </message>
-    <message>
-        <source>degrees</source>
-        <translation type="obsolete">astetta</translation>
-    </message>
-    <message>
-        <source>Folder: </source>
-        <translation type="obsolete">Kansio: </translation>
-    </message>
     <message>
         <source>Press SELECT to play again</source>
         <translation>Paina SELECT toistaaksesi uudelleen</translation>

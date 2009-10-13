@@ -11,6 +11,7 @@
 #include <mythtv/libmythui/mythuitextedit.h>
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuicheckbox.h>
+#include <mythtv/libmyth/mythuifilebrowser.h>
 
 #include "romedit.h"
 #include "rominfo.h"
@@ -36,11 +37,11 @@ bool EditRomInfoDialog::Create()
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_gamenameEdit, "gamename_edit", &err);
+    UIUtilE::Assign(this, m_gamenameEdit, "title_edit", &err);
     UIUtilE::Assign(this, m_genreEdit, "genre_edit", &err);
     UIUtilE::Assign(this, m_yearEdit, "year_edit", &err);
     UIUtilE::Assign(this, m_countryEdit, "country_edit", &err);
-    UIUtilE::Assign(this, m_plotEdit, "plot_edit", &err);
+    UIUtilE::Assign(this, m_plotEdit, "description_edit", &err);
     UIUtilE::Assign(this, m_publisherEdit, "publisher_edit", &err);
 
     UIUtilE::Assign(this, m_favoriteCheck, "favorite_check", &err);
@@ -49,8 +50,8 @@ bool EditRomInfoDialog::Create()
     UIUtilE::Assign(this, m_screenshotText, "screenshot_text", &err);
     UIUtilE::Assign(this, m_fanartButton, "fanart_button", &err);
     UIUtilE::Assign(this, m_fanartText, "fanart_text", &err);
-    UIUtilE::Assign(this, m_boxartButton, "boxart_button", &err);
-    UIUtilE::Assign(this, m_boxartText, "boxart_text", &err);
+    UIUtilE::Assign(this, m_boxartButton, "coverart_button", &err);
+    UIUtilE::Assign(this, m_boxartText, "coverart_text", &err);
 
     UIUtilE::Assign(this, m_doneButton, "done_button", &err);
 

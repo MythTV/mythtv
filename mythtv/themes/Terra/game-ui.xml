@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
   <window name="gameui">
@@ -46,60 +47,70 @@
         </buttonlist>
     </buttontree>
 
-    <textarea name="gametitle">
+    <textarea name="title">
         <area>296,440,752,60</area>
         <font>baseextralarge</font>
     </textarea>
 
-    <textarea name="system">
+    <textarea name="systemlabel">
         <area>296,510,140,35</area>
         <font>basemedium</font>
         <value>System:</value>
     </textarea>
 
-    <textarea name="systemname">
+    <textarea name="system">
         <area>436,510,580,35</area>
         <font>basemedium</font>
     </textarea>
 
-    <textarea name="year">
+    <textarea name="yearlabel">
         <area>296,545,140,35</area>
         <font>basemedium</font>
         <value>Year:</value>
     </textarea>
 
-    <textarea name="yearname">
+    <textarea name="year">
         <area>436,545,580,35</area>
         <font>basemedium</font>
     </textarea>
 
-    <textarea name="genre">
+    <textarea name="genrelabel">
         <area>296,580,140,35</area>
         <font>basemedium</font>
         <value>Genre:</value>
     </textarea>
 
-    <textarea name="genrename">
+    <textarea name="genre">
         <area>436,580,580,35</area>
         <font>basemedium</font>
     </textarea>
 
-    <textarea name="favorite">
+    <textarea name="favoritelabel">
         <area>296,615,140,35</area>
         <font>basemedium</font>
         <value>Favorite:</value>
     </textarea>
 
-    <textarea name="showfavorite">
+    <statetype name="favorite">
         <area>436,615,580,35</area>
-        <font>basemedium</font>
-    </textarea>
+        <state name="yes">
+            <textarea name="favorite" from="basetextarea">
+                <area>0,0,580,35</area>
+                <value>Yes</value>
+            </textarea>
+        </state>
+        <state name="no" from="yes">
+            <textarea name="favorite">
+                <value>No</value>
+            </textarea>
+        </state>
+    </statetype>
 
-    <imagetype name="gameimage">
+    <imagetype name="screenshot">
           <area>880,448,300,196</area>
     </imagetype>
 
-    <imagetype name="boxart">
+    <imagetype name="coverart">
           <area>25,448,300,196</area>
           <preserveaspect>true</preserveaspect>
     </imagetype>

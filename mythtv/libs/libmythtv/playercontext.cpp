@@ -432,7 +432,8 @@ bool PlayerContext::IsRecorderErrored(void) const
 
 bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
                               TVState desiredState,
-                              WId embedwinid, const QRect *embedbounds)
+                              WId embedwinid, const QRect *embedbounds,
+                              bool muted)
 {
     int exact_seeking = gContext->GetNumSetting("ExactSeeking", 0);
 
@@ -443,7 +444,7 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
         return false;
     }
 
-    NuppelVideoPlayer *_nvp = new NuppelVideoPlayer();
+    NuppelVideoPlayer *_nvp = new NuppelVideoPlayer(muted);
 
     if (nohardwaredecoders)
         _nvp->DisableHardwareDecoders();

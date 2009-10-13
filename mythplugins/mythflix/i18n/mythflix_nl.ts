@@ -1,117 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="nl">
+<!DOCTYPE TS>
+<TS version="2.0" language="nl">
+<context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythflix/main.cpp" line="105"/>
+        <source>Browse Netflix titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythflix/main.cpp" line="107"/>
+        <source>Administer Netflix Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythflix/main.cpp" line="109"/>
+        <source>View Netflix History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythflix/main.cpp" line="112"/>
+        <source>Moves movie to top of queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>MythFlix</name>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="448"/>
+        <location filename="../mythflix/mythflix.cpp" line="406"/>
         <source>Browse Options</source>
         <translation>Blader opties</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="460"/>
+        <location filename="../mythflix/mythflix.cpp" line="419"/>
         <source>Add to Top of Queue</source>
         <translation>Voeg bovenaan de wachtlijst toe</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="461"/>
+        <location filename="../mythflix/mythflix.cpp" line="420"/>
         <source>Add to Bottom of Queue</source>
         <translation>Voeg onderaan de wachtlijst toe</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="462"/>
+        <location filename="../mythflix/mythflix.cpp" line="421"/>
         <source>Show NetFlix Page</source>
         <translation>Toon NetFlix pagina</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="463"/>
+        <location filename="../mythflix/mythflix.cpp" line="422"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
-    </message>
-</context>
-<context>
-    <name>MythFlixConfig</name>
-    <message>
-        <location filename="../mythflix/mythflixconfig.cpp" line="244"/>
-        <source>Press MENU to set the update frequency.</source>
-        <translation type="obsolete">MENU gebruiken om de verversfrequentie te kiezen.</translation>
-    </message>
-    <message>
-        <location filename="" line="7471221"/>
-        <source>Set update frequency by using the up/down arrows.
-The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Verversfrequentie kiezen met pijltoetsen (omhoog/omlaag). 
-De kleinste waarde is 30 minuten.</translation>
-    </message>
-    <message>
-        <location filename="" line="7471221"/>
-        <source>Press MENU to return to feed selection.</source>
-        <translation type="obsolete">MENU gebruiken om terug te keren naar toevoerselectie.</translation>
-    </message>
-    <message>
-        <location filename="../mythflix/mythflixconfig.cpp" line="293"/>
-        <source>Set update frequency by using the up/down arrows.The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Verversfrequentie kiezen met pijltoetsen (omhoog/omlaag). De kleinste waarde is 30 minuten.</translation>
-    </message>
-    <message>
-        <location filename="../mythflix/mythflixconfig.cpp" line="298"/>
-        <source>Press Escape or Menu to exit.</source>
-        <translation type="obsolete">Gebruik escape of menu om af te sluiten.</translation>
     </message>
 </context>
 <context>
     <name>MythFlixQueue</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="517"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="474"/>
         <source>Manage Queue</source>
         <translation>Wachtrij beheren</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="529"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="486"/>
         <source>Top Of Queue</source>
         <translation>Bovenaan wachtlijst</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="530"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="487"/>
         <source>Remove From Queue</source>
         <translation>Uit wachtlijst verwijderen</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="534"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="491"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="170"/>
-        <source>Default</source>
-        <translation type="obsolete">Standaard</translation>
-    </message>
-    <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="182"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="159"/>
         <source>History for Queue: </source>
         <translation>Historie voor wachtlijst: </translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="184"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="161"/>
         <source>Items in Queue: </source>
         <translation>Items in de wachtlijst: </translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="586"/>
-        <source>Move Canceled</source>
-        <translation type="obsolete">Verplaats geannuleerde</translation>
-    </message>
-    <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="587"/>
-        <source>Item not moved.</source>
-        <translation type="obsolete">Item niet verplaatst.</translation>
-    </message>
-    <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="532"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="489"/>
         <source>Move To Another Queue</source>
         <translation>Verplaats naar andere wachtlijst</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="533"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="490"/>
         <source>Show NetFlix Page</source>
         <translation>Toon NetFlix pagina</translation>
     </message>
@@ -119,27 +98,29 @@ De kleinste waarde is 30 minuten.</translation>
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="205"/>
+        <location filename="../mythflix/newsengine.cpp" line="206"/>
         <source>Retrieve Failed. </source>
         <translation>Ophalen mislukt. </translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="225"/>
+        <location filename="../mythflix/newsengine.cpp" line="214"/>
+        <location filename="../mythflix/newsengine.cpp" line="220"/>
+        <location filename="../mythflix/newsengine.cpp" line="226"/>
         <source>Failed to retrieve news</source>
         <translation>Nieuws ophalen mislukt</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="214"/>
+        <location filename="../mythflix/newsengine.cpp" line="215"/>
         <source>No Cached News</source>
         <translation>Geen nieuws in geheugen</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="227"/>
+        <location filename="../mythflix/newsengine.cpp" line="228"/>
         <source>Failed to read downloaded file</source>
         <translation>Lezen van opgehaald bestand mislukt</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="233"/>
+        <location filename="../mythflix/newsengine.cpp" line="234"/>
         <source>Showing Cached News</source>
         <translation>Nieuws in geheugen laten zien</translation>
     </message>
@@ -147,17 +128,32 @@ De kleinste waarde is 30 minuten.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="179"/>
+        <location filename="../mythflix/mythflixqueue.cpp" line="156"/>
         <source>Default</source>
         <translation type="unfinished">Standaard</translation>
+    </message>
+    <message>
+        <location filename="../mythflix/flixutil.cpp" line="29"/>
+        <source>Queue Name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Minutes</source>
-        <translation>Minuten</translation>
+        <source>View Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Browse Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>Rental History</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -201,12 +201,13 @@ bool PlaybackSock::FillProgramInfo(ProgramInfo *pginfo, QString &playbackhost)
 }
 
 QStringList PlaybackSock::GetSGFileList(QString &host, QString &groupname,
-                                      QString &directory)
+                                      QString &directory, bool fileNamesOnly)
 {
     QStringList strlist( QString("QUERY_SG_GETFILELIST") );
     strlist << host;
     strlist << groupname;
     strlist << directory;
+    QString::number(fileNamesOnly);
 
     SendReceiveStringList(strlist);
 
@@ -479,6 +480,16 @@ void PlaybackSock::CancelNextRecording(int capturecardnum, bool cancel)
     strlist << QString::number(cancel);
 
     SendReceiveStringList(strlist);
+}
+
+QStringList PlaybackSock::ForwardRequest(const QStringList &slist)
+{
+    QStringList strlist = slist;
+
+    if (SendReceiveStringList(strlist))
+        return strlist;
+
+    return QStringList();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

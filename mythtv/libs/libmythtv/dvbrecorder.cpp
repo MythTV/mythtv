@@ -452,6 +452,9 @@ bool DVBRecorder::PauseAndWait(int timeout)
 
 bool DVBRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
 {
+    if (!ringBuffer)
+        return true;
+
     uint streamType = _stream_id[tspacket.PID()];
 
     // Check for keyframes and count frames
@@ -471,6 +474,9 @@ bool DVBRecorder::ProcessVideoTSPacket(const TSPacket &tspacket)
 
 bool DVBRecorder::ProcessAudioTSPacket(const TSPacket &tspacket)
 {
+    if (!ringBuffer)
+        return true;
+
     _buffer_packets = !FindAudioKeyframes(&tspacket);
     return ProcessAVTSPacket(tspacket);
 }

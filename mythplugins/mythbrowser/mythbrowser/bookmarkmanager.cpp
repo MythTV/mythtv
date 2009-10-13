@@ -60,9 +60,6 @@ bool BrowserConfig::Create()
 
     m_zoomEdit->SetText(gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
 
-    m_okButton->SetText(tr("Ok"));
-    m_cancelButton->SetText(tr("Cancel"));
-
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
 

@@ -93,7 +93,7 @@ bool UpgradeArchiveDatabaseSchema(void)
             "    size INT UNSIGNED NOT NULL,"
             "    filename TEXT NOT NULL,"
             "    hascutlist BOOL NOT NULL DEFAULT 0,"
-            "    cutlist TEXT DEFAULT '',"
+            "    cutlist TEXT,"
             "    INDEX (title)"
             ");",
             ""
@@ -127,7 +127,7 @@ bool UpgradeArchiveDatabaseSchema(void)
             "  MODIFY description blob,"
             "  MODIFY startdate varbinary(30) default NULL,"
             "  MODIFY starttime varbinary(30) default NULL,"
-            "  MODIFY filename blob NOT NULL,"
+            "  MODIFY filename blob,"
             "  MODIFY cutlist blob;",
             ""
         };

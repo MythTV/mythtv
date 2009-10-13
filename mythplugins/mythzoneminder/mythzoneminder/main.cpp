@@ -38,9 +38,12 @@ void runZMEventView(void);
 
 void setupKeys(void)
 {
-    REG_JUMP("ZoneMinder Console",    "", "", runZMConsole);
-    REG_JUMP("ZoneMinder Live View",  "", "", runZMLiveView);
-    REG_JUMP("ZoneMinder Events",     "", "", runZMEventView);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Console"),
+        "", "", runZMConsole);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Live View"),
+        "", "", runZMLiveView);
+    REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "ZoneMinder Events"),
+        "", "", runZMEventView);
 }
 
 bool checkConnection(void)

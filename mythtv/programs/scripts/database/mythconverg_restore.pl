@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.7';
+    $VERSION        = '1.0.8';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -733,7 +733,7 @@ EOF
     {
         if (!$backup_conf{'directory'})
         {
-            if (!-r "/$backup_conf{'filename'}")
+            if (!$backup_conf{'filename'} || (!-r "/$backup_conf{'filename'}"))
             {
                 print_configuration;
                 die("\nERROR: DBBackupDirectory not specified, stopped");
@@ -810,6 +810,19 @@ EOF
                         "$backup_conf{'directory'}/$backup_conf{'filename'}");
                 die("\nInvalid backup filename, stopped");
             }
+        }
+        if ((-d "$backup_conf{'directory'}/$backup_conf{'filename'}") ||
+            (-p "$backup_conf{'directory'}/$backup_conf{'filename'}") ||
+            (-S "$backup_conf{'directory'}/$backup_conf{'filename'}") ||
+            (-b "$backup_conf{'directory'}/$backup_conf{'filename'}") ||
+            (-c "$backup_conf{'directory'}/$backup_conf{'filename'}") ||
+            (!-s "$backup_conf{'directory'}/$backup_conf{'filename'}"))
+        {
+                verbose($verbose_level_error,
+                        '', 'ERROR: The specified backup file is empty or is'.
+                        ' not a file.',
+                        "$backup_conf{'directory'}/$backup_conf{'filename'}");
+                die("\nInvalid backup filename, stopped");
         }
         if (!-r "$backup_conf{'directory'}/$backup_conf{'filename'}")
         {

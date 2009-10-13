@@ -18,7 +18,7 @@ use BBCLocation;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d);
 
 my $name = 'BBC-Current-XML';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Stuart Morgan';
 my $email = 'stuart@tase.co.uk';
 my $updateTimeout = 120*60;
@@ -74,25 +74,19 @@ if (!(defined $opt_u && defined $locid && !$locid eq "")) {
 }
 
 my $units = $opt_u;
-my $base_url;
+my $base_url = 'http://newsrss.bbc.co.uk/weather/forecast/';
+my $base_xml = '/ObservationsRSS.xml';
 
-my $local_base_url = 'http://feeds.bbc.co.uk/weather/feeds/rss/obs/id/';
-my $world_base_url = 'http://feeds.bbc.co.uk/weather/feeds/rss/obs/world/';
-
-if ($locid =~ s/^W(.*)/$1/)
+if ($locid =~ s/^(\d*)/$1/)
 {
-    $base_url = $world_base_url;
-}
-elsif ($locid =~ s/^L(.*)/$1/)
-{
-    $base_url = $local_base_url;
+    $base_url = $base_url . $1 .$base_xml;
 }
 else
 {
     die "Invalid Location ID";
 }
 
-my $response = get $base_url . $locid . '.xml';
+my $response = get $base_url;
 die unless defined $response;
 
 my $xml = XMLin($response);
@@ -111,41 +105,47 @@ $location =~ s/.*?Observations for (.*)$/$1/s;
 printf "cclocation::" . $location . "\n";
 
 my $item_title = $xml->{channel}->{item}->{title};
-$item_title =~ s/\n//;
 
-my $obs_time = $item_title;
-$obs_time =~ s/^(.*?)\:.*/$1/s;
+my $obs_time = $1 if ($item_title =~ /(^.*)\:.*/);
 printf "observation_time::" . $obs_time . "\n";
 my $weather_string = $item_title;
-$weather_string =~ s/.*?\: (.*?)\..*/$1/s;
+
+$weather_string =~ s/.*\:.*\n(.*)\..*/$1/s;
 $weather_string = ucfirst($weather_string);
 printf "weather::" . $weather_string . "\n";
 
-if ($weather_string =~ /^cloudy$/i) {
+if ($weather_string =~ /^cloudy$/i     ||
+    $weather_string =~ /^grey cloud$/i ||
+    $weather_string =~ /^white cloud$/i) {
     printf "weather_icon::cloudy.png\n";
 }
-elsif ($weather_string =~ /^foggy$/i ||
-       $weather_string =~ /^misty$/i) {
+elsif ($weather_string =~ /^fog$/i ||
+    $weather_string =~ /^foggy$/i  ||
+    $weather_string =~ /^mist$/i   ||
+    $weather_string =~ /^misty$/i) {
     printf "weather_icon::fog.png\n";
 }
 elsif ($weather_string =~ /^sunny$/i) {
     printf "weather_icon::sunny.png\n";
 }
 elsif ($weather_string =~ /^sunny intervals$/i ||
-       $weather_string =~ /^partly cloudy$/i) {
+    $weather_string =~ /^partly cloudy$/i) {
     printf "weather_icon::pcloudy.png\n";
 }
 elsif ($weather_string =~ /^drizzle$/i ||
-       $weather_string =~ /^light rain$/i ||
-       $weather_string =~ /^light showers$/i) {
+    $weather_string =~ /^light rain$/i ||
+    $weather_string =~ /^light rain showers?$/i ||
+    $weather_string =~ /^light showers?$/i) {
     printf "weather_icon::lshowers.png\n";
 }
-elsif ($weather_string =~ /^heavy rain$/i ||
-       $weather_string =~ /^heavy showers$/i) {
+elsif ($weather_string =~ /^heavy rain$/i  ||
+    $weather_string =~ /^heavy showers?$/i ||
+    $weather_string =~ /^heavy rain showers?$/i) {
     printf "weather_icon::showers.png\n";
 }
 elsif ($weather_string =~ /^thundery rain$/i ||
-       $weather_string =~ /^thundery showers$/i) {
+    $weather_string =~ /^thunder storm$/i    ||
+    $weather_string =~ /^thundery showers$/i) {
     printf "weather_icon::thunshowers.png\n";
 }
 elsif ($weather_string =~ /^heavy snow$/i) {
@@ -156,11 +156,12 @@ elsif ($weather_string =~ /^light snow$/i ||
     printf "weather_icon::flurries.png\n";
 }
 elsif ($weather_string =~ /^sleet$/i ||
-    $weather_string =~ /^sleet showers$/i ||
-    $weather_string =~ /^hail showers$/i) {
+    $weather_string =~ /^sleet showers?$/i ||
+    $weather_string =~ /^hail showers?$/i) {
     printf "weather_icon::rainsnow.png\n";
 }
-elsif ($weather_string =~ /^clear$/i) {
+elsif ($weather_string =~ /^clear$/i ||
+       $weather_string =~ /^clear sky$/i) {
     printf "weather_icon::fair.png\n";
 }
 else {
@@ -187,7 +188,7 @@ foreach (@data) {
     }
     elsif ($datalabel =~ /Wind Speed/) {
         $datalabel = "wind_spdgst";
-        $datavalue =~ s/^(\d{1,3}) mph.*/$1/;
+        $datavalue =~ s/^(\d{1,3})mph.*/$1/;
 
         if ($units =~ /SI/) {
             $datavalue = int($datavalue * 1.609344 + .5);

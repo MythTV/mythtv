@@ -9,7 +9,9 @@ from socket import gethostname
 
 log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythVideo')
 
-class MythVideo:
+MVSCHEMA_VERSION = 1028
+
+class MythVideo(object):
 	"""
 	Provides convinience methods to access the MythTV MythVideo database.
 	"""
@@ -19,6 +21,13 @@ class MythVideo:
 		"""
 		self.db = MythDB()
 
+		# check schema version
+		sver = int(self.db.getSetting('mythvideo.DBSchemaVer'))
+		if MVSCHEMA_VERSION != sver:
+			log.Msg(CRITICAL, 'DB speaks schema version %d, but we speak version %d', 
+					sver, MVSCHEMA_VERSION)
+			raise MythError('Mismatched schema version')
+
 	def rtnVideoStorageGroup(self, host=None):
 		'''Get the storage group 'Videos' directory for the suppied host name or default to the localhost.
 		return None if no Videos Storage Group found
@@ -27,42 +36,14 @@ class MythVideo:
 		if not host: # If a hostname was not supplied then use the local host name
 			host = gethostname()
 
-		# Get storagegroup table field names
-		table_names = self.getTableFieldNames(u'storagegroup')
+		ret = []
+		for i in self.db.getStorageGroup('Videos',host):
+			ret.append(i['dirname'])
 
-		cur = self.db.cursor()
-		# Check is there are storage groups for the supplied host or default to the local host
-		try:
-			cur.execute(u"select * from storagegroup")
-		except MySQLdb.Error, e:
-			log.Msg(INFO, u"! Error: Reading storagegroup MythTV table: %d: %s\n" % (e.args[0], e.args[1]))
+		if ret:
+			return ret
+		else:
 			return None
-
-		videos_dir = []
-		while True:
-			data_id = cur.fetchone()
-			if not data_id:
-				break
-			record = {}
-			i = 0
-			for elem in data_id:
-				if table_names[i] == 'groupname' or table_names[i] == 'hostname' or table_names[i] == 'dirname': 
-					record[table_names[i]] = elem
-				i+=1
-			if record['hostname'].lower() == host.lower() and record['groupname'] == u'Videos':
-				# Add a slash if mussing to any storage group dirname
-				if record['dirname'][-1:] == '/': 
-					videos_dir.append(record['dirname'])
-				else:
-					videos_dir.append(record['dirname']+u'/')
-			continue
-		cur.close()
-
-		if not len(videos_dir):
-			return None
-
-		return videos_dir
-	# end getStorageGroups
 
 	def pruneMetadata(self):
 		"""
@@ -115,7 +96,8 @@ class MythVideo:
 		This function should have been called getCategoryId
 		"""
 		c = self.db.cursor()
-		c.execute("SELECT intid FROM videocategory WHERE lower(category) = %s", (genre_name,))
+		c.execute("""SELECT intid FROM videocategory
+				WHERE lower(category) = %s""", (genre_name,))
 		row = c.fetchone()
 		c.close()
 
@@ -124,7 +106,8 @@ class MythVideo:
 
 		# Insert a new genre.
 		c = self.db.cursor()
-		c.execute("INSERT INTO videocategory(category) VALUES (%s)", (genre_name.capitalize(),))
+		c.execute("""INSERT INTO videocategory(category)
+				VALUES (%s)""", (genre_name.capitalize(),))
 		newid = c.lastrowid
 		c.close()
 

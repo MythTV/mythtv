@@ -2,7 +2,6 @@
 #define MAINSERVER_H_
 
 #include <QMap>
-#include <QTimer>
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QEvent>
@@ -27,6 +26,7 @@ using namespace std;
 class ProcessRequestThread;
 class QUrl;
 class MythServer;
+class QTimer;
 
 class MainServer : public QObject, public MythSocketCBs
 {
@@ -128,6 +128,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleSetVerbose(QStringList &slist, PlaybackSock *pbs);
     void HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs);
     void HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs);
+    void HandlePixmapGetIfModified(const QStringList &slist, PlaybackSock *pbs);
     void HandleIsRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleCheckRecordingActive(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);
@@ -151,6 +152,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleBackendRefresh(MythSocket *socket);
     void HandleQueryLoad(PlaybackSock *pbs);
     void HandleQueryUptime(PlaybackSock *pbs);
+    void HandleQueryHostname(PlaybackSock *pbs);
     void HandleQueryMemStats(PlaybackSock *pbs);
     void HandleQueryTimeZone(PlaybackSock *pbs);
     void HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs);
@@ -220,11 +222,10 @@ class MainServer : public QObject, public MythSocketCBs
     };
 
     QMutex deferredDeleteLock;
-    QTimer *deferredDeleteTimer;
+    QTimer *deferredDeleteTimer; // audited ref #5318
     MythDeque<DeferredDeleteStruct> deferredDeleteList;
 
-    QTimer *autoexpireUpdateTimer;
-
+    QTimer *autoexpireUpdateTimer; // audited ref #5318
     static QMutex truncate_and_close_lock;
 
     int m_exitCode;

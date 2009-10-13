@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <window name="iconimport">
@@ -12,58 +12,65 @@
         </textarea>
 
         <textarea name="name" from="basetextarea">
-            <area>30,15,740,30</area>
+            <area>30,75,1220,30</area>
             <font>basemedium</font>
             <align>hcenter</align>
         </textarea>
 
         <buttonlist name="icons">
-            <area>20,50,760,460</area>
-            <buttonarea>0,0,760,460</buttonarea>
+            <area>30,120,1260,430</area>
+            <buttonarea>0,0,1260,430</buttonarea>
             <layout>grid</layout>
             <spacing>5</spacing>
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,240,60</area>
                     <imagetype name="buttonbackground">
-                        <area>0,0,250,60</area>
-                        <gradient start="#666666" end="#333333" alpha="200" />
+                        <area>0,0,240,60</area>
+                        <gradient start="#a8ac93" end="#8a916f" alpha="255" />
                     </imagetype>
                     <imagetype name="icon">
                         <area>0,5,80,50</area>
                         <preserveaspect>true</preserveaspect>
+                        <mask></mask>
                     </imagetype>
                     <textarea name="buttontext">
-                        <area>100,5,140,50</area>
+                        <area>90,5,140,50</area>
                         <align>allcenter</align>
                         <multiline>yes</multiline>
+                        <font>basesmall</font>
                     </textarea>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#669966" end="#339933" alpha="200" />
-                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basesmallbrown</font>
+                    </textarea>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
         </buttonlist>
 
+        <textarea name="status" from="basetextarea">
+            <area>30,540,1220,25</area>
+            <align>hcenter</align>
+        </textarea>
+
         <textarea name="manuallabel" from="basetextarea">
-            <area>30,505,300,25</area>
+            <area>30,575,300,25</area>
             <value>Search terms:</value>
         </textarea>
 
         <textedit name="manualsearch" from="basetextedit">
-            <position>30,535</position>
+            <position>30,605</position>
         </textedit>
 
         <button name="search" from="basebutton">
-            <position>440,538</position>
+            <position>480,605</position>
             <value>Search</value>
         </button>
 
         <button name="skip" from="basebutton">
-            <position>620,538</position>
+            <position>1024,605</position>
             <value>Skip</value>
         </button>
 
@@ -80,14 +87,14 @@
         </textarea>
 
         <buttonlist name="channels" focusorder="0">
-            <area>64,97,600,610</area>
+            <area>39,97,600,588</area>
             <layout>vertical</layout>
             <spacing>0</spacing>
-            <buttonarea>0,0,580,610</buttonarea>
+            <buttonarea>25,0,600,588</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,580,84</area>
+                <area>0,0,595,84</area>
                 <state name="active">
-                    <area>0,0,580,84</area>
+                    <area>0,0,595,84</area>
                     <statetype name="status">
                         <position>4,4</position>
                         <state name="disabled">
@@ -199,15 +206,19 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>240,270</position>
-                <showempty>yes</showempty>
+                <position>0,5</position>
                 <state type="full">
+                    <imagetype name="up">
+                        <filename>shared/list_up_arrow.png</filename>
+                    </imagetype>
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>456,270</position>
-                <showempty>yes</showempty>
+                <position>0,564</position>
                 <state type="full">
+                    <imagetype name="down">
+                        <filename>shared/list_down_arrow.png</filename>
+                    </imagetype>
                 </state>
             </statetype>
         </buttonlist>

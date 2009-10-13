@@ -1148,8 +1148,11 @@ subtitle_t *sub_read_file (demux_sputext_t *demuxstr) {
 
     sub = func[demuxstr->format] (demuxstr, &first[demuxstr->num]);
 
-    if (!sub) 
+    if (!sub) {
       break;   /* EOF */
+    } else { 
+      demuxstr->emptyReads = 0;
+    }
 
     if (sub==ERR) 
       ++demuxstr->errs; 

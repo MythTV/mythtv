@@ -207,7 +207,11 @@ bool get_glx_version(MythXDisplay *disp, uint &major, uint &minor)
 
     /** HACK until nvidia fixes glx 1.3 support in the latest drivers */
     if (gl_minor > 2)
+    {
+        VERBOSE(VB_PLAYBACK, QString("Forcing GLX version to %1.2 (orig %1.%2)")
+                .arg(gl_major).arg(gl_minor));
         gl_minor = 2;
+    }
 
     static_major = major = gl_major;
     static_minor = minor = gl_minor;

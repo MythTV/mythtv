@@ -11,6 +11,7 @@
 #include <pthread.h>
 
 #include "mythexp.h"
+#include "mythtimer.h"
 
 class TVRec;
 class RingBuffer;
@@ -289,7 +290,7 @@ class MPUBLIC RecorderBase
     mutable QMutex positionMapLock;
     PosMap         positionMap;
     PosMap         positionMapDelta;
-
+    MythTimer      positionMapTimer;
 };
 
 #endif

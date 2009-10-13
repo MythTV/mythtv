@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="LIBRARY">
 
     <button>
@@ -5,9 +6,7 @@
         <text>Watch Recordings</text>
         <text lang="IT">Guarda Registrazioni</text>
         <text lang="ES">Ver Grabaciones</text>
-        <text lang="CS">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
-        <text lang="FR">Regarder les enregistrements</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
         <text lang="IS">Horfa á upptökur</text>
@@ -18,16 +17,16 @@
         <text lang="ZH_TW">觀看預錄節目</text>
         <text lang="SL">Gledanje snemanj</text>
         <text lang="ET">Salvestiste vaatamine</text>
-        <text lang="NB">Se på opptak</text>
-        <text lang="CS">Sledování nahrávek</text>
         <text lang="RU">Смотреть записи</text>
         <text lang="PL">Oglądanie nagrań</text>
         <text lang="HE">צפיה בהקלטות</text>
+        <text lang="HU">Felvételek lejátszása</text>
         <alttext lang="SV">Inspelningar</alttext>
         <alttext lang="ET">Salvestised</alttext>
         <alttext lang="RU">Записи</alttext>
         <alttext lang="PL">Nagrania</alttext>
         <description>Play recordings</description>
+        <description lang="DE"></description>
         <action>TV_WATCH_RECORDING</action>
     </button>
 
@@ -36,29 +35,27 @@
         <text>Watch Videos</text>
         <text lang="IT">Guarda Video</text>
         <text lang="ES">Ver Videos</text>
-        <text lang="CS">Veure vídeos</text>
         <text lang="DE">Videos ansehen</text>
         <text lang="DA">Gennemse film</text>
         <text lang="IS">Horfa á myndir</text>
         <text lang="PT">Ver Filmes</text>
         <text lang="SV">Visa filmer</text>
-        <text lang="FR">Regarder les vidéos</text>
         <text lang="NL">Films Bekijken</text>
         <text lang="JA">ビデオブラウズ</text>
         <text lang="FI">Katso Videoita</text>
         <text lang="ZH_TW">播放電影</text>
         <text lang="SL">Gledanje filmov</text>
         <text lang="ET">Video vaatamine</text>
-        <text lang="NB">Se på videoer</text>
-        <text lang="CS">Sledovat filmy</text>
         <text lang="RU">Смотреть фильмы</text>
         <text lang="PL">Oglądanie filmów</text>
         <text lang="HE">צפיה בוידאו</text>
+        <text lang="HU">Video lejátszása</text>
         <alttext lang="SV">Filmer</alttext>
         <alttext lang="ET">Video</alttext>
         <alttext lang="RU">Фильмы</alttext>
         <alttext lang="PL">Filmy</alttext>
         <description>Play videos</description>
+        <description lang="DE"></description>
         <action>JUMP MythVideo</action>
         <depends>mythvideo</depends>
     </button>
@@ -68,25 +65,23 @@
         <text>Listen to Music</text>
         <text lang="IT">Esegui Brani Musicali</text>
         <text lang="ES">Escuchar Música</text>
-        <text lang="CS">Escoltar Música</text>
         <text lang="DE">Musik hören</text>
         <text lang="DA">Afspil musik</text>
         <text lang="IS">Spila tónlist</text>
         <text lang="NL">Muziek Afspelen</text>
         <text lang="PT">Tocar Músicas</text>
         <text lang="SV">Spela musik</text>
-        <text lang="FR">Écouter de la musique</text>
         <text lang="JA">ミュージック再生</text>
         <text lang="FI">Kuuntele Musiikkia</text>
         <text lang="ZH_TW">播放音樂</text>
         <text lang="SL">Predvajanje glasbe</text>
         <text lang="ET">Kuula muusikat</text>
-        <text lang="NB">Hør på musikk</text>
-        <text lang="CS">Poslouchat muziku</text>
         <text lang="RU">Слушать музыку</text>
         <text lang="PL">Odtwarzaj muzykę</text>
         <text lang="HE">האזנה למוסיקה</text>
+        <text lang="HU">Zene lejátszás</text>
         <description></description>
+        <description lang="DE"></description>
         <action>JUMP Play music</action>
         <depends>mythmusic</depends>
     </button>
@@ -99,24 +94,23 @@
         <text lang="NL">Radio Luisteren</text>
         <text lang="JA">ラジオ放送</text>
         <text lang="DE">Radio hören</text>
-        <text lang="FR">Écouter la radio</text>
         <text lang="FI">Kuuntele Radiota</text>
         <text lang="IS">Hlusta á útvarp</text>
         <text lang="SL">Poslušanje radia</text>
         <text lang="ET">Kuula raadiot</text>
-        <text lang="NB">Hør på radio</text>
         <text lang="DA">Hør radio</text>
         <text lang="ES">Escuchar Radio</text>
         <text lang="PT">Ouvir Rádio</text>
-        <text lang="CS">Poslouchat rádio</text>
         <text lang="RU">Слушать радио</text>
         <text lang="PL">Słuchaj radia</text>
         <text lang="HE">האזנה לרדיו</text>
+        <text lang="HU">Rádióhallgatás</text>
         <alttext lang="SV">Radio</alttext>
         <alttext lang="PT">Rádio</alttext>
         <alttext lang="ET">Raadio</alttext>
         <alttext lang="RU">Радио</alttext>
         <description></description>
+        <description lang="DE"></description>
         <action>PLUGIN mythFM</action>
         <depends>mythFM mythfm</depends>
     </button>
@@ -124,9 +118,11 @@
     <button>
         <type>STREAM</type>
         <text>Play Online Streams</text>
-        <text lang="FR">Lire des flux en ligne</text>
+        <text lang="DE">Internetstreams</text>
         <text lang="HE">נגן מדיה מכוונת</text>
+        <text lang="HU">Online folyam lejátszása</text>
         <description></description>
+        <description lang="DE"></description>
         <action>PLUGIN mythstream</action>
         <depends>mythstream</depends>
     </button>
@@ -136,9 +132,7 @@
         <text>Image Gallery</text>
         <text lang="IT">Immagini</text>
         <text lang="ES">Fotos</text>
-        <text lang="CS">Imatges</text>
         <text lang="NL">Foto's</text>
-        <text lang="FR">Galerie d&apos;images</text>
         <text lang="DE">Bilder ansehen</text>
         <text lang="DA">Billeder</text>
         <text lang="IS">Ljósmyndir</text>
@@ -149,12 +143,12 @@
         <text lang="ZH_TW">照相館</text>
         <text lang="SL">Gledanje slik</text>
         <text lang="ET">Pildialbum</text>
-        <text lang="NB">Bildegalleri</text>
-        <text lang="CS">Galerie fotek</text>
         <text lang="RU">Изображения</text>
         <text lang="PL">Galeria zdjęć</text>
         <text lang="HE">גלרית תמונות</text>
+        <text lang="HU">Kép galéria</text>
         <description>Look at Pictures</description>
+        <description lang="DE"></description>
         <action>PLUGIN mythgallery</action>
         <depends>mythgallery</depends>
     </button>
@@ -164,9 +158,7 @@
         <text>Play Games</text>
         <text lang="IT">Giochi</text>
         <text lang="ES">Juegos</text>
-        <text lang="CS">Jocs</text>
         <text lang="NL">Spelen</text>
-        <text lang="FR">Jouer</text>
         <text lang="DE">Spielen</text>
         <text lang="DA">Spil</text>
         <text lang="IS">Spila leiki</text>
@@ -177,12 +169,12 @@
         <text lang="ZH_TW">遊戲</text>
         <text lang="SL">Igranje iger</text>
         <text lang="ET">Mängud</text>
-        <text lang="NB">Spill</text>
-        <text lang="CS">Hrát hry</text>
         <text lang="RU">Играть в игры</text>
         <text lang="PL">Graj w gry</text>
         <text lang="HE">לשחק משחקים</text>
+        <text lang="HU">Játékok</text>
         <description>Play video games</description>
+        <description lang="DE">Videospiele spielen</description>
         <action>PLUGIN mythgame</action>
         <depends>mythgame</depends>
     </button>

@@ -1,7 +1,9 @@
+
+#include "mythuiclock.h"
+
 #include <QApplication>
 #include <QDomDocument>
 
-#include "mythuiclock.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
@@ -48,21 +50,15 @@ void MythUIClock::Pulse(void)
         {
             if (m_Flash)
             {
-                newMsg.replace(":", " ");
-                newMsg.replace(".", " ");
+                newMsg.replace(':', " ");
+                newMsg.replace('.', " ");
                 m_Flash = false;
             }
             else
                 m_Flash = true;
         }
 
-        m_CutMessage.clear();
-
-        if (m_Message != newMsg)
-        {
-            m_Message = newMsg;
-            SetRedraw();
-        }
+        SetText(newMsg);
 
         m_nextUpdate = m_Time.addSecs(1);
     }
@@ -72,7 +68,8 @@ void MythUIClock::Pulse(void)
 
 bool MythUIClock::ParseElement(QDomElement &element)
 {
-    if (element.tagName() == "format")
+    if (element.tagName() == "format" ||
+        element.tagName() == "template")
     {
         QString format = getFirstText(element);
         format.replace("%TIME%", m_TimeFormat, Qt::CaseInsensitive);
@@ -82,11 +79,7 @@ bool MythUIClock::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "secondflash")
     {
-        QString flash = getFirstText(element);
-        if (flash == "yes")
-        {
-            m_SecsFlash = true;
-        }
+        m_SecsFlash = parseBool(element);
     }
     else
         return MythUIText::ParseElement(element);

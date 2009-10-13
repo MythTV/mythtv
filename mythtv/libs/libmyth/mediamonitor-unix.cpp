@@ -75,7 +75,7 @@ static void fstabError(const QString &methodName)
 
 static void statError(const QString &methodName, const QString devPath)
 {
-    VERBOSE(VB_MEDIA, LOC + methodName + " Error: failed to stat "
+    VERBOSE(VB_IMPORTANT, LOC + methodName + " Error: failed to stat "
                           + devPath + ", " + ENO);
 }
 
@@ -480,9 +480,12 @@ bool MediaMonitorUnix::AddDevice(struct fstab * mep)
     }
     else
     {
-        char *dev;
+        char *dev = 0;
         int len = 0;
         dev = strstr(mep->fs_mntops, SUPER_OPT_DEV);
+        if (dev == NULL)
+            return false;
+
         dev += sizeof(SUPER_OPT_DEV)-1;
         while (dev[len] != ',' && dev[len] != ' ' && dev[len] != 0)
             len++;

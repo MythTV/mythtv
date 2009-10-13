@@ -1,14 +1,18 @@
+
+// Own header
+#include "mythuishape.h"
+
 // qt
 #include <QDomDocument>
 #include <QPainter>
+#include <QBrush>
+#include <QSize>
 
 // myth
 #include "mythverbose.h"
 #include "mythpainter.h"
 #include "mythimage.h"
 #include "mythmainwindow.h"
-
-#include "mythuishape.h"
 
 MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
           : MythUIType(parent, name)
@@ -95,6 +99,7 @@ void MythUIShape::DrawRect(const QRect &area,
     painter.end();
 
     m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image->UpRef();
     m_image->Assign(image);
 }
 
@@ -136,6 +141,7 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
     painter.end();
 
     m_image = GetMythMainWindow()->GetCurrentPainter()->GetFormatImage();
+    m_image->UpRef();
     m_image->Assign(image);
 }
 
@@ -203,6 +209,9 @@ void MythUIShape::CopyFrom(MythUIType *base)
     }
 
     m_image = shape->m_image;
+    if (m_image)
+        m_image->UpRef();
+
     m_type = shape->m_type;
     m_fillColor = shape->m_fillColor;
     m_lineColor = shape->m_lineColor;

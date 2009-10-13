@@ -545,37 +545,29 @@ void ChannelEditor::channelIconImport(void)
         channelname = query.value(0).toString();
     }
 
-    QStringList buttons;
-    buttons.append(tr("Cancel"));
-    buttons.append(tr("Download all icons.."));
-    buttons.append(tr("Rescan for missing icons.."));
-    if (!channelname.isEmpty())
-        buttons.append(tr("Download icon for ") + channelname);
+    QString label = tr("Icon Import Options");
 
-    int val = MythPopupBox::ShowButtonPopup(gContext->GetMainWindow(),
-                                             "", "Channel Icon Import", buttons, kDialogCodeButton2);
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    MythDialogBox *menu = new MythDialogBox(label, popupStack, "iconoptmenu");
 
-    ImportIconsWizard *iconwizard;
-    if (val == kDialogCodeButton0) // Cancel pressed
-        return;
-    else if (val == kDialogCodeButton1) // Import all icons pressed
-        iconwizard = new ImportIconsWizard(mainStack, false);
-    else if (val == kDialogCodeButton2) // Rescan for missing pressed
-        iconwizard = new ImportIconsWizard(mainStack, true);
-    else if (val == kDialogCodeButton3) // Import a single channel icon
-        iconwizard = new ImportIconsWizard(mainStack, true, channelname);
-    else
-        return;
-
-    if (iconwizard->Create())
+    if (menu->Create())
     {
-        connect(iconwizard, SIGNAL(Exiting()), SLOT(fillList()));
-        mainStack->AddScreen(iconwizard);
+        menu->SetReturnEvent(this, "iconimportopt");
+
+        menu->AddButton(tr("Download all icons.."));
+        menu->AddButton(tr("Rescan for missing icons.."));
+        if (!channelname.isEmpty())
+            menu->AddButton(tr("Download icon for %1").arg(channelname),
+                            channelname);
+
+        popupStack->AddScreen(menu);
     }
     else
-        delete iconwizard;
+    {
+        delete menu;
+        return;
+    }
 }
 
 void ChannelEditor::customEvent(QEvent *event)
@@ -659,5 +651,37 @@ void ChannelEditor::customEvent(QEvent *event)
             
             fillList();
         }
-    }
+        else if (resultid == "iconimportopt")
+        {
+            MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+            ImportIconsWizard *iconwizard;
+
+            QString channelname = dce->GetData().toString();
+            
+            switch (buttonnum)
+            {
+                case 0 : // Import all icons
+                    iconwizard = new ImportIconsWizard(mainStack, false);
+                    break;
+                case 1 : // Rescan for missing
+                    iconwizard = new ImportIconsWizard(mainStack, true);
+                    break;
+                case 2 : // Import a single channel icon
+                    iconwizard = new ImportIconsWizard(mainStack, true,
+                                                       channelname);
+                    break;
+                default:
+                    return;
+            }
+
+            if (iconwizard->Create())
+            {
+                connect(iconwizard, SIGNAL(Exiting()), SLOT(fillList()));
+                mainStack->AddScreen(iconwizard);
+            }
+            else
+                delete iconwizard;
+        }
+    }   
 }

@@ -67,7 +67,7 @@ to display the screen, these are not provided by scripts, they are things like
 pause text or the current date and time.  A + prepending the item name signifies
 an item that is required to show the screen, these are provided by scripts.  The
 text of the name within the weather-ui.xml file (with prepending flag removed)
-must match exactly the string returned by the -T flag; as well as the token
+must match exactly the string returned by the '-t' flag; as well as the token
 returned when retrieving data.
 
 If you want to see the code that controls the scripts within the plugin, look at

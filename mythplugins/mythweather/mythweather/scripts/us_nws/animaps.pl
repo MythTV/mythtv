@@ -8,12 +8,12 @@ use Data::Dumper;
 our ($opt_v, $opt_t, $opt_T, $opt_l, $opt_u, $opt_d); 
 
 my $name = 'Animated-Map-Download';
-my $version = 0.1;
+my $version = 0.2;
 my $author = 'Lucien Dunning';
 my $email = 'ldunning@gmail.com';
 my $updateTimeout = 10*60;
 my $retrieveTimeout = 30;
-my @types = ('amdesc', 'updatetime', 'animatedimage');
+my @types = ('amdesc', 'updatetime', 'animatedimage', 'copyright');
 my $dir = "./";
 
 getopts('Tvtlu:d:');
@@ -75,3 +75,4 @@ if (!$size) {
 print "amdesc::$desc\n";
 printf "animatedimage::${path}%%1-$i%s\n", ($size && "-$size" || '');
 print "updatetime::Last Updated on " . UnixDate("now", "%b %d, %I:%M %p %Z") . "\n";
+print "copyright::The Weather Channel Interactive, Inc.\n";

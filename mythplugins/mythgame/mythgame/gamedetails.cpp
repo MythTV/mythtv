@@ -66,7 +66,7 @@ bool GameDetailsPopup::Create(void)
     if (m_playButton || m_doneButton)
         SetFocusWidget(m_playButton ? m_playButton : m_doneButton);
 
-    handleText("gamename", m_romInfo->Gamename());
+    handleText("title", m_romInfo->Gamename());
     handleText("gametype", m_romInfo->GameType());
     handleText("romname", m_romInfo->Romname());
     handleText("crc", m_romInfo->CRC_VALUE());
@@ -75,11 +75,11 @@ bool GameDetailsPopup::Create(void)
     handleText("year", m_romInfo->Year());
     handleText("country", m_romInfo->Country());
     handleText("publisher", m_romInfo->Publisher());
-    handleText("plot", m_romInfo->Plot());
+    handleText("description", m_romInfo->Plot());
     handleText("allsystems", m_romInfo->AllSystems());
     handleImage("fanart", m_romInfo->Fanart());
-    handleImage("boxart", m_romInfo->Boxart());
-    handleImage("gameimage", m_romInfo->Screenshot());
+    handleImage("coverart", m_romInfo->Boxart());
+    handleImage("screenshot", m_romInfo->Screenshot());
 
     return true;
 }

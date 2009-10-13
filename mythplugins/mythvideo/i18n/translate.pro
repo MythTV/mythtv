@@ -1,22 +1,11 @@
-SOURCES += ../mythvideo/fileassoc.cpp
-SOURCES += ../mythvideo/editmetadata.cpp
-SOURCES += ../mythvideo/fileassoc.cpp
-SOURCES += ../mythvideo/globalsettings.cpp
-SOURCES += ../mythvideo/main.cpp
-SOURCES += ../mythvideo/metadata.cpp
-SOURCES += ../mythvideo/videodlg.cpp
-SOURCES += ../mythvideo/videofilter.cpp
-SOURCES += ../mythvideo/globals.cpp
-SOURCES += ../mythvideo/videolist.cpp
-SOURCES += ../mythvideo/videoscan.cpp
-SOURCES += ../mythvideo/videoutils.cpp
-SOURCES += ./themestrings.h
+SOURCES += ../mythvideo/*.cpp
+SOURCES += ../mythvideo/*.h
 
 # old MythDVD
-SOURCES += ../mythvideo/dvdripbox.cpp
-SOURCES += ../mythvideo/titledialog.cpp
-SOURCES += ../mtd/dvdprobe.cpp
-SOURCES += ../mtd/jobthread.cpp
+SOURCES += ../mtd/*.cpp
+SOURCES += ../mtd/*.h
+
+SOURCES += ./themestrings.h
 
 # Be sure to run 'lrelease -nocompress translate.pro'
 
@@ -26,3 +15,4 @@ TRANSLATIONS += mythvideo_pt.ts mythvideo_sv.ts mythvideo_ja.ts
 TRANSLATIONS += mythvideo_fr.ts mythvideo_sl.ts mythvideo_nb.ts
 TRANSLATIONS += mythvideo_fi.ts mythvideo_et.ts mythvideo_ru.ts
 TRANSLATIONS += mythvideo_cs.ts
+TRANSLATIONS += mythvideo_hu.ts

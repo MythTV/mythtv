@@ -14,7 +14,7 @@ import shlex
 import socket
 import code
 import re
-from datetime import datetime
+from datetime import datetime, tzinfo, timedelta
 from time import mktime
 
 from MythDB import *
@@ -46,29 +46,50 @@ RECSTATUS = {
 		}
 
 BACKEND_SEP = '[]:[]'
-PROTO_VERSION = 48
+PROTO_VERSION = 50
 PROGRAM_FIELDS = 47
 
-class MythTV:
+class MythTV(object):
 	"""
 	A connection to a MythTV backend.
 	"""
-	def __init__(self, conn_type='Monitor'):
-		self.db = MythDB(sys.argv[1:])
-		self.master_host = self.db.getSetting('MasterServerIP')
-		self.master_port = int(self.db.getSetting('MasterServerPort'))
 
-		if not self.master_host:
+	locked_tuners = []
+
+	def __init__(self, backend='', conn_type='Monitor'):
+		self.db = MythDB(sys.argv[1:])
+
+		if len(backend) == 0:  # use master backend
+			self.host = self.db.getSetting('MasterServerIP')
+			self.port = self.db.getSetting('MasterServerPort')
+		elif re.match('(?:\d{1,3}\.){3}\d{1,3}',backend): # given an ip address
+			self.host = backend
+			c = self.db.cursor()
+			c.execute("""SELECT hostname FROM settings WHERE
+					value='BackendServerIP' AND
+					data=%s""", self.host)
+			backend = c.fetchone()[0]
+			self.port = self.db.getSetting('BackendServerPort',backend)
+			c.close()
+		else: # assume given a hostname
+			self.host = self.db.getSetting('BackendServerIP',backend)
+			if not self.host: # try a truncated hostname
+				backend = backend.split('.')[0]
+				self.host = self.db.getSetting('BackendServerIP',backend)
+			self.port = self.db.getSetting('BackendServerPort',backend)
+			
+		if not self.host:
 			log.Msg(CRITICAL, 'Unable to find MasterServerIP in database')
 			sys.exit(1)
-		if not self.master_port:
+		if not self.port:
 			log.Msg(CRITICAL, 'Unable to find MasterServerPort in database')
 			sys.exit(1)
+		self.port = int(self.port)
 
 		try:
 			self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socket.settimeout(10)
-			self.socket.connect((self.master_host, self.master_port))
+			self.socket.connect((self.host, self.port))
 			res = self.backendCommand('MYTH_PROTO_VERSION %s' % PROTO_VERSION).split(BACKEND_SEP)
 			if res[0] == 'REJECT':
 				log.Msg(CRITICAL, 'Backend has version %s and we speak version %s', res[1], PROTO_VERSION)
@@ -77,15 +98,19 @@ class MythTV:
 			if res != 'OK':
 				log.Msg(CRITICAL, 'Unexpected answer to ANN command: %s', res)
 			else:
-				log.Msg(INFO, 'Successfully connected mythbackend at %s:%d', self.master_host, self.master_port)
+				log.Msg(INFO, 'Successfully connected mythbackend at %s:%d', self.host, self.port)
 		except socket.error, e:
-			log.Msg(CRITICAL, 'Couldn\'t connect to %s:%d (is the backend running)', self.master_host, self.master_port)
+			log.Msg(CRITICAL, 'Couldn\'t connect to %s:%d (is the backend running)', self.host, self.port)
 			sys.exit(1)
 
 	def __del__(self):
+		self.freeTuner()
 		self.backendCommand('DONE')
 		self.socket.shutdown(1)
 		self.socket.close()
+
+	def close(self):
+		self.__del__()
 
 	def backendCommand(self, data):
 		"""
@@ -172,7 +197,7 @@ class MythTV:
 		Returns a list of recorders, or an empty list if none.
 		"""
 		recorders = []
-		pc = self.db.cursor()
+		c = self.db.cursor()
 		c.execute('SELECT cardid FROM capturecard')
 		row = c.fetchone()
 		while row is not None:
@@ -203,18 +228,69 @@ class MythTV:
 		else:
 			return None
 
+	def lockTuner(self,id=None):
+		"""
+		Request a tuner be locked from use, optionally specifying which tuner
+		Returns a tuple of ID, video device node, audio device node, vbi device node
+		Returns an ID of -2 if tuner is locked, or -1 if no tuner could be found
+		"""
+		local = True
+		cmd = 'LOCK_TUNER'
+		if id is not None:
+			cmd += ' %d' % id
+			res = self.getRecorderDetails(id).hostname
+			if res != socket.gethostname():
+				local = False
+
+		res = ''
+		if local:
+			res = self.backendCommand(cmd).split(BACKEND_SEP)
+		else:
+			myth = MythTV(res)
+			res = myth.backendCommand(cmd).split(BACKEND_SEP)
+			myth.close()
+		res[0] = int(res[0])
+		if res[0] > 0:
+			self.locked_tuners.append(res[0])
+		return tuple(res)
+		
+
+	def freeTuner(self,id=None):
+		"""
+		Frees a requested tuner ID
+		If no ID given, free all tuners listed as used by this class instance
+		"""
+		def free(self,id):
+			res = self.getRecorderDetails(id).hostname
+			if res == socket.gethostname():
+				self.backendCommand('FREE_TUNER %d' % id)
+			else:
+				myth = MythTV(res)
+				myth.backendCommand('FREE_TUNER %d' % id)
+				myth.close()
+
+		if id is None:
+			for i in range(len(self.locked_tuners)):
+				free(self,self.locked_tuners.pop())
+		else:
+			try:
+				self.locked_tuners.remove(id)
+			except:
+				pass
+			free(self,id)	
+
 	def getCurrentRecording(self, recorder):
 		"""
 		Returns a Program object for the current recorders recording.
 		"""
-		res = self.backendCommand('QUERY_RECORDER %s[]:[]GET_CURRENT_RECORDING' % recorder)
+		res = self.backendCommand('QUERY_RECORDER '+BACKEND_SEP.join([recorder,'GET_CURRENT_RECORDING']))
 		return Program(res.split(BACKEND_SEP))
 
 	def isRecording(self, recorder):
 		"""
 		Returns a boolean as to whether the given recorder is recording.
 		"""
-		res = self.backendCommand('QUERY_RECORDER %s[]:[]IS_RECORDING' % recorder)
+		res = self.backendCommand('QUERY_RECORDER '+BACKEND_SEP.join([recorder,'IS_RECORDING']))
 		if res == '1':
 			return True
 		else:
@@ -224,7 +300,7 @@ class MythTV:
 		"""
 		Returns a boolean as to whether the given host is an active backend
 		"""
-		res = self.backendCommand('QUERY_IS_ACTIVE_BACKEND[]:[]%s' % hostname)
+		res = self.backendCommand(BACKEND_SEP.join(['QUERY_IS_ACTIVE_BACKEND',hostname]))
 		if res == 'TRUE':
 			return True
 		else:
@@ -245,9 +321,21 @@ class MythTV:
 		Returns a list of all Program objects which have already recorded
 		"""
 		programs = []
-		res = self.backendCommand('QUERY_RECORDINGS Play').split('[]:[]')
+		res = self.backendCommand('QUERY_RECORDINGS Play').split(BACKEND_SEP)
 		num_progs = int(res.pop(0))
 		log.Msg(DEBUG, '%s total recordings', num_progs)
+		for i in range(num_progs):
+			programs.append(Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS)
+				+ PROGRAM_FIELDS]))
+		return tuple(programs)
+
+	def getExpiring(self):
+		"""
+		Returns a tuple of all Program objects nearing expiration
+		"""
+		programs = []
+		res = self.backendCommand('QUERY_GETEXPIRING').split(BACKEND_SEP)
+		num_progs = int(res.pop(0))
 		for i in range(num_progs):
 			programs.append(Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS)
 				+ PROGRAM_FIELDS]))
@@ -257,7 +345,7 @@ class MythTV:
 		"""
 		Returns location of recording in file system
 		"""
-		res = self.backendCommand('QUERY_CHECKFILE[]:[]1[]:[]%s' % program.toString()).split(BACKEND_SEP)
+		res = self.backendCommand(BACKEND_SEP.join(['QUERY_CHECKFILE','1',program.toString()])).split(BACKEND_SEP)
 		if res[0] == 0:
 			return None
 		else:
@@ -271,20 +359,20 @@ class MythTV:
 		command = 'DELETE_RECORDING'
 		if force:
 			command = 'FORCE_DELETE_RECORDING'
-		return self.backendCommand('%s%s%s' % (command,BACKEND_SEP,program.toString()))
+		return self.backendCommand(BACKEND_SEP.join([command,program.toString()]))
 
 	def forgetRecording(self,program):
 		"""
 		Forgets old recording and allows it to be re-recorded
 		"""
-		self.backendCommand('FORGET_RECORDING%s%s' % (BACKEND_SEP,program.toString()))
+		self.backendCommand(BACKEND_SEP.join(['FORGET_RECORDING',program.toString()]))
 
 	def deleteFile(self,file,sgroup):
 		"""
 		Deletes a file from specified storage group on the connected backend
 		Takes a relative file path from the root of the storage group, and returns 1 on success
 		"""
-		return self.backendCommand('DELETE_FILE%s%s%s%s' % (BACKEND_SEP,file,BACKEND_SEP,sgroup))
+		return self.backendCommand(BACKEND_SEP.join(['DELETE_FILE',file,sgroup]))
 
 	def getFreeSpace(self,all=False):
 		"""
@@ -329,11 +417,17 @@ class MythTV:
 		res = self.backendCommand('QUERY_LOAD').split(BACKEND_SEP)
 		return (float(res[0]),float(res[1]),float(res[2]))
 
+	def getUptime(self):
+		"""
+		Returns machine uptime in seconds
+		"""
+		return self.backendCommand('QUERY_UPTIME')
+
 	def getSGList(self,host,sg,path):
 		"""
 		Returns a tuple of directories and files
 		"""
-		res = self.backendCommand('QUERY_SG_GETFILELIST%s%s%s%s%s%s' % (BACKEND_SEP,host,BACKEND_SEP,sg,BACKEND_SEP,path)).split(BACKEND_SEP)
+		res = self.backendCommand(BACKEND_SEP.join(['QUERY_SG_GETFILELIST',host,sg,path])).split(BACKEND_SEP)
 		if res[0] == 'EMPTY LIST':
 			return -1
 		if res[0] == 'SLAVE UNREACHABLE: ':
@@ -352,7 +446,7 @@ class MythTV:
 		"""
 		Returns a tuple of last modification time and file size
 		"""
-		res = self.backendCommand('QUERY_SG_FILEQUERY%s%s%s%s%s%s' % (BACKEND_SEP,host,BACKEND_SEP,sg,BACKEND_SEP,path)).split(BACKEND_SEP)
+		res = self.backendCommand(BACKEND_SEP.join(['QUERY_SG_FILEQUERY',host,sg,path])).split(BACKEND_SEP)
 		if res[0] == 'EMPTY LIST':
 			return -1
 		if res[0] == 'SLAVE UNREACHABLE: ':
@@ -382,6 +476,31 @@ class MythTV:
 		port = self.db.getSetting("NetworkControlPort",host)
 		return Frontend(host,port)
 
+	def getLastGuideData(self):
+		"""
+		Returns the last dat for which guide data is available
+		On error, 0000-00-00 00:00 is returned
+		"""
+		return self.backendCommand('QUERY_GUIDEDATATHROUGH')
+
+	def getTimeZone(self):
+		"""
+		Returns a tuple containing Zone ID, UTC offset, and ISO format date
+		"""
+		return tuple(self.backendCommand('QUERY_TIME_ZONE').split(BACKEND_SEP))
+
+	def getTime(self):
+		"""
+		Returns an "aware" datetime object of the backend's current time
+		"""
+		class tz(tzinfo):
+			def __init__(self,offs): self.offset = int(offs)
+			def tzname(self): return "GMT%d" % (self.offset/3600)
+			def dst(self,dt): return timedelta(0)
+			def utcoffset(self,dt): return timedelta(seconds=self.offset)
+		tup = self.getTimeZone()
+		return datetime.strptime(tup[2],"%Y-%m-%dT%H:%M:%S").replace(tzinfo=tz(tup[1]))
+
 	def joinInt(self,high,low):
 		"""
 		Returns a single long from a pair of signed integers
@@ -394,7 +513,7 @@ class MythTV:
 		"""
 		return integer/(2**32),integer%2**32 - (integer%2**32 > 2**31)*2**32
 
-class FileTransfer:
+class FileTransfer(object):
 	"""
 	A connection to mythbackend intended for file transfers
 	"""
@@ -458,7 +577,7 @@ class FileTransfer:
 			if res[0] == 'REJECT':
 				log.Msg(CRITICAL, 'Backend has version %s and we speak version %s', res[1], PROTO_VERSION)
 				sys.exit(1)
-			res = self.send('ANN FileTransfer %s %d %d %d%s%s%s%s' % (socket.gethostname(), write, False, -1, BACKEND_SEP, self.filename, BACKEND_SEP, self.sgroup))
+			res = self.send('ANN FileTransfer %s %d %d %s' % (socket.gethostbyname(),write, False, BACKEND_SEP.join(['-1',self.filename,self.sgroup])))
 			if res.split(BACKEND_SEP)[0] != 'OK':
 				log.Msg(CRITICAL, 'Unexpected answer to ANN command: %s', res)
 			else:
@@ -474,7 +593,7 @@ class FileTransfer:
 
 	def __del__(self):
 		if self.sockno:
-			self.comsock.backendCommand('QUERY_FILETRANSFER %d%sDONE' % (self.sockno, BACKEND_SEP))
+			self.comsock.backendCommand('QUERY_FILETRANSFER '+BACKEND_SEP.join([str(self.sockno), 'JOIN']))
 		if self.datsock:
 			self.datsock.shutdown(1)
 			self.datsock.close()
@@ -533,7 +652,7 @@ class FileTransfer:
 			csize = self.tsize
 			rsize = size - csize
 			
-		res = self.comsock.backendCommand('QUERY_FILETRANSFER %d%sREQUEST_BLOCK%s%d' % (self.sockno,BACKEND_SEP,BACKEND_SEP,csize))
+		res = self.comsock.backendCommand('QUERY_FILETRANSFER '+BACKEND_SEP.join([str(self.sockno),'REQUEST_BLOCK',str(csize)]))
 		self.pos += int(res)
 #		if int(res) == csize:
 #			if csize < size:
@@ -561,7 +680,7 @@ class FileTransfer:
 			buff = data[size:]
 			data = data[:size]
 		self.pos += int(self.datsock.send(data))
-		self.comsock.backendCommand('QUERY_FILETRANSFER %d%sWRITE_BLOCK%s%d' % (self.sockno,BACKEND_SEP,BACKEND_SEP,size))
+		self.comsock.backendCommand('QUERY_FILETRANSFER '+BACKEND_SEP.join([str(self.sockno),'WRITE_BLOCK',str(size)]))
 		self.write(buff)
 		return
 			
@@ -593,11 +712,11 @@ class FileTransfer:
 		curhigh,curlow = self.comsock.splitInt(self.pos)
 		offhigh,offlow = self.comsock.splitInt(offset)
 
-		res = self.comsock.backendCommand('QUERY_FILETRANSFER %d%sSEEK%s%d%s%d%s%d%s%d%s%d' % (self.sockno, BACKEND_SEP,BACKEND_SEP,offhigh,BACKEND_SEP,offlow,BACKEND_SEP,whence,BACKEND_SEP,curhigh,BACKEND_SEP,curlow)).split(BACKEND_SEP)
+		res = self.comsock.backendCommand('QUERY_FILETRANSFER '+BACKEND_SEP.join([str(self.sockno),'SEEK',str(offhigh),str(offlow),str(whence),str(curhigh),str(curlow)])).split(BACKEND_SEP)
 		self.pos = (int(res[0]) + (int(res[1])<0))*2**32 + int(res[1])
 
 
-class Frontend:
+class Frontend(object):
 	isConnected = False
 	socket = None
 	host = None
@@ -623,7 +742,7 @@ class Frontend:
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.socket.settimeout(10)
 		self.socket.connect((self.host, self.port))
-		if self.recv()[:28] != "MythFrontend Network Control":
+		if re.search("MythFrontend Network Control.*",self.recv()) is None:
 			self.socket.close()
 			self.socket = None
 			raise Exception('FrontendConnect','Connected socket does not belong to a mythfrontend')
@@ -641,15 +760,16 @@ class Frontend:
 		self.socket.send("%s\n" % command)
 
 	def recv(self,curstr=""):
-		def subrecv(self,curstr=""):
+		curstr = ''
+		prompt = re.compile('([\r\n.]*)\r\n# ')
+		while not prompt.search(curstr):
 			try:
 				curstr += self.socket.recv(100)
-			except:
-				return None
-			if curstr[-4:] != '\r\n# ':
-				curstr = subrecv(self,curstr)
-			return curstr
-		return subrecv(self)[:-4]
+			except socket.error:
+				raise MythError('Frontend has closed connection')
+			except KeyboardInterrupt:
+				raise
+		return prompt.split(curstr)[0]
 
 	def sendJump(self,jumppoint):
 		"""
@@ -666,12 +786,7 @@ class Frontend:
 		Returns a tuple containing available jumppoints
 		"""
 		self.send("help jump")
-		res = self.recv().split('\r\n')[3:-1]
-		points = []
-		for point in res:
-			spoint = point.split(' - ')
-			points.append((spoint[0].rstrip(),spoint[1]))
-		return tuple(points)
+		return tuple(re.findall('(\w+)[ ]+- ([\w /,]+)',self.recv()))
 
 	def sendKey(self,key):
 		"""
@@ -688,11 +803,7 @@ class Frontend:
 		Returns a tuple containing available special keys
 		"""
 		self.send("help key")
-		res = self.recv().split('\r\n')[4]
-		keys = []
-		for key in res.split(','):
-			keys.append(key.strip())
-		return tuple(keys)
+		return tuple(self.recv().split('\r\n')[4].split(', '))
 
 	def sendQuery(self,query):
 		"""
@@ -706,16 +817,7 @@ class Frontend:
 		Returns a tuple containing available queries
 		"""
 		self.send("help query")
-		res = self.recv().split('\r\n')[:-1]
-		queries = []
-		tmpstr = ""
-		for query in res:
-			tmpstr += query
-			squery = tmpstr.split(' - ')
-			if len(squery) == 2:
-				tmpstr = ""
-				queries.append((squery[0].rstrip().lstrip('query '),squery[1]))
-		return tuple(queries)
+		return tuple(re.findall('query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)',self.recv()))
 
 	def sendPlay(self,play):
 		"""
@@ -732,20 +834,10 @@ class Frontend:
 		Returns a tuple containing available playback commands
 		"""
 		self.send("help play")
-		res = self.recv().split('\r\n')[:-1]
-		plays = []
-		tmpstr = ""
-		for play in res:
-			tmpstr += play
-			splay = tmpstr.split(' - ')
-			if len(splay) == 2:
-				tmpstr = ""
-				plays.append((splay[0].rstrip().lstrip('play '),splay[1]))
-		return tuple(plays)
-			
+		return tuple(re.findall('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)',self.recv()))
 		
 
-class Recorder:
+class Recorder(object):
 	"""
 	Represents a MythTV capture card.
 	"""
@@ -764,7 +856,7 @@ class Recorder:
 		self.videodevice = data[2]
 		self.hostname = data[3]
 
-class Program:
+class Program(object):
 	"""
 	Represents a program with all the detail known.
 	"""
@@ -884,6 +976,34 @@ class Program:
 		string += BACKEND_SEP + self.year
 
 		return string
+
+	def setField(self,field,value):
+		if field not in ['basename','hostname','storagegroup']:
+			raise MythError('Invalid field name')
+		db = MythDB()
+		c = db.cursor()
+		c.execute("""UPDATE recorded SET %s = %%s
+				WHERE chanid=%%s and starttime=%%s""" % field,
+				(value,self.chanid,self.starttime))
+		c.close()
+
+	def setBasename(self,name):
+		"""
+		Change the file basename pointed to by the recording
+		"""
+		self.setField('basename',name)
+
+	def setHostname(self,name):
+		"""
+		Change the hostname of the machine which holds the recording
+		"""
+		self.setField('hostname',name)
+
+	def setSG(self,name):
+		"""
+		Change the storagegroup which holds the recording
+		"""
+		self.setField('storagegroup',name)
 
 if __name__ == '__main__':
 	banner = '\'m\' is a MythTV instance.'

@@ -107,7 +107,6 @@ class MythControls : public MythScreenType
 
   private:
     ViewType          m_currentView;
-    MythUIType        *m_focusedUIElement;
     MythUIButtonList    *m_leftList;
     MythUIButtonList    *m_rightList;
     MythUIText        *m_description;

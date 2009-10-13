@@ -9,9 +9,10 @@ QMAKE_COPY_DIR = sh ./cpsvndir
 win32:QMAKE_COPY_DIR = sh ./cpsimple
 
 themes.path = $${PREFIX}/share/mythtv/themes/
-themes.files = defaultosd default default-wide classic DVR
-themes.files += isthmus Terra defaultmenu mediacentermenu
+themes.files = default default-wide classic DVR
+themes.files += Terra defaultmenu mediacentermenu
 themes.files += MythCenter MythCenter-wide
+themes.files += BlackCurves-OSD isthmus Gray-OSD
 
 fonts.path = $${PREFIX}/share/mythtv
 fonts.files = FreeSans.ttf FreeSansBold.ttf FreeMono.ttf

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Using MythTV.</TITLE>
  <LINK HREF="mythtv-HOWTO-12.html" REL=next>
  <LINK HREF="mythtv-HOWTO-10.html" REL=previous>
@@ -14,22 +14,7 @@
 <HR>
 <H2><A NAME="s11">11.</A> <A HREF="mythtv-HOWTO.html#toc11">Using MythTV.</A></H2>
 
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE to Red Hat/Fedora 4 users</B>: Red Hat Linux and Fedora Core ship
-with Gnome as the default desktop environment.  However, Gnome seems to have
-issues with window focus and window switching which sometimes cause
-mythfrontend to obscure the video. KDE does not seem to have any such
-issues. Therefore you will need to switch to KDE by selecting
-RedHatMenu>Extras>System Settings>Desktop Switching Tool and choose "KDE".
-<B>NOTE to Fedora Core 5 and 6 users</B>:  Fedora 5 and 6 no longer have
-this tool in the Menu. Use "switchdesk KDE" from a command line. Read "man
-switchdesk" for further information about changing to other desktop
-environments.</CAPTION>
-</FIGURE>
-</P>
+
 <H2><A NAME="ss11.1">11.1</A> <A HREF="mythtv-HOWTO.html#toc11.1">Keyboard commands</A>
 </H2>
 
@@ -327,8 +312,8 @@ functionality.  Download the MythThemes tarball from the website and untar it:</
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf myththemes-0.21.tar.bz2
-$ cd ~/myththemes-0.21
+$ tar -xjf myththemes-0.22.tar.bz2
+$ cd ~/myththemes-0.22
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -339,14 +324,7 @@ $
 </P>
 <P>The theme will now be available in the mythfrontend Appearance section.</P>
 
-<H2><A NAME="ss11.3">11.3</A> <A HREF="mythtv-HOWTO.html#toc11.3">Adding DishTV information to the database</A>
-</H2>
-
-<P>A script for adding Pay Per View information into the MythTV database for
-DishTV subscribers is available at 
-<A HREF="http://www.mythppv.com/">http://www.mythppv.com/</A>.</P>
-
-<H2><A NAME="ss11.4">11.4</A> <A HREF="mythtv-HOWTO.html#toc11.4">Adding support for an external tuner</A>
+<H2><A NAME="ss11.3">11.3</A> <A HREF="mythtv-HOWTO.html#toc11.3">Adding support for an external tuner</A>
 </H2>
 
 <P>MythTV supports changing the channel on an external tuner.  If you have
@@ -364,7 +342,7 @@ assemble your own, rather than purchase, the following may be helpful:
 <A HREF="http://www.dtvcontrol.com/">http://www.dtvcontrol.com/</A> for
 cable pinouts.</P>
 
-<H2><A NAME="ss11.5">11.5</A> <A HREF="mythtv-HOWTO.html#toc11.5">Using Shutdown/Wakeup</A>
+<H2><A NAME="ss11.4">11.4</A> <A HREF="mythtv-HOWTO.html#toc11.4">Using Shutdown/Wakeup</A>
 </H2>
 
 <P>What does the MythTV Shutdown/Wakeup function do? The scheduler on the
@@ -403,17 +381,20 @@ parameter.
 <LI>the "pre Shutdown check-command" returns 0</LI>
 </UL>
 </P>
-<P>If we get to this idle state the Master backend will set the wakeuptime using the "Set
-wakeuptime command", which is the same for WOL and BIOS wakeup. The Master backend will
-then shut down the Slave backends and itself using the "Server halt command".</P>
-<P>One caveat is that the scheduler tries to guess if the Master backend was started by a
-wakeup call or by the user. If it thinks it was woken up by a user, it
-blocks shutdown until a client connects to the Master backend, after which it will
-behave as described above. To disable this feature, unset "Block shutdown
-before client connected" in the mythfrontend Setup->Setup->General screen.</P>
-<P>Once it is time to startup the system, the Master backend is woken up first and will
-wakeup the Slave backends using the "Wake command for slaves". At this time, there is
-no support for starting only the required Slave backend, so all Slave backends will startup.</P>
+<P>If we get to this idle state the Master backend will set the wakeuptime
+using the "Set wakeuptime command", which is the same for WOL and BIOS
+wakeup.  The Master backend will then shut down the Slave backends and
+itself using the "Server halt command".</P>
+<P>One caveat is that the scheduler tries to guess if the Master backend was
+started by a wakeup call or by the user.  If it thinks it was woken up by a
+user, it blocks shutdown until a client connects to the Master backend,
+after which it will behave as described above.  To disable this feature,
+unset "Block shutdown before client connected" in the mythfrontend
+Setup->Setup->General screen.</P>
+<P>Once it is time to startup the system, the Master backend is woken up first
+and will wakeup the Slave backends using the "Wake command for slaves".  At
+this time, there is no support for starting only the required Slave backend,
+so all Slave backends will startup.</P>
 
 <H3>Setting up the MythTV side of this extension.</H3>
 
@@ -572,7 +553,7 @@ permission to shutdown. If you cancel the shutdown, simply call
 <P>If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your
 set-wakeuptime-script should stop the program that uses <CODE>/dev/rtc</CODE> before
 setting the wakeuptime.</P>
-<H2><A NAME="ss11.6">11.6</A> <A HREF="mythtv-HOWTO.html#toc11.6">Controlling the mythfrontend via telnet</A>
+<H2><A NAME="ss11.5">11.5</A> <A HREF="mythtv-HOWTO.html#toc11.5">Controlling the mythfrontend via telnet</A>
 </H2>
 
 <P>To use this feature you must first enable it in Settings>General>General</P>

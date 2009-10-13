@@ -90,14 +90,15 @@ int  RunGames(void);
 
 void setupKeys(void)
 {
-    REG_JUMP("MythGame", "Game frontend", "", runGames);
+    REG_JUMP("MythGame", QT_TRANSLATE_NOOP("MythControls",
+        "Game frontend"), "", runGames);
 
-    REG_KEY("Game", "TOGGLEFAV",     "Toggle the current game as a favorite",
-            "?,/");
-    REG_KEY("Game", "INCSEARCH",     "Show incremental search dialog",
-            "Ctrl+S");
-    REG_KEY("Game", "INCSEARCHNEXT", "Incremental search find next match",
-            "Ctrl+N");
+    REG_KEY("Game", "TOGGLEFAV", QT_TRANSLATE_NOOP("MythControls",
+        "Toggle the current game as a favorite"), "?,/");
+    REG_KEY("Game", "INCSEARCH", QT_TRANSLATE_NOOP("MythControls",
+        "Show incremental search dialog"), "Ctrl+S");
+    REG_KEY("Game", "INCSEARCHNEXT", QT_TRANSLATE_NOOP("MythControls",
+        "Incremental search find next match"), "Ctrl+N");
 
 }
 

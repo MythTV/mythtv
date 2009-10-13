@@ -1,9 +1,13 @@
+// Qt
+#include <QSqlError>
+
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
+#include <mythcontext.h>
+#include <mythdb.h>
 
 // mythbrowser
 #include "browserdbutil.h"
+#include "bookmarkmanager.h"
 
 const QString currentDatabaseVersion = "1002";
 

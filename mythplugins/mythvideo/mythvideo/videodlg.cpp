@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QList>
 #include <QFile>
+#include <QFileInfo>
 #include <QDir>
 #include <QProcess>
 #include <QHttp>
@@ -29,6 +30,7 @@
 #include <mythtv/libmythui/mythgenerictree.h>
 #include <mythtv/libmythui/mythsystem.h>
 #include <mythtv/libmyth/remotefile.h>
+#include <mythtv/libmyth/remoteutil.h>
 
 #include "videoscan.h"
 #include "globals.h"
@@ -86,25 +88,35 @@ namespace
         return ret;
     }
 
-    class CoverDownloadProxy : public QObject
+    QString WatchedToState(bool watched)
+    {
+        QString ret;
+        if (watched)
+            ret = "yes";
+        else
+            ret = "no";
+        return ret;
+    }
+
+    class ImageDownloadProxy : public QObject
     {
         Q_OBJECT
 
       signals:
-        void SigFinished(CoverDownloadErrorState reason, QString errorMsg,
-                         Metadata *item);
+        void SigFinished(ImageDownloadErrorState reason, QString errorMsg,
+                         Metadata *item, const QString &);
       public:
-        static CoverDownloadProxy *Create(const QUrl &url, const QString &dest,
+        static ImageDownloadProxy *Create(const QUrl &url, const QString &dest,
                                           Metadata *item,
                                           const QString &db_value)
         {
-            return new CoverDownloadProxy(url, dest, item, db_value);
+            return new ImageDownloadProxy(url, dest, item, db_value);
         }
 
       public:
         void StartCopy()
         {
-            m_id = m_http.get(m_url.toString(), &m_data_buffer);
+            m_id = m_http.get(m_url.toEncoded(), &m_data_buffer);
 
             m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
                           * 1000);
@@ -115,25 +127,46 @@ namespace
             if (m_timer.isActive())
                 m_timer.stop();
 
-            VERBOSE(VB_GENERAL, tr("Cover download stopped."));
             m_http.abort();
         }
 
+      public slots:
+        void InspectHeader(const QHttpResponseHeader &header)
+        {
+            if (header.statusCode() == 302)
+            {
+                QString m_redirectUrl = header.value("Location");
+                m_redirectCount++;
+            }
+            else if (header.statusCode() == 404)
+            {
+                VERBOSE(VB_IMPORTANT, QString("404 error received when "
+                                              "retrieving '%1'")
+                                                    .arg(m_url.toString()));
+            }
+            else
+                m_redirectUrl.clear();
+        }
+
       private:
-        CoverDownloadProxy(const QUrl &url, const QString &dest,
+        ImageDownloadProxy(const QUrl &url, const QString &dest,
                            Metadata *item, const QString &db_value)
           : m_item(item), m_dest_file(dest), m_db_value(db_value),
-            m_id(0), m_url(url), m_error_state(esOK)
+            m_id(0), m_url(url), m_error_state(esOK), m_redirectCount(0)
         {
+            connect(&m_http,
+                    SIGNAL(responseHeaderReceived(const QHttpResponseHeader &)),
+                    SLOT(InspectHeader(const QHttpResponseHeader &)));
             connect(&m_http, SIGNAL(requestFinished(int, bool)),
                     SLOT(OnFinished(int, bool)));
 
             connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
+            
             m_timer.setSingleShot(true);
             m_http.setHost(m_url.host());
         }
 
-        ~CoverDownloadProxy() {}
+        ~ImageDownloadProxy() {}
 
       private slots:
         void OnDownloadTimeout()
@@ -146,6 +179,14 @@ namespace
 
         void OnFinished(int id, bool error)
         {
+            if (!m_redirectUrl.isEmpty() && m_redirectCount <= 8)
+            {
+                m_url.setUrl(m_redirectUrl);
+                m_data_buffer.reset();
+                StartCopy();
+                return;
+            }
+
             QString errorMsg;
             if (error)
                 errorMsg = m_http.errorString();
@@ -187,10 +228,12 @@ namespace
                                 off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
                                 if (written != m_data_buffer.size())
                                 {
-                                    errorMsg = tr("Error writing Coverart to file %1.")
+                                    errorMsg = tr("Error writing image to file %1.")
                                             .arg(m_dest_file);
                                     m_error_state = esError;
                                 }
+
+                                delete outFile;
                             }
                         }
                     }
@@ -232,12 +275,9 @@ namespace
                             m_error_state = esError;
                         }
                     }
-
-                    if (m_error_state != esError)
-                        m_item->SetCoverFile(m_db_value);
                 }
 
-                emit SigFinished(m_error_state, errorMsg, m_item);
+                emit SigFinished(m_error_state, errorMsg, m_item, m_db_value);
             }
         }
 
@@ -250,508 +290,9 @@ namespace
         int m_id;
         QTimer m_timer;
         QUrl m_url;
-        CoverDownloadErrorState m_error_state;
-    };
-
-    class ScreenshotDownloadProxy : public QObject
-    {
-        Q_OBJECT
-
-      signals:
-        void SigFinished(ScreenshotDownloadErrorState reason, QString errorMsg,
-                         Metadata *item);
-      public:
-        static ScreenshotDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                               Metadata *item,
-                                               const QString &db_value)
-        {
-            return new ScreenshotDownloadProxy(url, dest, item, db_value);
-        }
-
-      public:
-        void StartCopy()
-        {
-            m_id = m_http.get(m_url.toString(), &m_data_buffer);
-
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
-                          * 1000);
-        }
-
-        void Stop()
-        {
-            if (m_timer.isActive())
-                m_timer.stop();
-
-            VERBOSE(VB_GENERAL, tr("Screenshot download stopped."));
-            m_http.abort();
-        } 
-    
-      private:
-        ScreenshotDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item, const QString &db_value)
-          : m_item(item), m_dest_file(dest), m_db_value(db_value),
-            m_id(0), m_url(url), m_error_state(ssesOK)
-        {
-            connect(&m_http, SIGNAL(requestFinished(int, bool)),
-                    SLOT(OnFinished(int, bool)));
-
-            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
-            m_timer.setSingleShot(true);
-            m_http.setHost(m_url.host());
-        }
-
-        ~ScreenshotDownloadProxy() {}
-
-      private slots:
-        void OnDownloadTimeout()
-        {
-            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
-                    .arg(m_url.toString()));
-            m_error_state = ssesTimeout;
-            Stop();
-        }
-
-        void OnFinished(int id, bool error)
-        {
-            QString errorMsg;
-            if (error)
-                errorMsg = m_http.errorString();
-
-            if (id == m_id)
-            {
-                if (m_timer.isActive())
-                    m_timer.stop();
-
-                if (!error)
-                {
-                    if (m_dest_file.startsWith("myth://"))
-                    {
-                        QImage testImage;
-                        const QByteArray &testArray = m_data_buffer.data();
-                        bool didLoad = testImage.loadFromData(testArray);
-                        if (!didLoad)
-                        {
-                            errorMsg = tr("Tried to write %1, but it appears to "
-                                          "be an HTML redirect (filesize %2).")
-                                    .arg(m_dest_file).arg(m_data_buffer.size());
-                            m_error_state = ssesError;
-                        }
-                        else
-                        {
-                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                            if (!outFile->isOpen())
-                            {
-                                VERBOSE(VB_IMPORTANT,
-                                    QString("VideoDialog: Failed to open "
-                                            "remote file (%1) for write.  Does Screenshot "
-                                            "Storage Group Exist?").arg(m_dest_file));
-                                delete outFile;
-                                outFile = NULL;
-                                m_error_state = ssesError;
-                            }
-                            else
-                            {
-                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                                if (written != m_data_buffer.size())
-                                {
-                                    errorMsg = tr("Error writing Screenshot to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = ssesError;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        QFile dest_file(m_dest_file);
-                        if (dest_file.exists())
-                            dest_file.remove();
-
-                        if (dest_file.open(QIODevice::WriteOnly))
-                        {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
-                            {
-                                errorMsg = tr("Tried to write %1, but it appears to "
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
-                                dest_file.remove();
-                                m_error_state = ssesError;
-                            }
-                            else
-                            {
-                                const QByteArray &data = m_data_buffer.data();
-                                qint64 size = dest_file.write(data);
-                                if (size != data.size())
-                                {
-                                    errorMsg = tr("Error writing data to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = ssesError;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errorMsg = tr("Error: file error '%1' for file %2").
-                                    arg(dest_file.errorString()).arg(m_dest_file);
-                            m_error_state = ssesError;
-                        }
-                    }
-
-                    if (m_error_state != ssesError)
-                        m_item->SetScreenshot(m_db_value);
-                }
-
-                emit SigFinished(m_error_state, errorMsg, m_item);
-            }
-        }
-
-      private:
-        Metadata *m_item;
-        QHttp m_http;
-        QBuffer m_data_buffer;
-        QString m_dest_file;
-        QString m_db_value;
-        int m_id;
-        QTimer m_timer;
-        QUrl m_url;
-        ScreenshotDownloadErrorState m_error_state;
-    };
-
-    class FanartDownloadProxy : public QObject
-    {
-        Q_OBJECT
-
-      signals:
-        void SigFinished(FanartDownloadErrorState reason, QString errorMsg,
-                         Metadata *item);
-      public:
-        static FanartDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                          Metadata *item,
-                                          const QString db_value)
-        {
-            return new FanartDownloadProxy(url, dest, item, db_value);
-        }
-
-      public:
-        void StartCopy()
-        {
-            m_id = m_http.get(m_url.toString(), &m_data_buffer);
-
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
-                          * 1000);
-        }
-
-        void Stop()
-        {
-            if (m_timer.isActive())
-                m_timer.stop();
-
-            VERBOSE(VB_GENERAL, tr("Fanart download stopped."));
-            m_http.abort();
-        }
-
-      private:
-        FanartDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item, const QString &db_value)
-          : m_item(item), m_dest_file(dest), m_db_value(db_value),
-            m_id(0), m_url(url), m_error_state(fesOK)
-        {
-            connect(&m_http, SIGNAL(requestFinished(int, bool)),
-                    SLOT(OnFinished(int, bool)));
-
-            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
-            m_timer.setSingleShot(true);
-            m_http.setHost(m_url.host());
-        }
-
-        ~FanartDownloadProxy() {}
-
-      private slots:
-        void OnDownloadTimeout()
-        {
-            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
-                    .arg(m_url.toString()));
-            m_error_state = fesTimeout;
-            Stop();
-        }
-
-        void OnFinished(int id, bool error)
-        {
-            QString errorMsg;
-            if (error)
-                errorMsg = m_http.errorString();
-
-            if (id == m_id)
-            {
-                if (m_timer.isActive())
-                    m_timer.stop();
-
-                if (!error)
-                {
-                    if (m_dest_file.startsWith("myth://"))
-                    {
-                        QImage testImage;
-                        const QByteArray &testArray = m_data_buffer.data();
-                        bool didLoad = testImage.loadFromData(testArray);
-                        if (!didLoad)
-                        {
-                            errorMsg = tr("Tried to write %1, but it appears to "
-                                          "be an HTML redirect (filesize %2).")
-                                    .arg(m_dest_file).arg(m_data_buffer.size());
-                            m_error_state = fesError;
-                        }
-                        else
-                        {
-                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                            if (!outFile->isOpen())
-                            {
-                                VERBOSE(VB_IMPORTANT,
-                                    QString("VideoDialog: Failed to open "
-                                            "remote file (%1) for write.  Does Fanart "
-                                            "Storage Group Exist?").arg(m_dest_file));
-                                delete outFile; 
-                                outFile = NULL;
-                                m_error_state = fesError;
-                            }
-                            else
-                            {
-                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                                if (written != m_data_buffer.size())
-                                {
-                                    errorMsg = tr("Error writing Fanart to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = fesError;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        QFile dest_file(m_dest_file);
-                        if (dest_file.exists())
-                            dest_file.remove();
-
-                        if (dest_file.open(QIODevice::WriteOnly))
-                        {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
-                            {
-                                errorMsg = tr("Tried to write %1, but it appears to "
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
-                                dest_file.remove();
-                                m_error_state = fesError;
-                            }
-                            else
-                            {
-                                const QByteArray &data = m_data_buffer.data();
-                                qint64 size = dest_file.write(data);
-                                if (size != data.size())
-                                {
-                                    errorMsg = tr("Error writing data to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = fesError;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errorMsg = tr("Error: file error '%1' for file %2").
-                                    arg(dest_file.errorString()).arg(m_dest_file);
-                            m_error_state = fesError;
-                        }
-                    }
-
-                    if (m_error_state != fesError)
-                        m_item->SetFanart(m_db_value);
-                }
-
-                emit SigFinished(m_error_state, errorMsg, m_item);
-            }
-        }
-
-      private:
-        Metadata *m_item;
-        QHttp m_http;
-        QBuffer m_data_buffer;
-        QString m_dest_file;
-        QString m_db_value;
-        int m_id;
-        QTimer m_timer;
-        QUrl m_url;
-        FanartDownloadErrorState m_error_state;
-    };
-
-    class BannerDownloadProxy : public QObject
-    {
-        Q_OBJECT
-
-      signals:
-        void SigFinished(BannerDownloadErrorState reason, QString errorMsg,
-                         Metadata *item);
-      public:
-        static BannerDownloadProxy *Create(const QUrl &url, const QString &dest,
-                                           Metadata *item,
-                                           const QString &db_value)
-        {
-            return new BannerDownloadProxy(url, dest, item, db_value);
-        }
-
-      public:
-        void StartCopy()
-        {
-            m_id = m_http.get(m_url.toString(), &m_data_buffer);
-
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
-                          * 1000);
-        }
-
-        void Stop()
-        {
-            if (m_timer.isActive())
-                m_timer.stop();
-
-            VERBOSE(VB_GENERAL, tr("Banner download stopped."));
-            m_http.abort();
-        }
-
-      private:
-        BannerDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item, const QString &db_value)
-          : m_item(item), m_dest_file(dest), m_db_value(db_value),
-            m_id(0), m_url(url), m_error_state(besOK)
-        {
-            connect(&m_http, SIGNAL(requestFinished(int, bool)),
-                    SLOT(OnFinished(int, bool)));
-
-            connect(&m_timer, SIGNAL(timeout()), SLOT(OnDownloadTimeout()));
-            m_timer.setSingleShot(true);
-            m_http.setHost(m_url.host());
-        }
-
-        ~BannerDownloadProxy() {}
-
-      private slots:
-        void OnDownloadTimeout()
-        {
-            VERBOSE(VB_IMPORTANT, QString("Copying of '%1' timed out")
-                    .arg(m_url.toString()));
-            m_error_state = besTimeout;
-            Stop();
-        }
-
-        void OnFinished(int id, bool error)
-        {
-            QString errorMsg;
-            if (error)
-                errorMsg = m_http.errorString();
-
-            if (id == m_id)
-            {
-                if (m_timer.isActive())
-                    m_timer.stop();
-
-                if (!error)
-                {
-                    if (m_dest_file.startsWith("myth://"))
-                    {
-                        QImage testImage;
-                        const QByteArray &testArray = m_data_buffer.data();
-                        bool didLoad = testImage.loadFromData(testArray);
-                        if (!didLoad)
-                        {
-                            errorMsg = tr("Tried to write %1, but it appears to "
-                                          "be an HTML redirect (filesize %2).")
-                                    .arg(m_dest_file).arg(m_data_buffer.size());
-                            m_error_state = besError;
-                        }
-                        else
-                        {
-                            RemoteFile *outFile = new RemoteFile(m_dest_file, true);
-                            if (!outFile->isOpen()) 
-                            { 
-                                VERBOSE(VB_IMPORTANT, 
-                                    QString("VideoDialog: Failed to open " 
-                                            "remote file (%1) for write.  Does Banner "
-                                            "Storage Group Exist?").arg(m_dest_file)); 
-                                delete outFile; 
-                                outFile = NULL;
-                                m_error_state = besError;
-                            }
-                            else
-                            {
-                                off_t written = outFile->Write(m_data_buffer.data(), m_data_buffer.size());
-                                if (written != m_data_buffer.size())
-                                {
-                                    errorMsg = tr("Error writing Banner to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = besError;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        QFile dest_file(m_dest_file);
-                        if (dest_file.exists())
-                            dest_file.remove();
-
-                        if (dest_file.open(QIODevice::WriteOnly))
-                        {
-                            QImage testImage;
-                            const QByteArray &testArray = m_data_buffer.data();
-                            bool didLoad = testImage.loadFromData(testArray);
-                            if (!didLoad)
-                            {
-                                errorMsg = tr("Tried to write %1, but it appears to "
-                                              "be an HTML redirect (filesize %2).")
-                                        .arg(m_dest_file).arg(m_data_buffer.size());
-                                dest_file.remove();
-                                m_error_state = besError;
-                            }
-                            else
-                            {
-                                const QByteArray &data = m_data_buffer.data();
-                                qint64 size = dest_file.write(data);
-                                if (size != data.size())
-                                {
-                                    errorMsg = tr("Error writing data to file %1.")
-                                            .arg(m_dest_file);
-                                    m_error_state = besError;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            errorMsg = tr("Error: file error '%1' for file %2").
-                                    arg(dest_file.errorString()).arg(m_dest_file);
-                            m_error_state = besError;
-                        }
-                    }
-
-                    if (m_error_state != besError)
-                        m_item->SetBanner(m_db_value);
-                }
-
-                emit SigFinished(m_error_state, errorMsg, m_item);
-            }
-        }
-
-      private:
-        Metadata *m_item;
-        QHttp m_http;
-        QBuffer m_data_buffer;
-        QString m_dest_file;
-        QString m_db_value;
-        int m_id;
-        QTimer m_timer;
-        QUrl m_url;
-        BannerDownloadErrorState m_error_state;
+        ImageDownloadErrorState m_error_state;
+        QString m_redirectUrl;
+        int m_redirectCount;
     };
 
     /** \class ExecuteExternalCommand
@@ -923,7 +464,7 @@ namespace
         Q_OBJECT
 
       signals:
-        void SigSearchResults(bool normal_exit, const SearchListResults &items,
+        void SigSearchResults(bool normal_exit, const QStringList &items,
                 Metadata *item);
 
       public:
@@ -966,18 +507,7 @@ namespace
         {
             (void) err;
 
-            SearchListResults results;
-            if (normal_exit)
-            {
-                for (QStringList::const_iterator p = out.begin();
-                        p != out.end(); ++p)
-                {
-                    results.insert((*p).section(':', 0, 0),
-                            (*p).section(':', 1));
-                }
-            }
-
-            emit SigSearchResults(normal_exit, results, m_item);
+            emit SigSearchResults(normal_exit, out, m_item);
             deleteLater();
         }
 
@@ -1062,7 +592,7 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -mD"));
+                    .arg("mythvideo/scripts/ttvdb.py -D"));
                 const QString cmd = gContext->GetSetting("mythvideo.TVDataCommandLine",
                                                         def_cmd);
                 QStringList args;
@@ -1106,7 +636,7 @@ namespace
         Q_OBJECT
 
       signals:
-        void SigPosterURL(QString url, Metadata *item);
+        void SigPosterURL(QString url, Metadata *item, QString type);
 
       public:
         VideoPosterSearch(QObject *oparent) :
@@ -1123,7 +653,7 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -mP"));
+                    .arg("mythvideo/scripts/ttvdb.py -P"));
                 const QString cmd = gContext->GetSetting("mythvideo.TVPosterCommandLine",
                                                         def_cmd);
                 QStringList args;
@@ -1164,7 +694,7 @@ namespace
                 }
             }
 
-            emit SigPosterURL(url, m_item);
+            emit SigPosterURL(url, m_item, QString("Coverart"));
             deleteLater();
         }
 
@@ -1182,7 +712,7 @@ namespace
         Q_OBJECT
 
       signals:
-        void SigFanartURL(QString url, Metadata *item);
+        void SigFanartURL(QString url, Metadata *item, QString type);
 
       public:
         VideoFanartSearch(QObject *oparent) :
@@ -1199,7 +729,7 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -tF"));
+                    .arg("mythvideo/scripts/ttvdb.py -F"));
                 const QString cmd = gContext->GetSetting("mythvideo.TVFanartCommandLine",
                                                         def_cmd);
                 QStringList args;
@@ -1228,18 +758,23 @@ namespace
             QString url;
             if (normal_exit && out.size())
             {
-                for (QStringList::const_iterator p = out.begin();
-                        p != out.end(); ++p)
+                if (m_item->GetSeason() >= 1 && out.count() >= m_item->GetSeason())
+                    url = out.takeAt(m_item->GetSeason() - 1);
+                else
                 {
-                    if ((*p).length())
-                    {
-                        url = *p;
-                        break;
-                    }
+                    for (QStringList::const_iterator p = out.begin();
+                            p != out.end(); ++p)
+                    { 
+                        if ((*p).length())
+                        {
+                            url = *p;
+                            break;
+                        }
+                    } 
                 }
             }
 
-            emit SigFanartURL(url, m_item);
+            emit SigFanartURL(url, m_item, QString("Fanart"));
             deleteLater();
         }
 
@@ -1257,7 +792,7 @@ namespace
         Q_OBJECT
 
       signals:
-        void SigBannerURL(QString url, Metadata *item);
+        void SigBannerURL(QString url, Metadata *item, QString type);
 
       public:
         VideoBannerSearch(QObject *oparent) :
@@ -1272,7 +807,7 @@ namespace
 
             const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -tB"));
+                    .arg("mythvideo/scripts/ttvdb.py -B"));
             const QString cmd = gContext->GetSetting("mythvideo.TVBannerCommandLine",
                                                         def_cmd);
             QStringList args;
@@ -1301,7 +836,7 @@ namespace
                 }
             }
 
-            emit SigBannerURL(url, m_item);
+            emit SigBannerURL(url, m_item, QString("Banners"));
             deleteLater();
         }
 
@@ -1319,7 +854,7 @@ namespace
         Q_OBJECT
                 
       signals:
-        void SigScreenshotURL(QString url, Metadata *item);
+        void SigScreenshotURL(QString url, Metadata *item, QString type);
                                         
       public:
         VideoScreenshotSearch(QObject *oparent) :
@@ -1363,7 +898,7 @@ namespace
                 }
             }
 
-            emit SigScreenshotURL(url, m_item);
+            emit SigScreenshotURL(url, m_item, QString("Screenshots"));
             deleteLater();
         }
 
@@ -1441,7 +976,7 @@ namespace
 
       public:
         SearchResultsDialog(MythScreenStack *lparent,
-                const SearchListResults &results) :
+                const QStringList &results) :
             MythScreenType(lparent, "videosearchresultspopup"),
             m_results(results), m_resultsList(0)
         {
@@ -1460,14 +995,13 @@ namespace
                 return false;
             }
 
-            QMapIterator<QString, QString> resultsIterator(m_results);
-            while (resultsIterator.hasNext())
+            for (QStringList::const_iterator i = m_results.begin();
+                    i != m_results.end(); ++i)
             {
-                resultsIterator.next();
-                MythUIButtonListItem *button =
-                    new MythUIButtonListItem(m_resultsList,
-                            resultsIterator.value());
-                QString key = resultsIterator.key();
+                QString key = ((*i).left((*i).indexOf(':')));
+                QString value = ((*i).right((*i).length() - (*i).indexOf(":") - 1));
+                MythUIButtonListItem *button = new MythUIButtonListItem(m_resultsList, value);
+                VERBOSE(VB_GENERAL|VB_EXTRA, QString("Inserting into ButtonList: %1:%2").arg(key).arg(value));
                 button->SetData(key);
             }
 
@@ -1484,7 +1018,7 @@ namespace
         void haveResult(QString);
 
       private:
-        SearchListResults m_results;
+        QStringList m_results;
         MythUIButtonList *m_resultsList;
 
       private slots:
@@ -1497,12 +1031,11 @@ namespace
 
     bool GetLocalVideoImage(const QString &video_uid, const QString &filename,
                              const QStringList &in_dirs, QString &image,
-                             QString title, int season, const QString host, 
+                             const QString &title, int season, const QString host, 
                              QString sgroup, int episode = 0,
                              bool isScreenshot = false)
     {
         QStringList search_dirs(in_dirs);
-
         QFileInfo qfi(filename);
         search_dirs += qfi.absolutePath();
 
@@ -1531,28 +1064,31 @@ namespace
 
         if (!host.isEmpty())
         {
+            QStringList hostFiles;
+
+            RemoteGetFileList(host, "", &hostFiles, sgroup, true);
             const QString hntm("%2.%3");
 
             for (image_type_list::const_iterator ext = image_exts.begin();
                     ext != image_exts.end(); ++ext)
             {
                 QStringList sfn;
-                if (season > 0)
+                if (episode > 0 || season > 0)
                 {
-                    if (episode > 0 && isScreenshot)
+                    if (isScreenshot)
                         sfn += hntm.arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode))
                                  .arg(suffix))
                                  .arg(*ext);
-                    else if (!isScreenshot)
+                    else
                         sfn += hntm.arg(QString("%1 Season %2_%3")
                                  .arg(title).arg(QString::number(season))
                                  .arg(suffix))
                                  .arg(*ext);
 
                 }
-                if (!isScreenshot)
+                else
                 {
                 sfn += hntm.arg(base_name + "_%1").arg(suffix).arg(*ext);
                 sfn += hntm.arg(video_uid + "_%1").arg(suffix).arg(*ext);
@@ -1561,14 +1097,10 @@ namespace
                 for (QStringList::const_iterator i = sfn.begin();
                         i != sfn.end(); ++i)
                 {
-                    if (!host.isEmpty())
+                    if (hostFiles.contains(*i))
                     {
-                        QString url = GenRemoteFileURL(sgroup, host, *i);
-                        if (RemoteFile::Exists(url))
-                        {
-                            image = *i;
-                            return true;
-                        }
+                        image = *i;
+                        return true;
                     }
                 }
             }
@@ -1651,6 +1183,74 @@ namespace
         while (item && playing_time.elapsed() > WATCHED_WATERMARK);
     }
 
+    class FanartLoader: public QObject
+    {
+        Q_OBJECT
+
+      public:
+        FanartLoader() : itemsPast(0)
+        {
+            connect(&m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
+        }
+        
+       ~FanartLoader()
+        {
+            m_fanartTimer.disconnect(this);
+        }
+
+        void LoadImage(const QString &filename, MythUIImage *image)
+        {
+            bool wasActive = m_fanartTimer.isActive();
+            if (filename.isEmpty())
+            {
+                if (wasActive)
+                    m_fanartTimer.stop();
+
+                image->Reset();
+                itemsPast++;
+            }
+            else
+            {
+                QMutexLocker locker(&m_fanartLock);
+                m_fanart = image;
+                if (filename != m_fanart->GetFilename())
+                {
+                    if (wasActive)
+                        m_fanartTimer.stop();
+
+                    if (itemsPast > 2)
+                        m_fanart->Reset();
+
+                    m_fanart->SetFilename(filename);
+                    m_fanartTimer.setSingleShot(true);
+                    m_fanartTimer.start(300);
+
+                    if (wasActive)
+                        itemsPast++;
+                    else
+                        itemsPast = 0;
+                }
+                else
+                    itemsPast = 0;
+            }
+        }
+
+      protected slots:
+        void fanartLoad(void)
+        {
+            QMutexLocker locker(&m_fanartLock);
+            m_fanart->Load();
+        }
+
+      private:
+        int             itemsPast;
+        QMutex          m_fanartLock;
+        MythUIImage    *m_fanart;
+        QTimer          m_fanartTimer;
+    };
+
+    FanartLoader fanartLoader;
+
     struct CopyMetadataDestination
     {
         virtual void handleText(const QString &name, const QString &value) = 0;
@@ -1680,13 +1280,20 @@ namespace
             UIUtilW::Assign(m_screen, image, name);
             if (image)
             {
-                if (filename.size())
+                if (name != "fanart")
                 {
-                    image->SetFilename(filename);
-                    image->Load();
+                    if (filename.size())
+                    {
+                        image->SetFilename(filename);
+                        image->Load();
+                    }
+                    else
+                        image->Reset();
                 }
                 else
-                    image->Reset();
+                {
+                    fanartLoader.LoadImage(filename, image);
+                }
             }
         }
 
@@ -1734,7 +1341,7 @@ namespace
                 && !metadata->GetCoverFile().isEmpty()
                 && !IsDefaultCoverFile(metadata->GetCoverFile()))
             {
-                coverfile = GenRemoteFileURL("Coverart", metadata->GetHost(),
+                coverfile = RemoteGenFileURL("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
             }
             else
@@ -1743,7 +1350,7 @@ namespace
             }
 
             if (!IsDefaultCoverFile(coverfile))
-                tmp["coverimage"] = coverfile;
+                tmp["coverart"] = coverfile;
 
             tmp["coverfile"] = coverfile;
 
@@ -1751,7 +1358,7 @@ namespace
             if (metadata->IsHostSet() && !metadata->GetScreenshot().startsWith("/")
                 && !metadata->GetScreenshot().isEmpty())
             {
-                screenshotfile = GenRemoteFileURL("Screenshots",
+                screenshotfile = RemoteGenFileURL("Screenshots",
                         metadata->GetHost(), metadata->GetScreenshot());
             }
             else
@@ -1768,7 +1375,7 @@ namespace
             if (metadata->IsHostSet() && !metadata->GetBanner().startsWith("/")
                 && !metadata->GetBanner().isEmpty())
             {
-                bannerfile = GenRemoteFileURL("Banners", metadata->GetHost(),
+                bannerfile = RemoteGenFileURL("Banners", metadata->GetHost(),
                         metadata->GetBanner());
             }
             else
@@ -1785,7 +1392,7 @@ namespace
             if (metadata->IsHostSet() && !metadata->GetFanart().startsWith("/")
                 && !metadata->GetFanart().isEmpty())
             {
-                fanartfile = GenRemoteFileURL("Fanart", metadata->GetHost(),
+                fanartfile = RemoteGenFileURL("Fanart", metadata->GetHost(),
                         metadata->GetFanart());
             }
             else
@@ -1806,7 +1413,7 @@ namespace
             tmp["title"] = metadata->GetTitle();
             tmp["subtitle"] = metadata->GetSubtitle();
             tmp["director"] = metadata->GetDirector();
-            tmp["plot"] = metadata->GetPlot();
+            tmp["description"] = metadata->GetPlot();
             tmp["genres"] = GetDisplayGenres(*metadata);
             tmp["countries"] = GetDisplayCountries(*metadata);
             tmp["cast"] = GetDisplayCast(*metadata).join(", ");
@@ -1832,6 +1439,8 @@ namespace
             tmp["trailerstate"] = TrailerToState(metadata->GetTrailer());
             tmp["userratingstate"] =
                     QString::number((int)(metadata->GetUserRating()));
+            tmp["watchedstate"] = WatchedToState(metadata->GetWatched());
+
             tmp["videolevel"] = ParentalLevelToState(metadata->GetShowLevel());
 
             tmp["insertdate"] = metadata->GetInsertdate()
@@ -1869,7 +1478,7 @@ namespace
 
         helper h(tmp, dest);
 
-        h.handleImage("coverimage");
+        h.handleImage("coverart");
         h.handleImage("screenshot");
         h.handleImage("banner");
         h.handleImage("fanart");
@@ -1884,7 +1493,7 @@ namespace
         h.handleText("title");
         h.handleText("subtitle");
         h.handleText("director");
-        h.handleText("plot");
+        h.handleText("description");
         h.handleText("genres");
         h.handleText("countries");
         h.handleText("cast");
@@ -1906,6 +1515,7 @@ namespace
 
         h.handleState("trailerstate");
         h.handleState("userratingstate");
+        h.handleState("watchedstate");
         h.handleState("videolevel");
     }
 }
@@ -2082,10 +1692,7 @@ class VideoDialogPrivate
     ~VideoDialogPrivate()
     {
         delete m_scanner;
-        StopAllRunningCoverDownloads();
-        StopAllRunningFanartDownloads();
-        StopAllRunningBannerDownloads();
-        StopAllRunningScreenshotDownloads();
+        StopAllRunningImageDownloads();
 
         if (m_rememberPosition && m_lastTreeNodePath.length())
         {
@@ -2116,107 +1723,32 @@ class VideoDialogPrivate
         m_savedPtr = new VideoListDeathDelay(videoList);
     }
 
-    void AddCoverDownload(CoverDownloadProxy *download)
+    void AddImageDownload(ImageDownloadProxy *download)
     {
         m_running_downloads.insert(download);
     }
 
-    void RemoveCoverDownload(CoverDownloadProxy *download)
+    void RemoveImageDownload(ImageDownloadProxy *download)
     {
         if (download)
         {
-            cover_download_list::iterator p =
+            image_download_list::iterator p =
                     m_running_downloads.find(download);
             if (p != m_running_downloads.end())
                 m_running_downloads.erase(p);
         }
     }
 
-    void AddScreenshotDownload(ScreenshotDownloadProxy *download)
-    {   
-        m_running_ssdownloads.insert(download);
-    }
-
-    void RemoveScreenshotDownload(ScreenshotDownloadProxy *download)
-    {   
-        if (download)
-        {   
-            screenshot_download_list::iterator p =
-                    m_running_ssdownloads.find(download);
-            if (p != m_running_ssdownloads.end())
-                m_running_ssdownloads.erase(p);
-        }
-    }
-
-    void AddFanartDownload(FanartDownloadProxy *download)
+    void StopAllRunningImageDownloads()
     {
-        m_running_fdownloads.insert(download);
-    }
-
-    void RemoveFanartDownload(FanartDownloadProxy *download)
-    {
-        if (download)
-        {
-            fanart_download_list::iterator p =
-                    m_running_fdownloads.find(download);
-            if (p != m_running_fdownloads.end())
-                m_running_fdownloads.erase(p);
-        }
-    }
-
-    void AddBannerDownload(BannerDownloadProxy *download)
-    {
-        m_running_bdownloads.insert(download);
-    }
-
-    void RemoveBannerDownload(BannerDownloadProxy *download)
-    {
-        if (download)
-        {
-            banner_download_list::iterator p =
-                    m_running_bdownloads.find(download);
-            if (p != m_running_bdownloads.end())
-                m_running_bdownloads.erase(p);
-        }
-    }
-
-    void StopAllRunningCoverDownloads()
-    {
-        cover_download_list tmp(m_running_downloads);
-        for (cover_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
-            (*p)->Stop();
-    }
-
-    void StopAllRunningScreenshotDownloads()
-    {   
-        screenshot_download_list tmp(m_running_ssdownloads);
-        for (screenshot_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
-            (*p)->Stop();
-    }
-
-    void StopAllRunningFanartDownloads()
-    {
-        fanart_download_list tmp(m_running_fdownloads);
-        for (fanart_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
-            (*p)->Stop();
-    }
-
-    void StopAllRunningBannerDownloads()
-    {
-        banner_download_list tmp(m_running_bdownloads);
-        for (banner_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
+        image_download_list tmp(m_running_downloads);
+        for (image_download_list::iterator p = tmp.begin(); p != tmp.end(); ++p)
             (*p)->Stop();
     }
 
   public:
-    typedef std::set<CoverDownloadProxy *> cover_download_list;
-    cover_download_list m_running_downloads;
-    typedef std::set<ScreenshotDownloadProxy *> screenshot_download_list;
-    screenshot_download_list m_running_ssdownloads;
-    typedef std::set<FanartDownloadProxy *> fanart_download_list;
-    fanart_download_list m_running_fdownloads;
-    typedef std::set<BannerDownloadProxy *> banner_download_list;
-    banner_download_list m_running_bdownloads;
+    typedef std::set<ImageDownloadProxy *> image_download_list;
+    image_download_list m_running_downloads;
     ParentalLevelNotifyContainer m_parentalLevel;
     bool m_switchingLayout;
 
@@ -2305,7 +1837,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
     m_videoButtonList(0), m_videoButtonTree(0), m_titleText(0),
     m_novideoText(0), m_positionText(0), m_crumbText(0), m_coverImage(0),
     m_screenshot(0), m_banner(0), m_fanart(0), m_trailerState(0), 
-    m_parentalLevelState(0)
+    m_parentalLevelState(0), m_watchedState(0)
 {
     m_d = new VideoDialogPrivate(video_list, type, browse);
 
@@ -2315,6 +1847,8 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
                     lname));
 
     srand(time(NULL));
+
+    RemoteClearSGMap();
 }
 
 VideoDialog::~VideoDialog()
@@ -2414,13 +1948,14 @@ bool VideoDialog::Create()
     UIUtilW::Assign(this, m_positionText, "position");
     UIUtilW::Assign(this, m_crumbText, "breadcrumbs");
 
-    UIUtilW::Assign(this, m_coverImage, "coverimage");
+    UIUtilW::Assign(this, m_coverImage, "coverart");
     UIUtilW::Assign(this, m_screenshot, "screenshot");
     UIUtilW::Assign(this, m_banner, "banner");
     UIUtilW::Assign(this, m_fanart, "fanart");
 
     UIUtilW::Assign(this, m_trailerState, "trailerstate");
     UIUtilW::Assign(this, m_parentalLevelState, "parentallevel");
+    UIUtilW::Assign(this, m_watchedState, "watchedstate");
 
     if (err)
     {
@@ -2428,13 +1963,14 @@ bool VideoDialog::Create()
         return false;
     }
 
-    CheckedSet(m_novideoText, tr("No Videos Available"));
-
     CheckedSet(m_trailerState, "None");
     CheckedSet(m_parentalLevelState, "None");
+    CheckedSet(m_watchedState, "None");
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+
+    CheckedSet(m_novideoText, tr("Video dialog loading, or no videos available..."));
 
     if (m_d->m_type == DLG_TREE)
     {
@@ -2460,11 +1996,15 @@ bool VideoDialog::Create()
     connect(&m_d->m_parentalLevel, SIGNAL(SigLevelChanged()),
             SLOT(reloadData()));
 
+    return true;
+}
+
+void VideoDialog::Init()
+{
+
     m_d->m_parentalLevel.SetLevel(ParentalLevel(gContext->
                     GetNumSetting("VideoDefaultParentalLevel",
                             ParentalLevel::plLowest)));
-
-    return true;
 }
 
 /** \fn VideoDialog::refreshData()
@@ -2481,6 +2021,17 @@ void VideoDialog::refreshData()
 
     if (m_novideoText)
         m_novideoText->SetVisible(!m_d->m_treeLoaded);
+}
+
+void VideoDialog::reloadAllData(bool dbChanged)
+{
+    delete m_d->m_scanner;
+    m_d->m_scanner = 0;
+
+    if (dbChanged) {
+        m_d->m_videoList->InvalidateCache();
+    }
+    reloadData();
 }
 
 /** \fn VideoDialog::reloadData()
@@ -2522,6 +2073,12 @@ void VideoDialog::loadData()
         if (!m_d->m_treeLoaded)
             return;
 
+        if (!m_d->m_currentNode)
+            SetCurrentNode(m_d->m_rootNode);
+
+        if (!m_d->m_currentNode)
+            return;
+
         MythGenericTree *selectedNode = m_d->m_currentNode->getSelectedChild();
 
         typedef QList<MythGenericTree *> MGTreeChildList;
@@ -2530,16 +2087,19 @@ void VideoDialog::loadData()
         for (MGTreeChildList::const_iterator p = lchildren->begin();
                 p != lchildren->end(); ++p)
         {
-            MythUIButtonListItem *item =
-                    new MythUIButtonListItem(m_videoButtonList, QString(), 0,
-                            true, MythUIButtonListItem::NotChecked);
+            if (*p != NULL)
+            {
+                MythUIButtonListItem *item =
+                        new MythUIButtonListItem(m_videoButtonList, QString(), 0,
+                                true, MythUIButtonListItem::NotChecked);
 
-            item->SetData(qVariantFromValue(*p));
+                item->SetData(qVariantFromValue(*p));
 
-            UpdateItem(item);
+                UpdateItem(item);
 
-            if (*p == selectedNode)
-                m_videoButtonList->SetItemCurrent(item);
+                if (*p == selectedNode)
+                    m_videoButtonList->SetItemCurrent(item);
+            }
         }
     }
 
@@ -2565,37 +2125,31 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
     MythGenericTree *parent = node->getParent();    
 
     if (parent && metadata && ((QString::compare(parent->getString(),
-                             metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
+                            metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
                             parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
         item->SetText(metadata->GetSubtitle());
     else
         item->SetText(metadata ? metadata->GetTitle() : node->getString());
 
-    QString imgFilename = GetCoverImage(node);
-
-    if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() || 
-       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
+    QString coverimage = GetCoverImage(node);
+    QString screenshot = GetScreenshot(node);
+    QString banner     = GetBanner(node);
+    QString fanart     = GetFanart(node);
+    
+    if (!screenshot.isEmpty() && parent && metadata &&
+        ((QString::compare(parent->getString(),
+                            metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
+            parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)))
     {
-        if (parent && metadata &&
-            ((QString::compare(parent->getString(), 
-                              metadata->GetTitle(), Qt::CaseInsensitive) == 0) ||
-             parent->getString().startsWith(tr("Season"), Qt::CaseInsensitive)) &&
-            !GetScreenshot(node).isEmpty())
-        {
-            QString screenshot = GetScreenshot(node);
-            if (!screenshot.isEmpty())
-            {
-                item->SetImage(GetScreenshot(node));
-                item->SetImage(GetScreenshot(node), "buttonitem");
-            }
-        }
-        else
-        {
-            item->SetImage(imgFilename);
-            item->SetImage(imgFilename, "coverimage");
-        }
+        item->SetImage(screenshot);
     }
+    else
+    {
+        if (coverimage.isEmpty())
+            coverimage = GetFirstImage(node, "Coverart");
+        item->SetImage(coverimage);
+    }
+    
 //    else if (metadata)
 //    {
 //        imgFilename = GetImageFromFolder(metadata);
@@ -2605,45 +2159,42 @@ void VideoDialog::UpdateItem(MythUIButtonListItem *item)
 //            item->SetImage(imgFilename);
 //    }
 
+
     int nodeInt = node->getInt();
 
-    imgFilename = GetScreenshot(node);
+    if (coverimage.isEmpty() && nodeInt == kSubFolder)
+        coverimage = GetFirstImage(node, "Coverart");
 
-    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
-        imgFilename = GetFirstImage(node, "Screenshots");
+    item->SetImage(coverimage, "coverart");
 
-    if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() ||
-       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
-        item->SetImage(imgFilename, "screenshot");
+    if (screenshot.isEmpty() && nodeInt == kSubFolder)
+        screenshot = GetFirstImage(node, "Screenshots");
 
-    imgFilename = GetBanner(node);
+    item->SetImage(screenshot, "screenshot");
+    
+    if (banner.isEmpty() && nodeInt == kSubFolder)
+        banner = GetFirstImage(node, "Banners");
 
-    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
-        imgFilename = GetFirstImage(node, "Banners");
+    item->SetImage(banner, "banner");
 
-    if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() ||
-       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
-        item->SetImage(imgFilename, "banner");
+    if (fanart.isEmpty() && nodeInt == kSubFolder)
+        fanart = GetFirstImage(node, "Fanart");
 
-    imgFilename = GetFanart(node);
-
-    if (imgFilename.isEmpty() && nodeInt == kSubFolder)
-        imgFilename = GetFirstImage(node, "Fanart");
-
-    if (!imgFilename.isEmpty() &&
-       (QFileInfo(imgFilename).exists() ||
-       (imgFilename.startsWith("myth://") && !imgFilename.endsWith("/"))))
-        item->SetImage(imgFilename, "fanart");
+    item->SetImage(fanart, "fanart");
 
     if (nodeInt == kSubFolder)
     {
         item->SetText(QString("%1").arg(node->visibleChildCount()), "childcount");
         item->DisplayState("subfolder", "nodetype");
+        item->SetText(node->getString(), "title");
+        item->SetText(node->getString());
     }
     else if (nodeInt == kUpFolder)
+    {
         item->DisplayState("upfolder", "nodetype");
+        item->SetText(node->getString(), "title");
+        item->SetText(node->getString());
+    }
 
     if (item == GetItemCurrent())
         UpdateText(item);
@@ -2659,14 +2210,14 @@ void VideoDialog::fetchVideos()
     if (!m_d->m_treeLoaded)
     {
         m_d->m_rootNode = m_d->m_videoList->buildVideoList(m_d->m_isFileBrowser,
-                m_d->m_isGroupList, m_d->m_groupType,
+                m_d->m_isFlatList, m_d->m_isGroupList, m_d->m_groupType,
                 m_d->m_parentalLevel.GetLevel(), true);
     }
     else
     {
         m_d->m_videoList->refreshList(m_d->m_isFileBrowser,
                 m_d->m_parentalLevel.GetLevel(),
-                m_d->m_isGroupList, m_d->m_groupType);
+                m_d->m_isFlatList, m_d->m_isGroupList, m_d->m_groupType);
         m_d->m_rootNode = m_d->m_videoList->GetTreeRoot();
     }
 
@@ -2726,7 +2277,7 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
             }
 
             if ((list.size() > 0) && (list.at(0) == fname))
-                result = GenRemoteFileURL("Videos", host, filename);
+                result = RemoteGenFileURL("Videos", host, filename);
 
             if (!result.isEmpty())
             {
@@ -2822,7 +2373,7 @@ QString VideoDialog::GetImageFromFolder(Metadata *metadata)
 
                     path = path + "/" + subdir;
                     QStringList tmpList;
-                    bool ok = GetRemoteFileList(host, path, &tmpList, "Videos");
+                    bool ok = RemoteGetFileList(host, path, &tmpList, "Videos");
 
                     if (ok)
                     {
@@ -2859,7 +2410,7 @@ QString VideoDialog::GetImageFromFolder(Metadata *metadata)
                                 .arg(prefix)
                                 .arg(fList.at(0));
             else
-                icon_file = GenRemoteFileURL("Videos", host, fList.at(0));
+                icon_file = RemoteGenFileURL("Videos", host, fList.at(0));
         }
     }
 
@@ -2887,7 +2438,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 
     QString icon_file;
 
-    if (nodeInt  == kSubFolder || nodeInt == kUpFolder)  // subdirectory
+    if (nodeInt  == kSubFolder)  // subdirectory
     {
         // load folder icon
         QString folder_path = node->GetData().value<TreeNodeData>().GetPath();
@@ -2969,7 +2520,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                         path = path + "/" + subdir;
 
                         QStringList tmpList;
-                        bool ok = GetRemoteFileList(host, path, &tmpList, "Videos");
+                        bool ok = RemoteGetFileList(host, path, &tmpList, "Videos");
 
                         if (ok)
                         {
@@ -3003,12 +2554,12 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
             // Take the Coverfile for the first valid node in the dir, if it exists.
             if (icon_file.isEmpty())
             {
-                int list_count = node->childCount();
+                int list_count = node->visibleChildCount();
                 if (list_count > 0)
                 {
                     for (int i = 0; i < list_count; i++)
                     {
-                        MythGenericTree *subnode = node->getChildAt(i);
+                        MythGenericTree *subnode = node->getVisibleChildAt(i);
                         if (subnode)
                         {
                             Metadata *metadata = GetMetadataPtrFromNode(subnode);
@@ -3017,7 +2568,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                                 if (!metadata->GetHost().isEmpty() && 
                                     !metadata->GetCoverFile().startsWith("/"))
                                 {
-                                    QString test_file = GenRemoteFileURL("Coverart",
+                                    QString test_file = RemoteGenFileURL("Coverart",
                                                 metadata->GetHost(), metadata->GetCoverFile());
                                     if (!test_file.endsWith("/") && !test_file.isEmpty() &&
                                         !IsDefaultCoverFile(test_file))
@@ -3049,7 +2600,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                                     .arg(folder_path)
                                     .arg(fList.at(0));
                 else
-                    icon_file = GenRemoteFileURL("Videos", host, fList.at(0));
+                    icon_file = RemoteGenFileURL("Videos", host, fList.at(0));
             }
         }
 
@@ -3071,7 +2622,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 !metadata->GetCoverFile().startsWith("/") &&
                 !IsDefaultCoverFile(metadata->GetCoverFile()))
             {
-                icon_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
+                icon_file = RemoteGenFileURL("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
             }
             else
@@ -3088,113 +2639,126 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
 }
 
 /** \fn VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
- *  \brief Find the first image of "type" within a folder.
+ *  \brief Find the first image of "type" within a folder structure.
  *  \return QString local or myth:// for the image.
+ *
+ *  Will try immediate children (files) first, if no hits, will continue
+ *  through subfolders recursively.  Will only return a value on a
+ *  grandchild node if it matches the grandparent title, eg:
+ *
+ *  Lost->Season 1->Lost
+ *
  */
-QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type)
+QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
+                                   QString gpnode, int levels)
 {
     QString icon_file;
 
-    int list_count = node->childCount();
+    int list_count = node->visibleChildCount();
     if (list_count > 0)
     {
+        QList<MythGenericTree *> subDirs;
+        int maxRecurse = 1;
+
         for (int i = 0; i < list_count; i++)
         {
-            MythGenericTree *subnode = node->getChildAt(i);
+            MythGenericTree *subnode = node->getVisibleChildAt(i);
             if (subnode)
             {
+                if (subnode->childCount() > 0)
+                    subDirs << subnode;
+                
                 Metadata *metadata = GetMetadataPtrFromNode(subnode);
                 if (metadata)
                 {
                     QString test_file;
+                    QString host = metadata->GetHost();
+                    QString title = metadata->GetTitle();
 
-                    if (type == "Coverart" && !metadata->GetHost().isEmpty() &&
+                    if (type == "Coverart" && !host.isEmpty() &&
                         !metadata->GetCoverFile().startsWith("/"))
                     {
-                        test_file = GenRemoteFileURL("Coverart",
-                                    metadata->GetHost(), metadata->GetCoverFile());
-                        if (!test_file.endsWith("/") && !test_file.isEmpty() &&
-                            !IsDefaultCoverFile(test_file))
-                        {
-                            icon_file = test_file;
-                            break;
-                        }
+                        test_file = RemoteGenFileURL("Coverart",
+                                    host, metadata->GetCoverFile());
                     }
                     else if (type == "Coverart")
-                    {
                         test_file = metadata->GetCoverFile();
-                        if (!test_file.isEmpty() &&
-                            !IsDefaultCoverFile(test_file))
-                        {
-                            icon_file = test_file;
-                            break;
-                        }
+
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() &&
+                        !IsDefaultCoverFile(test_file) && (gpnode.isEmpty() ||
+                        (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
+                    {
+                        icon_file = test_file;
+                        break;
                     }
 
-                    if (type == "Fanart" && !metadata->GetHost().isEmpty() &&
+                    if (type == "Fanart" && !host.isEmpty() &&
                         !metadata->GetFanart().startsWith("/"))
                     {
-                        test_file = GenRemoteFileURL("Fanart",
-                                    metadata->GetHost(), metadata->GetFanart());
-                        if (!test_file.endsWith("/") && !test_file.isEmpty())
-                        {
-                            icon_file = test_file;
-                            break;
-                        }
+                        test_file = RemoteGenFileURL("Fanart",
+                                    host, metadata->GetFanart());
                     }
                     else if (type == "Fanart")
-                    {
                         test_file = metadata->GetFanart();
-                        if (!test_file.isEmpty() &&
-                             test_file != VIDEO_FANART_DEFAULT)
-                        {
-                            icon_file = test_file;
-                            break;
-                        }
+
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() &&
+                        test_file != VIDEO_FANART_DEFAULT && (gpnode.isEmpty() || 
+                        (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
+                    {
+                        icon_file = test_file;
+                        break;
                     }
 
-                    if (type == "Banners" && !metadata->GetHost().isEmpty() &&
+                    if (type == "Banners" && !host.isEmpty() &&
                         !metadata->GetBanner().startsWith("/"))
                     {
-                        test_file = GenRemoteFileURL("Banners",
-                                    metadata->GetHost(), metadata->GetBanner());
-                        if (!test_file.endsWith("/") && !test_file.isEmpty())
-                        {
-                            icon_file = test_file;
-                            break;
-                        }
+                        test_file = RemoteGenFileURL("Banners",
+                                    host, metadata->GetBanner());
                     }
                     else if (type == "Banners")
-                    {
                         test_file = metadata->GetBanner();
-                        if (!test_file.isEmpty() &&
-                             test_file != VIDEO_BANNER_DEFAULT)
-                        {
-                            icon_file = test_file;
-                            break;
-                        }
+
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() &&
+                        test_file != VIDEO_BANNER_DEFAULT && (gpnode.isEmpty() ||
+                        (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
+                    {
+                        icon_file = test_file;
+                        break;
                     }
 
-                    if (type == "Screenshots" && !metadata->GetHost().isEmpty() &&
+                    if (type == "Screenshots" && !host.isEmpty() &&
                         !metadata->GetScreenshot().startsWith("/"))
                     {
-                        test_file = GenRemoteFileURL("Screenshots",
-                                    metadata->GetHost(), metadata->GetScreenshot());
-                        if (!test_file.endsWith("/") && !test_file.isEmpty())
-                        {
-                            icon_file = test_file;
-                            break;
-                        }
+                        test_file = RemoteGenFileURL("Screenshots",
+                                    host, metadata->GetScreenshot());
                     }
                     else if (type == "Screenshots")
-                    {
                         test_file = metadata->GetScreenshot();
-                        if (!test_file.isEmpty() &&
-                             test_file != VIDEO_SCREENSHOT_DEFAULT)
-                        {
-                            icon_file = test_file;
-                            break;
-                        }
+
+                    if (!test_file.endsWith("/") && !test_file.isEmpty() && 
+                       test_file != VIDEO_SCREENSHOT_DEFAULT && (gpnode.isEmpty() ||
+                       (QString::compare(gpnode, title, Qt::CaseInsensitive) == 0)))
+                    {
+                        icon_file = test_file;
+                        break;
+                    }
+                }
+            }
+        }
+        if (icon_file.isEmpty() && !subDirs.isEmpty())
+        {
+            QString test_file;
+            int subDirCount = subDirs.count();
+            for (int i = 0; i < subDirCount; i ++)
+            {
+                if (levels < maxRecurse)
+                {
+                    test_file = GetFirstImage(subDirs[i], type,
+                                     node->getString(), levels + 1);
+                    if (!test_file.isEmpty())
+                    {
+                        icon_file = test_file;
+                        break;
                     }
                 }
             }
@@ -3227,7 +2791,7 @@ QString VideoDialog::GetScreenshot(MythGenericTree *node)
                     !metadata->GetScreenshot().startsWith("/") &&
                     !metadata->GetScreenshot().isEmpty())
             {
-                icon_file = GenRemoteFileURL("Screenshots", metadata->GetHost(),
+                icon_file = RemoteGenFileURL("Screenshots", metadata->GetHost(),
                         metadata->GetScreenshot());
             }
             else
@@ -3263,7 +2827,7 @@ QString VideoDialog::GetBanner(MythGenericTree *node)
                !metadata->GetBanner().startsWith("/") &&
                !metadata->GetBanner().isEmpty())
         {
-            icon_file = GenRemoteFileURL("Banners", metadata->GetHost(),
+            icon_file = RemoteGenFileURL("Banners", metadata->GetHost(),
                     metadata->GetBanner());
         }
         else
@@ -3298,7 +2862,7 @@ QString VideoDialog::GetFanart(MythGenericTree *node)
                 !metadata->GetFanart().startsWith("/") &&
                 !metadata->GetFanart().isEmpty())
         {
-            icon_file = GenRemoteFileURL("Fanart", metadata->GetHost(),
+            icon_file = RemoteGenFileURL("Fanart", metadata->GetHost(),
                     metadata->GetFanart());
         }
         else
@@ -3450,10 +3014,29 @@ void VideoDialog::searchComplete(QString string)
     VERBOSE(VB_GENERAL | VB_EXTRA,
             QString("Jumping to: %1").arg(string));
 
+    MythGenericTree *parent = m_d->m_currentNode->getParent();
+    QStringList childList;
+    QList<MythGenericTree*>::iterator it;
+    QList<MythGenericTree*> *children;
+    QMap<int, QString> idTitle;
+
+    if (parent && m_d->m_type == DLG_TREE)
+        children = parent->getAllChildren();
+    else
+        children = m_d->m_currentNode->getAllChildren();
+
+    for (it = children->begin(); it != children->end(); ++it)
+    {
+        MythGenericTree *child = *it;
+        QString title = child->getString();
+        int id = child->getPosition();
+        idTitle.insert(id, title);
+    }
+
     if (m_d->m_type == DLG_TREE)
     {
         MythGenericTree *parent = m_videoButtonTree->GetCurrentNode()->getParent();
-        MythGenericTree *new_node = parent->getChildByName(string);
+        MythGenericTree *new_node = parent->getChildAt(idTitle.key(string));
         if (new_node)
         {
             m_videoButtonTree->SetCurrentNode(new_node);
@@ -3461,7 +3044,7 @@ void VideoDialog::searchComplete(QString string)
         }
     }
     else
-        m_videoButtonList->MoveToNamedPosition(string);
+        m_videoButtonList->SetItemCurrent(idTitle.key(string));
 }
 
 /** \fn VideoDialog::searchStart(void)
@@ -3592,7 +3175,8 @@ void VideoDialog::UpdateText(MythUIButtonListItem *item)
         CheckedSet(m_titleText, item->GetText());
     UpdatePosition();
 
-    CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));
+    if (m_d->m_currentNode)
+        CheckedSet(m_crumbText, m_d->m_currentNode->getRouteByString().join(" > "));
 
     if (node && node->getInt() == kSubFolder)
         CheckedSet(this, "childcount",
@@ -3634,8 +3218,8 @@ void VideoDialog::VideoMenu()
     if (node && node->getInt() >= 0)
     {
         if (!metadata->GetTrailer().isEmpty() ||
-                gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0 ||
-                m_d->m_altPlayerEnabled))
+                gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0) ||
+                m_d->m_altPlayerEnabled)
             m_menuPopup->AddButton(tr("Play..."), SLOT(PlayMenu()), true);
         else
             m_menuPopup->AddButton(tr("Play"), SLOT(playVideo()));
@@ -4313,7 +3897,7 @@ void VideoDialog::playTrailer()
     QString url;
 
     if (metadata->IsHostSet() && !metadata->GetTrailer().startsWith("/"))
-        url = GenRemoteFileURL("Trailers", metadata->GetHost(),
+        url = RemoteGenFileURL("Trailers", metadata->GetHost(),
                         metadata->GetTrailer());
     else
         url = metadata->GetTrailer();
@@ -4428,9 +4012,9 @@ void VideoDialog::ImageOnlyDownload()
         createBusyDialog(title);
 
         VideoTitleSearch *vts = new VideoTitleSearch(this);
-        connect(vts, SIGNAL(SigSearchResults(bool, const SearchListResults &,
+        connect(vts, SIGNAL(SigSearchResults(bool, const QStringList &,
                                 Metadata *)),
-                SLOT(OnVideoImageOnlyDone(bool, const SearchListResults &,
+                SLOT(OnVideoImageOnlyDone(bool, const QStringList &,
                                 Metadata *)));
         vts->Run(title, metadata);
     }
@@ -4577,7 +4161,7 @@ void VideoDialog::EditMetadata()
             "mythvideoeditmetadata", metadata,
             m_d->m_videoList->getListCache());
 
-    connect(md_editor, SIGNAL(Finished()), SLOT(reloadData()));
+    connect(md_editor, SIGNAL(Finished()), SLOT(refreshData()));
 
     if (md_editor->Create())
         screenStack->AddScreen(md_editor);
@@ -4609,6 +4193,7 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
         return;
 
     MythUIButtonListItem *item = GetItemCurrent();
+    MythGenericTree *gtItem = GetNodePtrFromButton(item);
 
     Metadata *metadata = GetMetadata(item);
 
@@ -4621,6 +4206,9 @@ void VideoDialog::OnRemoveVideo(bool dodelete)
             m_videoButtonTree->RemoveItem(item, false); // FIXME Segfault when true
         else
             m_videoButtonList->RemoveItem(item);
+
+        MythGenericTree *parent = gtItem->getParent();
+        parent->deleteNode(gtItem);
     }
     else
     {
@@ -4708,15 +4296,15 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 "Coverart"))
         {
             metadata->SetCoverFile(cover_file);
-            OnVideoPosterSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
 
         if (cover_file.isEmpty() || IsDefaultCoverFile(cover_file))
         {
             // Obtain video poster
             VideoPosterSearch *vps = new VideoPosterSearch(this);
-            connect(vps, SIGNAL(SigPosterURL(QString, Metadata *)),
-                    SLOT(OnPosterURL(QString, Metadata *)));
+            connect(vps, SIGNAL(SigPosterURL(QString, Metadata *, QString)),
+                    SLOT(OnImageURL(QString, Metadata *, QString)));
             vps->Run(metadata->GetInetRef(), metadata);
         }
     }
@@ -4734,15 +4322,15 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 "Fanart"))
         {
             metadata->SetFanart(fanart_file);
-            OnVideoFanartSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
 
         if (metadata->GetFanart().isEmpty())
         {
             // Obtain video fanart
             VideoFanartSearch *vfs = new VideoFanartSearch(this);
-            connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *)),
-                    SLOT(OnFanartURL(QString, Metadata *)));
+            connect(vfs, SIGNAL(SigFanartURL(QString, Metadata *, QString)),
+                    SLOT(OnImageURL(QString, Metadata *, QString)));
             vfs->Run(metadata->GetInetRef(), metadata);
         }
     }
@@ -4760,7 +4348,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 "Banners"))
         {
             metadata->SetBanner(banner_file);
-            OnVideoBannerSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
 
         if (metadata->GetBanner().isEmpty() &&
@@ -4768,8 +4356,8 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
         {
             // Obtain video banner (only for TV)
             VideoBannerSearch *vbs = new VideoBannerSearch(this);
-            connect(vbs, SIGNAL(SigBannerURL(QString, Metadata *)),
-                    SLOT(OnBannerURL(QString, Metadata *)));
+            connect(vbs, SIGNAL(SigBannerURL(QString, Metadata *, QString)),
+                    SLOT(OnImageURL(QString, Metadata *, QString)));
             vbs->Run(metadata->GetInetRef(), metadata);
         }
     }
@@ -4787,7 +4375,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
                                 metadata->GetEpisode(), true))
         {
             metadata->SetScreenshot(screenshot_file);
-            OnVideoScreenshotSetDone(metadata);
+            OnVideoImageSetDone(metadata);
         }
 
         if (metadata->GetScreenshot().isEmpty() &&
@@ -4795,21 +4383,46 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
         {
             // Obtain video screenshot (only for TV)
             VideoScreenshotSearch *vsss = new VideoScreenshotSearch(this);
-            connect(vsss, SIGNAL(SigScreenshotURL(QString, Metadata *)),
-                    SLOT(OnScreenshotURL(QString, Metadata *)));
+            connect(vsss, SIGNAL(SigScreenshotURL(QString, Metadata *, QString)),
+                    SLOT(OnImageURL(QString, Metadata *, QString)));
             vsss->Run(metadata->GetInetRef(), metadata);
         }
     }
 
 }
 
-void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
+void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
 {
     if (metadata)
     {
         if (uri.length())
         {
-            QString fileprefix = m_d->m_artDir;
+            QString fileprefix;
+            QString suffix;
+            QString host = metadata->GetHost();
+            int season = metadata->GetSeason();
+            int episode = metadata->GetEpisode();
+
+            if (type == "Coverart")
+            {
+                fileprefix = m_d->m_artDir;
+                suffix = QString("coverart");
+            }
+            if (type == "Fanart")
+            {
+                fileprefix = m_d->m_fanDir;
+                suffix = QString("fanart");
+            }
+            if (type == "Banners")
+            {
+                fileprefix = m_d->m_banDir;
+                suffix = QString("banner");
+            }
+            if (type == "Screenshots")
+            {
+                fileprefix = m_d->m_sshotDir;
+                suffix = QString("screenshot");
+            }
 
             QDir dir;
 
@@ -4836,41 +4449,48 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
             QString dest_file;
             QString db_value;
 
-            if (metadata->GetSeason() > 0 || 
-                metadata->GetEpisode() > 0)
+            if (season > 0 || episode > 0)
             {
+                QString title;
+
                 // Name TV downloads so that they already work with the PBB
-                QString title = QString("%1 Season %2_coverart").arg(metadata->GetTitle())
-                        .arg(metadata->GetSeason());
-                if (!metadata->GetHost().isEmpty())
+
+                if (type == "Screenshots")
+                    title = QString("%1 Season %2x%3_%4").arg(metadata->GetTitle())
+                            .arg(season).arg(episode).arg(suffix);
+                else
+                    title = QString("%1 Season %2_%3").arg(metadata->GetTitle())
+                            .arg(season).arg(suffix);
+                if (!host.isEmpty())
                 {
-                    QString combFileName = QString("%1.%2").arg(title).arg(ext);
-                    dest_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
+                    QString combFileName = QString("%1.%2").arg(title)
+                                                    .arg(ext);
+                    dest_file = RemoteGenFileURL(type, host,
                         combFileName);
                     db_value = combFileName;
                 }
                 else
                 {
-                    dest_file = QString("%1/%2_coverart.%3").arg(fileprefix)
+                    dest_file = QString("%1/%2.%3").arg(fileprefix)
                             .arg(title).arg(ext);
                     db_value = dest_file;
                 }
             }
             else
             {
-                if (!metadata->GetHost().isEmpty())
+                if (!host.isEmpty())
                 {
-                    QString combFileName = QString("%1_coverart.%2")
+                    QString combFileName = QString("%1_%2.%3")
                                            .arg(metadata->GetInetRef())
-                                           .arg(ext);
-                    dest_file = GenRemoteFileURL("Coverart", metadata->GetHost(),
+                                           .arg(suffix).arg(ext);
+                    dest_file = RemoteGenFileURL(type, host,
                         combFileName);
                     db_value = combFileName;
                 }
                 else
                 {
-                    dest_file = QString("%1/%2_coverart.%3").arg(fileprefix)
-                            .arg(metadata->GetInetRef()).arg(ext);
+                    dest_file = QString("%1/%2_%3.%4").arg(fileprefix)
+                            .arg(metadata->GetInetRef()).arg(suffix).arg(ext);
                     db_value = dest_file;
                 }
             }
@@ -4878,455 +4498,131 @@ void VideoDialog::OnPosterURL(QString uri, Metadata *metadata)
             VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
                     .arg(url.toString()).arg(dest_file));
 
-            CoverDownloadProxy *cd =
-                    CoverDownloadProxy::Create(url, dest_file, metadata,
+            ImageDownloadProxy *cd =
+                    ImageDownloadProxy::Create(url, dest_file, metadata,
                                                db_value);
 
-            connect(cd, SIGNAL(SigFinished(CoverDownloadErrorState,
-                                          QString, Metadata *)),
-                    SLOT(OnPosterCopyFinished(CoverDownloadErrorState,
-                                              QString, Metadata *)));
+            if (type == "Coverart")
+            {
+            connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
+                                           QString, Metadata *,
+                                           const QString &)),
+                    SLOT(OnImageCopyFinished(ImageDownloadErrorState,
+                                              QString, Metadata *,
+                                              const QString &)));
+            }
+            else if (type == "Fanart")
+            {
+            connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
+                                           QString, Metadata *,
+                                           const QString &)),
+                    SLOT(OnImageCopyFinished(ImageDownloadErrorState,
+                                              QString, Metadata *,
+                                              const QString &)));
+            }
+            else if (type == "Banners")
+            {
+            connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
+                                           QString, Metadata *,
+                                           const QString &)),
+                    SLOT(OnImageCopyFinished(ImageDownloadErrorState,
+                                              QString, Metadata *,
+                                              const QString &)));
+            }
+            else if (type == "Screenshots")
+            {
+            connect(cd, SIGNAL(SigFinished(ImageDownloadErrorState,
+                                           QString, Metadata *,
+                                           const QString &)),
+                    SLOT(OnImageCopyFinished(ImageDownloadErrorState,
+                                              QString, Metadata *,
+                                              const QString &)));
+            }
 
             cd->StartCopy();
-            m_d->AddCoverDownload(cd);
+            m_d->AddImageDownload(cd);
         }
         else
         {
-            metadata->SetCoverFile("");
-            OnVideoPosterSetDone(metadata);
+            if (type == "Coverart")
+                metadata->SetCoverFile("");
+            if (type == "Fanart")
+                metadata->SetFanart("");
+            if (type == "Banners")
+                metadata->SetBanner("");
+            if (type == "Screenshot")
+                metadata->SetScreenshot("");
+
+            OnVideoImageSetDone(metadata);
         }
     }
     else
-        OnVideoPosterSetDone(metadata);
+        OnVideoImageSetDone(metadata);
 }
 
-void VideoDialog::OnPosterCopyFinished(CoverDownloadErrorState error,
-                                       QString errorMsg, Metadata *item)
+void VideoDialog::OnImageCopyFinished(ImageDownloadErrorState error,
+                                       QString errorMsg, Metadata *item,
+                                       const QString &imagePath)
 {
     QObject *src = sender();
     if (src)
-        m_d->RemoveCoverDownload(dynamic_cast<CoverDownloadProxy *>
+        m_d->RemoveImageDownload(dynamic_cast<ImageDownloadProxy *>
                                        (src));
 
-    if (error != esOK && item)
-        item->SetCoverFile("");
+    QString type;
 
-    VERBOSE(VB_IMPORTANT, tr("Poster download finished: %1 %2")
-            .arg(errorMsg).arg(error));
+    if (imagePath.contains("_coverart."))
+        type = QString("Coverart");
+    else if (imagePath.contains("_fanart."))
+        type = QString("Fanart");
+    else if (imagePath.contains("_banner."))
+        type = QString("Banner");
+    else if (imagePath.contains("_screenshot."))
+        type = QString("Screenshot");
+
+    if (item)
+    {
+        if (error != esOK)
+        {
+            if (type == "Coverart")
+                item->SetCoverFile("");
+            else if (type == "Fanart")
+                item->SetFanart("");
+            else if (type == "Banner")
+                item->SetBanner("");
+            else if (type == "Screenshot")
+                item->SetScreenshot("");
+        }
+        else
+        {
+            if (type == "Coverart")
+                item->SetCoverFile(imagePath);
+            else if (type == "Fanart")
+                item->SetFanart(imagePath);
+            else if (type == "Banner")
+                item->SetBanner(imagePath);
+            else if (type == "Screenshot")
+                item->SetScreenshot(imagePath);
+        }
+    }
+
+    VERBOSE(VB_IMPORTANT, tr("%1 download finished: %2 %3")
+            .arg(type).arg(errorMsg).arg(error));
 
     if (error == esTimeout)
     {
-        createOkDialog(tr("A poster exists for this item but could not be "
-                            "retrieved within the timeout period.\n"));
+        createOkDialog(tr("%1 exists for this item but could not be "
+                            "retrieved within the timeout period.\n")
+                            .arg(type));
     }
 
-    OnVideoPosterSetDone(item);
+    OnVideoImageSetDone(item);
 }
 
 // This is the final call as part of a StartVideoImageSet
-void VideoDialog::OnVideoPosterSetDone(Metadata *metadata)
+void VideoDialog::OnVideoImageSetDone(Metadata *metadata)
 {
     // The metadata has some cover file set
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
-
-    metadata->UpdateDatabase();
-    UpdateItem(GetItemCurrent());
-}
-
-void VideoDialog::OnFanartURL(QString uri, Metadata *metadata)
-{
-    if (metadata)
-    {
-        if (uri.length())
-        {
-            QString fileprefix = m_d->m_fanDir;
-
-            QDir dir;
-
-            // If the fanart setting hasn't been set default to
-            // using ~/.mythtv/MythVideo/Fanart
-            if (fileprefix.length() == 0)
-            {
-                fileprefix = GetConfDir();
-
-                dir.setPath(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                fileprefix += "/MythVideo/Fanart";
-            }
-
-            dir.setPath(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            QUrl url(uri);
-
-            QString ext = QFileInfo(url.path()).suffix();
-            QString dest_file;
-            QString db_value;
-
-            if (metadata->GetSeason() > 0 || 
-                metadata->GetEpisode() > 0)
-            {
-                // Name TV downloads so that they already work with the PBB
-                QString title = QString("%1 Season %2_fanart").arg(metadata->GetTitle())
-                        .arg(metadata->GetSeason());
-                if (!metadata->GetHost().isEmpty())
-                {
-                    QString combFileName = QString("%1.%2").arg(title).arg(ext);
-                    dest_file = GenRemoteFileURL("Fanart", metadata->GetHost(),
-                        combFileName);
-                    db_value = combFileName;
-                }
-                else
-                {
-                    dest_file = QString("%1/%2_fanart.%3").arg(fileprefix)
-                            .arg(title).arg(ext);
-                    db_value = dest_file;
-                }
-            }
-            else
-            {
-                if (!metadata->GetHost().isEmpty())
-                {
-                    QString combFileName = QString("%1_fanart.%2")
-                                           .arg(metadata->GetInetRef())
-                                           .arg(ext);
-                    dest_file = GenRemoteFileURL("Fanart", metadata->GetHost(),
-                        combFileName);
-                    db_value = combFileName;
-                }
-                else
-                {
-                    dest_file = QString("%1/%2_fanart.%3").arg(fileprefix)
-                            .arg(metadata->GetInetRef()).arg(ext);
-                    db_value = dest_file;
-                }
-            }
-
-            VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
-                    .arg(url.toString()).arg(dest_file));
-
-            FanartDownloadProxy *fd =
-                    FanartDownloadProxy::Create(url, dest_file, metadata,
-                                                db_value);
-
-            connect(fd, SIGNAL(SigFinished(FanartDownloadErrorState,
-                                          QString, Metadata *)),
-                    SLOT(OnFanartCopyFinished(FanartDownloadErrorState,
-                                              QString, Metadata *)));
-
-            fd->StartCopy();
-            m_d->AddFanartDownload(fd);
-        }
-        else
-        {
-            metadata->SetFanart("");
-            OnVideoFanartSetDone(metadata);
-        }
-    }
-    else
-        OnVideoFanartSetDone(metadata);
-}
-
-void VideoDialog::OnFanartCopyFinished(FanartDownloadErrorState error,
-                                       QString errorMsg, Metadata *item)
-{
-    QObject *src = sender();
-    if (src)
-        m_d->RemoveFanartDownload(dynamic_cast<FanartDownloadProxy *>
-                                       (src));
-
-    if (error != fesOK && item)
-        item->SetFanart("");
-
-    VERBOSE(VB_IMPORTANT, tr("Fanart download finished: %1 %2")
-            .arg(errorMsg).arg(error));
-
-    if (error == fesTimeout)
-    {
-        createOkDialog(tr("Fanart exists for this item but could not be "
-                            "retrieved within the timeout period.\n"));
-    }
-
-    OnVideoFanartSetDone(item);
-}
-
-void VideoDialog::OnVideoFanartSetDone(Metadata *metadata)
-{
-    // The metadata has some fanart set
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
-
-    metadata->UpdateDatabase();
-    UpdateItem(GetItemCurrent());
-}
-
-void VideoDialog::OnScreenshotURL(QString uri, Metadata *metadata)
-{
-    if (metadata)
-    {
-        if (uri.length())
-        {
-            QString fileprefix = m_d->m_sshotDir;
-
-            QDir dir;
-
-            // If the fanart setting hasn't been set default to
-            // using ~/.mythtv/MythVideo/Screenshot
-            if (fileprefix.length() == 0)
-            {
-                fileprefix = GetConfDir();
-
-                dir.setPath(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                fileprefix += "/MythVideo/Screenshot";
-            }
-
-            dir.setPath(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            QUrl url(uri);
-
-            QString ext = QFileInfo(url.path()).suffix();
-            QString dest_file;
-            QString db_value;
-
-            if (metadata->GetSeason() > 0 ||
-                metadata->GetEpisode() > 0)
-            {
-                // Name TV downloads so that they already work with the PBB
-                QString title = QString("%1 Season %2x%3_screenshot").arg(metadata->GetTitle())
-                        .arg(metadata->GetSeason()).arg(metadata->GetEpisode());
-                if (!metadata->GetHost().isEmpty())
-                {
-                    QString combFileName = QString("%1.%2").arg(title).arg(ext);
-                    dest_file = GenRemoteFileURL("Screenshots", metadata->GetHost(),
-                        combFileName);
-                    db_value = combFileName;
-                }
-                else
-                {
-                    dest_file = QString("%1/%2_screenshot.%3").arg(fileprefix)
-                            .arg(title).arg(ext);
-                    db_value = dest_file;
-                }
-            }
-            else
-            {
-                if (!metadata->GetHost().isEmpty())
-                {
-                    QString combFileName = QString("%1_screenshot.%2")
-                                           .arg(metadata->GetInetRef())
-                                           .arg(ext);
-                    dest_file = GenRemoteFileURL("Screenshots", metadata->GetHost(),
-                        combFileName);
-                    db_value = combFileName;
-                }
-                else
-                {
-                    dest_file = QString("%1/%2_screenshot.%3").arg(fileprefix)
-                            .arg(metadata->GetInetRef()).arg(ext);
-                    db_value = dest_file;
-                }
-            }
-
-            VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
-                    .arg(url.toString()).arg(dest_file));
-
-            ScreenshotDownloadProxy *ssd =
-                    ScreenshotDownloadProxy::Create(url, dest_file, metadata,
-                                                   db_value);
-
-            connect(ssd, SIGNAL(SigFinished(ScreenshotDownloadErrorState,
-                                          QString, Metadata *)),
-                    SLOT(OnScreenshotCopyFinished(ScreenshotDownloadErrorState,
-                                              QString, Metadata *)));
-
-            ssd->StartCopy();
-            m_d->AddScreenshotDownload(ssd);
-        }
-        else
-        {
-            metadata->SetScreenshot("");
-            OnVideoScreenshotSetDone(metadata);
-        }
-    }
-    else
-        OnVideoScreenshotSetDone(metadata);
-}
-
-void VideoDialog::OnScreenshotCopyFinished(ScreenshotDownloadErrorState error,
-                                       QString errorMsg, Metadata *item)
-{
-    QObject *src = sender();
-    if (src)
-        m_d->RemoveScreenshotDownload(dynamic_cast<ScreenshotDownloadProxy *>
-                                       (src));
-
-    if (error != ssesOK && item)
-        item->SetScreenshot("");
-
-    VERBOSE(VB_IMPORTANT, tr("Screenshot download finished: %1 %2")
-            .arg(errorMsg).arg(error));
-
-    if (error == ssesTimeout)
-    {
-        createOkDialog(tr("Screenshot exists for this item but could not be "
-                            "retrieved within the timeout period.\n"));
-    }
-
-    OnVideoScreenshotSetDone(item);
-}
-
-void VideoDialog::OnVideoScreenshotSetDone(Metadata *metadata)
-{   
-    // The metadata has some fanart set
-    if (m_busyPopup)
-    {
-        m_busyPopup->Close();
-        m_busyPopup = NULL;
-    }
-
-    metadata->UpdateDatabase();
-    UpdateItem(GetItemCurrent());
-}
-
-
-void VideoDialog::OnBannerURL(QString uri, Metadata *metadata)
-{
-    if (metadata)
-    {
-        if (uri.length())
-        {
-            QString fileprefix = m_d->m_banDir;
-
-            QDir dir;
-
-            // If the fanart setting hasn't been set default to
-            // using ~/.mythtv/MythVideo/Banners
-            if (fileprefix.length() == 0)
-            {
-                fileprefix = GetConfDir();
-
-                dir.setPath(fileprefix);
-                if (!dir.exists())
-                    dir.mkdir(fileprefix);
-
-                fileprefix += "/MythVideo/Banners";
-            }
-
-            dir.setPath(fileprefix);
-            if (!dir.exists())
-                dir.mkdir(fileprefix);
-
-            QUrl url(uri);
-
-            QString ext = QFileInfo(url.path()).suffix();
-            QString dest_file;
-            QString db_value;
-
-            if (metadata->GetSeason() > 0 || 
-                metadata->GetEpisode() > 0)
-            { 
-                // Name TV downloads so that they already work with the PBB    
-                QString title = QString("%1 Season %2_banner").arg(metadata->GetTitle())
-                        .arg(metadata->GetSeason());
-                if (!metadata->GetHost().isEmpty())
-                {
-                    QString combFileName = QString("%1.%2").arg(title).arg(ext);
-                    dest_file = GenRemoteFileURL("Banners", metadata->GetHost(),
-                        combFileName);
-                    db_value = combFileName;
-                }
-                else
-                {
-                    dest_file = QString("%1/%2_banner.%3").arg(fileprefix)
-                            .arg(title).arg(ext);
-                    db_value = dest_file;
-                }
-            }
-            else
-            {
-                if (!metadata->GetHost().isEmpty())
-                {
-                    QString combFileName = QString("%1_banner.%2")
-                                           .arg(metadata->GetInetRef())
-                                           .arg(ext);
-                    dest_file = GenRemoteFileURL("Banners", metadata->GetHost(),
-                        combFileName);
-                    db_value = combFileName;
-                }
-                else
-                {
-                    dest_file = QString("%1/%2_banner.%3").arg(fileprefix)
-                            .arg(metadata->GetInetRef()).arg(ext);
-                    db_value = dest_file;
-                }
-            }
-
-            VERBOSE(VB_IMPORTANT, QString("Copying '%1' -> '%2'...")
-                    .arg(url.toString()).arg(dest_file));
-
-            BannerDownloadProxy *bd =
-                    BannerDownloadProxy::Create(url, dest_file, metadata,
-                                                db_value);
-
-            connect(bd, SIGNAL(SigFinished(BannerDownloadErrorState,
-                                          QString, Metadata *)),
-                    SLOT(OnBannerCopyFinished(BannerDownloadErrorState,
-                                              QString, Metadata *)));
-
-            bd->StartCopy();
-            m_d->AddBannerDownload(bd);
-        }
-        else
-        {
-            metadata->SetBanner("");
-            OnVideoBannerSetDone(metadata);
-        }
-    }
-    else
-        OnVideoBannerSetDone(metadata);
-}
-
-void VideoDialog::OnBannerCopyFinished(BannerDownloadErrorState error,
-                                       QString errorMsg, Metadata *item)
-{
-    QObject *src = sender();
-    if (src)
-        m_d->RemoveBannerDownload(dynamic_cast<BannerDownloadProxy *>
-                                       (src));
-
-    if (error != besOK && item)
-        item->SetBanner("");
-
-    VERBOSE(VB_IMPORTANT, tr("Banner download finished: %1 %2")
-            .arg(errorMsg).arg(error));
-
-    if (error == besTimeout)
-    {
-        createOkDialog(tr("Banner exists for this item but could not be "
-                            "retrieved within the timeout period.\n"));
-    }
-
-    OnVideoBannerSetDone(item);
-}
-
-void VideoDialog::OnVideoBannerSetDone(Metadata *metadata)
-{
-    // The metadata has a banner set
     if (m_busyPopup)
     {
         m_busyPopup->Close();
@@ -5465,27 +4761,44 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
 void VideoDialog::StartVideoSearchByTitle(QString video_uid, QString title,
                                             Metadata *metadata)
 {
-    if (video_uid == VIDEO_INETREF_DEFAULT)
+    if (video_uid.isEmpty())
+    {
+        createBusyDialog(title);
+
+        metadata->SetTitle(Metadata::FilenameToMeta(metadata->GetFilename(), 1));
+        QString seas = Metadata::FilenameToMeta(metadata->GetFilename(), 2);
+        metadata->SetSeason(seas.toInt());
+        QString ep = Metadata::FilenameToMeta(metadata->GetFilename(), 3);
+        metadata->SetEpisode(ep.toInt());
+
+        VideoTitleSearch *vts = new VideoTitleSearch(this);
+        connect(vts, SIGNAL(SigSearchResults(bool, const QStringList &,
+                                Metadata *)),
+                SLOT(OnVideoSearchByTitleDone(bool, const QStringList &,
+                                Metadata *)));
+        vts->Run(title, metadata);
+    }
+    else if (video_uid == VIDEO_INETREF_DEFAULT)
     {
         createBusyDialog(title);
 
         VideoTitleSearch *vts = new VideoTitleSearch(this);
-        connect(vts, SIGNAL(SigSearchResults(bool, const SearchListResults &,
+        connect(vts, SIGNAL(SigSearchResults(bool, const QStringList &,
                                 Metadata *)),
-                SLOT(OnVideoSearchByTitleDone(bool, const SearchListResults &,
+                SLOT(OnVideoSearchByTitleDone(bool, const QStringList &,
                                 Metadata *)));
         vts->Run(title, metadata);
     }
     else
     {
-        SearchListResults videos;
-        videos.insertMulti(video_uid, title);
+        QStringList videos;
+        videos.append(QString("%1:%2").arg(video_uid).arg(title));
         OnVideoSearchByTitleDone(true, videos, metadata);
     }
 }
 
 void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
-        const SearchListResults &results, Metadata *metadata)
+        const QStringList &results, Metadata *metadata)
 {
     if (m_busyPopup)
     {
@@ -5500,15 +4813,19 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
 
     if (results.size() == 1)
     {
+        QString keyValue = results.first();
+        QString key = (keyValue.left(keyValue.indexOf(':')));
+        QString value = (keyValue.right(keyValue.length() - keyValue.indexOf(":") - 1));
+
         // Only one search result, fetch data.
-        if (results.begin().value().isEmpty())
+        if (value.isEmpty())
         {
             metadata->Reset();
             metadata->UpdateDatabase();
             UpdateItem(GetItemCurrent());
             return;
         }
-        StartVideoSearchByUID(results.begin().key(), metadata);
+        StartVideoSearchByUID(key, metadata);
     }
     else if (results.size() < 1)
     {
@@ -5529,7 +4846,7 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
 }
 
 void VideoDialog::OnVideoImageOnlyDone(bool normal_exit,
-        const SearchListResults &results, Metadata *metadata)
+        const QStringList &results, Metadata *metadata)
 {
     if (m_busyPopup)
     {
@@ -5544,12 +4861,16 @@ void VideoDialog::OnVideoImageOnlyDone(bool normal_exit,
 
     if (results.size() == 1)
     {
+        QString keyValue = results.first();
+        QString key = (keyValue.left(keyValue.indexOf(':')));
+        QString value = (keyValue.right(keyValue.length() - keyValue.indexOf(":") - 1));
+
         // Only one search result, fetch data.
-        if (results.begin().value().isEmpty())
+        if (value.isEmpty())
             return;
         else
         {
-            metadata->SetInetRef(results.begin().key());
+            metadata->SetInetRef(key);
             metadata->UpdateDatabase();
             UpdateItem(GetItemCurrent());
             StartVideoImageSet(metadata);
@@ -5640,7 +4961,7 @@ void VideoDialog::doVideoScan()
 {
     if (!m_d->m_scanner)
         m_d->m_scanner = new VideoScanner();
-    connect(m_d->m_scanner, SIGNAL(finished()), SLOT(reloadData()));
+    connect(m_d->m_scanner, SIGNAL(finished(bool)), SLOT(reloadAllData(bool)));
     m_d->m_scanner->doScan(GetVideoDirs());
 }
 

@@ -53,6 +53,7 @@
 #define SA3250HD_MODEL_ID1      0x00000be0
 #define SA4200HD_MODEL_ID1      0x00001072
 #define SA4250HDC_MODEL_ID1     0x000010cc
+#define SA8300HD_MODEL_ID1      0x000022ce
 
 #define AVC1394_SA3250_COMMAND_CHANNEL 0x000007c00   /* subunit command */
 #define AVC1394_SA3250_OPERAND_KEY_PRESS 0xe7
@@ -159,7 +160,8 @@ int main (int argc, char *argv[])
            (dir.vendor_id == SA_VENDOR_ID16)) &&
           ((dir.model_id == SA3250HD_MODEL_ID1)  ||
            (dir.model_id == SA4200HD_MODEL_ID1)  ||
-           (dir.model_id == SA4250HDC_MODEL_ID1)))
+           (dir.model_id == SA4250HDC_MODEL_ID1) ||
+           (dir.model_id == SA8300HD_MODEL_ID1)))
       {
           if (dir.model_id == SA4250HDC_MODEL_ID1)
           {
@@ -176,7 +178,7 @@ int main (int argc, char *argv[])
     
    if (device == -1)
    {
-        fprintf(stderr, "Could not find SA3250HD or SA4200HD "
+        fprintf(stderr, "Could not find SA3250HD, SA4200HD, or SA8300HD "
                 "on the IEEE 1394 bus.\n");
 
         raw1394_destroy_handle(handle);

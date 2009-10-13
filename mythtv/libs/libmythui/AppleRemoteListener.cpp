@@ -1,17 +1,17 @@
+
+#include "AppleRemoteListener.h"
+
 #include <QApplication>
 #include <QKeySequence>
 #include "lircevent.h"
-
-#include "AppleRemoteListener.h"
 
 AppleRemoteListener::AppleRemoteListener(QObject* mainWindow_)
                    : mainWindow(mainWindow_)
 {
 }
 
-void
-AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
-                                       bool               pressedDown)
+void AppleRemoteListener::appleRemoteButton(AppleRemote::Event button,
+                                            bool pressedDown)
 {
     char* code = 0;
     bool separateRelease = false;

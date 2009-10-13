@@ -28,35 +28,35 @@
     <name>DatabaseBox</name>
     <message>
         <source>Copy To New Playlist</source>
-        <translation>Copier dans la nouvelle liste d&apos;écoute</translation>
+        <translation>Copier dans la nouvelle liste de lecture</translation>
     </message>
     <message>
         <source>Clear the Active Play Queue</source>
-        <translation>Effacer la liste d&apos;écoute actuelle</translation>
+        <translation>Effacer la liste de lecture actuelle</translation>
     </message>
     <message>
         <source>Save Back to Playlist Tree</source>
-        <translation>Enregistrer dans l&apos;arborescence des listes d&apos;écoute</translation>
+        <translation>Enregistrer dans l&apos;arborescence des listes de lecture</translation>
     </message>
     <message>
         <source>Move to Active Play Queue</source>
-        <translation>Déplacer la liste d&apos;écoute</translation>
+        <translation>Déplacer la liste de lecture</translation>
     </message>
     <message>
         <source>Delete This Playlist</source>
-        <translation>Effacer cette liste d&apos;écoute</translation>
+        <translation>Effacer cette liste de lecture</translation>
     </message>
     <message>
         <source>Rename This Playlist</source>
-        <translation>Renommer cette liste d&apos;écoute</translation>
+        <translation>Renommer cette liste de lecture</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Activer la liste d&apos;écoute</translation>
+        <translation>Activer la liste de lecture</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation>Toutes mes listes d&apos;écoute</translation>
+        <translation>Toutes mes listes de lecture</translation>
     </message>
     <message>
         <source>All My Music</source>
@@ -92,11 +92,11 @@
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation>Créer un CD audio à partir de la liste d&apos;écoute</translation>
+        <translation>Créer un CD audio à partir de la liste de lecture</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation>Créer un CD MP3 à partir de la liste d&apos;écoute</translation>
+        <translation>Créer un CD MP3 à partir de la liste de lecture</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
@@ -163,7 +163,7 @@
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation>Enregistrer dans la BDD seulement</translation>
+        <translation>Enregistrer dans la base de données seulement</translation>
     </message>
     <message>
         <source>Save to File Only</source>
@@ -244,14 +244,6 @@
         <translation>Nouveau fichier</translation>
     </message>
     <message>
-        <source>All Ready in Database</source>
-        <translation>Déjà dans la bibliothèque</translation>
-    </message>
-    <message>
-        <source>Non found</source>
-        <translation>Introuvable</translation>
-    </message>
-    <message>
         <source>This track is already in the database</source>
         <translation>Cette piste est déjà dans la bibliothèque</translation>
     </message>
@@ -300,6 +292,14 @@
 Could not copy file to: %1</source>
         <translation>Copie en échec
 N&apos;a pu copier le fichier vers : %1</translation>
+    </message>
+    <message>
+        <source>Already in Database</source>
+        <translation>Déjà dans la bibliothèque</translation>
+    </message>
+    <message>
+        <source>Not found</source>
+        <translation>Introuvable</translation>
     </message>
 </context>
 <context>
@@ -398,7 +398,118 @@ N&apos;a pu copier le fichier vers : %1</translation>
     <name>MusicPlayer</name>
     <message>
         <source>playlist root</source>
-        <translation>Racine de la liste d&apos;écoute</translation>
+        <translation>Racine de la liste de lecture</translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Play music</source>
+        <translation>Jouer la musique</translation>
+    </message>
+    <message>
+        <source>Select music playlists</source>
+        <translation>Choisir une liste de lecture musicale</translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation>Extraire le CD</translation>
+    </message>
+    <message>
+        <source>Scan music</source>
+        <translation>Parcourir la musique</translation>
+    </message>
+    <message>
+        <source>Show Music Miniplayer</source>
+        <translation>Afficher le lecteur de musique miniature</translation>
+    </message>
+    <message>
+        <source>Move to the next track</source>
+        <translation>Atteindre la piste suivante</translation>
+    </message>
+    <message>
+        <source>Move to the previous track</source>
+        <translation>Atteindre la piste précédente</translation>
+    </message>
+    <message>
+        <source>Fast forward</source>
+        <translation>Avance rapide</translation>
+    </message>
+    <message>
+        <source>Rewind</source>
+        <translation>Retour en arrière</translation>
+    </message>
+    <message>
+        <source>Pause/Start playback</source>
+        <translation>mettre en pause/démarrer la lecture</translation>
+    </message>
+    <message>
+        <source>Start playback</source>
+        <translation>Démarrer la lecture</translation>
+    </message>
+    <message>
+        <source>Stop playback</source>
+        <translation>Arrêter la lecture</translation>
+    </message>
+    <message>
+        <source>Volume down</source>
+        <translation>Diminuer le volume</translation>
+    </message>
+    <message>
+        <source>Volume up</source>
+        <translation>Augmenter le volume</translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation>Mettre en sourdine</translation>
+    </message>
+    <message>
+        <source>Cycle visualizer mode</source>
+        <translation>Mode visualisation</translation>
+    </message>
+    <message>
+        <source>Blank screen</source>
+        <translation>Écran vide</translation>
+    </message>
+    <message>
+        <source>Increase rating</source>
+        <translation>Augmenter la notation</translation>
+    </message>
+    <message>
+        <source>Decrease rating</source>
+        <translation>Diminuer la notation</translation>
+    </message>
+    <message>
+        <source>Refresh music tree</source>
+        <translation>Rafraichir l&apos;aborescence musicale</translation>
+    </message>
+    <message>
+        <source>Filter All My Music</source>
+        <translation>Filtrer toute ma musique</translation>
+    </message>
+    <message>
+        <source>Show incremental search dialog</source>
+        <translation>Afficher la page de recherche incrémentale</translation>
+    </message>
+    <message>
+        <source>Incremental search find next match</source>
+        <translation>Item suivant dans la recherche incrémentale</translation>
+    </message>
+    <message>
+        <source>Increase Play Speed</source>
+        <translation>Augmenter la vitesse de lecture</translation>
+    </message>
+    <message>
+        <source>Decrease Play Speed</source>
+        <translation>Diminuer la vitesse de lecture</translation>
+    </message>
+    <message>
+        <source>MythMusic Media Handler 1/2</source>
+        <translation>Configurateur média de MythMusic 1/2</translation>
+    </message>
+    <message>
+        <source>MythMusic Media Handler 2/2</source>
+        <translation>Configurateur média de MythMusic 2/2</translation>
     </message>
 </context>
 <context>
@@ -461,7 +572,7 @@ N&apos;a pu copier le fichier vers : %1</translation>
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation>Listes astucieuses</translation>
+        <translation>Listes intelligentes</translation>
     </message>
     <message>
         <source>All Tracks</source>
@@ -473,15 +584,15 @@ N&apos;a pu copier le fichier vers : %1</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation>Piste du même album</translation>
+        <translation>Pistes du même album</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation>Piste du même genre</translation>
+        <translation>Pistes du même genre</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation>Piste de la même année</translation>
+        <translation>Pistes de la même année</translation>
     </message>
     <message>
         <source>Search</source>
@@ -497,7 +608,7 @@ N&apos;a pu copier le fichier vers : %1</translation>
     </message>
     <message>
         <source>Update Playlist Options</source>
-        <translation>Mettre à jour les options d&apos;écoute</translation>
+        <translation>Mettre à jour les options de la liste de lecture</translation>
     </message>
     <message>
         <source>Replace</source>
@@ -537,40 +648,40 @@ N&apos;a pu copier le fichier vers : %1</translation>
     </message>
     <message>
         <source>Rand</source>
-        <translation>aléatoire</translation>
+        <translation>Aléatoire</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation>album</translation>
+        <translation>Album</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation>artiste</translation>
+        <translation>Artiste</translation>
     </message>
     <message>
         <source>None</source>
-        <translation>non</translation>
+        <translation>Aucun</translation>
     </message>
     <message>
         <source>Shuffle</source>
-        <translation>mélange</translation>
+        <translation>Mélange</translation>
     </message>
     <message>
         <source>All</source>
-        <translation>tout</translation>
+        <translation>Tout</translation>
     </message>
     <message>
         <source>Track</source>
-        <translation>piste</translation>
+        <translation>Piste</translation>
     </message>
     <message>
         <source>Repeat</source>
-        <translation>répéter</translation>
+        <translation>Répéter</translation>
     </message>
     <message>
         <source>Exiting Music Player
 Do you want to continue playing in the background?</source>
-        <translation>Quitter le lecteur de musique.
+        <translation>Sortie du lecteur de musique.
 Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
@@ -618,7 +729,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Directory to hold music</source>
-        <translation>Dossier de stockage de la musique</translation>
+        <translation>Répertoire de stockage de la musique</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
@@ -646,7 +757,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation>Si le script est renseigné, il sera executé après l&apos;import de CD.</translation>
+        <translation>Si le script est fourni, il sera executé après l&apos;import de CD.</translation>
     </message>
     <message>
         <source>Filename Format</source>
@@ -690,7 +801,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation>Encodeur audio utilisé pour l&apos;extraction de CD. N.B. : le niveau de qualité &quot;Parfait&quot; utilisera l&apos;encodeur FLAC.</translation>
+        <translation>Encodeur audio utilisé pour l&apos;extraction de CD. N.B.: le niveau de qualité &quot;Parfait&quot; utilisera l&apos;encodeur FLAC.</translation>
     </message>
     <message>
         <source>File storage location</source>
@@ -702,7 +813,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>If set, whitespace characters in filenames will be replaced with underscore characters.</source>
-        <translation>Si coché, les caractères d&apos;espaces dans les noms de fichiers seront remplacés par des underscores.</translation>
+        <translation>Si coché, les blancs dans les noms de fichiers seront remplacés par des traits soulignés.</translation>
     </message>
     <message>
         <source>Paranoia Level</source>
@@ -734,7 +845,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation>Utilisé dans le mode aléatoire intelligent. Cette pondération affectera l&apos;importance accordée à vos évaluations lors du tri d&apos;un groupe de morceaux.</translation>
+        <translation>Utilisé dans le mode mélange « intelligent ». Cette pondération affectera l&apos;importance accordée à vos évaluations lors du tri d&apos;un groupe de morceaux.</translation>
     </message>
     <message>
         <source>Play Count Weight</source>
@@ -742,7 +853,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation>Utilisé dans le mode aléatoire intelligent. Ce poids affecte l&apos;importance donnée au nombre de fois qu&apos;une chanson à été jouée lors du tri d&apos;un groupe de morceaux.</translation>
+        <translation>Utilisé dans le mode mélange « intelligent ». Ce poids affecte l&apos;importance donnée au nombre de fois qu&apos;une piste à été jouée lors du tri d&apos;un groupe de morceaux.</translation>
     </message>
     <message>
         <source>Last Play Weight</source>
@@ -750,7 +861,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation>Utilisé dans le mode aléatoire intelligent. Ce poids affecte l&apos;importance donnée au temps depuis lequel une piste à été jouée lors du tri d&apos;un groupe de morceaux.</translation>
+        <translation>Utilisé dans le mode mélange « intelligent ». Ce poids affecte l&apos;importance donnée au temps depuis lequel une piste a été jouée lors du tri d&apos;un groupe de morceaux.</translation>
     </message>
     <message>
         <source>Random Weight</source>
@@ -758,7 +869,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>Utilisé dans le mode aléatoire intelligent. Ce poids affecte l&apos;importance donnée aux anciens bon choix (pseudo-)aléatoire lors du tri d&apos;un groupe de morceaux.</translation>
+        <translation>Utilisé dans le mode mélange « intelligent ». Ce poids affecte l&apos;importance donnée aux anciens bon choix (pseudo-)aléatoire lors du tri d&apos;un groupe de morceaux.</translation>
     </message>
     <message>
         <source>Show Song Ratings</source>
@@ -766,7 +877,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Show song ratings on the playback screen.</source>
-        <translation>Afficher les évaluations des morceaux dans l&apos;écran de lecture.</translation>
+        <translation>Afficher les évaluations des morceaux dans l&apos;a fenêtre de lecture.</translation>
     </message>
     <message>
         <source>List as Shuffled</source>
@@ -846,7 +957,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Default quality for new CD rips.</source>
-        <translation>Qualité par défault des nouvelles extractions de CD.</translation>
+        <translation>Qualité par défaut des nouvelles extractions de CD.</translation>
     </message>
     <message>
         <source>Playback Settings</source>
@@ -862,15 +973,15 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Unknown Artist</source>
-        <translation>Artiste Inconnu</translation>
+        <translation>Artiste inconnu</translation>
     </message>
     <message>
         <source>Unknown Album</source>
-        <translation>Album Inconnu</translation>
+        <translation>Album inconnu</translation>
     </message>
     <message>
         <source>Unknown Genre</source>
-        <translation>Genre Inconnu</translation>
+        <translation>Genre inconnu</translation>
     </message>
     <message>
         <source>CD -- none</source>
@@ -898,7 +1009,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Not Initialized</source>
-        <translation>Non Initialisé</translation>
+        <translation>Non initialisé</translation>
     </message>
     <message>
         <source>oops</source>
@@ -918,7 +1029,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation>Si coché, l&apos;encodeur MP3 utilisera des bitrates variables (VBR) sauf pour les réglages basses qualité. L&apos;encodeur Ogg utilisera toujours du bitrate variable.</translation>
+        <translation>Si coché, l&apos;encodeur MP3 utilisera des débits binaires variables (VBR) sauf pour les réglages basses qualité. L&apos;encodeur Ogg utilisera toujours le débit binaire variable.</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
@@ -954,7 +1065,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation>Authoriser les répertoires sur les CD MP3</translation>
+        <translation>Autoriser les répertoires sur les CD MP3</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
@@ -1018,7 +1129,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation>Ajouter automatiquement un nouveau CD dans la liste d&apos;écoute et débuter la lecture du CD.</translation>
+        <translation>Ajouter automatiquement un nouveau CD dans la liste de lecture et débuter la lecture du CD.</translation>
     </message>
     <message>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
@@ -1102,7 +1213,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
-        <translation>Reprendre la lecture au début de la liste d&apos;écoute, au début de la dernière piste ou à un point précis dans la piste actuelle.</translation>
+        <translation>Reprendre la lecture au début de la liste de lecture, au début de la dernière piste ou à un point précis dans la piste actuelle.</translation>
     </message>
     <message>
         <source>Playback Settings (2)</source>
@@ -1142,7 +1253,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Starting shuffle mode for the player.  Can be either normal, random, intelligent (random), or Album.</source>
-        <translation>Active le mode Shuffle du lecteur. Choisir parmi les attributs Normal, Random, Smart, ou Album.</translation>
+        <translation>Active le mode mélange du lecteur. Choisir parmi les attributs Normal, Aléatoire, Intelligent (aléatoire), ou Album.</translation>
     </message>
     <message>
         <source>Change the visualizer when the song changes.</source>
@@ -1186,11 +1297,11 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>OSX Audio CD mount parser</source>
-        <translation>Parser de montage de CD Audio OSX</translation>
+        <translation>Parseur de montage de CD Audio OSX</translation>
     </message>
     <message>
         <source>Windows CD parser</source>
-        <translation>Parser de CD Windows</translation>
+        <translation>Parseur de CD Windows</translation>
     </message>
     <message>
         <source>Cleaning music database</source>
@@ -1198,11 +1309,11 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation>Scanne les fichiers musicaux</translation>
+        <translation>Recherche les fichiers musicaux</translation>
     </message>
     <message>
         <source>Scanning Album Artwork</source>
-        <translation>Scanne les illustrations d&apos;album</translation>
+        <translation>Recherche les illustrations d&apos;album</translation>
     </message>
     <message>
         <source>Action on exit</source>
@@ -1251,6 +1362,22 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     <message>
         <source>cover</source>
         <translation>pochette</translation>
+    </message>
+    <message>
+        <source>All My Playlists</source>
+        <translation>Toutes mes listes de lecture</translation>
+    </message>
+    <message>
+        <source>Active Play Queue</source>
+        <translation>Liste de lecture active</translation>
+    </message>
+    <message>
+        <source>Active Play Queue (%1)</source>
+        <translation>Liste de lecture active (%1)</translation>
+    </message>
+    <message>
+        <source>Something is Wrong</source>
+        <translation>Quelque chose ne va pas</translation>
     </message>
 </context>
 <context>
@@ -1362,7 +1489,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation>Choisir un artiste de compil</translation>
+        <translation>Choisir un artiste de compilation</translation>
     </message>
 </context>
 <context>
@@ -1514,7 +1641,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation>Listes d&apos;écoute intelligentes</translation>
+        <translation>Listes de lecture intelligentes</translation>
     </message>
     <message>
         <source>1 Select</source>
@@ -1660,7 +1787,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation>Piste N°:</translation>
+        <translation>Piste N° :</translation>
     </message>
     <message>
         <source>Rating:</source>
@@ -1751,10 +1878,6 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
         <translation>Emplacement : </translation>
     </message>
     <message>
-        <source>All ready in database</source>
-        <translation>Déjà dans la bibliothèque</translation>
-    </message>
-    <message>
         <source>Import Cover Art</source>
         <translation>Importer une pochette</translation>
     </message>
@@ -1818,6 +1941,54 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
         <source>Copy</source>
         <translation>Copier</translation>
     </message>
+    <message>
+        <source>Already in database</source>
+        <translation>Déjà dans la bibliothèque</translation>
+    </message>
+    <message>
+        <source>General Settings</source>
+        <translation>Réglages généraux</translation>
+    </message>
+    <message>
+        <source>Player Settings</source>
+        <translation>Réglages du lecteur</translation>
+    </message>
+    <message>
+        <source>Ripper Settings</source>
+        <translation>Réglages de l&apos;extracteur</translation>
+    </message>
+    <message>
+        <source>Play Music</source>
+        <translation>Jouer la musique</translation>
+    </message>
+    <message>
+        <source>Select Music</source>
+        <translation>Sélectionner la musique</translation>
+    </message>
+    <message>
+        <source>Import CD</source>
+        <translation>Importer un CD</translation>
+    </message>
+    <message>
+        <source>Import Files</source>
+        <translation>Importer des fichiers</translation>
+    </message>
+    <message>
+        <source>Scan for New Music</source>
+        <translation>Rechercher de nouvelles musiques</translation>
+    </message>
+    <message>
+        <source>Eject media</source>
+        <translation>Éjecter le média</translation>
+    </message>
+    <message>
+        <source>Music Settings</source>
+        <translation>Réglages Musique</translation>
+    </message>
+    <message>
+        <source>Configure playback and CD ripping</source>
+        <translation>Configurer la lecture et l&apos;extraction de CD</translation>
+    </message>
 </context>
 <context>
     <name>VisualizationsEditor</name>
@@ -1856,52 +2027,6 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
-    </message>
-</context>
-<context>
-    <name>music_settings_xml</name>
-    <message>
-        <source>General Settings</source>
-        <translation>Réglages généraux</translation>
-    </message>
-    <message>
-        <source>Player Settings</source>
-        <translation>Réglages du lecteur</translation>
-    </message>
-    <message>
-        <source>Ripper Settings</source>
-        <translation>Réglages de l&apos;extracteur</translation>
-    </message>
-</context>
-<context>
-    <name>musicmenu_xml</name>
-    <message>
-        <source>Play Music</source>
-        <translation>Jouer la musique</translation>
-    </message>
-    <message>
-        <source>Select Music</source>
-        <translation>Sélectionner la musique</translation>
-    </message>
-    <message>
-        <source>Import CD</source>
-        <translation>Importer un CD</translation>
-    </message>
-    <message>
-        <source>Import Files</source>
-        <translation>Importer des fichiers</translation>
-    </message>
-    <message>
-        <source>Scan for New Music</source>
-        <translation>Rechercher de nouvelles musiques</translation>
-    </message>
-    <message>
-        <source>Eject media</source>
-        <translation>Éjecter le média</translation>
-    </message>
-    <message>
-        <source>Music Settings</source>
-        <translation>Réglages Musique</translation>
     </message>
 </context>
 </TS>

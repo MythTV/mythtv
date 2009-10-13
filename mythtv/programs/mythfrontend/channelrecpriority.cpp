@@ -1,9 +1,10 @@
 
+#include "channelrecpriority.h"
+
 #include <algorithm> // For std::sort()
 #include <vector> // For std::vector
 using namespace std;
 
-#include "channelrecpriority.h"
 #include "tv.h"
 
 #include "mythcontext.h"
@@ -28,7 +29,7 @@ typedef struct RecPriorityInfo
 class channelSort
 {
     public:
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             if (a.chan->chanstr.toInt() == b.chan->chanstr.toInt())
                 return(a.chan->sourceid > b.chan->sourceid);
@@ -39,7 +40,7 @@ class channelSort
 class channelRecPrioritySort
 {
     public:
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             if (a.chan->recpriority.toInt() == b.chan->recpriority.toInt())
                 return (a.chan->chanstr.toInt() > b.chan->chanstr.toInt());
@@ -48,7 +49,12 @@ class channelRecPrioritySort
 };
 
 ChannelRecPriority::ChannelRecPriority(MythScreenStack *parent)
-                  : MythScreenType(parent, "ChannelRecPriority")
+                  : MythScreenType(parent, "ChannelRecPriority"),
+                    m_channelList(NULL), m_chanstringText(NULL),
+                    m_channameText(NULL), m_channumText(NULL),
+                    m_callsignText(NULL), m_sourcenameText(NULL),
+                    m_sourceidText(NULL), m_priorityText(NULL),
+                    m_iconImage(NULL)
 {
     m_sortType = (SortType)gContext->GetNumSetting("ChannelRecPrioritySorting",
                                                  (int)byChannel);
@@ -246,8 +252,6 @@ void ChannelRecPriority::saveRecPriority(void)
 
 void ChannelRecPriority::FillList(void)
 {
-    int cnt = 999;
-
     QMap<int, QString> srcMap;
 
     m_channelData.clear();
@@ -257,7 +261,7 @@ void ChannelRecPriority::FillList(void)
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT sourceid, name FROM videosource;");
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec())
     {
         while (result.next())
         {
@@ -267,8 +271,9 @@ void ChannelRecPriority::FillList(void)
     result.prepare("SELECT chanid, channum, sourceid, callsign, "
                    "icon, recpriority, name, visible FROM channel;");
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec())
     {
+        int cnt = 999;
         while (result.next())
         {
             ChannelInfo *chaninfo = new ChannelInfo;
@@ -310,7 +315,7 @@ void ChannelRecPriority::updateList()
         ChannelInfo *chanInfo = *it;
 
         item = new MythUIButtonListItem(m_channelList, "",
-                                                    qVariantFromValue(chanInfo));
+                                                   qVariantFromValue(chanInfo));
 
         QString fontState = "default";
         if (!m_visMap[chanInfo->chanid])
@@ -368,7 +373,7 @@ void ChannelRecPriority::SortList()
 
     // copy m_channelData into sortingList
     for (i = 0, pit = m_channelData.begin(); pit != m_channelData.end();
-            ++pit, i++)
+            ++pit, ++i)
     {
         chanInfo = &(*pit);
         RecPriorityInfo tmp = {chanInfo, i};

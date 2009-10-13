@@ -1,31 +1,55 @@
-#include <cassert>
-#include <iostream>
+
+// QT headers
 #include <QPainter>
 #include <QPixmap>
 
+// MythUI headers
 #include "mythpainter_qt.h"
 #include "mythfontproperties.h"
 #include "mythmainwindow.h"
+
+// MythDB headers
 #include "compat.h"
+#include "mythverbose.h"
 
 class MythQtImage : public MythImage
 {
   public:
-    MythQtImage(MythPainter *parent) : MythImage(parent) { }
+    MythQtImage(MythPainter *parent) : MythImage(parent),
+                m_Pixmap(NULL), m_bRegenPixmap(false) { }
+   ~MythQtImage() { }
 
     void SetChanged(bool change = true);
-    QPixmap *GetPixmap(void) { return &m_Pixmap; }
+    QPixmap *GetPixmap(void) { return m_Pixmap; }
+
+    bool NeedsRegen(void) { return m_bRegenPixmap; }
+    void RegeneratePixmap(void);
 
   protected:
-    QPixmap m_Pixmap;
+    QPixmap *m_Pixmap;
+    bool m_bRegenPixmap;
 };
 
 void MythQtImage::SetChanged(bool change)
 {
     if (change)
-        m_Pixmap = QPixmap::fromImage(*((QImage *)this));
+        m_bRegenPixmap = true;
 
     MythImage::SetChanged(change);
+}
+
+void MythQtImage::RegeneratePixmap(void)
+{
+    // We allocate the pixmap here so it is done in the UI
+    // thread since QPixmap uses non-reentrant X calls.
+    if (!m_Pixmap)
+        m_Pixmap = new QPixmap;
+
+    if (m_Pixmap)
+    {
+        *m_Pixmap = QPixmap::fromImage(*((QImage *)this));
+        m_bRegenPixmap = false;
+    }
 }
 
 MythQtPainter::MythQtPainter() :
@@ -40,12 +64,25 @@ MythQtPainter::~MythQtPainter()
 
 void MythQtPainter::Begin(QWidget *parent)
 {
-    assert(parent);
+    if (!parent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: No parent widget defined for "
+                              "QT Painter, bailing");
+        return;
+    }
 
     MythPainter::Begin(parent);
 
     painter = new QPainter(parent);
     clipRegion = QRegion(QRect(0, 0, 0, 0));
+
+    QMutexLocker locker(&m_imageDeleteLock);
+    while (!m_imageDeleteList.empty())
+    {
+        QPixmap *pm = m_imageDeleteList.front();
+        m_imageDeleteList.pop_front();
+        delete pm;
+    }
 }
 
 void MythQtPainter::End(void)
@@ -74,10 +111,20 @@ void MythQtPainter::SetClipRect(const QRect &clipRect)
 void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
                               const QRect &src, int alpha)
 {
-    assert(painter);
+    if (!painter)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: DrawImage called with no painter");
+        return;
+    }
+    
     (void)alpha;
 
     MythQtImage *qim = reinterpret_cast<MythQtImage *>(im);
+
+    if (qim->NeedsRegen())
+    {
+       qim->RegeneratePixmap();
+    }
 
     painter->drawPixmap(r.topLeft(), *(qim->GetPixmap()), src);
 }
@@ -86,7 +133,12 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
                              int flags, const MythFontProperties &font,
                              int alpha, const QRect &boundRect)
 {
-    assert(painter);
+    if (!painter)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: DrawText called with no painter");
+        return;
+    }
+
     (void)alpha;
 
     painter->setFont(font.face());
@@ -210,7 +262,12 @@ MythImage *MythQtPainter::GetFormatImage()
     return new MythQtImage(this);
 }
 
-void MythQtPainter::DeleteFormatImage(MythImage* /* im */)
+void MythQtPainter::DeleteFormatImage(MythImage *im)
 {
+    MythQtImage *qim = (MythQtImage *)im;
+
+    QMutexLocker locker(&m_imageDeleteLock);
+    if (qim->GetPixmap())
+        m_imageDeleteList.push_back(qim->GetPixmap());
 }
 

@@ -46,3 +46,5 @@ SOURCES += dvdripbox.cpp dvdinfo.cpp titledialog.cpp
 mingw:DEFINES += USING_MINGW
 
 QT += sql xml network
+
+include ( ../../libs-targetfix.pro )

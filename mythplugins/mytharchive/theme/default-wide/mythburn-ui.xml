@@ -307,16 +307,16 @@ MythArchive GUI theme
             <value>No files are selected for archive</value>
         </textarea>
 
-        <button name="addrecording_button" from="basebutton">
+        <button name="addrecording_button" from="basewidebutton">
             <position>60,510</position>
         </button>
 
-        <button name="addvideo_button" from="basebutton">
-            <position>550,510</position>
+        <button name="addvideo_button" from="basewidebutton">
+            <position>500,510</position>
         </button>
 
-        <button name="addfile_button" from="basebutton">
-            <position>1060,510</position>
+        <button name="addfile_button" from="basewidebutton">
+            <position>920,510</position>
         </button>
 
         <progressbar name="size_bar" from="baseprogressbar">

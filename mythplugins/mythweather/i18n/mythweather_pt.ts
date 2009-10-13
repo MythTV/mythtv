@@ -2,6 +2,51 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>GlobalSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocationDialog</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Complete. Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Weather forecasts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause current page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search List</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
@@ -33,122 +78,124 @@
     </message>
 </context>
 <context>
-    <name>String::Accid</name>
+    <name>ScreenSetup</name>
     <message>
-        <source>Alcacer do Sal, Portugal</source>
-        <translation type="obsolete">Alcácer do Sal, Portugal</translation>
+        <source>Active Screens</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Barca D&apos;alva, Portugal</source>
-        <translation type="obsolete">Barca d&apos;Alva, Portugal</translation>
+        <source>Inactive Screens</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Braganca, Portugal</source>
-        <translation type="obsolete">Bragança, Portugal</translation>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Caldar Da Rainha, Portugal</source>
-        <translation type="obsolete">Caldas da Rainha, Portugal</translation>
+        <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Castro Daire, Portugal</source>
-        <translation type="obsolete">Castro d&apos;Aire, Portugal</translation>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Castro Verd, Portugal</source>
-        <translation type="obsolete">Castro Verde, Portugal</translation>
+        <source>Units: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Covilha, Portugal</source>
-        <translation type="obsolete">Covilhâ, Portugal</translation>
+        <source>English Units</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Evora/C. Coord, Portugal</source>
-        <translation type="obsolete">Évora/C. Coord, Portugal</translation>
+        <source>SI Units</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Figueira Da Foz, Portugal</source>
-        <translation type="obsolete">Figueira da Foz, Portugal</translation>
+        <source>Location: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Flores Acores, Portugal</source>
-        <translation type="obsolete">Flores, Açores, Portugal</translation>
+        <source>Not Defined</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Gaviao, Portugal</source>
-        <translation type="obsolete">Gavião, Portugal</translation>
+        <source>Source: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Lajes Acores, Portugal</source>
-        <translation type="obsolete">Lajes, Açores, Portugal</translation>
+        <source>Press SELECT to </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Lisbon, Portugal</source>
-        <translation type="obsolete">Lisboa, Portugal</translation>
+        <source>change location; </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>London, United Kingdom</source>
-        <translation type="obsolete">Londres, Grã Bretanha</translation>
+        <source>change units; </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mertola, Portugal</source>
-        <translation type="obsolete">Mértola, Portugal</translation>
+        <source>move screen up or down; or remove screen.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Misterio Da Prai, Portugal</source>
-        <translation type="obsolete">Mistério da Praia, Portugal</translation>
+        <source>Manipulate Screen</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Olhao, Portugal</source>
-        <translation type="obsolete">Olhão, Portugal</translation>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Portimao, Portugal</source>
-        <translation type="obsolete">Portimão, Portugal</translation>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Povoacao, Portugal</source>
-        <translation type="obsolete">Povoação, Portugal</translation>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Santa Cruz Da Gr, Portugal</source>
-        <translation type="obsolete">Santa Cruz da Graça, Portugal</translation>
+        <source>Change Location</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Santa Maria Acores, Portugal</source>
-        <translation type="obsolete">Santa Maria, Açores, Portugal</translation>
+        <source>Change Units</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Santarem, Portugal</source>
-        <translation type="obsolete">Santarém, Portugal</translation>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceManager</name>
+    <message>
+        <source>Searching for scripts</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sao Joao da Madeira, Portugal</source>
-        <translation type="obsolete">São João da Madeira, Portugal</translation>
+        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sao Marcos Da Se, Portugal</source>
-        <translation type="obsolete">São Marcos da Sé, Portugal</translation>
+        <source>Author: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sao Vicente, Portugal</source>
-        <translation type="obsolete">São Vicente, Portugal</translation>
+        <source>Email: </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Setubal, Portugal</source>
-        <translation type="obsolete">Setúbal, Portugal</translation>
-    </message>
-    <message>
-        <source>Torrao, Portugal</source>
-        <translation type="obsolete">Torrão, Portugal</translation>
-    </message>
-    <message>
-        <source>Vila Real De San, Portugal</source>
-        <translation type="obsolete">Vila Real de Santo António, Portugal</translation>
-    </message>
-    <message>
-        <source>Western Madeira, Portugal</source>
-        <translation type="obsolete">Madeira Oeste, Portugal</translation>
+        <source>Version: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -632,16 +679,8 @@
         <translation>NE</translation>
     </message>
     <message>
-        <source>NEE</source>
-        <translation type="obsolete">NEE</translation>
-    </message>
-    <message>
         <source>E</source>
         <translation>E</translation>
-    </message>
-    <message>
-        <source>SEE</source>
-        <translation type="obsolete">SEE</translation>
     </message>
     <message>
         <source>SE</source>
@@ -664,16 +703,8 @@
         <translation>SO</translation>
     </message>
     <message>
-        <source>SWW</source>
-        <translation type="obsolete">SOO</translation>
-    </message>
-    <message>
         <source>W</source>
         <translation>O</translation>
-    </message>
-    <message>
-        <source>NWW</source>
-        <translation type="obsolete">NOO</translation>
     </message>
     <message>
         <source>NW</source>
@@ -703,18 +734,6 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>loading...</source>
-        <translation>Aguarde um momento...</translation>
-    </message>
-    <message>
-        <source>[ retrieving weather data ... ]</source>
-        <translation>[ a obter a informação meteorológica ... ]</translation>
-    </message>
-    <message>
-        <source>current conditions</source>
-        <translation>Condições Actuais</translation>
-    </message>
-    <message>
         <source>Humidity</source>
         <translation>Humidade</translation>
     </message>
@@ -723,96 +742,8 @@
         <translation>Pressão</translation>
     </message>
     <message>
-        <source>Wind</source>
-        <translation>Vento</translation>
-    </message>
-    <message>
         <source>Visibility</source>
         <translation>Visibilidade</translation>
-    </message>
-    <message>
-        <source>Wind Chill</source>
-        <translation>Temperatura Aparente</translation>
-    </message>
-    <message>
-        <source>UV Index</source>
-        <translation>Radiação Ultra-Violeta</translation>
-    </message>
-    <message>
-        <source>extended forecast</source>
-        <translation>Próximos Dias</translation>
-    </message>
-    <message>
-        <source>LO</source>
-        <translation>Min</translation>
-    </message>
-    <message>
-        <source>HI</source>
-        <translation>Max</translation>
-    </message>
-    <message>
-        <source>today&apos;s forecast</source>
-        <translation>Previsões para Hoje</translation>
-    </message>
-    <message>
-        <source>tomorrow&apos;s outlook</source>
-        <translation>Previsões para Amanhã</translation>
-    </message>
-    <message>
-        <source>Forecast for</source>
-        <translation>Previsões para</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation>Imagem de Satélite</translation>
-    </message>
-    <message>
-        <source>Map Unavailable</source>
-        <translation>Mapa Indisponível</translation>
-    </message>
-    <message>
-        <source>RAIN</source>
-        <translation>CHUVA</translation>
-    </message>
-    <message>
-        <source>MIX/ICE</source>
-        <translation>GELO</translation>
-    </message>
-    <message>
-        <source>SNOW</source>
-        <translation>NEVE</translation>
-    </message>
-    <message>
-        <source>LIGHT</source>
-        <translation>MENOS</translation>
-    </message>
-    <message>
-        <source>HEAVY</source>
-        <translation>MAIS</translation>
-    </message>
-    <message>
-        <source>Enter Zip Code</source>
-        <translation>Código Postal</translation>
-    </message>
-    <message>
-        <source>weather setup</source>
-        <translation>Configurar Meteorologia</translation>
-    </message>
-    <message>
-        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
-        <translation>Para gravar, prima &apos;i&apos;, para cancelar, use o &apos;escape&apos;</translation>
-    </message>
-    <message>
-        <source>COLD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>COLDEST</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Wind(Gust)</source>
@@ -858,269 +789,37 @@
         <source>Source Update Timeout (seconds):</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Weather Alerts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>
-    <message>
-        <source> is invalid)</source>
-        <translation type="obsolete">é invalida)</translation>
-    </message>
-    <message>
-        <source>   No Location Set, Please read the README</source>
-        <translation type="obsolete">Tem de especificar uma localização. Em caso de dúvida, leia a documentaçáo</translation>
-    </message>
-    <message>
-        <source>Configuring MythWeather...</source>
-        <translation type="obsolete">A configurar o MythWeather...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select unit conversion...</source>
-        <translation type="obsolete">Use o cursor para a direita para selecionar a unidade de conversão...</translation>
-    </message>
-    <message>
-        <source>Weather Units</source>
-        <translation type="obsolete">Unidades de Meteorologia</translation>
-    </message>
-    <message>
-        <source>Location</source>
-        <translation type="obsolete">Localização</translation>
-    </message>
-    <message>
-        <source>Aggressiveness</source>
-        <translation type="obsolete">Agressividade</translation>
-    </message>
-    <message>
-        <source>Configuration Saved...</source>
-        <translation type="obsolete">Configuração Guardada...</translation>
-    </message>
-    <message>
-        <source>Retrieving weather data...</source>
-        <translation type="obsolete">A obter os dados meteorológicos...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select your location...</source>
-        <translation type="obsolete">Use o cursor para a direita para selecionar a localização...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation type="obsolete">Use o cursor para a direita p ara selecionar o nível de agressividade...</translation>
-    </message>
-    <message>
-        <source> 1  High Speed Connection</source>
-        <translation type="obsolete">1 Ligação de Banda-Larga</translation>
-    </message>
-    <message>
-        <source> 8  Medium Speed Connection</source>
-        <translation type="obsolete">8 Ligação de velocidade média (RDIS)</translation>
-    </message>
-    <message>
-        <source> 15 Low Speed Connection</source>
-        <translation type="obsolete">15 Ligação de velocidade baixa (Modem)</translation>
-    </message>
-    <message>
-        <source>Obtaining initial weather data...</source>
-        <translation type="obsolete">A obter os dados meteorológicos iniciais...</translation>
-    </message>
-    <message>
-        <source>Updating weather data...</source>
-        <translation type="obsolete">A actualizar os dados meteorológicos...</translation>
-    </message>
-    <message>
-        <source>Calm</source>
-        <translation type="obsolete">Calmo</translation>
-    </message>
-    <message>
-        <source> at </source>
-        <translation type="obsolete"> a </translation>
-    </message>
-    <message>
-        <source>Unlimited</source>
-        <translation type="obsolete">Ilimitado</translation>
-    </message>
-    <message>
-        <source> (minimal)</source>
-        <translation type="obsolete"> (mínimo)</translation>
-    </message>
-    <message>
-        <source> (moderate)</source>
-        <translation type="obsolete"> (moderado)</translation>
-    </message>
-    <message>
-        <source> (high)</source>
-        <translation type="obsolete"> (alta)</translation>
-    </message>
-    <message>
-        <source> (extreme)</source>
-        <translation type="obsolete"> (extrema)</translation>
-    </message>
-    <message>
-        <source>Today a high of </source>
-        <translation type="obsolete">Para hoje, prevê-se uma temperatura máxima de </translation>
-    </message>
-    <message>
-        <source> and a low of </source>
-        <translation type="obsolete">° e uma mínima de </translation>
-    </message>
-    <message>
-        <source>. Currently there is a humidity of </source>
-        <translation type="obsolete">°, a humidade actual é de </translation>
-    </message>
-    <message>
-        <source>% and the winds are</source>
-        <translation type="obsolete">% e o vento </translation>
-    </message>
-    <message>
-        <source> calm.</source>
-        <translation type="obsolete">é fraco. </translation>
-    </message>
-    <message>
-        <source> coming in at </source>
-        <translation type="obsolete">tem uma velocidade de </translation>
-    </message>
-    <message>
-        <source> mph from the </source>
-        <translation type="obsolete"> milhas por hora com direcção </translation>
-    </message>
-    <message>
-        <source> Km/h from the </source>
-        <translation type="obsolete"> kilometros por hora de direcção </translation>
-    </message>
-    <message>
-        <source> Visibility will be unlimited for today.</source>
-        <translation type="obsolete">A visibilidade é ilimitada.</translation>
-    </message>
-    <message>
-        <source> Visibility conditions are unknown.</source>
-        <translation type="obsolete">As condições de visibilidade são desconhecidas.</translation>
-    </message>
-    <message>
-        <source> There will be a visibility of </source>
-        <translation type="obsolete">A visibilidade é de </translation>
-    </message>
-    <message>
-        <source> miles.</source>
-        <translation type="obsolete"> milhas.</translation>
-    </message>
-    <message>
-        <source> km.</source>
-        <translation type="obsolete"> km.</translation>
-    </message>
-    <message>
-        <source>SUN</source>
-        <translation type="obsolete">DOM</translation>
-    </message>
-    <message>
-        <source>Sunday</source>
-        <translation type="obsolete">Domingo</translation>
-    </message>
-    <message>
-        <source>MON</source>
-        <translation type="obsolete">SEG</translation>
-    </message>
-    <message>
-        <source>Monday</source>
-        <translation type="obsolete">Segunda</translation>
-    </message>
-    <message>
-        <source>TUE</source>
-        <translation type="obsolete">TER</translation>
-    </message>
-    <message>
-        <source>Tuesday</source>
-        <translation type="obsolete">Terça</translation>
-    </message>
-    <message>
-        <source>WED</source>
-        <translation type="obsolete">QUA</translation>
-    </message>
-    <message>
-        <source>Wednesday</source>
-        <translation type="obsolete">Quarta</translation>
-    </message>
-    <message>
-        <source>THU</source>
-        <translation type="obsolete">QUI</translation>
-    </message>
-    <message>
-        <source>Thursday</source>
-        <translation type="obsolete">Quinta</translation>
-    </message>
-    <message>
-        <source>FRI</source>
-        <translation type="obsolete">SEX</translation>
-    </message>
-    <message>
-        <source>Friday</source>
-        <translation type="obsolete">Sexta</translation>
-    </message>
-    <message>
-        <source>SAT</source>
-        <translation type="obsolete">SÁB</translation>
-    </message>
-    <message>
-        <source>Saturday</source>
-        <translation type="obsolete">Sábado</translation>
-    </message>
-    <message>
-        <source>Date Error</source>
-        <translation type="obsolete">Erro de Data</translation>
-    </message>
-    <message>
-        <source>Tomorrow expect a high of </source>
-        <translation type="obsolete">Para amanhã, prevê-se uma temperatura máxima de </translation>
-    </message>
-    <message>
-        <source>Expected conditions: </source>
-        <translation type="obsolete">Tempo Previsto: </translation>
-    </message>
-    <message>
-        <source>Weather data from: </source>
-        <translation type="obsolete">Dados meteorológicos de: </translation>
-    </message>
-    <message>
-        <source>Updating...</source>
-        <translation type="obsolete">A Actualizar...</translation>
-    </message>
-    <message>
-        <source> (Not All Information Available)</source>
-        <translation type="obsolete">(Não estão disponíveis os dados todos)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID or Server Error ***</source>
-        <translation type="obsolete">*** ID de àrea inválida ou erro no servidor ***</translation>
-    </message>
-    <message>
-        <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation type="obsolete">Imperial (Fahrenheit, polegadas, etc)</translation>
-    </message>
-    <message>
-        <source>Metric (Celsius, kPa, etc)</source>
-        <translation type="obsolete">Métrico (Centígrados, Pascais, etc)</translation>
-    </message>
-    <message>
-        <source>.</source>
-        <translation type="obsolete">°.</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Desconhecido</translation>
-    </message>
-    <message>
-        <source> F</source>
-        <translation type="obsolete">°F</translation>
-    </message>
-    <message>
-        <source> C</source>
-        <translation type="obsolete">°C</translation>
-    </message>
-    <message>
-        <source> - PAUSED -</source>
-        <translation type="obsolete">- PARADO -</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation type="obsolete">Imagem de Satélite</translation>
-    </message>
     <message>
         <source>Paused</source>
         <translation type="unfinished"></translation>

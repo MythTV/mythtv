@@ -8,6 +8,7 @@
 #include <pthread.h>
 
 // C++ headers
+#include <algorithm>
 #include <iostream>
 using namespace std;
 
@@ -1274,16 +1275,16 @@ bool NuppelDecoder::GetFrame(int avignore)
             struct rtfileheader tmphead;
             struct rtfileheader *fh = &tmphead;
 
-            memcpy(fh, cur, frameheader.packetlength);
+            memcpy(fh, cur, min((int)sizeof(*fh), frameheader.packetlength));
 
-            while (QString(fileheader.finfo) != "MythTVVideo" &&
+            while (QString(fh->finfo) != "MythTVVideo" &&
                    cur + frameheader.packetlength <= eop)
             {
                 cur++;
-                memcpy(fh, cur, frameheader.packetlength);
+                memcpy(fh, cur, min((int)sizeof(*fh), frameheader.packetlength));
             }
 
-            if (QString(fileheader.finfo) == "MythTVVideo")
+            if (QString(fh->finfo) == "MythTVVideo")
             {
 #ifdef WORDS_BIGENDIAN
                 fh->width         = bswap_32(fh->width);
@@ -1298,7 +1299,7 @@ bool NuppelDecoder::GetFrame(int avignore)
                 fh->keyframedist  = bswap_32(fh->keyframedist);
 #endif
 
-                memcpy(&fileheader, fh, FRAMEHEADERSIZE);
+                fileheader = *fh;
 
                 if (fileheader.aspect > .999 && fileheader.aspect < 1.001)
                     fileheader.aspect = 4.0 / 3;

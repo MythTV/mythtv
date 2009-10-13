@@ -1,11 +1,12 @@
 #ifndef XBOX_H_
 #define XBOX_H_
 
-#include <qobject.h>
-#include <qtimer.h>
-#include <qstringlist.h>
+#include <QObject>
+#include <QString>
 
 #include "mythexp.h"
+
+class QTimer;
 
 class MPUBLIC XBox : public QObject
 {
@@ -28,6 +29,7 @@ class MPUBLIC XBox : public QObject
     QString PhaseCache;
     QString BlinkBIN;
     int     LEDNonLiveTV;
+    int     TimeLen;
 };
 
 #endif

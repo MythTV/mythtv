@@ -1,4 +1,8 @@
+
 #include "customedit.h"
+
+// QT
+#include <QSqlError>
 
 // libmythdb
 #include "mythdb.h"
@@ -11,7 +15,6 @@
 #include "mythuitextedit.h"
 #include "mythuibutton.h"
 #include "mythdialogbox.h"
-#include "mythdialogs.h"
 
 // libmythtv
 #include "recordingrule.h"
@@ -38,8 +41,7 @@ CustomEdit::CustomEdit(MythScreenStack *parent, ProgramInfo *pginfo)
 
 CustomEdit::~CustomEdit(void)
 {
-    if (m_pginfo)
-        delete m_pginfo;
+    delete m_pginfo;
 
     gContext->removeListener(this);
 }
@@ -98,10 +100,7 @@ void CustomEdit::loadData(void)
     baseTitle.remove(QRegExp(" \\(.*\\)$"));
 
     CustomRuleInfo rule;
-    rule.recordid = "0";
-    rule.title = "";
-    rule.subtitle = "";
-    rule.description = "";
+    rule.recordid = '0';
 
     MythUIButtonListItem *item;
     item = new MythUIButtonListItem(m_ruleList, tr("<New rule>"),
@@ -112,7 +111,7 @@ void CustomEdit::loadData(void)
                    "FROM record WHERE search = :SEARCH ORDER BY title;");
     result.bindValue(":SEARCH", kPowerSearch);
 
-    if (result.exec() && result.isActive())
+    if (result.exec())
     {
         while (result.next())
         {
@@ -137,7 +136,7 @@ void CustomEdit::loadData(void)
 
     loadClauses();
 
-    if (m_ruleList->GetCurrentPos() == 0 && m_pginfo->title > "")
+    if (m_ruleList->GetCurrentPos() == 0 && !m_pginfo->title.isEmpty())
     {
         m_titleEdit->SetText(baseTitle);
         QString quoteTitle = baseTitle;
@@ -156,21 +155,19 @@ void CustomEdit::loadClauses()
     quoteTitle.replace("\'","\'\'");
 
     CustomRuleInfo rule;
-    rule.recordid = "";
   
     rule.title = tr("Match an exact title");
-    rule.subtitle = "";
-    if (m_pginfo->title > "")
+    if (!m_pginfo->title.isEmpty())
         rule.description = QString("program.title = '%1' ").arg(quoteTitle);
     else 
         rule.description = "program.title = 'Nova' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                               qVariantFromValue(rule));
 
-    if (m_pginfo->seriesid > "") 
+    if (!m_pginfo->seriesid.isEmpty()) 
     {
         rule.title = tr("Match this series");
-        rule.subtitle = "";
+        rule.subtitle.clear();
         rule.description = QString("program.seriesid = '%1' ")
                                    .arg(m_pginfo->seriesid);
         new MythUIButtonListItem(m_clauseList, rule.title,
@@ -178,8 +175,8 @@ void CustomEdit::loadClauses()
     }
 
     rule.title = tr("Match words in the title");
-    rule.subtitle = "";
-    if (m_pginfo->title > "")
+    rule.subtitle.clear();
+    if (!m_pginfo->title.isEmpty())
         rule.description = QString("program.title LIKE '\%%1\%' ")
                                    .arg(quoteTitle);
     else
@@ -188,8 +185,8 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 
     rule.title = tr("Match words in the subtitle");
-    rule.subtitle = "";
-    if (m_pginfo->subtitle > "")
+    rule.subtitle.clear();
+    if (!m_pginfo->subtitle.isEmpty())
     {
         QString subt = m_pginfo->subtitle;
         subt.replace("\'","\'\'");
@@ -201,17 +198,17 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    if (m_pginfo->programid > "")
+    if (!m_pginfo->programid.isEmpty())
     {
         rule.title = tr("Match this episode");
-        rule.subtitle = "";
+        rule.subtitle.clear();
         rule.description = QString("program.programid = '%1' ")
                                    .arg(m_pginfo->programid); 
     }
-    else if (m_pginfo->subtitle > "")
+    else if (!m_pginfo->subtitle.isEmpty())
     {
         rule.title = tr("Match this episode");
-        rule.subtitle = "";
+        rule.subtitle.clear();
         rule.description = QString("program.subtitle = '%1' \n"
                              "AND program.description = '%2' ")
                              .arg(m_pginfo->subtitle.replace("\'","\'\'"))
@@ -221,7 +218,7 @@ void CustomEdit::loadClauses()
     else
     {
         rule.title = tr("Match an exact episode");
-        rule.subtitle = "";
+        rule.subtitle.clear();
         rule.description = QString("program.title = 'Seinfeld' \n"
                                    "AND program.subtitle = 'The Soup' ");
     }
@@ -229,7 +226,7 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 
     rule.title = tr("Match in any descriptive field");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = QString("(program.title LIKE '%Japan%' \n"
                                "     OR program.subtitle LIKE '%Japan%' \n"
                                "     OR program.description LIKE '%Japan%') ");
@@ -237,65 +234,65 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 
     rule.title = tr("New episodes only");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description =  "program.previouslyshown = 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Exclude unidentified episodes");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description =  "program.generic = 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("First showing of each episode");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description =  "program.first > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Last showing of each episode");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description =  "program.last > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Anytime on a specific day of the week");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = QString("DAYNAME(program.starttime) = '%1' ")
                                .arg(m_pginfo->startts.toString("dddd"));
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only on weekdays (Monday through Friday)");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "WEEKDAY(program.starttime) < 5 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only on weekends");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "WEEKDAY(program.starttime) >= 5 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only in primetime");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = QString("HOUR(program.starttime) >= 19 \n"
                                "AND HOUR(program.starttime) < 23 ");
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Not in primetime");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = QString("(HOUR(program.starttime) < 19 \n"
                                "      OR HOUR(program.starttime) >= 23) ");
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only on a specific station");
-    rule.subtitle = "";
-    if (m_pginfo->chansign > "")
+    rule.subtitle.clear();
+    if (!m_pginfo->chansign.isEmpty())
         rule.description = QString("channel.callsign = '%1' ")
                                    .arg(m_pginfo->chansign);
     else
@@ -304,13 +301,13 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 
     rule.title = tr("Exclude one station");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "channel.callsign != 'GOLF' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Match related callsigns");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "channel.callsign LIKE 'HBO%' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
@@ -322,51 +319,51 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 
     rule.title = tr("Only channels from a specific video source");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "channel.sourceid = 2 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
   
     rule.title = tr("Only channels marked as commercial free");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = QString("channel.commmethod = %1 ")
                                .arg(COMM_DETECT_COMMFREE); 
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only shows marked as HDTV");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.hdtv > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only shows marked as widescreen");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "FIND_IN_SET('WIDESCREEN', program.videoprop) > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Exclude H.264 encoded streams (EIT only)");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "FIND_IN_SET('AVC', program.videoprop) = 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Only shows with in-vision signing");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "FIND_IN_SET('SIGNED', program.subtitletypes) > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
     
     rule.title = tr("Only shows with in-vision subtitles");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "FIND_IN_SET('ONSCREEN', program.subtitletypes) > 0 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
     
     rule.title = tr("Limit by category");
-    rule.subtitle = "";
-    if (m_pginfo->category > "")
+    rule.subtitle.clear();
+    if (!m_pginfo->category.isEmpty())
         rule.description = QString("program.category = '%1' ")
                                    .arg(m_pginfo->category);
     else
@@ -378,7 +375,7 @@ void CustomEdit::loadClauses()
     rule.subtitle = "LEFT JOIN programgenres ON "
                     "program.chanid = programgenres.chanid AND "
                     "program.starttime = programgenres.starttime ";
-    if (m_pginfo->category > "")
+    if (!m_pginfo->category.isEmpty())
         rule.description = QString("programgenres.genre = '%1' ")
                                    .arg(m_pginfo->category);
     else
@@ -397,20 +394,20 @@ void CustomEdit::loadClauses()
 
     rule.title = QString(tr("Category type") +
                    " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.category_type = 'sports' ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Limit movies by the year of release");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.category_type = 'movie' AND "
                        "program.airdate >= 2000 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
     rule.title = tr("Minimum star rating (0.0 to 1.0 for movies only)");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.stars >= 0.75 ";
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
@@ -437,7 +434,7 @@ void CustomEdit::loadClauses()
 */
 
     rule.title = tr("Multiple sports teams (complete example)"); 
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.title = 'NBA Basketball' \n"
                  "AND program.subtitle REGEXP '(Miami|Cavaliers|Lakers)' \n"
                  "AND program.first > 0 \n";
@@ -445,7 +442,7 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 
     rule.title = tr("Sci-fi B-movies (complete example)");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.category_type='movie' \n"
                        "AND program.category='Science fiction' \n"
                        "AND program.stars <= 0.5 AND program.airdate < 1970 ";
@@ -454,7 +451,7 @@ void CustomEdit::loadClauses()
 
     rule.title =
         tr("SportsCenter Overnight (complete example - use FindDaily)");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.title = 'SportsCenter' \n"
                        "AND HOUR(program.starttime) >= 2 \n"
                        "AND HOUR(program.starttime) <= 6 ";
@@ -462,7 +459,7 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 
     rule.title = tr("Movie of the Week (complete example - use FindWeekly)");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.category_type='movie' \n"
                   "AND program.stars >= 1.0 AND program.airdate >= 1965 \n"
                   "AND DAYNAME(program.starttime) = 'Friday' \n"
@@ -471,7 +468,7 @@ void CustomEdit::loadClauses()
                              qVariantFromValue(rule));
 
     rule.title = tr("First Episodes (complete example for Data Direct)");
-    rule.subtitle = "";
+    rule.subtitle.clear();
     rule.description = "program.first > 0 \n"
                   "AND program.programid LIKE 'EP%0001' \n"
                   "AND program.originalairdate = DATE(program.starttime) ";
@@ -484,7 +481,7 @@ void CustomEdit::loadClauses()
     result.prepare("SELECT rulename,fromclause,whereclause,search "
                    "FROM customexample;");
 
-    if (result.exec() && result.isActive())
+    if (result.exec())
     {
         while (result.next())
         {
@@ -544,7 +541,7 @@ void CustomEdit::clauseChanged(MythUIButtonListItem *item)
     CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
 
     QString msg = rule.description;
-    msg.replace("\n", " ");
+    msg.replace('\n', ' ');
     msg.replace(QRegExp(" [ ]*"), " ");
     msg = QString("\"%1\"").arg(msg);
     m_clauseText->SetText(msg);
@@ -563,7 +560,7 @@ void CustomEdit::clauseClicked(MythUIButtonListItem *item)
 
     CustomRuleInfo rule = qVariantValue<CustomRuleInfo>(item->GetData());
 
-    QString clause = "";
+    QString clause;
     QString desc = m_descriptionEdit->GetText();
 
     if (desc.contains(QRegExp("\\S")))
@@ -638,19 +635,16 @@ void CustomEdit::scheduleCreated(int ruleID)
 void CustomEdit::storeClicked(void)
 {
     bool nameExists = false;
-    QString oldwhere = "";
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT rulename,whereclause FROM customexample "
                   "WHERE rulename = :RULE;");
     query.bindValue(":RULE", m_titleEdit->GetText());
 
-    if (query.exec() && query.isActive() && query.next())
-    {
+    if (query.exec() && query.next())
         nameExists = true;
-        oldwhere = query.value(1).toString();
-    }
-    QString msg = QString("%1: %2\n\n").arg(QObject::tr("Current Example"))
+
+    QString msg = QString("%1: %2\n\n").arg(tr("Current Example"))
                                        .arg(m_titleEdit->GetText());
 
     if (m_subtitleEdit->GetText().length())
@@ -665,9 +659,9 @@ void CustomEdit::storeClicked(void)
     storediag->SetReturnEvent(this, "storeruledialog");
     if (storediag->Create())
     {
-        QString action = QObject::tr("Store");
+        QString action = tr("Store");
         if (nameExists)
-            action = QObject::tr("Replace");
+            action = tr("Replace");
 
         QString str = QString("%1 \"%2\"").arg(action)
                                           .arg(m_titleEdit->GetText());
@@ -675,20 +669,19 @@ void CustomEdit::storeClicked(void)
         if (!m_titleEdit->GetText().isEmpty())
         {
             QString str2;
-            str2 = QString("%1 %2").arg(str).arg(QObject::tr("as a search"));
+            str2 = QString("%1 %2").arg(str).arg(tr("as a search"));
             storediag->AddButton(str2);
 
-            str2 = QString("%1 %2").arg(str).arg(QObject::tr("as an example"));
+            str2 = QString("%1 %2").arg(str).arg(tr("as an example"));
             storediag->AddButton(str2);
         }
         if (m_clauseList->GetCurrentPos() >= maxex)
         {
             MythUIButtonListItem* item = m_clauseList->GetItemCurrent();
-            str = QString("%1 \"%2\"").arg(QObject::tr("Delete"))
+            str = QString("%1 \"%2\"").arg(tr("Delete"))
                                       .arg(item->GetText());
             storediag->AddButton(str);
         }
-        storediag->AddButton(QObject::tr("Cancel"));
         mainStack->AddScreen(storediag);
     }
     else
@@ -699,7 +692,7 @@ void CustomEdit::storeClicked(void)
 bool CustomEdit::checkSyntax(void)
 {
     bool ret = false;
-    QString msg = "";
+    QString msg;
 
     QString desc = m_descriptionEdit->GetText();
     QString from = m_subtitleEdit->GetText();
@@ -718,7 +711,7 @@ bool CustomEdit::checkSyntax(void)
         query.prepare(QString("SELECT NULL FROM (program,channel) "
                               "%1 WHERE\n%2").arg(from).arg(desc));
 
-        if (query.exec() && query.isActive())
+        if (query.exec())
         {
             ret = true;
         }
@@ -735,13 +728,12 @@ bool CustomEdit::checkSyntax(void)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
-        MythDialogBox *checkSyntaxPopup =
-               new MythDialogBox(msg, popupStack, "checkSyntaxPopup");
+        MythConfirmationDialog *checkSyntaxPopup =
+               new MythConfirmationDialog(popupStack, msg, false);
 
         if (checkSyntaxPopup->Create())
         {
             checkSyntaxPopup->SetReturnEvent(this, "checkSyntaxPopup");
-            checkSyntaxPopup->AddButton(tr("Ok"));
             popupStack->AddScreen(checkSyntaxPopup);
         }
         else
@@ -756,7 +748,7 @@ bool CustomEdit::checkSyntax(void)
 void CustomEdit::storeRule(bool is_search, bool is_new)
 {
     CustomRuleInfo rule;
-    rule.recordid = "0";
+    rule.recordid = '0';
     rule.title = m_titleEdit->GetText();
     rule.subtitle = m_subtitleEdit->GetText();
     rule.description = m_descriptionEdit->GetText();
@@ -832,10 +824,11 @@ void CustomEdit::customEvent(QEvent *event)
 
         if (resultid == "storeruledialog")
         {
-             if (resulttext.startsWith(tr("Delete"))) {
+             if (resulttext.startsWith(tr("Delete")))
+             {
                  deleteRule();
              }
-             else if (resulttext > "" && resulttext != tr("Cancel"))
+             else if (!resulttext.isEmpty())
              {
                  storeRule(resulttext.contains(tr("as a search")),
                            !resulttext.startsWith(tr("Replace")));

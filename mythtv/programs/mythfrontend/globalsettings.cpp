@@ -80,8 +80,8 @@ static HostComboBox *AudioOutputDevice()
     gc->addSelection("CoreAudio:", "CoreAudio:");
 #endif
 #ifdef USING_MINGW
-	gc->addSelection("Windows:");
-	gc->addSelection("DirectX:");
+    gc->addSelection("Windows:");
+    gc->addSelection("DirectX:");
 #endif
     gc->addSelection("NULL", "NULL");
 
@@ -269,7 +269,7 @@ static HostComboBox *PIPLocationComboBox()
 {
     HostComboBox *gc = new HostComboBox("PIPLocation");
     gc->setLabel(QObject::tr("PIP Video Location"));
-    for (uint loc = 0; loc < kPIP_END; loc++)
+    for (uint loc = 0; loc < kPIP_END; ++loc)
         gc->addSelection(toString((PIPLocation) loc), QString::number(loc));
     gc->setHelpText(QObject::tr("Location of PIP Video window."));
     return gc;
@@ -296,7 +296,7 @@ static HostComboBox *DisplayRecGroup()
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT DISTINCT recgroup from recorded;");
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
     {
         while (query.next())
         {
@@ -310,7 +310,7 @@ static HostComboBox *DisplayRecGroup()
 
     query.prepare("SELECT DISTINCT category from recorded;");
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
     {
         while (query.next())
         {
@@ -343,33 +343,6 @@ static HostCheckBox *RememberRecGroup()
     gc->setHelpText(QObject::tr("Remember the last selected filter "
                     "instead of displaying the default filter "
                     "whenever you enter the playback screen."));
-
-    return gc;
-}
-
-static HostComboBox *DefaultView()
-{
-    HostComboBox *gc = new HostComboBox("DisplayGroupDefaultView");
-    gc->setLabel(QObject::tr("Default View"));
-
-    gc->addSelection(QObject::tr("Show Titles only"),
-            QString::number(PlaybackBox::TitlesOnly));
-    gc->addSelection(QObject::tr("Show Titles and Categories"),
-            QString::number(PlaybackBox::TitlesCategories));
-    gc->addSelection(QObject::tr(
-                "Show Titles, Categories, and Recording Groups"),
-            QString::number(PlaybackBox::TitlesCategoriesRecGroups));
-    gc->addSelection(QObject::tr("Show Titles and Recording Groups"),
-            QString::number(PlaybackBox::TitlesRecGroups));
-    gc->addSelection(QObject::tr("Show Categories only"),
-            QString::number(PlaybackBox::Categories));
-    gc->addSelection(QObject::tr("Show Categories and Recording Groups"),
-            QString::number(PlaybackBox::CategoriesRecGroups));
-    gc->addSelection(QObject::tr("Show Recording Groups only"),
-            QString::number(PlaybackBox::RecGroups));
-
-    gc->setHelpText(QObject::tr("Select what type of grouping to show on the "
-                    "Watch Recordings screen by default."));
 
     return gc;
 }
@@ -437,7 +410,7 @@ static GlobalComboBox *CommercialSkipMethod()
                         "detect when commercials start and end."));
 
     deque<int> tmp = GetPreferredSkipTypeCombinations();
-    for (uint i = 0; i < tmp.size(); i++)
+    for (uint i = 0; i < tmp.size(); ++i)
         bc->addSelection(SkipTypeToString(tmp[i]), QString::number(tmp[i]));
 
     return bc;
@@ -773,7 +746,7 @@ static GlobalComboBox *OverTimeCategory()
     query.prepare("SELECT DISTINCT category FROM program GROUP BY category;");
 
     gc->addSelection("", "");
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
     {
         while (query.next())
         {
@@ -855,17 +828,17 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     deint1    = new TransComboBoxSetting();
     filters   = new TransLineEditSetting(true);
 
-    for (uint i = 0; i < 2; i++)
+    for (uint i = 0; i < 2; ++i)
     {
         const QString kCMP[6] = { "", "<", "<=", "==", ">=", ">" };
-        for (uint j = 0; j < 6; j++)
+        for (uint j = 0; j < 6; ++j)
             cmp[i]->addSelection(kCMP[j]);
 
         cmp[i]->setLabel(tr("Match Criteria"));
         width[i]->setName(QString("w%1").arg(i));
-        width[i]->setLabel(tr("W"));
+        width[i]->setLabel(tr("W", "Width"));
         height[i]->setName(QString("h%1").arg(i));
-        height[i]->setLabel(tr("H"));
+        height[i]->setLabel(tr("H", "Height"));
 
         row[i]->addChild(cmp[i]);
         row[i]->addChild(width[i]);
@@ -938,7 +911,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
 
 void PlaybackProfileItemConfig::Load(void)
 {
-    for (uint i = 0; i < 2; i++)
+    for (uint i = 0; i < 2; ++i)
     {
         QString     pcmp  = item.Get(QString("pref_cmp%1").arg(i));
         QStringList clist = pcmp.split(" ");
@@ -970,7 +943,7 @@ void PlaybackProfileItemConfig::Load(void)
     QStringList decn = VideoDisplayProfile::GetDecoderNames();
     QStringList::const_iterator itr = decr.begin();
     QStringList::const_iterator itn = decn.begin();
-    for (; (itr != decr.end()) && (itn != decn.end()); itr++, itn++)
+    for (; (itr != decr.end()) && (itn != decn.end()); ++itr, ++itn)
     {
         decoder->addSelection(*itn, *itr, (*itr == pdecoder));
         found |= (*itr == pdecoder);
@@ -1001,10 +974,10 @@ void PlaybackProfileItemConfig::Load(void)
 
 void PlaybackProfileItemConfig::Save(void)
 {
-    for (uint i = 0; i < 2; i++)
+    for (uint i = 0; i < 2; ++i)
     {
         QString val = QString("pref_cmp%1").arg(i);
-        QString data = "";
+        QString data;
         if (!cmp[i]->getValue().isEmpty())
         {
             data = QString("%1 %2 %3")
@@ -1035,14 +1008,14 @@ void PlaybackProfileItemConfig::decoderChanged(const QString &dec)
     QStringList renderers = VideoDisplayProfile::GetVideoRenderers(dec);
     QStringList::const_iterator it;
 
-    QString prenderer = QString::null;
-    for (it = renderers.begin(); it != renderers.end(); it++)
+    QString prenderer;
+    for (it = renderers.begin(); it != renderers.end(); ++it)
         prenderer = (*it == vrenderer) ? vrenderer : prenderer;
     if (prenderer.isEmpty())
         prenderer = VideoDisplayProfile::GetPreferredVideoRenderer(dec);
 
     vidrend->clearSelections();
-    for (it = renderers.begin(); it != renderers.end(); it++)
+    for (it = renderers.begin(); it != renderers.end(); ++it)
     {
         if (*it != "null")
             vidrend->addSelection(*it, *it, (*it == prenderer));
@@ -1061,18 +1034,18 @@ void PlaybackProfileItemConfig::vrenderChanged(const QString &renderer)
     QStringList::const_iterator it;
 
     osdrend->clearSelections();
-    for (it = osds.begin(); it != osds.end(); it++)
+    for (it = osds.begin(); it != osds.end(); ++it)
         osdrend->addSelection(*it, *it, (*it == losd));
 
     deint0->clearSelections();
-    for (it = deints.begin(); it != deints.end(); it++)
+    for (it = deints.begin(); it != deints.end(); ++it)
     {
         deint0->addSelection(VideoDisplayProfile::GetDeinterlacerName(*it),
                              *it, (*it == ldeint0));
     }
 
     deint1->clearSelections();
-    for (it = deints.begin(); it != deints.end(); it++)
+    for (it = deints.begin(); it != deints.end(); ++it)
     {
         if (!(*it).contains("bobdeint") && !(*it).contains("doublerate") &&
             !(*it).contains("doubleprocess"))
@@ -1092,14 +1065,14 @@ void PlaybackProfileItemConfig::orenderChanged(const QString &renderer)
 void PlaybackProfileItemConfig::deint0Changed(const QString &deint)
 {
     deint0->setHelpText(
-        QObject::tr("Main deinterlacing method.") + " " +
+        QObject::tr("Main deinterlacing method.") + ' ' +
         VideoDisplayProfile::GetDeinterlacerHelp(deint));
 }
 
 void PlaybackProfileItemConfig::deint1Changed(const QString &deint)
 {
     deint1->setHelpText(
-        QObject::tr("Fallback deinterlacing method.") + " " +
+        QObject::tr("Fallback deinterlacing method.") + ' ' +
         VideoDisplayProfile::GetDeinterlacerHelp(deint));
 }
 
@@ -1128,14 +1101,14 @@ void PlaybackProfileConfig::InitLabel(uint i)
     QString andStr = QObject::tr("&", "and");
     QString cmp0   = items[i].Get("pref_cmp0");
     QString cmp1   = items[i].Get("pref_cmp1");
-    QString str    = QObject::tr("if rez") + " " + cmp0;
+    QString str    = QObject::tr("if rez") + ' ' + cmp0;
 
     if (!cmp1.isEmpty())
-        str += " " + andStr + " " + cmp1;
+        str += " " + andStr + ' ' + cmp1;
 
     str += " -> ";
     str += items[i].Get("pref_decoder");
-    str += " " + andStr + " ";
+    str += " " + andStr + ' ';
     str += items[i].Get("pref_videorenderer");
     str.replace("-blit", "");
     str.replace("ivtv " + andStr + " ivtv", "ivtv");
@@ -1160,7 +1133,7 @@ void PlaybackProfileConfig::InitUI(void)
 
     labels.resize(items.size());
 
-    for (uint i = 0; i < items.size(); i++)
+    for (uint i = 0; i < items.size(); ++i)
     {
         labels[i] = new TransLabelSetting();
         InitLabel(i);
@@ -1171,7 +1144,7 @@ void PlaybackProfileConfig::InitUI(void)
     delProf.resize(items.size());
     priority.resize(items.size());
 
-    for (uint i = 0; i < items.size(); i++)
+    for (uint i = 0; i < items.size(); ++i)
     {
         HorizontalConfigurationGroup *grp =
             new HorizontalConfigurationGroup(false, false, true, true);
@@ -1382,7 +1355,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
     grouptrigger = new HostComboBox("DefaultVideoPlaybackProfile");
     grouptrigger->setLabel(QObject::tr("Current Video Playback Profile"));
     QStringList::const_iterator it;
-    for (it = profiles.begin(); it != profiles.end(); it++)
+    for (it = profiles.begin(); it != profiles.end(); ++it)
         grouptrigger->addSelection(ProgramInfo::i18n(*it), *it);
 
     HorizontalConfigurationGroup *grp =
@@ -1419,7 +1392,7 @@ void PlaybackProfileConfigs::btnPress(QString cmd)
 {
     if (cmd == "add")
     {
-        QString name = QString::null;
+        QString name;
 
         QString host = gContext->GetHostName();
         QStringList not_ok_list = VideoDisplayProfile::GetProfiles(host);
@@ -1496,7 +1469,7 @@ static HostComboBox *PlayBoxOrdering()
     HostComboBox *gc = new HostComboBox("PlayBoxOrdering");
     gc->setLabel(QObject::tr("Episode sort orderings"));
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; ++i)
         gc->addSelection(str[i], QString::number(i));
 
     gc->setValue(1);
@@ -1632,6 +1605,9 @@ static HostComboBox *OSDFont()
     gc->setLabel(QObject::tr("OSD font"));
     QDir ttf(GetFontsDir(), GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
+    QString defaultOSDFont = "FreeSans.ttf";
+    if (gc->findSelection(defaultOSDFont) > -1)
+        gc->setValue(defaultOSDFont);
 
     return gc;
 }
@@ -1698,7 +1674,7 @@ static HostComboBox *OSDCC708DefaultFontType(void)
         QObject::tr("Cursive"),
         QObject::tr("Capitals"),
     };
-    for (uint i = 0; i < 7; i++)
+    for (uint i = 0; i < 7; ++i)
         hc->addSelection(typeNames[i], types[i]);
     return hc;
 }
@@ -1777,7 +1753,7 @@ static HorizontalConfigurationGroup *OSDCC708Fonts(void)
     col[1]->addChild(col1);
 
     uint i = 0;
-    for (uint j = 0; j < 7; j++)
+    for (uint j = 0; j < 7; ++j)
     {
         col[i]->addChild(OSDCC708Font(subtypes[i].arg(types[j]),
                                       typeNames[j], typeNames[j]));
@@ -1785,11 +1761,11 @@ static HorizontalConfigurationGroup *OSDCC708Fonts(void)
     grpmain->addChild(col[i]);
 
     i = 1;
-    for (uint j = 0; j < 7; j++)
+    for (uint j = 0; j < 7; ++j)
     {
         col[i]->addChild(OSDCC708Font(
                              subtypes[i].arg(types[j]), "",
-                             QObject::tr("Italic") + " " + typeNames[j]));
+                             QObject::tr("Italic") + ' ' + typeNames[j]));
     }
 
     grpmain->addChild(col[i]);
@@ -1803,7 +1779,7 @@ static HostComboBox *SubtitleCodec()
 
     gc->setLabel(QObject::tr("Subtitle Codec"));
     QList<QByteArray> list = QTextCodec::availableCodecs();
-    for (uint i = 0; i < (uint) list.size(); i++)
+    for (uint i = 0; i < (uint) list.size(); ++i)
     {
         QString val = QString(list[i]);
         gc->addSelection(val, val, val.toLower() == "utf-8");
@@ -1940,7 +1916,7 @@ static HostCheckBox *PreferCC708()
     gc->setHelpText(
         QObject::tr(
             "When enabled the new EIA-708 captions will be preferred over "
-            "the old EIA-608 captions in ATSC streams.") + " " +
+            "the old EIA-608 captions in ATSC streams.") + ' ' +
         QObject::tr(
             "This is the default, but as of early 2008 most stations are "
             "not broadcasting useable EIA-708 captions."));
@@ -2400,13 +2376,13 @@ static HostComboBox *LetterboxingColour()
 {
     HostComboBox *gc = new HostComboBox("LetterboxColour");
     gc->setLabel(QObject::tr("Letterboxing Color"));
-    for (int m = kLetterBoxColour_Black; m < kLetterBoxColour_END; m++)
+    for (int m = kLetterBoxColour_Black; m < kLetterBoxColour_END; ++m)
         gc->addSelection(toString((LetterBoxColour)m), QString::number(m));
     gc->setHelpText(
         QObject::tr(
             "By default MythTV uses black letterboxing to match broadcaster "
             "letterboxing, but those with plasma screens may prefer gray "
-            "to minimize burn-in.") +
+            "to minimize burn-in.") + " " +
         QObject::tr("Currently only works with XVideo video renderer."));
     return gc;
 }
@@ -2415,7 +2391,7 @@ static HostComboBox *AspectOverride()
 {
     HostComboBox *gc = new HostComboBox("AspectOverride");
     gc->setLabel(QObject::tr("Video Aspect Override"));
-    for (int m = kAspect_Off; m < kAspect_END; m++)
+    for (int m = kAspect_Off; m < kAspect_END; ++m)
         gc->addSelection(toString((AspectOverrideMode)m), QString::number(m));
     gc->setHelpText(QObject::tr(
                         "When enabled, these will override the aspect "
@@ -2432,7 +2408,7 @@ static HostComboBox *AdjustFill()
                      QString::number(kAdjustFill_AutoDetect_DefaultOff));
     gc->addSelection(toString(kAdjustFill_AutoDetect_DefaultHalf),
                      QString::number(kAdjustFill_AutoDetect_DefaultHalf));
-    for (int m = kAdjustFill_Off; m < kAdjustFill_END; m++)
+    for (int m = kAdjustFill_Off; m < kAdjustFill_END; ++m)
         gc->addSelection(toString((AdjustFillMode)m), QString::number(m));
     gc->setHelpText(QObject::tr(
                         "When enabled, these will apply a predefined "
@@ -2570,7 +2546,7 @@ static HostComboBox *GuiVidModeResolution()
     }
 
     // if no resolution setting, set it with a reasonable initial value
-    if (scr.size() && ("" == gContext->GetSetting("GuiVidModeResolution")))
+    if (scr.size() && (gContext->GetSetting("GuiVidModeResolution").isEmpty()))
     {
         int w = 0, h = 0;
         gContext->GetResolutionSetting("GuiVidMode", w, h);
@@ -2792,7 +2768,7 @@ static HostComboBox *MythDateFormat()
     gc->addSelection(sampdate.toString("ddd MMM d yyyy"), "ddd MMM d yyyy");
     gc->addSelection(sampdate.toString("ddd d MMM yyyy"), "ddd d MMM yyyy");
     gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
-    gc->setHelpText(QObject::tr("Your preferred date format.") + " " +
+    gc->setHelpText(QObject::tr("Your preferred date format.") + ' ' +
                     sampleStr);
     return gc;
 }
@@ -2831,7 +2807,7 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(sampdate.toString("ddd d/M"), "ddd d/M");
     gc->addSelection(sampdate.toString("M/d ddd"), "M/d ddd");
     gc->addSelection(sampdate.toString("d/M ddd"), "d/M ddd");
-    gc->setHelpText(QObject::tr("Your preferred short date format.") + " " +
+    gc->setHelpText(QObject::tr("Your preferred short date format.") + ' ' +
                     sampleStr);
     return gc;
 }
@@ -2853,17 +2829,6 @@ static HostComboBox *MythTimeFormat()
     gc->setHelpText(QObject::tr("Your preferred time format.  You must choose "
                     "a format with \"AM\" or \"PM\" in it, otherwise your "
                     "time display will be 24-hour or \"military\" time."));
-    return gc;
-}
-
-static HostComboBox *ThemeFontSizeType()
-{
-    HostComboBox *gc = new HostComboBox("ThemeFontSizeType");
-    gc->setLabel(QObject::tr("Font size"));
-    gc->addSelection(QObject::tr("default"), "default");
-    gc->addSelection(QObject::tr("small"), "small");
-    gc->addSelection(QObject::tr("big"), "big");
-    gc->setHelpText(QObject::tr("default: TV, small: monitor, big:"));
     return gc;
 }
 
@@ -2965,6 +2930,8 @@ ThemeSelector::ThemeSelector(QString label):
 
     if (themetype & THEME_UI)
         setValue("Terra");
+    else if (themetype & THEME_OSD)
+        setValue("BlackCurves-OSD");
 }
 
 class StyleSetting: public HostComboBox {
@@ -3781,29 +3748,6 @@ static HostComboBox *DisplayGroupTitleSort()
     return gc;
 }
 
-class DefaultViewSettings : public TriggeredConfigurationGroup
-{
-  public:
-    DefaultViewSettings() :
-        TriggeredConfigurationGroup(false, false, true, true)
-    {
-        HostComboBox *defaultView = DefaultView();
-        addChild(defaultView);
-        setTrigger(defaultView);
-
-        HostComboBox *titleSort = DisplayGroupTitleSort();
-
-        for (unsigned int ii = 0; ii < PlaybackBox::ViewTypes; ii++)
-        {
-            if (ii == PlaybackBox::TitlesOnly)
-                addTarget(QString::number(ii), titleSort);
-            else
-                addTarget(QString::number(ii),
-                        new VerticalConfigurationGroup(false, false));
-        }
-    }
-};
-
 static HostCheckBox *PlaybackWatchList()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackWatchList");
@@ -3908,10 +3852,10 @@ PVR350VideoDevice::PVR350VideoDevice() :
     setLabel(QObject::tr("Video device for the PVR-350 MPEG decoder"));
 
     QDir dev("/dev/v4l", "video*", QDir::Name, QDir::System);
-    fillSelectionsFromDir(dev, 16, 31, QString::null, "ivtv", false);
+    fillSelectionsFromDir(dev, 16, 31, QString(), "ivtv", false);
 
     dev.setPath("/dev");
-    fillSelectionsFromDir(dev, 16, 31, QString::null, "ivtv", false);
+    fillSelectionsFromDir(dev, 16, 31, QString(), "ivtv", false);
 }
 #endif // USING_IVTV
 
@@ -4870,7 +4814,7 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup* pbox3 = new VerticalConfigurationGroup(false);
     pbox3->setLabel(QObject::tr("View Recordings") +
                     QString(" (%1/%2)").arg(++i).arg(total));
-    pbox3->addChild(new DefaultViewSettings());
+    pbox3->addChild(DisplayGroupTitleSort());
     pbox3->addChild(new WatchListSettings());
     addChild(pbox3);
 
@@ -5122,7 +5066,6 @@ AppearanceSettings::AppearanceSettings()
 
     theme->addChild(ThemePainter());
     theme->addChild(new StyleSetting());
-    theme->addChild(ThemeFontSizeType());
     theme->addChild(MenuTheme());
     addChild(theme);
 

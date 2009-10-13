@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Downloading and compiling. </TITLE>
  <LINK HREF="mythtv-HOWTO-6.html" REL=next>
  <LINK HREF="mythtv-HOWTO-4.html" REL=previous>
@@ -40,152 +40,13 @@ skip XMLTV-related instructions), but you need <B>wget</B> version 1.9.1
 or higher.</P>
 <P>Get XMLTV from 
 <A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.51).</P>
-<P>
-<HR>
-<PRE>
-NOTE for Mandriva users:  If you have added a "PLF" mirror, you may skip the
-next step and type:
 
-# urpmi libmp3lame0 libmp3lame0-devel
-
-After downloading, be sure to install both:
-# rpm -Uvh lame*
-</PRE>
-<HR>
-</P>
-<P>Get lame from 
-<A HREF="http://lame.sourceforge.net/">http://lame.sourceforge.net/</A>.  Download the source code to v3.96.1
-by following the links from "Using" through "Download...".</P>
-
-<H2><A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Building LAME</A>
+<H2><A NAME="ConfigureSD"></A> <A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Configuring the Schedules Direct service </A>
 </H2>
 
-<P>Open a shell and switch to the directory where you saved lame.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xzf lame-3.96.1.tar.gz
-$ cd lame-3.96.1
-$ ./configure
-$ make
-$ make test
-$ su
-# make install
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Check that it worked:
-<BLOCKQUOTE><CODE>
-<PRE>
-# ls -l /usr/local/lib
--rw-r--r--    1 root     root       381706 Nov  4 14:22 libmp3lame.a
--rwxr-xr-x    1 root     root          674 Nov  4 14:22 libmp3lame.la*
-lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so ->
-libmp3lame.so.0.0.0*
-lrwxrwxrwx    1 root     root           19 Nov  4 14:22 libmp3lame.so.0 ->
-libmp3lame.so.0.0.0*
--rwxr-xr-x    1 root     root       360197 Nov  4 14:22
-libmp3lame.so.0.0.0*
-
-# exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">XMLTV</A>
-</H2>
-
-<H3>Red Hat Linux and Fedora Core:</H3>
-
-<P>RPMs for <B>XMLTV</B> and all of its dependencies can be obtained from
-<A HREF="http://ATrpms.net/name/xmltv/">http://ATrpms.net/name/xmltv/</A>. The web page has a
-list of all the dependent packages you must download and install.
-<BLOCKQUOTE><CODE>
-<PRE>
-# rpm -Uvh xmltv* perl*
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you install from this location you may skip to 
-<A HREF="#manually_building_mythtv">Manually building MythTV</A>.</P>
-<H3>Mandriva</H3>
-
-<P>RPMs for <B>XMLTV</B> and all of its dependencies are located in
-Mandriva's "contrib".  If you have added a contrib mirror, try installing
-<B>XMLTV</B>:
-<BLOCKQUOTE><CODE>
-<PRE>
-# urpmi xmltv xmltv-grabbers
-</PRE>
-</CODE></BLOCKQUOTE>
-
-If this does not work, it is possible that contrib for your Mandriva version
-does not have <B>XMLTV</B>, so you may install the XMLTV prerequisites by typing:
-<BLOCKQUOTE><CODE>
-<PRE>
-# urpmi perl-xml-twig perl-xml-writer perl-datemanip perl-libwww-perl
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>and skip straight to the XMLTV compilation step.</P>
-
-<H3>Manual installation</H3>
-
-<P>
-<A NAME="untarring_xmltv"></A> Untar the xmltv file:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xjf xmltv-0.5.51.tar.bz2
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Install the xmltv prerequisites.  The following prerequisites are the
-minimum required; when you actually start running the xmltv setup program it
-may alert you to other modules that are required.:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# perl -MCPAN -e shell
-cpan> install XML::Twig
-cpan> install Date::Manip
-Date::Manip is up to date.
-cpan> install LWP
-cpan> install XML::Writer
-cpan> exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Change to the XMLTV directory and compile it:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd xmltv-0.5.51
-$ perl Makefile.PL
-</PRE>
-</CODE></BLOCKQUOTE>
-
-You can answer "N" to the tv_check, tv_pick_cgi questions.  Say "yes" to
-the grabber required for your location.</P>
-<P>You may get errors about modules not being installed.  You will need to
-resolve any missing dependencies at this point, or your grabber may not work
-correctly.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ make
-$ make test
-$ su
-# make install
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="ConfigureSD"></A> <A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Configuring the Schedules Direct service </A>
-</H2>
-
-<P>As of 2007-09-01, Tribune Media Services will no longer offer free guide
-data.  Schedules Direct is a non-profit organization which has licensed the
-data to make it available to users of Freeware and Open Source applications.</P>
+<P>Schedules Direct is a non-profit organization which has licensed
+Television program data from Tribune Media Services and makes it
+available to users of Freeware and Open Source applications.</P>
 <P>If you wish to use Schedules Direct, you'll need to establish a user
 account.  Go to 
 <A HREF="http://www.schedulesdirect.org">http://www.schedulesdirect.org</A> and click on the "Membership" link.</P>
@@ -194,14 +55,13 @@ Privacy Policy proceed to the lineup choices and configure your account for
 your particular location and the channels that you have.  This configuration
 will be imported into MythTV when you first run the <B>mythtv-setup</B>
 program.</P>
-
 <P>
 <A NAME="manually_building_mythtv"></A> </P>
-<H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Manually building MythTV</A>
+<H2><A NAME="ss5.2">5.2</A> <A HREF="mythtv-HOWTO.html#toc5.2">Manually building MythTV</A>
 </H2>
 
 <P>If you are going to use <B>subversion</B>, execute the following
-instructions to obtain the latest version of MythTV:</P>
+instructions to obtain the latest trunk version of MythTV:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -214,23 +74,23 @@ $ cd mythtv
 <P>To use a release version, you can execute:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mkdir mythtv-release-0.21
-$ svn co http://svn.mythtv.org/svn/branches/release-0-21-fixes/ mythtv-release-0.21
-$ cd mythtv-release-0.21
+$ mkdir mythtv-release-0.22-fixes
+$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-release-0.22-fixes
+$ cd mythtv-release-0.22-fixes
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>:  Using a svn version of the code allows you to stay
-up-to-date with changes.  So, if there's an update to the 0.21 release and
+up-to-date with changes.  So, if there's an update to the 0.22 release and
 you originally obtained it using svn, you could enter the
-mythtv-release-0.21 directory and type "svn up", which will update your copy
+mythtv-release-0.22-fixes directory and type "svn up", which will update your copy
 with the fixed version from the website.  You would then recompile and
-install the updated 0.21 code.</P>
+install the updated 0.22 code.</P>
 <P>If you are using the tarball, then unpack it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.21.tar.bz2
-$ cd mythtv-0.21
+$ tar -xjf mythtv-0.22.tar.bz2
+$ cd mythtv-0.22
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -398,7 +258,7 @@ and a "Database Configuration" screen should appear.
 Set the "Host name" field to point to your Master backend's IP address.</LI>
 </P>
 
-<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.5">5.5</A> <A HREF="mythtv-HOWTO.html#toc5.5">Gentoo </A>
+<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Gentoo </A>
 </H2>
 
 <P>Installation of MythTV on Gentoo consists of simply emerging the desired

@@ -1,10 +1,15 @@
+
+#include "gameui.h"
+
 #include <mythcontext.h>
 #include <mythuibuttontree.h>
+#include <mythuiimage.h>
+#include <mythuitext.h>
+#include <mythuistatetype.h>
 #include <mythdialogbox.h>
 #include <mythgenerictree.h>
 
 // MythGame headers
-#include "gameui.h"
 #include "gamehandler.h"
 #include "rominfo.h"
 #include "gamedetails.h"
@@ -31,7 +36,7 @@ class GameTreeInfo
 Q_DECLARE_METATYPE(GameTreeInfo *)
 
 GameUI::GameUI(MythScreenStack *parent)
-        : MythScreenType(parent, "GameUI")
+       : MythScreenType(parent, "GameUI")
 {
 }
 
@@ -45,16 +50,16 @@ bool GameUI::Create()
         return false;
 
     bool err = false;
-    UIUtilE::Assign(this, m_gameTreeUI, "gametreelist", &err);
-    UIUtilE::Assign(this, m_gameTitle, "gametitle", &err);
-    UIUtilE::Assign(this, m_gameSystem, "systemname", &err);
-    UIUtilE::Assign(this, m_gameYear, "yearname", &err);
-    UIUtilE::Assign(this, m_gameGenre, "genrename", &err);
-    UIUtilE::Assign(this, m_gameFavourite, "showfavorite", &err);
-    UIUtilE::Assign(this, m_gamePlot, "plot", &err);
-    UIUtilE::Assign(this, m_gameImage, "gameimage", &err);
-    UIUtilE::Assign(this, m_fanartImage, "fanart", &err);
-    UIUtilE::Assign(this, m_boxImage, "boxart", &err);
+    UIUtilE::Assign(this, m_gameUITree, "gametreelist", &err);
+    UIUtilW::Assign(this, m_gameTitleText, "title");
+    UIUtilW::Assign(this, m_gameSystemText, "system");
+    UIUtilW::Assign(this, m_gameYearText, "year");
+    UIUtilW::Assign(this, m_gameGenreText, "genre");
+    UIUtilW::Assign(this, m_gameFavouriteState, "favorite");
+    UIUtilW::Assign(this, m_gamePlotText, "description");
+    UIUtilW::Assign(this, m_gameImage, "screenshot");
+    UIUtilW::Assign(this, m_fanartImage, "fanart");
+    UIUtilW::Assign(this, m_boxImage, "coverart");
 
     if (err)
     {
@@ -62,10 +67,10 @@ bool GameUI::Create()
         return false;
     }
     
-    connect(m_gameTreeUI, SIGNAL(itemClicked(MythUIButtonListItem*)),
+    connect(m_gameUITree, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(itemClicked(MythUIButtonListItem*)));
 
-    connect(m_gameTreeUI, SIGNAL(nodeChanged(MythGenericTree*)),
+    connect(m_gameUITree, SIGNAL(nodeChanged(MythGenericTree*)),
             this, SLOT(nodeChanged(MythGenericTree*)));
 
     m_gameShowFileName = gContext->GetSetting("GameShowFileNames").toInt();
@@ -142,7 +147,7 @@ bool GameUI::Create()
                 new GameTreeInfo("publisher gamename", systemFilter)));
     m_gameTree->addNode(new_node);
 
-    m_gameTreeUI->AssignTree(m_gameTree);
+    m_gameUITree->AssignTree(m_gameTree);
 
     BuildFocusList();
 
@@ -210,29 +215,31 @@ void GameUI::nodeChanged(MythGenericTree* node)
             showImages();
         else
         {
-            if (m_gameImage->IsVisible())
-                m_gameImage->Hide();
-            if (m_fanartImage->IsVisible())
-                m_fanartImage->Hide();
-            if (m_boxImage->IsVisible())
-                m_boxImage->Hide();
+            if (m_gameImage)
+                m_gameImage->Reset();
+            if (m_fanartImage)
+                m_fanartImage->Reset();
+            if (m_boxImage)
+                m_boxImage->Reset();
         }
     }
 }
 
 void GameUI::itemClicked(MythUIButtonListItem*)
 {
-    MythGenericTree *node = m_gameTreeUI->GetCurrentNode();
+    MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        if (!romInfo)
+            return;
         if (romInfo->RomCount() == 1)
         {
             GameHandler::Launchgame(romInfo, NULL);
         }
         else
         {
-            QString msg = QObject::tr("Choose System for") + 
+            QString msg = tr("Choose System for") +
                               ":\n" + node->getString();
             MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
@@ -260,64 +267,85 @@ void GameUI::itemClicked(MythUIButtonListItem*)
 
 void GameUI::showImages(void)
 {
-    m_gameImage->Load();
-    if (!m_gameImage->IsVisible())
-        m_gameImage->Show();
-    m_fanartImage->Load();
-    if (!m_fanartImage->IsVisible())
-        m_fanartImage->Show();
-    m_boxImage->Load();
-    if (!m_boxImage->IsVisible())
-        m_boxImage->Show();
+    if (m_gameImage)
+        m_gameImage->Load();
+    if (m_fanartImage)
+        m_fanartImage->Load();
+    if (m_boxImage)
+        m_boxImage->Load();
 }
 
 void GameUI::searchComplete(QString string)
 {
-    MythGenericTree *parent = m_gameTreeUI->GetCurrentNode()->getParent();
+    if (!m_gameUITree->GetCurrentNode())
+        return;
+
+    MythGenericTree *parent = m_gameUITree->GetCurrentNode()->getParent();
+    if (!parent)
+        return;
+
     MythGenericTree *new_node = parent->getChildByName(string);
     if (new_node)
-        m_gameTreeUI->SetCurrentNode(new_node);
+        m_gameUITree->SetCurrentNode(new_node);
 }
 
 void GameUI::updateRomInfo(RomInfo *rom)
 {
-    m_gameTitle->SetText(rom->Gamename());
-    m_gameSystem->SetText(rom->System());
-    m_gameYear->SetText(rom->Year());
-    m_gameGenre->SetText(rom->Genre());
-    m_gamePlot->SetText(rom->Plot());
+    if (m_gameTitleText)
+        m_gameTitleText->SetText(rom->Gamename());
+    if (m_gameSystemText)
+        m_gameSystemText->SetText(rom->System());
+    if (m_gameYearText)
+        m_gameYearText->SetText(rom->Year());
+    if (m_gameGenreText)
+        m_gameGenreText->SetText(rom->Genre());
+    if (m_gamePlotText)
+        m_gamePlotText->SetText(rom->Plot());
 
-    if (rom->Favorite())
-        m_gameFavourite->SetText("Yes");
-    else
-        m_gameFavourite->SetText("No");
+    if (m_gameFavouriteState)
+    {
+        if (rom->Favorite())
+            m_gameFavouriteState->DisplayState("yes");
+        else
+            m_gameFavouriteState->DisplayState("no");
+    }
 
-    m_gameImage->SetFilename(rom->Screenshot());
-    m_fanartImage->SetFilename(rom->Fanart());
-    m_boxImage->SetFilename(rom->Boxart());
+    if (m_gameImage)
+        m_gameImage->SetFilename(rom->Screenshot());
+    if (m_fanartImage)
+        m_fanartImage->SetFilename(rom->Fanart());
+    if (m_boxImage)
+        m_boxImage->SetFilename(rom->Boxart());
 }
 
-void GameUI::clearRomInfo(void) {
-    m_gameTitle->SetText("");
-    m_gameSystem->SetText("");
-    m_gameYear->SetText("");
-    m_gameGenre->SetText("");
-    m_gamePlot->SetText("");
-    m_gameFavourite->SetText("");
+void GameUI::clearRomInfo(void)
+{
+    if (m_gameTitleText)
+        m_gameTitleText->Reset();
+    if (m_gameSystemText)
+        m_gameSystemText->Reset();
+    if (m_gameYearText)
+        m_gameYearText->Reset();
+    if (m_gameGenreText)
+        m_gameGenreText->Reset();
+    if (m_gamePlotText)
+        m_gamePlotText->Reset();
+    if (m_gameFavouriteState)
+        m_gameFavouriteState->Reset();
 
-    if (m_gameImage->IsVisible())
-        m_gameImage->Hide();
+    if (m_gameImage)
+        m_gameImage->Reset();
 
-    if (m_fanartImage->IsVisible())
-        m_fanartImage->Hide();
+    if (m_fanartImage)
+        m_fanartImage->Reset();
 
-    if (m_boxImage->IsVisible())
-        m_boxImage->Hide();
+    if (m_boxImage)
+        m_boxImage->Reset();
 }
 
 void GameUI::edit(void)
 {
-    MythGenericTree *node = m_gameTreeUI->GetCurrentNode();
+    MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
@@ -339,10 +367,12 @@ void GameUI::edit(void)
 
 void GameUI::showInfo()
 {
-    MythGenericTree *node = m_gameTreeUI->GetCurrentNode();
+    MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        if (!romInfo)
+            return;
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         GameDetailsPopup *details_dialog  =
             new GameDetailsPopup(mainStack, romInfo);
@@ -359,10 +389,12 @@ void GameUI::showInfo()
 
 void GameUI::showMenu()
 {
-    MythGenericTree *node = m_gameTreeUI->GetCurrentNode();
+    MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
+        if (!romInfo)
+            return;
         MythScreenStack *popupStack = GetMythMainWindow()->
                                               GetStack("popup stack");
         MythDialogBox *showMenuPopup =
@@ -386,7 +418,7 @@ void GameUI::showMenu()
 
 void GameUI::searchStart(void)
 {
-    MythGenericTree *parent = m_gameTreeUI->GetCurrentNode()->getParent();
+    MythGenericTree *parent = m_gameUITree->GetCurrentNode()->getParent();
 
     if (parent != NULL)
     {
@@ -419,7 +451,7 @@ void GameUI::searchStart(void)
 
 void GameUI::toggleFavorite(void)
 {
-    MythGenericTree *node = m_gameTreeUI->GetCurrentNode();
+    MythGenericTree *node = m_gameUITree->GetCurrentNode();
     if (isLeaf(node))
     {
         RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
@@ -440,7 +472,8 @@ void GameUI::customEvent(QEvent *event)
 
         if (resultid == "showMenuPopup")
         {
-            if (resulttext == tr("Edit Metadata")) {
+            if (resulttext == tr("Edit Metadata"))
+            {
                 edit();
             }
             else if (resulttext == tr("Show Information"))
@@ -455,15 +488,16 @@ void GameUI::customEvent(QEvent *event)
         }
         else if (resultid == "chooseSystemPopup")
         {
-            if (resulttext != "" && resulttext != tr("Cancel")) {
-                MythGenericTree *node = m_gameTreeUI->GetCurrentNode();
+            if (!resulttext.isEmpty() && resulttext != tr("Cancel"))
+            {
+                MythGenericTree *node = m_gameUITree->GetCurrentNode();
                 RomInfo *romInfo = qVariantValue<RomInfo *>(node->GetData());
                 GameHandler::Launchgame(romInfo, resulttext);
             }
         }
         else if (resultid == "editMetadata")
         {
-            MythGenericTree *node = m_gameTreeUI->GetCurrentNode();
+            MythGenericTree *node = m_gameUITree->GetCurrentNode();
             RomInfo *oldRomInfo = qVariantValue<RomInfo *>(node->GetData());
             delete oldRomInfo;
 
@@ -722,7 +756,7 @@ void GameUI::updateChangedNode(MythGenericTree *node, RomInfo *romInfo)
 
     if (node->getParent() == m_favouriteNode && romInfo->Favorite() == 0) {
         // node is being removed
-        m_gameTreeUI->SetCurrentNode(m_favouriteNode);
+        m_gameUITree->SetCurrentNode(m_favouriteNode);
     }
     else
         nodeChanged(node);

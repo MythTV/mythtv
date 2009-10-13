@@ -767,6 +767,12 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     // Netherlands
     fix[ 1000U << 16] = EITFixUp::kFixNL;
 
+    // Finland
+    fix[      8438U << 16] = // DVB-T Espoo
+        fix[ 42249U << 16] = // DVB-C Welho
+        fix[    15U << 16] = // DVB-C Welho
+        EITFixUp::kFixFI;
+
     ///////////////////////////////////////////////////////////////////////////
     // Special Early fixups for providers that break DVB EIT spec.
     // transport_id<<32 | netword_id<<16 | service_id
@@ -864,12 +870,8 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[ 1100LL << 32 | 1 << 16 |  8710 ] = // NRJ 12
         EITFixUp::kEFixForceISO8859_15;
 
-    // DVB-T Espoo, Finland
-    fix[ 8438U << 16] = EITFixUp::kFixFI;
-
-    // DVB-C Welho Finland
-    fix[ 42249U << 16] = EITFixUp::kFixFI;
-    fix[ 15U << 16] = EITFixUp::kFixFI;
+    // DVB-T TDT, Portugal (RTP 1, RTP 2, SIC, TVI)
+    fix[ 1101LL << 32 | 8904U << 16 ] = EITFixUp::kEFixForceISO8859_15;
 }
 
 static int calc_eit_utc_offset(void)

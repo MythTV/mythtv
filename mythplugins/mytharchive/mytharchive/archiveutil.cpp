@@ -25,11 +25,22 @@
 
 struct ArchiveDestination ArchiveDestinations[] =
 {
-    {AD_DVD_SL,   "Single Layer DVD", "Single Layer DVD (4482Mb)", 4482*1024},
-    {AD_DVD_DL,   "Dual Layer DVD",   "Dual Layer DVD (8964Mb)",   8964*1024},
-    {AD_DVD_RW,   "DVD +/- RW",       "Rewritable DVD",            4482*1024},
-    {AD_FILE,     "File",             "Any file accessable from "
-            "your filesystem.",          -1},
+    {AD_DVD_SL,
+     QT_TRANSLATE_NOOP("SelectDestination", "Single Layer DVD"),
+     QT_TRANSLATE_NOOP("SelectDestination", "Single Layer DVD (4482Mb)"),
+     4482*1024},
+    {AD_DVD_DL,
+     QT_TRANSLATE_NOOP("SelectDestination", "Dual Layer DVD"),
+     QT_TRANSLATE_NOOP("SelectDestination", "Dual Layer DVD (8964Mb)"),
+     8964*1024},
+    {AD_DVD_RW,
+     QT_TRANSLATE_NOOP("SelectDestination", "DVD +/- RW"),
+     QT_TRANSLATE_NOOP("SelectDestination", "Rewritable DVD"),
+     4482*1024},
+    {AD_FILE,
+     QT_TRANSLATE_NOOP("SelectDestination", "File"),
+     QT_TRANSLATE_NOOP("SelectDestination", "Any file accessable from your filesystem."),
+     -1},
 };
 
 int ArchiveDestinationsCount = sizeof(ArchiveDestinations) / sizeof(ArchiveDestinations[0]);
@@ -264,14 +275,11 @@ bool getFileDetails(ArchiveItem *a)
 
 void showWarningDialog(const QString msg)
 {
-    MythScreenStack *mainStack = GetMythMainWindow()->GetStack("main stack");
-    QString title = "MythArchive Warning";
-    MythDialogBox *dialog = new MythDialogBox(title, msg, mainStack, "warningdlg", true);
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, msg, false);
 
     if (dialog->Create())
-        mainStack->AddScreen(dialog);
-
-    dialog->AddButton(QObject::tr("OK"));
+        popupStack->AddScreen(dialog);
 }
 
 void recalcItemSize(ArchiveItem *item)

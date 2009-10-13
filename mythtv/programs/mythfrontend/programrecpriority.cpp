@@ -1,27 +1,35 @@
 
+// own header
+#include "programrecpriority.h"
+
+// C/C++ headers
 #include <vector> // For std::vector
 using namespace std;
 
+// QT headers
 #include <QDateTime>
 #include <QRegExp>
 
-#include "programrecpriority.h"
+// libmythtv headers
 #include "recordingrule.h"
 #include "scheduledrecording.h"
-#include "customedit.h"
-#include "proglist.h"
 #include "storagegroup.h"
 
+// libmythdb
 #include "mythdb.h"
 #include "mythverbose.h"
 #include "remoteutil.h"
 
+// libmythui
 #include "mythuihelper.h"
 #include "mythuibuttonlist.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythdialogbox.h"
 
+// mythfrontend
+#include "customedit.h"
+#include "proglist.h"
 #include "scheduleeditor.h"
 
 // overloaded version of RecordingInfo with additional recording priority
@@ -95,7 +103,7 @@ ProgramRecPriorityInfo &ProgramRecPriorityInfo::clone(const ProgramInfo &other)
     last_record        = QDateTime();
     avg_delay          = 0;
     autoRecPriority    = 0;
-    profile            = "";
+    profile.clear();
 
     return *this;
 }
@@ -111,7 +119,7 @@ void ProgramRecPriorityInfo::clear(void)
     last_record        = QDateTime();
     avg_delay          = 0;
     autoRecPriority    = 0;
-    profile            = "";
+    profile.clear();
 }
 
 typedef struct RecPriorityInfo
@@ -125,7 +133,7 @@ class titleSort
     public:
         titleSort(bool m_reverseSort = false) {m_reverse = m_reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             if (a.prog->sortTitle != b.prog->sortTitle)
             {
@@ -171,7 +179,7 @@ class programRecPrioritySort
         programRecPrioritySort(bool m_reverseSort = false)
                                {m_reverse = m_reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             int finalA = a.prog->recpriority + a.prog->autoRecPriority +
                          a.prog->recTypeRecPriority;
@@ -211,7 +219,7 @@ class programRecTypeSort
         programRecTypeSort(bool m_reverseSort = false)
                                {m_reverse = m_reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             int typeA = RecTypePriority(a.prog->recType);
             int typeB = RecTypePriority(b.prog->recType);
@@ -248,7 +256,7 @@ class programCountSort
     public:
         programCountSort(bool m_reverseSort = false) {m_reverse = m_reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             int countA = a.prog->matchCount;
             int countB = b.prog->matchCount;
@@ -284,7 +292,7 @@ class programRecCountSort
             m_reverse = m_reverseSort;
         }
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             int countA = a.prog->matchCount;
             int countB = b.prog->matchCount;
@@ -318,7 +326,7 @@ class programLastRecordSort
         programLastRecordSort(bool m_reverseSort=false)
             {m_reverse = m_reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             QDateTime lastRecA = a.prog->last_record;
             QDateTime lastRecB = b.prog->last_record;
@@ -343,7 +351,7 @@ class programAvgDelaySort
         programAvgDelaySort(bool m_reverseSort=false)
             {m_reverse = m_reverseSort;}
 
-        bool operator()(const RecPriorityInfo a, const RecPriorityInfo b)
+        bool operator()(const RecPriorityInfo &a, const RecPriorityInfo &b)
         {
             int avgA = a.prog->avg_delay;
             int avgB = b.prog->avg_delay;
@@ -366,7 +374,16 @@ class programAvgDelaySort
 
 ProgramRecPriority::ProgramRecPriority(MythScreenStack *parent,
                                        const QString &name)
-                   : ScheduleCommon(parent, name)
+                   : ScheduleCommon(parent, name),
+                     m_programList(NULL), m_categoryText(NULL),
+                     m_descriptionText(NULL), m_schedInfoText(NULL),
+                     m_rectypePriorityText(NULL), m_recPriorityText(NULL),
+                     m_recPriorityBText(NULL), m_finalPriorityText(NULL),
+                     m_recGroupText(NULL), m_storageGroupText(NULL),
+                     m_lastRecordedText(NULL), m_lastRecordedDateText(NULL),
+                     m_lastRecordedTimeText(NULL), m_channameText(NULL),
+                     m_channumText(NULL), m_callsignText(NULL),
+                     m_recProfileText(NULL), m_currentItem(NULL)
 {
     m_sortType = (SortType)gContext->GetNumSetting("ProgramRecPrioritySorting",
                                                  (int)byTitle);
@@ -909,12 +926,7 @@ void ProgramRecPriority::customEdit(void)
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pgRecInfo);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-     else
-        delete ce;
+    EditCustom(pgRecInfo);
 }
 
 void ProgramRecPriority::remove(void)
@@ -969,14 +981,14 @@ void ProgramRecPriority::deactivate(void)
                       "WHERE recordid = :RECID");
         query.bindValue(":RECID", pgRecInfo->recordid);
 
-        int inactive = 0;
+
         if (!query.exec())
         {
             MythDB::DBError("ProgramRecPriority::deactivate()", query);
         }
         else if (query.next())
         {
-            inactive = query.value(0).toInt();
+            int inactive = query.value(0).toInt();
             if (inactive)
                 inactive = 0;
             else
@@ -1271,7 +1283,7 @@ void ProgramRecPriority::SortList()
     // copy m_programData into sortingList and make a copy
     // of m_programData in pdCopy
     for (i = 0, pit = m_programData.begin(); pit != m_programData.end();
-         ++pit, i++)
+         ++pit, ++i)
     {
         ProgramRecPriorityInfo *progInfo = &(*pit);
         RecPriorityInfo tmp = {progInfo, i};
@@ -1341,7 +1353,7 @@ void ProgramRecPriority::SortList()
     m_sortedProgram.clear();
 
     // rebuild m_channelData in sortingList order from m_sortedProgram
-    for (i = 0, sit = sortingList.begin(); sit != sortingList.end(); i++, ++sit)
+    for (i = 0, sit = sortingList.begin(); sit != sortingList.end(); ++i, ++sit)
     {
         recPriorityInfo = &(*sit);
 
@@ -1379,7 +1391,7 @@ void ProgramRecPriority::UpdateList()
         if ((progInfo->rectype == kSingleRecord ||
                 progInfo->rectype == kOverrideRecord ||
                 progInfo->rectype == kDontRecord) &&
-            (progInfo->subtitle).trimmed().length() > 0)
+            !(progInfo->subtitle).trimmed().isEmpty())
         {
 
             QString rating = QString::number((int)((progInfo->stars * 10.0) + 0.5));
@@ -1387,7 +1399,7 @@ void ProgramRecPriority::UpdateList()
             item->DisplayState(rating, "ratingstate");
         }
         else
-            progInfo->subtitle = "";
+            progInfo->subtitle.clear();
 
         QString state;
         if (progInfo->recType == kDontRecord ||
@@ -1487,7 +1499,7 @@ void ProgramRecPriority::updateInfo(MythUIButtonListItem *item)
     rectyperecpriority = pgRecInfo->recTypeRecPriority;
     finalRecPriority = progRecPriority + autorecpri + rectyperecpriority;
 
-    QString subtitle = "";
+    QString subtitle;
     if (pgRecInfo->subtitle != "(null)" &&
         (pgRecInfo->rectype == kSingleRecord ||
             pgRecInfo->rectype == kOverrideRecord ||
@@ -1632,13 +1644,11 @@ void ProgramRecPriority::RemoveItemFromList(MythUIButtonListItem *item)
         return;
 
     QMap<QString, ProgramRecPriorityInfo>::iterator it;
-    for (it = m_programData.begin(); it != m_programData.end(); it++)
+    for (it = m_programData.begin(); it != m_programData.end(); ++it)
     {
-        VERBOSE(VB_IMPORTANT, QString("Iterating %1").arg(it.key()));
         ProgramRecPriorityInfo *value = &(it.value());
         if (value == pgRecInfo)
         {
-            VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(it.key()));
             m_programData.erase(it);
             break;
         }

@@ -1,144 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
+<context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythnews/main.cpp" line="27"/>
+        <source>RSS News feed reader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="31"/>
+        <source>Update news items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="33"/>
+        <source>Force update news items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="35"/>
+        <source>Cancel news item updating</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="395"/>
+        <location filename="../mythnews/mythnews.cpp" line="437"/>
         <source>Updated</source>
         <translation>Posodobljeno</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="402"/>
+        <location filename="../mythnews/mythnews.cpp" line="444"/>
         <source>Unknown</source>
         <translation>Neznano</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
-        <source>Edit Site Details</source>
-        <translation type="obsolete">Uredi podatke o strani</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>Enter Site Details</source>
-        <translation type="obsolete">Vnesi podatke o strani</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>Name:</source>
-        <translation type="obsolete">Ime:</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>Icon:</source>
-        <translation type="obsolete">Ikona:</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>OK</source>
-        <translation type="obsolete">Vredu</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="810"/>
+        <location filename="../mythnews/mythnews.cpp" line="917"/>
         <source>Cancel</source>
         <translation>Prekliči</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="807"/>
+        <location filename="../mythnews/mythnews.cpp" line="913"/>
         <source>Edit News Site</source>
         <translation>Uredi stran z novicami</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="125"/>
+        <source>You haven&apos;t configured MythNews to use any sites.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
+        <location filename="../mythnews/mythnews.cpp" line="714"/>
+        <source>%1 of %2 (%3 percent)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="786"/>
+        <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="914"/>
         <source>Add News Site</source>
         <translation>Dodaj stran z novicami</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="809"/>
+        <location filename="../mythnews/mythnews.cpp" line="916"/>
         <source>Delete News Site</source>
         <translation>Odstrani stran z novicami</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="795"/>
+        <location filename="../mythnews/mythnews.cpp" line="899"/>
         <source>Options</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>MythNewsConfig</name>
+    <name>MythNewsEditor</name>
     <message>
-        <location filename="" line="97"/>
-        <source>Press MENU to set the update frequency.</source>
-        <translation type="obsolete">Pritisni MENU za nastavitev pogostosti posodabljanja.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <source>Edit Site Details</source>
+        <translation type="unfinished">Uredi podatke o strani</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
-        <source>Set update frequency by using the up/down arrows.
-The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Nastavi pogostost posodabljanja z uporabo smernih tipk gor/dol.
-Minimalna dovoljena vrednost je 30 minut.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <source>Enter Site Details</source>
+        <translation type="unfinished">Vnesi podatke o strani</translation>
     </message>
     <message>
-        <location filename="" line="97"/>
-        <source>Press MENU to return to feed selection.</source>
-        <translation type="obsolete">Pritisni MENU za vrnitev v izbor virov.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
+        <source>Name:</source>
+        <translation type="unfinished">Ime:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewsconfig.cpp" line="204"/>
-        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
+        <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
+        <source>Icon:</source>
+        <translation type="unfinished">Ikona:</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
+        <source>Podcast:</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
     </message>
 </context>
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="199"/>
+        <location filename="../mythnews/newssite.cpp" line="218"/>
         <source>Retrieve Failed. </source>
         <translation>Sprejem je spodletel.</translation>
     </message>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="219"/>
+        <location filename="../mythnews/newssite.cpp" line="225"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="243"/>
         <source>Failed to retrieve news</source>
         <translation>Napaka pri pridobivanju novic</translation>
     </message>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="208"/>
-        <source>No Cached News</source>
-        <translation>Ni shranjenih novic</translation>
+        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <source>No Cached News.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="221"/>
-        <source>Failed to read downloaded file</source>
-        <translation>Napaka pri branju snete datoteke</translation>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <source>Failed to read downloaded file.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="227"/>
-        <source>Showing Cached News</source>
-        <translation>Prikaz shranjenih novic</translation>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <source>Showing Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="274"/>
+        <source>XML-file is not valid RSS-feed</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="" line="97"/>
-        <source>MythNews</source>
-        <translation type="obsolete">MythNovice</translation>
-    </message>
-    <message>
-        <location filename="" line="97"/>
-        <source>Are you sure you want to delete this news site
-
-%1</source>
-        <translation type="obsolete">Ali ste prepričani, da želite odstraniti to stran z novicami?
-
-%1</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="608"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Downloading media...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -147,8 +168,13 @@ Minimalna dovoljena vrednost je 30 minut.</translation>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Minutes</source>
-        <translation>Minut</translation>
+        <source>Cancel</source>
+        <translation type="unfinished">Prekliči</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

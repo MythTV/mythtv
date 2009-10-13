@@ -1,27 +1,15 @@
-#include <cstdio>
-#include <cstdlib>
-#include <unistd.h>
 #include <fcntl.h>
-#include <cassert>
-#include <cerrno>
-#include <sys/time.h>
-#include <ctime>
 #include <math.h>
 
-#include <qstringlist.h>
-#include <qsqldatabase.h>
-#include <qmap.h>
-#include <qstringlist.h>
-#include <qregexp.h>
-
-#include <iostream>
 using namespace std;
 
-#include "osdtypes.h"
+#include <QStringList>
+#include <QMap>
+#include <QRegExp>
+
 #include "transcode.h"
 #include "audiooutput.h"
 #include "recordingprofile.h"
-#include "remoteutil.h"
 #include "mythcontext.h"
 #include "jobqueue.h"
 #include "exitcodes.h"

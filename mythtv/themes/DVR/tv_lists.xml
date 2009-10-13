@@ -4,7 +4,6 @@
         <type>TV_SEARCH_NEW_TITLES</type>
         <text>New Titles</text>
         <text lang="DE">Neue Sendungen</text>
-        <text lang="FR">Nouveaux titres</text>
         <text lang="SV">Nya titlar</text>
         <text lang="JA">新タイトル</text>
         <text lang="NL">Nieuwe Titels</text>
@@ -16,7 +15,9 @@
         <text lang="PT">Por Novos Títulos</text>
         <text lang="ES">Nuevos Títulos</text>
         <text lang="RU">Новые заголовки</text>
+        <text lang="HU">Új cím</text>
         <description>Pick a program to record for a list of new titles</description>
+        <description lang="DE">Wählen Sie eine Sendung aus verschiedenen Listen</description>
         <action>TV_SEARCH_NEW</action>
     </button>
 
@@ -25,7 +26,6 @@
         <text>Movies</text>
         <text lang="DE">Spielfilme</text>
         <text lang="SV">Filmer</text>
-        <text lang="FR">Films</text>
         <text lang="JA">映画</text>
         <text lang="NL">Films</text>
         <text lang="FI">Elokuvat</text>
@@ -36,7 +36,9 @@
         <text lang="PT">Por Filme</text>
         <text lang="ES">Películas</text>
         <text lang="RU">Фильмы</text>
+        <text lang="HU">Filmek</text>
         <description>Pick a movie to record</description>
+        <description lang="DE">Wählen Sie einen Film zum aufnehmen</description>
         <action>TV_SEARCH_MOVIE</action>
     </button>
 
@@ -45,7 +47,6 @@
         <text>Categories</text>
         <text lang="DE">Kategorien</text>
         <text lang="SV">Kategori</text>
-        <text lang="FR">Catégories</text>
         <text lang="JA">カテゴリー</text>
         <text lang="NL">Categorie</text>
         <text lang="FI">Kategoriat</text>
@@ -56,7 +57,9 @@
         <text lang="PT">Por Categoria</text>
         <text lang="ES">Categorías</text>
         <text lang="RU">Категории</text>
+        <text lang="HU">Kategóriák</text>
         <description>Pick a program based on category</description>
+        <description lang="DE">Wählen Sie eine Sendung nach Genre</description>
         <action>TV_SEARCH_CATEGORY</action>
     </button>
 
@@ -65,7 +68,6 @@
         <text>Channels</text>
         <text lang="DE">Sender</text>
         <text lang="SV">Kanal</text>
-        <text lang="FR">Chaînes</text>
         <text lang="NL">Zenders</text>
         <text lang="JA">チャンネル</text>
         <text lang="FI">Kanavat</text>
@@ -76,7 +78,9 @@
         <text lang="PT">Por Canal</text>
         <text lang="ES">Canales</text>
         <text lang="RU">Каналы</text>
+        <text lang="HU">Csatornák</text>
         <description>Pick a program on a given channel</description>
+        <description lang="DE">Wählen Sie eine Sendung auf einem best. Sender</description>
         <action>TV_SEARCH_CHANNEL</action>
     </button>
 
@@ -85,7 +89,6 @@
         <text>Time</text>
         <text lang="NL">Tijdstip</text>
         <text lang="SV">Tid</text>
-        <text lang="FR">Date</text>
         <text lang="JA">時間</text>
         <text lang="DE">Sendezeit</text>
         <text lang="FI">Aika</text>
@@ -96,7 +99,9 @@
         <text lang="PT">Por Data e Hora</text>
         <text lang="ES">Horas</text>
         <text lang="RU">Время</text>
+        <text lang="HU">Óra</text>
         <description>Pick a program based on time</description>
+        <description lang="DE">Wählen Sie eine Sendung nach ihrer Sendezeit</description>
         <action>TV_SEARCH_TIME</action>
     </button>
 

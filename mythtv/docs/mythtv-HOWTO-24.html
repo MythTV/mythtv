@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Example Configurations.</TITLE>
  <LINK HREF="mythtv-HOWTO-23.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc24" REL=contents>
@@ -13,215 +13,11 @@ Next
 <HR>
 <H2><A NAME="s24">24.</A> <A HREF="mythtv-HOWTO.html#toc24">Example Configurations.</A></H2>
 
-<H2><A NAME="LVM"></A> <A NAME="ss24.1">24.1</A> <A HREF="mythtv-HOWTO.html#toc24.1">Logical Volume Manager (LVM) </A>
-</H2>
-
-<P>LVM greatly increases the flexibility you have in managing your storage
-than traditional physical partitions. This section will provide some brief
-notes on how to use LVM to create storage space for your video files and how
-to add additional disk space in the future. There's lots more that can be
-done with LVM, so check the LVM HOWTO 
-<A HREF="http://tldp.org/HOWTO/LVM-HOWTO/">http://tldp.org/HOWTO/LVM-HOWTO/</A> document for details.</P>
-
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you are running MythTV 0.21 and you are using LVM to
-create one large filesystem to store your recordings, it's no longer
-recommended that you go the LVM route. The preferred solution is to use 
-<A HREF="mythtv-HOWTO-9.html#storagegroups">Storage Groups</A>.  They're more flexible and less
-likely to lose all of your recordings if you have a drive failure.</CAPTION>
-</FIGURE>
-</P>
-<P>If you don't understand how to partition a drive, or how to change the
-partition type you should stop and look at documentation on how to perform
-these steps.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>BIG FAT WARNING</B>:  Using an incorrect parameter can make your files
-inaccessible, prevent your computer from booting, etc.  Be careful!</CAPTION>
-</FIGURE>
-</P>
-<P>Make sure your kernel configuration includes LVM support or that it's
-available as a module. Today, most vendors include this by default. You'll
-also want to ensure that you have a copy of the LVM utilities; check your
-distribution, or get the latest versions from 
-<A HREF="http://www.sistina.com/products_lvm.htm">http://www.sistina.com/products_lvm.htm</A> and build them manually.</P>
-<P>Check that the <B>vgscan</B> program is being run at some point during
-your boot sequence - most distributions do this by default. Look for a
-message during boot up that looks like this: <CODE>vgscan -- reading all
-physical volumes (this may take a while...)</CODE> If you don't see any
-messages during boot, you may need to install a LVM init script or confirm
-that you have all of the LVM packages installed from your distribution.</P>
-<P>LVM uses a few concepts you should be familiar with before starting.
-<UL>
-<LI>PV (Physical Volume).  The actual partition on the hard drive.</LI>
-<LI>VG (Volume Group).  The aggregation of all the PVs make a VG.</LI>
-<LI>LV (Logical Volume).  Subdivision of the pool of space available in
-the VG into individual chunks, like /usr, /var/video, etc.</LI>
-</UL>
-</P>
-<P>The following example assumes that you want to create a LVM partition from a
-chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
-/var/video. You later decide to extend this filesystem by adding a new disk:
-/dev/hdb.</P>
-<P>You need to create at least one LVM partition for a physical volume. Use
-<B>fdisk</B> or your favorite partition editor to set the type to LVM
-(0x8e). If you're using an entire disk, create one big partition rather than
-using the device itself. e.g. use /dev/hdb1 not /dev/hdb.</P>
-<P>In the following example, you have a 15GB disk.  The first 6GB are set as
-your boot partition.  <CODE>/dev/hda2</CODE> was added as an extended partition,
-and within that partition you created the <CODE>/dev/hda5</CODE> linux (ext2)
-partition.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-# fdisk /dev/hda
-
-The number of cylinders for this disk is set to 1823.
-There is nothing wrong with that, but this is larger than 1024,
-and could in certain setups cause problems with:
-1) software that runs at boot time (e.g., old versions of LILO)
-2) booting and partitioning software from other OSs
-   (e.g., DOS FDISK, OS/2 FDISK)
-
-Command (m for help): p
-
-Disk /dev/hda: 15.0 GB, 15000330240 bytes
-255 heads, 63 sectors/track, 1823 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-
-   Device Boot    Start       End    Blocks   Id  System
-/dev/hda1   *         1       764   6136798+  83  Linux
-/dev/hda2           765      1823   8506417+   5  Extended
-/dev/hda5           765      1823   8506417   83  Linux
-
-Command (m for help): t
-Partition number (1-6): 5
-Hex code (type L to list codes): 8e
-
-Command (m for help): p
-
-Disk /dev/hda: 15.0 GB, 15000330240 bytes
-255 heads, 63 sectors/track, 1823 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-
-   Device Boot    Start       End    Blocks   Id  System
-/dev/hda1   *         1       764   6136798+  83  Linux
-/dev/hda2           765      1823   8506417+   5  Extended
-/dev/hda5           765      1823   8506417   8e  Linux LVM
-
-Command (m for help): w
-
-#
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Create the LVM physical volume from the partitions (repeat if you have
-multiple partitions to use):
-<BLOCKQUOTE><CODE>
-<PRE>
-# pvcreate /dev/hda5
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Create a LVM volume group out of this physical volume called "VGforMyth" that is
-allocated in chunks that are a multiple of 64MB
-<BLOCKQUOTE><CODE>
-<PRE>
-# vgcreate VGforMyth -s 64m /dev/hda5
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Create a logical volume of 5GB called "video" and then create the reiserfs
-filesystem and mount it:
-<BLOCKQUOTE><CODE>
-<PRE>
-# lvcreate --name video --size 5G VGforMyth
-# mkreiserfs /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Now create a 3GB volume for mythmusic files if you like:
-<BLOCKQUOTE><CODE>
-<PRE>
-# lvcreate --name music --size 3G VGforMyth
-# mkreiserfs /dev/VGforMyth/music
-# mount /dev/VGforMyth/music /var/music
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Display the volume group status:
-<CODE># vgdisplay -v</CODE></P>
-<P>Now, lets suppose you want to add a 60GB hard disk to the system as hdb and
-allocate 50GB of it to video storage.</P>
-<P>First, create a single partition /dev/hdb1 covering the whole disk and make
-it type 0x8e using your partition editor.</P>
-<P><CODE># fdisk /dev/hdb</CODE>
-.... create partition, set type, save and reboot if it says you have to</P>
-<P>Create the new LVM physical volume:</P>
-<P><CODE># pvcreate /dev/hdb1</CODE></P>
-<P>Add the new physical volume to the volume group:</P>
-<P><CODE># vgextend VGforMyth /dev/hdb1</CODE></P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  You may get errors at this point stating that there are no
-physical volumes available for adding to the LV, even though you know for a
-fact that there are.  You may need to specify the physical volume in the
-<CODE>/dev/ide/host/bus/target/lun/etc</CODE> format.</CAPTION>
-</FIGURE>
-
-Once you've completed one of the following two procedures, use <B>df</B>
-to check that you've got more space.</P>
-<P>Make the logical volume used for video bigger:</P>
-<P><CODE># lvextend --size +50G /dev/VGforMyth/video</CODE></P>
-<H3>ReiserFS</H3>
-
-<P>Unmount, resize and remount the filesystem.  Technically, you don't need to
-unmount and remount the ReiserFS.
-<BLOCKQUOTE><CODE>
-<PRE>
-# umount /var/video
-# resize_reiserfs /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H3>ext2 or ext3</H3>
-
-<P>LVM comes with a program called <B>resize2fs</B>.</P>
-<P>Unmount, resize and remount the filesystem.  The filesystem <EM>must</EM> be
-unmounted during this procedure.
-<BLOCKQUOTE><CODE>
-<PRE>
-# umount /var/video
-# resize2fs --size +50G /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<H3>xfs</H3>
-
-<P>XFS does not need to be unmounted to extend the size:
-<BLOCKQUOTE><CODE>
-<PRE>
-# xfs_growfs /var/video
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss24.2">24.2</A> <A HREF="mythtv-HOWTO.html#toc24.2">Advanced Partition Formatting </A>
+<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss24.1">24.1</A> <A HREF="mythtv-HOWTO.html#toc24.1">Advanced Partition Formatting </A>
 </H2>
 
 <P>The partitions that your distribution sets up for you may not be
-optimized for large files. Using LVM in conjunction with the following
-techniques can be quite useful.</P>
+optimized for large files.</P>
 <P>Unlike a typical filesystem, a MythTV video partition is usually a very
 large filesystem filled with a fairly small number of large files.
 Filesystem I/O is usually not an issue, even in multi-tuner and/or
@@ -302,33 +98,8 @@ results shown at (
 higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
-<P>
-<A NAME="migratingtoSD"></A> </P>
-<H2><A NAME="ss24.3">24.3</A> <A HREF="mythtv-HOWTO.html#toc24.3">Migrating from DataDirect Labs to Schedules Direct</A>
-</H2>
 
-<P>MythTV v0.20.2 or later is required to natively support Schedules Direct.
-Code has been included to make the transition as simple as possible.</P>
-<P><B>You do not need to delete your existing video sources or add new ones!</B></P>
-<P>The following steps should work for most users:
-<UL>
-<LI>Create a Schedules Direct account and use the same information as your
-existing lineups at Zap2It Labs.  Do not add or delete channels at this
-time.</LI>
-<LI>Shut down any running <B>mythfrontend</B> and <B>mythbackend</B> programs.</LI>
-<LI>Perform a backup of your existing database.  See 
-<A HREF="mythtv-HOWTO-23.html#backupdb">Saving or restoring the database</A> for instructions.</LI>
-<LI>Run <B>mythtv-setup</B> -> Video Sources.  Change the grabber to
-Schedules Direct, update the username and password fields with the account
-information you created at Schedules Direct and select "Retrieve Lineups".
-Click Finish.</LI>
-<LI>Exit <B>mythtv-setup</B> and run <B>mythfilldatabase</B>.  Check
-if there were any errors.</LI>
-<LI>Restart your <B>mythbackend</B> and <B>mythfrontend</B> programs.</LI>
-</UL>
-</P>
-
-<H2><A NAME="ss24.4">24.4</A> <A HREF="mythtv-HOWTO.html#toc24.4">Caching support for Schedules Direct</A>
+<H2><A NAME="ss24.2">24.2</A> <A HREF="mythtv-HOWTO.html#toc24.2">Caching support for Schedules Direct</A>
 </H2>
 
 <P>MythTV 0.20.2 or later supports caching of downloaded information from

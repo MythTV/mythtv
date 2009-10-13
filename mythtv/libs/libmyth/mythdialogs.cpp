@@ -1007,7 +1007,6 @@ void MythBusyDialog::Teardown(void)
     if (timer)
     {
         timer->disconnect();
-        timer->deleteLater();
         timer = NULL;
     }
 }
@@ -1015,7 +1014,7 @@ void MythBusyDialog::Teardown(void)
 void MythBusyDialog::start(int interval)
 {
     if (!timer)
-        timer = new QTimer (this);
+        timer = new QTimer(this);
 
     connect(timer, SIGNAL(timeout()),
             this,  SLOT  (timeout()));
@@ -1028,7 +1027,6 @@ void MythBusyDialog::Close(void)
     if (timer)
     {
         timer->disconnect();
-        timer->deleteLater();
         timer = NULL;
     }
 

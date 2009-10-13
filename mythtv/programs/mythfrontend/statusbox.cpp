@@ -110,13 +110,10 @@ bool StatusBox::Create()
                 SLOT(clicked(MythUIButtonListItem *)));
 
     BuildFocusList();
-
-    Load();
-
     return true;
 }
 
-void StatusBox::Load()
+void StatusBox::Init()
 {
     MythUIButtonListItem *item;
 
@@ -182,7 +179,7 @@ bool StatusBox::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("Status", event, actions);
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;
@@ -479,7 +476,7 @@ void StatusBox::doListingsStatus()
                                     "mythfilldatabase"));
 
     QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, mfdNextRunStart;
-    QString querytext, Status, DataDirectMessage;
+    QString querytext, DataDirectMessage;
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
 
@@ -498,7 +495,7 @@ void StatusBox::doListingsStatus()
     mfdNextRunStart = gContext->GetSetting("MythFillSuggestedRunTime");
     DataDirectMessage = gContext->GetSetting("DataDirectMessage");
 
-    mfdNextRunStart.replace("T", " ");
+    mfdNextRunStart.replace('T', ' ');
 
     extern const char *myth_source_version;
     extern const char *myth_source_path;
@@ -529,8 +526,7 @@ void StatusBox::doListingsStatus()
                         .arg(QDateTime(GuideDataThrough)
                             .toString("yyyy-MM-dd hh:mm")));
 
-        Status = QString("(%1).").arg(tr("%n day(s)", "", DaysOfData));
-        AddLogLine(Status);
+        AddLogLine(QString("(%1).").arg(tr("%n day(s)", "", DaysOfData)));
     }
 
     if (DaysOfData <= 3)
@@ -618,7 +614,7 @@ void StatusBox::doScheduleStatus()
     {
         while (query.next())
         {
-            if (query.value(3).toString() > "")
+            if (!query.value(3).toString().isEmpty())
                 inputText[query.value(0).toInt()] = query.value(3).toString();
             else
                 inputText[query.value(0).toInt()] = QString("%1: %2")
@@ -662,11 +658,10 @@ void StatusBox::doScheduleStatus()
     int j = i;
 
     QString fontstate;
-    for (i = 0; i < j; i++)
+    for (i = 0; i < j; ++i)
     {
         RecStatusType type = statusMap[i];
 
-        fontstate = "";
         if (statusMatch[type] > 0)
         {
             tmpstr = QString("%1 %2").arg(statusMatch[type])
@@ -685,7 +680,7 @@ void StatusBox::doScheduleStatus()
                                     .arg(tr("marked as HDTV"));
         AddLogLine(tmpstr, tmpstr);
     }
-    for (i = 1; i <= maxSource; i++)
+    for (i = 1; i <= maxSource; ++i)
     {
         if (sourceMatch[i] > 0)
         {
@@ -695,7 +690,7 @@ void StatusBox::doScheduleStatus()
             AddLogLine(tmpstr, tmpstr);
         }
     }
-    for (i = 1; i <= maxInput; i++)
+    for (i = 1; i <= maxInput; ++i)
     {
         if (inputMatch[i] > 0)
         {
@@ -779,7 +774,7 @@ void StatusBox::doTunerStatus()
             ProgramInfo *proginfo = new ProgramInfo;
             proginfo->FromStringList(strlist, 0);
 
-            status += " " + proginfo->title;
+            status += ' ' + proginfo->title;
             status += "\n";
             status += proginfo->subtitle;
             longtuner = tun.arg(cardid).arg(devlabel).arg(status);
@@ -886,13 +881,13 @@ void StatusBox::doJobQueueStatus()
                     .arg(JobQueue::StatusText((*it).status));
 
             if ((*it).status != JOB_QUEUED)
-                detail += " (" + (*it).hostname + ")";
+                detail += " (" + (*it).hostname + ')';
 
             if ((*it).schedruntime > QDateTime::currentDateTime())
-                detail += "\n" + tr("Scheduled Run Time:") + " " +
+                detail += '\n' + tr("Scheduled Run Time:") + ' ' +
                     (*it).schedruntime.toString(m_timeDateFormat);
             else
-                detail += "\n" + (*it).comment;
+                detail += '\n' + (*it).comment;
 
             line = QString("%1 @ %2").arg(pginfo->title)
                                      .arg(starttime.toString(m_timeDateFormat));
@@ -1151,7 +1146,7 @@ void StatusBox::doMachineStatus()
 
     if (!m_isBackendActive)
     {
-        line = tr("MythTV server") + ":";
+        line = tr("MythTV server") + ':';
         AddLogLine(line, QString("%1\n").arg(line));
 
         // uptime
@@ -1199,7 +1194,7 @@ void StatusBox::doMachineStatus()
     QString hostnames;
 
     vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
-    for (uint i=0; i<fsInfos.size(); i++)
+    for (uint i=0; i<fsInfos.size(); ++i)
     {
         // For a single-directory installation just display the totals
         if ((fsInfos.size() == 2) && (i == 0) &&
@@ -1208,8 +1203,8 @@ void StatusBox::doMachineStatus()
             i++;
 
         hostnames = QString("\"%1\"").arg(fsInfos[i].hostname);
-        hostnames.replace(QRegExp(" "), "");
-        hostnames.replace(QRegExp(","), "\",\"");
+        hostnames.replace(' ', "");
+        hostnames.replace(',', "\",\"");
 
         getActualRecordedBPS(hostnames);
 
@@ -1229,7 +1224,7 @@ void StatusBox::doMachineStatus()
             line = tr("MythTV Drive #%1:").arg(fsInfos[i].fsID);
             AddLogLine(line, QString("%1\n").arg(line));
 
-            QStringList tokens = fsInfos[i].directory.split(",");
+            QStringList tokens = fsInfos[i].directory.split(',');
 
             if (tokens.size() > 1)
             {
@@ -1241,7 +1236,7 @@ void StatusBox::doMachineStatus()
             }
             else
             {
-                AddLogLine(QString("   " ) + tr("Directory:") + " " +
+                AddLogLine(QString("   " ) + tr("Directory:") + ' ' +
                             fsInfos[i].directory);
             }
         }
@@ -1280,13 +1275,13 @@ void StatusBox::doAutoExpireList()
     int                   deletedGroupCount(0);
 
     vector<ProgramInfo *>::iterator it;
-    for (it = m_expList.begin(); it != m_expList.end(); it++)
+    for (it = m_expList.begin(); it != m_expList.end(); ++it)
         delete *it;
     m_expList.clear();
 
     RemoteGetAllExpiringRecordings(m_expList);
 
-    for (it = m_expList.begin(); it != m_expList.end(); it++)
+    for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {
         pginfo = *it;
 
@@ -1315,7 +1310,7 @@ void StatusBox::doAutoExpireList()
                         deletedGroupCount)
                         .arg(sm_str(deletedGroupSize / 1024));
 
-    for (it = m_expList.begin(); it != m_expList.end(); it++)
+    for (it = m_expList.begin(); it != m_expList.end(); ++it)
     {
         pginfo = *it;
         contentLine = pginfo->recstartts.toString(m_dateFormat) + " - ";

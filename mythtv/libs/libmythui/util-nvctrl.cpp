@@ -1,18 +1,15 @@
-#include <map>
-#include <vector>
-using namespace std;
+
+#include "util-nvctrl.h"
 
 #include "mythverbose.h"
 #include "mythdb.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <cmath>
 
 #include "mythxdisplay.h"
-#include "util-nvctrl.h"
 
 #include "libmythnvctrl/NVCtrl.h"
 #include "libmythnvctrl/NVCtrlLib.h"
@@ -47,6 +44,9 @@ int GetNvidiaRates(t_screenrate& screenmap)
     int id;
     int twinview =  0;
     map<int, map<int,bool> > maprate;
+
+    memset(pModeLines, 0, sizeof(pModeLines));
+    memset(ModeLineLen, 0, sizeof(ModeLineLen));
 
     /*
      * Open a display connection, and make sure the NV-CONTROL X
@@ -132,7 +132,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
     /* now, parse each MetaMode */
     str = start = pMetaModes;
 
-    for (j = 0; j < MetaModeLen; j++)
+    for (j = 0; j < MetaModeLen; ++j)
     {
         /*
          * if we found the end of a line, treat the string from
@@ -237,7 +237,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
         }
     }
     // Free Memory
-    for (j=0; j < nDisplayDevice; j++)
+    for (j=0; j < nDisplayDevice; ++j)
     {
         free(pModeLines[j]);
     }

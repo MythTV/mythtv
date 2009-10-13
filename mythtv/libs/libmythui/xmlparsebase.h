@@ -9,6 +9,17 @@ class MythUIType;
 class MythScreenType;
 class QDomElement;
 
+#define XML_ERROR(element, error) \
+            QString tagName = element.tagName(); \
+            int lineNum = element.lineNumber(); \
+            QString name    = element.attribute("name", ""); \
+            VERBOSE(VB_IMPORTANT, QString("Theme error: %1\nType: '%2'\n" \
+                                            "Name: '%3'\nLine: %4") \
+                                            .arg(error) \
+                                            .arg(tagName) \
+                                            .arg(name) \
+                                            .arg(lineNum));
+
 class MPUBLIC XMLParseBase
 {
   public:

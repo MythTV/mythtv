@@ -10,13 +10,15 @@ MYTH_SHLIB_EXT=$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 MYTH_LIB_EXT  =$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
 
-# On Windows, dlls were installed with exes:
-mingw : LIBDIR = $${PREFIX}/bin
+DEPLIBS = $${LIBDIR}
 
-TARGETDEPS += $${LIBDIR}/libmyth-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythdb-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythui-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythupnp-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythavutil-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythavcodec-$${MYTH_SHLIB_EXT}
-TARGETDEPS += $${LIBDIR}/libmythavformat-$${MYTH_SHLIB_EXT}
+# On Windows, dlls were installed with exes:
+mingw : DEPLIBS = $${PREFIX}/bin
+
+TARGETDEPS += $${DEPLIBS}/libmyth-$${MYTH_SHLIB_EXT}
+TARGETDEPS += $${DEPLIBS}/libmythdb-$${MYTH_SHLIB_EXT}
+TARGETDEPS += $${DEPLIBS}/libmythui-$${MYTH_SHLIB_EXT}
+TARGETDEPS += $${DEPLIBS}/libmythupnp-$${MYTH_SHLIB_EXT}
+TARGETDEPS += $${DEPLIBS}/libmythavutil-$${MYTH_SHLIB_EXT}
+TARGETDEPS += $${DEPLIBS}/libmythavcodec-$${MYTH_SHLIB_EXT}
+TARGETDEPS += $${DEPLIBS}/libmythavformat-$${MYTH_SHLIB_EXT}

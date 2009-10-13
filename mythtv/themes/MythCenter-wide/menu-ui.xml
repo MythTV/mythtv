@@ -13,8 +13,6 @@
 
         <font name="clock" from="small">
             <size>20</size>
-            <size:small>18</size:small>
-            <size:big>22</size:big>
         </font>
 
         <clock name="clock">

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Configuring MythTV. </TITLE>
  <LINK HREF="mythtv-HOWTO-10.html" REL=next>
  <LINK HREF="mythtv-HOWTO-8.html" REL=previous>
@@ -16,30 +16,14 @@
 
 <P>By this point, all of the compile-time prerequisites have been installed,
 <B>mysql</B> is running and has had its initial database setup.  It's now
-time to configure MythTV.
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you're running Debian unstable and you have compiled
-MythTV from source, you will need to install an additional package before
-you will be able to run MythTV.  Execute the following to install the MySQL
-driver for QT.</CAPTION>
-</FIGURE>
+time to configure MythTV.</P>
 
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su -
-# apt-get install libqt3c102-mt-mysql
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <H2><A NAME="ss9.1">9.1</A> <A HREF="mythtv-HOWTO.html#toc9.1">Configuring the Master backend system</A>
 </H2>
 
 <P>Open a shell and decide where you will store your video files.  This may
 be one directory or multiple directories on the same or different
-filesystems. There is no default directory used for new recordings, you
+filesystems. There is no default directory used for new recordings, so you
 <B>must</B> create at least one storage directory and configure Myth to
 use it by running <B>mythtv-setup</B>.  If you do not do this, then MythTV
 will be unable to record anything.  The following example is specific for
@@ -102,12 +86,7 @@ have only one backend, then it will be its own master.</P>
 <P>The Master backend will always choose the first available tuner in the same
 order as you add cards through "mythtv-setup". In other words, the second
 card you add will only be used when there are two overlapping recordings,
-the third when there are three, and so on.
- Therefore, you will want to have
-the greatest amount of disk space on the Master backend because its tuner
-will always be the first choice. You will then want to add your 
-<A HREF="#nonmaster_backend">other backends</A> in the order of your
-preference for recording.</P>
+the third when there are three, and so on.</P>
 <P>
 <FIGURE>
 <EPS FILE="warning.eps">
@@ -126,24 +105,6 @@ database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
 not, you'll need to change the Host Name in the "Database Configuration"
 screen of the mythfrontend program.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  Users that have been running the frontend and the backend on
-different machines have stated that they have been having issues with remote
-access to the MySQL database.  The following instructions may or may not
-work.  Add the following to <CODE>/etc/my.cnf</CODE> on the backend machine and
-restart MySQL.</CAPTION>
-</FIGURE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-skip-innodb
-set-variable=thread_stack=256k
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <P>Run the setup program:
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -158,14 +119,7 @@ configurations for your capture cards.  Initially, you should say "YES" so
 that there are no surprises later.</P>
 <P>The next question will ask you if you wish to clear out your video source
 information.  You should answer "YES" to this as well.</P>
-<P>Once the graphical setup starts, you'll see that there are six choices</P>
-<P>
-<FIGURE>
-<EPS FILE="add.eps">
-<IMG SRC="add.png">
-<CAPTION>The Storage Directories feature is available only in the SVN version of MythTV.</CAPTION>
-</FIGURE>
-</P>
+<P>Once the graphical setup starts, you'll see that there are six choices:</P>
 <P>
 <OL>
 <LI>General</LI>
@@ -306,7 +260,7 @@ configure the "Starting channel" setting for this source->input connection.</P>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  If you have a Hauppauge PVR-500, you must think of
-it has two PVR-150's on a single PCI card.  For example, if you have a
+it as two PVR-150's on a single PCI card.  For example, if you have a
 single PVR-500 card, it will appear as <CODE>/dev/video0</CODE> and
 <CODE>/dev/video1</CODE>.  Each <CODE>/dev/video</CODE> device will have a Tuner input.</CAPTION>
 </FIGURE>
@@ -337,21 +291,14 @@ database.</P>
 
 <H3><A NAME="storagegroups"></A> Storage Groups </H3>
 
-<P>
-<FIGURE>
-<EPS FILE="add.eps">
-<IMG SRC="add.png">
-<CAPTION>New in MythTV 0.21</CAPTION>
-</FIGURE>
-</P>
 <H3>Introduction.</H3>
 
 <P>Storage Groups are lists of directories that are used to hold MythTV
-recording files giving you a flexible way to allow you to add capacity to
-your MythTV system without having to use exotic solutions such as LVM,
-filesystem expansion or RAID Online Capacity Expansion.  You can also use
-Storage Groups to organize recordings and to put recordings of a certain
-type into one subdirectory.</P>
+recording files, giving you a flexible way to add capacity to your MythTV
+system without having to use exotic solutions such as LVM, filesystem
+expansion or RAID Online Capacity Expansion.  You can also use Storage
+Groups to organize recordings and to put recordings of a certain type into
+one subdirectory.</P>
 <P>Storage Groups do not offer redundancy in case of hard drive failure, but
 unlike LVM, if you lose a hard drive, you only lose the recordings that were
 on that drive.  With LVM, if you lose a hard drive, you will most likely
@@ -383,15 +330,6 @@ backend" section for additional information.</P>
 points (<CODE>/mnt/store/d1/video</CODE>, etc) into the "Default" Storage Group.</P>
 <P>At recording time, if there were four simultaneous recordings, MythTV would
 put one recording onto each drive.</P>
-<P>Or, say that you originally installed MythTV to a 80GB hard drive, and that
-hard drive is now filling up.  You could simply add a new drive to your
-system, mount it and update the Storage Group to add additional space.</P>
-<P>You may create additional Storage Groups to store specific recordings in
-their own directories.  Storage Groups are edited via the 'Storage
-Directories' section of mythtv-setup.</P>
-<P>You can also create multiple Storage Groups to group recordings together;
-recording schedules now have an option to specify which Storage Group to
-use.</P>
 <P>MythTV will balance concurrent recordings across the available directories
 in a Storage Group in order to spread out the file I/O load.  MythTV will
 prefer filesystems that are local to the backend over filesystems that are
@@ -400,6 +338,15 @@ other equivalent I/O, then the next recording will go to the remote
 filesystem.  The balancing method is based purely on I/O, Myth does not try
 to balance out disk space unless a filesystem is too low on free disk space
 in which case it will not be used except as a last resort.</P>
+<P>Or, say that you originally installed MythTV to a 750GB hard drive, and that
+hard drive is now filling up.  You could simply add a new drive to your
+system, mount it and update the Storage Group to add the additional space.</P>
+<P>You may create additional Storage Groups to store specific recordings in
+their own directories.  Storage Groups are edited via the 'Storage
+Directories' section of mythtv-setup.</P>
+<P>You can also create multiple Storage Groups to group recordings together;
+recording schedules now have an option to specify which Storage Group to
+use.</P>
 <P>Storage Groups are global, but can be overridden on a slave backend by
 creating a local Storage Group by running <B>mythtv-setup</B> on the
 slave.  If a problem occurs and the slave backend is unable to use the
@@ -407,14 +354,13 @@ desired Storage Group, it will fail back and try the directories defined in
 the master's Storage Group.</P>
 <P>There's also a special 'LiveTV' Storage Group, but the directory list starts
 out empty.  If you add a directory to the Storage Group, it will be used
-instead of putting LiveTV recordings in the Default Storage Group.  This
-will allow you to put your LiveTV recordings on their own filesystem, which
-is similar to the old MythTV method which used a RingBuffer for LiveTV.  Of
-course, you don't have to do anything, and Live TV recordings will just go
-into the Default Storage Group where they'll be the first programs eligible
-for expiration if the system needs free space for recordings.</P>
+instead of putting LiveTV recordings in the Default Storage Group and will
+allow you to put your LiveTV recordings on their own filesystem.</P>
+<P>Of course, you don't have to do anything, and Live TV recordings will just
+go into the Default Storage Group where they'll be the first programs
+eligible for expiration if the system needs free space for recordings.</P>
 <P>Usage information for all Storage Group directories is visible on the
-mythfrontend status screen as well as the mythbackend status webpage.
+mythfrontend status screen as well as the mythbackend status webpage. 
 MythTV is smart enough to determine which directories are on shared
 filesystems so it should not count free or used space multiple times if you
 have more than one directory on the same filesystem.</P>
@@ -498,7 +444,7 @@ $ mythbackend
 <P>mythbackend will print information about connections and what it's doing to
 the console.  If you'd like to see the options that are available for
 mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
-<P>As of MythTV v0.21, the available options are:
+<P>As of MythTV v0.22, the available options are:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mythbackend --help

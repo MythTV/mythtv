@@ -1,11 +1,14 @@
 #include <unistd.h>
 
+#include <QFileInfo>
 #include <QFile>
+#include <QDir>
 
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "decodeencode.h"
+#include "storagegroup.h"
 
 vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
 {
@@ -28,10 +31,10 @@ vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
     return info;
 }
 
-/** \fn RemoteGetFreeSpace()
+/** \fn RemoteGetFreeSpace(void)
  *  \brief Returns total and used space in kilobytes for each backend.
  */
-vector<FileSystemInfo> RemoteGetFreeSpace()
+vector<FileSystemInfo> RemoteGetFreeSpace(void)
 {
     FileSystemInfo fsInfo;
     vector<FileSystemInfo> fsInfos;
@@ -128,29 +131,37 @@ bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves)
     return true;
 }
 
-bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
-                           bool forceMetadataDelete)
+bool RemoteDeleteRecording(
+    const ProgramInfo *pginfo, bool forgetHistory, bool forceMetadataDelete)
 {
     bool result = true;
-    QStringList strlist;
+    QStringList strlist(
+        forceMetadataDelete ? "FORCE_DELETE_RECORDING" : "DELETE_RECORDING");
 
-    if (forceMetadataDelete)
-        strlist.append(QString("FORCE_DELETE_RECORDING"));
-    else
-        strlist.append(QString("DELETE_RECORDING"));
     pginfo->ToStringList(strlist);
 
-    gContext->SendReceiveStringList(strlist);
-
-    if (strlist[0].toInt() == -2)
+    if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
+        result = false;
+    else if (strlist[0].toInt() == -2)
         result = false;
 
+    if (!result)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to delete recording %1:%2")
+                .arg(pginfo->title).arg(pginfo->subtitle));
+    }
+
+    // We don't care if the recording is successfully deleted..
     if (forgetHistory)
     {
-        strlist = QStringList(QString("FORGET_RECORDING"));
+        strlist = QStringList("FORGET_RECORDING");
         pginfo->ToStringList(strlist);
 
-        gContext->SendReceiveStringList(strlist);
+        if (!gContext->SendReceiveStringList(strlist))
+        {
+            VERBOSE(VB_IMPORTANT, QString("Failed to forget recording %1:%2")
+                    .arg(pginfo->title).arg(pginfo->subtitle));
+        }
     }
 
     return result;
@@ -279,6 +290,128 @@ QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo)
     return retdatetime;
 }
 
+/// Download preview & get timestamp if newer than cachefile's
+/// last modified time, otherwise just get the timestamp
+QDateTime RemoteGetPreviewIfModified(
+    const ProgramInfo &pginfo, const QString &cachefile)
+{
+    QString loc_err("RemoteGetPreviewIfModified, Error: ");
+
+    QDateTime cacheLastModified;
+    QFileInfo cachefileinfo(cachefile);
+    if (cachefileinfo.exists())
+        cacheLastModified = cachefileinfo.lastModified();
+
+    QStringList strlist("QUERY_PIXMAP_GET_IF_MODIFIED");
+    strlist << ((cacheLastModified.isValid()) ? // unix secs, UTC
+                QString::number(cacheLastModified.toTime_t()) : QString("-1"));
+    strlist << QString::number(200 * 1024); // max size of preview file
+    pginfo.ToStringList(strlist);
+
+    if (!gContext->SendReceiveStringList(strlist) ||
+        strlist.empty() || strlist[0] == "ERROR")
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Remote error") +
+                ((strlist.size() >= 2) ?
+                 (QString(":\n\t\t\t") + strlist[1]) : QString("")));
+
+        return QDateTime();
+    }
+
+    if (strlist[0] == "WARNING")
+    {
+        VERBOSE(VB_NETWORK, QString("RemoteGetPreviewIfModified, Warning: ") +
+                QString("Remote warning") +
+                ((strlist.size() >= 2) ?
+                 (QString(":\n\t\t\t") + strlist[1]) : QString("")));
+
+        return QDateTime();
+    }
+
+    QDateTime retdatetime;
+    qlonglong timet = strlist[0].toLongLong();
+    if (timet >= 0)
+        retdatetime.setTime_t(timet);
+
+    if (strlist.size() < 4)
+    {
+        return retdatetime;
+    }
+
+    size_t  length     = strlist[1].toLongLong();
+    quint16 checksum16 = strlist[2].toUInt();
+    QByteArray data = QByteArray::fromBase64(strlist[3].toAscii());
+    if ((size_t) data.size() < length)
+    { // (note data.size() may be up to 3 bytes longer after decoding
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Preview size check failed %1 < %2")
+                .arg(data.size()).arg(length));
+        return QDateTime();
+    }
+
+    if (checksum16 != qChecksum(data.constData(), data.size()))
+    {
+        VERBOSE(VB_IMPORTANT, loc_err + "Preview checksum failed");
+        return QDateTime();
+    }
+
+    QString pdir(cachefile.section("/", 0, -2));
+    QDir cfd(pdir);
+    if (!cfd.exists() && !cfd.mkdir(pdir))
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Unable to create remote cache directory '%1'")
+                .arg(pdir));
+
+        return QDateTime();
+    }
+
+    QFile file(cachefile);
+    if (!file.open(QIODevice::WriteOnly|QIODevice::Truncate))
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Unable to open cached "
+                        "preview file for writing '%1'")
+                .arg(cachefile));
+
+        return QDateTime();
+    }
+
+    off_t offset = 0;
+    size_t remaining = length;
+    uint failure_cnt = 0;
+    while ((remaining > 0) && (failure_cnt < 5))
+    {
+        ssize_t written = file.write(data.data() + offset, remaining);
+        if (written < 0)
+        {
+            failure_cnt++;
+            usleep(50000);
+            continue;
+        }
+
+        failure_cnt  = 0;
+        offset      += written;
+        remaining   -= written;
+    }
+
+    if (remaining)
+    {
+        VERBOSE(VB_IMPORTANT, loc_err +
+                QString("Failed to write cached preview file '%1'")
+                .arg(cachefile));
+
+        file.resize(0); // in case unlink fails..
+        file.remove();  // closes fd
+        return QDateTime();
+    }
+
+    file.close();
+
+    return retdatetime;
+}
+
 void RemoteFillProginfo(ProgramInfo *pginfo, const QString &playbackhostname)
 {
     QStringList strlist( "FILL_PROGRAM_INFO" );
@@ -361,6 +494,78 @@ int RemoteGetFreeRecorderCount(void)
     }
 
     return strlist[0].toInt();
+}
+
+static QMutex sgroupMapLock;
+static QHash <QString, QString>sgroupMap;
+
+void RemoteClearSGMap(void)
+{
+    QMutexLocker locker(&sgroupMapLock);
+    sgroupMap.clear();
+}
+
+QString GetHostSGToUse(QString host, QString sgroup)
+{
+    QString tmpGroup = sgroup;
+    QString groupKey = QString("%1:%2").arg(sgroup, host);
+
+    QMutexLocker locker(&sgroupMapLock);
+
+    if (sgroupMap.contains(groupKey))
+    {
+        tmpGroup = sgroupMap[groupKey];
+    }
+    else
+    {
+        if (StorageGroup::FindDirs(sgroup, host))
+        {
+            sgroupMap[groupKey] = sgroup;
+        }
+        else
+        {
+            VERBOSE(VB_FILE+VB_EXTRA, QString("GetHostSGToUse(): "
+                    "falling back to Videos Storage Group for host %1 "
+                    "since it does not have a %2 Storage Group.")
+                    .arg(host).arg(sgroup));
+
+            tmpGroup = "Videos";
+            sgroupMap[groupKey] = tmpGroup;
+        }
+    }
+
+    return tmpGroup;
+}
+
+bool RemoteGetFileList(QString host, QString path, QStringList* list,
+                       QString sgroup, bool fileNamesOnly)
+{
+
+    // Make sure the list is empty when we get started
+    list->clear();
+
+    if (sgroup.isEmpty())
+        sgroup = "Videos";
+
+    *list << "QUERY_SG_GETFILELIST";
+    *list << host;
+    *list << GetHostSGToUse(host, sgroup);
+    *list << path;
+    *list << QString::number(fileNamesOnly);
+
+    bool ok = gContext->SendReceiveStringList(*list);
+
+// Should the SLAVE UNREACH test be here ?
+    return ok;
+}
+
+QString RemoteGenFileURL(QString sgroup, QString host, QString path)
+{
+    return QString("myth://%1@").arg(GetHostSGToUse(host, sgroup)) +
+              gContext->GetSettingOnHost("BackendServerIP", host) + ":" +
+              gContext->GetSettingOnHost("BackendServerPort", host) + "/" +
+              path;
+
 }
 
 /**

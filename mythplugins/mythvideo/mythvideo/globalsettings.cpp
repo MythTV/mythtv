@@ -47,8 +47,8 @@ HostComboBox *VideoDefaultView()
     return gc;
 }
 
-const QString password_clue =
-    QObject::tr("Setting this value to all numbers will make your life "
+const char *password_clue =
+    QT_TR_NOOP("Setting this value to all numbers will make your life "
                 "much easier.");
 
 HostLineEdit *VideoAdminPassword()
@@ -58,7 +58,7 @@ HostLineEdit *VideoAdminPassword()
     gc->setHelpText(QString("%1 %2")
         .arg(QObject::tr("This PIN is used to enter Parental Control "
                          "Level 4 as well as the Video Manager."))
-        .arg(password_clue));
+        .arg(QObject::tr(password_clue)));
     return gc;
 }
 
@@ -68,7 +68,7 @@ HostLineEdit *VideoAdminPasswordThree()
     gc->setLabel(QObject::tr("Parental Level 3 PIN"));
     gc->setHelpText(QString("%1 %2")
         .arg(QObject::tr("This PIN is used to enter Parental Control Level 3."))
-        .arg(password_clue));
+        .arg(QObject::tr(password_clue)));
     return gc;
 }
 
@@ -78,7 +78,7 @@ HostLineEdit *VideoAdminPasswordTwo()
     gc->setLabel(QObject::tr("Parental Level 2 PIN"));
     gc->setHelpText(QString("%1 %2")
         .arg(QObject::tr("This PIN is used to enter Parental Control Level 2."))
-        .arg(password_clue));
+        .arg(QObject::tr(password_clue)));
     return gc;
 }
 
@@ -152,7 +152,7 @@ HostCheckBox *VideoDBGroupView()
 HostComboBox *VideoTreeGroup() 
 { 
     HostComboBox *gc = new HostComboBox("mythvideo.db_group_type"); 
-    gc->setLabel(QObject::tr("Group based on"));
+    gc->setLabel(QObject::tr("Default Metadata View"));
     gc->addSelection(QObject::tr("Folder"),"0");
     gc->addSelection(QObject::tr("Genres"),"1");
     gc->addSelection(QObject::tr("Category"),"2");
@@ -162,7 +162,10 @@ HostComboBox *VideoTreeGroup()
     gc->addSelection(QObject::tr("User Rating"),"6");
     gc->addSelection(QObject::tr("Date Added"),"7");
     gc->addSelection(QObject::tr("TV/Movies"),"8");
-    gc->setHelpText(QObject::tr("Group videos in the tree")); 
+    gc->setHelpText(QObject::tr("Default metadata view contols "
+                                "the method used to build the tree. Folder "
+                                "mode (the default) displays the videos as "
+                                "they are found in the filesystem.")); 
     return gc; 
 } 
 
@@ -230,7 +233,7 @@ HostLineEdit *GetTVPostersCommand()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TVPosterCommandLine");
     gc->setLabel(QObject::tr("Command to search for TV Season posters"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -mP");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -P");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
@@ -240,7 +243,7 @@ HostLineEdit *GetTVFanartCommand()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TVFanartCommandLine");
     gc->setLabel(QObject::tr("Command to search for TV fanart"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -tF");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -F");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;
@@ -250,7 +253,7 @@ HostLineEdit *GetTVBannerCommand()
 {
     HostLineEdit *gc = new HostLineEdit("mythvideo.TVBannerCommandLine");
     gc->setLabel(QObject::tr("Command to search for TV banners"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -tB");
+    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -B");
     gc->setHelpText(QObject::tr("This command must be "
                     "executable by the user running MythVideo."));
     return gc;

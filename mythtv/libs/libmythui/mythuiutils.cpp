@@ -1,5 +1,12 @@
-#include "mythverbose.h"
+
+// Own header
 #include "mythuiutils.h"
+
+// QT headers
+#include <QString>
+
+// libmythdb headers
+#include "mythverbose.h"
 
 bool ETPrintWarning::Child(const QString &container_name,
                            const QString &child_name)

@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>Rotate CCW</source>
-        <translation>Tourner sens anti-horaire</translation>
+        <translation>Tourner sens antihoraire</translation>
     </message>
     <message>
         <source>Import</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation>Suppression de %1 images et dossiers, incluant tout sous-répertoire et fichier.</translation>
+        <translation>Suppression de %1 image(s) et dossier(s), incluant tout sous-répertoire et fichier.</translation>
     </message>
     <message>
         <source>New Folder</source>
@@ -153,6 +153,105 @@
     <message>
         <source>Failed to rename file</source>
         <translation>Échec de renommage du fichier</translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation>%1 sur %2</translation>
+    </message>
+    <message>
+        <source>Gallery Home</source>
+        <translation>Accueil Galerie</translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Image viewer / slideshow</source>
+        <translation>Visionneuse d&apos;images / diaporama</translation>
+    </message>
+    <message>
+        <source>Start/Stop Slideshow</source>
+        <translation>Démarrer/arrêter le diaporama</translation>
+    </message>
+    <message>
+        <source>Go to the first image in thumbnail view</source>
+        <translation>Atteindre la première image du mode miniature</translation>
+    </message>
+    <message>
+        <source>Go to the last image in thumbnail view</source>
+        <translation>Atteindre la dernière image du mode miniature</translation>
+    </message>
+    <message>
+        <source>Start Slideshow in thumbnail view</source>
+        <translation>Démarrer le diaporama dans le mode miniature</translation>
+    </message>
+    <message>
+        <source>Start Random Slideshow in thumbnail view</source>
+        <translation>Démarrer le diaporama aléatoire dans le mode miniature</translation>
+    </message>
+    <message>
+        <source>Rotate image right 90 degrees</source>
+        <translation>Tourner l&apos;image à droite de 90 degrés</translation>
+    </message>
+    <message>
+        <source>Rotate image left 90 degrees</source>
+        <translation>Tourner l&apos;image à gauche de 90 degrés</translation>
+    </message>
+    <message>
+        <source>Zoom image out</source>
+        <translation>Activer le zoom</translation>
+    </message>
+    <message>
+        <source>Zoom image in</source>
+        <translation>Dé-activer le zoom</translation>
+    </message>
+    <message>
+        <source>Scroll image up</source>
+        <translation>Faire défiler les images vers le haut</translation>
+    </message>
+    <message>
+        <source>Scroll image left</source>
+        <translation>Faire défiler les images vers la gauche</translation>
+    </message>
+    <message>
+        <source>Scroll image right</source>
+        <translation>Faire défiler les images vers la droite</translation>
+    </message>
+    <message>
+        <source>Scroll image down</source>
+        <translation>Faire défiler les images vers le bas</translation>
+    </message>
+    <message>
+        <source>Recenter image</source>
+        <translation>Recenter l&apos;image</translation>
+    </message>
+    <message>
+        <source>Full-size (un-zoom) image</source>
+        <translation>Image taille maximale (sans zoom)</translation>
+    </message>
+    <message>
+        <source>Go to the upper-left corner of the image</source>
+        <translation>Aller dans le coin en haut à gauche de l&apos;image</translation>
+    </message>
+    <message>
+        <source>Go to the lower-right corner of the image</source>
+        <translation>Aller dans le coin en bas à droite de l&apos;image</translation>
+    </message>
+    <message>
+        <source>Mark image</source>
+        <translation>Marquer l&apos;image</translation>
+    </message>
+    <message>
+        <source>Toggle scale to fullscreen/scale to fit</source>
+        <translation>Basculer entre la taille réelle et la taille ajustée</translation>
+    </message>
+    <message>
+        <source>MythGallery Media Handler 1/2</source>
+        <translation>Configurateur media de MythGallery 1/2</translation>
+    </message>
+    <message>
+        <source>MythGallery Media Handler 2/2</source>
+        <translation>Configurateur media de MythGallery 2/2</translation>
     </message>
 </context>
 <context>
@@ -183,7 +282,7 @@
     </message>
     <message>
         <source>This is a colon separated list of paths. If the path in the list is a directory, its contents will be copied. If it is an executable, it will be run.</source>
-        <translation>Liste des chemins d&apos;accès séparés par &apos;:&apos;. Si le chemin est un répertoire, son contenu sera copié. S&apos;il s&apos;agit d&apos;un exécutable. il sera exécuté.</translation>
+        <translation>Liste des chemins d&apos;accès séparés par « : ». Si le chemin est un répertoire, son contenu sera copié. S&apos;il s&apos;agit d&apos;un exécutable. il sera exécuté.</translation>
     </message>
     <message>
         <source>This is the type of transition used between pictures in slideshow mode.</source>
@@ -272,6 +371,50 @@ Check the directory exists, is readable and the setting is correct on MythGaller
         <translation>MythGallery ne peut trouver son répertoire de départ.
 %1
 Vérifiez que le répertoire existe, est accessible en lecture et que les réglages sont corrects sur la page de réglages de MythGallery.</translation>
+    </message>
+    <message>
+        <source>Folder: </source>
+        <translation>Répertoire : </translation>
+    </message>
+    <message>
+        <source>Created: </source>
+        <translation>Créé par : </translation>
+    </message>
+    <message>
+        <source>Modified: </source>
+        <translation>Modifié : </translation>
+    </message>
+    <message>
+        <source>Bytes</source>
+        <translation>Octets</translation>
+    </message>
+    <message>
+        <source>Width</source>
+        <translation>Largeur</translation>
+    </message>
+    <message>
+        <source>pixels</source>
+        <translation>pixels</translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation>Hauteur</translation>
+    </message>
+    <message>
+        <source>Pixel Count</source>
+        <translation>taille en pixels</translation>
+    </message>
+    <message>
+        <source>megapixels</source>
+        <translation>mégapixels</translation>
+    </message>
+    <message>
+        <source>Rotation Angle</source>
+        <translation>Angle de rotation</translation>
+    </message>
+    <message>
+        <source>degrees</source>
+        <translation>degrés</translation>
     </message>
 </context>
 <context>

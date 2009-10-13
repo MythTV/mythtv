@@ -1,5 +1,3 @@
-#include <iostream>
-using namespace std;
 
 // qt
 #include <QKeyEvent>
@@ -49,13 +47,8 @@ bool ProgDetails::Create(void)
 
     if (!BuildFocusList())
     {
-#ifdef USING_QTWEBKIT
         VERBOSE(VB_IMPORTANT,
                 "Failed to build a focuslist. Something is wrong");
-#else
-        ShowOkPopup(tr("Sorry, this screen requires Qt 4.4 or greater"));
-        return false;
-#endif
     }
 
     SetFocusWidget(m_browser);
@@ -86,7 +79,7 @@ QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
     }
 
     QMap<QString,QString> main_ratings;
-    QString advisory = "";
+    QString advisory;
     while (query.next())
     {
         if (query.value(0).toString().toLower() == "advisory")
@@ -111,7 +104,7 @@ QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
         return *main_ratings.begin() + advisory;
     }
 
-    QString ratings = "";
+    QString ratings;
     QMap<QString,QString>::const_iterator it;
     for (it = main_ratings.begin(); it != main_ratings.end(); ++it)
     {
@@ -168,7 +161,7 @@ bool ProgDetails::keyPressEvent(QKeyEvent *event)
 
 void ProgDetails::updatePage(void)
 {
-    if (m_page[m_currentPage] == QString())
+    if (m_page[m_currentPage].isEmpty())
         loadPage();
 
     m_browser->SetHtml(m_page[m_currentPage]);
@@ -178,7 +171,7 @@ void ProgDetails::addItem(const QString &key, const QString &title, const QStrin
 {
     QString escapedKey = "%" + key + "%";
 
-    if (data == "")
+    if (data.isEmpty())
     {
         removeItem(key);
         return;
@@ -254,9 +247,8 @@ void ProgDetails::loadPage(void)
         query.bindValue(":CHANID", m_progInfo.chanid);
         query.bindValue(":STARTTIME", m_progInfo.startts);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             category_type = query.value(0).toString();
             year = query.value(1).toString();
             stars = query.value(2).toDouble();
@@ -277,7 +269,7 @@ void ProgDetails::loadPage(void)
         rating = getRatings(recorded, m_progInfo.chanid.toUInt(), m_progInfo.startts);
     }
 
-    if (category_type == "" && m_progInfo.programid != "")
+    if (category_type.isEmpty() && !m_progInfo.programid.isEmpty())
     {
         QString prefix = m_progInfo.programid.left(2);
 
@@ -291,83 +283,81 @@ void ProgDetails::loadPage(void)
            category_type = "tvshow";
     }
 
-    QString s   = "";
-
-    s = m_progInfo.title;
-    if (m_progInfo.subtitle != "")
+    QString s = m_progInfo.title;
+    if (!m_progInfo.subtitle.isEmpty())
         s += " - \"" + m_progInfo.subtitle + "\"";
-    addItem("TITLE", QObject::tr("Title"), s);
+    addItem("TITLE", tr("Title"), s);
 
-    addItem("TITLE_PRONOUNCE", QObject::tr("Title Pronounce"), title_pronounce);
+    addItem("TITLE_PRONOUNCE", tr("Title Pronounce"), title_pronounce);
 
     s = m_progInfo.description;
 
-    QString attr = "";
+    QString attr;
 
     if (partnumber > 0)
-        attr += QString(QObject::tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
+        attr += QString(tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
 
-    if (rating != "" && rating != "NR")
+    if (!rating.isEmpty() && rating != "NR")
         attr += rating + ", ";
     if (category_type == "movie")
     {
-        if (year != "")
+        if (!year.isEmpty())
             attr += year + ", ";
 
         if (stars > 0.0)
-            attr += QObject::tr("%n star(s)", "", (int) (stars * 4.0)) + ", ";
+            attr += tr("%n star(s)", "", (int) (stars * 4.0)) + ", ";
     }
-    if (colorcode != "")
+    if (!colorcode.isEmpty())
         attr += colorcode + ", ";
 
     if (audioprop & AUD_MONO)
-        attr += QObject::tr("Mono") + ", ";
+        attr += tr("Mono") + ", ";
     if (audioprop & AUD_STEREO)
-        attr += QObject::tr("Stereo") + ", ";
+        attr += tr("Stereo") + ", ";
     if (audioprop & AUD_SURROUND)
-        attr += QObject::tr("Surround Sound") + ", ";
+        attr += tr("Surround Sound") + ", ";
     if (audioprop & AUD_DOLBY)
-        attr += QObject::tr("Dolby Sound") + ", ";
+        attr += tr("Dolby Sound") + ", ";
     if (audioprop & AUD_HARDHEAR)
-        attr += QObject::tr("Audio for Hearing Impaired") + ", ";
+        attr += tr("Audio for Hearing Impaired") + ", ";
     if (audioprop & AUD_VISUALIMPAIR)
-        attr += QObject::tr("Audio for Visually Impaired") + ", ";
+        attr += tr("Audio for Visually Impaired") + ", ";
 
     if (videoprop & VID_HDTV)
-        attr += QObject::tr("HDTV") + ", ";
+        attr += tr("HDTV") + ", ";
     if  (videoprop & VID_WIDESCREEN)
-        attr += QObject::tr("Widescreen") + ", ";
+        attr += tr("Widescreen") + ", ";
     if  (videoprop & VID_AVC)
-        attr += QObject::tr("AVC/H.264") + ", ";
+        attr += tr("AVC/H.264") + ", ";
     if  (videoprop & VID_720)
-        attr += QObject::tr("720p Resolution") + ", ";
+        attr += tr("720p Resolution") + ", ";
     if  (videoprop & VID_1080)
-        attr += QObject::tr("1080i/p Resolution") + ", ";
+        attr += tr("1080i/p Resolution") + ", ";
 
     if (subtype & SUB_HARDHEAR)
-        attr += QObject::tr("CC","Closed Captioned") + ", ";
+        attr += tr("CC","Closed Captioned") + ", ";
     if (subtype & SUB_NORMAL)
-        attr += QObject::tr("Subtitles Available") + ", ";
+        attr += tr("Subtitles Available") + ", ";
     if (subtype & SUB_ONSCREEN)
-        attr += QObject::tr("Subtitled") + ", ";
+        attr += tr("Subtitled") + ", ";
     if (subtype & SUB_SIGNED)
-        attr += QObject::tr("Deaf Signing") + ", ";
+        attr += tr("Deaf Signing") + ", ";
 
     if (generic && category_type == "series")
-        attr += QObject::tr("Unidentified Episode") + ", ";
+        attr += tr("Unidentified Episode") + ", ";
     else if (m_progInfo.repeat)
-        attr += QObject::tr("Repeat") + ", ";
+        attr += tr("Repeat") + ", ";
 
-    if (attr != "")
+    if (!attr.isEmpty())
     {
         attr.truncate(attr.lastIndexOf(','));
         s += " (" + attr + ")";
     }
 
-    addItem("DESCRIPTION", QObject::tr("Description"), s);
+    addItem("DESCRIPTION", tr("Description"), s);
 
-    s = "";
-    if (m_progInfo.category != "")
+    s.clear();
+    if (!m_progInfo.category.isEmpty())
     {
         s = m_progInfo.category;
 
@@ -378,40 +368,39 @@ void ProgDetails::loadPage(void)
         query.bindValue(":CHANID", m_progInfo.chanid);
         query.bindValue(":STARTTIME", m_progInfo.startts);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec())
         {
             while (query.next())
                 s += ", " + query.value(0).toString();
         }
     }
-    addItem("CATEGORY", QObject::tr("Category"), s);
+    addItem("CATEGORY", tr("Category"), s);
 
-    s = "";
-    if (category_type  != "")
+    s.clear();
+    if (!category_type.isEmpty())
     {
         s = category_type;
-        if (m_progInfo.seriesid != "")
+        if (!m_progInfo.seriesid.isEmpty())
             s += "  (" + m_progInfo.seriesid + ")";
-        if (showtype != "")
+        if (!showtype.isEmpty())
             s += "  " + showtype;
     }
-    addItem("CATEGORY_TYPE", QObject::tr("Type", "category_type"), s);
+    addItem("CATEGORY_TYPE", tr("Type", "category_type"), s);
 
-    addItem("EPISODE", QObject::tr("Episode Number"), epinum);
+    addItem("EPISODE", tr("Episode Number"), epinum);
 
-    s = "";
+    s.clear();
     if (m_progInfo.hasAirDate && category_type != "movie")
     {
-          s = m_progInfo.originalAirDate.toString(fullDateFormat);
+        s = m_progInfo.originalAirDate.toString(fullDateFormat);
     }
-    addItem("ORIGINAL_AIRDATE", QObject::tr("Original Airdate"), s);
+    addItem("ORIGINAL_AIRDATE", tr("Original Airdate"), s);
 
-    addItem("PROGRAMID", QObject::tr("Program ID"), m_progInfo.programid);
+    addItem("PROGRAMID", tr("Program ID"), m_progInfo.programid);
 
-    QString role = "", pname = "";
-    QString actors = "", director = "", producer = "", execProducer = "";
-    QString writer = "", guestStar = "", host = "", adapter = "";
-    QString presenter = "", commentator = "", guest = "";
+    QString actors, director, producer, execProducer;
+    QString writer, guestStar, host, adapter;
+    QString presenter, commentator, guest;
 
     if (m_progInfo.endts != m_progInfo.startts)
     {
@@ -431,9 +420,10 @@ void ProgDetails::loadPage(void)
         query.bindValue(":CHANID", m_progInfo.chanid);
         query.bindValue(":STARTTIME", m_progInfo.startts);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.size() > 0)
         {
-            QString rstr = "", plist = "";
+            QString rstr, plist;
+            QString role, pname;
 
             while(query.next())
             {
@@ -495,17 +485,17 @@ void ProgDetails::loadPage(void)
                 guest =  plist;
         }
     }
-    addItem("ACTORS", QObject::tr("Actors"), actors);
-    addItem("DIRECTOR", QObject::tr("Director"), director);
-    addItem("PRODUCER", QObject::tr("Producer"), producer);
-    addItem("EXECUTIVE_PRODUCER", QObject::tr("Executive Producer"), execProducer);
-    addItem("WRITER", QObject::tr("Writer"), writer);
-    addItem("GUEST_STAR", QObject::tr("Guest Star"), guestStar);
-    addItem("HOST", QObject::tr("Host"), host);
-    addItem("ADAPTER", QObject::tr("Adapter"), adapter);
-    addItem("PRESENTER", QObject::tr("Presenter"), presenter);
-    addItem("COMMENTATOR", QObject::tr("Commentator"), commentator);
-    addItem("GUEST", QObject::tr("Guest"), guest);
+    addItem("ACTORS", tr("Actors"), actors);
+    addItem("DIRECTOR", tr("Director"), director);
+    addItem("PRODUCER", tr("Producer"), producer);
+    addItem("EXECUTIVE_PRODUCER", tr("Executive Producer"), execProducer);
+    addItem("WRITER", tr("Writer"), writer);
+    addItem("GUEST_STAR", tr("Guest Star"), guestStar);
+    addItem("HOST", tr("Host"), host);
+    addItem("ADAPTER", tr("Adapter"), adapter);
+    addItem("PRESENTER", tr("Presenter"), presenter);
+    addItem("COMMENTATOR", tr("Commentator"), commentator);
+    addItem("GUEST", tr("Guest"), guest);
 
     // Begin MythTV information not found in the listings info
 //    msg += "<br>";
@@ -535,9 +525,8 @@ void ProgDetails::loadPage(void)
         if (!query.exec() || !query.isActive())
             MythDB::DBError("showDetails", query);
 
-        if (query.isActive() && query.size() > 0)
+        if (query.next())
         {
-            query.next();
             if (p->recstatus == rsUnknown)
                 p->recstatus = RecStatusType(query.value(0).toInt());
             if (p->recstatus == rsPreviousRecording ||
@@ -561,16 +550,16 @@ void ProgDetails::loadPage(void)
     s = p->RecStatusText();
     if (statusDate.isValid())
         s += " " + statusDate.toString(fullDateFormat);
-    addItem("MYTHTV_STATUS", QString("MythTV " + QObject::tr("Status")), s);
+    addItem("MYTHTV_STATUS", QString("MythTV " + tr("Status")), s);
     delete p;
 
-    QString recordingRule = "";
-    QString lastRecorded = "";
-    QString nextRecording = "";
-    QString averageTimeShift = "";
-    QString watchListScore = "";
-    QString watchListStatus = "";
-    QString searchPhrase = "";
+    QString recordingRule;
+    QString lastRecorded;
+    QString nextRecording;
+    QString averageTimeShift;
+    QString watchListScore;
+    QString watchListStatus;
+    QString searchPhrase;
 
     if (m_progInfo.recordid)
     {
@@ -584,15 +573,14 @@ void ProgDetails::loadPage(void)
                       "FROM record WHERE recordid = :RECORDID");
         query.bindValue(":RECORDID", m_progInfo.recordid);
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             if (query.value(0).toDateTime().isValid())
                 lastRecorded = query.value(0).toDateTime().toString(fullDateFormat);
             if (query.value(1).toDateTime().isValid())
                 nextRecording = query.value(1).toDateTime().toString(fullDateFormat);
             if (query.value(2).toInt() > 0)
-                averageTimeShift = QObject::tr("%n hour(s)", "",
+                averageTimeShift = tr("%n hour(s)", "",
                                                 query.value(2).toInt());
         }
         if (recorded)
@@ -605,16 +593,16 @@ void ProgDetails::loadPage(void)
                 switch(m_progInfo.recpriority2)
                 {
                 case wlExpireOff:
-                    watchListStatus = QObject::tr("Auto-expire off");
+                    watchListStatus = tr("Auto-expire off");
                     break;
                 case wlWatched:
-                    watchListStatus = QObject::tr("Marked as 'watched'");
+                    watchListStatus = tr("Marked as 'watched'");
                     break;
                 case wlEarlier:
-                    watchListStatus = QObject::tr("Not the earliest episode");
+                    watchListStatus = tr("Not the earliest episode");
                     break;
                 case wlDeleted:
-                    watchListStatus = QObject::tr("Recently deleted episode");
+                    watchListStatus = tr("Recently deleted episode");
                     break;
                 }
             }
@@ -625,37 +613,37 @@ void ProgDetails::loadPage(void)
                                                 .replace(">", "&gt;")
                                                 .replace("\n", " ");
     }
-    addItem("RECORDING_RULE", QObject::tr("Recording Rule"), recordingRule);
-    addItem("LAST_RECORDED", QObject::tr("Last Recorded"), lastRecorded);
-    addItem("NEXT_RECORDING", QObject::tr("Next Recording"), nextRecording);
-    addItem("AVERAGE_TIME_SHIFT", QObject::tr("Average Time Shift"), averageTimeShift);
-    addItem("WATCH_LIST_SCORE", QObject::tr("Watch List Score"), watchListScore);
-    addItem("WATCH_LIST_STATUS", QObject::tr("Watch List Status"), watchListStatus);
-    addItem("SEARCH_PHRASE", QObject::tr("Search Phrase"), searchPhrase);
+    addItem("RECORDING_RULE", tr("Recording Rule"), recordingRule);
+    addItem("LAST_RECORDED", tr("Last Recorded"), lastRecorded);
+    addItem("NEXT_RECORDING", tr("Next Recording"), nextRecording);
+    addItem("AVERAGE_TIME_SHIFT", tr("Average Time Shift"), averageTimeShift);
+    addItem("WATCH_LIST_SCORE", tr("Watch List Score"), watchListScore);
+    addItem("WATCH_LIST_STATUS", tr("Watch List Status"), watchListStatus);
+    addItem("SEARCH_PHRASE", tr("Search Phrase"), searchPhrase);
 
-    s = "";
+    s.clear();
     if (m_progInfo.findid > 0)
     {
         QDate fdate(1970, 1, 1);
         fdate = fdate.addDays(m_progInfo.findid - 719528);
         s = QString("%1 (%2)").arg(m_progInfo.findid).arg(fdate.toString(fullDateFormat));
     }
-    addItem("FINDID", QObject::tr("Find ID"), s);
+    addItem("FINDID", tr("Find ID"), s);
 
-    QString recordingHost = "";
-    QString recordedFilename = "";
-    QString recordedFileSize = "";
-    QString recordingGroup = "";
-    QString storageGroup = "";
-    QString playbackGroup = "";
-    QString recordingProfile = "";
+    QString recordingHost;
+    QString recordedFilename;
+    QString recordedFileSize;
+    QString recordingGroup;
+    QString storageGroup;
+    QString playbackGroup;
+    QString recordingProfile;
 
     if (recorded)
     {
         recordingHost = m_progInfo.hostname;
         recordedFilename = m_progInfo.GetRecordBasename();
         recordedFileSize.sprintf("%0.2f ", m_progInfo.filesize / 1024.0 / 1024.0 / 1024.0);
-        recordedFileSize += QObject::tr("GB", "GigaBytes");
+        recordedFileSize += tr("GB", "GigaBytes");
 
         query.prepare("SELECT profile FROM recorded"
                       " WHERE chanid = :CHANID"
@@ -675,13 +663,13 @@ void ProgDetails::loadPage(void)
     {
         recordingProfile =  record->m_recProfile;
     }
-    addItem("RECORDING_HOST", QObject::tr("Recording Host"), recordingHost);
-    addItem("RECORDED_FILE_NAME", QObject::tr("Recorded File Name"), recordedFilename);
-    addItem("RECORDED_FILE_SIZE", QObject::tr("Recorded File Size"), recordedFileSize);
-    addItem("RECORDING_PROFILE", QObject::tr("Recording Profile"), recordingProfile);
-    addItem("RECORDING_GROUP", QObject::tr("Recording Group"), recordingGroup);
-    addItem("STORAGE_GROUP", QObject::tr("Storage Group"), storageGroup);
-    addItem("PLAYBACK_GROUP", QObject::tr("Playback Group"),  playbackGroup);
+    addItem("RECORDING_HOST", tr("Recording Host"), recordingHost);
+    addItem("RECORDED_FILE_NAME", tr("Recorded File Name"), recordedFilename);
+    addItem("RECORDED_FILE_SIZE", tr("Recorded File Size"), recordedFileSize);
+    addItem("RECORDING_PROFILE", tr("Recording Profile"), recordingProfile);
+    addItem("RECORDING_GROUP", tr("Recording Group"), recordingGroup);
+    addItem("STORAGE_GROUP", tr("Storage Group"), storageGroup);
+    addItem("PLAYBACK_GROUP", tr("Playback Group"),  playbackGroup);
 
     m_page[m_currentPage] = m_html.join("\n");
 

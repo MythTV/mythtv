@@ -71,6 +71,7 @@ class VideoOutputVDPAU : public VideoOutput
                          NuppelVideoPlayer *pipplayer,
                          PIPLocation        loc);
     virtual void RemovePIP(NuppelVideoPlayer *pipplayer);
+    void ParseBufferSize(void);
 
     MythCodecID          m_codec_id;
     Window               m_win;
@@ -80,6 +81,7 @@ class VideoOutputVDPAU : public VideoOutput
     QMutex               m_lock;
     bool                 m_osd_avail;
     bool                 m_pip_avail;
+    uint                 m_buffer_size;
 };
 
 #endif // VIDEOOUT_VDPAU_H

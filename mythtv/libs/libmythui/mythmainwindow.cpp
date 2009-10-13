@@ -1,10 +1,14 @@
 
+#include "mythmainwindow.h"
+#include "mythmainwindow_internal.h"
+
+// C++ headers
 #include <math.h>
 #include <pthread.h>
-
 #include <algorithm>
 #include <vector>
 
+// QT headers
 #ifdef USE_OPENGL_PAINTER
 #include <QGLWidget>
 #endif
@@ -16,7 +20,9 @@
 #include <QFile>
 #include <QDir>
 #include <QEvent>
+#include <QKeyEvent>
 
+// Platform headers
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
@@ -24,6 +30,14 @@
 #include <HIToolbox/Menus.h>   // For GetMBarHeight()
 #endif
 
+// libmythdb headers
+#include "mythdb.h"
+#include "mythverbose.h"
+#include "mythevent.h"
+#include "mythdirs.h"
+
+// Libmythui headers
+#include "screensaver.h"
 #include "lirc.h"
 #include "lircevent.h"
 
@@ -36,8 +50,6 @@
 #include "jsmenuevent.h"
 #endif
 
-#include "mythmainwindow.h"
-#include "mythmainwindow_internal.h"
 #include "mythscreentype.h"
 #include "mythpainter.h"
 #ifdef USE_OPENGL_PAINTER
@@ -46,15 +58,6 @@
 #include "mythpainter_qt.h"
 #include "mythgesture.h"
 #include "mythuihelper.h"
-
-/* from libmythdb */
-#include "mythdb.h"
-#include "mythverbose.h"
-#include "mythevent.h"
-#include "mythdirs.h"
-
-/* from libmyth */
-#include "screensaver.h"
 
 #ifdef USING_VDPAU
 #include "mythpainter_vdpau.h"
@@ -156,7 +159,7 @@ class MythMainWindowPrivate
     MythGesture gesture;
     QTimer *gestureTimer;
 
-    /* compatability only, FIXME remove */
+    /* compatibility only, FIXME remove */
     std::vector<QWidget *> widgetList;
 
     QWidget *paintwin;
@@ -164,7 +167,7 @@ class MythMainWindowPrivate
     QWidget *oldpaintwin;
     MythPainter *oldpainter;
 
-    bool m_drawEnabled;
+    volatile bool m_drawEnabled;
 };
 
 // Make keynum in QKeyEvent be equivalent to what's in QKeySequence
@@ -342,64 +345,103 @@ MythMainWindow::MythMainWindow(const bool useDB)
         d->appleRemote->start();
 #endif
 
-    RegisterKey("Global", "UP", "Up Arrow", "Up");
-    RegisterKey("Global", "DOWN", "Down Arrow", "Down");
-    RegisterKey("Global", "LEFT", "Left Arrow", "Left");
-    RegisterKey("Global", "RIGHT", "Right Arrow", "Right");
-    RegisterKey("Global", "NEXT", "Move to next widget", "Tab");
-    RegisterKey("Global", "PREVIOUS", "Move to preview widget", "Backtab");
-    RegisterKey("Global", "SELECT", "Select", "Return,Enter,Space");
-    RegisterKey("Global", "BACKSPACE", "Backspace", "Backspace");
-    RegisterKey("Global", "ESCAPE", "Escape", "Esc");
-    RegisterKey("Global", "MENU", "Pop-up menu", "M");
-    RegisterKey("Global", "INFO", "More information", "I");
-    RegisterKey("Global", "DELETE", "Delete", "D");
-    RegisterKey("Global", "EDIT", "Edit", "E");
+    RegisterKey("Global", "UP", QT_TRANSLATE_NOOP("MythControls",
+        "Up Arrow"),               "Up");
+    RegisterKey("Global", "DOWN", QT_TRANSLATE_NOOP("MythControls",
+        "Down Arrow"),           "Down");
+    RegisterKey("Global", "LEFT", QT_TRANSLATE_NOOP("MythControls",
+        "Left Arrow"),           "Left");
+    RegisterKey("Global", "RIGHT", QT_TRANSLATE_NOOP("MythControls",
+        "Right Arrow"),         "Right");
+    RegisterKey("Global", "NEXT", QT_TRANSLATE_NOOP("MythControls",
+        "Move to next widget"),   "Tab");
+    RegisterKey("Global", "PREVIOUS", QT_TRANSLATE_NOOP("MythControls",
+        "Move to preview widget"), "Backtab");
+    RegisterKey("Global", "SELECT", QT_TRANSLATE_NOOP("MythControls",
+        "Select"), "Return,Enter,Space");
+    RegisterKey("Global", "BACKSPACE", QT_TRANSLATE_NOOP("MythControls",
+        "Backspace"),       "Backspace");
+    RegisterKey("Global", "ESCAPE", QT_TRANSLATE_NOOP("MythControls",
+        "Escape"),                "Esc");
+    RegisterKey("Global", "MENU", QT_TRANSLATE_NOOP("MythControls",
+        "Pop-up menu"),             "M");
+    RegisterKey("Global", "INFO", QT_TRANSLATE_NOOP("MythControls",
+        "More information"),        "I");
+    RegisterKey("Global", "DELETE", QT_TRANSLATE_NOOP("MythControls",
+        "Delete"),                  "D");
+    RegisterKey("Global", "EDIT", QT_TRANSLATE_NOOP("MythControls",
+        "Edit"),                    "E");
 
-    RegisterKey("Global", "PAGEUP", "Page Up", "PgUp");
-    RegisterKey("Global", "PAGEDOWN", "Page Down", "PgDown");
-    RegisterKey("Global", "PAGETOP", "Page to top of list", "");
-    RegisterKey("Global", "PAGEMIDDLE", "Page to middle of list", "");
-    RegisterKey("Global", "PAGEBOTTOM", "Page to bottom of list", "");
+    RegisterKey("Global", "PAGEUP", QT_TRANSLATE_NOOP("MythControls",
+        "Page Up"),              "PgUp");
+    RegisterKey("Global", "PAGEDOWN", QT_TRANSLATE_NOOP("MythControls",
+        "Page Down"),          "PgDown");
+    RegisterKey("Global", "PAGETOP", QT_TRANSLATE_NOOP("MythControls",
+        "Page to top of list"),      "");
+    RegisterKey("Global", "PAGEMIDDLE", QT_TRANSLATE_NOOP("MythControls",
+        "Page to middle of list"),   "");
+    RegisterKey("Global", "PAGEBOTTOM", QT_TRANSLATE_NOOP("MythControls",
+        "Page to bottom of list"),   "");
 
-    RegisterKey("Global", "PREVVIEW", "Previous View", "Home");
-    RegisterKey("Global", "NEXTVIEW", "Next View", "End");
+    RegisterKey("Global", "PREVVIEW", QT_TRANSLATE_NOOP("MythControls",
+        "Previous View"),        "Home");
+    RegisterKey("Global", "NEXTVIEW", QT_TRANSLATE_NOOP("MythControls",
+        "Next View"),             "End");
 
-    RegisterKey("Global", "HELP", "Help", "F1");
-    RegisterKey("Global", "EJECT", "Eject Removable Media", "");
+    RegisterKey("Global", "HELP", QT_TRANSLATE_NOOP("MythControls",
+        "Help"),                   "F1");
+    RegisterKey("Global", "EJECT", QT_TRANSLATE_NOOP("MythControls"
+        ,"Eject Removable Media"),   "");
 
-    RegisterKey("Global", "0", "0", "0");
-    RegisterKey("Global", "1", "1", "1");
-    RegisterKey("Global", "2", "2", "2");
-    RegisterKey("Global", "3", "3", "3");
-    RegisterKey("Global", "4", "4", "4");
-    RegisterKey("Global", "5", "5", "5");
-    RegisterKey("Global", "6", "6", "6");
-    RegisterKey("Global", "7", "7", "7");
-    RegisterKey("Global", "8", "8", "8");
-    RegisterKey("Global", "9", "9", "9");
+    RegisterKey("Global", "0", QT_TRANSLATE_NOOP("MythControls","0"), "0");
+    RegisterKey("Global", "1", QT_TRANSLATE_NOOP("MythControls","1"), "1");
+    RegisterKey("Global", "2", QT_TRANSLATE_NOOP("MythControls","2"), "2");
+    RegisterKey("Global", "3", QT_TRANSLATE_NOOP("MythControls","3"), "3");
+    RegisterKey("Global", "4", QT_TRANSLATE_NOOP("MythControls","4"), "4");
+    RegisterKey("Global", "5", QT_TRANSLATE_NOOP("MythControls","5"), "5");
+    RegisterKey("Global", "6", QT_TRANSLATE_NOOP("MythControls","6"), "6");
+    RegisterKey("Global", "7", QT_TRANSLATE_NOOP("MythControls","7"), "7");
+    RegisterKey("Global", "8", QT_TRANSLATE_NOOP("MythControls","8"), "8");
+    RegisterKey("Global", "9", QT_TRANSLATE_NOOP("MythControls","9"), "9");
 
     // these are for the html viewer widget (MythUIWebBrowser)
-    RegisterKey("Browser", "ZOOMIN",      "Zoom in on browser window",           ".,>");
-    RegisterKey("Browser", "ZOOMOUT",     "Zoom out on browser window",          ",,<");
-    RegisterKey("Browser", "TOGGLEINPUT", "Toggle where keyboard input goes to", "F1");
+    RegisterKey("Browser", "ZOOMIN",          QT_TRANSLATE_NOOP("MythControls",
+        "Zoom in on browser window"),           ".,>");
+    RegisterKey("Browser", "ZOOMOUT",         QT_TRANSLATE_NOOP("MythControls",
+        "Zoom out on browser window"),          ",,<");
+    RegisterKey("Browser", "TOGGLEINPUT",     QT_TRANSLATE_NOOP("MythControls",
+        "Toggle where keyboard input goes to"),  "F1");
 
-    RegisterKey("Browser", "MOUSEUP",         "Move mouse pointer up",   "2");
-    RegisterKey("Browser", "MOUSEDOWN",       "Move mouse pointer down", "8");
-    RegisterKey("Browser", "MOUSELEFT",       "Move mouse pointer left", "4");
-    RegisterKey("Browser", "MOUSERIGHT",      "Move mouse pointer right","6");
-    RegisterKey("Browser", "MOUSELEFTBUTTON", "Mouse Left button click", "5");
+    RegisterKey("Browser", "MOUSEUP",         QT_TRANSLATE_NOOP("MythControls",
+        "Move mouse pointer up"),                 "2");
+    RegisterKey("Browser", "MOUSEDOWN",       QT_TRANSLATE_NOOP("MythControls",
+        "Move mouse pointer down"),               "8");
+    RegisterKey("Browser", "MOUSELEFT",       QT_TRANSLATE_NOOP("MythControls",
+        "Move mouse pointer left"),               "4");
+    RegisterKey("Browser", "MOUSERIGHT",      QT_TRANSLATE_NOOP("MythControls",
+        "Move mouse pointer right"),              "6");
+    RegisterKey("Browser", "MOUSELEFTBUTTON", QT_TRANSLATE_NOOP("MythControls",
+        "Mouse Left button click"),               "5");
 
-    RegisterKey("Browser", "PAGEDOWN",       "Scroll down half a page",  "9");
-    RegisterKey("Browser", "PAGEUP",         "Scroll up half a page",    "3");
-    RegisterKey("Browser", "PAGELEFT",       "Scroll left half a page",  "7");
-    RegisterKey("Browser", "PAGERIGHT",      "Scroll right half a page", "1");
+    RegisterKey("Browser", "PAGEDOWN",        QT_TRANSLATE_NOOP("MythControls",
+        "Scroll down half a page"),               "9");
+    RegisterKey("Browser", "PAGEUP",          QT_TRANSLATE_NOOP("MythControls",
+        "Scroll up half a page"),                 "3");
+    RegisterKey("Browser", "PAGELEFT",        QT_TRANSLATE_NOOP("MythControls",
+        "Scroll left half a page"),               "7");
+    RegisterKey("Browser", "PAGERIGHT",       QT_TRANSLATE_NOOP("MythControls",
+        "Scroll right half a page"),              "1");
 
-    RegisterKey("Browser", "NEXTLINK",       "Move selection to next link",     "Z");
-    RegisterKey("Browser", "PREVIOUSLINK",   "Move selection to previous link", "Q");
-    RegisterKey("Browser", "FOLLOWLINK",     "Follow selected link",            "Return,Space,Enter");
-    RegisterKey("Browser", "HISTORYBACK",    "Go back to previous page",        "R,Backspace");
-    RegisterKey("Browser", "HISTORYFORWARD", "Go forward to previous page",     "F");
+    RegisterKey("Browser", "NEXTLINK",        QT_TRANSLATE_NOOP("MythControls",
+        "Move selection to next link"),           "Z");
+    RegisterKey("Browser", "PREVIOUSLINK",    QT_TRANSLATE_NOOP("MythControls",
+        "Move selection to previous link"),       "Q");
+    RegisterKey("Browser", "FOLLOWLINK",      QT_TRANSLATE_NOOP("MythControls",
+        "Follow selected link"),            "Return,Space,Enter");
+    RegisterKey("Browser", "HISTORYBACK",     QT_TRANSLATE_NOOP("MythControls",
+        "Go back to previous page"),        "R,Backspace");
+    RegisterKey("Browser", "HISTORYFORWARD",  QT_TRANSLATE_NOOP("MythControls",
+        "Go forward to previous page"),     "F");
 
     d->gestureTimer = new QTimer(this);
     connect(d->gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));
@@ -845,7 +887,7 @@ void MythMainWindow::Show(void)
 #endif
 }
 
-/* FIXME compatability only */
+/* FIXME compatibility only */
 void MythMainWindow::attach(QWidget *child)
 {
 #ifdef USING_MINGW
@@ -902,10 +944,16 @@ QWidget *MythMainWindow::currentWidget(void)
 
 void MythMainWindow::SetDrawEnabled(bool enable)
 {
+    setUpdatesEnabled(enable);
     d->m_drawEnabled = enable;
+
+    // TODO FIXME
+    // Sleep 50 ms to give any in progress draw a chance to finish.
+    // This should be replaced with something sane after MythTV 0.22
+    usleep(50 * 1000);
 }
 
-/* FIXME: end compatability */
+/* FIXME: end compatibility */
 
 bool MythMainWindow::IsExitingToMain(void) const
 {
@@ -918,7 +966,7 @@ void MythMainWindow::ExitToMainMenu(void)
 
     d->exitingtomain = true;
 
-    /* compatability code, remove, FIXME */
+    /* compatibility code, remove, FIXME */
     QWidget *current = currentWidget();
     if (current && d->exitingtomain && d->popwindows)
     {
@@ -1102,9 +1150,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
         query.bindValue(":ACTION", action);
         query.bindValue(":HOSTNAME", GetMythDB()->GetHostName());
 
-        bool ok = query.exec() && query.isActive();
-
-        if (ok && query.next())
+        if (query.exec() && query.next())
         {
             keybind = query.value(0).toString();
             QString db_description = query.value(1).toString();
@@ -1112,7 +1158,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
             // Update keybinding description if changed
             if (db_description != description)
             {
-                VERBOSE(VB_IMPORTANT, "Updating description...");
+                VERBOSE(VB_IMPORTANT, "Updating keybinding description...");
                 query.prepare(
                     "UPDATE keybindings "
                     "SET description = :DESCRIPTION "
@@ -1125,7 +1171,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
                 query.bindValue(":ACTION",      action);
                 query.bindValue(":HOSTNAME",    GetMythDB()->GetHostName());
 
-                if (!query.exec())
+                if (!query.exec() && !(GetMythDB()->SuppressDBMessages()))
                 {
                     MythDB::DBError("Update Keybinding", query);
                 }
@@ -1145,7 +1191,7 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
             query.bindValue(":KEYLIST", inskey);
             query.bindValue(":HOSTNAME", GetMythDB()->GetHostName());
 
-            if (!query.exec() || !query.isActive())
+            if (!query.exec() && !(GetMythDB()->SuppressDBMessages()))
             {
                 MythDB::DBError("Insert Keybinding", query);
             }
@@ -1247,9 +1293,8 @@ void MythMainWindow::RegisterJump(const QString &destination,
         query.bindValue(":DEST", destination);
         query.bindValue(":HOST", GetMythDB()->GetHostName());
 
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
             keybind = query.value(0).toString();
         }
         else
@@ -1281,7 +1326,7 @@ void MythMainWindow::RegisterJump(const QString &destination,
 void MythMainWindow::JumpTo(const QString& destination, bool pop)
 {
     if (destination == "ScreenShot")
-	screenShot();
+        screenShot();
     else if (d->destinationMap.count(destination) > 0 && d->exitmenucallback == NULL)
     {
         d->exitingtomain = true;
@@ -1364,7 +1409,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
 {
     MythGestureEvent *ge;
 
-    /* dont let anything through if input is disallowed. */
+    /* Don't let anything through if input is disallowed. */
     if (!d->AllowInput)
         return true;
 
@@ -1384,8 +1429,6 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 QWidget *current = currentWidget();
                 if (current && current->isEnabled())
                     qApp->notify(current, ke);
-                //else
-                //    QDialog::keyPressEvent(ke);
 
                 break;
             }
@@ -1397,9 +1440,12 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 if (top)
                 {
                     if (top->keyPressEvent(ke))
-                    {
                         return true;
-                    }
+
+                    // Note:  The following break prevents keypresses being
+                    //        sent to windows below popups
+                    if ((*it)->objectName() == "popup stack")
+                        break;
                 }
             }
             break;
@@ -1445,20 +1491,36 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
 
+                        if (!screen)
+                            continue;
+
                         // A focusable screen should be a rare event but there
                         // but may be desirable in a couple of scenarios
-                        if (screen && screen->CanTakeFocus())
+                        // e.g. Clicking anywhere on the screen when watching a
+                        // video could bring up playback controls, or pause/play
+                        if (screen->CanTakeFocus())
                         {
                             screen->gestureEvent(screen, ge);
                             break;
                         }
 
-                        if (screen && (clicked = screen->GetChildAt(p)) != NULL)
+                        MythUIType *clicked = screen->GetChildAt(p);
+                        if (clicked && clicked->IsEnabled())
                         {
                             screen->SetFocusWidget(clicked);
                             clicked->gestureEvent(clicked, ge);
                             break;
                         }
+
+                        // Note:  The following break prevents clicks being
+                        //        sent to windows below popups
+                        //
+                        //        we want to permit this in some cases, e.g.
+                        //        when the music miniplayer is on screen or a
+                        //        non-interactive alert/news scroller. So these
+                        //        things need to be in a third or more stack
+                        if ((*it)->objectName() == "popup stack")
+                            break;
                     }
 
                     delete ge;
@@ -1671,7 +1733,7 @@ void MythMainWindow::customEvent(QEvent *ce)
 
         if (message.left(12) == "HANDLE_MEDIA")
         {
-            QStringList tokens = message.split(" ", QString::SkipEmptyParts);
+            QStringList tokens = message.split(' ', QString::SkipEmptyParts);
             HandleMedia(tokens[1],
                         message.mid(tokens[0].length() +
                                     tokens[1].length() + 2));

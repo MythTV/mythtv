@@ -37,9 +37,12 @@ static void log_rotate_handler(int);
 
 void initKeys(void)
 {
-    REG_KEY("Welcome", "STARTXTERM", "Open an Xterm window", "F12");
-    REG_KEY("Welcome", "SHOWSETTINGS", "Show Mythshutdown settings", "F11");
-    REG_KEY("Welcome", "STARTSETUP", "Start Mythtv-Setup", "");
+    REG_KEY("Welcome", "STARTXTERM", QT_TRANSLATE_NOOP("MythControls",
+        "Open an Xterm window"),       "F12");
+    REG_KEY("Welcome", "SHOWSETTINGS", QT_TRANSLATE_NOOP("MythControls",
+        "Show Mythshutdown settings"), "F11");
+    REG_KEY("Welcome", "STARTSETUP", QT_TRANSLATE_NOOP("MythControls",
+        "Start Mythtv-Setup"),            "");
 }
 
 void showUsage(const MythCommandLineParser &cmdlineparser)
@@ -185,6 +188,11 @@ int main(int argc, char **argv)
     LanguageSettings::load("mythfrontend");
 
     GetMythUI()->LoadQtConfig();
+
+#ifdef Q_WS_MACX
+    // Mac OS 10.4 and Qt 4.4 have window-focus problems
+    gContext->SetSetting("RunFrontendInWindow", "1");
+#endif
 
     MythMainWindow *mainWindow = GetMythMainWindow();
     mainWindow->Init();

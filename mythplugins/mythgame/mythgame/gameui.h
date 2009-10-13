@@ -8,6 +8,8 @@
 
 class MythUIButtonTree;
 class MythGenericTree;
+class MythUIText;
+class MythUIStateType;
 class RomInfo;
 
 class GameUI : public MythScreenType
@@ -54,13 +56,13 @@ class GameUI : public MythScreenType
     MythGenericTree  *m_gameTree;
     MythGenericTree  *m_favouriteNode;
 
-    MythUIButtonTree *m_gameTreeUI;
-    MythUIText       *m_gameTitle;
-    MythUIText       *m_gameSystem;
-    MythUIText       *m_gameYear;
-    MythUIText       *m_gameGenre;
-    MythUIText       *m_gamePlot;
-    MythUIText       *m_gameFavourite;
+    MythUIButtonTree *m_gameUITree;
+    MythUIText       *m_gameTitleText;
+    MythUIText       *m_gameSystemText;
+    MythUIText       *m_gameYearText;
+    MythUIText       *m_gameGenreText;
+    MythUIText       *m_gamePlotText;
+    MythUIStateType  *m_gameFavouriteState;
     MythUIImage      *m_gameImage; 
     MythUIImage      *m_fanartImage;
     MythUIImage      *m_boxImage;

@@ -439,7 +439,7 @@ GenericTree* GenericTree::getParent()
 
 void GenericTree::setAttribute(uint attribute_position, int value_of_attribute)
 {
-    // You can use attibutes for anything you like. Mythmusic, for example,
+    // You can use attributes for anything you like. Mythmusic, for example,
     // stores a value for random ordering in the first "column" (0) and a value
     // for "intelligent" (1) ordering in the second column
 
@@ -453,7 +453,7 @@ int GenericTree::getAttribute(uint which_one) const
 {
     if (m_attributes->size() < (int)(which_one + 1))
     {
-        cerr << "asked a GenericTree node for a nonexistant attribute\n";
+        cerr << "asked a GenericTree node for a nonexistent attribute\n";
         return 0;
     }
 
@@ -512,7 +512,7 @@ GenericTree* GenericTree::nextPrevFromFlatList(bool forward_or_backward,
 
     if (it == m_flatened_subnodes->end())
     {
-        VERBOSE(VB_IMPORTANT, "Can't find active item on flatened list");
+        VERBOSE(VB_IMPORTANT, "Can't find active item on flattened list");
         return NULL;
     }
     int i = it - m_flatened_subnodes->begin();

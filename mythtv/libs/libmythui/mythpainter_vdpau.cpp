@@ -1,20 +1,29 @@
-#include <cassert>
 
+// Config header
+#include "config.h"
+
+// Own header
+#include "mythpainter_vdpau.h"
+
+// QT headers
 #include <QApplication>
 #include <QPixmap>
 #include <QPainter>
+#include <QMutex>
 #include <QX11Info>
 
-#include "config.h"
-
+// Mythdb headers
 #include "mythverbose.h"
-#include "mythpainter_vdpau.h"
+
+// Mythui headers
 #include "mythfontproperties.h"
 
+// VDPAU headers
 extern "C" {
 #include "vdpau/vdpau.h"
 #include "vdpau/vdpau_x11.h"
 }
+
 
 #define MAX_GL_ITEMS 256
 #define MAX_STRING_ITEMS 256
@@ -78,6 +87,9 @@ class MythVDPAUPrivate
 
     int surfaceNum;
     bool initialized;
+
+    std::list<VdpBitmapSurface> m_surfaceDeleteList;
+    QMutex                      m_surfaceDeleteLock;
 
     VdpOutputSurface curOutput;
     VdpRect outRect;
@@ -305,8 +317,17 @@ MythVDPAUPrivate::MythVDPAUPrivate(MythVDPAUPainter *painter) :
     m_painter(painter),
     surfaceNum(0), initialized(false),
     curOutput(0), vdp_device(0),
-    vdpFlipTarget(0), vdpFlipQueue(0)
+    vdpFlipTarget(0), vdpFlipQueue(0),
+    vdp_get_proc_address(0), vdp_device_destroy(0),
+    vdp_presentation_queue_target_destroy(0), vdp_presentation_queue_create(0),
+    vdp_presentation_queue_destroy(0), vdp_presentation_queue_display(0),
+    vdp_presentation_queue_block_until_surface_idle(0), vdp_presentation_queue_target_create_x11(0),
+    vdp_bitmap_surface_create(0), vdp_bitmap_surface_destroy(0),
+    vdp_bitmap_surface_put_bits_native(0), vdp_output_surface_create(0),
+    vdp_output_surface_destroy(0), vdp_output_surface_render_bitmap_surface(0)
 {
+    memset(outputSurfaces, 0, sizeof(outputSurfaces));
+    memset(&outRect, 0, sizeof(outRect));
 }
 
 MythVDPAUPrivate::~MythVDPAUPrivate()
@@ -330,7 +351,12 @@ void MythVDPAUPrivate::Begin(QWidget *parent)
     VdpTime dummy = 0;
     bool ok = true;
 
-    assert(parent);
+    if (!parent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: No parent widget defined for "
+                              "VDPAU Painter, bailing");
+        return;
+    }
 
     if (initialized &&
         (parent->width() != (int)outRect.x1 || parent->height() != (int)outRect.y1))
@@ -353,7 +379,15 @@ void MythVDPAUPrivate::Begin(QWidget *parent)
         curOutput,
         &dummy
     );
-    CHECK_ST
+    CHECK_ST;
+
+    QMutexLocker locker(&m_surfaceDeleteLock);
+    while (!m_surfaceDeleteList.empty())
+    {
+        VdpBitmapSurface bitmap = m_surfaceDeleteList.front();
+        m_surfaceDeleteList.pop_front();
+        vdp_bitmap_surface_destroy(bitmap);
+    }
 }
 
 void MythVDPAUPainter::Begin(QWidget *parent)
@@ -389,8 +423,9 @@ void MythVDPAUPrivate::RemoveImageFromCache(MythImage *im)
 {
     if (m_ImageBitmapMap.contains(im))
     {
-        VdpBitmapSurface bitmap = m_ImageBitmapMap[im];
-        vdp_bitmap_surface_destroy(bitmap);
+        m_surfaceDeleteLock.lock();
+        m_surfaceDeleteList.push_back(m_ImageBitmapMap[im]);
+        m_surfaceDeleteLock.unlock();
 
         m_ImageBitmapMap.remove(im);
         m_ImageExpireList.remove(im);

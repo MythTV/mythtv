@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mythuitheme>
+
+    <window name="gallery">
+
+        <imagetype name="fanart" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Image Gallery</value>
+        </textarea>
+
+        <buttonlist name="images">
+            <area>37,50,1250,690</area>
+            <layout>grid</layout>
+            <spacing>2</spacing>
+            <buttonarea>0,0,1250,675</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,200,209</area>
+                    <imagetype name="buttonbackground">
+                        <filename>video/video_gallery_background.png</filename>
+                    </imagetype>
+
+                    <imagetype name="buttonimage">
+                        <area>6,5,187,145</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    
+                    <statetype name="nodetype">
+                        <position>118,83</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <filename>shared/directory.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder" from="subfolder">
+                            <imagetype name="upnode">
+                                <position>37,34</position>
+                                <filename>shared/updirectory.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>8,155,183,50</area>
+                        <align>hcenter,vcenter</align>
+                        <multiline>true</multiline>
+                    </textarea>
+                    <textarea name="childcount" from="basetextarea">
+                        <area>144,118,35,20</area>
+                        <font>basesmallbrown</font>
+                        <align>hcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>video/video_gallery_background_selected.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <!-- optional - shows a message when no images are available
+             in the current directory -->
+        <textarea name="noimages" from="basetextarea">
+            <area>15,20,1250,680</area>
+            <font>basemedium</font>
+            <align>allcenter</align>
+            <value>No images found in configured directory.  Are you sure you have set up the plugin properly?</value>
+        </textarea>
+
+    </window>
+
+</mythuitheme>

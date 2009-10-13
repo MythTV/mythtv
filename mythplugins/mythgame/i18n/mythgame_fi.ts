@@ -1,35 +1,74 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
-    <name>GameTree</name>
+    <name>GameUI</name>
     <message>
         <source>All Games</source>
-        <translation>Kaikki pelit</translation>
-    </message>
-    <message>
-        <source>Favourites</source>
-        <translation>Suosikit</translation>
-    </message>
-    <message>
-        <source>-   By Name</source>
-        <translation>-   Nimen mukaisesti</translation>
-    </message>
-    <message>
-        <source>-   By Year</source>
-        <translation>-  Vuoden  mukaisesti</translation>
+        <translation type="unfinished">Kaikki pelit</translation>
     </message>
     <message>
         <source>-   By Genre</source>
-        <translation>-   Lajin Mukaisesti</translation>
+        <translation type="unfinished">-   Lajin Mukaisesti</translation>
     </message>
     <message>
-        <source>Players Available. 
-
- Please pick one.</source>
-        <translation>Valitse sopivin emulaattori.</translation>
+        <source>-   By Year</source>
+        <translation type="unfinished">-  Vuoden  mukaisesti</translation>
+    </message>
+    <message>
+        <source>-   By Name</source>
+        <translation type="unfinished">-   Nimen mukaisesti</translation>
     </message>
     <message>
         <source>-   By Publisher</source>
-        <translation>-  Julkaisijan  Mukaisesti</translation>
+        <translation type="unfinished">-  Julkaisijan  Mukaisesti</translation>
+    </message>
+    <message>
+        <source>Choose System for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Show Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Game frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the current game as a favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show incremental search dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incremental search find next match</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -138,26 +177,12 @@
         <translation>Tiedostojen Ppäätteet</translation>
     </message>
     <message>
-        <source>ScreenShots</source>
-        <translation>Kuvakaappaukset</translation>
-    </message>
-    <message>
-        <source>Path to any screenshots for this player</source>
-        <translation>Tiedostopolku kuvankaappauksille tällä soittimella</translation>
-    </message>
-    <message>
         <source>Game Player Setup</source>
         <translation>Pelausasetukset</translation>
     </message>
     <message>
         <source>(New Game Player)</source>
         <translation>(Uusi pelaaja)</translation>
-    </message>
-    <message>
-        <source>Rom Information
-</source>
-        <translation type="obsolete">Rom-tiedot
-</translation>
     </message>
     <message>
         <source>OTHER</source>
@@ -305,8 +330,28 @@ Pelitietokannasta. Oletko Varma?</translation>
         <translation>Binääri- ja valinnaisasetukset. Monia komentoja, joita jaetaan puolipisteellä, ( ; ). Käytä % ROM-tiedoston nimeä varten. %d1, %d2 ja %d4 kuvastavat levyjä monilevypelissä. %:n automaattista liitäntää ei ole määritelty</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <source>Directory where Game Screenshots are stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning screenshots.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where Game Fanart is stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning fanart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where Game Boxart is stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning boxart.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -326,6 +371,110 @@ Pelitietokannasta. Oletko Varma?</translation>
     <message>
         <source>Favorite:</source>
         <translation>Suosikki:</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Ei</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Kyllä</translation>
+    </message>
+    <message>
+        <source>Edit Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Publisher:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Boxart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rompath:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System(s):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Plot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Players</source>
+        <translation type="unfinished">Emulaattorit</translation>
+    </message>
+    <message>
+        <source>Scan for Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Game Data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -736,13 +736,13 @@ int internal_play_media(const QString &mrl, const QString &plot,
         pginfo->pathname = QString("dvd:%1").arg(mrl);
     }
 
-    if (director.length())
+    if (!director.isEmpty())
         pginfo->description = QString( "%1: %2.  " )
                            .arg(QObject::tr("Directed By")).arg(director);
 
     pginfo->description += plot;
 
-    if (subtitle.length())
+    if (!subtitle.isEmpty())
         pginfo->subtitle = subtitle;
 
     if ((season > 0) || (episode > 0))
@@ -758,6 +758,8 @@ int internal_play_media(const QString &mrl, const QString &plot,
 
     pginfo->title = title;
 
+    long long pos = 0;
+
     if (pginfo->pathname.startsWith("dvd:"))
     {
         bool allowdvdbookmark = gContext->GetNumSetting("EnableDVDBookmark", 0);
@@ -766,6 +768,12 @@ int internal_play_media(const QString &mrl, const QString &plot,
             gContext->GetNumSetting("DVDBookmarkPrompt", 0))
         {
             RingBuffer *tmprbuf = new RingBuffer(pginfo->pathname, false);
+
+            if (!tmprbuf) 
+            { 
+                delete pginfo; 
+                return res;               
+            } 
             QString name;
             QString serialid;
             if (tmprbuf->isDVD() &&
@@ -775,33 +783,34 @@ int internal_play_media(const QString &mrl, const QString &plot,
                 if (!fields.empty())
                 {
                     QStringList::Iterator it = fields.begin();
-                    long long pos = (long long)
-                        ((*++it).toLongLong() & 0xffffffffLL);
-                    if (pos > 0)
-                    {
-                        QString msg = QObject::tr("DVD contains a bookmark");
-                        QString btn0msg = QObject::tr("Play from bookmark");
-                        QString btn1msg = QObject::tr("Play from beginning");
-
-                        DialogCode ret = MythPopupBox::Show2ButtonPopup(
-                            gContext->GetMainWindow(),
-                            "", msg,
-                            btn0msg,
-                            btn1msg,
-                            kDialogCodeButton0);
-                        if (kDialogCodeButton1 == ret)
-                            pginfo->setIgnoreBookmark(true);
-                        else if (kDialogCodeRejected == ret)
-                        {
-                            delete tmprbuf;
-                            delete pginfo;
-                            return res;
-                        }
-                    }
+                    pos = (long long)((*++it).toLongLong() & 0xffffffffLL);
                 }
             }
             delete tmprbuf;
         }
+    }
+    else if (pginfo->isVideo)
+        pos = pginfo->GetBookmark(); 
+ 
+    if (pos > 0) 
+    { 
+        QString msg = QObject::tr("DVD/Video contains a bookmark"); 
+        QString btn0msg = QObject::tr("Play from bookmark"); 
+        QString btn1msg = QObject::tr("Play from beginning"); 
+ 
+        DialogCode ret = MythPopupBox::Show2ButtonPopup( 
+            gContext->GetMainWindow(), 
+            "", msg, 
+            btn0msg, 
+            btn1msg, 
+            kDialogCodeButton0); 
+        if (kDialogCodeButton1 == ret) 
+            pginfo->setIgnoreBookmark(true); 
+        else if (kDialogCodeRejected == ret) 
+        { 
+            delete pginfo;
+            return res;
+        } 
     }
 
     TV::StartTV(pginfo);
@@ -902,24 +911,38 @@ void getScreenShot(void)
 
 void InitJumpPoints(void)
 {
-    REG_JUMP("Reload Theme", "", "", reloadTheme_void);
-    REG_JUMP("Main Menu", "", "", gotoMainMenu);
-    REG_JUMPLOC("Program Guide", "", "", startGuide, "GUIDE");
-    REG_JUMPLOC("Program Finder", "", "", startFinder, "FINDER");
-    //REG_JUMP("Search Listings", "", "", startSearch);
-    REG_JUMPLOC("Manage Recordings / Fix Conflicts", "", "",
-                startManaged, "VIEWSCHEDULED");
-    REG_JUMP("Program Recording Priorities", "", "", startProgramRecPriorities);
-    REG_JUMP("Manage Recording Rules", "", "", startManageRecordingRules);
-    REG_JUMP("Channel Recording Priorities", "", "", startChannelRecPriorities);
-    REG_JUMP("TV Recording Playback", "", "", startPlayback);
-    REG_JUMP("TV Recording Deletion", "", "", startDelete);
-    REG_JUMP("Live TV", "", "", startTVNormal);
-    REG_JUMP("Live TV In Guide", "", "", startTVInGuide);
-    REG_JUMP("Status Screen", "", "", showStatus);
-    REG_JUMP("Previously Recorded", "", "", startPrevious);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Reload Theme"),
+         "", "", reloadTheme_void);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Main Menu"),
+         "", "", gotoMainMenu);
+     REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Program Guide"),
+         "", "", startGuide, "GUIDE");
+     REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Program Finder"),
+         "", "", startFinder, "FINDER");
+     //REG_JUMP("Search Listings", "", "", startSearch);
+     REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "Manage Recordings / "
+         "Fix Conflicts"), "", "", startManaged, "VIEWSCHEDULED");
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Program Recording "
+         "Priorities"), "", "", startProgramRecPriorities);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Manage Recording Rules"),
+         "", "", startManageRecordingRules);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Channel Recording "
+         "Priorities"), "", "", startChannelRecPriorities);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "TV Recording Playback"),
+         "", "", startPlayback);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "TV Recording Deletion"),
+         "", "", startDelete);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV"),
+         "", "", startTVNormal);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV In Guide"),
+         "", "", startTVInGuide);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Status Screen"),
+         "", "", showStatus);
+     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Previously Recorded"),
+         "", "", startPrevious);
 
-    REG_JUMPEX("ScreenShot","","",getScreenShot,false);
+     REG_JUMPEX(QT_TRANSLATE_NOOP("MythControls", "ScreenShot"),
+         "", "", getScreenShot, false);
 
     TV::InitKeys();
 
@@ -949,8 +972,8 @@ void signal_USR2_handler(int)
 
 int internal_media_init()
 {
-    REG_MEDIAPLAYER("Internal", "MythTV's native media player.",
-                    internal_play_media);
+    REG_MEDIAPLAYER("Internal", QT_TRANSLATE_NOOP("MythControls",
+        "MythTV's native media player."), internal_play_media);
     return 0;
 }
 
@@ -1156,7 +1179,7 @@ int main(int argc, char **argv)
 #ifdef Q_WS_MACX
     // Without this, we can't set focus to any of the CheckBoxSetting, and most
     // of the MythPushButton widgets, and they don't use the themed background.
-    QApplication::setDesktopSettingsAware(FALSE);
+    QApplication::setDesktopSettingsAware(false);
 #endif
     QApplication a(argc, argv);
 
@@ -1406,8 +1429,6 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythfrontend");
 
-    WriteDefaults();
-
     QString themename = gContext->GetSetting("Theme", "Terra");
     bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);
 
@@ -1440,6 +1461,8 @@ int main(int argc, char **argv)
                 "Couldn't upgrade database to new schema, exiting.");
         return FRONTEND_EXIT_DB_OUTOFDATE;
     }
+
+    WriteDefaults();
 
     InitJumpPoints();
 
@@ -1500,8 +1523,7 @@ int main(int argc, char **argv)
 
     if (!RunMenu(themedir, themename) && !resetTheme(themedir, themename))
     {
-        if (networkControl)
-            delete networkControl;
+        delete networkControl;
         return FRONTEND_EXIT_NO_THEME;
     }
 
@@ -1525,8 +1547,7 @@ int main(int argc, char **argv)
         pthread_join(priv_thread, NULL);
     }
 
-    if (networkControl)
-        delete networkControl;
+    delete networkControl;
 
     DestroyMythMainWindow();
 

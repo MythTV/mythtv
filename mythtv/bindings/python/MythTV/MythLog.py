@@ -12,7 +12,7 @@ WARNING = logging.WARNING
 INFO = logging.INFO
 DEBUG = logging.DEBUG
 
-class MythLog:
+class MythLog(object):
 	"""
 	A simple logging class
 	"""
@@ -26,7 +26,7 @@ class MythLog:
 	def Msg(self, level, msg, *args, **kwargs):
 		self.log.log(level, msg, *args, **kwargs)
 
-class MythError:
+class MythError(Exception):
 	"""
 	A simple exception class
 	"""

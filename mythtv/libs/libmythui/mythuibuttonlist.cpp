@@ -1,3 +1,6 @@
+
+#include "mythuibuttonlist.h"
+
 #include <math.h>
 
 // QT headers
@@ -7,7 +10,6 @@
 #include "mythverbose.h"
 
 // mythui headers
-#include "mythuibuttonlist.h"
 #include "mythuigroup.h"
 #include "mythmainwindow.h"
 #include "mythuistatetype.h"
@@ -483,7 +485,7 @@ int MythUIButtonList::GetItemPos(MythUIButtonListItem* item) const
     return m_itemList.indexOf(item);
 }
 
-bool MythUIButtonList::MoveUp(MovementUnit unit)
+bool MythUIButtonList::MoveUp(MovementUnit unit, uint amount)
 {
     int pos = m_selPosition;
     if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
@@ -510,7 +512,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
         case MoveRow:
             if ((pos - m_columns) >= 0)
             {
-                for (int i = 0; i < m_columns; i++)
+                for (int i = 0; i < m_columns; ++i)
                 {
                     --m_selPosition;
                 }
@@ -538,6 +540,15 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
         case MoveMax:
             m_selPosition = 0;
             break;
+        case MoveByAmount:
+            for (uint i = 0; i < amount; ++i)
+            {
+                if (m_selPosition > 0)
+                    --m_selPosition;
+                else if (m_wrapStyle > WrapNone)
+                    m_selPosition = m_itemList.size() - 1;
+            }
+            break;
     }
 
     SanitizePosition();
@@ -553,7 +564,7 @@ bool MythUIButtonList::MoveUp(MovementUnit unit)
     return true;
 }
 
-bool MythUIButtonList::MoveDown(MovementUnit unit)
+bool MythUIButtonList::MoveDown(MovementUnit unit, uint amount)
 {
     int pos = m_selPosition;
     if (pos == -1 || m_itemList.isEmpty() || !m_initialized)
@@ -598,6 +609,15 @@ bool MythUIButtonList::MoveDown(MovementUnit unit)
             break;
         case MoveMax:
             m_selPosition = m_itemCount - 1;
+            break;
+        case MoveByAmount:
+            for (uint i = 0; i < amount; ++i)
+            {
+                if (m_selPosition < m_itemList.size() - 1)
+                    ++m_selPosition;
+                else if (m_wrapStyle > WrapNone)
+                    m_selPosition = 0;
+            }
             break;
     }
 
@@ -873,7 +893,7 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-/** \brief Mouse click/movement handler, recieves mouse gesture events from the
+/** \brief Mouse click/movement handler, receives mouse gesture events from the
  *         QApplication event loop. Should not be used directly.
  *
  *  \param uitype The mythuitype receiving the event
@@ -883,8 +903,9 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
-        QPoint position = event->GetPosition();
-
+        // We want the relative position of the click
+        QPoint position = event->GetPosition() - m_Parent->GetArea().topLeft();
+        
         MythUIType *type = uitype->GetChildAt(position,false,false);
 
         if (!type)
@@ -1083,7 +1104,7 @@ void MythUIButtonList::Finalize(void)
 void MythUIButtonList::SetLCDTitles(const QString &title, const QString &columnList)
 {
     m_lcdTitle = title;
-    m_lcdColumns = columnList.split("|");
+    m_lcdColumns = columnList.split('|');
 }
 
 void MythUIButtonList::updateLCD(void)
@@ -1154,7 +1175,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
                                       bool showArrow)
 {
     if (!lbtype)
-        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existant list!");
+        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existent list!");
 
     m_parent    = lbtype;
     m_text      = text;
@@ -1177,7 +1198,7 @@ MythUIButtonListItem::MythUIButtonListItem(MythUIButtonList* lbtype,
                                        QVariant data)
 {
     if (!lbtype)
-        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existant list!");
+        VERBOSE(VB_IMPORTANT, "Cannot add a button to a non-existent list!");
 
     m_parent    = lbtype;
     m_text      = text;
@@ -1341,7 +1362,7 @@ QString MythUIButtonListItem::GetImage(const QString &name) const
     if (it != m_imageFilenames.end())
         return *it;
 
-    return QString::null;
+    return QString();
 }
 
 void MythUIButtonListItem::DisplayState(const QString &state,
@@ -1546,7 +1567,10 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         statetype = dynamic_cast<MythUIStateType *>
                                     (buttonstate->GetChild(state_it.key()));
         if (statetype)
-            statetype->DisplayState(state_it.value());
+        {
+            if (!statetype->DisplayState(state_it.value()))
+                statetype->Reset();
+        }
         ++state_it;
     }
 }

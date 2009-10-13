@@ -1,4 +1,7 @@
 
+#include "playbackbox.h"
+
+// QT
 #include <QDateTime>
 #include <QDir>
 #include <QApplication>
@@ -8,26 +11,28 @@
 #include <QMap>
 #include <QWaitCondition>
 
-#include "playbackbox.h"
-#include "playbackboxlistitem.h"
-#include "proglist.h"
-#include "tv.h"
+// libmythdb
 #include "oldsettings.h"
-#include "NuppelVideoPlayer.h"
-
-#include "mythdirs.h"
-#include "mythcontext.h"
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
+#include "mythdirs.h"
+
+// libmythtv
+#include "tv.h"
+#include "NuppelVideoPlayer.h"
 #include "recordinginfo.h"
-#include "remoteutil.h"
 #include "tvremoteutil.h"
 #include "previewgenerator.h"
 #include "playgroup.h"
-#include "customedit.h"
-#include "util.h"
 
+// libmyth
+#include "mythcontext.h"
+#include "remoteutil.h"
+#include "util.h"
+#include "storagegroup.h"
+
+// libmythui
 #include "mythuihelper.h"
 #include "mythuitext.h"
 #include "mythuibutton.h"
@@ -38,6 +43,11 @@
 #include "mythuiimage.h"
 #include "mythuicheckbox.h"
 #include "mythuiprogressbar.h"
+
+//  Mythfrontend
+#include "playbackboxlistitem.h"
+#include "proglist.h"
+#include "customedit.h"
 
 #define LOC QString("PlaybackBox: ")
 #define LOC_ERR QString("PlaybackBox Error: ")
@@ -206,7 +216,7 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
         //
         // Deal with QMap sorting. Positive recpriority values have a
         // '+' prefix (QMap alphabetically sorts before '-'). Positive
-        // recpriority values are "inverted" by substracting them from
+        // recpriority values are "inverted" by subtracting them from
         // 1000, so that high recpriorities are sorted first (QMap
         // alphabetically). For example:
         //
@@ -226,7 +236,7 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
         else
             sortprefix.sprintf("-%03u", -recpriority);
 
-        sTitle = sortprefix + "-" + sTitle;
+        sTitle = sortprefix + '-' + sTitle;
     }
     return sTitle;
 }
@@ -254,6 +264,9 @@ ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
                             TV *player, bool showTV)
     : ScheduleCommon(parent, name),
+      // Artwork Variables
+      m_fanartTimer(new QTimer(this)),    m_bannerTimer(new QTimer(this)),
+      m_coverartTimer(new QTimer(this)),
       // Settings
       m_type(ltype),
       m_formatShortDate("M/d"),           m_formatLongDate("ddd MMMM d"),
@@ -349,6 +362,9 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
             m_recGroup = tmp;
     }
 
+    // Clear SG Map
+    RemoteClearSGMap();
+
     // recording group stuff
     m_recGroupIdx = -1;
     m_recGroupType.clear();
@@ -371,24 +387,39 @@ PlaybackBox::~PlaybackBox(void)
 {
     gContext->removeListener(this);
 
+    if (m_fanartTimer)
+    {
+        m_fanartTimer->disconnect(this);
+        m_fanartTimer = NULL;
+    }
+
+    if (m_bannerTimer)
+    {
+        m_bannerTimer->disconnect(this);
+        m_bannerTimer = NULL;
+    }
+
+    if (m_coverartTimer)
+    {
+        m_coverartTimer->disconnect(this);
+        m_coverartTimer = NULL;
+    }
+
     if (m_fillListTimer)
     {
         m_fillListTimer->disconnect(this);
-        m_fillListTimer->deleteLater();
         m_fillListTimer = NULL;
     }
 
     if (m_freeSpaceTimer)
     {
         m_freeSpaceTimer->disconnect(this);
-        m_freeSpaceTimer->deleteLater();
         m_freeSpaceTimer = NULL;
     }
 
     clearProgramCache();
 
-    if (m_currentItem)
-        delete m_currentItem;
+    delete m_currentItem;
 
     // disconnect preview generators
     QMutexLocker locker(&m_previewGeneratorLock);
@@ -443,12 +474,15 @@ bool PlaybackBox::Create()
 
         if ((m_titleList.size() <= 1) && (m_progsInDB > 0))
         {
-            m_recGroup = "";
+            m_recGroup.clear();
             showGroupFilter();
         }
     }
 
     // connect up timers...
+    connect(m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
+    connect(m_bannerTimer, SIGNAL(timeout()), SLOT(bannerLoad()));
+    connect(m_coverartTimer, SIGNAL(timeout()), SLOT(coverartLoad()));
     connect(m_freeSpaceTimer, SIGNAL(timeout()), SLOT(setUpdateFreeSpace()));
     connect(m_fillListTimer, SIGNAL(timeout()), SLOT(listChanged()));
 
@@ -513,6 +547,9 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         infoMap["title"] = m_groupDisplayName;
         infoMap["group"] = m_groupDisplayName;
         infoMap["show"]  = ProgramInfo::i18n("All Programs");
+
+        if (m_fanart)
+            m_fanart->Reset();
     }
     else
     {
@@ -521,6 +558,26 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
                                              .arg(grouplabel);
         infoMap["group"] = m_groupDisplayName;
         infoMap["show"]  = grouplabel;
+
+        if (m_fanart)
+        {
+            static int itemsPast = 0;
+            QString artworkHost;
+            if (gContext->GetNumSetting("MasterBackendOverride", 0))
+                artworkHost = gContext->GetMasterHostName();
+            else
+                artworkHost = (*(m_progLists[groupname].begin()))->hostname;
+
+            QString artworkTitle = groupname;
+            QString artworkSeriesID;
+            QString artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
+                                                  "fanart", artworkHost);
+            if (loadArtwork(artworkFile, m_fanart, m_fanartTimer, 300,
+                            itemsPast > 2))
+                itemsPast++;
+            else
+                itemsPast = 0;
+        }
     }
 
     if (countInGroup > 1)
@@ -551,16 +608,13 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         jobState->Reset();
 
     if (m_previewImage)
-        m_previewImage->SetVisible(false);
-
-    if (m_fanart)
-        m_fanart->SetVisible(false);
+        m_previewImage->Reset();
 
     if (m_banner)
-        m_banner->SetVisible(false);
+        m_banner->Reset();
 
     if (m_coverart)
-        m_coverart->SetVisible(false);
+        m_coverart->Reset();
 
     updateIcons();
 }
@@ -592,11 +646,11 @@ void PlaybackBox::UpdateProgramInfo(
     QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
 
     item->DisplayState(rating, "ratingstate");
-
+    
     QString oldimgfile = item->GetImage("preview");
-    QString imagefile = QString::null;
+    QString imagefile;
     if (oldimgfile.isEmpty() || force_preview_reload)
-        imagefile = getPreviewImage(pginfo);
+        imagefile = GetPreviewImage(pginfo);
 
     if (!imagefile.isEmpty())
         item->SetImage(imagefile, "preview", force_preview_reload);
@@ -623,51 +677,48 @@ void PlaybackBox::UpdateProgramInfo(
         if (m_previewImage)
         {
             imagefile = (imagefile.isEmpty()) ? oldimgfile : imagefile;
-            m_previewImage->SetVisible(!imagefile.isEmpty());
             m_previewImage->SetFilename(imagefile);
             m_previewImage->Load();
         }
 
-        if (m_fanart)
+        if (m_fanart || m_banner || m_coverart)
         {
-            QString fanartDir = gContext->GetSetting("mythvideo.fanartDir");
-            QString fanartTitle = pginfo->title;
-            QString fanartSeriesID = pginfo->seriesid;
-            QString fanartFile = testImageFiles(fanartDir,
-                                                fanartSeriesID,
-                                                fanartTitle,
-                                                "fanart");
-            m_fanart->SetVisible(!fanartFile.isEmpty());
-            m_fanart->SetFilename(fanartFile);
-            m_fanart->Load();
-        }
+            QString artworkHost;
+            QString artworkDir;
+            QString artworkFile;
+            QString artworkTitle = pginfo->title;
+            QString artworkSeriesID = pginfo->seriesid;
 
-        if (m_banner)
-        {
-            QString bannerDir = gContext->GetSetting("mythvideo.bannerDir");
-            QString bannerTitle = pginfo->title;
-            QString bannerSeriesID = pginfo->seriesid;
-            QString bannerFile = testImageFiles(bannerDir,
-                                                bannerSeriesID,
-                                                bannerTitle,
-                                                "banner");
-            m_banner->SetVisible(!bannerFile.isEmpty());
-            m_banner->SetFilename(bannerFile);
-            m_banner->Load();
-        }
+            if (gContext->GetNumSetting("MasterBackendOverride", 0))
+                artworkHost = gContext->GetMasterHostName();
+            else
+                artworkHost = pginfo->hostname;
 
-        if (m_coverart)
-        {
-            QString coverDir = gContext->GetSetting("VideoArtworkDir");
-            QString coverTitle = pginfo->title;
-            QString coverSeriesID = pginfo->seriesid;
-            QString coverFile = testImageFiles(coverDir,
-                                               coverSeriesID,
-                                               coverTitle,
-                                               "coverart");
-            m_coverart->SetVisible(!coverFile.isEmpty());
-            m_coverart->SetFilename(coverFile);
-            m_coverart->Load();
+            if (m_fanart)
+            {
+                static int itemsPast = 0;
+                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
+                                              "fanart", artworkHost);
+                if (loadArtwork(artworkFile, m_fanart, m_fanartTimer, 300,
+                                itemsPast > 2))
+                    itemsPast++;
+                else
+                    itemsPast = 0;
+            }
+
+            if (m_banner)
+            {
+                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
+                                              "banner", artworkHost);
+                loadArtwork(artworkFile, m_banner, m_bannerTimer, 50);
+            }
+
+            if (m_coverart)
+            {
+                artworkFile = findArtworkFile(artworkSeriesID, artworkTitle,
+                                              "coverart", artworkHost);
+                loadArtwork(artworkFile, m_coverart, m_coverartTimer, 50);
+            }
         }
 
         updateIcons(pginfo);
@@ -694,12 +745,22 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconMap["watched"]     = FL_WATCHED;
     iconMap["preserved"]   = FL_PRESERVED;
 
-    MythUIImage *iconImage;
+    MythUIImage *iconImage = NULL;
+    MythUIStateType *iconState = NULL;
     for (it = iconMap.begin(); it != iconMap.end(); ++it)
     {
         iconImage = dynamic_cast<MythUIImage *>(GetChild(it.key()));
         if (iconImage)
             iconImage->SetVisible(flags & (*it));
+
+        iconState = dynamic_cast<MythUIStateType *>(GetChild(it.key()));
+        if (iconState)
+        {
+            if (flags & (*it))
+                iconState->DisplayState("yes");
+            else
+                iconState->DisplayState("no");
+        }
     }
 
     iconMap.clear();
@@ -708,8 +769,8 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconMap["stereo"] = AUD_STEREO;
     iconMap["mono"] = AUD_MONO;
 
-    MythUIStateType *iconState;
     iconState = dynamic_cast<MythUIStateType *>(GetChild("audioprops"));
+    bool haveIcon = false;
     if (pginfo && iconState)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
@@ -717,13 +778,16 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo->audioproperties & (*it))
             {
                 if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
                     break;
+                }
             }
         }
     }
 
-    if (iconState && (!pginfo || it == iconMap.end()))
-        iconState->DisplayState("default");
+    if (iconState && !haveIcon)
+        iconState->Reset();
 
     iconMap.clear();
     iconMap["hd1080"] = VID_1080;
@@ -733,6 +797,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     //iconMap["avchd"] = VID_AVC;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("videoprops"));
+    haveIcon = false;
     if (pginfo && iconState)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
@@ -740,13 +805,16 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo->videoproperties & (*it))
             {
                 if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
                     break;
+                }
             }
         }
     }
 
-    if (iconState && (!pginfo || it == iconMap.end()))
-        iconState->DisplayState("default");
+    if (iconState && !haveIcon)
+        iconState->Reset();
 
     iconMap.clear();
     iconMap["deafsigned"] = SUB_SIGNED;
@@ -755,6 +823,7 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
     iconMap["cc"] = SUB_HARDHEAR;
 
     iconState = dynamic_cast<MythUIStateType *>(GetChild("subtitletypes"));
+    haveIcon = false;
     if (pginfo && iconState)
     {
         for (it = iconMap.begin(); it != iconMap.end(); ++it)
@@ -762,26 +831,38 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
             if (pginfo->subtitleType & (*it))
             {
                 if (iconState->DisplayState(it.key()))
+                {
+                    haveIcon = true;
                     break;
+                }
             }
         }
     }
 
-    if (iconState && (!pginfo || it == iconMap.end()))
-        iconState->DisplayState("default");
+    if (iconState && !haveIcon)
+        iconState->Reset();
 }
 
 void PlaybackBox::updateUsage()
 {
-    vector<FileSystemInfo> fsInfos;
-    if (m_freeSpaceNeedsUpdate && m_connected)
+    MythUIText        *freereportText = dynamic_cast<MythUIText *>
+                                        (GetChild("freereport"));
+    MythUIProgressBar *usedProgress   = dynamic_cast<MythUIProgressBar *>
+                                        (GetChild("usedbar"));
+
+    // If the theme doesn't have these widgets,
+    // don't waste time querying the backend...
+    if (!freereportText && !usedProgress)
+        return;
+
+    if (m_freeSpaceNeedsUpdate || m_connected)
     {
         m_freeSpaceNeedsUpdate = false;
         m_freeSpaceTotal = 0;
         m_freeSpaceUsed = 0;
 
-        fsInfos = RemoteGetFreeSpace();
-        for (unsigned int i = 0; i < fsInfos.size(); i++)
+        vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
+        for (unsigned int i = 0; i < fsInfos.size(); ++i)
         {
             if (fsInfos[i].directory == "TotalDiskSpace")
             {
@@ -806,17 +887,13 @@ void PlaybackBox::updateUsage()
     QString rep = tr(", %1 GB free").arg(size);
     usestr = usestr + rep;
 
-    MythUIText *m_freeSpaceText = dynamic_cast<MythUIText *>
-                                                    (GetChild("freereport"));
-    if (m_freeSpaceText)
-        m_freeSpaceText->SetText(usestr);
+    if (freereportText)
+        freereportText->SetText(usestr);
 
-    MythUIProgressBar *m_freeSpaceProgress = dynamic_cast<MythUIProgressBar *>
-                                                        (GetChild("usedbar"));
-    if (m_freeSpaceProgress)
+    if (usedProgress)
     {
-        m_freeSpaceProgress->SetUsed(m_freeSpaceUsed);
-        m_freeSpaceProgress->SetTotal(m_freeSpaceTotal);
+        usedProgress->SetTotal(m_freeSpaceTotal);
+        usedProgress->SetUsed(m_freeSpaceUsed);
     }
 }
 
@@ -832,7 +909,7 @@ void PlaybackBox::updateGroupList()
 
         bool foundGroup = false;
         QStringList::iterator it;
-        for (it = m_titleList.begin(); it != m_titleList.end(); it++)
+        for (it = m_titleList.begin(); it != m_titleList.end(); ++it)
         {
             groupname = (*it).simplified();
 
@@ -890,7 +967,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     m_recordingList->Reset();
 
     if (groupname == "default")
-        groupname = "";
+        groupname.clear();
 
     ProgramMap::iterator pmit = m_progLists.find(groupname);
     if (pmit == m_progLists.end())
@@ -898,11 +975,32 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     ProgramList &progList = *pmit;
 
-    static const char *disp_flags[] = { "playlist", "watched", };
+    static const char *disp_flags[] = { "playlist", "watched", "preserve",
+                                        "cutlist", "autoexpire", "editing",
+                                        "bookmark", "inuse", "commflagged",
+                                        "transcoded" };
     bool disp_flag_stat[sizeof(disp_flags)/sizeof(char*)];
 
+    QMap<AudioProps, QString> audioFlags;
+    audioFlags[AUD_DOLBY] = "dolby";
+    audioFlags[AUD_SURROUND] = "surround";
+    audioFlags[AUD_STEREO] = "stereo";
+    audioFlags[AUD_MONO] = "mono";
+
+    QMap<VideoProps, QString> videoFlags;
+    videoFlags[VID_1080] = "hd1080";
+    videoFlags[VID_720] = "hd720";
+    videoFlags[VID_HDTV] = "hdtv";
+    videoFlags[VID_WIDESCREEN] = "widescreen";
+
+    QMap<SubtitleTypes, QString> subtitleFlags;
+    subtitleFlags[SUB_SIGNED] = "deafsigned";
+    subtitleFlags[SUB_ONSCREEN] = "onscreensub";
+    subtitleFlags[SUB_NORMAL] = "subtitles";
+    subtitleFlags[SUB_HARDHEAR] = "cc";
+    
     ProgramList::iterator it = progList.begin();
-    for (; it != progList.end(); it++)
+    for (; it != progList.end(); ++it)
     {
         MythUIButtonListItem *item =
             new PlaybackBoxListItem(this, m_recordingList, *it);
@@ -927,8 +1025,9 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         QString tempShortDate = ((*it)->recstartts).toString(m_formatShortDate);
         QString tempLongDate  = ((*it)->recstartts).toString(m_formatLongDate);
 
-        QString state = ((*it)->recstatus == rsRecording) ?
-            QString("running") : QString::null;
+        QString state;
+        if ((*it)->recstatus == rsRecording)
+            state = "running";
 
         if ((((*it)->recstatus != rsRecording) &&
              ((*it)->availableStatus != asAvailable) &&
@@ -954,9 +1053,38 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
         disp_flag_stat[0] = !m_playList.filter((*it)->MakeUniqueKey()).empty();
         disp_flag_stat[1] = (*it)->programflags & FL_WATCHED;
-
-        for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); i++)
+        disp_flag_stat[2] = (*it)->programflags & FL_PRESERVED;
+        disp_flag_stat[3] = (*it)->programflags & FL_CUTLIST;
+        disp_flag_stat[4] = (*it)->programflags & FL_AUTOEXP;
+        disp_flag_stat[5] = (*it)->programflags & FL_EDITING;
+        disp_flag_stat[6] = (*it)->programflags & FL_BOOKMARK;
+        disp_flag_stat[7] = (*it)->programflags & FL_INUSEPLAYING;
+        disp_flag_stat[8] = (*it)->programflags & FL_COMMFLAG;
+        disp_flag_stat[9] = (*it)->programflags & FL_TRANSCODED;
+        
+        for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
             item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
+        
+        QMap<AudioProps, QString>::iterator ait;
+        for (ait = audioFlags.begin(); ait != audioFlags.end(); ++ait)
+        {
+            if ((*it)->audioproperties & ait.key())
+                item->DisplayState(ait.value(), "audioprops");
+        }
+
+        QMap<VideoProps, QString>::iterator vit;
+        for (vit = videoFlags.begin(); vit != videoFlags.end(); ++vit)
+        {
+            if ((*it)->videoproperties & vit.key())
+                item->DisplayState(vit.value(), "videoprops");
+        }
+          
+        QMap<SubtitleTypes, QString>::iterator sit;
+        for (sit = subtitleFlags.begin(); sit != subtitleFlags.end(); ++sit)
+        {
+            if ((*it)->subtitleType & sit.key())
+                item->DisplayState(sit.value(), "subtitletypes");
+        }
 
         if (m_currentItem &&
             (m_currentItem->chanid     == (*it)->chanid) &&
@@ -1044,7 +1172,6 @@ bool PlaybackBox::FillList(bool useCachedData)
     QMap<QString, QString> sortedList;
     QMap<int, QString> searchRule;
     QMap<int, int> recidEpisodes;
-    QString sTitle;
 
     m_progCacheLock.lock();
     if (!useCachedData || !m_progCache || m_progCache->empty())
@@ -1065,12 +1192,14 @@ bool PlaybackBox::FillList(bool useCachedData)
                 i = m_progCache->erase(i);
             }
             else
-                i++;
+                ++i;
         }
     }
 
     if (m_progCache)
     {
+        QString sTitle;
+
         if ((m_viewMask & VIEW_SEARCHES))
         {
             MSqlQuery query(MSqlQuery::InitCon());
@@ -1090,7 +1219,7 @@ bool PlaybackBox::FillList(bool useCachedData)
         }
 
         vector<ProgramInfo *>::iterator i = m_progCache->begin();
-        for ( ; i != m_progCache->end(); i++)
+        for ( ; i != m_progCache->end(); ++i)
         {
             m_progsInDB++;
             p = *i;
@@ -1464,7 +1593,6 @@ bool PlaybackBox::FillList(bool useCachedData)
     if (m_progCache)
     {
         QMutexLocker locker(&m_recGroupsLock);
-        QString name;
 
         m_recGroups.clear();
         m_recGroupIdx = -1;
@@ -1477,6 +1605,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                       "deletepending = 0 ORDER BY recgroup");
         if (query.exec())
         {
+            QString name;
             while (query.next())
             {
                 name = query.value(0).toString();
@@ -1614,12 +1743,7 @@ void PlaybackBox::upcoming()
         return;
     }
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, pginfo->title, "");
-    if (pl->Create())
-        mainStack->AddScreen(pl);
-    else
-        delete pl;
+    ShowUpcoming(pginfo);
 }
 
 ProgramInfo *PlaybackBox::CurrentItem(void)
@@ -1651,17 +1775,8 @@ void PlaybackBox::customEdit()
         showAvailablePopup(pginfo);
         return;
     }
-    ProgramInfo *pi = pginfo;
 
-    if (!pi)
-        return;
-
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pi);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-    else
-        delete ce;
+    EditCustom(pginfo);
 }
 
 void PlaybackBox::details()
@@ -1880,10 +1995,87 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
     return result;
 }
 
-QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
-                                    QString &titleIn, QString imagetype)
+void PlaybackBox::fanartLoad(void)
 {
+    m_fanart->Load();
+}
+
+void PlaybackBox::bannerLoad(void)
+{
+    m_banner->Load();
+}
+
+void PlaybackBox::coverartLoad(void)
+{
+    m_coverart->Load();
+}
+
+bool PlaybackBox::loadArtwork(QString artworkFile, MythUIImage *image, QTimer *timer,
+                              int delay, bool resetImage)
+{
+    bool wasActive = timer->isActive();
+
+    if (artworkFile.isEmpty())
+    {
+        if (wasActive)
+            timer->stop();
+
+        image->Reset();
+
+        return true;
+    }
+    else
+    {
+        if (artworkFile != image->GetFilename())
+        {
+            if (wasActive)
+                timer->stop();
+
+            if (resetImage)
+                image->Reset();
+
+            image->SetFilename(artworkFile);
+
+            timer->setSingleShot(true);
+            timer->start(delay);
+
+            return wasActive;
+        }
+    }
+
+    return false;
+}
+
+QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
+                                     QString imagetype, QString host)
+{
+    static QHash <QString, QString>imageFileCache;
+
+    QString cacheKey = QString("%1:%2:%3").arg(imagetype).arg(seriesID)
+                               .arg(titleIn);
+
+    if (imageFileCache.contains(cacheKey))
+        return imageFileCache[cacheKey];
+
     QString foundFile;
+    QString sgroup;
+    QString localDir;
+
+    if (imagetype == "fanart")
+    {
+        sgroup = "Fanart";
+        localDir = gContext->GetSetting("mythvideo.fanartDir");
+    }
+    else if (imagetype == "banner")
+    {
+        sgroup = "Banners";
+        localDir = gContext->GetSetting("mythvideo.bannerDir");
+    }
+    else if (imagetype == "coverart")
+    {
+        sgroup = "Coverart";
+        localDir = gContext->GetSetting("VideoArtworkDir");
+    }
 
     // Attempts to match image file in specified directory.
     // Falls back like this:
@@ -1910,21 +2102,24 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
     //     or SeriesID.ext or Title.ext (without caring about cases,
     //     spaces, dashes, periods, or underscores)
 
-    QDir dir(testDirectory);
+    QDir dir(localDir);
     dir.setSorting(QDir::Name | QDir::Reversed | QDir::IgnoreCase);
 
     QStringList entries = dir.entryList();
+    QStringList sgEntries;
+
+    RemoteGetFileList(host, "", &sgEntries, sgroup, true); 
 
     int regIndex = 0;
-    titleIn.replace(" ", "(?:\\s|-|_|\\.)?");
+    titleIn.replace(' ', "(?:\\s|-|_|\\.)?");
     QString regs[] = {
         QString("%1" // title
             "(?:\\s|-|_|\\.)?" // optional separator
             "(?:" // begin optional Season portion
             "S(?:eason)?" // optional "S" or "Season"
             "(?:\\s|-|_|\\.)?" // optional separator
-            ")?" // end optional Season portion
             "[0-9]{1,3}" // number
+            ")?" // end optional Season portion
             "(?:" // begin optional Episode portion
             "(?:\\s|-|_|\\.)?" // optional separator
             "(?:x?" // optional "x"
@@ -1937,7 +2132,6 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
             "\\.(?:png|gif|jpg)" // file extension
             ).arg(titleIn).arg(imagetype),
         QString("%1\\.(?:png|jpg|gif)").arg(seriesID),
-        QString("%1\\.(?:png|jpg|gif)").arg(titleIn),
         "" };  // This blank entry must exist, do not remove.
 
     QString reg = regs[regIndex];
@@ -1953,11 +2147,27 @@ QString PlaybackBox::testImageFiles(QString &testDirectory, QString &seriesID,
                 break;
             }
         }
+        for (QStringList::const_iterator it = sgEntries.begin();
+            it != sgEntries.end(); ++it)
+        {
+            if (re.exactMatch(*it))
+            {
+                foundFile = RemoteGenFileURL(sgroup, host, *it);
+                break;
+            }
+        }
         reg = regs[++regIndex];
     }
 
     if (!foundFile.isEmpty())
-        return QString("%1/%2").arg(testDirectory).arg(foundFile);
+    {
+        if (foundFile.startsWith("myth://"))
+            imageFileCache[cacheKey] = foundFile;
+        else
+            imageFileCache[cacheKey] = QString("%1/%2").arg(localDir)
+                                               .arg(foundFile);
+        return imageFileCache[cacheKey];
+    }
     else
         return QString();
 }
@@ -2261,10 +2471,10 @@ void PlaybackBox::showPlaylistJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc1");
 
         if (!isRunningUserJob1)
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                              SLOT(doPlaylistBeginUserJob1()));
         else
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                              SLOT(stopPlaylistUserJob1()));
     }
 
@@ -2274,10 +2484,10 @@ void PlaybackBox::showPlaylistJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc2");
 
         if (!isRunningUserJob2)
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                              SLOT(doPlaylistBeginUserJob2()));
         else
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                              SLOT(stopPlaylistUserJob2()));
     }
 
@@ -2287,10 +2497,10 @@ void PlaybackBox::showPlaylistJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc3");
 
         if (!isRunningUserJob3)
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                              SLOT(doPlaylistBeginUserJob3()));
         else
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                              SLOT(stopPlaylistUserJob3()));
     }
 
@@ -2362,14 +2572,8 @@ MythDialogBox *PlaybackBox::createPlaylistPopupMenu()
     if (m_popupMenu)
         return NULL;
 
-    QString label;
-    if (m_playList.size() > 1)
-        label = tr("There are %1 items in the playlist.").arg(m_playList.size());
-    else
-        label = tr("There is %1 item in the playlist.").arg(m_playList.size());
-
-    label.append(" ");
-    label.append(tr("Actions affect all items in the playlist"));
+    QString label = tr("There is %n item(s) in the playlist. Actions affect "
+                       "all items in the playlist", "", m_playList.size());
 
     return createPopupMenu(label);
 }
@@ -2478,10 +2682,10 @@ void PlaybackBox::showJobPopup()
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1, pginfo->chanid,
                                    pginfo->recstartts))
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob1()));
         else
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob1()));
     }
 
@@ -2492,10 +2696,10 @@ void PlaybackBox::showJobPopup()
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2, pginfo->chanid,
                                    pginfo->recstartts))
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob2()));
         else
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob2()));
     }
 
@@ -2506,10 +2710,10 @@ void PlaybackBox::showJobPopup()
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3, pginfo->chanid,
                                    pginfo->recstartts))
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob3()));
         else
-            m_popupMenu->AddButton(tr("Begin") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob3()));
     }
 
@@ -2520,10 +2724,10 @@ void PlaybackBox::showJobPopup()
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4, pginfo->chanid,
                                    pginfo->recstartts))
-            m_popupMenu->AddButton(tr("Stop") + " " + jobTitle,
+            m_popupMenu->AddButton(tr("Stop") + ' ' + jobTitle,
                                     SLOT(doBeginUserJob4()));
         else
-            m_popupMenu->AddButton(tr("Begin") + " "  + jobTitle,
+            m_popupMenu->AddButton(tr("Begin") + ' '  + jobTitle,
                                     SLOT(doBeginUserJob4()));
     }
 }
@@ -2662,7 +2866,21 @@ void PlaybackBox::popupString(ProgramInfo *program, QString &message)
 
     QString title = program->title;
 
-    message = QString("%1\n%2\n%3").arg(message).arg(title).arg(timedate);
+    QString extra;
+
+    if (!program->subtitle.isEmpty())
+    {
+        extra = program->subtitle;
+        extra = (title.length() + extra.length() + 2 <= message.length()) ?
+            QString(" -- ") + extra : QString('\n') + extra;
+
+        int maxll = max(max(message.length(),title.length()), 20);
+        if (extra.length() > maxll)
+            extra = extra.left(maxll - 3) + "...";
+    }
+
+    message = QString("%1\n%2%3\n%4")
+        .arg(message).arg(title).arg(extra).arg(timedate);
 }
 
 void PlaybackBox::doClearPlaylist(void)
@@ -2936,7 +3154,7 @@ ProgramInfo *PlaybackBox::findMatchingProg(const QString &key)
     if ((key.isEmpty()) || (key.indexOf('_') < 0))
         return NULL;
 
-    keyParts = key.split("_");
+    keyParts = key.split('_');
 
     // ProgramInfo::MakeUniqueKey() has 2 parts separated by '_' characters
     if (keyParts.size() == 2)
@@ -3018,11 +3236,16 @@ void PlaybackBox::toggleAutoExpire()
         pginfo->SetAutoExpire(on, true);
 
         if (on)
+        {
             pginfo->programflags |= FL_AUTOEXP;
+            item->DisplayState("yes", "autoexpire");
+        }
         else
+        {
             pginfo->programflags &= ~FL_AUTOEXP;
+            item->DisplayState("no", "autoexpire");
+        }
 
-        item->DisplayState("off", "expiry");
         updateIcons(pginfo);
     }
 }
@@ -3045,11 +3268,16 @@ void PlaybackBox::togglePreserveEpisode()
         pginfo->SetPreserveEpisode(on);
 
         if (on)
+        {
             pginfo->programflags |= FL_PRESERVED;
+            item->DisplayState("yes", "preserve");
+        }
         else
+        {
             pginfo->programflags &= ~FL_PRESERVED;
+            item->DisplayState("no", "preserve");
+        }
 
-        item->DisplayState("on", "preserve");
         updateIcons(pginfo);
     }
 }
@@ -3245,7 +3473,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
     QStringList actions;
     handled = GetMythMainWindow()->TranslateKeyPress("TV Frontend", event, actions);
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;
@@ -3369,7 +3597,7 @@ void PlaybackBox::customEvent(QEvent *event)
                     return;
                 }
                 vector<ProgramInfo *>::iterator i = m_progCache->begin();
-                for ( ; i != m_progCache->end(); i++)
+                for ( ; i != m_progCache->end(); ++i)
                 {
                    if (((*i)->chanid == tokens[2]) &&
                        ((*i)->recstartts.toString(Qt::ISODate) == tokens[3]))
@@ -3444,25 +3672,6 @@ bool PlaybackBox::fileExists(ProgramInfo *pginfo)
     if (pginfo)
        return pginfo->PathnameExists();
     return false;
-}
-
-QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
-{
-    QDateTime datetime;
-    QString filename = pginfo->pathname + ".png";
-
-    if (filename.left(7) != "myth://")
-    {
-        QFileInfo retfinfo(filename);
-        if (retfinfo.exists())
-            datetime = retfinfo.lastModified();
-    }
-    else
-    {
-        datetime = RemoteGetPreviewLastModified(pginfo);
-    }
-
-    return datetime;
 }
 
 void PlaybackBox::IncPreviewGeneratorPriority(const QString &xfn)
@@ -3626,41 +3835,83 @@ void PlaybackBox::HandlePreviewEvent(const ProgramInfo &evinfo)
     UpdateProgramInfo(item, item == sel_item, true);
 }
 
-bool check_lastmod(LastCheckedMap &elapsedtime, const QString &filename)
+QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
 {
-    LastCheckedMap::iterator it = elapsedtime.find(filename);
-
-    if (it != elapsedtime.end() && ((*it).elapsed() < 300))
-        return false;
-
-    elapsedtime[filename].restart();
-    return true;
-}
-
-QString PlaybackBox::getPreviewImage(ProgramInfo *pginfo)
-{
-    QString filename;
-
     if (!pginfo || pginfo->availableStatus == asPendingDelete)
-        return filename;
+        return QString();
 
-    filename = pginfo->GetPlaybackURL() + ".png";
+    QString filename = pginfo->GetPlaybackURL() + ".png";
 
+    // If someone is asking for this preview it must be on screen
+    // and hence higher priority than anything else we may have
+    // queued up recently....
     IncPreviewGeneratorPriority(filename);
 
-    bool check_date = check_lastmod(m_previewLastModifyCheck, filename);
-
     QDateTime previewLastModified;
+    QString ret_file = filename;
+    bool streaming = filename.left(1) != "/";
+    bool locally_accessible = false;
+    bool bookmark_updated = false;
 
-    if (check_date)
-        previewLastModified = getPreviewLastModified(pginfo);
+    if (m_previewFromBookmark || streaming)
+    {
+        if (streaming)
+        {
+            ret_file = QString("%1/remotecache/%2")
+                .arg(GetConfDir()).arg(filename.section('/', -1));
 
-    if (m_previewFromBookmark && check_date &&
-        (!previewLastModified.isValid() ||
-         (previewLastModified <  pginfo->lastmodified &&
-          previewLastModified >= pginfo->recendts)) &&
-        !pginfo->IsEditing() &&
-        !JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo) &&
+            QFileInfo finfo(ret_file);
+            if (finfo.exists() &&
+                (!m_previewFromBookmark ||
+                 (finfo.lastModified() >= pginfo->lastmodified)))
+            {
+                // This is just an optimization to avoid
+                // hitting the backend if our cached copy
+                // is newer than the bookmark, or if we have
+                // a preview and do not update it when the
+                // bookmark changes.
+                previewLastModified = finfo.lastModified();
+            }
+            else
+            {
+                previewLastModified =
+                    RemoteGetPreviewIfModified(*pginfo, ret_file);
+            }
+        }
+        else
+        {
+            QFileInfo fi(filename);
+            if ((locally_accessible = fi.exists()))
+                previewLastModified = fi.lastModified();
+        }
+
+        bookmark_updated =
+            m_previewFromBookmark &&
+            ((!previewLastModified.isValid() ||
+              (previewLastModified <  pginfo->lastmodified &&
+               previewLastModified >= pginfo->recendts)));
+    }
+    else
+    {
+        locally_accessible = QFileInfo(filename).exists();
+    }
+
+    bool up_to_date_preview_exists =
+        locally_accessible || previewLastModified.isValid();
+
+    if (0)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("File  '%1' \n\t\t\tCache '%2'")
+                .arg(filename).arg(ret_file) +
+                QString("\n\t\t\tPreview Exists: %1, "
+                        "Bookmark Updated: %2, "
+                        "Need Preview: %3")
+                .arg(up_to_date_preview_exists).arg(bookmark_updated)
+                .arg((bookmark_updated || !up_to_date_preview_exists)));
+    }
+
+    if ((bookmark_updated || !up_to_date_preview_exists) &&
         !IsGeneratingPreview(filename))
     {
         uint attempts = IncPreviewGeneratorAttempts(filename);
@@ -3677,46 +3928,18 @@ QString PlaybackBox::getPreviewImage(ProgramInfo *pginfo)
                             "%2 times, giving up.")
                     .arg(filename).arg(PreviewGenState::maxAttempts));
         }
-
-        if (attempts >= PreviewGenState::maxAttempts)
-            return filename;
     }
 
     UpdatePreviewGeneratorThreads();
 
-    // Image is local
-    if (QFileInfo(filename).exists())
-        return filename;
+    QString ret = (locally_accessible) ?
+        filename : (previewLastModified.isValid()) ?
+        ret_file : (QFileInfo(ret_file).exists()) ?
+        ret_file : QString();
 
-    // If this is a remote frontend then check the remote file cache
-    QString cachefile = QString("%1/remotecache/%3").arg(GetConfDir())
-                                                .arg(filename.section('/', -1));
-    QFileInfo cachefileinfo(cachefile);
-    if (!cachefileinfo.exists() ||
-        previewLastModified.addSecs(-60) > cachefileinfo.lastModified())
-    {
-        if (!IsGeneratingPreview(filename))
-        {
-            uint attempts = IncPreviewGeneratorAttempts(filename);
-            if (attempts < PreviewGenState::maxAttempts)
-            {
-                SetPreviewGenerator(filename, new PreviewGenerator(pginfo,
-                                (PreviewGenerator::Mode)m_previewGeneratorMode));
-            }
-            else if (attempts == PreviewGenState::maxAttempts)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        QString("Attempted to generate m_preview for '%1' "
-                                "%2 times, giving up.")
-                        .arg(filename).arg(PreviewGenState::maxAttempts));
-            }
-        }
-    }
+    //VERBOSE(VB_IMPORTANT, QString("Returning: '%1'").arg(ret));
 
-    if (cachefileinfo.exists())
-        return cachefile;
-
-    return "";
+    return ret;
 }
 
 void PlaybackBox::showIconHelp(void)
@@ -3766,7 +3989,6 @@ void PlaybackBox::showGroupFilter(void)
 
     uint items = 0;
     uint totalItems = 0;
-    QString itemStr;
 
     // Add the group entries
     displayNames.append(QString("------- %1 -------").arg(tr("Groups")));
@@ -3783,7 +4005,6 @@ void PlaybackBox::showGroupFilter(void)
         {
             dispGroup = query.value(0).toString();
             items     = query.value(1).toInt();
-            itemStr   = (items == 1) ? tr("item") : tr("items");
 
             if ((dispGroup != "LiveTV" || (m_viewMask & VIEW_LIVETVGRP)) &&
                 (dispGroup != "Deleted"))
@@ -3795,18 +4016,15 @@ void PlaybackBox::showGroupFilter(void)
             dispGroup = (dispGroup == "Deleted") ? tr("Deleted") : dispGroup;
             dispGroup = (dispGroup == "LiveTV")  ? tr("LiveTV")  : dispGroup;
 
-            displayNames.append(QString("%1 [%2 %3]").arg(dispGroup).arg(items)
-                                .arg(itemStr));
+            displayNames.append(tr("%1 [%n item(s)]", 0, items).arg(dispGroup));
 
             m_recGroupType[query.value(0).toString()] = "recgroup";
         }
     }
 
     // Create and add the "All Programs" entry
-    itemStr = (totalItems == 1) ? tr("item") : tr("items");
-    displayNames.prepend(QString("%1 [%2 %3]")
-                        .arg(ProgramInfo::i18n("All Programs"))
-                        .arg(totalItems).arg(itemStr));
+    displayNames.prepend(tr("%1 [%n item(s)]", 0, totalItems)
+                         .arg(ProgramInfo::i18n("All Programs")));
     groupNames.prepend("All Programs");
     m_recGroupType["All Programs"] = "recgroup";
 
@@ -3821,8 +4039,6 @@ void PlaybackBox::showGroupFilter(void)
         while (query.next())
         {
             items     = query.value(1).toInt();
-            itemStr   = (items == 1) ? tr("item") : tr("items");
-
             dispGroup = query.value(0).toString();
             if (dispGroup.isEmpty())
             {
@@ -3835,8 +4051,7 @@ void PlaybackBox::showGroupFilter(void)
             if ((!m_recGroupType.contains(dispGroup)) &&
                 (dispGroup != tr("Unknown")))
             {
-                displayGroups += QString("%1 [%2 %3]").arg(dispGroup)
-                                  .arg(items).arg(itemStr);
+                displayGroups += tr("%1 [%n item(s)]", 0, items).arg(dispGroup);
                 groups += dispGroup;
 
                 m_recGroupType[dispGroup] = "category";
@@ -3847,9 +4062,7 @@ void PlaybackBox::showGroupFilter(void)
         {
             dispGroup = tr("Unknown");
             items     = unknownCount;
-            itemStr   = (items == 1) ? tr("item") : tr("items");
-            displayGroups += QString("%1 [%2 %3]").arg(dispGroup)
-                              .arg(items).arg(itemStr);
+            displayGroups += tr("%1 [%n item(s)]", 0, items).arg(dispGroup);
             groups += dispGroup;
 
             m_recGroupType[dispGroup] = "category";
@@ -3862,9 +4075,9 @@ void PlaybackBox::showGroupFilter(void)
     groups.sort();
     displayGroups.sort();
     QStringList::iterator it;
-    for (it = displayGroups.begin(); it != displayGroups.end(); it++)
+    for (it = displayGroups.begin(); it != displayGroups.end(); ++it)
         displayNames.append(*it);
-    for (it = groups.begin(); it != groups.end(); it++)
+    for (it = groups.begin(); it != groups.end(); ++it)
         groupNames.append(*it);
 
     QString label = tr("Change Filter");
@@ -3975,16 +4188,15 @@ void PlaybackBox::showRecGroupChanger(void)
 
     QStringList groupNames;
     QStringList displayNames;
-    QString selected = "";
-
-    QString itemStr;
-    QString dispGroup;
+    QString selected;
 
     groupNames.append("addnewgroup");
     displayNames.append(tr("Add New"));
 
     if (query.exec())
     {
+        QString itemStr;
+        QString dispGroup;
         while (query.next())
         {
             dispGroup = query.value(0).toString();
@@ -4045,7 +4257,7 @@ void PlaybackBox::showPlayGroupChanger(void)
 {
     QStringList groupNames;
     QStringList displayNames;
-    QString selected = "";
+    QString selected;
 
     displayNames.append(tr("Default"));
     groupNames.append("Default");
@@ -4149,6 +4361,8 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
 void PlaybackBox::setRecGroup(QString newRecGroup)
 {
     ProgramInfo *tmpItem = CurrentItem();
+
+    newRecGroup = newRecGroup.simplified();
 
     if (newRecGroup.isEmpty() || !tmpItem)
         return;
@@ -4311,7 +4525,7 @@ void PlaybackBox::clearProgramCache(void)
         return;
 
     vector<ProgramInfo *>::iterator i = m_progCache->begin();
-    for ( ; i != m_progCache->end(); i++)
+    for ( ; i != m_progCache->end(); ++i)
         delete *i;
     delete m_progCache;
     m_progCache = NULL;
@@ -4577,7 +4791,8 @@ void RecMetadataEdit::SaveChanges()
 //////////////////////////////////////////
 
 HelpPopup::HelpPopup(MythScreenStack *lparent)
-                : MythScreenType(lparent, "helppopup")
+                : MythScreenType(lparent, "helppopup"),
+                  m_iconList(NULL)
 {
 
 }

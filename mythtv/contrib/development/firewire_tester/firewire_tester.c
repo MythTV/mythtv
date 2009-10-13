@@ -19,6 +19,7 @@
 #define ACTION_TEST_P2P     1
 #define ACTION_FIX_BCAST    2
 #define ACTION_RESET_BUS    3
+#define ACTION_OUTPUT_P2P   4
 
 #define SYNC_BYTE           0x47
 #define MIN_PACKETS         25
@@ -29,6 +30,7 @@
 int verbose = 0;
 int sync_failed = 0;
 int nodata = 0;
+int run = 0;
 
 static int read_packet (unsigned char *tspacket, int len, 
                         unsigned int dropped, void *callback_data)
@@ -49,6 +51,29 @@ static int read_packet (unsigned char *tspacket, int len,
     nodata = 0;
     *count = *count + 1;
     return 1;
+}
+
+static int fwrite_packet (unsigned char *tspacket, int len, 
+                        unsigned int dropped, void *callback_data)
+{
+    int n;
+    FILE *fp = (FILE *) callback_data;
+
+    if (dropped)
+    {
+        fprintf(stderr, "Dropped %d packet(s).\n", dropped);
+        return 0;
+    }
+
+    if (tspacket[0] != SYNC_BYTE)
+    {
+        sync_failed = 1;
+        return 0;
+    }
+    nodata = 0;
+    n = fwrite(tspacket, sizeof(char), 188, fp);
+    //fprintf(stderr, "fwrite_packets: wrote %d of %d\n", n, len);
+    return(n == len ? 0 : 1);
 }
 
 int test_connection(raw1394handle_t handle, int channel)
@@ -93,22 +118,27 @@ int test_connection(raw1394handle_t handle, int channel)
 // create and test a p2p connection
 // returns 1 on success, 0 on failure
 int test_p2p(raw1394handle_t handle, nodeid_t node) {
+    int oplug = -1, iplug = -1, bandwidth = -1;
     int channel, count, success = 0;
-    channel = node;
-
-
-    VERBOSE("P2P: Creating, node %d, channel %d\n", node, channel);
 
     printf("P2P: Testing...");
     fflush(stdout);
- 
+
     // make connection
+    channel = iec61883_cmp_connect(handle, node, &oplug,
+		raw1394_get_local_id(handle), &iplug, &bandwidth);
+
+    VERBOSE("P2P: Creating, node %d, channel %d\n", node, channel);
+    fflush(stdout);
+
+#if 0
     if (iec61883_cmp_create_p2p_output(handle, node | 0xffc0, 0, channel,
                                        1 /* fix me, speed */ ) != 0)
     {
         printf("iec61883_cmp_create_p2p_output failed\n");
         return 0;
     }
+#endif
 
     count = test_connection(handle, channel);
     if (count >= MIN_PACKETS)
@@ -210,6 +240,70 @@ int fix_broadcast(raw1394handle_t handle, nodeid_t node) {
     return 0;
 }
 
+// create and test a p2p connection, copy packets to stdout
+// returns 1 on success, 0 on failure
+int output_p2p(raw1394handle_t handle, nodeid_t node) {
+    int channel, count = 0, success = 0;
+    int oplug = -1, iplug = -1, bandwidth = -1;
+    int retry = 0;
+    FILE *fp = stdout;
+    iec61883_mpeg2_t mpeg;
+    struct timeval tv;
+    fd_set rfds;
+    int fd = raw1394_get_fd(handle);
+
+    sync_failed = 0;
+
+    // make connection
+    channel = iec61883_cmp_connect(handle, node, &oplug,
+		raw1394_get_local_id(handle), &iplug, &bandwidth);
+#if 0
+    if (iec61883_cmp_create_p2p_output(handle, node | 0xffc0, 0, channel,
+                                       1 /* fix me, speed */ ) != 0)
+    {
+        fprintf(stderr, "iec61883_cmp_create_p2p_output failed\n");
+        return 0;
+    }
+#endif
+
+    VERBOSE("P2P: Creating, node %d, channel %d\n", node, channel);
+    fflush(stdout);
+
+    mpeg = iec61883_mpeg2_recv_init(handle, fwrite_packet, (void*) fp);
+    run = 1;
+    iec61883_mpeg2_recv_start(mpeg, channel);
+    while(run && retry < 2 && !sync_failed && nodata < MAX_NODATA)
+    {
+        FD_ZERO(&rfds);
+        FD_SET(fd, &rfds);
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+
+        if (select(fd + 1, &rfds, NULL, NULL, &tv) > 0)
+        {
+             nodata++;
+             raw1394_loop_iterate(handle);
+        }
+        else
+        {
+            retry++;
+        }
+    }
+    iec61883_mpeg2_recv_stop(mpeg);
+    iec61883_mpeg2_close(mpeg);
+
+    if (sync_failed)
+        return 0;
+
+    return count;
+
+    VERBOSE("P2P: Disconnecting.\n");
+    iec61883_cmp_disconnect(handle, node | 0xffc0, 0,
+                            raw1394_get_local_id (handle),
+                            -1, channel, 0);
+    return success;
+}
+
 void usage(void) {
     printf("firewire_tester <action> -n <node> [-P <port>] [-r <n>] [-v]\n");
     printf(" Actions: (one is required)\n");
@@ -219,6 +313,7 @@ void usage(void) {
     printf("    -R          - reset the firewire bus\n");
     printf(" Options\n");
     printf("    -n <node>   - firewire node, required\n");
+    printf("    -o          - write packets to stdout using p2p connection\n");
     printf("    -P <port>   - firewire port, default 0\n");
     printf("    -r <n>      - run action <n> times, default 1\n");
     printf("    -v          - verbose\n");
@@ -234,7 +329,7 @@ int main(int argc, char **argv) {
     int action = ACTION_NONE;
 
     opterr = 0;
-    while ((c = getopt(argc, argv, "Bbn:pP:r:Rv")) != -1)
+    while ((c = getopt(argc, argv, "Bbn:opP:r:Rv")) != -1)
     {
         switch (c) 
         {
@@ -267,6 +362,16 @@ int main(int argc, char **argv) {
                     printf("Invalid node: %d\n", node);
                     exit(1);
                 }
+                break;
+
+            // output packets using p2p connection
+            case 'o':
+                if (action != ACTION_NONE)
+                {
+                    printf("Invalid command line\n");
+                    usage();
+                }
+                action = ACTION_OUTPUT_P2P;
                 break;
 
             // set the port, optional
@@ -367,6 +472,13 @@ int main(int argc, char **argv) {
             {
                 printf("Bus reset failed: %d\n", errno);
             }
+            break;
+        case ACTION_OUTPUT_P2P:
+            runs = 1;
+            fprintf(stderr,
+                    "Action: Output P2P packets using node %d, channel %d\n",
+                    node, node);
+            success = output_p2p(handle, node);
             break;
     }
 

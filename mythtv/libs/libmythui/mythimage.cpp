@@ -1,20 +1,31 @@
-#include <cassert>
+
+// Own header
+#include "mythimage.h"
+
+// C++ headers
 #include <stdint.h>
 
 // QT headers
 #include <QPainter>
 #include <QMatrix>
+#include <QRgb>
 
-#include "mythimage.h"
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
+// Mythdb headers
+#include "mythverbose.h"
+
+// Myth headers
 #include "remotefile.h"
+
+// MythUI headers
+#include "mythuihelper.h"
+#include "mythmainwindow.h"
 
 MythUIHelper *MythImage::m_ui = NULL;
 
 MythImage::MythImage(MythPainter *parent)
 {
-    assert(parent);
+    if (!parent)
+        VERBOSE(VB_IMPORTANT, "ERROR: Image created without parent!");
 
     m_Parent = parent;
     m_RefCount = 0;
@@ -43,9 +54,9 @@ MythImage::~MythImage()
     m_Parent->DeleteFormatImage(this);
 }
 
-// these technically should be locked, but all deletion should be happening in the UI thread, and nowhere else.
 void MythImage::UpRef(void)
 {
+    QMutexLocker locker(&m_RefCountLock);
     if (m_ui && m_cached && m_RefCount == 1)
         m_ui->ExcludeFromCacheSize(this);
     m_RefCount++;
@@ -53,6 +64,7 @@ void MythImage::UpRef(void)
 
 bool MythImage::DownRef(void)
 {
+    m_RefCountLock.lock();
     m_RefCount--;
     if (m_ui && m_cached)
     {
@@ -64,14 +76,23 @@ bool MythImage::DownRef(void)
 
     if (m_RefCount <= 0)
     {
+        m_RefCountLock.unlock();
         delete this;
         return true;
     }
+    m_RefCountLock.unlock();
     return false;
+}
+
+int MythImage::RefCount(void)
+{
+    QMutexLocker locker(&m_RefCountLock);
+    return m_RefCount;
 }
 
 void MythImage::SetIsInCache(bool bCached)
 {
+    QMutexLocker locker(&m_RefCountLock);
     if (m_ui && m_RefCount == 1)
     {
         if (!m_cached && bCached)
@@ -84,6 +105,7 @@ void MythImage::SetIsInCache(bool bCached)
 
 void MythImage::Assign(const QImage &img)
 {
+    QMutexLocker locker(&m_RefCountLock);
     if (m_ui && m_RefCount == 1 && m_cached)
         m_ui->ExcludeFromCacheSize(this);
     *(static_cast<QImage *> (this)) = img;
@@ -210,9 +232,9 @@ void MythImage::ToGreyscale()
     if (isGrayscale())
         return;
 
-    for (int y = 0; y < height(); y++)
+    for (int y = 0; y < height(); ++y)
     {
-        for (int x = 0; x < width(); x++)
+        for (int x = 0; x < width(); ++x)
         {
             QRgb oldPixel = pixel(x, y);
             int greyVal = qGray(oldPixel);
@@ -307,7 +329,7 @@ void MythImage::MakeGradient(QImage &image, const QColor &begin,
 
     if (drawBoundary)
     {
-        // Draw boundry rect
+        // Draw boundary rect
         QColor black(0, 0, 0, alpha);
         painter.setPen(black);
         QPen pen = painter.pen();

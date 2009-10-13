@@ -182,8 +182,11 @@ uint ChannelImporter::DeleteChannels(
         for (uint k = 0; k < off_air_list.size(); k++)
         {
             int i = off_air_list[k] >> 16, j = off_air_list[k] & 0xFFFF;
-            ChannelUtil::SetVisible(
-                transports[i].channels[j].channel_id, false);
+            int chanid = transports[i].channels[j].channel_id;
+            QString channum = ChannelUtil::GetChanNum(chanid);
+            ChannelUtil::SetVisible(chanid, false);
+            ChannelUtil::SetChannelValue("channum", QString("_%1").arg(channum),
+                                         chanid);
         }
     }
     else
@@ -290,6 +293,14 @@ void ChannelImporter::InsertChannels(
         if (kNTSCNonConflicting == type)
             continue;
 
+        if (old_chan)
+        {
+            QString msg = QObject::tr("Found %1 old %2 channels.")
+                .arg(old_chan).arg(toString(type));
+
+            UpdateAction action = QueryUserUpdate(msg);
+            list = UpdateChannels(list, info, action, type, filtered);
+        }
         if (new_chan)
         {
             QString msg = QObject::tr(
@@ -298,14 +309,6 @@ void ChannelImporter::InsertChannels(
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, filtered);
-        }
-        if (old_chan)
-        {
-            QString msg = QObject::tr("Found %1 old %2 channels.")
-                .arg(old_chan).arg(toString(type));
-
-            UpdateAction action = QueryUserUpdate(msg);
-            list = UpdateChannels(list, info, action, type, filtered);
         }
     }
 

@@ -2,6 +2,51 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 <context>
+    <name>GlobalSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation>Terminé</translation>
+    </message>
+</context>
+<context>
+    <name>LocationDialog</name>
+    <message>
+        <source>Search</source>
+        <translation>Rechercher</translation>
+    </message>
+    <message>
+        <source>Searching ...</source>
+        <translation>En cours de recherche ...</translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation>En cours de recherche... Résultats : %1</translation>
+    </message>
+    <message>
+        <source>Search Complete. Results: %1</source>
+        <translation>Recherche terminée. Résultats : %1</translation>
+    </message>
+    <message>
+        <source>Source: %1</source>
+        <translation>Source : %1</translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Weather forecasts</source>
+        <translation>Prévisions météo</translation>
+    </message>
+    <message>
+        <source>Pause current page</source>
+        <translation>Pause sur la page actuelle</translation>
+    </message>
+    <message>
+        <source>Search List</source>
+        <translation>Liste de recherche</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
@@ -9,11 +54,11 @@
     </message>
     <message>
         <source>Three Day Forecast</source>
-        <translation>Prévision à trois jours</translation>
+        <translation>Prévision sur trois jours</translation>
     </message>
     <message>
         <source>18 Hour Forecast</source>
-        <translation>Prévision sous 18 heures</translation>
+        <translation>Prévision sur 18 heures</translation>
     </message>
     <message>
         <source>Severe Weather Alerts</source>
@@ -21,7 +66,7 @@
     </message>
     <message>
         <source>Six Day Forecast</source>
-        <translation>Prévision à six jours</translation>
+        <translation>Prévision sur six jours</translation>
     </message>
     <message>
         <source>Static Map</source>
@@ -30,6 +75,127 @@
     <message>
         <source>Animated Map</source>
         <translation>Carte animée</translation>
+    </message>
+</context>
+<context>
+    <name>ScreenSetup</name>
+    <message>
+        <source>Active Screens</source>
+        <translation>Pages actives</translation>
+    </message>
+    <message>
+        <source>Inactive Screens</source>
+        <translation>Pages inactives</translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation>Terminé</translation>
+    </message>
+    <message>
+        <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
+        <translation>Ajouter cette page à la liste des pages actives en appuyant sur SÉLECT</translation>
+    </message>
+    <message>
+        <source>Sources</source>
+        <translation>Sources</translation>
+    </message>
+    <message>
+        <source>Units: </source>
+        <translation>Unités</translation>
+    </message>
+    <message>
+        <source>English Units</source>
+        <translation>Unités anglaises</translation>
+    </message>
+    <message>
+        <source>SI Units</source>
+        <translation>Unités du système international</translation>
+    </message>
+    <message>
+        <source>Location: </source>
+        <translation>Localisation</translation>
+    </message>
+    <message>
+        <source>Not Defined</source>
+        <translation>Non défini</translation>
+    </message>
+    <message>
+        <source>Source: </source>
+        <translation>Source : </translation>
+    </message>
+    <message>
+        <source>Press SELECT to </source>
+        <translation>Appuyer sur SÉLECT pour</translation>
+    </message>
+    <message>
+        <source>change location; </source>
+        <translation>Modifier la localisation : </translation>
+    </message>
+    <message>
+        <source>change units; </source>
+        <translation>Changer d&apos;unités : </translation>
+    </message>
+    <message>
+        <source>move screen up or down; or remove screen.</source>
+        <translation>Deplacer la page vers le haut ou le bas; ou la supprimer</translation>
+    </message>
+    <message>
+        <source>Manipulate Screen</source>
+        <translation>gérer la page</translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation>Deplacer vers le haut</translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation>Déplacer vers le bas</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>Change Location</source>
+        <translation>Changer la localisation</translation>
+    </message>
+    <message>
+        <source>Change Units</source>
+        <translation>Changer d&apos;unités</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+</context>
+<context>
+    <name>SourceManager</name>
+    <message>
+        <source>Searching for scripts</source>
+        <translation>Rechercher un script</translation>
+    </message>
+    <message>
+        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
+        <translation>Le script %1 est en train de s&apos;exécuter quand vous avez demandé la mise à jour, vérifier qu&apos;il n&apos;est pas suspendu ou hors de la fenêtre temporelle d&apos;éxécution...Ne sera pas éxécuter pendant ce temps</translation>
+    </message>
+</context>
+<context>
+    <name>SourceSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation>Terminé</translation>
+    </message>
+    <message>
+        <source>Author: </source>
+        <translation>Fourni par : </translation>
+    </message>
+    <message>
+        <source>Email: </source>
+        <translation>Email : </translation>
+    </message>
+    <message>
+        <source>Version: </source>
+        <translation>Version : </translation>
     </message>
 </context>
 <context>
@@ -67,7 +233,7 @@
     <name>String::WeatherType</name>
     <message>
         <source>Cloudy</source>
-        <translation>Couvert</translation>
+        <translation>Nuageux</translation>
     </message>
     <message>
         <source>Mostly Cloudy</source>
@@ -75,7 +241,7 @@
     </message>
     <message>
         <source>Partly Cloudy</source>
-        <translation>Nuageux</translation>
+        <translation>Partiellement nuageux</translation>
     </message>
     <message>
         <source>Light Rain</source>
@@ -187,7 +353,7 @@
     </message>
     <message>
         <source>Sct Flurries/Wind</source>
-        <translation>fortes rafales/Vent</translation>
+        <translation>Fortes rafales/Vent</translation>
     </message>
     <message>
         <source>Sct Strong Storms</source>
@@ -471,7 +637,7 @@
     </message>
     <message>
         <source>Smoke</source>
-        <translation>Brouillard épais</translation>
+        <translation>Fumée</translation>
     </message>
     <message>
         <source>Haze</source>
@@ -593,11 +759,11 @@
     </message>
     <message>
         <source>High</source>
-        <translation>Élevé</translation>
+        <translation>Max.</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation>Faible</translation>
+        <translation>Min.</translation>
     </message>
     <message>
         <source>Global Settings</source>
@@ -645,7 +811,7 @@
     </message>
     <message>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation>Entrez votre emplacement actuel, le plus près d&apos;une grande ville. Dans certains pays le code postal est également supporté.</translation>
+        <translation>Entrez votre emplacement actuel, le plus près d&apos;une grande ville. Dans certains pays le code postal est Ãélement supporté.</translation>
     </message>
     <message>
         <source>Enter Location:</source>
@@ -688,21 +854,6 @@
     <message>
         <source>Saturday</source>
         <translation>Samedi</translation>
-    </message>
-</context>
-<context>
-    <name>weather_settings_xml</name>
-    <message>
-        <source>Global Settings</source>
-        <translation>Réglages globaux</translation>
-    </message>
-    <message>
-        <source>Screen Settings</source>
-        <translation>Réglages d&apos;écran</translation>
-    </message>
-    <message>
-        <source>Source Settings</source>
-        <translation>Réglages des sources</translation>
     </message>
 </context>
 </TS>

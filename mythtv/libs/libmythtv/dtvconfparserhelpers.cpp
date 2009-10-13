@@ -38,15 +38,22 @@ QString DTVParamHelper::toString(const char *strings[], int index,
     return strings[index];
 }
 
+const int DTVTunerType::kTunerTypeDVBS1   = 0x00;
+const int DTVTunerType::kTunerTypeDVBS2   = 0x20;
+const int DTVTunerType::kTunerTypeDVBC    = 0x01;
+const int DTVTunerType::kTunerTypeDVBT    = 0x02;
+const int DTVTunerType::kTunerTypeATSC    = 0x03;
+const int DTVTunerType::kTunerTypeUnknown = 0x80000000;
+
 static QMutex dtv_tt_canonical_str_lock;
 static QMap<int,QString> dtv_tt_canonical_str;
 void DTVTunerType::initStr(void)
 {
     QMutexLocker locker(&dtv_tt_canonical_str_lock);
     dtv_tt_canonical_str[kTunerTypeATSC]    = "ATSC";
-    dtv_tt_canonical_str[kTunerTypeDVBT]    = "QPSK";
+    dtv_tt_canonical_str[kTunerTypeDVBT]    = "OFDM";
     dtv_tt_canonical_str[kTunerTypeDVBC]    = "QAM";
-    dtv_tt_canonical_str[kTunerTypeDVBS1]   = "DVBS";
+    dtv_tt_canonical_str[kTunerTypeDVBS1]   = "QPSK";
     dtv_tt_canonical_str[kTunerTypeDVBS2]   = "DVB_S2";
     dtv_tt_canonical_str[kTunerTypeUnknown] = "UNKNOWN";
 }
@@ -183,6 +190,8 @@ const DTVParamHelperStruct DTVCodeRate::parseTable[] =
     { "7/8",  kFEC_7_8 },
     { "8/9",  kFEC_8_9 },
     { "none", kFECNone },
+    { "3/5",  kFEC_3_5 },
+    { "9/10", kFEC_9_10},
     { NULL,   kFECAuto }
 };
 
@@ -198,8 +207,8 @@ const char *DTVCodeRate::dbStr[DTVCodeRate::kDBStrCnt] =
      "7/8",  ///< kFEC_7_8
      "8/9",  ///< kFEC_8_9
      "auto", ///< kFECAuto
-     "3/5",  ///< KFEC_3_5
-     "9/10",  ///< KFEC_9_10
+     "3/5",  ///< kFEC_3_5
+     "9/10",  ///< kFEC_9_10
 };
 
 const DTVParamHelperStruct DTVModulation::confTable[] =

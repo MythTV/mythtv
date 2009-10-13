@@ -2,10 +2,8 @@
  * pes.c: MPEG PES functions for replex
  *        
  *
- * Copyright (C) 2003 - 2006
- *                    Marcus Metzler <mocm@metzlerbros.de>
+ * Copyright (C) 2003 Marcus Metzler <mocm@metzlerbros.de>
  *                    Metzler Brothers Systementwicklung GbR
- *           (C) 2006 Reel Multimedia
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,13 +26,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <netinet/in.h>
 #include <string.h>
 
+#ifdef USING_MINGW
+#include <winsock2.h>
+#else
+#include <netinet/in.h>
+#endif
+
 #include "pes.h"
-
-//#define PES_DEBUG
-
 void printpts(int64_t pts)
 {
 	if (pts < 0){
@@ -43,11 +43,11 @@ void printpts(int64_t pts)
 	}
 	pts = pts/300;
 	pts &= (MAX_PTS-1);
-	fprintf(stderr,"%2d:%02d:%02d.%03d ",
+	fprintf(stderr,"%2d:%02d:%02d.%04d ",
 		(unsigned int)(pts/90000.)/3600,
 		((unsigned int)(pts/90000.)%3600)/60,
 		((unsigned int)(pts/90000.)%3600)%60,
-		(((unsigned int)(pts/90.)%3600000)%60000)%1000
+		(((unsigned int)(pts/9.)%36000000)%600000)%10000
 		);
 }
 
@@ -159,231 +159,233 @@ void init_pes_in(pes_in_t *p, int t, ringbuffer *rb, int wi){
 void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 {
 
-	int l=0;
-	unsigned short *pl=NULL;
-	int c=0;
+	int l;
+	unsigned short *pl;
+        int done;
 
 	uint8_t headr[3] = { 0x00, 0x00, 0x01} ;
-	while (c < count && (!p->mpeg ||
-			     (p->mpeg == 2 && p->found < 9))
-	       &&  (p->found < 5 || !p->done)){
-		switch ( p->found ){
-		case 0:
-		case 1:
-			if (buf[c] == 0x00) p->found++;
-			else p->found = 0;
-			c++;
-			break;
-		case 2:
-			if (buf[c] == 0x01) p->found++;
-			else if (buf[c] == 0){
-				p->found = 2;
-			} else p->found = 0;
-			c++;
-			break;
-		case 3:
-			p->cid = 0;
-			switch (buf[c]){
-			case PROG_STREAM_MAP:
-			case PRIVATE_STREAM2:
-			case PROG_STREAM_DIR:
-			case ECM_STREAM     :
-			case EMM_STREAM     :
-			case PADDING_STREAM :
-			case DSM_CC_STREAM  :
-			case ISO13522_STREAM:
-				p->done = 1;
-			case PRIVATE_STREAM1:
-			case VIDEO_STREAM_S ... VIDEO_STREAM_E:
-			case AUDIO_STREAM_S ... AUDIO_STREAM_E:
-				p->found++;
-				p->cid = buf[c];
+	do {
+		int c=0;
+		done = 1;
+		while (c < count && (!p->mpeg ||
+				     (p->mpeg == 2 && p->found < 9))
+	               &&  (p->found < 5 || !p->done)){
+			switch ( p->found ){
+			case 0:
+			case 1:
+				if (buf[c] == 0x00) p->found++;
+				else p->found = 0;
 				c++;
 				break;
-			default:
-			case PACK_START:
-			case SYS_START:
-				p->found = 0;
+			case 2:
+				if (buf[c] == 0x01) p->found++;
+				else if (buf[c] == 0){
+					p->found = 2;
+				} else p->found = 0;
 				c++;
 				break;
-			}
-			break;
+			case 3:
+				p->cid = 0;
+				switch (buf[c]){
+				case PROG_STREAM_MAP:
+				case PRIVATE_STREAM2:
+				case PROG_STREAM_DIR:
+				case ECM_STREAM     :
+				case EMM_STREAM     :
+				case PADDING_STREAM :
+				case DSM_CC_STREAM  :
+				case ISO13522_STREAM:
+					p->done = 1;
+				case PRIVATE_STREAM1:
+				case VIDEO_STREAM_S ... VIDEO_STREAM_E:
+				case AUDIO_STREAM_S ... AUDIO_STREAM_E:
+					p->found++;
+					p->cid = buf[c];
+					c++;
+					break;
+				default:
+				case PACK_START:
+				case SYS_START:
+					p->found = 0;
+					c++;
+					break;
+				}
+				break;
 			
 
-		case 4:
-			if (count-c > 1){
-				pl = (unsigned short *) (buf+c);
-				p->plength =  ntohs(*pl);
-				p->plen[0] = buf[c];
-				c++;
+			case 4:
+				if (count-c > 1){
+					pl = (unsigned short *) (buf+c);
+					p->plength =  ntohs(*pl);
+					p->plen[0] = buf[c];
+					c++;
+					p->plen[1] = buf[c];
+					c++;
+					p->found+=2;
+				} else {
+					p->plen[0] = buf[c];
+					p->found++;
+					return;
+				}
+				break;
+			case 5:
 				p->plen[1] = buf[c];
 				c++;
-				p->found+=2;
-			} else {
-				p->plen[0] = buf[c];
+				pl = (unsigned short *) p->plen;
+				p->plength = ntohs(*pl);
 				p->found++;
-				return;
-			}
-			break;
-		case 5:
-			p->plen[1] = buf[c];
-			c++;
-			pl = (unsigned short *) p->plen;
-			p->plength = ntohs(*pl);
-			p->found++;
-			break;
+				break;
 
 
-		case 6:
-			if (!p->done){
-				p->flag1 = buf[c];
-				c++;
-				p->found++;
-				if ( (p->flag1 & 0xC0) == 0x80 ) p->mpeg = 2;
-				else {
-					fprintf(stderr, "Error in PES Header 0x%2x\n",p->cid);
-					p->found = 0;
+			case 6:
+				if (!p->done){
+					p->flag1 = buf[c];
+					c++;
+					p->found++;
+					if ( (p->flag1 & 0xC0) == 0x80 ) p->mpeg = 2;
+					else {
+						fprintf(stderr, 
+							"Error: THIS IS AN MPEG1 FILE\n");
+						exit(1);
+					}
 				}
-			}
-			break;
+				break;
 
-		case 7:
-			if ( !p->done && p->mpeg == 2){
-				p->flag2 = buf[c];
-				c++;
-				p->found++;
-			}	
-			break;
+			case 7:
+				if ( !p->done && p->mpeg == 2){
+					p->flag2 = buf[c];
+					c++;
+					p->found++;
+				}	
+				break;
 
-		case 8:
-			if ( !p->done && p->mpeg == 2){
-				p->hlength = buf[c];
-				c++;
-				p->found++;
-			}
-			break;
+			case 8:
+				if ( !p->done && p->mpeg == 2){
+					p->hlength = buf[c];
+					c++;
+					p->found++;
+				}
+				break;
 			
-		default:
+			default:
 
-			break;
-		}
-		if(p->plength && p->found == 9 && p->found > p->plength+6){
-			fprintf(stderr, "Error in PES Header 0x%2x\n",p->cid);
-			p->found = 0;
-		}
-	}
-
-	if (!p->plength) p->plength = MMAX_PLENGTH-6;
-
-
-	if ( p->done || (p->mpeg == 2 && p->found >= 9) ){
-		switch (p->cid){
-			
-		case AUDIO_STREAM_S ... AUDIO_STREAM_E:			
-		case VIDEO_STREAM_S ... VIDEO_STREAM_E:
-		case PRIVATE_STREAM1:
-
-			if (p->withbuf){
-				memcpy(p->buf, headr, 3);
-				p->buf[3] = p->cid;
-				memcpy(p->buf+4,p->plen,2);
-			} else {
-				memcpy(p->hbuf, headr, 3);
-				p->hbuf[3] = p->cid;
-				memcpy(p->hbuf+4,p->plen,2);
+				break;
 			}
+		}
 
-			if (p->found == 9){
+		if (!p->plength) p->plength = MMAX_PLENGTH-6;
+
+
+		if ( p->done || (p->mpeg == 2 && p->found >= 9) ){
+			switch (p->cid){
+			
+			case AUDIO_STREAM_S ... AUDIO_STREAM_E:			
+			case VIDEO_STREAM_S ... VIDEO_STREAM_E:
+			case PRIVATE_STREAM1:
+
 				if (p->withbuf){
-					p->buf[6] = p->flag1;
-					p->buf[7] = p->flag2;
-					p->buf[8] = p->hlength;
+					memcpy(p->buf, headr, 3);
+					p->buf[3] = p->cid;
+					memcpy(p->buf+4,p->plen,2);
 				} else {
-					p->hbuf[6] = p->flag1;
-					p->hbuf[7] = p->flag2;
-					p->hbuf[8] = p->hlength;
+					memcpy(p->hbuf, headr, 3);
+					p->hbuf[3] = p->cid;
+					memcpy(p->hbuf+4,p->plen,2);
 				}
-			}
 
-			if ( (p->flag2 & PTS_ONLY) &&  p->found < 14){
-				while (c < count && p->found < 14){
-					p->pts[p->found-9] = buf[c];
-					if (p->withbuf)
-						p->buf[p->found] = buf[c];
-					else 
-						p->hbuf[p->found] = buf[c];
-					c++;
-					p->found++;
-				}
-				if (c == count) return;
-			}
-
-			if (((p->flag2 & PTS_DTS) == 0xC0) && p->found < 19){
-				while (c < count && p->found < 19){
-					p->dts[p->found-14] = buf[c];
-					if (p->withbuf)
-						p->buf[p->found] = buf[c];
-					else 
-						p->hbuf[p->found] = buf[c];
-					c++;
-					p->found++;
-				}
-				if (c == count) return;
-			}
-
-
-			while (c < count && p->found < p->plength+6){
-				l = count -c;
-				if (l+p->found > p->plength+6)
-					l = p->plength+6-p->found;
-				if (p->withbuf)
-					memcpy(p->buf+p->found, buf+c, l);
-				else {
-					if ( p->found < p->hlength+9 ){
-						int rest = p->hlength+9-p->found;
-						memcpy(p->hbuf+p->found, buf+c, rest);
-						if (ring_write(p->rbuf, buf+c+rest, 
-							       l-rest) <0){
-							fprintf(stderr,
-								"ring buffer overflow in get_pes %d\n"
-								,p->rbuf->size);
-							exit(1);
-						}
+				if (p->found == 9){
+					if (p->withbuf){
+						p->buf[6] = p->flag1;
+						p->buf[7] = p->flag2;
+						p->buf[8] = p->hlength;
 					} else {
-						if (ring_write(p->rbuf, buf+c, l)<0){
-							fprintf(stderr,
-								"ring buffer overflow in get_pes %d\n"
-								,p->rbuf->size);
-							exit(1);
-						}
+						p->hbuf[6] = p->flag1;
+						p->hbuf[7] = p->flag2;
+						p->hbuf[8] = p->hlength;
 					}
 				}
 
-				p->found += l;
-				c += l;
-			}			
-			if(p->found == p->plength+6){
-				func(p);
-			}
-			break;
-		}
+				if ( (p->flag2 & PTS_ONLY) &&  p->found < 14){
+					while (c < count && p->found < 14){
+						p->pts[p->found-9] = buf[c];
+						if (p->withbuf)
+							p->buf[p->found] = buf[c];
+						else 
+							p->hbuf[p->found] = buf[c];
+						c++;
+						p->found++;
+					}
+					if (c == count) return;
+				}
 
-		if ( p->done ){
-			if( p->found + count - c < p->plength+6){
-				p->found += count-c;
-				c = count;
-			} else {
-				c += p->plength+6 - p->found;
-				p->found = p->plength+6;
-			}
-		}
+				if (((p->flag2 & PTS_DTS) == 0xC0) && p->found < 19){
+					while (c < count && p->found < 19){
+						p->dts[p->found-14] = buf[c];
+						if (p->withbuf)
+							p->buf[p->found] = buf[c];
+						else 
+							p->hbuf[p->found] = buf[c];
+						c++;
+						p->found++;
+					}
+					if (c == count) return;
+				}
 
-		if (p->plength && p->found == p->plength+6) {
-			init_pes_in(p, p->type, NULL, p->withbuf);
-			if (c < count)
-				get_pes(p, buf+c, count-c, func);
-		}
-	}
+
+				while (c < count && p->found < p->plength+6){
+					l = count -c;
+					if (l+p->found > p->plength+6)
+						l = p->plength+6-p->found;
+					if (p->withbuf)
+						memcpy(p->buf+p->found, buf+c, l);
+					else {
+						if ( p->found < 
+                                                     (unsigned int)p->hlength+9 ){
+							int rest = p->hlength+9-p->found;
+							memcpy(p->hbuf+p->found, buf+c, rest);
+							if (ring_write(p->rbuf, buf+c+rest, 
+								       l-rest) <0){
+								exit(1);
+							}
+						} else {
+							if (ring_write(p->rbuf, buf+c, l)<0){
+								fprintf(stderr,
+									"ring buffer overflow %d\n"
+									,p->rbuf->size);
+								exit(1);
+							}
+						}
+					}
+
+					p->found += l;
+					c += l;
+				}			
+				if(p->found == p->plength+6){
+					func(p);
+				}
+				break;
+			}
+
+			if ( p->done ){
+				if( p->found + count - c < p->plength+6){
+					p->found += count-c;
+					c = count;
+				} else {
+					c += p->plength+6 - p->found;
+					p->found = p->plength+6;
+				}
+			}
+
+			if (p->plength && p->found == p->plength+6) {
+				init_pes_in(p, p->type, NULL, p->withbuf);
+				if (c < count) {
+					done = 0;
+					count -= c;
+					buf += c;
+				}
+			}
+		} 
+	} while(!done);
 	return;
 }
 
@@ -457,6 +459,7 @@ static void setl_ps(ps_packet *p)
 int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
 {
         long count,i;
+        (void)length;
         uint8_t headr1[4] = {0x00, 0x00, 0x01, PACK_START };
         uint8_t headr2[4] = {0x00, 0x00, 0x01, SYS_START };
         uint8_t buffy = 0xFF;
@@ -553,6 +556,7 @@ int write_ps_header(uint8_t *buf,
 		p.rate_bound[1] = (uint8_t)(0xff & (muxr >> 7));
 		p.rate_bound[2] = (uint8_t)(0x01 | ((muxr & 0x7f)<<1));
 
+	
 		p.audio_bound = (uint8_t)((audio_bound << 2)|(fixed << 1)|CSPS);
 		p.video_bound = (uint8_t)((audio_lock << 7)|
 				     (video_lock << 6)|0x20|video_bound);
@@ -582,10 +586,10 @@ int write_ps_header(uint8_t *buf,
 }
 
 
-void get_pespts(uint8_t *spts,uint8_t *pts)
+static void get_pespts(uint8_t *spts,uint8_t *pts)
 {
-
-        pts[0] = 0x21 |
+	//Make sure to set the 1st 4 bits properly
+        pts[0] = 0x01 |
                 ((spts[0] & 0xC0) >>5);
         pts[1] = ((spts[0] & 0x3F) << 2) |
                 ((spts[1] & 0xC0) >> 6);
@@ -643,21 +647,22 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 
 	dummy[0] = 0x80;
 	dummy[1] = 0;
-	dummy[2] = 0;
+	dummy[2] = stuffing;
 	
 	if (ptsdts == PTS_ONLY){
-		dummy[2] = 5 + stuffing;
+		dummy[2] += 5;
 		dummy[1] |= PTS_ONLY;
+		ppts[0] |= 0x20;
 	} else 	if (ptsdts == PTS_DTS){
-		dummy[2] = 10 + stuffing;
+		dummy[2] += 10;
 		dummy[1] |= PTS_DTS;
+		ppts[0] |= 0x30;
+		pdts[0] |= 0x10;
 	}
+		
 
 	memcpy(obuf+c,dummy,3);
 	c += 3;
-
-	memset(obuf+c,0xFF,stuffing);
-	c += stuffing;
 
 	if (ptsdts == PTS_ONLY){
 		memcpy(obuf+c,ppts,5);
@@ -668,15 +673,19 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 		memcpy(obuf+c,pdts,5);
 		c += 5;
 	}
+
+	memset(obuf+c,0xFF,stuffing);
+	c += stuffing;
+
 	return c;
 }
 
-void write_padding_pes( int pack_size, int apidn, int ac3n, 
+void write_padding_pes( int pack_size, int extcnt, 
 			uint64_t SCR, uint64_t muxr, uint8_t *buf)
 {
 	int pos = 0;
 
-	pos = write_ps_header(buf,SCR,muxr, apidn+ ac3n, 0, 0, 1, 1, 1,
+	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 1,
 			      0);
 
 	pos += write_pes_header( PADDING_STREAM, pack_size-pos, 0, 0, buf+pos,
@@ -684,7 +693,7 @@ void write_padding_pes( int pack_size, int apidn, int ac3n,
 
 }
 
-int write_video_pes( int pack_size, int apidn, int ac3n, uint64_t vpts, 
+int write_video_pes( int pack_size, int extcnt, uint64_t vpts, 
 		     uint64_t vdts, uint64_t SCR, uint64_t muxr, 
 		     uint8_t *buf, int *vlength, 
 		     uint8_t ptsdts, ringbuffer *vrbuffer)
@@ -695,11 +704,6 @@ int write_video_pes( int pack_size, int apidn, int ac3n, uint64_t vpts,
 	int stuff = 0;
 	int length = *vlength;
 
-#ifdef PES_DEBUG
-	fprintf(stderr,"write video PES ");
-	printpts(vdts);
-	fprintf(stderr,"\n");
-#endif
 	if (! length) return 0;
 	p = PS_HEADER_L1+PES_H_MIN;
 
@@ -719,7 +723,7 @@ int write_video_pes( int pack_size, int apidn, int ac3n, uint64_t vpts,
 			length = length+p;
 	}
 
-	pos = write_ps_header(buf,SCR,muxr, apidn+ac3n, 0, 0, 1, 1, 
+	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
 			      1, 0);
 
 	pos += write_pes_header( 0xE0, length-pos, vpts, vdts, buf+pos, 
@@ -742,7 +746,7 @@ int write_video_pes( int pack_size, int apidn, int ac3n, uint64_t vpts,
 	return pos;
 }
 
-int write_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts, 
+int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts, 
 		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
 		      uint8_t ptsdts, 	ringbuffer *arbuffer)
 {
@@ -751,12 +755,6 @@ int write_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts,
 	int p   = 0;
 	int stuff = 0;
 	int length = *alength;
-
-#ifdef PES_DEBUG
-	fprintf(stderr,"write audio PES ");
-	printpts(pts);
-	fprintf(stderr,"\n");
-#endif
 
 	if (!length) return 0;
 	p = PS_HEADER_L1+PES_H_MIN;
@@ -774,7 +772,7 @@ int write_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts,
 		} else 
 			length = length+p;
 	}
-	pos = write_ps_header(buf,SCR,muxr, apidn + ac3n, 0, 0, 1, 1, 
+	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
 			      1, 0);
 	pos += write_pes_header( 0xC0+n, length-pos, pts, 0, buf+pos, stuff, 
 				 ptsdts);
@@ -796,12 +794,10 @@ int write_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts,
 	return pos;
 }
 
-
-
-int write_ac3_pes(  int pack_size, int apidn, int ac3n, int n,
+int write_ac3_pes(  int pack_size, int extcnt, int n,
 		    uint64_t pts, uint64_t SCR, 
 		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
-		    int nframes,int ac3_off, ringbuffer *ac3rbuffer, int framelength)
+		    int nframes,int ac3_off, ringbuffer *ac3rbuffer)
 {
 	int add;
 	int pos = 0;
@@ -809,21 +805,14 @@ int write_ac3_pes(  int pack_size, int apidn, int ac3n, int n,
 	int stuff = 0;
 	int length = *alength;
 
-#ifdef PES_DEBUG
-	fprintf(stderr,"write ac3 PES ");
-	printpts(pts);
-	fprintf(stderr,"\n");
-#endif
-
 	if (!length) return 0;
-	p = PS_HEADER_L1+PES_H_MIN;
+	p = PS_HEADER_L1+PES_H_MIN+4;
 
 	if (ptsdts == PTS_ONLY){
 		p += 5;
 	}
 
 	if ( length+p >= pack_size){
-		if (length+p -pack_size == framelength-4) nframes--;
 		length = pack_size;
 	} else {
 		if (pack_size-length-p <= PES_MIN){
@@ -832,12 +821,12 @@ int write_ac3_pes(  int pack_size, int apidn, int ac3n, int n,
 		} else 
 			length = length+p;
 	}
-	pos = write_ps_header(buf,SCR,muxr, apidn+ac3n, 0, 0, 1, 1, 
+	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
 			      1, 0);
 
 	pos += write_pes_header( PRIVATE_STREAM1, length-pos, pts, 0, 
 				 buf+pos, stuff, ptsdts);
-	buf[pos] = 0x80 + n +apidn;
+	buf[pos] = 0x80 + n;
 	buf[pos+1] = nframes;
 	buf[pos+2] = (ac3_off >> 8)& 0xFF;
 	buf[pos+3] = (ac3_off)& 0xFF;
@@ -861,139 +850,14 @@ int write_ac3_pes(  int pack_size, int apidn, int ac3n, int n,
 	return pos;
 }
 
-
-int bwrite_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts, 
-		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
-		       uint8_t ptsdts, uint8_t *arbuffer, int bsize )
-{
-	int add;
-	int pos = 0;
-	int p   = 0;
-	int stuff = 0;
-	int length = *alength;
-
-#ifdef PES_DEBUG
-	fprintf(stderr,"write audio PES ");
-	printpts(pts);
-	fprintf(stderr,"\n");
-#endif
-
-	if (!length) return 0;
-	p = PS_HEADER_L1+PES_H_MIN;
-
-	if (ptsdts == PTS_ONLY){
-		p += 5;
-	}
-
-	if ( length+p >= pack_size){
-		length = pack_size;
-	} else {
-		if (pack_size-length-p <= PES_MIN){
-			stuff = pack_size - length-p;
-			length = pack_size;
-		} else 
-			length = length+p;
-	}
-	pos = write_ps_header(buf,SCR,muxr, apidn + ac3n, 0, 0, 1, 1, 
-			      1, 0);
-	pos += write_pes_header( 0xC0+n, length-pos, pts, 0, buf+pos, stuff, 
-				 ptsdts);
-
-	if (length -pos < bsize){
-		memcpy(buf+pos, arbuffer, length-pos);
-		add = length - pos;
-		*alength = add;
-	} else  return -1;
-	
-	pos += add;
-
-	if (pos+PES_MIN < pack_size){
-		pos += write_pes_header( PADDING_STREAM, pack_size-pos, 0,0,
-					 buf+pos, 0, 0);
-		pos = pack_size;
-	}		
-	if (pos != pack_size) {
-		fprintf(stderr,"apos: %d\n",pos);
-		exit(1);
-	}
-
-	return pos;
-}
-
-
-
-int bwrite_ac3_pes(  int pack_size, int apidn, int ac3n, int n,
-		    uint64_t pts, uint64_t SCR, 
-		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
-		     int nframes,int ac3_off, uint8_t *ac3rbuffer, int bsize, int framelength)
-{
-	int add;
-	int pos = 0;
-	int p   = 0;
-	int stuff = 0;
-	int length = *alength;
-
-#ifdef PES_DEBUG
-	fprintf(stderr,"write ac3 PES ");
-	printpts(pts);
-	fprintf(stderr,"\n");
-#endif
-	if (!length) return 0;
-	p = PS_HEADER_L1+PES_H_MIN;
-
-	if (ptsdts == PTS_ONLY){
-		p += 5;
-	}
-
-	if ( length+p >= pack_size){
-		if (length+p -pack_size == framelength-4) nframes--;
-		length = pack_size;
-	} else {
-		if (pack_size-length-p <= PES_MIN){
-			stuff = pack_size - length-p;
-			length = pack_size;
-		} else 
-			length = length+p;
-	}
-	pos = write_ps_header(buf,SCR,muxr, apidn+ac3n, 0, 0, 1, 1, 
-			      1, 0);
-
-	pos += write_pes_header( PRIVATE_STREAM1, length-pos, pts, 0, 
-				 buf+pos, stuff, ptsdts);
-	buf[pos] = 0x80 + n +apidn;
-	buf[pos+1] = nframes;
-	buf[pos+2] = (ac3_off >> 8)& 0xFF;
-	buf[pos+3] = (ac3_off)& 0xFF;
-	pos += 4;
-
-	if (length-pos <= bsize){
-		memcpy(buf+pos, ac3rbuffer, length-pos);
-		add = length-pos;
-		*alength = add;
-	} else return -1;
-	pos += add;
-
-	if (pos+PES_MIN < pack_size){
-		pos += write_pes_header( PADDING_STREAM, pack_size-pos, 0,0,
-					 buf+pos, 0, 0);
-		pos = pack_size;
-	}		
-	if (pos != pack_size) {
-		fprintf(stderr,"apos: %d\n",pos);
-		exit(1);
-	}
-
-	return pos;
-}
-
-
-int write_nav_pack(int pack_size, int apidn, int ac3n, uint64_t SCR, uint32_t muxr, 
+int write_nav_pack(int pack_size, int extcnt, uint64_t SCR, uint32_t muxr, 
 		   uint8_t *buf)
 {
 	int pos = 0;
         uint8_t headr[5] = {0x00, 0x00, 0x01, PRIVATE_STREAM2, 0x03 };
+        (void)pack_size;
 
-	pos = write_ps_header( buf, SCR, muxr, apidn+ac3n, 0, 0, 1, 1, 1, 1);
+	pos = write_ps_header( buf, SCR, muxr, extcnt, 0, 0, 1, 1, 1, 1);
 	memcpy(buf+pos, headr, 5);
 	buf[pos+5] = 0xD4;
 	pos += 6;

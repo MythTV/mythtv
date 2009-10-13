@@ -7,7 +7,6 @@
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
       <text lang="DE">Grundeinstellungen</text>
-      <text lang="FR">Réglages généraux</text>
       <text lang="DA">Generelle indstillinger</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
@@ -34,7 +33,6 @@
       <text lang="SV">Generella inställningar</text>
       <text lang="SL">Igralci</text>
       <text lang="FI">Emulaattorit</text>
-      <text lang="FR">Émulateurs</text>
       <text lang="ET">Mängijad</text>
       <text lang="NB">Spillere</text>
       <text lang="RU">Игроки</text>
@@ -53,7 +51,6 @@
       <text lang="FI">Etsi Pelejä</text>
       <text lang="ES">Buscar Juegos</text>
       <text lang="ET">Mängude skaneerimine</text>
-      <text lang="FR">Rechercher des jeux</text>
       <text lang="NB">Leit etter spill</text>
       <text lang="RU">Искать игры</text>
       <text lang="PL">Wyszukaj gry</text>
@@ -63,7 +60,6 @@
    <button>
        <type>GAME_CLEAR_DATA</type>
       <text>Clear Game Data</text>
-      <text lang="FR">Effacer les données sur les jeux</text>
       <text lang="IT">Impostazioni generali</text>
       <text lang="ES">Borrar Datos</text>
       <text lang="CA">Opcions Generals</text>

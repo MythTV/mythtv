@@ -16,7 +16,7 @@ class VideoScanner : public QObject
     void doScan(const QStringList &dirs);
 
   signals:
-    void finished();
+    void finished(bool);
 
   public slots:
     void finishedScan();

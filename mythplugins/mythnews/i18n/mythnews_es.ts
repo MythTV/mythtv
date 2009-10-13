@@ -1,126 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="es">
-<defaultcodec></defaultcodec>
+<!DOCTYPE TS>
+<TS version="2.0" language="es">
+<context>
+    <name>MythControls</name>
+    <message>
+        <location filename="../mythnews/main.cpp" line="27"/>
+        <source>RSS News feed reader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="31"/>
+        <source>Update news items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="33"/>
+        <source>Force update news items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/main.cpp" line="35"/>
+        <source>Cancel news item updating</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="395"/>
+        <location filename="../mythnews/mythnews.cpp" line="437"/>
         <source>Updated</source>
         <translation>Actualizado</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="402"/>
+        <location filename="../mythnews/mythnews.cpp" line="444"/>
         <source>Unknown</source>
         <translation>Desconocido</translation>
     </message>
     <message>
-        <source>Edit Site Details</source>
-        <translation type="obsolete">Editar Detalles Fuente</translation>
-    </message>
-    <message>
-        <source>Enter Site Details</source>
-        <translation type="obsolete">Introducir Detalles Fuente</translation>
-    </message>
-    <message>
-        <source>Name:</source>
-        <translation type="obsolete">Nombre:</translation>
-    </message>
-    <message>
-        <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
-    </message>
-    <message>
-        <source>Icon:</source>
-        <translation type="obsolete">Icono:</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="810"/>
+        <location filename="../mythnews/mythnews.cpp" line="917"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="807"/>
+        <location filename="../mythnews/mythnews.cpp" line="913"/>
         <source>Edit News Site</source>
         <translation>Editar Fuente Noticias</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="808"/>
+        <location filename="../mythnews/mythnews.cpp" line="125"/>
+        <source>You haven&apos;t configured MythNews to use any sites.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
+        <location filename="../mythnews/mythnews.cpp" line="714"/>
+        <source>%1 of %2 (%3 percent)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="786"/>
+        <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnews.cpp" line="914"/>
         <source>Add News Site</source>
         <translation>Añadir Fuente Noticias</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="809"/>
+        <location filename="../mythnews/mythnews.cpp" line="916"/>
         <source>Delete News Site</source>
         <translation>Borrar Fuente Noticias</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="795"/>
+        <location filename="../mythnews/mythnews.cpp" line="899"/>
         <source>Options</source>
         <translation>Opciones</translation>
     </message>
 </context>
 <context>
-    <name>MythNewsConfig</name>
+    <name>MythNewsEditor</name>
     <message>
-        <source>Press MENU to set the update frequency.</source>
-        <translation type="obsolete">Pulse MENU para ajustar la frecuencia de actualización.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <source>Edit Site Details</source>
+        <translation type="unfinished">Editar Detalles Fuente</translation>
     </message>
     <message>
-        <source>Set update frequency by using the up/down arrows.
-The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Ajuste la frecuencia de actualización usando las flechas arriba/abajo.
-El valor mínimo permitido es de 30 minutos.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
+        <source>Enter Site Details</source>
+        <translation type="unfinished">Introducir Detalles Fuente</translation>
     </message>
     <message>
-        <source>Press MENU to return to feed selection.</source>
-        <translation type="obsolete">Pulse MENU para volver a la selección de feeds.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
+        <source>Name:</source>
+        <translation type="unfinished">Nombre:</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnewsconfig.cpp" line="204"/>
-        <source>Set update frequency by using the up/down arrows.Minimum value is 30 Minutes.</source>
-        <translation>Ajuste la frecuencia de actualización utilizando las flechas arriba/abajo. 30 minutos es el mismo.</translation>
+        <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
+        <source>URL:</source>
+        <translation type="unfinished">URL:</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
+        <source>Icon:</source>
+        <translation type="unfinished">Icono:</translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
+        <source>Podcast:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
     </message>
 </context>
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="219"/>
+        <location filename="../mythnews/newssite.cpp" line="225"/>
+        <location filename="../mythnews/newssite.cpp" line="234"/>
+        <location filename="../mythnews/newssite.cpp" line="243"/>
         <source>Failed to retrieve news</source>
         <translation>Fallo al descargar noticias</translation>
     </message>
     <message>
-        <location filename="../mythnews/newsengine.cpp" line="199"/>
+        <location filename="../mythnews/newssite.cpp" line="226"/>
+        <source>No Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="245"/>
+        <source>Failed to read downloaded file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="253"/>
+        <source>Showing Cached News.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="274"/>
+        <source>XML-file is not valid RSS-feed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythnews/newssite.cpp" line="218"/>
         <source>Retrieve Failed. </source>
         <translation>Descarga fallida. </translation>
-    </message>
-    <message>
-        <location filename="../mythnews/newsengine.cpp" line="208"/>
-        <source>No Cached News</source>
-        <translation>Sin noticias cacheadas</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/newsengine.cpp" line="221"/>
-        <source>Failed to read downloaded file</source>
-        <translation>Fallo al leer fichero descargado</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/newsengine.cpp" line="227"/>
-        <source>Showing Cached News</source>
-        <translation>Mostrando noticias cacheadas</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>Are you sure you want to delete this news site
-
-%1</source>
-        <translation type="obsolete">¿Seguro que quiere borrar esta fuente de noticias?
-
-%1</translation>
-    </message>
-    <message>
-        <location filename="../mythnews/mythnews.cpp" line="608"/>
+        <location filename="../mythnews/mythnews.cpp" line="687"/>
         <source>Downloading media...</source>
         <translation>Obteniendo recurso...</translation>
     </message>
@@ -129,8 +168,13 @@ El valor mínimo permitido es de 30 minutos.</translation>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Minutes</source>
-        <translation>Minutos</translation>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="3"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

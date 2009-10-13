@@ -207,9 +207,7 @@ namespace
         if (dbver == "1000")
         {
             const QString updates[] = {
-"ALTER TABLE videometadata ADD playcommand VARCHAR(255);",
 "ALTER TABLE videometadata ADD INDEX(title);",
-"ALTER TABLE videometadata ADD browse BOOL NOT NULL DEFAULT 1;",
 ""
             };
 
@@ -310,6 +308,10 @@ namespace
 
         if (dbver == "1007")
         {
+// videobookmarks table was dropped in MythTV schema version 1218
+// Since mythfrontend will refuse to run without a current MythTV schema, the
+// table will be gone before this code executes.
+/*
             const QString updates[] = {
 "INSERT INTO filemarkup (filename, type, mark) SELECT filename,"
 " '2', bookmark FROM videobookmarks;",
@@ -319,6 +321,8 @@ namespace
             if (!performActualUpdate(updates, "1008", dbver,
                                      OldMythVideoVersionName))
                 return false;
+ */
+            dbver = "1008";
         }
 
         if (dbver == "1008")
@@ -660,9 +664,9 @@ namespace
 
 
         SchemaUpgradeWizard  * DBup; 
-        DBup = SchemaUpgradeWizard::Get(MythVideoVersionName,
+        DBup = SchemaUpgradeWizard::Get(MythVideoVersionName, "MythVideo",
                                         currentDatabaseVersion); 
-	 
+
         // There may be a race condition where another frontend is upgrading, 
         // so wait up to 3 seconds for a more accurate version: 
         DBup->CompareAndWait(3); 
@@ -671,7 +675,8 @@ namespace
             return true;
 
         // An upgrade is likely. Ensure we have a backup first:
-        if (!DBup->didBackup)
+        if ((DBup->backupStatus == kDB_Backup_Unknown) ||
+            (DBup->backupStatus == kDB_Backup_Failed))
             DBup->BackupDB();
 
         // Pop up messages, questions, warnings, et c. 
@@ -703,6 +708,8 @@ namespace
 
         if (dbver == "1012")
         {
+            VERBOSE(VB_IMPORTANT, "Upgrading to MythVideo schema version 1013");
+
             // handle DialogType value change
             const QString setting("Default MythVideo View");
             int view = gContext->GetNumSetting(setting, -1);
@@ -719,6 +726,8 @@ namespace
             }
             if (!UpdateDBVersionNumber(MythVideoVersionName, "1013"))
                 return false;
+
+            dbver = "1013";
         }
 
         if (dbver == "1013")
@@ -890,6 +899,8 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
         if (dbver == "1020")
         {
+            VERBOSE(VB_IMPORTANT, "Upgrading to MythVideo schema version 1021");
+
             AddFileType("mkv");
             AddFileType("mp4");
             AddFileType("m2ts");
@@ -977,6 +988,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
         if (dbver == "1027")
         {
+            VERBOSE(VB_IMPORTANT, "Upgrading to MythVideo schema version 1028");
             VERBOSE(VB_IMPORTANT, "Converting filenames in filemarkup table "
                     "from absolute to relative paths.  This may take a long "
                     "time if you have a large number of MythVideo seektables.");
@@ -1023,6 +1035,8 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
             if (!UpdateDBVersionNumber(MythVideoVersionName, "1028"))
                 return false;
+
+            dbver = "1028";
         }
 
         return true;

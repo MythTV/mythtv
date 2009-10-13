@@ -17,13 +17,16 @@ static SchemaUpgradeWizard * c_wizard = 0;
 
 
 SchemaUpgradeWizard::SchemaUpgradeWizard(const QString &DBSchemaSetting,
+                                         const QString &appName,
                                          const QString &upgradeSchemaVal)
-    : DBver(), didBackup(false), emptyDB(false), versionsBehind(-1),
+    : DBver(), emptyDB(false), versionsBehind(-1),
+      backupStatus(kDB_Backup_Unknown),
       m_autoUpgrade(false),
       m_backupResult(),
       m_busyPopup(NULL),
       m_expertMode(false),
       m_schemaSetting(DBSchemaSetting),
+      m_schemaName(appName),
       m_newSchemaVer(upgradeSchemaVal)
 {
     c_wizard = this;
@@ -46,15 +49,18 @@ SchemaUpgradeWizard::~SchemaUpgradeWizard()
 
 SchemaUpgradeWizard *
 SchemaUpgradeWizard::Get(const QString &DBSchemaSetting,
+                         const QString &appName,
                          const QString &upgradeSchemaVal)
 {
     if (c_wizard == 0)
-        c_wizard = new SchemaUpgradeWizard(DBSchemaSetting, upgradeSchemaVal);
+        c_wizard = new SchemaUpgradeWizard(DBSchemaSetting, appName,
+                                           upgradeSchemaVal);
     else
     {
         c_wizard->DBver            = QString();
         c_wizard->versionsBehind   = -1;
         c_wizard->m_schemaSetting  = DBSchemaSetting;
+        c_wizard->m_schemaName     = appName;
         c_wizard->m_newSchemaVer   = upgradeSchemaVal;
     }
 
@@ -74,18 +80,18 @@ void SchemaUpgradeWizard::BusyPopup(const QString &message)
     m_busyPopup = ShowBusyPopup(message);
 }
 
-bool SchemaUpgradeWizard::BackupDB(void)
+MythDBBackupStatus SchemaUpgradeWizard::BackupDB(void)
 {
     if (emptyDB)
     {
         VERBOSE(VB_GENERAL,
                 "The database seems to be empty - not attempting a backup");
-        return false;
+        return kDB_Backup_Empty_DB;
     }
 
-    didBackup = DBUtil::BackupDB(m_backupResult);
+    backupStatus = DBUtil::BackupDB(m_backupResult);
 
-    return didBackup;
+    return backupStatus;
 }
 
 int SchemaUpgradeWizard::Compare(void)
@@ -104,7 +110,9 @@ int SchemaUpgradeWizard::Compare(void)
         }
     }
     else
-        VERBOSE(VB_GENERAL, "Current Schema Version: " + DBver);
+        VERBOSE(VB_GENERAL, QString("Current %1 Schema Version (%2): %3")
+                                    .arg(m_schemaName).arg(m_schemaSetting)
+                                    .arg(DBver));
 
 #if TESTING
     //DBver = "9" + DBver + "-testing";
@@ -119,8 +127,8 @@ int SchemaUpgradeWizard::CompareAndWait(const int seconds)
 {
     if (Compare() > 0)  // i.e. if DB is older than expected
     {
-        QString message = tr("Database schema is old."
-                             " Waiting to see if DB is being upgraded.");
+        QString message = tr("%1 database schema is old. Waiting to see if DB "
+                             "is being upgraded.").arg(m_schemaName);
 
         VERBOSE(VB_IMPORTANT, message);
 
@@ -368,7 +376,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
         }
     }
 
-    if (!didBackup)
+    if (backupStatus == kDB_Backup_Failed)
         message += "\n" + tr("MythTV was unable to backup your database.");
 
     if (message.contains("%1"))
@@ -396,7 +404,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
             return returnValue;  // Experts don't like to repeat themselves :-)
 
         // The annoying extra confirmation:
-        if (didBackup)
+        if (backupStatus == kDB_Backup_Completed)
         {
             int dirPos = m_backupResult.lastIndexOf('/');
             QString dirName;
@@ -427,10 +435,11 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (returnValue == MYTH_SCHEMA_ERROR)
         return MYTH_SCHEMA_ERROR;
 
-    if (!didBackup)
+    if (backupStatus == kDB_Backup_Failed)
         cout << "WARNING: MythTV was unable to backup your database."
              << endl << endl;
-    else if (m_backupResult != "")
+    else if ((backupStatus == kDB_Backup_Completed) &&
+             (m_backupResult != ""))
         cout << "If your system becomes unstable, "
                 "a database backup is located in "
              << m_backupResult.toLocal8Bit().constData() << endl << endl;
@@ -449,7 +458,8 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
     if (connections)
         cout << endl << warnOtherCl.toLocal8Bit().constData() << endl;
 
-    if (didBackup)
+    if ((backupStatus != kDB_Backup_Completed) &&
+        (backupStatus != kDB_Backup_Empty_DB))
     {
         resp = getResponse("\nA database backup might be a good idea"
                            "\nAre you sure you want to upgrade?", "no");

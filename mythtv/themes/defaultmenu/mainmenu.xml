@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="MAIN">
 
     <button>
@@ -5,7 +6,6 @@
         <text>Media Library</text>
         <text lang="IT">Multimedia</text>
         <text lang="DE">Mediathek</text>
-        <text lang="FR">Médiathèque</text>
         <text lang="IS">Margmiðlunarsafn</text>
         <text lang="NL">Mediatheek</text>    
         <text lang="SV">Mediabibliotek</text>
@@ -14,15 +14,14 @@
         <text lang="ZH_TW">媒體館</text>
         <text lang="SL">Media</text>
         <text lang="ET">Meediakataloog</text>
-        <text lang="NB">Mediebibliotek</text>
         <text lang="DA">Mediebibliotek</text>
         <text lang="ES">Mediateca</text>
         <text lang="PT">Galeria Multimédia</text>
-        <text lang="CS">Multimediální katalog</text>
         <text lang="RU">Мультимедиа</text>
         <text lang="AR">مكتبة الوسائط</text>
         <text lang="PL">Biblioteka media***</text>
         <text lang="HE">ספרית המדיה</text>
+        <text lang="HU">Média könyvtár</text>
         <alttext lang="SV">Bibliotek</alttext>
         <alttext lang="ET">Kataloog</alttext>
         <alttext lang="PT">Galeria</alttext>
@@ -30,6 +29,7 @@
         <alttext lang="AR">المكتبة</alttext>
         <action>MENU library.xml</action>
         <description>Play any of your media</description>
+        <description lang="DE">Musik hören, Videos ansehen usw.</description>
     </button>
   
     <button>
@@ -37,9 +37,7 @@
         <text>Manage Recordings</text>
         <text lang="IT">Programma Registrazioni</text>
         <text lang="ES">Programar Grabaciones</text>
-        <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Beheren</text>
-        <text lang="FR">Gérer les enregistrements</text>
         <text lang="DE">Aufnahmen verwalten</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="IS">Upptaka útsendinga</text>
@@ -50,12 +48,11 @@
         <text lang="ZH_TW">管理電視錄影</text>
         <text lang="SL">Posnetki</text>
         <text lang="ET">Salvestamine</text>
-        <text lang="NB">Behandle opptak</text>
-        <text lang="CS">Spravovat nahrávky</text>
         <text lang="RU">Управление записями</text>
         <text lang="AR">أدر التسجيلات</text>
         <text lang="PL">Zarządzaj nagraniami</text>
         <text lang="HE">ניהול הקלטות</text>
+        <text lang="HU">Felvételek kezelése</text>
         <alttext lang="DE">Verwaltung</alttext>
         <alttext lang="SV">Hantera</alttext>
         <alttext lang="ES">Programar</alttext>
@@ -63,6 +60,7 @@
         <alttext lang="RU">Записи</alttext>
         <alttext lang="AR">التسجيلات</alttext>
         <description>Pick and prioritize shows to record</description>
+        <description lang="DE">Planen Sie Ihre Aufnahmen</description>
         <action>MENU manage_recordings.xml</action>
     </button>
 
@@ -71,7 +69,6 @@
         <text>Information Center</text>
         <text lang="IT">Centro Informazioni</text>
         <text lang="DE">Informationen</text>
-        <text lang="FR">Centre d&apos;informations</text>
         <text lang="IS">Upplýsinga miðstöð</text>
         <text lang="NL">Informatie Centrale</text>
         <text lang="SV">Informationscenter</text>
@@ -80,16 +77,15 @@
         <text lang="ZH_TW">資訊中心</text>
         <text lang="SL">Info center</text>
         <text lang="ET">Infokeskus</text>
-        <text lang="NB">Informasjonssenter</text>
         <text lang="DA">Informationscenter</text>
         <text lang="ES">Centro de Información</text>
         <text lang="EN_GB">Information Centre</text>
         <text lang="PT">Centro de Informação</text>
         <text lang="PL">Centrum informacyjne</text>
-        <text lang="CS">Centrum informací</text>
         <text lang="RU">Центр информации</text>
         <text lang="AR">مركز المعلومات</text>
         <text lang="HE">מרכז מידע</text>
+        <text lang="HU">Információk</text>
         <alttext lang="ES">Información</alttext>
         <alttext lang="DE">Infocenter</alttext>
         <alttext lang="DA">Infocenter</alttext>
@@ -101,6 +97,7 @@
         <alttext lang="RU">Информация</alttext>
         <alttext lang="AR">معلومات</alttext>
         <description>Information and Communications</description>
+        <description lang="DE">Informationen &amp; Kommunikation</description>
         <action>MENU info_menu.xml</action>
     </button>
 
@@ -109,26 +106,25 @@
         <text>Optical Disks</text>
         <text lang="IT">CD/DVD</text>
         <text lang="DE">CD/DVD</text>
-        <text lang="FR">Disques optiques</text>
         <text lang="IS">Geisladiskar</text>
         <text lang="NL">DVD/CD</text>
-        <text lang="SV">Optiska diskar</text>
+        <text lang="SV">Optiska skivor</text>
         <text lang="JA">オプティカルディスク</text>
         <text lang="FI">DVD ja CD</text>
         <text lang="ZH_TW">光碟</text>
         <text lang="SL">CD/DVD</text>
         <text lang="ET">DVD ja CD</text>
-        <text lang="NB">CD-/DVD-stasjoner</text>
         <text lang="DA">CD/DVD</text>
         <text lang="ES">CD/DVD</text>
         <text lang="EN_GB">CD/DVD</text>
         <text lang="PT">CD/DVD</text>
-        <text lang="CS">CD/DVD</text>
         <text lang="RU">CD/DVD</text>
         <text lang="AR">تشغيل إسطوانات</text>
         <text lang="PL">Dyski optyczne</text>
         <text lang="HE">דיסקים אופטים</text>
+        <text lang="HU">CD/DVD</text>
         <description>Play or import CDs and DVDs</description>
+        <description lang="DE">Abspielen/Importieren von CDs und DVDs</description>
         <action>MENU optical_menu.xml</action>
         <depends>mythmusic mythvideo mytharchive mythburn</depends>
     </button>
@@ -138,9 +134,7 @@
         <text>Watch TV</text>
         <text lang="IT">Guarda la TV</text>
         <text lang="ES">Ver la TV</text>
-        <text lang="CS">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
-        <text lang="FR">Regarder la TV</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
         <text lang="IS">Horfa á sjónvarp</text>
@@ -151,13 +145,13 @@
         <text lang="ZH_TW">觀看電視</text>
         <text lang="SL">Glej TV</text>
         <text lang="ET">Vaata telerit</text>
-        <text lang="NB">Se på TV</text>
-        <text lang="CS">Sledovat TV</text>
         <text lang="RU">Смотреть ТВ</text>
         <text lang="AR">شاهد التلفاز</text>
         <text lang="PL">Oglądanie TV</text>
         <text lang="HE">צפיה בטלויזיה</text>
+        <text lang="HU">TV nézés</text>
         <description>Watch live television</description>
+        <description lang="DE">Jetzt Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -166,8 +160,6 @@
         <text>Utilities / Setup</text>
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configuración</text>
-        <text lang="CS">Configurar</text>
-        <text lang="FR">Utilitaires / Configuration</text>
         <text lang="DE">Zubehör / Konfiguration</text>
         <text lang="DA">Tilbehør/Indstillinger</text>
         <text lang="IS">Uppsetning</text>
@@ -179,25 +171,24 @@
         <text lang="ZH_TW">工具/設定</text>
         <text lang="SL">Nastavitve</text>
         <text lang="ET">Utiliidid / sätted</text>
-        <text lang="NB">Verktøy/Oppsett</text>
-        <text lang="CS">Pomůcky</text>
         <text lang="RU">Утилиты / Настройки</text>
         <text lang="AR">تضبيطات</text>
         <text lang="PL">Narzędzia / ustawienia</text>
         <text lang="HE">עזרים / הגדרות</text>
+        <text lang="HU">Eszközök / Beállítások</text>
         <alttext lang="DE">Verschiedenes</alttext>
         <alttext lang="SV">Inställningar</alttext>
         <alttext lang="ET">Sätted</alttext>
         <alttext lang="RU">Настройки</alttext>
         <alttext lang="AR">تضبيطات</alttext>
         <description>Configure MythTV and plugins</description>
+        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU util_menu.xml</action>
     </button>
 
     <!-- <button>
         <type>SHUTDOWN</type>
         <text>Shutdown</text>
-        <text lang="FR">Éteindre</text>
         <text lang="SV">Avstängning</text>
         <text lang="DA">Sluk</text>
         <text lang="NL">Uitschakelen</text>
@@ -208,6 +199,7 @@
         <text lang="RU">Завершение работы</text>
         <text lang="PL">Zamknij system</text>
         <text lang="HE">כיבוי</text>
+        <text lang="HU">Leállítás</text>
         <action>SHUTDOWN</action>
     </button> -->
 

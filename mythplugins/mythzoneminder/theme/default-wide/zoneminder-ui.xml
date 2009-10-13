@@ -334,13 +334,13 @@
         </shape>
 
         <textarea name="label1" from="basetextarea">
-            <area>60,85,200,50</area>
+            <area>65,85,200,50</area>
             <font>listlabel</font>
             <value>Select Camera</value>
         </textarea>
 
         <textarea name="label2" from="basetextarea">
-            <area>500,85,200,50</area>
+            <area>575,85,200,50</area>
             <font>listlabel</font>
             <value>Select Date</value>
         </textarea>
@@ -350,11 +350,11 @@
         </buttonlist>
 
         <buttonlist name="date_selector" from="basewideselector">
-            <position>500,110</position>
+            <position>570,110</position>
         </buttonlist>
 
         <textarea name="eventno_text" from="basetextarea">
-            <area>1080,125,120,50</area>
+            <area>1090,125,130,50</area>
             <font>label</font>
             <align>right</align>
             <value>0/0</value>

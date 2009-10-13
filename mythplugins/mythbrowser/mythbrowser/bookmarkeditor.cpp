@@ -74,10 +74,6 @@ bool BookmarkEditor::Create()
         return false;
     }
 
-    m_okButton->SetText(tr("Ok"));
-    m_cancelButton->SetText(tr("Cancel"));
-    m_findCategoryButton->SetText(tr("Find..."));
-
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(Save()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Exit()));
     connect(m_findCategoryButton, SIGNAL(Clicked()), this, SLOT(slotFindCategory()));

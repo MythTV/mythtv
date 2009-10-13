@@ -104,7 +104,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     friend class PlayerContext;
 
   public:
-    NuppelVideoPlayer();
+    NuppelVideoPlayer(bool muted = false);
    ~NuppelVideoPlayer();
 
     // Initialization
@@ -720,6 +720,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void    *audio_codec;
     bool     audio_passthru;
     QMutex   audio_lock;
+    bool     audio_muted_on_creation;
 
     // Picture-in-Picture
     mutable QMutex pip_players_lock;

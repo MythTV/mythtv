@@ -62,6 +62,7 @@ class NetworkControl : public QTcpServer
     QString answer;
     QMap <QString, QString> jumpMap;
     QMap <QString, int> keyMap;
+    QMap <int, QString> keyTextMap;
 
     mutable QMutex  clientLock;
     QTcpSocket     *client;

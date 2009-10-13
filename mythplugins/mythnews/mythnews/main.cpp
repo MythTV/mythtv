@@ -24,11 +24,15 @@ int  RunNews(void);
 
 void setupKeys(void)
 {
-    REG_JUMP("MythNews", "RSS News feed reader", "", runNews);
+    REG_JUMP("MythNews", QT_TRANSLATE_NOOP("MythControls",
+        "RSS News feed reader"), "", runNews);
 
-    REG_KEY("News", "RETRIEVENEWS", "Update news items", "I");
-    REG_KEY("News", "FORCERETRIEVE", "Force update news items", "M");
-    REG_KEY("News", "CANCEL", "Cancel news item updating", "C");
+    REG_KEY("News", "RETRIEVENEWS",
+        QT_TRANSLATE_NOOP("MythControls", "Update news items"), "I");
+    REG_KEY("News", "FORCERETRIEVE",
+        QT_TRANSLATE_NOOP("MythControls", "Force update news items"), "M");
+    REG_KEY("News", "CANCEL",
+        QT_TRANSLATE_NOOP("MythControls", "Cancel news item updating"), "C");
 }
 
 int mythplugin_init(const char *libversion)

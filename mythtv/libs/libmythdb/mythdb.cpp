@@ -1,5 +1,6 @@
 #include <QMutex>
 #include <QHash>
+#include <QSqlError>
 
 #include "mythdb.h"
 #include "mythdbcon.h"
@@ -58,6 +59,7 @@ class MythDBPrivate
 
     bool ignoreDatabase;
     bool useSettingsCache;
+    bool suppressDBMessages;
     QMutex settingsCacheLock;
     QHash <QString, QString> settingsCache;      // permanent settings in the DB
     QHash <QString, QString> overriddenSettings; // overridden this session only
@@ -67,7 +69,7 @@ static const int settings_reserve = 61;
 
 MythDBPrivate::MythDBPrivate()
     : m_settings(new Settings()),
-      ignoreDatabase(false), useSettingsCache(false)
+      ignoreDatabase(false), useSettingsCache(false), suppressDBMessages(true)
 {
     m_localhostname.clear();
     settingsCache.reserve(settings_reserve);
@@ -193,6 +195,16 @@ bool MythDB::IsDatabaseIgnored(void) const
     return d->ignoreDatabase;
 }
 
+void MythDB::SetSuppressDBMessages(bool bUpgraded)
+{
+    d->suppressDBMessages = bUpgraded;
+}
+
+bool MythDB::SuppressDBMessages(void) const
+{
+    return d->suppressDBMessages;
+}
+
 
 void MythDB::SaveSetting(const QString &key, int newValue)
 {
@@ -247,7 +259,7 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (!host.isEmpty())
             query.bindValue(":HOSTNAME", host);
 
-        if (!query.exec() || !query.isActive())
+        if (!query.exec() && !(GetMythDB()->SuppressDBMessages()))
             MythDB::DBError("Clear setting", query);
 
         if (!host.isEmpty())
@@ -262,10 +274,10 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         if (!host.isEmpty())
             query.bindValue(":HOSTNAME", host);
 
-        if (!query.exec() || !query.isActive())
-            MythDB::DBError(LOC + "- query failure: ", query);
-        else
+        if (query.exec())
             success = true;
+        else if (!(GetMythDB()->SuppressDBMessages()))
+            MythDB::DBError(LOC + "- query failure: ", query);
     }
     else
     {

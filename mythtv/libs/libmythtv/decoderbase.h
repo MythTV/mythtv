@@ -161,7 +161,8 @@ class DecoderBase
     bool DoRewindSeek(long long desiredFrame);
     void DoFastForwardSeek(long long desiredFrame, bool &needflush);
 
-    long long GetLastFrameInPosMap(long long desiredFrame);
+    long long ConditionallyUpdatePosMap(long long desiredFrame);
+    long long GetLastFrameInPosMap(void) const;
     unsigned long GetPositionMapSize(void) const;
 
     typedef struct posmapentry
@@ -170,7 +171,7 @@ class DecoderBase
         long long adjFrame; // keyFrameAdjustTable adjusted frame number
         long long pos;      // position in stream
     } PosMapEntry;
-    long long GetKey(PosMapEntry &entry) const;
+    long long GetKey(const PosMapEntry &entry) const;
 
     NuppelVideoPlayer *m_parent;
     ProgramInfo *m_playbackinfo;

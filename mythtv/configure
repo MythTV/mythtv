@@ -3872,6 +3872,7 @@ echo "#define FFMPEG_DATADIR \"$(eval c_escape $datadir)\"" >> $TMPH
 
 echo "RUNPREFIX=$runprefix" >> $MYTH_CONFIG_MAK
 echo "PREFIX=$prefix" >> $MYTH_CONFIG_MAK
+echo "SYSROOT=$sysroot" >> $MYTH_CONFIG_MAK
 echo "LIBDIRNAME=$libdir_name" >> $MYTH_CONFIG_MAK
 echo "LIBDIR=$libdir" >> $MYTH_CONFIG_MAK
 <<BLOCK_QUOTE

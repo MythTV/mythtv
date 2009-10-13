@@ -1,6 +1,7 @@
 #include <QString>
 #include <QDir>
 #include <QStringList>
+#include <QSqlError>
 
 #include <mythcontext.h>
 #include <mythdb.h>

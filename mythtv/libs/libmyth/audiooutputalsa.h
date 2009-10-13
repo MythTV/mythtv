@@ -72,7 +72,9 @@ class AudioOutputALSA : public AudioOutputBase
                              unsigned int rate, unsigned int buffer_time,
                              unsigned int period_time);
 
-
+    void ReorderSmpteToAlsa6ch(void *buf, int frames);
+    template <class AudioDataType>
+        void _ReorderSmpteToAlsa6ch(AudioDataType *buf, int frames);
     // Volume related
     void SetCurrentVolume(QString control, int channel, int volume);
     void OpenMixer(bool setstartingvolume);

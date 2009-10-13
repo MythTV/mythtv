@@ -11,13 +11,13 @@
       <text lang="NL">Muziek Afspelen</text>
       <text lang="PT">Tocar Músicas</text>
       <text lang="SV">Spela musik</text>
-      <text lang="FR">Jouer la musique</text>
       <text lang="JA">ミュージック再生</text>
       <text lang="FI">Soita Musiikkia</text>
       <text lang="SL">Predvajaj glasbo</text>
       <text lang="ET">Muusika mängimine</text>
       <text lang="RU">Слушать музыку</text>
       <text lang="PL">Odtwarzaj muzykę</text>
+      <text lang="NB">Spill musikk</text>
       <action>MUSIC_PLAY</action>
    </button>
 
@@ -32,13 +32,13 @@
       <text lang="NL">Muziek Kiezen</text>
       <text lang="PT">Escolher Músicas</text>
       <text lang="SV">Välj musik</text>
-      <text lang="FR">Sélectionner la musique</text>
       <text lang="JA">ミュージック選択</text>
       <text lang="FI">Valitse Musiikkia</text>
       <text lang="SL">Izberi glasbo</text>
       <text lang="ET">Muusika valimine</text>
       <text lang="RU">Выбрать музыку</text>
       <text lang="PL">Lista odtwarzania</text>
+      <text lang="NB">Velg musikk</text>
       <action>MUSIC_CREATE_PLAYLIST</action>
    </button>
 
@@ -53,25 +53,25 @@
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Importar CD para Disco</text>
       <text lang="SV">Importera CD</text>
-      <text lang="FR">Importer un CD</text>
       <text lang="JA">CD取込</text>
       <text lang="FI">Tuo CD</text>
       <text lang="SL">Uvozi CD</text>
       <text lang="ET">CD importimine</text>
       <text lang="RU">Импортировать CD</text>
       <text lang="PL">Zrzucaj CD</text>
+      <text lang="NB">Importer CD</text>
       <action>MUSIC_RIP</action>
    </button>
 
    <button>
        <type>MUSIC_IMPORT</type>
        <text>Import Files</text>
-       <text lang="FR">Importer des fichiers</text>
        <text lang="DA">Importér filer</text>
        <text lang="SL">Uvoz datotek</text>
        <text lang="PL">Importuj muzykę</text>
        <text lang="FI">Tuo Tiedostoja</text>
        <text lang="DE">Datei-Import</text>
+       <text lang="NB">Importer filer</text>
        <action>MUSIC_IMPORT</action>
    </button>
 
@@ -86,13 +86,13 @@
       <text lang="NL">Muziek Zoeken</text>
       <text lang="PT">Refresc. Lista Músicas</text>
       <text lang="SV">Scanna efter ny musik</text>
-      <text lang="FR">Rechercher de nouvelles musiques</text>
       <text lang="JA">新しいミュージックを検索</text>
       <text lang="FI">Hae Uutta Musiikkia</text>
       <text lang="SL">Iskanje nove glasbe</text>
       <text lang="ET">Uue muusika skaneerimine</text>
       <text lang="RU">Искать новую музыку</text>
       <text lang="PL">Wyszukaj nową muzykę</text>
+      <text lang="NB">Søk etter musikk</text>
       <action>SETTINGS_SCAN</action>
    </button>
 
@@ -101,11 +101,11 @@
       <text>Eject media</text>
       <text lang="ET">Meedia väljastamine</text>
       <text lang="RU">Достать диск</text>
-      <text lang="FR">Éjecter le média</text>
       <text lang="SL">Izvrzi medij</text>
       <text lang="PL">Wysuń tackę</text>
       <text lang="FI">Poista Media</text>
       <text lang="DE">CD auswerfen</text>
+      <text lang="NB">Løs ut CD</text>
       <action>EJECT</action>
    </button>
 
@@ -115,7 +115,6 @@
      <text>Music Settings</text>
      <text lang="IT">Impostazioni Musica</text>
      <text lang="ES">Configurar Música</text>
-     <text lang="FR">Réglages Musique</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
      <text lang="DA">Musik Indstillinger</text>
@@ -129,11 +128,11 @@
      <text lang="SL">Glasbene nastavitve</text>
      <text lang="ET">Muusika sätted</text>
      <text lang="NB">Musikkinnstillinger</text>
-     <text lang="CS">Nastavení muziky</text>
      <text lang="RU">Настройка музыки</text>
      <text lang="PL">Konfiguracja Muzyki</text>
      <text lang="HE">הגדרות מוסיקה</text>
      <description>Configure playback and CD ripping</description>
+     <description lang="NB">Konfigurer avspilling og CD-ripping</description>
      <action>CONFIGPLUGIN mythmusic</action>
    </button>
 

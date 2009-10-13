@@ -293,8 +293,8 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
 void OpenGLVideo::CheckResize(bool deinterlacing, bool allow)
 {
     // to improve performance on slower cards
-    bool resize_up = (video_dim.height() < display_video_rect.height()) ||
-                     (video_dim.width()  < display_video_rect.width()) && allow;
+    bool resize_up = ((video_dim.height() < display_video_rect.height()) ||
+                     (video_dim.width() < display_video_rect.width())) && allow;
 
     // to ensure deinterlacing works correctly
     bool resize_down = (video_dim.height() > display_video_rect.height()) &&

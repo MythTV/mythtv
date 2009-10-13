@@ -3,6 +3,8 @@
 
 #include <QApplication>
 #include <QDomDocument>
+#include <QFontMetrics>
+#include <QString>
 
 #include "mythverbose.h"
 
@@ -64,13 +66,6 @@ MythUIText::~MythUIText()
 {
     delete m_Font;
     m_Font = NULL;
-//     QMutableMapIterator<QString, MythFontProperties> it(m_FontStates);
-//     while (it.hasNext())
-//     {
-//         it.next();
-//         delete it.value();
-//         it.remove();
-//     }
 }
 
 void MythUIText::Reset()
@@ -78,7 +73,6 @@ void MythUIText::Reset()
     if (m_Message != m_DefaultMessage)
     {
         SetText(m_DefaultMessage);
-        m_CutMessage.clear();
         SetRedraw();
     }
 
@@ -96,15 +90,17 @@ void MythUIText::SetText(const QString &text)
     if (newtext == m_Message)
         return;
 
+    m_Message = newtext;
+    m_CutMessage.clear();
+    FillCutMessage();
+    
     if (m_scrolling)
     {
         QFontMetrics fm(GetFontProperties()->face());
-        QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
+        QSize stringSize = fm.size(Qt::TextSingleLine, m_CutMessage);
         SetDrawRectSize(stringSize.width(), m_Area.height());
     }
 
-    m_Message = newtext;
-    m_CutMessage.clear();
     SetRedraw();
 }
 
@@ -122,6 +118,7 @@ void MythUIText::SetFontProperties(const MythFontProperties &fontProps)
 {
     m_FontStates.insert("default", fontProps);
     *m_Font = m_FontStates["default"];
+    FillCutMessage();
     SetRedraw();
 }
 
@@ -132,25 +129,27 @@ void MythUIText::SetFontState(const QString &state)
     else
         *m_Font = m_FontStates["default"];
 
+    FillCutMessage();
     SetRedraw();
 }
 
 void MythUIText::UseAlternateArea(bool useAlt)
 {
-    m_CutMessage.clear();
-
     if (useAlt && m_AltDisplayRect.width() > 1)
         MythUIType::SetArea(m_AltDisplayRect);
     else
         MythUIType::SetArea(m_OrigDisplayRect);
+    FillCutMessage();
 }
 
 void MythUIText::SetJustification(int just)
 {
-    if (m_Justification != just)
+    if (m_Justification != (just & ~Qt::TextWordWrap))
     {
-        m_Justification = just;
-        m_CutMessage.clear();
+        // preserve the wordbreak attribute, drop everything else
+        m_Justification = m_Justification & Qt::TextWordWrap;
+        m_Justification |= just;
+        FillCutMessage();
         SetRedraw();
     }
 }
@@ -163,7 +162,7 @@ int MythUIText::GetJustification(void)
 void MythUIText::SetCutDown(bool cut)
 {
     m_Cutdown = cut;
-    m_CutMessage.clear();
+    FillCutMessage();
     SetRedraw();
 }
 
@@ -174,6 +173,7 @@ void MythUIText::SetMultiLine(bool multiline)
         m_Justification |= Qt::TextWordWrap;
     else
         m_Justification &= ~Qt::TextWordWrap;
+    FillCutMessage();
     SetRedraw();
 }
 
@@ -189,6 +189,7 @@ void MythUIText::SetArea(const MythRect &rect)
         QSize stringSize = fm.size(Qt::TextSingleLine, m_Message);
         SetDrawRectSize(stringSize.width(), m_Area.height());
     }
+    FillCutMessage();
 }
 
 void MythUIText::SetPosition(const MythPoint &pos)
@@ -244,16 +245,15 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     int alpha = CalcAlpha(alphaMod);
 
-    if (m_CutMessage.isEmpty())
-    {
-        if (m_Cutdown)
-            m_CutMessage = cutDown(m_Message, m_Font, m_MultiLine);
-        else
-            m_CutMessage = m_Message;
-    }
+    p->DrawText(drawrect, m_CutMessage, m_Justification, *m_Font, alpha, area);
+}
+
+void MythUIText::FillCutMessage()
+{
+    m_CutMessage = m_Message;
 
     if (!m_CutMessage.isEmpty())
-        {
+    {
         QStringList templist;
         QStringList::iterator it;
         switch (m_textCase)
@@ -265,14 +265,14 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                 m_CutMessage = m_CutMessage.toLower();
             break;
             case CaseCapitaliseFirst :
-                m_CutMessage = m_CutMessage.toLower();
+                //m_CutMessage = m_CutMessage.toLower();
                 templist = m_CutMessage.split(". ");
                 for (it = templist.begin(); it != templist.end(); ++it)
                     (*it).replace(0,1,(*it).left(1).toUpper());
                 m_CutMessage = templist.join(". ");
                 break;
             case CaseCapitaliseAll :
-                m_CutMessage = m_CutMessage.toLower();
+                //m_CutMessage = m_CutMessage.toLower();
                 templist = m_CutMessage.split(" ");
                 for (it = templist.begin(); it != templist.end(); ++it)
                     (*it).replace(0,1,(*it).left(1).toUpper());
@@ -280,8 +280,9 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             break;
         }
     }
-
-    p->DrawText(drawrect, m_CutMessage, m_Justification, *m_Font, alpha, area);
+    
+    if (m_Cutdown & !m_CutMessage.isEmpty())
+        m_CutMessage = cutDown(m_CutMessage, m_Font, m_MultiLine);
 }
 
 void MythUIText::Pulse(void)
@@ -376,20 +377,14 @@ void MythUIText::StopCycling(void)
 }
 
 QString MythUIText::cutDown(const QString &data, MythFontProperties *font,
-                            bool multiline, int overload_width,
-                            int overload_height)
+                            bool multiline)
 {
     int length = data.length();
     if (length == 0)
         return data;
 
     int maxwidth = m_Area.width();
-    if (overload_width != -1)
-        maxwidth = overload_width;
     int maxheight = m_Area.height();
-    if (overload_height != -1)
-        maxheight = overload_height;
-
     int justification = Qt::AlignLeft | Qt::TextWordWrap;
     QFontMetrics fm(font->face());
 
@@ -493,11 +488,7 @@ bool MythUIText::ParseElement(QDomElement &element)
     else if (element.tagName() == "align")
     {
         QString align = getFirstText(element).toLower();
-
-        // preserve the wordbreak attribute, drop everything else
-        m_Justification = m_Justification & Qt::TextWordWrap;
-
-        m_Justification |= parseAlignment(align);
+        SetJustification(parseAlignment(align));
     }
     else if (element.tagName() == "colorcycle")
     {
@@ -558,6 +549,7 @@ bool MythUIText::ParseElement(QDomElement &element)
             m_textCase = CaseCapitaliseAll;
         else
             m_textCase = CaseNormal;
+        FillCutMessage();
     }
     else
         return MythUIType::ParseElement(element);
@@ -624,6 +616,6 @@ void MythUIText::CreateCopy(MythUIType *parent)
 
 void MythUIText::Finalize(void)
 {
-    m_CutMessage.clear();
+    FillCutMessage();
 }
 

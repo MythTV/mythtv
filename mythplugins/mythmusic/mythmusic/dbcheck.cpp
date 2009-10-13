@@ -71,7 +71,7 @@ bool UpgradeMusicDatabaseSchema(void)
     SchemaUpgradeWizard  * DBup;
 
 
-    DBup = SchemaUpgradeWizard::Get("MusicDBSchemaVer",
+    DBup = SchemaUpgradeWizard::Get("MusicDBSchemaVer", "MythMusic",
                                     currentDatabaseVersion);
 
     // There may be a race condition where another frontend is upgrading,
@@ -81,13 +81,12 @@ bool UpgradeMusicDatabaseSchema(void)
     if (DBup->versionsBehind == 0)  // same schema
         return true;
 
-    bool retVal;
-
     if (DBup->DBver.isEmpty())
         return doUpgradeMusicDatabaseSchema(DBup->DBver);
 
     // An upgrade is likely. Ensure we have a backup first:
-    if (!DBup->didBackup)
+    if ((DBup->backupStatus == kDB_Backup_Unknown) ||
+        (DBup->backupStatus == kDB_Backup_Failed))
         DBup->BackupDB();
 
     // Pop up messages, questions, warnings, et c.
@@ -410,7 +409,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 "CREATE TABLE music_playlists ("
 "    playlist_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
 "    playlist_name varchar(255) NOT NULL default '',"
-"    playlist_songs text NOT NULL default '',"
+"    playlist_songs text NOT NULL,"
 "    last_accessed timestamp NOT NULL,"
 "    length int(11) unsigned NOT NULL default '0',"
 "    songcount smallint(8) unsigned NOT NULL default '0',"
@@ -418,7 +417,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 ");",
 "CREATE TABLE music_songs ("
 "    song_id int(11) unsigned NOT NULL auto_increment PRIMARY KEY,"
-"    filename text NOT NULL default '',"
+"    filename text NOT NULL,"
 "    name varchar(255) NOT NULL default '',"
 "    track smallint(6) unsigned NOT NULL default '0',"
 "    artist_id int(11) unsigned NOT NULL default '0',"
@@ -516,7 +515,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         const QString updates[] = {
 "ALTER TABLE music_songs MODIFY lastplay DATETIME DEFAULT NULL;",
 "CREATE TABLE music_directories (directory_id int(20) NOT NULL AUTO_INCREMENT "
-"PRIMARY KEY, path TEXT NOT NULL DEFAULT '', "
+"PRIMARY KEY, path TEXT NOT NULL, "
 "parent_id INT(20) NOT NULL DEFAULT '0') ;",
 "INSERT IGNORE INTO music_directories (path) SELECT DISTINCT"
 " SUBSTRING(filename FROM 1 FOR INSTR(filename, "

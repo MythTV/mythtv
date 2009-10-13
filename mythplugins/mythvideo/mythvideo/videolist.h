@@ -25,13 +25,13 @@ class VideoList
     VideoList();
     ~VideoList();
 
-    MythGenericTree *buildVideoList(bool filebrowser,
+    MythGenericTree *buildVideoList(bool filebrowser, bool flatlist,
                                 bool group_list, int group_type,
                                 const ParentalLevel &parental_level,
                                 bool include_updirs);
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
-                     bool group_list, int group_type);
+                     bool flatlist, bool group_list, int group_type);
 
     unsigned int count() const;
 
@@ -48,6 +48,8 @@ class VideoList
     const MetadataListManager &getListCache() const;
 
     MythGenericTree *GetTreeRoot();
+
+    void InvalidateCache();
 
   private:
     class VideoListImp *m_imp;

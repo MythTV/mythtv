@@ -2,11 +2,38 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
-    <name>EditMetadataDialog</name>
+    <name>ArchiveFileSelector</name>
     <message>
-        <source>Save</source>
-        <translation type="obsolete">Uložit</translation>
+        <source>Find File To Import</source>
+        <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Další</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Zrušit</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Předchozí</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="unfinished">Zpět</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="unfinished">Domů</translation>
+    </message>
+    <message>
+        <source>The selected item is not a valid archive file!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditMetadataDialog</name>
     <message>
         <source>Cancel</source>
         <translation>Zrušit</translation>
@@ -50,52 +77,9 @@
         <source>You don&apos;t have any videos!</source>
         <translation type="unfinished">Nemáte žádná videa.</translation>
     </message>
-</context>
-<context>
-    <name>ExportNativeWizard</name>
     <message>
-        <source>0 Mb</source>
-        <translation type="obsolete">0 Mb</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Další</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="obsolete">Předchozí</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">Zrušit</translation>
-    </message>
-    <message>
-        <source>Choose File...</source>
-        <translation type="obsolete">Vybrat soubor...</translation>
-    </message>
-    <message>
-        <source>Add Recording</source>
-        <translation type="obsolete">Přidat nahrávku</translation>
-    </message>
-    <message>
-        <source>Add Video</source>
-        <translation type="obsolete">Přidat video</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth Archiv</translation>
-    </message>
-    <message>
-        <source>You need to add at least one item to archive!</source>
-        <translation type="obsolete">Musíte vybrat minimálně jednu položku k archivaci!</translation>
-    </message>
-    <message>
-        <source>Finish</source>
-        <translation type="obsolete">Konec</translation>
-    </message>
-    <message>
-        <source>Remove Item</source>
-        <translation type="obsolete">Odstranit položku</translation>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -117,14 +101,6 @@
         <translation type="unfinished">Domů</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth Archiv</translation>
-    </message>
-    <message>
-        <source>You need to select at least one file!</source>
-        <translation type="obsolete">Musíte vybrat minimálně jeden soubor!</translation>
-    </message>
-    <message>
         <source>The selected item is not a directory!</source>
         <translation>Vybraná položka není adresář!</translation>
     </message>
@@ -142,70 +118,46 @@
     </message>
 </context>
 <context>
-    <name>ImportNativeWizard</name>
+    <name>ImportNative</name>
     <message>
-        <source>Back</source>
-        <translation type="obsolete">Zpět</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation type="obsolete">Domů</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="obsolete">Další</translation>
+        <source>Finish</source>
+        <translation type="unfinished">Konec</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="obsolete">Předchozí</translation>
+        <translation type="unfinished">Předchozí</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Zrušit</translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth Archiv</translation>
-    </message>
-    <message>
-        <source>You need to select a valid archive XML file!</source>
-        <translation type="obsolete">Musíte vybrat platný XML archivační soubor!</translation>
+        <translation type="unfinished">Zrušit</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="obsolete">Musíte vybrat platný chanID!</translation>
+        <translation type="unfinished">Musíte vybrat platný chanID!</translation>
     </message>
     <message>
-        <source>Finish</source>
-        <translation type="obsolete">Konec</translation>
+        <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
+        <translation type="unfinished">Nebylo možné importovat Archiv.  Vyskytla se chyba při běhu &apos;mytharchivehelper&apos;.</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation type="obsolete">Vyber chanID</translation>
+        <translation type="unfinished">Vyber chanID</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation type="obsolete">Vyber chanNo</translation>
+        <translation type="unfinished">Vyber chanNo</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation type="obsolete">Vyber název kanálu</translation>
+        <translation type="unfinished">Vyber název kanálu</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation type="obsolete">Vyber volací znak</translation>
+        <translation type="unfinished">Vyber volací znak</translation>
     </message>
 </context>
 <context>
     <name>LogViewer</name>
-    <message>
-        <source>Log Viewer</source>
-        <translation type="obsolete">Prohlížeč logů</translation>
-    </message>
-    <message>
-        <source>Seconds</source>
-        <translation type="obsolete">Sekund</translation>
-    </message>
     <message>
         <source>Cancel</source>
         <translation>Zrušit</translation>
@@ -217,14 +169,6 @@
     <message>
         <source>Exit</source>
         <translation type="unfinished">Ukončit</translation>
-    </message>
-    <message>
-        <source>Increase Font Size</source>
-        <translation type="obsolete">Zvětšit velikost fontu</translation>
-    </message>
-    <message>
-        <source>Decrease Font Size</source>
-        <translation type="obsolete">Zmenšit velikost fontu</translation>
     </message>
     <message>
         <source>Show Progress Log</source>
@@ -242,68 +186,130 @@
         <source>Auto Update</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
-    <name>MythburnWizard</name>
+    <name>MythBurn</name>
     <message>
-        <source>Next</source>
-        <translation type="obsolete">Další</translation>
+        <source>Finish</source>
+        <translation type="unfinished">Konec</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="obsolete">Předchozí</translation>
+        <translation type="unfinished">Předchozí</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="obsolete">Zrušit</translation>
-    </message>
-    <message>
-        <source>Choose File...</source>
-        <translation type="obsolete">Vybrat soubor...</translation>
+        <translation type="unfinished">Zrušit</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="obsolete">Přidat nahrávku</translation>
+        <translation type="unfinished">Přidat nahrávku</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="obsolete">Přidat video</translation>
+        <translation type="unfinished">Přidat video</translation>
     </message>
     <message>
         <source>Add File</source>
-        <translation type="obsolete">Přidat soubor</translation>
+        <translation type="unfinished">Přidat soubor</translation>
     </message>
     <message>
-        <source>Don&apos;t re-encode</source>
-        <translation type="obsolete">Nepřekódovávat</translation>
+        <source>Using Cutlist</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New Size </source>
-        <translation type="obsolete">Nová velikost </translation>
+        <source>Not Using Cutlist</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Original Size </source>
-        <translation type="obsolete">Původní velikost </translation>
-    </message>
-    <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth Archiv</translation>
+        <source>No Cut List</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="obsolete">Musíte vybrat minimálně jednu položku do archivu!</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Finish</source>
-        <translation type="obsolete">Konec</translation>
+        <source>Retrieving File Information. Please Wait...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit Details</source>
-        <translation type="obsolete">Editovat detaily</translation>
+        <source>Encoder: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t Use Cutlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Cutlist</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="obsolete">Odstranit položku</translation>
+        <translation type="unfinished">Odstranit položku</translation>
+    </message>
+    <message>
+        <source>Edit Details</source>
+        <translation type="unfinished">Editovat detaily</translation>
+    </message>
+    <message>
+        <source>Change Encoding Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
+        <translation type="unfinished">Nebylo možné vytvořit DVD.  Při běhu skriptů se vyskytla chyba.</translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Toggle use cut list state for selected program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Archive Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Created DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ProfileDialog</name>
+    <message>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -517,28 +523,8 @@
         <translation type="unfinished">MythArchiv externí příkazy (2)</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth Archiv</translation>
-    </message>
-    <message>
-        <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation type="obsolete">Nebylo možné vytvořit DVD.  Při běhu skriptů se vyskytla chyba.</translation>
-    </message>
-    <message>
-        <source>Video Selector</source>
-        <translation type="obsolete">Výběr videa</translation>
-    </message>
-    <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="obsolete">Nemáte žádná videa.</translation>
-    </message>
-    <message>
-        <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="obsolete">Nebylo možné importovat Archiv.  Vyskytla se chyba při běhu &apos;mytharchivehelper&apos;.</translation>
-    </message>
-    <message>
-        <source>Myth Burn</source>
-        <translation type="obsolete">Vypalování Myth</translation>
+        <translation type="unfinished">Nemáte žádná videa.</translation>
     </message>
     <message>
         <source>Background creation has been asked to stop.
@@ -620,6 +606,36 @@ Removing stale lock file.</source>
         <source>Last run failed to create a DVD.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot burn a DVD.
+The last run failed to create a DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>
+Place a blank DVD in the drive and select an option below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD Rewritable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD Rewritable (Force Erase)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Zrušit</translation>
+    </message>
+    <message>
+        <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RecordingSelector</name>
@@ -640,27 +656,8 @@ Removing stale lock file.</source>
         <translation>OK</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth Archiv</translation>
-    </message>
-    <message>
-        <source>You need to select at least one recording!</source>
-        <translation type="obsolete">Musíte vybrat minimálně jednu nahrávku!</translation>
-    </message>
-    <message>
         <source>All Recordings</source>
         <translation>Všechny nahrávky</translation>
-    </message>
-    <message>
-        <source>MythArchive</source>
-        <translation type="obsolete">MythArchiv</translation>
-    </message>
-    <message>
-        <source>Either you don&apos;t have any recordings or no recordings are available locally!
-
-Click OK</source>
-        <translation type="obsolete">Buď nemáte žádné nahrávky nebo žádné nahrávky nejsou lokálně dostupné!
-Klikni OK</translation>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
@@ -668,6 +665,10 @@ Klikni OK</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -689,6 +690,312 @@ Klikni OK</translation>
         <source>Find...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Single Layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Layer DVD (4482Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual Layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual Layer DVD (8964Mb)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD +/- RW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewritable DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any file accessable from your filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ThemeSelector</name>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Další</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished">Předchozí</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Zrušit</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>Select Destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>description goes here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free Space:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.00Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make ISO Image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force Overwrite of DVD-RW Media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Finder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Videos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Category</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>title goes here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x.xx Gb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PL:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No videos available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log Viewer</source>
+        <translation type="unfinished">Prohlížeč logů</translation>
+    </message>
+    <message>
+        <source>Change Encoding Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12.34GB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVD Menu Theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a theme</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Intro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chapter Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Archive Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No files are selected for archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>xxxxx mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Item Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Date:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Thumb Image Selector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0:00:00.00</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seek Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sep 13, 2004 11:00 pm (1h 15m)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Finder To Import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Associated Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chan. ID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chan. No:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Callsign:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A high quality profile giving approx. 1 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A standard play profile giving approx. 2 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A long play profile giving approx. 4 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A extended play profile giving approx. 6 hour of video on a single layer DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encode Video File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive Utilities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Log Viewer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Created DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Burn DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThumbFinder</name>
@@ -706,6 +1013,10 @@ Klikni OK</translation>
     </message>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -728,31 +1039,16 @@ Klikni OK</translation>
         <translation>OK</translation>
     </message>
     <message>
-        <source>Myth Archive</source>
-        <translation type="obsolete">Myth Archiv</translation>
-    </message>
-    <message>
-        <source>You need to select at least one video file!</source>
-        <translation type="obsolete">Musíte vybrat minimálně jeden video soubor!</translation>
-    </message>
-    <message>
         <source>All Videos</source>
         <translation type="unfinished">Všechna videa</translation>
     </message>
     <message>
-        <source>Video Selector</source>
-        <translation type="obsolete">Výběr videa</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have any videos!
-
-Click OK</source>
-        <translation type="obsolete">Nemáte žádná videa!
-Klikni OK</translation>
-    </message>
-    <message>
         <source>Parental Pin:</source>
         <translation type="unfinished">Rodičovský PIN:</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

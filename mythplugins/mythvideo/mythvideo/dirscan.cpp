@@ -6,6 +6,7 @@
 #include "dbaccess.h"
 #include "dirscan.h"
 
+#include <mythtv/libmyth/remoteutil.h>
 #include <mythtv/mythcontext.h>
 #include "mythverbose.h"
 #include "videoutils.h"
@@ -123,7 +124,7 @@ namespace
             path = "";
 
         QStringList list;
-        bool ok = GetRemoteFileList(host, start_path, &list, "Videos");
+        bool ok = RemoteGetFileList(host, start_path, &list, "Videos");
 
         if (!ok || list.at(0).startsWith("SLAVE UNREACHABLE"))
         {

@@ -1,14 +1,22 @@
 
 #include "custompriority.h"
 
-#include "mythcontext.h"
+// qt
+#include <QSqlError>
+
+// libmythdb
 #include "mythdb.h"
 #include "mythverbose.h"
 
+// libmyth
+#include "mythcontext.h"
+
+// libmythtv
 #include "scheduledrecording.h"
 #include "viewschdiff.h"
 #include "channelutil.h"
 
+// libmythui
 #include "mythuibuttonlist.h"
 #include "mythuispinbox.h"
 #include "mythuitextedit.h"
@@ -28,8 +36,7 @@ CustomPriority::CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo)
 
 CustomPriority::~CustomPriority(void)
 {
-    if (m_pginfo)
-        delete m_pginfo;
+    delete m_pginfo;
 
     gContext->removeListener(this);
 }
@@ -93,9 +100,7 @@ void CustomPriority::loadData()
     m_prioritySpin->SetValue(1);
 
     RuleInfo rule;
-    rule.title = "";
     rule.priority = QString().setNum(1);
-    rule.description = "";
 
     MythUIButtonListItem *item = NULL;
     item = new MythUIButtonListItem(m_ruleList, tr("<New priority rule>"),
@@ -350,7 +355,7 @@ bool CustomPriority::checkSyntax(void)
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(qstr);
 
-        if (query.exec() && query.isActive())
+        if (query.exec())
         {
             ret = true;
         }

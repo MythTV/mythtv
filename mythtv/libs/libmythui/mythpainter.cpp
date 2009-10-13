@@ -1,8 +1,14 @@
+
+// Own header
+#include "mythpainter.h"
+
+// QT headers
 #include <QRect>
 
+// libmythdb headers
 #include "mythverbose.h"
 
-#include "mythpainter.h"
+// libmythui headers
 #include "mythfontproperties.h"
 #include "mythimage.h"
 

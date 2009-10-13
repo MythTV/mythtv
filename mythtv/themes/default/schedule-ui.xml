@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <window name="programguide">
@@ -71,7 +72,6 @@
         <buttonlist name="timelist">
             <area>155,175,630,30</area>
             <layout>horizontal</layout>
-            <spacing>0</spacing>
             <buttonarea>0,0,630,30</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,156,30</area>
@@ -89,36 +89,10 @@
                 <state name="selected" from="active"/>
                 <state name="inactive" from="active"/>
             </statetype>
-            <statetype name="downscrollarrow">
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="upscrollarrow">
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-            </statetype>
         </buttonlist>
 
         <buttonlist name="channellist">
             <area>20,205,135,380</area>
-            <layout>vertical</layout>
-            <spacing>0</spacing>
             <buttonarea>0,0,135,380</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,135,74</area>
@@ -142,30 +116,6 @@
                 </state>
                 <state name="selected" from="active"/>
                 <state name="inactive" from="active"/>
-            </statetype>
-            <statetype name="downscrollarrow">
-                <state type="off">
-                    <imagetype name="dnon">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="dnoff">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-            </statetype>
-            <statetype name="upscrollarrow">
-                <state type="off">
-                    <imagetype name="upon">
-                        <filename></filename>
-                    </imagetype>
-                </state>
-                <state type="full">
-                    <imagetype name="upoff">
-                        <filename></filename>
-                    </imagetype>
-                </state>
             </statetype>
         </buttonlist>
 
@@ -587,7 +537,7 @@
             <font>basemedium</font>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
-                Select 'Program Guide' or 'Program Finder'</value>
+                select 'Program Guide' or 'Program Finder'</value>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -690,7 +640,7 @@
             <font>basemedium</font>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
-                Select 'Program Guide' or 'Program Finder'</value>
+                select 'Program Guide' or 'Program Finder'</value>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -1247,13 +1197,7 @@
             <align>left,bottom</align>
             <value>Program Listings</value>
         </textarea>
-        <!--
-        <textarea name="keyinstr" from="basetextarea">
-            <area>260,5,180,40</area>
-            <align>hcenter,bottom</align>
-            <value>(1)Time (2)Title</value>
-        </textarea>
-        -->
+
         <shape name="list_background" from="basebackground">
             <area>15,55,770,330</area>
         </shape>
@@ -1319,7 +1263,7 @@
         <textarea name="msg" from="basetextarea">
             <area>0,110,800,70</area>
             <align>allcenter</align>
-            <value>No listings found for this program. </value>
+            <value>No listings found for this program.</value>
             <multiline>yes</multiline>
         </textarea>
 
@@ -1539,7 +1483,7 @@
 
         <buttonlist name="rules" from="basewideselector">
             <position>250,75</position>
-            <wrapstyle>items</wrapstyle>
+            <wrapstyle>selection</wrapstyle>
         </buttonlist>
 
         <textarea name="titlelabel" from="ruleslabel">
@@ -1670,6 +1614,7 @@
     
         <buttonlist name="rules" from="basewideselector">
             <position>215,210</position>
+            <wrapstyle>selection</wrapstyle>
             <helptext>Select the recording rule</helptext>
         </buttonlist>
 

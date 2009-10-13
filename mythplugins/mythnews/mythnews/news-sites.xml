@@ -38,6 +38,12 @@
         <url>http://rss.news.yahoo.com/rss/entertainment</url> 
     </item> 
 
+    <item>
+        <title>Die Zeit - Kultur (DE)</title>
+        <url>http://newsfeed.zeit.de/kultur/index</url>
+        <ico>http://www.zeit.de/favicon.ico</ico>
+    </item>
+
 </category> 
 
 <category name="Business"> 
@@ -63,6 +69,24 @@
         <url>http://www.topix.net/rss/business</url> 
         <ico>http://rss.topix.net/favicon.ico</ico> 
     </item> 
+
+    <item>
+        <title>Handelsblatt.com (DE)</title>
+        <url>http://www.handelsblatt.com/rss/hb.xml</url>
+        <ico>http://www.handelsblatt.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>FT Deutschland - Unternehmen (DE)</title>
+        <url>http://www.ftd.de/static/container/rss/ftd-rss-300.rdf</url>
+        <ico>http://www.ftd.de/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>FT Deutschland - Finanzen (DE)</title>
+        <url>http://www.ftd.de/static/container/rss/ftd-rss2-500.rdf</url>
+        <ico>http://www.ftd.de/favicon.ico</ico>
+    </item>
 
 </category> 
 
@@ -1029,6 +1053,12 @@
         <ico>http://www.reuters.com/favicon.ico</ico>
     </item>
 
+    <item>
+        <title>Die Zeit - Lebensart (DE)</title>
+        <url>http://newsfeed.zeit.de/lebensart/index</url>
+        <ico>http://www.zeit.de/favicon.ico</ico>
+    </item>
+
 </category>
 
 <category name="Regional (non-US)">
@@ -1116,6 +1146,30 @@
         <title>The Globe and Mail</title>
         <url>http://www.theglobeandmail.com/generated/headlines/pickup/rdf/ROB.rdf</url>
         <ico>http://www.globeandmail.com/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Spiegel Online - Schlagzeilen (DE)</title>
+        <url>http://www.spiegel.de/schlagzeilen/index.rss</url>
+        <ico>http://www.spiegel.de/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>FT Deutschland - Topnews (DE)</title>
+        <url>http://www.ftd.de/static/container/rss2/ftd-topnews.rdf</url>
+        <ico>http://www.ftd.de/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>FT Deutschland - Nachrichten Podcast (DE)</title>
+        <url>http://www.ftd.de/podcast.php</url>
+        <ico>http://www.ftd.de/favicon.ico</ico>
+    </item>
+
+    <item>
+        <title>Die Zeit - Online Startseite (DE)</title>
+        <url>http://newsfeed.zeit.de/index</url>
+        <ico>http://www.zeit.de/favicon.ico</ico>
     </item>
 
     <item>
@@ -1663,6 +1717,12 @@
 </category>
 
 <category name="Society">
+
+    <item>
+        <title>Die Zeit - Gesellschaft (DE)</title>
+        <url>http://newsfeed.zeit.de/gesellschaft/index</url>
+        <ico>http://www.zeit.de/favicon.ico</ico>
+    </item>
 
 </category>
 

@@ -9,7 +9,6 @@
       <text lang="DE">Grundeinstellungen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
-      <text lang="FR">Réglages généraux</text>
       <text lang="NL">Algemene Instellingen</text>
       <text lang="JA">全般設定</text>
       <text lang="IT">Generale</text>
@@ -18,6 +17,7 @@
       <text lang="ET">Üldised sätted</text>
       <text lang="RU">Общие настройки</text>
       <text lang="PL">Ustawienia ogólne</text>
+      <text lang="NB">Generelle innstillinger</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -30,7 +30,6 @@
       <text lang="DE">Wiedergabe</text>
       <text lang="PT">Configurar Leitura</text>
       <text lang="SV">Uppspelning</text>
-      <text lang="FR">Réglages du lecteur</text>
       <text lang="NL">Weergave Instellingen</text>
       <text lang="JA">プレイヤー設定</text>
       <text lang="IT">Player</text>
@@ -39,6 +38,7 @@
       <text lang="ET">Mängija sätted</text>
       <text lang="RU">Настройки проигрывателя</text>
       <text lang="PL">Ustaw odtwarzacz</text>
+      <text lang="NB"> Innstillinger for avpiller</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 
@@ -50,7 +50,6 @@
       <text lang="cA">Tipus d'arxius</text>
       <text lang="DE">Dateitypen</text>
       <text lang="ES">Tipos de archivos</text>
-      <text lang="FR">Types de fichier</text>
       <text lang="NL">Bestandstypes</text>
       <text lang="JA">ファイルタイプ</text>
       <text lang="IT">Tipi di file</text>
@@ -60,6 +59,7 @@
       <text lang="ET">Failitüübid</text>
       <text lang="RU">Типы файлов</text>
       <text lang="PL">Typy plików</text>
+      <text lang="NB">Filtyper</text>
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 
@@ -73,13 +73,13 @@
       <text lang="SV">Inställningar för kopiering</text>
       <text lang="ES">Opciones de "ripear"</text>
       <text lang="CA">Opcions de volcat</text>
-      <text lang="FR">Réglages d&apos;extraction</text>
       <text lang="NL">DVD RIP instellingen</text>
       <text lang="JA">再生設定</text>
       <text lang="FI">Aseta DVD-Kopionti</text>
       <text lang="ET">Rippimise sätted</text>
       <text lang="RU">Настройки импорта</text>
       <text lang="PL">Ustaw zrzucanie DVD</text>
+      <text lang="NB">Innstillinger for import</text>
       <action>DVD_SETTINGS_RIP</action>
    </button>
 

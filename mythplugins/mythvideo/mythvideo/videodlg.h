@@ -24,12 +24,7 @@ class VideoScanner;
 
 class QUrl;
 
-typedef QMap<QString, QString> SearchListResults;
-
-enum CoverDownloadErrorState { esOK, esError, esTimeout };
-enum ScreenshotDownloadErrorState { ssesOK, ssesError, ssesTimeout };
-enum FanartDownloadErrorState { fesOK, fesError, fesTimeout };
-enum BannerDownloadErrorState { besOK, besError, besTimeout };
+enum ImageDownloadErrorState { esOK, esError, esTimeout };
 
 class VideoDialog : public MythScreenType
 {
@@ -64,6 +59,9 @@ class VideoDialog : public MythScreenType
 
   public slots:
     void searchComplete(QString string);
+
+  protected slots:
+    void Init(); /// Called after the screen is created by MythScreenStack
 
   private slots:
     void UpdatePosition();
@@ -133,6 +131,7 @@ class VideoDialog : public MythScreenType
     void doVideoScan();
 
   protected slots:
+    void reloadAllData(bool);
     void reloadData();
     void refreshData();
     void UpdateItem(MythUIButtonListItem *item);
@@ -146,7 +145,8 @@ class VideoDialog : public MythScreenType
     void fetchVideos();
     QString RemoteImageCheck(QString host, QString filename);
     QString GetCoverImage(MythGenericTree *node);
-    QString GetFirstImage(MythGenericTree *node, QString type);
+    QString GetFirstImage(MythGenericTree *node, QString type,
+                          QString gpnode = NULL, int levels = 0);
     QString GetImageFromFolder(Metadata *metadata);
     QString GetScreenshot(MythGenericTree *node);
     QString GetBanner(MythGenericTree *node);
@@ -189,37 +189,25 @@ class VideoDialog : public MythScreenType
 
   private slots:
     // called during StartVideoPosterSet
-    void OnPosterURL(QString uri, Metadata *metadata);
-    void OnPosterCopyFinished(CoverDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata);
-    void OnFanartURL(QString uri, Metadata *metadata);
-    void OnFanartCopyFinished(FanartDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata);
-    void OnScreenshotURL(QString uri, Metadata *metadata);
-    void OnScreenshotCopyFinished(ScreenshotDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata);
-    void OnBannerURL(QString uri, Metadata *metadata);
-    void OnBannerCopyFinished(BannerDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata);
+    void OnImageURL(QString uri, Metadata *metadata, QString type);
+    void OnImageCopyFinished(ImageDownloadErrorState error, QString errorMsg,
+                              Metadata *metadata, const QString &imagePath);
 
     // called during StartVideoSearchByTitle
     void OnVideoSearchByTitleDone(bool normal_exit,
-                                  const SearchListResults &results,
+                                  const QStringList &results,
                                   Metadata *metadata);
     void OnVideoSearchByTitleSubtitleDone(bool normal_exit,
                                   QStringList result,
                                   Metadata *metadata);
     void OnVideoImageOnlyDone(bool normal_exit,
-                                  const SearchListResults &results,
+                                  const QStringList &results,
                                   Metadata *metadata);
 
 // and now the end points
 
     // StartVideoPosterSet end
-    void OnVideoPosterSetDone(Metadata *metadata);
-    void OnVideoFanartSetDone(Metadata *metadata);
-    void OnVideoScreenshotSetDone(Metadata *metadata); 
-    void OnVideoBannerSetDone(Metadata *metadata);
+    void OnVideoImageSetDone(Metadata *metadata);
 
     // StartVideoSearchByUID end
     void OnVideoSearchByUIDDone(bool normal_exit,
@@ -251,6 +239,7 @@ class VideoDialog : public MythScreenType
     MythUIStateType  *m_parentalLevelState;
     MythUIStateType  *m_videoLevelState;
     MythUIStateType  *m_userRatingState;
+    MythUIStateType  *m_watchedState;
 
     class VideoDialogPrivate *m_d;
 };

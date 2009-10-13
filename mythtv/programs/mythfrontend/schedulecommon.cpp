@@ -22,6 +22,7 @@
 #include "scheduleeditor.h"
 #include "progdetails.h"
 #include "proglist.h"
+#include "customedit.h"
 
 /**
 *  \brief Show the Program Details screen
@@ -106,15 +107,29 @@ void ScheduleCommon::EditScheduled(RecordingInfo *recinfo)
 }
 
 /**
+*  \brief Creates a dialog for creating a custom recording rule
+*/
+void ScheduleCommon::EditCustom(ProgramInfo *pginfo)
+{
+    if (!pginfo)
+        return;
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
+    if (ce->Create())
+        mainStack->AddScreen(ce);
+    else
+        delete ce;
+}
+
+/**
 *  \brief Creates a dialog for editing an override recording schedule
 */
-void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
+void ScheduleCommon::MakeOverride(RecordingInfo *recinfo, bool startActive)
 {
     if (!recinfo || recinfo->recordid <= 0)
         return;
 
-    VERBOSE(VB_IMPORTANT, QString("We're OK"));
-    
     RecordingRule *recrule = new RecordingRule();
     
     if (!recrule->LoadByProgram(static_cast<ProgramInfo*>(recinfo)))
@@ -126,7 +141,9 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo)
         delete recrule;
         return;
     }
-    
+    if (startActive)
+        recrule->m_type = kOverrideRecord;
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     ScheduleEditor *schededit = new ScheduleEditor(mainStack, recrule);
     if (schededit->Create())
@@ -143,7 +160,7 @@ void ScheduleCommon::ShowRecordingDialog(RecordingInfo recinfo)
 {
     QString message = recinfo.title;
     
-    if (recinfo.subtitle != "")
+    if (!recinfo.subtitle.isEmpty())
         message += QString(" - \"%1\"").arg(recinfo.subtitle);
     
     message += "\n\n";
@@ -256,7 +273,7 @@ void ScheduleCommon::ShowNotRecordingDialog(RecordingInfo recinfo)
 
     QString message = recinfo.title;
 
-    if (recinfo.subtitle != "")
+    if (!recinfo.subtitle.isEmpty())
         message += QString(" - \"%1\"").arg(recinfo.subtitle);
 
     message += "\n\n";
@@ -277,7 +294,7 @@ void ScheduleCommon::ShowNotRecordingDialog(RecordingInfo recinfo)
             message += QString("%1 - %2  %3")
             .arg(p->recstartts.toString(timeFormat))
             .arg(p->recendts.toString(timeFormat)).arg(p->title);
-            if (p->subtitle != "")
+            if (!p->subtitle.isEmpty())
                 message += QString(" - \"%1\"").arg(p->subtitle);
             message += "\n";
             delete p;
@@ -476,14 +493,12 @@ void ScheduleCommon::customEvent(QEvent *event)
                 recInfo.ApplyRecordStateChange(kNotRecording);
             else if (resulttext == tr("Change Ending Time"))
             {
-                if (recInfo.rectype != kSingleRecord &&
-                    recInfo.rectype != kOverrideRecord &&
-                    recInfo.rectype != kFindOneRecord)
-                {
-                    recInfo.ApplyRecordStateChange(kOverrideRecord, false);
-                }
-
-                EditScheduled(&recInfo);
+                if (recInfo.rectype == kSingleRecord ||
+                    recInfo.rectype == kOverrideRecord ||
+                    recInfo.rectype == kFindOneRecord)
+                    EditScheduled(&recInfo);
+                else
+                    MakeOverride(&recInfo, true);
             }
             else if (resulttext == tr("Edit Override") ||
                      resulttext == tr("Edit Options"))

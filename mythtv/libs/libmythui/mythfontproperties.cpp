@@ -1,3 +1,6 @@
+
+#include "mythfontproperties.h"
+
 #include <QApplication>
 #include <QDomDocument>
 
@@ -5,8 +8,8 @@
 #include "mythdb.h"
 
 #include "mythuihelper.h"
-#include "mythfontproperties.h"
 #include "mythmainwindow.h"
+#include "xmlparsebase.h"
 
 MythFontProperties::MythFontProperties() :
     m_color(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
@@ -131,7 +134,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     QString name = element.attribute("name", "");
     if (name.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Font needs a name");
+        XML_ERROR(element, "Font needs a name");
         return NULL;
     }
 
@@ -156,9 +159,8 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 
         if (!tmp)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Specified base font '%1' does not "
-                            "exist for font %2").arg(base).arg(name));
+            XML_ERROR(element, QString("Specified base font '%1' does not "
+                                       "exist for font %2").arg(base).arg(name));
             return NULL;
         }
 
@@ -166,15 +168,15 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         fromBase = true;
     }
 
-    int size, sizeSmall, sizeBig;
-    size = sizeSmall = sizeBig = -1;
+    int size, pixelsize;
+    size = pixelsize = -1;
 
     QString face = element.attribute("face", "");
     if (face.isEmpty())
     {
         if (!fromBase)
         {
-            VERBOSE(VB_IMPORTANT, QString("Font '%1' needs a face").arg(name));
+            XML_ERROR(element, "Font needs a face");
             delete newFont;
             return NULL;
         }
@@ -206,13 +208,9 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             {
                 size = getFirstText(info).toInt();
             }
-            else if (info.tagName() == "size:small")
+            else if (info.tagName() == "pixelsize")
             {
-                sizeSmall = getFirstText(info).toInt();
-            }
-            else if (info.tagName() == "size:big")
-            {
-                sizeBig = getFirstText(info).toInt();
+                pixelsize = getFirstText(info).toInt();
             }
             else if (info.tagName() == "color")
             {
@@ -258,39 +256,115 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             {
                 newFont->m_face.setUnderline(parseBool(info));
             }
+            else if (info.tagName() == "letterspacing")
+            {
+                newFont->m_face.setLetterSpacing(QFont::AbsoluteSpacing,
+                                              getFirstText(info).toInt());
+            }
+            else if (info.tagName() == "wordspacing")
+            {
+                newFont->m_face.setWordSpacing(getFirstText(info).toInt());
+            }
+            else if (info.tagName() == "decoration")
+            {
+                QString dec = getFirstText(info).toLower();
+                QStringList values = dec.split(',');
+
+                QStringList::Iterator it;
+                for ( it = values.begin(); it != values.end(); ++it )
+                {
+                    if (*it == "underline")
+                        newFont->m_face.setUnderline(true);
+                    else if (*it == "overline")  
+                        newFont->m_face.setOverline(true);
+                    else if (*it == "strikeout")  
+                        newFont->m_face.setStrikeOut(true);
+                }
+            }
+            else if (info.tagName() == "weight")
+            {
+                QString weight = getFirstText(info).toLower();
+
+                if (weight == "ultralight" ||
+                    weight == "1")
+                    newFont->m_face.setWeight(1);
+                else if (weight == "light" ||
+                         weight == "2")
+                    newFont->m_face.setWeight(QFont::Light);
+                else if (weight == "normal" ||
+                         weight == "3")
+                    newFont->m_face.setWeight(QFont::Normal);
+                else if (weight == "demibold" ||
+                         weight == "4")
+                    newFont->m_face.setWeight(QFont::DemiBold);
+                else if (weight == "bold" ||
+                         weight == "5")
+                    newFont->m_face.setWeight(QFont::Bold);
+                else if (weight == "black" ||
+                         weight == "6")
+                    newFont->m_face.setWeight(QFont::Black);
+                else if (weight == "ultrablack" ||
+                         weight == "7")
+                    newFont->m_face.setWeight(100);
+                else
+                    newFont->m_face.setWeight(QFont::Normal);
+            }
+            else if (info.tagName() == "stretch")
+            {
+                QString stretch = getFirstText(info).toLower();
+
+                if (stretch == "ultracondensed" ||
+                    stretch == "1")    
+                    newFont->m_face.setStretch(QFont::UltraCondensed);
+                else if (stretch == "extracondensed" ||
+                         stretch == "2")
+                    newFont->m_face.setStretch(QFont::ExtraCondensed);
+                else if (stretch == "condensed" ||
+                         stretch == "3")
+                    newFont->m_face.setStretch(QFont::Condensed);
+                else if (stretch == "semicondensed" ||
+                         stretch == "4")
+                    newFont->m_face.setStretch(QFont::SemiCondensed);
+                else if (stretch == "unstretched" ||
+                         stretch == "5")
+                    newFont->m_face.setStretch(QFont::Unstretched);
+                else if (stretch == "semiexpanded" ||
+                         stretch == "6")
+                    newFont->m_face.setStretch(QFont::SemiExpanded);
+                else if (stretch == "expanded" ||
+                         stretch == "7")
+                    newFont->m_face.setStretch(QFont::Expanded);
+                else if (stretch == "extraexpanded" ||
+                         stretch == "8")
+                    newFont->m_face.setStretch(QFont::ExtraExpanded);
+                else if (stretch == "ultraexpanded" ||
+                         stretch == "9")
+                    newFont->m_face.setStretch(QFont::UltraExpanded);
+                else
+                    newFont->m_face.setStretch(QFont::Unstretched);
+            }
             else
             {
-                VERBOSE(VB_IMPORTANT, QString("Unknown tag %1 in font '%2'")
-                                              .arg(info.tagName())
-                                              .arg(name));
+                XML_ERROR(info, QString("Unknown tag in font %1").arg(name));
                 return NULL;
             }
         }
     }
 
-    if (sizeSmall > 0 && fontSizeType == "small")
+    if (size <= 0 && pixelsize <= 0 && !fromBase)
     {
-        size = sizeSmall;
-    }
-    else if (sizeBig > 0 && fontSizeType == "big")
-    {
-        size = sizeBig;
-    }
-
-    if (size <= 0 && !fromBase)
-    {
-        VERBOSE(VB_IMPORTANT, "Error, font size must be > 0");
+        XML_ERROR(element, "Error, font size must be > 0");
         return NULL;
     }
+    else if (pixelsize > 0)
+        newFont->m_face.setPixelSize(GetMythMainWindow()->NormY(pixelsize));
     else if (size > 0)
         newFont->m_face.setPointSize(GetMythMainWindow()->NormalizeFontSize(size));
 
     newFont->Unfreeze();
 
     if (addToGlobal)
-    {
         GetGlobalFontMap()->AddFont(name, newFont);
-    }
 
     return newFont;
 }

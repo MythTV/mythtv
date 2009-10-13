@@ -22,7 +22,7 @@ HEADERS += mythplugin.h mythpluginapi.h
 HEADERS += mythwidgets.h mythwizard.h schemawizard.h
 HEADERS += output.h 
 HEADERS += settings.h 
-HEADERS += uilistbtntype.h uitypes.h util.h
+HEADERS += uilistbtntype.h uitypes.h util.h mythuifilebrowser.h
 HEADERS += volumebase.h visual.h xmlparse.h
 HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += mythcommandlineparser.h mythterminal.h
@@ -44,7 +44,7 @@ SOURCES += mythplugin.cpp
 SOURCES += mythwidgets.cpp mythwizard.cpp schemawizard.cpp
 SOURCES += output.cpp 
 SOURCES += settings.cpp
-SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp
+SOURCES += uilistbtntype.cpp uitypes.cpp util.cpp mythuifilebrowser.cpp
 SOURCES += volumebase.cpp xmlparse.cpp
 SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
@@ -91,7 +91,7 @@ inc.files += uilistbtntype.h generictree.h managedlist.h mythmediamonitor.h
 inc.files += visual.h volumebase.h output.h langsettings.h
 inc.files += mythexp.h mythpluginapi.h storagegroup.h
 inc.files += mythconfigdialogs.h mythconfiggroups.h
-inc.files += mythterminal.h mythdeque.h
+inc.files += mythterminal.h mythdeque.h mythuifilebrowser.h
 inc.files += mythhttppool.h programinfo.h recordingtypes.h remoteutil.h
 
 # remove when everything is switched to mythui

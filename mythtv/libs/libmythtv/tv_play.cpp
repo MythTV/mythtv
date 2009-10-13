@@ -425,187 +425,301 @@ void TV::SetFuncPtr(const char *string, void *lptr)
 
 void TV::InitKeys(void)
 {
-    REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
-    REG_KEY("TV Frontend", "PAGEDOWN", "Page Down", "9");
-    REG_KEY("TV Frontend", "PLAYBACK", "Play Program", "P");
-    REG_KEY("TV Frontend", "TOGGLERECORD", "Toggle recording status of current "
-            "program", "R");
-    REG_KEY("TV Frontend", "DAYLEFT", "Page the program guide back one day",
-            "Home,7");
-    REG_KEY("TV Frontend", "DAYRIGHT", "Page the program guide forward one day",
-            "End,1");
-    REG_KEY("TV Frontend", "PAGELEFT", "Page the program guide left",
-            ",,<");
-    REG_KEY("TV Frontend", "PAGERIGHT", "Page the program guide right",
-            ">,.");
-    REG_KEY("TV Frontend", "TOGGLEFAV", "Toggle the current channel as a "
-            "favorite", "?");
-    REG_KEY("TV Frontend", "TOGGLEEPGORDER", "Reverse the channel order "
-            "in the program guide", "0");
-    REG_KEY("TV Frontend", "GUIDE", "Show the Program Guide", "S");
-    REG_KEY("TV Frontend", "FINDER", "Show the Program Finder", "#");
-    REG_KEY("TV Frontend", "NEXTFAV", "Cycle through channel groups and all channels "
-            "in the program guide.", "/");
-    REG_KEY("TV Frontend", "CHANUPDATE", "Switch channels without exiting "
-            "guide in Live TV mode.", "X");
-    REG_KEY("TV Frontend", "VOLUMEDOWN", "Volume down", "[,{,F10,Volume Down");
-    REG_KEY("TV Frontend", "VOLUMEUP",   "Volume up",   "],},F11,Volume Up");
-    REG_KEY("TV Frontend", "MUTE",       "Mute",        "|,\\,F9,Volume Mute");
-    REG_KEY("TV Frontend", "RANKINC", "Increase program or channel rank",
-            "Right");
-    REG_KEY("TV Frontend", "RANKDEC", "Decrease program or channel rank",
-            "Left");
-    REG_KEY("TV Frontend", "UPCOMING", "List upcoming episodes", "O");
-    REG_KEY("TV Frontend", "DETAILS", "Show program details", "U");
-    REG_KEY("TV Frontend", "VIEWCARD", "Switch Capture Card view", "Y");
-    REG_KEY("TV Frontend", "VIEWINPUT", "Switch Capture Card view", "C");
-    REG_KEY("TV Frontend", "CUSTOMEDIT", "Edit Custom Record Rule", "");
-    REG_KEY("TV Frontend", "CHANGERECGROUP", "Change Recording Group", "");
-    REG_KEY("TV Frontend", "CHANGEGROUPVIEW", "Change Group View", "");
+    REG_KEY("TV Frontend", "PAGEUP", QT_TRANSLATE_NOOP("MythControls",
+            "Page Up"), "3");
+    REG_KEY("TV Frontend", "PAGEDOWN", QT_TRANSLATE_NOOP("MythControls",
+            "Page Down"), "9");
+    REG_KEY("TV Frontend", "PLAYBACK", QT_TRANSLATE_NOOP("MythControls",
+            "Play Program"), "P");
+    REG_KEY("TV Frontend", "TOGGLERECORD", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle recording status of current program"), "R");
+    REG_KEY("TV Frontend", "DAYLEFT", QT_TRANSLATE_NOOP("MythControls",
+            "Page the program guide back one day"), "Home,7");
+    REG_KEY("TV Frontend", "DAYRIGHT", QT_TRANSLATE_NOOP("MythControls",
+            "Page the program guide forward one day"), "End,1");
+    REG_KEY("TV Frontend", "PAGELEFT", QT_TRANSLATE_NOOP("MythControls",
+            "Page the program guide left"), ",,<");
+    REG_KEY("TV Frontend", "PAGERIGHT", QT_TRANSLATE_NOOP("MythControls",
+            "Page the program guide right"), ">,.");
+    REG_KEY("TV Frontend", "TOGGLEFAV", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle the current channel as a favorite"), "?");
+    REG_KEY("TV Frontend", "TOGGLEEPGORDER", QT_TRANSLATE_NOOP("MythControls",
+            "Reverse the channel order in the program guide"), "0");
+    REG_KEY("TV Frontend", "GUIDE", QT_TRANSLATE_NOOP("MythControls",
+            "Show the Program Guide"), "S");
+    REG_KEY("TV Frontend", "FINDER", QT_TRANSLATE_NOOP("MythControls",
+            "Show the Program Finder"), "#");
+    REG_KEY("TV Frontend", "NEXTFAV", QT_TRANSLATE_NOOP("MythControls",
+            "Cycle through channel groups and all channels in the "
+            "program guide."), "/");
+    REG_KEY("TV Frontend", "CHANUPDATE", QT_TRANSLATE_NOOP("MythControls",
+            "Switch channels without exiting guide in Live TV mode."), "X");
+    REG_KEY("TV Frontend", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
+            "Volume down"), "[,{,F10,Volume Down");
+    REG_KEY("TV Frontend", "VOLUMEUP", QT_TRANSLATE_NOOP("MythControls",
+            "Volume up"), "],},F11,Volume Up");
+    REG_KEY("TV Frontend", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
+            "|,\\,F9,Volume Mute");
+    REG_KEY("TV Frontend", "RANKINC", QT_TRANSLATE_NOOP("MythControls",
+            "Increase program or channel rank"), "Right");
+    REG_KEY("TV Frontend", "RANKDEC", QT_TRANSLATE_NOOP("MythControls",
+            "Decrease program or channel rank"), "Left");
+    REG_KEY("TV Frontend", "UPCOMING", QT_TRANSLATE_NOOP("MythControls",
+            "List upcoming episodes"), "O");
+    REG_KEY("TV Frontend", "DETAILS", QT_TRANSLATE_NOOP("MythControls",
+            "Show program details"), "U");
+    REG_KEY("TV Frontend", "VIEWCARD", QT_TRANSLATE_NOOP("MythControls",
+            "Switch Capture Card view"), "Y");
+    REG_KEY("TV Frontend", "VIEWINPUT", QT_TRANSLATE_NOOP("MythControls",
+            "Switch Capture Card view"), "C");
+    REG_KEY("TV Frontend", "CUSTOMEDIT", QT_TRANSLATE_NOOP("MythControls",
+            "Edit Custom Record Rule"), "E");
+    REG_KEY("TV Frontend", "CHANGERECGROUP", QT_TRANSLATE_NOOP("MythControls",
+            "Change Recording Group"), "");
+    REG_KEY("TV Frontend", "CHANGEGROUPVIEW", QT_TRANSLATE_NOOP("MythControls",
+            "Change Group View"), "");
 
-    REG_KEY("TV Playback", "CLEAROSD", "Clear OSD", "Backspace");
-    REG_KEY("TV Playback", "PAUSE", "Pause", "P");
-    REG_KEY("TV Playback", "SEEKFFWD", "Fast Forward", "Right");
-    REG_KEY("TV Playback", "SEEKRWND", "Rewind", "Left");
-    REG_KEY("TV Playback", "ARBSEEK", "Arbitrary Seek", "*");
-    REG_KEY("TV Playback", "CHANNELUP", "Channel up", "Up");
-    REG_KEY("TV Playback", "CHANNELDOWN", "Channel down", "Down");
-    REG_KEY("TV Playback", "NEXTFAV", "Switch to the next favorite channel",
-            "/");
-    REG_KEY("TV Playback", "PREVCHAN", "Switch to the previous channel", "H");
-    REG_KEY("TV Playback", "JUMPFFWD", "Jump ahead", "PgDown");
-    REG_KEY("TV Playback", "JUMPRWND", "Jump back", "PgUp");
-    REG_KEY("TV Playback", "JUMPBKMRK", "Jump to bookmark", "K");
-    REG_KEY("TV Playback", "FFWDSTICKY", "Fast Forward (Sticky) or Forward one "
-            "frame while paused", ">,.");
-    REG_KEY("TV Playback", "RWNDSTICKY", "Rewind (Sticky) or Rewind one frame "
-            "while paused", ",,<");
-    REG_KEY("TV Playback", "NEXTSOURCE",    "Next Video Source",     "Y");
-    REG_KEY("TV Playback", "PREVSOURCE",    "Previous Video Source", "Ctrl+Y");
-    REG_KEY("TV Playback", "NEXTINPUT",     "Next Input",            "C");
-    REG_KEY("TV Playback", "NEXTCARD",      "Next Card",             "");
-    REG_KEY("TV Playback", "SKIPCOMMERCIAL", "Skip Commercial", "Z,End");
-    REG_KEY("TV Playback", "SKIPCOMMBACK", "Skip Commercial (Reverse)",
-            "Q,Home");
-    REG_KEY("TV Playback", "JUMPSTART", "Jump to the start of the recording.", "Ctrl+B");
-    REG_KEY("TV Playback", "TOGGLEBROWSE", "Toggle channel browse mode", "O");
-    REG_KEY("TV Playback", "TOGGLERECORD", "Toggle recording status of current "
-            "program", "R");
-    REG_KEY("TV Playback", "TOGGLEFAV", "Toggle the current channel as a "
-            "favorite", "?");
-    REG_KEY("TV Playback", "VOLUMEDOWN", "Volume down", "[,{,F10,Volume Down");
-    REG_KEY("TV Playback", "VOLUMEUP",   "Volume up",   "],},F11,Volume Up");
-    REG_KEY("TV Playback", "MUTE",       "Mute",        "|,\\,F9,Volume Mute");
-    REG_KEY("TV Playback", "TOGGLEPIPMODE", "Toggle Picture-in-Picture view",
-            "V");
-    REG_KEY("TV Playback", "TOGGLEPBPMODE", "Toggle Picture-by-Picture view",
-            "Ctrl+V");
-    REG_KEY("TV Playback", "CREATEPIPVIEW", "Create Picture-in-Picture view",
-            "");
-    REG_KEY("TV Playback", "CREATEPBPVIEW", "Create Picture-by-Picture view",
-            "");
-    REG_KEY("TV Playback", "NEXTPIPWINDOW", "Toggle active PIP/PBP window", "B");
-    REG_KEY("TV Playback", "SWAPPIP", "Swap PBP/PIP Windows", "N");
-    REG_KEY("TV Playback", "TOGGLEPIPSTATE", "Change PxP view", "");
-    REG_KEY("TV Playback", "TOGGLEASPECT",
-            "Toggle the video aspect ratio", "Ctrl+W");
-    REG_KEY("TV Playback", "TOGGLEFILL", "Next Preconfigured Zoom mode", "W");
+    REG_KEY("TV Playback", "CLEAROSD", QT_TRANSLATE_NOOP("MythControls",
+            "Clear OSD"), "Backspace");
+    REG_KEY("TV Playback", "PAUSE", QT_TRANSLATE_NOOP("MythControls",
+            "Pause"), "P");
+    REG_KEY("TV Playback", "SEEKFFWD", QT_TRANSLATE_NOOP("MythControls",
+            "Fast Forward"), "Right");
+    REG_KEY("TV Playback", "SEEKRWND", QT_TRANSLATE_NOOP("MythControls",
+            "Rewind"), "Left");
+    REG_KEY("TV Playback", "ARBSEEK", QT_TRANSLATE_NOOP("MythControls",
+            "Arbitrary Seek"), "*");
+    REG_KEY("TV Playback", "CHANNELUP", QT_TRANSLATE_NOOP("MythControls",
+            "Channel up"), "Up");
+    REG_KEY("TV Playback", "CHANNELDOWN", QT_TRANSLATE_NOOP("MythControls",
+            "Channel down"), "Down");
+    REG_KEY("TV Playback", "NEXTFAV", QT_TRANSLATE_NOOP("MythControls",
+            "Switch to the next favorite channel"), "/");
+    REG_KEY("TV Playback", "PREVCHAN", QT_TRANSLATE_NOOP("MythControls",
+            "Switch to the previous channel"), "H");
+    REG_KEY("TV Playback", "JUMPFFWD", QT_TRANSLATE_NOOP("MythControls",
+            "Jump ahead"), "PgDown");
+    REG_KEY("TV Playback", "JUMPRWND", QT_TRANSLATE_NOOP("MythControls",
+            "Jump back"), "PgUp");
+    REG_KEY("TV Playback", "JUMPBKMRK", QT_TRANSLATE_NOOP("MythControls",
+            "Jump to bookmark"), "K");
+    REG_KEY("TV Playback", "FFWDSTICKY", QT_TRANSLATE_NOOP("MythControls",
+            "Fast Forward (Sticky) or Forward one frame while paused"), ">,.");
+    REG_KEY("TV Playback", "RWNDSTICKY", QT_TRANSLATE_NOOP("MythControls",
+            "Rewind (Sticky) or Rewind one frame while paused"), ",,<");
+    REG_KEY("TV Playback", "NEXTSOURCE", QT_TRANSLATE_NOOP("MythControls",
+            "Next Video Source"), "Y");
+    REG_KEY("TV Playback", "PREVSOURCE", QT_TRANSLATE_NOOP("MythControls",
+            "Previous Video Source"), "Ctrl+Y");
+    REG_KEY("TV Playback", "NEXTINPUT", QT_TRANSLATE_NOOP("MythControls",
+            "Next Input"), "C");
+    REG_KEY("TV Playback", "NEXTCARD", QT_TRANSLATE_NOOP("MythControls",
+            "Next Card"), "");
+    REG_KEY("TV Playback", "SKIPCOMMERCIAL", QT_TRANSLATE_NOOP("MythControls",
+            "Skip Commercial"), "Z,End");
+    REG_KEY("TV Playback", "SKIPCOMMBACK", QT_TRANSLATE_NOOP("MythControls",
+            "Skip Commercial (Reverse)"), "Q,Home");
+    REG_KEY("TV Playback", "JUMPSTART", QT_TRANSLATE_NOOP("MythControls",
+            "Jump to the start of the recording."), "Ctrl+B");
+    REG_KEY("TV Playback", "TOGGLEBROWSE", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle channel browse mode"), "O");
+    REG_KEY("TV Playback", "TOGGLERECORD", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle recording status of current program"), "R");
+    REG_KEY("TV Playback", "TOGGLEFAV", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle the current channel as a favorite"), "?");
+    REG_KEY("TV Playback", "VOLUMEDOWN", QT_TRANSLATE_NOOP("MythControls",
+            "Volume down"), "[,{,F10,Volume Down");
+    REG_KEY("TV Playback", "VOLUMEUP", QT_TRANSLATE_NOOP("MythControls",
+            "Volume up"), "],},F11,Volume Up");
+    REG_KEY("TV Playback", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
+            "|,\\,F9,Volume Mute");
+    REG_KEY("TV Playback", "TOGGLEPIPMODE", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle Picture-in-Picture view"), "V");
+    REG_KEY("TV Playback", "TOGGLEPBPMODE", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle Picture-by-Picture view"), "Ctrl+V");
+    REG_KEY("TV Playback", "CREATEPIPVIEW", QT_TRANSLATE_NOOP("MythControls",
+            "Create Picture-in-Picture view"), "");
+    REG_KEY("TV Playback", "CREATEPBPVIEW", QT_TRANSLATE_NOOP("MythControls",
+            "Create Picture-by-Picture view"), "");
+    REG_KEY("TV Playback", "NEXTPIPWINDOW", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle active PIP/PBP window"), "B");
+    REG_KEY("TV Playback", "SWAPPIP", QT_TRANSLATE_NOOP("MythControls",
+            "Swap PBP/PIP Windows"), "N");
+    REG_KEY("TV Playback", "TOGGLEPIPSTATE", QT_TRANSLATE_NOOP("MythControls",
+            "Change PxP view"), "");
+    REG_KEY("TV Playback", "TOGGLEASPECT", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle the video aspect ratio"), "Ctrl+W");
+    REG_KEY("TV Playback", "TOGGLEFILL", QT_TRANSLATE_NOOP("MythControls",
+            "Next Preconfigured Zoom mode"), "W");
+    REG_KEY("TV Playback", "TOGGLECC", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle any captions"), "T");
+    REG_KEY("TV Playback", "TOGGLETTC", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle Teletext Captions"),"");
+    REG_KEY("TV Playback", "TOGGLESUBTITLE", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle Subtitles"), "");
+    REG_KEY("TV Playback", "TOGGLECC608", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle VBI CC"), "");
+    REG_KEY("TV Playback", "TOGGLECC708", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle ATSC CC"), "");
+    REG_KEY("TV Playback", "TOGGLETTM", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle Teletext Menu"), "");
 
-    REG_KEY("TV Playback", "TOGGLECC",      "Toggle any captions",   "T");
-    REG_KEY("TV Playback", "TOGGLETTC",     "Toggle Teletext Captions","");
-    REG_KEY("TV Playback", "TOGGLESUBTITLE","Toggle Subtitles",      "");
-    REG_KEY("TV Playback", "TOGGLECC608",   "Toggle VBI CC",         "");
-    REG_KEY("TV Playback", "TOGGLECC708",   "Toggle ATSC CC",        "");
+    REG_KEY("TV Playback", "SELECTAUDIO_0", QT_TRANSLATE_NOOP("MythControls",
+            "Play audio track 1"), "");
+    REG_KEY("TV Playback", "SELECTAUDIO_1", QT_TRANSLATE_NOOP("MythControls",
+            "Play audio track 2"), "");
+    REG_KEY("TV Playback", "SELECTSUBTITLE_0",QT_TRANSLATE_NOOP("MythControls",
+            "Display subtitle 1"), "");
+    REG_KEY("TV Playback", "SELECTSUBTITLE_1",QT_TRANSLATE_NOOP("MythControls",
+            "Display subtitle 2"), "");
+    REG_KEY("TV Playback", "SELECTCC608_0", QT_TRANSLATE_NOOP("MythControls",
+            "Display VBI CC1"), "");
+    REG_KEY("TV Playback", "SELECTCC608_1", QT_TRANSLATE_NOOP("MythControls",
+            "Display VBI CC2"), "");
+    REG_KEY("TV Playback", "SELECTCC608_2", QT_TRANSLATE_NOOP("MythControls",
+            "Display VBI CC3"), "");
+    REG_KEY("TV Playback", "SELECTCC608_3", QT_TRANSLATE_NOOP("MythControls",
+            "Display VBI CC4"), "");
+    REG_KEY("TV Playback", "SELECTCC708_0", QT_TRANSLATE_NOOP("MythControls",
+            "Display ATSC CC1"), "");
+    REG_KEY("TV Playback", "SELECTCC708_1", QT_TRANSLATE_NOOP("MythControls",
+            "Display ATSC CC2"), "");
+    REG_KEY("TV Playback", "SELECTCC708_2", QT_TRANSLATE_NOOP("MythControls",
+            "Display ATSC CC3"), "");
+    REG_KEY("TV Playback", "SELECTCC708_3", QT_TRANSLATE_NOOP("MythControls",
+            "Display ATSC CC4"), "");
 
-    REG_KEY("TV Playback", "TOGGLETTM",     "Toggle Teletext Menu",  "");
+    REG_KEY("TV Playback", "NEXTAUDIO", QT_TRANSLATE_NOOP("MythControls",
+            "Next audio track"), "+");
+    REG_KEY("TV Playback", "PREVAUDIO", QT_TRANSLATE_NOOP("MythControls",
+            "Previous audio track"), "-");
+    REG_KEY("TV Playback", "NEXTSUBTITLE", QT_TRANSLATE_NOOP("MythControls",
+            "Next subtitle track"), "");
+    REG_KEY("TV Playback", "PREVSUBTITLE", QT_TRANSLATE_NOOP("MythControls",
+            "Previous subtitle track"), "");
+    REG_KEY("TV Playback", "NEXTCC608", QT_TRANSLATE_NOOP("MythControls",
+            "Next VBI CC track"), "");
+    REG_KEY("TV Playback", "PREVCC608", QT_TRANSLATE_NOOP("MythControls",
+            "Previous VBI CC track"), "");
+    REG_KEY("TV Playback", "NEXTCC708", QT_TRANSLATE_NOOP("MythControls",
+            "Next ATSC CC track"), "");
+    REG_KEY("TV Playback", "PREVCC708", QT_TRANSLATE_NOOP("MythControls",
+            "Previous ATSC CC track"), "");
+    REG_KEY("TV Playback", "NEXTCC", QT_TRANSLATE_NOOP("MythControls",
+            "Next of any captions"), "");
 
-    REG_KEY("TV Playback", "SELECTAUDIO_0", "Play audio track 1",    "");
-    REG_KEY("TV Playback", "SELECTAUDIO_1", "Play audio track 2",    "");
-    REG_KEY("TV Playback", "SELECTSUBTITLE_0","Display subtitle 1",  "");
-    REG_KEY("TV Playback", "SELECTSUBTITLE_1","Display subtitle 2",  "");
-    REG_KEY("TV Playback", "SELECTCC608_0", "Display VBI CC1",       "");
-    REG_KEY("TV Playback", "SELECTCC608_1", "Display VBI CC2",       "");
-    REG_KEY("TV Playback", "SELECTCC608_2", "Display VBI CC3",       "");
-    REG_KEY("TV Playback", "SELECTCC608_3", "Display VBI CC4",       "");
-    REG_KEY("TV Playback", "SELECTCC708_0", "Display ATSC CC1",      "");
-    REG_KEY("TV Playback", "SELECTCC708_1", "Display ATSC CC2",      "");
-    REG_KEY("TV Playback", "SELECTCC708_2", "Display ATSC CC3",      "");
-    REG_KEY("TV Playback", "SELECTCC708_3", "Display ATSC CC4",      "");
-
-    REG_KEY("TV Playback", "NEXTAUDIO",    "Next audio track",         "+");
-    REG_KEY("TV Playback", "PREVAUDIO",    "Previous audio track",     "-");
-    REG_KEY("TV Playback", "NEXTSUBTITLE", "Next subtitle track",      "");
-    REG_KEY("TV Playback", "PREVSUBTITLE", "Previous subtitle track",  "");
-    REG_KEY("TV Playback", "NEXTCC608",    "Next VBI CC track",        "");
-    REG_KEY("TV Playback", "PREVCC608",    "Previous VBI CC track",    "");
-    REG_KEY("TV Playback", "NEXTCC708",    "Next ATSC CC track",       "");
-    REG_KEY("TV Playback", "PREVCC708",    "Previous ATSC CC track",   "");
-    REG_KEY("TV Playback", "NEXTCC",       "Next of any captions",     "");
-
-    REG_KEY("TV Playback", "NEXTSCAN",    "Next video scan overidemode", "");
-    REG_KEY("TV Playback", "QUEUETRANSCODE", "Queue the current recording for "
-            "transcoding", "X");
-    REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
-    REG_KEY("TV Playback", "SPEEDDEC", "Decrease the playback speed", "J");
-    REG_KEY("TV Playback", "ADJUSTSTRETCH", "Turn on time stretch control", "A");
-    REG_KEY("TV Playback", "STRETCHINC", "Increase time stretch speed", "");
-    REG_KEY("TV Playback", "STRETCHDEC", "Decrease time stretch speed", "");
-    REG_KEY("TV Playback", "TOGGLESTRETCH", "Toggle time stretch speed", "");
-    REG_KEY("TV Playback", "TOGGLEAUDIOSYNC",
-            "Turn on audio sync adjustment controls", "");
+    REG_KEY("TV Playback", "NEXTSCAN", QT_TRANSLATE_NOOP("MythControls",
+            "Next video scan overidemode"), "");
+    REG_KEY("TV Playback", "QUEUETRANSCODE", QT_TRANSLATE_NOOP("MythControls",
+            "Queue the current recording for transcoding"), "X");
+    REG_KEY("TV Playback", "SPEEDINC", QT_TRANSLATE_NOOP("MythControls",
+            "Increase the playback speed"), "U");
+    REG_KEY("TV Playback", "SPEEDDEC", QT_TRANSLATE_NOOP("MythControls",
+            "Decrease the playback speed"), "J");
+    REG_KEY("TV Playback", "ADJUSTSTRETCH", QT_TRANSLATE_NOOP("MythControls",
+            "Turn on time stretch control"), "A");
+    REG_KEY("TV Playback", "STRETCHINC", QT_TRANSLATE_NOOP("MythControls",
+            "Increase time stretch speed"), "");
+    REG_KEY("TV Playback", "STRETCHDEC", QT_TRANSLATE_NOOP("MythControls",
+            "Decrease time stretch speed"), "");
+    REG_KEY("TV Playback", "TOGGLESTRETCH", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle time stretch speed"), "");
+    REG_KEY("TV Playback", "TOGGLEAUDIOSYNC", QT_TRANSLATE_NOOP("MythControls",
+            "Turn on audio sync adjustment controls"), "");
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS",
-            "Playback picture adjustments",                    "F");
+            QT_TRANSLATE_NOOP("MythControls", "Playback picture adjustments"),
+             "F");
     REG_KEY("TV Playback", "TOGGLECHANCONTROLS",
-            "Recording picture adjustments for this channel",  "Ctrl+G");
+            QT_TRANSLATE_NOOP("MythControls", "Recording picture adjustments "
+            "for this channel"), "Ctrl+G");
     REG_KEY("TV Playback", "TOGGLERECCONTROLS",
-            "Recording picture adjustments for this recorder", "G");
-    REG_KEY("TV Playback", "CYCLECOMMSKIPMODE", "Cycle Commercial Skip mode", "");
-    REG_KEY("TV Playback", "GUIDE", "Show the Program Guide", "S");
-    REG_KEY("TV Playback", "FINDER", "Show the Program Finder", "#");
-    REG_KEY("TV Playback", "TOGGLESLEEP", "Toggle the Sleep Timer", "F8");
-    REG_KEY("TV Playback", "PLAY", "Play", "Ctrl+P");
-    REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
-    REG_KEY("TV Playback", "JUMPREC", "Display menu of recorded programs to jump to", "");
-    REG_KEY("TV Playback", "VIEWSCHEDULED", "Display scheduled recording list", "");
-    REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "Alt+F7");
-    REG_KEY("TV Playback", "JUMPTODVDROOTMENU", "Jump to the DVD Root Menu", "");
-    REG_KEY("TV Playback", "EXITSHOWNOPROMPTS","Exit Show without any prompts", "");
-    REG_KEY("TV Playback", "SCREENSHOT","Save screenshot of current video frame", "");
+            QT_TRANSLATE_NOOP("MythControls", "Recording picture adjustments "
+            "for this recorder"), "G");
+    REG_KEY("TV Playback", "CYCLECOMMSKIPMODE",
+            QT_TRANSLATE_NOOP("MythControls", "Cycle Commercial Skip mode"),
+            "");
+    REG_KEY("TV Playback", "GUIDE", QT_TRANSLATE_NOOP("MythControls",
+            "Show the Program Guide"), "S");
+    REG_KEY("TV Playback", "FINDER", QT_TRANSLATE_NOOP("MythControls",
+            "Show the Program Finder"), "#");
+    REG_KEY("TV Playback", "TOGGLESLEEP", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle the Sleep Timer"), "F8");
+    REG_KEY("TV Playback", "PLAY", QT_TRANSLATE_NOOP("MythControls", "Play"),
+            "Ctrl+P");
+    REG_KEY("TV Playback", "JUMPPREV", QT_TRANSLATE_NOOP("MythControls",
+            "Jump to previously played recording"), "");
+    REG_KEY("TV Playback", "JUMPREC", QT_TRANSLATE_NOOP("MythControls",
+            "Display menu of recorded programs to jump to"), "");
+    REG_KEY("TV Playback", "VIEWSCHEDULED", QT_TRANSLATE_NOOP("MythControls",
+            "Display scheduled recording list"), "");
+    REG_KEY("TV Playback", "SIGNALMON", QT_TRANSLATE_NOOP("MythControls",
+            "Monitor Signal Quality"), "Alt+F7");
+    REG_KEY("TV Playback", "JUMPTODVDROOTMENU",
+            QT_TRANSLATE_NOOP("MythControls", "Jump to the DVD Root Menu"), "");
+    REG_KEY("TV Playback", "EXITSHOWNOPROMPTS",
+            QT_TRANSLATE_NOOP("MythControls", "Exit Show without any prompts"),
+            "");
+    REG_KEY("TV Playback", "SCREENSHOT",
+            QT_TRANSLATE_NOOP("MythControls", "Save screenshot of current "
+            "video frame"), "");
 
     /* Interactive Television keys */
-    REG_KEY("TV Playback", "MENURED",    "Menu Red",    "F2");
-    REG_KEY("TV Playback", "MENUGREEN",  "Menu Green",  "F3");
-    REG_KEY("TV Playback", "MENUYELLOW", "Menu Yellow", "F4");
-    REG_KEY("TV Playback", "MENUBLUE",   "Menu Blue",   "F5");
-    REG_KEY("TV Playback", "TEXTEXIT",   "Menu Exit",   "F6");
-    REG_KEY("TV Playback", "MENUTEXT",   "Menu Text",   "F7");
-    REG_KEY("TV Playback", "MENUEPG",    "Menu EPG",    "F12");
+    REG_KEY("TV Playback", "MENURED",    QT_TRANSLATE_NOOP("MythControls",
+            "Menu Red"),    "F2");
+    REG_KEY("TV Playback", "MENUGREEN",  QT_TRANSLATE_NOOP("MythControls",
+            "Menu Green"),  "F3");
+    REG_KEY("TV Playback", "MENUYELLOW", QT_TRANSLATE_NOOP("MythControls",
+            "Menu Yellow"), "F4");
+    REG_KEY("TV Playback", "MENUBLUE",   QT_TRANSLATE_NOOP("MythControls",
+            "Menu Blue"),   "F5");
+    REG_KEY("TV Playback", "TEXTEXIT",   QT_TRANSLATE_NOOP("MythControls",
+            "Menu Exit"),   "F6");
+    REG_KEY("TV Playback", "MENUTEXT",   QT_TRANSLATE_NOOP("MythControls",
+            "Menu Text"),   "F7");
+    REG_KEY("TV Playback", "MENUEPG",    QT_TRANSLATE_NOOP("MythControls",
+            "Menu EPG"),    "F12");
 
     /* Editing keys */
-    REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
-    REG_KEY("TV Editing", "INVERTMAP", "Invert Begin/End cut points", "I");
-    REG_KEY("TV Editing", "LOADCOMMSKIP", "Load cut list from commercial skips",
-            "Z,End");
-    REG_KEY("TV Editing", "NEXTCUT", "Jump to the next cut point", "PgDown");
-    REG_KEY("TV Editing", "PREVCUT", "Jump to the previous cut point", "PgUp");
-    REG_KEY("TV Editing", "BIGJUMPREW", "Jump back 10x the normal amount",
-            ",,<");
-    REG_KEY("TV Editing", "BIGJUMPFWD", "Jump forward 10x the normal amount",
-            ">,.");
+    REG_KEY("TV Editing", "CLEARMAP",    QT_TRANSLATE_NOOP("MythControls",
+            "Clear editing cut points"), "C,Q,Home");
+    REG_KEY("TV Editing", "INVERTMAP",   QT_TRANSLATE_NOOP("MythControls",
+            "Invert Begin/End cut points"),"I");
+    REG_KEY("TV Editing", "LOADCOMMSKIP",QT_TRANSLATE_NOOP("MythControls",
+            "Load cut list from commercial skips"), "Z,End");
+    REG_KEY("TV Editing", "NEXTCUT",     QT_TRANSLATE_NOOP("MythControls",
+            "Jump to the next cut point"), "PgDown");
+    REG_KEY("TV Editing", "PREVCUT",     QT_TRANSLATE_NOOP("MythControls",
+            "Jump to the previous cut point"), "PgUp");
+    REG_KEY("TV Editing", "BIGJUMPREW",  QT_TRANSLATE_NOOP("MythControls",
+            "Jump back 10x the normal amount"), ",,<");
+    REG_KEY("TV Editing", "BIGJUMPFWD",  QT_TRANSLATE_NOOP("MythControls",
+            "Jump forward 10x the normal amount"), ">,.");
 
     /* Teletext keys */
-    REG_KEY("Teletext Menu", "NEXTPAGE",    "Next Page",             "Down");
-    REG_KEY("Teletext Menu", "PREVPAGE",    "Previous Page",         "Up");
-    REG_KEY("Teletext Menu", "NEXTSUBPAGE", "Next Subpage",          "Right");
-    REG_KEY("Teletext Menu", "PREVSUBPAGE", "Previous Subpage",      "Left");
-    REG_KEY("Teletext Menu", "TOGGLETT",    "Toggle Teletext",       "T");
-    REG_KEY("Teletext Menu", "MENURED",     "Menu Red",              "F2");
-    REG_KEY("Teletext Menu", "MENUGREEN",   "Menu Green",            "F3");
-    REG_KEY("Teletext Menu", "MENUYELLOW",  "Menu Yellow",           "F4");
-    REG_KEY("Teletext Menu", "MENUBLUE",    "Menu Blue",             "F5");
-    REG_KEY("Teletext Menu", "MENUWHITE",   "Menu White",            "F6");
-    REG_KEY("Teletext Menu", "TOGGLEBACKGROUND","Toggle Background", "F7");
-    REG_KEY("Teletext Menu", "REVEAL",      "Reveal hidden Text",    "F8");
+    REG_KEY("Teletext Menu", "NEXTPAGE",    QT_TRANSLATE_NOOP("MythControls",
+            "Next Page"),             "Down");
+    REG_KEY("Teletext Menu", "PREVPAGE",    QT_TRANSLATE_NOOP("MythControls",
+            "Previous Page"),         "Up");
+    REG_KEY("Teletext Menu", "NEXTSUBPAGE", QT_TRANSLATE_NOOP("MythControls",
+            "Next Subpage"),          "Right");
+    REG_KEY("Teletext Menu", "PREVSUBPAGE", QT_TRANSLATE_NOOP("MythControls",
+            "Previous Subpage"),      "Left");
+    REG_KEY("Teletext Menu", "TOGGLETT",    QT_TRANSLATE_NOOP("MythControls",
+            "Toggle Teletext"),       "T");
+    REG_KEY("Teletext Menu", "MENURED",     QT_TRANSLATE_NOOP("MythControls",
+            "Menu Red"),              "F2");
+    REG_KEY("Teletext Menu", "MENUGREEN",   QT_TRANSLATE_NOOP("MythControls",
+            "Menu Green"),            "F3");
+    REG_KEY("Teletext Menu", "MENUYELLOW",  QT_TRANSLATE_NOOP("MythControls",
+            "Menu Yellow"),           "F4");
+    REG_KEY("Teletext Menu", "MENUBLUE",    QT_TRANSLATE_NOOP("MythControls",
+            "Menu Blue"),             "F5");
+    REG_KEY("Teletext Menu", "MENUWHITE",   QT_TRANSLATE_NOOP("MythControls",
+            "Menu White"),            "F6");
+    REG_KEY("Teletext Menu", "TOGGLEBACKGROUND",
+            QT_TRANSLATE_NOOP("MythControls", "Toggle Background"), "F7");
+    REG_KEY("Teletext Menu", "REVEAL",      QT_TRANSLATE_NOOP("MythControls",
+            "Reveal hidden Text"),    "F8");
 
 /*
   keys already used:
@@ -698,7 +812,6 @@ TV::TV(void)
       // Program Info for currently playing video
       lastProgram(NULL),
       inPlaylist(false), underNetworkControl(false),
-      isnearend(false),
       // Jump to program stuff
       jumpToProgramPIPState(kPIPOff),
       jumpToProgram(false),
@@ -933,6 +1046,12 @@ bool TV::Init(bool createWindow)
 TV::~TV(void)
 {
     VERBOSE(VB_PLAYBACK, "TV::~TV() -- begin");
+
+    if (udpnotify)
+    {
+        udpnotify->deleteLater();
+        udpnotify = NULL;
+    }
 
     gContext->removeListener(this);
 
@@ -2673,14 +2792,13 @@ void TV::timerEvent(QTimerEvent *te)
     if (ctx)
     {
         PlayerContext *mctx = GetPlayerReadLock(0, __FILE__, __LINE__);
-        bool still_exists = find_player_index(ctx) >= 0;
-
-        ctx->LockDeleteNVP(__FILE__, __LINE__);
-        if (still_exists && ctx->nvp && ctx->nvp->IsMuted())
-            ctx->nvp->SetMuted(false);
-        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
-
-
+        if (find_player_index(ctx) >= 0)
+        {
+            ctx->LockDeleteNVP(__FILE__, __LINE__);
+            if (ctx->nvp && ctx->nvp->IsMuted())
+                ctx->nvp->SetMuted(false);
+            ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+        }
         ReturnPlayerLock(mctx);
         handled = true;
     }
@@ -2897,7 +3015,7 @@ void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark) const
     ctx->LockDeleteNVP(__FILE__, line);
     if (ctx->nvp)
     {
-        if (bookmark_it)
+        if (bookmark_it && !(ctx->nvp->IsNearEnd()))
             ctx->nvp->SetBookmark();
         if (db_auto_set_watched)
             ctx->nvp->SetWatched();
@@ -3508,7 +3626,6 @@ bool TV::BrowseHandleAction(PlayerContext *ctx, const QStringList &actions)
         BrowseDispInfo(ctx, BROWSE_FAVORITE);
     else if (has_action("SELECT", actions))
     {
-        CommitQueuedInput(ctx);
         BrowseEnd(ctx, true);
     }
     else if (has_action("CLEAROSD",     actions) ||
@@ -3640,6 +3757,9 @@ bool TV::OSDDialogHandleAction(PlayerContext *actx, const QStringList &actions)
     }
 
     bool handled = true;
+    actx->LockDeleteNVP(__FILE__, __LINE__);
+    bool isnearend = actx->nvp && actx->nvp->IsNearEnd();
+    actx->UnlockDeleteNVP(__FILE__, __LINE__);
     if (((has_action("RWNDSTICKY", actions) ||
           has_action("SEEKRWND", actions) ||
           has_action("JUMPRWND", actions))) &&
@@ -5683,7 +5803,7 @@ bool TV::DoNVPSeek(PlayerContext *ctx, float time)
     }
 
     if (ctx == GetPlayer(ctx, 0))
-        muted = ctx->nvp->SetMuted(true);
+        muted = MuteChannelChange(ctx);
 
     bool res = false;
 
@@ -5989,7 +6109,7 @@ void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
         return;
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
-    bool muted = ctx->nvp->SetMuted(true);
+    bool muted = MuteChannelChange(ctx);
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     struct StatusPosInfo posInfo;
@@ -6182,6 +6302,12 @@ void TV::SwitchCards(PlayerContext *ctx,
         if (mctx != ctx)
             PIPRemovePlayer(mctx, ctx);
 
+        bool muted = false;
+        ctx->LockDeleteNVP(__FILE__, __LINE__);
+        if (ctx->nvp && ctx->nvp->IsMuted())
+            muted = true;
+        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
         // pause the decoder first, so we're not reading too close to the end.
         ctx->buffer->IgnoreLiveEOF(true);
         ctx->buffer->StopReads();
@@ -6215,9 +6341,7 @@ void TV::SwitchCards(PlayerContext *ctx,
         {
             ctx->LockPlayingInfo(__FILE__, __LINE__);
             QString playbackURL = ctx->playingInfo->GetPlaybackURL(true);
-
             bool opennow = (ctx->tvchain->GetCardType(-1) != "DUMMY");
-
             ctx->SetRingBuffer(new RingBuffer(playbackURL, false, true,
                                               opennow ? 12 : (uint)-1));
 
@@ -6235,7 +6359,7 @@ void TV::SwitchCards(PlayerContext *ctx,
 
             if (ctx->CreateNVP(
                     this, gContext->GetMainWindow(), ctx->GetState(),
-                    mctx->embedWinID, &mctx->embedBounds))
+                    mctx->embedWinID, &mctx->embedBounds, muted))
             {
                 ScheduleStateChange(ctx);
                 ok = true;
@@ -6624,10 +6748,7 @@ void TV::ChangeChannel(PlayerContext *ctx, int direction)
 
     QString oldinputname = ctx->recorder->GetInput();
 
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (ctx->nvp && !ctx->nvp->IsMuted())
-        muted = ctx->nvp->SetMuted(true);
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    muted = MuteChannelChange(ctx);
 
     if (ctx->paused)
     {
@@ -6745,10 +6866,7 @@ void TV::ChangeChannel(PlayerContext *ctx, uint chanid, const QString &chan)
     if (getit || !ctx->recorder || !ctx->recorder->CheckChannel(channum))
         return;
 
-    ctx->LockDeleteNVP(__FILE__, __LINE__);
-    if (ctx->nvp && !ctx->nvp->IsMuted())
-        muted = ctx->nvp->SetMuted(true);
-    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    muted = MuteChannelChange(ctx);
 
     OSD *osd = GetOSDLock(ctx);
     if (osd && ctx->paused)
@@ -7756,6 +7874,14 @@ vector<bool> TV::DoSetPauseState(PlayerContext *lctx, const vector<bool> &pause)
 
 void TV::DoEditSchedule(int editType)
 {
+    if ((editType == kScheduleProgramGuide  && !RunProgramGuidePtr) ||
+        (editType == kScheduleProgramFinder && !RunProgramFinderPtr) ||
+        (editType == kScheduledRecording    && !RunScheduleEditorPtr) ||
+        (editType == kViewSchedule          && !RunViewScheduledPtr))
+    {
+        return;
+    }
+
     PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
 
     actx->LockPlayingInfo(__FILE__, __LINE__);
@@ -8233,6 +8359,20 @@ void TV::SetMuteTimer(PlayerContext *ctx, int timeout)
     // otherwise it never fires on Win32
     QString message = QString("UNMUTE %1 %2").arg((long long)ctx).arg(timeout);
     qApp->postEvent(gContext->GetMainWindow(), new MythEvent(message));
+}
+
+bool TV::MuteChannelChange(PlayerContext *ctx)
+{
+    if (!ctx)
+        return false;
+
+    bool muted = false;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp && !ctx->nvp->IsMuted())
+        muted = ctx->nvp->SetMuted(true);
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+    return muted;
 }
 
 void TV::customEvent(QEvent *e)
@@ -10882,11 +11022,6 @@ void TV::UnpauseLiveTV(PlayerContext *ctx)
         UpdateOSDProgInfo(ctx, "program_info");
         UpdateLCD();
         ctx->PushPreviousChannel();
-
-        ctx->LockDeleteNVP(__FILE__, __LINE__);
-        if (!ctx->IsPIP() && ctx->nvp)
-            ctx->nvp->SetMuted(false);
-        ctx->UnlockDeleteNVP(__FILE__, __LINE__);
     }
 }
 

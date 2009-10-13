@@ -2,6 +2,51 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>GlobalSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocationDialog</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Complete. Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Weather forecasts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause current page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search List</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
@@ -29,6 +74,127 @@
     </message>
     <message>
         <source>Animated Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScreenSetup</name>
+    <message>
+        <source>Active Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Units: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>English Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SI Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press SELECT to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change location; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change units; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>move screen up or down; or remove screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manipulate Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceManager</name>
+    <message>
+        <source>Searching for scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Author: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -568,18 +734,6 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>loading...</source>
-        <translation>загружается...</translation>
-    </message>
-    <message>
-        <source>[ retrieving weather data ... ]</source>
-        <translation>[ получаем данные погоды... ]</translation>
-    </message>
-    <message>
-        <source>current conditions</source>
-        <translation>текущие условия</translation>
-    </message>
-    <message>
         <source>Humidity</source>
         <translation>Влажность</translation>
     </message>
@@ -588,96 +742,8 @@
         <translation>Давление</translation>
     </message>
     <message>
-        <source>Wind</source>
-        <translation>Ветер</translation>
-    </message>
-    <message>
         <source>Visibility</source>
         <translation>Видимость</translation>
-    </message>
-    <message>
-        <source>Wind Chill</source>
-        <translation>Температура ветра</translation>
-    </message>
-    <message>
-        <source>UV Index</source>
-        <translation>УФ излучение</translation>
-    </message>
-    <message>
-        <source>extended forecast</source>
-        <translation>расширенный прогноз</translation>
-    </message>
-    <message>
-        <source>LO</source>
-        <translation>Мин</translation>
-    </message>
-    <message>
-        <source>HI</source>
-        <translation>Макс</translation>
-    </message>
-    <message>
-        <source>today&apos;s forecast</source>
-        <translation>прогноз на сегодня</translation>
-    </message>
-    <message>
-        <source>tomorrow&apos;s outlook</source>
-        <translation>прогноз на завтра</translation>
-    </message>
-    <message>
-        <source>Forecast for</source>
-        <translation>Прогноз на</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation>доплеровский радар</translation>
-    </message>
-    <message>
-        <source>Map Unavailable</source>
-        <translation>Карта недоступна</translation>
-    </message>
-    <message>
-        <source>RAIN</source>
-        <translation>ДОЖДЬ</translation>
-    </message>
-    <message>
-        <source>MIX/ICE</source>
-        <translation>СМЕСЬ/ГРАД</translation>
-    </message>
-    <message>
-        <source>SNOW</source>
-        <translation>СНЕГ</translation>
-    </message>
-    <message>
-        <source>LIGHT</source>
-        <translation>СВЕТ</translation>
-    </message>
-    <message>
-        <source>HEAVY</source>
-        <translation>СИЛЬНЫЙ</translation>
-    </message>
-    <message>
-        <source>Enter Zip Code</source>
-        <translation>Введите почтовый код</translation>
-    </message>
-    <message>
-        <source>weather setup</source>
-        <translation>настройки погоды</translation>
-    </message>
-    <message>
-        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
-        <translation>Для сохранения нажмите &apos;i&apos;; для отмены - ESCAPE</translation>
-    </message>
-    <message>
-        <source>COLD</source>
-        <translation>ХОЛОДНО</translation>
-    </message>
-    <message>
-        <source>COLDEST</source>
-        <translation>ХОЛОДНЕЙШИЙ</translation>
-    </message>
-    <message>
-        <source>CLOUD TEMPERATURE</source>
-        <translation>ТЕМПЕРАТУРА ОБЛАКОВ</translation>
     </message>
     <message>
         <source>Wind(Gust)</source>
@@ -723,249 +789,37 @@
         <source>Source Update Timeout (seconds):</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Weather Alerts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>
-    <message>
-        <source> is invalid)</source>
-        <translation type="obsolete"> не корректно)</translation>
-    </message>
-    <message>
-        <source>   No Location Set, Please read the README</source>
-        <translation type="obsolete">   Не настроено местоположение, Пожалуйста прочтите README</translation>
-    </message>
-    <message>
-        <source>Configuring MythWeather...</source>
-        <translation type="obsolete">Настраиваем MythWeather...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select unit conversion...</source>
-        <translation type="obsolete">Используйте стрелку вправо для настройки единиц измерения...</translation>
-    </message>
-    <message>
-        <source>Weather Units</source>
-        <translation type="obsolete">Единицы измерения</translation>
-    </message>
-    <message>
-        <source>Location</source>
-        <translation type="obsolete">Местоположение</translation>
-    </message>
-    <message>
-        <source>Aggressiveness</source>
-        <translation type="obsolete">Агрессивность</translation>
-    </message>
-    <message>
-        <source>Configuration Saved...</source>
-        <translation type="obsolete">Настройки сохранены...</translation>
-    </message>
-    <message>
-        <source>Retrieving weather data...</source>
-        <translation type="obsolete">Получаем данные погоды...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select your location...</source>
-        <translation type="obsolete">Используйте стрелку вправо для выбора своего местоположения...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation type="obsolete">Используйте стрелку вправо для выбора уровня агрессивности...</translation>
-    </message>
-    <message>
-        <source> 1  High Speed Connection</source>
-        <translation type="obsolete"> 1  Высокоскоростное соединение</translation>
-    </message>
-    <message>
-        <source> 8  Medium Speed Connection</source>
-        <translation type="obsolete"> 8  Соединение со средней скоростью</translation>
-    </message>
-    <message>
-        <source> 15 Low Speed Connection</source>
-        <translation type="obsolete"> 15 Низкоскоростное соединение</translation>
-    </message>
-    <message>
-        <source>Obtaining initial weather data...</source>
-        <translation type="obsolete">Получаем начальные данные погоды...</translation>
-    </message>
-    <message>
-        <source>Updating weather data...</source>
-        <translation type="obsolete">Обновляем данные погоды...</translation>
-    </message>
-    <message>
-        <source>Calm</source>
-        <translation type="obsolete">Безветрено</translation>
-    </message>
-    <message>
-        <source> at </source>
-        <translation type="obsolete"> в </translation>
-    </message>
-    <message>
-        <source>Unlimited</source>
-        <translation type="obsolete">Не ограниченно</translation>
-    </message>
-    <message>
-        <source> (minimal)</source>
-        <translation type="obsolete"> (минимальное)</translation>
-    </message>
-    <message>
-        <source> (moderate)</source>
-        <translation type="obsolete"> (умереное)</translation>
-    </message>
-    <message>
-        <source> (high)</source>
-        <translation type="obsolete"> (высокое)</translation>
-    </message>
-    <message>
-        <source> (extreme)</source>
-        <translation type="obsolete"> (чрезмерное)</translation>
-    </message>
-    <message>
-        <source>Today a high of </source>
-        <translation type="obsolete">Сегодня максимум </translation>
-    </message>
-    <message>
-        <source> and a low of </source>
-        <translation type="obsolete">° и минимум </translation>
-    </message>
-    <message>
-        <source>. Currently there is a humidity of </source>
-        <translation type="obsolete">°. Текущая влажность </translation>
-    </message>
-    <message>
-        <source>% and the winds are</source>
-        <translation type="obsolete">% и ветер </translation>
-    </message>
-    <message>
-        <source> calm.</source>
-        <translation type="obsolete"> отсутствует.</translation>
-    </message>
-    <message>
-        <source> coming in at </source>
-        <translation type="obsolete"> силой </translation>
-    </message>
-    <message>
-        <source> mph from the </source>
-        <translation type="obsolete"> миль/ч с </translation>
-    </message>
-    <message>
-        <source> Km/h from the </source>
-        <translation type="obsolete"> км/ч с </translation>
-    </message>
-    <message>
-        <source> Visibility will be unlimited for today.</source>
-        <translation type="obsolete"> Видимость не ограничена сегодня.</translation>
-    </message>
-    <message>
-        <source> Visibility conditions are unknown.</source>
-        <translation type="obsolete"> Видимость неизвестна сегодня.</translation>
-    </message>
-    <message>
-        <source> There will be a visibility of </source>
-        <translation type="obsolete"> Видимость </translation>
-    </message>
-    <message>
-        <source> miles.</source>
-        <translation type="obsolete"> миль.</translation>
-    </message>
-    <message>
-        <source> km.</source>
-        <translation type="obsolete"> км.</translation>
-    </message>
-    <message>
-        <source>Sunday</source>
-        <translation type="obsolete">Воскресенье</translation>
-    </message>
-    <message>
-        <source>Monday</source>
-        <translation type="obsolete">Понедельник</translation>
-    </message>
-    <message>
-        <source>Tuesday</source>
-        <translation type="obsolete">Вторник</translation>
-    </message>
-    <message>
-        <source>Wednesday</source>
-        <translation type="obsolete">Среда</translation>
-    </message>
-    <message>
-        <source>Thursday</source>
-        <translation type="obsolete">Четверг</translation>
-    </message>
-    <message>
-        <source>Friday</source>
-        <translation type="obsolete">Пятница</translation>
-    </message>
-    <message>
-        <source>Saturday</source>
-        <translation type="obsolete">Субота</translation>
-    </message>
-    <message>
-        <source>Date Error</source>
-        <translation type="obsolete">Ошибка данных</translation>
-    </message>
-    <message>
-        <source>Tomorrow expect a high of </source>
-        <translation type="obsolete">Завтра ожидается максимум </translation>
-    </message>
-    <message>
-        <source>Expected conditions: </source>
-        <translation type="obsolete">Ожидаемые условия: </translation>
-    </message>
-    <message>
-        <source>Weather data from: </source>
-        <translation type="obsolete">Данные погоды из: </translation>
-    </message>
-    <message>
-        <source>Updating...</source>
-        <translation type="obsolete">Обновляем...</translation>
-    </message>
-    <message>
-        <source> (Not All Information Available)</source>
-        <translation type="obsolete"> (Не вся информация доступна)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID or Server Error ***</source>
-        <translation type="obsolete">*** Некорректный код местоположения или ошибка сервера ***</translation>
-    </message>
-    <message>
-        <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation type="obsolete">Английские (Фаренгейт, дюйм и т.д)</translation>
-    </message>
-    <message>
-        <source>Metric (Celsius, kPa, etc)</source>
-        <translation type="obsolete">Метрические (Цельсий, кПа и т.д.)</translation>
-    </message>
-    <message>
-        <source> F</source>
-        <translation type="obsolete">°F</translation>
-    </message>
-    <message>
-        <source> C</source>
-        <translation type="obsolete">°C</translation>
-    </message>
-    <message>
-        <source>.</source>
-        <translation type="obsolete">.</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Неизвестно</translation>
-    </message>
-    <message>
-        <source> - PAUSED -</source>
-        <translation type="obsolete"> - ПАУЗА -</translation>
-    </message>
-    <message>
-        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
-Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation type="obsolete">MythWeather не может получить данные погоды за отведенный промежуток времени (%1 секунд).
-Нажмите &apos;OK&apos; для повторный попытки с большим значением таймаута. Нажмите &apos;Отмена&apos; для попытки снова без анимированной карты.</translation>
-    </message>
-    <message>
-        <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
-Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation type="obsolete">MythWeather не может получить данные погоды за отведенный промежуток времени (%1 секунд).
-Нажмите &apos;OK&apos; для повторный попытки с большим значением таймаута. Нажмите &apos;Отмена&apos; для отмены.</translation>
-    </message>
     <message>
         <source>Paused</source>
         <translation type="unfinished"></translation>

@@ -30,14 +30,14 @@ class MPUBLIC FileSystemInfo
 };
 
 MPUBLIC vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype);
-MPUBLIC vector<FileSystemInfo> RemoteGetFreeSpace();
+MPUBLIC vector<FileSystemInfo> RemoteGetFreeSpace(void);
 MPUBLIC bool RemoteGetLoad(float load[3]);
 MPUBLIC bool RemoteGetUptime(time_t &uptime);
 MPUBLIC
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
 MPUBLIC bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves = true);
 MPUBLIC
-bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
+bool RemoteDeleteRecording(const ProgramInfo *pginfo, bool forgetHistory,
                            bool forceMetadataDelete = false);
 MPUBLIC
 bool RemoteUndeleteRecording(const ProgramInfo *pginfo);
@@ -52,6 +52,8 @@ MPUBLIC void RemoteSendMessage(const QString &message);
 MPUBLIC vector<uint> RemoteRequestFreeRecorderList(void);
 MPUBLIC void RemoteGeneratePreviewPixmap(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo);
+MPUBLIC QDateTime RemoteGetPreviewIfModified(
+    const ProgramInfo &pginfo, const QString &cachefile);
 MPUBLIC void RemoteFillProginfo(ProgramInfo *pginfo,
                                 const QString &playbackhostname);
 MPUBLIC QStringList RemoteRecordings(void);
@@ -62,6 +64,12 @@ MPUBLIC int RemoteCheckForRecording(const ProgramInfo *pginfo);
 MPUBLIC int RemoteGetRecordingStatus(const ProgramInfo *pginfo, int overrecsecs,
                                      int underrecsecs);
 MPUBLIC vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
+
+MPUBLIC bool RemoteGetFileList(QString host, QString path, QStringList* list,
+                       QString sgroup, bool fileNamesOnly = false);
+MPUBLIC void RemoteClearSGMap(void);
+MPUBLIC QString RemoteGenFileURL(QString sgroup, QString host, QString path);
+
 
 #endif
 

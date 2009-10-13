@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="TV">
 
     <button>
@@ -5,9 +6,7 @@
         <text>Watch TV</text>
         <text lang="IT">Guarda la TV</text>
         <text lang="ES">Ver la TV</text>
-        <text lang="CS">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
-        <text lang="FR">Regarder la TV</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
         <text lang="IS">Horfa á sjónvarp</text>
@@ -18,12 +17,12 @@
         <text lang="ZH_TW">觀看電視</text>
         <text lang="SL">Gledanje TV</text>
         <text lang="ET">Vaata telerit</text>
-        <text lang="NB">Se på TV</text>
-        <text lang="CS">Sledovat TV</text>
         <text lang="RU">Смотреть ТВ</text>
         <text lang="PL">Oglądanie TV</text>
         <text lang="HE">צפיה בטלויזיה</text>
+        <text lang="HU">TV nézés</text>
         <description>Watch live television</description>
+        <description lang="DE">Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -32,9 +31,7 @@
         <text>Schedule Recordings</text>
         <text lang="IT">Pianifica Registrazioni</text>
         <text lang="ES">Programar Grabaciones</text>
-        <text lang="CS">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
-        <text lang="FR">Programmer les enregistrements</text>
         <text lang="DE">Aufnahmen planen</text>
         <text lang="DA">Optag udsendelse</text>
         <text lang="IS">Stilla upptöku</text>
@@ -45,15 +42,12 @@
         <text lang="ZH_TW">預設錄影</text>
         <text lang="SL">Plan snemanj</text>
         <text lang="ET">Salvestamiste plaanimine</text>
-        <text lang="NB">Planlegg opptak</text>
-        <text lang="CS">Plánovat nahrávky</text>
         <text lang="RU">Расписание записей</text>
         <text lang="PL">Harmonogram</text>
         <text lang="HE">תזמון הקלטות</text>
+        <text lang="HU">Felvétel ütemezése</text>
         <alttext>Schedule</alttext>
-        <alttext lang="FR">Programmation</alttext>
         <alttext lang="ES">Temporizadores</alttext>
-        <alttext lang="CS">Temporitzadors</alttext>
         <alttext lang="DA">Optagelser</alttext>
         <alttext lang="NL">Planning</alttext>
         <alttext lang="PT">Programar</alttext>
@@ -64,9 +58,9 @@
         <alttext lang="ZH_TW">預錄</alttext>
         <alttext lang="SL">Plan</alttext>
         <alttext lang="ET">Plaanimine</alttext>
-        <alttext lang="NB">Planlegg</alttext>
         <alttext lang="RU">Расписание</alttext>
         <description>Pick shows to record</description>
+        <description lang="DE">Eine neue Aufnahme planen</description>
         <action>MENU tv_schedule.xml</action>
     </button>
 
@@ -75,27 +69,25 @@
         <text>Watch Recordings</text>
         <text lang="IT">Guarda Registrazioni</text>
         <text lang="ES">Ver Grabaciones</text>
-        <text lang="CS">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
-        <text lang="FR">Regarder les enregistrements</text>
         <text lang="DE">Aufnahmen ansehen</text>
         <text lang="DA">Afspil optagelser</text>
         <text lang="IS">Horfa á upptöku</text>
         <text lang="PT">Ver Gravações</text>
-        <text lang="SV">Titta på inspelningar</text>
+        <text lang="SV">Visa inspelningar</text>
         <text lang="JA">録画再生</text>
         <text lang="FI">Katso Nauhoitukset</text>
         <text lang="ZH_TW">觀看預錄節目</text>
         <text lang="SL">Predvajanje snemanj</text>
         <text lang="ET">Salvestiste vaatamine</text>
-        <text lang="NB">Se på opptak</text>
-        <text lang="CS">Sledovat nahrávky</text>
         <text lang="RU">Смотреть записи</text>
         <text lang="PL">Oglądanie nagrań</text>
         <text lang="HE">צפיה בהקלטות</text>
+        <text lang="HU">Felvételek lejátszása</text>
         <alttext lang="ET">Salvestised</alttext>
         <alttext lang="PL">Oglądanie</alttext>
         <description>Play Recordings</description>
+        <description lang="DE"></description>
         <action>TV_WATCH_RECORDING</action>
     </button>
 
@@ -104,9 +96,7 @@
         <text>Delete Recordings</text>
         <text lang="IT">Elimina Registrazioni</text>
         <text lang="ES">Borrar Grabaciones</text>
-        <text lang="CS">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
-        <text lang="FR">Supprimer les enregistrements</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
         <text lang="IS">Eyða upptöku</text>
@@ -117,15 +107,15 @@
         <text lang="ZH_TW">刪除錄影</text>
         <text lang="SL">Brisanje snemanj</text>
         <text lang="ET">Salvestiste kustutamine</text>
-        <text lang="NB">Slett opptak</text>
-        <text lang="CS">Mazat nahrávky</text>
         <text lang="RU">Удалить записи</text>
         <text lang="PL">Kasowanie nagrań</text>
         <text lang="HE">מחיקת הקלטות</text>
+        <text lang="HU">Felvételek törlése</text>
         <alttext lang="ET">Kustutamine</alttext>
         <alttext lang="DE">Löschen</alttext>
         <alttext lang="PL">Kasowanie</alttext>
         <description>Remove television recordings</description>
+        <description lang="DE">TV-Aufnahmen löschen</description>
         <action>TV_DELETE</action>
     </button>
 
@@ -135,14 +125,13 @@
         <text>Passthrough Mode</text>
         <text lang="PT">Modo Directo de TV</text>
         <text lang="ES">TV directo</text>
-        <text lang="CS">TV directe</text>
-        <text lang="FR">Mode direct</text>
         <text lang="DE">TV direkt</text>
         <text lang="SV">TV direkt</text>
         <text lang="JA">パススルーモード</text>
         <text lang="ET">TV läbilase</text>
         <text lang="PT">Televisão Directa</text>
         <text lang="NL">TV Direct</text>
+        <text lang="HU">Közvetlen TV adás</text>
         <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
     </button>
 -->
@@ -153,22 +142,21 @@
         <text lang="DE">Systemstatus</text>
         <text lang="IS">Staða kerfis</text>
         <text lang="NL">Systeemstatus</text>
-        <text lang="FR">État système</text>
         <text lang="SV">Systemstatus</text>
         <text lang="JA">システムステータス</text>
         <text lang="FI">Systeemin Tila</text>
         <text lang="ZH_TW">系統狀態</text>
         <text lang="SL">Status sistema</text>
         <text lang="ET">Süsteemi olek</text>
-        <text lang="NB">Systemstatus</text>
         <text lang="ES">Estado Sistema</text>
         <text lang="DA">Systemstatus</text>
         <text lang="PT">Estado do Sistema</text>
-        <text lang="CS">Stav systému</text>
         <text lang="RU">Состояние системы</text>
         <text lang="PL">Status systemu</text>
-        <text lang="HE">מצב מערכת</text>     
+        <text lang="HE">מצב מערכת</text>
+        <text lang="HU">Rendszer állapot</text>
         <description>What your system is doing right now</description>
+        <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
 

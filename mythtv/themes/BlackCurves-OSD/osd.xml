@@ -1,0 +1,496 @@
+<mythosdtheme>
+
+    <!--Mythtv OSD "BlackCurves-OSD" by Gary Butters -->
+    <!-- if timeformat is set to 'FROMSETTINGS', it will use the time format
+        specified in the general mythtv settings -->
+    <timeformat>FROMSETTINGS</timeformat>
+    <fadeaway>30</fadeaway>
+
+    <font name="callsignfont">
+	<color normal="#FFFFFF">255</color>
+	<filename>DejaVuSans.ttf</filename>
+	<size>20</size>
+	<size:big>22</size:big>
+	<size:small>18</size:small>
+	<shadow>1,1</shadow>
+    </font>
+
+    <font name="callsignfontsmall">
+	<color normal="#FFFFFF">255</color>
+	<filename>DejaVuSans.ttf</filename>
+	<size>18</size>
+	<size:big>20</size:big>
+	<size:small>16</size:small>
+	<shadow>1,1</shadow>
+    </font>
+
+    <font name="channelfont">
+	<color normal="#FFFFFF">255</color>
+	<filename>DejaVuSans.ttf</filename>
+	<size>24</size>
+	<size:big>26</size:big>
+	<size:small>22</size:small>
+	<shadow>1,1</shadow>
+    </font>
+  
+    <font name="channelfontlarge">
+        <color>200</color>
+	<filename>DejaVuSans.ttf</filename> 
+        <size>30</size>
+	<size:big>32</size:big>
+	<size:small>28</size:small>
+        <shadow>1,1</shadow>
+    </font>
+
+    <font name="descriptionfont">
+        <color>200</color>
+	<filename>DejaVuSans.ttf</filename>
+        <size>20</size>
+	<size:big>22</size:big>
+	<size:small>18</size:small>
+        <shadow>1,1</shadow>
+    </font>
+
+    <font name="descriptionfontsmall">
+        <color>200</color>
+	<filename>DejaVuSans.ttf</filename>
+        <size>18</size>
+	<size:big>20</size:big>
+	<size:small>16</size:small>
+	<shadow>1,1</shadow>
+    </font>
+
+    <font name="infofont">
+        <color>200</color>
+	<filename>DejaVuSans.ttf</filename>
+        <size>20</size>
+	<size:big>20</size:big>
+	<size:small>18</size:small>
+        <shadow>1,1</shadow>
+    </font>
+
+    <font name="starttimefont">
+	<color>175</color>
+	<filename>DejaVuSans.ttf</filename>
+	<size>17</size>
+	<size:big>17</size:big>
+	<size:small>16</size:small>
+	<shadow>1,1</shadow>
+    </font>
+
+    <font name="starttimefontsmall">
+	<color>175</color>
+	<filename>DejaVuSans.ttf</filename>
+	<size>14</size>
+	<size:big>14</size:big>
+	<size:small>13</size:small>
+	<shadow>1,1</shadow>
+    </font>
+
+    <font name="infofontgray">
+        <color>128</color>
+	<filename>DejaVuSans.ttf</filename>
+        <size>20</size>
+	<size:big>20</size:big>
+	<size:small>18</size:small>
+        <shadow>1,1</shadow>
+    </font>
+	
+    <font name="statusfont">
+	<color>200</color>
+	<filename>DejaVuSans.ttf</filename>
+	<size>17</size>
+	<size:big>18</size:big>
+	<size:small>16</size:small>
+	<shadow>1,1</shadow>
+    </font>
+
+    <font name="statusfontsmall">
+        <color>200</color>
+	<filename>DejaVuSans.ttf</filename>
+        <size>16</size>
+	<size:big>17</size:big>
+	<size:small>15</size:small>
+        <shadow>1,1</shadow>
+    </font>
+  
+    <font name="timefont">
+	<color normal="#FFFFFF">255</color>
+	<filename>DejaVuSans.ttf</filename>
+	<size>21</size>
+	<size:big>22</size:big>
+	<size:small>19</size:small>
+	<shadow>1,1</shadow>
+    </font>
+
+    <font name="titlefont">
+        <color normal="#FFFFFF">255</color>
+	<filename>DejaVuSans.ttf</filename>
+        <size>22</size>
+	<size:big>22</size:big>
+	<size:small>20</size:small>
+        <shadow>1,1</shadow>
+    </font>
+
+    <font name="titlefontsmall">
+        <color normal="#FFFFFF">255</color>
+	<filename>DejaVuSans.ttf</filename>
+        <size>18</size>
+	<size:big>18</size:big>
+	<size:small>16</size:small>
+        <shadow>1,1</shadow>
+    </font>
+ 
+    <container name="channel_number" fademovement="0,-24">
+        <image name="osd_channel">
+            <filename>osd_channel_number.png</filename>
+            <position>113,54</position>
+        </image>
+        <textarea name="channum" align="center">
+            <area>142,76,168,34</area>
+            <font>channelfontlarge</font>
+            <value>%CHANNUM%</value>
+        </textarea>
+    </container>
+
+    <container name="program_info" fademovement="0,24">
+         <image name="background">
+            <filename>osd_program_info.png</filename>
+            <position>116,372</position>
+        </image>
+        <textarea name="title">
+            <area>139,395,854,45</area>
+            <font>titlefont</font>
+        </textarea>
+        <textarea name="description">
+            <multiline>yes</multiline>
+            <area>272,474,874,178</area>
+            <font>descriptionfont</font>
+            <value>%SUBTITLE|"|" %%DESCRIPTION%</value>
+        </textarea>
+        <textarea name="starttime">
+            <area>139,426,842,30</area>
+            <font>starttimefont</font>
+            <value>%STARTDATE%  (%STARTTIME% - %ENDTIME%)  %LENMINS%</value>
+        </textarea>
+        <textarea name="time" align="right">
+            <area>1001,395,140,60</area>
+            <font>timefont</font>
+        </textarea>
+	<textarea name="channum" align="center">
+            <area>130,474,138,40</area>
+            <font>channelfont</font>
+            <value>%CHANNUM%</value>
+        </textarea>
+	<image name="channelicon">
+	    <position>147,516</position>
+	    <staticsize>100,75</staticsize>
+	</image>
+        <textarea name="callsign" align="center">
+            <multiline>no</multiline>
+            <area>130,607,135,40</area>
+            <font>callsignfont</font>
+            <value>%CALLSIGN%</value>
+        </textarea>
+    </container>
+
+    <container name="browse_info" fademovement="0,24">
+        <image name="background">
+            <filename>osd_browse_info.png</filename>
+            <position>116,483</position>
+        </image>
+        <textarea name="title">
+            <area>253,500,726,45</area>
+            <font>titlefontsmall</font>
+        </textarea>
+        <textarea name="description">
+            <multiline>yes</multiline>
+            <area>253,567,888,78</area>
+            <font>descriptionfontsmall</font>
+            <value>%SUBTITLE|"|" %%DESCRIPTION%</value>
+        </textarea>
+        <textarea name="starttime">
+            <area>263,527,716,30</area>
+            <font>starttimefontsmall</font>
+            <value>%STARTDATE%  (%STARTTIME% - %ENDTIME%)  %LENMINS%</value>
+        </textarea> 
+        <image name="channelicon">
+            <position>159,560</position>
+            <staticsize>62,46</staticsize>
+        </image>
+        <textarea name="time" align="right">
+            <area>984,510,138,60</area>
+            <font>timefont</font>
+        </textarea>
+        <textarea name="channum" align="center">
+            <area>134,509,115,40</area>
+            <font>channelfont</font>
+            <value>%CHANNUM%</value>
+        </textarea>
+        <textarea name="callsign" align="center">
+            <multiline>no</multiline>
+            <area>134,603,115,40</area>
+            <font>callsignfontsmall</font>
+            <value>%CALLSIGN%</value>
+        </textarea> 
+    </container>
+   
+    <container name="status" priority="10" fademovement="0,24">
+        <image name="background">
+            <filename>osd_status.png</filename>
+            <position>116,576</position>
+        </image>
+        <image name="sliderframe">
+            <filename>osd_status_frame.png</filename>
+            <position>148,576</position>
+        </image>
+        <textarea name="status" align="left">
+            <area>148,594,500,30</area>
+            <font>statusfont</font>
+        </textarea>
+        <slider name="statusslider" type="fill">
+            <area>148,576,984,90</area>
+            <filename>fill_green.png</filename>
+        </slider>
+        <textarea name="slidertext" align="center">
+            <area>148,631,984,30</area>
+            <font>statusfontsmall</font>
+            <multiline>no</multiline>
+        </textarea>
+        <textarea name="time" align="right">
+            <area>950,594,182,30</area>
+            <font>statusfont</font>
+        </textarea>
+    </container>
+
+    <container name="notify_cid_info" priority="10" fademovement="0,24">
+        <image name="background">
+            <filename>osd_notify.png</filename>
+            <position>116,520</position>
+        </image>
+        <image name="watermark">
+            <filename>phone.png</filename>
+            <position>148,535</position>
+        </image>
+        <textarea name="notify_cid_name">
+            <area>264,539,874,30</area>
+            <font>infofont</font>
+            <multiline>no</multiline>
+        </textarea>
+        <textarea name="notify_cid_num">
+            <area>264,581,874,30</area>
+            <font>infofont</font>
+            <multiline>no</multiline>
+        </textarea>
+        <textarea name="notify_cid_dt">
+            <area>264,623,874,30</area>
+            <font>infofont</font>
+            <multiline>no</multiline>
+        </textarea>
+    </container>
+
+    <container name="notify_alert_text" priority="10" fademovement="0,24">
+        <image name="background">
+            <filename>osd_notify.png</filename>
+            <position>116,520</position>
+        </image>
+        <textarea name="notify_text">
+            <area>148,547,982,94</area>
+            <font>infofont</font>
+            <multiline>yes</multiline>
+        </textarea>
+    </container>
+
+    <container name="editmode" fademovement="0,24">
+        <image name="background">
+            <filename>osd_status.png</filename>
+            <position>116,576</position>
+        </image>
+        <textarea name="edit">
+            <area>148,594,200,30</area>
+            <font>statusfont</font>
+            <value>Edit</value>
+        </textarea>
+        <slider name="editslider" type="edit">
+            <area>148,576,984,90</area>
+            <filename>fill_green.png</filename>
+            <altfilename>fill_red.png</altfilename>
+        </slider>
+        <slider name="editposition" type="position">
+            <area>148,576,984,90</area>
+            <filename>position_marker.png</filename>
+        </slider>
+        <editarrow name="left">
+            <filename>cut_point.png</filename>
+            <area>148,576,984,90</area>
+        </editarrow>
+        <editarrow name="right">
+            <filename>cut_point.png</filename>
+            <area>148,576,984,90</area>
+        </editarrow>
+        <textarea name="timedisplay" align="center">
+            <area>148,631,984,30</area>
+            <font>statusfontsmall</font>
+        </textarea>
+        <textarea name="cutindicator">
+            <area>148,628,200,30</area>
+            <font>infofont</font>
+        </textarea>
+        <textarea name="seekamount" align="right">
+            <area>882,594,250,30</area>
+            <font>statusfont</font>
+        </textarea>
+    </container>
+
+    <container name="settings" fademovement="0,-24">
+        <image name="osd_settings">
+            <filename>osd_settings.png</filename>
+            <position>347,54</position>
+        </image>
+        <textarea name="settings" align="center">
+            <area>378,76,524,32</area>
+            <font>statusfont</font>
+        </textarea>
+    </container>
+
+    <container name="basedialog" priority="0" fademovement="0,0"> <!-- must be named this --> 
+        <image name="background"> 
+            <filename>osd_popup.png</filename> 
+            <position>154,125</position> 
+        </image> 
+        <positionimage name="selector"> 
+            <filename>select.png</filename> 
+            <position>169,357</position> 
+            <position>169,399</position> 
+            <position>169,441</position> 
+            <position>169,483</position>
+            <position>169,524</position> 
+        </positionimage> 
+        <textarea name="message">
+            <area>176,145,928,198</area> 
+            <font>infofont</font> 
+            <multiline>yes</multiline> 
+        </textarea> 
+        <textarea name="option1"> 
+            <area>176,361,928,35</area> 
+            <font>infofont</font> 
+            <altfont>infofontgray</altfont> 
+        </textarea> 
+        <textarea name="option2"> 
+            <area>176,403,928,35</area> 
+            <font>infofont</font> 
+            <altfont>infofontgray</altfont> 
+        </textarea> 
+        <textarea name="option3"> 
+            <area>176,445,928,35</area> 
+            <font>infofont</font> 
+            <altfont>infofontgray</altfont> 
+        </textarea> 
+        <textarea name="option4"> 
+            <area>176,487,928,35</area> 
+            <font>infofont</font> 
+            <altfont>infofontgray</altfont> 
+        </textarea> 
+        <textarea name="option5">
+            <area>176,529,928,35</area>
+            <font>infofont</font>
+            <altfont>infofontgray</altfont>
+        </textarea>
+    </container> 
+ 
+    <container name="news_scroller" priority="20">
+        <image name="background">
+            <filename>osd_scroll.png</filename>
+            <position>0,602</position>
+        </image>
+        <textarea name="text_scroll">
+            <area>0,623,1280,32</area>
+            <font>infofont</font>
+            <scroller>yes</scroller>
+            <scrollmovement>-6,0</scrollmovement> <!-- only x movement for now -->
+        </textarea>
+    </container>
+
+    <container name="menu">
+        <listtreemenu name="menu">
+            <area>88,66,1192,450</area>
+            <listsize>0,0,548,390</listsize>
+            <leveloffset>10</leveloffset>
+            <gradient type="unselected" start="#000000" end="#000000" alpha="150">
+            </gradient>
+            <gradient type="selected" start="#666666" end="#666666" alpha="150">
+            </gradient>
+            <fcnfont name="infofont" function="active"></fcnfont>
+            <fcnfont name="infofontgray" function="inactive"></fcnfont>
+        </listtreemenu>
+    </container>
+    
+    <container name="channel_editor">
+        <image name="background">
+            <filename>osd_channel_editor.png</filename>
+            <position>175,180</position>
+        </image>
+        <textarea name="dialog_label" align="center">
+            <area>193,214,893,58</area>
+            <font>titlefont</font>
+            <value>Channel Editor</value>
+        </textarea>
+        <textarea name="callsign_label" align="center">
+            <area>193,279,436,38</area>
+            <font>infofont</font>
+            <value>Callsign</value>
+        </textarea>
+        <textarea name="callsign" entry="0" align="center">
+            <area>650,280,436,38</area>
+            <font>infofontgray</font>
+            <altfont>infofont</altfont>
+            <value></value>
+        </textarea>
+        <textarea name="channum_label" align="center">
+            <area>193,334,436,38</area>
+            <font>infofont</font>
+            <value>Channel #</value>
+        </textarea>
+        <textarea name="channum" entry="1" align="center">
+            <area>650,334,436,38</area>
+            <font>infofontgray</font>
+            <altfont>infofont</altfont>
+            <value></value>
+        </textarea>
+        <textarea name="channame_label" align="center">
+            <area>193,387,308,38</area>
+            <font>infofont</font>
+            <value>Channel Name</value>
+        </textarea>
+        <textarea name="channame" entry="2" align="center">
+            <area>522,386,564,38</area>
+            <font>infofontgray</font>
+            <altfont>infofont</altfont>
+            <value></value>
+        </textarea>
+        <textarea name="XMLTV_label" align="center">
+            <area>193,441,436,38</area>
+            <font>infofont</font>
+            <value>XMLTV ID</value>
+        </textarea>
+        <textarea name="XMLTV" entry="3" align="center">
+            <area>650,441,436,38</area>
+            <font>infofontgray</font>
+            <altfont>infofont</altfont>
+            <value></value>
+        </textarea>
+        <textarea name="probe_all" entry="4" button="yes" align="center">
+            <area>193,495,436,38</area>
+            <font>infofontgray</font>
+            <altfont>infofont</altfont>
+            <value>[P]robe</value>
+        </textarea>
+        <textarea name="ok" entry="5" button="yes" align="center">
+            <area>650,495,436,38</area>
+            <font>infofontgray</font>
+            <altfont>infofont</altfont>
+            <value>[O]k</value>
+        </textarea>
+    </container>
+    
+</mythosdtheme>

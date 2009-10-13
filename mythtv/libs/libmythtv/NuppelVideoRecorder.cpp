@@ -1272,9 +1272,26 @@ void NuppelVideoRecorder::DoV4L2(void)
 
         if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: Unable to set desired format");
-            errored = true;
-            return;
+            // this is supported by the HVR-950q
+            vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_UYVY;
+            if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: Unable to set desired format");
+                errored = true;
+                return;
+            }
+            else
+            {
+                // we need to convert the buffer - we can't deal with uyvy directly.
+                if (inpixfmt == FMT_YUV422P)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: uyvy format supported, but yuv422 requested.");
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: unfortunately, this converter hasn't been written yet, exiting");
+                    errored = true;
+                    return;
+                }
+                VERBOSE(VB_RECORD, LOC + "v4l2: format set, getting uyvy from v4l, converting");
+            }
         }
         else
         {
@@ -1522,12 +1539,31 @@ again:
             if (vfmt.fmt.pix.pixelformat == V4L2_PIX_FMT_YUYV)
             {
                 // Convert YUYV to YUV420P
+                /* FIXME:
+                 *   don't use the stack for the conversion buffer
+                 *   use swscale directly
+                 */
                 unsigned conversion_buffer_size = h * w * 3 / 2;
                 uint8_t conversion_buffer[conversion_buffer_size];
                 AVPicture img_in, img_out;
                 avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, w, h);
                 avpicture_fill(&img_in, buffers[frame], PIX_FMT_YUYV422, w, h);
                 myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_YUYV422, w, h);
+                BufferIt(conversion_buffer, video_buffer_size);
+            }
+            else if (vfmt.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY)
+            {
+                // Convert UYVY to YUV420P
+                /* FIXME:
+                 *   don't use the stack for the conversion buffer
+                 *   use swscale directly
+                 */
+                unsigned conversion_buffer_size = h * w * 3 / 2;
+                uint8_t conversion_buffer[conversion_buffer_size];
+                AVPicture img_in, img_out;
+                avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, w, h);
+                avpicture_fill(&img_in, buffers[frame], PIX_FMT_UYVY422, w, h);
+                myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_UYVY422, w, h);
                 BufferIt(conversion_buffer, video_buffer_size);
             }
             else

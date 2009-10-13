@@ -129,13 +129,8 @@ using_opengl {
     mingw:LIBS += -lopengl32
 }
 
-#The following line was inserted by qt3to4
-QT += xml sql network
-
-using_qtwebkit {
-        QT += webkit
-        DEFINES += USING_QTWEBKIT
-}
+QT += xml sql network webkit
+DEFINES += USING_QTWEBKIT
 
 use_hidesyms {
     QMAKE_CXXFLAGS += -fvisibility=hidden

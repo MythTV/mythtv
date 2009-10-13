@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <!-- Popups -->
@@ -39,11 +40,6 @@
             <filename>popups/alt_menu_background.png</filename>
         </imagetype>
 
-        <imagetype name="listback">
-            <position>896,238</position>
-            <filename>recordings/filterlist_background.png</filename>
-        </imagetype>
-
         <textarea name="label" from="basetextarea">
             <area>889,93,378,125</area>
             <align>allcenter</align>
@@ -52,14 +48,45 @@
             <value>Cast Members</value>
         </textarea>
 
-        <buttonlist name="cast" from="basebuttonlist">
-            <area>900,248,364,307</area>
-            <buttonarea>0,0,378,300</buttonarea>
-            <spacing>2</spacing>
+        <buttonlist name="cast">
+            <area>900,238,364,307</area>
+            <buttonarea>0,0,378,350</buttonarea>
+            <spacing>3</spacing>
+            <wrapstyle>selection</wrapstyle>
+            <statetype name="buttonitem">
+                <area>0,0,367,53</area>
+                <state name="active">
+                    <area>0,0,367,53</area>
+                    <imagetype name="buttonbackground">
+                        <filename>popups/menu_button.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>18,0,324,50</area>
+                        <align>allcenter</align>
+                        <font>basemedium</font>
+                    </textarea>
+                    <imagetype name="buttonarrow">
+                        <position>346,16</position>
+                        <filename>popups/submenu_arrow.png</filename>
+                    </imagetype>
+                </state>
+                <state name="inactive" from="active">
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="selecteditemarrow">
+                        <position>5,16</position>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <font>basemediumbrown</font>
+                    </textarea>
+                </state>
+            </statetype>
         </buttonlist>
+
     </window>
 
-    <window name="plotpopup">
+    <window name="descriptionpopup">
         <area>0,42,1280,515</area>
         <shape name="fade" from="basefadebackground" />
 
@@ -79,17 +106,17 @@
             <font>basemedium</font>
             <multiline>yes</multiline>
             <value>Full Plot</value>
-            <scroll direction="left">auto</scroll>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>903,242,350,307</area>
             <multiline>yes</multiline>
         </textarea>
     </window>
 
     <window name="filter">
-        <area>0,22,1280,555</area>
+        <area>0,42,1280,555</area>
+
         <shape name="fade" from="basefadebackground" />
 
         <imagetype name="backimg">
@@ -98,14 +125,14 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>251,110,774,40</area>
+            <area>251,70,774,40</area>
             <value>Video List Filters</value>
             <align>hcenter,vcenter</align>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="numvideos_text" from="title">
-            <position>251,160</position>
+            <position>251,120</position>
             <align>allcenter</align>
             <font>basesmall</font>
         </textarea>
@@ -113,133 +140,133 @@
         <!-- Labels -->
 
         <textarea name="textfilter_text">
-            <area>419,236,180,30</area>
+            <area>419,196,180,30</area>
             <value>Text Filter:</value>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="category_text">
-            <area>269,272,220,30</area>
+            <area>269,232,220,30</area>
             <value>Category</value>
             <align>hcenter</align>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="genre_text" from="category_text">
-            <position>269,339</position>
+            <position>269,299</position>
             <value>Genre</value>
         </textarea>
 
         <textarea name="country_text" from="category_text">
-            <position>269,406</position>
+            <position>269,366</position>
             <value>Country</value>
         </textarea>
 
         <textarea name="cast_text" from="category_text">
-            <position>269,473</position>
+            <position>269,433</position>
             <value>Actor/Actress</value>
         </textarea>
 
         <textarea name="year_text" from="category_text">
-            <position>526,272</position>
+            <position>526,232</position>
             <value>Year</value>
         </textarea>
 
         <textarea name="runtime_text" from="category_text">
-            <position>526,339</position>
+            <position>526,299</position>
             <value>Runtime</value>
         </textarea>
 
         <textarea name="userrating_text" from="category_text">
-            <position>526,406</position>
+            <position>526,366</position>
             <value>User Rating</value>
         </textarea>
 
         <textarea name="browse_text" from="category_text">
-            <position>526,473</position>
+            <position>526,433</position>
             <value>Browse</value>
         </textarea>
 
         <textarea name="inetref_text" from="category_text">
-            <position>784,272</position>
+            <position>784,232</position>
             <value>InetRef</value>
         </textarea>
 
         <textarea name="coverfile_text" from="category_text">
-            <position>784,339</position>
+            <position>784,299</position>
             <value>Cover File</value>
         </textarea>
 
         <textarea name="orderby_text" from="category_text">
-            <position>784,406</position>
+            <position>784,366</position>
             <value>Sort by</value>
         </textarea>
 
         <textarea name="watched_text" from="category_text">
-            <position>784,473</position>
+            <position>784,433</position>
             <value>Watched</value>
         </textarea>
 
         <!-- Widgets -->
         <textedit name="textfilter_input" from="baseshorttextedit">
-            <position>545,225</position>
+            <position>545,185</position>
         </textedit>
 
         <buttonlist name="category_select" from="baseselector">
-            <position>269,299</position>
+            <position>269,259</position>
         </buttonlist>
 
         <buttonlist name="genre_select" from="baseselector">
-            <position>269,366</position>
+            <position>269,326</position>
         </buttonlist>
 
         <buttonlist name="country_select" from="baseselector">
-            <position>269,433</position>
+            <position>269,393</position>
         </buttonlist>
 
         <buttonlist name="cast_select" from="baseselector">
-            <position>269,500</position>
+            <position>269,460</position>
         </buttonlist>
 
         <buttonlist name="year_select" from="baseselector">
-            <position>526,299</position>
+            <position>526,259</position>
         </buttonlist>
 
         <buttonlist name="runtime_select" from="baseselector">
-            <position>526,366</position>
+            <position>526,326</position>
         </buttonlist>
 
         <buttonlist name="userrating_select" from="baseselector">
-            <position>526,433</position>
+            <position>526,393</position>
         </buttonlist>
 
         <buttonlist name="browse_select" from="baseselector">
-            <position>526,500</position>
+            <position>526,460</position>
         </buttonlist>
 
         <buttonlist name="inetref_select" from="baseselector">
-            <position>784,299</position>
+            <position>784,259</position>
         </buttonlist>
 
         <buttonlist name="coverfile_select" from="baseselector">
-            <position>784,366</position>
+            <position>784,326</position>
         </buttonlist>
 
         <buttonlist name="orderby_select" from="baseselector">
-            <position>784,433</position>
+            <position>784,393</position>
         </buttonlist>
 
         <buttonlist name="watched_select" from="baseselector">
-            <position>784,500</position>
+            <position>784,460</position>
         </buttonlist>
 
         <button name="done_button" from="basebutton">
-            <position>693,560</position>
+            <position>693,520</position>
             <value>Done</value>
         </button>
 
         <button name="save_button" from="basebutton">
-            <position>363,560</position>
+            <position>363,520</position>
             <value>Make default</value>
         </button>
 
@@ -309,6 +336,10 @@
                     </textarea>
                     <textarea name="director">
                         <position>100,85</position>
+                    </textarea>
+                    <textarea name="year" from="director">
+                        <area>497,85,75,25</area>
+                        <align>right</align>
                     </textarea>
                 </state>
             </statetype>
@@ -499,13 +530,14 @@
             <position>838,440</position>
         </textarea>
 
-        <textarea name="plot" from="director">
+        <textarea name="description" from="director">
             <area>695,500,540,160</area>
             <multiline>yes</multiline>
         </textarea>
 
-        <textarea name="novideos" from="plot">
+        <textarea name="novideos" from="description">
             <align>allcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
     </window>
@@ -535,7 +567,7 @@
             <statetype name="buttonitem">
                 <state name="selected">
                     <area>-13,0,209,332</area>
-                    <imagetype name="coverimage">
+                    <imagetype name="coverart">
                         <area>1,3,209,325</area>
                         <filename>mv_browse_nocover.png</filename>
                         <mask>video/postermask.png</mask>
@@ -568,7 +600,7 @@
                 </state>
                 <state name="active" from="selected">
                     <area>0,0,183,332</area>
-                    <imagetype name="coverimage">
+                    <imagetype name="coverart">
                         <area>0,25,183,275</area>
                     </imagetype>
 
@@ -618,11 +650,16 @@
             <position>1193,72</position>
         </statetype>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>48,124,1182,145</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
         </textarea>
+
+        <textarea name="novideos" from="description">
+            <align>allcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
+        </textarea>  
 
         <textarea name="year" from="basetextarea">
             <area>48,284,290,30</area>
@@ -727,6 +764,7 @@
             <area>50,50,700,50</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
         <shape name="textbackground" from="basetextbackground">
@@ -751,7 +789,7 @@
             <position>1193,492</position>
         </statetype>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>48,535,1182,110</area>
             <multiline>yes</multiline>
             <align>vcenter</align>
@@ -814,12 +852,17 @@
             <align>right</align>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>40,395,530,80</area>
             <align>left,top</align>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
         </textarea>
+
+        <textarea name="novideos" from="description">
+            <align>allcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
+        </textarea>  
 
         <textarea name="cast" from="basetextarea">
             <area>60,480,505,70</area>
@@ -834,7 +877,7 @@
             <align>hcenter,vcenter</align>
         </textarea>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>624,335,140,212</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>
@@ -1088,7 +1131,6 @@
 
         <textarea name="coverart_text" from="basetextarea">
             <area>500,358,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="screenshot_button">
@@ -1115,7 +1157,6 @@
 
         <textarea name="screenshot_text" from="basetextarea">
             <area>500,387,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="banner_button">
@@ -1142,7 +1183,6 @@
 
         <textarea name="banner_text" from="basetextarea">
             <area>500,416,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="fanart_button">
@@ -1169,7 +1209,6 @@
 
         <textarea name="fanart_text" from="basetextarea">
             <area>500,445,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
         <button name="trailer_button">
@@ -1196,7 +1235,6 @@
 
         <textarea name="trailer_text" from="basetextarea">
             <area>500,477,250,40</area>
-            <value>/path/to/the/thing.jpg</value>
         </textarea>
 
 
@@ -1220,7 +1258,7 @@
             <filename>video/info_background.png</filename>
         </imagetype>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>759,79,260,391</area>
             <mask>video/info_poster_mask.png</mask>
             <preserveaspect>true</preserveaspect>
@@ -1231,7 +1269,7 @@
             <font>baselarge</font>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>270,165,455,220</area>
             <multiline>yes</multiline>
         </textarea>

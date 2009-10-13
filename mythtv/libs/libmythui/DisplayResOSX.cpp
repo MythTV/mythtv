@@ -1,9 +1,11 @@
+
+#include "DisplayResOSX.h"
+
 #import <CoreGraphics/CGBase.h>
 #import <CoreGraphics/CGDisplayConfiguration.h>
 #import <Carbon/Carbon.h>
 #import <IOKit/graphics/IOGraphicsLib.h> // for IODisplayCreateInfoDictionary()
 
-#include "DisplayResOSX.h"
 #include "util-osx.h"
 
 CGDirectDisplayID mythtv_display();
@@ -124,7 +126,7 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
 
         uint key = DisplayResScreen::CalcKey(width, height, 0.0);
 
-	if (screen_map.find(key)==screen_map.end())
+    if (screen_map.find(key)==screen_map.end())
             screen_map[key] = DisplayResScreen(width, height,
                                                0, 0, -1.0, (double) refresh);
         else

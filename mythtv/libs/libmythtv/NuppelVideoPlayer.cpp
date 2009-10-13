@@ -147,7 +147,7 @@ uint track_type_to_display_mode[kTrackTypeCount+2] =
     kDisplayNUVTeletextCaptions,
 };
 
-NuppelVideoPlayer::NuppelVideoPlayer()
+NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
     : decoder(NULL),                decoder_change_lock(QMutex::Recursive),
       videoOutput(NULL),            player_ctx(NULL),
       no_hardware_decoders(false),
@@ -215,6 +215,7 @@ NuppelVideoPlayer::NuppelVideoPlayer()
       audio_channels(2),            audio_bits(-1),
       audio_samplerate(44100),      audio_stretchfactor(1.0f),
       audio_codec(NULL),            audio_lock(QMutex::Recursive),
+      audio_muted_on_creation(muted),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
       // Preview window support
@@ -934,6 +935,11 @@ QString NuppelVideoPlayer::ReinitAudio(void)
             VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
             no_audio_out = false;
         }
+        if (audio_muted_on_creation)
+        {
+            SetMuteState(kMuteAll);
+            audio_muted_on_creation = false;
+        }
     }
 
     if (audioOutput)
@@ -1023,6 +1029,12 @@ void NuppelVideoPlayer::AutoDeint(VideoFrame *frame)
             VERBOSE(VB_PLAYBACK, LOC + "interlaced frame seen after "
                     << abs(m_scan_tracker) << " progressive frames");
             m_scan_tracker = 2;
+            if (!player_ctx->buffer->isDVD())
+            {
+                VERBOSE(VB_PLAYBACK, LOC + "Locking scan to Interlaced.");
+                SetScanType(kScan_Interlaced);
+                return;
+            }
         }
         m_scan_tracker++;
     }
@@ -2762,7 +2774,8 @@ bool NuppelVideoPlayer::PrebufferEnoughFrames(void)
             }
         }
         prebuffering_lock.unlock();
-        videosync->Start();
+        if (normal_speed)
+            videosync->Start();
 
         return false;
     }
@@ -4136,7 +4149,7 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
     if (!usevideotimebase)
     {
         if (!audioOutput->AddSamples(buffer, samples, timecode))
-            VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p1: "
+            VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p1: "
                     "Audio buffer overflow, audio data lost!");
         return;
     }
@@ -4169,7 +4182,7 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 
     // Send new warped audio to audioOutput
     if (!audioOutput->AddSamples((char*)warplbuff, samples, timecode))
-        VERBOSE(VB_IMPORTANT,"NVP::AddAudioData():p2: "
+        VERBOSE(VB_PLAYBACK,"NVP::AddAudioData():p2: "
                 "Audio buffer overflow, audio data lost!");
 }
 
@@ -4197,7 +4210,7 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
         buffers[0] = (char*) lbuffer;
         buffers[1] = (char*) rbuffer;
         if (!audioOutput->AddSamples(buffers, samples, timecode))
-            VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p3: "
+            VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p3: "
                     "Audio buffer overflow, audio data lost!");
         return;
     }
@@ -4232,7 +4245,7 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
     buffers[0] = (char*) warplbuff;
     buffers[1] = (char*) warprbuff;
     if (!audioOutput->AddSamples(buffers, samples, timecode))
-        VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p4: "
+        VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p4: "
                 "Audio buffer overflow, audio data lost!");
 }
 
@@ -7124,6 +7137,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
 {
     OSDSet *subtitleOSD;
     bool setVisible = false;
+    long long subtitles_start_at=0;
     VideoFrame *currentFrame = videoOutput->GetLastShownFrame();
 
     if (!osd || !currentFrame || !(subtitleOSD = osd->GetSet("subtitles")))
@@ -7211,16 +7225,33 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
 
                 subtitleOSD->AddType(image);
 
+                subtitles_start_at   = subtitlePage.start_display_time;
                 osdSubtitlesExpireAt = subtitlePage.end_display_time;
                 // fix subtitles that don't display for very long (if at all).
                 if (subtitlePage.end_display_time <=
                     subtitlePage.start_display_time)
                 {
+                    osdSubtitlesExpireAt = subtitles_start_at + MAX_SUBTITLE_DISPLAY_TIME_MS;
+
                     if (nonDisplayedAVSubtitles.size() > 0)
-                        osdSubtitlesExpireAt =
-                            nonDisplayedAVSubtitles.front().start_display_time;
-                    else
-                        osdSubtitlesExpireAt += MAX_SUBTITLE_DISPLAY_TIME_MS;
+                    {
+                        long long next_start = nonDisplayedAVSubtitles.front().start_display_time;
+                        osdSubtitlesExpireAt = min(osdSubtitlesExpireAt, next_start);
+                    }
+                }
+                // fix delayed subtitles
+                else if (subtitles_start_at < currentFrame->timecode)
+                {
+                    VERBOSE(VB_PLAYBACK, LOC + QString("Delayed subtitle: %1ms late")
+                            .arg(currentFrame->timecode - subtitles_start_at));
+                    osdSubtitlesExpireAt = currentFrame->timecode
+                        + subtitlePage.end_display_time - subtitles_start_at;
+
+                    if (nonDisplayedAVSubtitles.size() > 0)
+                    {
+                        long long next_start = nonDisplayedAVSubtitles.front().start_display_time;
+                        osdSubtitlesExpireAt = min(osdSubtitlesExpireAt, next_start);
+                    }
                 }
 
                 setVisible = true;
@@ -7242,8 +7273,9 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
     {
         VERBOSE(VB_PLAYBACK,
                 QString("Setting subtitles visible, frame_timecode=%1 "
-                        "expires=%2")
-                .arg(currentFrame->timecode).arg(osdSubtitlesExpireAt));
+                        "starts=%2 expires=%3")
+                .arg(currentFrame->timecode).arg(subtitles_start_at)
+                .arg(osdSubtitlesExpireAt));
         osd->SetVisible(subtitleOSD, 0);
     }
 }

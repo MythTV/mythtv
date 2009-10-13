@@ -2,6 +2,51 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
+    <name>GlobalSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocationDialog</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Searching ... Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search Complete. Results: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Weather forecasts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause current page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search List</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
@@ -29,6 +74,127 @@
     </message>
     <message>
         <source>Animated Map</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScreenSetup</name>
+    <message>
+        <source>Active Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inactive Screens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Units: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>English Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SI Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not Defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Source: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press SELECT to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change location; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>change units; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>move screen up or down; or remove screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manipulate Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceManager</name>
+    <message>
+        <source>Searching for scripts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SourceSetup</name>
+    <message>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Author: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -568,18 +734,6 @@
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>loading...</source>
-        <translation>Indlæser...</translation>
-    </message>
-    <message>
-        <source>[ retrieving weather data ... ]</source>
-        <translation>[ henter vejr-data ... ]</translation>
-    </message>
-    <message>
-        <source>current conditions</source>
-        <translation>Nuværende forhold</translation>
-    </message>
-    <message>
         <source>Humidity</source>
         <translation>Luftfugtighed</translation>
     </message>
@@ -588,96 +742,8 @@
         <translation>Lufttryk</translation>
     </message>
     <message>
-        <source>Wind</source>
-        <translation>Vind</translation>
-    </message>
-    <message>
         <source>Visibility</source>
         <translation>Sigtbarhed</translation>
-    </message>
-    <message>
-        <source>Wind Chill</source>
-        <translation>Lufttemperatur</translation>
-    </message>
-    <message>
-        <source>UV Index</source>
-        <translation>UV-index</translation>
-    </message>
-    <message>
-        <source>extended forecast</source>
-        <translation>De kommende dage</translation>
-    </message>
-    <message>
-        <source>LO</source>
-        <translation>Min</translation>
-    </message>
-    <message>
-        <source>HI</source>
-        <translation>Max</translation>
-    </message>
-    <message>
-        <source>today&apos;s forecast</source>
-        <translation>Dagens vejrudsigt</translation>
-    </message>
-    <message>
-        <source>tomorrow&apos;s outlook</source>
-        <translation>Vejret i morgen</translation>
-    </message>
-    <message>
-        <source>Forecast for</source>
-        <translation>Vejrudsigt for </translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation>Doppler Radar</translation>
-    </message>
-    <message>
-        <source>Map Unavailable</source>
-        <translation>Kortet er ikke tilgængeligt</translation>
-    </message>
-    <message>
-        <source>Enter Zip Code</source>
-        <translation>Indtast postnr</translation>
-    </message>
-    <message>
-        <source>weather setup</source>
-        <translation>Vejr-opsætning</translation>
-    </message>
-    <message>
-        <source>To save, press &apos;i&apos; - to cancel, hit escape</source>
-        <translation>Gem med &apos;i&apos;. Afbryd med &apos;Esc&apos;</translation>
-    </message>
-    <message>
-        <source>RAIN</source>
-        <translation>Regn</translation>
-    </message>
-    <message>
-        <source>MIX/ICE</source>
-        <translation>Blandet/Isslag</translation>
-    </message>
-    <message>
-        <source>SNOW</source>
-        <translation>Sne</translation>
-    </message>
-    <message>
-        <source>LIGHT</source>
-        <translation>Let</translation>
-    </message>
-    <message>
-        <source>HEAVY</source>
-        <translation>Kraftig</translation>
-    </message>
-    <message>
-        <source>COLD</source>
-        <translation>Koldt</translation>
-    </message>
-    <message>
-        <source>COLDEST</source>
-        <translation>Koldest</translation>
-    </message>
-    <message>
-        <source>CLOUD TEMPERATURE</source>
-        <translation>Sky temperatur</translation>
     </message>
     <message>
         <source>Wind(Gust)</source>
@@ -723,245 +789,37 @@
         <source>Source Update Timeout (seconds):</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Weather Alerts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Precip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Weather</name>
-    <message>
-        <source> is invalid)</source>
-        <translation type="obsolete"> er ugyldig)</translation>
-    </message>
-    <message>
-        <source>   No Location Set, Please read the README</source>
-        <translation type="obsolete">   Ingen lokation sat. Læs venligst README-filen</translation>
-    </message>
-    <message>
-        <source>Configuring MythWeather...</source>
-        <translation type="obsolete">Konfigurerer MythWeather...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select unit conversion...</source>
-        <translation type="obsolete">Brug pil til højre til at vælge enheds-konvertering...</translation>
-    </message>
-    <message>
-        <source>Weather Units</source>
-        <translation type="obsolete">Vejr-enheder</translation>
-    </message>
-    <message>
-        <source>Location</source>
-        <translation type="obsolete">Lokation</translation>
-    </message>
-    <message>
-        <source>Aggressiveness</source>
-        <translation type="obsolete">Aggressivitet</translation>
-    </message>
-    <message>
-        <source>Configuration Saved...</source>
-        <translation type="obsolete">Konfiguration gemt...</translation>
-    </message>
-    <message>
-        <source>Retrieving weather data...</source>
-        <translation type="obsolete">Henter vejr-data...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select your location...</source>
-        <translation type="obsolete">Brug pil til højre for at vælge din lokation...</translation>
-    </message>
-    <message>
-        <source>Use the right arrow key to select the aggressiveness level...</source>
-        <translation type="obsolete">Brug pil til højre til at vælge aggressivitets-niveau...</translation>
-    </message>
-    <message>
-        <source> 1  High Speed Connection</source>
-        <translation type="obsolete"> 1  Høj-hastigheds forbindelse</translation>
-    </message>
-    <message>
-        <source> 8  Medium Speed Connection</source>
-        <translation type="obsolete"> 8  Mellem-hastigheds forbindelse</translation>
-    </message>
-    <message>
-        <source> 15 Low Speed Connection</source>
-        <translation type="obsolete"> 15 Lav-hastigheds forbindelse</translation>
-    </message>
-    <message>
-        <source>Obtaining initial weather data...</source>
-        <translation type="obsolete">Henter grundlæggende vejr-data...</translation>
-    </message>
-    <message>
-        <source>Updating weather data...</source>
-        <translation type="obsolete">Opdaterer vejr-data...</translation>
-    </message>
-    <message>
-        <source>Calm</source>
-        <translation type="obsolete">Roligt</translation>
-    </message>
-    <message>
-        <source> at </source>
-        <translation type="obsolete"> med </translation>
-    </message>
-    <message>
-        <source>Unlimited</source>
-        <translation type="obsolete">Ubegrænset</translation>
-    </message>
-    <message>
-        <source> (minimal)</source>
-        <translation type="obsolete"> (minimalt)</translation>
-    </message>
-    <message>
-        <source> (moderate)</source>
-        <translation type="obsolete"> (moderat)</translation>
-    </message>
-    <message>
-        <source> (high)</source>
-        <translation type="obsolete"> (høj)</translation>
-    </message>
-    <message>
-        <source> (extreme)</source>
-        <translation type="obsolete"> (ekstrem)</translation>
-    </message>
-    <message>
-        <source>Today a high of </source>
-        <translation type="obsolete">Dagens højeste temperatur er </translation>
-    </message>
-    <message>
-        <source> and a low of </source>
-        <translation type="obsolete"> og den laveste er </translation>
-    </message>
-    <message>
-        <source>. Currently there is a humidity of </source>
-        <translation type="obsolete"> Lige nu er luftfugtigheden </translation>
-    </message>
-    <message>
-        <source>% and the winds are</source>
-        <translation type="obsolete">% og vinden blæser</translation>
-    </message>
-    <message>
-        <source> calm.</source>
-        <translation type="obsolete"> roligt.</translation>
-    </message>
-    <message>
-        <source> coming in at </source>
-        <translation type="obsolete"> med </translation>
-    </message>
-    <message>
-        <source> mph from the </source>
-        <translation type="obsolete"> mph fra </translation>
-    </message>
-    <message>
-        <source> Km/h from the </source>
-        <translation type="obsolete"> km/t fra </translation>
-    </message>
-    <message>
-        <source> Visibility will be unlimited for today.</source>
-        <translation type="obsolete"> Sightbarheden vil være ubegrænset i dag.</translation>
-    </message>
-    <message>
-        <source> Visibility conditions are unknown.</source>
-        <translation type="obsolete"> Sigtbarheden er ukendt.</translation>
-    </message>
-    <message>
-        <source> There will be a visibility of </source>
-        <translation type="obsolete"> Sigtbarheden er </translation>
-    </message>
-    <message>
-        <source> miles.</source>
-        <translation type="obsolete"> mil.</translation>
-    </message>
-    <message>
-        <source> km.</source>
-        <translation type="obsolete"> km.</translation>
-    </message>
-    <message>
-        <source>Sunday</source>
-        <translation type="obsolete">Søndag</translation>
-    </message>
-    <message>
-        <source>Monday</source>
-        <translation type="obsolete">Mandag</translation>
-    </message>
-    <message>
-        <source>Tuesday</source>
-        <translation type="obsolete">Tirsdag</translation>
-    </message>
-    <message>
-        <source>Wednesday</source>
-        <translation type="obsolete">Onsdag</translation>
-    </message>
-    <message>
-        <source>Thursday</source>
-        <translation type="obsolete">Torsdag</translation>
-    </message>
-    <message>
-        <source>Friday</source>
-        <translation type="obsolete">Fredag</translation>
-    </message>
-    <message>
-        <source>Saturday</source>
-        <translation type="obsolete">Lørdag</translation>
-    </message>
-    <message>
-        <source>Date Error</source>
-        <translation type="obsolete">Dato-fejl</translation>
-    </message>
-    <message>
-        <source>Tomorrow expect a high of </source>
-        <translation type="obsolete">I morgen når temperaturen op omkring </translation>
-    </message>
-    <message>
-        <source>Expected conditions: </source>
-        <translation type="obsolete">Forventede forhold: </translation>
-    </message>
-    <message>
-        <source>Weather data from: </source>
-        <translation type="obsolete">Vejr-data fra: </translation>
-    </message>
-    <message>
-        <source>Updating...</source>
-        <translation type="obsolete">Opdaterer...</translation>
-    </message>
-    <message>
-        <source> (Not All Information Available)</source>
-        <translation type="obsolete"> (Ikke al information er tilgængelig)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID or Server Error ***</source>
-        <translation type="obsolete">*** Ugyldigt område-ID eller server-fejl ***</translation>
-    </message>
-    <message>
-        <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation type="obsolete">Imperial (Fahrenheit, tommer, osv.)</translation>
-    </message>
-    <message>
-        <source>Metric (Celsius, kPa, etc)</source>
-        <translation type="obsolete">Metrisk (Celcius, kPa, osv.)</translation>
-    </message>
-    <message>
-        <source> F</source>
-        <translation type="obsolete"> F</translation>
-    </message>
-    <message>
-        <source> C</source>
-        <translation type="obsolete"> C</translation>
-    </message>
-    <message>
-        <source>.</source>
-        <translation type="obsolete">.</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Ukendt</translation>
-    </message>
-    <message>
-        <source> - PAUSED -</source>
-        <translation type="obsolete"> - PAUSE -</translation>
-    </message>
-    <message>
-        <source>doppler radar</source>
-        <translation type="obsolete">Doppler Radar</translation>
-    </message>
-    <message>
-        <source>satellite image</source>
-        <translation type="obsolete">satellit billede</translation>
-    </message>
     <message>
         <source>Paused</source>
         <translation type="unfinished"></translation>

@@ -496,6 +496,7 @@ bool DVDProbe::Probe(void)
         return titles.size();
     }
 #endif
+
     dvdDevice.close();
 
     //

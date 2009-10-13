@@ -110,6 +110,7 @@ class MPUBLIC MythContext : public MythObservable, public MythSocketCBs
               const bool ignoreDB = false);
 
     QString GetMasterHostPrefix(void);
+    QString GetMasterHostName(void);
 
     QString GetHostName(void);
 

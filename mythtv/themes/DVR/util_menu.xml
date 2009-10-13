@@ -4,7 +4,6 @@
         <type>TV</type>
         <text>TV Utilities</text>
         <text lang="PT">Televisão</text>
-        <text lang="FR">Utilitaires TV</text>
         <text lang="SV">TV</text>
         <text lang="DE">TV</text>
         <text lang="SL">TV</text>
@@ -14,6 +13,7 @@
         <text lang="NL">TV</text>
         <text lang="JA">テレビ</text>
         <text lang="RU">ТВ</text>
+        <text lang="HU">TV</text>
         <action>MENU tvmenu.xml</action>
     </button>
 
@@ -24,7 +24,6 @@
         <text lang="ES">Música</text>
         <text lang="CA">Música</text>
         <text lang="NL">Muziek</text>
-        <text lang="FR">Musique</text>
         <text lang="DE">Musik</text>
         <text lang="DA">Musik</text>
         <text lang="PT">Música</text>
@@ -33,6 +32,7 @@
         <text lang="SL">Glasba</text>
         <text lang="ET">Muusika</text>
         <text lang="RU">Музыка</text>
+        <text lang="HU">Zene</text>
         <action>PLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
@@ -44,7 +44,6 @@
         <text lang="ES">Video</text>
         <text lang="CA">Vídeo</text>
         <text lang="NL">Films</text>
-        <text lang="FR">Vidéos</text>
         <text lang="DE">Videos</text>
         <text lang="DA">Film</text>
         <text lang="PT">Filmes</text>
@@ -53,6 +52,7 @@
         <text lang="SL">Filmi</text>
         <text lang="ET">Videod</text>
         <text lang="RU">Фильмы</text>
+        <text lang="HU">Video</text>
         <action>PLUGIN mythvideo</action>
         <depends>mythvideo</depends>
     </button>
@@ -60,7 +60,6 @@
     <button>
         <type>FM</type>
         <text>Radio</text>
-        <text lang="FR">Radio</text>
         <text lang="DE">Radio</text>
         <text lang="SL">Radio</text>
         <text lang="ET">Raadio</text>
@@ -71,6 +70,7 @@
         <text lang="NL">Radio</text>
         <text lang="JA">ラジオ</text>
         <text lang="RU">Радио</text>
+        <text lang="HU">Rádió</text>
         <action>PLUGIN mythFM</action>
         <depends>mythFM</depends>
     </button>
@@ -82,7 +82,6 @@
         <text lang="ES">Fotos</text>
         <text lang="CA">Imatges</text>
         <text lang="NL">Foto 's</text>
-        <text lang="FR">Photos</text>
         <text lang="DE">Bilder</text>
         <text lang="DA">Billeder</text>
         <text lang="PT">Fotos</text>
@@ -91,6 +90,7 @@
         <text lang="SL">Slike</text>
         <text lang="ET">Pildid</text>
         <text lang="RU">Изображения</text>
+        <text lang="HU">Fotógaléria</text>
         <action>PLUGIN mythgallery</action>
         <depends>mythgallery</depends>
     </button>
@@ -102,7 +102,6 @@
         <text lang="ES">Juegos</text>
         <text lang="CA">Jocs</text>
         <text lang="NL">Spelen</text>
-        <text lang="FR">Jeux</text>
         <text lang="DE">Spiele</text>
         <text lang="DA">Spil</text>
         <text lang="PT">Jogos</text>
@@ -111,6 +110,7 @@
         <text lang="SL">Igre</text>
         <text lang="ET">Mängud</text>
         <text lang="RU">Игры</text>
+        <text lang="HU">Játékok</text>
         <action>PLUGIN mythgame</action>
         <depends>mythgame</depends>
     </button>
@@ -122,7 +122,6 @@
         <text lang="ES">El Tiempo</text>
         <text lang="CA">El Temps</text>
         <text lang="NL">Het Weer</text>
-        <text lang="FR">Météo</text>
         <text lang="DE">Wetter</text>
         <text lang="DA">Vejret</text>
         <text lang="PT">Meteorologia</text>
@@ -131,6 +130,7 @@
         <text lang="SL">Vreme</text>
         <text lang="ET">Ilm</text>
         <text lang="RU">Погода</text>
+        <text lang="HU">Időjárás</text>
         <action>PLUGIN mythweather</action>
         <depends>mythweather</depends>
     </button>
@@ -141,7 +141,6 @@
         <text lang="DE">Nachrichten</text>
         <text lang="CA">Notícies</text>
         <text lang="ES">Noticias</text>
-        <text lang="FR">Nouvelles</text>
         <text lang="NL">Nieuws</text>
         <text lang="SV">Nyheter</text>
         <text lang="JA">ニュース</text>
@@ -150,6 +149,7 @@
         <text lang="DA">Nyheder</text>
         <text lang="PT">Notícias</text>
         <text lang="RU">Новости</text>
+        <text lang="HU">Friss hírek</text>
         <action>PLUGIN mythnews</action>
         <depends>mythnews</depends>
     </button>
@@ -163,11 +163,11 @@
         <text lang="SL">Splet</text>
         <text lang="ET">Veeb</text>
         <text lang="DA">Web</text>
-        <text lang="FR">Web</text>
         <text lang="PT">Navegação na Web</text>
         <text lang="ES">Web</text>
         <text lang="NL">Internet</text>
         <text lang="RU">WWW</text>
+        <text lang="HU">Web</text>
         <action>PLUGIN mythbrowser</action>
         <depends>mythbrowser</depends>
     </button>
@@ -181,11 +181,11 @@
         <text lang="SV">Telefon</text>
         <text lang="DA">Telefon</text>
         <text lang="PT">Telefone</text>
-        <text lang="FR">Téléphone</text>
         <text lang="ES">Teléfono</text>
         <text lang="NL">Telefoon</text>
         <text lang="JA">電話</text>
         <text lang="RU">Телефон</text>
+        <text lang="HU">Telefon</text>
         <action>PLUGIN mythphone</action>
         <depends>mythphone</depends>
     </button>
@@ -193,12 +193,13 @@
     <button>
         <type>BURN</type>
         <text>Burn DVD</text>
+        <text lang="SV">Skriv DVD</text>
         <text lang="PT">Gravar DVD</text>
         <text lang="ES">Grabar DVD</text>
-        <text lang="FR">Gravure DVD</text>
         <text lang="NL">DVD Branden</text>
         <text lang="JA">DVD書込</text>
         <text lang="ET">DVD kirjutamine</text>
+        <text lang="HU">DVD égetés</text>
         <action>PLUGIN mythburn</action>
         <text lang="RU">Прожиг DVD</text>
         <depends>mythburn</depends>
@@ -211,13 +212,13 @@
         <text lang="SL">Recepti</text>
         <text lang="ET">Retseptid</text>
         <text lang="SV">Recept</text>
-        <text lang="FR">Recettes</text>
         <text lang="DA">Opskrifter</text>
         <text lang="PT">Receitas</text>
         <text lang="ES">Recetas</text>
         <text lang="NL">Recepten</text>
         <text lang="JA">レシピ</text>
         <text lang="RU">Рецепты</text>
+        <text lang="HU">Receptek</text>
         <action>PLUGIN mythRecipe</action>
         <depends>mythRecipe</depends>
     </button>
@@ -226,9 +227,9 @@
         <type>ARCHIVE</type>
         <text>Archive Files</text>
         <text lang="ET">Arhiveerimine</text>
-        <text lang="FR">Archivage de fichiers</text>
         <text lang="SV">Arkivera filer</text>
         <text lang="RU">Архив файлов</text>
+        <text lang="HU">Archív fájlok</text>
         <action>PLUGIN mytharchive</action>
         <depends>mytharchive</depends>
     </button>
@@ -236,7 +237,7 @@
     <button>
         <type>ZONEMINDER</type>
         <text>Zone Minder</text>
-        <text lang="FR">Zone Minder</text>
+        <text lang="HU">Video megfigyelő rendszer</text>
         <action>PLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
     </button>
@@ -248,12 +249,12 @@
         <text lang="SL">Čas filmov</text>
         <text lang="ET">Filmide ajad</text>
         <text lang="SV">Biotider</text>
-        <text lang="FR">Horaires de cinéma</text>
         <text lang="DA">Biograf</text>
         <text lang="PT">Horários de Cinema</text>
         <text lang="NL">Bioscoop Tijden</text>
         <text lang="JA">ムービータイム</text>
         <text lang="RU">Афиша кино</text>
+        <text lang="HU">Moziműsor</text>
         <action>PLUGIN mythmovies</action>
         <depends>mythmovies</depends>
     </button>
@@ -261,9 +262,10 @@
     <button>
         <type>NETFLIX</type>
         <text>NetFlix</text>
+        <text lang="SV">Nätfilmer</text>
         <text lang="PT">Aluguer de Filmes</text>
         <text lang="ET">MythFlix</text>
-        <text lang="FR">NetFlix</text>
+        <text lang="HU">Netflix</text>
         <action>PLUGIN mythflix</action>
         <depends>mythflix</depends>
     </button>
@@ -272,7 +274,6 @@
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
         <text lang="IT">Modifica Tasti</text>
-        <text lang="FR">Éditer les touches</text>
         <text lang="DE">Tastenbelegung ändern</text>
         <text lang="SV">Ändra knappar</text>
         <text lang="DA">Tasteopsætning</text>
@@ -283,6 +284,7 @@
         <text lang="PL">Ustaw klawisze</text>
         <text lang="JA">キー設定</text>
         <text lang="RU">Редактировать клавиши</text>
+        <text lang="HU">Billenyűzet beállítása</text>
         <action>SETUP_KEYS</action>
     </button>
 
@@ -292,7 +294,6 @@
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configurar</text>
         <text lang="CA">Configurar</text>
-        <text lang="FR">Configuration</text>
         <text lang="DE">Konfiguration</text>
         <text lang="DA">Konfiguration</text>
         <text lang="NL">Instellingen</text>
@@ -302,6 +303,7 @@
         <text lang="SL">Nastavitve</text>
         <text lang="ET">Sätted</text>
         <text lang="RU">Настройки</text>
+        <text lang="HU">Beállítások</text>
         <action>MENU main_settings.xml</action>
         <password>SetupPinCode</password>
     </button>
@@ -309,7 +311,6 @@
     <!-- <button>
         <type>SHUTDOWN</type>
         <text>Shutdown</text>
-        <text lang="FR">Éteindre</text>
         <text lang="SV">Avstängning</text>
         <text lang="DE">Beenden</text>
         <text lang="ET">Seiskamine</text>
@@ -317,6 +318,7 @@
         <text lang="PT">Desligar</text>
         <text lang="NL">Afsluiten</text>
         <text lang="RU">Завершение работы</text>
+        <text lang="HU">Kikapcsolás</text>
         <action>SHUTDOWN</action>
     </button> -->
 

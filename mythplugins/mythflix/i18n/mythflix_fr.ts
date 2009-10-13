@@ -2,6 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 <context>
+    <name>MythControls</name>
+    <message>
+        <source>Browse Netflix titles</source>
+        <translation>Parcourir les titres Netflix</translation>
+    </message>
+    <message>
+        <source>Administer Netflix Queue</source>
+        <translation>Gérer la liste d&apos;attente</translation>
+    </message>
+    <message>
+        <source>View Netflix History</source>
+        <translation>Afficher l&apos;historique de Netflix</translation>
+    </message>
+    <message>
+        <source>Moves movie to top of queue</source>
+        <translation>Déplacer la vidéo en haut de la file d&apos;attente</translation>
+    </message>
+</context>
+<context>
     <name>MythFlix</name>
     <message>
         <source>Browse Options</source>
@@ -88,9 +107,13 @@
         <source>Default</source>
         <translation>Par défaut</translation>
     </message>
+    <message>
+        <source>Queue Name</source>
+        <translation>Nom de la liste d&apos;attente</translation>
+    </message>
 </context>
 <context>
-    <name>netflix_menu_xml</name>
+    <name>ThemeUI</name>
     <message>
         <source>View Queue</source>
         <translation>Voir la file d&apos;attente</translation>

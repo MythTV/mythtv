@@ -2,17 +2,17 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="Bitstream Vera Sans">
-        <size>16</size>
+    <font name="basesmall" face="DejaVu Sans">
+        <pixelsize>22</pixelsize>
         <color>#FFFFFF</color>
     </font>
 
     <font name="basemedium" from="basesmall">
-        <size>18</size>
+        <pixelsize>25</pixelsize>
     </font>
 
     <font name="baselarge" from="basesmall">
-        <size>20</size>
+        <pixelsize>28</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -20,7 +20,7 @@
     </font>
 
     <font name="baseextralarge" from="basesmall">
-        <size>24</size>
+        <pixelsize>33</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -377,7 +377,7 @@
                     <area>5,5,55,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
-                    <align>right,vcenter</align>
+                    <align>left,vcenter</align>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -413,6 +413,31 @@
         </statetype>
     </spinbox>
 
+    <!-- Base definition of a wide spinbox (room for strings) -->
+    <spinbox name="basewidespinbox" from="basespinbox">
+        <area>0,0,495,40</area>
+        <layout>horizontal</layout>
+        <buttonarea>0,0,475,100%</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,475,40</area>
+                <textarea name="buttontext">
+                    <area>5,5,465,30</area>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+            </state>
+            <state name="inactive" from="active" />
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>480,2</position>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>480,21</position>
+        </statetype>
+    </spinbox>
+
     <!-- Base definition of a list in 'selector' configuration -->
     <buttonlist name="baseselector">
         <area>0,0,220,40</area>
@@ -429,8 +454,10 @@
                     <align>left,vcenter</align>
                 </textarea>
             </state>
-            <shape name="background" from="baseselectedwidgetshape" />
             <state name="inactive" from="active" />
+            <state name="selected" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+            </state>
         </statetype>
         <statetype name="downscrollarrow">
             <position>205,2</position>
@@ -461,19 +488,14 @@
     </buttonlist>
 
     <!-- Base definition of a list in wide 'selector' configuration -->
-    <buttonlist name="basewideselector">
-        <area>0,0,395,40</area>
-        <layout>horizontal</layout>
-        <buttonarea>0,0,375,100%</buttonarea>
+    <buttonlist name="basewideselector" from="baseselector">
+        <area>0,0,495,40</area>
+        <buttonarea>0,0,475,100%</buttonarea>
         <statetype name="buttonitem">
             <state name="active">
-                <area>0,0,375,40</area>
-                <shape name="background" from="basewidgetshape" />
+                <area>0,0,475,40</area>
                 <textarea name="buttontext">
-                    <area>5,5,365,30</area>
-                    <font>basesmall</font>
-                    <cutdown>yes</cutdown>
-                    <align>left,vcenter</align>
+                    <area>5,5,465,30</area>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -482,30 +504,10 @@
             <state name="inactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
-            <position>380,2</position>
-            <state type="off">
-                <imagetype name="dnon">
-                    <filename>lb-rtarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="dnoff">
-                    <filename>lb-rtarrow-sel.png</filename>
-                </imagetype>
-            </state>
+            <position>480,2</position>
         </statetype>
         <statetype name="upscrollarrow">
-            <position>380,21</position>
-            <state type="off">
-                <imagetype name="upon">
-                    <filename>lb-ltarrow-reg.png</filename>
-                </imagetype>
-            </state>
-            <state type="full">
-                <imagetype name="upoff">
-                    <filename>lb-ltarrow-sel.png</filename>
-                </imagetype>
-            </state>
+            <position>480,21</position>
         </statetype>
     </buttonlist>
 
@@ -552,13 +554,15 @@
 
     <!-- Base definition of a progressbar -->
     <progressbar name="baseprogressbar">
-        <area>0,0,10,10</area>
+        <area>0,0,536,38</area>
         <layout>horizontal</layout>
         <style>reveal</style>
         <imagetype name="background">
+            <area>0,0,100%,100%</area>
             <filename>progressbar_background.png</filename>
         </imagetype>
         <imagetype name="progressimage">
+            <area>0,0,100%,100%</area>
             <filename>progressbar_fill.png</filename>
         </imagetype>
     </progressbar>
@@ -588,7 +592,6 @@
         <buttonlist name="list" from="basebuttonlist">
             <area>12,225,470,250</area>
             <drawfrombottom>yes</drawfrombottom>
-            <align>center</align>
             <showarrow>no</showarrow>
             <wrapstyle>selection</wrapstyle>
             <statetype name="buttonitem">
@@ -638,7 +641,6 @@
         <buttonlist name="list" from="basebuttonlist">
             <area>100,320,1080,350</area>
             <drawfrombottom>yes</drawfrombottom>
-            <align>center</align>
             <showarrow>no</showarrow>
             <wrapstyle>selection</wrapstyle>
             <statetype name="buttonitem">
@@ -765,7 +767,6 @@
 
         <buttonlist name="itemlist" from="basebuttonlist">
             <area>12,150,470,270</area>
-            <align>left,vcenter</align>
             <showarrow>no</showarrow>
             <statetype name="buttonitem">
                 <state name="active">

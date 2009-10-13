@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
     <window name="iconimport">
         <textarea name="name" from="basetextarea">
@@ -7,13 +8,13 @@
         </textarea>
 
         <buttonlist name="icons">
-            <area>20,50,760,460</area>
-            <buttonarea>0,0,760,460</buttonarea>
+            <area>20,50,760,450</area>
+            <buttonarea>0,0,760,420</buttonarea>
             <layout>grid</layout>
             <spacing>5</spacing>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,240,60</area>
+                    <area>0,0,250,60</area>
                     <imagetype name="buttonbackground">
                         <area>0,0,250,60</area>
                         <gradient start="#666666" end="#333333" alpha="200" />
@@ -35,7 +36,37 @@
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
+            <statetype name="upscrollarrow">
+                <position>700,425</position>
+                <state type="off">
+                    <imagetype name="upon">
+                        <filename>lb-uparrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="upoff">
+                        <filename>lb-uparrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>740,425</position>
+                <state type="off">
+                    <imagetype name="dnon">
+                        <filename>lb-dnarrow-reg.png</filename>
+                    </imagetype>
+                </state>
+                <state type="full">
+                    <imagetype name="dnoff">
+                        <filename>lb-dnarrow-sel.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
         </buttonlist>
+
+        <textarea name="status" from="basetextarea">
+            <area>30,480,600,25</area>
+        </textarea>
 
         <textarea name="manuallabel" from="basetextarea">
             <area>30,505,300,25</area>

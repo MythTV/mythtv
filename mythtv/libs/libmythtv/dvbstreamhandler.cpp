@@ -66,7 +66,7 @@ void DVBStreamHandler::Return(DVBStreamHandler * & ref)
     if (*rit > 1)
     {
         ref = NULL;
-        *rit--;
+        (*rit)--;
         return;
     }
 

@@ -1,4 +1,25 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Browse Netflix titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Administer Netflix Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Netflix History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moves movie to top of queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>MythFlix</name>
     <message>
@@ -23,31 +44,6 @@
     </message>
 </context>
 <context>
-    <name>MythFlixConfig</name>
-    <message>
-        <source>Press MENU to set the update frequency.</source>
-        <translation type="obsolete">Valitse MENU asettaaksesi päivitysvälin.</translation>
-    </message>
-    <message>
-        <source>Set update frequency by using the up/down arrows.
-The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Aseta päivitysväli käyttäen ylös/alas-näppäimiä.
-Pienin sallittu arvo on 30 minuuttia.</translation>
-    </message>
-    <message>
-        <source>Press MENU to return to feed selection.</source>
-        <translation type="obsolete">Valitse MENU palataksesi valikkoon.</translation>
-    </message>
-    <message>
-        <source>Set update frequency by using the up/down arrows.The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Aseta taajuus, jonka mukaan päivitetään. Pienin arvo on 30 minuuttia.</translation>
-    </message>
-    <message>
-        <source>Press Escape or Menu to exit.</source>
-        <translation type="obsolete">Paina Escape tai Menu poistuaksesi.</translation>
-    </message>
-</context>
-<context>
     <name>MythFlixQueue</name>
     <message>
         <source>Manage Queue</source>
@@ -66,24 +62,12 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
         <translation>Peruuta</translation>
     </message>
     <message>
-        <source>Default</source>
-        <translation type="obsolete">Oletus</translation>
-    </message>
-    <message>
         <source>History for Queue: </source>
         <translation>Jonon historia: </translation>
     </message>
     <message>
         <source>Items in Queue: </source>
         <translation>Jonossa olevia artikkeleita: </translation>
-    </message>
-    <message>
-        <source>Move Canceled</source>
-        <translation type="obsolete">Siirrä Peruutetut</translation>
-    </message>
-    <message>
-        <source>Item not moved.</source>
-        <translation type="obsolete">Artikkelia ei siirretty.</translation>
     </message>
     <message>
         <source>Move To Another Queue</source>
@@ -123,12 +107,24 @@ Pienin sallittu arvo on 30 minuuttia.</translation>
         <source>Default</source>
         <translation>Oletus</translation>
     </message>
+    <message>
+        <source>Queue Name</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <source>Minutes</source>
-        <translation>Minuuttia</translation>
+        <source>View Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rental History</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

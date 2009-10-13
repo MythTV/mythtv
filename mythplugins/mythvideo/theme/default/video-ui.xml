@@ -32,14 +32,14 @@
         </button>
     </window>
 
-    <window name="plotpopup">
+    <window name="descriptionpopup">
         <area>193,87,413,426</area>
 
         <imagetype name="box">
             <filename>mv_results_popup.png</filename>
         </imagetype>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>18,18,360,325</area>
             <multiline>yes</multiline>
         </textarea>
@@ -71,7 +71,7 @@
             <filename>mv_itemdetail_popup.png</filename>
         </imagetype>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>25,100,227,350</area>
             <filename>mv_browse_nocover_large.png</filename>
             <preserveaspect>true</preserveaspect>
@@ -84,7 +84,7 @@
             <align>center</align>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>284,100,423,140</area>
             <multiline>yes</multiline>
         </textarea>
@@ -184,6 +184,7 @@
             <area>0,110,800,70</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
         <textarea name="title" from="basetextarea">
@@ -284,12 +285,12 @@
             <area>160,125,350,35</area>
         </textarea>
 
-        <textarea name="pltlbl" from="dirlbl">
+        <textarea name="desclbl" from="dirlbl">
             <position>20,155</position>
             <value>Plot:</value>
         </textarea>
 
-        <textarea name="plot" from="director">
+        <textarea name="description" from="director">
             <area>160,155,600,35</area>
         </textarea>
 
@@ -494,7 +495,7 @@
             <font>basemedium</font>
         </textarea>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>30,90,203,311</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>
@@ -515,7 +516,7 @@
             <font>basemedium</font>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>245,97,523,145</area>
             <multiline>yes</multiline>
         </textarea>
@@ -564,6 +565,7 @@
             <area>250,130,540,70</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
         <statetype name="parentallevel">
@@ -695,6 +697,7 @@
             <area>250,130,540,70</area>
             <multiline>yes</multiline>
             <align>hcenter,vcenter</align>
+            <value>No videos in library, or no files found.  If you have configured a video directory, press "M" (or the MENU key) and select "Scan for Changes."</value>
         </textarea>
 
         <!-- <textarea name="breadcrumbs" from="basetextarea">
@@ -770,7 +773,7 @@
             <align>right</align>
         </textarea>
 
-        <textarea name="plot" from="basetextarea">
+        <textarea name="description" from="basetextarea">
             <area>40,418,530,80</area>
             <align>left,top</align>
             <multiline>yes</multiline>
@@ -790,7 +793,7 @@
             <align>hcenter,vcenter</align>
         </textarea>
 
-        <imagetype name="coverimage">
+        <imagetype name="coverart">
             <area>624,335,140,212</area>
             <preserveaspect>yes</preserveaspect>
         </imagetype>

@@ -1,12 +1,27 @@
-#include <cassert>
-#include <math.h>
 
+// Own header
+#include "mythpainter_ogl.h"
+
+// Config header generated in base directory by configure
+#include "config.h"
+
+// C headers
+#include <cmath>
+
+// C++ headers
+#include <vector>
+using namespace std;
+
+// QT headers
 #include <QApplication>
 #include <QPixmap>
 #include <QPainter>
 #include <QGLWidget>
 
-#include "config.h"
+// libmythdb headers
+#include "mythverbose.h"
+
+// OpenGL headers
 #if CONFIG_DARWIN
 #include <OpenGL/glext.h>
 #endif
@@ -15,10 +30,10 @@
 #include <GL/glext.h>
 #endif
 
-#include "mythverbose.h"
-#include "mythpainter_ogl.h"
+// Mythui headers
 #include "mythfontproperties.h"
 
+// Defines
 #define MAX_GL_ITEMS 256
 #define MAX_STRING_ITEMS 256
 
@@ -66,12 +81,32 @@ MythOpenGLPainter::~MythOpenGLPainter()
 
 void MythOpenGLPainter::Begin(QWidget *parent)
 {
-    assert(parent);
+    if (!parent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: No parent widget defined for "
+                              "OpenGL Painter, bailing");
+        return;
+    }
 
     MythPainter::Begin(parent);
 
     QGLWidget *realParent = dynamic_cast<QGLWidget *>(parent);
-    assert(realParent);
+    if (!realParent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: Failed to cast parent to QGLWidget");
+        return;
+    }
+
+    vector<GLuint> textures;
+    {
+        QMutexLocker locker(&m_textureDeleteLock);
+        while (!m_textureDeleteList.empty())
+        {
+            textures.push_back(m_textureDeleteList.front());
+            m_textureDeleteList.pop_front();
+        }
+    }
+    glDeleteTextures(textures.size(), &textures[0]);
 
     realParent->makeCurrent();
     glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -95,7 +130,11 @@ void MythOpenGLPainter::Begin(QWidget *parent)
 void MythOpenGLPainter::End(void)
 {
     QGLWidget *realParent = dynamic_cast<QGLWidget *>(m_Parent);
-    assert(realParent);
+    if (!realParent)
+    {
+        VERBOSE(VB_IMPORTANT, "FATAL ERROR: Failed to cast parent to QGLWidget");
+        return;
+    }
 
     realParent->makeCurrent();
     glFlush();
@@ -132,10 +171,10 @@ void MythOpenGLPainter::RemoveImageFromCache(MythImage *im)
 {
     if (m_ImageIntMap.contains(im))
     {
-        GLuint textures[1];
-        textures[0] = m_ImageIntMap[im];
+        m_textureDeleteLock.lock();
+        m_textureDeleteList.push_back(m_ImageIntMap[im]);
+        m_textureDeleteLock.unlock();
 
-        glDeleteTextures(1, textures);
         m_ImageIntMap.remove(im);
 
         m_ImageExpireList.remove(im);

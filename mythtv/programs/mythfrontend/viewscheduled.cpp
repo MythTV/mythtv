@@ -24,7 +24,8 @@
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ViewScheduled *vsb = new ViewScheduled(mainStack, (TV*)player, showTV);
+    ViewScheduled *vsb = new ViewScheduled(mainStack, static_cast<TV*>(player),
+                                           showTV);
 
     if (vsb->Create())
         mainStack->AddScreen(vsb);
@@ -508,15 +509,7 @@ void ViewScheduled::customEdit()
         return;
 
     ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
-    if (!pginfo)
-        return;
-
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pginfo);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-    else
-        delete ce;
+    EditCustom(pginfo);
 }
 
 void ViewScheduled::deleteRule()

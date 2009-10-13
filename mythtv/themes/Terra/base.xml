@@ -1,22 +1,22 @@
-
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <!-- Base Font Definitions -->
     <font name="basesmall" face="Arial">
-        <size>14</size>
+        <pixelsize>19</pixelsize>
         <color>#DDDDDD</color>
     </font>
 
     <font name="basemedium" from="basesmall">
-        <size>16</size>
+        <pixelsize>22</pixelsize>
     </font>
 
     <font name="baselarge" from="basesmall">
-        <size>21</size>
+        <pixelsize>29</pixelsize>
     </font>
 
     <font name="baseextralarge" from="basesmall">
-        <size>22</size>
+        <pixelsize>31</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -476,26 +476,27 @@
         </imagetype>
 
         <font name="datefont" from="baselargebrown">
-            <size>15</size>
+            <pixelsize>21</pixelsize>
         </font>
 
         <font name="timefont" from="datefont">
-            <size>19</size>
+            <pixelsize>26</pixelsize>
             <bold>yes</bold>
         </font>
 
         <clock name="date">
-            <area>910,688,250,30</area>
+            <area>825,689,350,30</area>
             <font>datefont</font>
             <format>%DATE%</format>
             <align>right,vcenter</align>
         </clock>
 
         <clock name="time">
-            <area>1167,688,110,30</area>
+            <area>1185,688,80,30</area>
             <font>timefont</font>
             <format>%TIME%</format>
             <align>left,vcenter</align>
+            <cutdown>no</cutdown>
         </clock>
 
     </window>
@@ -523,7 +524,9 @@
             <spacing>3</spacing>
             <wrapstyle>selection</wrapstyle>
             <statetype name="buttonitem">
+                <area>0,0,367,53</area>
                 <state name="active">
+                    <area>0,0,367,53</area>
                     <imagetype name="buttonbackground">
                         <filename>popups/menu_button.png</filename>
                     </imagetype>
@@ -559,7 +562,7 @@
 
         <imagetype name="backimg">
             <position>236,58</position>
-            <filename>menu/largemenubackground.png</filename>
+            <filename>popups/largemenubackground.png</filename>
         </imagetype>
 
         <textarea name="messagearea">
@@ -590,8 +593,7 @@
                         <filename>popups/submenu_arrow.png</filename>
                     </imagetype>
                 </state>
-                <state name="inactive" from="active">
-                </state>
+                <state name="inactive" from="active" />
                 <state name="selected" from="active">
                     <imagetype name="selecteditemarrow">
                         <position>5,16</position>
@@ -661,19 +663,29 @@
 
     <!-- Busy Dialog -->
     <window name="MythBusyDialog">
-        <area>-1,-1,580,165</area>
+        <area>-1,-1,619,92</area>
         <imagetype name="backimg">
-            <filename>mythprogressdialog-background.png</filename>
-        </imagetype>
-        <imagetype name="animation">
-            <position>40,40</position>
-            <filepattern low="0" high="24">busyimages/%1.png</filepattern>
-            <delay>250</delay>
+            <filename>popups/progress_dialog_background.png</filename>
         </imagetype>
         <textarea name="message" from="basetextarea">
-            <area>170,20,390,125</area>
+            <area>20,10,580,50</area>
             <align>allcenter</align>
+            <multiline>true</multiline>
         </textarea>
+
+        <imagetype name="background">
+            <position>30,62</position>
+            <filename>popups/progress_bar_background.png</filename>
+        </imagetype>
+        <imagetype name="animation">
+            <position>30,62</position>
+            <filepattern low="0" high="29" cycle="reverse">popups/busy/busy_%1.png</filepattern>
+            <delay>40</delay>
+        </imagetype>
+        <imagetype name="overlay">
+            <position>30,62</position>
+            <filename>popups/progress_bar_overlay.png</filename>
+        </imagetype>
     </window>
 
     <!-- Progress Dialog -->

@@ -146,6 +146,31 @@ void AudioOutputALSA::CloseDevice()
     }
 }
 
+void AudioOutputALSA::ReorderSmpteToAlsa6ch(void *buf, int frames)
+{
+    if (audio_bits == 8)
+        _ReorderSmpteToAlsa6ch((unsigned char *)buf, frames);
+    else if (audio_bits == 16)
+        _ReorderSmpteToAlsa6ch((short *)buf, frames);
+}
+
+template <class AudioDataType>
+void AudioOutputALSA::_ReorderSmpteToAlsa6ch(AudioDataType *buf, int frames)
+{
+    AudioDataType tmpC, tmpLFE, *buf2;
+
+    for (int i = 0; i < frames; i++)
+    {
+        buf = buf2 = buf + 2;
+
+        tmpC = *buf++;
+        tmpLFE = *buf++;
+        *buf2++ = *buf++;
+        *buf2++ = *buf++;
+        *buf2++ = tmpC;
+        *buf2++ = tmpLFE;
+    }
+}
 
 void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
 {
@@ -158,7 +183,10 @@ void AudioOutputALSA::WriteAudio(unsigned char *aubuf, int size)
         VERBOSE(VB_IMPORTANT, QString("WriteAudio() called with pcm_handle == NULL!"));
         return;
     }
-    
+
+    if (!audio_passthru && audio_channels == 6)
+        ReorderSmpteToAlsa6ch(aubuf, frames);
+
     tmpbuf = aubuf;
 
     VERBOSE(VB_AUDIO+VB_TIMESTAMP,

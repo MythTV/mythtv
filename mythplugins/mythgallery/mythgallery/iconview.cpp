@@ -15,6 +15,9 @@
  *
  * ============================================================ */
 
+// POSIX headers
+#include <unistd.h>
+
 // ANSI C headers
 #include <cmath>
 
@@ -1079,16 +1082,7 @@ void IconView::HandleImport(void)
         return;
     }
 
-    ThumbItem *item = new ThumbItem(importdir.dirName(),
-                                    importdir.absolutePath(), true);
-    m_itemList.append(item);
-    m_itemHash.insert(item->GetName(), item);
-    m_thumbGen->addFile(item->GetName());
-
-    if (!m_thumbGen->isRunning())
-    {
-        m_thumbGen->start();
-    }
+    LoadDirectory(m_currDir);
 }
 
 void IconView::HandleShowDevices(void)

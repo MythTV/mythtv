@@ -1,36 +1,73 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
-    <name>GameTree</name>
-    <message>
-        <source>Favourites</source>
-        <translation>Favoritter</translation>
-    </message>
+    <name>GameUI</name>
     <message>
         <source>All Games</source>
-        <translation>Alle spill</translation>
+        <translation type="unfinished">Alle spill</translation>
     </message>
     <message>
         <source>-   By Genre</source>
-        <translation>-   Etter sjanger</translation>
+        <translation type="unfinished">-   Etter sjanger</translation>
     </message>
     <message>
         <source>-   By Year</source>
-        <translation>-   Etter år</translation>
+        <translation type="unfinished">-   Etter år</translation>
     </message>
     <message>
         <source>-   By Name</source>
-        <translation>-   Etter navn</translation>
-    </message>
-    <message>
-        <source>Players Available. 
-
- Please pick one.</source>
-        <translation>Tilgjengelige spillere. 
-
- Velg en.</translation>
+        <translation type="unfinished">-   Etter navn</translation>
     </message>
     <message>
         <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose System for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Game frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the current game as a favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show incremental search dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incremental search find next match</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -174,10 +211,6 @@ det?</translation>
         <translation>Kommando</translation>
     </message>
     <message>
-        <source>Path+name of binary and optional parameters. %s can be used to represent the name of any rom being launched. if not specified the rom filename will be added to the end of the command. As well %d1, %d2, %d3 and %d4 represent disks in a multidisk/game situation</source>
-        <translation type="obsolete">Sti+navn for programfil og valgfrie argumenter. %s kan brukes for å representere navnet på rom-files som skal startes. Hvis %s ikke er med legges dette navnet til på slutten av kommandoen. %d1, %d2, %d3 og %d4 representerer disker hvis spillet har flere</translation>
-    </message>
-    <message>
         <source>Type</source>
         <translation>Type</translation>
     </message>
@@ -204,18 +237,6 @@ det?</translation>
     <message>
         <source>File Extensions</source>
         <translation>Filetternavn</translation>
-    </message>
-    <message>
-        <source>List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="obsolete">Liste med filetternavn som skal brukes av denne emulatoren. Et tomt felt betyr at enhver fil i ROM-stien kan brukes av denne emulatoren</translation>
-    </message>
-    <message>
-        <source>ScreenShots</source>
-        <translation>Skjermbilder</translation>
-    </message>
-    <message>
-        <source>Path to any screenshots for this player</source>
-        <translation>Sti til skjermbilder for denne spilleren</translation>
     </message>
     <message>
         <source>Game Player Setup</source>
@@ -310,7 +331,27 @@ det?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
+        <source>Directory where Game Screenshots are stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning screenshots.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where Game Fanart is stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning fanart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where Game Boxart is stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning boxart.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -331,6 +372,110 @@ det?</translation>
     <message>
         <source>Favorite:</source>
         <translation>Favoritt:</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Nei</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Ja</translation>
+    </message>
+    <message>
+        <source>Edit Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Publisher:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Boxart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rompath:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System(s):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Plot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Players</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Game Data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

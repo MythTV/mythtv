@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QRegExp>
 #include <QDateTime>
+#include <QSqlError>
 
 #include "dbutil.h"
 #include "mythcontext.h"
@@ -185,25 +186,25 @@ bool DBUtil::IsBackupInProgress(void)
  *   Care should be taken in calling this function.  It has the potential to
  *   corrupt in-progress recordings or interfere with playback.
  */
-bool DBUtil::BackupDB(QString &filename)
+MythDBBackupStatus DBUtil::BackupDB(QString &filename)
 {
     filename = QString();
 
 #ifdef USING_MINGW
     VERBOSE(VB_IMPORTANT, "Database backups disabled on Windows.");
-    return true;
+    return kDB_Backup_Disabled;
 #endif
 
     if (gContext->GetNumSetting("DisableAutomaticBackup", 0))
     {
         VERBOSE(VB_IMPORTANT, "Database backups disabled.  Skipping backup.");
-        return true;
+        return kDB_Backup_Disabled;
     }
 
     if (IsNewDatabase())
     {
         VERBOSE(VB_IMPORTANT, "New database detected.  Skipping backup.");
-        return true;
+        return kDB_Backup_Empty_DB;
     }
 
     QString backupScript = GetShareDir() + "mythconverg_backup.pl";
@@ -253,7 +254,10 @@ bool DBUtil::BackupDB(QString &filename)
             MythDB::DBError("DBUtil::BackupDB", query);
     }
 
-    return result;
+    if (result)
+        return kDB_Backup_Completed;
+
+    return kDB_Backup_Failed;
 }
 
 QMap<QString,bool> DBUtil::GetTableMap(void)

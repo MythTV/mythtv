@@ -85,11 +85,17 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
             if (info.tagName() == "icon")
             {
                 QString path = info.attribute("src", "");
-                if (!path.isEmpty())
+                if (!path.isEmpty() && !path.contains("://"))
                 {
                     QString base = baseUrl.toString(QUrl::StripTrailingSlash);
                     chaninfo->iconpath = base +
                         ((path.left(1) == "/") ? path : QString("/") + path);
+                }
+                else if (!path.isEmpty())
+                {
+                    QUrl url(path);
+                    if (url.isValid())
+                        chaninfo->iconpath = url.toString();
                 }
             }
             else if (info.tagName() == "display-name")

@@ -5,7 +5,6 @@
       <text>Create DVD</text>
       <text lang="es">Crear DVD</text>
       <text lang="et">DVD valmistamine</text>
-      <text lang="FR">Créer un DVD</text>
       <text lang="nl">Maak DVD</text>
       <text lang="nb">Lag DVD</text>
       <text lang="de">DVD erstellen</text>
@@ -13,6 +12,7 @@
       <text lang="SL">Ustvari DVD</text>
       <text lang="PL">Utwórz DVD</text>
       <text lang="FI">Luo DVD</text>
+      <text lang="NB">Lag DVD</text>
       <action>ARCHIVE_CREATE_DVD</action>
    </button>
 
@@ -21,7 +21,6 @@
       <text>Create Archive</text>
       <text lang="es">Crear Archivo Nativo</text>
       <text lang="et">Arhiivi valmistamine</text>
-      <text lang="FR">Créer une archive</text>
       <text lang="nl">Maak Backup</text>
       <text lang="de">Natives Archiv erstellen</text>
       <text lang="nb">Lag naturlig arkiv</text>
@@ -29,6 +28,7 @@
       <text lang="SL">Ustvari izvorni arhiv</text>
       <text lang="PL">Utwórz archiwum</text>
       <text lang="FI">Luo Tiedosto</text>
+      <text lang="NB">Lag arkiv</text>
       <action>ARCHIVE_CREATE_ARCHIVE</action>
   </button>
 
@@ -37,7 +37,6 @@
        <text>Encode Video File</text>
        <text lang="es">Codificar Fichero Video</text>
        <text lang="et">Videofaili kodeerimine</text>
-       <text lang="FR">Encoder un fichier vidéo</text>
        <text lang="de">Videodatei kodieren</text>
        <text lang="nl">Encodeer Video Bestanden</text>
        <text lang="nb">Konverter videofil</text>
@@ -45,6 +44,7 @@
        <text lang="SL">Kodiranje videa</text>
        <text lang="PL">Zakoduj plik wideo</text>
        <text lang="FI">Luo Video</text>
+       <text lang="NB">Kod videofiler</text>
        <action>ARCHIVE_ENCODE_VIDEO</action>
        <depends></depends>
    </button>
@@ -54,7 +54,6 @@
        <text>Import Archive</text>
        <text lang="es">Importar Ficheros Video</text>
        <text lang="et">Videofailide importimine</text>
-       <text lang="FR">Importer une archive</text>
        <text lang="de">Videodateien importieren</text>
        <text lang="nl">Importeer Video Bestanden</text>
        <text lang="nb">Importer videofiler</text>
@@ -62,15 +61,17 @@
        <text lang="SL">Uvoz video datotek</text>
        <text lang="PL">Importuj pliki wideo</text>
        <text lang="FI">Tuo DVD</text>
+       <text lang="NB">Importer arkiv</text>
        <action>ARCHIVE_IMPORT_VIDEO</action>
    </button>
 
    <button>
        <type>ARCHIVE_UTILITIES</type>
        <text>Archive Utilities</text>
-       <text lang="FR">Utilitaires d&apos;archivage</text>
        <text lang="SL">Pripomočki za arhiviranje</text>
        <text lang="FI">Lisätoiminnot</text>
+       <text lang="NB">Arkiv-verktøy</text>
+       <text lang="DE">Zubehör</text>
        <action>MENU archiveutils.xml</action>
    </button>
 

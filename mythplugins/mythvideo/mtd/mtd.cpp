@@ -93,7 +93,7 @@ void DiscCheckingThread::run(void)
 
         QMutexLocker locker(cancelLock);
         if (!cancel_me)
-            cancelWaitCond->wait(cancelLock, 1000);
+            cancelWaitCond->wait(cancelLock, 14000);
     }
 }
 

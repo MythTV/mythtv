@@ -27,13 +27,13 @@
  * the appropriate fixes.
  */
 
+#include "mythgesture.h"
+
 #include <cmath>
 #include <algorithm>
 
 #include <QMutex>
 #include <QMap>
-
-#include "mythgesture.h"
 
 /**
  * @class MythGesturePrivate
@@ -258,7 +258,7 @@ QString MythGesture::translate(void)
     
     /* bail out on error cases */
     if (sequence_count > max_sequence) 
-        sequence = "0";
+        sequence = '0';
 
     return sequence;
 }

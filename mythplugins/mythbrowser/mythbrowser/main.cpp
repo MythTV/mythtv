@@ -21,6 +21,12 @@ using namespace std;
 
 int handleMedia(const QString &url, const QString &, const QString &, const QString &, const QString &, int, int, int, const QString &)
 {
+    if (url.isEmpty())
+    {
+        VERBOSE(VB_IMPORTANT, "MythBrowser: handleMedia got empty url!");
+        return 1;
+    }
+
     QStringList urls = url.split(" ", QString::SkipEmptyParts);
     float zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4").toFloat();
 
@@ -38,10 +44,13 @@ int handleMedia(const QString &url, const QString &, const QString &, const QStr
 
 void setupKeys(void)
 {
-    REG_KEY("Browser", "NEXTTAB",   "Move to next browser tab",       "P");
-    REG_KEY("Browser", "PREVTAB",   "Move to previous browser tab",   "");
+    REG_KEY("Browser", "NEXTTAB", QT_TRANSLATE_NOOP("MythControls",
+        "Move to next browser tab"), "P");
+    REG_KEY("Browser", "PREVTAB", QT_TRANSLATE_NOOP("MythControls",
+        "Move to previous browser tab"), "");
 
-    REG_MEDIAPLAYER("WebBrowser", "Internal Web Browser", handleMedia);
+    REG_MEDIAPLAYER("WebBrowser", QT_TRANSLATE_NOOP("MythControls",
+        "Internal Web Browser"), handleMedia);
 }
 
 int mythplugin_init(const char *libversion)

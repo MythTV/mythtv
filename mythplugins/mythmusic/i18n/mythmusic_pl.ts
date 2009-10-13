@@ -1,4 +1,6 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
     <name>AlbumArtImages</name>
     <message>
@@ -69,23 +71,23 @@
         <translation>Trwa czyszczenie CD-RW</translation>
     </message>
     <message>
-        <source>Compilation Artist:<byte value="x9"/></source>
+        <source>Compilation Artist:	</source>
         <translation>Wykonawca składanki:</translation>
     </message>
     <message>
-        <source>Artist:<byte value="x9"/></source>
+        <source>Artist:	</source>
         <translation>Wykonawca:</translation>
     </message>
     <message>
-        <source>Album:<byte value="x9"/></source>
+        <source>Album:	</source>
         <translation>Album:</translation>
     </message>
     <message>
-        <source>Title:<byte value="x9"/></source>
+        <source>Title:	</source>
         <translation>Tytuł:</translation>
     </message>
     <message>
-        <source>Length:<byte value="x9"/></source>
+        <source>Length:	</source>
         <translation>Długość:</translation>
     </message>
     <message>
@@ -242,14 +244,6 @@
         <translation>Nowy plik</translation>
     </message>
     <message>
-        <source>All Ready in Database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Non found</source>
-        <translation>Nie znaleziono</translation>
-    </message>
-    <message>
         <source>Copy Failed
 Could not copy file to: %1</source>
         <translation>Kopiowanie nie powiodło się.Nie można skopiować pliku do: %1</translation>
@@ -297,6 +291,14 @@ Could not copy file to: %1</source>
     <message>
         <source>Cancel</source>
         <translation>Anuluj</translation>
+    </message>
+    <message>
+        <source>Already in Database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -396,6 +398,117 @@ Could not copy file to: %1</source>
     <message>
         <source>playlist root</source>
         <translation>Początek listy odtwarzania</translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Play music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select music playlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation type="unfinished">Rippuj CD</translation>
+    </message>
+    <message>
+        <source>Scan music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Music Miniplayer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to the next track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to the previous track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause/Start playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cycle visualizer mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blank screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease rating</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh music tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter All My Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show incremental search dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incremental search find next match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase Play Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease Play Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythMusic Media Handler 1/2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythMusic Media Handler 2/2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1719,10 +1832,6 @@ Chcesz usunąć istniejący utwór?</translation>
         <translation></translation>
     </message>
     <message>
-        <source>Please select a quality level and check the album information below:</source>
-        <translation>Proszę wybrać poziom jakości i sprawdzić poniższe informacje o albumie:</translation>
-    </message>
-    <message>
         <source>Quality:</source>
         <translation>Jakość:</translation>
     </message>
@@ -1767,38 +1876,6 @@ Chcesz usunąć istniejący utwór?</translation>
         <translation>Lokalizacja:</translation>
     </message>
     <message>
-        <source>123 of 345</source>
-        <translation>123 z 345</translation>
-    </message>
-    <message>
-        <source>All ready in database</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>/some/file/goes/here/test.mp3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Compilation Artist</source>
-        <translation>Wykonawca składanki</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation>Album</translation>
-    </message>
-    <message>
-        <source>Genre</source>
-        <translation>Gatunek</translation>
-    </message>
-    <message>
-        <source>Year</source>
-        <translation>Rok</translation>
-    </message>
-    <message>
-        <source>Directory Finder</source>
-        <translation>Wyszukiwacz katalogów</translation>
-    </message>
-    <message>
         <source>Import Cover Art</source>
         <translation>Importuj okładkę</translation>
     </message>
@@ -1813,6 +1890,102 @@ Chcesz usunąć istniejący utwór?</translation>
     <message>
         <source>Image Type:</source>
         <translation>Typ obrazu:</translation>
+    </message>
+    <message>
+        <source>Please Wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished">Zakończone</translation>
+    </message>
+    <message>
+        <source>Switch Titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already in database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished">Szukaj</translation>
+    </message>
+    <message>
+        <source>Cover Art</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">Dodaj</translation>
+    </message>
+    <message>
+        <source>Next New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add All New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Player Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ripper Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import CD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for New Music</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Eject media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Music Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Configure playback and CD ripping</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -1,10 +1,16 @@
+
+// Own header
+#include "mythuitype.h"
+
+// QT headers
 #include <QEvent>
 #include <QKeyEvent>
 #include <QDomDocument>
 
+// Mythdb headers
 #include "mythverbose.h"
 
-#include "mythuitype.h"
+// MythUI headers
 #include "mythimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
@@ -15,13 +21,12 @@
 #include "mythuicheckbox.h"
 #include "mythuibuttonlist.h"
 #include "mythuitextedit.h"
-#include "mythuibuttonlist.h"
 #include "mythuiprogressbar.h"
 #include "mythuispinbox.h"
 #include "mythuiwebbrowser.h"
 
 MythUIType::MythUIType(QObject *parent, const QString &name)
-    : QObject(parent), m_helptext(QString::null)
+    : QObject(parent)
 {
     setObjectName(name);
 
@@ -90,8 +95,8 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
     if (children.isEmpty())
         return 0;
 
-    bool onlyWidgets = (inheritsClass && qstrcmp(inheritsClass, "QWidget") == 0)
-;
+    bool onlyWidgets = (inheritsClass
+                        && qstrcmp(inheritsClass, "QWidget") == 0);
     const QLatin1String oName(objName);
     for (int i = 0; i < children.size(); ++i)
     {
@@ -201,7 +206,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
 
     if (GetArea().contains(p))
     {
-        if (!IsVisible())
+        if (!IsVisible() || !IsEnabled())
             return NULL;
 
         if (m_ChildrenList.isEmpty())
@@ -712,6 +717,10 @@ bool MythUIType::ParseElement(QDomElement &element)
     else if (element.tagName() == "loadondemand")
     {
         SetDeferLoad(parseBool(element));
+    }
+    else if (element.tagName() == "helptext")
+    {
+        m_helptext = getFirstText(element);
     }
     else
         return false;

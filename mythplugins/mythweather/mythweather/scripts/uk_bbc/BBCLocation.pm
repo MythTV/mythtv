@@ -4,94 +4,77 @@ require Exporter;
 use LWP::Simple;
 
 our @EXPORT = qw(Search);
-our $VERSION = 0.1;
+our $VERSION = 0.2;
 
 my @searchresults;
+my @resulturl;
+my $resultcount = -1;
 
 sub Search {
 
-    my $base_url = 'http://www.bbc.co.uk/cgi-perl/weather/search/new_search.pl?search_query=';
+    my $base_url       = 'http://news.bbc.co.uk/weather/forecast/';
+    my $world_base_url = $base_url . '?lowgraphics=true&search=';
+    my $local_base_url = $base_url . '?lowgraphics=true&type=county_state&search=';
 
     my $search_string = shift;
 
-    my $response = get $base_url . $search_string;
-    die unless defined $response;
+    my $world_response = get $world_base_url . $search_string;
+    die unless defined $world_response;
+    my $local_response = get $local_base_url . $search_string;
+    die unless defined $local_response;
 
+    &parseResults($world_response);
+    &parseResults($local_response);
+
+    if ( ($resultcount > 0 ) && ($#searchresults < 0) ) {
+        foreach my $url (@resulturl) {
+            my $url_response = get $base_url . $url;
+            die unless defined $url_response;
+            &parseResults($url_response);
+        }
+    }
+
+    return @searchresults;
+}
+
+sub parseResults {
+    my $response = shift;
     my $isresults = 0;
-    my $isredirect = 0;
-    my $isworld = 0;
-
     my $havename = 0;
     my $haveid = 0;
-
     my $resultline = "";
 
     foreach (split("\n", $response)) {
-        if (/<title>.*?Search Results.*?<\/title>/) {
+        if (/<p class=\"response\">/) {
             $isresults = 1;
-        }
-        else {
-            $isredirect = 1;
         }
 
         my $locname;
-        my $locid;
+        my $locid; 
+        my $url;
 
         if ($isresults) {
+            last if (/There are no forecasts matching/);
 
-            if (/No locations were found/) {
-                last;
+            $resultcount = $1 if (/<strong>There \w{2,3} (\d*) forecasts? matching/);
+
+            # Collect result URLs
+            if (/<a id=\"result_\d*\" href \=\"?.*search\=.*/) {
+                $url = $_;
+                $url =~ s/.*href \=\"(.*)\".*/$1/s;
+                push (@resulturl, $url);
             }
-            elsif (/if query returns results close/) {
-                last;
-            }
-            elsif (/non UK towns results open/) {
-                $isworld = 1;
-            }
-            elsif (/\/weather\/5day\.shtml\?id=/) {
+
+            # Collect location IDs and location names
+            elsif (/<a id=\"result_\d*\" href \=\"\/weather\/forecast\//) {
                 $locid = $_;
-                $locid =~ s/.*?\?id=(\d{0,4}).*/$1/s;
-
+                $locid =~ s/.*\/weather\/forecast\/(\d{0,5})\?.*/$1/s;
+        
                 $locname = $_;
-                $locname =~ s/.*?<strong>(.*?)<.*/$1/s;
+                $locname =~ s/.*<a id=\"result_\d*\".*>(.*)<\/a>.*/$1/s;
 
-                $resultline = "L" . $locid . "::" . $locname . ", United Kingdom";
+                $resultline = $locid . "::" . $locname;
                 push (@searchresults, $resultline);
-            }
-            elsif (/\/weather\/5day\.shtml\?world=/) {
-                $locid = $_;
-                $locid =~ s/.*?\?world=(\d{4}).*/$1/s;
-
-                $locname = $_;
-                $locname =~ s/.*?<strong>(.*?)<.*/$1/s;
-
-                $resultline = "W" . $locid . "::" . $locname;
-
-                unless ($isworld) {
-                    $resultline = $resultline . ", United Kingdom";
-                    push (@searchresults, $resultline);
-                }
-            }
-            elsif ($isworld && /<\/a><\/strong>/) {
-                my $country = $_;
-                $country =~ s/.*?>([a-zA-Z ,']*)<\/a><\/strong>.*/$1/;
-                $resultline = $resultline . ", " . $country;
-                push (@searchresults, $resultline);
-            }
-
-        }
-        elsif ($isredirect) {
-            if (/name : \"/) {
-                my $locname = $_;
-                $locname =~ s/^.*name : \"(.*?)\".*$/$1/;
-                $resultline = $resultline . "::" . $locname . ", United Kingdom";
-                $havename = 1;
-            }
-            if (/rssloc :/) {
-                my $id = 0;
-                $id = s/.*rssloc : (\d{4}),.*/$1/;
-                $resultline = "W" . $_ . $resultline;
-                $haveid = 1;
             }
         }
 

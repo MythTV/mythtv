@@ -176,7 +176,11 @@ void cMutex::Lock(void)
 
 void cMutex::Unlock(void)
 {
- if (!--locked) {
+ if (--locked <= 0) {
+    if (locked < 0) {
+        esyslog("cMutex Lock inbalance detected");
+        locked = 0;
+        }
     lockingPid = 0;
     pthread_mutex_unlock(&mutex);
     }

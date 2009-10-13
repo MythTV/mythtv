@@ -303,14 +303,16 @@ static QString getSystemTimeZoneID(void)
             time_t t;
             struct tm *result = (struct tm *)malloc(sizeof(*result));
 
-            t = time(NULL);
-            localtime_r(&t, result);
-
             if (result != NULL)
             {
-                if (strftime(name, sizeof(name), "%Z", result) > 0)
-                    zone_id = name;
-                free(result);
+                t = time(NULL);
+                localtime_r(&t, result);
+                if (result != NULL)
+                {
+                    if (strftime(name, sizeof(name), "%Z", result) > 0)
+                        zone_id = name;
+                    free(result);
+                }
             }
         }
     }
@@ -1100,7 +1102,7 @@ bool telnet(const QString &host, int port)
  *   This function does not care if the files are actual files.
  *   For compatibility with pipes and socket streams the file location
  *   will not be reset to 0 at the end of this function. If the function
- *   is succesful the file pointers will be at the end of the copied
+ *   is successful the file pointers will be at the end of the copied
  *   data.
  *
  *  \param dst Destination QFile

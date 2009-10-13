@@ -3,7 +3,6 @@
     <button>
         <type>TV_RECPRIORITIES_SETTINGS_GENERAL</type>
         <text>Set Recording Priorities</text>
-        <text lang="FR">Fixer les priorités d&apos;enregistrement</text>
         <text lang="DE">Aufnahmen</text>
         <text lang="SV">Inspelningsprioriteter</text>
         <text lang="SL">Nast. snemalne prioritete</text>
@@ -14,8 +13,8 @@
         <text lang="NL">Opnameprioriteit Instellen</text>
         <text lang="JA">録画優先順位設定</text>
         <text lang="RU">Установить приоритет записей</text>
+        <text lang="HU">Felvételi prioritások beállítása</text>
         <alttext>Recording Priorities</alttext>
-        <alttext lang="FR">Priorités d&apos;enresgitrement</alttext>
         <alttext lang="DE">Aufnahmen</alttext>
         <alttext lang="SV">Inspelning</alttext>
         <alttext lang="SL">Snemalne prioritete</alttext>
@@ -34,7 +33,6 @@
         <type>TV_RECPRIORITIES_CHANNEL</type>
         <text>Set Channel Recording Priorities</text>
         <text lang="DE">Sender</text>
-        <text lang="FR">Fixer les priorités d&apos;enregistrement des chaînes</text>
         <text lang="SV">Kanalprioriteter</text>
         <text lang="JA">チャンネル録画優先順位設定</text>
         <text lang="SL">Nast. kanalne snem. priritete</text>
@@ -44,8 +42,8 @@
         <text lang="ES">Ajustar Prioridades de Canales</text>
         <text lang="NL">Opnameprioriteit Per Zender</text>
         <text lang="RU">Установить приоритет каналов</text>
+        <text lang="HU">Csatorna prioritások beállítása</text>
         <alttext>Channel Priorities</alttext>
-        <alttext lang="FR">Priorités de chaîne</alttext>
         <alttext lang="SV">Kanal</alttext>
         <alttext lang="JA">チャンネル優先順位</alttext>
         <alttext lang="DE">Sender</alttext>
@@ -63,9 +61,9 @@
     <button>
         <type>TV_RECPRIORITIES_CUSTOM</type>
         <text>Custom Priority</text>
-        <text lang="FR">Priorité personnalisée</text>
+        <text lang="HU">Egyéni prioritások</text>
         <alttext>Custom Priority</alttext>
-        <description>???</description>
+        <description></description>
         <action>SETTINGS CUSTOMPRIORITY</action>
     </button>
 

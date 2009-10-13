@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
     <window name="mainmenu">
 
@@ -71,11 +71,15 @@
 
             </state>
             <state name="DVD">
-
+                <textarea name="heading" from="baseheading">
+                    <value>CD/DVD Options</value>
+                </textarea>
             </state>
             <state name="DVD_SETTINGS" from="DVD" />
             <state name="MUSIC_SETTINGS">
-
+                <textarea name="heading" from="baseheading">
+                    <value>Music Settings</value>
+                </textarea>
             </state>
             <state name="VIDEO_SETTINGS" from="VIDEO" />
             <state name="GAME_SETTINGS" from="GAMES" />
@@ -121,91 +125,91 @@
 
                     <statetype name="icon">
                         <loadondemand>true</loadondemand>
-                        <state name="DEFAULT">
+                        <state name="default">
                             <imagetype name="icon">
                                 <area>0,0,256,220</area>
                                 <filename>watermarks/default.png</filename>
                             </imagetype>
                         </state>
 
-                        <state name="TV" from="DEFAULT">
+                        <state name="TV" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/tv.png</filename>
                             </imagetype>
                         </state>
-                        <state name="MUSIC" from="DEFAULT">
+                        <state name="MUSIC" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/music2.png</filename>
                             </imagetype>
                         </state>
-                        <state name="VIDEO" from="DEFAULT">
+                        <state name="VIDEO" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/video.png</filename>
                             </imagetype>
                         </state>
-                        <state name="DVD" from="DEFAULT">
+                        <state name="DVD" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/dvd.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="FM" from="DEFAULT">
+                        <state name="FM" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/radio.png</filename>
                             </imagetype>
                         </state>
-                        <state name="IMAGES" from="DEFAULT">
+                        <state name="IMAGES" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/gallery.png</filename>
                             </imagetype>
                         </state>
-                        <state name="GAME" from="DEFAULT">
+                        <state name="GAME" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/games.png</filename>
                             </imagetype>
                         </state>
-                        <state name="WEATHER" from="DEFAULT">
+                        <state name="WEATHER" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/weather.png</filename>
                             </imagetype>
                         </state>
-                        <state name="NEWS" from="DEFAULT">
+                        <state name="NEWS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/news.png</filename>
                             </imagetype>
                         </state>
-                        <state name="WEBPAGE" from="DEFAULT">
+                        <state name="WEBPAGE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/browser.png</filename>
                             </imagetype>
                         </state>
-                        <state name="RECIPE" from="DEFAULT">
+                        <state name="RECIPE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/food.png</filename>
                             </imagetype>
                         </state>
-                        <state name="PHONE" from="DEFAULT">
+                        <state name="PHONE" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/phone.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="SETUP" from="DEFAULT">
+                        <state name="SETUP" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/tools.png</filename>
                             </imagetype>
                         </state>
-                        <state name="SHUTDOWN" from="DEFAULT">
+                        <state name="SHUTDOWN" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/important.png</filename>
                             </imagetype>-->
                         </state>
 
                         <state name="DVD_PLAY" from="DVD" />
-                        <state name="VCD_PLAY" from="DEFAULT">
+                        <state name="VCD_PLAY" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/cd.png</filename>
                             </imagetype>
                         </state>
-                        <state name="DVD_RIP" from="DEFAULT">
+                        <state name="DVD_RIP" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/dvd_rip.png</filename>
                             </imagetype>-->
@@ -225,23 +229,23 @@
                         <state name="SETTINGS_NETFLIX" from="DVD" />
 
                         <state name="SETTINGS_GENERAL" from="SETUP" />
-                        <state name="SETTINGS_APPEARANCE" from="DEFAULT">
+                        <state name="SETTINGS_APPEARANCE" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="SCREENSETUPWIZARD" from="DEFAULT">
+                        <state name="SCREENSETUPWIZARD" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/screenwiz.png</filename>
                             </imagetype>-->
                         </state>
                         <state name="SETTINGS_TV" from="TV" />
-                        <state name="SETTINGS_MUSIC" from="DEFAULT">
+                        <state name="SETTINGS_MUSIC" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/music_settings.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="SETTINGS_VIDEO" from="DEFAULT">
+                        <state name="SETTINGS_VIDEO" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/video_settings.png</filename>
                             </imagetype>-->
@@ -255,7 +259,7 @@
                         <state name="SETTINGS_WEBPAGE" from="WEBPAGE" />
                         <state name="SETTINGS_RECIPE" from="RECIPE" />
                         <state name="SETTINGS_XBOX" from="SETUP" />
-                        <state name="SETUP_KEYS" from="DEFAULT">
+                        <state name="SETUP_KEYS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/keys.png</filename>
                             </imagetype>
@@ -264,7 +268,7 @@
                         <state name="MUSIC_PLAY" from="MUSIC" />
                         <state name="MUSIC_PLAYLIST" from="MUSIC" />
                         <state name="MUSIC_RIP" from="VCD_PLAY" />
-                        <state name="MUSIC_SCAN" from="DEFAULT">
+                        <state name="MUSIC_SCAN" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/search.png</filename>
                             </imagetype>-->
@@ -274,12 +278,12 @@
                         <state name="MUSIC_SETTINGS_PLAYER" from="SETTINGS_MUSIC" />
                         <state name="MUSIC_SETTINGS_RIP" from="MUSIC_RIP" />
 
-                        <state name="TV_PROGRAM_GUIDE" from="DEFAULT">
+                        <state name="TV_PROGRAM_GUIDE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/guide.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_PROGFIND" from="DEFAULT">
+                        <state name="TV_PROGFIND" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/search.png</filename>
                             </imagetype>-->
@@ -290,18 +294,18 @@
                         <state name="TV_SEARCH_PEOPLE" from="TV_PROGFIND" />
                         <state name="TV_SEARCH_POWER" from="TV_PROGFIND" />
                         <state name="TV_SEARCH_KEYWORDS" from="TV_PROGFIND" />
-                        <state name="TV_CUSTOM_RECORD" from="DEFAULT">
+                        <state name="TV_CUSTOM_RECORD" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/record.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="TV_MANUAL_SCHEDULE" from="DEFAULT">
+                        <state name="TV_MANUAL_SCHEDULE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/clock.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_RECORDING_RULES" from="DEFAULT" />
-                        <state name="TV_RECPRIORITIES" from="DEFAULT">
+                        <state name="TV_RECORDING_RULES" from="default" />
+                        <state name="TV_RECPRIORITIES" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/priority.png</filename>
                             </imagetype>-->
@@ -314,18 +318,18 @@
 
                         <state name="SETUP_GENERAL" from="SETUP" />
                         <state name="SETUP_STORAGE_GROUPS" from="SETUP" />
-                        <state name="SETUP_CAPTURE_CARDS" from="DEFAULT">
+                        <state name="SETUP_CAPTURE_CARDS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/aerial.png</filename>
                             </imagetype>
                         </state>
                         <state name="SETUP_VIDEO_SOURCES" from="SETTINGS_VIDEO" />
-                        <state name="SETUP_INPUT_CONNECTIONS" from="DEFAULT">
+                        <state name="SETUP_INPUT_CONNECTIONS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/aerial.png</filename>
                             </imagetype>
                         </state>
-                        <state name="SETUP_CHANNEL_EDITOR" from="DEFAULT">
+                        <state name="SETUP_CHANNEL_EDITOR" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/aerial.png</filename>
                             </imagetype>
@@ -351,22 +355,22 @@
 
                         <state name="TV_WATCH_TV" from="TV" />
                         <state name="TV_SCHEDULE_RECORDINGS" from="TV_MANUAL_SCHEDULE" />
-                        <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
+                        <state name="TV_WATCH_RECORDINGS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/watchrec.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_DELETE" from="DEFAULT">
+                        <state name="TV_DELETE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/delete.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_PREVIOUS" from="DEFAULT">
+                        <state name="TV_PREVIOUS" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/big_arrow_down.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="TV_STATUS" from="DEFAULT">
+                        <state name="TV_STATUS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/status.png</filename>
                             </imagetype>
@@ -382,22 +386,22 @@
                         <state name="VIDEO_MANAGER" from="SETTINGS_VIDEO" />
 
                         <state name="TV_UPCOMING_RECORDINGS" from="TV_PROGRAM_GUIDE" />
-                        <state name="SETTINGS_MEDIA" from="DEFAULT">
+                        <state name="SETTINGS_MEDIA" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/multimedia.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="SETTINGS_INFO_CENTER" from="DEFAULT">
+                        <state name="SETTINGS_INFO_CENTER" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/info_setup.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="MENU_MEDIA_LIBRARY" from="DEFAULT">
+                        <state name="MENU_MEDIA_LIBRARY" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/library.png</filename>
                             </imagetype>
                         </state>
-                        <state name="MENU_MANAGE_RECORDINGS" from="DEFAULT">
+                        <state name="MENU_MANAGE_RECORDINGS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/clock.png</filename>
                             </imagetype>
@@ -407,7 +411,7 @@
                                 <filename>watermarks/news.png</filename>
                             </imagetype>
                         </state>
-                        <state name="MENU_OPTICAL_DISKS" from="DEFAULT">
+                        <state name="MENU_OPTICAL_DISKS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/cd.png</filename>
                             </imagetype>
@@ -416,17 +420,17 @@
                         <state name="SETUP_FRONTEND" from="SETUP" />
                         <state name="SETUP_BACKEND" from="SETUP" />
                         <state name="SETUP_MENU" from="SETUP" />
-                        <state name="STREAM" from="DEFAULT">
+                        <state name="STREAM" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/stream.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="EJECT" from="DEFAULT">
+                        <state name="EJECT" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/dvd_eject.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="ARCHIVE" from="DEFAULT">
+                        <state name="ARCHIVE" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/dvd_burn.png</filename>
                             </imagetype>-->
@@ -449,14 +453,14 @@
                         </state>
                         <state name="ARCHIVE_BURN_DVD" from="ARCHIVE" />
 
-                        <state name="MOVIETIMES" from="DEFAULT">
+                        <state name="MOVIETIMES" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/movie.png</filename>
                             </imagetype>
                         </state>
                         <state name="SETTINGS_MOVIETIME" from="MOVIETIMES" />
 
-                        <state name="ZONEMINDER" from="DEFAULT">
+                        <state name="ZONEMINDER" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/zoneminder.png</filename>
                             </imagetype>
@@ -474,91 +478,91 @@
 
                     <statetype name="icon">
                         <loadondemand>true</loadondemand>
-                        <state name="DEFAULT">
+                        <state name="default">
                             <imagetype name="icon">
                                 <area>0,2,277,238</area>
                                 <mask>menu/iconmask.png</mask>
                             </imagetype>
                         </state>
 
-                        <state name="TV" from="DEFAULT">
+                        <state name="TV" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/tv.png</filename>
                             </imagetype>
                         </state>
-                        <state name="MUSIC" from="DEFAULT">
+                        <state name="MUSIC" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/music2.png</filename>
                             </imagetype>
                         </state>
-                        <state name="VIDEO" from="DEFAULT">
+                        <state name="VIDEO" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/video.png</filename>
                             </imagetype>
                         </state>
-                        <state name="DVD" from="DEFAULT">
+                        <state name="DVD" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/dvd.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="FM" from="DEFAULT">
+                        <state name="FM" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/radio.png</filename>
                             </imagetype>
                         </state>
-                        <state name="IMAGES" from="DEFAULT">
+                        <state name="IMAGES" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/gallery.png</filename>
                             </imagetype>
                         </state>
-                        <state name="GAME" from="DEFAULT">
+                        <state name="GAME" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/games.png</filename>
                             </imagetype>
                         </state>
-                        <state name="WEATHER" from="DEFAULT">
+                        <state name="WEATHER" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/weather.png</filename>
                             </imagetype>
                         </state>
-                        <state name="NEWS" from="DEFAULT">
+                        <state name="NEWS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/news.png</filename>
                             </imagetype>
                         </state>
-                        <state name="WEBPAGE" from="DEFAULT">
+                        <state name="WEBPAGE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/browser.png</filename>
                             </imagetype>
                         </state>
-                        <state name="RECIPE" from="DEFAULT">
+                        <state name="RECIPE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/food.png</filename>
                             </imagetype>
                         </state>
-                        <state name="PHONE" from="DEFAULT">
+                        <state name="PHONE" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/phone.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="SETUP" from="DEFAULT">
+                        <state name="SETUP" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/tools.png</filename>
                             </imagetype>
                         </state>
-                        <state name="SHUTDOWN" from="DEFAULT">
+                        <state name="SHUTDOWN" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/important.png</filename>
                             </imagetype>-->
                         </state>
 
                         <state name="DVD_PLAY" from="DVD" />
-                        <state name="VCD_PLAY" from="DEFAULT">
+                        <state name="VCD_PLAY" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/cd.png</filename>
                             </imagetype>
                         </state>
-                        <state name="DVD_RIP" from="DEFAULT">
+                        <state name="DVD_RIP" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/dvd_rip.png</filename>
                             </imagetype>-->
@@ -578,23 +582,23 @@
                         <state name="SETTINGS_NETFLIX" from="DVD" />
 
                         <state name="SETTINGS_GENERAL" from="SETUP" />
-                        <state name="SETTINGS_APPEARANCE" from="DEFAULT">
+                        <state name="SETTINGS_APPEARANCE" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="SCREENSETUPWIZARD" from="DEFAULT">
+                        <state name="SCREENSETUPWIZARD" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/screenwiz.png</filename>
                             </imagetype>-->
                         </state>
                         <state name="SETTINGS_TV" from="TV" />
-                        <state name="SETTINGS_MUSIC" from="DEFAULT">
+                        <state name="SETTINGS_MUSIC" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/music_settings.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="SETTINGS_VIDEO" from="DEFAULT">
+                        <state name="SETTINGS_VIDEO" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/video_settings.png</filename>
                             </imagetype>-->
@@ -608,7 +612,7 @@
                         <state name="SETTINGS_WEBPAGE" from="WEBPAGE" />
                         <state name="SETTINGS_RECIPE" from="RECIPE" />
                         <state name="SETTINGS_XBOX" from="SETUP" />
-                        <state name="SETUP_KEYS" from="DEFAULT">
+                        <state name="SETUP_KEYS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/keys.png</filename>
                             </imagetype>
@@ -617,7 +621,7 @@
                         <state name="MUSIC_PLAY" from="MUSIC" />
                         <state name="MUSIC_PLAYLIST" from="MUSIC" />
                         <state name="MUSIC_RIP" from="VCD_PLAY" />
-                        <state name="MUSIC_SCAN" from="DEFAULT">
+                        <state name="MUSIC_SCAN" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/search.png</filename>
                             </imagetype>-->
@@ -627,12 +631,12 @@
                         <state name="MUSIC_SETTINGS_PLAYER" from="SETTINGS_MUSIC" />
                         <state name="MUSIC_SETTINGS_RIP" from="MUSIC_RIP" />
 
-                        <state name="TV_PROGRAM_GUIDE" from="DEFAULT">
+                        <state name="TV_PROGRAM_GUIDE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/guide.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_PROGFIND" from="DEFAULT">
+                        <state name="TV_PROGFIND" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/search.png</filename>
                             </imagetype>-->
@@ -643,18 +647,18 @@
                         <state name="TV_SEARCH_PEOPLE" from="TV_PROGFIND" />
                         <state name="TV_SEARCH_POWER" from="TV_PROGFIND" />
                         <state name="TV_SEARCH_KEYWORDS" from="TV_PROGFIND" />
-                        <state name="TV_CUSTOM_RECORD" from="DEFAULT">
+                        <state name="TV_CUSTOM_RECORD" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/record.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="TV_MANUAL_SCHEDULE" from="DEFAULT">
+                        <state name="TV_MANUAL_SCHEDULE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/clock.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_RECORDING_RULES" from="DEFAULT" />
-                        <state name="TV_RECPRIORITIES" from="DEFAULT">
+                        <state name="TV_RECORDING_RULES" from="default" />
+                        <state name="TV_RECPRIORITIES" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/priority.png</filename>
                             </imagetype>-->
@@ -667,18 +671,18 @@
 
                         <state name="SETUP_GENERAL" from="SETUP" />
                         <state name="SETUP_STORAGE_GROUPS" from="SETUP" />
-                        <state name="SETUP_CAPTURE_CARDS" from="DEFAULT">
+                        <state name="SETUP_CAPTURE_CARDS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/aerial.png</filename>
                             </imagetype>
                         </state>
                         <state name="SETUP_VIDEO_SOURCES" from="SETTINGS_VIDEO" />
-                        <state name="SETUP_INPUT_CONNECTIONS" from="DEFAULT">
+                        <state name="SETUP_INPUT_CONNECTIONS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/aerial.png</filename>
                             </imagetype>
                         </state>
-                        <state name="SETUP_CHANNEL_EDITOR" from="DEFAULT">
+                        <state name="SETUP_CHANNEL_EDITOR" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/aerial.png</filename>
                             </imagetype>
@@ -704,22 +708,22 @@
 
                         <state name="TV_WATCH_TV" from="TV" />
                         <state name="TV_SCHEDULE_RECORDINGS" from="TV_MANUAL_SCHEDULE" />
-                        <state name="TV_WATCH_RECORDINGS" from="DEFAULT">
+                        <state name="TV_WATCH_RECORDINGS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/watchrec.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_DELETE" from="DEFAULT">
+                        <state name="TV_DELETE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/delete.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_PREVIOUS" from="DEFAULT">
+                        <state name="TV_PREVIOUS" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/big_arrow_down.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="TV_STATUS" from="DEFAULT">
+                        <state name="TV_STATUS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/status.png</filename>
                             </imagetype>
@@ -735,22 +739,22 @@
                         <state name="VIDEO_MANAGER" from="SETTINGS_VIDEO" />
 
                         <state name="TV_UPCOMING_RECORDINGS" from="TV_PROGRAM_GUIDE" />
-                        <state name="SETTINGS_MEDIA" from="DEFAULT">
+                        <state name="SETTINGS_MEDIA" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/multimedia.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="SETTINGS_INFO_CENTER" from="DEFAULT">
+                        <state name="SETTINGS_INFO_CENTER" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/info_setup.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="MENU_MEDIA_LIBRARY" from="DEFAULT">
+                        <state name="MENU_MEDIA_LIBRARY" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/library.png</filename>
                             </imagetype>
                         </state>
-                        <state name="MENU_MANAGE_RECORDINGS" from="DEFAULT">
+                        <state name="MENU_MANAGE_RECORDINGS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/clock.png</filename>
                             </imagetype>
@@ -760,7 +764,7 @@
                                 <filename>watermarks/news.png</filename>
                             </imagetype>
                         </state>
-                        <state name="MENU_OPTICAL_DISKS" from="DEFAULT">
+                        <state name="MENU_OPTICAL_DISKS" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/cd.png</filename>
                             </imagetype>
@@ -769,17 +773,17 @@
                         <state name="SETUP_FRONTEND" from="SETUP" />
                         <state name="SETUP_BACKEND" from="SETUP" />
                         <state name="SETUP_MENU" from="SETUP" />
-                        <state name="STREAM" from="DEFAULT">
+                        <state name="STREAM" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/stream.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="EJECT" from="DEFAULT">
+                        <state name="EJECT" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/dvd_eject.png</filename>
                             </imagetype>-->
                         </state>
-                        <state name="ARCHIVE" from="DEFAULT">
+                        <state name="ARCHIVE" from="default">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/dvd_burn.png</filename>
                             </imagetype>-->
@@ -795,21 +799,17 @@
                         <state name="ARCHIVE_CREATE_ARCHIVE" from="ARCHIVE" />
                         <state name="ARCHIVE_UTILITIES" from="ARCHIVE" />
                         <state name="ARCHIVE_LAST_LOG" from="TV_STATUS" />
-                        <state name="ARCHIVE_TEST_DVD">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/play.png</filename>
-                            </imagetype>-->
-                        </state>
+                        <state name="ARCHIVE_TEST_DVD" from="ARCHIVE" />
                         <state name="ARCHIVE_BURN_DVD" from="ARCHIVE" />
 
-                        <state name="MOVIETIMES" from="DEFAULT">
+                        <state name="MOVIETIMES" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/movie.png</filename>
                             </imagetype>
                         </state>
                         <state name="SETTINGS_MOVIETIME" from="MOVIETIMES" />
 
-                        <state name="ZONEMINDER" from="DEFAULT">
+                        <state name="ZONEMINDER" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/zoneminder.png</filename>
                             </imagetype>

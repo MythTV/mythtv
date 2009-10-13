@@ -332,7 +332,7 @@ QString MythScreenStack::GetLocation(bool fullPath)
                 if (path.isEmpty())
                     path = (*it)->objectName();
                 else
-                    path += "/" + (*it)->objectName();
+                    path += '/' + (*it)->objectName();
             }
         }
         return path;

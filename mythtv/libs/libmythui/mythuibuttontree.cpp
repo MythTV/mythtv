@@ -1,3 +1,7 @@
+
+// Own header
+#include "mythuibuttontree.h"
+
 // Qt headers
 #include <QDomDocument>
 
@@ -5,7 +9,6 @@
 #include "mythverbose.h"
 
 // Mythui Headers
-#include "mythuibuttontree.h"
 #include "mythmainwindow.h"
 
 MythUIButtonTree::MythUIButtonTree(MythUIType *parent, const QString &name)

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythuitheme>
 
     <window name="watchrecordings">
@@ -35,7 +36,7 @@
 
         <buttonlist name="recordings" from="basebuttonlist2">
             <area>225,26,550,330</area>
-            <buttonarea>0,30,550,280</buttonarea>
+            <buttonarea>0,30,550,270</buttonarea>
             <wrapstyle>captive</wrapstyle>
             <statetype name="buttonitem">
                 <state name="active">

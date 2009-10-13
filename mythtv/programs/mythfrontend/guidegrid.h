@@ -35,7 +35,7 @@ typedef vector<PixmapChannel>   pix_chan_list_t;
 typedef vector<pix_chan_list_t> pix_chan_list_list_t;
 
 class JumpToChannel;
-class MPUBLIC JumpToChannelListener
+class JumpToChannelListener
 {
   public:
     virtual void GoTo(int start, int cur_row) = 0;
@@ -44,7 +44,7 @@ class MPUBLIC JumpToChannelListener
                              bool exact = true) const = 0;
 };
 
-class MPUBLIC JumpToChannel : public QObject
+class JumpToChannel : public QObject
 {
     Q_OBJECT
 
@@ -55,7 +55,7 @@ class MPUBLIC JumpToChannel : public QObject
 
     bool ProcessEntry(const QStringList &actions, const QKeyEvent *e);
 
-    QString GetEntry(void) const { return entry; }
+    QString GetEntry(void) const { return m_entry; }
 
   public slots:
     virtual void deleteLater(void);
@@ -65,17 +65,17 @@ class MPUBLIC JumpToChannel : public QObject
     bool Update(void);
 
   private:
-    JumpToChannelListener *listener;
-    QString  entry;
-    int      previous_start_channel_index;
-    int      previous_current_channel_index;
-    uint     rows_displayed;
-    QTimer  *timer;
+    JumpToChannelListener *m_listener;
+    QString  m_entry;
+    int      m_previous_start_channel_index;
+    int      m_previous_current_channel_index;
+    uint     m_rows_displayed;
+    QTimer  *m_timer; // audited ref #5318
 
     static const uint kJumpToChannelTimeout = 3500; // ms
 };
 
-class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
+class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 {
     Q_OBJECT
 
@@ -122,7 +122,6 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void generateListings();
 
     void enter();
-    void escape();
 
     void showProgFinder();
     void channelUpdate();
@@ -138,6 +137,7 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     void upcoming();
     void details();
 
+    void Close();
     void customEvent(QEvent *event);
 
   protected:
@@ -211,7 +211,7 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     TV     *m_player;
     bool    m_usingNullVideo;
     bool    m_embedVideo;
-    QTimer *previewVideoRefreshTimer;
+    QTimer *m_previewVideoRefreshTimer; // audited ref #5318
     void    EmbedTVWindow(void);
     void    HideTVWindow(void);
     QRect   m_videoRect;
@@ -222,7 +222,7 @@ class MPUBLIC GuideGrid : public ScheduleCommon, public JumpToChannelListener
     QString m_unknownTitle;
     QString m_unknownCategory;
 
-    QTimer *m_updateTimer;
+    QTimer *m_updateTimer; // audited ref #5318
 
     int               m_changrpid;
     ChannelGroupList  m_changrplist;

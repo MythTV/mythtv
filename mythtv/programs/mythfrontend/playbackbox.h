@@ -56,7 +56,6 @@ class PreviewGenState
 typedef QMap<QString,ProgramList>       ProgramMap;
 typedef QMap<QString,QString>           Str2StrMap;
 typedef QMap<QString,PreviewGenState>   PreviewMap;
-typedef QMap<QString,MythTimer>         LastCheckedMap;
 
 class PlaybackBox : public ScheduleCommon
 {
@@ -260,6 +259,10 @@ class PlaybackBox : public ScheduleCommon
 
     void checkPassword(const QString &password);
 
+    void fanartLoad(void);
+    void bannerLoad(void);
+    void coverartLoad(void);
+
   protected:
     bool SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
     void IncPreviewGeneratorPriority(const QString &fn);
@@ -272,8 +275,7 @@ class PlaybackBox : public ScheduleCommon
     void UpdateProgressBar(void);
 
     QString cutDown(const QString &, QFont *, int);
-    QDateTime getPreviewLastModified(ProgramInfo *);
-    QString getPreviewImage(ProgramInfo *);
+    QString GetPreviewImage(ProgramInfo *);
 
     bool play(ProgramInfo *rec, bool inPlaylist = false);
     void stop(ProgramInfo *);
@@ -307,9 +309,10 @@ class PlaybackBox : public ScheduleCommon
     QString getRecGroupPassword(const QString &recGroup);
     void fillRecGroupPasswordCache(void);
 
-    QString testImageFiles(QString &testDirectory,
-                           QString &seriesID, QString &titleIn,
-                           QString imagetype);
+    bool loadArtwork(QString artworkFile, MythUIImage *image, QTimer *timer,
+                     int delay = 500, bool resetImage = false);
+    QString findArtworkFile(QString &seriesID, QString &titleIn,
+                            QString imagetype, QString host);
 
     void updateGroupList();
     void updateIcons(const ProgramInfo *pginfo = NULL);
@@ -331,6 +334,9 @@ class PlaybackBox : public ScheduleCommon
     MythUIImage *m_fanart;
     MythUIImage *m_banner;
     MythUIImage *m_coverart;
+    QTimer      *m_fanartTimer;
+    QTimer      *m_bannerTimer;
+    QTimer      *m_coverartTimer;
 
     InfoMap m_currentMap;
 
@@ -386,7 +392,7 @@ class PlaybackBox : public ScheduleCommon
 
     // State Variables ////////////////////////////////////////////////////////
     // Main Recording List support
-    QTimer             *m_fillListTimer;
+    QTimer             *m_fillListTimer; // audited ref #5318
     bool                m_fillListFromCache;
     bool                m_connected;  ///< true if last FillList() succeeded
     QStringList         m_titleList;  ///< list of pages
@@ -424,14 +430,13 @@ class PlaybackBox : public ScheduleCommon
 
     // Free disk space tracking
     bool                m_freeSpaceNeedsUpdate;
-    QTimer             *m_freeSpaceTimer;
+    QTimer             *m_freeSpaceTimer; // audited ref #5318
     int                 m_freeSpaceTotal;
     int                 m_freeSpaceUsed;
 
     // Preview Pixmap Variables ///////////////////////////////////////////////
     bool                m_previewFromBookmark;
     uint                m_previewGeneratorMode;
-    LastCheckedMap      m_previewLastModifyCheck;
     QMap<QString,QDateTime> m_previewFileTS;
     bool                m_previewSuspend;
     mutable QMutex      m_previewGeneratorLock;

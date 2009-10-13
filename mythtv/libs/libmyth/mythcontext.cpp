@@ -110,6 +110,7 @@ class MythContextPrivate
 
     QMutex  m_hostnamelock;      ///< Locking for thread-safe copying of:
     QString m_localhostname;     ///< hostname from mysql.txt or gethostname()
+    QString m_masterhostname;    ///< master backend hostname
 
     DatabaseParams  m_DBparams;  ///< Current database host & WOL details
     QString         m_DBhostCp;  ///< dbHostName backup
@@ -1877,6 +1878,25 @@ QString MythContext::GetMasterHostPrefix(void)
     return ret;
 }
 
+QString MythContext::GetMasterHostName(void)
+{
+    QMutexLocker locker(&d->m_hostnamelock);
+
+    if (d->m_masterhostname.isEmpty())
+    {
+        QStringList strlist("QUERY_HOSTNAME");
+
+        SendReceiveStringList(strlist);
+
+        d->m_masterhostname = strlist[0];
+    }
+
+    QString ret = d->m_masterhostname;
+    ret.detach();
+
+    return ret;
+}
+
 void MythContext::ClearSettingsCache(QString myKey, QString newVal)
 {
     d->m_database->ClearSettingsCache(myKey, newVal);
@@ -2079,12 +2099,17 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                                  "server has gone away for some reason.. "
                                  "Is it running?"));
                 else
+                {
+                    QMutexLocker locker(&d->MBEconnectPopupLock);
                     if (!d->MBEconnectPopup)
+                    {
                         d->MBEconnectPopup = ShowOkPopup(
                             QObject::tr(
                                 "The connection to the master backend "
                                 "server has gone away for some reason.. "
                                 "Is it running?"));
+                    }
+                }
             }
 
             if (!block)

@@ -1,120 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0" language="sv_SE">
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Browse Netflix titles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Administer Netflix Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>View Netflix History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Moves movie to top of queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>MythFlix</name>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="407"/>
         <source>Browse Options</source>
-        <translation>Bläddra inställningar</translation>
+        <translation>Bläddringsinställningar</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="419"/>
         <source>Add to Top of Queue</source>
         <translation>Lägg till först i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="420"/>
         <source>Add to Bottom of Queue</source>
         <translation>Lägg till sist i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="421"/>
         <source>Show NetFlix Page</source>
-        <translation>Visa NetFlix sidan</translation>
+        <translation>Visa nätfilmsidan</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflix.cpp" line="422"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
-    </message>
-</context>
-<context>
-    <name>MythFlixConfig</name>
-    <message>
-        <location filename="" line="0"/>
-        <source>Press MENU to set the update frequency.</source>
-        <translation type="obsolete">Tryck MENY för att sätta uppdateringsfrekvensen.</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Set update frequency by using the up/down arrows.
-The minimum allowed value is 30 Minutes.</source>
-        <translation type="obsolete">Sätt uppdateringsfrekvensen genom att använda upp/ner-pilarna.
-Minsta tillåtna värde är 30 minuter.</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Press MENU to return to feed selection.</source>
-        <translation type="obsolete">Tryck MENY för att återgå till matningsval.</translation>
     </message>
 </context>
 <context>
     <name>MythFlixQueue</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="474"/>
         <source>Manage Queue</source>
         <translation>Hantera kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="486"/>
         <source>Top Of Queue</source>
         <translation>Först i kön</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="487"/>
         <source>Remove From Queue</source>
         <translation>Ta bort från kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="491"/>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="159"/>
         <source>History for Queue: </source>
-        <translation>Historia för kön:</translation>
+        <translation>Historik för kön:</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="161"/>
         <source>Items in Queue: </source>
-        <translation>Nummer i kön:</translation>
+        <translation>Antal i kön:</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="489"/>
         <source>Move To Another Queue</source>
         <translation>Flytta till en annan kö</translation>
     </message>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="490"/>
         <source>Show NetFlix Page</source>
-        <translation>Visa NetFlix sidan</translation>
+        <translation>Visa nätfilmsidan</translation>
     </message>
 </context>
 <context>
     <name>NewsSite</name>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="206"/>
         <source>Retrieve Failed. </source>
         <translation>Hämtning misslyckades. </translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="226"/>
         <source>Failed to retrieve news</source>
         <translation>Misslyckades med att hämta nyheter</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="215"/>
         <source>No Cached News</source>
         <translation>Inga cachade nyhter</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="228"/>
         <source>Failed to read downloaded file</source>
         <translation>Misslyckades med att läsa nerladdad fil</translation>
     </message>
     <message>
-        <location filename="../mythflix/newsengine.cpp" line="234"/>
         <source>Showing Cached News</source>
         <translation>Visar cachade nyheter</translation>
     </message>
@@ -122,17 +104,27 @@ Minsta tillåtna värde är 30 minuter.</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythflix/mythflixqueue.cpp" line="156"/>
         <source>Default</source>
-        <translation>Misslyckades</translation>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Queue Name</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
-        <location filename="themestrings.h" line="2"/>
-        <source>Minutes</source>
-        <translation>Minuter</translation>
+        <source>View Queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse Movies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rental History</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

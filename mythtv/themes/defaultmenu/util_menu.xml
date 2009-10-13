@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="UTIL">
 
     <button>
@@ -8,21 +9,20 @@
         <text lang="IS">Tónlistartól</text>
         <text lang="NL">Muziek Beheren</text>
         <text lang="SV">Musikverktyg</text>
-        <text lang="FR">Outils musique</text>
         <text lang="JA">ミュージックツール</text>
         <text lang="FI">Musiikkityökalut</text>
         <text lang="ZH_TW">音樂工具</text>
         <text lang="SL">Glasbena orodja</text>
         <text lang="ET">Muusikatööriistad</text>
-        <text lang="NB">Musikkverktøy</text>
         <text lang="DA">Musikværktøjer</text>
         <text lang="ES">Gestionar Música</text>
         <text lang="PT">Gerir Música</text>
-        <text lang="CS">Hudební nástroje</text>
         <text lang="RU">Работа с музыкой</text>
         <text lang="PL">Narzędzia muzyczne</text>
         <text lang="HE">כלי מוסיקה</text>
+        <text lang="HU">Zenei eszközök</text>
         <description>Select, import, or play music</description>
+        <description lang="DE">Musik auswählen, importieren oder hören</description>
         <action>PLUGIN mythmusic</action>
         <depends>mythmusic</depends>
     </button>
@@ -32,25 +32,23 @@
         <text>Video Manager</text>
         <text lang="IT">Gestione Video</text>
         <text lang="ES">Gestionar Videos</text>
-        <text lang="CS">Gestionar vÃ­deos</text>
         <text lang="DA">Filmopsætning</text>
         <text lang="DE">Videos verwalten</text>
         <text lang="IS">Kvikmyndatól</text>
         <text lang="PT">Gerir Filmes</text>
         <text lang="SV">Filmhanterare</text>
-        <text lang="FR">Gestionnaire vidéo</text>
         <text lang="NL">Films Beheren</text>
         <text lang="JA">ビデオマネージャー</text>
         <text lang="FI">Videonhallinta</text>
         <text lang="ZH_TW">電影工具</text>
         <text lang="SL">Video orodja</text>
         <text lang="ET">Videohaldus</text>
-        <text lang="NB">Videobehandler</text>
-        <text lang="CS">Manažer filmů</text>
         <text lang="RU">Управление фильмами</text>
         <text lang="PL">Zarządca Filmów</text>
         <text lang="HE">מנהל וידאו</text>
+        <text lang="HU">Video kezelő</text>
         <description>Scan for new videos, edit metadata, or delete</description>
+        <description lang="DE">Videos suchen oder löschen und Metadaten bearbeiten</description>
         <action>JUMP Video Manager</action>
         <depends>mythvideo</depends>
     </button>
@@ -59,7 +57,6 @@
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
         <text lang="IT">Modifica Tasti</text>
-        <text lang="FR">Éditer les touches</text>
         <text lang="IS">Stilla takka</text>
         <text lang="DE">Tastenbelegung ändern</text>
         <text lang="FI">Muokkaa Näppäimiä</text>
@@ -69,13 +66,14 @@
         <text lang="PT">Configurar Teclas</text>
         <text lang="ET">Klahvide muutmine</text>
         <text lang="NL">Toetsen Aanpassen</text>
-        <text lang="CS">Editovat klávesy</text>
         <text lang="JA">キー設定</text>
         <text lang="RU">Редактировать клавиши</text>
         <text lang="SL">Urejanje tipk</text>
         <text lang="PL">Edytuj klawisze</text>
         <text lang="HE">עריכת מקשים</text>
+        <text lang="HU">Billentyűzet beállítások</text>
         <description>Change mythtv key bindings.</description>
+        <description lang="DE">Tastaturbelegung anpassen</description>
         <action>SETUP_KEYS</action>
     </button>
 
@@ -84,8 +82,6 @@
         <text>Setup</text>
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configurar</text>
-        <text lang="CS">Configurar</text>
-        <text lang="FR">Configuration</text>
         <text lang="DE">Konfiguration</text>
         <text lang="DA">Indstillinger</text>
         <text lang="IS">Stillingar</text>
@@ -97,12 +93,12 @@
         <text lang="ZH_TW">設定</text>
         <text lang="SL">Nastavitve</text>
         <text lang="ET">Sätted</text>
-        <text lang="NB">Innstillinger</text>
-        <text lang="CS">Nastavení</text>
         <text lang="RU">Настройки</text>
         <text lang="PL">Ustawienia</text>
         <text lang="HE">הגדרה</text>
+        <text lang="HU">Beállítások</text>
         <description>Configure MythTV and plugins</description>
+        <description lang="DE">MythTV und Plugins konfigurieren</description>
         <action>MENU main_settings.xml</action>
         <password>SetupPinCode</password>
     </button>

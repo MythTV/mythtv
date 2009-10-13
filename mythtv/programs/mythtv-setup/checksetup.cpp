@@ -72,10 +72,28 @@ bool checkStoragePaths(QStringList &probs)
                   "FROM storagegroup "
                   "WHERE hostname = :HOSTNAME;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
-    if (!query.exec() || !query.isActive() || query.size() < 1)
+    if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("checkStoragePaths", query);
         return false;
+    }
+    else if (query.size() < 1)
+    {
+        if (gContext->GetSetting("MasterServerIP","master") ==
+            gContext->GetSetting("BackendServerIP","me"))
+        {
+            // Master backend must have a defined Default SG
+            QString trMesg =
+                    QObject::tr("No Storage Group directories are defined.  "
+                                "You must add at least one directory to the "
+                                "Default Storage Group where new recordings "
+                                "will be stored.");
+            probs.push_back(trMesg);
+            VERBOSE(VB_IMPORTANT, trMesg);
+            return true;
+        }
+        else
+            return false;
     }
 
     QDir checkDir("");
@@ -108,9 +126,13 @@ bool checkImageStoragePaths(QStringList &probs)
                   "FROM storagegroup "
                   "WHERE hostname = :HOSTNAME;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
-    if (!query.exec() || !query.isActive() || query.size() < 1)
+    if (!query.exec() || !query.isActive())
     {
         MythDB::DBError("checkImageStoragePaths", query);
+        return false;
+    }
+    else if (query.size() < 1)
+    {
         return false;
     }
 
@@ -133,8 +155,9 @@ bool checkImageStoragePaths(QStringList &probs)
                 QObject::tr("You have a Video Storage "
                             "Group, but have not set up "
                             "all Image Groups.  If you continue, "
-                            "video image downloads will fail.  Do "
-                            "you want to go back and fix this?");
+                            "video image downloads will be saved in "
+                            "your Videos Storage Group.  Do you want "
+                            "to store them in their own groups?");
             probs.push_back(trMesg);
             VERBOSE(VB_IMPORTANT, trMesg);
             problemFound = true;

@@ -128,7 +128,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             break;
         default:
             return;
-    }       
+    }
 
     if ((print_verbose_messages & verbose_level) != verbose_level)
         return;
@@ -606,9 +606,14 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     if (CODEC_IS_MPEG(context->codec_id))
         frameseekadjust = maxkeyframedist+1;
 
+    long long ts = 0;
+    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
+        ts = ic->start_time;
+
     // convert framenumber to normalized timestamp
-    long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE;
-    long long ts = (long long)( diff / fps );
+    long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE / fps;
+    ts += (long long)diff;
+
     if (av_seek_frame(ic, -1, ts, AVSEEK_FLAG_BACKWARD) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR
@@ -1058,11 +1063,10 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         }
 
         dontSyncPositionMap = true;
+        ic->build_index = 1;
     }
-
-    // Don't build a seek index for MythTV files, the user needs to
-    // use mythcommflag to build a proper MythTV position map for these.
-    if (livetv || watchingrecording)
+    // we have a position map, disable libavformat's seek index
+    else
         ic->build_index = 0;
 
     dump_format(ic, 0, filename, 0);
@@ -2327,7 +2331,7 @@ void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
     else
     {
         VERBOSE(VB_IMPORTANT, LOC +
-                "render_slice_xvmc called with bad avctx or src");
+                "render_slice_vdpau called with bad avctx or src");
     }
 }
 
@@ -2443,7 +2447,8 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
     }
 }
 
-void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
+void AvFormatDecoder::HandleGopStart(
+    AVPacket *pkt, bool can_reliably_parse_keyframes)
 {
     if (prevgoppos != 0 && keyframedist != 1)
     {
@@ -2495,7 +2500,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 
     lastKey = prevgoppos = framesRead - 1;
 
-    if (!hasFullPositionMap)
+    if (can_reliably_parse_keyframes &&
+        !hasFullPositionMap && !livetv && !watchingrecording)
     {
         long long last_frame = 0;
         {
@@ -2609,13 +2615,13 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
             if (!seen_gop && seq_count > 1)
             {
-                HandleGopStart(pkt);
+                HandleGopStart(pkt, true);
                 pkt->flags |= PKT_FLAG_KEY;
             }
         }
         else if (GOP_START == start_code_state)
         {
-            HandleGopStart(pkt);
+            HandleGopStart(pkt, true);
             seen_gop = true;
             pkt->flags |= PKT_FLAG_KEY;
         }
@@ -2680,7 +2686,7 @@ void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             }
         }
 
-        HandleGopStart(pkt);
+        HandleGopStart(pkt, false);
         pkt->flags |= PKT_FLAG_KEY;
     }
 }
@@ -3373,9 +3379,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (ringBuffer->isDVD() &&
                 ringBuffer->DVD()->InStillFrame())
             {
-                mpeg_seq_end_seen = false;
-                decodeStillFrame = false;
-                ringBuffer->DVD()->InStillFrame(false);
+                AVStream *curstream = ic->streams[pkt->stream_index];
+                if (curstream && 
+                    curstream->codec->codec_type == CODEC_TYPE_VIDEO)
+                {
+                    mpeg_seq_end_seen = false;
+                    decodeStillFrame = false;
+                    ringBuffer->DVD()->InStillFrame(false);
+                }
             }
 
             if (waitingForChange && pkt->pos >= readAdjust)
@@ -3418,7 +3429,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
             bool inDVDStill = ringBuffer->DVD()->InStillFrame();
 
-            VERBOSE(VB_PLAYBACK+VB_EXTRA, 
+            VERBOSE(VB_PLAYBACK+VB_EXTRA,
                 QString("DVD Playback Debugging: mpeg seq end %1 "
                 " inDVDStill %2 decodeStillFrame %3")
                 .arg(mpeg_seq_end_seen).arg(inDVDStill).arg(decodeStillFrame));
@@ -3461,10 +3472,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             .arg(video_width).arg(current_width)
                             .arg(dvd_video_codec_changed));
                     av_free_packet(pkt);
-                    CloseCodecs();
-                    ScanStreams(false);
-                    allowedquit = true;
-                    dvd_video_codec_changed = false;
+                    if (current_width > 0) {
+                        CloseCodecs();
+                        ScanStreams(false);
+                        allowedquit = true;
+                        dvd_video_codec_changed = false;
+                    }
                     continue;
                 }
             }
@@ -3497,7 +3510,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 if (pkt->flags & PKT_FLAG_KEY)
                 {
-                    HandleGopStart(pkt);
+                    HandleGopStart(pkt, false);
                     seen_gop = true;
                 }
                 else
@@ -3505,7 +3518,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     seq_count++;
                     if (!seen_gop && seq_count > 1)
                     {
-                        HandleGopStart(pkt);
+                        HandleGopStart(pkt, false);
                     }
                 }
             }
@@ -3638,6 +3651,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         (allow_dts_passthru && !transcoding &&
                          (curstream->codec->codec_id == CODEC_ID_DTS));
                     bool using_passthru = do_ac3_passthru || do_dts_passthru;
+
+                    /// XXX HACK: set sample format to signed 16 bit
+                    if (curstream->codec->codec_id == CODEC_ID_TRUEHD)
+                        curstream->codec->sample_fmt = SAMPLE_FMT_S16;
 
                     // detect channels on streams that need
                     // to be decoded before we can know this
@@ -4056,6 +4073,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         subtitle.start_display_time += pts;
                         subtitle.end_display_time += pts;
                         GetNVP()->AddAVSubtitle(subtitle);
+
+                        VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
+                                QString("subtl timecode %1 %2 %3 %4")
+                                .arg(pkt->pts).arg(pkt->dts)
+                                .arg(subtitle.start_display_time)
+                                .arg(subtitle.end_display_time));
                     }
 
                     break;

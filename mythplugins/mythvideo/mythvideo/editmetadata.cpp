@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include <QImageReader>
+#include <QUrl>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdirs.h>
@@ -13,6 +14,8 @@
 #include <mythtv/libmythui/mythuibutton.h>
 #include <mythtv/libmythui/mythuicheckbox.h>
 #include <mythtv/libmythui/mythuispinbox.h>
+#include <mythtv/libmyth/mythuifilebrowser.h>
+#include <mythtv/libmyth/remoteutil.h>
 
 #include "globals.h"
 #include "dbaccess.h"
@@ -90,12 +93,12 @@ bool EditMetadataDialog::Create()
     UIUtilW::Assign(this, m_ratingEdit, "rating_edit");
     UIUtilW::Assign(this, m_directorEdit, "director_edit");
     UIUtilW::Assign(this, m_inetrefEdit, "inetref_edit");
-    UIUtilW::Assign(this, m_plotEdit, "plot_edit");
+    UIUtilW::Assign(this, m_plotEdit, "description_edit");
     UIUtilW::Assign(this, m_yearSpin, "year_spin");
     UIUtilW::Assign(this, m_userRatingSpin, "userrating_spin");
     UIUtilW::Assign(this, m_lengthSpin, "length_spin");
 
-    UIUtilW::Assign(this, m_coverart, "coverimage");
+    UIUtilW::Assign(this, m_coverart, "coverart");
     UIUtilW::Assign(this, m_screenshot, "screenshot");
     UIUtilW::Assign(this, m_banner, "banner");
     UIUtilW::Assign(this, m_fanart, "fanart");
@@ -175,7 +178,12 @@ namespace
     void FindImagePopup(const QString &prefix, const QString &prefixAlt,
             QObject &inst, const QString &returnEvent)
     {
-        QString fp = prefix.isEmpty() ? prefixAlt : prefix;
+        QString fp;
+
+        if (prefix.startsWith("myth://"))
+            fp = prefix;
+        else
+            fp = prefix.isEmpty() ? prefixAlt : prefix;
 
         MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
@@ -194,8 +202,13 @@ namespace
     void FindVideoFilePopup(const QString &prefix, const QString &prefixAlt,
             QObject &inst, const QString &returnEvent)
     {
-        QString fp = prefix.isEmpty() ? prefixAlt : prefix;
-    
+        QString fp;
+
+        if (prefix.startsWith("myth://"))
+            fp = prefix;
+        else
+            fp = prefix.isEmpty() ? prefixAlt : prefix;
+
         MythScreenStack *popupStack =
                 GetMythMainWindow()->GetStack("popup stack");
         QStringList exts;
@@ -324,7 +337,9 @@ void EditMetadataDialog::fillWidgets()
                     target_name.left((int)(length_compare * 0.75));
 
             if (caught_name_three_quarters == target_name_three_quarters &&
-                m_workingMetadata->GetChildID() == -1)
+                m_workingMetadata->GetChildID() == -1 &&
+                !(m_workingMetadata->GetSeason() > 0) &&
+                !(m_workingMetadata->GetEpisode() > 0))
             {
                 possible_starting_point = p->first;
                 m_workingMetadata->SetChildID(possible_starting_point);
@@ -385,7 +400,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetCoverFile().isEmpty() &&
             !m_workingMetadata->GetCoverFile().startsWith("/"))
         {
-            m_coverart->SetFilename(GenRemoteFileURL("Coverart",
+            m_coverart->SetFilename(RemoteGenFileURL("Coverart",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetCoverFile()));
         }
@@ -401,7 +416,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetScreenshot().isEmpty() &&
             !m_workingMetadata->GetScreenshot().startsWith("/"))
         {
-            m_screenshot->SetFilename(GenRemoteFileURL("Screenshots",
+            m_screenshot->SetFilename(RemoteGenFileURL("Screenshots",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetScreenshot()));
         }
@@ -417,7 +432,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetBanner().isEmpty() &&
             !m_workingMetadata->GetBanner().startsWith("/"))
         {
-            m_banner->SetFilename(GenRemoteFileURL("Banners",
+            m_banner->SetFilename(RemoteGenFileURL("Banners",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetBanner()));
         }
@@ -433,7 +448,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetFanart().isEmpty() &&
             !m_workingMetadata->GetFanart().startsWith("/"))
         {
-            m_fanart->SetFilename(GenRemoteFileURL("Fanart", 
+            m_fanart->SetFilename(RemoteGenFileURL("Fanart", 
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetFanart()));
         }
@@ -570,9 +585,18 @@ void EditMetadataDialog::ToggleWatched()
 
 void EditMetadataDialog::FindCoverArt()
 {
-    FindImagePopup(gContext->GetSetting("VideoArtworkDir"),
-            GetConfDir() + "/MythVideo",
-            *this, CEID_COVERARTFILE);
+    if (!m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = RemoteGenFileURL("Coverart",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,"",
+                       *this, CEID_COVERARTFILE);
+    }
+    else
+        FindImagePopup(gContext->GetSetting("VideoArtworkDir"),
+                GetConfDir() + "/MythVideo",
+                *this, CEID_COVERARTFILE);
 }
 
 void EditMetadataDialog::SetCoverArt(QString file)
@@ -580,15 +604,35 @@ void EditMetadataDialog::SetCoverArt(QString file)
     if (file.isEmpty())
         return;
 
-    m_workingMetadata->SetCoverFile(file);
+    if (file.startsWith("myth://"))
+    {
+        QUrl url(file);
+        file = url.path();
+        file = file.right(file.length() - 1);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetCoverFile(file);
+        else
+            m_workingMetadata->SetCoverFile(QString());
+    }
+    else
+        m_workingMetadata->SetCoverFile(file);
     CheckedSet(m_coverartText, file);
 }
 
 void EditMetadataDialog::FindBanner()
 {
-    FindImagePopup(gContext->GetSetting("mythvideo.bannerDir"),
-            GetConfDir() + "/MythVideo/Banners",
-            *this, CEID_BANNERFILE);
+    if (!m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = RemoteGenFileURL("Banners",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,"",
+                *this, CEID_BANNERFILE);
+    }
+    else
+        FindImagePopup(gContext->GetSetting("mythvideo.bannerDir"),
+                GetConfDir() + "/MythVideo/Banners",
+                *this, CEID_BANNERFILE);
 }
 
 void EditMetadataDialog::SetBanner(QString file)
@@ -596,15 +640,35 @@ void EditMetadataDialog::SetBanner(QString file)
     if (file.isEmpty())
         return;
 
-    m_workingMetadata->SetBanner(file);
+    if (file.startsWith("myth://"))
+    {
+        QUrl url(file);
+        file = url.path();
+        file = file.right(file.length() - 1);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetBanner(file);
+        else
+            m_workingMetadata->SetBanner(QString());
+    }
+    else
+        m_workingMetadata->SetBanner(file);
     CheckedSet(m_bannerText, file);
 }
 
 void EditMetadataDialog::FindFanart()
 {
-    FindImagePopup(gContext->GetSetting("mythvideo.fanartDir"),
-            GetConfDir() + "/MythVideo/Fanart",
-            *this, CEID_FANARTFILE);
+    if (!m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = RemoteGenFileURL("Fanart",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,"",
+                *this, CEID_FANARTFILE);
+    }
+    else
+        FindImagePopup(gContext->GetSetting("mythvideo.fanartDir"),
+                GetConfDir() + "/MythVideo/Fanart",
+                *this, CEID_FANARTFILE);
 }
 
 void EditMetadataDialog::SetFanart(QString file)
@@ -612,15 +676,35 @@ void EditMetadataDialog::SetFanart(QString file)
     if (file.isEmpty())
         return;
 
-    m_workingMetadata->SetFanart(file);
+    if (file.startsWith("myth://"))
+    {
+        QUrl url(file);
+        file = url.path();
+        file = file.right(file.length() - 1);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetFanart(file);
+        else
+            m_workingMetadata->SetFanart(QString());
+    }
+    else
+        m_workingMetadata->SetFanart(file);
     CheckedSet(m_fanartText, file);
 }
 
 void EditMetadataDialog::FindScreenshot()
 {
-    FindImagePopup(gContext->GetSetting("mythvideo.screenshotDir"),
-            GetConfDir() + "/MythVideo/Screenshots",
-            *this, CEID_SCREENSHOTFILE);
+    if (!m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = RemoteGenFileURL("Screenshots",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindImagePopup(url,"",
+                *this, CEID_SCREENSHOTFILE);
+    }
+    else
+        FindImagePopup(gContext->GetSetting("mythvideo.screenshotDir"),
+                GetConfDir() + "/MythVideo/Screenshots",
+                *this, CEID_SCREENSHOTFILE);
 }
 
 void EditMetadataDialog::SetScreenshot(QString file)
@@ -628,15 +712,35 @@ void EditMetadataDialog::SetScreenshot(QString file)
     if (file.isEmpty())
         return;
 
-    m_workingMetadata->SetScreenshot(file);
+    if (file.startsWith("myth://"))
+    {
+        QUrl url(file);
+        file = url.path();
+        file = file.right(file.length() - 1);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetScreenshot(file);
+        else
+            m_workingMetadata->SetScreenshot(QString());
+    }
+    else
+        m_workingMetadata->SetScreenshot(file);
     CheckedSet(m_screenshotText, file);
 }
 
 void EditMetadataDialog::FindTrailer()
 {
-    FindVideoFilePopup(gContext->GetSetting("mythvideo.TrailersDir"),
-            GetConfDir() + "/MythVideo/Trailers",
-            *this, CEID_TRAILERFILE);
+    if (!m_workingMetadata->GetHost().isEmpty())
+    {
+        QString url = RemoteGenFileURL("Trailers",
+                      m_workingMetadata->GetHost(),
+                      "");
+        FindVideoFilePopup(url,"",
+                *this, CEID_TRAILERFILE);
+    }
+    else
+        FindVideoFilePopup(gContext->GetSetting("mythvideo.TrailersDir"),
+                GetConfDir() + "/MythVideo/Trailers",
+                *this, CEID_TRAILERFILE);
 }
     
 void EditMetadataDialog::SetTrailer(QString file)
@@ -644,7 +748,18 @@ void EditMetadataDialog::SetTrailer(QString file)
     if (file.isEmpty())
         return;
     
-    m_workingMetadata->SetTrailer(file);
+    if (file.startsWith("myth://"))
+    {
+        QUrl url(file);
+        file = url.path();
+        file = file.right(file.length() - 1);
+        if (!file.endsWith("/"))
+            m_workingMetadata->SetTrailer(file);
+        else
+            m_workingMetadata->SetTrailer(QString());
+    }
+    else
+        m_workingMetadata->SetTrailer(file);
     CheckedSet(m_trailerText, file);
 }
 

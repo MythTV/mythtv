@@ -201,6 +201,13 @@ QString HTTPRequest::BuildHeader( long long nSize )
 
     sHeader += GetAdditionalHeaders();
 
+    sHeader += QString( "Connection: %1\r\n"
+                        "Content-Type: %2\r\n"
+                        "Content-Length: %3\r\n" )
+                        .arg( GetKeepAlive() ? "Keep-Alive" : "Close" )
+                        .arg( sContentType )
+                        .arg( nSize );
+
     // ----------------------------------------------------------------------
     // Temp Hack to process DLNA header
                              
@@ -212,14 +219,6 @@ QString HTTPRequest::BuildHeader( long long nSize )
 
     // ----------------------------------------------------------------------
 
-
-
-    sHeader += QString( "Connection: %1\r\n"
-                        "Content-Type: %2\r\n"
-                        "Content-Length: %3\r\n" )
-                        .arg( GetKeepAlive() ? "Keep-Alive" : "Close" )
-                        .arg( sContentType )
-                        .arg( nSize );
     sHeader += "\r\n";
 
     return sHeader;

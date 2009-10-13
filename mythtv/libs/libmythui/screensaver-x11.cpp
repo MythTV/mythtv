@@ -1,14 +1,21 @@
+
+// Own header
+#include "screensaver-x11.h"
+
+// QT headers
 #include <QDateTime>
 #include <QTimer>
 #include <QX11Info>
 
-#include "mythsystem.h"
+// Mythdb headers
 #include "mythverbose.h"
 #include "mythdb.h"
 
-#include "screensaver-x11.h"
+// Mythui headers
+#include "mythsystem.h"
 #include "mythxdisplay.h"
 
+// X11 headers
 #include <X11/Xlib.h>
 
 extern "C" {
@@ -27,7 +34,7 @@ class ScreenSaverX11Private
     ScreenSaverX11Private(ScreenSaverX11 *outer) :
         m_dpmsaware(false),           m_dpmsdeactivated(false),
         m_xscreensaverRunning(false), m_gscreensaverRunning(false),
-        m_dpmsenabled(FALSE),
+        m_dpmsenabled(false),
         m_timeoutInterval(-1),        m_resetTimer(NULL),
         m_display(NULL)
     {

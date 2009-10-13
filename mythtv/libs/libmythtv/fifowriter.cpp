@@ -158,7 +158,7 @@ void FIFOWriter::FIFOWriteThread(void)
                 if (ret < 0)
                 {
                     VERBOSE(VB_IMPORTANT, QString("FIFOW: write failed with %1")
-                            .arg(strerror(ret)));
+                            .arg(strerror(errno)));
                     ///FIXME: proper error propagation
                     break;
                 }

@@ -4,38 +4,29 @@
   <window name="backgroundwindow">
     <imagetype name="backimg">
       <filename>ui/background.png</filename>
-      <staticsize>-1,-1</staticsize>
     </imagetype>
 
     <font name="small" face="Trebuchet MS">
       <color>#FFFFFF</color>
-      <size>14</size>
-      <size:small>12</size:small>
-      <size:big>16</size:big>
+      <pixelsize>19</pixelsize>
       <bold>yes</bold>
     </font>
 
     <font name="medium" face="Trebuchet MS">
       <color>#FFFFFF</color>
-      <size>16</size>
-      <size:small>14</size:small>
-      <size:big>20</size:big>
+      <pixelsize>22</pixelsize>
       <bold>yes</bold>
     </font>
 
     <font name="large" face="Trebuchet MS">
       <color>#FFFFFF</color>
-      <size>20</size>
-      <size:small>18</size:small>
-      <size:big>22</size:big>
+      <pixelsize>28</pixelsize>
       <bold>yes</bold>
     </font>
 
     <font name="clock" face="Trebuchet MS">
          <color>#FFFFFF</color>
-         <size>18</size>
-         <size:small>14</size:small>
-         <size:big>22</size:big>
+         <pixelsize>25</pixelsize>
          <bold>yes</bold>
     </font>
 

@@ -1,3 +1,7 @@
+
+// Own header
+#include "mythvirtualkeyboard.h"
+
 // c++
 #include <iostream>
 
@@ -14,7 +18,6 @@
 #include "mythuibutton.h"
 #include "mythuitextedit.h"
 
-#include "mythvirtualkeyboard.h"
 
 #define LOC      QString("MythUIVirtualKeyboard: ")
 #define LOC_WARN QString("MythUIVirtualKeyboard, Warning: ")

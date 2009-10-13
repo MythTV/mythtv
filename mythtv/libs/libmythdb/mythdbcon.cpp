@@ -1,9 +1,17 @@
-#include "unistd.h"
-#include "stdlib.h"
+// ANSI C
+#include <cstdlib>
 
+// POSIX
+#include "unistd.h"
+
+// Qt
 #include <QVector>
 #include <QSqlDriver>
+#include <QSemaphore>
+#include <QSqlError>
+#include <QSqlField>
 
+// MythTV
 #include "compat.h"
 #include "mythdbcon.h"
 #include "mythdb.h"
@@ -328,7 +336,9 @@ MSqlQuery::MSqlQuery(const MSqlQueryInfo &qi)
 
     m_isConnected = m_db && m_db->isOpen();
 
+#ifdef DEBUG_QT4_PORT
     m_testbindings = QRegExp("(:\\w+)\\W.*\\1\\b");
+#endif
 }
 
 MSqlQuery::~MSqlQuery()
@@ -451,6 +461,7 @@ bool MSqlQuery::prepare(const QString& query)
     QMutexLocker lock(&prepareLock);
 
     m_last_prepared_query = query;
+#ifdef DEBUG_QT4_PORT
     if (query.contains(m_testbindings))
     {
         VERBOSE(VB_IMPORTANT,
@@ -458,7 +469,15 @@ bool MSqlQuery::prepare(const QString& query)
                 .arg(m_testbindings.cap(1)) + query);
         //exit(1);
     }
-    return QSqlQuery::prepare(query);
+#endif
+    bool ok = QSqlQuery::prepare(query);
+    if (!ok && !(GetMythDB()->SuppressDBMessages()))
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error preparing query: %1").arg(query));
+        VERBOSE(VB_IMPORTANT, MythDB::DBErrorMessage(QSqlQuery::lastError()));
+    }
+
+    return ok;
 }
 
 bool MSqlQuery::testDBConnection()
@@ -476,6 +495,7 @@ bool MSqlQuery::testDBConnection()
 void MSqlQuery::bindValue (const QString  & placeholder,
                            const QVariant & val, QSql::ParamType paramType)
 {
+#ifdef DEBUG_QT4_PORT
     // XXX - HACK BEGIN
     QMutexLocker lock(&prepareLock);
 
@@ -488,6 +508,7 @@ void MSqlQuery::bindValue (const QString  & placeholder,
         return;
     }
     // XXX - HACK END
+#endif
 
     if (val.type() == QVariant::String && val.isNull())
     {

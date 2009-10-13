@@ -98,7 +98,7 @@ class MPUBLIC MythMainWindow : public QWidget
 
     void StartLIRC(void);
 
-    /* compatability functions, to go away once everything's mythui */
+    /* compatibility functions, to go away once everything's mythui */
     void attach(QWidget *child);
     void detach(QWidget *child);
 

@@ -2,7 +2,7 @@
 using namespace std;
 
 #include <QString>
-//#include <QSqlError>
+#include <QSqlError>
 
 #include "dbcheck.h"
 #include "datadirect.h"          // for DataDirectProcessor::FixProgramIDs
@@ -406,7 +406,8 @@ static bool performActualUpdate(
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    VERBOSE(VB_IMPORTANT, QString("Upgrading to schema version ") + version);
+    VERBOSE(VB_IMPORTANT, QString("Upgrading to MythTV schema version ") +
+            version);
 
     int counter = 0;
     const char *thequery = updates[counter];
@@ -456,12 +457,14 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     SchemaUpgradeWizard  * DBup;
 
 
+    GetMythDB()->SetSuppressDBMessages(true);
     gContext->ActivateSettingsCache(false);
 
     if (!gContext->GetNumSetting("MythFillFixProgramIDsHasRunOnce", 0))
         DataDirectProcessor::FixProgramIDs();
 
-    DBup = SchemaUpgradeWizard::Get("DBSchemaVer", currentDatabaseVersion);
+    DBup = SchemaUpgradeWizard::Get("DBSchemaVer", "MythTV",
+                                    currentDatabaseVersion);
 
     // There may be a race condition where another program (e.g. mythbackend)
     // is upgrading, so wait up to 5 seconds for a more accurate version:
@@ -470,6 +473,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     if (DBup->versionsBehind == 0)  // same schema
     {
         gContext->ActivateSettingsCache(true);
+        GetMythDB()->SetSuppressDBMessages(false);
         return true;
     }
 
@@ -487,9 +491,11 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     {
         case MYTH_SCHEMA_USE_EXISTING:
             gContext->ActivateSettingsCache(true);
+            GetMythDB()->SetSuppressDBMessages(false);
             return true;
         case MYTH_SCHEMA_ERROR:
         case MYTH_SCHEMA_EXIT:
+            GetMythDB()->SetSuppressDBMessages(false);
             return false;
         case MYTH_SCHEMA_UPGRADE:
             break;
@@ -502,10 +508,14 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
         MythDB::DBError("UpgradeTVDatabaseSchema -- alter charset", query);
 
 
-    VERBOSE(VB_IMPORTANT, "Newest Schema Version : " + currentDatabaseVersion);
+    VERBOSE(VB_IMPORTANT, "Newest MythTV Schema Version : "+
+            currentDatabaseVersion);
 
     if (!DBUtil::lockSchema(query))
+    {
+        GetMythDB()->SetSuppressDBMessages(false);
         return false;
+    }
 
     bool ret = doUpgradeTVDatabaseSchema();
 
@@ -517,6 +527,7 @@ bool UpgradeTVDatabaseSchema(const bool upgradeAllowed,
     DBUtil::unlockSchema(query);
     gContext->ActivateSettingsCache(true);
 
+    GetMythDB()->SetSuppressDBMessages(false);
     return ret;
 }
 
@@ -2998,7 +3009,7 @@ NULL
 
     if (dbver == "1181")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to schema version 1182");
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1182");
 
         MSqlQuery airdates(MSqlQuery::InitCon());
         airdates.prepare("SELECT chanid, starttime FROM recordedprogram "
@@ -3067,7 +3078,7 @@ NULL
 
     if (dbver == "1185")
     {
-        VERBOSE(VB_IMPORTANT, "Upgrading to schema version 1186");
+        VERBOSE(VB_IMPORTANT, "Upgrading to MythTV schema version 1186");
 
         MSqlQuery ppuq(MSqlQuery::InitCon());
 
@@ -3591,9 +3602,9 @@ NULL
         MSqlQuery query(MSqlQuery::InitCon());
         int tableIndex      = 0;
         QString tables[][3] = {
-            { "people",  // table name
-              "name",    // columns to convert, colon-separated
-              "name"},   // columns for test index, comma-separated
+            { "people",    // table name
+              "name",      // columns to convert, colon-separated
+              "name(41)"}, // columns for test index, comma-separated
             { "oldprogram",
               "oldtitle",
               "oldtitle"},
@@ -3672,7 +3683,7 @@ NULL
                                           .arg(table).arg(warnings);
                     VERBOSE(VB_IMPORTANT, msg);
                     VERBOSE(VB_IMPORTANT, "Your database must be fixed before "
-                            "you can upgrade beyond 0.21-fixes. Please see"
+                            "you can upgrade beyond 0.21-fixes. Please see "
                             "http://www.mythtv.org/wiki/index.php/"
                             "Fixing_Corrupt_Database_Encoding for information "
                             "on fixing your database.");
@@ -3957,8 +3968,8 @@ NULL
             VERBOSE(VB_IMPORTANT, "DB charset conversions update failed! "
                     "Your database seems to be partially corrupted. Please "
                     "move the backup to a safe place. Your database must be "
-                    "fixed before you can upgrade beyond 0.21-fixes. Please see"
-                    "http://www.mythtv.org/wiki/index.php/Fixing_Corrupt_"
+                    "fixed before you can upgrade beyond 0.21-fixes. Please "
+                    "see http://www.mythtv.org/wiki/index.php/Fixing_Corrupt_"
                     "Database_Encoding for information.");
             return false;
         }
@@ -4267,8 +4278,8 @@ NULL
             VERBOSE(VB_IMPORTANT, "DB charset conversions update failed! "
                     "Your database seems to be partially corrupted. Please "
                     "move the backup to a safe place. Your database must be "
-                    "fixed before you can upgrade beyond 0.21-fixes. Please see"
-                    "http://www.mythtv.org/wiki/index.php/Fixing_Corrupt_"
+                    "fixed before you can upgrade beyond 0.21-fixes. Please "
+                    "see http://www.mythtv.org/wiki/index.php/Fixing_Corrupt_"
                     "Database_Encoding for information.");
             return false;
         }

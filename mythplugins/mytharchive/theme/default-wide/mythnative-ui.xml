@@ -77,12 +77,12 @@ MythTV Archive GUI theme
             <value>No files are selected for archive</value>
         </textarea>
 
-        <button name="addrecording_button" from="basebutton">
-            <position>250,290</position>
+        <button name="addrecording_button" from="basewidebutton">
+            <position>250,300</position>
         </button>
 
-        <button name="addvideo_button" from="basebutton">
-            <position>800,290</position>
+        <button name="addvideo_button" from="basewidebutton">
+            <position>800,300</position>
         </button>
 
         <shape name="bottombackground" from="basebackground">
@@ -112,7 +112,6 @@ MythTV Archive GUI theme
         </textarea>
 
         <textarea name="filesize" from="basetextarea">
-            <context>2</context>
             <area>1010,555,100,40</area>
             <font>detail</font>
             <align>right</align>

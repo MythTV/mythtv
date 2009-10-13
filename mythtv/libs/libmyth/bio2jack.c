@@ -340,7 +340,7 @@ void sample_silence_dS (sample_t *dst, unsigned long nsamples)
 /******************************************************************
  *    JACK_callback
  *
- * everytime the jack server wants something from us it calls this
+ * every time the jack server wants something from us it calls this
  * function, so we either deliver it some sound to play or deliver it nothing
  * to play
  */

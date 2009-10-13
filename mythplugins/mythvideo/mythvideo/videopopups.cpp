@@ -59,18 +59,18 @@ PlotDialog::PlotDialog(MythScreenStack *lparent, Metadata *metadata) :
 
 bool PlotDialog::Create()
 {
-    if (!LoadWindowFromXML("video-ui.xml", "plotpopup", this))
+    if (!LoadWindowFromXML("video-ui.xml", "descriptionpopup", this))
         return false;
 
     MythUIText   *plotText = NULL;
     MythUIButton *okButton = NULL;
 
     bool err = false;
-    UIUtilE::Assign(this, plotText, "plot", &err);
+    UIUtilE::Assign(this, plotText, "description", &err);
 
     if (err)
     {
-        VERBOSE(VB_IMPORTANT, "Cannot load screen 'plotpopup'");
+        VERBOSE(VB_IMPORTANT, "Cannot load screen 'descriptionpopup'");
         return false;
     }
 

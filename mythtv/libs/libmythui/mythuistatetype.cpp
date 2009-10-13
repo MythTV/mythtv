@@ -1,8 +1,11 @@
+
+// Own header
+#include "mythuistatetype.h"
+
 // Qt headers
 #include <QDomDocument>
 
 // MythUI headers
-#include "mythuistatetype.h"
 #include "mythuiimage.h"
 #include "mythuigroup.h"
 #include "mythpainter.h"
@@ -21,19 +24,21 @@ MythUIStateType::~MythUIStateType()
 
 bool MythUIStateType::AddImage(const QString &name, MythImage *image)
 {
-    QString key = name;
+    QString key = name.toLower();
     if (m_ObjectsByName.contains(key) || !image)
         return false;
 
-    MythUIImage *imType = new MythUIImage(this, key);
+    // Uses name, not key which is lower case otherwise we break
+    // inheritance
+    MythUIImage *imType = new MythUIImage(this, name);
     imType->SetImage(image);
 
-    return AddObject(name, imType);
+    return AddObject(key, imType);
 }
 
 bool MythUIStateType::AddObject(const QString &name, MythUIType *object)
 {
-    QString key = name;
+    QString key = name.toLower();
     if (m_ObjectsByName.contains(key) || !object)
         return false;
 
@@ -99,8 +104,8 @@ bool MythUIStateType::DisplayState(const QString &name)
         return false;
 
     MythUIType *old = m_CurrentState;
-
-    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name);
+    
+    QMap<QString, MythUIType *>::Iterator i = m_ObjectsByName.find(name.toLower());
     if (i != m_ObjectsByName.end())
         m_CurrentState = i.value();
     else
@@ -108,9 +113,9 @@ bool MythUIStateType::DisplayState(const QString &name)
 
     if (m_CurrentState != old)
     {
-        if (m_ShowEmpty || m_CurrentState != NULL)
+        if (m_ShowEmpty || m_CurrentState)
         {
-            if (m_deferload)
+            if (m_deferload && m_CurrentState)
                 m_CurrentState->LoadNow();
 
             if (old)
@@ -135,15 +140,15 @@ bool MythUIStateType::DisplayState(StateType type)
 
     if (m_CurrentState != old)
     {
-        if (m_ShowEmpty || m_CurrentState != NULL)
+        if (m_ShowEmpty || m_CurrentState)
         {
-            if (m_deferload)
+            if (m_deferload && m_CurrentState)
                 m_CurrentState->LoadNow();
 
-            if (m_CurrentState)
-                m_CurrentState->SetVisible(true);
             if (old)
                 old->SetVisible(false);
+            if (m_CurrentState)
+                m_CurrentState->SetVisible(true);
         }
     }
 
@@ -152,8 +157,9 @@ bool MythUIStateType::DisplayState(StateType type)
 
 MythUIType *MythUIStateType::GetState(const QString &name)
 {
-    if (m_ObjectsByName.contains(name))
-        return m_ObjectsByName[name];
+    QString lcname = name.toLower();
+    if (m_ObjectsByName.contains(lcname))
+        return m_ObjectsByName[lcname];
 
     return NULL;
 }
@@ -192,9 +198,15 @@ void MythUIStateType::Clear()
 
 void MythUIStateType::Reset()
 {
-    if (m_CurrentState)
-        m_CurrentState->SetVisible(false);
-    m_CurrentState = NULL;
+    if (!DisplayState("default"))
+    {
+        if (!DisplayState(None))
+        {
+            if (m_CurrentState)
+                m_CurrentState->SetVisible(false);
+            m_CurrentState = NULL;
+        }
+    }
     MythUIType::Reset();
 }
 
@@ -285,6 +297,8 @@ void MythUIStateType::CreateCopy(MythUIType *parent)
 
 void MythUIStateType::Finalize(void)
 {
+    if (!DisplayState("default"))
+        DisplayState(None);
 }
 
 void MythUIStateType::EnsureStateLoaded(const QString &name)

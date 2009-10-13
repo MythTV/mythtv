@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <mythmenu name="SETUP">
 
     <button>
@@ -6,24 +7,23 @@
         <text lang="IT">Generale</text>
         <text lang="ES">General</text>
         <text lang="CA">General</text>
-        <text lang="FR">Général</text>
         <text lang="DE">Grundeinstellungen</text>
         <text lang="DA">Generelt</text>
         <text lang="IS">Almennt</text>
         <text lang="NL">Algemeen</text>
         <text lang="PT">Configurações Gerais</text>
-        <text lang="SV">Generellt</text>
+        <text lang="SV">Allmänt</text>
         <text lang="JA">全般</text>
         <text lang="FI">Yleiset</text>
         <text lang="ZH_TW">一般設定</text>
         <text lang="SL">Splošno</text>
         <text lang="ET">Üldine</text>
-        <text lang="NB">Generelt</text>
-        <text lang="CS">Obecné</text>
         <text lang="RU">Общие</text>
         <text lang="PL">Ogólne</text>
         <text lang="HE">כללי</text>
+        <text lang="HU">Általános</text>
         <description>Core MythTV behavior and system settings</description>
+        <description lang="DE">MythTV- und Systemeinstellungen</description>
         <action>SETTINGS MAINGENERAL</action>
     </button>
 
@@ -33,7 +33,6 @@
         <text lang="IT">Aspetto</text>
         <text lang="ES">Aspecto</text>
         <text lang="CA">Aspecte</text>
-        <text lang="FR">Apparence</text>
         <text lang="DE">Erscheinungsbild</text>
         <text lang="DA">Udseende</text>
         <text lang="IS">Útlit</text>
@@ -45,24 +44,24 @@
         <text lang="ZH_TW">外觀設定</text>
         <text lang="SL">Vzgled</text>
         <text lang="ET">Kujundus</text>
-        <text lang="NB">Utseende</text>
-        <text lang="CS">Vzhled</text>
         <text lang="RU">Внешний вид</text>
         <text lang="PL">Ustaw wyglądy</text>
         <text lang="HE">מראה</text>
+        <text lang="HU">Megjelenés</text>
         <description>pick the theme, font, size, and locale</description>
+        <description lang="DE">GUI-Thema oder Zeichensatzgrößen wählen</description>
         <action>SETTINGS APPEARANCE</action>
     </button>
 
     <button>
         <type>SCREENSETUPWIZARD</type>
         <text>Screen Setup Wizards</text>
-        <text lang="FR">Assistants de configuration d&apos;écran</text>
         <text lang="HE">אשף הגדרות מסך</text>
         <text lang="FI">Kuvavelho</text>
-        <text lang="NB">Skjerm</text>
         <text lang="DE">Bildschirm einrichten</text>
+        <text lang="HU">épernyő beállítás varázsló</text>
         <description>Compensate for TVs with overscan</description>
+        <description lang="DE">Passen Sie das Bild an Ihren Fernseher an</description>
         <action>SCREENSETUPWIZARD</action>
     </button>
 
@@ -75,21 +74,20 @@
         <text lang="NL">TV Instellingen</text>
         <text lang="CA">Configuració de TV</text>
         <text lang="ES">Configuración de TV</text>
-        <text lang="FR">Réglages TV</text>
         <text lang="IS">Stillingar sjónvarps</text>
         <text lang="JA">TV設定</text>
         <text lang="FI">TV:n Asetukset</text>
         <text lang="ZH_TW">電視設定</text>
         <text lang="SL">TV nastavitve</text>
         <text lang="ET">TV sätted</text>
-        <text lang="NB">TV</text>
         <text lang="DA">TV Indstillinger</text>
         <text lang="PT">Configurar Televisão</text>
-        <text lang="CS">Nastavení televize</text>
         <text lang="RU">Настройки ТВ</text>
         <text lang="PL">Telewizja</text>
         <text lang="HE">הגדרות טלויזיה</text>
+        <text lang="HU">TV beállítások</text>
         <description>Settings for TV recording and playback</description>
+        <description lang="DE">Einstellungen für TV-Aufnahme und -Wiedergabe</description>
         <action>MENU tv_settings.xml</action>
     </button>
 
@@ -101,22 +99,21 @@
         <text lang="DE">Medien</text>
         <text lang="SV">Media</text>
         <text lang="NL">Media Instellingen</text>
-        <text lang="FR">Réglages Media</text>
         <text lang="IS">Stillingar margmiðlunar</text>
         <text lang="JA">メディア設定</text>
         <text lang="FI">Media</text>
         <text lang="ZH_TW">媒體設定</text>
         <text lang="SL">Media nastavitve</text>
         <text lang="ET">Andmekandja sätted</text>
-        <text lang="NB">Media</text>
         <text lang="DA">Medier Indstillinger</text>
         <text lang="ES">Configurar Medios</text>
         <text lang="PT">Configurar Multimédia</text>
-        <text lang="CS">Nastavení multimédií</text>
         <text lang="RU">Настройки мультимедиа</text>
         <text lang="PL">Konfiguracja Media</text>
         <text lang="HE">הגדרות מדיה</text>
+        <text lang="HU">Média beállítások</text>
         <description>Settings for all non-TV media</description>
+        <description lang="DE">Einstellungen für alle anderen Medien</description>
         <action>MENU media_settings.xml</action>
         <depends>mythvideo mythmusic mythgallery mythfm mythgame mythburn mytharchive</depends>
     </button>
@@ -127,7 +124,6 @@
         <text lang="IT">Impostazioni Centro Informazioni</text>
         <text lang="DE">Informationen</text>
         <text lang="NL">Informatiecentrale</text>   
-        <text lang="FR">Réglages Center d&apos;info</text>
         <text lang="IS">Stillingar upplýsinga- miðstöðvar</text>
         <text lang="SV">Informationscenter</text>
         <text lang="JA">インフォセンター設定</text>
@@ -135,17 +131,17 @@
         <text lang="ZH_TW">資訊中心設定</text>
         <text lang="SL">Nastavitve info centra</text>
         <text lang="ET">Infokeskuse sätted</text>
-        <text lang="NB">Informasjonssenter</text>
         <text lang="DA">Informationscenter</text>
         <text lang="ES">Centro Información</text>
         <text lang="EN_GB">Info Centre Settings</text>
         <text lang="PT">Config. Centro de Info.</text>
-        <text lang="CS">Nastavení informačního centra</text>
         <text lang="RU">Настройки инфоцентра</text>
         <text lang="PL">Centrum informacyjne</text>
         <text lang="HE">הגדרות מרכז מידע</text>
+        <text lang="HU">Info központ beállítások</text>
         <alttext lang="DE">Infocenter</alttext>
         <description>Configure weather, news, movie info, web, and recipes</description>
+        <description lang="DE">Einstellungen der Plugins (Wetter, Nachrichten etc)</description>
         <action>MENU info_settings.xml</action>
         <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends>
     </button>
@@ -157,7 +153,6 @@
         <text lang="PT">Configurar Xbox</text>
         <text lang="CA">Configurar Xbox</text>
         <text lang="ES">Configurar Xbox</text>
-        <text lang="FR">Réglages Xbox</text>
         <text lang="DE">Xbox</text>
         <text lang="IS">Stillingar Xbox</text>
         <text lang="NL">Xbox Instellingen</text>
@@ -167,12 +162,11 @@
         <text lang="ZH_TW">Xbox設定</text>
         <text lang="SL">Xbox nastavitve</text>
         <text lang="ET">Xbox-i sätted</text>
-        <text lang="NB">X-Box</text>
         <text lang="DA">Xbox Indstillinger</text>
-        <text lang="CS">Nastavení XBOXu</text>
         <text lang="RU">Настройки Xbox</text>
         <text lang="PL">Konfiguracja Xbox</text>
         <text lang="HE">הגדרות Xbox</text>
+        <text lang="HU">XBOX beállítások</text>
         <description></description>
         <action>SETTINGS XBOXSETTINGS</action>
         <dependssetting>EnableXbox</dependssetting>
@@ -182,7 +176,6 @@
         <type>PHONE</type>
         <text>Phone Settings</text>
         <text lang="IT">Impostazioni Telefono</text>
-        <text lang="FR">Réglages Téléphone</text>
         <text lang="DE">Telefon</text>
         <text lang="IS">Stillingar síma</text>
         <text lang="SV">Telefon</text>
@@ -190,16 +183,16 @@
         <text lang="FI">Puhelimen Asetukset</text>
         <text lang="SL">Nastavitve telefona</text>
         <text lang="ET">Telefoni sätted</text>
-        <text lang="NB">Telefon</text>
         <text lang="DA">Telefon Indstillinger</text>
         <text lang="ES">Configurar Teléfono</text>
         <text lang="PT">Configurar Telefone</text>
-        <text lang="CS">Nastavení telefonu</text>
         <text lang="JA">電話設定</text>
         <text lang="RU">Настройки телефона</text>
         <text lang="PL">Konfiguracja Telefonu</text>
         <text lang="HE">הגדרות טלפון</text>
+        <text lang="HU">Telefon beállítások</text>
         <description>Configure SIP-based VoIP phone</description>
+        <description lang="DE">Einstellungen des VoIP-Telefons</description>
         <action>CONFIGPLUGIN mythphone</action>
         <depends>mythphone</depends>
     </button>
@@ -207,12 +200,14 @@
     <button>
         <type>ZONEMINDER</type>
         <text>ZoneMinder Settings</text>
-        <text lang="FR">Réglages Zone Minder</text>
         <text lang="IT">Impostazioni Videosorveglianza</text>
         <text lang="DA">ZoneMinder</text>
         <text lang="PL">Ustaw strażnika</text>
         <text lang="FI">Zoneminder Asetukset</text>
+        <text lang="HU">Video megfigyelő rendszer beállítások</text>
+        <text lang="DE">Zoneminder</text>
         <description>Set up surveillance software</description>
+        <description lang="DE">Einstellungen der Überwachungssoftware</description>
         <action>CONFIGPLUGIN mythzoneminder</action>
         <depends>mythzoneminder</depends>
     </button>

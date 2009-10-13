@@ -15,6 +15,7 @@ firewire_tester <action> -n <node> [-P <port>] [-r <n>] [-v]
     -n <node>   - firewire node, required
     -P <port>   - firewire port, default 0
     -r <n>      - run action <n> times, default 1
+    -o          - output mpeg2 stream to stdout using p2p connection
     -v          - verbose
 
 There are 2 types of connections that can be used by mythtv to talk to 

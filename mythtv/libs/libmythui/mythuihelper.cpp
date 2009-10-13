@@ -1,3 +1,6 @@
+
+#include "mythuihelper.h"
+
 #include <cmath>
 
 #include <QImage>
@@ -11,9 +14,9 @@
 #include <QPainter>
 #include <QDesktopWidget>
 #include <QStyleFactory>
+#include <QThreadPool>
 
 #include "mythdirs.h"
-#include "mythuihelper.h"
 #include "mythverbose.h"
 #include "oldsettings.h"
 #include "screensaver.h"
@@ -29,7 +32,7 @@
 
 static MythUIHelper *mythui = NULL;
 static QMutex uiLock;
-QString MythUIHelper::x11_display = QString::null;
+QString MythUIHelper::x11_display;
 
 MythUIHelper *MythUIHelper::getMythUI(void)
 {
@@ -95,6 +98,9 @@ class MythUIHelperPrivate
 
     QMap<QString, MythImage*> imageCache;
     QMap<QString, uint> CacheTrack;
+    QMutex *m_cacheLock;
+    size_t m_cacheSize;
+    QMutex *m_cacheSizeLock;
 
     uint maxImageCacheSize;
 
@@ -119,6 +125,8 @@ class MythUIHelperPrivate
     DisplayRes *display_res;
     bool screenSetup;
 
+    QThreadPool *m_imageThreadPool;
+
     MythUIMenuCallbacks callbacks;
 
     MythUIHelper *parent;
@@ -132,16 +140,16 @@ int MythUIHelperPrivate::h_override = -1;
 MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
     : m_qtThemeSettings(new Settings()),
       m_themeloaded(false),
-      m_menuthemepathname(QString::null), m_themepathname(QString::null),
       language(""),
       m_wmult(1.0), m_hmult(1.0),
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
+      m_cacheLock(new QMutex(QMutex::Recursive)), m_cacheSize(0),
+      m_cacheSizeLock(new QMutex(QMutex::Recursive)),
       m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
-      themecachedir(QString::null),
       bigfontsize(0), mediumfontsize(0), smallfontsize(0),
       screensaver(NULL), screensaverEnabled(false), display_res(NULL),
-      screenSetup(false), parent(p)
+      screenSetup(false), m_imageThreadPool(new QThreadPool()), parent(p)
 {
 }
 
@@ -158,6 +166,9 @@ MythUIHelperPrivate::~MythUIHelperPrivate()
 
     CacheTrack.clear();
 
+    delete m_cacheLock;
+    delete m_cacheSizeLock;
+    delete m_imageThreadPool;
     delete m_qtThemeSettings;
     delete screensaver;
     if(display_res)
@@ -322,7 +333,6 @@ void MythUIHelperPrivate::StoreGUIsettings()
 }
 
 MythUIHelper::MythUIHelper()
-             : m_cacheSize(0)
 {
     d = new MythUIHelperPrivate(this);
 }
@@ -336,8 +346,11 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
 {
     d->Init();
     d->callbacks = cbs;
+
+    d->m_cacheSizeLock->lock();
     d->maxImageCacheSize = GetMythDB()->GetNumSetting("UIImageCacheSize", 20)
                                 * 1024 * 1024;
+    d->m_cacheSizeLock->unlock();
 
     VERBOSE(VB_GENERAL, QString("MythUI Image Cache size set to %1 bytes")
                         .arg(d->maxImageCacheSize));
@@ -401,7 +414,7 @@ void MythUIHelper::LoadQtConfig(void)
     // Recalculate GUI dimensions
     d->StoreGUIsettings();
 
-    d->m_themepathname = themedir + "/";
+    d->m_themepathname = themedir + '/';
 
     themedir += "/qtlook.txt";
     d->m_qtThemeSettings->ReadSettings(themedir);
@@ -410,7 +423,7 @@ void MythUIHelper::LoadQtConfig(void)
     themename = GetMythDB()->GetSetting("MenuTheme", "defaultmenu");
     if (themename == "default")
         themename = "defaultmenu";
-    d->m_menuthemepathname = FindMenuThemeDir(themename) + "/";
+    d->m_menuthemepathname = FindMenuThemeDir(themename) + '/';
 
     d->bigfontsize    = GetMythDB()->GetNumSetting("QtFontBig",    25);
     d->mediumfontsize = GetMythDB()->GetNumSetting("QtFontMedium", 16);
@@ -424,6 +437,8 @@ Settings *MythUIHelper::qtconfig(void)
 
 void MythUIHelper::UpdateImageCache(void)
 {
+    QMutexLocker locker(d->m_cacheLock);
+
     QMutableMapIterator<QString, MythImage*> i(d->imageCache);
     while (i.hasNext())
     {
@@ -434,15 +449,22 @@ void MythUIHelper::UpdateImageCache(void)
     }
 
     d->CacheTrack.clear();
-    m_cacheSize = 0;
+
+    d->m_cacheSizeLock->lock();
+    d->m_cacheSize = 0;
+    d->m_cacheSizeLock->unlock();
 
     ClearOldImageCache();
 }
 
 MythImage *MythUIHelper::GetImageFromCache(const QString &url)
 {
+    QMutexLocker locker(d->m_cacheLock);
     if (d->imageCache.contains(url))
+    {
+        d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
         return d->imageCache[url];
+    }
 
 /*
     if (QFileInfo(url).exists())
@@ -461,7 +483,9 @@ void MythUIHelper::IncludeInCacheSize(MythImage *im)
     if (!im)
         return;
 
-    m_cacheSize += im->numBytes();
+    d->m_cacheSizeLock->lock();
+    d->m_cacheSize += im->numBytes();
+    d->m_cacheSizeLock->unlock();
 }
 
 void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
@@ -469,7 +493,9 @@ void MythUIHelper::ExcludeFromCacheSize(MythImage *im)
     if (!im)
         return;
 
-    m_cacheSize -= im->numBytes();
+    d->m_cacheSizeLock->lock();
+    d->m_cacheSize -= im->numBytes();
+    d->m_cacheSizeLock->unlock();
 }
 
 MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
@@ -480,7 +506,7 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
     if (!nodisk)
     {
-        QString dstfile = GetMythUI()->GetThemeCacheDir() + "/" + url;
+        QString dstfile = GetMythUI()->GetThemeCacheDir() + '/' + url;
         VERBOSE(VB_FILE, QString("Saved to Cache (%1)").arg(dstfile));
 
         // This would probably be better off somewhere else before any
@@ -494,11 +520,14 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
     }
 
     // delete the oldest cached images until we fall below threshold.
-    while (m_cacheSize + im->numBytes() >= d->maxImageCacheSize &&
+    QMutexLocker locker(d->m_cacheLock);
+    d->m_cacheSizeLock->lock();
+    while (d->m_cacheSize + im->numBytes() >= d->maxImageCacheSize &&
            d->imageCache.size())
     {
+        d->m_cacheSizeLock->unlock();
         QMap<QString, MythImage*>::iterator it = d->imageCache.begin();
-        uint oldestTime = d->CacheTrack[it.key()];
+        uint oldestTime = QDateTime::currentDateTime().toTime_t();
         QString oldestKey = it.key();
 
         int count = 0;
@@ -519,15 +548,21 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         if (count > 0)
         {
             VERBOSE(VB_FILE, QString("Cache too big (%1), removing :%2:")
-                            .arg(m_cacheSize + im->numBytes()).arg(oldestKey));
+                            .arg(d->m_cacheSize + im->numBytes()).arg(oldestKey));
 
             d->imageCache[oldestKey]->DownRef();
             d->imageCache.remove(oldestKey);
             d->CacheTrack.remove(oldestKey);
+
+            d->m_cacheSizeLock->lock();
         }
         else
+        {
+            d->m_cacheSizeLock->lock();
             break;
+        }
     }
+    d->m_cacheSizeLock->unlock();
 
     QMap<QString, MythImage*>::iterator it = d->imageCache.find(url);
     if (it == d->imageCache.end())
@@ -538,18 +573,19 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
 
         im->SetIsInCache(true);
         VERBOSE(VB_FILE, QString("NOT IN RAM CACHE, Adding, and adding to size "
-                                 ":%1: :%2:").arg(url).arg(m_cacheSize));
+                                 ":%1: :%2:").arg(url).arg(im->numBytes()));
     }
 
     VERBOSE(VB_FILE, QString("MythUIHelper::CacheImage : Cache Count = :%1: "
                              "size :%2:")
-                             .arg(d->imageCache.count()).arg(m_cacheSize));
+                             .arg(d->imageCache.count()).arg(d->m_cacheSize));
 
     return d->imageCache[url];
 }
 
 void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 {
+    QMutexLocker locker(d->m_cacheLock);
     QMap<QString, MythImage*>::iterator it = d->imageCache.find(url);
 
     if (it != d->imageCache.end())
@@ -562,7 +598,7 @@ void MythUIHelper::RemoveFromCacheByURL(const QString &url)
 
     QString dstfile;
 
-    dstfile = GetThemeCacheDir() + "/" + url;
+    dstfile = GetThemeCacheDir() + '/' + url;
     VERBOSE(VB_FILE, QString("RemoveFromCacheByURL removed :%1: "
                              "from cache").arg(dstfile));
     QFile::remove(dstfile);
@@ -576,11 +612,13 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
     QString partialKey = fname;
     partialKey.replace('/', '-');
 
+    d->m_cacheLock->lock();
     for (it = d->imageCache.begin(); it != d->imageCache.end(); ++it)
     {
         if (it.key().contains(partialKey))
             RemoveFromCacheByURL(it.key());
     }
+    d->m_cacheLock->unlock();
 
     // Loop through files to cache any that were not caught by
     // RemoveFromCacheByURL
@@ -600,6 +638,8 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
 
 bool MythUIHelper::IsImageInCache(const QString &url)
 {
+    QMutexLocker locker(d->m_cacheLock);
+
     if (d->imageCache.contains(url))
         return true;
 
@@ -633,7 +673,7 @@ void MythUIHelper::ClearOldImageCache(void)
 
     QString themecachedir = d->themecachedir;
 
-    d->themecachedir += "/";
+    d->themecachedir += '/';
 
     dir.setPath(themecachedir);
     if (!dir.exists())
@@ -1059,7 +1099,7 @@ bool MythUIHelper::FindThemeFile(QString &path)
     bool foundit = false;
     QList<QString> searchpath = GetThemeSearchPath();
     for (QList<QString>::const_iterator ii = searchpath.begin();
-        ii != searchpath.end(); ii++)
+        ii != searchpath.end(); ++ii)
     {
         if (fi.isRelative())
         {
@@ -1216,25 +1256,32 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     return ret;
 }
 
-MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label)
+MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
+                                        ImageCacheMode cacheMode)
 {
-    //VERBOSE(VB_GENERAL, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
+    //VERBOSE(VB_FILE+VB_EXTRA, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
+
+    if (srcfile.isEmpty() || label.isEmpty())
+        return NULL;
        
-    QString cachefilepath = GetThemeCacheDir() + "/" + label;
+    QString cachefilepath = GetThemeCacheDir() + '/' + label;
     QFileInfo fi(cachefilepath);
 
     MythImage *ret = NULL;
 
-    if (fi.exists())
+    if ((cacheMode == kCacheIgnoreDisk) || fi.exists())
     {
         // Now compare the time on the source versus our cached copy
-        FindThemeFile(srcfile);
+        if (cacheMode != kCacheIgnoreDisk)
+            FindThemeFile(srcfile);
+
         QFileInfo original(srcfile);
-        if (fi.lastModified() > original.lastModified())
+        if ((cacheMode == kCacheIgnoreDisk) ||
+            (fi.lastModified() > original.lastModified()))
         {
             // Check Memory Cache
             ret = GetImageFromCache(label);
-            if (!ret)
+            if (!ret && (cacheMode == kCacheNormal))
             {
                 // Load file from disk cache to memory cache
                 ret = GetMythPainter()->GetFormatImage();
@@ -1310,7 +1357,7 @@ QString MythUIHelper::GetLanguage(void)
  */
 QString MythUIHelper::GetLanguageAndVariant(void)
 {
-    if (d->language == QString::null || d->language.isEmpty())
+    if (d->language.isEmpty())
         d->language = GetMythDB()->GetSetting("Language", "EN_US").toLower();
 
     return d->language;
@@ -1424,14 +1471,14 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
             // get popup stack main screen
             stack = GetMythMainWindow()->GetStack("popup stack");
             if (!stack->GetLocation(true).isEmpty())
-                result += "/" + stack->GetLocation(false);
+                result += '/' + stack->GetLocation(false);
         }
 
         // if there's a location in the stringlist add that (non mythui screen or external app running)
         if (!m_currentLocation.isEmpty())
         {
             for (int x = 0; x < m_currentLocation.count(); x++)
-                result += "/" + m_currentLocation[x];
+                result += '/' + m_currentLocation[x];
         }
     }
     else
@@ -1457,4 +1504,9 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
         result = "UNKNOWN";
 
     return result;
+}
+
+QThreadPool *MythUIHelper::GetImageThreadPool(void)
+{
+    return d->m_imageThreadPool;
 }

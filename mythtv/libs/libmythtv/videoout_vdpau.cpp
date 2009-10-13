@@ -21,7 +21,8 @@ VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
   : VideoOutput(),
     m_codec_id(codec_id), m_win(0),
     m_disp(NULL), m_ctx(NULL), m_colorkey(0x020202),
-    m_lock(QMutex::Recursive), m_osd_avail(false), m_pip_avail(true)
+    m_lock(QMutex::Recursive), m_osd_avail(false), m_pip_avail(true),
+    m_buffer_size(NUM_VDPAU_BUFFERS)
 {
     if (gContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes(true);
@@ -101,12 +102,19 @@ bool VideoOutputVDPAU::InitContext(void)
 void VideoOutputVDPAU::DeleteContext(void)
 {
     QMutexLocker locker(&m_lock);
+
+    if (m_disp)
+        m_disp->Lock();
+
     if (m_ctx)
     {
         m_ctx->Deinit();
         delete m_ctx;
     }
     m_ctx = NULL;
+
+    if (m_disp)
+        m_disp->Unlock();
 }
 
 bool VideoOutputVDPAU::InitBuffers(void)
@@ -116,9 +124,12 @@ bool VideoOutputVDPAU::InitBuffers(void)
 
     QMutexLocker locker(&m_lock);
     const QSize video_dim = windows[0].GetVideoDim();
-    vbuffers.Init(NUM_VDPAU_BUFFERS, false, 1, 4, 4, 1, false);
+
+    ParseBufferSize();
+
+    vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1, false);
     bool ok = m_ctx->InitBuffers(video_dim.width(), video_dim.height(),
-                                 NUM_VDPAU_BUFFERS, db_letterbox_colour);
+                                 m_buffer_size, db_letterbox_colour);
 
     if (codec_is_vdpau(m_codec_id) && ok)
     {
@@ -654,4 +665,27 @@ void VideoOutputVDPAU::RemovePIP(NuppelVideoPlayer *pipplayer)
 {
     if (m_ctx)
         m_ctx->DeinitPIP(pipplayer);
+}
+
+void VideoOutputVDPAU::ParseBufferSize(void)
+{
+    QStringList list = GetFilters().split(",");
+    if (list.empty())
+        return;
+
+    for (QStringList::Iterator i = list.begin(); i != list.end(); ++i)
+    {
+        QString name = (*i).section('=', 0, 0);
+        if (!name.contains("vdpaubuffersize"))
+            continue;
+
+        uint num = (*i).section('=', 1).toUInt();
+        if (6 <= num && num <= 50)
+        {
+            m_buffer_size = num;
+            VERBOSE(VB_IMPORTANT, LOC +
+                        QString("VDPAU video buffer size: %1 (default %2)")
+                        .arg(m_buffer_size).arg(NUM_VDPAU_BUFFERS));
+        }
+    }
 }

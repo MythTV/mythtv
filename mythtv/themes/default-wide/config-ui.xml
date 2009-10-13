@@ -47,13 +47,13 @@
         </buttonlist>
 
         <textarea name="sortlabel" from="basetextarea">
-            <area>30,420,170,30</area>
+            <area>30,420,220,30</area>
             <value>Sort Mode:</value>
             <font>basemedium</font>
         </textarea>
 
         <buttonlist name="sorting" from="basewideselector">
-            <position>210,415</position>
+            <position>260,415</position>
         </buttonlist>
 
         <textarea name="sourcelabel" from="sortlabel">
@@ -62,16 +62,16 @@
         </textarea>
 
         <buttonlist name="source" from="basewideselector">
-            <position>210,475</position>
+            <position>260,475</position>
         </buttonlist>
 
         <button name="delete" from="basebutton">
-            <position>620,472</position>
+            <position>760,475</position>
             <value>Delete</value>
         </button>
 
         <textarea name="nochannumlabel" from="basetextarea">
-            <area>70,541,500,60</area>
+            <area>70,537,500,60</area>
             <value>Hide Channels without channel number.</value>
         </textarea>
 
@@ -80,17 +80,17 @@
         </checkbox>
 
         <button name="scan" from="basewidebutton">
-            <position>55,585</position>
+            <position>90,605</position>
             <value>Channel Scan</value>
         </button>
 
         <button name="importicons" from="basewidebutton">
-            <position>325,585</position>
+            <position>490,605</position>
             <value>Icon Download</value>
         </button>
 
         <button name="edittransport" from="basewidebutton">
-            <position>585,585</position>
+            <position>890,605</position>
             <value>Edit Transports</value>
         </button>
 

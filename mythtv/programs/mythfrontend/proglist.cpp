@@ -1,3 +1,7 @@
+
+#include "proglist.h"
+
+// C/C++
 #include <iostream>
 #include <map>
 #include <vector>
@@ -8,17 +12,22 @@ using namespace std;
 #include <QApplication>
 #include <QRegExp>
 
-// MythTV
+// libmyth
 #include "mythcontext.h"
-#include "proglist.h"
+#include "remoteutil.h"
+
+// libmythtv
 #include "scheduledrecording.h"
 #include "recordingrule.h"
-#include "remoteutil.h"
 #include "channelutil.h"
 #include "recordinginfo.h"
+
+// libmythdb
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
+
+// libmythui
 #include "mythuitext.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
@@ -39,7 +48,7 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
 
     m_dayFormat = gContext->GetSetting("DateFormat");
     m_hourFormat = gContext->GetSetting("TimeFormat");
-    m_fullDateFormat = m_dayFormat + " " + m_hourFormat;
+    m_fullDateFormat = m_dayFormat + ' ' + m_hourFormat;
     m_channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
     m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 
@@ -75,14 +84,14 @@ ProgLister::ProgLister(MythScreenStack *parent, int recid, const QString &title)
     m_recid = recid;
     m_title = title;
 
-    m_addTables = "";
+    m_addTables.clear();
     m_startTime = QDateTime::currentDateTime();
     m_searchTime = m_startTime;
 
     m_dayFormat = gContext->GetSetting("DateFormat");
     m_hourFormat = gContext->GetSetting("TimeFormat");
-    m_timeFormat = gContext->GetSetting("ShortDateFormat") + " " + m_hourFormat;
-    m_fullDateFormat = m_dayFormat + " " + m_hourFormat;
+    m_timeFormat = gContext->GetSetting("ShortDateFormat") + ' ' + m_hourFormat;
+    m_fullDateFormat = m_dayFormat + ' ' + m_hourFormat;
     m_channelOrdering = gContext->GetSetting("ChannelOrdering", "channum");
     m_channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
 
@@ -189,7 +198,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
     QStringList actions;
     handled = gContext->GetMainWindow()->TranslateKeyPress("TV Frontend", e, actions);
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    for (int i = 0; i < actions.size() && !handled; ++i)
     {
         QString action = actions[i];
         handled = true;
@@ -368,10 +377,9 @@ void ProgLister::updateKeywordInDB(const QString &text, const QString &oldValue)
     int oldview = m_viewList.indexOf(oldValue);
     int newview = m_viewList.indexOf(text);
 
-    QString qphrase = NULL;
-
     if (newview < 0 || newview != oldview)
     {
+        QString qphrase;
         if (oldview >= 0)
         {
             qphrase = m_viewList[oldview];
@@ -448,7 +456,7 @@ void ProgLister::chooseView(void)
              m_type == plPeopleSearch)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-        QString currentItem = "";
+        QString currentItem;
 
         if (m_curView >= 0)
             currentItem = m_viewList[m_curView];
@@ -471,7 +479,7 @@ void ProgLister::chooseView(void)
     else if (m_type == plPowerSearch)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-        QString currentItem = "";
+        QString currentItem;
 
         if (m_curView >= 0)
             currentItem = m_viewList[m_curView];
@@ -492,7 +500,7 @@ void ProgLister::chooseView(void)
     else if (m_type == plTime)
     {
         MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-        QString currentItem = "";
+        QString currentItem;
 
         TimePopup *popup = new TimePopup(popupStack, this);
 
@@ -528,10 +536,10 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
                                   MSqlBindings &bindings)
 {
     int ret = 0;
-    output = "";
+    output.clear();
     QString curfield;
 
-    QStringList field = qphrase.split(":");
+    QStringList field = qphrase.split(':');
 
     if (field.count() != 6)
     {
@@ -542,34 +550,34 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
 
     if (!field[0].isEmpty())
     {
-        curfield = "%" + field[0] + "%";
+        curfield = '%' + field[0] + '%';
         output += "program.title LIKE :POWERTITLE ";
         bindings[":POWERTITLE"] = curfield;
     }
 
     if (!field[1].isEmpty())
     {
-        if (output > "")
+        if (!output.isEmpty())
             output += "\nAND ";
 
-        curfield = "%" + field[1] + "%";
+        curfield = '%' + field[1] + '%';
         output += "program.subtitle LIKE :POWERSUB ";
         bindings[":POWERSUB"] = curfield;
     }
 
     if (!field[2].isEmpty())
     {
-        if (output > "")
+        if (!output.isEmpty())
             output += "\nAND ";
 
-        curfield = "%" + field[2] + "%";
+        curfield = '%' + field[2] + '%';
         output += "program.description LIKE :POWERDESC ";
         bindings[":POWERDESC"] = curfield;
     }
 
     if (!field[3].isEmpty())
     {
-        if (output > "")
+        if (!output.isEmpty())
             output += "\nAND ";
 
         output += "program.category_type = :POWERCATTYPE ";
@@ -578,7 +586,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
 
     if (!field[4].isEmpty())
     {
-        if (output > "")
+        if (!output.isEmpty())
             output += "\nAND ";
 
         output += "programgenres.genre = :POWERGENRE ";
@@ -588,7 +596,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
 
     if (!field[5].isEmpty())
     {
-        if (output > "")
+        if (!output.isEmpty())
             output += "\nAND ";
 
         output += "channel.callsign = :POWERCALLSIGN ";
@@ -626,9 +634,6 @@ void ProgLister::edit()
 {
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
-    if (!pi)
-        return;
-
     EditScheduled(pi);
 }
 
@@ -636,15 +641,7 @@ void ProgLister::customEdit()
 {
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
-    if (!pi)
-        return;
-
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    CustomEdit *ce = new CustomEdit(mainStack, pi);
-    if (ce->Create())
-        mainStack->AddScreen(ce);
-    else
-        delete ce;
+    EditCustom(pi);
 }
 
 void ProgLister::deleteItem()
@@ -800,20 +797,14 @@ void ProgLister::upcoming()
     if (!pi || m_type == plTitle)
         return;
 
-    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, pi->title, "");
-    if (pl->Create())
-        mainStack->AddScreen(pl);
-    else
-        delete pl;
+    ShowUpcoming(pi);
 }
 
 void ProgLister::details()
 {
     ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
 
-    if (pi)
-        ShowDetails(pi);
+    ShowDetails(pi);
 }
 
 void ProgLister::fillViewList(const QString &view)
@@ -827,7 +818,7 @@ void ProgLister::fillViewList(const QString &view)
                                                        "channum, chanid");
         ChannelUtil::SortChannels(channels, m_channelOrdering, true);
 
-        for (uint i = 0; i < channels.size(); i++)
+        for (uint i = 0; i < channels.size(); ++i)
         {
             QString chantext = m_channelFormat;
             chantext
@@ -860,12 +851,12 @@ void ProgLister::fillViewList(const QString &view)
 
         if (query.exec() && query.size())
         {
-            QString lastGenre1;
+            QString lastGenre1, genre1;
 
             while (query.next())
             {
-                QString genre1 = query.value(0).toString();
-                if (genre1 <= " ")
+                genre1 = query.value(0).toString();
+                if (genre1.isEmpty())
                     continue;
 
                 if (genre1 != lastGenre1)
@@ -876,7 +867,7 @@ void ProgLister::fillViewList(const QString &view)
                 }
 
                 QString genre2 = query.value(1).toString();
-                if (genre2 <= " " || genre2 == genre1)
+                if (genre2.isEmpty() || genre2 == genre1)
                     continue;
 
                 m_viewList << genre1 + ":/:" + genre2;
@@ -893,7 +884,7 @@ void ProgLister::fillViewList(const QString &view)
                           "GROUP BY category;");
             query.bindValue(":PGILSTART", startstr);
 
-            if (query.exec() && query.size())
+            if (query.exec())
             {
                 while (query.next())
                 {
@@ -920,12 +911,12 @@ void ProgLister::fillViewList(const QString &view)
                       "WHERE searchtype = :SEARCHTYPE;");
         query.bindValue(":SEARCHTYPE", m_searchType);
 
-        if (query.exec() && query.size())
+        if (query.exec())
         {
             while (query.next())
             {
                 QString phrase = query.value(0).toString();
-                if (phrase <= " ")
+                if (phrase.isEmpty())
                     continue;
                 phrase = query.value(0).toString();
                 m_viewList << phrase;
@@ -1201,7 +1192,7 @@ void ProgLister::fillItemList(bool restorePosition)
         m_curviewText->SetText(m_viewTextList[m_curView]);
 
     bool oneChanid = false;
-    QString where = "";
+    QString where;
     QString startstr = m_startTime.toString("yyyy-MM-ddThh:mm:50");
     QString qphrase = m_viewList[m_curView];
 
@@ -1260,7 +1251,7 @@ void ProgLister::fillItemList(bool restorePosition)
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
                 "  AND program.title LIKE :PGILLIKEPHRASE0 ";
-        bindings[":PGILLIKEPHRASE0"] = QString("%") + qphrase + "%";
+        bindings[":PGILLIKEPHRASE0"] = QString("%") + qphrase + '%';
     }
     else if (m_type == plKeywordSearch) // keyword search
     {
@@ -1269,9 +1260,9 @@ void ProgLister::fillItemList(bool restorePosition)
                 "  AND (program.title LIKE :PGILLIKEPHRASE1 "
                 "    OR program.subtitle LIKE :PGILLIKEPHRASE2 "
                 "    OR program.description LIKE :PGILLIKEPHRASE3 ) ";
-        bindings[":PGILLIKEPHRASE1"] = QString("%") + qphrase + "%";
-        bindings[":PGILLIKEPHRASE2"] = QString("%") + qphrase + "%";
-        bindings[":PGILLIKEPHRASE3"] = QString("%") + qphrase + "%";
+        bindings[":PGILLIKEPHRASE1"] = QString("%") + qphrase + '%';
+        bindings[":PGILLIKEPHRASE2"] = QString("%") + qphrase + '%';
+        bindings[":PGILLIKEPHRASE3"] = QString("%") + qphrase + '%';
     }
     else if (m_type == plPeopleSearch) // people search
     {
@@ -1309,8 +1300,8 @@ void ProgLister::fillItemList(bool restorePosition)
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > :PGILSTART "
                         "  AND ( %1 ) ").arg(qphrase);
-        if (m_addTables > "")
-            where = m_addTables + " " + where;
+        if (!m_addTables.isEmpty())
+            where = m_addTables + ' ' + where;
     }
     else if (m_type == plChannel) // list by channel
     {
@@ -1360,7 +1351,7 @@ void ProgLister::fillItemList(bool restorePosition)
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
                 "  AND program.category_type = 'movie' "
-                "  AND program.stars "+qphrase+" ";
+                "  AND program.stars " + qphrase + ' ';
     }
     else if (m_type == plTime) // list by time
     {
@@ -1386,7 +1377,6 @@ void ProgLister::fillItemList(bool restorePosition)
     }
     else if (m_type == plStoredSearch) // stored search
     {
-        QString fromc, wherec;
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT fromclause, whereclause FROM customexample "
                       "WHERE rulename = :RULENAME;");
@@ -1394,14 +1384,14 @@ void ProgLister::fillItemList(bool restorePosition)
 
         if (query.exec() && query.next())
         {
-            fromc  = query.value(0).toString();
-            wherec = query.value(1).toString();
+            QString fromc = query.value(0).toString();
+            QString wherec = query.value(1).toString();
 
             where = QString("WHERE channel.visible = 1 "
                             "  AND program.endtime > :PGILSTART "
                             "  AND ( %1 ) ").arg(wherec);
-            if (fromc > "")
-                where = fromc + " " + where;
+            if (!fromc.isEmpty())
+                where = fromc + ' ' + where;
         }
     }
     else if (m_type == plPreviouslyRecorded)
@@ -1455,7 +1445,7 @@ void ProgLister::fillItemList(bool restorePosition)
             // Prune to one per title
             sort(sortedList.begin(), sortedList.end(), plTitleSort());
 
-            QString curtitle = "";
+            QString curtitle;
             vector<ProgramInfo *>::iterator i = sortedList.begin();
             while (i != sortedList.end())
             {
@@ -1486,7 +1476,7 @@ void ProgLister::fillItemList(bool restorePosition)
     else
     {
         vector<ProgramInfo *>::iterator i = sortedList.begin();
-        for (; i != sortedList.end(); i++)
+        for (; i != sortedList.end(); ++i)
             m_itemList.append(*i);
     }
 
@@ -1530,8 +1520,7 @@ void ProgLister::fillItemList(bool restorePosition)
         m_progList->SetItemCurrent(i + 1, i + 1 - selectedOffset);
     }
 
-    if (selected)
-        delete selected;
+    delete selected;
 }
 
 void ProgLister::updateButtonList(void)
@@ -1767,12 +1756,12 @@ PhrasePopup::PhrasePopup(MythScreenStack *parentStack,
                          RecSearchType searchType,
                          const QStringList &list,
                          const QString &currentValue)
-            : MythScreenType(parentStack, "phrasepopup")
+            : MythScreenType(parentStack, "phrasepopup"),
+              m_parent(parent), m_searchType(searchType),  m_list(list),
+              m_titleText(NULL), m_phraseList(NULL), m_phraseEdit(NULL),
+              m_okButton(NULL), m_deleteButton(NULL), m_recordButton(NULL)
 {
-    m_parent = parent;
-    m_list = list;
     m_currentValue = currentValue;
-    m_searchType = searchType;
 }
 
 bool PhrasePopup::Create()
@@ -1839,9 +1828,9 @@ bool PhrasePopup::Create()
 
 void PhrasePopup::editChanged(void)
 {
-    m_okButton->SetEnabled((m_phraseEdit->GetText().trimmed().length() > 0));
+    m_okButton->SetEnabled(!m_phraseEdit->GetText().trimmed().isEmpty());
     m_deleteButton->SetEnabled((m_list.indexOf(m_phraseEdit->GetText().trimmed()) != -1));
-    m_recordButton->SetEnabled((m_phraseEdit->GetText().trimmed().length() > 0));
+    m_recordButton->SetEnabled(!m_phraseEdit->GetText().trimmed().isEmpty());
 }
 
 void PhrasePopup::phraseClicked(MythUIButtonListItem *item)
@@ -1874,7 +1863,7 @@ void PhrasePopup::phraseSelected(MythUIButtonListItem *item)
 
 void PhrasePopup::okClicked(void)
 {
-    if (m_phraseEdit->GetText().trimmed().length() == 0)
+    if (m_phraseEdit->GetText().trimmed().isEmpty())
         return;
 
     // check to see if we need to save the phrase
@@ -1978,9 +1967,10 @@ void PhrasePopup::recordClicked(void)
 ///////////////////////////////////////////////////////////////////////////////
 
 TimePopup::TimePopup(MythScreenStack *parentStack, ProgLister *parent)
-         : MythScreenType(parentStack, "timepopup")
+         : MythScreenType(parentStack, "timepopup"),
+           m_parent(parent), m_dateList(NULL), m_timeList(NULL),
+           m_okButton(NULL)
 {
-    m_parent = parent;
 }
 
 bool TimePopup::Create()
@@ -2059,12 +2049,12 @@ PowerSearchPopup::PowerSearchPopup(MythScreenStack *parentStack,
                                    RecSearchType searchType,
                                    const QStringList &list,
                                    const QString &currentValue)
-            : MythScreenType(parentStack, "phrasepopup")
+            : MythScreenType(parentStack, "phrasepopup"),
+              m_parent(parent), m_searchType(searchType), m_list(list),
+              m_currentValue(currentValue),
+              m_titleText(NULL), m_phraseList(NULL), m_phraseEdit(NULL),
+              m_editButton(NULL), m_deleteButton(NULL), m_recordButton(NULL)
 {
-    m_parent = parent;
-    m_list = list;
-    m_currentValue = currentValue;
-    m_searchType = searchType;
 }
 
 bool PowerSearchPopup::Create()
@@ -2266,7 +2256,7 @@ EditPowerSearchPopup::EditPowerSearchPopup(MythScreenStack *parentStack,
 
     //sanity check currentvalue
     m_currentValue = currentValue;
-    QStringList field = m_currentValue.split(":");
+    QStringList field = m_currentValue.split(':');
     if (field.count() != 6)
     {
         VERBOSE(VB_IMPORTANT, QString("Error. PowerSearch %1 has %2 fields")
@@ -2295,7 +2285,7 @@ bool EditPowerSearchPopup::Create()
         return false;
     }
 
-    QStringList field = m_currentValue.split(":");
+    QStringList field = m_currentValue.split(':');
 
     m_titleEdit->SetText(field[0]);
     m_subtitleEdit->SetText(field[1]);
@@ -2317,17 +2307,17 @@ bool EditPowerSearchPopup::Create()
 
 void EditPowerSearchPopup::okClicked(void)
 {
-    QString text = "";
-    text =  m_titleEdit->GetText().replace(":","%").replace("*","%") + ":";
-    text += m_subtitleEdit->GetText().replace(":","%").replace("*","%") + ":";
-    text += m_descEdit->GetText().replace(":","%").replace("*","%") + ":";
+    QString text;
+    text =  m_titleEdit->GetText().replace(':','%').replace('*','%') + ':';
+    text += m_subtitleEdit->GetText().replace(':','%').replace('*','%') + ':';
+    text += m_descEdit->GetText().replace(':','%').replace('*','%') + ':';
 
     if (m_categoryList->GetCurrentPos() > 0)
         text += m_categories[m_categoryList->GetCurrentPos()];
-    text += ":";
+    text += ':';
     if (m_genreList->GetCurrentPos() > 0)
         text += m_genres[m_genreList->GetCurrentPos()];
-    text += ":";
+    text += ':';
     if (m_channelList->GetCurrentPos() > 0)
         text += m_channels[m_channelList->GetCurrentPos()];
 
@@ -2343,7 +2333,7 @@ void EditPowerSearchPopup::okClicked(void)
 
 void EditPowerSearchPopup::initLists(void)
 {
-    QStringList field = m_currentValue.split(":");
+    QStringList field = m_currentValue.split(':');
 
     // category type
     m_categories.clear();
@@ -2368,7 +2358,7 @@ void EditPowerSearchPopup::initLists(void)
 
     query.prepare("SELECT genre FROM programgenres GROUP BY genre;");
 
-    if (query.exec() && query.size())
+    if (query.exec())
     {
         while (query.next())
         {
@@ -2394,7 +2384,7 @@ void EditPowerSearchPopup::initLists(void)
     DBChanList channels = ChannelUtil::GetChannels(0, true, "callsign");
     ChannelUtil::SortChannels(channels, channelOrdering, true);
 
-    for (uint i = 0; i < channels.size(); i++)
+    for (uint i = 0; i < channels.size(); ++i)
     {
         QString chantext = channelFormat;
         chantext

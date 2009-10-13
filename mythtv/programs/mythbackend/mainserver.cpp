@@ -35,6 +35,7 @@ using namespace std;
 #include <QEvent>
 #include <QUrl>
 #include <QTcpServer>
+#include <QTimer>
 
 #include "exitcodes.h"
 #include "mythcontext.h"
@@ -374,6 +375,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     {
         HandleQueryUptime(pbs);
     }
+    else if (command == "QUERY_HOSTNAME")
+    {
+        HandleQueryHostname(pbs);
+    }
     else if (command == "QUERY_MEMSTATS")
     {
         HandleQueryMemStats(pbs);
@@ -530,6 +535,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     else if (command == "QUERY_PIXMAP_LASTMODIFIED")
     {
         HandlePixmapLastModified(listline, pbs);
+    }
+    else if (command == "QUERY_PIXMAP_GET_IF_MODIFIED")
+    {
+        HandlePixmapGetIfModified(listline, pbs);
     }
     else if (command == "QUERY_ISRECORDING")
     {
@@ -2614,6 +2623,21 @@ void MainServer::HandleQueryUptime(PlaybackSock *pbs)
 
 /**
  * \addtogroup myth_network_protocol
+ * \par        QUERY_HOSTNAME
+ * Returns the hostname of this backend
+ */
+void MainServer::HandleQueryHostname(PlaybackSock *pbs)
+{
+    MythSocket    *pbssock = pbs->getSocket();
+    QStringList strlist;
+
+    strlist << gContext->GetHostName();
+
+    SendResponse(pbssock, strlist);
+}
+
+/**
+ * \addtogroup myth_network_protocol
  * \par        QUERY_MEMSTATS
  * Returns total RAM, free RAM, total VM and free VM (all in MB)
  */
@@ -2883,17 +2907,25 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
     QString wantHost = sList.at(1);
     QString groupname = sList.at(2);
     QString path = sList.at(3);
+    bool fileNamesOnly = false;
     QStringList strList;
+
+    if (sList.size() >= 5)
+        fileNamesOnly = sList.at(4).toInt();
 
     bool slaveUnreachable = false;
 
     VERBOSE(VB_FILE, QString("HandleSGGetFileList: group = %1  host = %2  path = %3 wanthost = %4").arg(groupname).arg(host).arg(path).arg(wantHost));
 
-    if (host.toLower() == wantHost.toLower())
+    if ((host.toLower() == wantHost.toLower()) ||
+        (gContext->GetSetting("BackendServerIP") == wantHost))
     {
         StorageGroup sg(groupname, host);
         VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting local info"));
-        strList = sg.GetFileList(path);
+        if (fileNamesOnly)
+            strList = sg.GetFileList(path);
+        else
+            strList = sg.GetFileInfoList(path);
     }
     else
     {
@@ -2901,7 +2933,8 @@ void MainServer::HandleSGGetFileList(QStringList &sList,
         if (slave)
         {
             VERBOSE(VB_FILE, QString("HandleSGGetFileList: Getting remote info"));
-            strList = slave->GetSGFileList(wantHost, groupname, path);
+            strList = slave->GetSGFileList(wantHost, groupname, path,
+                                           fileNamesOnly);
             slave->DownRef();
             slaveUnreachable = false;
         }
@@ -3090,6 +3123,7 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
     MythSocket *pbssock = pbs->getSocket();
     QString pbshost = pbs->getHostname();
 
+    vector<uint> excluded_cardids;
     QStringList strlist;
     int retval = -1;
 
@@ -3114,7 +3148,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
                 enchost = elink->GetHostName();
 
             if (enchost == pbshost && elink->IsConnected() &&
-                !elink->IsBusy() && !elink->IsTunerLocked())
+                !elink->IsTunerLocked() &&
+                !elink->GetFreeInputs(excluded_cardids).empty())
             {
                 encoder = elink;
                 retval = iter.key();
@@ -3125,7 +3160,8 @@ void MainServer::HandleGetFreeRecorder(PlaybackSock *pbs)
         }
 
         if ((retval == -1 || lastcard) && elink->IsConnected() &&
-            !elink->IsBusy() && !elink->IsTunerLocked())
+            !elink->IsTunerLocked() &&
+            !elink->GetFreeInputs(excluded_cardids).empty())
         {
             encoder = elink;
             retval = iter.key();
@@ -3165,6 +3201,7 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
 
+    vector<uint> excluded_cardids;
     QStringList strlist;
     int count = 0;
 
@@ -3173,9 +3210,8 @@ void MainServer::HandleGetFreeRecorderCount(PlaybackSock *pbs)
     {
         EncoderLink *elink = *iter;
 
-        if ((elink->IsConnected()) &&
-            (!elink->IsBusy()) &&
-            (!elink->IsTunerLocked()))
+        if (elink->IsConnected() && !elink->IsTunerLocked() &&
+            !elink->GetFreeInputs(excluded_cardids).empty())
         {
             count++;
         }
@@ -3197,9 +3233,8 @@ void MainServer::HandleGetFreeRecorderList(PlaybackSock *pbs)
     {
         EncoderLink *elink = *iter;
 
-        if ((elink->IsConnected()) &&
-            (!elink->IsBusy()) &&
-            (!elink->IsTunerLocked()))
+        if (elink->IsConnected() && !elink->IsTunerLocked() &&
+            !elink->IsBusy())
         {
             strlist << QString::number(iter.key());
         }
@@ -3232,6 +3267,9 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
 
     if (currrec > 0 && curr != encoderList->end())
     {
+        vector<uint> excluded_cardids;
+        excluded_cardids.push_back(currrec);
+
         // cycle through all recorders
         for (iter = curr;;)
         {
@@ -3245,10 +3283,9 @@ void MainServer::HandleGetNextFreeRecorder(QStringList &slist,
 
             elink = *iter;
 
-            if ((retval == -1) &&
-                (elink->IsConnected()) &&
-                (!elink->IsBusy()) &&
-                (!elink->IsTunerLocked()))
+            if (retval == -1 && elink->IsConnected() &&
+                !elink->IsTunerLocked() &&
+                !elink->GetFreeInputs(excluded_cardids).empty())
             {
                 encoder = elink;
                 retval = iter.key();
@@ -4613,6 +4650,131 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 
     SendResponse(pbssock, strlist);
     delete pginfo;
+}
+
+void MainServer::HandlePixmapGetIfModified(
+    const QStringList &slist, PlaybackSock *pbs)
+{
+    QStringList strlist;
+
+    MythSocket *pbssock = pbs->getSocket();
+    if (slist.size() < (3 + NUMPROGRAMLINES))
+    {
+        strlist = QStringList("ERROR");
+        strlist += "1: Parameter list too short";
+        SendResponse(pbssock, strlist);
+        return;
+    }
+
+    QDateTime cachemodified;
+    if (slist[1].toInt() != -1)
+        cachemodified.setTime_t(slist[1].toInt());
+
+    int max_file_size = slist[2].toInt();
+
+    ProgramInfo pginfo;
+
+    if (!pginfo.FromStringList(slist, 3))
+    {
+        strlist = QStringList("ERROR");
+        strlist += "2: Invalid ProgramInfo";
+        SendResponse(pbssock, strlist);
+        return;
+    }
+
+    pginfo.pathname = GetPlaybackURL(&pginfo) + ".png";
+    if (pginfo.pathname.left(1) == "/")
+    {
+        QFileInfo finfo(pginfo.pathname);
+        if (finfo.exists())
+        {
+            size_t fsize = finfo.size();
+            QDateTime lastmodified = finfo.lastModified();
+            bool out_of_date = !cachemodified.isValid() ||
+                (lastmodified > cachemodified);
+
+            if (out_of_date && (fsize > 0) && ((ssize_t)fsize < max_file_size))
+            {
+                QByteArray data;
+                QFile file(pginfo.pathname);
+                bool open_ok = file.open(QIODevice::ReadOnly);
+                if (open_ok)
+                    data = file.readAll();
+
+                if (data.size())
+                {
+                    VERBOSE(VB_FILE, QString("Read preview file '%1'")
+                            .arg(pginfo.pathname));
+                    strlist += QString::number(lastmodified.toTime_t());
+                    strlist += QString::number(data.size());
+                    strlist += QString::number(
+                        qChecksum(data.constData(), data.size()));
+                    strlist += QString(data.toBase64());
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            QString("Failed to read preview file '%1'")
+                            .arg(pginfo.pathname));
+
+                    strlist = QStringList("ERROR");
+                    strlist +=
+                        QString("3: Failed to read preview file '%1'%2")
+                        .arg(pginfo.pathname)
+                        .arg((open_ok) ? "" : " open failed");
+                }
+            }
+            else if (out_of_date && (max_file_size > 0))
+            {
+                if (fsize >= (size_t) max_file_size)
+                {
+                    strlist = QStringList("WARNING");
+                    strlist += QString("1: Preview file too big %1 > %2")
+                        .arg(fsize).arg(max_file_size);
+                }
+                else
+                {
+                    strlist = QStringList("ERROR");
+                    strlist += "4: Preview file is invalid";
+                }
+            }
+            else
+            {
+                strlist += QString::number(lastmodified.toTime_t());
+            }
+
+            SendResponse(pbssock, strlist);
+            return;
+        }
+    }
+
+    // handle remote ...
+    if (ismaster && pginfo.hostname != gContext->GetHostName())
+    {
+        PlaybackSock *slave = getSlaveByHostname(pginfo.hostname);
+        if (!slave)
+        {
+            strlist = QStringList("ERROR");
+            strlist +=
+                "5: Could not locate mythbackend that made this recording";
+            SendResponse(pbssock, strlist);
+            return;
+        }
+
+        strlist = slave->ForwardRequest(slist);
+
+        slave->DownRef(); slave = NULL;
+
+        if (!strlist.empty())
+        {
+            SendResponse(pbssock, strlist);
+            return;
+        }
+    }
+
+    strlist = QStringList("WARNING");
+    strlist += "2: Could not locate requested file";
+    SendResponse(pbssock, strlist);
 }
 
 void MainServer::HandleBackendRefresh(MythSocket *socket)

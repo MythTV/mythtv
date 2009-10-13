@@ -1,24 +1,28 @@
+
+#include "myththemedmenu.h"
+
+// QT headers
 #include <QApplication>
 #include <QDir>
 #include <QKeyEvent>
 #include <QDomDocument>
+#include <QFile>
 
-#include "myththemedmenu.h"
+// Mythui headers
 #include "mythmainwindow.h"
 #include "mythdialogbox.h"
-
 #include "mythgesture.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "xmlparsebase.h"
 #include "mythsystem.h"
-
-#include "mythverbose.h"
 #include "mythuihelper.h"
+#include "lcddevice.h"
 
+// Mythdb headers
+#include "mythverbose.h"
 #include "mythdb.h"
 #include "mythdirs.h"
-#include "lcddevice.h"
 
 MythThemedMenuState::MythThemedMenuState(MythScreenStack *parent,
                                          const QString &name)
@@ -169,7 +173,7 @@ void MythThemedMenu::setButtonActive(MythUIButtonListItem* item)
     if (m_watermarkState)
     {
         if (!(m_watermarkState->DisplayState(button.type)))
-            m_watermarkState->DisplayState("DEFAULT");
+            m_watermarkState->Reset();
     }
 
     if (m_descriptionText)
@@ -489,7 +493,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "text")
             {
-                if ((text.isNull() || text.isEmpty()) &&
+                if (text.isEmpty() &&
                     info.attribute("lang","").isEmpty())
                 {
                     text = qApp->translate("ThemeUI",
@@ -508,7 +512,7 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "alttext")
             {
-                if ((alttext.isNull() || alttext.isEmpty()) &&
+                if (alttext.isEmpty() &&
                     info.attribute("lang","").isEmpty())
                 {
                     alttext = qApp->translate("ThemeUI",
@@ -544,7 +548,22 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
             }
             else if (info.tagName() == "description")
             {
-                description = getFirstText(info);
+                if (description.isEmpty() &&
+                    info.attribute("lang","").isEmpty())
+                {
+                    description = qApp->translate("ThemeUI",
+                                            qPrintable(getFirstText(info)));
+                }
+                else if (info.attribute("lang","").toLower() ==
+                         GetMythUI()->GetLanguageAndVariant())
+                {
+                    description = getFirstText(info);
+                }
+                else if (info.attribute("lang","").toLower() ==
+                         GetMythUI()->GetLanguage())
+                {
+                    description = getFirstText(info);
+                }
             }
             else if (info.tagName() == "password")
             {
@@ -725,21 +744,21 @@ void MythThemedMenu::buttonAction(MythUIButtonListItem *item, bool skipPass)
  */
 QString MythThemedMenu::findMenuFile(const QString &menuname)
 {
-    QString testdir = GetConfDir() + "/" + menuname;
+    QString testdir = GetConfDir() + '/' + menuname;
     QFile file(testdir);
     if (file.exists())
         return testdir;
     else
         VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
-    testdir = GetMythUI()->GetMenuThemeDir() + "/" + menuname;
+    testdir = GetMythUI()->GetMenuThemeDir() + '/' + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
     else
         VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
-    testdir = GetMythUI()->GetThemeDir() + "/" + menuname;
+    testdir = GetMythUI()->GetThemeDir() + '/' + menuname;
     file.setFileName(testdir);
     if (file.exists())
         return testdir;
@@ -760,7 +779,7 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
     else
         VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
-    return "";
+    return QString();
 }
 
 /** \brief Handle a MythTV action for the Menus.

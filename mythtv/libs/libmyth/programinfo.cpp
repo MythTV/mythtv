@@ -14,8 +14,6 @@ using namespace std;
 #include <QRegExp>
 #include <QMap>
 #include <QUrl>
-#include <QLayout>
-#include <QLabel>
 #include <QApplication>
 #include <QFile>
 #include <QFileInfo>
@@ -352,15 +350,15 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 
 void ProgramInfo::clear(void)
 {
-    title = "";
-    subtitle = "";
-    description = "";
-    category = "";
+    title.clear();
+    subtitle.clear();
+    description.clear();
+    category.clear();
 
-    chanid = "";
-    chanstr = "";
-    chansign = "";
-    channame = "";
+    chanid.clear();
+    chanstr.clear();
+    chansign.clear();
+    channame.clear();
     m_videoHeight = 0;
 
     recpriority = 0;
@@ -368,9 +366,9 @@ void ProgramInfo::clear(void)
     playgroup = "Default";
     chancommfree = 0;
 
-    pathname = "";
+    pathname.clear();
     filesize = 0;
-    hostname = "";
+    hostname.clear();
     storagegroup = "Default";
 
     startts = mythCurrentDateTime();
@@ -382,7 +380,7 @@ void ProgramInfo::clear(void)
     isVideo = false;
     lenMins = 0;
 
-    year = "";
+    year.clear();
     stars = 0.0f;
 
     originalAirDate = QDate(0, 1, 1);
@@ -415,7 +413,7 @@ void ProgramInfo::clear(void)
     shareable = false;
     duplicate = false;
 
-    schedulerid = "";
+    schedulerid.clear();
     findid = 0;
 
     programflags = 0;
@@ -423,18 +421,18 @@ void ProgramInfo::clear(void)
     videoproperties = 0;
     audioproperties = 0;
     transcoder = 0;
-    chanOutputFilters = "";
+    chanOutputFilters.clear();
 
-    seriesid = "";
-    programid = "";
-    catType = "";
+    seriesid.clear();
+    programid.clear();
+    catType.clear();
 
-    sortTitle = "";
+    sortTitle.clear();
 
     // Private
     ignoreBookmark = false;
 
-    inUseForWhat = "";
+    inUseForWhat.clear();
     positionMapDBReplacement = NULL;
 }
 
@@ -460,7 +458,7 @@ QString ProgramInfo::MakeUniqueKey(void) const
 #define LONGLONG_TO_LIST(x)  INT_TO_LIST((int)((x) >> 32))  \
                              INT_TO_LIST((int)((x) & 0xffffffffLL))
 
-#define STR_TO_LIST(x)       if ((x).isNull()) list << ""; else list << (x);
+#define STR_TO_LIST(x)       list << (x);
 #define DATE_TO_LIST(x)      STR_TO_LIST((x).toString(Qt::ISODate))
 
 #define FLOAT_TO_LIST(x)     sprintf(tmp, "%f", (x)); list << tmp;
@@ -505,7 +503,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     DATETIME_TO_LIST(recendts)
     INT_TO_LIST(repeat)
     INT_TO_LIST(programflags)
-    STR_TO_LIST((recgroup != "") ? recgroup : "Default")
+    STR_TO_LIST((!recgroup.isEmpty()) ? recgroup : "Default")
     INT_TO_LIST(chancommfree)
     STR_TO_LIST(chanOutputFilters)
     STR_TO_LIST(seriesid)
@@ -514,10 +512,10 @@ void ProgramInfo::ToStringList(QStringList &list) const
     FLOAT_TO_LIST(stars)
     DATE_TO_LIST(originalAirDate)
     INT_TO_LIST(hasAirDate)
-    STR_TO_LIST((playgroup != "") ? playgroup : "Default")
+    STR_TO_LIST((!playgroup.isEmpty()) ? playgroup : "Default")
     INT_TO_LIST(recpriority2)
     INT_TO_LIST(parentid)
-    STR_TO_LIST((storagegroup != "") ? storagegroup : "Default")
+    STR_TO_LIST((!storagegroup.isEmpty()) ? storagegroup : "Default")
     INT_TO_LIST(audioproperties)
     INT_TO_LIST(videoproperties)
     INT_TO_LIST(subtitleType)
@@ -551,9 +549,7 @@ bool ProgramInfo::FromStringList(const QStringList &list, uint offset)
                                    VERBOSE(VB_IMPORTANT, listerror); \
                                    return false;      \
                                }                      \
-                               ts = *it++;            \
-                               if (ts.isNull())       \
-                                   ts = "";
+                               ts = *it++;
 
 #define INT_FROM_LIST(x)       NEXT_STR() (x) = ts.toInt();
 #define ENUM_FROM_LIST(x, y)   NEXT_STR() (x) = ((y)ts.toInt());
@@ -646,6 +642,8 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
  */
 void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 {
+    // NOTE: Format changes and relevant additions made here should be
+    //       reflected in RecordingRule
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     QString fullDateFormat = dateFormat;
@@ -830,6 +828,10 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
                           recstartts.time().toString(timeFormat) + " - " +
                           recendts.time().toString(timeFormat);
 
+    progMap["starttimedate"] =
+                          recstartts.date().toString(dateFormat) + ", " +
+                          recstartts.time().toString(timeFormat);
+                          
     progMap["shortstarttimedate"] =
                           recstartts.date().toString(shortDateFormat) + " " +
                           recstartts.time().toString(timeFormat);
@@ -867,7 +869,7 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
     if (stars)
     {
         QString str = QObject::tr("%n star(s)", "", (int)(stars * 4));
-        progMap["yearstars"] = QString("(%1, %2) ").arg(year).arg(str);
+        progMap["yearstars"] = QString("(%1, %2)").arg(year).arg(str);
     }
     else
         progMap["yearstars"] = "";
@@ -1117,7 +1119,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->stars = query.value(15).toDouble();
         proginfo->repeat = query.value(16).toInt();
 
-        if (query.value(17).isNull() || query.value(17).toString().isEmpty())
+        if (query.value(17).toString().isEmpty())
         {
             proginfo->originalAirDate = QDate (0, 1, 1);
             proginfo->hasAirDate = false;
@@ -1307,7 +1309,7 @@ bool ProgramInfo::IsSameTimeslot(const ProgramInfo& other) const
         return false;
     if (startts == other.startts && endts == other.endts &&
         (chanid == other.chanid ||
-         (chansign != "" && chansign == other.chansign)))
+         (!chansign.isEmpty() && chansign == other.chansign)))
         return true;
 
     return false;
@@ -1324,7 +1326,7 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
     if (title != other.title)
         return false;
     if ((chanid == other.chanid ||
-         (chansign != "" && chansign == other.chansign)) &&
+         (!chansign.isEmpty() && chansign == other.chansign)) &&
         startts < other.endts &&
         endts > other.startts)
         return true;
@@ -1375,7 +1377,7 @@ bool ProgramInfo::SetRecordBasename(const QString &basename)
  */
 QString ProgramInfo::GetRecordBasename(bool fromDB) const
 {
-    QString retval = "";
+    QString retval;
 
     if (!fromDB && !pathname.isEmpty())
         retval = pathname.section('/', -1);
@@ -1429,7 +1431,7 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
         //VERBOSE(VB_FILE, LOC +QString("GetPlaybackURL: CHECKING SG : %1 : ").arg(tmpURL));
         tmpURL = sgroup.FindRecordingFile(basename);
 
-        if (tmpURL != "")
+        if (!tmpURL.isEmpty())
         {
             VERBOSE(VB_FILE, LOC +
                     QString("GetPlaybackURL: File is local: '%1'").arg(tmpURL));
@@ -1842,7 +1844,7 @@ bool ProgramInfo::IsInUse(QString &byWho) const
     query.bindValue(":STARTTIME", recstartts);
     query.bindValue(":ONEHOURAGO", oneHourAgo);
 
-    byWho = "";
+    byWho.clear();
     if (query.exec() && query.size() > 0)
     {
         QString usageStr, recusage;
@@ -2121,7 +2123,7 @@ void ProgramInfo::ClearMarkupMap(int type, long long min_frame,
                                            long long max_frame) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString comp = "";
+    QString comp;
 
     if (min_frame >= 0)
     {
@@ -2428,7 +2430,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
 
     QMap<long long, long long>::Iterator i;
     MSqlQuery query(MSqlQuery::InitCon());
-    QString comp = "";
+    QString comp;
 
     if (min_frame >= 0)
         comp += " AND mark >= :MIN_FRAME ";
@@ -3064,7 +3066,7 @@ bool ProgramInfo::FillInRecordInfo(const vector<ProgramInfo *> &reclist)
     ProgramInfo *found = NULL;
     int pfound = 0;
 
-    for (i = reclist.begin(); i != reclist.end(); i++)
+    for (i = reclist.begin(); i != reclist.end(); ++i)
     {
         ProgramInfo *p = *i;
         if (IsSameTimeslot(*p))
@@ -3210,7 +3212,7 @@ bool ProgramInfo::PathnameExists(void)
 
 QString ProgramInfo::GetRecGroupPassword(QString group)
 {
-    QString result = QString("");
+    QString result;
 
     if (group == "All Programs")
     {
@@ -3226,9 +3228,6 @@ QString ProgramInfo::GetRecGroupPassword(QString group)
         if (query.exec() && query.next())
             result = query.value(0).toString();
     }
-
-    if (result == QString::null)
-        result = QString("");
 
     return(result);
 }
@@ -3248,6 +3247,7 @@ void ProgramInfo::UpdateRecGroup(void)
         recgroup = query.value(0).toString();
     }
 }
+
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 {
     if (isVideo)
@@ -3257,7 +3257,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     if (inuse && inUseForWhat.length() < 2)
     {
-        if (usedFor != "")
+        if (!usedFor.isEmpty())
             inUseForWhat = usedFor;
         else
             inUseForWhat = QObject::tr("Unknown") + " [" +
@@ -3286,14 +3286,14 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     {
         if (!gContext->IsBackend())
             RemoteSendMessage("RECORDING_LIST_CHANGE");
-        inUseForWhat = "";
+        inUseForWhat.clear();
         return;
     }
 
     if (pathname.left(1) != "/")
         pathname = GetPlaybackURL(false, true);
 
-    QString recDir = "";
+    QString recDir;
     QFileInfo testFile(pathname);
     if (testFile.exists() || hostname == gContext->GetHostName())
     {
@@ -3324,7 +3324,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     }
     else if (inUseForWhat == kPreviewGeneratorInUseID)
     {
-        recDir = "";
+        // recDir = "";
     }
     else if (!gContext->IsBackend() &&
               RemoteCheckFile(this) && pathname.left(1) == "/")
@@ -3363,7 +3363,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
  */
 bool ProgramInfo::GetChannel(QString &channum, QString &input) const
 {
-    channum = input = QString::null;
+    channum.clear();
+    input.clear();
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT channel.channum, cardinput.inputname "
@@ -3376,7 +3377,7 @@ bool ProgramInfo::GetChannel(QString &channum, QString &input) const
     query.bindValue(":SOURCEID", sourceid);
     query.bindValue(":CARDID",   cardid);
 
-    if (query.exec() && query.isActive() && query.next())
+    if (query.exec() && query.next())
     {
         channum = query.value(0).toString();
         input   = query.value(1).toString();

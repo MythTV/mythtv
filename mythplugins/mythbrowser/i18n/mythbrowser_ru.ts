@@ -1,231 +1,291 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1">
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
-    <name>Bookmarks</name>
+    <name>BookmarkEditor</name>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="504"/>
-        <source>MythBrowser: Select group or single site to view</source>
-        <translation>MythBrowser: Выберите группу или сайт для просмотра</translation>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="56"/>
+        <source>Edit Bookmark Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="58"/>
+        <source>Enter Bookmark Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="77"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="78"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="79"/>
+        <source>Find...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkeditor.cpp" line="143"/>
+        <source>Select a category</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>BookmarksConfig</name>
+    <name>BookmarkManager</name>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="245"/>
-        <source>MythBrowser Bookmarks Settings</source>
-        <translation>Настройки закладок MythBrowser</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="158"/>
+        <source>No bookmarks defined.
+
+Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="256"/>
-        <source>Press the &apos;New Bookmark&apos; button to add a new site/group.
-Pressing SPACE/Enter on a selected entry removes it from the listview.</source>
-        <translation>Нажмите клавишу &apos;Новая закладка&apos; чтобы добавить новый сайт или группу.
-Нажатие ПРОБЕЛ/Enter на выбраных элементах удаляет их из списка.</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="268"/>
+        <source>Actions</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="277"/>
-        <source>Zoom [%]:</source>
-        <translation>Увеличение [%]:</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="283"/>
+        <source>Add Bookmark</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="290"/>
-        <source>Browser:</source>
-        <translation>Браузер:</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="287"/>
+        <source>Edit Bookmark</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="304"/>
-        <source>Hide Scrollbars</source>
-        <translation>Прятать прокрутку</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="288"/>
+        <source>Delete Bookmark</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="311"/>
-        <source>Scroll Page</source>
-        <translation>Прокручивать страницу</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="289"/>
+        <source>Show Bookmark</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="317"/>
-        <source>Scroll Speed:</source>
-        <translation>Скорость прокрутки:</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
+        <source>Delete Marked</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="332"/>
-        <source>&amp;New Bookmark</source>
-        <translation>&amp;Новая закладка</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="295"/>
+        <source>Show Marked</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="339"/>
-        <source>Add a new Website</source>
-        <translation>Добавить новый сайт</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="296"/>
+        <source>Clear Marked</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="345"/>
-        <source>&amp;Finish</source>
-        <translation>&amp;Завершить</translation>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="299"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="476"/>
+        <source>Are you sure you want to delete the selected bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="520"/>
+        <source>Are you sure you want to delete the marked bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BrowserConfig</name>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="42"/>
+        <source>MythBrowser Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="63"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="64"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="115"/>
+        <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="119"/>
+        <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="124"/>
+        <source>Exit without saving settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/bookmarkmanager.cpp" line="126"/>
+        <source>Save settings and Exit</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MythBrowser</name>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="339"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="104"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
         <source>Enter URL</source>
         <translation type="unfinished">Введите URL</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="226"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="240"/>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="328"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="336"/>
         <source>Actions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="342"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
         <source>Back</source>
         <translation type="unfinished">Назад</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="345"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="355"/>
         <source>Forward</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="347"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="357"/>
         <source>Zoom In</source>
         <translation type="unfinished">Уменьшить</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="348"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="358"/>
         <source>Zoom Out</source>
         <translation type="unfinished">Увеличить</translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="349"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="359"/>
         <source>New Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="352"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="362"/>
         <source>Delete Tab</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbrowser/mythbrowser.cpp" line="354"/>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="364"/>
+        <source>Add Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mythbrowser/mythbrowser.cpp" line="366"/>
         <source>Cancel</source>
         <translation type="unfinished">Отмена</translation>
     </message>
 </context>
 <context>
-    <name>PopupBox</name>
+    <name>MythControls</name>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="112"/>
-        <source>&amp;Ok</source>
-        <translation>&amp;OK</translation>
+        <location filename="../mythbrowser/main.cpp" line="47"/>
+        <source>Move to next browser tab</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="93"/>
-        <source>Add New Website</source>
-        <translation>Добавить новый сайт</translation>
+        <location filename="../mythbrowser/main.cpp" line="49"/>
+        <source>Move to previous browser tab</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="96"/>
-        <source>Group:</source>
-        <translation>Группа:</translation>
-    </message>
-    <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="100"/>
-        <source>Description:</source>
-        <translation>Описание:</translation>
-    </message>
-    <message>
-        <location filename="../mythbookmarkmanager/bookmarkmanager.cpp" line="104"/>
-        <source>URL:</source>
-        <translation>URL:</translation>
+        <location filename="../mythbrowser/main.cpp" line="52"/>
+        <source>Internal Web Browser</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>TabView</name>
+    <name>ThemeUI</name>
     <message>
-        <location filename="" line="0"/>
-        <source>Save Link in Bookmarks</source>
-        <translation type="obsolete">Сохранить ссылку в закладках</translation>
+        <location filename="themestrings.h" line="2"/>
+        <source>Bookmark Manager</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="0"/>
-        <source>MythBrowser Menu</source>
-        <translation type="obsolete">Меню MythBrowser</translation>
+        <location filename="themestrings.h" line="3"/>
+        <source>Category</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="0"/>
-        <source>Enter URL</source>
-        <translation type="obsolete">Введите URL</translation>
+        <location filename="themestrings.h" line="4"/>
+        <source>[x]</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="0"/>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
+        <location filename="themestrings.h" line="5"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="0"/>
-        <source>Cancel</source>
-        <translation type="obsolete">Отмена</translation>
+        <location filename="themestrings.h" line="6"/>
+        <source>URL</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="0"/>
-        <source>Back</source>
-        <translation type="obsolete">Назад</translation>
+        <location filename="themestrings.h" line="7"/>
+        <source>Category:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="0"/>
-        <source>Next Tab</source>
-        <translation type="obsolete">Новая вкладка</translation>
+        <location filename="themestrings.h" line="8"/>
+        <source>Find...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="0"/>
-        <source>Prev Tab</source>
-        <translation type="obsolete">Пред. вкладка</translation>
+        <location filename="themestrings.h" line="9"/>
+        <source>Name:</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="" line="0"/>
-        <source>Remove Tab</source>
-        <translation type="obsolete">Удалить вкладку</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Zoom Out</source>
-        <translation type="obsolete">Увеличить</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Zoom In</source>
-        <translation type="obsolete">Уменьшить</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Add New Bookmark</source>
-        <translation type="obsolete">Добавить новую закладку</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Group:</source>
-        <translation type="obsolete">Группа:</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
-        <source>Description:</source>
-        <translation type="obsolete">Описание:</translation>
-    </message>
-    <message>
-        <location filename="" line="0"/>
+        <location filename="themestrings.h" line="10"/>
         <source>URL:</source>
-        <translation type="obsolete">URL:</translation>
+        <translation type="unfinished">URL:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>Ok</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Browser Command:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Text Size:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>WebPage</name>
     <message>
-        <location filename="../mythbrowser/webpage.cpp" line="131"/>
+        <location filename="../mythbrowser/webpage.cpp" line="129"/>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>

@@ -26,9 +26,10 @@
 
 #include <sys/types.h>
 
-#include <qpoint.h>
-#include <qlist.h>
-#include <qevent.h>
+#include <QPoint>
+#include <QList>
+#include <QString>
+#include <QEvent>
 
 const int MythGestureEventType = 24427;
 
@@ -114,14 +115,13 @@ class MythGesturePrivate;
  * @brief Contains the points in a stroke, and translates them into 
  * gestures.
  *
- * Becase the indended use of the stop method is to be called by
+ * Because the indended use of the stop method is to be called by
  * either the expiration of a timer or when an event is called (or
  * both at the same time) it must have a mutex.
  */
 class MythGesture 
 {
-public:
-
+  public:
     /**
      * @brief Create a new stroke, specifying tuning values
      * @param max_points The maximum number of points to record.
@@ -131,9 +131,9 @@ public:
      * @param bin_percent The bin count percentage required
      * to add to the sequence.
      */
-    MythGesture(size_t max_points = 10000, size_t min_points = 50,
-                size_t max_sequence = 20, size_t scale_ratio = 4,
-                float bin_percent = 0.07);
+    explicit MythGesture(size_t max_points = 10000, size_t min_points = 50,
+                         size_t max_sequence = 20, size_t scale_ratio = 4,
+                         float bin_percent = 0.07);
    ~MythGesture();
 
     /**
@@ -174,7 +174,7 @@ public:
      */
     bool hasMinimumPoints(void) const { return (uint)points.size() >= min_points; }
 
-protected:
+  protected:
 
     /**
      * @brief Translate the stroke into a sequence.
@@ -191,7 +191,7 @@ protected:
      */
     void adjustExtremes(int x, int y);
 
-private:
+  private:
 
     bool m_recording;
     int min_x;

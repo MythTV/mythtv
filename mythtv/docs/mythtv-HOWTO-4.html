@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: System Configuration Requirements for Compiling MythTV. </TITLE>
  <LINK HREF="mythtv-HOWTO-5.html" REL=next>
  <LINK HREF="mythtv-HOWTO-3.html" REL=previous>
@@ -101,52 +101,6 @@ prompt before compiling.</P>
 <CODE>/usr/lib/qt3/mkspecs</CODE> (<CODE>/usr/share/qt3/mkspecs</CODE> for Debian)
 called <CODE>default</CODE>. If not, you'll get errors during the compile. See
 the Troubleshooting Section for more information.</P>
-<H3>Distribution-Specific Notes</H3>
-
-<H3>Mandriva</H3>
-
-<P>The following instructions work for Mandriva using
-<B>bash</B> as the shell, and may be applicable for a distribution which
-uses <CODE>/etc/profile.d</CODE>.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  Mandriva 10 installs a <CODE>/etc/profile.d/qtdir3.sh</CODE>
-file, but it doesn't include the addition of the PATH variable.  If you're
-running Mandriva 10, don't create a <CODE>mythtv.sh</CODE> file as detailed
-below; edit the <CODE>qtdir3.sh</CODE> file and add the PATH statement within
-the if / fi block.</CAPTION>
-</FIGURE>
-
-As root, create the following file in <CODE>/etc/profile.d</CODE> The example
-filename is "mythtv.sh". Use what you feel is appropriate.</P>
-<P>Open a shell, and switch to superuser mode.</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>: ^D means press CTRL and d at the same time.</CAPTION>
-</FIGURE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cd /etc/profile.d
-cat > mythtv.sh
-export QTDIR=/usr/lib/qt3
-export PATH=$PATH:/usr/lib/qt3/bin
-^D
-
-# chmod a+x mythtv.sh
-# exit
-$ exit
-</PRE>
-</CODE></BLOCKQUOTE>
-
-The last two commands are to exit out of the shell. This way, when you next
-open a shell your new commands
-will take effect.</P>
 
 <H3><A NAME="devperms"></A> Device Permissions </H3>
 
@@ -173,6 +127,7 @@ and replace it with
 </P>
 <P>What we're doing is allowing read and write access to the files in the
 video4linux directory.</P>
+
 <HR>
 <A HREF="mythtv-HOWTO-5.html">Next</A>
 <A HREF="mythtv-HOWTO-3.html">Previous</A>

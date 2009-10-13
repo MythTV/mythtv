@@ -1,8 +1,9 @@
-// Myth headers
-#include "mythverbose.h"
 
 // Mythui headers
 #include "mythgenerictree.h"
+
+// Myth headers
+#include "mythverbose.h"
 
 class SortableMythGenericTreeList : public QList<MythGenericTree*>
 {
@@ -122,8 +123,7 @@ MythGenericTree::MythGenericTree(const QString &a_string, int an_int,
 
 MythGenericTree::~MythGenericTree()
 {
-    while (!m_subnodes->isEmpty())
-        delete m_subnodes->takeFirst();
+    deleteAllChildren();
     delete m_subnodes;
     delete m_ordered_subnodes;
     delete m_flatenedSubnodes;
@@ -160,7 +160,7 @@ void MythGenericTree::removeNode(MythGenericTree *child)
     m_flatenedSubnodes->removeAll(child);
     m_subnodes->removeAll(child);
 
-    if (child->IsVisible())
+    if (child && child->IsVisible())
         DecVisibleCount();
 }
 
@@ -171,6 +171,7 @@ void MythGenericTree::deleteNode(MythGenericTree *child)
 
     removeNode(child);
     delete child;
+    child = NULL;
 }
 
 int MythGenericTree::calculateDepth(int start)
@@ -453,7 +454,7 @@ MythGenericTree* MythGenericTree::getParent() const
 
 void MythGenericTree::setAttribute(uint attribute_position, int value_of_attribute)
 {
-    // You can use attibutes for anything you like. Mythmusic, for example,
+    // You can use attributes for anything you like. Mythmusic, for example,
     // stores a value for random ordering in the first "column" (0) and a value
     // for "intelligent" (1) ordering in the second column
 
@@ -466,7 +467,7 @@ int MythGenericTree::getAttribute(uint which_one) const
 {
     if (m_attributes->size() < (int)(which_one + 1))
     {
-        VERBOSE(VB_IMPORTANT, "asked a MythGenericTree node for a nonexistant"
+        VERBOSE(VB_IMPORTANT, "Asked a MythGenericTree node for a non-existent"
                               "attribute");
         return 0;
     }
@@ -658,8 +659,13 @@ void MythGenericTree::deleteAllChildren()
     m_ordered_subnodes->clear();
     m_selected_subnode = NULL;
     m_currentOrderingIndex = -1;
+    MythGenericTree *child;
     while (!m_subnodes->isEmpty())
-        delete m_subnodes->takeFirst();
+    {
+        child = m_subnodes->takeFirst();
+        delete child;
+        child = NULL;
+    }
     m_subnodes->clear();
 }
 

@@ -1,0 +1,2 @@
+void strings_null() {
+}

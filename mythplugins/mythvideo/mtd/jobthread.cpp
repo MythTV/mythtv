@@ -1043,7 +1043,6 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
 
     // Convert query results to named variables
     int       sync_mode = a_query.value(0).toInt();
-    bool       use_yv12 = a_query.value(1).toBool();
     int         cliptop = a_query.value(2).toInt();
     int      clipbottom = a_query.value(3).toInt();
     int        clipleft = a_query.value(4).toInt();
@@ -1092,6 +1091,22 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     int input_vsize = a_query.value(1).toInt();
     int fr_code = a_query.value(2).toInt();
 
+    QProcess versionCheck;
+
+    QString version;
+    versionCheck.setReadChannelMode(QProcess::MergedChannels);
+    versionCheck.start("transcode", QStringList() << "-v");
+    versionCheck.waitForFinished();
+    QByteArray result = versionCheck.readAll();
+    QString resultString(result);
+
+    if (resultString.contains("v1.0"))
+        version = "1.0";
+    else if (resultString.contains("v1.1"))
+        version = "1.1";
+
+    VERBOSE(VB_GENERAL, QString("Found Transcode Version: %1").arg(version));
+
     //  Check if we are doing subtitles
     if (subtitle_track > -1)
     {
@@ -1123,11 +1138,6 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
 
     tc_arguments.push_back("-M");
     tc_arguments.push_back(QString("%1").arg(sync_mode));
-
-    if (use_yv12)
-    {
-        tc_arguments.push_back("-1");
-    }
 
     //  The order of these is defined by transcode
     if (clipbottom || cliptop || clipleft || clipright)
@@ -1230,8 +1240,13 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
         (two_pass && which_run == 1) ?
         QString("/dev/null") : QString("%1.avi").arg(destination_file_string));
 
-    tc_arguments.push_back("--color");
-    tc_arguments.push_back("0");
+    if (version == "1.0")
+    {
+        tc_arguments.push_back("--color");
+        tc_arguments.push_back("0");
+    }
+    else
+        tc_arguments.push_back("--log_no_color");
 
     if (two_pass)
     {

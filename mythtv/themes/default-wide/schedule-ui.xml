@@ -48,13 +48,14 @@
             <font>basesmallpurple</font>
         </textarea>
 
+        // Temporary guide widget for 0.22
         <guidegrid name="guidegrid">
             <area>220,295,1032,390</area>
             <layout>horizontal</layout>
             <channels>5</channels>
             <timeslots>4</timeslots>
             <solidcolor>#003256</solidcolor>
-            <selector type="roundbox" linecolor="#ffff33" ></selector>
+            <selector type="roundbox" linecolor="#ffff33" />
             <showcategories>yes</showcategories>
             <categoryalpha>60</categoryalpha>
             <recordingcolor>#00aa00</recordingcolor>
@@ -62,15 +63,15 @@
             <cutdown>no</cutdown>
             <multiline>yes</multiline>
             <textoffset>9,6</textoffset>
-            <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
-            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
-            <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
-            <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
-            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
-            <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
-            <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
-            <arrow direction="left" image="gg-arrow-left.png"></arrow>
-            <arrow direction="right" image="gg-arrow-right.png"></arrow>
+            <recordstatus type="SingleRecord" image="gg-rs-single.png" />
+            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png" />
+            <recordstatus type="ChannelRecord" image="gg-rs-channel.png" />
+            <recordstatus type="AllRecord" image="gg-rs-all.png" />
+            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png" />
+            <recordstatus type="FindOneRecord" image="gg-rs-findone.png" />
+            <recordstatus type="OverrideRecord" image="gg-rs-override.png" />
+            <arrow direction="left" image="gg-arrow-left.png" />
+            <arrow direction="right" image="gg-arrow-right.png" />
             <font>basesmall</font>
         </guidegrid>
 
@@ -601,7 +602,7 @@
             <font>basemedium</font>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
-                Select 'Program Guide' or 'Program Finder'</value>
+                select 'Program Guide' or 'Program Finder'</value>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -704,7 +705,7 @@
             <font>basemedium</font>
             <value>You Haven't Scheduled Any Programs To Be Recorded\n
                 To schedule a recording, exit this screen and
-                Select 'Program Guide' or 'Program Finder'</value>
+                select 'Program Guide' or 'Program Finder'</value>
             <multiline>yes</multiline>
             <align>allcenter</align>
         </textarea>
@@ -934,7 +935,6 @@
 
         <buttonlist name="phrase_list" from="basebuttonlist">
             <area>20,60,450,270</area>
-            <align>left</align>
             <showarrow>no</showarrow>
             <statetype name="buttonitem">
                 <state name="active">
@@ -1534,46 +1534,51 @@
     <window name="customedit">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>40,40,760,40</area>
+            <area>40,30,760,40</area>
             <font>baselarge</font>
             <value>Custom Record Rules</value>
         </textarea>
 
         <textarea name="ruleslabel" from="basetextarea">
-            <area>50,100,200,40</area>
+            <area>30,90,220,40</area>
             <font>basemedium</font>
             <align>right,vcenter</align>
             <value>Existing Rules:</value>
         </textarea>
 
         <buttonlist name="rules" from="basewideselector">
-            <position>300,100</position>
-            <wrapstyle>items</wrapstyle>
+            <position>300,90</position>
+            <wrapstyle>selection</wrapstyle>
         </buttonlist>
 
         <textarea name="titlelabel" from="ruleslabel">
-            <area>50,150,200,40</area>
+            <area>30,140,220,40</area>
             <value>Rule Name:</value>
-            <align>right,vcenter</align>
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>300,150</position>
+            <position>300,140</position>
         </textedit>
 
+        <textarea name="sampleslabel" from="ruleslabel">
+            <area>30,230,220,40</area>
+            <value>Sample Clauses:</value>
+        </textarea>
+
         <buttonlist name="clauses" from="basewideselector">
-            <position>100,230</position>
+            <position>300,230</position>
             <wrapstyle>items</wrapstyle>
         </buttonlist>
 
         <textarea name="clausetext" from="ruleslabel">
-            <area>520,230,660,40</area>
-            <align>left,vcenter</align>
+            <area>300,275,900,80</area>
+            <align>left,top</align>
+            <multiline>yes</multiline>
             <cutdown>yes</cutdown>
         </textarea>
 
         <textedit name="description">
-            <area>100,320,1080,150</area>
+            <area>100,340,1080,150</area>
             <statetype name="background">
                 <state name="active">
                     <imagetype name="background">
@@ -1599,13 +1604,13 @@
         </textedit>
 
         <textarea name="subtitlelabel" from="ruleslabel">
-            <area>50,500,250,85</area>
+            <area>50,520,250,85</area>
             <value>Additional Tables:</value>
             <align>left,vcenter</align>
         </textarea>
 
         <textedit name="subtitle">
-            <area>300,500,880,85</area>
+            <area>300,520,880,85</area>
             <statetype name="background">
                 <state name="active">
                     <imagetype name="background">
@@ -1631,22 +1636,22 @@
         </textedit>
 
         <button name="test" from="basebutton">
-            <position>100,630</position>
+            <position>100,650</position>
             <value>Test</value>
         </button>
 
         <button name="record" from="basebutton">
-            <position>387,630</position>
+            <position>387,650</position>
             <value>Record</value>
         </button>
 
         <button name="store" from="basebutton">
-            <position>674,630</position>
+            <position>674,650</position>
             <value>Store</value>
         </button>
 
         <button name="cancel" from="basebutton">
-            <position>960,630</position>
+            <position>960,650</position>
             <value>Cancel</value>
         </button>
 
@@ -1681,6 +1686,7 @@
         <buttonlist name="rules" from="basewideselector">
             <position>455,310</position>
             <helptext>Select the recording rule</helptext>
+            <wrapstyle>selection</wrapstyle>
         </buttonlist>
 
         <button name="schedoptions" from="basewidebutton">

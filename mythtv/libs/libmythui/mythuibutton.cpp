@@ -1,7 +1,10 @@
 
+#include "mythuibutton.h"
+
 // QT
 #include <QTimer>
 #include <QDomDocument>
+#include <QApplication>
 
 // Myth headers
 #include "mythverbose.h"
@@ -9,8 +12,6 @@
 // MythUI headers
 #include "mythmainwindow.h"
 #include "mythuigroup.h"
-
-#include "mythuibutton.h"
 
 MythUIButton::MythUIButton(MythUIType *parent, const QString &name)
             : MythUIType(parent, name)
@@ -143,7 +144,7 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-/** \brief Mouse click/movement handler, recieves mouse gesture events from the
+/** \brief Mouse click/movement handler, receives mouse gesture events from the
  *         QApplication event loop. Should not be used directly.
  *
  *  \param uitype The mythuitype receiving the event
@@ -245,7 +246,8 @@ bool MythUIButton::ParseElement(QDomElement &element)
 {
     if (element.tagName() == "value")
     {
-        m_ValueText = getFirstText(element);
+        m_ValueText = qApp->translate(
+            "ThemeUI", getFirstText(element).toLatin1().constData());
     }
     else
         return MythUIType::ParseElement(element);

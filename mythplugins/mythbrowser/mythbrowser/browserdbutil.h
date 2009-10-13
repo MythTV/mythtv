@@ -1,8 +1,9 @@
 #ifndef BROWSERDBUTIL_H_
 #define BROWSERDBUTIL_H_
 
-// mythbrowser
-#include "bookmarkmanager.h"
+#include <QStringList>
+
+class Bookmark;
 
 bool UpgradeBrowserDatabaseSchema(void);
 

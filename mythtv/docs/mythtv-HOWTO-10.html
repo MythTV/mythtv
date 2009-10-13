@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Configuring mythfrontend.</TITLE>
  <LINK HREF="mythtv-HOWTO-11.html" REL=next>
  <LINK HREF="mythtv-HOWTO-9.html" REL=previous>
@@ -269,19 +269,21 @@ The following types of hardware encoding cards are supported:
 <A HREF="http://ivtvdriver.org">http://ivtvdriver.org</A></LI>
 <LI>HDTV - pcHDTV cards; see 
 <A HREF="http://pchdtv.com">http://pchdtv.com</A> and
-the Air2PC-ATSC-PCI see 
-<A HREF="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103</A></LI>
+the Air2PC-ATSC-PCI</LI>
+<LI>H.264 - HD PVR</LI>
 <LI>DVB - cards supporting DVB; see 
 <A HREF="http://linuxtv.org">http://linuxtv.org</A></LI>
+<LI>HD Homerun</LI>
 </UL>
-
-For cards without hardware encoding capabilities (all cards supported by
+</P>
+<P>For cards without hardware encoding capabilities (all cards supported by
 V4L not listed above), Myth includes two methods for software encoding:
 RTjpeg and MPEG-4.  RTjpeg has significantly fewer CPU demands than MPEG-4,
 but it generates larger files than MPEG-4 for a given recording.</P>
-<P>For DVB and HDTV cards, no further configuration is required after
-setting up the card using the 'mythtv-setup' program.
-For all other cards, configuration is done through MythFrontend.
+<P>Any cards which simply demodulate MPEG-2 which has been encoded by the
+broadcaster will not offer much in the way of configuration because the
+broadcaster will be choosing the bitrate, etc.</P>
+<P>For all other cards, configuration is done through MythFrontend.
 Selecting 'Recording Profiles' from the 'TV Settings' screen will list
 the profiles currently available for the cards in your system.
 Depending on what types of cards you have installed you may see:
@@ -338,46 +340,6 @@ default as-is until you're sure that MythTV is operational.</CAPTION>
 </P>
 <P>See the 
 <A HREF="mythtv-HOWTO-23.html#capture_resolution_">What capture resolution should I use? How does video work?</A> section for more information.</P>
-
-<H2><A NAME="ss10.6">10.6</A> <A HREF="mythtv-HOWTO.html#toc10.6">Xbox Frontends</A>
-</H2>
-
-<P>MythTV is able to control the LED on the Xbox to indicate backend
-recording status.</P>
-<P>To control the LED, you will need the <B>blink</B> program from the
-xbox-linux project, which is installed as <CODE>/bin/led</CODE> on GentooX.  On
-Xebian (the new Ed's Debian) you must install it yourself.  On other
-distributions it may or may not be installed as a program called
-<B>blink</B> and should be located in your path.  (Type <CODE>which
-blink</CODE> to see if the program is available.) If you do not have
-<B>blink</B>, you may obtain it from the Xbox-Linux project site at 
-<A HREF="http://xbox-linux.sf.net/">http://xbox-linux.sf.net/</A>. The
-program you need is part of the <CODE>eds_i2c_staff</CODE> module in CVS.  Note
-the spelling.</P>
-<P>Once you have installed <B>blink</B> you will need to set permissions.
-<B>blink</B> needs write permission to the i2c device to function
-properly.  There are three methods to accomplish this.  First, you could run
-<CODE>mythfrontend</CODE> as root, which is the simplest method, but could
-potentially be a security risk.  Next, you may make the <B>blink</B>
-binary setuid root, which allows non-privileged users to run a program with
-root capability.  This is done by typing the command:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# chmod u+s /path/to/blink
-</PRE>
-</CODE></BLOCKQUOTE>
-
-The final technique would be to set the <CODE>/dev/i2c/0</CODE> device read/write
-for all users, but this is the least preferred method.</P>
-<P>Now it's time to setup MythTV for Xbox hardware.  Enter Setup -> General.
-On the second page check the 'Enable Xbox Hardware' option.  Upon reentering
-the settings, you should have a new option named 'Xbox'.  Within this option
-you may select the distribution, LED colors for recording and the update
-interval.  If you select GentooX as the distribution <B>led</B> will be
-used as the <B>blink</B> binary name, otherwise, <B>blink</B> is used.
-Colors should be self explanatory.  The update interval determines how often
-the frontend should poll the backend to determine if the status has changed.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-11.html">Next</A>

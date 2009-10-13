@@ -1,8 +1,10 @@
+
+#include "lircevent.h"
+
 #include <QApplication>
 #include <QString>
 
 #include "mythmainwindow.h"
-#include "lircevent.h"
 
 LircEventLock::LircEventLock(bool lock_events) 
              : events_locked(false)

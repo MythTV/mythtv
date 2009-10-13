@@ -1,4 +1,3 @@
-#include <cassert>
 
 #include <QDomDocument>
 
@@ -13,8 +12,6 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
                                bool fullscreen)
               : MythUIType(parent, name)
 {
-    assert(parent);
-
     m_FullScreen = fullscreen;
     m_CurrentFocusWidget = NULL;
 
@@ -325,7 +322,7 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
         else if (action == "RIGHT" || action == "DOWN" || action == "NEXT")
             NextPrevWidgetFocus(true);
         else if (action == "ESCAPE")
-            GetScreenStack()->PopScreen();
+            Close();
         else
             handled = false;
     }

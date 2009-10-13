@@ -74,7 +74,8 @@ class VideoScannerThread : public QThread
 {
     Q_OBJECT
   public:
-    VideoScannerThread() : m_RemoveAll(false), m_KeepAll(false)
+    VideoScannerThread() : m_RemoveAll(false), m_KeepAll(false),
+        m_DBDataChanged(false)
     {
         m_dbmetadata = new MetadataListManager;
         MetadataListManager::metadata_list ml;
@@ -127,7 +128,7 @@ class VideoScannerThread : public QThread
 
         PurgeList db_remove;
         verifyFiles(fs_files, db_remove);
-        updateDB(fs_files, db_remove);
+        m_DBDataChanged = updateDB(fs_files, db_remove);
     }
 
     void SetDirs(const QStringList &dirs)
@@ -143,6 +144,11 @@ class VideoScannerThread : public QThread
     QStringList GetFailedSGHosts(void)
     {
         return failedSGHosts;
+    }
+
+    bool getDataChanged()
+    {
+        return m_DBDataChanged;
     }
 
   private:
@@ -251,8 +257,10 @@ class VideoScannerThread : public QThread
         }
     }
 
-    void updateDB(const FileCheckList &add, const PurgeList &remove)
+    // Returns true if DB changes were made (additions or deletions).
+    bool updateDB(const FileCheckList &add, const PurgeList &remove)
     {
+        int ret = 0;
         uint counter = 0;
         SendProgressEvent(counter, (uint)(add.size() + remove.size()),
                           tr("Updating video database"));
@@ -282,16 +290,21 @@ class VideoScannerThread : public QThread
                 newFile.SetHost(p->second.host);
 
                 newFile.SaveToDatabase();
+                ret += 1;
             }
             SendProgressEvent(++counter);
         }
 
+        // When prompting is restored, account for the answer here.
+        ret += remove.size();
         for (PurgeList::const_iterator p = remove.begin(); p != remove.end();
                 ++p)
         {
             promptForRemoval(p->first, p->second);
             SendProgressEvent(++counter);
         }
+
+        return ret;
     }
 
     bool buildFileList(const QString &directory,
@@ -326,6 +339,8 @@ class VideoScannerThread : public QThread
 
     MetadataListManager *m_dbmetadata;
     MythUIProgressDialog *m_dialog;
+
+    bool m_DBDataChanged;
 };
 
 VideoScanner::VideoScanner()
@@ -370,8 +385,6 @@ void VideoScanner::doScan(const QStringList &dirs)
 
 void VideoScanner::finishedScan()
 {
-    emit finished();
-
     QStringList failedHosts = m_scanThread->GetFailedSGHosts();
     if (failedHosts.size() > 0)
     {
@@ -385,6 +398,7 @@ void VideoScanner::finishedScan()
         ShowOkPopup(msg);
     }
 
+    emit finished(m_scanThread->getDataChanged());
 }
 
 ////////////////////////////////////////////////////////////////////////

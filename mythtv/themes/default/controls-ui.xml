@@ -14,10 +14,12 @@
 
         <button name="cancel" from="basebutton">
             <position>85,420</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok" from="basebutton">
             <position>265,420</position>
+            <value>Ok</value>
         </button>
     </window>
 

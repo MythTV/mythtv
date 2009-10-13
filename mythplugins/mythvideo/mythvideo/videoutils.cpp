@@ -66,35 +66,6 @@ void CheckedSet(MythUIImage *uiItem, const QString &filename)
     }
 }
 
-bool GetRemoteFileList(QString host, QString path, QStringList* list, QString sgroup)
-{
-
-    // Make sure the list is empty when we get started
-    list->clear();
-
-    if (sgroup.isEmpty())
-        sgroup = "Videos";
-
-    *list << "QUERY_SG_GETFILELIST";
-    *list << host;
-    *list << sgroup;
-    *list << path;
-
-    bool ok = gContext->SendReceiveStringList(*list);
-
-// Should the SLAVE UNREACH test be here ?
-    return ok;
-}
-
-QString GenRemoteFileURL(QString sgroup, QString host, QString path)
-{
-    return QString("myth://%1@").arg(sgroup) +
-              gContext->GetSettingOnHost("BackendServerIP", host) + ":" +
-              gContext->GetSettingOnHost("BackendServerPort", host) + "/" +
-              path;
-
-}
-
 QStringList GetVideoDirsByHost(QString host)
 {
     QStringList tmp;

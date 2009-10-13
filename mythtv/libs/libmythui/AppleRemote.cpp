@@ -1,3 +1,6 @@
+
+#include "AppleRemote.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -16,8 +19,6 @@
 
 #include "mythverbose.h"
 
-#include "AppleRemote.h"
-
 AppleRemote*      AppleRemote::_instance = 0;
 const char* const AppleRemote::AppleRemoteDeviceName = "AppleIRController";
 const int         AppleRemote::REMOTE_SWITCH_COOKIE = 19;
@@ -28,8 +29,7 @@ AppleRemote::Listener::~Listener()
 {
 }
 
-AppleRemote *
-AppleRemote::Get()
+AppleRemote * AppleRemote::Get()
 {
     if (_instance == 0)
         _instance = new AppleRemote();
@@ -42,23 +42,20 @@ AppleRemote::~AppleRemote()
     stopListening();
 }
 
-bool 
-AppleRemote::isListeningToRemote()
+bool AppleRemote::isListeningToRemote()
 {
     return (hidDeviceInterface != NULL && !cookies.empty() && queue != NULL);
 }
 
-void 
-AppleRemote::setListener(AppleRemote::Listener* listener)
+void AppleRemote::setListener(AppleRemote::Listener* listener)
 {
     _listener = listener;
 }
 
-void
-AppleRemote::startListening()
+void AppleRemote::startListening()
 {
     if (queue != NULL)   // already listening
-    	return;
+        return;
  
     io_object_t hidDevice = _findAppleRemoteDevice();
 
@@ -68,15 +65,14 @@ AppleRemote::startListening()
     if (!_openDevice()) goto error;
     goto cleanup;
 
-error:
+  error:
     stopListening();
 
-cleanup:
+  cleanup:
     IOObjectRelease(hidDevice);
 }
 
-void 
-AppleRemote::stopListening()
+void AppleRemote::stopListening()
 {
     if (queue != NULL)
     {
@@ -97,8 +93,7 @@ AppleRemote::stopListening()
     }
 }
 
-void 
-AppleRemote::run()
+void AppleRemote::run()
 {
     CFRunLoopRun();
     exec();  // prevent QThread exiting, by entering its run loop
@@ -116,8 +111,7 @@ AppleRemote::AppleRemote() : openInExclusiveMode(true),
 }
 
 // private
-void
-AppleRemote::_initCookieMap()
+void AppleRemote::_initCookieMap()
 {
     // 10.4 sequences:
     cookieToButtonMapping["14_12_11_6_5_"]        = VolumePlus;
@@ -147,8 +141,7 @@ AppleRemote::_initCookieMap()
 }
 
 // private
-io_object_t
-AppleRemote::_findAppleRemoteDevice()
+io_object_t AppleRemote::_findAppleRemoteDevice()
 {
     CFMutableDictionaryRef hidMatchDictionary = 0;
     io_iterator_t          hidObjectIterator = 0;
@@ -172,8 +165,7 @@ AppleRemote::_findAppleRemoteDevice()
     return hidDevice;
 }
 
-bool
-AppleRemote::_initCookies()
+bool AppleRemote::_initCookies()
 {
     IOHIDDeviceInterface122** handle;
     CFArrayRef                elements;
@@ -186,7 +178,7 @@ AppleRemote::_initCookies()
 
     if (success == kIOReturnSuccess)
     {
-        for (CFIndex i = 0; i < CFArrayGetCount(elements); i++)
+        for (CFIndex i = 0; i < CFArrayGetCount(elements); ++i)
         {
             CFDictionaryRef    element;
             CFTypeRef          object;
@@ -213,8 +205,7 @@ AppleRemote::_initCookies()
     return false;
 }
 
-bool
-AppleRemote::_createDeviceInterface(io_object_t hidDevice)
+bool AppleRemote::_createDeviceInterface(io_object_t hidDevice)
 {
     IOReturn              ioReturnValue;
     IOCFPlugInInterface** plugInInterface = NULL;
@@ -244,8 +235,7 @@ AppleRemote::_createDeviceInterface(io_object_t hidDevice)
     return hidDeviceInterface != 0;
 }
 
-bool
-AppleRemote::_openDevice()
+bool AppleRemote::_openDevice()
 {
     CFRunLoopSourceRef eventSource;
     IOReturn           ioReturnValue;
@@ -277,7 +267,7 @@ AppleRemote::_openDevice()
 
     for (std::vector<int>::iterator iter = cookies.begin(); 
          iter != cookies.end();
-         iter++)
+         ++iter)
     {
         IOHIDElementCookie cookie = (IOHIDElementCookie)(*iter);
         (*queue)->addElement(queue, cookie, 0);
@@ -306,8 +296,7 @@ AppleRemote::_openDevice()
     return true;
 }
 
-void 
-AppleRemote::QueueCallbackFunction(void* target, IOReturn result, 
+void AppleRemote::QueueCallbackFunction(void* target, IOReturn result, 
                                    void* refcon, void* sender)
 {
     AppleRemote* remote = static_cast<AppleRemote*>(target);
@@ -315,8 +304,7 @@ AppleRemote::QueueCallbackFunction(void* target, IOReturn result,
     remote->_queueCallbackFunction(result,refcon,sender);
 }
 
-void 
-AppleRemote::_queueCallbackFunction(IOReturn result,
+void AppleRemote::_queueCallbackFunction(IOReturn result,
                                     void* /*refcon*/, void* /*sender*/)
 {
     AbsoluteTime      zeroTime = {0,0};
@@ -346,8 +334,7 @@ AppleRemote::_queueCallbackFunction(IOReturn result,
     _handleEventWithCookieString(cookieString.str(), sumOfValues);
 }
 
-void 
-AppleRemote::_handleEventWithCookieString(std::string cookieString, 
+void AppleRemote::_handleEventWithCookieString(std::string cookieString, 
                                           SInt32 sumOfValues)
 {
     std::map<std::string,AppleRemote::Event>::iterator ii;

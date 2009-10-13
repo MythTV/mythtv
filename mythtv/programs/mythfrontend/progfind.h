@@ -18,13 +18,13 @@ class TV;
 class MythUIText;
 class MythUIButtonList;
 
-MPUBLIC void RunProgramFinder(TV *player = NULL, bool embedVideo = false, bool allowEPG = true);
+void RunProgramFinder(TV *player = NULL, bool embedVideo = false, bool allowEPG = true);
 
 class ProgFinder : public ScheduleCommon
 {
     Q_OBJECT
   public:
-    ProgFinder(MythScreenStack *parentStack, bool allowEPG = true, 
+    explicit ProgFinder(MythScreenStack *parentStack, bool allowEPG = true,
                TV *player = NULL, bool embedVideo = false);
     virtual ~ProgFinder();
 
@@ -90,7 +90,7 @@ class ProgFinder : public ScheduleCommon
 class JaProgFinder : public ProgFinder
 {
   public:
-    JaProgFinder(MythScreenStack *parentStack, bool gg = false, 
+    explicit JaProgFinder(MythScreenStack *parentStack, bool gg = false, 
                  TV *player = NULL, bool embedVideo = false);
 
   protected:
@@ -108,7 +108,7 @@ class JaProgFinder : public ProgFinder
 class HeProgFinder : public ProgFinder
 {
   public:
-    HeProgFinder(MythScreenStack *parentStack, bool gg = false, 
+    explicit HeProgFinder(MythScreenStack *parentStack, bool gg = false, 
                  TV *player = NULL, bool embedVideo = false);
 
   protected:
@@ -123,7 +123,7 @@ class HeProgFinder : public ProgFinder
     int numberOfSearchChars;
 };
 
-class MPUBLIC SearchInputDialog : public MythTextInputDialog
+class SearchInputDialog : public MythTextInputDialog
 {
   Q_OBJECT
 

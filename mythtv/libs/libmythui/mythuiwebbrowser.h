@@ -8,19 +8,15 @@
 #include <QColor>
 #include <QIcon>
 
-
-#ifdef USING_QTWEBKIT
 #include <QWebView>
 #include <QWebPage>
 #include <QNetworkReply>
-#endif
 
 #include "mythuitype.h"
 
 
 class MythUIWebBrowser;
 
-#ifdef USING_QTWEBKIT
 class MythWebView : public QWebView
 {
   Q_OBJECT
@@ -35,7 +31,6 @@ class MythWebView : public QWebView
   private:
     MythUIWebBrowser *m_parentBrowser;
 };
-#endif
 
 class MPUBLIC MythUIWebBrowser : public MythUIType
 {
@@ -102,9 +97,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 
-#ifdef USING_QTWEBKIT
     MythWebView *m_browser;
-#endif
 
     MythImage   *m_image;
 

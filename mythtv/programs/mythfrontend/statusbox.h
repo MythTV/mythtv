@@ -29,6 +29,9 @@ class StatusBox : public MythScreenType
   signals:
     void updateLog();
 
+  protected:
+    virtual void Init(void);
+    
   private slots:
     void setHelpText(MythUIButtonListItem *item);
     void updateLogList(MythUIButtonListItem *item);
@@ -43,8 +46,6 @@ class StatusBox : public MythScreenType
     void doAutoExpireList();
 
   private:
-    void Load();
-
     MythUIButtonListItem* AddLogLine(QString line, QString detail="",
                                      QString state="", QString data="");
 

@@ -69,7 +69,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
     m_allowFallback = allowFallback;
     m_dirlist.clear();
 
-    found = FindDirs(m_groupname, m_hostname);
+    found = FindDirs(m_groupname, m_hostname, &m_dirlist);
     if ((!found) && m_allowFallback && (m_groupname != "LiveTV") &&
         (!hostname.isEmpty()))
     {
@@ -77,7 +77,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
                 QString("Unable to find any directories for the local "
                         "storage group '%1' on '%2', trying directories on "
                         "all hosts!").arg(group).arg(hostname));
-        found = FindDirs(m_groupname, "");
+        found = FindDirs(m_groupname, "", &m_dirlist);
         if (found)
         {
             m_hostname = "";
@@ -89,7 +89,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
         VERBOSE(VB_FILE, LOC +
                 QString("Unable to find storage group '%1', trying "
                         "'Default' group!").arg(group));
-        found = FindDirs("Default", m_hostname);
+        found = FindDirs("Default", m_hostname, &m_dirlist);
         if(found)
         {
             m_groupname = "Default";
@@ -101,7 +101,7 @@ void StorageGroup::Init(const QString group, const QString hostname,
                     QString("Unable to find any directories for the local "
                             "Default storage group on '%1', trying directories "
                             "in all Default groups!").arg(hostname));
-            found = FindDirs("Default", "");
+            found = FindDirs("Default", "", &m_dirlist);
             if(found)
             {
                 m_groupname = "Default";
@@ -135,7 +135,41 @@ void StorageGroup::Init(const QString group, const QString hostname,
 QStringList StorageGroup::GetFileList(QString Path)
 {
     QStringList files;
+    QString tmpDir;
+    QDir d;
+
+    for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
+    {
+        tmpDir = *it + Path;
+
+        d.setPath(tmpDir);
+        if (d.exists())
+        {
+            VERBOSE(VB_FILE, LOC + QString("GetFileList: Reading '%1'").arg(tmpDir));
+            QStringList list = d.entryList(QDir::Files|QDir::Readable);
+            for (QStringList::iterator p = list.begin(); p != list.end(); ++p)
+            {
+                VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetFileList: (%1)").arg(*p));
+                files.append(*p);
+            }
+        }
+    }
+
+    return files;
+}
+
+QStringList StorageGroup::GetFileInfoList(QString Path)
+{
+    QStringList files;
     bool badPath = true;
+
+    if (Path.isEmpty() || Path == "/")
+    {
+        for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
+            files << QString("sgdir::%1").arg(*it);
+
+        return files;
+    }
 
     for (QStringList::Iterator it = m_dirlist.begin(); it != m_dirlist.end(); ++it)
     {
@@ -145,7 +179,7 @@ QStringList StorageGroup::GetFileList(QString Path)
         }
     }
 
-    VERBOSE(VB_FILE, LOC + QString("GetFileList: Reading '%1'").arg(Path));
+    VERBOSE(VB_FILE, LOC + QString("GetFileInfoList: Reading '%1'").arg(Path));
 
     if (badPath)
         return files;
@@ -170,11 +204,11 @@ QStringList StorageGroup::GetFileList(QString Path)
         QString tmp;
 
         if (p->isDir())
-            tmp = QString("dir::%1").arg(p->fileName());
+            tmp = QString("dir::%1::0").arg(p->fileName());
         else
-            tmp = QString("file::%1").arg(p->fileName());
+            tmp = QString("file::%1::%2").arg(p->fileName()).arg(p->size());
 
-        VERBOSE(VB_FILE, LOC + QString("GetFileList: (%1)").arg(tmp));
+        VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("GetFileInfoList: (%1)").arg(tmp));
         files.append(tmp);
     }
 
@@ -285,17 +319,26 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
     {
         while (query.next())
         {
-            if (filename.startsWith(query.value(0).toString()))
+            QString videostartupdir = query.value(0).toString();
+            QStringList videodirs = videostartupdir.split(':',
+                                            QString::SkipEmptyParts);
+            QString directory;
+            for (QStringList::Iterator it = videodirs.begin();
+                                       it != videodirs.end(); ++it)
             {
-                result = filename;
-                result.replace(0, query.value(0).toString().length(), "");
-                if (result.startsWith("/"))
-                    result.replace(0, 1, "");
+                directory = *it;
+                if (filename.startsWith(directory))
+                {
+                    result = filename;
+                    result.replace(0, directory.length(), "");
+                    if (result.startsWith("/"))
+                        result.replace(0, 1, "");
 
-                VERBOSE(VB_FILE+VB_EXTRA,
-                        QString("StorageGroup::GetRelativePathname(%1) = '%2'")
-                                .arg(filename).arg(result));
-                return result;
+                    VERBOSE(VB_FILE+VB_EXTRA,
+                            QString("StorageGroup::GetRelativePathname(%1) "
+                                    "= '%2'").arg(filename).arg(result));
+                    return result;
+                }
             }
         }
     }
@@ -304,16 +347,16 @@ QString StorageGroup::GetRelativePathname(const QString &filename)
 }
 
 /** \fn StorageGroup::FindDirs(const QString, const QString)
- *  \brief Finds and initializes the directory list associated with the Storage
- *         Group
- *
- *   This function should only be called by StorageGroup::Init().
+ *  \brief Finds and and optionally initialize a directory list
+ *         associated with a Storage Group
  *
  *  \param group    The name of the Storage Group
  *  \param hostname The host whose directory list should be checked, first
+ *  \param dirlist  Optional pointer to a QStringList to hold found dir list
  *  \return         true if directories were found
  */
-bool StorageGroup::FindDirs(const QString group, const QString hostname)
+bool StorageGroup::FindDirs(const QString group, const QString hostname,
+                            QStringList *dirlist)
 {
     bool found = false;
     QString dirname;
@@ -348,7 +391,11 @@ bool StorageGroup::FindDirs(const QString group, const QString hostname)
             dirname.replace(QRegExp("\\s*$"), "");
             if (dirname.right(1) == "/")
                 dirname.remove(dirname.length() - 1, 1);
-            m_dirlist << dirname;
+
+            if (dirlist)
+                (*dirlist) << dirname;
+            else
+                return true;
         }
         while (query.next());
         found = true;
@@ -456,7 +503,7 @@ QString StorageGroup::FindNextDirMostFree(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("FindNextDirMostFree: '%1' does not exist!")
-                            .arg(nextDir));
+                            .arg(m_dirlist[curDir]));
             curDir++;
             continue;
         }
@@ -806,7 +853,8 @@ void StorageGroupEditor::Load(void)
     listbox->addSelection(tr("(Add New Directory)"),
         "__CREATE_NEW_STORAGE_DIRECTORY__");
 
-    listbox->setValue(lastValue);
+    if (!lastValue.isEmpty())
+        listbox->setValue(lastValue);
 }
 
 DialogCode StorageGroupEditor::exec(void)
@@ -878,10 +926,8 @@ void StorageGroupListEditor::doDelete(void)
     if (name.left(28) == "__CREATE_NEW_STORAGE_GROUP__")
         return;
 
-    if ((gContext->GetSetting("MasterServerIP","master") ==
-         gContext->GetSetting("BackendServerIP","me")) &&
-        (name == "Default"))
-        return;
+    bool is_master_host = gContext->GetSetting("MasterServerIP","master") ==
+                          gContext->GetSetting("BackendServerIP","me");
 
     QString dispGroup = name;
     if (name == "Default")
@@ -890,6 +936,17 @@ void StorageGroupListEditor::doDelete(void)
         dispGroup = QObject::tr(name.toLatin1().constData());
 
     QString message = tr("Delete '%1' Storage Group?").arg(dispGroup);
+    if (is_master_host)
+    {
+        if (name == "Default")
+        {
+            message.append("\n" + tr("(from remote hosts)"));
+        }
+        else
+        {
+            message.append("\n" + tr("(from all hosts"));
+        }
+    }
 
     DialogCode value = MythPopupBox::Show2ButtonPopup(
         gContext->GetMainWindow(),
@@ -900,10 +957,27 @@ void StorageGroupListEditor::doDelete(void)
     if (kDialogCodeButton0 == value)
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("DELETE FROM storagegroup "
-                      "WHERE groupname = :NAME AND hostname = :HOSTNAME;");
+        QString sql = "DELETE FROM storagegroup "
+                      "WHERE groupname = :NAME";
+        if (is_master_host)
+        {
+            // From the master host, delete the group completely (versus just
+            // local directory list) unless it's the Default group, then just
+            // delete remote overrides of the Default group
+            if (name == "Default")
+                sql.append(" AND hostname != :HOSTNAME");
+        }
+        else
+        {
+            // For non-master hosts, delete only the local override of the
+            // group directory list
+            sql.append(" AND hostname = :HOSTNAME");
+        }
+        sql.append(';');
+        query.prepare(sql);
         query.bindValue(":NAME", name);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        if (!is_master_host || (name == "Default"))
+            query.bindValue(":HOSTNAME", gContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("StorageGroupListEditor::doDelete", query);
 

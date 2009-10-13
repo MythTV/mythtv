@@ -1,36 +1,73 @@
-<!DOCTYPE TS><TS>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0">
 <context>
-    <name>GameTree</name>
+    <name>GameUI</name>
     <message>
         <source>All Games</source>
-        <translation>Kõik mängud</translation>
-    </message>
-    <message>
-        <source>Favourites</source>
-        <translation>Lemmikud</translation>
-    </message>
-    <message>
-        <source>-   By Name</source>
-        <translation>-   nime järgi</translation>
-    </message>
-    <message>
-        <source>-   By Year</source>
-        <translation>-   aasta järgi</translation>
+        <translation type="unfinished">Kõik mängud</translation>
     </message>
     <message>
         <source>-   By Genre</source>
-        <translation>-   žanri järgi</translation>
+        <translation type="unfinished">-   žanri järgi</translation>
     </message>
     <message>
-        <source>Players Available. 
-
- Please pick one.</source>
-        <translation>Olemasolevad mängijad.
-
-Vali siit.</translation>
+        <source>-   By Year</source>
+        <translation type="unfinished">-   aasta järgi</translation>
+    </message>
+    <message>
+        <source>-   By Name</source>
+        <translation type="unfinished">-   nime järgi</translation>
     </message>
     <message>
         <source>-   By Publisher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose System for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MythControls</name>
+    <message>
+        <source>Game frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle the current game as a favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show incremental search dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incremental search find next match</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -96,10 +133,6 @@ Vali siit.</translation>
 Remove it from the database?</source>
         <translation>%1 paistab puuduvat.
 Kustutada andmebaasist?</translation>
-    </message>
-    <message>
-        <source>Updating Rom database</source>
-        <translation type="obsolete">ROM andmebaasi uuendamine</translation>
     </message>
     <message>
         <source>Are you sure?</source>
@@ -172,10 +205,6 @@ Oled sa ikka kindel, et soovid seda?</translation>
         <translation>Käsk</translation>
     </message>
     <message>
-        <source>Path+name of binary and optional parameters. %s can be used to represent the name of any rom being launched. if not specified the rom filename will be added to the end of the command. As well %d1, %d2, %d3 and %d4 represent disks in a multidisk/game situation</source>
-        <translation type="obsolete">Programmi kataloog+nimi ning lisaparameetrid. %s asendatakse ROMi nimega. Kui seda pole kasutatud lisatakse ROMi nimi käsurea viimaseks parameetriks. Mitme ketta peal asuva mängu puhul saab kasutada %d1, %d2, %d3 ja %d4 erinevate osade tähistamiseks</translation>
-    </message>
-    <message>
         <source>Type</source>
         <translation>Tüüp</translation>
     </message>
@@ -202,18 +231,6 @@ Oled sa ikka kindel, et soovid seda?</translation>
     <message>
         <source>File Extensions</source>
         <translation>Faililaiendid</translation>
-    </message>
-    <message>
-        <source>List of all file extensions to be used for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="obsolete">Kõik selle emulaatori kasutatavate failide laiendid. Kõikide kataloogis olevate failide kasutamiseks jätta tühjaks</translation>
-    </message>
-    <message>
-        <source>ScreenShots</source>
-        <translation>Ekraanitõmmised</translation>
-    </message>
-    <message>
-        <source>Path to any screenshots for this player</source>
-        <translation>Selle mängija ekraanitõmmiste kataloog</translation>
     </message>
     <message>
         <source>Game Player Setup</source>
@@ -272,12 +289,6 @@ Oled sa ikka kindel, et soovid seda?</translation>
         <translation>Selle mängu ja/või emulaatori nimi</translation>
     </message>
     <message>
-        <source>Rom Information
-</source>
-        <translation type="obsolete">Rom info
-</translation>
-    </message>
-    <message>
         <source>19xx</source>
         <translation>19xx</translation>
     </message>
@@ -322,7 +333,27 @@ Oled sa ikka kindel, et soovid seda?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
+        <source>Directory where Game Screenshots are stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning screenshots.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where Game Fanart is stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning fanart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Directory where Game Boxart is stored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This directory will be the default browse location when assigning boxart.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -343,6 +374,110 @@ Oled sa ikka kindel, et soovid seda?</translation>
     <message>
         <source>Favorite:</source>
         <translation>Lemmik:</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">Ei</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Jah</translation>
+    </message>
+    <message>
+        <source>Edit Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Publisher:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screenshot:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fanart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Boxart:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>/path/to/the/thing.jpg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rompath:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System(s):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CRC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Plot.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Game Players</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan for Games</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Game Data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

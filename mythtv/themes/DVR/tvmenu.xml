@@ -7,7 +7,6 @@
         <text lang="ES">Ver la TV</text>
         <text lang="CA">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
-        <text lang="FR">Regarder la TV</text>
         <text lang="DE">Fernsehen</text>
         <text lang="DA">Se TV</text>
         <text lang="PT">Ver Televisão</text>
@@ -16,7 +15,9 @@
         <text lang="SL">Gledanje TV</text>
         <text lang="ET">Vaata telerit</text>
         <text lang="RU">Смотреть ТВ</text>
+        <text lang="HU">TV nézés</text>
         <description>Watch live television</description>
+        <description lang="DE">Fernsehen schauen</description>
         <action>TV_WATCH_LIVE</action>
     </button>
 
@@ -27,7 +28,6 @@
         <text lang="ES">Borrar Grabaciones</text>
         <text lang="CA">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
-        <text lang="FR">Supprimer les enregistrements</text>
         <text lang="DE">Aufnahmen löschen</text>
         <text lang="DA">Slet optagelser</text>
         <text lang="PT">Apagar Gravações</text>
@@ -36,12 +36,14 @@
         <text lang="SL">Brisanje Snemanj</text>
         <text lang="ET">Salvestiste kustutamine</text>
         <text lang="RU">Удалить записи</text>
+        <text lang="HU">Felvételek törlése</text>
         <alttext lang="DE">Löschen</alttext>
         <alttext lang="ET">Kustutamine</alttext>
         <alttext lang="SV">Radera</alttext>
         <alttext lang="NL">Verwijderen</alttext>
         <alttext lang="RU">Удалить</alttext>
         <description>Remove television recordings</description>
+        <description lang="DE">TV-Aufnahmen löschen</description>
         <action>TV_DELETE</action>
     </button>
 
@@ -52,12 +54,12 @@
         <text lang="PT">Modo Directo de TV</text>
         <text lang="ES">TV directo</text>
         <text lang="CA">TV directe</text>
-        <text lang="FR">Mode direct</text>
         <text lang="DE">TV direkt</text>
         <text lang="SV">TV direkt</text>
         <text lang="JA">パススルーモード</text>
         <text lang="ET">Otse-TV</text>
         <text lang="NL">TV Direct</text>
+        <text lang="HU">Közvetlen TV adás</text>
         <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
     </button>
 -->
@@ -66,7 +68,6 @@
         <type>TV_PREVIOUS</type>
         <text>Previously Recorded</text>
         <text lang="IT">Recentemente Registrati</text>
-        <text lang="FR">Déjà enregistré</text>
         <text lang="SV">Föregående</text>
         <text lang="DE">Alte Aufnahmen</text>
         <text lang="SL">Že posneto</text>
@@ -77,6 +78,7 @@
         <text lang="NL">Eerder Opgenomen</text>
         <text lang="JA">録画履歴</text>
         <text lang="RU">Ранее записано</text>
+        <text lang="HU">Korábbi felvételek</text>
         <description>See what you have recorded before</description>
         <action>TV_PREVIOUS</action>
     </button>

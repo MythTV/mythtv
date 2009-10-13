@@ -187,6 +187,30 @@ NetworkControl::NetworkControl() :
     keyMap["f23"]                    = Qt::Key_F23;
     keyMap["f24"]                    = Qt::Key_F24;
 
+    keyTextMap[Qt::Key_Plus]            = "+";
+    keyTextMap[Qt::Key_Comma]           = ",";
+    keyTextMap[Qt::Key_Minus]           = "-";
+    keyTextMap[Qt::Key_Underscore]      = "_";
+    keyTextMap[Qt::Key_Period]          = ".";
+    keyTextMap[Qt::Key_NumberSign]      = "#";
+    keyTextMap[Qt::Key_BracketLeft]     = "[";
+    keyTextMap[Qt::Key_BracketRight]    = "]";
+    keyTextMap[Qt::Key_Backslash]       = "\\";
+    keyTextMap[Qt::Key_Dollar]          = "$";
+    keyTextMap[Qt::Key_Percent]         = "%";
+    keyTextMap[Qt::Key_Ampersand]       = "&";
+    keyTextMap[Qt::Key_ParenLeft]       = "(";
+    keyTextMap[Qt::Key_ParenRight]      = ")";
+    keyTextMap[Qt::Key_Asterisk]        = "*";
+    keyTextMap[Qt::Key_Question]        = "?";
+    keyTextMap[Qt::Key_Slash]           = "/";
+    keyTextMap[Qt::Key_Colon]           = ":";
+    keyTextMap[Qt::Key_Semicolon]       = ";";
+    keyTextMap[Qt::Key_Less]            = "<";
+    keyTextMap[Qt::Key_Equal]           = "=";
+    keyTextMap[Qt::Key_Greater]         = ">";
+    keyTextMap[Qt::Key_Bar]             = "|";
+
     stopCommandThread = false;
     pthread_create(&command_thread, NULL, CommandThread, this);
 
@@ -226,7 +250,7 @@ bool NetworkControl::listen(const QHostAddress & address, quint16 port)
 
 void *NetworkControl::CommandThread(void *param)
 {
-    NetworkControl *networkControl = (NetworkControl *)param;
+    NetworkControl *networkControl = static_cast<NetworkControl *>(param);
     networkControl->RunCommandThread();
 
     return NULL;
@@ -258,7 +282,7 @@ void NetworkControl::RunCommandThread(void)
 void NetworkControl::processNetworkControlCommand(QString command)
 {
     QMutexLocker locker(&clientLock);
-    QString result = "";
+    QString result;
     QStringList tokens = command.simplified().split(" ");
 
     if (is_abbrev("jump", tokens[0]))
@@ -309,7 +333,7 @@ void NetworkControl::deleteClientLater(void)
 
 void NetworkControl::newConnection()
 {
-    QString welcomeStr = "";
+    QString welcomeStr;
     bool closedOldConn = false;
 
     VERBOSE(VB_GENERAL, LOC +
@@ -447,13 +471,19 @@ QString NetworkControl::processKey(QStringList tokens)
         else if (keyMap.contains(tokens[curToken]))
         {
             int keyCode = keyMap[tokens[curToken]];
+            QString keyText;
+
+            if (keyTextMap.contains(keyCode))
+                keyText = keyTextMap[keyCode];
 
             GetMythUI()->ResetScreensaver();
 
-            event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier);
+            event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier,
+                                  keyText);
             QApplication::postEvent(keyDest, event);
 
-            event = new QKeyEvent(QEvent::KeyRelease, keyCode, Qt::NoModifier);
+            event = new QKeyEvent(QEvent::KeyRelease, keyCode, Qt::NoModifier,
+                                  keyText);
             QApplication::postEvent(keyDest, event);
         }
         else if (((tokenLen == 1) &&
@@ -467,7 +497,7 @@ QString NetworkControl::processKey(QStringList tokens)
 
             if (tokenLen > 1)
             {
-                QStringList tokenParts = tokens[curToken].split("+");
+                QStringList tokenParts = tokens[curToken].split('+');
 
                 int partNum = 0;
                 while (partNum < (tokenParts.size() - 1))
@@ -514,7 +544,7 @@ QString NetworkControl::processKey(QStringList tokens)
 QString NetworkControl::processPlay(QStringList tokens)
 {
     QString result = "OK";
-    QString message = "";
+    QString message;
 
     if (tokens.size() < 2)
         return QString("ERROR: See 'help %1' for usage information")
@@ -585,7 +615,7 @@ QString NetworkControl::processPlay(QStringList tokens)
             MythEvent me(message);
             gContext->dispatch(me);
 
-            result = "";
+            result.clear();
         }
         else
         {
@@ -855,7 +885,7 @@ QString NetworkControl::processHelp(QStringList tokens)
             if (tokens.size() >= 2)
                 command = tokens[1];
             else
-                command = "";
+                command.clear();
         }
         else
         {
@@ -1072,14 +1102,14 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     query.bindValue(":END", QDateTime::currentDateTime());
     query.bindValue(":CHANID", chanID);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
     {
         while (query.next())
         {
             QString title = query.value(3).toString();
             QString subtitle = query.value(4).toString();
 
-            if (subtitle > " ")
+            if (!subtitle.isEmpty())
                 title += QString(" -\"%1\"").arg(subtitle);
             QByteArray atitle = title.toLocal8Bit();
 
@@ -1104,8 +1134,7 @@ QString NetworkControl::listSchedule(const QString& chanID) const
 
 QString NetworkControl::listRecordings(QString chanid, QString starttime)
 {
-    QString result = "";
-    QString episode;
+    QString result;
     MSqlQuery query(MSqlQuery::InitCon());
     QString queryStr;
     bool appendCRLF = true;
@@ -1123,14 +1152,15 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     queryStr += "ORDER BY starttime, title;";
 
     query.prepare(queryStr);
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec())
     {
+        QString episode, title, subtitle;
         while (query.next())
         {
-            QString title = query.value(2).toString();
-            QString subtitle = query.value(3).toString();
+            title = query.value(2).toString();
+            subtitle = query.value(3).toString();
 
-            if (subtitle > " ")
+            if (!subtitle.isEmpty())
                 episode = QString("%1 -\"%2\"")
                                   .arg(title)
                                   .arg(subtitle);
@@ -1154,9 +1184,7 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
 
 QString NetworkControl::saveScreenshot(QStringList tokens)
 {
-    QString result = "";
-    int width = -1;
-    int height = -1;
+    QString result;
     long long frameNumber = 150;
 
     QString location = GetMythUI()->GetCurrentLocation();
@@ -1179,6 +1207,8 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
     ProgramInfo *pginfo = NULL;
     if (gotAnswer)
     {
+        int width = -1;
+        int height = -1;
         QStringList results = answer.simplified().split(" ");
         pginfo = ProgramInfo::GetProgramFromRecorded(results[5], results[6]);
         if (!pginfo)
@@ -1191,7 +1221,7 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
 
         if (tokens.size() >= 5)
         {
-            QStringList size = tokens[4].split("x");
+            QStringList size = tokens[4].split('x');
             width  = size[0].toInt();
             height = size[1].toInt();
         }
