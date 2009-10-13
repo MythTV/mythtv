@@ -282,6 +282,10 @@ bool RecorderBase::GetKeyframePositions(
     for (; (it != positionMap.end()) && (it.key() <= end); ++it)
         map[it.key()] = *it;
 
+    VERBOSE(VB_IMPORTANT, LOC +
+            QString("GetKeyframePositions(%1,%2,#%3) out of %4")
+            .arg(start).arg(end).arg(map.size()).arg(positionMap.size()));
+
     return true;
 }
 
