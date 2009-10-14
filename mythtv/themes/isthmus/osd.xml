@@ -13,50 +13,50 @@
 
   <font name="infofont">
     <color>255</color>
-    <size>16</size>
-    <size:small>12</size:small>
+    <size:big>16</size:big>
+    <size>12</size>
     <shadow>2,2</shadow>
   </font>
   
    <font name="titlefont">
     <color>255</color>
-    <size>16</size>
-    <size:small>14</size:small>
+    <size:big>16</size:big>
+    <size>14</size>
     <shadow>2,2</shadow>
   </font>
   
   <font name="grayfont">
     <color>200</color>
-    <size>14</size>
-    <size:small>12</size:small>
+    <size:big>14</size:big>
+    <size>12</size>
     <outline>yes</outline>
   </font>
 
   <font name="infofontgray">
     <color>128</color>
-    <size>16</size>
-    <size:small>14</size:small>
+    <size:big>16</size:big>
+    <size>14</size>
     <shadow>2,2</shadow>
   </font>
 
   <font name="channelfont">
     <color>255</color>
-    <size>24</size>
-    <size:small>18</size:small>
+    <size:big>24</size:big>
+    <size>18</size>
     <shadow>2,2</shadow>
   </font>
  
   <font name="timefont">
     <color>255</color>
-    <size>16</size>
-    <size:small>14</size:small>
+    <size:big>16</size:big>
+    <size>14</size>
     <shadow>2,2</shadow>
   </font>
 
   <font name="settings">
     <color>220</color>
-    <size>18</size>
-    <size:small>16</size:small>
+    <size:big>18</size:big>
+    <size>16</size>
     <shadow>3,3</shadow>
   </font>
  
