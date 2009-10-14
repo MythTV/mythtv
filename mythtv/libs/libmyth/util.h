@@ -4,10 +4,8 @@
 #include <algorithm>
 using namespace std;
 
-#include <qstringlist.h>
-#include <qdatetime.h>
-#include <qcolor.h>
-#include <QPixmap>
+#include <QStringList>
+#include <QDateTime>
 
 #include <stdint.h>
 #include <time.h>
@@ -16,10 +14,6 @@ using namespace std;
 #include "mythtimer.h"
 #include "mythsystem.h"
 
-class QPixmap;
-class QImage;
-class QPainter;
-class QFont;
 class QFile;
 
 MPUBLIC QDateTime mythCurrentDateTime();
@@ -27,10 +21,6 @@ MPUBLIC int calc_utc_offset(void);
 MPUBLIC QString getTimeZoneID(void);
 MPUBLIC bool checkTimeZone(void);
 MPUBLIC bool checkTimeZone(const QStringList &master_settings);
-
-MPUBLIC QRgb blendColors(QRgb source, QRgb add, int alpha);
-
-MPUBLIC QString cutDownString(const QString &text, QFont *testFont, uint maxwidth);
 
 MPUBLIC QDateTime MythUTCToLocal(const QDateTime &utc);
 MPUBLIC int MythSecsTo(const QDateTime &from, const QDateTime &to);

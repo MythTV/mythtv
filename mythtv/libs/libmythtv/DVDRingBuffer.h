@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QString>
 #include <QMutex>
+#include <QRect>
 
 #include "util.h"
 extern "C" {

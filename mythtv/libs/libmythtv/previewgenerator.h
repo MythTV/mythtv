@@ -4,8 +4,9 @@
 
 #include <pthread.h>
 
-#include <qstring.h>
-#include <qmutex.h>
+#include <QString>
+#include <QMutex>
+#include <QSize>
 
 #include "programinfo.h"
 #include "util.h"

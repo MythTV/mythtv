@@ -1,3 +1,6 @@
+
+#include "util.h"
+
 // C++ headers
 #include <iostream>
 
@@ -27,13 +30,8 @@ using namespace std;
 #include <sys/sysctl.h>
 #endif
 
-
 // Qt headers
 #include <QApplication>
-#include <QImage>
-#include <QPainter>
-#include <QPixmap>
-#include <QFont>
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
@@ -41,7 +39,6 @@ using namespace std;
 // Myth headers
 #include "mythcontext.h"
 #include "exitcodes.h"
-#include "util.h"
 #include "mythxdisplay.h"
 #include "mythmediamonitor.h"
 #include "mythverbose.h"
@@ -595,59 +592,6 @@ long long decodeLongLong(QStringList &list, QStringList::const_iterator &it)
     retval = ((long long)(l2) & 0xffffffffLL) | ((long long)(l1) << 32);
 
     return retval;
-}
-
-/** \fn blendColors(QRgb source, QRgb add, int alpha)
- *  \brief Inefficient alpha blending function.
- */
-QRgb blendColors(QRgb source, QRgb add, int alpha)
-{
-    int sred = qRed(source);
-    int sgreen = qGreen(source);
-    int sblue = qBlue(source);
-
-    int tmp1 = (qRed(add) - sred) * alpha;
-    int tmp2 = sred + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-    sred = tmp2 & 0xff;
-
-    tmp1 = (qGreen(add) - sgreen) * alpha;
-    tmp2 = sgreen + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-    sgreen = tmp2 & 0xff;
-
-    tmp1 = (qBlue(add) - sblue) * alpha;
-    tmp2 = sblue + ((tmp1 + (tmp1 >> 8) + 0x80) >> 8);
-    sblue = tmp2 & 0xff;
-
-    return qRgb(sred, sgreen, sblue);
-}
-
-/** \fn cutDownString(const QString&, QFont*, uint)
- *  \brief Returns a string based on "text" that fits within "maxwidth" pixels.
- */
-QString cutDownString(const QString &text, QFont *testFont, uint maxwidth)
-{
-    QFontMetrics fm(*testFont);
-
-    uint curFontWidth = fm.width(text);
-    if (curFontWidth > maxwidth)
-    {
-        QString testInfo;
-        curFontWidth = fm.width(testInfo);
-        int tmaxwidth = maxwidth - fm.width("LLL");
-        int count = 0;
-
-        while ((int)curFontWidth < tmaxwidth)
-        {
-            testInfo = text.left(count);
-            curFontWidth = fm.width(testInfo);
-            count = count + 1;
-        }
-
-        testInfo = testInfo + "...";
-        return testInfo;
-    }
-
-    return text;
 }
 
 /** \fn MythSecsTo(const QDateTime&, const QDateTime&)

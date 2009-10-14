@@ -14,6 +14,7 @@ using namespace std;
 #include <QVector>
 #include <QMap>
 #include <QHash>
+#include <QRect>
 
 #include "mythdeque.h"
 #include "tv.h"

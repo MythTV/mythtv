@@ -8,7 +8,7 @@
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythdb, libmyth and libmythui class methods
 /// used by plug-ins.
-#define MYTH_BINARY_VERSION "0.22.20091013-3"
+#define MYTH_BINARY_VERSION "0.22.20091013-4"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
