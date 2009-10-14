@@ -2637,6 +2637,23 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
     const uint8_t  *buf_end = pkt->data + pkt->size;
     bool on_frame = false;
 
+    // crude NAL unit vs Annex B detection.
+    // the parser only understands Annex B
+    if (context->extradata && context->extradata_size >+ 4)
+    {
+        int nal_size    = 0;
+        int size_length = (context->extradata[4] & 0x3) + 1;
+
+        for (int i = 0; i < size_length; i++)
+            nal_size += buf[i];
+
+        if (nal_size)
+        {
+            if (pkt->flags & PKT_FLAG_KEY)
+                HandleGopStart(pkt, false);
+            return true;
+    }
+
     while (buf < buf_end)
     {
         buf += m_h264_parser->addBytes(buf, buf_end - buf, 0);
@@ -2652,7 +2669,9 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
                     continue;
             }
             else
+            {
                 continue;
+            }
         }
         else
         {
@@ -2703,7 +2722,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             }
         }
 
-        HandleGopStart(pkt, false);
+        HandleGopStart(pkt, true);
         pkt->flags |= PKT_FLAG_KEY;
     }
 
