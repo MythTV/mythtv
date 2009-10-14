@@ -3,6 +3,9 @@
 
 // QT headers
 #include <QColor>
+#include <QPen>
+#include <QBrush>
+#include <QLinearGradient>
 
 // Mythui headers
 #include "mythuitype.h"
@@ -25,21 +28,18 @@ class MPUBLIC MythUIShape : public MythUIType
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 
-    void DrawRect(const QRect &area,
-                  bool drawFill, const QColor &fillColor,
-                  bool drawLine, int lineWidth, const QColor &lineColor);
-    void DrawRoundRect(const QRect &area, int radius,
-                       bool drawFill, const QColor &fillColor,
-                       bool drawLine, int lineWidth, const QColor &lineColor);
+    QLinearGradient parseGradient(const QDomElement &element);
+    
+    void DrawRect(const QRect &area, const QBrush &fillBrush,
+                  const QPen &linePen);
+    void DrawRoundRect(const QRect &area, int radius, const QBrush &fillBrush,
+                       const QPen &linePen);
   private:
-    MythImage *m_image;
-    QString    m_type;
-    bool       m_drawFill;
-    bool       m_drawLine;
-    QColor     m_fillColor;
-    QColor     m_lineColor;
-    int        m_lineWidth;
-    int        m_cornerRadius;
+    MythImage     *m_image;
+    QString        m_type;
+    QBrush         m_fillBrush;
+    QPen           m_linePen;
+    int            m_cornerRadius;
 };
 
 #endif

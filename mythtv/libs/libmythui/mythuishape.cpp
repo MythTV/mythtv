@@ -5,8 +5,8 @@
 // qt
 #include <QDomDocument>
 #include <QPainter>
-#include <QBrush>
 #include <QSize>
+#include <QColor>
 
 // myth
 #include "mythverbose.h"
@@ -19,11 +19,8 @@ MythUIShape::MythUIShape(MythUIType *parent, const QString &name)
 {
     m_image = NULL;
     m_type = "box";
-    m_fillColor = QColor();
-    m_lineColor = QColor();
-    m_drawFill = false;
-    m_drawLine = false;
-    m_lineWidth = 1;
+    m_fillBrush = QBrush(Qt::NoBrush);
+    m_linePen = QPen(Qt::NoPen);
     m_cornerRadius = 10;
 }
 
@@ -55,21 +52,18 @@ void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
     if (!m_image || m_image->isNull())
     {
-        if (m_type == "box")
-            DrawRect(area, m_drawFill, m_fillColor,
-                     m_drawLine, m_lineWidth, m_lineColor);
+            if (m_type == "box")
+            DrawRect(area, m_fillBrush, m_linePen);
         else if (m_type == "roundbox")
-            DrawRoundRect(area, m_cornerRadius, m_drawFill, m_fillColor,
-                          m_drawLine, m_lineWidth, m_lineColor);
+            DrawRoundRect(area, m_cornerRadius, m_fillBrush, m_linePen);
     }
 
     if (m_image)
         p->DrawImage(area.x(), area.y(), m_image, alphaMod);
 }
 
-void MythUIShape::DrawRect(const QRect &area,
-                           bool drawFill, const QColor &fillColor,
-                           bool drawLine, int lineWidth, const QColor &lineColor)
+void MythUIShape::DrawRect(const QRect &area,const QBrush &fillBrush,
+                           const QPen &linePen)
 {
     if (m_image)
     {
@@ -83,17 +77,12 @@ void MythUIShape::DrawRect(const QRect &area,
 
     painter.setRenderHint(QPainter::Antialiasing);
 
-    if (drawLine)
-        painter.setPen(QPen(lineColor, lineWidth));
-    else
-        painter.setPen(QPen(Qt::NoPen));
-
-    if (drawFill)
-        painter.setBrush(QBrush(fillColor));
-    else
-        painter.setBrush(QBrush(Qt::NoBrush));
-
-    QRect r(lineWidth, lineWidth, area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
+    painter.setPen(linePen);
+    painter.setBrush(fillBrush);
+    
+    int lineWidth = linePen.width();
+    QRect r(lineWidth, lineWidth,
+            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
     painter.drawRect(r);
 
     painter.end();
@@ -104,8 +93,7 @@ void MythUIShape::DrawRect(const QRect &area,
 }
 
 void MythUIShape::DrawRoundRect(const QRect &area, int radius,
-                                bool drawFill, const QColor &fillColor,
-                                bool drawLine, int lineWidth, const QColor &lineColor)
+                                const QBrush &fillBrush, const QPen &linePen)
 {
     if (m_image)
     {
@@ -119,15 +107,8 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
 
     painter.setRenderHint(QPainter::Antialiasing);
 
-    if (drawLine)
-        painter.setPen(QPen(lineColor, lineWidth));
-    else
-        painter.setPen(QPen(Qt::NoPen));
-
-    if (drawFill)
-        painter.setBrush(QBrush(fillColor));
-    else
-        painter.setBrush(QBrush(Qt::NoBrush));
+    painter.setPen(linePen);
+    painter.setBrush(fillBrush);
 
     if ((area.width() / 2) < radius)
         radius = area.width() / 2;
@@ -135,7 +116,9 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
     if ((area.height() / 2) < radius)
         radius = area.height() / 2;
 
-    QRect r(lineWidth, lineWidth, area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
+    int lineWidth = linePen.width();
+    QRect r(lineWidth, lineWidth,
+            area.width() - (lineWidth * 2), area.height() - (lineWidth * 2));
     painter.drawRoundedRect(r, (qreal)radius, qreal(radius));
 
     painter.end();
@@ -155,39 +138,50 @@ bool MythUIShape::ParseElement(QDomElement &element)
     }
     else if (element.tagName() == "fill")
     {
+        QString style = element.attribute("style", "solid");
         QString color = element.attribute("color", "");
         int alpha = element.attribute("alpha", "255").toInt();
 
-        if (!color.isEmpty())
+        if (style == "solid" && !color.isEmpty())
         {
-            m_fillColor = QColor(color);
-            m_fillColor.setAlpha(alpha);
-            m_drawFill = true;
+            m_fillBrush.setStyle(Qt::SolidPattern);
+            QColor brushColor = QColor(color);
+            brushColor.setAlpha(alpha);
+            m_fillBrush.setColor(brushColor);
+        }
+        else if (style == "gradient")
+        {
+            for (QDomNode child = element.firstChild(); !child.isNull();
+                child = child.nextSibling())
+            {
+                QDomElement childElem = child.toElement();
+                if (childElem.tagName() == "gradient")
+                {
+                    QLinearGradient gradient = parseGradient(childElem);
+                    m_fillBrush = QBrush(gradient);
+                }
+            }
         }
         else
-        {
-           m_fillColor = QColor();
-           m_drawFill = false;
-        }
+            m_fillBrush.setStyle(Qt::NoBrush);
     }
     else if (element.tagName() == "line")
     {
+        QString style = element.attribute("style", "solid");
         QString color = element.attribute("color", "");
-        int alpha = element.attribute("alpha", "255").toInt();
 
-        if (!color.isEmpty())
+        if (style == "solid" && !color.isEmpty())
         {
-            m_lineColor = QColor(color);
-            m_lineColor.setAlpha(alpha);
-            m_drawLine = true;
+            int width = element.attribute("width", "1").toInt();
+            int alpha = element.attribute("alpha", "255").toInt();
+            QColor lineColor = QColor(color);
+            lineColor.setAlpha(alpha);
+            m_linePen.setColor(lineColor);
+            m_linePen.setWidth(width);
+            m_linePen.setStyle(Qt::SolidLine);
         }
         else
-        {
-           m_lineColor = QColor();
-           m_drawLine = false;
-        }
-
-        m_lineWidth = element.attribute("width", "1").toInt();
+           m_linePen.setStyle(Qt::NoPen);
     }
     else if (element.tagName() == "cornerradius")
     {
@@ -197,6 +191,82 @@ bool MythUIShape::ParseElement(QDomElement &element)
         return MythUIType::ParseElement(element);
 
     return true;
+}
+
+QLinearGradient MythUIShape::parseGradient(const QDomElement &element)
+{
+    QLinearGradient gradient;
+    QString gradientStart = element.attribute("start", "");
+    QString gradientEnd = element.attribute("end", "");
+    int gradientAlpha = element.attribute("alpha", "100").toInt();
+    QString direction = element.attribute("direction", "vertical");
+
+    float x1, y1, x2, y2 = 0.0;
+    if (direction == "vertical")
+    {
+        x1 = 0.5;
+        x2 = 0.5;
+        y1 = 0.0;
+        y2 = 1.0;
+    }
+    else if (direction == "diagonal")
+    {
+        x1 = 0.0;
+        x2 = 1.0;
+        y1 = 0.0;
+        y2 = 1.0;
+    }
+    else
+    {
+        x1 = 0.0;
+        x2 = 1.0;
+        y1 = 0.5;
+        y2 = 0.5;
+    }
+
+    gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+    gradient.setStart(x1, y1);
+    gradient.setFinalStop(x2, y2);
+
+    QGradientStops stops;
+    
+    if (!gradientStart.isEmpty())
+    {
+        QColor startColor = QColor(gradientStart);
+        startColor.setAlpha(gradientAlpha);
+        QGradientStop stop(0.0, startColor);
+        stops.append(stop);
+    }
+    
+    if (!gradientEnd.isEmpty())
+    {
+        QColor endColor = QColor(gradientEnd);
+        endColor.setAlpha(gradientAlpha);
+        QGradientStop stop(1.0, endColor);
+        stops.append(stop);
+    }
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+        child = child.nextSibling())
+    {
+        QDomElement childElem = child.toElement();
+        if (childElem.tagName() == "stop")
+        {
+            float position = childElem.attribute("position", "0").toFloat();
+            QString color = childElem.attribute("color", "");
+            int alpha = childElem.attribute("alpha", "-1").toInt();
+            if (alpha < 0)
+                alpha = gradientAlpha;
+            QColor stopColor = QColor(color);
+            stopColor.setAlpha(alpha);
+            QGradientStop stop((position / 100), stopColor);
+            stops.append(stop);
+        }
+    }
+
+    gradient.setStops(stops);
+
+    return gradient;
 }
 
 void MythUIShape::CopyFrom(MythUIType *base)
@@ -213,11 +283,8 @@ void MythUIShape::CopyFrom(MythUIType *base)
         m_image->UpRef();
 
     m_type = shape->m_type;
-    m_fillColor = shape->m_fillColor;
-    m_lineColor = shape->m_lineColor;
-    m_lineWidth = shape->m_lineWidth;
-    m_drawFill = shape->m_drawFill;
-    m_drawLine = shape->m_drawLine;
+    m_fillBrush = shape->m_fillBrush;
+    m_linePen = shape->m_linePen;
     m_cornerRadius = shape->m_cornerRadius;
 
     MythUIType::CopyFrom(base);
