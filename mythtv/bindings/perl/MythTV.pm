@@ -165,15 +165,12 @@ package MythTV;
         unless (-d $conf) {
             mkdir $conf or die "Can't create config directory $conf:  $!\n";
         }
-    # Alert the user
-        print STDERR "No config found; attempting to find mythbackend via UPnP.\n";
     # @todo:  prompt for a security pin
         my $pin = '';
     # Try to detect things via upnp
         my (%seen, @devices);
         my $obj = Net::UPnP::ControlPoint->new();
         my @dev_list = $obj->search(
-            #st => 'urn:schemas-upnp-org:device:MediaServer:1',
             st => 'urn:schemas-mythtv-org:device:MasterMediaServer:1',
             mx => 2
             );
@@ -838,4 +835,3 @@ EOF
 
 # Return true
 1;
-
