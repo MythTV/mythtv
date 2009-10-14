@@ -45,9 +45,9 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     virtual void Reset(void);
 
     void AddChild(MythUIType *child);
-    MythUIType *GetChild(const QString &name);
+    MythUIType *GetChild(const QString &name) const;
     MythUIType *GetChildAt(const QPoint &p, bool recursive=true,
-                           bool focusable=true);
+                           bool focusable=true) const;
     QList<MythUIType *> *GetAllChildren(void);
 
     void DeleteChild(const QString &name);
@@ -61,7 +61,7 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     void SetChildNeedsRedraw(MythUIType *child);
 
     // Check set if this can take focus
-    bool CanTakeFocus(void);
+    bool CanTakeFocus(void) const;
     void SetCanTakeFocus(bool set = true);
     void SetFocusOrder(int);
 
@@ -101,16 +101,16 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     virtual bool keyPressEvent(QKeyEvent *);
     virtual void gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
 
-    MythFontProperties *GetFont(const QString &text);
+    MythFontProperties *GetFont(const QString &text) const;
     bool AddFont(const QString &text, MythFontProperties *fontProp);
 
     void SetHelpText(const QString &text) { m_helptext = text; }
     QString GetHelpText(void) const { return m_helptext; }
 
-    bool IsDeferredLoading(bool recurse = false);
+    bool IsDeferredLoading(bool recurse = false) const;
     void SetDeferLoad(bool defer) { m_deferload = defer; }
     virtual void LoadNow(void);
-
+    
   protected:
     virtual void customEvent(QEvent *);
 

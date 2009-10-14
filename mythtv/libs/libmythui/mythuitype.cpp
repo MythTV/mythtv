@@ -123,7 +123,7 @@ static QObject *qChildHelper(const char *objName, const char *inheritsClass,
  *  \param Name of child
  *  \return Pointer to child if found, or NULL
  */
-MythUIType *MythUIType::GetChild(const QString &name)
+MythUIType *MythUIType::GetChild(const QString &name) const
 {
     QObject *ret = qChildHelper(name.toAscii().constData(), NULL, false, children());
     if (ret)
@@ -201,7 +201,7 @@ void MythUIType::DeleteAllChildren(void)
  *  \return The widget at these coordinates
  */
 MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
-                                   bool focusable)
+                                   bool focusable) const
 {
 
     if (GetArea().contains(p))
@@ -213,7 +213,7 @@ MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
             return NULL;
 
         /* check all children */
-        QList<MythUIType *>::iterator it;
+        QList<MythUIType *>::const_iterator it;
         for (it = m_ChildrenList.end()-1; it != m_ChildrenList.begin()-1; --it)
         {
             if (!(*it))
@@ -285,7 +285,7 @@ void MythUIType::SetChildNeedsRedraw(MythUIType *child)
         m_Parent->SetChildNeedsRedraw(this);
 }
 
-bool MythUIType::CanTakeFocus(void)
+bool MythUIType::CanTakeFocus(void) const
 {
     return m_CanHaveFocus;
 }
@@ -732,7 +732,7 @@ void MythUIType::Finalize(void)
 {
 }
 
-MythFontProperties *MythUIType::GetFont(const QString &text)
+MythFontProperties *MythUIType::GetFont(const QString &text) const
 {
     MythFontProperties *ret = m_Fonts->GetFont(text);
     if (!ret && m_Parent)
@@ -796,7 +796,7 @@ bool MythUIType::MoveToTop(void)
     return false;
 }
 
-bool MythUIType::IsDeferredLoading(bool recurse)
+bool MythUIType::IsDeferredLoading(bool recurse) const
 {
      if (m_deferload)
          return true;
@@ -818,4 +818,3 @@ void MythUIType::LoadNow(void)
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->LoadNow();
 }
-
