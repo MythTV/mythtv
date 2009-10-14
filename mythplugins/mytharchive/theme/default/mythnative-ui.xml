@@ -149,6 +149,7 @@ MythTV Archive GUI theme
 
         <button name="cancel_button" from="basebutton">
             <position>35,550</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
@@ -249,6 +250,7 @@ MythTV Archive GUI theme
 
         <button name="cancel_button" from="basebutton">
             <position>35,550</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
@@ -434,6 +436,7 @@ MythTV Archive GUI theme
 
         <button name="cancel_button" from="basebutton">
             <position>35,550</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">

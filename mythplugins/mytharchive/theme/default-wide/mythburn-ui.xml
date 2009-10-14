@@ -52,6 +52,7 @@ MythArchive GUI theme
 
         <button name="ok_button" from="basebutton">
             <position>125,350</position>
+            <value>Ok</value>
         </button>
     </window>
 
@@ -155,6 +156,7 @@ MythArchive GUI theme
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
@@ -349,6 +351,7 @@ MythArchive GUI theme
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
@@ -444,10 +447,12 @@ MythArchive GUI theme
         -->
         <button name="ok_button" from="basebutton">
             <position>250,540</position>
+            <value>Ok</value>
         </button>
 
         <button name="cancel_button" from="basebutton">
             <position>450,540</position>
+            <value>Cancel</value>
         </button>
     </window>
 

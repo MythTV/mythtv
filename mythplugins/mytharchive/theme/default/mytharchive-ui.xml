@@ -118,6 +118,7 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>35,550</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
@@ -226,10 +227,12 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>35,550</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok_button" from="basebutton">
             <position>610,550</position>
+            <value>Ok</value>
         </button>
 
     </window>
@@ -294,10 +297,12 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>35,550</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok_button" from="basebutton">
             <position>610,550</position>
+            <value>Ok</value>
         </button>
 
     </window>
@@ -406,11 +411,13 @@ Common MythArchive window definitions
         </textarea>
 
         <button name="cancel_button" from="basebutton">
-            <position>35,550</position >
+            <position>35,550</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok_button" from="basebutton">
             <position>610,550</position>
+            <value>Ok</value>
         </button>
 
     </window>
@@ -443,6 +450,7 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>35,550</position>
+            <value>Cancel</value>
         </button>
 
         <button name="update_button" from="basebutton">

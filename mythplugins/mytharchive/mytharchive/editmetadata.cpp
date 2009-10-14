@@ -40,10 +40,7 @@ bool EditMetadataDialog::Create(void)
         return false;
     }
 
-    m_okButton->SetText(tr("OK"));
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okPressed()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
 
     m_titleEdit->SetText(m_sourceMetadata->title);

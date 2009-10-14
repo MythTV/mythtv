@@ -70,20 +70,17 @@ bool VideoSelector::Create(void)
         return false;
     }
 
-    m_okButton->SetText(tr("OK"));
-    connect(m_okButton, SIGNAL(Clicked()), this, SLOT(OKPressed()));
-
-    m_cancelButton->SetText(tr("Cancel"));
-    connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
+    connect(m_okButton, SIGNAL(Clicked()), SLOT(OKPressed()));
+    connect(m_cancelButton, SIGNAL(Clicked()), SLOT(cancelPressed()));
 
     connect(m_categorySelector, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            this, SLOT(setCategory(MythUIButtonListItem *)));
+            SLOT(setCategory(MythUIButtonListItem *)));
 
     getVideoList();
     connect(m_videoButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
-            this, SLOT(titleChanged(MythUIButtonListItem *)));
+            SLOT(titleChanged(MythUIButtonListItem *)));
     connect(m_videoButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-            this, SLOT(toggleSelected(MythUIButtonListItem *)));
+            SLOT(toggleSelected(MythUIButtonListItem *)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");

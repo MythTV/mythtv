@@ -93,10 +93,7 @@ bool RecordingSelector::Create(void)
         return false;
     }
 
-    m_okButton->SetText(tr("OK"));
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(OKPressed()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
 
     new MythUIButtonListItem(m_categorySelector, tr("All Recordings"));
