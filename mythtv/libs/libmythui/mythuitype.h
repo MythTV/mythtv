@@ -110,7 +110,9 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     bool IsDeferredLoading(bool recurse = false) const;
     void SetDeferLoad(bool defer) { m_deferload = defer; }
     virtual void LoadNow(void);
-    
+
+    bool ContainsPoint(const QPoint &point) const;
+
   protected:
     virtual void customEvent(QEvent *);
 
@@ -134,8 +136,6 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     void Disabling();
     void FinishedMoving();
     void FinishedFading();
-
-    bool ContainsPoint(const QPoint &point) const;
     
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
