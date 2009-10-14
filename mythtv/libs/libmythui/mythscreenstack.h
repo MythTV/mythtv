@@ -6,6 +6,8 @@
 
 #include "mythexp.h"
 
+class QString;
+
 class MythScreenType;
 class MythMainWindow;
 
@@ -23,15 +25,15 @@ class MPUBLIC MythScreenStack : public QObject
     void PopScreen(MythScreenType *screen, bool allowFade = true,
                    bool deleteScreen = true);
 
-    MythScreenType *GetTopScreen(void);
+    MythScreenType *GetTopScreen(void) const;
 
     void GetDrawOrder(QVector<MythScreenType *> &screens);
-    int TotalScreens();
+    int TotalScreens() const;
 
     void DisableEffects(void) { m_DoTransitions = false; }
     void EnableEffects(void);
 
-    QString GetLocation(bool fullPath);
+    QString GetLocation(bool fullPath) const;
 
   private slots:
     void doInit(void);

@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QTimer>
+#include <QString>
 
 const int kFadeVal = 20;
 
@@ -40,7 +41,7 @@ void MythScreenStack::EnableEffects(void)
                        GetMythPainter()->SupportsAnimation());
 }
 
-int MythScreenStack::TotalScreens(void)
+int MythScreenStack::TotalScreens(void) const
 {
     return m_Children.count();
 }
@@ -157,7 +158,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
     }
 }
 
-MythScreenType *MythScreenStack::GetTopScreen(void)
+MythScreenType *MythScreenStack::GetTopScreen(void) const
 {
     if (m_topScreen)
         return m_topScreen;
@@ -319,12 +320,12 @@ void MythScreenStack::CheckDeletes(void)
     }
 }
 
-QString MythScreenStack::GetLocation(bool fullPath)
+QString MythScreenStack::GetLocation(bool fullPath) const
 {
     if (fullPath)
     {
         QString path;
-        QVector<MythScreenType *>::Iterator it;
+        QVector<MythScreenType *>::const_iterator it;
         for (it = m_Children.begin(); it != m_Children.end(); ++it)
         {
             if (!(*it)->IsDeleting())
