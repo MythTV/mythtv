@@ -164,10 +164,12 @@ class VDPAUContext
     int               numRefs;
     float             denoise;
     float             sharpen;
-
+   
     bool              useColorControl;
     VdpCSCMatrix      cscMatrix;
     VdpProcamp        proCamp;
+    int               colorspace;
+    uint8_t           studio;
 
     VdpLayer          pipLayer;
     VdpOutputSurface  pipOutputSurface;
