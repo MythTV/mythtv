@@ -2628,19 +2628,54 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     }
 }
 
-void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
+bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
     AVCodecContext *context = stream->codec;
     const uint8_t  *buf     = pkt->data;
     const uint8_t  *buf_end = pkt->data + pkt->size;
+    bool on_frame = false;
+
+    // crude NAL unit vs Annex B detection.
+    // the parser only understands Annex B
+    if (context->extradata && context->extradata_size >+ 4)
+    {
+        int nal_size    = 0;
+        int size_length = (context->extradata[4] & 0x3) + 1;
+
+        for (int i = 0; i < size_length; i++)
+            nal_size += buf[i];
+
+        if (nal_size)
+        {
+            if (pkt->flags & PKT_FLAG_KEY)
+                HandleGopStart(pkt, false);
+            return true;
+        }
+    }
 
     while (buf < buf_end)
     {
         buf += m_h264_parser->addBytes(buf, buf_end - buf, 0);
 
-        if (!m_h264_parser->stateChanged() || !m_h264_parser->onKeyFrameStart()
-            || m_h264_parser->FieldType() == H264Parser::FIELD_BOTTOM)
+        if (m_h264_parser->stateChanged())
+        {
+            if (m_h264_parser->FieldType() != H264Parser::FIELD_BOTTOM)
+            {
+                if (m_h264_parser->onFrameStart())
+                    on_frame = true;
+
+                if (!m_h264_parser->onKeyFrameStart())
+                    continue;
+            }
+            else
+            {
+                continue;
+            }
+        }
+        else
+        {
             continue;
+        }
 
         float aspect_ratio;
         if (context->sample_aspect_ratio.num == 0)
@@ -2686,9 +2721,11 @@ void AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             }
         }
 
-        HandleGopStart(pkt, false);
+        HandleGopStart(pkt, true);
         pkt->flags |= PKT_FLAG_KEY;
     }
+
+    return on_frame;
 }
 
 /** \fn AvFormatDecoder::ProcessVBIDataPacket(const AVStream*, const AVPacket*)
@@ -3496,6 +3533,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             pkt->stream_index == selectedVideoIndex)
         {
             AVCodecContext *context = curstream->codec;
+            bool on_frame = true;
 
             if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
             {
@@ -3504,7 +3542,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             }
             else if (CODEC_IS_H264(context->codec_id))
             {
-                H264PreProcessPkt(curstream, pkt);
+                on_frame = H264PreProcessPkt(curstream, pkt);
             }
             else
             {
@@ -3530,7 +3568,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 continue;
             }
 
-            framesRead++;
+            if (on_frame)
+                framesRead++;
             justAfterChange = false;
 
             if (exitafterdecoded)
