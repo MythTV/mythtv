@@ -2648,7 +2648,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
         if (nal_size)
         {
             if (pkt->flags & PKT_FLAG_KEY)
-                HandleGopStart(pkt, false);
+                HandleGopStart(pkt, true);
             return true;
         }
     }
@@ -3548,7 +3548,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             {
                 if (pkt->flags & PKT_FLAG_KEY)
                 {
-                    HandleGopStart(pkt, false);
+                    HandleGopStart(pkt, true);
                     seen_gop = true;
                 }
                 else
@@ -3556,7 +3556,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     seq_count++;
                     if (!seen_gop && seq_count > 1)
                     {
-                        HandleGopStart(pkt, false);
+                        HandleGopStart(pkt, true);
                     }
                 }
             }
