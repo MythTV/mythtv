@@ -436,8 +436,8 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
             .arg(backupScript));
 
     QString command = backupScript + scriptArgs + " " + tempDatabaseConfFile;
-    QByteArray tmpcmd = command.toLocal8Bit();
-    uint status = system(tmpcmd.constData());
+    uint status = myth_system(command, MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                              MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
 
     if (hastemp)
     {
@@ -449,7 +449,7 @@ bool DBUtil::DoBackup(const QString &backupScript, QString &filename)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Error backing up database: %1 (%2)")
-                .arg(tmpcmd.constData()).arg(status));
+                .arg(command).arg(status));
         filename = "__FAILED__";
         return false;
     }
@@ -542,8 +542,8 @@ bool DBUtil::DoBackup(QString &filename)
     VERBOSE(VB_IMPORTANT, QString("Backing up database to file: '%1'")
             .arg(backupPathname));
 
-    QByteArray tmpcmd = command.toAscii();
-    uint status = system(tmpcmd.constData());
+    uint status = myth_system(command, MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                              MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
 
     QByteArray tmpfile = tempExtraConfFile.toLocal8Bit();
     unlink(tmpfile.constData());
@@ -561,8 +561,8 @@ bool DBUtil::DoBackup(QString &filename)
     {
         VERBOSE(VB_IMPORTANT, "Compressing database backup file.");
         compressCommand += " " + backupPathname;
-        QByteArray tmpcompresscmd = compressCommand.toAscii();
-        status = system(tmpcompresscmd.constData());
+        status = myth_system(compressCommand, MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                             MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
 
         if (status)
         {
