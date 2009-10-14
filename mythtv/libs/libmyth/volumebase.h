@@ -20,6 +20,8 @@ class MPUBLIC VolumeBase
     VolumeBase();    
     virtual ~VolumeBase() {};
 
+    void SWVolume(bool set);
+    bool SWVolume(void);
     virtual uint GetCurrentVolume(void) const;
     virtual void SetCurrentVolume(int value);
     virtual void AdjustCurrentVolume(int change);
@@ -34,6 +36,8 @@ class MPUBLIC VolumeBase
 
     virtual int GetVolumeChannel(int channel) const = 0; // Returns 0-100
     virtual void SetVolumeChannel(int channel, int volume) = 0; // range 0-100 for vol
+    virtual void SetSWVolume(int new_volume, bool save) = 0;
+    virtual int GetSWVolume(void) = 0;
 
     void UpdateVolume(void);
     void SyncVolume(void);
@@ -44,6 +48,8 @@ class MPUBLIC VolumeBase
     
     int volume;
     MuteState current_mute_state;
+    bool swvol;
+    bool swvol_setting;
 
 };
 

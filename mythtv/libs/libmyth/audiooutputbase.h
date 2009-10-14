@@ -43,8 +43,12 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     virtual void SetStretchFactor(float factor);
     virtual float GetStretchFactor(void) const;
+    virtual bool ToggleUpmix(void);
 
     virtual void Reset(void);
+
+    void SetSWVolume(int new_volume, bool save);
+    int GetSWVolume(void);
 
     // timecode is in milliseconds.
     virtual bool AddSamples(char *buffer, int samples, long long timecode);
@@ -85,6 +89,8 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual void WriteAudio(unsigned char *aubuf, int size) = 0;
     virtual int  GetSpaceOnSoundcard(void) const = 0;
     virtual int  GetBufferedOnSoundcard(void) const = 0;
+    virtual vector<int> GetSupportedRates(void) 
+        { vector<int> rates; return rates; }
     /// You need to call this from any implementation in the dtor.
     void KillAudio(void);
 
@@ -122,6 +128,7 @@ class AudioOutputBase : public AudioOutput, public QThread
 
     // Basic details about the audio stream
     int audio_channels;
+    int audio_codec;
     int audio_bytes_per_sample;
     int audio_bits;
     int audio_samplerate;
@@ -132,9 +139,10 @@ class AudioOutputBase : public AudioOutput, public QThread
     QString audio_passthru_device;
 
     bool audio_passthru;
+    bool audio_enc;
+    bool audio_reenc;
 
     float audio_stretchfactor;
-    AVCodecContext *audio_codec;
     AudioOutputSource source;
 
     bool killaudio;
@@ -144,8 +152,15 @@ class AudioOutputBase : public AudioOutput, public QThread
     bool buffer_output_data_for_use; //  used by AudioOutputNULL
 
     int configured_audio_channels;
+    int orig_config_channels;
+    int src_quality;
 
  private:
+    // software volume
+    template <class AudioDataType>
+    void _AdjustVolume(AudioDataType *buffer, int len, bool music);
+    void AdjustVolume(void *buffer, int len, bool music);
+
     // resampler
     bool need_resampler;
     SRC_STATE *src_ctx;
@@ -160,9 +175,13 @@ class AudioOutputBase : public AudioOutput, public QThread
         void *_MonoToStereo(AudioDataType *s1, AudioDataType *s2, int samples);
 
     int source_audio_channels;
+    int source_audio_samplerate;
     int source_audio_bytes_per_sample;
     bool needs_upmix;
     int surround_mode;
+    bool allow_ac3_passthru;
+    float old_audio_stretchfactor;
+    int volume;
 
     bool blocking; // do AddSamples calls block?
 

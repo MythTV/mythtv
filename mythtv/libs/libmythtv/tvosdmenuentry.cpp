@@ -232,6 +232,8 @@ void TVOSDMenuEntryList::InitDefaultEntries(void)
     curMenuEntries.append(new TVOSDMenuEntry(
         "AUDIOSYNC",          1,  1,  1,  1, "Audio Sync"));
     curMenuEntries.append(new TVOSDMenuEntry(
+        "TOGGLEUPMIX",        1,  1,  1,  1, "Toggle Upmixer"));
+    curMenuEntries.append(new TVOSDMenuEntry(
         "TIMESTRETCH",        1,  1,  1,  1, "Time Stretch"));
     curMenuEntries.append(new TVOSDMenuEntry(
         "VIDEOSCAN",          1,  1,  1,  1, "Video Scan"));

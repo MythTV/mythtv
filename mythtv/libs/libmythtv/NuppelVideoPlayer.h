@@ -125,7 +125,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void SetAudioStretchFactor(float factor)  { audio_stretchfactor = factor; }
     void SetAudioOutput(AudioOutput *ao)      { audioOutput = ao; }
     void SetAudioInfo(const QString &main, const QString &passthru, uint rate);
-    void SetAudioParams(int bits, int channels, int samplerate, bool passthru);
+    void SetAudioParams(int bits, int channels, int codec, int samplerate, bool passthru);
     void SetEffDsp(int dsprate);
     uint AdjustVolume(int change);
     bool SetMuted(bool mute);
@@ -179,6 +179,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     // Toggle Sets
     void ToggleAspectOverride(AspectOverrideMode aspectMode = kAspect_Toggle);
     void ToggleAdjustFill(AdjustFillMode adjustfillMode = kAdjustFill_Toggle);
+    bool ToggleUpmix(void);
 
     // Gets
     QSize   GetVideoBufferSize(void) const    { return video_dim; }
@@ -714,10 +715,10 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     QString  audio_main_device;
     QString  audio_passthru_device;
     int      audio_channels;
+    int      audio_codec;
     int      audio_bits;
     int      audio_samplerate;
     float    audio_stretchfactor;
-    void    *audio_codec;
     bool     audio_passthru;
     QMutex   audio_lock;
     bool     audio_muted_on_creation;

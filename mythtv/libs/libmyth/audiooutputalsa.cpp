@@ -32,6 +32,117 @@ AudioOutputALSA::AudioOutputALSA(const AudioSettings &settings) :
 AudioOutputALSA::~AudioOutputALSA()
 {
     KillAudio();
+    SetIECStatus(true);
+}
+
+void AudioOutputALSA::SetIECStatus(bool audio)
+{
+    snd_ctl_t *ctl;
+    const char *spdif_str = SND_CTL_NAME_IEC958("", PLAYBACK, DEFAULT);
+    int spdif_index = -1;
+    snd_ctl_elem_list_t *clist;
+    snd_ctl_elem_id_t *cid;
+    snd_ctl_elem_value_t *cval;
+    snd_aes_iec958_t iec958;
+    int cidx, controls;
+
+    VERBOSE(VB_AUDIO, QString("Setting IEC958 status: %1")
+                      .arg(audio ? "audio" : "non-audio"));
+
+    int err;
+    if ((err = snd_ctl_open(&ctl, "default", 0)) < 0)
+    {
+        Error(QString("AudioOutputALSA::SetIECStatus: snd_ctl_open(default): %1")
+              .arg(snd_strerror(err)));
+        return;
+    }
+    snd_ctl_elem_list_alloca(&clist);
+    snd_ctl_elem_list(ctl, clist);
+    snd_ctl_elem_list_alloc_space(clist, snd_ctl_elem_list_get_count(clist));
+    snd_ctl_elem_list(ctl, clist);
+    controls = snd_ctl_elem_list_get_used(clist);
+    for (cidx = 0; cidx < controls; cidx++)
+    {
+        if (!strcmp(snd_ctl_elem_list_get_name(clist, cidx), spdif_str))
+            if (spdif_index < 0 ||
+                snd_ctl_elem_list_get_index(clist, cidx) == (uint)spdif_index)
+                    break;
+    }
+
+    if (cidx >= controls)
+        return;
+
+    snd_ctl_elem_id_alloca(&cid);
+    snd_ctl_elem_list_get_id(clist, cidx, cid);
+    snd_ctl_elem_value_alloca(&cval);
+    snd_ctl_elem_value_set_id(cval, cid);
+    snd_ctl_elem_read(ctl,cval);
+    snd_ctl_elem_value_get_iec958(cval, &iec958);
+
+    if (!audio) 
+        iec958.status[0] |= IEC958_AES0_NONAUDIO;
+    else
+        iec958.status[0] &= ~IEC958_AES0_NONAUDIO;
+
+    snd_ctl_elem_value_set_iec958(cval, &iec958);
+    snd_ctl_elem_write(ctl, cval);
+}
+
+vector<int> AudioOutputALSA::GetSupportedRates()
+{
+    snd_pcm_hw_params_t *params;
+    int err;
+    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000 };
+    vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
+    QString real_device;
+    
+    if (audio_passthru || audio_enc)
+        real_device = audio_passthru_device;
+    else 
+        real_device = audio_main_device;
+
+    if((err = snd_pcm_open(&pcm_handle, real_device.toAscii(),
+                           SND_PCM_STREAM_PLAYBACK, 
+                           SND_PCM_NONBLOCK|SND_PCM_NO_AUTO_RESAMPLE)) < 0)
+    { 
+        Error(QString("snd_pcm_open(%1): %2")
+              .arg(real_device).arg(snd_strerror(err)));
+
+        if (pcm_handle)
+        {
+            snd_pcm_close(pcm_handle);
+            pcm_handle = NULL;
+        }
+        rates.clear();
+        return rates;
+    }
+    
+    snd_pcm_hw_params_alloca(&params);
+
+    if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
+    {
+        Error(QString("Broken configuration for playback; no configurations"
+              " available: %1").arg(snd_strerror(err)));
+        snd_pcm_close(pcm_handle);
+        pcm_handle = NULL;
+        rates.clear();
+        return rates;
+    }
+    
+    vector<int>::iterator it = rates.begin();
+
+    while (it != rates.end())
+    {
+        if(snd_pcm_hw_params_test_rate(pcm_handle, params, *it, 0) < 0)
+            it = rates.erase(it);
+        else
+            it++;
+    }
+    
+    snd_pcm_close(pcm_handle);
+    pcm_handle = NULL;
+
+    return rates;
 }
 
 bool AudioOutputALSA::OpenDevice()
@@ -39,6 +150,7 @@ bool AudioOutputALSA::OpenDevice()
     snd_pcm_format_t format;
     unsigned int buffer_time, period_time;
     int err;
+    QString real_device;
 
     if (pcm_handle != NULL)
         CloseDevice();
@@ -46,8 +158,16 @@ bool AudioOutputALSA::OpenDevice()
     pcm_handle = NULL;
     numbadioctls = 0;
 
-    QString real_device = (audio_passthru) ?
-        audio_passthru_device : audio_main_device;
+    if (audio_passthru || audio_enc)
+    {
+        real_device = audio_passthru_device;
+        SetIECStatus(false);
+    }
+    else 
+    {
+        real_device = audio_main_device;
+        SetIECStatus(true);
+    }
 
     VERBOSE(VB_GENERAL, QString("Opening ALSA audio device '%1'.")
             .arg(real_device));
@@ -661,6 +781,9 @@ void AudioOutputALSA::SetupMixer(void)
 
     if (mixer_handle != NULL)
         CloseMixer();
+
+    if (alsadevice.toLower() == "software")
+        return;
 
     VERBOSE(VB_AUDIO, QString("Opening mixer %1").arg(device));
 

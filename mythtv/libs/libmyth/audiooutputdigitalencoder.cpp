@@ -32,9 +32,8 @@ extern "C" {
 AudioOutputDigitalEncoder::AudioOutputDigitalEncoder(void) :
     audio_bytes_per_sample(0),
     av_context(NULL),
-    outbuf(NULL),
-    outbuf_size(0),
-    frame_buffer(NULL),
+    outbuflen(0),
+    inbuflen(0),
     one_frame_bytes(0)
 {
 }
@@ -52,20 +51,6 @@ void AudioOutputDigitalEncoder::Dispose()
         av_free(av_context);
         av_context = NULL;
     }
-
-    if (outbuf)
-    {
-        delete [] outbuf;
-        outbuf = NULL;
-        outbuf_size = 0;
-    }
-
-    if (frame_buffer)
-    {
-        delete [] frame_buffer;
-        frame_buffer = NULL;
-        one_frame_bytes = 0;
-    }
 }
 
 //CODEC_ID_AC3
@@ -81,7 +66,9 @@ bool AudioOutputDigitalEncoder::Init(
             .arg(samplerate)
             .arg(channels));
 
-    //codec = avcodec_find_encoder(codec_id);
+    // We need to do this when called from mythmusic
+    avcodec_init();
+    avcodec_register_all();
     // always AC3 as there is no DTS encoder at the moment 2005/1/9
     codec = avcodec_find_encoder(CODEC_ID_AC3);
     if (!codec)
@@ -110,8 +97,6 @@ bool AudioOutputDigitalEncoder::Init(
     audio_bytes_per_sample = bytes_per_frame;
     one_frame_bytes = bytes_per_frame * av_context->frame_size;
 
-    outbuf_size = 16384;    // ok for AC3 but DTS?
-    outbuf = new char [outbuf_size];
     VERBOSE(VB_AUDIO, QString("DigitalEncoder::Init fs=%1, bpf=%2 ofb=%3")
             .arg(av_context->frame_size)
             .arg(bytes_per_frame)
@@ -259,10 +244,9 @@ typedef struct {
 static int encode_frame(
         bool dts, 
         unsigned char *data,
-        size_t &len)
+        size_t enc_len)
 {
     unsigned char *payload = data + 8;  // skip header, currently 52 or 54bits
-    size_t         enc_len;
     int            flags, sample_rate, bit_rate;
 
     // we don't do any length/crc validation of the AC3 frame here; presumably
@@ -273,7 +257,8 @@ static int encode_frame(
     // ignore, and if so, may as well just assume that it will ignore
     // anything with a bad CRC...
 
-    uint nr_samples = 0, block_len;
+    uint nr_samples = 0, block_len = 0;
+
     if (dts)
     {
         enc_len = dts_syncinfo(payload, &flags, &sample_rate, &bit_rate);
@@ -300,13 +285,6 @@ static int encode_frame(
             enc_len     = hdr.frame_size;
             block_len   = AC3_FRAME_SIZE * 4;
         }
-    }
-
-    if (enc_len == 0 || enc_len > len)
-    {
-        int l = len;
-        len = 0;
-        return l;
     }
 
     enc_len = std::min((uint)enc_len, block_len - 8);
@@ -361,31 +339,42 @@ static int encode_frame(
     data[6] = (enc_len << 3) & 0xFF;
     data[7] = (enc_len >> 5) & 0xFF;
     memset(payload + enc_len, 0, block_len - 8 - enc_len);
-    len = block_len;
 
     return enc_len;
 }
 
-// must have exactly 1 frames worth of data
-size_t AudioOutputDigitalEncoder::Encode(short *buff)
+size_t AudioOutputDigitalEncoder::Encode(void *buf, int len)
 {
-    int encsize = 0;
     size_t outsize = 0;
- 
-    // put data in the correct spot for encode frame
-    outsize = avcodec_encode_audio(
-        av_context, ((uchar*)outbuf) + 8, outbuf_size - 8, buff);
 
-    size_t tmpsize = outsize;
+    int fs = FrameSize();
+    memcpy(inbuf+inbuflen, buf, len);
+    inbuflen += len;
+    int frames = inbuflen / fs;
 
-    outsize = MAX_AC3_FRAME_SIZE;
-    encsize = encode_frame(
-        /*av_context->codec_id==CODEC_ID_DTS*/ false,
-        (unsigned char*)outbuf, outsize);
+    while (frames--) 
+    {
+        // put data in the correct spot for encode frame
+        outsize = avcodec_encode_audio(
+            av_context, ((uchar*)outbuf) + outbuflen + 8, OUTBUFSIZE - 8, (short int *)inbuf);
 
-    VERBOSE(VB_AUDIO+VB_TIMESTAMP, 
-            QString("DigitalEncoder::Encode len1=%1 len2=%2 finallen=%3")
-                .arg(tmpsize).arg(encsize).arg(outsize));
+        encode_frame(
+            /*av_context->codec_id==CODEC_ID_DTS*/ false,
+            (unsigned char*)outbuf + outbuflen, outsize
+        );
 
-    return outsize;
+        outbuflen += MAX_AC3_FRAME_SIZE;
+        inbuflen -= fs;
+        memmove(inbuf, inbuf+fs, inbuflen);
+    }
+
+    return outbuflen;
+}
+
+void AudioOutputDigitalEncoder::GetFrames(void *ptr, int maxlen)
+{
+    int len = (maxlen < outbuflen ? maxlen : outbuflen);
+    memcpy(ptr, outbuf, len);
+    outbuflen -= len;
+    memmove(outbuf, outbuf+len, outbuflen);
 }

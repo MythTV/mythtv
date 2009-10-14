@@ -7,16 +7,18 @@
 
 #include "audiosettings.h"
 
+// startup_upmixer 
 AudioSettings::AudioSettings() :
     main_device(QString::null),
     passthru_device(QString::null),
     bits(-1),
     channels(-1),
+    codec(0),
     samplerate(-1),
     set_initial_vol(false),
     use_passthru(false),
-    codec(NULL),
-    source(AUDIOOUTPUT_UNKNOWN)
+    source(AUDIOOUTPUT_UNKNOWN),
+    upmixer(0)
 {
 }
 
@@ -25,11 +27,12 @@ AudioSettings::AudioSettings(const AudioSettings &other) :
     passthru_device(other.passthru_device),
     bits(other.bits),
     channels(other.channels),
+    codec(other.codec),
     samplerate(other.samplerate),
     set_initial_vol(other.set_initial_vol),
     use_passthru(other.use_passthru),
-    codec(other.codec),
-    source(other.source)
+    source(other.source),
+    upmixer(other.upmixer)
 {
 }
 
@@ -38,38 +41,42 @@ AudioSettings::AudioSettings(
     const QString &audio_passthru_device,
     int audio_bits,
     int audio_channels,
+    int audio_codec,
     int audio_samplerate,
     AudioOutputSource audio_source,
     bool audio_set_initial_vol,
     bool audio_use_passthru,
-    void *audio_codec) :
+    int upmixer_startup) :
     main_device(audio_main_device),
     passthru_device(audio_passthru_device),
     bits(audio_bits),
     channels(audio_channels),
+    codec(audio_codec),
     samplerate(audio_samplerate),
     set_initial_vol(audio_set_initial_vol),
     use_passthru(audio_use_passthru),
-    codec(audio_codec),
-    source(audio_source)
+    source(audio_source),
+    upmixer(upmixer_startup)
 {
 }
 
 AudioSettings::AudioSettings(
     int   audio_bits, 
     int   audio_channels, 
+    int   audio_codec,
     int   audio_samplerate,
     bool  audio_use_passthru,
-    void *audio_codec) :
+    int   upmixer_startup) :
     main_device(QString::null),
     passthru_device(QString::null),
     bits(audio_bits),
     channels(audio_channels),
+    codec(audio_codec),
     samplerate(audio_samplerate),
     set_initial_vol(false),
     use_passthru(audio_use_passthru),
-    codec(audio_codec),
-    source(AUDIOOUTPUT_UNKNOWN)
+    source(AUDIOOUTPUT_UNKNOWN),
+    upmixer(upmixer_startup)
 {
 }
 

@@ -31,14 +31,16 @@ using namespace std;
 AudioOutput *AudioOutput::OpenAudio(
     const QString &main_device,
     const QString &passthru_device,
-    int audio_bits, int audio_channels, int audio_samplerate,
+    int audio_bits, int audio_channels, 
+    int audio_codec, int audio_samplerate,
     AudioOutputSource source,
-    bool set_initial_vol, bool audio_passthru)
+    bool set_initial_vol, bool audio_passthru,
+    int upmixer_startup)
 {
     AudioSettings settings(
         main_device, passthru_device, audio_bits,
-        audio_channels, audio_samplerate, source,
-        set_initial_vol, audio_passthru);
+        audio_channels, audio_codec, audio_samplerate, source,
+        set_initial_vol, audio_passthru, upmixer_startup);
 
     settings.FixPassThrough();
 

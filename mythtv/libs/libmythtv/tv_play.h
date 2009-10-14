@@ -430,6 +430,7 @@ class MPUBLIC TV : public QThread
     bool TimeStretchHandleAction(PlayerContext*,
                                  const QStringList &actions);
 
+    void ToggleUpmix(PlayerContext*);
     void ChangeAudioSync(PlayerContext*, int dir, bool allowEdit = true);
     bool AudioSyncHandleAction(PlayerContext*, const QStringList &actions);
 

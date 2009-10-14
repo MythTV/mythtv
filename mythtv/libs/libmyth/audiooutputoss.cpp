@@ -42,6 +42,36 @@ AudioOutputOSS::~AudioOutputOSS()
     KillAudio();
 }
 
+vector<int> AudioOutputOSS::GetSupportedRates()
+{
+    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000 };
+    vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
+    audiofd = open(audio_main_device.toAscii(), O_WRONLY | O_NONBLOCK);
+
+    if (audiofd < 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Error opening audio device (%1), the"
+                " error was: %2").arg(audio_main_device).arg(strerror(errno)));
+        rates.clear();
+        return rates;
+    }
+
+    vector<int>::iterator it = rates.begin();
+
+    while (it != rates.end())
+    {
+        if(ioctl(audiofd, SNDCTL_DSP_SPEED, &audio_samplerate) < 0)
+            it = rates.erase(it);
+        else
+            it++;
+    }
+
+    close(audiofd);
+    audiofd = -1;
+
+    return rates;
+}
+
 bool AudioOutputOSS::OpenDevice()
 {
     numbadioctls = 0;
@@ -287,6 +317,9 @@ void AudioOutputOSS::VolumeInit()
     int volume = 0;
 
     QString device = gContext->GetSetting("MixerDevice", "/dev/mixer");
+    if (device.toLower() == "software")
+        return;
+
     QByteArray dev = device.toAscii();
     mixerfd = open(dev.constData(), O_RDONLY);
 

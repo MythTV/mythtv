@@ -47,14 +47,11 @@ public:
 	//  a is the coefficient of left rear in left total, b is the coefficient of left rear in right total; the same is true for right.
 	void surround_coefficients(float a, float b);
 
-	// override for master surround gain
-	void gain(float gain);
-
 	// set the phase shifting mode for decoding
-	// 0 = (+0°,+0°)   - music mode
-	// 1 = (+0°,+180°) - PowerDVD compatibility
-	// 2 = (+180°,+0°) - BeSweet compatibility
-	// 3 = (-90°,+90°) - This seems to work. I just don't know why.
+	// 0 = (+0ï¾°,+0ï¾°)   - music mode
+	// 1 = (+0ï¾°,+180ï¾°) - PowerDVD compatibility
+	// 2 = (+180ï¾°,+0ï¾°) - BeSweet compatibility
+	// 3 = (-90ï¾°,+90ï¾°) - This seems to work. I just don't know why.
 	void phase_mode(unsigned mode);
 
 	// override the steering mode

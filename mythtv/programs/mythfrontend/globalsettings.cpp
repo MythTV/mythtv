@@ -91,13 +91,23 @@ static HostComboBox *AudioOutputDevice()
 static HostComboBox *MaxAudioChannels()
 {
     HostComboBox *gc = new HostComboBox("MaxChannels",false);
-    gc->setLabel(QObject::tr("Max Audio Channels"));
+    gc->setLabel(QObject::tr("Speakers configuration"));
     gc->addSelection(QObject::tr("Stereo"), "2", true); // default
     gc->addSelection(QObject::tr("5.1"), "6");
     gc->setHelpText(
             QObject::tr(
-                "Set the maximum number of audio channels to be decoded. "
-                "This is for multi-channel/surround audio playback."));
+                "Set your audio configuration: Stereo or Surround."));
+    return gc;
+}
+
+static HostCheckBox *AudioUpmix()
+{
+    HostCheckBox *gc = new HostCheckBox("AudioDefaultUpmix");
+    gc->setLabel(QObject::tr("Upconvert stereo to 5.1 surround"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("MythTV can upconvert stereo to 5.1 audio. "
+                                "Set this option to enable it by default. "
+                                "You can enable or disable the upconversion during playback at anytime."));
     return gc;
 }
 
@@ -105,16 +115,13 @@ static HostComboBox *AudioUpmixType()
 {
     HostComboBox *gc = new HostComboBox("AudioUpmixType",false);
     gc->setLabel(QObject::tr("Upmix"));
-    gc->addSelection(QObject::tr("Passive"), "0", true); // default
-    gc->addSelection(QObject::tr("Active Simple"), "1");
-    gc->addSelection(QObject::tr("Active Linear"), "2");
+    gc->addSelection(QObject::tr("Fastest"), "0", true); // default
+    gc->addSelection(QObject::tr("Good"), "1");
+    gc->addSelection(QObject::tr("Best"), "2");
     gc->setHelpText(
             QObject::tr(
-                "Set the audio upmix type for 2ch to 6ch conversion. "
-                "This is for multi-channel/surround audio playback. "
-                "'Passive' is the least demanding on the CPU. "
-                "'Active Simple' is more demanding and 'Active Linear' "
-                "is the most demanding (but highest quality)."));
+                "Set the audio surround upconversion quality. "
+                "'Fastest' is the least demanding on the CPU at the expense of quality."));
     return gc;
 }
 
@@ -122,7 +129,7 @@ static HostComboBox *PassThroughOutputDevice()
 {
     HostComboBox *gc = new HostComboBox("PassThruOutputDevice", true);
 
-    gc->setLabel(QObject::tr("Passthrough output device"));
+    gc->setLabel(QObject::tr("Digital output device"));
     gc->addSelection(QObject::tr("Default"), "Default");
 #ifndef USING_MINGW
     gc->addSelection("ALSA:iec958:{ AES0 0x02 }", "ALSA:iec958:{ AES0 0x02 }");
@@ -130,8 +137,7 @@ static HostComboBox *PassThroughOutputDevice()
     gc->addSelection("ALSA:plughw:0,3", "ALSA:plughw:0,3");
 #endif
 
-    gc->setHelpText(QObject::tr("Audio output device to use for AC3 and "
-                    "DTS passthrough. Default is the same as Audio output "
+    gc->setHelpText(QObject::tr("Audio output device to use for digital audio. Default is the same as Audio output "
                     "device. This value is currently only used with ALSA "
                     "sound output."));
     return gc;
@@ -143,8 +149,9 @@ static HostCheckBox *MythControlsVolume()
     gc->setLabel(QObject::tr("Use internal volume controls"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("MythTV can control the PCM and master "
-                    "mixer volume.  If you prefer to use an external mixer "
-                    "program, then disable this option."));
+                    "mixer volume.  If you prefer to control the volume externally "
+                    "(like your amplifier) or use an external mixer "
+                    "program, disable this option."));
     return gc;
 }
 
@@ -169,6 +176,11 @@ static HostComboBox *MixerDevice()
 #ifdef USING_MINGW
     gc->addSelection("DirectX:", "DirectX:");
     gc->addSelection("Windows:", "Windows:");
+#endif
+#if !defined(USING_MINGW)
+    gc->addSelection("software", "software");
+    gc->setHelpText(QObject::tr("Setting the mixer device to \"software\" lets MythTV control "
+                                "the volume of all audio at the expense of a slight quality loss."));
 #endif
 
     return gc;
@@ -230,24 +242,20 @@ static HostCheckBox *IndividualMuteControl()
 static HostCheckBox *AC3PassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("AC3PassThru");
-    gc->setLabel(QObject::tr("Enable AC3 to SPDIF passthrough"));
+    gc->setLabel(QObject::tr("Dolby Digital"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable sending AC3 audio directly to your "
-                    "sound card's SPDIF output, on sources which contain "
-                    "AC3 soundtracks (usually digital TV).  Requires that "
-                    "the audio output device be set to something suitable."));
+    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder supports AC3/Dolby Digital. "
+                                "You must use a digital connection. Uncheck if using an analog connection."));
     return gc;
 }
 
 static HostCheckBox *DTSPassThrough()
 {
     HostCheckBox *gc = new HostCheckBox("DTSPassThru");
-    gc->setLabel(QObject::tr("Enable DTS to SPDIF passthrough"));
+    gc->setLabel(QObject::tr("DTS"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable sending DTS audio directly to your "
-                    "sound card's SPDIF output, on sources which contain "
-                    "DTS soundtracks (usually DVDs).  Requires that the "
-                    "audio output device be set to something suitable."));
+    gc->setHelpText(QObject::tr("Enable if your amplifier or sound decoder supports DTS. "
+                                "You must use a digital connection. Uncheck if using an analog connection"));
     return gc;
 }
 
@@ -1961,18 +1969,6 @@ static HostCheckBox *BrowseAllTuners()
     return gc;
 }
 
-static HostCheckBox *AggressiveBuffer()
-{
-    HostCheckBox *gc = new HostCheckBox("AggressiveSoundcardBuffer");
-    gc->setLabel(QObject::tr("Aggressive Sound card Buffering"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will pretend to have "
-                   "a smaller sound card buffer than is really present.  This "
-                   "may speed up seeking, but can also cause playback "
-                   "problems."));
-    return gc;
-}
-
 static HostCheckBox *ClearSavedPosition()
 {
     HostCheckBox *gc = new HostCheckBox("ClearSavedPosition");
@@ -3472,25 +3468,43 @@ static HostSpinBox *EPGRecThreshold()
     return gs;
 }
 
-class AudioSystemSettingsGroup : public VerticalConfigurationGroup
+class AudioSystemSettingsGroup : public TriggeredConfigurationGroup
 {
   public:
     AudioSystemSettingsGroup() :
-        VerticalConfigurationGroup(false, true, false, false)
+        TriggeredConfigurationGroup(false, true, false, false)
     {
         setLabel(QObject::tr("Audio System"));
         setUseLabel(false);
 
         addChild(AudioOutputDevice());
-        addChild(PassThroughOutputDevice());
 
-        addChild(MaxAudioChannels());
-        addChild(AudioUpmixType());
+        Setting *numchannels = MaxAudioChannels();
+        addChild(numchannels);
 
-        // General boolean settings
-        addChild(AC3PassThrough());
-        addChild(DTSPassThrough());
-        addChild(AggressiveBuffer());
+        ConfigurationGroup *dummy =
+        new VerticalConfigurationGroup(false, true, false, false);
+
+        ConfigurationGroup *settings =
+        new VerticalConfigurationGroup(false, true, false, false);
+
+        settings->addChild(AudioUpmix());
+        settings->addChild(AudioUpmixType());
+        settings->addChild(PassThroughOutputDevice());
+
+        ConfigurationGroup *settings2 =
+        new HorizontalConfigurationGroup();
+        settings2->setLabel(QObject::tr("Audio Processing Capabilities"));
+        settings2->addChild(AC3PassThrough());
+        settings2->addChild(DTSPassThrough());
+
+        settings->addChild(settings2);
+
+        // Show surround/upmixer config only if 5.1 Audio is selected
+        setTrigger(numchannels);
+        addTarget("2", dummy);
+        addTarget("6", settings);
+        
     }
 };
 

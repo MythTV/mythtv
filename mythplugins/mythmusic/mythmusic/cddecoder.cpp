@@ -14,6 +14,7 @@ using namespace std;
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythmediamonitor.h>
+#include <mythtv/libavcodec/avcodec.h>
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                      AudioOutput *o) :
@@ -149,7 +150,8 @@ bool CdDecoder::initialize()
     if (output())
     {
         const AudioSettings settings(
-            16 /*bits*/, chan, freq, false /* AC3/DTS passthru */);
+            16 /*bits*/, chan, CODEC_ID_PCM_S16LE, freq,
+            false /* AC3/DTS passthru */);
         output()->Reconfigure(settings);
         output()->SetSourceBitrate(44100 * 2 * 16);
     }

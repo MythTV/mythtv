@@ -10,6 +10,20 @@ VolumeBase::VolumeBase() :
     internal_vol(false), volume(80), 
     current_mute_state(kMuteOff)
 {
+    swvol = swvol_setting =
+        (gContext->GetSetting("MixerDevice", "default").toLower() == "software");
+}
+
+bool VolumeBase::SWVolume(void)
+{
+    return swvol;
+}
+
+void VolumeBase::SWVolume(bool set)
+{
+    if (swvol_setting)
+        return;
+    swvol = set;
 }
 
 uint VolumeBase::GetCurrentVolume(void) const
@@ -76,9 +90,17 @@ MuteState VolumeBase::NextMuteState(MuteState cur)
 void VolumeBase::UpdateVolume(void)
 {
     int new_volume = volume;
+    bool save = true;
     if (current_mute_state == kMuteAll)
     {
         new_volume = 0;
+        save = false;
+    }
+
+    if (swvol)
+    {
+        SetSWVolume(new_volume, save);
+        return;
     }
     
     // TODO: Avoid assumption that there are 2 channels!
@@ -102,6 +124,9 @@ void VolumeBase::UpdateVolume(void)
 void VolumeBase::SyncVolume(void)
 {
     // Read the volume from the audio driver and setup our internal state to match
-    volume = GetVolumeChannel(0);
+    if (swvol)
+        volume = GetSWVolume();
+    else
+        volume = GetVolumeChannel(0);
 }
 

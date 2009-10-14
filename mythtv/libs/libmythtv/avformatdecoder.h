@@ -188,6 +188,7 @@ class AvFormatDecoder : public DecoderBase
 
     void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
 
+    bool DoPassThrough(const AVCodecContext *ctx);
     bool SetupAudioStream(void);
     void SetupAudioStreamSubIndexes(int streamIndex);
     void RemoveAudioStreams();
@@ -258,8 +259,10 @@ class AvFormatDecoder : public DecoderBase
     short int        *audioSamples;
     bool              allow_ac3_passthru;
     bool              allow_dts_passthru;
+    bool              internal_vol;
     bool              disable_passthru;
     uint              max_channels;
+    uint              last_ac3_channels;
 
     VideoFrame       *dummy_frame;
 

@@ -63,10 +63,9 @@ using namespace std;
 const unsigned default_block_size = 8192;
 // there will be a slider for this in the future
 //const float master_gain = 1.0;
-//#define MASTER_GAIN * master_gain
+//#define MASTER_GAIN * master_gain 
 #define MASTER_GAIN
-//const float master_gain = 1.0/(1<<15);
-//const float inv_master_gain = (1<<15);
+//const float inv_master_gain = 1.0;
 //#define INV_MASTER_GAIN * inv_master_gain
 #define INV_MASTER_GAIN
 
@@ -192,15 +191,13 @@ FreeSurround::FreeSurround(uint srate, bool moviemode, SurroundMode smode) :
     if (moviemode)
     {
         params.phasemode = 1;
-        params.center_width = 0;
-        params.gain = 1.0;
+        params.center_width = 25;
+        params.dimension = 0.5;
     }
     else
     {
-        params.center_width = 70;
-        // for 50, gain should be about 1.9, c/lr about 2.7
-        // for 70, gain should be about 3.1, c/lr about 1.5
-        params.gain = 3.1;
+        params.center_width = 65;
+        params.dimension = 0.3;
     }
     switch (surround_mode)
     {
@@ -236,7 +233,6 @@ void FreeSurround::SetParams()
         decoder->phase_mode(params.phasemode);
         decoder->surround_coefficients(params.coeff_a, params.coeff_b);				
         decoder->separation(params.front_sep/100.0,params.rear_sep/100.0);
-        decoder->gain(params.gain);
     }
 }
 
@@ -250,8 +246,7 @@ FreeSurround::fsurround_params::fsurround_params(
     phasemode(0),
     steering(1),
     front_sep(100),
-    rear_sep(100), 
-    gain(1.0)
+    rear_sep(100) 
 {
 }
 
@@ -581,6 +576,7 @@ uint FreeSurround::receiveSamples(
     uint oc = out_count;
     if (maxSamples>oc) maxSamples = oc;
     uint outindex = processed_size - oc;
+
     switch (surround_mode)
     {
         case SurroundModePassive:
@@ -655,16 +651,6 @@ void FreeSurround::process_block()
     {
         if (decoder) 
         {
-            // actually these params need only be set when they change... but it doesn't hurt
-#if 0
-            decoder->steering_mode(params.steering);
-            decoder->phase_mode(params.phasemode);
-            decoder->surround_coefficients(params.coeff_a, params.coeff_b);				
-            decoder->separation(params.front_sep/100.0,params.rear_sep/100.0);
-#endif
-            // decode the bufs->block
-            //decoder->decode(input,output,params.center_width/100.0,params.dimension/100.0);
-            //decoder->decode(output,params.center_width/100.0,params.dimension/100.0);
             decoder->decode(params.center_width/100.0,params.dimension/100.0);
         }
     }

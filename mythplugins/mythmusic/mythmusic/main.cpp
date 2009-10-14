@@ -404,6 +404,8 @@ void setupKeys(void)
         "Volume up"),         "],},F11,Volume Up");
     REG_KEY("Music", "MUTE",       QT_TRANSLATE_NOOP("MythControls",
         "Mute"),              "|,\\,F9,Volume Mute");
+    REG_KEY("Music", "TOGGLEUPMIX",QT_TRANSLATE_NOOP("MythControls",
+        "Toggle audio upmixer"),    "Ctrl+U");
     REG_KEY("Music", "CYCLEVIS",   QT_TRANSLATE_NOOP("MythControls",
         "Cycle visualizer mode"),      "6");
     REG_KEY("Music", "BLANKSCR",   QT_TRANSLATE_NOOP("MythControls",

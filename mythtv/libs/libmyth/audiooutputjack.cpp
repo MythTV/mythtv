@@ -30,6 +30,44 @@ AudioOutputJACK::AudioOutputJACK(const AudioSettings &settings) :
     Reconfigure(settings);
 }
 
+vector<int> AudioOutputJACK::GetSupportedRates()
+{
+    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000 };
+    vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
+    unsigned long jack_port_flags = 0;
+    unsigned int jack_port_name_count = 1;
+    const char *jack_port_name = audio_main_device.toAscii();
+    int err = -1;
+    audioid = -1;
+    vector<int>::iterator it = rates.begin();
+
+    while (it != rates.end())
+    {
+        unsigned long lrate = (unsigned long) *it;
+        err = JACK_OpenEx(&audioid, 16, &lrate,
+                          2, 2, &jack_port_name, jack_port_name_count,
+                          jack_port_flags);
+
+        if (err == ERR_OPENING_JACK)
+        {
+            Error(QString("Error connecting to jackd: %1. Is it running?")
+                  .arg(audio_main_device));
+            rates.clear();
+            return rates;
+        }
+        else
+            if (err == ERR_RATE_MISMATCH)
+                it = rates.erase(it);
+            else
+                it++;
+
+        JACK_Close(audioid);
+        audioid = -1;
+    }
+    return rates;
+}
+
+
 AudioOutputJACK::~AudioOutputJACK()
 {
     // Close down all audio stuff

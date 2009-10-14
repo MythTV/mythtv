@@ -69,6 +69,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void changeVolume(bool up_or_down);
     void changeSpeed(bool up_or_down);
     void toggleMute();
+    void toggleUpmix();
     void resetTimer();
     void hideVolume(){showVolume(false);}
     void showVolume(bool on_or_off);

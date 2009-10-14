@@ -212,9 +212,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       audioOutput(NULL),
       audio_main_device(QString::null),
       audio_passthru_device(QString::null),
-      audio_channels(2),            audio_bits(-1),
-      audio_samplerate(44100),      audio_stretchfactor(1.0f),
-      audio_codec(NULL),            audio_lock(QMutex::Recursive),
+      audio_channels(2),            audio_codec(0),
+      audio_bits(-1),               audio_samplerate(44100),
+      audio_stretchfactor(1.0f),    audio_lock(QMutex::Recursive),
       audio_muted_on_creation(muted),
       // Picture-in-Picture stuff
       pip_active(false),            pip_visible(true),
@@ -911,7 +911,7 @@ QString NuppelVideoPlayer::ReinitAudio(void)
         audioOutput = AudioOutput::OpenAudio(audio_main_device,
                                              audio_passthru_device,
                                              audio_bits, audio_channels,
-                                             audio_samplerate,
+                                             audio_codec, audio_samplerate,
                                              AUDIOOUTPUT_VIDEO,
                                              setVolume, audio_passthru);
         if (!audioOutput)
@@ -944,10 +944,11 @@ QString NuppelVideoPlayer::ReinitAudio(void)
 
     if (audioOutput)
     {
-        const AudioSettings settings(
-            audio_bits, audio_channels, audio_samplerate,
-            audio_passthru, audio_codec);
+        const AudioSettings settings(audio_bits, audio_channels, audio_codec,
+                                     audio_samplerate, audio_passthru);
         audioOutput->Reconfigure(settings);
+        if (audio_passthru)
+            audio_channels = 2;
         errMsg = audioOutput->GetError();
         if (!errMsg.isEmpty())
             audioOutput->SetStretchFactor(audio_stretchfactor);
@@ -3916,18 +3917,14 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
     return !IsErrored();
 }
 
-void NuppelVideoPlayer::SetAudioParams(int bps, int channels,
+void NuppelVideoPlayer::SetAudioParams(int bps, int channels, int codec,
                                        int samplerate, bool passthru)
 {
     audio_bits = bps;
     audio_channels = channels;
+    audio_codec = codec;
     audio_samplerate = samplerate;
     audio_passthru = passthru;
-}
-
-void NuppelVideoPlayer::SetAudioCodec(void *ac)
-{
-    audio_codec = ac;
 }
 
 void NuppelVideoPlayer::SetEffDsp(int dsprate)
@@ -5351,6 +5348,13 @@ void NuppelVideoPlayer::ToggleAdjustFill(AdjustFillMode adjustfillMode)
         videoOutput->ToggleAdjustFill(adjustfillMode);
         ReinitOSD();
     }
+}
+
+bool NuppelVideoPlayer::ToggleUpmix()
+{
+    if (audioOutput)
+        return audioOutput->ToggleUpmix();
+    return false;
 }
 
 void NuppelVideoPlayer::Zoom(ZoomDirection direction)

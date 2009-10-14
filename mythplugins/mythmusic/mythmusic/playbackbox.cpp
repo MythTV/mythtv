@@ -365,6 +365,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             changeSpeed(true);
         else if (action == "MUTE")
             toggleMute();
+        else if (action == "TOGGLEUPMIX")
+            toggleUpmix();
         else if (action == "MENU" && visualizer_status != 2)
         {
             menufilters = false;
@@ -1201,6 +1203,13 @@ void PlaybackBoxMusic::toggleMute()
         showVolume(true);
     }
 }
+
+void PlaybackBoxMusic::toggleUpmix()
+{
+    if (gPlayer->getOutput())
+        gPlayer->getOutput()->ToggleUpmix();
+}
+    
 
 void PlaybackBoxMusic::showProgressBar()
 {

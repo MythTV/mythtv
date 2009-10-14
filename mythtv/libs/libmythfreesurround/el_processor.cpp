@@ -26,7 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "fftw3.h"
 #else
 extern "C" {
-#include "libavutil/declare_aligned.h"
 #include "dsputil.h"
 };
 typedef FFTSample FFTComplexArray[2];
@@ -41,17 +40,7 @@ typedef std::complex<float> cfloat;
 
 const float PI = 3.141592654;
 const float epsilon = 0.000001;
-//const float center_level = 0.5*sqrt(0.5);   // gain of the center channel
-//const float center_level = sqrt(0.5);   // gain of the center channel
-const float center_level = 1.0;   // gain of the center channel
-//const float center_level = 0.5;   // gain of the center channel
-
-// should be .6-.7
-// but with centerlevel 2x what its supposed to be, we halve 0.68
-// to keep center from clipping
-//const float window_gain = 0.34;     
-//const float window_gain = 0.68;     
-const float window_gain = 0.95;     // to prive a bit of margin
+const float center_level = 0.5*sqrt(0.5);
 
 // private implementation of the surround decoder
 class decoder_impl {
@@ -99,19 +88,11 @@ public:
             outbuf[c].resize(N);
             filter[c].resize(N);
         }
-        // DC component of filters is always 0
-        for (unsigned c=0;c<5;c++)
-        {
-            filter[c][0] = 0.0;
-            filter[c][1] = 0.0;
-            filter[c][halfN] = 0.0;
-        }
         sample_rate(48000);
         // generate the window function (square root of hann, b/c it is applied before and after the transform)
         wnd.resize(N);
-        // dft normalization included in the window for zero cost scaling
-        // also add a gain factor of *2 due to processing gain in algo (see center_level)
-        surround_gain(1.0);
+        for (unsigned k=0;k<N;k++)
+            wnd[k] = sqrt(0.5*(1-cos(2*PI*k/N))/N);
         current_buf = 0;
         memset(inbufs, 0, sizeof(inbufs));
         memset(outbufs, 0, sizeof(outbufs));
@@ -195,10 +176,10 @@ public:
     // set lfe filter params
     void sample_rate(unsigned int srate) {
         // lfe filter is just straight through band limited
-        unsigned int cutoff = (250*N)/srate;
+        unsigned int cutoff = (30*N)/srate;
         for (unsigned f=0;f<=halfN;f++) {           
-            if ((f>=2) && (f<cutoff))
-                filter[5][f] = 1.0;
+            if (f<cutoff)
+                filter[5][f] = 0.5*sqrt(0.5);
             else
                 filter[5][f] = 0.0;
         }
@@ -215,12 +196,6 @@ public:
         cfloat i(0,1), u((a+b)*i), v((b-a)*i), n(0.25,0),o(1,0);
         A = (v-o)*n; B = (o-u)*n; C = (-o-v)*n; D = (o+u)*n;
         E = (o+v)*n; F = (o+u)*n; G = (o-v)*n;  H = (o-u)*n;
-    }
-
-    void surround_gain(float gain) {
-        master_gain = gain * window_gain * 0.5 * 0.25;
-        for (unsigned k=0;k<N;k++)
-            wnd[k] = sqrt(master_gain*(1-cos(2*PI*k/N))/N);
     }
 
     // set the phase shifting mode
@@ -293,7 +268,7 @@ private:
 
         // 2. compare amplitude and phase of each DFT bin and produce the X/Y coordinates in the sound field
         //    but dont do DC or N/2 component
-        for (unsigned f=2;f<halfN;f++) {           
+        for (unsigned f=0;f<halfN;f++) {           
             // get left/right amplitudes/phases
             float ampL = amplitude(dftL[f]), ampR = amplitude(dftR[f]);
             float phaseL = phase(dftL[f]), phaseR = phase(dftR[f]);
@@ -308,41 +283,6 @@ private:
             phaseDiff = abs(phaseDiff);
 
             if (linear_steering) {
-/*              cfloat w = polar(sqrt(ampL*ampL+ampR*ampR), (phaseL+phaseR)/2);
-                cfloat lt = cfloat(dftL[f][0],dftL[f][1])/w, rt = cfloat(dftR[f][0],dftR[f][1])/w;              */
-//              xfs[f] = -(C*(rt-H) - B*E + F*A + G*(D-lt)) / (G*A - C*E).real();
-//              yfs[f] = (rt - (xfs[f]*E+H))/(F+xfs[f]*G);
-
-                /*
-                Problem: 
-                This assumes that the values are interpolated linearly between the cardinal points.
-                But this way we have no chance of knowing the average volume...
-                - Can we solve that computing everything under the assumption of normalized volume?
-                  No. Seemingly not.
-                - Maybe we should add w explitcitly into the equation and see if we can solve it...
-                */
-
-
-                //cfloat lt(0.5,0),rt(0.5,0);
-                //cfloat x(0,0), y(1,0);
-                /*cfloat p = (C*(rt-H) - B*E + F*A + G*(D-lt)) / (G*A - C*E);
-                cfloat q = B*(rt+H) + F*(D-lt) / (G*A - C*E);
-                cfloat s = sqrt(p*p/4.0f - q);
-                cfloat x = -p;
-                cfloat x1 = -p/2.0f + s;
-                cfloat x2 = -p/2.0f - s;
-                float x = 0;
-                if (x1.real() >= -1 && x1.real() <= 1)
-                    x = x1.real();
-                else if (x2.real() >= -1 && x2.real() <= 1)
-                    x = x2.real();*/
-
-                //cfloat yp = (rt - (x*E+H))/(F+x*G);
-                //cfloat xp = (lt - (y*B+D))/(A+y*C);
-
-                /*xfs[f] = x;
-                yfs[f] = y.real();*/
-
                 // --- this is the fancy new linear mode ---
 
                 // get sound field x/y position
@@ -600,7 +540,6 @@ private:
     float surround_high,surround_low;  // high and low surround mixing coefficient (e.g. 0.8165/0.5774)
     float surround_balance;            // the xfs balance that follows from the coeffs
     float surround_level;              // gain for the surround channels (follows from the coeffs
-    float master_gain;                 // gain for all channels
     float phase_offsetL, phase_offsetR;// phase shifts to be applied to the rear channels
     float front_separation;            // front stereo separation
     float rear_separation;             // rear stereo separation
@@ -627,8 +566,6 @@ void fsurround_decoder::decode(float center_width, float dimension, float adapti
 void fsurround_decoder::flush() { impl->flush(); }
 
 void fsurround_decoder::surround_coefficients(float a, float b) { impl->surround_coefficients(a,b); }
-
-void fsurround_decoder::gain(float gain) { impl->surround_gain(gain); }
 
 void fsurround_decoder::phase_mode(unsigned mode) { impl->phase_mode(mode); }
 

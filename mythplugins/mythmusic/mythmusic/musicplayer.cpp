@@ -348,16 +348,19 @@ void MusicPlayer::stopDecoder(void)
 
 void MusicPlayer::openOutputDevice(void)
 {
-    QString adevice;
+    QString adevice, pdevice;
 
     if (gContext->GetSetting("MusicAudioDevice") == "default")
         adevice = gContext->GetSetting("AudioOutputDevice");
     else
         adevice = gContext->GetSetting("MusicAudioDevice");
 
+    pdevice = gContext->GetSetting("PassThruOutputDevice");
+
     // TODO: Error checking that device is opened correctly!
-    m_output = AudioOutput::OpenAudio(adevice, "default", 16, 2, 44100,
-                                    AUDIOOUTPUT_MUSIC, true, false);
+    m_output = AudioOutput::OpenAudio(adevice, pdevice, 16, 2, 0, 44100,
+                                      AUDIOOUTPUT_MUSIC, true, false,
+                                      gContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
     m_output->setBufferSize(256 * 1024);
     m_output->SetBlocking(false);
 

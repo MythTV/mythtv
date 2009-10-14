@@ -15,9 +15,11 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     static AudioOutput *OpenAudio(
         const QString &audiodevice,
         const QString &passthrudevice,
-        int audio_bits, int audio_channels, int audio_samplerate,
+        int audio_bits, int audio_channels, 
+        int audio_codec, int audio_samplerate,
         AudioOutputSource source,
-        bool set_initial_vol, bool audio_passthru);
+        bool set_initial_vol, bool audio_passthru,
+        int upmixer_startup = 0);
 
     AudioOutput() :
         VolumeBase(),             OutputListeners(),
@@ -68,6 +70,7 @@ class MPUBLIC AudioOutput : public VolumeBase, public OutputListeners
     
     virtual void bufferOutputData(bool y) = 0;
     virtual int readOutputData(unsigned char *read_buffer, int max_length) = 0;
+    virtual bool ToggleUpmix(void) = 0;
 
   protected:
     void Error(const QString &msg);

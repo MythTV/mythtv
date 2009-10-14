@@ -29,17 +29,19 @@ class MPUBLIC AudioSettings
         const QString    &audio_passthru_device,
         int               audio_bits,
         int               audio_channels,
+        int               audio_codec,
         int               audio_samplerate,
         AudioOutputSource audio_source,
         bool              audio_set_initial_vol,
         bool              audio_use_passthru,
-        void             *audio_codec = NULL);
+        int               upmixer_startup = 0);
 
     AudioSettings(int   audio_bits, 
                   int   audio_channels, 
+                  int   audio_codec,
                   int   audio_samplerate,
                   bool  audio_use_passthru,
-                  void *audio_codec = NULL);
+                  int   upmixer_startup = 0);
 
     void FixPassThrough(void);
     void TrimDeviceType(void);
@@ -54,11 +56,12 @@ class MPUBLIC AudioSettings
   public:
     int     bits;
     int     channels;
+    int     codec;
     int     samplerate;
     bool    set_initial_vol;
     bool    use_passthru;
-    void   *codec;
     AudioOutputSource source;
+    int     upmixer;
 };
 
 #endif // _AUDIO_SETTINGS_H_

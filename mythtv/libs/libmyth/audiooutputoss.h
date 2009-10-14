@@ -23,6 +23,7 @@ class AudioOutputOSS : public AudioOutputBase
     virtual void WriteAudio(unsigned char *aubuf, int size);
     virtual int  GetSpaceOnSoundcard(void) const;
     virtual int  GetBufferedOnSoundcard(void) const;
+    vector<int> GetSupportedRates(void);
 
   private:
     void VolumeInit(void);

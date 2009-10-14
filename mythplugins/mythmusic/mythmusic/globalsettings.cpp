@@ -67,6 +67,17 @@ static HostComboBox *MusicAudioDevice()
     return gc;
 };
 
+static HostCheckBox *MusicUpmixer()
+{
+    HostCheckBox *gc = new HostCheckBox("MusicDefaultUpmix");
+    gc->setLabel(QObject::tr("Upconvert stereo to 5.1 surround"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("MythTV can upconvert stereo tracks to 5.1 audio. "
+                                "Set this option to enable it by default. "
+                                "You can enable or disable the upconversion during playback at anytime."));
+    return gc;
+};
+
 static HostLineEdit *CDDevice()
 {
     HostLineEdit *gc = new HostLineEdit("CDDevice");
@@ -545,6 +556,7 @@ MusicGeneralSettings::MusicGeneralSettings(void)
     general->setLabel(QObject::tr("General Settings (1)"));
     general->addChild(SetMusicDirectory());
     general->addChild(MusicAudioDevice());
+    general->addChild(MusicUpmixer());
     general->addChild(CDDevice());
     general->addChild(AutoLookupCD());
     general->addChild(AutoPlayCD());

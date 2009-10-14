@@ -65,8 +65,10 @@ class AudioOutputALSA : public AudioOutputBase
     virtual void WriteAudio(unsigned char *aubuf, int size);
     virtual int  GetSpaceOnSoundcard(void) const;
     virtual int  GetBufferedOnSoundcard(void) const;
+    vector<int> GetSupportedRates(void);
 
   private:
+    void SetIECStatus(bool audio);
     inline int SetParameters(snd_pcm_t *handle,
                              snd_pcm_format_t format, unsigned int channels,
                              unsigned int rate, unsigned int buffer_time,

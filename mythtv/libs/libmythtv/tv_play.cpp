@@ -533,6 +533,8 @@ void TV::InitKeys(void)
             "Volume up"), "],},F11,Volume Up");
     REG_KEY("TV Playback", "MUTE", QT_TRANSLATE_NOOP("MythControls", "Mute"),
             "|,\\,F9,Volume Mute");
+    REG_KEY("TV Playback", "TOGGLEUPMIX", QT_TRANSLATE_NOOP("MythControls",
+            "Toggle audio upmixer"), "Ctrl+U");
     REG_KEY("TV Playback", "TOGGLEPIPMODE", QT_TRANSLATE_NOOP("MythControls",
             "Toggle Picture-in-Picture view"), "V");
     REG_KEY("TV Playback", "TOGGLEPBPMODE", QT_TRANSLATE_NOOP("MythControls",
@@ -747,7 +749,7 @@ void TV::InitKeys(void)
   Teletext     F2,F3,F4,F5,F6,F7,F8
   ITV          F2,F3,F4,F5,F6,F7,F12
 
-  Playback: Ctrl-B,Ctrl-G,Ctrl-Y
+  Playback: Ctrl-B,Ctrl-G,Ctrl-Y,Ctrl-U
 */
 }
 
@@ -4467,6 +4469,8 @@ bool TV::ToggleHandleAction(PlayerContext *ctx,
         DoTogglePictureAttribute(ctx, kAdjustingPicture_Playback);
     else if (has_action("TOGGLESTRETCH", actions))
         ToggleTimeStretch(ctx);
+    else if (has_action("TOGGLEUPMIX", actions))
+        ToggleUpmix(ctx);
     else if (has_action("TOGGLESLEEP", actions))
         ToggleSleepTimer(ctx);
     else if (has_action("TOGGLERECORD", actions) && islivetv)
@@ -8100,6 +8104,20 @@ void TV::ChangeTimeStretch(PlayerContext *ctx, int dir, bool allowEdit)
     SetSpeedChangeTimer(0, __LINE__);
 }
 
+void TV::ToggleUpmix(PlayerContext *ctx)
+{
+    if (!ctx->nvp || !ctx->nvp->HasAudioOut())
+        return;
+    QString text;
+    if (ctx->nvp->ToggleUpmix())
+        text = tr("Upmixer On");
+    else
+        text = tr("Upmixer Off");
+    
+    if (ctx->nvp->GetOSD() && !browsemode)
+        ctx->nvp->GetOSD()->SetSettingsText(text, 5);
+}
+    
 // dir in 10ms jumps
 void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
 {
@@ -9743,6 +9761,8 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
         SetManualZoom(actx, true, tr("Zoom Mode ON"));
     else if (action == "TOGGLESTRETCH")
         ToggleTimeStretch(actx);
+    else if (action == "TOGGLEUPMIX")
+        ToggleUpmix(actx);
     else if (action.left(13) == "ADJUSTSTRETCH")
     {
         bool floatRead;
@@ -10108,6 +10128,8 @@ void TV::FillOSDTreeMenu(
 
     if (category == "AUDIOSYNC")
         new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
+    else if (category == "TOGGLEUPMIX")
+        new OSDGenericTree(treeMenu, tr("Toggle Audio Upmixer"), "TOGGLEUPMIX");
     else if (category == "TIMESTRETCH")
         FillMenuTimeStretch(ctx, treeMenu);
     else if (category == "VIDEOSCAN")

@@ -256,8 +256,8 @@ bool avfDecoder::initialize()
     if (output())
     {
         const AudioSettings settings(
-            16 /*bits*/, m_audioDec->channels, m_audioDec->sample_rate,
-            false /* AC3/DTS pass through */);
+            16 /*bits*/, m_audioDec->channels, m_audioDec->codec_id, 
+            m_audioDec->sample_rate, false /* AC3/DTS pass through */);
         output()->Reconfigure(settings);
         output()->SetSourceBitrate(m_audioDec->bit_rate);
     }

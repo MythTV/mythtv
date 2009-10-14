@@ -37,7 +37,7 @@ class AudioReencodeBuffer : public AudioOutput
     AudioReencodeBuffer(int audio_bits, int audio_channels)
     {
         Reset();
-        const AudioSettings settings(audio_bits, audio_channels, 0, false);
+        const AudioSettings settings(audio_bits, audio_channels, 0, 0, false);
         Reconfigure(settings);
         bufsize = 512000;
         audiobuffer = new unsigned char[bufsize];
@@ -209,6 +209,22 @@ class AudioReencodeBuffer : public AudioOutput
     {
         // Do nothing
         return kMuteOff;
+    }
+    virtual bool ToggleUpmix(void) 
+    {
+        // Do nothing
+        return false;
+    }
+
+    virtual void SetSWVolume(int new_volume, bool save)
+    {
+        // Do nothing
+        return;
+    }
+    virtual int GetSWVolume(void)
+    {
+        // Do nothing
+        return 100;
     }
 
     //  These are pure virtual in AudioOutput, but we don't need them here
