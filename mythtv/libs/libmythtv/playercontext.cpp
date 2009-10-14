@@ -1,7 +1,5 @@
 #include <cmath>
 
-#include <QDir>
-#include <QTimer>
 #include <QPainter>
 
 #include "playercontext.h"
@@ -10,7 +8,6 @@
 #include "livetvchain.h"
 #include "RingBuffer.h"
 #include "playgroup.h"
-#include "dialogbox.h"
 #include "util-osx-cocoa.h"
 #include "videoouttypes.h"
 #include "storagegroup.h"
