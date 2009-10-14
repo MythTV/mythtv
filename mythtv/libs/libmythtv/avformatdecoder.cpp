@@ -2637,7 +2637,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
 
     // crude NAL unit vs Annex B detection.
     // the parser only understands Annex B
-    if (context->extradata && context->extradata_size >+ 4)
+    if (context->extradata && context->extradata_size >= 4)
     {
         int nal_size    = 0;
         int size_length = (context->extradata[4] & 0x3) + 1;
