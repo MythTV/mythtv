@@ -339,7 +339,8 @@ void MythUIType::HandleMovementPulse(void)
 
 void MythUIType::HandleAlphaPulse(void)
 {
-    if (!GetMythPainter()->SupportsAlpha())
+    if (!GetMythPainter()->SupportsAlpha() ||
+        !GetMythPainter()->SupportsAnimation())
         return;
 
     if (m_AlphaChangeMode == 0)

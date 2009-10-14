@@ -16,7 +16,7 @@ class MythQtPainter : public MythPainter
 
     virtual QString GetName(void) { return QString("Qt"); }
     virtual bool SupportsAnimation(void) { return false; }
-    virtual bool SupportsAlpha(void) { return false; }
+    virtual bool SupportsAlpha(void) { return true; }
     virtual bool SupportsClipping(void) { return true; }
 
     virtual void Begin(QWidget *parent);

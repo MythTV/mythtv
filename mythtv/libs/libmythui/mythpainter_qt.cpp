@@ -126,7 +126,9 @@ void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
        qim->RegeneratePixmap();
     }
 
+    painter->setOpacity(static_cast<float>(alpha) / 255.0);
     painter->drawPixmap(r.topLeft(), *(qim->GetPixmap()), src);
+    painter->setOpacity(1.0);
 }
 
 void MythQtPainter::DrawText(const QRect &r, const QString &msg,
@@ -141,6 +143,8 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
 
     (void)alpha;
 
+    painter->setOpacity(static_cast<float>(alpha) / 255.0);
+    
     painter->setFont(font.face());
 
     if (font.hasShadow())
@@ -203,6 +207,7 @@ void MythQtPainter::DrawText(const QRect &r, const QString &msg,
 
     painter->setPen(font.color());
     painter->drawText(r, flags, msg);
+    painter->setOpacity(1.0);
 }
 
 void MythQtPainter::DrawRect(const QRect &area,
