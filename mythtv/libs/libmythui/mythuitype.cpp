@@ -818,3 +818,17 @@ void MythUIType::LoadNow(void)
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
         (*it)->LoadNow();
 }
+
+/**
+ *  \brief Check if the given point falls within this widgets area
+ *
+ *  Largely used For correctly handling mouse clicks
+ */
+bool MythUIType::ContainsPoint(const QPoint &point) const
+{
+    if (m_Area.contains(point - m_Area.topLeft()))
+        return true;
+
+    return false;
+}
+

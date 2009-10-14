@@ -135,6 +135,8 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     void FinishedMoving();
     void FinishedFading();
 
+    bool ContainsPoint(const QPoint &point) const;
+    
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);
