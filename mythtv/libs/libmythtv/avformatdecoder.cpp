@@ -2652,6 +2652,7 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
             if (pkt->flags & PKT_FLAG_KEY)
                 HandleGopStart(pkt, false);
             return true;
+        }
     }
 
     while (buf < buf_end)
