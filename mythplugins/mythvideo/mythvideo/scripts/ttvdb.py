@@ -756,10 +756,13 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 			cast_print=False
 			for extra_data in extra_ep_data:
 				if extra_data[:extra_data.index(':')] == u'Gueststars':
+					extra_cast = extra_data[extra_data.index(':')+1:]
+					if (len(extra_cast)>128) and not extra_cast.count(','):
+						continue
 					if cast_members:
-						extra_data=(u"Cast:%s" % cast_members)+', '+extra_data[extra_data.index(':')+1:]
+						extra_data=(u"Cast:%s" % cast_members)+', '+extra_cast
 					else:
-						extra_data=u"Cast:%s" % extra_data[extra_data.index(':')+1:]
+						extra_data=u"Cast:%s" % extra_cast
 					cast_print=True
 				print extra_data
 			if cast_print == False:
