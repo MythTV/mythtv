@@ -1358,6 +1358,7 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         !profiles.contains("VDPAU Slim"))
     {
         VideoDisplayProfile::CreateVDPAUProfiles(host);
+        profiles = VideoDisplayProfile::GetProfiles(host);
     }
 
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
