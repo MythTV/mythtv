@@ -2518,7 +2518,10 @@ class Tvdatabase(object):
 							if ep_data[key] == '':
 								tmp+=u'Cast:%s\n' % cast_members
 							else:
-								tmp+=u'Cast:%s, %s\n' % (cast_members, ep_data[key])
+								if (len(ep_data[key]) > 128) and not ep_data[key].count(','):
+									tmp+=u'Cast:%s\n' % cast_members
+								else:
+									tmp+=u'Cast:%s, %s\n' % (cast_members, ep_data[key])
 							continue
 						try:
 							tmp+=u'%s:%s\n' % (key, ep_data[key])
