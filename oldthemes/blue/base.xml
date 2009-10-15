@@ -8,29 +8,21 @@
         <font name="small" face="Arial">
             <color>#FFFFFF</color>
             <size>14</size>
-            <size:small>12</size:small>
-            <size:big>16</size:big>
             <bold>yes</bold>
         </font>
 
         <font name="medium" from="small">
             <size>16</size>
-            <size:small>14</size:small>
-            <size:big>20</size:big>
         </font>
 
         <font name="large" from="small">
             <size>20</size>
-            <size:small>18</size:small>
-            <size:big>22</size:big>
         </font>
 
         <font name="basefont"  face="Trebuchet Ms">
             <color>#ffffff</color>
             <dropcolor>#000000</dropcolor>
             <size>16</size>
-            <size:small>14</size:small>
-            <size:big>18</size:big>
             <shadow>2,2</shadow>
             <bold>yes</bold>
         </font>
@@ -39,15 +31,11 @@
             <color>#ffffdd</color>
             <size>22</size>
             <bold>no</bold>
-            <size:big>24</size:big>
-            <size:small>18</size:small>
         </font>
 
         <font name="subtitle" from="basefont">
             <color>#ffffdd</color>
             <size>18</size>
-            <size:big>20</size:big>
-            <size:small>14</size:small>
         </font>
 
         <font name="info" from="basefont">
@@ -69,14 +57,10 @@
 
         <font name="small-info" from="info">
             <size>14</size>
-            <size:small>12</size:small>
-            <size:big>17</size:big>
         </font>
 
         <font name="list-active" from="basefont" face="Freesans">
             <size>15</size>
-            <size:small>14</size:small>
-            <size:big>18</size:big>
             <shadow>1,1</shadow>
             <color>#ddddff</color>
         </font>
