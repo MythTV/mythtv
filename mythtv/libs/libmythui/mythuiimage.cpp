@@ -180,7 +180,8 @@ void MythUIImage::Clear(void)
     while (!m_Images.isEmpty())
     {
         QHash<int, MythImage*>::iterator it = m_Images.begin();
-        (*it)->DownRef();
+        if (*it)
+            (*it)->DownRef();
         m_Images.remove(it.key());
     }
 }
@@ -353,6 +354,13 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
     for (it = images.begin(); it != images.end(); ++it)
     {
         MythImage *im = (*it);
+        if (!im)
+        {
+            QMutexLocker locker(&m_ImagesLock);
+            m_Images[m_Images.size()] = im;
+            continue;
+        }
+
         im->UpRef();
 
         if (!m_ForceSize.isNull())
@@ -866,9 +874,14 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
         int alpha = CalcAlpha(alphaMod);
 
         MythImage *currentImage = m_Images[m_CurPos];
-        currentImage->UpRef();
+        if (currentImage)
+            currentImage->UpRef();
         m_ImagesLock.unlock();
         d->m_UpdateLock.unlock();
+
+        if (!currentImage)
+            return;
+
         d->m_UpdateLock.lockForRead();
 
         QRect currentImageArea = currentImage->rect();
