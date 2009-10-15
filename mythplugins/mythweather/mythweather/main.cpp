@@ -142,8 +142,10 @@ int mythplugin_config()
     menu->setKillable();
     if (menu->foundTheme())
     {
-        if (LCD *lcd = LCD::Get())
+        if (LCD *lcd = LCD::Get()) {
+            lcd->setFunctionLEDs(FUNC_NEWS, false);
             lcd->switchToTime();
+        }
 
         GetMythMainWindow()->GetMainStack()->AddScreen(menu);
         return 0;

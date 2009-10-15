@@ -29,6 +29,8 @@ using namespace std;
 #include "mythuihelper.h"
 #include "myth_imgconvert.h"
 
+#include "lcddevice.h"
+
 #include "videoout_dvdv.h"    // AvFormatDecoderPrivate has DVDV ptr
 #include "videoout_quartz.h"  // For VOQ::GetBestSupportedCodec()
 
@@ -521,6 +523,15 @@ AvFormatDecoder::~AvFormatDecoder()
 
     if (avfRingBuffer)
         delete avfRingBuffer;
+
+    if (LCD *lcd = LCD::Get())
+    {
+        VERBOSE(VB_GENERAL, QString("LCD: Switch all codec/hdtv/spdif OFF"));
+        lcd->setAVFormatLEDs(CODEC_ID_MPEG2VIDEO, false);
+        lcd->setAVFormatLEDs(CODEC_ID_MP2, false);
+        lcd->setVariousLEDs(VARIOUS_HDTV, false);
+        lcd->setVariousLEDs(VARIOUS_SPDIF, false);
+    }
 }
 
 void AvFormatDecoder::CloseCodecs()
@@ -1292,6 +1303,15 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         GetNVP()->SetVideoParams(width, height, fps,
                                  keyframedist, aspect_ratio, kScan_Detect,
                                  dvd_video_codec_changed);
+        if (LCD *lcd = LCD::Get())
+        {
+            VERBOSE(VB_GENERAL, QString("LCD: Set AVFormat to Codec %1").arg(enc->codec_id));
+            lcd->setAVFormatLEDs(enc->codec_id, true);
+            if(height >= 720)
+                lcd->setVariousLEDs(VARIOUS_HDTV, true);
+            else
+                lcd->setVariousLEDs(VARIOUS_HDTV, false);
+        }
     }
 }
 
@@ -4346,6 +4366,42 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     GetNVP()->ReinitAudio();
 
+    if (LCD *lcd = LCD::Get())
+    {
+        VERBOSE(VB_GENERAL, QString("LCD: Set Audio Codec %1")
+                .arg(codec_id_string(codec_ctx->codec_id)));
+        lcd->setAVFormatLEDs(codec_ctx->codec_id, true);
+
+        VERBOSE(VB_GENERAL, QString("LCD: Set SPDIF LED %1")
+                .arg((using_passthru) ? "on" : "off"));
+        if (using_passthru)
+            lcd->setVariousLEDs(VARIOUS_SPDIF, true);
+        else
+            lcd->setVariousLEDs(VARIOUS_SPDIF, false);
+
+        VERBOSE(VB_GENERAL, QString("LCD: setting speaker LEDs for %1 channels")
+                .arg(audioIn.channels));
+        switch (audioIn.channels)
+        {
+            case 0:
+                lcd->setSpeakerLEDs(SPEAKER_LR, false);
+                break;
+            case 1:
+            case 2:
+                lcd->setSpeakerLEDs(SPEAKER_LR, true);
+                break;
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                lcd->setSpeakerLEDs(SPEAKER_51, true);
+                break;
+            default:
+                lcd->setSpeakerLEDs(SPEAKER_71, true);
+                break;
+        }
+
+    }
     return true;
 }
 

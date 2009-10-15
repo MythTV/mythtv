@@ -22,6 +22,8 @@ SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp mythverbose.cpp
 SOURCES += mythobservable.cpp httpcomms.cpp qcodecs.cpp mythdirs.cpp
 SOURCES += lcddevice.cpp mythstorage.cpp remotefile.cpp decodeencode.cpp
 
+INCLUDEPATH += ../libavcodec ../libavutil ../
+
 win32:SOURCES += msocketdevice_win.cpp
 unix {
     SOURCES += msocketdevice_unix.cpp

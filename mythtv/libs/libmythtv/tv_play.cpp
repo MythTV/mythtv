@@ -1086,7 +1086,11 @@ TV::~TV(void)
         delete lastProgram;
 
     if (class LCD * lcd = LCD::Get())
+    {
+        lcd->setFunctionLEDs(FUNC_TV, false);
+        lcd->setFunctionLEDs(FUNC_MOVIE, false);
         lcd->switchToTime();
+    }
 
     if (ddMapLoaderRunning)
     {
@@ -1661,8 +1665,13 @@ int TV::Playback(const ProgramInfo &rcinfo)
 
     ReturnPlayerLock(mctx);
 
-    if (class LCD * lcd = LCD::Get())
+    if (class LCD * lcd = LCD::Get()) {
         lcd->switchToChannel(rcinfo.chansign, rcinfo.title, rcinfo.subtitle);
+        if (rcinfo.isVideo)
+            lcd->setFunctionLEDs(FUNC_MOVIE, true);
+        else
+            lcd->setFunctionLEDs(FUNC_TV, true);
+    }
 
     return 1;
 }

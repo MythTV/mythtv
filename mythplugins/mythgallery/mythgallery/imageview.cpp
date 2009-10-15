@@ -152,9 +152,11 @@ void ImageView::UpdateLCD(const ThumbItem *item)
 
     if (!item)
     {
+        lcd->setFunctionLEDs(FUNC_PHOTO, false);
         lcd->switchToTime();
         return;
     }
+    lcd->setFunctionLEDs(FUNC_PHOTO, true);
 
     QString name = item->GetName();
     QString desc = QString::number(m_pos + 1) + " / " +

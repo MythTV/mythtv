@@ -15,6 +15,7 @@
 #include "audiooutputdigitalencoder.h"
 #include "SoundTouch.h"
 #include "freesurround.h"
+#include "lcddevice.h"
 
 #define LOC QString("AO: ")
 #define LOC_ERR QString("AO, ERROR: ")
@@ -461,6 +462,11 @@ void AudioOutputBase::KillAudio()
     CloseDevice();
 
     killAudioLock.unlock();
+    if (LCD *lcd = LCD::Get())
+    {
+        lcd->setAVFormatLEDs(CODEC_ID_MP2, false); // which codec is not important, only that it was a audio codec
+        lcd->setSpeakerLEDs(SPEAKER_71, false);    // should clear any and all speaker LEDs
+    }
 }
 
 void AudioOutputBase::Pause(bool paused)

@@ -517,6 +517,7 @@ namespace
         {
             if (LCD *lcd = LCD::Get())
             {
+                lcd->setFunctionLEDs(FUNC_MOVIE, false);
                 lcd->switchToTime();
             }
             GetMythMainWindow()->GetMainStack()->AddScreen(diag);

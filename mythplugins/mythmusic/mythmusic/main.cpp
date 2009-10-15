@@ -21,6 +21,7 @@
 #include <mythtv/compat.h>
 #include <mythtv/libmythui/mythuihelper.h>
 #include <mythtv/libmythui/mythprogressdialog.h>
+#include <mythtv/lcddevice.h>
 
 // MythMusic headers
 #include "decoder.h"
@@ -529,6 +530,11 @@ static void preMusic()
     gMusicData->startdir = startdir;
     gMusicData->all_playlists = all_playlists;
     gMusicData->all_music = all_music;
+
+    if (LCD *lcd = LCD::Get())
+    {
+        lcd->setFunctionLEDs(FUNC_MUSIC, true);
+    }
 }
 
 static void postMusic()
@@ -550,6 +556,11 @@ static void postMusic()
     gMusicData->all_music = NULL;
     delete gMusicData->all_playlists;
     gMusicData->all_playlists = NULL;
+
+    if (LCD *lcd = LCD::Get())
+    {
+        lcd->setFunctionLEDs(FUNC_MUSIC, false);
+    }
 }
 
 int mythplugin_run(void)

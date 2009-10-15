@@ -5,6 +5,7 @@
 #include <mythtv/libmythui/mythmainwindow.h>
 #include <mythtv/libmythui/mythsystem.h>
 #include <mythtv/libmyth/remoteutil.h>
+#include <mythtv/lcddevice.h>
 
 #include "dbaccess.h"
 #include "metadata.h"
@@ -391,11 +392,19 @@ VideoPlayerCommand &VideoPlayerCommand::operator=(const VideoPlayerCommand &rhs)
 
 void VideoPlayerCommand::Play() const
 {
+    class LCD *lcd = LCD::Get();
+
+    if (lcd) {
+        lcd->setFunctionLEDs(FUNC_TV, false);
+        lcd->setFunctionLEDs(FUNC_MOVIE, true);
+    }
     m_d->Play();
     gContext->GetMainWindow()->raise();
     gContext->GetMainWindow()->activateWindow();
     if (gContext->GetMainWindow()->currentWidget())
         gContext->GetMainWindow()->currentWidget()->setFocus();
+    if (lcd)
+        lcd->setFunctionLEDs(FUNC_MOVIE, false);
 }
 
 QString VideoPlayerCommand::GetCommandDisplayName() const
