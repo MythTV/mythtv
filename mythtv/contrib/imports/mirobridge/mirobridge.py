@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.4.6" 
+__version__=u"v0.4.7" 
 # 0.1.0 Initial development 
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -150,6 +150,8 @@ __version__=u"v0.4.6"
 # 0.4.6 Changed "original air date" and "air date" to be Miro's item release date. This is more appropriate then
 #		using download date as was done previously. Download date is still the fall back of there is no 
 #		release date.
+# 0.4.7 Changed all occurances of "strftime(u'" to "strftime('" as the unicode causes issues with python versions
+#		less than 2.6
 
 
 examples_txt=u'''
@@ -209,9 +211,9 @@ recorded_initialize_record = {u'chanid': 9999, u'starttime': u'', u'endtime': u'
 
 recordedprogram_initialize_record = {u'chanid': 9999, u'starttime': u'', u'endtime': u'', u'title': u'', u'subtitle': u'', u'description': u'', u'category': u'', u'category_type': u'', u'airdate': u'', u'stars': 0, u'previouslyshown': 0, u'title_pronounce':	'', u'stereo': 0, u'subtitled': 0, u'hdtv': 0, u'closecaptioned': 0, u'partnumber': 0, u'parttotal': 0, u'seriesid': '', u'originalairdate': u'', u'showtype': u'Series', u'colorcode': u'', u'syndicatedepisodenumber': u'', u'programid': u'', u'manualid': 0, u'generic': 0, u'listingsource': 0, u'first': 0, u'last': 0, u'audioprop': u'', u'subtitletypes': u'', u'videoprop': u'',}
 
-channel_initialize_record = {u'chanid': 9999, u'channum': '999', u'freqid':'999', u'sourceid': 0, u'callsign': 'Miro', u'name': 'Miro', u'icon': u'', u'finetune': 0, u'videofilters': '', u'xmltvid': '', u'recpriority': 0, u'contrast': 32768, u'brightness': 32768, u'colour': 32768, u'hue': 32768, u'tvformat': 'Default', u'visible': 1, u'outputfilters': '', u'useonairguide': 0, u'mplexid': 32767, u'serviceid': 0, u'tmoffset': 0, u'atsc_major_chan': 999, u'atsc_minor_chan': 0, u'last_record': datetime.datetime.now().strftime(u'%Y-%m-%d %H:%M:%S'), u'default_authority': '', u'commmethod': -1, }
+channel_initialize_record = {u'chanid': 9999, u'channum': '999', u'freqid':'999', u'sourceid': 0, u'callsign': 'Miro', u'name': 'Miro', u'icon': u'', u'finetune': 0, u'videofilters': '', u'xmltvid': '', u'recpriority': 0, u'contrast': 32768, u'brightness': 32768, u'colour': 32768, u'hue': 32768, u'tvformat': 'Default', u'visible': 1, u'outputfilters': '', u'useonairguide': 0, u'mplexid': 32767, u'serviceid': 0, u'tmoffset': 0, u'atsc_major_chan': 999, u'atsc_minor_chan': 0, u'last_record': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), u'default_authority': '', u'commmethod': -1, }
 
-oldrecorded_initialize_record = {u'chanid': 0L, u'starttime': datetime.datetime.now().strftime(u'%Y-%m-%d %H:%M:%S'), u'endtime': datetime.datetime.now().strftime(u'%Y-%m-%d %H:%M:%S'), u'title': u'', u'subtitle': u'', u'description': u'', u'category': u'Miro', u'seriesid': u'', u'programid': u'', u'findid': 0, u'recordid': 0, u'station': u'MIRO', u'rectype': 1, u'duplicate': 1, u'recstatus': -3, u'reactivate': 0, u'generic': 0, }
+oldrecorded_initialize_record = {u'chanid': 0L, u'starttime': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), u'endtime': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), u'title': u'', u'subtitle': u'', u'description': u'', u'category': u'Miro', u'seriesid': u'', u'programid': u'', u'findid': 0, u'recordid': 0, u'station': u'MIRO', u'rectype': 1, u'duplicate': 1, u'recstatus': -3, u'reactivate': 0, u'generic': 0, }
 
 
 
@@ -1313,13 +1315,13 @@ def getStartEndTimes(duration, downloadedTime):
 	return an array of initialised values if either duration or downloadedTime is invalid
 	return an array of the video's start, end times and isotime
 	'''
-	start_end = [datetime.datetime.now().strftime(u'%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime(u'%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime(u'%Y%m%d%H%M%S')]
+	start_end = [datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime('%Y%m%d%H%M%S')]
 
 	if downloadedTime != None:
 		end = downloadedTime+datetime.timedelta(seconds=duration)
-		start_end[0] = downloadedTime.strftime(u'%Y-%m-%d %H:%M:%S')
-		start_end[1] = end.strftime(u'%Y-%m-%d %H:%M:%S')
-		start_end[2] = downloadedTime.strftime(u'%Y%m%d%H%M%S')
+		start_end[0] = downloadedTime.strftime('%Y-%m-%d %H:%M:%S')
+		start_end[1] = end.strftime('%Y-%m-%d %H:%M:%S')
+		start_end[2] = downloadedTime.strftime('%Y%m%d%H%M%S')
 
 	return start_end
 	# end getStartEndTimes()
@@ -1458,7 +1460,7 @@ def createRecordedRecords(item):
 	tmp_recorded[u'lastmodified'] = tmp_recorded[u'endtime']
 	tmp_recorded[u'filesize'] = item[u'size']
 	if item[u'releasedate'] != None:
-		tmp_recorded[u'originalairdate'] = item[u'releasedate'].strftime(u'%Y-%m-%d')
+		tmp_recorded[u'originalairdate'] = item[u'releasedate'].strftime('%Y-%m-%d')
 
 	basename = setSymbolic(item[u'videoFilename'], u'default', u"%s_%s" % (channel_id, start_end[2]), allow_symlink=True)
 	if basename != None:
@@ -1484,8 +1486,8 @@ def createRecordedRecords(item):
 	tmp_recordedprogram[u'category'] = u"Miro"
 	tmp_recordedprogram[u'category_type'] = u"series"
 	if item[u'releasedate'] != None:
-		tmp_recordedprogram[u'airdate'] = item[u'releasedate'].strftime(u'%Y')
-		tmp_recordedprogram[u'originalairdate'] = item[u'releasedate'].strftime(u'%Y-%m-%d')
+		tmp_recordedprogram[u'airdate'] = item[u'releasedate'].strftime('%Y')
+		tmp_recordedprogram[u'originalairdate'] = item[u'releasedate'].strftime('%Y-%m-%d')
 	tmp_recordedprogram[u'stereo'] = ffmpeg_details[u'stereo']
 	tmp_recordedprogram[u'hdtv'] = ffmpeg_details[u'hdtv']
 	tmp_recordedprogram[u'audioprop'] = ffmpeg_details[u'audio']
@@ -1554,7 +1556,7 @@ def createVideometadataRecord(item):
 		item[u'releasedate'] = item[u'downloadedTime']
 
 	if item[u'releasedate'] != None:
-		videometadata[u'year'] = item[u'releasedate'].strftime(u'%Y')
+		videometadata[u'year'] = item[u'releasedate'].strftime('%Y')
 	if u'episode' in fieldnames:
 		videometadata[u'season'] = 0
 		videometadata[u'episode'] = 0
