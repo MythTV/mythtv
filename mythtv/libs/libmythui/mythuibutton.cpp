@@ -150,18 +150,21 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
  *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event
  */
-void MythUIButton::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
+bool MythUIButton::gestureEvent(MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
-        if (!IsEnabled())
-            return;
+        if (IsEnabled())
+        {
+            if (m_Pushed)
+                UnPush();
+            else
+                Push();
 
-        if (m_Pushed)
-            UnPush();
-        else
-            Push();
+            return true;
+        }
     }
+    return false;
 }
 
 void MythUIButton::Push(bool lock)

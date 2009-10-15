@@ -21,7 +21,7 @@ class MPUBLIC MythUICheckBox : public MythUIType
     enum StateType { None = 0, Normal, Disabled, Active, Selected,
                      SelectedInactive };
 
-    virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
+    virtual bool gestureEvent(MythGestureEvent *event);
     virtual bool keyPressEvent(QKeyEvent *);
 
     void toggleCheckState(void);

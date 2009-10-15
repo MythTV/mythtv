@@ -9,7 +9,6 @@
 #include "mythuitype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
-#include "mythgesture.h"
 
 class MythUIButtonList;
 class MythFontProperties;
@@ -108,7 +107,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     ~MythUIButtonList();
 
     virtual bool keyPressEvent(QKeyEvent *);
-    virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
+    virtual bool gestureEvent(MythGestureEvent *event);
 
     void SetDrawFromBottom(bool draw);
 

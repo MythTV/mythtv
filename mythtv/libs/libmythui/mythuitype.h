@@ -9,6 +9,7 @@
 
 #include "xmlparsebase.h"
 #include "mythrect.h"
+#include "mythgesture.h"
 
 class MythImage;
 class MythPainter;
@@ -99,7 +100,7 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     int GetAlpha(void) const;
 
     virtual bool keyPressEvent(QKeyEvent *);
-    virtual void gestureEvent(MythUIType *origtype, MythGestureEvent *ge);
+    virtual bool gestureEvent(MythGestureEvent *);
 
     MythFontProperties *GetFont(const QString &text) const;
     bool AddFont(const QString &text, MythFontProperties *fontProp);

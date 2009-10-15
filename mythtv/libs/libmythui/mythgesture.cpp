@@ -351,5 +351,5 @@ static const char *gesturename[] = {
 /* comments in header */
 MythGestureEvent::operator QString() const
 {
-    return gesturename[_gesture];
+    return gesturename[m_gesture];
 }

@@ -24,6 +24,7 @@ class MPUBLIC MythScreenType : public MythUIType
     virtual bool Create(void); // do the actual work of making the screen.
     virtual void Init(void);
     virtual bool keyPressEvent(QKeyEvent *);
+    virtual bool gestureEvent(MythGestureEvent *);
 
     // if the widget is full screen and obscures widgets below it
     bool IsFullscreen(void) const;

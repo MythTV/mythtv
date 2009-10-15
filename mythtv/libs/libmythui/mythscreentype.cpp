@@ -1,9 +1,10 @@
 
+#include "mythscreentype.h"
+
 #include <QDomDocument>
 
 #include "mythverbose.h"
 
-#include "mythscreentype.h"
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
@@ -328,6 +329,19 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
     }
 
     return handled;
+}
+
+bool MythScreenType::gestureEvent(MythGestureEvent *ge)
+{
+    MythUIType *clicked = GetChildAt(ge->GetPosition());
+    if (clicked && clicked->IsEnabled())
+    {
+        SetFocusWidget(clicked);
+        if (clicked->gestureEvent(ge))
+            return true;
+    }
+
+    return false;
 }
 
 bool MythScreenType::ParseElement(QDomElement &element)

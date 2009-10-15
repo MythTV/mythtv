@@ -899,21 +899,24 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
  *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event
  */
-void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
+bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 {
+    bool handled = false;
+    
     if (event->gesture() == MythGestureEvent::Click)
     {
         // We want the relative position of the click
         QPoint position = event->GetPosition() - m_Parent->GetArea().topLeft();
         
-        MythUIType *type = uitype->GetChildAt(position,false,false);
+        MythUIType *type = GetChildAt(position,false,false);
 
         if (!type)
-            return;
+            return false;
 
         MythUIStateType *object = dynamic_cast<MythUIStateType *>(type);
         if (object)
         {
+            handled = true;
             QString name = object->objectName();
 
             if (name == "upscrollarrow")
@@ -936,10 +939,12 @@ void MythUIButtonList::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
                         SetItemCurrent(item);
                 }
             }
-
-            return;
+            else
+                handled = false;
         }
     }
+
+    return handled;
 }
 
 QPoint MythUIButtonList::GetButtonPosition(int column, int row) const

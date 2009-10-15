@@ -11,6 +11,7 @@
 #include "mythverbose.h"
 
 // MythUI headers
+#include "mythgesture.h"
 #include "mythimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"
@@ -203,7 +204,6 @@ void MythUIType::DeleteAllChildren(void)
 MythUIType *MythUIType::GetChildAt(const QPoint &p, bool recursive,
                                    bool focusable) const
 {
-
     if (GetArea().contains(p))
     {
         if (!IsVisible() || !IsEnabled())
@@ -560,10 +560,12 @@ void MythUIType::customEvent(QEvent *)
     return;
 }
 
-void MythUIType::gestureEvent(MythUIType *origtype, MythGestureEvent *ge)
+bool MythUIType::gestureEvent(MythGestureEvent *ge)
 {
     if (m_Parent)
-        m_Parent->gestureEvent(origtype, ge);
+        return m_Parent->gestureEvent(ge);
+
+    return false;
 }
 
 void MythUIType::LoseFocus(void)

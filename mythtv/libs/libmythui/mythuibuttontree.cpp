@@ -538,20 +538,6 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-// /*!
-// * \copydoc MythUIType::gestureEvent()
-// */
-// void MythUIButtonTree::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
-// {
-//     if (event->gesture() == MythGestureEvent::Click)
-//     {
-//         QPoint position = event->GetPosition();
-//
-//         MythUIType *object = GetChildAt(position, false);
-//         object->gestureEvent(object, event);
-//     }
-// }
-
 /*!
  * \copydoc MythUIType::ParseElement()
  */

@@ -74,15 +74,26 @@ class MythGestureEvent : public QEvent
         MaxGesture
     };
 
+    enum Button {
+        NoButton,
+        LeftButton,
+        RightButton,
+        MiddleButton,
+        Aux1Button,
+        Aux2Button
+    };
+    
     /**
      * @brief Create a myth gesture.
      * @param type The gesture type, as per the Type enumeration.
      * @sa Type
      */
-    inline MythGestureEvent(size_t gesture):QEvent((QEvent::Type)MythGestureEventType)
+    inline MythGestureEvent(Gesture gesture, Button button = LeftButton)
+            :QEvent((QEvent::Type)MythGestureEventType)
     {
         m_position = QPoint(0,0);
-        (gesture >= MaxGesture) ? _gesture = MaxGesture : _gesture = gesture;
+        m_button = button;
+        (gesture >= MaxGesture) ? m_gesture = MaxGesture : m_gesture = gesture;
     }
 
     /**
@@ -90,7 +101,7 @@ class MythGestureEvent : public QEvent
      * @return The gesture value corresponding to the Gesture
      * enumeration.
      */
-    inline int gesture(void) const { return this->_gesture; }
+    inline Gesture gesture(void) const { return m_gesture; }
 
     /**
      * @brief Get the symbolic name of the gesture.
@@ -99,12 +110,16 @@ class MythGestureEvent : public QEvent
     operator QString() const;
 
     void SetPosition(QPoint position) { m_position = position; }
-    QPoint GetPosition() { return m_position; }
+    QPoint GetPosition() const { return m_position; }
 
- private:
+    void SetButton(Button button) { m_button = button; }
+    Button GetButton(void) const { return m_button; }
 
-    size_t _gesture;
+  private:
+    Gesture m_gesture;
     QPoint m_position;
+    Button m_button;
+    
 };
 
 /* forward declaration of private information */
@@ -203,7 +218,7 @@ class MythGesture
     size_t max_sequence;
     int scale_ratio;
     float bin_percent;
-    size_t last_gesture;    
+    MythGestureEvent::Gesture last_gesture;
     QList <QPoint> points;
 
     MythGesturePrivate *p;

@@ -140,13 +140,18 @@ void MythUICheckBox::Disable()
  *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event
  */
-void MythUICheckBox::gestureEvent(MythUIType *uitype, MythGestureEvent *event)
+bool MythUICheckBox::gestureEvent(MythGestureEvent *event)
 {
     if (event->gesture() == MythGestureEvent::Click)
     {
         if (IsEnabled())
+        {
             toggleCheckState();
+            return true;
+        }
     }
+
+    return false;
 }
 
 /** \brief Key event handler

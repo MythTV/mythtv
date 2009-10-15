@@ -26,7 +26,7 @@ class MPUBLIC MythUIButton : public MythUIType
 
     virtual void Reset(void);
 
-    virtual void gestureEvent(MythUIType *uitype, MythGestureEvent *event);
+    virtual bool gestureEvent(MythGestureEvent *event);
     virtual bool keyPressEvent(QKeyEvent *);
 
     void SetText(const QString &msg);

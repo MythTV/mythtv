@@ -1481,37 +1481,49 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                 /* handle clicks separately */
                 if (ge->gesture() == MythGestureEvent::Click)
                 {
-                    MythUIType *clicked;
+                    QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent*>(e);
+                    if (!mouseEvent)
+                        return false;
+
                     QVector<MythScreenStack *>::iterator it;
-                    QPoint p = dynamic_cast<QMouseEvent*>(e)->pos();
+                    QPoint p = mouseEvent->pos();
 
                     ge->SetPosition(p);
 
+                    MythGestureEvent::Button button = MythGestureEvent::NoButton;
+                    switch (mouseEvent->button())
+                    {
+                        case Qt::LeftButton :
+                            button = MythGestureEvent::LeftButton;
+                            break;
+                        case Qt::RightButton :
+                            button = MythGestureEvent::RightButton;
+                            break;
+                        case Qt::MidButton :
+                            button = MythGestureEvent::MiddleButton;
+                            break;
+                        case Qt::XButton1 :
+                            button = MythGestureEvent::Aux1Button;
+                            break;
+                        case Qt::XButton2 :
+                            button = MythGestureEvent::Aux2Button;
+                            break;
+                        default :
+                            button = MythGestureEvent::NoButton;
+                    }
+
+                    ge->SetButton(button);
+                    
                     for (it = d->stackList.end()-1; it != d->stackList.begin()-1;
                          --it)
                     {
                         MythScreenType *screen = (*it)->GetTopScreen();
 
-                        if (!screen)
+                        if (!screen || !screen->ContainsPoint(p))
                             continue;
 
-                        // A focusable screen should be a rare event but there
-                        // but may be desirable in a couple of scenarios
-                        // e.g. Clicking anywhere on the screen when watching a
-                        // video could bring up playback controls, or pause/play
-                        if (screen->CanTakeFocus())
-                        {
-                            screen->gestureEvent(screen, ge);
+                        if (screen->gestureEvent(ge))
                             break;
-                        }
-
-                        MythUIType *clicked = screen->GetChildAt(p);
-                        if (clicked && clicked->IsEnabled())
-                        {
-                            screen->SetFocusWidget(clicked);
-                            clicked->gestureEvent(clicked, ge);
-                            break;
-                        }
 
                         // Note:  The following break prevents clicks being
                         //        sent to windows below popups
@@ -1591,7 +1603,7 @@ void MythMainWindow::customEvent(QEvent *ce)
         {
             MythScreenType *screen = toplevel->GetTopScreen();
             if (screen)
-                screen->gestureEvent(NULL, ge);
+                screen->gestureEvent(ge);
         }
         VERBOSE(VB_IMPORTANT, QString("Gesture: %1")
                 .arg(QString(*ge).toLocal8Bit().constData()));
