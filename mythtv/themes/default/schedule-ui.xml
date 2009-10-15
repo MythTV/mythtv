@@ -50,7 +50,6 @@
             <timeslots>4</timeslots>
             <solidcolor>#003256</solidcolor>
             <selector type="roundbox" linecolor="#ffff33"></selector>
-            <showcategories>yes</showcategories>
             <categoryalpha>60</categoryalpha>
             <recordingcolor>#00aa00</recordingcolor>
             <conflictingcolor>#ff6600</conflictingcolor>
@@ -145,7 +144,7 @@
         <textarea name="description"  from="basetextarea">
             <area>30,110,740,60</area>
             <multiline>yes</multiline>
-            <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
+            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -362,7 +361,7 @@
         <textarea name="description"  from="basetextarea">
             <area>30,140,520,80</area>
             <multiline>yes</multiline>
-            <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
+            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -524,7 +523,7 @@
             <area>20,430,720,140</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <value>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</value>
+            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">

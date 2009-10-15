@@ -202,7 +202,7 @@
         <textarea name="description"  from="basetextarea">
             <area>40,130,1200,90</area>
             <multiline>yes</multiline>
-            <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
+            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -425,7 +425,7 @@
         <textarea name="description"  from="basetextarea">
             <area>40,130,870,90</area>
             <multiline>yes</multiline>
-            <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
+            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -589,7 +589,7 @@
             <area>20,530,1240,160</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <value>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</value>
+            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
