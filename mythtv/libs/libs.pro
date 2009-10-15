@@ -18,6 +18,8 @@ libmythui.depends = libmythdb
 libmythupnp.depends = libmythdb
 libmyth.depends = libavcodec libmythdb libmythui libmythupnp
 libmyth.depends += libmythsamplerate libmythsoundtouch libmythfreesurround
+libmythdb.depends += libavcodec
+
 libavcodec.depends = libavutil
 libavformat.depends = libavcodec libavutil
 libswscale.depends = libavutil
