@@ -3301,8 +3301,7 @@ void VideoDialog::DisplayMenu()
     if (m_d->m_isGroupList)
         m_menuPopup->AddButton(tr("Browse By..."), SLOT(MetadataBrowseMenu()), true);
 
-    if (m_d->m_isGroupList)
-        m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
+    m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
 
     if (m_d->m_isFileBrowser)
         m_menuPopup->AddButton(tr("Disable File Browse Mode"),
