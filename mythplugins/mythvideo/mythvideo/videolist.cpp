@@ -745,8 +745,6 @@ class VideoListImp
     metadata_list_type m_metadata_list_type;
 
     VideoFilterSettings m_video_filter;
-
-    bool m_sort_ignores_case;
 };
 
 VideoList::VideoList()
@@ -829,9 +827,6 @@ VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
     m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 0);
 
     m_LoadMetaData = gContext->GetNumSetting("VideoTreeLoadMetaData", 0);
-
-    m_sort_ignores_case =
-            gContext->GetNumSetting("mythvideo.sort_ignores_case", 1);
 }
 
 void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
@@ -989,13 +984,13 @@ void VideoListImp::sort_view_data(bool flat_list)
     if (flat_list)
     {
         std::sort(m_metadata_view_flat.begin(), m_metadata_view_flat.end(),
-                  metadata_sort(m_video_filter, m_sort_ignores_case));
+                  metadata_sort(m_video_filter, true));
     }
     else
     {
-        m_metadata_view_tree.sort(metadata_path_sort(m_sort_ignores_case),
+        m_metadata_view_tree.sort(metadata_path_sort(true),
                                   metadata_sort(m_video_filter,
-                                                m_sort_ignores_case));
+                                                true));
     }
 }
 
@@ -1048,7 +1043,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
     std::transform(m_metadata.getList().begin(), m_metadata.getList().end(), 
                    mli, to_metadata_ptr()); 
 
-    metadata_path_sort mps(m_sort_ignores_case); 
+    metadata_path_sort mps(true); 
     std::sort(mlist.begin(), mlist.end(), mps); 
 
     typedef std::map<QString, meta_dir_node *> group_to_node_map; 
@@ -1174,7 +1169,7 @@ void VideoListImp::buildTVList()
     std::transform(m_metadata.getList().begin(), m_metadata.getList().end(),
                    mli, to_metadata_ptr());
 
-    metadata_path_sort mps(m_sort_ignores_case);
+    metadata_path_sort mps(true);
     std::sort(mlist.begin(), mlist.end(), mps);
 
     typedef std::map<QString, meta_dir_node *> group_to_node_map;
@@ -1223,7 +1218,7 @@ void VideoListImp::buildDbList()
 
 //    print_meta_list(mlist);
 
-    metadata_path_sort mps(m_sort_ignores_case);
+    metadata_path_sort mps(true);
     std::sort(mlist.begin(), mlist.end(), mps);
 
     // TODO: break out the prefix in the DB so this isn't needed
@@ -1478,8 +1473,7 @@ void VideoListImp::update_meta_view(bool flat_list)
         if (!(*si)->HasSortKey())
         {
             Metadata::SortKey skey =
-                    Metadata::GenerateDefaultSortKey(*(*si),
-                                                     m_sort_ignores_case);
+                    Metadata::GenerateDefaultSortKey(*(*si), true);
             (*si)->SetSortKey(skey);
         }
     }

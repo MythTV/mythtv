@@ -105,37 +105,16 @@ HostCheckBox *VideoListUnknownFiletypes()
     return gc;
 }
 
-HostCheckBox *VideoTreeNoMetaData() 
-{ 
-    HostCheckBox *gc = new HostCheckBox("VideoTreeLoadMetaData"); 
-    gc->setLabel(QObject::tr("Video List Loads Video Meta Data")); 
-    gc->setValue(true); 
-    gc->setHelpText(QObject::tr("If set along with Browse Files, this " 
-                    "will cause the Video List to load any known video meta" 
-                    "data from the database. Turning this off can greatly " 
-                    "speed up how long it takes to load the Video List tree")); 
-    return gc;
-}
-
-HostCheckBox *VideoNewBrowsable()
+HostCheckBox *VideoTreeNoMetaData()
 {
-    HostCheckBox *gc = new HostCheckBox("VideoNewBrowsable");
-    gc->setLabel(QObject::tr("Newly scanned files are browsable by default"));
+    HostCheckBox *gc = new HostCheckBox("VideoTreeLoadMetaData");
+    gc->setLabel(QObject::tr("Video List Loads Video Meta Data"));
     gc->setValue(true);
-    gc->setHelpText(QObject::tr("If set, newly scanned files in the Video "
-                    "Manager will be marked as browsable and will appear in "
-                    "the 'Browse' menu."));
+    gc->setHelpText(QObject::tr("If set along with Browse Files, this "
+                    "will cause the Video List to load any known video meta"
+                    "data from the database. Turning this off can greatly "
+                    "speed up how long it takes to load the Video List tree."));
     return gc;
-}
-
-HostCheckBox *VideoSortIgnoresCase()
-{
-    HostCheckBox *hcb = new HostCheckBox("mythvideo.sort_ignores_case");
-    hcb->setLabel(QObject::tr("Sorting ignores case"));
-    hcb->setValue(true);
-    hcb->setHelpText(QObject::tr("If set, case is ignored when sorting "
-                                 "entries in a view."));
-    return hcb;
 }
 
 HostCheckBox *VideoDBGroupView()
@@ -149,9 +128,9 @@ HostCheckBox *VideoDBGroupView()
     return hcb;
 }
 
-HostComboBox *VideoTreeGroup() 
-{ 
-    HostComboBox *gc = new HostComboBox("mythvideo.db_group_type"); 
+HostComboBox *VideoTreeGroup()
+{
+    HostComboBox *gc = new HostComboBox("mythvideo.db_group_type");
     gc->setLabel(QObject::tr("Default Metadata View"));
     gc->addSelection(QObject::tr("Folder"),"0");
     gc->addSelection(QObject::tr("Genres"),"1");
@@ -165,9 +144,27 @@ HostComboBox *VideoTreeGroup()
     gc->setHelpText(QObject::tr("Default metadata view contols "
                                 "the method used to build the tree. Folder "
                                 "mode (the default) displays the videos as "
-                                "they are found in the filesystem.")); 
-    return gc; 
-} 
+                                "they are found in the filesystem."));
+    return gc;
+}
+
+class MetadataBrowseSettings : public TriggeredConfigurationGroup
+{
+    public:
+        MetadataBrowseSettings():
+            TriggeredConfigurationGroup(false, false, true, true)
+        {
+            Setting *metabrowseSettings = VideoDBGroupView();
+            addChild(metabrowseSettings);
+            setTrigger(metabrowseSettings);
+
+            ConfigurationGroup *settings =
+                    new VerticalConfigurationGroup(false);
+            settings->addChild(VideoTreeGroup());
+            addTarget("1", settings);
+            addTarget("0", new VerticalConfigurationGroup(true));
+        }
+};
 
 HostCheckBox *VideoTreeRemember()
 {
@@ -450,7 +447,7 @@ HostComboBox *SetOnInsertDVD()
     gc->addSelection(QObject::tr("Play DVD"),"2");
     gc->addSelection(QObject::tr("Rip DVD"),"3");
     gc->setHelpText(QObject::tr("Media Monitoring should be turned on to "
-                   "allow this feature (Setup -> General -> CD/DVD Monitor"));
+                   "allow this feature (Setup -> General -> CD/DVD Monitor)."));
     return gc;
 }
 
@@ -460,7 +457,7 @@ HostSlider *DVDBookmarkDays()
     gs->setLabel(QObject::tr("Remove DVD Bookmarks Older than (days)"));
     gs->setValue(10);
     gs->setHelpText((QObject::tr("Delete DVD Bookmarks that are older than the "
-                                 "Number of days specified")));
+                                 "number of days specified.")));
     return gs;
 }
 
@@ -481,7 +478,8 @@ HostCheckBox *EnableDVDBookmark()
     HostCheckBox *gc = new HostCheckBox("EnableDVDBookmark");
     gc->setLabel(QObject::tr("Enable DVD Bookmark Support"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable DVD Bookmark Support"));
+    gc->setHelpText(QObject::tr("Enable the setting and skipping to "
+                                "of a bookmark in DVD playback."));
     return gc;
 }
 
@@ -491,7 +489,7 @@ HostCheckBox *DVDBookmarkPrompt()
     gc->setLabel(QObject::tr("DVD Bookmark Prompt"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Display a prompt to choose whether "
-                "to play the DVD from the beginning or from the bookmark"));
+                "to play the DVD from the beginning or from the bookmark."));
     return gc;
 }
 
@@ -800,7 +798,7 @@ class RandomTrailers : public TriggeredConfigurationGroup
         rc->setLabel(QObject::tr("Number of trailers to play"));
         rc->setValue(3);
         rc->setHelpText(QObject::tr("The number of trailers to play "
-                        "before playing the film itself "));
+                        "before playing the film itself."));
         vcg->addChild(rc);
 
         addTarget("0", new VerticalConfigurationGroup(true));
@@ -816,20 +814,18 @@ VideoGeneralSettings::VideoGeneralSettings()
 
     VConfigPage page1(pages, false);
     page1->addChild(VideoStartupDirectory());
+    page1->addChild(TrailerDirectory());
     page1->addChild(VideoArtworkDirectory());
-    page1->addChild(VideoScreenshotDirectory()); 
-    page1->addChild(VideoBannerDirectory()); 
-    page1->addChild(VideoFanartDirectory()); 
+    page1->addChild(VideoScreenshotDirectory());
+    page1->addChild(VideoBannerDirectory());
+    page1->addChild(VideoFanartDirectory());
     page1->addChild(VideoDefaultView());
 
     VConfigPage page2(pages, false);
     page2->addChild(VideoListUnknownFiletypes());
-    page2->addChild(VideoTreeNoMetaData()); 
-    page2->addChild(VideoNewBrowsable());
-    page2->addChild(VideoSortIgnoresCase());
-    page2->addChild(VideoDBGroupView());
+    page2->addChild(VideoTreeNoMetaData());
     page2->addChild(VideoTreeRemember());
-    page2->addChild(VideoTreeGroup());
+    page2->addChild(new MetadataBrowseSettings());
 
     VConfigPage page3(pages, false);
     page3->addChild(SetDVDDevice());
@@ -837,11 +833,12 @@ VideoGeneralSettings::VideoGeneralSettings()
     page3->addChild(SetOnInsertDVD());
     page3->addChild(SetDVDDriveSpeed());
     page3->addChild(new DVDBookmarkSettings());
+    page3->addChild(new RandomTrailers());
 
     // page 4
     VerticalConfigurationGroup *vman =
             new VerticalConfigurationGroup(true, false);
-    vman->setLabel(QObject::tr("Video Manager"));
+    vman->setLabel(QObject::tr("Movie Metadata Grabbing"));
     vman->addChild(SearchListingsCommand());
     vman->addChild(GetPostersCommand());
     vman->addChild(GetFanartCommand());
@@ -851,31 +848,9 @@ VideoGeneralSettings::VideoGeneralSettings()
     page4->addChild(vman);
 
     // page 5
-    VerticalConfigurationGroup *pctrl =
-            new VerticalConfigurationGroup(true, false);
-    pctrl->addChild(VideoDefaultParentalLevel());
-    pctrl->addChild(VideoAdminPassword());
-    pctrl->addChild(VideoAdminPasswordThree());
-    pctrl->addChild(VideoAdminPasswordTwo());
-    pctrl->addChild(VideoAggressivePC());
-    VConfigPage page5(pages, false);
-    page5->addChild(pctrl);
-
-    VConfigPage page6(pages, false);
-    page6->addChild(new RatingsToPL());
-
-    // page 7
-    VerticalConfigurationGroup *trlr =
-            new VerticalConfigurationGroup(true, false);
-    trlr->addChild(TrailerDirectory());
-    trlr->addChild(new RandomTrailers());
-    VConfigPage page7(pages, false);
-    page7->addChild(trlr);
-
-    // page 8
     VerticalConfigurationGroup *tvman =
             new VerticalConfigurationGroup(true, false);
-    tvman->setLabel(QObject::tr("Television in MythVideo"));
+    tvman->setLabel(QObject::tr("Television Metadata Grabbing"));
     tvman->addChild(SearchTVListingsCommand());
     tvman->addChild(GetTVPostersCommand());
     tvman->addChild(GetTVFanartCommand());
@@ -884,8 +859,23 @@ VideoGeneralSettings::VideoGeneralSettings()
     tvman->addChild(GetTVTitleSubCommand());
     tvman->addChild(GetTVScreenshotCommand());
 
-    VConfigPage page8(pages, false);
-    page8->addChild(tvman);
+    VConfigPage page5(pages, false);
+    page5->addChild(tvman);
+
+    // page 6
+    VerticalConfigurationGroup *pctrl =
+            new VerticalConfigurationGroup(true, false);
+    pctrl->setLabel(QObject::tr("Parental Control Settings"));
+    pctrl->addChild(VideoDefaultParentalLevel());
+    pctrl->addChild(VideoAdminPassword());
+    pctrl->addChild(VideoAdminPasswordThree());
+    pctrl->addChild(VideoAdminPasswordTwo());
+    pctrl->addChild(VideoAggressivePC());
+    VConfigPage page6(pages, false);
+    page6->addChild(pctrl);
+
+    VConfigPage page7(pages, false);
+    page7->addChild(new RatingsToPL());
 
     int page_num = 1;
     for (ConfigPage::PageList::const_iterator p = pages.begin();

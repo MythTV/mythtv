@@ -582,7 +582,7 @@ void MetadataImp::saveToDatabase()
 
     if (inserting)
     {
-        m_browse = gContext->GetNumSetting("VideoNewBrowsable", 1);
+        m_browse = 1;
 
         m_watched = 0;
 
