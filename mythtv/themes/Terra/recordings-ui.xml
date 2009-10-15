@@ -215,7 +215,7 @@
             <position>1063,442</position>
             <state name="yes">
                 <imagetype name="on">
-                    <filename>shared/icons/commflagged.png</filename>
+                    <filename>shared/icons/adflagged.png</filename>
                 </imagetype>
             </state>
         </statetype>
