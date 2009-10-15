@@ -6,7 +6,7 @@ CONFIG += thread staticlib warn_off
 CONFIG -= qt
 target.path = $${LIBDIR}
 
-INCLUDEPATH += ../../
+INCLUDEPATH += . ../../
 INCLUDEPATH += ./dvdnav
 INCLUDEPATH += ../libmythdb
 
