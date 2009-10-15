@@ -133,6 +133,7 @@ class MPUBLIC VideoDisplayProfile
     static void        CreateProfiles(const QString &hostname);
     static void        CreateOldProfiles(const QString &hostname);
     static void        CreateNewProfiles(const QString &hostname);
+    static void        CreateVDPAUProfiles(const QString &hostname);
 
     static QStringList GetVideoRenderers(const QString &decoder);
     static QString     GetVideoRendererHelp(const QString &renderer);

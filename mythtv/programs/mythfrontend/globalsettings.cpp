@@ -1353,6 +1353,13 @@ PlaybackProfileConfigs::PlaybackProfileConfigs(const QString &str) :
         profiles = VideoDisplayProfile::GetProfiles(host);
     }
 
+    if (!profiles.contains("VDPAU Normal") &&
+        !profiles.contains("VDPAU High Quality") &&
+        !profiles.contains("VDPAU Slim"))
+    {
+        VideoDisplayProfile::CreateVDPAUProfiles(host);
+    }
+
     QString profile = VideoDisplayProfile::GetDefaultProfileName(host);
     if (!profiles.contains(profile))
     {
