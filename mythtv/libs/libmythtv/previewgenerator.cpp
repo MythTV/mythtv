@@ -238,7 +238,9 @@ bool PreviewGenerator::Run(void)
         if (!outFileName.isEmpty())
             command += QString("--outfile \"%1\" ").arg(outFileName);
 
-        int ret = myth_system(command, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+        int ret = myth_system(command, MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                                       MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU |
+                                       MYTH_SYSTEM_DONT_BLOCK_PARENT);
         if (ret)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Encountered problems running " +
