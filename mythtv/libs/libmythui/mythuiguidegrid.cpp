@@ -56,7 +56,7 @@ MythUIGuideGrid::MythUIGuideGrid(MythUIType *parent, const QString &name)
     m_progPastCol = 0;
 
     m_drawCategoryColors = GetMythDB()->GetNumSetting("EPGShowCategoryColors", 1);
-    m_drawCategoryText = GetMythDB()->GetNumSetting("EPGShowCategoryText", 1);
+    m_drawCategoryText = true;
     m_categoryAlpha = 255;
 
     QMap<QString, QString> catColors;

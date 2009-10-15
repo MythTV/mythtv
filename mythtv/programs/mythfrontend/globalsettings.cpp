@@ -3079,15 +3079,6 @@ static HostCheckBox *EPGShowCategoryColors()
     return gc;
 }
 
-static HostCheckBox *EPGShowCategoryText()
-{
-    HostCheckBox *gc = new HostCheckBox("EPGShowCategoryText");
-    gc->setLabel(QObject::tr("Display Genre Text"));
-    gc->setHelpText(QObject::tr("(Not available for all grabbers.)"));
-    gc->setValue(true);
-    return gc;
-}
-
 static HostCheckBox *EPGShowChannelIcon()
 {
     HostCheckBox *gc = new HostCheckBox("EPGShowChannelIcon");
@@ -5018,7 +5009,6 @@ EPGSettings::EPGSettings()
     VerticalConfigurationGroup* epg = new VerticalConfigurationGroup(false);
     epg->setLabel(QObject::tr("Program Guide") + " 1/2");
     epg->addChild(EPGShowCategoryColors());
-    epg->addChild(EPGShowCategoryText());
     epg->addChild(EPGShowChannelIcon());
     epg->addChild(WatchTVGuide());
     addChild(epg);
