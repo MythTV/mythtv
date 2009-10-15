@@ -25,6 +25,14 @@ SVNREPOPATH=$(echo $2 | sed -e 's,.*/svn/,,' \
 
 SOURCE_VERSION=$(svnversion ${SVNTREEDIR} 2>/dev/null || echo Unknown)
 
+case "${SOURCE_VERSION}" in
+    exported|Unknown)
+        if test -e $SVNTREEDIR/VERSION ; then
+            . $SVNTREEDIR/VERSION
+        fi
+     ;;
+esac
+
 # Get a string like "0.21.20071125-1"
 BINARY_VERSION=$(grep MYTH_BINARY_VERSION \
     "${SVNTREEDIR}/libs/libmythdb/mythversion.h" \
