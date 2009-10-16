@@ -3134,8 +3134,21 @@ void PlaybackBox::doDeleteForgetHistory()
 
 ProgramInfo *PlaybackBox::findMatchingProg(const ProgramInfo *pginfo)
 {
-    ProgramList::iterator it = m_progLists[""].begin();
-    ProgramList::iterator end = m_progLists[""].end();
+    ProgramList::iterator it;
+    ProgramList::iterator end;
+    
+    if (pginfo->recgroup == "LiveTV")
+    {
+        // LiveTV ProgramInfo's are not in the aggregated list
+        it  = m_progLists[tr("LiveTV").toLower()].begin();
+        end = m_progLists[tr("LiveTV").toLower()].end();
+    }
+    else
+    {
+        it  = m_progLists[""].begin();
+        end = m_progLists[""].end();
+    }
+
     for (; it != end; ++it)
     {
         if ((*it)->recstartts == pginfo->recstartts &&
@@ -3175,6 +3188,21 @@ ProgramInfo *PlaybackBox::findMatchingProg(const QString &chanid,
             (*it)->chanid == chanid)
         {
             return *it;
+        }
+    }
+
+    // LiveTV ProgramInfo's are not in the aggregated list
+    if (m_progLists.contains(tr("LiveTV").toLower()))
+    {
+        it  = m_progLists[tr("LiveTV").toLower()].begin();
+        end = m_progLists[tr("LiveTV").toLower()].end();
+        for (; it != end; ++it)
+        {
+            if ((*it)->recstartts.toString(Qt::ISODate) == recstartts &&
+                (*it)->chanid == chanid)
+            {
+                return *it;
+            }
         }
     }
 
