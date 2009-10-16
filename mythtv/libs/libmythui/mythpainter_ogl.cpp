@@ -97,6 +97,8 @@ void MythOpenGLPainter::Begin(QWidget *parent)
         return;
     }
 
+    realParent->makeCurrent();
+
     vector<GLuint> textures;
     {
         QMutexLocker locker(&m_textureDeleteLock);
@@ -108,7 +110,6 @@ void MythOpenGLPainter::Begin(QWidget *parent)
     }
     glDeleteTextures(textures.size(), &textures[0]);
 
-    realParent->makeCurrent();
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glShadeModel(GL_FLAT);
