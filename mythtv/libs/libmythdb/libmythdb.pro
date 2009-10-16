@@ -9,6 +9,10 @@ INSTALLS = target
 
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
+DEPENDPATH  += ../libavcodec
+LIBS += -L../libavcodec
+LIBS += -lmythavcodec-$$LIBVERSION
+
 # Input
 HEADERS += mythsocket.h mythsocketthread.h msocketdevice.h
 HEADERS += mythexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
