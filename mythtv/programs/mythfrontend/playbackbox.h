@@ -141,7 +141,6 @@ class PlaybackBox : public ScheduleCommon
     void upcoming();
     void details();
     void stopSelected();
-    void showMenu();
     void showActionsSelected();
     void showRecGroupChanger();
     void showPlayGroupChanger();
@@ -269,7 +268,6 @@ class PlaybackBox : public ScheduleCommon
     void UpdatePreviewGeneratorThreads(void);
     bool IsGeneratingPreview(const QString &fn, bool really = false) const;
     uint IncPreviewGeneratorAttempts(const QString &fn);
-
   private:
     bool FillList(bool useCachedData = false);
     void UpdateProgressBar(void);
@@ -324,6 +322,8 @@ class PlaybackBox : public ScheduleCommon
     void clearProgramCache(void);
 
     void HandlePreviewEvent(const ProgramInfo &evinfo);
+
+    void ShowMenu(void);
 
     MythUIButtonList *m_groupList;
     MythUIButtonList *m_recordingList;

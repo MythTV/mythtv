@@ -56,7 +56,6 @@ class MythControls : public MythScreenType
     ~MythControls();
 
     bool Create(void);
-    bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent*);
 
     typedef enum
@@ -106,6 +105,9 @@ class MythControls : public MythScreenType
     void AddKeyToAction(QString key, bool ignoreconflict = false);
 
   private:
+    void ShowMenu(void);
+    void Close(void);
+    
     ViewType          m_currentView;
     MythUIButtonList    *m_leftList;
     MythUIButtonList    *m_rightList;

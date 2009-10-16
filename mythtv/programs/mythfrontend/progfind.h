@@ -58,7 +58,7 @@ class ProgFinder : public ScheduleCommon
     virtual void restoreSelectedData(QString &data);
     virtual void whereClauseGetSearchData(QString &where, MSqlBindings &bindings);
 
-    void showMenu(void);
+    void ShowMenu(void);
     void updateShowList();
     void updateTimesList();
     void selectShowData(QString, int);

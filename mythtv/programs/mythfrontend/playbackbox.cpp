@@ -1809,7 +1809,7 @@ void PlaybackBox::popupClosed()
     m_popupMenu = NULL;
 }
 
-void PlaybackBox::showMenu()
+void PlaybackBox::ShowMenu()
 {
     if (m_popupMenu)
         return;
@@ -3480,8 +3480,6 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
 
         if (action == "1" || action == "HELP")
             showIconHelp();
-        else if (action == "MENU")
-            showMenu();
         else if (action == "NEXTFAV")
         {
             if (GetFocusWidget() == m_groupList)

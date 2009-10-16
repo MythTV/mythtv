@@ -184,9 +184,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "MENU")
-            showMenu();
-        else if (action == "EDIT")
+        if (action == "EDIT")
             edit();
         else if (action == "CUSTOMEDIT")
             customEdit();
@@ -218,7 +216,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void ProgFinder::showMenu(void)
+void ProgFinder::ShowMenu(void)
 {
     QString label = tr("Options");
 

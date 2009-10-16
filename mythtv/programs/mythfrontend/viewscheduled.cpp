@@ -142,8 +142,6 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
 
         if (action == "EDIT" || action == "INFO") // TODO: Use of INFO
             edit();                               // is inconsistent
-        else if (action == "MENU")
-            showMenu();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "DELETE")
@@ -177,7 +175,7 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void ViewScheduled::showMenu(void)
+void ViewScheduled::ShowMenu(void)
 {
     QString label = tr("Options");
 

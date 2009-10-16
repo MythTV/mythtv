@@ -241,76 +241,49 @@ void MythControls::ChangeView(void)
 
 }
 
-bool MythControls::keyPressEvent(QKeyEvent *event)
+void MythControls::ShowMenu()
 {
-    // Always send keypress events to the currently focused widget first
-    if (GetFocusWidget()->keyPressEvent(event))
-        return true;
+    QString label = tr("Options");
 
-    bool handled = false;
-    bool escape = false;
-    QStringList actions;
-    handled = GetMythMainWindow()->TranslateKeyPress("Controls", event, actions);
+    MythScreenStack *popupStack =
+                            GetMythMainWindow()->GetStack("popup stack");
 
-    for (int i = 0; i < actions.size() && !handled; i++)
+    m_menuPopup =
+            new MythDialogBox(label, popupStack, "optionmenu");
+
+    if (m_menuPopup->Create())
+        popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "option");
+
+    m_menuPopup->AddButton(tr("Save"));
+    m_menuPopup->AddButton(tr("Change View"));
+    m_menuPopup->AddButton(tr("Cancel"));
+}
+
+void MythControls::Close()
+{
+    if (m_bindings && m_bindings->HasChanges())
     {
-        QString action = actions[i];
-        handled = true;
+        /* prompt user to save changes */
+        QString label = tr("Exiting, but there are unsaved changes."
+                            "Which would you prefer?");
 
-        if (action == "MENU" || action == "INFO")
-        {
-            QString label = tr("Options");
+        MythScreenStack *popupStack =
+                                GetMythMainWindow()->GetStack("popup stack");
 
-            MythScreenStack *popupStack =
-                                    GetMythMainWindow()->GetStack("popup stack");
+        m_menuPopup = new MythDialogBox(label, popupStack, "exitmenu");
 
-            m_menuPopup =
-                    new MythDialogBox(label, popupStack, "optionmenu");
+        if (m_menuPopup->Create())
+            popupStack->AddScreen(m_menuPopup);
 
-            if (m_menuPopup->Create())
-                popupStack->AddScreen(m_menuPopup);
+        m_menuPopup->SetReturnEvent(this, "exit");
 
-            m_menuPopup->SetReturnEvent(this, "option");
-
-            m_menuPopup->AddButton(tr("Save"));
-            m_menuPopup->AddButton(tr("Change View"));
-            m_menuPopup->AddButton(tr("Cancel"));
-        }
-        else if (action == "ESCAPE")
-        {
-            escape = true;
-
-            if (m_bindings->HasChanges())
-            {
-                /* prompt user to save changes */
-                QString label = tr("Exiting, but there are unsaved changes."
-                                   "Which would you prefer?");
-
-                MythScreenStack *popupStack =
-                                        GetMythMainWindow()->GetStack("popup stack");
-
-                m_menuPopup =
-                        new MythDialogBox(label, popupStack, "exitmenu");
-
-                if (m_menuPopup->Create())
-                    popupStack->AddScreen(m_menuPopup);
-
-                m_menuPopup->SetReturnEvent(this, "exit");
-
-                m_menuPopup->AddButton(tr("Save then Exit"));
-                m_menuPopup->AddButton(tr("Exit without saving changes"));
-            }
-            else
-                handled = false;
-        }
-        else
-            handled = false;
+        m_menuPopup->AddButton(tr("Save then Exit"));
+        m_menuPopup->AddButton(tr("Exit without saving changes"));
     }
-
-    if (!handled && MythScreenType::keyPressEvent(event))
-        handled = true;
-
-    return handled;
+    else
+        MythScreenType::Close();
 }
 
 /**
@@ -392,7 +365,7 @@ void MythControls::RefreshKeyInformation(void)
 
     if (GetFocusWidget() == m_leftList)
     {
-        m_description->SetText("");
+        m_description->Reset();
         return;
     }
 
@@ -743,7 +716,12 @@ void MythControls::customEvent(QEvent *event)
         else if (resultid == "exit")
         {
             if (buttonnum == 0)
+            {
                 Save();
+                Teardown();
+            }
+            else if (buttonnum == 1)
+                Teardown();
 
             Close();
         }

@@ -209,8 +209,6 @@ class ProgLister : public ScheduleCommon
     void setViewFromList(QString item);
     void doDeleteOldEpisode(bool ok);
     void doDeleteOldTitle(bool ok);
-
-    void showMenu(void);
     void showSortMenu();
 
   protected:
@@ -226,6 +224,8 @@ class ProgLister : public ScheduleCommon
 
     void updateKeywordInDB(const QString &text, const QString &oldValue);
 
+    void ShowMenu(void);
+    
     ProgListType m_type;
     int          m_recid;
     QString      m_title;

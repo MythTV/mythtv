@@ -57,7 +57,7 @@ class ViewScheduled : public ScheduleCommon
     void setShowAll(bool all);
     void viewCards(void);
     void viewInputs(void);
-    void showMenu(void);
+    void ShowMenu(void);
 
     void EmbedTVWindow(void);
 

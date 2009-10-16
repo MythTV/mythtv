@@ -207,8 +207,6 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             prevView();
         else if (action == "NEXTVIEW")
             nextView();
-        else if (action == "MENU")
-            showMenu();
         else if (action == "INFO")
             chooseView();
         else if (action == "CUSTOMEDIT")
@@ -264,7 +262,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
     return handled;
 }
 
-void ProgLister::showMenu(void)
+void ProgLister::ShowMenu(void)
 {
     QString label = tr("Options");
 

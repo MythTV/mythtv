@@ -122,9 +122,7 @@ bool ChannelRecPriority::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "MENU")
-            menu();
-        else if (action == "UPCOMING")
+        if (action == "UPCOMING")
             upcoming();
         else if (action == "RANKINC")
             changeRecPriority(1);
@@ -164,7 +162,7 @@ bool ChannelRecPriority::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-void ChannelRecPriority::menu()
+void ChannelRecPriority::ShowMenu()
 {
     MythUIButtonListItem *item = m_channelList->GetItemCurrent();
 
