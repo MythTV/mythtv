@@ -1475,7 +1475,8 @@ void MpegRecorder::RestartEncoding(void)
         StopEncoding(readfd);
     
     // Make sure the next things in the file are a PAT & PMT
-    if (_stream_data->PATSingleProgram() &&
+    if (_stream_data &&
+        _stream_data->PATSingleProgram() &&
         _stream_data->PMTSingleProgram())
     {
         _wait_for_keyframe_option = false;
