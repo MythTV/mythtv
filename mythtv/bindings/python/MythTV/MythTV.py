@@ -14,6 +14,7 @@ import shlex
 import socket
 import code
 import re
+import locale
 from datetime import datetime, tzinfo, timedelta
 from time import mktime
 
@@ -21,6 +22,7 @@ from MythDB import *
 from MythLog import *
 
 log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythTV')
+locale.setlocale(locale.LC_ALL, '')
 
 RECSTATUS = {
 		'TunerBusy': -8,
@@ -415,7 +417,7 @@ class MythTV(object):
 		Returns a tuple of the 1, 5, and 15 minute load averages
 		"""
 		res = self.backendCommand('QUERY_LOAD').split(BACKEND_SEP)
-		return (float(res[0]),float(res[1]),float(res[2]))
+		return (locale.atof(res[0]),locale.atof(res[1]),locale.atof(res[2]))
 
 	def getUptime(self):
 		"""
@@ -909,7 +911,7 @@ class Program(object):
 		self.seriesid = data[33]
 		self.programid = data[34]
 		self.lastmodified = data[35]
-		self.stars = float(data[36])
+		self.stars = locale.atof(data[36])
 		self.airdate = data[37]
 		self.hasairdate = int(data[38])
 		self.playgroup = data[39]
@@ -963,7 +965,7 @@ class Program(object):
 		string += BACKEND_SEP + self.seriesid
 		string += BACKEND_SEP + self.programid
 		string += BACKEND_SEP + self.lastmodified
-		string += BACKEND_SEP + str(self.stars)
+		string += BACKEND_SEP + locale.format("%0.6f" %self.stars)
 		string += BACKEND_SEP + self.airdate
 		string += BACKEND_SEP + str(self.hasairdate)
 		string += BACKEND_SEP + self.playgroup
