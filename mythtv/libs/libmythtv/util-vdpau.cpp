@@ -2275,7 +2275,15 @@ void VDPAUContext::ParseOptions(QString options)
 
         if (name.contains("colorspace"))
         {
-            int tmp = std::max(0, std::min(2, opts.toInt()));
+            int tmp;
+
+            if (opts.contains("auto", Qt::CaseInsensitive))
+                tmp = 0;
+            else if (opts.contains("601"))
+                tmp = 1;
+            else if  (opts.contains("709"))
+                tmp = 2;
+            else tmp = std::max(0, std::min(2, opts.toInt()));
             if (tmp >= 0)
             {
                 VERBOSE(VB_PLAYBACK, LOC + QString("Colorspace %1").arg(vdp_names[tmp]));

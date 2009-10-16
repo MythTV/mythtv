@@ -1120,24 +1120,24 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
     uint groupid = CreateProfileGroup("VDPAU High Quality", hostname);
     CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
                   "vdpau", 1, "vdpau", "vdpau", true,
-                  "vdpauadvanceddoublerate", "vdpauadvanced", "colorspace=0");
+                  "vdpauadvanceddoublerate", "vdpauadvanced", "colorspace=auto");
 
     (void) QObject::tr("VDPAU Normal", "Sample: VDPAU average quality");
     DeleteProfileGroup("VDPAU Normal", hostname);
     groupid = CreateProfileGroup("VDPAU Normal", hostname);
     CreateProfile(groupid, 1, ">=", 0, 720, "", 0, 0,
                   "vdpau", 1, "vdpau", "vdpau", true,
-                  "vdpaubasicdoublerate", "vdpaubasic", "colorspace=0");
+                  "vdpaubasicdoublerate", "vdpaubasic", "colorspace=auto");
     CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
                   "vdpau", 1, "vdpau", "vdpau", true,
-                  "vdpauadvanceddoublerate", "vdpauadvanced", "colorspace=0");
+                  "vdpauadvanceddoublerate", "vdpauadvanced", "colorspace=auto");
 
     (void) QObject::tr("VDPAU Slim", "Sample: VDPAU low power GPU");
     DeleteProfileGroup("VDPAU Slim", hostname);
     groupid = CreateProfileGroup("VDPAU Slim", hostname);
     CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
                   "vdpau", 1, "vdpau", "vdpau", false,
-                  "vdpaubobdeint", "vdpauonefield", "vdpauskipchroma,colorspace=0");
+                  "vdpaubobdeint", "vdpauonefield", "vdpauskipchroma,colorspace=auto");
 }
 
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
