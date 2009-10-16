@@ -1002,6 +1002,10 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     ProgramList::iterator it = progList.begin();
     for (; it != progList.end(); ++it)
     {
+        if ((*it)->availableStatus == asPendingDelete ||
+            (*it)->availableStatus == asDeleted)
+            continue;
+
         MythUIButtonListItem *item =
             new PlaybackBoxListItem(this, m_recordingList, *it);
 
