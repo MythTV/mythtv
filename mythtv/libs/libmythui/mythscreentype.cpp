@@ -235,6 +235,11 @@ void MythScreenType::Close(void)
     GetScreenStack()->PopScreen(this);
 }
 
+void MythScreenType::ShowMenu(void)
+{
+    // Virtual
+}
+
 void MythScreenType::SetTextFromMap(QHash<QString, QString> &infoMap)
 {
     QList<MythUIType *> *children = GetAllChildren();
@@ -324,6 +329,8 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
             NextPrevWidgetFocus(true);
         else if (action == "ESCAPE")
             Close();
+        else if (action == "MENU")
+            ShowMenu();
         else
             handled = false;
     }
@@ -331,17 +338,34 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
     return handled;
 }
 
-bool MythScreenType::gestureEvent(MythGestureEvent *ge)
+bool MythScreenType::gestureEvent(MythGestureEvent *event)
 {
-    MythUIType *clicked = GetChildAt(ge->GetPosition());
-    if (clicked && clicked->IsEnabled())
+    bool handled = false;
+    if (event->gesture() == MythGestureEvent::Click)
     {
-        SetFocusWidget(clicked);
-        if (clicked->gestureEvent(ge))
-            return true;
+        switch (event->GetButton())
+        {
+            case MythGestureEvent::LeftButton :
+            {
+                MythUIType *clicked = GetChildAt(event->GetPosition());
+                if (clicked && clicked->IsEnabled())
+                {
+                    SetFocusWidget(clicked);
+                    if (clicked->gestureEvent(event))
+                        handled = true;
+                }
+                break;
+            }
+            case MythGestureEvent::RightButton :
+                ShowMenu();
+                break;
+            default :
+                break;
+        }
+            
     }
 
-    return false;
+    return handled;
 }
 
 bool MythScreenType::ParseElement(QDomElement &element)

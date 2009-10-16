@@ -25,6 +25,7 @@ class MPUBLIC MythScreenType : public MythUIType
     virtual void Init(void);
     virtual bool keyPressEvent(QKeyEvent *);
     virtual bool gestureEvent(MythGestureEvent *);
+    virtual void ShowMenu(void);
 
     // if the widget is full screen and obscures widgets below it
     bool IsFullscreen(void) const;
