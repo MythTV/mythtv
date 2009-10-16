@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.4.7" 
+__version__=u"v0.4.8" 
 # 0.1.0 Initial development 
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -152,6 +152,7 @@ __version__=u"v0.4.7"
 #		release date.
 # 0.4.7 Changed all occurances of "strftime(u'" to "strftime('" as the unicode causes issues with python versions
 #		less than 2.6
+# 0.4.8 Some Miro "release" date values are not valid. Override with the current date.
 
 
 examples_txt=u'''
@@ -1318,6 +1319,10 @@ def getStartEndTimes(duration, downloadedTime):
 	start_end = [datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), datetime.datetime.now().strftime('%Y%m%d%H%M%S')]
 
 	if downloadedTime != None:
+		try:
+			dummy = downloadedTime.strftime('%Y-%m-%d')
+		except ValueError:
+			downloadedTime = datetime.datetime.now()
 		end = downloadedTime+datetime.timedelta(seconds=duration)
 		start_end[0] = downloadedTime.strftime('%Y-%m-%d %H:%M:%S')
 		start_end[1] = end.strftime('%Y-%m-%d %H:%M:%S')
@@ -1440,6 +1445,10 @@ def createRecordedRecords(item):
 
 	if item[u'releasedate'] == None: 
 		item[u'releasedate'] = item[u'downloadedTime']
+	try:
+		dummy = item[u'releasedate'].strftime('%Y-%m-%d')
+	except ValueError:
+		item[u'releasedate'] = item[u'downloadedTime']
 
 	# Create the recorded dictionary
 	tmp_recorded[u'chanid'] = channel_id
@@ -1553,6 +1562,10 @@ def createVideometadataRecord(item):
 		videometadata[key] = details[key]
 
 	if item[u'releasedate'] == None: 
+		item[u'releasedate'] = item[u'downloadedTime']
+	try:
+		dummy = item[u'releasedate'].strftime('%Y-%m-%d')
+	except ValueError:
 		item[u'releasedate'] = item[u'downloadedTime']
 
 	if item[u'releasedate'] != None:
