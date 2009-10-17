@@ -6,6 +6,7 @@ using namespace std;
 
 #include <pthread.h>
 
+#include <QEvent>
 #include <QWaitCondition>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -18,6 +19,67 @@ class QTextStream;
 // clientLock -> ncLock
 //            -> nrLock
 
+const int kNetworkControlCloseEvent = 35672;
+
+class NetworkControlClient : public QObject
+{
+    Q_OBJECT
+  public:
+    NetworkControlClient(QTcpSocket *);
+   ~NetworkControlClient();
+
+    QTcpSocket  *getSocket()     { return m_socket; }
+    QTextStream *getTextStream() { return m_textStream; }
+
+  signals:
+    void commandReceived(QString&);
+
+  public slots:
+    void readClient();
+
+  private:
+    QTcpSocket  *m_socket;
+    QTextStream *m_textStream;
+};
+
+class NetworkCommand : public QObject
+{
+    Q_OBJECT
+  public:
+    NetworkCommand(NetworkControlClient *cli, QString c)
+    {
+        m_command = c;
+        m_client = cli;
+    }
+    
+    NetworkCommand &operator=(NetworkCommand const &nc)
+    {
+        m_command = nc.m_command;
+        m_client = nc.m_client;
+        return *this;
+    }
+
+    QString               getCommand() { return m_command; }
+    NetworkControlClient *getClient()  { return m_client; }
+
+  private:
+    QString               m_command;
+    NetworkControlClient *m_client;
+};
+
+class NetworkControlCloseEvent : public QEvent
+{
+  public:
+    NetworkControlCloseEvent(NetworkControlClient * ncc)
+        : QEvent((QEvent::Type)kNetworkControlCloseEvent),
+          m_networkControlClient(ncc) {};
+
+    NetworkControlClient *getClient() { return m_networkControlClient; }
+
+  private:
+    NetworkControlClient * m_networkControlClient;
+};
+
 class NetworkControl : public QTcpServer
 {
     Q_OBJECT
@@ -29,8 +91,8 @@ class NetworkControl : public QTcpServer
 
   private slots:
     void newConnection();
-    void readClient();
-    void deleteClientLater();
+    void receiveCommand(QString &command);
+    void deleteClient(void);
 
   protected:
     static void *SocketThread(void *param);
@@ -42,20 +104,22 @@ class NetworkControl : public QTcpServer
     QString processJump(QStringList tokens);
     QString processKey(QStringList tokens);
     QString processLiveTV(QStringList tokens);
-    QString processPlay(QStringList tokens);
+    QString processPlay(QStringList tokens, int clientID);
     QString processQuery(QStringList tokens);
     QString processSet(QStringList tokens);
     QString processHelp(QStringList tokens);
 
     void notifyDataAvailable(void);
+    void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
     void customEvent(QEvent *e);
 
     QString listRecordings(QString chanid = "", QString starttime = "");
     QString listSchedule(const QString& chanID = "") const;
     QString saveScreenshot(QStringList tokens);
 
-    void processNetworkControlCommand(QString command);
+    void processNetworkControlCommand(NetworkCommand *nc);
 
+    void deleteClient(NetworkControlClient *ncc);
 
     QString prompt;
     bool gotAnswer;
@@ -65,14 +129,13 @@ class NetworkControl : public QTcpServer
     QMap <int, QString> keyTextMap;
 
     mutable QMutex  clientLock;
-    QTcpSocket     *client;
-    QTextStream    *clientStream;
+    QList<NetworkControlClient*> clients;
 
-    deque<QString> networkControlCommands;
+    QList<NetworkCommand*> networkControlCommands;
     QMutex ncLock;
     QWaitCondition ncCond;
 
-    deque<QString> networkControlReplies;
+    QList<NetworkCommand*> networkControlReplies;
     QMutex nrLock;
 
     pthread_t command_thread;

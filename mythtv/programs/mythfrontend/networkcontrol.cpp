@@ -24,7 +24,6 @@
 #define LOC_ERR QString("NetworkControl Error: ")
 
 const int kNetworkControlDataReadyEvent = 35671;
-const int kNetworkControlCloseEvent     = 35672;
 
 /** Is @p test an abbreviation of @p command ?
  * The @p test substring must be at least @p minchars long.
@@ -46,8 +45,7 @@ NetworkControl::NetworkControl() :
     QTcpServer(),
     prompt("# "),
     gotAnswer(false), answer(""),
-    clientLock(QMutex::Recursive),
-    client(NULL), clientStream(NULL)
+    clientLock(QMutex::Recursive)
 {
     // Eventually this map should be in the jumppoints table
     jumpMap["channelpriorities"]     = "Channel Recording Priorities";
@@ -221,11 +219,18 @@ NetworkControl::NetworkControl() :
 
 NetworkControl::~NetworkControl(void)
 {
-    deleteClientLater();
+    clientLock.lock();
+    while (!clients.isEmpty())
+    {
+        NetworkControlClient *ncc = clients.front();
+        clients.pop_front();
+        delete ncc;
+    }
+    clientLock.unlock();
 
     nrLock.lock();
-    networkControlReplies.push_back(
-        "mythfrontend shutting down, connection closing...");
+    networkControlReplies.push_back(new NetworkCommand(NULL,
+        "mythfrontend shutting down, connection closing..."));
     nrLock.unlock();
 
     notifyDataAvailable();
@@ -258,7 +263,7 @@ void *NetworkControl::CommandThread(void *param)
 
 void NetworkControl::RunCommandThread(void)
 {
-    QString command;
+    NetworkCommand *nc;
 
     while (!stopCommandThread)
     {
@@ -271,26 +276,28 @@ void NetworkControl::RunCommandThread(void)
                 return;
             }
         }
-        command = networkControlCommands.front();
+        nc = networkControlCommands.front();
         networkControlCommands.pop_front();
         ncLock.unlock();
 
-        processNetworkControlCommand(command);
+        processNetworkControlCommand(nc);
     }
 }
 
-void NetworkControl::processNetworkControlCommand(QString command)
+void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
 {
     QMutexLocker locker(&clientLock);
     QString result;
-    QStringList tokens = command.simplified().split(" ");
+    QStringList tokens = nc->getCommand().simplified().split(" ");
+
+    int clientID = clients.indexOf(nc->getClient());
 
     if (is_abbrev("jump", tokens[0]))
         result = processJump(tokens);
     else if (is_abbrev("key", tokens[0]))
         result = processKey(tokens);
     else if (is_abbrev("play", tokens[0]))
-        result = processPlay(tokens);
+        result = processPlay(tokens, clientID);
     else if (is_abbrev("query", tokens[0]))
         result = processQuery(tokens);
     else if (is_abbrev("set", tokens[0]))
@@ -298,8 +305,8 @@ void NetworkControl::processNetworkControlCommand(QString command)
     else if (is_abbrev("help", tokens[0]))
         result = processHelp(tokens);
     else if ((tokens[0].toLower() == "exit") || (tokens[0].toLower() == "quit"))
-        QApplication::postEvent(this,
-                                new QEvent((QEvent::Type)kNetworkControlCloseEvent));
+        QApplication::postEvent(this, 
+                                new NetworkControlCloseEvent(nc->getClient()));
     else if (! tokens[0].isEmpty())
         result = QString("INVALID command '%1', try 'help' for more info")
                          .arg(tokens[0]);
@@ -307,88 +314,88 @@ void NetworkControl::processNetworkControlCommand(QString command)
     if (!result.isEmpty())
     {
         nrLock.lock();
-        networkControlReplies.push_back(result);
+        networkControlReplies.push_back(new NetworkCommand(nc->getClient(),result));
         nrLock.unlock();
 
         notifyDataAvailable();
     }
 }
 
-void NetworkControl::deleteClientLater(void)
+void NetworkControl::deleteClient(void)
 {
-    VERBOSE(VB_GENERAL, LOC + "Socket disconnected");
+    VERBOSE(VB_GENERAL, LOC + "Client Socket disconnected");
     QMutexLocker locker(&clientLock);
-    if (client)
+
+    QList<NetworkControlClient *>::const_iterator it;
+    for (it = clients.begin(); it != clients.end(); ++it)
     {
-        client->disconnect();
-        client->deleteLater();
-        client = NULL;
+        NetworkControlClient *ncc = *it;
+        if (ncc->getSocket()->state() == QTcpSocket::UnconnectedState)
+        {
+            deleteClient(ncc);
+            return;
+        }
     }
-    if (clientStream)
+}
+
+void NetworkControl::deleteClient(NetworkControlClient *ncc)
+{
+    int index = clients.indexOf(ncc);
+    if (index >= 0)
     {
-        delete clientStream;
-        clientStream = NULL;
+        clients.removeAt(index);
+
+        delete ncc;
     }
+    else
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("deleteClient(%1), unable to "
+                "locate specified NetworkControlClient").arg((long long)ncc));
 }
 
 void NetworkControl::newConnection()
 {
     QString welcomeStr;
-    bool closedOldConn = false;
 
     VERBOSE(VB_GENERAL, LOC +
             QString("New connection established."));
 
-    QTcpSocket *s = this->nextPendingConnection();
+    QTcpSocket           *client = this->nextPendingConnection();
+    NetworkControlClient *ncc = new NetworkControlClient(client);
 
     QMutexLocker locker(&clientLock);
-    if (clientStream)
-    {
-        clientStream->setDevice(s);
-    }
-    else
-    {
-        clientStream = new QTextStream(s);
-        clientStream->setCodec("UTF-8");
-    }
-    
-    if (client)
-    {
-        closedOldConn = true;
-        deleteClientLater();
-    }
-    client = s;
+    clients.push_back(ncc);
 
-    connect(client, SIGNAL(readyRead()),    this, SLOT(readClient()));
-    connect(client, SIGNAL(disconnected()), this, SLOT(deleteClientLater()));
-
-    ncLock.lock();
-    networkControlCommands.clear();
-    ncLock.unlock();
-
-    nrLock.lock();
-    networkControlReplies.clear();
-    nrLock.unlock();
+    connect(ncc, SIGNAL(commandReceived(QString&)), this,
+            SLOT(receiveCommand(QString&)));
+    connect(client, SIGNAL(disconnected()), this, SLOT(deleteClient()));
 
     welcomeStr = "MythFrontend Network Control\r\n";
-    if (closedOldConn)
-    {
-        welcomeStr +=
-            "WARNING: mythfrontend was already under network control.\r\n";
-        welcomeStr +=
-            "         Previous session is being disconnected.\r\n";
-    }
-
     welcomeStr += "Type 'help' for usage information\r\n"
                   "---------------------------------";
     nrLock.lock();
-    networkControlReplies.push_back(welcomeStr);
+    networkControlReplies.push_back(new NetworkCommand(ncc,welcomeStr));
     nrLock.unlock();
 
     notifyDataAvailable();
 }
 
-void NetworkControl::readClient(void)
+NetworkControlClient::NetworkControlClient(QTcpSocket *s)
+{
+    m_socket = s;
+    m_textStream = new QTextStream(s);
+    m_textStream->setCodec("UTF-8");
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readClient()));
+}
+
+NetworkControlClient::~NetworkControlClient()
+{
+    m_socket->close();
+    m_socket->deleteLater();
+
+    delete m_textStream;
+}
+
+void NetworkControlClient::readClient(void)
 {
     QTcpSocket *socket = (QTcpSocket *)sender();
     if (!socket)
@@ -407,12 +414,25 @@ void NetworkControl::readClient(void)
             continue;
 
         tokens = lineIn.simplified().split(" ");
-
-        ncLock.lock();
-        networkControlCommands.push_back(lineIn);
-        ncCond.wakeOne();
-        ncLock.unlock();
+        
+        VERBOSE(VB_NETWORK, LOC +
+            QString("emit commandReceived(%1)").arg(lineIn));
+        emit commandReceived(lineIn);
     }
+}
+
+void NetworkControl::receiveCommand(QString &command)
+{
+    VERBOSE(VB_NETWORK, LOC +
+            QString("NetworkControl::receiveCommand(%1)").arg(command));
+    NetworkControlClient *ncc = (NetworkControlClient *)sender();
+    if (!ncc)
+         return;
+ 
+    ncLock.lock();
+    networkControlCommands.push_back(new NetworkCommand(ncc,command));
+    ncCond.wakeOne();
+    ncLock.unlock();
 }
 
 QString NetworkControl::processJump(QStringList tokens)
@@ -541,7 +561,7 @@ QString NetworkControl::processKey(QStringList tokens)
     return result;
 }
 
-QString NetworkControl::processPlay(QStringList tokens)
+QString NetworkControl::processPlay(QStringList tokens, int clientID)
 {
     QString result = "OK";
     QString message;
@@ -609,9 +629,9 @@ QString NetworkControl::processPlay(QStringList tokens)
             if (tokens.size() == 5 && tokens[4] == "resume")
                 action = "RESUME";
 
-            QString message = QString("NETWORK_CONTROL %1 PROGRAM %2 %3")
+            QString message = QString("NETWORK_CONTROL %1 PROGRAM %2 %3 %4")
                                       .arg(action).arg(tokens[2])
-                                      .arg(tokens[3].toUpper());
+                                      .arg(tokens[3].toUpper()).arg(clientID);
             MythEvent me(message);
             gContext->dispatch(me);
 
@@ -1017,6 +1037,28 @@ void NetworkControl::notifyDataAvailable(void)
         (QEvent::Type)kNetworkControlDataReadyEvent));
 }
 
+void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
+                                       QString &reply)
+{
+    QRegExp crlfRegEx("\r\n$");
+    QRegExp crlfcrlfRegEx("\r\n.*\r\n");
+
+    QTcpSocket  *client = ncc->getSocket();
+    QTextStream *clientStream = ncc->getTextStream();
+
+    if (client && clientStream && client->state() == QTcpSocket::ConnectedState)
+    {
+        *clientStream << reply;
+
+        if ((!reply.contains(crlfRegEx)) ||
+            ( reply.contains(crlfcrlfRegEx)))
+            *clientStream << "\r\n" << prompt;
+
+        clientStream->flush();
+        client->flush();
+    }
+}
+
 void NetworkControl::customEvent(QEvent *e)
 {
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
@@ -1036,14 +1078,20 @@ void NetworkControl::customEvent(QEvent *e)
                 answer += QString(" ") + tokens[i];
             gotAnswer = true;
         }
-        else if ((tokens.size() >= 3) &&
+        else if ((tokens.size() >= 4) &&
                  (tokens[1] == "RESPONSE"))
         {
-            QString response = tokens[2];
-            for (int i = 3; i < tokens.size(); i++)
+            int clientID = tokens[2].toInt();
+            QString response = tokens[3];
+            for (int i = 4; i < tokens.size(); i++)
                 response += QString(" ") + tokens[i];
+
+            clientLock.lock();
+            NetworkControlClient *ncc = clients.at(clientID);
+            clientLock.unlock();
+
             nrLock.lock();
-            networkControlReplies.push_back(response);
+            networkControlReplies.push_back(new NetworkCommand(ncc, response));
             nrLock.unlock();
 
             notifyDataAvailable();
@@ -1051,32 +1099,43 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == kNetworkControlDataReadyEvent)
     {
+        NetworkCommand *nc;
         QString reply;
-        int replies;
-        QRegExp crlfRegEx("\r\n$");
-        QRegExp crlfcrlfRegEx("\r\n.*\r\n");
 
         QMutexLocker locker(&clientLock);
         QMutexLocker nrLocker(&nrLock);
 
-        replies = networkControlReplies.size();
-        while (client && clientStream && replies > 0 &&
-               client->state() == QTcpSocket::ConnectedState)
+        while (!networkControlReplies.isEmpty())
         {
-            reply = networkControlReplies.front();
+            nc = networkControlReplies.front();
             networkControlReplies.pop_front();
-            *clientStream << reply;
-            if (!reply.contains(crlfRegEx) || reply.contains(crlfcrlfRegEx))
-                *clientStream << "\r\n" << prompt;
-            clientStream->flush();
-            client->flush();
 
-            replies = networkControlReplies.size();
+            reply = nc->getCommand();
+
+            NetworkControlClient * ncc = nc->getClient();
+            if (ncc)
+            {
+                sendReplyToClient(ncc, reply);
+            }
+            else //send to all clients
+            {
+                QList<NetworkControlClient *>::const_iterator it;
+                for (it = clients.begin(); it != clients.end(); ++it)
+                {
+                    NetworkControlClient *ncc = *it;
+                    if (ncc)
+                        sendReplyToClient(ncc, reply);
+                }
+            }
+            delete nc;
         }
     }
     else if (e->type() == kNetworkControlCloseEvent)
     {
-        deleteClientLater();
+        NetworkControlCloseEvent *ncce = (NetworkControlCloseEvent*)e;
+        NetworkControlClient     *ncc  = ncce->getClient();
+
+        deleteClient(ncc);
     }
 }
 

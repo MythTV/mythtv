@@ -3433,8 +3433,10 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
 
     if (tokens.size() >= 4 && (tokens[1] == "PLAY" || tokens[1] == "RESUME"))
     {
-        if (tokens.size() == 5 && tokens[2] == "PROGRAM")
+        if (tokens.size() == 6 && tokens[2] == "PROGRAM")
         {
+            int clientID = tokens[5].toInt();
+
             VERBOSE(VB_IMPORTANT,
                     QString("NetworkControl: Trying to %1 program '%2' @ '%3'")
                             .arg(tokens[1]).arg(tokens[3]).arg(tokens[4]));
@@ -3443,8 +3445,12 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
             {
                 VERBOSE(VB_IMPORTANT, "NetworkControl: ERROR: Already playing");
 
-                MythEvent me("NETWORK_CONTROL RESPONSE ERROR: Unable to play, "
-                             "player is already playing another recording.");
+                QString msg = QString(
+                    "NETWORK_CONTROL RESPONSE %1 ERROR: Unable to play, "
+                    "player is already playing another recording.")
+                    .arg(clientID);
+
+                MythEvent me(msg);
                 gContext->dispatch(me);
                 return;
             }
@@ -3456,7 +3462,9 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
             {
                 m_recordingList->SetValueByData(qVariantFromValue(tmpItem));
 
-                MythEvent me("NETWORK_CONTROL RESPONSE OK");
+                QString msg = QString("NETWORK_CONTROL RESPONSE %1 OK")
+                                      .arg(clientID);
+                MythEvent me(msg);
                 gContext->dispatch(me);
 
                 if (tokens[1] == "PLAY")
@@ -3468,9 +3476,9 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
             }
             else
             {
-                QString message = QString("NETWORK_CONTROL RESPONSE "
+                QString message = QString("NETWORK_CONTROL RESPONSE %1 "
                                           "ERROR: Could not find recording for "
-                                          "chanid %1 @ %2")
+                                          "chanid %2 @ %3").arg(clientID)
                                           .arg(tokens[3]).arg(tokens[4]);
                 MythEvent me(message);
                 gContext->dispatch(me);
