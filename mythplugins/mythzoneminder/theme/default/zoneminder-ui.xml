@@ -367,7 +367,6 @@
 <!--+++++++++++++++++++ layout 1 - list view +++++++++++++++++++++++++-->
 
         <textarea name="layout1_title1" from="basetextarea">
-            <context>1</context>
             <area>50,165,130,30</area>
             <font>listlabel</font>
             <value>Event Name</value>
