@@ -208,7 +208,8 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
 
     // Extended functionality for eg SoundGraph iMON LCD devices
     void setSpeakerLEDs(enum LCDSpeakerSet speaker, bool on);
-    void setAVFormatLEDs(int codec_id, bool on);
+    void setAudioFormatLEDs(enum LCDAudioFormatSet acodec, bool on);
+    void setVideoFormatLEDs(enum LCDVideoFormatSet vcodec, bool on);
     void setVideoSrcLEDs(enum LCDVideoSourceSet vsrc, bool on);
     void setFunctionLEDs(enum LCDFunctionSet video, bool on);
     void setTunerLEDs(enum LCDTunerSet tuner, bool on);

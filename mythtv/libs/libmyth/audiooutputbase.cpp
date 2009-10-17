@@ -464,7 +464,7 @@ void AudioOutputBase::KillAudio()
     killAudioLock.unlock();
     if (LCD *lcd = LCD::Get())
     {
-        lcd->setAVFormatLEDs(CODEC_ID_MP2, false); // which codec is not important, only that it was a audio codec
+        lcd->setAudioFormatLEDs(AUDIO_AC3, false); // which format is not important, only that it was an audio codec
         lcd->setSpeakerLEDs(SPEAKER_71, false);    // should clear any and all speaker LEDs
     }
 }

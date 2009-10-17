@@ -526,9 +526,8 @@ AvFormatDecoder::~AvFormatDecoder()
 
     if (LCD *lcd = LCD::Get())
     {
-        VERBOSE(VB_GENERAL, QString("LCD: Switch all codec/hdtv/spdif OFF"));
-        lcd->setAVFormatLEDs(CODEC_ID_MPEG2VIDEO, false);
-        lcd->setAVFormatLEDs(CODEC_ID_MP2, false);
+        lcd->setAudioFormatLEDs(AUDIO_AC3, false);
+        lcd->setVideoFormatLEDs(VIDEO_MPG, false);
         lcd->setVariousLEDs(VARIOUS_HDTV, false);
         lcd->setVariousLEDs(VARIOUS_SPDIF, false);
     }
@@ -1305,8 +1304,33 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                  dvd_video_codec_changed);
         if (LCD *lcd = LCD::Get())
         {
-            VERBOSE(VB_GENERAL, QString("LCD: Set AVFormat to Codec %1").arg(enc->codec_id));
-            lcd->setAVFormatLEDs(enc->codec_id, true);
+            LCDVideoFormatSet video_format;
+
+            switch (enc->codec_id)
+            {
+                case CODEC_ID_H263:
+                case CODEC_ID_MPEG4:
+                case CODEC_ID_MSMPEG4V1:
+                case CODEC_ID_MSMPEG4V2:
+                case CODEC_ID_MSMPEG4V3:
+                case CODEC_ID_H263P:
+                case CODEC_ID_H263I:
+                    video_format = VIDEO_DIVX;
+                    break;
+                case CODEC_ID_WMV1:
+                case CODEC_ID_WMV2:
+                    video_format = VIDEO_WMV;
+                    break;
+                case CODEC_ID_XVID:
+                    video_format = VIDEO_XVID;
+                    break;
+                default:
+                    video_format = VIDEO_MPG;
+                    break;
+            }
+
+            lcd->setVideoFormatLEDs(video_format, true);
+
             if(height >= 720)
                 lcd->setVariousLEDs(VARIOUS_HDTV, true);
             else
@@ -4368,19 +4392,43 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
     if (LCD *lcd = LCD::Get())
     {
-        VERBOSE(VB_GENERAL, QString("LCD: Set Audio Codec %1")
-                .arg(codec_id_string(codec_ctx->codec_id)));
-        lcd->setAVFormatLEDs(codec_ctx->codec_id, true);
+        LCDAudioFormatSet audio_format;
 
-        VERBOSE(VB_GENERAL, QString("LCD: Set SPDIF LED %1")
-                .arg((using_passthru) ? "on" : "off"));
+        switch (codec_ctx->codec_id)
+        {
+            case CODEC_ID_MP2:
+                audio_format = AUDIO_MPEG2;
+                break;
+            case CODEC_ID_MP3:
+                audio_format = AUDIO_MP3;
+                break;
+            case CODEC_ID_AC3:
+                audio_format = AUDIO_AC3;
+                break;
+            case CODEC_ID_DTS:
+                audio_format = AUDIO_DTS;
+                break;
+            case CODEC_ID_VORBIS:
+                audio_format = AUDIO_OGG;
+                break;
+            case CODEC_ID_WMAV1:
+                audio_format = AUDIO_WMA;
+                break;
+            case CODEC_ID_WMAV2:
+                audio_format = AUDIO_WMA2;
+                break;
+            default:
+                audio_format = AUDIO_WAV;
+                break;
+        }
+
+        lcd->setAudioFormatLEDs(audio_format, true);
+
         if (using_passthru)
             lcd->setVariousLEDs(VARIOUS_SPDIF, true);
         else
             lcd->setVariousLEDs(VARIOUS_SPDIF, false);
 
-        VERBOSE(VB_GENERAL, QString("LCD: setting speaker LEDs for %1 channels")
-                .arg(audioIn.channels));
         switch (audioIn.channels)
         {
             case 0:

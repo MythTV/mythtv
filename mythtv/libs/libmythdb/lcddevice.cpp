@@ -51,8 +51,6 @@
 // Necessary for codec icon support
 extern "C" {
 #include <stdint.h>
-#include "avutil.h"
-#include "avcodec.h"
 }
 static QString LOC = "lcddevice: ";
 
@@ -423,297 +421,29 @@ void LCD::setSpeakerLEDs(enum LCDSpeakerSet speaker, bool on)
     sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
 }
 
-void LCD::setAVFormatLEDs(int codec_id, bool on)
+void LCD::setAudioFormatLEDs(enum LCDAudioFormatSet acodec, bool on)
 {
     if (!lcd_ready)
         return;
 
-    int mask = 0;
+    lcd_ledmask &= ~AUDIO_MASK;
+    if (on)
+        lcd_ledmask |= (acodec & AUDIO_MASK);
 
-    VERBOSE(VB_AUDIO, LOC + QString("LEDs AVFormat %1/%2").arg(codec_id).arg(codec_id_string((CodecID)codec_id)));
-
-    switch (codec_id) {
-    case CODEC_ID_MPEG1VIDEO:
-    case CODEC_ID_MPEG2VIDEO:	/* preferred ID for MPEG-1/2 video decoding */
-    case CODEC_ID_MPEG2VIDEO_XVMC:
-    case CODEC_ID_MPEG2VIDEO_XVMC_VLD:
-    case CODEC_ID_MPEG2VIDEO_DVDV:
-    case CODEC_ID_H261:
-    case CODEC_ID_RV10:
-    case CODEC_ID_RV20:
-    case CODEC_ID_MJPEG:
-    case CODEC_ID_MJPEGB:
-    case CODEC_ID_LJPEG:
-    case CODEC_ID_SP5X:
-    case CODEC_ID_JPEGLS:
-    case CODEC_ID_RAWVIDEO:
-    case CODEC_ID_FLV1:
-    case CODEC_ID_SVQ1:
-    case CODEC_ID_SVQ3:
-    case CODEC_ID_DVVIDEO:
-    case CODEC_ID_HUFFYUV:
-    case CODEC_ID_CYUV:
-    case CODEC_ID_H264:
-    case CODEC_ID_INDEO3:
-    case CODEC_ID_VP3:
-    case CODEC_ID_THEORA:
-    case CODEC_ID_ASV1:
-    case CODEC_ID_ASV2:
-    case CODEC_ID_FFV1:
-    case CODEC_ID_4XM:
-    case CODEC_ID_VCR1:
-    case CODEC_ID_CLJR:
-    case CODEC_ID_MDEC:
-    case CODEC_ID_ROQ:
-    case CODEC_ID_INTERPLAY_VIDEO:
-    case CODEC_ID_XAN_WC3:
-    case CODEC_ID_XAN_WC4:
-    case CODEC_ID_RPZA:
-    case CODEC_ID_CINEPAK:
-    case CODEC_ID_WS_VQA:
-    case CODEC_ID_MSRLE:
-    case CODEC_ID_MSVIDEO1:
-    case CODEC_ID_IDCIN:
-    case CODEC_ID_8BPS:
-    case CODEC_ID_SMC:
-    case CODEC_ID_FLIC:
-    case CODEC_ID_TRUEMOTION1:
-    case CODEC_ID_VMDVIDEO:
-    case CODEC_ID_MSZH:
-    case CODEC_ID_ZLIB:
-    case CODEC_ID_QTRLE:
-    case CODEC_ID_SNOW:
-    case CODEC_ID_TSCC:
-    case CODEC_ID_ULTI:
-    case CODEC_ID_QDRAW:
-    case CODEC_ID_VIXL:
-    case CODEC_ID_QPEG:
-    case CODEC_ID_PNG:
-    case CODEC_ID_PPM:
-    case CODEC_ID_PBM:
-    case CODEC_ID_PGM:
-    case CODEC_ID_PGMYUV:
-    case CODEC_ID_PAM:
-    case CODEC_ID_FFVHUFF:
-    case CODEC_ID_RV30:
-    case CODEC_ID_RV40:
-    case CODEC_ID_VC1:
-    case CODEC_ID_WMV3:
-    case CODEC_ID_LOCO:
-    case CODEC_ID_WNV1:
-    case CODEC_ID_AASC:
-    case CODEC_ID_INDEO2:
-    case CODEC_ID_FRAPS:
-    case CODEC_ID_TRUEMOTION2:
-    case CODEC_ID_BMP:
-    case CODEC_ID_CSCD:
-    case CODEC_ID_MMVIDEO:
-    case CODEC_ID_ZMBV:
-    case CODEC_ID_AVS:
-    case CODEC_ID_SMACKVIDEO:
-    case CODEC_ID_NUV:
-    case CODEC_ID_KMVC:
-    case CODEC_ID_FLASHSV:
-    case CODEC_ID_CAVS:
-    case CODEC_ID_JPEG2000:
-    case CODEC_ID_VMNC:
-    case CODEC_ID_VP5:
-    case CODEC_ID_VP6:
-    case CODEC_ID_VP6F:
-    case CODEC_ID_TARGA:
-    case CODEC_ID_DSICINVIDEO:
-    case CODEC_ID_TIERTEXSEQVIDEO:
-    case CODEC_ID_TIFF:
-    case CODEC_ID_GIF:
-    case CODEC_ID_FFH264:
-    case CODEC_ID_DXA:
-    case CODEC_ID_DNXHD:
-    case CODEC_ID_THP:
-    case CODEC_ID_SGI:
-    case CODEC_ID_C93:
-    case CODEC_ID_BETHSOFTVID:
-    case CODEC_ID_PTX:
-    case CODEC_ID_TXD:
-    case CODEC_ID_VP6A:
-    case CODEC_ID_AMV:
-    case CODEC_ID_VB:
-    case CODEC_ID_MPEG2TS: /* _FAKE_ codec to indicate a raw MPEG-2 TS */
-        mask |= VIDEO_MPG;
-        break;
-
-    case CODEC_ID_H263:
-    case CODEC_ID_MPEG4:
-    case CODEC_ID_MSMPEG4V1:
-    case CODEC_ID_MSMPEG4V2:
-    case CODEC_ID_MSMPEG4V3:
-    case CODEC_ID_H263P:
-    case CODEC_ID_H263I:
-        mask |= VIDEO_DIVX;
-        break;
-
-    case CODEC_ID_WMV1:
-    case CODEC_ID_WMV2:
-        mask |= VIDEO_WMV;
-        break;
-
-    case CODEC_ID_XVID:
-        mask |= VIDEO_XVID;
-        break;
-
-    /* various PCM "codecs" */
-    case CODEC_ID_PCM_S16LE:
-    case CODEC_ID_PCM_S16BE:
-    case CODEC_ID_PCM_U16LE:
-    case CODEC_ID_PCM_U16BE:
-    case CODEC_ID_PCM_S8:
-    case CODEC_ID_PCM_U8:
-    case CODEC_ID_PCM_MULAW:
-    case CODEC_ID_PCM_ALAW:
-    case CODEC_ID_PCM_S32LE:
-    case CODEC_ID_PCM_S32BE:
-    case CODEC_ID_PCM_U32LE:
-    case CODEC_ID_PCM_U32BE:
-    case CODEC_ID_PCM_S24LE:
-    case CODEC_ID_PCM_S24BE:
-    case CODEC_ID_PCM_U24LE:
-    case CODEC_ID_PCM_U24BE:
-    case CODEC_ID_PCM_S24DAUD:
-    case CODEC_ID_PCM_ZORK:
-
-    /* various ADPCM codecs */
-    case CODEC_ID_ADPCM_IMA_QT:
-    case CODEC_ID_ADPCM_IMA_WAV:
-    case CODEC_ID_ADPCM_IMA_DK3:
-    case CODEC_ID_ADPCM_IMA_DK4:
-    case CODEC_ID_ADPCM_IMA_WS:
-    case CODEC_ID_ADPCM_IMA_SMJPEG:
-    case CODEC_ID_ADPCM_MS:
-    case CODEC_ID_ADPCM_4XM:
-    case CODEC_ID_ADPCM_XA:
-    case CODEC_ID_ADPCM_ADX:
-    case CODEC_ID_ADPCM_EA:
-    case CODEC_ID_ADPCM_G726:
-    case CODEC_ID_ADPCM_CT:
-    case CODEC_ID_ADPCM_SWF:
-    case CODEC_ID_ADPCM_YAMAHA:
-    case CODEC_ID_ADPCM_SBPRO_4:
-    case CODEC_ID_ADPCM_SBPRO_3:
-    case CODEC_ID_ADPCM_SBPRO_2:
-    case CODEC_ID_ADPCM_THP:
-    case CODEC_ID_ADPCM_IMA_AMV:
-    case CODEC_ID_ADPCM_EA_R1:
-    case CODEC_ID_ADPCM_EA_R3:
-    case CODEC_ID_ADPCM_EA_R2:
-    case CODEC_ID_ADPCM_IMA_EA_SEAD:
-    case CODEC_ID_ADPCM_IMA_EA_EACS:
-    case CODEC_ID_ADPCM_EA_XAS:
-
-    /* AMR */
-    case CODEC_ID_AMR_NB:
-    case CODEC_ID_AMR_WB:
-
-    /* RealAudio codecs*/
-    case CODEC_ID_RA_144:
-    case CODEC_ID_RA_288:
-
-    /* various DPCM codecs */
-    case CODEC_ID_ROQ_DPCM:
-    case CODEC_ID_INTERPLAY_DPCM:
-    case CODEC_ID_XAN_DPCM:
-    case CODEC_ID_SOL_DPCM:
-
-    /* more misc things we'll call WAV */
-    case CODEC_ID_AAC:
-    case CODEC_ID_DVAUDIO:
-    case CODEC_ID_MACE3:
-    case CODEC_ID_MACE6:
-    case CODEC_ID_VMDAUDIO:
-    case CODEC_ID_SONIC:
-    case CODEC_ID_SONIC_LS:
-    case CODEC_ID_FLAC:
-    case CODEC_ID_MP3ADU:
-    case CODEC_ID_MP3ON4:
-    case CODEC_ID_SHORTEN:
-    case CODEC_ID_ALAC:
-    case CODEC_ID_WESTWOOD_SND1:
-    case CODEC_ID_GSM: /* as in Berlin toast format */
-    case CODEC_ID_QDM2:
-    case CODEC_ID_COOK:
-    case CODEC_ID_TRUESPEECH:
-    case CODEC_ID_TTA:
-    case CODEC_ID_SMACKAUDIO:
-    case CODEC_ID_QCELP:
-    case CODEC_ID_WAVPACK:
-    case CODEC_ID_DSICINAUDIO:
-    case CODEC_ID_IMC:
-    case CODEC_ID_MUSEPACK7:
-    case CODEC_ID_MLP:
-    case CODEC_ID_GSM_MS: /* as found in WAV */
-    case CODEC_ID_ATRAC3:
-    case CODEC_ID_VOXWARE:
-    case CODEC_ID_APE:
-    case CODEC_ID_NELLYMOSER:
-    case CODEC_ID_MUSEPACK8:
-        mask |= AUDIO_WAV;
-        break;
-
-    case CODEC_ID_MP2:
-        mask |= AUDIO_MPEG2;
-        break;
-
-    case CODEC_ID_MP3: /* preferred ID for decoding MPEG audio layer 1: 2 or 3 */
-        mask |= AUDIO_MP3;
-        break;
-
-    case CODEC_ID_AC3:
-        mask |= AUDIO_AC3;
-        break;
-
-    case CODEC_ID_DTS:
-        mask |= AUDIO_DTS;
-        break;
-
-    case CODEC_ID_VORBIS:
-        mask |= AUDIO_OGG;
-        break;
-
-    case CODEC_ID_WMAV1:
-        mask |= AUDIO_WMA;
-        break;
-
-    case CODEC_ID_WMAV2:
-        mask |= AUDIO_WMA2;
-        break;
-
-    /* subtitle codecs */
-    case CODEC_ID_DVD_SUBTITLE:
-    case CODEC_ID_DVB_SUBTITLE:
-    case CODEC_ID_TEXT:
-    case CODEC_ID_XSUB:
-    /* teletext codecs */
-    case CODEC_ID_MPEG2VBI:
-    case CODEC_ID_DVB_VBI:
-    /* DSMCC codec */
-    case CODEC_ID_DSMCC_B:
-        mask |= 0;
-        break;
-    }
-
-    if(mask & AUDIO_MASK)
-    {
-        lcd_ledmask &= ~AUDIO_MASK;
-        if (on)
-            lcd_ledmask |= (mask & AUDIO_MASK);
-    }
-    if(mask & VIDEO_MASK)
-    {
-        lcd_ledmask &= ~VIDEO_MASK;
-        if (on)
-            lcd_ledmask |= (mask & VIDEO_MASK);
-    }
     sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
 }
 
+void LCD::setVideoFormatLEDs(enum LCDVideoFormatSet vcodec, bool on)
+{
+    if (!lcd_ready)
+        return;
+
+    lcd_ledmask &= ~VIDEO_MASK;
+    if (on)
+        lcd_ledmask |= (vcodec & VIDEO_MASK);
+
+    sendToServer(QString("UPDATE_LEDS %1").arg(lcd_ledmask));
+}
 
 void LCD::setVideoSrcLEDs(enum LCDVideoSourceSet vsrc, bool on)
 {
