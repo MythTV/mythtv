@@ -83,6 +83,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     void slotLosingFocus(void);
     void slotStatusBarMessage(const QString &text);
     void slotIconChanged(void);
+    void slotLinkClicked(const QUrl &url);
 
   protected:
     void Finalize(void);

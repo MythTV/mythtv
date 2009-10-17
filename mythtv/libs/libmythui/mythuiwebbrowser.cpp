@@ -178,6 +178,7 @@ void MythUIWebBrowser::Init(void)
     m_browser->setGeometry(m_Area);
     m_browser->setFixedSize(m_Area.size());
     m_browser->move(m_Area.x(), m_Area.y());
+    m_browser->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 
     m_browser->winId();
 
@@ -197,6 +198,8 @@ void MythUIWebBrowser::Init(void)
             this, SLOT(slotStatusBarMessage(const QString&)));
     connect(m_browser->page(), SIGNAL(linkHovered(const QString&, const QString&, const QString&)),
             this, SLOT(slotStatusBarMessage(const QString&)));
+    connect(m_browser, SIGNAL(linkClicked(const QUrl&)),
+            this, SLOT(slotLinkClicked(const QUrl&)));
 
     connect(this, SIGNAL(TakingFocus()),
             this, SLOT(slotTakingFocus(void)));
@@ -475,6 +478,11 @@ void MythUIWebBrowser::slotTitleChanged( const QString &title)
 void MythUIWebBrowser::slotStatusBarMessage(const QString &text)
 {
     emit statusBarMessage(text);
+}
+
+void MythUIWebBrowser::slotLinkClicked(const QUrl &url)
+{
+    LoadPage(url);
 }
 
 void MythUIWebBrowser::slotIconChanged(void)
