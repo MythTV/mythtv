@@ -121,6 +121,18 @@
                             </imagetype>
                         </state>
                     </statetype>
+                    <statetype name="playlist">
+                        <position>212,8</position>
+                        <state name="yes">
+                            <imagetype name="overlay">
+                                <filename>recordings/statusoverlay.png</filename>
+                            </imagetype>
+                            <imagetype name="watchedimage">
+                                <position>4,4</position>
+                                <filename>shared/playlist.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
                     <textarea name="title" from="basetextarea">
                         <area>8,148,240,60</area>
                         <font>basemedium</font>
@@ -171,6 +183,9 @@
                     </statetype>
                     <statetype name="watched">
                         <position>13,124</position>
+                    </statetype>
+                    <statetype name="playlist">
+                        <position>240,12</position>
                     </statetype>
                 </state>
                 <state name="inactive" from="active" />
