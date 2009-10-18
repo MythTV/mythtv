@@ -81,7 +81,7 @@ class MPUBLIC MythThemedMenu : public MythThemedMenuState
     void ReloadExitKey(void);
     virtual void aboutToShow(void);
 
-    void doMenu();
+    void ShowMenu();
     void aboutScreen();
     MythDialogBox* m_menuPopup;
     void customEvent(QEvent *event);

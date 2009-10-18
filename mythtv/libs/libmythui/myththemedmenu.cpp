@@ -274,9 +274,9 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                 }
             }
         }
-        else if (action == "MENU")
+        else if (action == "HELP")
         {
-            doMenu();
+            aboutScreen();
         }
         else
             handled = false;
@@ -298,9 +298,9 @@ void MythThemedMenu::aboutToShow()
     MythScreenType::aboutToShow();
 }
 
-void MythThemedMenu::doMenu()
+void MythThemedMenu::ShowMenu()
 {
-    if( m_menuPopup != NULL )
+    if (m_menuPopup)
         return;
 
     int allowsd =  GetMythDB()->GetNumSetting("AllowQuitShutdown");
