@@ -1,9 +1,478 @@
+2009-02-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/samplerate.c
+    Add new error value SRC_ERR_SINC_PREPARE_DATA_BAD_LEN.
+
+    * src/common.h
+    Add WARN_UNUSED macro.
+
+    * src/src_sinc.c
+    Fix a segfault which occurs when memcpy is passed a bad length parameter.
+    This bug has zero security implications beyond the ability to cause a
+    program hitting this bug to exit immediately with a segfault.
+    See : http://www.mega-nerd.com/erikd/Blog/2009/Feb/14/index.html
+    Thanks to David Cournapeau for the bug report.
+
+    * doc/win32.html Makefile.am configure.ac
+    Reinstate Win32/MSVC compile instructions.
+
+    * doc/*.html
+    Update for new release.
+
+    * configure.ac
+    Verison 0.1.7.
+
+2009-02-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/samplerate.c
+    Fix SRC_ERR_BAD_SRC_RATIO error string. Thanks David Cournapeau.
+
+2009-01-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/src_sinc.c
+    Replace C99 "variable length arrays" with arrays allocated on the heap so
+    that libsamplerate can be compiled with crappy compilers like MSVC.
+
+2009-01-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac NEWS README doc/*.html
+    Updates for 0.1.6 release.
+
+2009-01-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/termination_test.c
+    Fix termination test error on x86_64. Error probably due to difference in
+    rounding.
+
+2009-01-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/win32.html
+    Update win32 compile instructions to explain that this release cannot be
+    compiled using the microsoft compiler.
+
+    * NEWS README doc/*.html
+    Updates for 0.1.5 release.
+
+    * Makefile.am configure.ac
+    Remove Win32 directory from distributed tarball.
+
+2008-12-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/multi_channel_test.c tests/multichan_throughput_test.c
+    Update tests to make sure tests include tests for 10 channels.
+
+    * src/src_sinc.c
+    Make 6 channel Sinc conversion another special case.
+    Use Duff's Device to speed up the multi-channel case.
+
+    * tests/multi_channel_test.c
+    Only test 1, 2 and 3 channels for ZOH and linear converters.
+
+2008-12-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/samplerate.c
+    Move variable definition out one scope level to avoid warnings from static
+    analysis tools. Thanks Erik Hovland.
+
+    * tests/util.c
+    Make sure FILE* is closed. Thanks Erik Hovland.
+
+    * tests/multi_channel_test.c tests/multichan_throughput_test.c
+    Update tests to make sure tests include tests for 6 channels with the Sinc
+    converters.
+
+2008-12-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/multichan_throughput_test.c
+    Do throughput test on all three SINC based converters.
+
+    * src/src_sinc.c
+    Rejig converter so filter coefficients are calculated once per frame and
+    special case channel counts of 1, 2 and 4.
+
+2008-12-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    *  src/samplerate.c examples/audio_out.c tests/*.c
+    Fix a couple of very minor warnings uncovered by Erik Hovland using a
+    static analysis tool.
+
+    * src/src_*.c
+    Fix a potential memory leak. Thanks to Peter G. Vavaroutsos for point this
+    out.
+
+    * tests/multi_channel_test.c
+    Robustify test.
+
+2008-12-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * reconfigure.mk autogen.sh
+    Remove the first, add the second.
+
+    * configure.ac
+    Various updates.
+
+    * tests/multichan_throughput_test.c tests/Makefile.am
+    Add new test and hook into build.
+
+2008-11-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/index.html
+    Update best converter specs.
+
+2008-10-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/audio_out.c
+    Fix gcc-4.3 compiler warning.
+
+2008-10-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/faq.html
+    Add Q/A about accuracy of src_ratio field of SRC_DATA struct.
+
+2008-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * INSTALL
+    Fix minor typo. Thanks to Sean Wood.
+
+2008-09-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/src_sinc.c
+    Optimization. About a 5% improvement in throughput.
+
+2008-09-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/util.[ch]
+    Add function print_cpu_name.
+
+    * tests/throughput_test.c
+    Add ability to do best-of N runs, print CPU type.
+
+2008-09-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Add AC_PROG_MKDIR_P.
+
+2008-07-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/samplerate.c
+    Fix a valgrind warning which occured when the call back function returns
+    a count of zero without modifying the pointer value. Thanks to Paul Kelly.
+
+    * tests/callback_test.c
+    Add a callback test where the callback returns a zero count without setting
+    the data pointer. The problem can only be detected when run under valgrind.
+
+2008-07-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/src_sinc.c
+    Remove use of llrint because sizeof (increment_t) is guaranteed not to be 8.
+
+    * tests/callback_test.c
+    Test with 2 channels for improved generality. Simplify setup.
+
+    * src/src_linear.c src/src_zoh.c
+    Change local variable names to be the same across these two files for easier
+    comparison.
+
+    * src/src_linear.c
+    Fix a bug where the the converter was reading beyond the end of the input.
+    Thanks to Paul Kelly for the bug report.
+
+2008-07-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/downsample_test.c
+    New test file to test for buffer overrun bugs at extreme low conversion
+    ratios.
+
+    * tests/Makefile.am
+    Hook above test program into build.
+
+    * src/src_sinc.c
+    Fix buffer overrrun bug at extreme low conversion ratios. Thanks to Russell
+    O'Connor for the report.
+
+    * configure.ac NEWS README doc/*.html
+    Update for 0.1.4 release.
+
+2008-05-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Make use of libsndfile optional. Patch from Samuli Suominen.
+
+2008-04-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Win32/libsamplerate-0.def
+    Add src_int_to_float/float_to_int_array to exports.
+
+    * examples/sndfile-resample.c
+    Add printing of libsndfile version, modify libsamplerate version.
+
+2008-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/*.html
+    Final documentation tweaks for release.
+
+2008-03-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/throughput_test.c
+    Include config.h and float_cast.h." -- tests/throughput_test.c
+
+    * Make.bat Win32/*
+    Bunch more Win32 updates.
+
+2008-03-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/* tests/*
+    Remove all traces of old SRC_OLD_SINC_* converters.
+
+    * Make.bat Win32/*
+    Preliminary Win32 updates.
+
+    * configure.ac
+    Bump version to 0.1.3.
+
+2008-03-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/api_simple.html
+    Try once again to convince people that src_simple cannot be used on small
+    chunks of a larger piece of audio.
+
+2008-03-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/snr_bw_test.c
+    Remove bodgy old throughput calculations.
+
+2008-03-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/benchmark.c tests/throughput_test.c
+    Rename former to the latter and make significant improvements.
+
+2008-03-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/old_high_qual_coeffs.h src/old_mid_qual_coeffs.h
+    Copy these from the old versions.
+
+    * src/high_qual_coeffs.h src/mid_qual_coeffs.h
+    New versions of the coefficients with improved SNR.
+
+2008-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Makefile.am configure.ac
+    Add DISTCHECK_CONFIGURE_FLAGS to Makefile.am and a bunch of configure
+    cleanups.
+
+2008-01-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/audio_out.c
+    Apply patch from Yair K. to fix compiles with OSS v4.
+
+2007-07-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * acinclude.m4
+    Add AC_CHECK_SIGNAL macro.
+
+    * configure.ac
+    Use AC_CHECK_SIGNAL to check for SIGALRM.
+
+    * tests/callback_hang_test.c
+    Use HAVE_SIGGALRM and add empty main function if it doesn't exist.
+
+2007-06-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/*_coeffs.h
+    Change the way the coefficients are defined for improved safety.
+
+    * src/src_sinc.c
+    Adapt to the above.
+
+2007-05-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/src_sinc.c
+    Change macros into inline functions for better error checking.
+
+    * src/common.h
+    Add static inline function fmod_one.
+
+    * src/*.c
+    Use fmod_one where appropriate.
+
+2007-05-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests.Makefile.am
+    Fix includes for varispeed_test target.
+
+2007-04-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/snr_bw_test.c
+    Remove cruft.
+
+    * doc/index.html
+    Add link to Foobar 2000 plugin.
+
+    * configure.ac tests/callback_hang_test.c
+    Test for functions alarm and signal and only compile test if both are
+    available.
+
+2007-01-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/samplerate.c
+    Refactor checking of supplied src ratio against min and max.
+
+    * configure.ac
+    Remove -pendantic from CFLAGS and add -std=gnu99.
+
+    * tests/callback_hang_test.c tests/Makefile.am
+    Add new test program and hook it into build.
+
+    * src/src_linear.c src/src_sinc.c src/src_zoh.c
+    Fix a bug where the src_callback_read () function would hang under varying
+    src_ratio.
+
+2007-01-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/api.html doc/api_callback.html doc/api_misc.html
+    Update docs to make handling of interleaved data more explicit.
+
+2006-07-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/audio_out.c
+    Fix bug arising from last change.
+
+    * configure.ac
+    Add -Wpointer-arith to CFLAGS.
+
+2006-07-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/audio_out.c
+    Be more explicit about setting the audio output format.
+
+2006-06-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/samplerate.c src/src_linear.c src/src_sinc.c
+    Fix MSVC compiler warnings.
+
+2006-05-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/calc_snr.c
+    Fix minor bug in analysis routines.
+
+    * tests/varispeed_test.c tests/snr_bw_test.c
+    Fix knock on effects of above change.
+
+2006-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/Makefile.am
+    Update check-asm rule to check src_linear.c and src_zoh.c.
+
+    * src/src_linear.c
+    Remove all uses of floor() function.
+
+2006-04-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/samplerate.[ch] src/Version_script.in
+    Add functions src_int_to_float_array and src_float_to_int_array.
+
+    * tests/float_short_test.c
+    Update test to including testing of above.
+
+    * doc/api_misc.html
+    Update docs for the above addition.
+
+2006-03-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/src_*.c src/samplerate.c
+    Add slots for vari_process and const_process functions.
+
+    * tests/varispeed_test.c tests/Makefile.am
+    Add new test and hook into build.
+
+    * tests/util.[ch]
+    Add new function reverse_data.
+
+2005-12-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-resample.c
+    Exit if SRC ratio is 1.0. Suggested by Bram de Jong.
+
+2005-11-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/timewarp-file.c
+    New file.
+
+2005-09-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/float_cast.h
+    Update to include Cygwin specific fixes.
+
+    * doc/api_callback.html
+    Complete the documentation of the callback API.
+
+2005-08-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/termination_test.c
+    Rename term_test() to init_term_test() and add extra test functionality
+    to sanity test the first sample output after reset.
+
+    * src/src_zoh.c src/src_linear.c
+    Fix bug found by new test. Thanks Stas Sergeev for bringint this to my
+    attention.
+
+2005-08-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/Makefile.am
+    Fix a bug preventing the inclusion of the html API docs in the tarball.
+
+    * src/src_zoh.c src/src_linear.c
+    Improve calculation of input_index.
+    Fix updating of input_index (thanks to Stas Sergeev).
+
+    * tests/calc_snr.c
+    Fix a compile problem when FFTW is not present (thanks to Stas Sergeev).
+
+2005-04-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac src/Makefile.am
+    Fix minor problems with generation of shared library version number.
+
+2005-02-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/faq.html
+    Add a question about the use of src_simple().
+
+    * src/api_simple.html
+    Fix defintion of src_ratio.
+
+2004-12-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac tests/Makefile.am tests/*.c
+    Ditch detection and use of libefence. Valgrind is a far better debugging
+    tool.
+
+    * INSTALL
+    Write complete libsamplerate specific install instructions.
+
+2004-10-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/configure.ac src/makefile.am
+    Finally fix the bulding of DLLs on Win32/MinGW.
+
+    * tests/makefile.am
+    Fix running of tests on Win32/MinGW.
+
+2004-09-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac Win32/Makefile.mingw.in
+    More support for compiling on Win32 using MinGW. Now uses FFTW3.
+
+    * examples/audio_out.c
+    Remove include of <mmreg.h> on win32.
+
 2004-09-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac Win32/Makefile.mingw.in
     Add preliminary support for compiling on Win32 using MinGW.
 
-    * configure.ac 
+    * configure.ac
     Bump version to 0.1.2.
     Add --enable-gcc-werror configure option.
 

@@ -2921,26 +2921,57 @@ fi
 
 # "CPU_CLIP" test for SRC / libsamplerate
 # test positive wrap
-check_exec << EOF && enable cpuclipspositive
-int main(){
-    float f = (1<<(sizeof(short)*8))>>1;
-    short s = (short)f;
-    if ( s == --f )
-        return(0);
-    return(1);
-}
+temp_ldflags -lm
+check_exec << EOF && enable cpu_clips_positive
+    #define _ISOC9X_SOURCE  1
+    #define _ISOC99_SOURCE  1
+    #define __USE_ISOC99    1
+    #define __USE_ISOC9X    1
+    #include <math.h>
+    int main (void)
+    {	double	fval ;
+        int k, ival ;
+
+        fval = 1.0 * 0x7FFFFFFF ;
+        for (k = 0 ; k < 100 ; k++)
+        {
+            ival = (lrint (fval)) >> 24 ;
+            if (ival != 127)
+                return 1 ;
+
+            fval *= 1.2499999 ;
+        } ;
+
+        return 0 ;
+    }
 EOF
 
 # test negative wrap
-check_exec << EOF && enable cpuclipsnegative
-int main(){
-    float f = -((1<<(sizeof(short)*8))>>1) - 1;
-    short s = (short)f;
-    if ( s == ++f)
-        return(0);
-    return(1);
-}
+check_exec << EOF && enable cpu_clips_negative
+    #define	_ISOC9X_SOURCE	1
+    #define _ISOC99_SOURCE  1
+    #define __USE_ISOC99    1
+    #define __USE_ISOC9X    1
+    #include <math.h>
+    int main (void)
+    {
+        double	fval ;
+        int k, ival ;
+
+        fval = -8.0 * 0x10000000 ;
+        for (k = 0 ; k < 100 ; k++)
+        {
+            ival = (lrint (fval)) >> 24 ;
+            if (ival != -128)
+                return 1 ;
+
+            fval *= 1.2499999 ;
+        } ;
+
+        return 0 ;
+    }
 EOF
+restore_flags
 
 # test for distcc
 enabled distcc && check_cmd distcc --version || disable distcc

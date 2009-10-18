@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,24 +16,42 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/*
+** This code is part of Secret Rabibt Code aka libsamplerate. A commercial
+** use license for this code is available, please see:
+**		http://www.mega-nerd.com/SRC/procedure.html
+*/
+
 #ifndef COMMON_H_INCLUDED
 #define COMMON_H_INCLUDED
 
-#if HAVE_STDINT_H
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
 #elif (SIZEOF_INT == 4)
-typedef	int	int32_t ;
+typedef	int		int32_t ;
 #elif (SIZEOF_LONG == 4)
 typedef	long	int32_t ;
 #endif
 
 #define	SRC_MAX_RATIO			256
+#define	SRC_MAX_RATIO_STR		"256"
+
 #define	SRC_MIN_RATIO_DIFF		(1e-20)
 
 #define	MAX(a,b)	(((a) > (b)) ? (a) : (b))
 #define	MIN(a,b)	(((a) < (b)) ? (a) : (b))
 
+#define	ARRAY_LEN(x)			((int) (sizeof (x) / sizeof ((x) [0])))
+#define OFFSETOF(type,member)	((int) (&((type*) 0)->member))
+
 #define	MAKE_MAGIC(a,b,c,d,e,f)	((a) + ((b) << 4) + ((c) << 8) + ((d) << 12) + ((e) << 16) + ((f) << 20))
+
+#ifdef __GNUC__
+#	define WARN_UNUSED	__attribute__ ((warn_unused_result))
+#else
+#	define WARN_UNUSED
+#endif
+
 
 #include "samplerate.h"
 
@@ -67,6 +85,8 @@ enum
 	SRC_ERR_BAD_CALLBACK,
 	SRC_ERR_BAD_MODE,
 	SRC_ERR_NULL_CALLBACK,
+	SRC_ERR_NO_VARIABLE_RATIO,
+	SRC_ERR_SINC_PREPARE_DATA_BAD_LEN,
 
 	/* This must be the last error number. */
 	SRC_ERR_MAX_ERROR
@@ -84,7 +104,13 @@ typedef struct SRC_PRIVATE_tag
 	/* Pointer to data to converter specific data. */
 	void	*private_data ;
 
-	int		(*process) (struct SRC_PRIVATE_tag *psrc, SRC_DATA *data) ;
+	/* Varispeed process function. */
+	int		(*vari_process) (struct SRC_PRIVATE_tag *psrc, SRC_DATA *data) ;
+
+	/* Constant speed process function. */
+	int		(*const_process) (struct SRC_PRIVATE_tag *psrc, SRC_DATA *data) ;
+
+	/* State reset. */
 	void	(*reset) (struct SRC_PRIVATE_tag *psrc) ;
 
 	/* Data specific to SRC_MODE_CALLBACK. */
@@ -112,13 +138,20 @@ const char* zoh_get_description (int src_enum) ;
 
 int zoh_set_converter (SRC_PRIVATE *psrc, int src_enum) ;
 
-#endif	/* COMMON_H_INCLUDED */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 737d46dc-a2f8-4025-bb88-fc8915c69085
+/*----------------------------------------------------------
+**	Common static inline functions.
 */
+
+static inline double
+fmod_one (double x)
+{	double res ;
+
+	res = x - lrint (x) ;
+	if (res < 0.0)
+		return res + 1.0 ;
+
+	return res ;
+} /* fmod_one */
+
+#endif	/* COMMON_H_INCLUDED */
 
