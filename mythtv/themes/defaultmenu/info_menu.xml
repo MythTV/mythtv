@@ -200,7 +200,7 @@
         <text lang="PL">Status systemu</text>
         <text lang="HE">מב מערכת</text>
         <text lang="HU">Rendszer állapot</text>
-        <description>What your system is doing right now</description>
+        <description>See what your system is doing</description>
         <description lang="DE">Der aktuelle Zustand von MythTV</description>
         <action>TV_STATUS</action>
     </button>
