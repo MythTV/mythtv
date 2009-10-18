@@ -118,7 +118,7 @@
         <text lang="HE">הוקלט מקודם</text>
         <text lang="HU">Korábbi felvételek</text>
         <alttext lang="SV">Tidigare</alttext>
-        <description>See what you have recorded before</description>
+        <description>See what you have recorded</description>
         <description lang="DE">Was Sie bisher aufgenommen haben</description>
         <action>TV_PREVIOUS</action>
     </button>

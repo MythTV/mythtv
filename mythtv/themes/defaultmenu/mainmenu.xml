@@ -59,7 +59,7 @@
         <alttext lang="PT">Programação</alttext>
         <alttext lang="RU">Записи</alttext>
         <alttext lang="AR">التسجيلات</alttext>
-        <description>Pick and prioritize shows to record</description>
+        <description>Pick and prioritize recordings</description>
         <description lang="DE">Planen Sie Ihre Aufnahmen</description>
         <action>MENU manage_recordings.xml</action>
     </button>

@@ -25,7 +25,7 @@
         <alttext lang="ET">Salvestised</alttext>
         <alttext lang="RU">Записи</alttext>
         <alttext lang="PL">Nagrania</alttext>
-        <description>Play recordings</description>
+        <description>Browse your recordings</description>
         <description lang="DE"></description>
         <action>TV_WATCH_RECORDING</action>
     </button>
@@ -54,7 +54,7 @@
         <alttext lang="ET">Video</alttext>
         <alttext lang="RU">Фильмы</alttext>
         <alttext lang="PL">Filmy</alttext>
-        <description>Play videos</description>
+        <description>Browse your video library</description>
         <description lang="DE"></description>
         <action>JUMP MythVideo</action>
         <depends>mythvideo</depends>
@@ -80,7 +80,7 @@
         <text lang="PL">Odtwarzaj muzykę</text>
         <text lang="HE">האזנה למוסיקה</text>
         <text lang="HU">Zene lejátszás</text>
-        <description></description>
+        <description>Browse your music library</description>
         <description lang="DE"></description>
         <action>JUMP Play music</action>
         <depends>mythmusic</depends>
