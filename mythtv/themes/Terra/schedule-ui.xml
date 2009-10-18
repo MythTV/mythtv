@@ -294,14 +294,14 @@
         </textarea>
 
         <textarea name="statuslabel" from="basetextarea">
-            <area>700,183,160,30</area>
+            <area>700,183,180,30</area>
             <font>basemedium</font>
             <value>First Conflict:</value>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="status" from="basetextarea">
-            <area>870,183,380,30</area>
+            <area>890,183,360,30</area>
             <font state="warning">basesmallred</font>
             <align>vcenter</align>
         </textarea>
@@ -312,7 +312,7 @@
         </textarea>
 
         <textarea name="filter" from="status">
-            <position>870,223</position>
+            <position>890,223</position>
         </textarea>
 
         <shape name="descriptionbackground" from="basetextbackground">
@@ -347,6 +347,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1172,6 +1173,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1325,9 +1327,10 @@
         </statetype>
 
         <textarea name="description" from="basetextarea">
-            <area>48,529,1190,100</area>
+            <area>48,527,1190,100</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="year" from="basetextarea">
@@ -1335,12 +1338,12 @@
         </textarea>
 
         <textarea name="lentime" from="basetextarea">
-            <area>830,642,400,30</area>
+            <area>930,642,300,30</area>
             <align>right</align>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
-            <area>490,642,300,30</area>
+            <area>390,642,500,30</area>
             <align>hcenter</align>
         </textarea>
     </window>
@@ -1426,6 +1429,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1536,6 +1540,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1654,6 +1659,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1765,6 +1771,7 @@
             <area>700,405,535,230</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1956,6 +1963,7 @@
             <area>48,117,1190,145</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="year" from="basetextarea">

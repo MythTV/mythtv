@@ -87,7 +87,7 @@
     </font>
 
     <textarea name="baseheading">
-        <area>20,4,400,36</area>
+        <area>20,4,650,36</area>
         <font>baselargebrown</font>
         <value>Heading</value>
     </textarea>

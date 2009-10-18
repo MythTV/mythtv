@@ -258,6 +258,7 @@
             <area>48,487,1190,145</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %DESCRIPTION%</template>
+            <align>vcenter</align>
         </textarea>
 
         <textarea name="year" from="basetextarea">
