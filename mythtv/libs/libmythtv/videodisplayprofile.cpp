@@ -1120,17 +1120,20 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
     uint groupid = CreateProfileGroup("VDPAU High Quality", hostname);
     CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
                   "vdpau", 1, "vdpau", "vdpau", true,
-                  "vdpauadvanceddoublerate", "vdpauadvanced", "colorspace=auto");
+                  "vdpauadvanceddoublerate", "vdpauadvanced",
+                  "vdpaucolorspace=auto");
 
     (void) QObject::tr("VDPAU Normal", "Sample: VDPAU average quality");
     DeleteProfileGroup("VDPAU Normal", hostname);
     groupid = CreateProfileGroup("VDPAU Normal", hostname);
     CreateProfile(groupid, 1, ">=", 0, 720, "", 0, 0,
                   "vdpau", 1, "vdpau", "vdpau", true,
-                  "vdpaubasicdoublerate", "vdpaubasic", "colorspace=auto");
+                  "vdpaubasicdoublerate", "vdpaubasic",
+                  "vdpaucolorspace=auto");
     CreateProfile(groupid, 2, ">", 0, 0, "", 0, 0,
                   "vdpau", 1, "vdpau", "vdpau", true,
-                  "vdpauadvanceddoublerate", "vdpauadvanced", "colorspace=auto");
+                  "vdpauadvanceddoublerate", "vdpauadvanced",
+                  "vdpaucolorspace=auto");
 
     (void) QObject::tr("VDPAU Slim", "Sample: VDPAU low power GPU");
     DeleteProfileGroup("VDPAU Slim", hostname);
