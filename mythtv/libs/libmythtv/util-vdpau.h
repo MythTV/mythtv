@@ -169,7 +169,7 @@ class VDPAUContext
     VdpCSCMatrix      cscMatrix;
     VdpProcamp        proCamp;
     int               colorspace;
-    uint8_t           studio;
+    bool              studio;
 
     VdpLayer          pipLayer;
     VdpOutputSurface  pipOutputSurface;

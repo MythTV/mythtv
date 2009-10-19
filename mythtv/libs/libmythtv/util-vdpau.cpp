@@ -81,8 +81,9 @@ VDPAUContext::VDPAUContext()
     deinterlacer("notset"), deinterlacing(false), currentFrameNum(-1),
     needDeintRefs(false),   deintLock(QMutex::Recursive), skipChroma(0),
     numRefs(0),             denoise(0.0f),          sharpen(0.0f),
-    useColorControl(false), colorspace(1),          studio(0),
-    pipOutputSurface(0),    pipAlpha(0),            pipBorder(0),
+    useColorControl(false), colorspace(VDP_COLOR_STANDARD_ITUR_BT_601),
+    studio(false),
+    pipOutputSurface(0),    pipAlpha(0),       pipBorder(0),
     pipClear(0),            pipReady(0),       pipNeedsClear(false),
     vdp_flip_target(0),     vdp_flip_queue(0), vdpauDecode(false),
     vdp_device(0),          errorCount(0),     errorState(kError_None),
@@ -1745,34 +1746,34 @@ bool VDPAUContext::InitColorControl(void)
     return ok;
 }
 
+#define COL_Y 0
+#define COL_U 1
+#define COL_V 2
+#define COL_C 3
+
 bool VDPAUContext::SetPictureAttributes(void)
 {
     bool ok = true;
     VdpStatus vdp_st;
-    static const VdpColorStandard vdp_colors[] = {0, VDP_COLOR_STANDARD_ITUR_BT_601, VDP_COLOR_STANDARD_ITUR_BT_709};
-    static const QString vdp_names[] = { NULL, "BT.601", "BT.709" };
 
     if (!videoMixer || !useColorControl)
         return false;
 
-    int csp = colorspace;
-
-        // Try to detect best color standard based on the resolution
-        // Use BT_601 if SD, BT_709 if HD
-    if (!colorspace)
+    if (colorspace < 0)
     {
-        csp = videoSize.width() >= 1280 || videoSize.height() > 576 ? 2 : 1;
+        colorspace = (videoSize.width() >= 1280 || videoSize.height() > 576) ?
+                      VDP_COLOR_STANDARD_ITUR_BT_709 :
+                      VDP_COLOR_STANDARD_ITUR_BT_601;
+        VERBOSE(VB_PLAYBACK, LOC + QString("Using ITU %1 colorspace")
+                    .arg((colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
+                    "BT.601" : "BT.709"));
     }
-
-    VERBOSE(VB_PLAYBACK, LOC + QString("Updating CSC matrix for ITU %1 (%2 levels)")
-            .arg(vdp_names[csp])
-            .arg(studio ? "studio" : "PC"));
 
     if (studio)
     {
-        static const float color_coeffs[][3] = { { 0, 0, 0 },
-                                                 { 0.299, 0.587, 0.114 },
-                                                 { 0.2125, 0.7154, 0.0721 } };
+        static const float color_coeffs[][3] = {{ 0.299, 0.587, 0.114},
+                                                { 0.2125, 0.7154, 0.0721}};
+        int csp = (colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ? 0 : 1;
         float uvcos = proCamp.saturation * cos(proCamp.hue);
         float uvsin = proCamp.saturation * sin(proCamp.hue);
         float Kr, Kg, Kb;
@@ -1783,32 +1784,6 @@ bool VDPAUContext::SetPictureAttributes(void)
         Kg = color_coeffs[csp][1];
         Kb = color_coeffs[csp][2];
 
-        /*
-
-          BT.709 PC levels
-            1.164400    0.000000    1.792700   -0.972926
-            1.164400   -0.213200   -0.532900    0.301453
-            1.164400    2.112400    0.000000   -1.133402
-          BT.601 PC levels
-            1.164400    0.000000    1.596000   -0.874190
-            1.164400   -0.391800   -0.813000    0.531702
-            1.164400    2.017200    0.000000   -1.085616
-
-            
-           See:
-           http://avisynth.org/mediawiki/Color_conversions
-           and http://en.wikipedia.org/wiki/YCbCr for more information.
-
-           rgbr/219    0                        (1-Kr)*rgbr/112           -16/219 - 128/112*(1-Kr) + rgbmin/255
-           rgbr/219    -(rgbr/112)*(1-Kb)*Kb/Kg -(rgbr/112)*(1-Kr)*Kr/Kg  -16/219 + 128/112*(1-Kb)*Kb/Kg + 128/112*(1-Kr)*Kr/Kg + rgbmin/255
-           rgbr/219    (rgbr/112)*(1-Kb)        0                         -16/219 - 128/112*(1-Kb) + rgbmin/255
-
-         */
-
-#define COL_Y 0
-#define COL_U 1
-#define COL_V 2
-#define COL_C 3
         float uv_coeffs[3][2] = {
             { 0.000,                      (rgbr/112.0)*(1-Kr)       },
             {-(rgbr/112.0)*(1-Kb)*Kb/Kg, -(rgbr/112.0)*(1-Kr)*Kr/Kg },
@@ -1825,8 +1800,6 @@ bool VDPAUContext::SetPictureAttributes(void)
             cscMatrix[i][COL_V]  = uv_coeffs[i][0] * uvsin + uv_coeffs[i][1] * uvcos;
             cscMatrix[i][COL_C] += (-128 / 255.0) * cscMatrix[i][COL_V];
             cscMatrix[i][COL_C] += rgbmin / 255.0;
-                // this "centers" contrast control so that e.g. a contrast of 0
-                // leads to a grey image, not a black one
             cscMatrix[i][COL_C] += 0.5 - proCamp.contrast / 2.0;
         }
     }
@@ -1834,7 +1807,7 @@ bool VDPAUContext::SetPictureAttributes(void)
     {
         vdp_st = vdp_generate_csc_matrix(
             &proCamp,
-            vdp_colors[csp],
+            colorspace,
             &cscMatrix);
         CHECK_ST
     }
@@ -2224,15 +2197,14 @@ bool VDPAUContext::ShowPIP(NuppelVideoPlayer *pipplayer,
 void VDPAUContext::ParseOptions(QString options)
 {
     QStringList list = options.split(",");
-    static const QString vdp_names[] = { "auto", "ITU BT.601", "ITU BT.709" };
 
     if (list.empty())
         return;
 
     for (QStringList::Iterator i = list.begin(); i != list.end(); ++i)
     {
-        QString name = (*i).section('=', 0, 0);
-        QString opts = (*i).section('=', 1);
+        QString name = (*i).section('=', 0, 0).toLower();
+        QString opts = (*i).section('=', 1).toLower();
 
         if (name.contains("vdpauivtc"))
         {
@@ -2277,17 +2249,19 @@ void VDPAUContext::ParseOptions(QString options)
         {
             int tmp;
 
-            if (opts.contains("auto", Qt::CaseInsensitive))
-                tmp = 0;
+            if (opts.contains("auto"))
+                colorspace = -1;
             else if (opts.contains("601"))
-                tmp = 1;
-            else if  (opts.contains("709"))
-                tmp = 2;
-            else tmp = std::max(0, std::min(2, opts.toInt()));
-            if (tmp >= 0)
+                colorspace = VDP_COLOR_STANDARD_ITUR_BT_601;
+            else if (opts.contains("709"))
+                colorspace = VDP_COLOR_STANDARD_ITUR_BT_709;
+
+            if (colorspace > -1)
             {
-                VERBOSE(VB_PLAYBACK, LOC + QString("Colorspace %1").arg(vdp_names[tmp]));
-                colorspace = tmp;
+                VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Forcing ITU BT.%1 colorspace")
+                    .arg((colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
+                    "BT.601" : "BT.709"));
             }
         }
 
@@ -2295,7 +2269,7 @@ void VDPAUContext::ParseOptions(QString options)
         {
             VERBOSE(VB_PLAYBACK, LOC +
                     QString("Enabling Studio Levels [16-235]."));
-            studio = 1;
+            studio = true;
         }
     }
 }
