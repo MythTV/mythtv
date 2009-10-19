@@ -802,13 +802,13 @@ bool resetTheme(QString themedir, const QString badtheme)
     QString themename = "Terra";
 
     if (badtheme == "Terra")
-        themename = "G.A.N.T";
+        themename = "MythCenter-wide";
 
     VERBOSE(VB_IMPORTANT,
-                QString("Overridding broken theme '%1' with '%2'")
+                QString("Overriding broken theme '%1' with '%2'")
                 .arg(badtheme).arg(themename));
 
-    gContext->OverrideSettingForSession("Theme", themename);
+    gContext->SaveSetting("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);
 
     LanguageSettings::reload();
@@ -837,7 +837,7 @@ int reloadTheme(void)
 
     GetMythMainWindow()->GetMainStack()->EnableEffects();
 
-    QString themename = gContext->GetSetting("Theme", "blue");
+    QString themename = gContext->GetSetting("Theme", "Terra");
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
@@ -1471,7 +1471,7 @@ int main(int argc, char **argv)
                     .arg(networkPort));
     }
 
-    themename = gContext->GetSetting("Theme", "blue");
+    themename = gContext->GetSetting("Theme", "Terra");
     themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
