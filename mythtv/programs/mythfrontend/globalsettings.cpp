@@ -2725,17 +2725,6 @@ static HostCheckBox *UseFixedWindowSize()
 }
 }
 
-
-static HostCheckBox *RandomTheme()
-{
-    HostCheckBox *gc = new HostCheckBox("RandomTheme");
-    gc->setLabel(QObject::tr("Use a random theme"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Use a random theme each time MythTV is "
-                    "started."));
-    return gc;
-}
-
 static HostComboBox *MythDateFormat()
 {
     HostComboBox *gc = new HostComboBox("DateFormat");
@@ -4832,11 +4821,7 @@ AppearanceSettings::AppearanceSettings()
 
     theme->addChild(new ThemeSelector("Theme"));
 
-    HorizontalConfigurationGroup *hgrp1 =
-        new HorizontalConfigurationGroup(false, false, false, false);
-    hgrp1->addChild(RandomTheme());
-    hgrp1->addChild(ThemeCacheSize());
-    theme->addChild(hgrp1);
+    theme->addChild(ThemeCacheSize());
 
     theme->addChild(ThemePainter());
     theme->addChild(new StyleSetting());

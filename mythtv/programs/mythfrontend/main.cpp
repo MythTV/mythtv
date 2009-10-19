@@ -658,43 +658,6 @@ void WriteDefaults()
     grs.Save();
 }
 
-QString RandTheme(QString &themename)
-{
-    QDir themes(GetThemesParentDir());
-    themes.setFilter(QDir::Dirs);
-
-    QStringList themelist;
-    srand(time(NULL));
-
-    QFileInfoList fil = themes.entryInfoList();
-
-    for( QFileInfoList::iterator it =  fil.begin();
-                                 it != fil.end();
-                               ++it )
-    {
-        QFileInfo  &theme = *it;
-
-        if (theme.fileName() == "." || theme.fileName() =="..")
-            continue;
-
-        QFileInfo xml(theme.absoluteFilePath() + "/theme.xml");
-
-        if (!xml.exists())
-            continue;
-
-        // We don't want the same one as last time.
-        if (theme.fileName() != themename)
-            themelist.append(theme.fileName());
-    }
-
-    if (themelist.size())
-        themename = themelist[rand() % themelist.size()];
-
-    gContext->SaveSetting("Theme", themename);
-
-    return themename;
-}
-
 int internal_play_media(const QString &mrl, const QString &plot,
                         const QString &title, const QString &subtitle,
                         const QString &director, int season, int episode,
@@ -1430,10 +1393,6 @@ int main(int argc, char **argv)
     LanguageSettings::load("mythfrontend");
 
     QString themename = gContext->GetSetting("Theme", "Terra");
-    bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);
-
-    if (randomtheme)
-        themename = RandTheme(themename);
 
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
