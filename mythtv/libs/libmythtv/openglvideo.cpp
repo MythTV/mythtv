@@ -1717,8 +1717,8 @@ uint OpenGLVideo::ParseOptions(QString options)
     for (QStringList::Iterator i = list.begin();
          i != list.end(); ++i)
     {
-        QString name = (*i).section('=', 0, 0);
-        QString opts = (*i).section('=', 1);
+        QString name = (*i).section('=', 0, 0).toLower();
+        QString opts = (*i).section('=', 1).toLower();
 
         if (name == "opengloptions")
         {

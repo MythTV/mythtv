@@ -2245,7 +2245,7 @@ void VDPAUContext::ParseOptions(QString options)
             }
         }
 
-        if (name.contains("colorspace"))
+        if (name.contains("vdpaucolorspace"))
         {
             int tmp;
 
@@ -2265,7 +2265,7 @@ void VDPAUContext::ParseOptions(QString options)
             }
         }
 
-        if (name.contains("studio"))
+        if (name.contains("vdpaustudio"))
         {
             VERBOSE(VB_PLAYBACK, LOC +
                     QString("Enabling Studio Levels [16-235]."));

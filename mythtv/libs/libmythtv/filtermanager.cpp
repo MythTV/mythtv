@@ -229,7 +229,8 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         QString FiltName = (*i).section('=', 0, 0);
         QString FiltOpts = (*i).section('=', 1);
 
-        if (FiltName.contains("opengl") || FiltName.contains("vdpau"))
+        if (FiltName.contains("opengl", Qt::CaseInsensitive) ||
+            FiltName.contains("vdpau",  Qt::CaseInsensitive))
             continue;
 
         FI = GetFilterInfo(FiltName);
