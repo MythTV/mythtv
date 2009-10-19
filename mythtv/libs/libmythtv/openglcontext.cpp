@@ -1272,6 +1272,7 @@ void OpenGLContext::SetFence(void)
 OpenGLContextGLX::OpenGLContextGLX(QMutex *lock)
     : OpenGLContext(lock),
       m_display(NULL),     m_created_display(false),
+      m_created_window(false),
       m_major_ver(1),      m_minor_ver(1),
       m_glx_fbconfig(0),   m_gl_window(0),   m_glx_window(0),
       m_glx_context(NULL), m_vis_info(NULL), m_attr_list(NULL)
@@ -1318,19 +1319,8 @@ bool OpenGLContextGLX::Create(WId window, const QRect &display_visible,
         return false;
     m_created_display = true;
 
-    bool show_window = true;
-
-    if (!window)
-    {
-        window = m_display->GetRoot();
-        show_window = false;
-    }
-
-    if (!window)
-        return false;
-
     return Create(m_display, window, display_visible,
-                  colour_control, show_window);
+                  colour_control, window ? true : false);
 }
 
 bool OpenGLContextGLX::Create(MythXDisplay *disp, Window XJ_curwin,
@@ -1404,14 +1394,31 @@ bool OpenGLContextGLX::Create(MythXDisplay *disp, Window XJ_curwin,
         m_vis_info = glXGetVisualFromFBConfig(d, m_glx_fbconfig);
     }
 
-    m_gl_window = get_gl_window(m_display, XJ_curwin,
-                                m_vis_info, display_visible, map_window);
+    if (XJ_curwin)
+    {
+        m_gl_window = XJ_curwin;
+    }
+    else
+    {
+
+        Window win = m_display->GetRoot();
+        if (win)
+        {
+            m_gl_window = get_gl_window(m_display, win,
+                                        m_vis_info, display_visible,
+                                        map_window);
+            m_created_window = true;
+        }
+    }
 
     if (!m_gl_window)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't create OpenGL Window");
         return false;
     }
+
+    if (m_created_window)
+        VERBOSE(VB_PLAYBACK, LOC + QString("Created OpenGL window."));
 
     if ((1 == major) && (minor > 2))
     {
@@ -1424,7 +1431,7 @@ bool OpenGLContextGLX::Create(MythXDisplay *disp, Window XJ_curwin,
         }
     }
    
-    VERBOSE(VB_PLAYBACK, LOC + QString("Created window and GLX context."));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Created GLX context."));
 
     static bool debugged = false;
     if (!debugged)
@@ -1505,13 +1512,14 @@ void OpenGLContextGLX::DeleteWindowResources(void)
         m_glx_window = 0;
     }
 
-    if (m_gl_window)
+    if (m_created_window && m_gl_window)
     {
         VERBOSE(VB_PLAYBACK, LOC + "Unmapping gl window");
         UnmapWindow(); // needed for nvidia driver bug
         VERBOSE(VB_PLAYBACK, LOC + "Destroying gl window");
         XDestroyWindow(d, m_gl_window);
         m_gl_window = 0;
+        m_created_window = false;
     }
 
     if (m_glx_context)

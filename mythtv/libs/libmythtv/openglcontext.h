@@ -210,6 +210,7 @@ class OpenGLContextGLX : public OpenGLContext
 
     MythXDisplay *m_display;
     bool          m_created_display;
+    bool          m_created_window;
     uint          m_major_ver;
     uint          m_minor_ver;
     GLXFBConfig   m_glx_fbconfig;
