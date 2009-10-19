@@ -64,7 +64,7 @@
         <alttext lang="PT">Prioridades de Gravação de Canais</alttext>
         <alttext lang="RU">Каналы</alttext>
         <alttext lang="PL">Kanały</alttext>
-        <description>Settings to prioritize some channels over others</description>
+        <description>Prioritize some channels over others</description>
         <description lang="DE">Einstellungen um bestimmte Sender zu bevorzugen</description>
         <action>SETTINGS CHANNELRECPRIORITIES</action>
     </button>
@@ -77,7 +77,7 @@
         <text lang="FI">Muokatut Prioriteetit</text>
         <text lang="HU">Egyéni prioritások</text>
         <alttext>Custom Priority</alttext>
-        <description></description>
+        <description>Prioritize some recordings over others</description>
         <action>SETTINGS CUSTOMPRIORITY</action>
     </button>
 

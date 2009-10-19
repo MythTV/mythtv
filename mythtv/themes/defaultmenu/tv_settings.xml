@@ -97,6 +97,7 @@
         <text>OSD Menu Editor</text>
         <text lang="DE">OSD-Menü anpassen</text>
         <text lang="HU">OSD menu szerkesztő</text>
+        <description>Choose which menu options appear during playback</description>
         <description lang="DE">Welche Men�punkte sollen im OSD-Men� erscheinen?</description>
         <action>OSDMENUEDITOR</action>
   </button>
@@ -127,6 +128,7 @@
       <text>Channel Groups</text>
       <text lang="DE">Sendergruppen</text>
       <text lang="HU">Csatorna csoport</text>
+      <description>Group your favorite channels together</description>
       <description lang="DE">Einstellungen f�r die Sendergruppen</description>
       <action>SETTINGS CHANNELGROUPS</action>
     </button>
@@ -157,7 +159,7 @@
         <alttext lang="PT">Perfis</alttext>
         <alttext lang="RU">Профили</alttext>
         <alttext lang="PL">Profil</alttext>
-        <description> </description>
+        <description>Change the quality of your recordings</description>
         <action>SETTINGS RECORDING</action>
     </button>
 

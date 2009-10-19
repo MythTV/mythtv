@@ -2,31 +2,6 @@
 <mythmenu name="INFO">
 
     <button>
-        <type>PHONE</type>
-        <text>Phone</text>
-        <text lang="IT">Telefono</text>
-        <text lang="JA">電話</text>
-        <text lang="DE">Telefon</text>
-        <text lang="IS">Sími</text>
-        <text lang="FI">Puhelin</text>
-        <text lang="NL">Telefoon</text>    
-        <text lang="SV">Telefon</text>
-        <text lang="SL">Telefon</text>
-        <text lang="ET">Telefon</text>
-        <text lang="DA">Telefon</text>
-        <text lang="ES">Teléfono</text>
-        <text lang="PT">Telefone</text>
-        <text lang="RU">Телефон</text>
-        <text lang="PL">Telefon</text>
-        <text lang="HE">טלפון</text>
-        <text lang="HU">Telefon</text>
-        <description>Make or accept a VoIP call</description>
-        <description lang="DE">Über VoIP telefonieren</description>
-        <action>PLUGIN mythphone</action>
-        <depends>mythphone</depends>
-    </button>
-
-    <button>
         <type>NEWS</type>
         <text>News Feeds</text>
         <text lang="IT">Notizie</text>

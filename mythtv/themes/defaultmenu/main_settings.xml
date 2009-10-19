@@ -48,7 +48,7 @@
         <text lang="PL">Ustaw wyglądy</text>
         <text lang="HE">מראה</text>
         <text lang="HU">Megjelenés</text>
-        <description>pick the theme, font, size, and locale</description>
+        <description>Pick the theme, font, size, and locale</description>
         <description lang="DE">GUI-Thema oder Zeichensatzgrößen wählen</description>
         <action>SETTINGS APPEARANCE</action>
     </button>
@@ -170,31 +170,6 @@
         <description></description>
         <action>SETTINGS XBOXSETTINGS</action>
         <dependssetting>EnableXbox</dependssetting>
-    </button>
-
-    <button>
-        <type>PHONE</type>
-        <text>Phone Settings</text>
-        <text lang="IT">Impostazioni Telefono</text>
-        <text lang="DE">Telefon</text>
-        <text lang="IS">Stillingar síma</text>
-        <text lang="SV">Telefon</text>
-        <text lang="NL">Telefoon Instellingen</text>
-        <text lang="FI">Puhelimen Asetukset</text>
-        <text lang="SL">Nastavitve telefona</text>
-        <text lang="ET">Telefoni sätted</text>
-        <text lang="DA">Telefon Indstillinger</text>
-        <text lang="ES">Configurar Teléfono</text>
-        <text lang="PT">Configurar Telefone</text>
-        <text lang="JA">電話設定</text>
-        <text lang="RU">Настройки телефона</text>
-        <text lang="PL">Konfiguracja Telefonu</text>
-        <text lang="HE">הגדרות טלפון</text>
-        <text lang="HU">Telefon beállítások</text>
-        <description>Configure SIP-based VoIP phone</description>
-        <description lang="DE">Einstellungen des VoIP-Telefons</description>
-        <action>CONFIGPLUGIN mythphone</action>
-        <depends>mythphone</depends>
     </button>
 
     <button>

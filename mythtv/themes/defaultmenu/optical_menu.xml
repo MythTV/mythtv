@@ -21,7 +21,7 @@
         <text lang="PL">Oglądanie DVD</text>
         <text lang="HE">נגן DVD</text>
         <text lang="HU">DVD lejátszása</text>
-        <description>Play the video on a movie DVD</description>
+        <description>Play a film on DVD</description>
         <description lang="DE">Einen Spielfim auf DVD ansehen</description>
         <action>JUMP Play DVD</action>
         <depends>mythvideo</depends>
