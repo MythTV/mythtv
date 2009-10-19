@@ -4462,9 +4462,9 @@ void NuppelVideoPlayer::DoPlay(void)
     else
     {
         skip_changed = true;
-        uint tmp = (uint) ceil(4.0 * abs(play_speed) / keyframedist);
-        ffrew_skip = tmp * keyframedist;
-        ffrew_skip = (play_speed > 0.0) ? ffrew_skip : -ffrew_skip;
+        ffrew_skip = ((uint)ceil(4.0 * fabs(play_speed) / 30)) * 30;
+        if (play_speed > 0.0)
+            ffrew_skip = -ffrew_skip;
     }
 
     if (player_ctx->buffer->isDVD() && GetDecoder())
