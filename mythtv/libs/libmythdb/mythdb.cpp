@@ -292,20 +292,22 @@ bool MythDB::SaveSettingOnHost(const QString &key,
 
 QString MythDB::GetSetting(const QString &key, const QString &defaultval)
 {
-    d->settingsCacheLock.lock();
-
-    QString value = d->settingsCache.value(key, "_cold_");
-
-    d->settingsCacheLock.unlock();
-
-    if (value != "_cold_" && d->useSettingsCache)
-        return value;
-
+    QString value;
+    
     if (d->overriddenSettings.contains(key))
     {
         value = d->overriddenSettings[key];
         return value;
     }
+    
+    d->settingsCacheLock.lock();
+
+    value = d->settingsCache.value(key, "_cold_");
+
+    d->settingsCacheLock.unlock();
+
+    if (value != "_cold_" && d->useSettingsCache)
+        return value;
 
     bool found = false;
     if (!d->ignoreDatabase)
