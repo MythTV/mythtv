@@ -27,7 +27,7 @@ str Cat_Crime=MediumVioletRed
 str Cat_Talk=MediumTurquoise
 
 str ActiveForeground=#dddddd
-str ActiveButton=#8a916f
+str ActiveButton=#585c47
 str ActiveLight=#a7ac93
 str ActiveMidlight=#4871a2
 str ActiveDark=#8a916f
@@ -42,7 +42,7 @@ str ActiveHighlight=#8a916f
 str ActiveHighlightedText=#000000
 
 str InactiveForeground=#dddddd
-str InactiveButton=#8a916f
+str InactiveButton=#585c47
 str InactiveLight=#a7ac93
 str InactiveMidlight=#4871a2
 str InactiveDark=#162231
@@ -57,14 +57,14 @@ str InactiveHighlight=#8a916f
 str InactiveHighlightedText=#000000
 
 str DisabledForeground=#555555
-str DisabledButton=#8a916f
-str DisabledLight=#5788c3
+str DisabledButton=#555555
+str DisabledLight=#585c47
 str DisabledMidlight=#4871a2
 str DisabledDark=#162231
 str DisabledMid=#464345
 str DisabledText=#464345
 str DisabledBrightText=#5788c3
-str DisabledButtonText=#dddddd
+str DisabledButtonText=#666666
 str DisabledBase=#767662
 str DisabledBackground=#484537
 str DisabledShadow=#333333
