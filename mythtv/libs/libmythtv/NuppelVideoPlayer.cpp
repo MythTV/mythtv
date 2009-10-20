@@ -4463,7 +4463,7 @@ void NuppelVideoPlayer::DoPlay(void)
     {
         skip_changed = true;
         ffrew_skip = ((uint)ceil(4.0 * fabs(play_speed) / 30)) * 30;
-        if (play_speed > 0.0)
+        if (play_speed < 0.0)
             ffrew_skip = -ffrew_skip;
     }
 
