@@ -901,20 +901,28 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
  */
 QString MythUIHelper::FindThemeDir(const QString &themename)
 {
-    QString testdir = GetConfDir() + "/themes/" + themename;
+    QString testdir;
+    QDir dir;
 
-    QDir dir(testdir);
-    if (dir.exists())
-        return testdir;
-    else
-        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
+    if (!themename.isEmpty())
+    {
+        testdir = GetConfDir() + "/themes/" + themename;
 
-    testdir = GetThemesParentDir() + themename;
-    dir.setPath(testdir);
-    if (dir.exists())
-        return testdir;
-    else
-        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
+        dir.setPath(testdir);
+        if (dir.exists())
+            return testdir;
+        else
+            VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " +
+                    dir.absolutePath());
+
+        testdir = GetThemesParentDir() + themename;
+        dir.setPath(testdir);
+        if (dir.exists())
+            return testdir;
+        else
+            VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " +
+                    dir.absolutePath());
+    }
 
     testdir = GetThemesParentDir() + "Terra";
     dir.setPath(testdir);
