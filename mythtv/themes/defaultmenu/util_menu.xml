@@ -28,32 +28,6 @@
     </button>
 
     <button>
-        <type>VIDEO_MANAGER</type>
-        <text>Video Manager</text>
-        <text lang="IT">Gestione Video</text>
-        <text lang="ES">Gestionar Videos</text>
-        <text lang="DA">Filmopsætning</text>
-        <text lang="DE">Videos verwalten</text>
-        <text lang="IS">Kvikmyndatól</text>
-        <text lang="PT">Gerir Filmes</text>
-        <text lang="SV">Filmhanterare</text>
-        <text lang="NL">Films Beheren</text>
-        <text lang="JA">ビデオマネージャー</text>
-        <text lang="FI">Videonhallinta</text>
-        <text lang="ZH_TW">電影工具</text>
-        <text lang="SL">Video orodja</text>
-        <text lang="ET">Videohaldus</text>
-        <text lang="RU">Управление фильмами</text>
-        <text lang="PL">Zarządca Filmów</text>
-        <text lang="HE">מנהל וידאו</text>
-        <text lang="HU">Video kezelő</text>
-        <description>Scan for new videos, edit metadata, or delete</description>
-        <description lang="DE">Videos suchen oder löschen und Metadaten bearbeiten</description>
-        <action>JUMP Video Manager</action>
-        <depends>mythvideo</depends>
-    </button>
-
-    <button>
         <type>SETUP_KEYS</type>
         <text>Edit Keys</text>
         <text lang="IT">Modifica Tasti</text>
