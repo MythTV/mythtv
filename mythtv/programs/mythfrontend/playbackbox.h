@@ -119,6 +119,7 @@ class PlaybackBox : public ScheduleCommon
    ~PlaybackBox(void);
 
     bool Create(void);
+    virtual void Init(void);
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent *event);
 
