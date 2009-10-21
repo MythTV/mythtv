@@ -395,8 +395,9 @@ void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
                       QRect clipRect)
 {
-    m_NeedsRedraw = false;
-    m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
+    m_DirtyRegion = m_DirtyRegion.subtracted(QRegion(clipRect));
+    if (!m_DirtyRegion.numRects())
+        m_NeedsRedraw = false;
 
     if (!m_Visible)
         return;
