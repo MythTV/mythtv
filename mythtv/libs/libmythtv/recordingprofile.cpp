@@ -1256,7 +1256,9 @@ void RecordingProfile::loadByID(int profileId)
 
     QString type = "";
     if (!result.exec())
+    {
         MythDB::DBError("RecordingProfile::loadByID -- cardtype", result);
+    }
     else if (result.next())
     {
         type = result.value(0).toString();
@@ -1313,23 +1315,23 @@ void RecordingProfile::FiltersChanged(const QString &val)
     }
 }
 
-bool RecordingProfile::loadByType(QString name, QString cardtype)
+bool RecordingProfile::loadByType(const QString &name, const QString &cardtype)
 {
-    QString hostname = gContext->GetHostName();
-    int recid = 0;
+    QString hostname = gContext->GetHostName().toLower();
+    uint recid = 0;
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(
         "SELECT recordingprofiles.id, profilegroups.hostname, "
         "       profilegroups.is_default "
-        "FROM recordingprofiles, profilegroups, capturecard "
+        "FROM recordingprofiles, profilegroups "
         "WHERE profilegroups.id       = recordingprofiles.profilegroup AND "
         "      profilegroups.cardtype = :CARDTYPE                      AND "
         "      recordingprofiles.name = :NAME");
     result.bindValue(":CARDTYPE", cardtype);
     result.bindValue(":NAME", name);
 
-    if (!result.exec() || !result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("RecordingProfile::loadByType()", result);
         return false;
@@ -1337,23 +1339,27 @@ bool RecordingProfile::loadByType(QString name, QString cardtype)
 
     while (result.next())
     {
-        if (result.value(1).toString() == hostname)
+        if (result.value(1).toString().toLower() == hostname)
         {
-            recid = result.value(0).toInt();
+            recid = result.value(0).toUInt();
             break;
         }
         else if (result.value(2).toInt() == 1)
-            recid = result.value(0).toInt();
+        {
+            recid = result.value(0).toUInt();
+        }
     }
+
     if (recid)
     {
         loadByID(recid);
         return true;
     }
+
     return false;
 }
 
-bool RecordingProfile::loadByGroup(QString name, QString group)
+bool RecordingProfile::loadByGroup(const QString &name, const QString &group)
 {
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(
@@ -1365,11 +1371,18 @@ bool RecordingProfile::loadByGroup(QString name, QString group)
     result.bindValue(":GROUPNAME", group);
     result.bindValue(":NAME", name);
 
-    if (result.exec() && result.isActive() && result.next())
+    if (!result.exec())
     {
-        loadByID(result.value(0).toInt());
+        MythDB::DBError("RecordingProfile::loadByGroup()", result);
+        return false;
+    }
+
+    if (result.next())
+    {
+        loadByID(result.value(0).toUInt());
         return true;
     }
+
     return false;
 }
 
@@ -1441,7 +1454,9 @@ void RecordingProfileEditor::open(int id)
         query.bindValue(":AUDIOCODEC", "MP3");
         query.bindValue(":PROFILEGROUP", group);
         if (!query.exec())
+        {
             MythDB::DBError("RecordingProfileEditor::open", query);
+        }
         else
         {
             query.prepare(
@@ -1451,7 +1466,9 @@ void RecordingProfileEditor::open(int id)
             query.bindValue(":NAME", profName);
             query.bindValue(":PROFILEGROUP", group);
             if (!query.exec())
+            {
                 MythDB::DBError("RecordingProfileEditor::open", query);
+            }
             else
             {
                 if (query.next())
@@ -1502,13 +1519,15 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
         "ORDER BY id");
     result.bindValue(":GROUP", group);
 
-    if (!result.exec() || !result.isActive())
+    if (!result.exec())
     {
         MythDB::DBError("RecordingProfile::fillSelections 1", result);
         return;
     }
-    else if (!result.size())
+    else if (!result.next())
+    {
         return;
+    }
 
     if (group == RecordingProfile::TranscoderGroup && foldautodetect)
     {
@@ -1516,7 +1535,7 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
         setting->addSelection(QObject::tr("Autodetect"), id);
     }
 
-    while (result.next())
+    do
     {
         QString name = result.value(0).toString();
         QString id   = result.value(1).toString();
@@ -1540,6 +1559,7 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
 
         setting->addSelection(name, id);
     }
+    while (result.next());
 }
 
 QMap<int, QString> RecordingProfile::listProfiles(int group)
@@ -1628,36 +1648,37 @@ void RecordingProfile::fillSelections(SelectManagedListItem *setting,
 QString RecordingProfile::groupType(void) const
 {
     MSqlQuery result(MSqlQuery::InitCon());
-    QString querystr = QString("SELECT profilegroups.cardtype FROM "
-                        "profilegroups, recordingprofiles WHERE "
-                        "profilegroups.id = recordingprofiles.profilegroup "
-                        "AND recordingprofiles.id = %1;")
-                        .arg(getProfileNum());
-    result.prepare(querystr);
+    result.prepare(
+        "SELECT profilegroups.cardtype "
+        "FROM profilegroups, recordingprofiles "
+        "WHERE profilegroups.id = recordingprofiles.profilegroup AND "
+        "      recordingprofiles.id = :ID");
+    result.bindValue(":ID", getProfileNum());
 
-    if (result.exec() && result.isActive() && result.size() > 0)
-    {
-        result.next();
-        return (result.value(0).toString());
-    }
+    if (!result.exec())
+        MythDB::DBError("RecordingProfile::groupType", result);
+    else if (result.next())
+        return result.value(0).toString();
 
-    return NULL;
+    return QString::null;
 }
 
 QString RecordingProfile::getName(int id)
 {
     MSqlQuery result(MSqlQuery::InitCon());
-    QString querystr = QString("SELECT name FROM recordingprofiles WHERE "
-                                "id = %1;").arg(id);
-    result.prepare(querystr);
+    result.prepare(
+        "SELECT name "
+        "FROM recordingprofiles "
+        "WHERE id = :ID");
 
-    if (result.exec() && result.isActive() && result.size() > 0)
-    {
-        result.next();
-        return (result.value(0).toString());
-    }
+    result.bindValue(":ID", id);
 
-    return NULL;
+    if (!result.exec())
+        MythDB::DBError("RecordingProfile::getName", result);
+    else if (result.next())
+        return result.value(0).toString();
+
+    return QString::null;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
