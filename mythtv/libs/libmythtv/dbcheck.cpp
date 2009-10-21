@@ -414,7 +414,7 @@ static bool performActualUpdate(
 
     while (thequery != NULL)
     {
-        if (!query.exec(thequery))
+        if (strlen(thequery) && !query.exec(thequery))
         {
             QString msg =
                 QString("DB Error (Performing database upgrade): \n"
