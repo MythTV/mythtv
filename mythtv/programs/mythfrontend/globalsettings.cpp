@@ -11,7 +11,6 @@
 #include <QApplication>
 #include <QEvent>
 #include <qnamespace.h>
-#include <QStyleFactory>
 #include <QFile>
 #include <QDialog>
 #include <QCursor>
@@ -2927,36 +2926,6 @@ ThemeSelector::ThemeSelector(QString label):
         setValue("BlackCurves-OSD");
 }
 
-class StyleSetting: public HostComboBox {
-public:
-    StyleSetting():
-        HostComboBox("Style") {
-        setLabel(QObject::tr("Qt Style"));
-        fillSelections();
-        setHelpText(QObject::tr("At startup, MythTV will change the Qt "
-                    "widget style to this setting.  If \"Desktop Style\" "
-                    "is selected, MythTV will use the existing desktop "
-                    "setting."));
-    };
-
-    void fillSelections(void) {
-        clearSelections();
-        addSelection(QObject::tr("Desktop Style"),
-                     "UseSystemDefaultDesktopStyle");
-        QStyleFactory factory;
-        QStringList list = factory.keys();
-        QStringList::iterator iter = list.begin();
-        for (; iter != list.end(); iter++ )
-            addSelection(*iter);
-    };
-
-    void Load(void)
-    {
-        fillSelections();
-        HostComboBox::Load();
-    };
-};
-
 static HostComboBox *ChannelFormat()
 {
     HostComboBox *gc = new HostComboBox("ChannelFormat");
@@ -4824,7 +4793,6 @@ AppearanceSettings::AppearanceSettings()
     theme->addChild(ThemeCacheSize());
 
     theme->addChild(ThemePainter());
-    theme->addChild(new StyleSetting());
     theme->addChild(MenuTheme());
     addChild(theme);
 

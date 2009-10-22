@@ -391,10 +391,7 @@ void MythUIHelper::LoadQtConfig(void)
 
     d->m_qtThemeSettings = new Settings;
 
-    QString style = GetMythDB()->GetSetting("Style",
-                                            "UseSystemDefaultDesktopStyle");
-    if (QStyleFactory::keys().contains(style))
-        qApp->setStyle(style);
+    qApp->setStyle("Windows");
 
     QString themename = GetMythDB()->GetSetting("Theme");
     QString themedir = FindThemeDir(themename);
