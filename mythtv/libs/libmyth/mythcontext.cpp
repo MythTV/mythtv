@@ -297,8 +297,6 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 
     m_database->SetSetting("Theme", "Terra");
 #ifdef Q_WS_MACX
-    // Myth looks horrible in default Mac style for Qt
-    m_database->SetSetting("Style", "Windows");
     // Qt 4.4 has window-focus problems
     m_database->SetSetting("RunFrontendInWindow", "1");
 #endif
