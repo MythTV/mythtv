@@ -4492,9 +4492,9 @@ NULL
         // Fix data corruption caused by a data conversion issue in the
         // original implementation of the 1215-1216 database upgrade
         const char *updates[] = {
-"CREATE TABLE bad_people AS SELECT * FROM people;",
-"CREATE TABLE bad_credits AS SELECT * FROM credits;",
-"CREATE TABLE bad_recordedcredits AS SELECT * FROM recordedcredits;",
+"CREATE TEMPORARY TABLE bad_people AS SELECT * FROM people;",
+"CREATE TEMPORARY TABLE bad_credits AS SELECT * FROM credits;",
+"CREATE TEMPORARY TABLE bad_recordedcredits AS SELECT * FROM recordedcredits;",
 "ALTER TABLE bad_people ADD INDEX (person);",
 "TRUNCATE TABLE people;",
 "TRUNCATE TABLE credits;",
@@ -4511,9 +4511,9 @@ NULL
 "        FROM people p, bad_people bp, bad_recordedcredits br "
 "        WHERE p.name = bp.name "
 "            AND bp.person = br.person;",
-"DROP TABLE bad_people;",
-"DROP TABLE bad_credits;",
-"DROP TABLE bad_recordedcredits;",
+"DROP TEMPORARY TABLE bad_people;",
+"DROP TEMPORARY TABLE bad_credits;",
+"DROP TEMPORARY TABLE bad_recordedcredits;",
 "UPDATE programgenres SET genre = TRIM(TRAILING 0x00 FROM genre);",
 "REPLACE INTO programrating (chanid, starttime, system, rating) "
 "  SELECT chanid, starttime, "
