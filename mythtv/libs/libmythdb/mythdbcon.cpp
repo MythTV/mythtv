@@ -17,7 +17,7 @@
 #include "mythdb.h"
 #include "mythverbose.h"
 
-QMutex MSqlQuery::prepareLock;
+//QMutex MSqlQuery::prepareLock;
 
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
