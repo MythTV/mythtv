@@ -271,6 +271,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     vector<int>::iterator it;
     bool resample = true;
 
+    // Assume 48k if we can't get supported rates
+    if (rates.empty())
+        rates.push_back(48000);
+    
     for (it = rates.begin(); it < rates.end(); it++)
     {
         VERBOSE(VB_AUDIO, LOC + QString("Sample rate %1 is supported")
@@ -278,10 +282,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         if (*it == audio_samplerate)
             resample = false;
     }
-
-    // Assume 48k if we can't get supported rates
-    if (rates.empty())
-        rates.push_back(48000);
 
     if (resample)
     {
@@ -294,7 +294,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         {
             Error(QString("Error creating resampler, the error was: %1")
                   .arg(src_strerror(error)) );
-	    src_ctx = NULL;
+            src_ctx = NULL;
             return;
         }
         src_data.src_ratio = (double) audio_samplerate / settings.samplerate;
