@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.4.8" 
+__version__=u"v0.4.9" 
 # 0.1.0 Initial development 
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -153,6 +153,8 @@ __version__=u"v0.4.8"
 # 0.4.7 Changed all occurances of "strftime(u'" to "strftime('" as the unicode causes issues with python versions
 #		less than 2.6
 # 0.4.8 Some Miro "release" date values are not valid. Override with the current date.
+# 0.4.9 The ffmpeg SVN (e.g. SVN-r20151) is now outputting additional metadata, skip metadata that cannot be
+#		processed.
 
 
 examples_txt=u'''
@@ -752,12 +754,18 @@ def getVideoDetails(videofilename, screenshot=False):
 			return False
 
 	ffmpeg_found = True
+	alldata = 3
+	datacount = 0
 	while 1:
+		if datacount == alldata:	# Stop if all the required data has been extracted from ffmpeg's output
+			break
 		data = p.stderr.readline()
 		if data == '':
 			break
 		try:
 			data = unicode(data, 'utf8')
+		except (UnicodeDecodeError):
+			continue	# Skip any line that has non-utf8 characters in it
 		except (UnicodeEncodeError, TypeError):
 			pass
 		if data.endswith(u'command not found\n'):
@@ -766,8 +774,10 @@ def getVideoDetails(videofilename, screenshot=False):
 		if data.startswith(u'  Duration:'):
 			time = (data[data.index(':')+1: data.index('.')]).strip()
 			ffmpeg_details[u'duration'] = (360*(int(time[:2]))+(int(time[3:5])*60))+int(time[6:8])
+			datacount+=1
 		elif len(video.findall(data)):
 			match = width_height.match(data)
+			datacount+=1
 			if match:
 				dummy, width, height = match.groups()
 				width, height = float(width), float(height)
@@ -790,6 +800,7 @@ def getVideoDetails(videofilename, screenshot=False):
 				elif width > 800.0:
 					ffmpeg_details[u'video']+=comma+u'720'
 		elif len(audio.findall(data)):
+			datacount+=1
 			if len(audio_stereo.findall(data)) or len(audio_2C.findall(data)):
 				ffmpeg_details[u'audio']+=u'STEREO'
 				ffmpeg_details[u'stereo'] = 1
