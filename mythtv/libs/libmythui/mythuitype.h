@@ -57,6 +57,7 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
 
     // Check set dirty status
     bool NeedsRedraw(void) const;
+    void ResetNeedsRedraw(void);
     void SetRedraw();
 
     void SetChildNeedsRedraw(MythUIType *child);
