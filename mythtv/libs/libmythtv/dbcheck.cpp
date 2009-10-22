@@ -3684,7 +3684,7 @@ NULL
                     VERBOSE(VB_IMPORTANT, msg);
                     VERBOSE(VB_IMPORTANT, "Your database must be fixed before "
                             "you can upgrade beyond 0.21-fixes. Please see "
-                            "http://www.mythtv.org/wiki/index.php/"
+                            "http://www.mythtv.org/wiki/"
                             "Fixing_Corrupt_Database_Encoding for information "
                             "on fixing your database.");
                     return false;
@@ -3714,7 +3714,7 @@ NULL
                             "corrupted. Please move the backup to a safe "
                             "place. Your database must be fixed before you "
                             "can upgrade beyond 0.21-fixes. Please see "
-                            "http://www.mythtv.org/wiki/index.php/Fixing_"
+                            "http://www.mythtv.org/wiki/Fixing_"
                             "Corrupt_Database_Encoding for information.");
                     return false;
                 }
@@ -3969,7 +3969,7 @@ NULL
                     "Your database seems to be partially corrupted. Please "
                     "move the backup to a safe place. Your database must be "
                     "fixed before you can upgrade beyond 0.21-fixes. Please "
-                    "see http://www.mythtv.org/wiki/index.php/Fixing_Corrupt_"
+                    "see http://www.mythtv.org/wiki/Fixing_Corrupt_"
                     "Database_Encoding for information.");
             return false;
         }
@@ -4279,7 +4279,7 @@ NULL
                     "Your database seems to be partially corrupted. Please "
                     "move the backup to a safe place. Your database must be "
                     "fixed before you can upgrade beyond 0.21-fixes. Please "
-                    "see http://www.mythtv.org/wiki/index.php/Fixing_Corrupt_"
+                    "see http://www.mythtv.org/wiki/Fixing_Corrupt_"
                     "Database_Encoding for information.");
             return false;
         }
