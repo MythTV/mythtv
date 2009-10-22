@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.5.4" 
+__version__=u"v0.5.5" 
  # 0.1.0 Initial development 
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -216,6 +216,7 @@ __version__=u"v0.5.4"
  #       Fixed a bug with Miro video file renaming of Miro Movie trailers 
  #       for the same movie but which had different file extentions.
  # 0.5.4 Conform to changeset 22104 setting of SG graphics directories to default to SG Videos if not configured.
+ # 0.5.5 Deal with TV Series and Movie titles with a "/" forward slash in their name e.g. "Face/Off" 
 
 
 usage_txt=u'''
@@ -465,6 +466,45 @@ if imdb_lib:
 			"from (http://imdbpy.sourceforge.net/?page=download)\n")
 		sys.exit(False)
 		
+		
+def isValidPosixFilename(name, NAME_MAX=255):
+    """Checks for a valid POSIX filename
+
+    Filename: a name consisting of 1 to {NAME_MAX} bytes used to name a file.
+        The characters composing the name may be selected from the set of
+        all character values excluding the slash character and the null byte.
+        The filenames dot and dot-dot have special meaning.
+        A filename is sometimes referred to as a "pathname component".
+
+    name: (base)name of the file
+    NAME_MAX: is defined in limits.h (implementation-defined constants)
+              Maximum number of bytes in a filename
+              (not including terminating null).
+              Minimum Acceptable Value: {_POSIX_NAME_MAX}
+              _POSIX_NAME_MAX: Maximum number of bytes in a filename
+                               (not including terminating null).
+                               Value: 14
+                               
+    More information on http://www.opengroup.org/onlinepubs/009695399/toc.htm
+    """
+    return 1<=len(name)<= NAME_MAX and "/" not in name and "\000" not in name
+# end isValidPosixFilename()
+
+
+def sanitiseFileName(name):
+	'''Take a file name and change it so that invalid or problematic characters are substituted with a "_" 
+	return a sanitised valid file name
+	'''
+	if name == None or name == u'':
+		return u'_'
+	for char in u"/%\000":
+		name = name.replace(char, u'_')
+	if name[0] == u'.':
+		name = u'_'+name[1:]
+	return name
+# end sanitiseFileName()
+
+
 # Two routines used for movie title search and matching
 def is_punct_char(char):
 	'''check if char is punctuation char
@@ -2022,7 +2062,9 @@ class Tvdatabase(object):
 			return u'%(url)s.%(ext)s'
 		cfile={}
 		cfile['seriesid']=self.config['sid']
-		cfile['series']=self.config['series_name']
+		cfile['series'] = sanitiseFileName(self.config['series_name'])
+		if cfile['series'] != self.config['series_name']:
+			self.config['g_series'] = self.config['g_series'].replace(self.config['series_name'], cfile['series'])
 		if self.config['season_num']:
 			cfile['seasonnumber']=int(self.config['season_num'])
 		else:
@@ -2037,6 +2079,7 @@ class Tvdatabase(object):
 
 		if self.config['season_num']:
 			return self.config['g_season'] % cfile
+			
 		return self.config['g_series'] % cfile
 	# end _setGraphicsFileNameFormat
 
@@ -2104,13 +2147,18 @@ class Tvdatabase(object):
 			for url in url_dict[URLtype]:
 				(dirName, fileName) = os.path.split(url[0])
 				(fileBaseName, fileExtension)=os.path.splitext(fileName)
+				fileBaseName = sanitiseFileName(fileBaseName)
 				# Fix file extentions in all caps or 4 character JPEG extentions
 				fileExtension = fileExtension.lower()
 				if fileExtension == '.jpeg':
 					fileExtension = '.jpg'
 				cfile={u'url': fileBaseName, u'seq': seq_num, u'ext': fileExtension[1:]}
-				cfile['series'] = self.config['series_name']
+				if not isValidPosixFilename(self.config['series_name']):
+					if file_format.startswith(self.config['series_name']):
+						file_format = file_format.replace(self.config['series_name'], sanitiseFileName(self.config['series_name']))
+				cfile['series'] = sanitiseFileName(self.config['series_name'])
 				cfile['seriesid'] = self.config['sid']
+				
 				if URLtype != 'filename':
 					if unique_dir[URLtype][1]:
 						url_dict[URLtype][seq_num][1] = directory+'/'+file_format % cfile
@@ -2125,7 +2173,7 @@ class Tvdatabase(object):
 						cfile['episodenumber']=int(self.config['episode_num'])
 					else:
 						cfile['episodenumber'] = 0
-					cfile['episodename'] = self.config['episode_name']
+					cfile['episodename'] = sanitiseFileName(self.config['episode_name'])
 					url_dict[URLtype][seq_num][1] = directory+'/'+self.config['ep_metadata'] % cfile
 				seq_num+=1
 
@@ -2602,7 +2650,8 @@ class Tvdatabase(object):
 		for key in ['seasonnumber', 'episodenumber']:
 			if tmp_dict.has_key(key):
 				tmp_dict[key] = int(tmp_dict[key])
-		return u"%s" % (self.config['ep_metadata'] % tmp_dict)[:-1]
+		
+		return sanitiseFileName(u"%s" % (self.config['ep_metadata'] % tmp_dict)[:-1])
 	# end returnFilename
 
 	def processTVdatabaseRequests(self):
@@ -3326,7 +3375,7 @@ class MythTvMetaData(VideoFiles):
 			if fileExtension == u'jpeg':
 				fileExtension = u'jpg'
 			if watched:
-				filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], cfile['file_seriesname'], self.graphic_suffix[rel_type], fileExtension)
+				filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], sanitiseFileName(cfile['file_seriesname']), self.graphic_suffix[rel_type], fileExtension)
 			else:
 				filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], cfile['inetref'], self.graphic_suffix[rel_type], fileExtension)
 
@@ -4078,7 +4127,7 @@ class MythTvMetaData(VideoFiles):
 						data = self._getTmdbIMDB(cfile['file_seriesname'], rtnyear=True)
 						if data:
 							sid = data[u'sid']
-							new_filename = data[u'name']
+							new_filename = sanitiseFileName(data[u'name'])
 						else:
 							continue
 					else:
@@ -4088,7 +4137,7 @@ class MythTvMetaData(VideoFiles):
 							if data.has_key('long imdb title'):
 								new_filename = data['long imdb title']
 							elif data.has_key('title'):
-								new_filename = data['title']
+								new_filename = sanitiseFileName(namedata['title'])
 							else:
 								continue
 						except imdb._exceptions.IMDbDataAccessError:
@@ -4308,6 +4357,7 @@ class MythTvMetaData(VideoFiles):
 		# Remove MythVideo files from the graphics delete list
 		for cfile in validFiles:
 			videopath = self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext'])
+
 			# Find the MythTV meta data
 			intid = mythvideo.getMetadataId(videopath, localhostname.lower())
 			if not intid:
@@ -4363,6 +4413,11 @@ class MythTvMetaData(VideoFiles):
 						if fileBaseName.lower().startswith(program['title'].lower()):
 							remove.append(graphic)
 							break
+						if not isValidPosixFilename(program['title']) and program['seriesid'] != u'':
+							if fileBaseName.lower().startswith(program['seriesid'].lower()):
+								remove.append(graphic)
+								break
+							
 				for rem in remove:
 					if self._checkValidGraphicFile(rem, graphicstype=u'', vidintid=False) == True:
 						graphics_file_dict[field].remove(rem)
@@ -4655,7 +4710,7 @@ class MythTvMetaData(VideoFiles):
 					dir_list = os.listdir(dirName)
 				index = 1
 				while index != 0:
-					filename = u'%s - Trailer %d' % (mirodetails[u'moviename'], index)
+					filename = sanitiseFileName(u'%s - Trailer %d' % (mirodetails[u'moviename'], index))
 					fullfilename = u'%s/%s%s' % (dirName, filename, fileExtension)
 					for flenme in dir_list: 
 						if fnmatch.fnmatch(flenme.lower(), u'%s.*' % filename.lower()):
@@ -4696,6 +4751,7 @@ class MythTvMetaData(VideoFiles):
 			record={}
 			record['title'] = prog.title
 			record['subtitle'] = prog.subtitle
+			record['seriesid'] = prog.seriesid
 
 			if record['subtitle']:
 				record['originalairdate'] = prog.airdate[:4]
@@ -4730,7 +4786,7 @@ class MythTvMetaData(VideoFiles):
 			for elem in data_id:
 				if table_names[i] == u'chanid' and elem == 9999:
 					recorded[u'miro_tv'] = True
-				if table_names[i] == 'title' or table_names[i] == 'subtitle': 
+				if table_names[i] == 'title' or table_names[i] == 'subtitle' or table_names[i] == 'seriesid': 
 					recorded[table_names[i]] = elem
 				i+=1
 
@@ -4844,6 +4900,13 @@ class MythTvMetaData(VideoFiles):
 							program[u'miro'] = self._getExtraMiroDetails(record, u'movies')
 							if program[u'miro'][u'inetref']:
 								programs[duplicatekeys[moviename]][u'miro'] = self._getExtraMiroDetails(record, u'movies')
+
+		# Check that each program has seriesid
+		for program in programs:
+			if not program.has_key('seriesid'):
+				program['seriesid'] = u'' 	# Set an empty seriesid - Generall only for Miro Videos
+			if program['seriesid'] == None:
+				program['seriesid'] = u'' 	# Set an empty seriesid
 
 		return programs
 	# end _getScheduledRecordedProgramList
@@ -4963,6 +5026,9 @@ class MythTvMetaData(VideoFiles):
 					filename = program['title']
 				else:
 					filename = mirodetails[u'inetref']
+					
+				if not isValidPosixFilename(filename) and program['seriesid'] != u'':
+					filename = program['seriesid']
 
 				# Actual check for existing graphics
 				for dirct in self.config[graphicsDirectories[directory]]:
@@ -5027,6 +5093,22 @@ class MythTvMetaData(VideoFiles):
 				if program['subtitle'] and not miromovieflag:	# This is a TV episode or Miro TV show
 					results = self._getScheduledRecordedTVGraphics(program, key)
 					if results:
+						if not mirodetails:
+							filename = program['title']
+						elif mirodetails[u'tv']:
+							filename = program['title']
+						else:
+							filename = mirodetails[u'moviename']
+						if not isValidPosixFilename(filename) and program['seriesid'] != u'' and not self.config['simulation']:
+							abs_results = self.rtnAbsolutePath(results, graphicsDirectories[key])
+							(dirName, fileName) = os.path.split(abs_results)
+							(fileBaseName, fileExtension) = os.path.splitext(fileName)
+							# Take graphics name apart and get new name with seriesid
+							newfilename = u"%s/%s%s" % (dirName, program['seriesid'], fileExtension)
+							if not os.path.isfile(newfilename):
+								os.rename(abs_results, newfilename)
+								results = self.rtnRelativePath(newfilename, graphicsDirectories[key])
+							
 						if key == 'coverfile':
 							total_posters_downloaded +=1
 						elif key == 'banner':
@@ -5060,6 +5142,16 @@ class MythTvMetaData(VideoFiles):
 					if not results:
 						results = self._getSecondarySourceGraphics(cfile, key, watched=True)
 					if results:
+						if not miromovieflag:
+							if not isValidPosixFilename(title) and program['seriesid'] != u'' and not self.config['simulation']:
+								abs_results = self.rtnAbsolutePath(results, graphicsDirectories[key])
+								(dirName, fileName) = os.path.split(abs_results)
+								(fileBaseName, fileExtension) = os.path.splitext(fileName)
+								# Take graphics name apart and get new name with seriesid
+								newfilename = u"%s/%s%s" % (dirName, program['seriesid'], fileExtension)
+								if not os.path.isfile(newfilename):
+									os.rename(abs_results, newfilename)
+									results = self.rtnRelativePath(newfilename, graphicsDirectories[key])
 						if key == 'coverfile':
 							total_posters_downloaded +=1
 						elif key == 'banner':
@@ -5440,7 +5532,7 @@ class MythTvMetaData(VideoFiles):
 					if need_graphic or new_format: # Graphic does not exist or is in an old format
 						for ext in self.image_extensions:
 							for graphicsdir in graphicsdirs:
-								filename=self.findFileInDir(u"%s Season %d.%s" % (available_metadata['title'], available_metadata['season'], ext), [graphicsdir], suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
+								filename=self.findFileInDir(u"%s Season %d.%s" % (sanitiseFileName(available_metadata['title']), available_metadata['season'], ext), [graphicsdir], suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
 								if filename:
 									available_metadata[graphic_type]=self.rtnRelativePath(filename,  graphicsDirectories[graphic_type])
 									need_graphic = False
@@ -5476,6 +5568,7 @@ class MythTvMetaData(VideoFiles):
 								if must_rename:
 									filepath, filename = os.path.split(graphic_file)
 									baseFilename, ext = os.path.splitext( filename )
+									baseFilename = sanitiseFileName(baseFilename)
 									if season_missing and suffix_missing:
 										newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename, available_metadata['season'], self.graphic_suffix[graphic_type], ext)
 									elif suffix_missing:
@@ -5501,6 +5594,7 @@ class MythTvMetaData(VideoFiles):
 											tmp_fullfilename = self.rtnAbsolutePath(tmp, graphicsDirectories[graphic_type])
 											filepath, filename = os.path.split(tmp_fullfilename)
 											baseFilename, ext = os.path.splitext( filename )
+											baseFilename = sanitiseFileName(baseFilename)
 											baseFilename = baseFilename.replace(self.graphic_suffix[graphic_type], u'')
 											newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename, available_metadata['season'], self.graphic_suffix[graphic_type], ext)
 											if self.config['simulation']:
@@ -5532,6 +5626,7 @@ class MythTvMetaData(VideoFiles):
 									if tmp!= None:
 										filepath, filename = os.path.split(tmp)
 										baseFilename, ext = os.path.splitext( filename )
+										baseFilename = sanitiseFileName(baseFilename)
 										baseFilename = baseFilename.replace(self.graphic_suffix[graphic_type], u'')
 										newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename, available_metadata['season'], self.graphic_suffix[graphic_type], ext)
 										if self.config['simulation']:
@@ -5550,9 +5645,9 @@ class MythTvMetaData(VideoFiles):
 					else:
 						if graphic_type == 'coverfile' or graphic_type == 'banner':
 							for ext in self.image_extensions:
-								filename = self.findFileInDir(u"%s.%s" % (available_metadata['title'], ext), self.config[graphicsDirectories[graphic_type]], suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
+								filename = self.findFileInDir(u"%s.%s" % (sanitiseFileName(available_metadata['title']), ext), self.config[graphicsDirectories[graphic_type]], suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
 								if filename:
-									size = self.findFileInDir(u"%s Season %d.%s" % (available_metadata['title'], available_metadata['season'], ext), self.config[graphicsDirectories[graphic_type]], suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
+									size = self.findFileInDir(u"%s Season %d.%s" % (sanitiseFileName(available_metadata['title']), available_metadata['season'], ext), self.config[graphicsDirectories[graphic_type]], suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
 									if not size:
 										continue
 									if os.path.getsize(size) == os.path.getsize(filename):
@@ -5590,7 +5685,7 @@ class MythTvMetaData(VideoFiles):
 															num_banners_downloads+=1
 									break
 					for ext in self.image_extensions:
-						dest = self.findFileInDir(u"%s.%s" % (available_metadata['title'], ext), graphicsdirs, suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
+						dest = self.findFileInDir(u"%s.%s" % (sanitiseFileName(available_metadata['title']), ext), graphicsdirs, suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
 						if dest:
 							break
 					else:
@@ -5873,7 +5968,7 @@ class MythTvMetaData(VideoFiles):
 							if match:
 								season_num = int((match.groups())[0])
 								for ext in self.image_extensions:
-									filename = self.findFileInDir(u"%s Season %d.%s" % (cfile['file_seriesname'], season_num, ext), self.config['posterdir'])
+									filename = self.findFileInDir(u"%s Season %d.%s" % (sanitiseFileName(cfile['file_seriesname']), season_num, ext), self.config['posterdir'])
 									if filename:
 										if self.config['simulation']:
 											sys.stdout.write(
@@ -5891,7 +5986,7 @@ class MythTvMetaData(VideoFiles):
 							if movie:
 								name = inetref							
 							else:
-								name = cfile['file_seriesname']
+								name = sanitiseFileName(cfile['file_seriesname'])
 							for ext in self.image_extensions:
 								filename = self.findFileInDir(u"%s.%s" % (name, ext), self.config['posterdir'])
 								if filename:
