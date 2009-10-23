@@ -16,6 +16,10 @@
 # @license   GPL
 # @copyright MythTV
 #
+# Modified: 2009-10-16
+# Modification Author: John Baab (rhpot1991@ubuntu.com)
+# Modification Description: Added command line args so this will be easier to support in Mythbuntu
+#
 
 ###############################################################################
 
@@ -23,12 +27,53 @@
 
     my $plugreport      = '/usr/bin/plugreport';
     my $firewire_tester = '/usr/local/bin/firewire_tester';
+    my $retry = 0;
+    my $connection = "";
+    my $fw_tester_options = "-B";
+    
+    my $usage = "\nHow to use firewire_primer.pl:\n"
+    ."--connection -c = Type of connection, available options: broadcast, p2p, broadcast-fix.  (default: broadcast-fix)\n"
+    ."--retry -r = Retry attempts, any integer.  (default: 1)\n"
+    ."--help -h = Displays Help.\n"
+    ."\nExamples:\nfirewire_primer.pl --connection=broadcast --retry=5"
+    ."\nfirewire_primer.pl -c=broadcast -r=5"
+    ."\nfirewire_primer.pl -cbroadcast -r5\n\n";
 
 ###############################################################################
 
 # Some helpful libraries
     use MythTV;
     use Sys::Hostname;
+    
+# Get our command line args
+    foreach (@ARGV){
+        if ($_ =~ m/\-\-retry=(\d+)/ || $_ =~ m/\-r=?(\d+)/) {
+            $retry = $1;
+        }
+        elsif ($_ =~ m/\-\-connection=(\w+)/ || $_ =~ m/\-c=?(\w+)/) {
+            $connection = $1;
+        }
+        else{
+            die "$usage";
+        }
+    }
+   
+# Figure out what to do with the args   
+    if($connection =~ m/^broadcast$/){
+        $fw_tester_options = "-b";
+    }
+    elsif($connection =~ m/^p2p$/){
+        $fw_tester_options = "-p";
+    }
+    else{
+        if($connection !~ m/^broadcast\-fix$/  && $connection ne ""){
+            die "$usage";
+        }
+    }
+    
+    if($retry > 0){
+        $fw_tester_options .= " -r $retry";
+    }
 
 # Plugreport, etc needs to run as root.
     BEGIN {
@@ -76,7 +121,7 @@
         my $overload;
         for (;;) {
             $overload++;
-            my $results = `$firewire_tester -B -P $guid_list{$guid}{host} -n $guid_list{$guid}{node}`;
+            my $results = `$firewire_tester $fw_tester_options -P $guid_list{$guid}{host} -n $guid_list{$guid}{node}`;
             my $num =()= $results =~ /Success,\s+\d+\s+packets/g;
             if ($num >= 5) {
                 print "    success.\n";
