@@ -89,6 +89,17 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     if (orig_config_channels == 2)
         src_quality = 1;
 
+        // Handle override of SRC quality settings
+    if (gContext->GetNumSetting("AdvancedAudioSettings", false) &&
+        gContext->GetNumSetting("SRCQualityOverride", false))
+    {
+        src_quality = gContext->GetNumSetting("SRCQuality", 1);
+            // Extra test to keep backward compatibility with earlier SRC code setting
+        if (src_quality > 2)
+            src_quality = 2;
+        VERBOSE(VB_AUDIO, LOC + QString("Force SRC quality (%1)").arg(src_quality));
+    }
+
     if (!settings.upmixer)
         configured_audio_channels = gContext->GetNumSetting("AudioDefaultUpmix", false) ? orig_config_channels : 2;
     else

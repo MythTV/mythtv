@@ -124,6 +124,38 @@ static HostComboBox *AudioUpmixType()
     return gc;
 }
 
+static HostCheckBox *AdvancedAudioSettings()
+{
+    HostCheckBox *gc = new HostCheckBox("AdvancedAudioSettings");
+    gc->setLabel(QObject::tr("Advanced Audio Configuration"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable extra audio settings."));
+    return gc;
+}
+
+static HostCheckBox *SRCQualityOverride()
+{
+    HostCheckBox *gc = new HostCheckBox("SRCQualityOverride");
+    gc->setLabel(QObject::tr("Override SRC quality"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Override audio sample rate conversion quality"));
+    return gc;
+}
+
+static HostComboBox *SRCQuality()
+{
+    HostComboBox *gc = new HostComboBox("SRCQuality", false);
+    gc->setLabel(QObject::tr("Sample Rate Conversion"));
+    gc->addSelection(QObject::tr("Fastest"), "0");
+    gc->addSelection(QObject::tr("Good"), "1", true); // default
+    gc->addSelection(QObject::tr("Best"), "2");
+    gc->setHelpText(QObject::tr("Set the quality of audio sample rate conversion. "
+                                "\"Good\" (default) provides the best compromise between CPU usage "
+                                "and quality. "
+                                "This only affects non 48kHz PCM audio."));
+    return gc;
+}
+
 static HostComboBox *PassThroughOutputDevice()
 {
     HostComboBox *gc = new HostComboBox("PassThruOutputDevice", true);
@@ -3430,45 +3462,103 @@ static HostSpinBox *EPGRecThreshold()
     return gs;
 }
 
-class AudioSystemSettingsGroup : public TriggeredConfigurationGroup
+class AudioSystemSurroundGroup : public TriggeredConfigurationGroup
 {
   public:
-    AudioSystemSettingsGroup() :
-        TriggeredConfigurationGroup(false, true, false, false)
+    AudioSystemSurroundGroup(Setting *checkbox, ConfigurationGroup *group) :
+        TriggeredConfigurationGroup(false, false, false, false)
     {
-        setLabel(QObject::tr("Audio System"));
-        setUseLabel(false);
+        setTrigger(checkbox);
 
-        addChild(AudioOutputDevice());
-
-        Setting *numchannels = MaxAudioChannels();
-        addChild(numchannels);
-
-        ConfigurationGroup *dummy =
-        new VerticalConfigurationGroup(false, true, false, false);
-
-        ConfigurationGroup *settings =
-        new VerticalConfigurationGroup(false, true, false, false);
-
-        settings->addChild(AudioUpmix());
-        settings->addChild(AudioUpmixType());
-        settings->addChild(PassThroughOutputDevice());
-
-        ConfigurationGroup *settings2 =
-        new HorizontalConfigurationGroup();
-        settings2->setLabel(QObject::tr("Audio Processing Capabilities"));
-        settings2->addChild(AC3PassThrough());
-        settings2->addChild(DTSPassThrough());
-
-        settings->addChild(settings2);
-
-        // Show surround/upmixer config only if 5.1 Audio is selected
-        setTrigger(numchannels);
-        addTarget("2", dummy);
-        addTarget("6", settings);
-        
+        addTarget("6", group);
+        addTarget("2", new VerticalConfigurationGroup(false, true));
     }
 };
+
+class AudioSystemAdvancedGroup : public TriggeredConfigurationGroup
+{
+  public:
+    AudioSystemAdvancedGroup(Setting *checkbox, ConfigurationGroup *group) :
+        TriggeredConfigurationGroup(false, false, false, false)
+    {
+        setTrigger(checkbox);
+
+        addTarget("1", group);
+        addTarget("0", new VerticalConfigurationGroup(false, true));
+    }
+};
+
+
+class AudioSystemAdvancedSettings : public TriggeredConfigurationGroup
+{
+  public:
+    AudioSystemAdvancedSettings(Setting *checkbox, Setting *setting) :
+        TriggeredConfigurationGroup(false, false, false, false)
+    {
+        setTrigger(checkbox);
+
+        addTarget("1", setting);
+        addTarget("0", new VerticalConfigurationGroup(false, false));
+    }
+};
+
+static ConfigurationGroup *AudioSystemSettingsGroup()
+{
+    ConfigurationGroup *vcg = new VerticalConfigurationGroup(false, true, false, false);
+    
+    vcg->setLabel(QObject::tr("Audio System"));
+    vcg->setUseLabel(false);
+
+    vcg->addChild(AudioOutputDevice());
+
+    Setting *numchannels = MaxAudioChannels();
+    vcg->addChild(numchannels);
+
+    ConfigurationGroup *group1 =
+        new VerticalConfigurationGroup(false, true, false, false);
+
+    group1->addChild(AudioUpmix());
+    group1->addChild(AudioUpmixType());
+    group1->addChild(PassThroughOutputDevice());
+
+    ConfigurationGroup *settings1 =
+        new HorizontalConfigurationGroup();
+    settings1->setLabel(QObject::tr("Audio Processing Capabilities"));
+    settings1->addChild(AC3PassThrough());
+    settings1->addChild(DTSPassThrough());
+
+    group1->addChild(settings1);
+
+        // Show surround/upmixer config only if 5.1 Audio is selected
+    AudioSystemSurroundGroup *sub1 =
+        new AudioSystemSurroundGroup(numchannels, group1);
+    vcg->addChild(sub1);
+
+    Setting *advancedsettings = AdvancedAudioSettings();
+    vcg->addChild(advancedsettings);
+
+    ConfigurationGroup *group2 =
+        new VerticalConfigurationGroup(false, true, false, false);
+
+    AudioSystemAdvancedGroup *sub2 =
+        new AudioSystemAdvancedGroup(advancedsettings, group2);
+    vcg->addChild(sub2);
+
+    ConfigurationGroup *settings2 =
+            new HorizontalConfigurationGroup(false, false, false, false);
+
+    Setting *srcqualityoverride = SRCQualityOverride();
+    
+    AudioSystemAdvancedSettings *sub3 =
+        new AudioSystemAdvancedSettings(srcqualityoverride, SRCQuality());
+    settings2->addChild(srcqualityoverride);
+    settings2->addChild(sub3);
+    
+    group2->addChild(settings2);
+
+    return vcg;
+
+}
 
 class AudioMixerSettingsGroup : public TriggeredConfigurationGroup
 {
@@ -4398,7 +4488,7 @@ MainGeneralSettings::MainGeneralSettings()
     pin->addChild(SetupPinCode());
     addChild(pin);
 
-    addChild(new AudioSystemSettingsGroup());
+    addChild(AudioSystemSettingsGroup());
 
     addChild(new AudioMixerSettingsGroup());
 
