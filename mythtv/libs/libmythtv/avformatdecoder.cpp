@@ -4432,10 +4432,12 @@ bool AvFormatDecoder::SetupAudioStream(void)
         switch (audioIn.channels)
         {
             case 0:
-                lcd->setSpeakerLEDs(SPEAKER_LR, false);
-                break;
+            /* nb: aac and mp3 seem to be coming up 0 here, may point to an
+             * avformatdecoder audio channel handling bug, per janneg */
             case 1:
             case 2:
+                /* all audio codecs have at *least* one channel, but
+                 * LR is the fewest LED we can light up */
                 lcd->setSpeakerLEDs(SPEAKER_LR, true);
                 break;
             case 3:
