@@ -581,12 +581,11 @@ void MythMainWindow::animate(void)
         }
     }
 
-    if (!redraw)
-    {
-        return;
-    }
+    if (redraw)
+        d->paintwin->update(d->repaintRegion);
 
-    d->paintwin->update(d->repaintRegion);
+    for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+        (*it)->ScheduleInitIfNeeded();
 }
 
 void MythMainWindow::drawScreen(void)
