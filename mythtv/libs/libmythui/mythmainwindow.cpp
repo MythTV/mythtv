@@ -1859,9 +1859,14 @@ void MythMainWindow::StartLIRC(void)
     if (!QFile::exists(config_file))
         config_file = QDir::homePath() + "/.lircrc";
 
+    /* lircd socket moved from /dev/ to /var/run/lirc/ in lirc 0.8.6 */
+    QString lirc_socket = "/dev/lircd";
+    if (!QFile::exists(lirc_socket))
+        lirc_socket = "/var/run/lirc/lircd";
+
     d->lircThread = new LIRC(
         this,
-        GetMythDB()->GetSetting("LircSocket", "/dev/lircd"),
+        GetMythDB()->GetSetting("LircSocket", lirc_socket),
         "mythtv", config_file,
         GetMythDB()->GetSetting("LircKeyPressedApp", ""));
 

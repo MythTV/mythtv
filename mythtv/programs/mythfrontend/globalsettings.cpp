@@ -2283,7 +2283,12 @@ static HostLineEdit *LircDaemonDevice()
 {
     HostLineEdit *ge = new HostLineEdit("LircSocket");
     ge->setLabel(QObject::tr("LIRC Daemon Socket"));
-    ge->setValue("/dev/lircd");
+
+    /* lircd socket moved from /dev/ to /var/run/lirc/ in lirc 0.8.6 */
+    QString lirc_socket = "/dev/lircd";
+    if (!QFile::exists(lirc_socket))
+        lirc_socket = "/var/run/lirc/lircd";
+    ge->setValue(lirc_socket);
     QString help = QObject::tr(
         "UNIX socket or IP address[:port] to connect in "
         "order to communicate with the LIRC Daemon.");
