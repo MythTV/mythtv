@@ -67,7 +67,7 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     raud(0),                    waud(0),
     audbuf_timecode(0),
 
-    killAudioLock(QMutex::NonRecursive),
+    numlowbuffer(0),            killAudioLock(QMutex::NonRecursive),
     current_seconds(-1),        source_bitrate(-1),
 
     memory_corruption_test0(0xdeadbeef),
@@ -270,6 +270,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     was_paused = true;
     internal_vol = gContext->GetNumSetting("MythControlsVolume", 0);
 
+    numlowbuffer = 0;
+    
     // Find out what sample rates we can output (if output layer supports it)
     vector<int> rates = GetSupportedRates();
     vector<int>::iterator it;
@@ -1283,9 +1285,18 @@ void AudioOutputBase::OutputAudioLoop(void)
                 last_space_on_soundcard = space_on_soundcard;
             }
 
+            numlowbuffer++;
+            if (numlowbuffer > 5 && audio_buffer_unused)
+            {
+                VERBOSE(VB_IMPORTANT, LOC + "dropping back audio_buffer_unused");
+                audio_buffer_unused /= 2;
+            }
+
             usleep(5000);
             continue;
         }
+        else
+            numlowbuffer = 0;
 
         Status();
 
