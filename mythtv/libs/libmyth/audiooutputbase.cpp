@@ -85,6 +85,10 @@ AudioOutputBase::AudioOutputBase(const AudioSettings &settings) :
     memset(audiobuffer,        0, sizeof(char)  * kAudioRingBufferSize);
     orig_config_channels = gContext->GetNumSetting("MaxChannels", 2);
     src_quality = gContext->GetNumSetting("AudioUpmixType", 2);
+        //Set default upsampling quality to medium if using stereo
+    if (orig_config_channels == 2)
+        src_quality = 1;
+
     if (!settings.upmixer)
         configured_audio_channels = gContext->GetNumSetting("AudioDefaultUpmix", false) ? orig_config_channels : 2;
     else
