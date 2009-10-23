@@ -123,6 +123,7 @@ class PlaybackBox : public ScheduleCommon
     bool keyPressEvent(QKeyEvent *);
     void customEvent(QEvent *event);
 
+    void setInitialRecGroup(QString initialGroup) { m_recGroup = initialGroup; }
     static ProgramInfo *RunPlaybackBox(void *player, bool);
 
   public slots:
