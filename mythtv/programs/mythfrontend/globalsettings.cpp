@@ -290,6 +290,18 @@ static HostCheckBox *DTSPassThrough()
     return gc;
 }
 
+static HostCheckBox *AggressiveBuffer()
+{
+    HostCheckBox *gc = new HostCheckBox("AggressiveSoundcardBuffer");
+    gc->setLabel(QObject::tr("Aggressive Sound card Buffering"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If enabled, MythTV will pretend to have "
+                                "a smaller sound card buffer than is really present. "
+                                "Should be unchecked in most cases. "
+                                "Only enable if you have playback issues."))
+    return gc;
+}
+
 static HostCheckBox *DecodeExtraAudio()
 {
     HostCheckBox *gc = new HostCheckBox("DecodeExtraAudio");
@@ -3555,6 +3567,7 @@ static ConfigurationGroup *AudioSystemSettingsGroup()
     settings2->addChild(sub3);
     
     group2->addChild(settings2);
+    group2->addChild(AggressiveBuffer());
 
     return vcg;
 

@@ -374,7 +374,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     VERBOSE(VB_AUDIO, LOC + QString("Audio fragment size: %1")
             .arg(fragment_size));
 
-    audio_buffer_unused = 0;
+    if (audio_buffer_unused < 0)
+        audio_buffer_unused = 0;
+
+    if (!gContext->GetNumSetting("AdvancedAudioSettings", false))
+        audio_buffer_unused = 0;
+    else if (!gContext->GetNumSetting("AggressiveSoundcardBuffer", false))
+        audio_buffer_unused = 0;
 
     audbuf_timecode = 0;
     audiotime = 0;
