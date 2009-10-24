@@ -836,13 +836,13 @@ void gotoMainMenu(void)
 //
 bool resetTheme(QString themedir, const QString badtheme)
 {
-    QString themename = "Terra";
+    QString themename = DEFAULT_UI_THEME;
 
-    if (badtheme == "Terra")
-        themename = "G.A.N.T";
+    if (badtheme == DEFAULT_UI_THEME)
+        themename = "MythCenter-wide";
 
     VERBOSE(VB_IMPORTANT,
-                QString("Overridding broken theme '%1' with '%2'")
+                QString("Overriding broken theme '%1' with '%2'")
                 .arg(badtheme).arg(themename));
 
     gContext->OverrideSettingForSession("Theme", themename);
@@ -853,6 +853,8 @@ bool resetTheme(QString themedir, const QString badtheme)
     GetMythMainWindow()->Init();
     themeBase->Reload();
     GetMythUI()->UpdateImageCache();
+
+    GetMythMainWindow()->ReinitDone();
 
     return RunMenu(themedir, themename);
 }
@@ -874,7 +876,7 @@ int reloadTheme(void)
 
     GetMythMainWindow()->GetMainStack()->EnableEffects();
 
-    QString themename = gContext->GetSetting("Theme", "blue");
+    QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
@@ -1429,7 +1431,7 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythfrontend");
 
-    QString themename = gContext->GetSetting("Theme", "Terra");
+    QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
     bool randomtheme = gContext->GetNumSetting("RandomTheme", 0);
 
     if (randomtheme)
@@ -1512,7 +1514,7 @@ int main(int argc, char **argv)
                     .arg(networkPort));
     }
 
-    themename = gContext->GetSetting("Theme", "blue");
+    themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
     themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
