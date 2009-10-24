@@ -300,7 +300,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             resample = false;
     }
 
-    if (resample)
+    if (resample && src_quality >= 0)
     {
         int error;
         audio_samplerate = *(rates.end());
@@ -1173,14 +1173,14 @@ void AudioOutputBase::Status()
 
     if (source_bitrate == -1)
     {
-        source_bitrate = audio_samplerate * source_audio_channels * audio_bits;
+        source_bitrate = source_audio_samplerate * source_audio_channels * audio_bits;
     }
 
     if (ct / 1000 != current_seconds)
     {
         current_seconds = ct / 1000;
         OutputEvent e(current_seconds, ct,
-                      source_bitrate, audio_samplerate, audio_bits,
+                      source_bitrate, source_audio_samplerate, audio_bits,
                       source_audio_channels);
         dispatch(e);
     }

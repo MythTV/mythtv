@@ -146,12 +146,13 @@ static HostComboBox *SRCQuality()
 {
     HostComboBox *gc = new HostComboBox("SRCQuality", false);
     gc->setLabel(QObject::tr("Sample Rate Conversion"));
+    gc->addSelection(QObject::tr("Disabled"), "-1");
     gc->addSelection(QObject::tr("Fastest"), "0");
     gc->addSelection(QObject::tr("Good"), "1", true); // default
     gc->addSelection(QObject::tr("Best"), "2");
     gc->setHelpText(QObject::tr("Set the quality of audio sample rate conversion. "
                                 "\"Good\" (default) provides the best compromise between CPU usage "
-                                "and quality. "
+                                "and quality. \"Disabled\" let the audio card handle sample rate conversion. "
                                 "This only affects non 48kHz PCM audio."));
     return gc;
 }
