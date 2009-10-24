@@ -808,7 +808,7 @@ bool resetTheme(QString themedir, const QString badtheme)
                 QString("Overriding broken theme '%1' with '%2'")
                 .arg(badtheme).arg(themename));
 
-    gContext->SaveSetting("Theme", themename);
+    gContext->OverrideSettingForSession("Theme", themename);
     themedir = GetMythUI()->FindThemeDir(themename);
 
     LanguageSettings::reload();

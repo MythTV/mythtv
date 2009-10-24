@@ -683,7 +683,7 @@ QString OSD::FindTheme(QString name)
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't find OSD theme: %1. "
                 "Switching to default.").arg(gContext->GetSetting("OSDTheme")));
-        gContext->SaveSetting("OSDTheme", "BlackCurves-OSD");
+        gContext->OverrideSettingForSession("OSDTheme", "BlackCurves-OSD");
         return testdir;
     }
 

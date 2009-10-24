@@ -927,7 +927,7 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
     {
         VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
                 "Switching to %2").arg(themename).arg(DEFAULT_UI_THEME));
-        GetMythDB()->SaveSetting("Theme", DEFAULT_UI_THEME);
+        GetMythDB()->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
         return testdir;
     }
     else
