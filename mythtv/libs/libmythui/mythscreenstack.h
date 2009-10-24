@@ -27,6 +27,7 @@ class MPUBLIC MythScreenStack : public QObject
 
     void GetDrawOrder(QVector<MythScreenType *> &screens);
     int TotalScreens();
+    void ScheduleInitIfNeeded(void);
 
     void DisableEffects(void) { m_DoTransitions = false; }
     void EnableEffects(void);
@@ -49,6 +50,7 @@ class MPUBLIC MythScreenStack : public QObject
 
     bool m_DoTransitions;
     bool m_DoInit;
+    bool m_InitTimerStarted;
     bool m_InNewTransition;
     MythScreenType *m_newTop;
 

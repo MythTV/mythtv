@@ -574,18 +574,18 @@ void MythMainWindow::animate(void)
             if ((*screenit)->NeedsRedraw())
             {
                 QRegion topDirty = (*screenit)->GetDirtyArea();
+                (*screenit)->ResetNeedsRedraw();
                 d->repaintRegion = d->repaintRegion.unite(topDirty);
                 redraw = true;
             }
         }
     }
 
-    if (!redraw)
-    {
-        return;
-    }
+    if (redraw)
+        d->paintwin->update(d->repaintRegion);
 
-    d->paintwin->update(d->repaintRegion);
+    for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+        (*it)->ScheduleInitIfNeeded();
 }
 
 void MythMainWindow::drawScreen(void)
@@ -601,6 +601,42 @@ void MythMainWindow::drawScreen(void)
         // Ensure that the region is not larger than the screen which
         // can happen with bad themes
         d->repaintRegion = d->repaintRegion.intersect(d->uiScreenRect);
+
+        // Check for any widgets that have been updated since we built
+        // the dirty region list in ::animate()
+        QVector<MythScreenStack *>::Iterator it;
+        for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+        {
+            QVector<MythScreenType *> redrawList;
+            (*it)->GetDrawOrder(redrawList);
+
+            QVector<MythScreenType *>::Iterator screenit;
+            for (screenit = redrawList.begin(); screenit != redrawList.end();
+                 ++screenit)
+            {
+                if ((*screenit)->NeedsRedraw())
+                {
+                    QRegion topDirty = (*screenit)->GetDirtyArea();
+                    QVector<QRect> wrects = topDirty.rects();
+                    for (int i = 0; i < wrects.size(); i++)
+                    {
+                        bool foundThisRect = false;
+                        QVector<QRect> drects = d->repaintRegion.rects();
+                        for (int j = 0; j < drects.size(); j++)
+                        {
+                            if (drects[j].contains(wrects[i]))
+                            {
+                                foundThisRect = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundThisRect)
+                            return;
+                    }
+                }
+            }
+        }
     }
 
     d->painter->Begin(d->paintwin);

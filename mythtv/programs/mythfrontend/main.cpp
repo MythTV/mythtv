@@ -345,7 +345,7 @@ void startPlaybackWithGroup(QString recGroup = "")
     if (pbb->Create())
     {
         if (!recGroup.isEmpty())
-            pbb->displayRecGroup(recGroup);
+            pbb->setInitialRecGroup(recGroup);
 
         mainStack->AddScreen(pbb);
     }

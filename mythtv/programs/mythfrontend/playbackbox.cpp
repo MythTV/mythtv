@@ -461,6 +461,19 @@ bool PlaybackBox::Create()
     connect(m_recordingList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             SLOT(playSelected(MythUIButtonListItem*)));
 
+    // connect up timers...
+    connect(m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
+    connect(m_bannerTimer, SIGNAL(timeout()), SLOT(bannerLoad()));
+    connect(m_coverartTimer, SIGNAL(timeout()), SLOT(coverartLoad()));
+    connect(m_freeSpaceTimer, SIGNAL(timeout()), SLOT(setUpdateFreeSpace()));
+    connect(m_fillListTimer, SIGNAL(timeout()), SLOT(listChanged()));
+
+    BuildFocusList();
+    return true;
+}
+
+void PlaybackBox::Init()
+{
     m_groupList->SetLCDTitles(tr("Groups"));
     m_recordingList->SetLCDTitles(tr("Recordings"), "titlesubtitle|shortdate|starttime");
 
@@ -479,19 +492,8 @@ bool PlaybackBox::Create()
         }
     }
 
-    // connect up timers...
-    connect(m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
-    connect(m_bannerTimer, SIGNAL(timeout()), SLOT(bannerLoad()));
-    connect(m_coverartTimer, SIGNAL(timeout()), SLOT(coverartLoad()));
-    connect(m_freeSpaceTimer, SIGNAL(timeout()), SLOT(setUpdateFreeSpace()));
-    connect(m_fillListTimer, SIGNAL(timeout()), SLOT(listChanged()));
-
-    BuildFocusList();
-
     if (!gContext->GetNumSetting("PlaybackBoxStartInTitle", 0))
         SetFocusWidget(m_recordingList);
-
-    return true;
 }
 
 void PlaybackBox::SwitchList()

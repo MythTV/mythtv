@@ -248,6 +248,15 @@ bool MythUIType::NeedsRedraw(void) const
     return m_NeedsRedraw;
 }
 
+void MythUIType::ResetNeedsRedraw(void)
+{
+    m_NeedsRedraw = false;
+
+    QList<MythUIType *>::Iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+        (*it)->ResetNeedsRedraw();
+}
+
 void MythUIType::SetRedraw(void)
 {
     if (m_Area.width() == 0 || m_Area.height() == 0)
@@ -394,7 +403,6 @@ void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
 void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
                       QRect clipRect)
 {
-    m_NeedsRedraw = false;
     m_DirtyRegion = QRegion(QRect(0, 0, 0, 0));
 
     if (!m_Visible)

@@ -28,6 +28,7 @@ MythScreenStack::MythScreenStack(MythMainWindow *parent, const QString &name,
     m_InNewTransition = false;
 
     m_DoInit = false;
+    m_InitTimerStarted = false;
 }
 
 MythScreenStack::~MythScreenStack()
@@ -168,15 +169,21 @@ MythScreenType *MythScreenStack::GetTopScreen(void)
 
 void MythScreenStack::GetDrawOrder(QVector<MythScreenType *> &screens)
 {
-    // make sure Init() is called outside the paintEvent
-    if (m_DoInit && m_topScreen)
-        QTimer::singleShot(100, this, SLOT(doInit()));
-
     if (m_InNewTransition)
         CheckNewFadeTransition();
     CheckDeletes();
 
     screens = m_DrawOrder;
+}
+
+void MythScreenStack::ScheduleInitIfNeeded(void)
+{
+    // make sure Init() is called outside the paintEvent
+    if (m_DoInit && m_topScreen && !m_InitTimerStarted)
+    {
+        m_InitTimerStarted = true;
+        QTimer::singleShot(100, this, SLOT(doInit()));
+    }
 }
 
 void MythScreenStack::doInit(void)
@@ -186,6 +193,7 @@ void MythScreenStack::doInit(void)
         m_DoInit = false;
         m_topScreen->Init();
     }
+    m_InitTimerStarted = false;
 }
 
 void MythScreenStack::RecalculateDrawOrder(void)
