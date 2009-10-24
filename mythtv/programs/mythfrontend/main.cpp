@@ -799,9 +799,9 @@ void gotoMainMenu(void)
 //
 bool resetTheme(QString themedir, const QString badtheme)
 {
-    QString themename = "Terra";
+    QString themename = DEFAULT_UI_THEME;
 
-    if (badtheme == "Terra")
+    if (badtheme == DEFAULT_UI_THEME)
         themename = "MythCenter-wide";
 
     VERBOSE(VB_IMPORTANT,
@@ -839,7 +839,7 @@ int reloadTheme(void)
 
     GetMythMainWindow()->GetMainStack()->EnableEffects();
 
-    QString themename = gContext->GetSetting("Theme", "Terra");
+    QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {
@@ -1394,7 +1394,7 @@ int main(int argc, char **argv)
 
     LanguageSettings::load("mythfrontend");
 
-    QString themename = gContext->GetSetting("Theme", "Terra");
+    QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
 
     QString themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
@@ -1473,7 +1473,7 @@ int main(int argc, char **argv)
                     .arg(networkPort));
     }
 
-    themename = gContext->GetSetting("Theme", "Terra");
+    themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
     themedir = GetMythUI()->FindThemeDir(themename);
     if (themedir.isEmpty())
     {

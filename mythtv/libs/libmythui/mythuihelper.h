@@ -9,6 +9,8 @@
 
 #include "mythexp.h"
 
+#define DEFAULT_UI_THEME "Terra"
+
 class MythUIHelperPrivate;
 class MythImage;
 class QImage;

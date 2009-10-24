@@ -393,7 +393,7 @@ void MythUIHelper::LoadQtConfig(void)
 
     qApp->setStyle("Windows");
 
-    QString themename = GetMythDB()->GetSetting("Theme", "Terra");
+    QString themename = GetMythDB()->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = FindThemeDir(themename);
 
     ThemeInfo *themeinfo = new ThemeInfo(themedir);
@@ -891,8 +891,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
 /**
  *  \brief Returns the full path to the theme denoted by themename
  *
- *   If the theme cannot be found falls back to the Terra theme.
- *   If the Terra theme doesn't exist then returns an empty string.
+ *   If the theme cannot be found falls back to the DEFAULT_UI_THEME.
+ *   If the DEFAULT_UI_THEME doesn't exist then returns an empty string.
  *  \param themename The theme name.
  *  \return Path to theme or empty string.
  */
@@ -921,13 +921,13 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
                     dir.absolutePath());
     }
 
-    testdir = GetThemesParentDir() + "Terra";
+    testdir = GetThemesParentDir() + DEFAULT_UI_THEME;
     dir.setPath(testdir);
     if (dir.exists())
     {
         VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
-                "Switching to Terra").arg(themename));
-        GetMythDB()->SaveSetting("Theme", "Terra");
+                "Switching to %2").arg(themename).arg(DEFAULT_UI_THEME));
+        GetMythDB()->SaveSetting("Theme", DEFAULT_UI_THEME);
         return testdir;
     }
     else

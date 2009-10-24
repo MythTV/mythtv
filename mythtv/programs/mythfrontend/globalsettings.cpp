@@ -2971,7 +2971,7 @@ ThemeSelector::ThemeSelector(QString label):
     }
 
     if (themetype & THEME_UI)
-        setValue("Terra");
+        setValue(DEFAULT_UI_THEME);
     else if (themetype & THEME_OSD)
         setValue("BlackCurves-OSD");
 }

@@ -295,7 +295,7 @@ void MythContextPrivate::TempMainWindow(bool languagePrompt)
 
     SilenceDBerrors();
 
-    m_database->SetSetting("Theme", "Terra");
+    m_database->SetSetting("Theme", DEFAULT_UI_THEME);
 #ifdef Q_WS_MACX
     // Qt 4.4 has window-focus problems
     m_database->SetSetting("RunFrontendInWindow", "1");
