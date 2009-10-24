@@ -817,6 +817,8 @@ bool resetTheme(QString themedir, const QString badtheme)
     themeBase->Reload();
     GetMythUI()->UpdateImageCache();
 
+    GetMythMainWindow()->ReinitDone();
+
     return RunMenu(themedir, themename);
 }
 

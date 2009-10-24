@@ -836,8 +836,7 @@ void MythMainWindow::Init(void)
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 
-    if (!d->paintwin)
-        GetMythUI()->ThemeWidget(this);
+    GetMythUI()->ThemeWidget(this);
     Show();
 
     // Set cursor call must come after Show() to work on some systems.
@@ -902,8 +901,6 @@ void MythMainWindow::Init(void)
 
 void MythMainWindow::ReinitDone(void)
 {
-    qApp->processEvents();
-
     if (d->oldpainter)
     {
         delete d->oldpainter;

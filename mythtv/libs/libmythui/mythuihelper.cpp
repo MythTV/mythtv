@@ -393,7 +393,7 @@ void MythUIHelper::LoadQtConfig(void)
 
     qApp->setStyle("Windows");
 
-    QString themename = GetMythDB()->GetSetting("Theme");
+    QString themename = GetMythDB()->GetSetting("Theme", "Terra");
     QString themedir = FindThemeDir(themename);
 
     ThemeInfo *themeinfo = new ThemeInfo(themedir);
