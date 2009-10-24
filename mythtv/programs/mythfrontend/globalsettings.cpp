@@ -298,7 +298,7 @@ static HostCheckBox *AggressiveBuffer()
     gc->setHelpText(QObject::tr("If enabled, MythTV will pretend to have "
                                 "a smaller sound card buffer than is really present. "
                                 "Should be unchecked in most cases. "
-                                "Only enable if you have playback issues."))
+                                "Enable only if you have playback issues."));
     return gc;
 }
 
