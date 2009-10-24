@@ -7205,8 +7205,8 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                     }
                 }
 
-                float hmult = osd->GetSubtitleBounds().width() / video_disp_dim.width();
-                float vmult = osd->GetSubtitleBounds().height() / video_disp_dim.height();
+                float hmult = osd->GetSubtitleBounds().width() / (float) video_disp_dim.width();
+                float vmult = osd->GetSubtitleBounds().height() / (float) video_disp_dim.height();
 
                 rect->x = (int)(rect->x * hmult);
                 rect->y = (int)(rect->y * vmult);
