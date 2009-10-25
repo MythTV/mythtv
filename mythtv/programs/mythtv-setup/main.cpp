@@ -34,6 +34,7 @@
 
 using namespace std;
 
+static MythThemeBase *themeBase   = NULL;
 ExitPrompter   *exitPrompt  = NULL;
 StartPrompter  *startPrompt = NULL;
 
@@ -89,25 +90,52 @@ void SetupMenuCallback(void* data, QString& selection)
         VERBOSE(VB_IMPORTANT, "Unknown menu action: " + selection);
 }
 
-void SetupMenu(MythMainWindow *win)
+bool SetupMenu(QString themedir, QString themename)
 {
-    QString theme = gContext->GetSetting("Theme", "blue");
-
-    MythThemedMenu* menu = new MythThemedMenu(GetMythUI()->FindThemeDir(theme),
-                                              "setup.xml", win->GetMainStack(),
-                                              "mainmenu", false);
-
-    menu->setCallback(SetupMenuCallback, gContext);
+    QByteArray tmp = themedir.toLocal8Bit();
+    MythThemedMenu *menu = new MythThemedMenu(
+        QString(tmp.constData()), "setup.xml",
+        GetMythMainWindow()->GetMainStack(), "mainmenu", false);
 
     if (menu->foundTheme())
     {
-        win->GetMainStack()->AddScreen(menu);
-        qApp->exec();
+        menu->setCallback(SetupMenuCallback, gContext);
+        GetMythMainWindow()->GetMainStack()->AddScreen(menu);
+        return true;
     }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'").arg(theme));
-    }
+
+    VERBOSE(VB_IMPORTANT, QString("Couldn't use theme '%1'").arg(themename));
+    delete menu;
+    menu = NULL;
+
+    return false;
+}
+
+// If the theme specified in the DB is somehow broken, try a standard one:
+//
+bool resetTheme(QString themedir, const QString badtheme)
+{
+    QString themename = DEFAULT_UI_THEME;
+
+    if (badtheme == DEFAULT_UI_THEME)
+        themename = "MythCenter-wide";
+
+    VERBOSE(VB_IMPORTANT,
+                QString("Overriding broken theme '%1' with '%2'")
+                .arg(badtheme).arg(themename));
+
+    gContext->OverrideSettingForSession("Theme", themename);
+    themedir = GetMythUI()->FindThemeDir(themename);
+
+    LanguageSettings::reload();
+    GetMythUI()->LoadQtConfig();
+    GetMythMainWindow()->Init();
+    themeBase->Reload();
+    GetMythUI()->UpdateImageCache();
+
+    GetMythMainWindow()->ReinitDone();
+
+    return SetupMenu(themedir, themename);
 }
 
 static void print_usage()
@@ -530,7 +558,7 @@ int main(int argc, char *argv[])
     gContext->SetMainWindow(mainWindow);
     mainWindow->setWindowTitle(QObject::tr("MythTV Setup"));
 
-    MythThemeBase *themeBase = new MythThemeBase();
+    themeBase = new MythThemeBase();
     GetMythUI()->UpdateImageCache();
     (void) themeBase;
 
@@ -547,10 +575,20 @@ int main(int argc, char *argv[])
         startPrompt = new StartPrompter();
     startPrompt->handleStart();
 
+    QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
+    QString themedir = GetMythUI()->FindThemeDir(themename);
+    if (themedir.isEmpty())
     {
-        // Let the user select buttons, type values, scan for channels, etc.
-        SetupMenu(mainWindow);
+        VERBOSE(VB_IMPORTANT, QString("Couldn't find theme '%1'")
+                .arg(themename));
+        return FRONTEND_BUGGY_EXIT_NO_THEME;
     }
+
+    // Let the user select buttons, type values, scan for channels, etc.
+    if (!SetupMenu(themedir, themename) && !resetTheme(themedir, themename))
+        return FRONTEND_BUGGY_EXIT_NO_THEME;
+
+    qApp->exec();
     // Main menu callback to ExitPrompter does CheckSetup(), cleanup and exit.
 }
 
