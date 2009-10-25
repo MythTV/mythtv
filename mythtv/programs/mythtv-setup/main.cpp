@@ -118,7 +118,7 @@ bool resetTheme(QString themedir, const QString badtheme)
     QString themename = DEFAULT_UI_THEME;
 
     if (badtheme == DEFAULT_UI_THEME)
-        themename = "MythCenter-wide";
+        themename = FALLBACK_UI_THEME;
 
     VERBOSE(VB_IMPORTANT,
                 QString("Overriding broken theme '%1' with '%2'")

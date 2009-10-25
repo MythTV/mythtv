@@ -933,6 +933,18 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
     else
         VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
 
+    testdir = GetThemesParentDir() + FALLBACK_UI_THEME;
+    dir.setPath(testdir);
+    if (dir.exists())
+    {
+        VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
+                "Switching to %2").arg(themename).arg(FALLBACK_UI_THEME));
+        GetMythDB()->OverrideSettingForSession("Theme", FALLBACK_UI_THEME);
+        return testdir;
+    }
+    else
+        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
+
     VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1").arg(themename));
     return QString();
 }

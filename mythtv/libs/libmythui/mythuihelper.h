@@ -10,6 +10,7 @@
 #include "mythexp.h"
 
 #define DEFAULT_UI_THEME "Terra"
+#define FALLBACK_UI_THEME "MythCenter-wide"
 
 class MythUIHelperPrivate;
 class MythImage;
