@@ -1,6 +1,8 @@
 #ifndef MYTHPAINTER_QT_H_
 #define MYTHPAINTER_QT_H_
 
+#include <list>
+
 #include "mythpainter.h"
 #include "mythimage.h"
 
