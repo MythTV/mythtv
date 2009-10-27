@@ -434,7 +434,7 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
         "       c.serviceid,     c.atsc_major_chan, c.atsc_minor_chan, "
         "       c.useonairguide, c.visible,         c.freqid,          "
         "       c.icon,          c.tvformat,        c.xmltvid,         "
-        "       d.transportid,   d.networkid                           "
+        "       d.transportid,   d.networkid,       c.default_authority "
         "FROM channel AS c, dtv_multiplex AS d "
         "WHERE c.mplexid = :MPLEXID AND"
         "      c.mplexid = d.mplexid");
@@ -464,7 +464,8 @@ bool ScanDTVTransport::FillFromDB(DTVTunerType type, uint mplexid)
             QString::null,
             false, false, false, false,
             false, false, false, false,
-            false, false, false, 0);
+            false, false, false, 0,
+            query.value(18).toString() /* default_authority */);
 
         channels.push_back(chan);
     }

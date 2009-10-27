@@ -170,7 +170,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
         "    in_pat,             in_pmt,             in_vct,             "
         "    in_nit,             in_sdt,             is_encrypted,       "
         "    is_data_service,    is_audio_service,   is_opencable,       "
-        "    could_be_opencable, decryption_status                       "
+        "    could_be_opencable, decryption_status,  default_authority   "
         " )  "
         "VALUES "
         " ( :SCANID,            :TRANSPORTID,                            "
@@ -185,7 +185,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
         "   :IN_PAT,            :IN_PMT,            :IN_VCT,             "
         "   :IN_NIT,            :IN_SDT,            :IS_ENCRYPTED,       "
         "   :IS_DATA_SERVICE,   :IS_AUDIO_SERVICE,  :IS_OPEBCABLE,       "
-        "   :COULD_BE_OPENCABLE,:DECRYPTION_STATUS                       "
+        "   :COULD_BE_OPENCABLE,:DECRYPTION_STATUS, :DEFAULT_AUTHORITY   "
         " );");
 
     query.bindValue(":SCANID", scanid);
@@ -225,6 +225,7 @@ bool ChannelInsertInfo::SaveScan(uint scanid, uint transportid) const
     query.bindValue(":IS_OPEBCABLE", is_opencable);
     query.bindValue(":COULD_BE_OPENCABLE", could_be_opencable);
     query.bindValue(":DECRYPTION_STATUS", decryption_status);
+    query.bindValue(":DEFAULT_AUTHORITY", default_authority);
 
     if (!query.exec())
     {
@@ -254,7 +255,8 @@ ChannelInsertInfo::ChannelInsertInfo(
     bool    _in_nit,             bool    _in_sdt,
     bool    _is_encrypted,       bool    _is_data_service,
     bool    _is_audio_service,   bool    _is_opencable,
-    bool    _could_be_opencable, int     _decryption_status) :
+    bool    _could_be_opencable, int     _decryption_status,
+    QString _default_authority) :
     db_mplexid(_db_mplexid),
     source_id(_source_id),
     channel_id(_channel_id),
@@ -271,6 +273,7 @@ ChannelInsertInfo::ChannelInsertInfo(
     icon(_icon),
     format(_format),
     xmltvid(_xmltvid),
+    default_authority(_default_authority),
     pat_tsid(_pat_tsid),
     vct_tsid(_vct_tsid),
     vct_chan_tsid(_vct_chan_tsid),
@@ -298,6 +301,7 @@ ChannelInsertInfo::ChannelInsertInfo(
     icon.detach();
     format.detach();
     xmltvid.detach();
+    default_authority.detach();
     si_standard.detach();
 }
 
@@ -320,6 +324,7 @@ ChannelInsertInfo &ChannelInsertInfo::operator=(
     icon               = other.icon;        icon.detach();
     format             = other.format;      format.detach();
     xmltvid            = other.xmltvid;     xmltvid.detach();
+    default_authority  = other.default_authority; default_authority.detach();
 
     // non-DB info
     pat_tsid           = other.pat_tsid;
@@ -390,6 +395,10 @@ void ChannelInsertInfo::ImportExtraInfo(const ChannelInsertInfo &other)
     if (!other.xmltvid.isEmpty() && xmltvid.isEmpty())
     {
         xmltvid            = other.xmltvid;     xmltvid.detach();
+    }
+    if (!other.default_authority.isEmpty() && default_authority.isEmpty())
+    {
+        default_authority  = other.default_authority; default_authority.detach();
     }
     // non-DB info
     if (other.pat_tsid && !pat_tsid)

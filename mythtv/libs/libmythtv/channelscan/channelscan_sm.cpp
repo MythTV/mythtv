@@ -928,6 +928,18 @@ static void update_info(ChannelInsertInfo &info,
     info.sdt_tsid   = sdt->TSID();
     info.orig_netid = sdt->OriginalNetworkID();
     info.in_sdt     = true;
+
+    desc_list_t parsed =
+        MPEGDescriptor::Parse(sdt->ServiceDescriptors(i),
+                                sdt->ServiceDescriptorsLength(i));
+    // Look for default authority
+    const unsigned char *def_auth =
+        MPEGDescriptor::Find(parsed, DescriptorID::default_authority);
+    if (def_auth)
+    {
+        DefaultAuthorityDescriptor authority(def_auth);
+        info.default_authority = authority.DefaultAuthority();
+    }
 }
 
 uint ChannelScanSM::GetCurrentTransportInfo(
