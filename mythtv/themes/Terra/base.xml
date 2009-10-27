@@ -724,11 +724,128 @@
 
         <textarea name="progresstext" from="basetextarea">
             <area>0,660,1280,60</area>
-            <value>Playback starting ...</value>
+            <value>Playback starting …</value>
             <align>allcenter</align>
         </textarea>
         
     </window>
+
+    <window name="MythFileBrowser">
+        <area>0,42,1280,515</area>
+        <shape name="fade" from="basefadebackground" />
+
+        <imagetype name="backimg">
+            <position>236,58</position>
+            <filename>popups/largemenubackground.png</filename>
+        </imagetype>
+
+        <buttonlist name="filelist">
+            <area>285,90,740,270</area>
+            <layout>grid</layout>
+            <buttonarea>0,0,720,270</buttonarea>
+            <spacing>10</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,170,130</area>
+                    <shape name="buttonbackground" />
+                    <statetype name="nodetype">
+                        <state name="folder">
+                            <imagetype name="icon">
+                                <area>5,4,160,75</area>
+                                <filename>shared/directory.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder" from="folder">
+                            <imagetype name="icon">
+                                <filename>shared/updirectory.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="executable" from="folder">
+                            <imagetype name="icon">
+                                <filename>shared/executable.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="file" from="folder">
+                            <imagetype name="icon">
+                                <filename>shared/file.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <imagetype name="buttonimage">
+                        <area>5,4,160,75</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>5,80,160,50</area>
+                        <align>allcenter</align>
+                        <multiline>yes</multiline>
+                    </textarea>
+                </state>
+                <state name="inactive" from="active" />
+                <state name="selected" from="active">
+                    <shape name="buttonbackground">
+                        <area>0,0,100%,100%</area>
+                        <type>roundbox</type>
+                        <cornerradius>4</cornerradius>
+                        <fill color="#A7AC93" />
+                        <line width="2" color="#8A916F" />
+                    </shape>
+                    <textarea name="buttontext">
+                        <font>basesmallbrown</font>
+                    </textarea>
+                </state>
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>985,270</position>
+                <state type="full">
+                    // Arrow Image
+                </state>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>985,270</position>
+                <state type="full">
+                    // Arrow Image
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <textedit name="location" from="basetextedit">
+            <position>315,383</position>
+        </textedit>
+
+        <button name="back" from="basebutton">
+            <position>280,435</position>
+            <value>Up Level</value>
+        </button>
+
+        <button name="home" from="basebutton">
+            <position>573,435</position>
+            <value>Home</value>
+        </button>
+
+        <button name="cancel" from="basebutton">
+            <position>280,495</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>573,495</position>
+            <value>Ok</value>
+        </button>
+
+        <imagetype name="preview">
+            <area>812,383,200,145</area>
+            <preserveaspect>true</preserveaspect>
+        </imagetype>
+
+        <textarea name="info" from="basetextarea">
+            <area>812,528,200,25</area>
+            <align>allcenter</align>
+        </textarea>
+
+    </window>
+
 
 </mythuitheme>
 
