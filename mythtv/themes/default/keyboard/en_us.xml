@@ -175,7 +175,7 @@
 
     <!-- row 4 -->
     <key name="key_\" type="char">
-        <char normal="0x00a3" shift="0x00ac" alt="0x00a3" altshift="0x00ac"></char>
+        <char normal="0x0024" shift="0x00ac" alt="0x00a3" altshift="0x00ac"></char>
         <move left="key_del" right="key_z" up="key_a" down="key_lshift"></move>
     </key>
     <key name="key_z" type="char">
