@@ -461,7 +461,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       itv(NULL),
       selectedVideoIndex(-1),
       // Audio
-      audioSamples(NULL),
+      audioSamples(NULL),           audioSamples2(NULL),
+      reformat_ctx(NULL),
       allow_ac3_passthru(false),    allow_dts_passthru(false),
       internal_vol(false),
       disable_passthru(false),      max_channels(2),
@@ -477,6 +478,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     params.prealloced_context = 1;
     audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
                                            sizeof(*audioSamples));
+    audioSamples2 = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                           sizeof(*audioSamples2));
     ccd608->SetIgnoreTimecode(true);
 
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
@@ -513,6 +516,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete m_h264_parser;
 
     av_freep((void *)&audioSamples);
+    av_freep((void *)&audioSamples2);
 
     if (dummy_frame)
     {
@@ -3706,6 +3710,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 case CODEC_TYPE_AUDIO:
                 {
                     bool reselectAudioTrack = false;
+                    char *s;
 
                     /// HACK HACK HACK -- begin See #3731
                     if (!GetNVP()->HasAudioIn())
@@ -3723,10 +3728,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         SetupAudioStreamSubIndexes(audIdx);
                         reselectAudioTrack = true;
                     }
-
-                    /// XXX HACK: set sample format to signed 16 bit
-                    if (curstream->codec->codec_id == CODEC_ID_TRUEHD)
-                        curstream->codec->sample_fmt = SAMPLE_FMT_S16;
 
                     // detect channels on streams that need
                     // to be decoded before we can know this
@@ -3815,6 +3816,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     avcodeclock.lock();
                     data_size = 0;
+                    s = (char *)audioSamples;
+
                     if (audioOut.do_passthru)
                     {
                         data_size = pkt->size;
@@ -3839,6 +3842,44 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
                             ret = avcodec_decode_audio2(ctx, audioSamples,
                                                         &data_size, ptr, len);
+                        }
+
+                            // Convert sample format if required (Myth only handles 8 and 16 bits audio)
+                        if (ctx->sample_fmt != SAMPLE_FMT_S16 && ctx->sample_fmt != SAMPLE_FMT_U8)
+                        {
+                            if (reformat_ctx)
+                                av_audio_convert_free(reformat_ctx);
+                            reformat_ctx = av_audio_convert_alloc(SAMPLE_FMT_S16, 1,
+                                                                  ctx->sample_fmt, 1,
+                                                                  NULL, 0);
+                            if (!reformat_ctx)
+                            {
+                                VERBOSE(VB_PLAYBACK, QString("Cannot convert %1 sample format to %2 sample format")
+                                        .arg(avcodec_get_sample_fmt_name(ctx->sample_fmt))
+                                        .arg(avcodec_get_sample_fmt_name(SAMPLE_FMT_S16)));
+
+                                avcodeclock.unlock();
+                                have_err = true;
+                                continue;
+                            }
+
+                            const void *ibuf[6] = {audioSamples};
+                            void *obuf[6] = {audioSamples2};
+                            int istride[6] = {av_get_bits_per_sample_format(ctx->sample_fmt)/8};
+                            int ostride[6] = {2};
+                            int len = data_size/istride[0];
+                            if (av_audio_convert(reformat_ctx, obuf, ostride,
+                                                 ibuf, istride, len) < 0)
+                            {
+                                VERBOSE(VB_PLAYBACK, "av_audio_convert() failed");
+                    
+                                avcodeclock.unlock();
+                                have_err = true;
+                                continue;
+                            }
+
+                            data_size = len * 2;
+                            s = (char *)audioSamples2;
                         }
 
                         // When decoding some audio streams the number of
@@ -3887,11 +3928,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     if (audSubIdx != -1)
                     {
                         extract_mono_channel(audSubIdx, &audioOut,
-                                             (char*)audioSamples, data_size);
+                                             s, data_size);
                     }
 
-                    GetNVP()->AddAudioData(
-                        (char *)audioSamples, data_size, temppts);
+                    GetNVP()->AddAudioData(s, data_size, temppts);
 
                     total_decoded_audio += data_size;
 

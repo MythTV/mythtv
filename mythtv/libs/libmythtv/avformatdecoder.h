@@ -15,6 +15,7 @@ extern "C" {
 #include "frame.h"
 #include "avcodec.h"
 #include "avformat.h"
+#include "audioconvert.h"
 }
 
 #include "avfringbuffer.h"
@@ -257,6 +258,9 @@ class AvFormatDecoder : public DecoderBase
 
     // Audio
     short int        *audioSamples;
+    short int        *audioSamples2;
+    AVAudioConvert   *reformat_ctx;
+
     bool              allow_ac3_passthru;
     bool              allow_dts_passthru;
     bool              internal_vol;
