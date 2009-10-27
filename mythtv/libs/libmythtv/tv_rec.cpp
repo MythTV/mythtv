@@ -198,6 +198,8 @@ bool TVRec::CreateChannel(const QString &startchannel)
              genOpt.videodev.toLower().left(5) == "file:")
     {
         channel = new DummyChannel(this);
+        if (!channel->Open())
+            return false;
         InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
     }
