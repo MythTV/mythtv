@@ -258,7 +258,7 @@ class AvFormatDecoder : public DecoderBase
 
     // Audio
     short int        *audioSamples;
-    short int        *audioSamplesConverted;
+    short int        *audioSamplesResampled;
     AVAudioConvert   *reformat_ctx;
     enum SampleFormat audio_src_fmt;
 

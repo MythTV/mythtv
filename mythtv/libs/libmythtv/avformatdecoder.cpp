@@ -478,8 +478,6 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     params.prealloced_context = 1;
     audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
                                            sizeof(*audioSamples));
-    audioSamplesResampled = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
-                                           sizeof(*audioSamplesResampled));
     ccd608->SetIgnoreTimecode(true);
 
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
@@ -516,7 +514,11 @@ AvFormatDecoder::~AvFormatDecoder()
     delete m_h264_parser;
 
     av_freep((void *)&audioSamples);
-    av_freep((void *)&audioSamplesResampled);
+
+    if (audioSamplesResampled)
+        av_freep((void *)&audioSamplesResampled);
+    if (reformat_ctx)
+        av_audio_convert_free(reformat_ctx);
 
     if (dummy_frame)
     {
@@ -3854,11 +3856,15 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                 reformat_ctx = av_audio_convert_alloc(SAMPLE_FMT_S16, 1,
                                                                       ctx->sample_fmt, 1,
                                                                       NULL, 0);
-                                if (!reformat_ctx)
+                                if (!reformat_ctx ||
+                                    (!audioSamplesResampled &&
+                                    !(audioSamplesResampled = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                                                                      sizeof(*audioSamplesResampled)))))
                                 {
                                     VERBOSE(VB_PLAYBACK, QString("Cannot convert %1 sample format to %2 sample format")
                                             .arg(avcodec_get_sample_fmt_name(ctx->sample_fmt))
                                             .arg(avcodec_get_sample_fmt_name(SAMPLE_FMT_S16)));
+                                    
                                     avcodeclock.unlock();
                                     have_err = true;
                                     continue;
