@@ -18,9 +18,6 @@ using namespace std;
 #ifdef USE_ALSA
 #include "audiooutputalsa.h"
 #endif
-#ifdef USE_ARTS
-#include "audiooutputarts.h"
-#endif
 #if CONFIG_DARWIN
 #include "audiooutputca.h"
 #endif
@@ -61,14 +58,9 @@ AudioOutput *AudioOutput::OpenAudio(
     }
     else if (main_device.startsWith("ARTS:"))
     {
-#ifdef USE_ARTS
-        settings.TrimDeviceType();
-        return new AudioOutputARTS(settings);
-#else
         VERBOSE(VB_IMPORTANT, "Audio output device is set to an ARTS device "
-                              "but ARTS support is not compiled in!");
+                              "but ARTS is no longer supported !");
         return NULL;
-#endif
     }
     else if (main_device.startsWith("JACK:"))
     {

@@ -179,13 +179,6 @@ using_alsa {
     LIBS += $$ALSA_LIBS
 }
 
-using_arts {
-    DEFINES += USE_ARTS
-    HEADERS += audiooutputarts.h
-    SOURCES += audiooutputarts.cpp
-    LIBS += $$ARTS_LIBS
-}
-
 using_jack {
     DEFINES += USE_JACK
     HEADERS += bio2jack.h audiooutputjack.h

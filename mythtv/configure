@@ -259,7 +259,6 @@ BLOCK_QUOTE
   echo ""
   echo "  --disable-audio-oss      disable OSS audio support"
   echo "  --disable-audio-alsa     disable ALSA audio support"
-  echo "  --disable-audio-arts     disable aRts audio support"
   echo "  --disable-audio-jack     disable JACK audio support"
   echo "  --enable-valgrind        disables timeouts for valgrind memory debugging"
   # Don't print disable frontend/backend options, these
@@ -1217,7 +1216,6 @@ MYTHTV_CONFIG_LIST='
 MYTHTV_LIST='
     audio_pulse
     audio_alsa
-    audio_arts
     audio_jack
     audio_oss
     ffmpeg_pthreads
@@ -1592,7 +1590,6 @@ audio_pulse="default"
 audio_pulse_libs="-lpulse"
 audio_alsa="default"
 audio_alsa_libs="-lasound"
-audio_arts="default"
 audio_jack="default"
 audio_jack_libs="-ljack"
 
@@ -3322,14 +3319,6 @@ enabled jack_demuxer && check_lib2 jack/jack.h jack_client_open -ljack
     enable  audio_alsa ||
     disable audio_alsa
 
-# aRts probe
-! disabled audio_arts &&
-    check_foo_config arts artsc artsc.h arts_init &&
-    audio_arts_libs=`artsc-config --libs`  &&
-    audio_arts_cflags=`artsc-config --cflags` &&
-    enable  audio_arts ||
-    disable audio_arts
-
 # JACK probe
 ! disabled audio_jack &&
     check_lib jack/jack.h jack_client_new $audio_jack_libs &&
@@ -3841,7 +3830,6 @@ if enabled frontend; then
   echo "PulseAudio support        ${audio_pulse-no}"
   echo "OSS support               ${audio_oss-no}"
   echo "ALSA support              ${audio_alsa-no}"
-  echo "aRts support              ${audio_arts-no}"
   echo "JACK support              ${audio_jack-no}"
   if test x"$target_os" = x"mingw32" ; then
     echo "Windows (Windows audio)   yes"
@@ -4037,12 +4025,6 @@ fi
 if enabled audio_pulse; then
   append CCONFIG "using_pulse"
   echo "CONFIG_AUDIO_PULSE_LIBS=$audio_pulse_libs" >> $MYTH_CONFIG_MAK
-fi
-
-if enabled audio_arts; then
-    append CCONFIG "using_arts"
-  echo "CONFIG_AUDIO_ARTS_LIBS=$audio_arts_libs" >> $MYTH_CONFIG_MAK
-  echo "CONFIG_AUDIO_ARTS_CFLAGS=$audio_arts_cflags" >> $MYTH_CONFIG_MAK
 fi
 
 if enabled audio_jack; then
