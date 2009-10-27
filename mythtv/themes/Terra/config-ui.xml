@@ -321,18 +321,18 @@
             <value>Global Options</value>
         </textarea>
 
-        <button name="scan" from="basebutton" focusorder="5">
-            <position>850,445</position>
+        <button name="scan" from="basewidebutton" focusorder="5">
+            <position>778,445</position>
             <value>Channel Scan</value>
         </button>
 
-        <button name="importicons" from="basebutton" focusorder="6">
-            <position>850,520</position>
+        <button name="importicons" from="basewidebutton" focusorder="6">
+            <position>778,520</position>
             <value>Icon Download</value>
         </button>
 
-        <button name="edittransport" from="basebutton" focusorder="7">
-            <position>850,600</position>
+        <button name="edittransport" from="basewidebutton" focusorder="7">
+            <position>778,600</position>
             <value>Edit Transports</value>
         </button>
 
