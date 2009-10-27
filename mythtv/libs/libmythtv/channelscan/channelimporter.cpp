@@ -501,7 +501,11 @@ ScanDTVTransportList ChannelImporter::InsertChannels(
                         chan.atsc_minor_channel,
                         chan.use_on_air_guide,
                         chan.hidden, chan.hidden_in_guide,
-                        chan.freqid);
+                        chan.freqid,
+                        QString::null,
+                        QString::null,
+                        QString::null,
+                        chan.default_authority);
                 }
             }
 
@@ -627,7 +631,11 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                     chan.atsc_minor_channel,
                     chan.use_on_air_guide,
                     chan.hidden, chan.hidden_in_guide,
-                    chan.freqid);
+                    chan.freqid,
+                    QString::null,
+                    QString::null,
+                    QString::null,
+                    chan.default_authority);
             }
 
             if (filter)

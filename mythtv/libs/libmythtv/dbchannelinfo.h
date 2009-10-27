@@ -90,6 +90,7 @@ class MPUBLIC ChannelInsertInfo
         hidden(false), hidden_in_guide(false),
         freqid(QString::null), icon(QString::null),
         format(QString::null), xmltvid(QString::null),
+        default_authority(QString::null),
         pat_tsid(0), vct_tsid(0), vct_chan_tsid(0), sdt_tsid(0),
         orig_netid(0), netid(0),
         si_standard(QString::null),
@@ -128,7 +129,8 @@ class MPUBLIC ChannelInsertInfo
 
         bool    _is_encrypted,       bool    _is_data_service,
         bool    _is_audio_service,   bool    _is_opencable,
-        bool    _could_be_opencable, int     _decryption_status);
+        bool    _could_be_opencable, int     _decryption_status,
+        QString _default_authority);
 
     ChannelInsertInfo(const ChannelInsertInfo &other) { (*this = other); }
     ChannelInsertInfo &operator=(const ChannelInsertInfo &other);
@@ -156,6 +158,7 @@ class MPUBLIC ChannelInsertInfo
     QString icon;
     QString format;
     QString xmltvid;
+    QString default_authority;
 
     // non-DB info
     uint    pat_tsid;
