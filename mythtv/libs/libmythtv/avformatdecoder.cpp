@@ -461,8 +461,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       itv(NULL),
       selectedVideoIndex(-1),
       // Audio
-      audioSamples(NULL),           audioSamples2(NULL),
-      reformat_ctx(NULL),
+      audioSamples(NULL),           audioSamplesResampled(NULL),
+      reformat_ctx(NULL),           audio_src_fmt(SAMPLE_FMT_NONE),
       allow_ac3_passthru(false),    allow_dts_passthru(false),
       internal_vol(false),
       disable_passthru(false),      max_channels(2),
@@ -478,8 +478,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
     params.prealloced_context = 1;
     audioSamples = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
                                            sizeof(*audioSamples));
-    audioSamples2 = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
-                                           sizeof(*audioSamples2));
+    audioSamplesResampled = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                           sizeof(*audioSamplesResampled));
     ccd608->SetIgnoreTimecode(true);
 
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
@@ -516,7 +516,7 @@ AvFormatDecoder::~AvFormatDecoder()
     delete m_h264_parser;
 
     av_freep((void *)&audioSamples);
-    av_freep((void *)&audioSamples2);
+    av_freep((void *)&audioSamplesResampled);
 
     if (dummy_frame)
     {
@@ -3816,7 +3816,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     avcodeclock.lock();
                     data_size = 0;
-                    s = (char *)audioSamples;
 
                     if (audioOut.do_passthru)
                     {
@@ -3824,6 +3823,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         bool dts = CODEC_ID_DTS == curstream->codec->codec_id;
                         ret = encode_frame(dts, ptr, len,
                                            audioSamples, data_size);
+                        s = (char *)audioSamples;
                     }
                     else
                     {
@@ -3847,24 +3847,30 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             // Convert sample format if required (Myth only handles 8 and 16 bits audio)
                         if (ctx->sample_fmt != SAMPLE_FMT_S16 && ctx->sample_fmt != SAMPLE_FMT_U8)
                         {
-                            if (reformat_ctx)
-                                av_audio_convert_free(reformat_ctx);
-                            reformat_ctx = av_audio_convert_alloc(SAMPLE_FMT_S16, 1,
-                                                                  ctx->sample_fmt, 1,
-                                                                  NULL, 0);
-                            if (!reformat_ctx)
+                            if (audio_src_fmt != ctx->sample_fmt)
                             {
-                                VERBOSE(VB_PLAYBACK, QString("Cannot convert %1 sample format to %2 sample format")
-                                        .arg(avcodec_get_sample_fmt_name(ctx->sample_fmt))
-                                        .arg(avcodec_get_sample_fmt_name(SAMPLE_FMT_S16)));
-
-                                avcodeclock.unlock();
-                                have_err = true;
-                                continue;
+                                if (reformat_ctx)
+                                    av_audio_convert_free(reformat_ctx);
+                                reformat_ctx = av_audio_convert_alloc(SAMPLE_FMT_S16, 1,
+                                                                      ctx->sample_fmt, 1,
+                                                                      NULL, 0);
+                                if (!reformat_ctx)
+                                {
+                                    VERBOSE(VB_PLAYBACK, QString("Cannot convert %1 sample format to %2 sample format")
+                                            .arg(avcodec_get_sample_fmt_name(ctx->sample_fmt))
+                                            .arg(avcodec_get_sample_fmt_name(SAMPLE_FMT_S16)));
+                                    avcodeclock.unlock();
+                                    have_err = true;
+                                    continue;
+                                }
+                                audio_src_fmt = ctx->sample_fmt;
                             }
-
+                        }
+                        
+                        if (reformat_ctx)
+                        {
                             const void *ibuf[6] = {audioSamples};
-                            void *obuf[6] = {audioSamples2};
+                            void *obuf[6] = {audioSamplesResampled};
                             int istride[6] = {av_get_bits_per_sample_format(ctx->sample_fmt)/8};
                             int ostride[6] = {2};
                             int len = data_size/istride[0];
@@ -3879,8 +3885,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             }
 
                             data_size = len * 2;
-                            s = (char *)audioSamples2;
+                            s = (char *)audioSamplesResampled;
                         }
+                        else
+                            s = (char *)audioSamples;
 
                         // When decoding some audio streams the number of
                         // channels, etc isn't known until we try decoding it.

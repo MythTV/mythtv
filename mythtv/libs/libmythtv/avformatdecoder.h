@@ -258,8 +258,9 @@ class AvFormatDecoder : public DecoderBase
 
     // Audio
     short int        *audioSamples;
-    short int        *audioSamples2;
+    short int        *audioSamplesConverted;
     AVAudioConvert   *reformat_ctx;
+    enum SampleFormat audio_src_fmt;
 
     bool              allow_ac3_passthru;
     bool              allow_dts_passthru;
