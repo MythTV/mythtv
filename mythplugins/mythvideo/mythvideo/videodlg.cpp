@@ -4300,7 +4300,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
             OnVideoImageSetDone(metadata);
         }
 
-        if (coverart.length())
+        if (coverart.length() && cover_file.isEmpty())
         {
             OnImageURL(coverart.takeAt(0), metadata, "Coverart");
         }
@@ -4330,7 +4330,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
             OnVideoImageSetDone(metadata);
         }
 
-        if (fanart.length())
+        if (fanart.length() && metadata->GetFanart().isEmpty())
         {
             OnImageURL(fanart.takeAt(0), metadata, "Fanart");
         }
@@ -4360,11 +4360,11 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
             OnVideoImageSetDone(metadata);
         }
 
-        else if (banner.length())
+        if (banner.length() && metadata->GetBanner().isEmpty())
         {
             OnImageURL(banner.takeAt(0), metadata, "Banners");
         }
-        if (metadata->GetBanner().isEmpty() &&
+        else if (metadata->GetBanner().isEmpty() &&
            (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0))
         {
             // Obtain video banner (only for TV)
@@ -4391,11 +4391,11 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
             OnVideoImageSetDone(metadata);
         }
 
-        if (screenshot.length())
+        if (screenshot.length() && metadata->GetScreenshot().isEmpty())
         {
             OnImageURL(screenshot.takeAt(0), metadata, "Screenshots");
         }
-        if (metadata->GetScreenshot().isEmpty() &&
+        else if (metadata->GetScreenshot().isEmpty() &&
            (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0))
         {
             // Obtain video screenshot (only for TV)
