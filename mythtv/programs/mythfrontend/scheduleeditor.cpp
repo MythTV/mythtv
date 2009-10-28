@@ -4,6 +4,7 @@
 // QT
 #include <QString>
 #include <QHash>
+#include <QApplication>
 
 // Libmyth
 #include "mythcontext.h"
@@ -12,6 +13,7 @@
 // Libmythtv
 #include "playgroup.h"
 #include "viewschdiff.h"
+#include "tv_play.h"
 
 // Libmythui
 #include "mythmainwindow.h"
@@ -31,16 +33,17 @@
 #define ENUM_TO_QVARIANT(a) qVariantFromValue(static_cast<int>(a))
 
 
-void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo)
+void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
     RecordingRule *rule = new RecordingRule();
     rule->LoadByProgram(proginfo);
     
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *se = new ScheduleEditor(mainStack, rule);
+    ScheduleEditor *se = new ScheduleEditor(mainStack, rule, 
+                                            static_cast<TV*>(player));
 
     if (se->Create())
-        mainStack->AddScreen(se);
+        mainStack->AddScreen(se, (player == NULL));
     else
         delete se;
 
@@ -53,34 +56,41 @@ void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo)
  */
 
 ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
-                               RecordingInfo *recInfo)
+                               RecordingInfo *recInfo, TV *player)
           : ScheduleCommon(parent, "ScheduleEditor"),
             m_recInfo(new RecordingInfo(*recInfo)), m_recordingRule(NULL),
             m_sendSig(false),
             m_saveButton(NULL), m_cancelButton(NULL), m_rulesList(NULL),
             m_schedOptButton(NULL), m_storeOptButton(NULL),
             m_postProcButton(NULL), m_schedInfoButton(NULL),
-            m_previewButton(NULL)
+            m_previewButton(NULL), m_player(player)
 {
     m_recordingRule = new RecordingRule();
     m_recordingRule->m_recordID = m_recInfo->recordid;
 }
 
 ScheduleEditor::ScheduleEditor(MythScreenStack *parent,
-                               RecordingRule *recRule)
+                               RecordingRule *recRule, TV *player)
           : ScheduleCommon(parent, "ScheduleEditor"),
             m_recInfo(NULL), m_recordingRule(recRule),
             m_sendSig(false),
             m_saveButton(NULL), m_cancelButton(NULL), m_rulesList(NULL),
             m_schedOptButton(NULL), m_storeOptButton(NULL),
             m_postProcButton(NULL), m_schedInfoButton(NULL),
-            m_previewButton(NULL)
+            m_previewButton(NULL), m_player(player)
 {
 }
 
 ScheduleEditor::~ScheduleEditor(void)
 {
     delete m_recordingRule;
+
+    // if we have a player, we need to tell we are done
+    if (m_player)
+    {
+        QString message = QString("VIEWSCHEDULED_EXITING");
+        qApp->postEvent(m_player, new MythEvent(message));
+    }
 }
 
 bool ScheduleEditor::Create()
@@ -140,6 +150,15 @@ bool ScheduleEditor::Create()
     Load();
     
     return true;
+}
+
+void ScheduleEditor::Close()
+{
+    // don't fade the screen if we are returning to the player
+    if (m_player)
+        GetScreenStack()->PopScreen(this, false);
+    else
+        GetScreenStack()->PopScreen(this, true);
 }
 
 void ScheduleEditor::Load()

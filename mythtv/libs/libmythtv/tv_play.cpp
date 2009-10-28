@@ -7925,6 +7925,7 @@ void TV::DoEditSchedule(int editType)
     }
 
     pause_active |= kScheduledRecording == editType;
+    pause_active |= kViewSchedule == editType;
     pause_active |=
         !isLiveTV && (!db_continue_embedded || isNearEnd);
     pause_active |= actx->paused;
@@ -7969,7 +7970,7 @@ void TV::DoEditSchedule(int editType)
         }
         case kScheduledRecording:
         {
-            RunScheduleEditorPtr(&pginfo);
+            RunScheduleEditorPtr(&pginfo, (void *)this);
             ignoreKeyPresses = true;
             break;
         }
@@ -8675,7 +8676,10 @@ void TV::customEvent(QEvent *e)
         DoEditSchedule(editType);
     }
 
-    if (message.left(11) == "EPG_EXITING" || message.left(18) == "PROGFINDER_EXITING")
+    if (message.left(11) == "EPG_EXITING" || 
+        message.left(18) == "PROGFINDER_EXITING" || 
+        message.left(21) == "VIEWSCHEDULED_EXITING" || 
+        message.left(22) == "SCHEDULEEDITOR_EXITING")
     {
         GetMythMainWindow()->SetDrawEnabled(false);
         // Resize the window back to the MythTV Player size

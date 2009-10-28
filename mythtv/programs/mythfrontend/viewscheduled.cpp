@@ -28,7 +28,7 @@ void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
                                            showTV);
 
     if (vsb->Create())
-        mainStack->AddScreen(vsb);
+        mainStack->AddScreen(vsb, (player == NULL));
     else
         delete vsb;
 
@@ -65,6 +65,13 @@ ViewScheduled::~ViewScheduled()
 {
     gContext->removeListener(this);
     gContext->SaveSetting("ViewSchedShowLevel", !m_showAll);
+
+    // if we have a player, we need to tell we are done
+    if (m_player)
+    {
+        QString message = QString("VIEWSCHEDULED_EXITING");
+        qApp->postEvent(m_player, new MythEvent(message));
+    }
 }
 
 bool ViewScheduled::Create()
@@ -107,6 +114,15 @@ bool ViewScheduled::Create()
     BuildFocusList();
 
     return true;
+}
+
+void ViewScheduled::Close()
+{
+    // don't fade the screen if we are returning to the player
+    if (m_player)
+        GetScreenStack()->PopScreen(this, false);
+    else
+        GetScreenStack()->PopScreen(this, true);
 }
 
 void ViewScheduled::SwitchList()

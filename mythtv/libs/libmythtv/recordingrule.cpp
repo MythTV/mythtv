@@ -158,8 +158,7 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
     if (proginfo->recordid)
     {
         m_recordID = proginfo->recordid;
-        if (!Load())
-            return false;
+        Load();
     }
 
     if (m_searchType == kNoSearch || m_searchType == kManualSearch)

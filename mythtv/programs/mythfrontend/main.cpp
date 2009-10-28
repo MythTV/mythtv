@@ -23,6 +23,7 @@ using namespace std;
 #include "tv.h"
 #include "proglist.h"
 #include "progfind.h"
+#include "scheduleeditor.h"
 #include "manualschedule.h"
 #include "playbackbox.h"
 #include "customedit.h"
@@ -952,7 +953,7 @@ void InitJumpPoints(void)
     TV::SetFuncPtr("viewscheduled", (void *)ViewScheduled::RunViewScheduled);
     TV::SetFuncPtr("programguide", (void *)GuideGrid::RunProgramGuide);
     TV::SetFuncPtr("programfinder", (void *)RunProgramFinder);
-    TV::SetFuncPtr("scheduleeditor", (void *)RunProgramFinder);
+    TV::SetFuncPtr("scheduleeditor", (void *)ScheduleEditor::RunScheduleEditor);
 }
 
 
