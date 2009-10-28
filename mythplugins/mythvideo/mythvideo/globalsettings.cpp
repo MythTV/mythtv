@@ -186,26 +186,6 @@ HostLineEdit *SearchListingsCommand()
     return gc;
 }
 
-HostLineEdit *GetPostersCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("MoviePosterCommandLine");
-    gc->setLabel(QObject::tr("Command to search for movie posters"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl -P");
-    gc->setHelpText(QObject::tr("This command must be "
-                    "executable by the user running MythVideo."));
-    return gc;
-}
-
-HostLineEdit *GetFanartCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("MovieFanartCommandLine");
-    gc->setLabel(QObject::tr("Command to search for movie fanart"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl -B");
-    gc->setHelpText(QObject::tr("This command must be "
-                    "executable by the user running MythVideo."));
-    return gc;
-}
-
 HostLineEdit *GetDataCommand()
 {
     HostLineEdit *gc = new HostLineEdit("MovieDataCommandLine");
@@ -840,8 +820,6 @@ VideoGeneralSettings::VideoGeneralSettings()
             new VerticalConfigurationGroup(true, false);
     vman->setLabel(QObject::tr("Movie Metadata Grabbing"));
     vman->addChild(SearchListingsCommand());
-    vman->addChild(GetPostersCommand());
-    vman->addChild(GetFanartCommand());
     vman->addChild(GetDataCommand());
 
     VConfigPage page4(pages, false);
