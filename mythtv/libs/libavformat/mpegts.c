@@ -1533,7 +1533,8 @@ static void new_pes_packet(PESContext *pes, AVPacket *pkt)
     pkt->destruct = av_destruct_packet;
     pkt->data = pes->buffer;
     pkt->size = pes->data_index;
-    memset(pkt->data+pkt->size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+    if (pkt->data && pkt->size)
+        memset(pkt->data+pkt->size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
     pkt->stream_index = pes->st->index;
     pkt->pts = pes->pts;
@@ -1546,6 +1547,7 @@ static void new_pes_packet(PESContext *pes, AVPacket *pkt)
     pes->dts = AV_NOPTS_VALUE;
     pes->buffer = NULL;
     pes->data_index = 0;
+    pes->total_size = 0;
 }
 
 static void init_stream(AVStream *st, int stream_type, int code)
