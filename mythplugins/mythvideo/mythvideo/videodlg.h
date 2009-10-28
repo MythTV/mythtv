@@ -173,7 +173,9 @@ class VideoDialog : public MythScreenType
     //       OnVideoPosterSetDone()
     //       OnPosterCopyFinished()
     // OnVideoPosterSetDone() stop wait background
-    void StartVideoImageSet(Metadata *metadata);
+    void StartVideoImageSet(Metadata *metadata, QStringList coverart = QStringList(),
+                            QStringList fanart = QStringList(), QStringList banner = QStringList(),
+                            QStringList screenshot = QStringList());
 
     // StartVideoSearchByUID() start wait background
     //   OnVideoSearchByUIDDone() stop wait background

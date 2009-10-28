@@ -22,7 +22,7 @@ use Encode;
 
 eval "use DateTime::Format::Strptime"; my $has_date_format = $@ ? 0 : 1;
 
-use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P);
+use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M);
 use Getopt::Std; 
 
 $title = "Alpacine Query"; 
@@ -41,7 +41,6 @@ sub usage {
    print "       -i           display info\n";
    print "\n";
    print "       -M <query>    get movie list\n";
-   print "       -P <movieid>  get movie poster\n";
    print "       -D <movieid>  get movie data\n";
    exit(-1);
 }
@@ -183,32 +182,7 @@ sub getMovieData {
    # fix encoding plot because this use ISO-8859-1
 	Encode::from_to($plot, "utf8", "ISO-8859-1");
 
-   print "Plot:$plot\n";
-   print "UserRating:$userrating\n";
-   print "MovieRating:$movierating\n";
-   print "Runtime:$runtime\n";
-   print "Writers: $writer\n";
-   print "Cast: $cast\n";
-   print "Genres: $lgenres\n";
-   print "Countries: $lcountries\n";
-}
-
-# dump Movie Poster
-sub getMoviePoster {
-   my ($movieid)=@_; # grab movieid parameter
-   if (defined $opt_d) { printf("# looking for movie id: '%s'\n", $movieid);}
-
-   # get the search results  page
-   my $request = "http://www.alpacine.com/pelicula/" . $movieid . "/";
-   if (defined $opt_d) { printf("# request: '%s'\n", $request); }
-
-   my $ua = LWP::UserAgent->new;
-   $ua->timeout(10);
-   $ua->env_proxy;
-   my $response = $ua->get($request);
-   if (!$response->is_success){die $response->status_line;}
-   if (defined $opt_r) { print $response->content; }
-
+   # Add the coverart to the output
    my $uri = "";
    my $impsite = "";
    $impsite = parseBetween($response->content, "/cartel/", "/");
@@ -232,7 +206,16 @@ sub getMoviePoster {
       $data = parseBetween($response->content,"<div class=\"imagen\">","alt");
       $uri = parseBetween($data,"\"","\"");
    }
-   print "$uri";
+
+   print "Plot:$plot\n";
+   print "UserRating:$userrating\n";
+   print "MovieRating:$movierating\n";
+   print "Runtime:$runtime\n";
+   print "Writers: $writer\n";
+   print "Cast: $cast\n";
+   print "Genres: $lgenres\n";
+   print "Countries: $lcountries\n";
+   print "Coverart: $uri\n";
 }
 
 # dump Movie list:  1 entry per line, each line as 'movieid:Movie Title'
@@ -352,13 +335,6 @@ if (defined $opt_D) {
    # take movieid from cmdline arg
    $movieid = shift || die "Usage : $0 -D <movieid>\n";
    getMovieData($movieid);
-}
-
-# get Poster
-elsif (defined $opt_P) {
-   # take movieid from cmdline arg
-   $movieid = shift || die "Usage : $0 -P <movieid>\n";
-   getMoviePoster($movieid);
 }
 
 # get Movie List

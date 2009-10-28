@@ -4276,7 +4276,9 @@ void VideoDialog::ResetMetadata()
 // Copy video images to appropriate directory and set the item's image files.
 // This is the start of an async operation that needs to always complete
 // to OnVideo*SetDone.
-void VideoDialog::StartVideoImageSet(Metadata *metadata)
+void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
+                                     QStringList fanart, QStringList banner,
+                                     QStringList screenshot)
 {
     //createBusyDialog(QObject::tr("Fetching poster for %1 (%2)")
     //                    .arg(metadata->InetRef())
@@ -4298,7 +4300,11 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
             OnVideoImageSetDone(metadata);
         }
 
-        if (cover_file.isEmpty() || IsDefaultCoverFile(cover_file))
+        if (coverart.length())
+        {
+            OnImageURL(coverart.takeAt(0), metadata, "Coverart");
+        }
+        else if (cover_file.isEmpty() || IsDefaultCoverFile(cover_file))
         {
             // Obtain video poster
             VideoPosterSearch *vps = new VideoPosterSearch(this);
@@ -4324,7 +4330,11 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
             OnVideoImageSetDone(metadata);
         }
 
-        if (metadata->GetFanart().isEmpty())
+        if (fanart.length())
+        {
+            OnImageURL(fanart.takeAt(0), metadata, "Fanart");
+        }
+        else if (metadata->GetFanart().isEmpty())
         {
             // Obtain video fanart
             VideoFanartSearch *vfs = new VideoFanartSearch(this);
@@ -4350,6 +4360,10 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
             OnVideoImageSetDone(metadata);
         }
 
+        else if (banner.length())
+        {
+            OnImageURL(banner.takeAt(0), metadata, "Banners");
+        }
         if (metadata->GetBanner().isEmpty() &&
            (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0))
         {
@@ -4377,6 +4391,10 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
             OnVideoImageSetDone(metadata);
         }
 
+        if (screenshot.length())
+        {
+            OnImageURL(screenshot.takeAt(0), metadata, "Screenshots");
+        }
         if (metadata->GetScreenshot().isEmpty() &&
            (metadata->GetSeason() > 0 || metadata->GetEpisode() > 0))
         {
@@ -4654,6 +4672,7 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
     }
 
     std::map<QString, QString> data;
+    QStringList coverart, fanart, banner, screenshot;
 
     if (normal_exit && output.size())
     {
@@ -4688,6 +4707,18 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
             metadata->SetEpisode(data["Episode"].toInt());
 
         m_d->AutomaticParentalAdjustment(metadata);
+
+        // Imagery
+        coverart = data["Coverart"].split(",", QString::SkipEmptyParts);
+        fanart = data["Fanart"].split(",", QString::SkipEmptyParts);
+        banner = data["Banner"].split(",", QString::SkipEmptyParts);
+        screenshot = data["Screenshot"].split(",", QString::SkipEmptyParts);
+
+        // Inetref
+        // Always update this if it exists-- This allows us to transition
+        // seamlessly to TMDB numbers from IMDB numbers.
+        if (data["InetRef"].length())
+            metadata->SetInetRef(data["InetRef"]);
 
         // Cast
         Metadata::cast_list cast;
@@ -4746,7 +4777,7 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
         metadata->UpdateDatabase();
         UpdateItem(GetItemCurrent());
 
-        StartVideoImageSet(metadata);
+        StartVideoImageSet(metadata, coverart, fanart, banner, screenshot);
 
     }
     else
