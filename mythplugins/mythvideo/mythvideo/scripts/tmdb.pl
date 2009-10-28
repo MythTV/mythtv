@@ -6,7 +6,7 @@
 # For more information on MythVideo's external movie lookup mechanism, see
 # the README file in this directory.
 #
-# Author: William Stewart, Stuart Morgan
+# Author: William Stewart, Stuart Morgan, Robert McNamara
 #
 # v0.1
 # - Initial script
@@ -24,7 +24,7 @@ use MythTV::MythVideoCommon;
 
 eval "use DateTime::Format::Strptime"; my $has_date_format = $@ ? 0 : 1;
 
-use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_B);
+use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M);
 use Getopt::Std;
 use Data::Dumper;
 use LWP::Simple;
@@ -56,8 +56,6 @@ sub usage {
     print "       -i           display info\n";
     print "\n";
     print "       -M <query>    get movie list\n";
-    print "       -P <movieid>  get movie poster\n";
-    print "       -B <movieid>  get movie backdrop\n";
     print "       -D <movieid>  get movie data\n";
     exit(-1);
 }
@@ -128,6 +126,20 @@ sub getMovieData {
         KeyAttr => []);
     my $xml = $xs->XMLin($response);
 
+    # Get Coverart
+    my $coverart;
+    my $imagexml = $xs->XMLin($response, ForceArray => ['movie', 'poster', 'backdrop'],
+        KeyAttr => {poster => 'size'});
+
+    if ($imagexml->{"opensearch:totalResults"} > 0) {
+        if (exists $imagexml->{moviematches}->{movie}->[0]->{poster}->{original})
+        {   
+            $coverart = $imagexml->{moviematches}->{movie}->[0]->{poster}->
+                {original}->{content};
+        }
+    }
+
+    # Get Text Data and Fanart
     if ($xml->{"opensearch:totalResults"} > 0) {
         # now get the movie data via Movie.getInfo, Movie.imdbLookup does not
         # provide us all the data
@@ -138,6 +150,21 @@ sub getMovieData {
         if (!defined $response) {
             die "Unable to contact themoviedb.org while retrieving ".
                 "movie data, stopped";
+        }
+
+        my $fanart;
+        my $fanartxml = XMLin($response, ForceArray=> ['backdrop'], KeyAttr => ['key', 'id']);  
+        
+        foreach my $backdrop (@{$fanartxml->{moviematches}->{movie}->{backdrop}}) {
+            if ($backdrop->{size} eq "original")
+            {
+                if ($fanart) {
+                    $fanart = $fanart . "," . $backdrop->{content};
+                }
+                else {
+                    $fanart = $backdrop->{content};
+                }
+            }
         }
 
         $xml = $xs->XMLin($response,
@@ -232,80 +259,8 @@ sub getMovieData {
         if ($revenue) {print "Revenue: $revenue\n";}
         if ($trailer) {print "trailer: $trailer\n";}
         if ($homepage) {print "Homepage: $homepage\n";}
-    }
-}
-
-# dump Movie Poster
-sub getMoviePoster {
-    my ($movieid) = @_; # grab movieid parameter
-    if (defined $opt_d) {
-        printf("# looking for poster for movie id: '%s'\n", $movieid);
-    }
-
-    # get the search results  page
-    my ($rc, $response) =
-        TMDBAPIRequest('Movie.imdbLookup', {'imdb_id' => "tt$movieid"});
-
-    if (!defined $response) {
-        die "Unable to contact themoviedb.org while retrieving ".
-            "movie poster, stopped";
-    }
-
-    my $xml = XMLin($response, ForceArray => ['movie', 'poster', 'backdrop'],
-        KeyAttr => {poster => 'size'});
-
-    if ($xml->{"opensearch:totalResults"} > 0) {
-        if (exists $xml->{moviematches}->{movie}->[0]->{poster}->{mid})
-        {
-            print($xml->{moviematches}->{movie}->[0]->{poster}->
-                {mid}->{content} . "\n");
-        }
-    }
-}
-
-# dump Movie Backdrop
-sub getMovieBackdrop {
-    my ($movieid) = @_; # grab movieid parameter
-    if (defined $opt_d) {
-        printf("# looking for backdrop for movie id: '%s'\n", $movieid);
-    }
-
-    # get the search results page via Movie.imdbLookup
-    my ($rc, $response) =
-        TMDBAPIRequest('Movie.imdbLookup', {'imdb_id' => "tt$movieid"});
-
-    if (!defined $response) {
-        die "Unable to contact themoviedb.org while retrieving ".
-            "movie backdrop, stopped";
-    }
-
-    my $xs = new XML::Simple(SuppressEmpty => '', ForceArray => ['movie'],
-        KeyAttr => []);
-    my $xml = $xs->XMLin($response);
-
-    if ($xml->{"opensearch:totalResults"} > 0) {
-        # now get the movie data via Movie.getInfo, Movie.imdbLookup does not
-        # provide us all the data
-        my $tmdbid = $xml->{moviematches}{movie}[0]{id};
-
-        my ($rc, $response) =
-            TMDBAPIRequest('Movie.getInfo', {'id' => $tmdbid});
-
-        if (!defined $response) {
-            die "Unable to contact themoviedb.org while retrieving ".
-                "movie backdrop, stopped";
-        }
-
-        $xml = XMLin($response, ForceArray=> ['backdrop'], KeyAttr => ['key', 'id']);
-
-        foreach my $backdrop (@{$xml->{moviematches}->{movie}->{backdrop}}) {
-            # print "$backdrop->{content}\n";
-
-            if ($backdrop->{size} eq "original")
-            {
-                print "$backdrop->{content}\n";
-            }
-        }
+        if ($coverart) {print "Coverart: $coverart\n";}
+        if ($fanart) {print "Fanart: $fanart\n";}
     }
 }
 
@@ -383,14 +338,6 @@ if (defined $opt_D) {
     # take movieid from cmdline arg
     my $movieid = shift || die "Usage : $0 -D <movieid>\n";
     getMovieData($movieid);
-} elsif (defined $opt_P) {
-    # take movieid from cmdline arg
-    my $movieid = shift || die "Usage : $0 -P <movieid>\n";
-    getMoviePoster($movieid);
-} elsif (defined $opt_B) {
-    # take movieid from cmdline arg
-    my $movieid = shift || die "Usage : $0 -B <movieid>\n";
-    getMovieBackdrop($movieid);
 } elsif (defined $opt_M) {
     # take query from cmdline arg
     # ignore any options, such as those used by imdb.pl
