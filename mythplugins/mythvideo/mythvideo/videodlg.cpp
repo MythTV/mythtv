@@ -4719,6 +4719,8 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
         // seamlessly to TMDB numbers from IMDB numbers.
         if (data["InetRef"].length())
             metadata->SetInetRef(data["InetRef"]);
+        else
+            metadata->SetInetRef(video_uid);
 
         // Cast
         Metadata::cast_list cast;
@@ -4771,8 +4773,6 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
         }
 
         metadata->SetCountries(video_countries);
-
-        metadata->SetInetRef(video_uid);
 
         metadata->UpdateDatabase();
         UpdateItem(GetItemCurrent());
