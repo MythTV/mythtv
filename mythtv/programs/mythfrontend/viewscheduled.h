@@ -50,6 +50,7 @@ class ViewScheduled : public ScheduleCommon
     void selected(MythUIButtonListItem *);
     void updateInfo(MythUIButtonListItem *);
     void SwitchList(void);
+    void Close(void);
 
   private:
     void FillList(void);

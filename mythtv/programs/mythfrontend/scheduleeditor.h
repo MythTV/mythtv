@@ -22,20 +22,23 @@ class MythUIButtonList;
 class MythUIButtonListItem;
 class MythUIStateType;
 class MythUISpinBox;
+class TV;
 
 class ScheduleEditor : public ScheduleCommon
 {
   Q_OBJECT
   public:
-    ScheduleEditor(MythScreenStack *parent, RecordingInfo* recinfo);
-    ScheduleEditor(MythScreenStack *parent, RecordingRule* recrule);
+    ScheduleEditor(MythScreenStack *parent, RecordingInfo* recinfo,
+                   TV *player = NULL);
+    ScheduleEditor(MythScreenStack *parent, RecordingRule* recrule, 
+                   TV *player = NULL);
    ~ScheduleEditor();
 
     bool Create(void);
     void customEvent(QEvent *event);
 
     /// Callback
-    void *RunScheduleEditor(ProgramInfo *proginfo);
+    static void *RunScheduleEditor(ProgramInfo *proginfo, void *player = NULL);
     
   signals:
     void ruleSaved(int ruleId);
@@ -48,6 +51,7 @@ class ScheduleEditor : public ScheduleCommon
     void ShowSchedInfo(void);
     void ShowPreview(void);
     void Save(void);
+    void Close(void);
     
   private:
     void Load(void);
@@ -73,6 +77,7 @@ class ScheduleEditor : public ScheduleCommon
     MythUIButton    *m_schedInfoButton;
     MythUIButton    *m_previewButton;
     
+    TV *m_player;
 };
 
 class SchedOptEditor : public MythScreenType
