@@ -7,29 +7,31 @@
 # For more information on MythVideo's external movie lookup mechanism, see
 # the README file in this directory.
 #
-# Author: Xavier Hervy (maxpower44 AT tiscali DOT fr)
-#
+# Original author: Xavier Hervy (maxpower44 AT tiscali DOT fr)
 
 # changes:
-# 9-10-2006: Anduin Withers
-#   Changed output to utf8
-#   Made -u option a dummy for this release, it is deprecated and will be
-#   removed
-
-#   18-06-2009: Geoffroy Geerseau ( http://www.soslinux.net : jamdess AT soslinux DOT net )
-#   Add regex to new html code
+#   20-10-2009: Geoffroy Geerseau ( http://www.soslinux.net : jamdess AT soslinux DOT net )
+#   Modified for the new allocine templates
+#   25-10-2009: Geoffroy Geerseau ( http://www.soslinux.net : jamdess AT soslinux DOT net )
+#   Poster download correction
+#   Userrating correction
+#   28-10-2009: Robert McNamara (Myth Dev)
+#   Fix issues in above patches-- files should never be downloaded to /tmp.
+#   Convert script to output in new grabber output format for .23.  Leave backwards compat.
    
 use File::Basename;
+use File::Copy;
 use lib dirname($0);
 use Encode;
-
+use utf8;
+use Encode 'from_to';
 use MythTV::MythVideoCommon;
 
 use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_originaltitle $opt_casting $opt_u_dummy);
 use Getopt::Long;
 
 $title = "Allocine Query"; 
-$version = "v2.04";
+$version = "v2.05";
 $author = "Xavier Hervy";
 push(@MythTV::MythVideoCommon::URL_get_extras, ($title, $version));
 
@@ -67,7 +69,6 @@ sub help {
    usage();
 }
 
-#print encode('iso-8859-1','Durée');
 # returns text within 'data' without tag
 sub removeTag {
    my ($data)=@_; # grab parameters
@@ -93,44 +94,45 @@ sub getMovieData {
    my $request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid . ".html";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my ($rc, $response) = myth_url_get($request);
-
+   from_to($response,'utf-8','iso-8859-1');
    # parse title and year
    my $title = parseBetween($response, "<title>", "</title>");
    $title =~ s/\s*-\s*AlloCin.*//;
-   my $original_title = parseBetween($response, ">Titre original : <i>","</i></h3></div>");
-   $original_title = removeTag($original_title);
+   $title =~ s/(.*)\(.*$/$1/;
+   $title =~ s/^\s*(.*)\s*$/$1/;
+   my $original_title = parseBetween($response, "Titre original :","<br");
+   $original_title = trim(removeTag($original_title));
    if (defined $opt_originaltitle){
       if ($original_title ne  ""){
         $title = $title . " (" . $original_title . ")";
       }
    }
    
-   #print "titre = $title\n";
    $title = removeTag($title);
-   my $year = parseBetween($response,"e de production : ","</h");
+   my $year = parseBetween(parseBetween($response,"/film/tous/decennie","/a>"),'>','<');
 
    # parse director 
    my $tempresponse = $response;
-   $tempresponse =~ s/>R.alis.\spar/>Ralispar/gm;
-   my $director = parseBetween($tempresponse,">Ralispar ","</h");
+   my $director = parseBetween($tempresponse,"Réalisé par ","</a></span>");
    $director = removeTag($director);
 
    # parse plot
-   my $plot = parseBetween($response,"<td valign=\"top\" style=\"padding:10 0 0 0\"><div align=\"justify\"><h4>","</h4></div></td>");
+   my $plot = parseBetween($response,"Synopsis :</span>","</p>");
    $plot =~ s/\n//g;
-   $plot = removeTag($plot);
+   $plot = trim(removeTag($plot));
   
    # parse user rating
    my $userrating=0;
-   my $tmpratings = parseBetween($response,"Critiques&nbsp;:</b></h5>", "</table>");
-   my $rating_pat = qr'class="etoile_(\d+)"';
-
-   # ratings are from one to four stars
-   my @ratings = ($tmpratings =~ m/$rating_pat/g);
-   $userrating += $_ foreach @ratings;
-   if (@ratings) { $userrating /= @ratings; }
-	
-   if ($userrating) { $userrating = int($userrating * 2.5); }
+   my $tmpratings = parseBetween(parseBetween($response,"/film/critiquepublic_gen_cfilm=$movieid.html'><img", "</span></p></div>"),'(',')');
+   $tmpratings =~ s/,/./gm;
+   if($tmpratings =~ /^(\d+\.?\d*|\.\d+)$/ && !$tmpratings eq "")
+   {   
+	$userrating = int($tmpratings*2.5);
+   }
+   else
+   {
+	$userrating =  "";
+   }
 
    # parse rating
    my $movierating = parseBetween($response,"Interdit aux moins de ","ans");
@@ -145,9 +147,7 @@ sub getMovieData {
 
    # parse movie length
 
-   $tempresponse = $response;
-   $tempresponse =~ s/>Dur.e\s:/>Durae\ :/gm;
-   my $runtime = parseBetween($tempresponse,"Durae : ",".&nbsp;</h");
+   my $runtime = trim(parseBetween($response,"Durée :","min"));
    my $heure;
    my $minutes;
    ($heure,$minutes)=($runtime=~/[^\d]*(\d+)[^\d]*(\d*)/);
@@ -156,37 +156,49 @@ sub getMovieData {
       $runtime = $heure * 60;
    }else{
        $runtime = $heure * 60 + $minutes;
-  }
-
- 
-
+   }
+   
 
    # parse cast 
 
    my $castchunk;
 
-   my $name_link_pat = qr'<a .*?href="/personne/.*?".*?>(.*?)</a>';
-   if (defined $opt_casting){
-	  my ($tmprc, $responsecasting) = myth_url_get("http://www.allocine.fr/film/casting_gen_cfilm=" . $movieid . ".html");
-      $castchunk = parseBetween($responsecasting, "Acteurs", "</table");
-   }
-   
-   if (!$castchunk) {
-      $castchunk = parseBetween($response, ">Avec ","</h");
-   }
+   $castchunk = parseBetween($response, "Avec ","<img class=");
    
    my $cast = "";
-   if (defined $castchunk) {
-      $cast = trim(join(',', ($castchunk =~ m/$name_link_pat/g)));
-   }
-
+   $cast = trim(join(',', removeTag($castchunk)));
    #genres
-   my $genres = parseBetween($response,">Genre : ","</h");
-   $genres = removeTag($genres);
+   my $genres = parseBetween($response,"Genre :","<br");
+   $genres =~ s/\s*\n*(.*)\s*$/ $1/;
+   $genres = trim(removeTag($genres));
+   $genres =~ s/\s*\n*(.*)\s*$/ $1/;
    
    #countries
-   my $countries = parseBetween($response,">Film ",".&nbsp;</h");
-   $countries = removeTag($countries);
+   my $countries = parseBetween($response,"Long-métrage",".");
+   $countries = trim(removeTag($countries));
+   $countries =~ s/\s*(.*)\s*$/ $1/;
+
+   # parse for coverart
+   my $mediafile = parseBetween($response,"<a href=\"/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=","\" >");
+   $covrequest = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=".$mediafile;
+   ($rc, $covresponse) = myth_url_get($covrequest);
+   my $uri = parseBetween(parseBetween($covresponse,"<div class=\"tac\" style=\"\">","</div>"),"<img src=\"","\" alt");
+   if ($uri eq "")
+   {
+        $request = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/";
+        ($rc, $response) = myth_url_get($request);
+        my $tmp_uri = parseBetween($response, "<a href=\"/film/fichefilm-".$movieid."/affiches/\">"," alt=");
+        $tmp_uri =~ s/\n/ /gm;
+        $uri = trim(parseBetween($tmp_uri,"<img src='h","'"));
+        if($uri ne "")
+        {
+                $uri = "h$uri";
+        }
+   }
+   # if no picture was found, just download the empty poster
+   if($uri eq ""){
+        $uri = "http://images.allocine.fr/r_160_214/commons/emptymedia/AffichetteAllocine.gif";
+   }
 
    # output fields (these field names must match what MythVideo is looking for)
    print "Title:$title\n";
@@ -202,6 +214,7 @@ sub getMovieData {
    print "Cast:$cast\n";
    print "Genres:$genres\n";
    print "Countries:$countries\n";
+   print "Coverart: $uri\n";
 }
 
 # dump Movie Poster
@@ -211,78 +224,33 @@ sub getMoviePoster {
 
    # get the search results  page
    
-   my $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . ".html";
+   my $request = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/";
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my ($rc, $response) = myth_url_get($request);
-   my $page=parseBetween($response,"&page=",".html\" class=\"link1\"><span class=\"text2\">>>");
-   my @pages = split ("page=",$page);
-   $request = "";
+   my $mediafile = parseBetween($response,"<a href=\"/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=","\" >");
 
-   my $uri = "";
-   my $furi = "";
-   my $first= 1;
-   for $page (@pages ) { 
-        $request = $page;
-  	
-	#
-	# get only the page number
-	# 
-	$request = substr($request, 0, index($request, '.'));
-  
-        if (!($request eq "")) {
-	     $request = "http://www.allocine.fr/film/galerie_gen_cfilm=" . $movieid . "&page=" . $request . ".html";
-	     ($rc, $response) = myth_url_get($request);
-        
-             $uri = parseBetween($response,"<table style=\"padding:0 0 0 0\" border=\"0\" >","Ko\" />");
-             $uri = parseBetween($uri ,"<img src=\"","\" border=\"0\" class=\"galerie\" ");
-	     if ($first && ! ($uri eq ""))
-	     {
-		     $furi = $uri;
-		     $first = 0;
-	     }
-
-
-        }
-	#
-	# stop when we have an poster...
-	#
-	last if (($uri =~ /affiche/) or ($uri =~ /_af/))
-   }
-
-   # if $uri =~ affiche or _af then get the first poster if exist
-
-   if (($uri !~ /affiche/) or ($uri !~ /_af/))
-   {
-	   if ($first == 0)
-	   {
-		   $uri = $furi;
-	   }
-   }
-
-   #
-   # in case nothing was found fall back to the little poster...
-   #
+   $request = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=".$mediafile;
+   ($rc, $response) = myth_url_get($request);
+   my $uri = parseBetween(parseBetween($response,"<div class=\"tac\" style=\"\">","</div>"),"<img src=\"","\" alt");
    if ($uri eq "")
    {
-	$request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid .".html";
+	$request = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/";
 	($rc, $response) = myth_url_get($request);
-	$response = parseBetween($response, "sousnav_separe_droite2.gif","sortie");
-	$uri = parseBetween($response, "<img src=\"","\"");
-   
-        #
-	# in case no little poster was found get the small DVD poster
-	# if exists !
-        #
-        if ($uri =~ /AffichetteAllocine/)
+	my $tmp_uri = parseBetween($response, "<a href=\"/film/fichefilm-".$movieid."/affiches/\">"," alt=");
+        $tmp_uri =~ s/\n/ /gm;
+	$uri = trim(parseBetween($tmp_uri,"<img src='h","'"));
+	if($uri ne "")
 	{
-		$request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid .".html";
-		($rc, $response) = myth_url_get($request);
-		$response = parseBetween($response, "Disponible en","Zone");
-		$uri = parseBetween($response, "<img src=\"","\"");
-		return if ($uri eq "");
+		$uri = "h$uri";
 	}
+        print "$uri\n";
    }
- 
+   
+   # if no picture was found, just download the empty poster
+   if($uri eq ""){
+	$uri = "http://images.allocine.fr/r_160_214/commons/emptymedia/AffichetteAllocine.gif";
+   }
+
    print "$uri\n";
 }
 
@@ -296,17 +264,18 @@ sub getMovieList {
 	}
 
 	# get the search results  page
-	my $request = "http://www.allocine.fr/recherche/?rub=1&motcle=$query";
+	my $request = "http://www.allocine.fr/recherche/1/?q=$query";
 	if (defined $opt_d) { printf("# request: '%s'\n", $request); }
 	my ($rc, $response) = myth_url_get($request);
-
+	from_to($response,'utf-8','iso-8859-1');
+	$response =~ s/\n//g;
 	# extract possible matches
 	#    possible matches are grouped in several catagories:  
 	#        exact, partial, and approximate
 	my $exact_matches = $response;
 	# parse movie list from matches
-	my $beg = "<h4><a href=\"/film/fichefilm_gen_cfilm=";
-	my $end = "</a></h4>";
+	my $beg = "<div style=\"margin-top:-5px;\">";
+	my $end = "<span class=\"fs11\">";
 
 	my @movies;
 
@@ -318,11 +287,15 @@ sub getMovieList {
 		my $finish = index($data, $end, $start);
 
 		my $title;
+		my $movienum;
+		my $moviename;
 		while ($start != -1) {
 			$start += length($beg);
-			my $sub = substr($data, $start, $finish - $start);
-			my ($movienum, $moviename) =
-				split(".html\" class=\"link1\">", $sub);
+			my $sub1 = substr($data, $start, $finish - $start);
+			$sub1 =~ s/(.*)\(.*$/$1/;
+			$moviename = trim(removeTag($sub1));
+			$movienum = parseBetween($sub1,"<a href='/film/fichefilm_gen_cfilm=",".html");
+			
 			$title = removeTag($moviename);
 			$moviename = removeTag($moviename);
 			my ($movieyear)= $moviename =~/\((\d+)\)/;
@@ -334,7 +307,7 @@ sub getMovieList {
 			# advance data to next movie
 			$data = substr($data, - (length($data) - $finish));
 			$start = index($data, $beg);
-			$finish = index($data, $end, $start + 1); 
+			$finish = index($data, $end, $start); 
 
 			# add to array
 			push(@movies, "$movienum:$moviename");
