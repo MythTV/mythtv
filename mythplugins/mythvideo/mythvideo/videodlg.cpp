@@ -4300,7 +4300,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
             OnVideoImageSetDone(metadata);
         }
 
-        if (coverart.length() && cover_file.isEmpty())
+        if (coverart.size() && cover_file.isEmpty())
         {
             OnImageURL(coverart.takeAt(0), metadata, "Coverart");
         }
@@ -4330,7 +4330,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
             OnVideoImageSetDone(metadata);
         }
 
-        if (fanart.length() && metadata->GetFanart().isEmpty())
+        if (fanart.size() && metadata->GetFanart().isEmpty())
         {
             OnImageURL(fanart.takeAt(0), metadata, "Fanart");
         }
@@ -4360,7 +4360,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
             OnVideoImageSetDone(metadata);
         }
 
-        if (banner.length() && metadata->GetBanner().isEmpty())
+        if (banner.size() && metadata->GetBanner().isEmpty())
         {
             OnImageURL(banner.takeAt(0), metadata, "Banners");
         }
@@ -4391,7 +4391,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
             OnVideoImageSetDone(metadata);
         }
 
-        if (screenshot.length() && metadata->GetScreenshot().isEmpty())
+        if (screenshot.size() && metadata->GetScreenshot().isEmpty())
         {
             OnImageURL(screenshot.takeAt(0), metadata, "Screenshots");
         }

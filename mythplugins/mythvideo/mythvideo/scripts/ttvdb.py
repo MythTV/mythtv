@@ -331,7 +331,7 @@ name_parse=[
 massage={'writer':'|','director':'|', 'overview':'&', 'gueststars':'|' }
 # Keys and titles used for episode data (option '-D')
 data_keys =['seasonnumber','episodenumber','episodename','firstaired','director','overview','rating','writer','filename','language' ]
-data_titles=['Season:','Episode:','Subtitle:','ReleaseDate:','Director:','Plot:','UserRating:','Writers:','Episode Image:','Language:' ]
+data_titles=['Season:','Episode:','Subtitle:','ReleaseDate:','Director:','Plot:','UserRating:','Writers:','Screenshot:','Language:' ]
 # High level dictionay keys for select graphics URL(s)
 fanart_key='fanart'
 banner_key='series'
