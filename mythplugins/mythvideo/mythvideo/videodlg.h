@@ -92,7 +92,6 @@ class VideoDialog : public MythScreenType
     void EditMetadata();
     void VideoSearch();
     void TitleSubtitleSearch();
-    void ImageOnlyDownload();
     void ManualVideoUID();
     void ManualVideoTitle();
     void ResetMetadata();
@@ -123,7 +122,6 @@ class VideoDialog : public MythScreenType
 
     // Called when the underlying data for an item changes
     void OnVideoSearchListSelection(QString video_uid);
-    void OnVideoImgSearchListSelection(QString video_uid);
 
     void OnManualVideoUID(QString video_uid);
     void OnManualVideoTitle(QString title);
@@ -201,9 +199,6 @@ class VideoDialog : public MythScreenType
                                   Metadata *metadata);
     void OnVideoSearchByTitleSubtitleDone(bool normal_exit,
                                   QStringList result,
-                                  Metadata *metadata);
-    void OnVideoImageOnlyDone(bool normal_exit,
-                                  const QStringList &results,
                                   Metadata *metadata);
 
 // and now the end points
