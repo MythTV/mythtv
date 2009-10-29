@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="thetvdb.com Query Engine";
 __author__="R.D.Vaughan"
-__version__="v1.0.3"        # Version .1 Initial development
+__version__="v1.0.4"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
 							# Version .3 Cleaned up the documentation and added a usage display option
 							# Version .4 Added override formating of the number option (-N)
@@ -114,6 +114,7 @@ __version__="v1.0.3"        # Version .1 Initial development
 							# Version 1.0.3 Conform to new -D standards which return all graphics URLs along
 							#               with text meta data. Also Posters, Banners and Fan art have one or
 							#               comma separated URLs as one continuous string.
+							# Version 1.0.4 Poster Should be Coverart instead.
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -122,7 +123,7 @@ NOTE: In the case of multiple queries the display order will always be:
     Numbers            - Used as a single option not valid as a multi-option parameter
     List               - Used as a single option not valid as a multi-option parameter
     Data               - The initial line of an episode's data starts with 'Series:'
-    Poster URL(s)      - The initial line is 'poster:' then comma seperated URL(s)
+    Coverart URL(s)    - The initial line is 'Coverart:' then comma seperated URL(s)
     Fan art URL(s)     - The initial line is 'fanart:' then comma seperated URL(s)
     Banner URL(s)      - The initial line is 'banner:' then comma seperated URL(s)
     Screenshot URL(s)  - The initial line is 'screenshot:' then the URL
@@ -180,14 +181,14 @@ Banner:http://www.thetvdb.com/banners/graphical/72449-g2.jpg,http://www.thetvdb.
 
 (Return the posters, banners and fan art for a series)
 > ttvdb -PFB "Sanctuary"
-Poster:http://www.thetvdb.com/banners/posters/80159-2.jpg,http://www.thetvdb.com/banners/posters/80159-1.jpg
+Coverart:http://www.thetvdb.com/banners/posters/80159-2.jpg,http://www.thetvdb.com/banners/posters/80159-1.jpg
 Fanart:http://www.thetvdb.com/banners/fanart/original/80159-2.jpg,http://www.thetvdb.com/banners/fanart/original/80159-1.jpg,http://www.thetvdb.com/banners/fanart/original/80159-8.jpg,http://www.thetvdb.com/banners/fanart/original/80159-6.jpg,http://www.thetvdb.com/banners/fanart/original/80159-5.jpg,http://www.thetvdb.com/banners/fanart/original/80159-9.jpg,http://www.thetvdb.com/banners/fanart/original/80159-3.jpg,http://www.thetvdb.com/banners/fanart/original/80159-7.jpg,http://www.thetvdb.com/banners/fanart/original/80159-4.jpg
 Banner:http://www.thetvdb.com/banners/graphical/80159-g2.jpg,http://www.thetvdb.com/banners/graphical/80159-g3.jpg,http://www.thetvdb.com/banners/graphical/80159-g.jpg
 
 (Return thetvdb.com's top rated poster, banner and fan art for a TV Series)
 (NOTE: If there is no graphic for a type or any graphics at all then those types are not returned)
 > ttvdb -tPFB "Stargate SG-1"
-Poster:http://www.thetvdb.com/banners/posters/72449-1.jpg
+Coverart:http://www.thetvdb.com/banners/posters/72449-1.jpg
 Fanart:http://www.thetvdb.com/banners/fanart/original/72449-1.jpg
 Banner:http://www.thetvdb.com/banners/graphical/185-g3.jpg
 > ttvdb -tB "Night Gallery"
@@ -239,7 +240,7 @@ Seriesid:80159
 Productioncode:101
 Genres:Action and Adventure, Science-Fiction
 Runtime:60
-Poster:http://www.thetvdb.com/banners/seasons/80159-0-2.jpg,http://www.thetvdb.com/banners/seasons/80159-0-4.jpg,http://www.thetvdb.com/banners/seasons/80159-0-3.jpg,http://www.thetvdb.com/banners/seasons/80159-0.jpg
+Coverart:http://www.thetvdb.com/banners/seasons/80159-0-2.jpg,http://www.thetvdb.com/banners/seasons/80159-0-4.jpg,http://www.thetvdb.com/banners/seasons/80159-0-3.jpg,http://www.thetvdb.com/banners/seasons/80159-0.jpg
 Fanart:http://www.thetvdb.com/banners/fanart/original/80159-2.jpg,http://www.thetvdb.com/banners/fanart/original/80159-1.jpg,http://www.thetvdb.com/banners/fanart/original/80159-8.jpg,http://www.thetvdb.com/banners/fanart/original/80159-6.jpg,http://www.thetvdb.com/banners/fanart/original/80159-5.jpg,http://www.thetvdb.com/banners/fanart/original/80159-9.jpg,http://www.thetvdb.com/banners/fanart/original/80159-3.jpg,http://www.thetvdb.com/banners/fanart/original/80159-7.jpg,http://www.thetvdb.com/banners/fanart/original/80159-4.jpg
 Banner:http://www.thetvdb.com/banners/graphical/80159-g2.jpg,http://www.thetvdb.com/banners/graphical/80159-g3.jpg,http://www.thetvdb.com/banners/graphical/80159-g.jpg
 
@@ -1189,7 +1190,7 @@ fan art and banners. The richer the source the more valuable the script.\n\n"
 				if single_option==True:
 					print (search_for_series(t, series_name)['poster']).replace(http_find, http_replace)
 				else:
-					print u"Poster:%s" % (search_for_series(t, series_name)['poster']).replace(http_find, http_replace)
+					print u"Coverart:%s" % (search_for_series(t, series_name)['poster']).replace(http_find, http_replace)
 		if opts.fanart==True:
 			if search_for_series(t, series_name)['fanart'] != None:
 				if single_option==True:
@@ -1210,7 +1211,7 @@ fan art and banners. The richer the source the more valuable the script.\n\n"
 			if len(series_season_ep) < 2:
 				print u"Season and Episode numbers required."
 				sys.exit(True)
-		all_posters = u'Poster:'
+		all_posters = u'Coverart:'
 		all_empty = len(all_posters)
 		for p in get_graphics(t, opts, series_season_ep, poster_type, single_option, opts.language):
 			all_posters = all_posters+p+u','

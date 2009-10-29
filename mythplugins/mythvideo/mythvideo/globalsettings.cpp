@@ -109,53 +109,42 @@ HostCheckBox *VideoTreeRemember()
     return gc;
 }
 
-HostLineEdit *SearchListingsCommand()
+QDir TVScriptPath = QString("%1/mythvideo/scripts/Television/").arg(GetShareDir());
+QStringList TVScripts = TVScriptPath.entryList(QDir::Files);
+QDir MovieScriptPath = QString("%1/mythvideo/scripts/Movie/").arg(GetShareDir());
+QStringList MovieScripts = MovieScriptPath.entryList(QDir::Files);
+
+HostComboBox *MovieGrabber()
 {
-    HostLineEdit *gc = new HostLineEdit("MovieListCommandLine");
-    gc->setLabel(QObject::tr("Command to search for movie listings"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl -M");
-    gc->setHelpText(QObject::tr("This command must be "
-                    "executable by the user running MythVideo."));
+    HostComboBox *gc = new HostComboBox("mythvideo.MovieGrabber");
+    gc->setLabel(QObject::tr("Movie Grabber Script"));
+
+    for (QStringList::const_iterator i = MovieScripts.begin();
+            i != MovieScripts.end(); ++i)
+    {
+        gc->addSelection(QString("%1").arg(*i),
+                     QString("%1mythvideo/scripts/Movie/%2")
+                     .arg(GetShareDir()).arg(*i));
+    }
+    gc->setHelpText(QObject::tr("This is the script used to search "
+                    "for and download Movie Metadata."));
     return gc;
 }
 
-HostLineEdit *GetDataCommand()
+HostComboBox *TVGrabber()
 {
-    HostLineEdit *gc = new HostLineEdit("MovieDataCommandLine");
-    gc->setLabel(QObject::tr("Command to extract data for movies"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/tmdb.pl -D");
-    gc->setHelpText(QObject::tr("This command must be "
-                    "executable by the user running MythVideo."));
-    return gc;
-}
-
-HostLineEdit *SearchTVListingsCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("mythvideo.TVListCommandLine");
-    gc->setLabel(QObject::tr("Command to search for TV shows in MythVideo"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -M");
-    gc->setHelpText(QObject::tr("This command must be "
-                    "executable by the user running MythVideo."));
-    return gc;
-}
-
-HostLineEdit *GetTVDataCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("mythvideo.TVDataCommandLine");
-    gc->setLabel(QObject::tr("Command to extract data for TV Episodes"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -D");
-    gc->setHelpText(QObject::tr("This command must be "
-                    "executable by the user running MythVideo."));
-    return gc;
-}
-
-HostLineEdit *GetTVTitleSubCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("mythvideo.TVTitleSubCommandLine");
-    gc->setLabel(QObject::tr("Command to search for TV by Title/Subtitle"));
-    gc->setValue(GetShareDir() + "mythvideo/scripts/ttvdb.py -N");
-    gc->setHelpText(QObject::tr("This command must be "
-                    "executable by the user running MythVideo."));
+    HostComboBox *gc = new HostComboBox("mythvideo.TVGrabber");
+    gc->setLabel(QObject::tr("Television Grabber Script"));
+    
+    for (QStringList::const_iterator i = TVScripts.begin();
+            i != TVScripts.end(); ++i)
+    {
+        gc->addSelection(QString("%1").arg(*i),
+                     QString("%1mythvideo/scripts/Television/%2")
+                     .arg(GetShareDir()).arg(*i));
+    }
+    gc->setHelpText(QObject::tr("This is the script used to search "
+                    "for and download Television Metadata."));
     return gc;
 }
 
@@ -697,6 +686,8 @@ VideoGeneralSettings::VideoGeneralSettings()
     page2->addChild(VideoListUnknownFiletypes());
     page2->addChild(VideoTreeNoMetaData());
     page2->addChild(VideoTreeRemember());
+    page2->addChild(MovieGrabber());
+    page2->addChild(TVGrabber());
 
     VConfigPage page3(pages, false);
     page3->addChild(SetDVDDevice());
@@ -707,19 +698,6 @@ VideoGeneralSettings::VideoGeneralSettings()
     page3->addChild(new RandomTrailers());
 
     // page 4
-    VerticalConfigurationGroup *vman =
-            new VerticalConfigurationGroup(true, false);
-    vman->setLabel(QObject::tr("Metadata Grabbing"));
-    vman->addChild(SearchListingsCommand());
-    vman->addChild(GetDataCommand());
-    vman->addChild(SearchTVListingsCommand());
-    vman->addChild(GetTVDataCommand());
-    vman->addChild(GetTVTitleSubCommand());
-
-    VConfigPage page4(pages, false);
-    page4->addChild(vman);
-
-    // page 5
     VerticalConfigurationGroup *pctrl =
             new VerticalConfigurationGroup(true, false);
     pctrl->setLabel(QObject::tr("Parental Control Settings"));
@@ -728,11 +706,11 @@ VideoGeneralSettings::VideoGeneralSettings()
     pctrl->addChild(VideoAdminPasswordThree());
     pctrl->addChild(VideoAdminPasswordTwo());
     pctrl->addChild(VideoAggressivePC());
-    VConfigPage page5(pages, false);
-    page5->addChild(pctrl);
+    VConfigPage page4(pages, false);
+    page4->addChild(pctrl);
 
-    VConfigPage page6(pages, false);
-    page6->addChild(new RatingsToPL());
+    VConfigPage page5(pages, false);
+    page5->addChild(new RatingsToPL());
 
     int page_num = 1;
     for (ConfigPage::PageList::const_iterator p = pages.begin();

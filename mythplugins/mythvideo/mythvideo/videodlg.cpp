@@ -483,17 +483,20 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -M"));
-                cmd = gContext->GetSetting("mythvideo.TVListCommandLine",
+                    .arg("mythvideo/scripts/Television/ttvdb.py"));
+
+                cmd = gContext->GetSetting("mythvideo.TVGrabber",
                                                         def_cmd);
+                cmd.append(" -M");
             }
             else
             {
                 QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/tmdb.pl -M"));
+                    .arg("mythvideo/scripts/Movie/tmdb.pl"));
 
-                cmd = gContext->GetSetting("MovieListCommandLine", def_cmd);
+                cmd = gContext->GetSetting("mythvideo.MovieGrabber", def_cmd);
+                cmd.append(" -M");
             }
                 QStringList args;
                 args += title;
@@ -539,9 +542,10 @@ namespace
 
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -N"));
-                cmd = gContext->GetSetting("mythvideo.TVTitleSubCommandLine",
+                    .arg("mythvideo/scripts/Television/ttvdb.py"));
+                cmd = gContext->GetSetting("mythvideo.TVGrabber",
                                                         def_cmd);
+                cmd.append(" -N");
                 QStringList args;
                 args += title;
                 args += subtitle;
@@ -592,9 +596,10 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/ttvdb.py -D"));
-                const QString cmd = gContext->GetSetting("mythvideo.TVDataCommandLine",
+                    .arg("mythvideo/scripts/Television/ttvdb.py"));
+                QString cmd = gContext->GetSetting("mythvideo.TVGrabber",
                                                         def_cmd);
+                cmd.append(" -D");
                 QStringList args;
                 args << video_uid << QString::number(m_season) 
                                   << QString::number(m_episode);
@@ -604,9 +609,10 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/tmdb.pl -D"));
-                const QString cmd = gContext->GetSetting("MovieDataCommandLine",
+                    .arg("mythvideo/scripts/Movie/tmdb.pl"));
+                QString cmd = gContext->GetSetting("mythvideo.MovieGrabber",
                                                         def_cmd);
+                cmd.append(" -D");
                 StartRun(cmd, QStringList(video_uid), "Video Data Query");
             }
         }
