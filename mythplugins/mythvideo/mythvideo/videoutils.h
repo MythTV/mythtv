@@ -43,4 +43,8 @@ QString GetDisplayGenres(const Metadata &item);
 QString GetDisplayCountries(const Metadata &item);
 QStringList GetDisplayCast(const Metadata &item);
 
+int editDistance(const QString& s, const QString& t);
+QString nearestName(const QString& actual, const QStringList& candidates,
+                    bool mythvideomode = false);
+
 #endif // VIDEOUTILS_H_
