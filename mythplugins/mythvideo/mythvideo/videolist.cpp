@@ -19,6 +19,7 @@
 #include "videoutils.h"
 #include "parentalcontrols.h"
 #include "videolist.h"
+#include "videodlg.h"
 
 class TreeNodeDataPrivate
 {
@@ -646,12 +647,12 @@ class VideoListImp
 
     void build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
                             bool include_updirs);
-    MythGenericTree *buildVideoList(bool filebrowser, bool flatlist, bool group_list,
+    MythGenericTree *buildVideoList(bool filebrowser, bool flatlist,
                                 int group_type, const ParentalLevel &parental_level,
                                 bool include_updirs);
 
     void refreshList(bool filebrowser, const ParentalLevel &parental_level,
-                     bool flatlist, bool group_list, int group_type);
+                     bool flatlist, int group_type);
 
     unsigned int count() const
     {
@@ -758,19 +759,18 @@ VideoList::~VideoList()
 }
 
 MythGenericTree *VideoList::buildVideoList(bool filebrowser, bool flatlist,
-    bool grouplist, int group_type, const ParentalLevel &parental_level,
+    int group_type, const ParentalLevel &parental_level,
     bool include_updirs)
 {
-    return m_imp->buildVideoList(filebrowser, flatlist, grouplist,
+    return m_imp->buildVideoList(filebrowser, flatlist,
                                  group_type, parental_level, include_updirs);
 }
 
 void VideoList::refreshList(bool filebrowser,
                             const ParentalLevel &parental_level,
-                            bool flat_list, bool group_list, int group_type)
+                            bool flat_list, int group_type)
 {
-    m_imp->refreshList(filebrowser, parental_level, flat_list, group_list,
-                       group_type);
+    m_imp->refreshList(filebrowser, parental_level, flat_list, group_type);
 }
 
 unsigned int VideoList::count() const
@@ -891,11 +891,11 @@ void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
 //      If false, the hierarchy present on the filesystem or in the database
 //      is preserved. In this mode, both sub-dirs and updirs are present.
 MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
-                                          bool grouplist, int group_type,
+                                          int group_type, 
                                           const ParentalLevel &parental_level,
                                           bool include_updirs)
 {
-    refreshList(filebrowser, parental_level, flatlist, grouplist, group_type);
+    refreshList(filebrowser, parental_level, flatlist, group_type);
 
     typedef std::map<QString, MythGenericTree *> string_to_tree;
     string_to_tree prefix_tree_map;
@@ -919,8 +919,7 @@ MythGenericTree *VideoListImp::buildVideoList(bool filebrowser, bool flatlist,
 
 void VideoListImp::refreshList(bool filebrowser,
                                const ParentalLevel &parental_level,
-                               bool flat_list, bool group_list,
-                               int group_type)
+                               bool flat_list, int group_type)
 {
 
     m_video_filter.setParentalLevel(parental_level.GetLevel());
@@ -931,50 +930,48 @@ void VideoListImp::refreshList(bool filebrowser,
     }
     else 
     { 
-        if (group_list) 
+        switch (group_type) 
         { 
-            switch (group_type) 
-            { 
-                case 0: 
-                    fillMetadata(ltDBMetadata); 
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Folder mode")); 
-                    break; 
-                case 1: 
-                    fillMetadata(ltDBGenreGroup); 
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Group mode")); 
-                    break; 
-                case 2: 
-                    fillMetadata(ltDBCategoryGroup);
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Category mode")); 
-                    break; 
-                case 3:
-                    fillMetadata(ltDBYearGroup);
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Year mode"));
-                    break;
-                case 4:
-                    fillMetadata(ltDBDirectorGroup);
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Director mode"));
-                    break;
-                case 5:
-                    fillMetadata(ltDBCastGroup);
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Cast Mode"));
-                    break;
-                case 6:
-                    fillMetadata(ltDBUserRatingGroup);
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using User Rating Mode"));
-                    break;
-                case 7:
-                    fillMetadata(ltDBInsertDateGroup);
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Insert Date Mode"));
-                    break;
-                case 8:
-                    fillMetadata(ltTVMetadata);
-                    VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using TV/Movie Mode"));
-                    break;
-            } 
+            case VideoDialog::BRS_FOLDER: 
+                fillMetadata(ltDBMetadata); 
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Folder mode")); 
+                break; 
+            case VideoDialog::BRS_GENRE: 
+                fillMetadata(ltDBGenreGroup); 
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Genre mode")); 
+                break; 
+            case VideoDialog::BRS_CATEGORY:
+                fillMetadata(ltDBCategoryGroup);
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Category mode")); 
+                break; 
+            case VideoDialog::BRS_YEAR:
+                fillMetadata(ltDBYearGroup);
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Year mode"));
+                break;
+            case VideoDialog::BRS_DIRECTOR:
+                fillMetadata(ltDBDirectorGroup);
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Director mode"));
+                break;
+            case VideoDialog::BRS_CAST:
+                fillMetadata(ltDBCastGroup);
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Cast Mode"));
+                break;
+            case VideoDialog::BRS_USERRATING:
+                fillMetadata(ltDBUserRatingGroup);
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using User Rating Mode"));
+                break;
+            case VideoDialog::BRS_INSERTDATE:
+                fillMetadata(ltDBInsertDateGroup);
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using Insert Date Mode"));
+                break;
+            case VideoDialog::BRS_TVMOVIE:
+                fillMetadata(ltTVMetadata);
+                VERBOSE(VB_IMPORTANT|VB_EXTRA,QString("Using TV/Movie Mode"));
+                break;
+            default:
+                fillMetadata(ltDBMetadata);
+                break;
         } 
-        else 
-            fillMetadata(ltDBMetadata); 
     } 
     update_meta_view(flat_list);
 }

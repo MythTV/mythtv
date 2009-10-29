@@ -29,24 +29,6 @@ HostComboBox *VideoDefaultParentalLevel()
     return gc;
 }
 
-HostComboBox *VideoDefaultView()
-{
-    HostComboBox *gc = new HostComboBox("Default MythVideo View");
-    gc->setLabel(QObject::tr("Default View"));
-    gc->addSelection(QObject::tr("Gallery"),
-                     QString::number(VideoDialog::DLG_GALLERY));
-    gc->addSelection(QObject::tr("Browser"),
-                     QString::number(VideoDialog::DLG_BROWSER));
-    gc->addSelection(QObject::tr("Listings"),
-                     QString::number(VideoDialog::DLG_TREE));
-    gc->addSelection(QObject::tr("Manager"),
-                     QString::number(VideoDialog::DLG_MANAGER));
-    gc->setHelpText(QObject::tr("The default view for MythVideo. "
-                    "Other views can be reached via the popup menu available "
-                    "via the MENU key."));
-    return gc;
-}
-
 const char *password_clue =
     QT_TR_NOOP("Setting this value to all numbers will make your life "
                 "much easier.");
@@ -116,55 +98,6 @@ HostCheckBox *VideoTreeNoMetaData()
                     "speed up how long it takes to load the Video List tree."));
     return gc;
 }
-
-HostCheckBox *VideoDBGroupView()
-{
-    HostCheckBox *hcb = new HostCheckBox("mythvideo.db_group_view");
-    hcb->setLabel(QObject::tr("Enable Metadata Browse Modes"));
-    hcb->setValue(true);
-    hcb->setHelpText(QObject::tr("If set, metadata groupings of your video "
-                                 "directory will be shown in supported "
-                                 "views.  Default group is set below."));
-    return hcb;
-}
-
-HostComboBox *VideoTreeGroup()
-{
-    HostComboBox *gc = new HostComboBox("mythvideo.db_group_type");
-    gc->setLabel(QObject::tr("Default Metadata View"));
-    gc->addSelection(QObject::tr("Folder"),"0");
-    gc->addSelection(QObject::tr("Genres"),"1");
-    gc->addSelection(QObject::tr("Category"),"2");
-    gc->addSelection(QObject::tr("Year"),"3");
-    gc->addSelection(QObject::tr("Director"),"4");
-    gc->addSelection(QObject::tr("Cast"),"5");
-    gc->addSelection(QObject::tr("User Rating"),"6");
-    gc->addSelection(QObject::tr("Date Added"),"7");
-    gc->addSelection(QObject::tr("TV/Movies"),"8");
-    gc->setHelpText(QObject::tr("Default metadata view contols "
-                                "the method used to build the tree. Folder "
-                                "mode (the default) displays the videos as "
-                                "they are found in the filesystem."));
-    return gc;
-}
-
-class MetadataBrowseSettings : public TriggeredConfigurationGroup
-{
-    public:
-        MetadataBrowseSettings():
-            TriggeredConfigurationGroup(false, false, true, true)
-        {
-            Setting *metabrowseSettings = VideoDBGroupView();
-            addChild(metabrowseSettings);
-            setTrigger(metabrowseSettings);
-
-            ConfigurationGroup *settings =
-                    new VerticalConfigurationGroup(false);
-            settings->addChild(VideoTreeGroup());
-            addTarget("1", settings);
-            addTarget("0", new VerticalConfigurationGroup(true));
-        }
-};
 
 HostCheckBox *VideoTreeRemember()
 {
@@ -799,13 +732,11 @@ VideoGeneralSettings::VideoGeneralSettings()
     page1->addChild(VideoScreenshotDirectory());
     page1->addChild(VideoBannerDirectory());
     page1->addChild(VideoFanartDirectory());
-    page1->addChild(VideoDefaultView());
 
     VConfigPage page2(pages, false);
     page2->addChild(VideoListUnknownFiletypes());
     page2->addChild(VideoTreeNoMetaData());
     page2->addChild(VideoTreeRemember());
-    page2->addChild(new MetadataBrowseSettings());
 
     VConfigPage page3(pages, false);
     page3->addChild(SetDVDDevice());

@@ -1677,7 +1677,6 @@ class VideoDialogPrivate
                 gContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
 
         m_isFileBrowser = gContext->GetNumSetting("VideoDialogNoDB", 0);
-        m_isGroupList = gContext->GetNumSetting("mythvideo.db_group_view", 1);
         m_groupType = gContext->GetNumSetting("mythvideo.db_group_type", 0); 
 
         m_altPlayerEnabled = 
@@ -1865,6 +1864,8 @@ bool VideoDialog::Create()
     {
         m_d->m_type = static_cast<DialogType>(
                 gContext->GetNumSetting("Default MythVideo View", DLG_GALLERY));
+        m_d->m_browse = static_cast<BrowseType>(
+                gContext->GetNumSetting("mythvideo.db_group_type", BRS_FOLDER));
     }
 
     if (!IsValidDialogType(m_d->m_type))
@@ -1901,32 +1902,32 @@ bool VideoDialog::Create()
     switch (m_d->m_browse)
     {
         case BRS_GENRE:
-            m_d->m_groupType = 1;
+            m_d->m_groupType = BRS_GENRE;
             break;
         case BRS_CATEGORY:
-            m_d->m_groupType = 2;
+            m_d->m_groupType = BRS_CATEGORY;
             break;
         case BRS_YEAR:
-            m_d->m_groupType = 3;
+            m_d->m_groupType = BRS_YEAR;
             break;
         case BRS_DIRECTOR:
-            m_d->m_groupType = 4;
+            m_d->m_groupType = BRS_DIRECTOR;
             break;
         case BRS_CAST:
-            m_d->m_groupType = 5;
+            m_d->m_groupType = BRS_CAST;
             break;
         case BRS_USERRATING:
-            m_d->m_groupType = 6;
+            m_d->m_groupType = BRS_USERRATING;
             break;
         case BRS_INSERTDATE:
-            m_d->m_groupType = 7;
+            m_d->m_groupType = BRS_INSERTDATE;
             break; 
         case BRS_TVMOVIE:
-            m_d->m_groupType = 8;
+            m_d->m_groupType = BRS_TVMOVIE;
             break;
         case BRS_FOLDER:
         default:
-            m_d->m_groupType = 0;
+            m_d->m_groupType = BRS_FOLDER;
             break;
     }
 
@@ -2210,14 +2211,14 @@ void VideoDialog::fetchVideos()
     if (!m_d->m_treeLoaded)
     {
         m_d->m_rootNode = m_d->m_videoList->buildVideoList(m_d->m_isFileBrowser,
-                m_d->m_isFlatList, m_d->m_isGroupList, m_d->m_groupType,
+                m_d->m_isFlatList, m_d->m_groupType,
                 m_d->m_parentalLevel.GetLevel(), true);
     }
     else
     {
         m_d->m_videoList->refreshList(m_d->m_isFileBrowser,
                 m_d->m_parentalLevel.GetLevel(),
-                m_d->m_isFlatList, m_d->m_isGroupList, m_d->m_groupType);
+                m_d->m_isFlatList, m_d->m_groupType);
         m_d->m_rootNode = m_d->m_videoList->GetTreeRoot();
     }
 
@@ -3298,8 +3299,7 @@ void VideoDialog::DisplayMenu()
     m_menuPopup->AddButton(tr("Scan For Changes"), SLOT(doVideoScan()));
     m_menuPopup->AddButton(tr("Filter Display"), SLOT(ChangeFilter()));
 
-    if (m_d->m_isGroupList)
-        m_menuPopup->AddButton(tr("Browse By..."), SLOT(MetadataBrowseMenu()), true);
+    m_menuPopup->AddButton(tr("Browse By..."), SLOT(MetadataBrowseMenu()), true);
 
     m_menuPopup->AddButton(tr("Change View"), SLOT(ViewMenu()), true);
 
@@ -3364,44 +3364,41 @@ void VideoDialog::MetadataBrowseMenu()
 
     m_menuPopup->SetReturnEvent(this, "metadata");
 
-    if (m_d->m_isGroupList)
-    {
-       if (m_d->m_groupType != 5)
-           m_menuPopup->AddButton(tr("Cast"),
-                     SLOT(SwitchVideoCastGroup()));
+    if (m_d->m_groupType != BRS_CAST)
+        m_menuPopup->AddButton(tr("Cast"),
+                  SLOT(SwitchVideoCastGroup()));
 
-       if (m_d->m_groupType != 2)
-           m_menuPopup->AddButton(tr("Category"),
-                     SLOT(SwitchVideoCategoryGroup()));
+    if (m_d->m_groupType != BRS_CATEGORY)
+        m_menuPopup->AddButton(tr("Category"),
+                  SLOT(SwitchVideoCategoryGroup()));
 
-       if (m_d->m_groupType != 7)
-           m_menuPopup->AddButton(tr("Date Added"),
-                     SLOT(SwitchVideoInsertDateGroup()));
+    if (m_d->m_groupType != BRS_INSERTDATE)
+        m_menuPopup->AddButton(tr("Date Added"),
+                  SLOT(SwitchVideoInsertDateGroup()));
 
-       if (m_d->m_groupType != 4)  
-           m_menuPopup->AddButton(tr("Director"),
-                     SLOT(SwitchVideoDirectorGroup()));
+    if (m_d->m_groupType != BRS_DIRECTOR)  
+        m_menuPopup->AddButton(tr("Director"),
+                  SLOT(SwitchVideoDirectorGroup()));
 
-       if (m_d->m_groupType != 0)
-           m_menuPopup->AddButton(tr("Folder"),
-                    SLOT(SwitchVideoFolderGroup()));
+    if (m_d->m_groupType != BRS_FOLDER)
+        m_menuPopup->AddButton(tr("Folder"),
+                 SLOT(SwitchVideoFolderGroup()));
 
-       if (m_d->m_groupType != 1)
-           m_menuPopup->AddButton(tr("Genre"),
-                     SLOT(SwitchVideoGenreGroup()));
+    if (m_d->m_groupType != BRS_GENRE)
+        m_menuPopup->AddButton(tr("Genre"),
+                  SLOT(SwitchVideoGenreGroup()));
 
-       if (m_d->m_groupType != 8)
-           m_menuPopup->AddButton(tr("TV/Movies"),
-                     SLOT(SwitchVideoTVMovieGroup()));
+    if (m_d->m_groupType != BRS_TVMOVIE)
+        m_menuPopup->AddButton(tr("TV/Movies"),
+                  SLOT(SwitchVideoTVMovieGroup()));
 
-       if (m_d->m_groupType != 6)
-           m_menuPopup->AddButton(tr("User Rating"),
-                     SLOT(SwitchVideoUserRatingGroup()));
+    if (m_d->m_groupType != BRS_USERRATING)
+        m_menuPopup->AddButton(tr("User Rating"),
+                  SLOT(SwitchVideoUserRatingGroup()));
 
-       if (m_d->m_groupType != 3)
-           m_menuPopup->AddButton(tr("Year"),
-                     SLOT(SwitchVideoYearGroup()));
-    }
+    if (m_d->m_groupType != BRS_YEAR)
+        m_menuPopup->AddButton(tr("Year"),
+                  SLOT(SwitchVideoYearGroup()));
 }
 
 /** \fn VideoDialog::InfoMenu()
@@ -3693,6 +3690,8 @@ void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
 
     if (mythvideo->Create())
     {
+        gContext->SaveSetting("Default MythVideo View", type);
+        gContext->SaveSetting("mythvideo.db_group_type", browse);
         MythScreenStack *screenStack = GetScreenStack();
         screenStack->AddScreen(mythvideo);
         screenStack->PopScreen(this, false, false);

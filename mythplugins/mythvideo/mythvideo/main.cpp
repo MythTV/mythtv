@@ -52,42 +52,9 @@ namespace
             }
         }
     
-        int browseNum = gContext->GetNumSetting("mythvideo.db_group_type", 0);
-        VideoDialog::BrowseType browse;
-
-        switch (browseNum)
-        {
-            case 0:
-                browse = VideoDialog::BRS_FOLDER;
-                break;
-            case 1:
-                browse = VideoDialog::BRS_GENRE;
-                break;
-            case 2:
-                browse = VideoDialog::BRS_CATEGORY;
-                break;
-            case 3:
-                browse = VideoDialog::BRS_YEAR;
-                break;
-            case 4:
-                browse = VideoDialog::BRS_DIRECTOR;
-                break;
-            case 5:
-                browse = VideoDialog::BRS_CAST;
-                break;
-            case 6:
-                browse = VideoDialog::BRS_USERRATING;
-                break;
-            case 7:
-                browse = VideoDialog::BRS_INSERTDATE;
-                break;
-            case 8:
-                browse = VideoDialog::BRS_TVMOVIE;
-                break;
-            default:
-                browse = VideoDialog::BRS_FOLDER;
-                break;
-        }
+        VideoDialog::BrowseType browse = static_cast<VideoDialog::BrowseType>(
+                             gContext->GetNumSetting("mythvideo.db_group_type", 
+                                                     VideoDialog::BRS_FOLDER));
 
         if (!video_list)
             video_list = new VideoList;
