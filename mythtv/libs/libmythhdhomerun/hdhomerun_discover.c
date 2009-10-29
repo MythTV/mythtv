@@ -193,6 +193,8 @@ static void hdhomerun_discover_sock_detect(struct hdhomerun_discover_t *ds)
 
 		hdhomerun_discover_sock_create(ds, local_ip, mask);
 	}
+
+	close(fd);
 }
 #endif
 
