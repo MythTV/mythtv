@@ -234,6 +234,7 @@ QString nearestName(const QString& actual, const QStringList& candidates, bool m
 {
     int deltaBest = 10000;
     int numBest = 0;
+    int tolerance = gContext->GetNumSetting("mythvideo.lookupTolerance", 10);
     QString best;
     QString bestKey;
     QStringList possibles; 
@@ -280,7 +281,7 @@ QString nearestName(const QString& actual, const QStringList& candidates, bool m
         ++i;
     }
 
-    if ( numBest == 1 && deltaBest <= 2 &&
+    if ( numBest == 1 && deltaBest <= tolerance &&
        actual.length() + best.length() >= 5 )
     {
         if (mythvideomode)
