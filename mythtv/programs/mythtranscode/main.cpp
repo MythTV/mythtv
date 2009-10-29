@@ -932,7 +932,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                 // file, if required.
                 const QString oldfileop = QString("%1/%2")
                     .arg(fInfo.path()).arg(dir[nIdx]);
-                const QByteArray aoldfileop = oldfile.toLocal8Bit();
+                const QByteArray aoldfileop = oldfileop.toLocal8Bit();
                 transUnlink(aoldfileop.constData());
             }
         }
