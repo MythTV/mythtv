@@ -961,7 +961,6 @@ void signal_USR1_handler(int){
       VERBOSE(VB_GENERAL, "SIG USR1 received, reloading theme");
       RemoteSendMessage("CLEAR_SETTINGS_CACHE");
       gContext->ActivateSettingsCache(false);
-      qApp->processEvents();
       GetMythMainWindow()->JumpTo("Reload Theme");
       gContext->ActivateSettingsCache(true);
 }
