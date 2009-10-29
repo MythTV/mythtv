@@ -79,7 +79,11 @@ bool KeyGrabPopupBox::keyPressEvent(QKeyEvent *event)
         int keycode = event->key();
 
         // Modifier keypress, ignore until we see the complete combo
-        if ((keycode >= Qt::Key_Shift) && (keycode <= Qt::Key_AltGr))
+        if ((keycode == Qt::Key_Shift   ) || (keycode == Qt::Key_Control) ||
+            (keycode == Qt::Key_Meta    ) || (keycode == Qt::Key_Alt    ) ||
+            (keycode == Qt::Key_Super_L ) || (keycode == Qt::Key_Super_R) ||
+            (keycode == Qt::Key_Hyper_L ) || (keycode == Qt::Key_Hyper_R) ||
+            (keycode == Qt::Key_AltGr   ))
             return true;
 
         m_waitingForKeyRelease = false;
