@@ -1241,7 +1241,8 @@
         </textarea>
 
         <textarea name="default_text" from="basetextarea">
-            <area>100,105,200,30</area>
+            <area>100,105,130,30</area>
+            <align>right</align>
             <value>Default Player:</value>
         </textarea>
 
@@ -1250,43 +1251,66 @@
         </textedit>
 
         <textarea name="dvd_text" from="basetextarea">
-            <area>100,175,200,30</area>
+            <area>100,155,130,30</area>
+            <align>right</align>
             <value>DVD Player:</value>
         </textarea>
 
         <textedit name="dvdplayer" from="basetextedit">
-            <position>250,165</position>
+            <position>250,145</position>
+        </textedit>
+
+        <textarea name="dvddrive_text" from="basetextarea">
+            <area>100,205,130,30</area>
+            <align>right</align>
+            <value>DVD Drive:</value>
+        </textarea>
+
+        <textedit name="dvddrive" from="basetextedit">
+            <position>250,195</position>
         </textedit>
 
         <textarea name="vcd_text" from="basetextarea">
-            <area>100,245,200,30</area>
+            <area>100,255,130,30</area>
+            <align>right</align>
             <value>VCD Player:</value>
         </textarea>
 
         <textedit name="vcdplayer" from="basetextedit">
-            <position>250,235</position>
+            <position>250,245</position>
+        </textedit>
+
+        <textarea name="vcddrive_text" from="basetextarea">
+            <area>100,305,130,30</area>
+            <align>right</align>
+            <value>VCD Drive:</value>
+        </textarea>
+
+        <textedit name="vcddrive" from="basetextedit">
+            <position>250,295</position>
         </textedit>
 
         <checkbox name="altcheck" from="basecheckbox">
-            <position>500,315</position>
+            <position>500,350</position>
         </checkbox>
 
         <textarea name="altcheck_text" from="basetextarea">
-            <area>300,315,300,30</area>
+            <area>300,350,300,30</area>
             <value>Enable Alternate Player:</value>
         </textarea>
 
         <textarea name="alt_text" from="basetextarea">
-            <area>100,385,200,30</area>
+            <area>100,395,130,30</area>
+            <align>right</align>
             <value>Alternate Player:</value>
         </textarea>
 
         <textedit name="altplayer" from="basetextedit">
-            <position>250,375</position>
+            <position>250,385</position>
         </textedit>
 
         <textarea name="helptext" from="basetextarea">
-            <area>50,430,700,95</area>
+            <area>50,440,700,95</area>
             <multiline>true</multiline>
         </textarea>
 

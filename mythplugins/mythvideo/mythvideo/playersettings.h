@@ -28,7 +28,9 @@ class PlayerSettings : public MythScreenType
   private:
     MythUITextEdit   *m_defaultPlayerEdit;
     MythUITextEdit   *m_dvdPlayerEdit;
+    MythUITextEdit   *m_dvdDriveEdit;
     MythUITextEdit   *m_vcdPlayerEdit;
+    MythUITextEdit   *m_vcdDriveEdit;
     MythUITextEdit   *m_altPlayerEdit;
 
     MythUIText       *m_helpText;

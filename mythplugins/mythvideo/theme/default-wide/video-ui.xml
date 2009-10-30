@@ -1323,69 +1323,93 @@
     <window name="playersettings">
 
         <textarea name="title" from="basetextarea">
-            <area>10,10,1260,50</area>
+            <area>20,40,1240,40</area>
             <value>Player Settings</value>
-            <font>baselarge</font>
             <align>hcenter,vcenter</align>
+            <font>baselarge</font>
         </textarea>
 
         <textarea name="default_text" from="basetextarea">
-            <area>350,125,200,30</area>
+            <area>300,105,230,30</area>
+            <align>right</align>
             <value>Default Player:</value>
         </textarea>
 
         <textedit name="defaultplayer" from="basetextedit">
-            <position>600,115</position>
+            <position>550,95</position>
         </textedit>
 
         <textarea name="dvd_text" from="basetextarea">
-            <area>350,205,200,30</area>
+            <area>300,175,230,30</area>
+            <align>right</align>
             <value>DVD Player:</value>
         </textarea>
 
         <textedit name="dvdplayer" from="basetextedit">
-            <position>600,195</position>
+            <position>550,165</position>
+        </textedit>
+
+        <textarea name="dvddrive_text" from="basetextarea">
+            <area>300,245,230,30</area>
+            <align>right</align>
+            <value>DVD Drive:</value>
+        </textarea>
+
+        <textedit name="dvddrive" from="basetextedit">
+            <position>550,235</position>
         </textedit>
 
         <textarea name="vcd_text" from="basetextarea">
-            <area>350,285,200,30</area>
+            <area>300,315,230,30</area>
+            <align>right</align>
             <value>VCD Player:</value>
         </textarea>
 
         <textedit name="vcdplayer" from="basetextedit">
-            <position>600,275</position>
+            <position>550,305</position>
+        </textedit>
+
+        <textarea name="vcddrive_text" from="basetextarea">
+            <area>300,385,230,30</area>
+            <align>right</align>
+            <value>VCD Drive:</value>
+        </textarea>
+
+        <textedit name="vcddrive" from="basetextedit">
+            <position>550,375</position>
         </textedit>
 
         <checkbox name="altcheck" from="basecheckbox">
-            <position>600,365</position>
+            <position>775,450</position>
         </checkbox>
 
         <textarea name="altcheck_text" from="basetextarea">
-            <area>300,365,300,30</area>
+            <area>500,450,300,30</area>
             <value>Enable Alternate Player:</value>
         </textarea>
 
         <textarea name="alt_text" from="basetextarea">
-            <area>350,445,200,30</area>
+            <area>300,515,230,30</area>
+            <align>right</align>
             <value>Alternate Player:</value>
         </textarea>
 
         <textedit name="altplayer" from="basetextedit">
-            <position>600,435</position>
+            <position>550,505</position>
         </textedit>
 
         <textarea name="helptext" from="basetextarea">
-            <area>150,500,980,125</area>
+            <area>50,580,1180,60</area>
             <multiline>true</multiline>
         </textarea>
 
         <button name="ok" from="basebutton">
-            <position>415,630</position>
+            <position>415,650</position>
             <value>OK</value>
         </button>
 
         <button name="cancel" from="basebutton">
-            <position>715,630</position>
+            <position>715,650</position>
             <value>Cancel</value>
         </button>
 
