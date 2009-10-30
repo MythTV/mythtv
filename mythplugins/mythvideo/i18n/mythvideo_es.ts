@@ -169,7 +169,7 @@
     </message>
     <message>
         <source>Decrease Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bajar Nivel Parental</translation>
     </message>
     <message>
         <source>Show Incremental Search Dialog</source>
@@ -248,7 +248,7 @@
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished">PIN de acceso:</translation>
+        <translation type="unfinished">PIN de control parental:</translation>
     </message>
     <message>
         <source>No Cover</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Si</translation>
+        <translation>Si</translation>
     </message>
     <message>
         <source>No</source>
@@ -356,11 +356,11 @@
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Título</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished">Año</translation>
+        <translation>Año</translation>
     </message>
     <message>
         <source>User Rating</source>
@@ -600,11 +600,11 @@
     </message>
     <message>
         <source>Unknown Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Prefijo Desconocido</translation>
     </message>
     <message>
         <source>videos</source>
-        <translation type="unfinished"></translation>
+        <translation>videos</translation>
     </message>
     <message>
         <source>No rating available.</source>
@@ -612,7 +612,7 @@
     </message>
     <message>
         <source>Parental Level 4 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PIN de nivel parental 4</translation>
     </message>
     <message>
         <source>This PIN is used to enter Parental Control Level 4 as well as the Video Manager.</source>
@@ -684,7 +684,7 @@
     </message>
     <message>
         <source>Transcode is thinking</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Transcode está pensando</translation>
     </message>
     <message>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
@@ -736,7 +736,7 @@
     </message>
     <message>
         <source>TV/Movies</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TV/Películas</translation>
     </message>
     <message>
         <source>Group videos in the tree</source>
@@ -812,7 +812,7 @@
     </message>
     <message>
         <source>Remove DVD Bookmarks Older than (days)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eliminar Bookmarks de DVD más antiguos que (días)</translation>
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
@@ -820,7 +820,7 @@
     </message>
     <message>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configurar la velocidad de la unidad mientras se reproduce un DVD. Debe ser un múltiplo de 177KB/s. Velocidades menores pueden ayudar a reducir el ruido pero en algunos casos podrían causar saltos en la reprodución.</translation>
     </message>
     <message>
         <source>Enable random trailers before videos</source>
@@ -840,7 +840,7 @@
     </message>
     <message>
         <source>Television in MythVideo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Televisión en MythVideo</translation>
     </message>
     <message>
         <source>Loading videos ...</source>
@@ -852,7 +852,7 @@
     </message>
     <message>
         <source>You have no VCD Player command defined.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No tienes un comando definido para el reproductor de VCD.</translation>
     </message>
     <message>
         <source>Aggressive Parental Controls Warning: invalid password. An attempt to enter a MythVideo settings screen was prevented.</source>
@@ -860,7 +860,7 @@
     </message>
     <message>
         <source>Season</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporada</translation>
     </message>
     <message>
         <source>Episode</source>
@@ -876,7 +876,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Season/Episode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temporada/Episodio</translation>
     </message>
     <message>
         <source>Video Home</source>
@@ -884,7 +884,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Television</source>
-        <translation type="unfinished"></translation>
+        <translation>Televisión</translation>
     </message>
     <message>
         <source>Movies</source>
@@ -892,11 +892,11 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Temporada %1</translation>
     </message>
     <message>
         <source>Storage Groups</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grupos de Almacenamiento</translation>
     </message>
 </context>
 <context>
