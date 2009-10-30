@@ -14,6 +14,7 @@
 #include "videodlg.h"
 #include "globalsettings.h"
 #include "fileassoc.h"
+#include "playersettings.h"
 #include "dbcheck.h"
 #include "cleanup.h"
 #include "globals.h"
@@ -437,8 +438,12 @@ namespace
         }
         else if (sel == "settings_player")
         {
-            VideoPlayerSettings settings;
-            settings.exec();
+            MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+            PlayerSettings *ps = new PlayerSettings(mainStack, "player settings");
+
+            if (ps->Create())
+                mainStack->AddScreen(ps);
         }
         else if (sel == "settings_associations")
         {
@@ -520,10 +525,6 @@ int mythplugin_init(const char *libversion)
     VideoGeneralSettings general;
     general.Load();
     general.Save();
-
-    VideoPlayerSettings settings;
-    settings.Load();
-    settings.Save();
 
     DVDRipperSettings rsettings;
     rsettings.Load();

@@ -236,60 +236,6 @@ HostLineEdit *TrailerDirectory()
     return gc;
 }
 
-//Player Settings
-
-HostLineEdit *VideoDefaultPlayer()
-{
-    HostLineEdit *gc = new HostLineEdit("VideoDefaultPlayer");
-    gc->setLabel(QObject::tr("Default Video Player"));
-    gc->setValue("Internal");
-    gc->setHelpText(QObject::tr("This is the command used for any file "
-                    "that the extension is not specifically defined. "
-                    "You may also enter the name of one of the playback "
-                    "plugins such as 'Internal'."));
-    return gc;
-}
-
-HostCheckBox *EnableAlternatePlayer()
-{
-    HostCheckBox *gc = new HostCheckBox("mythvideo.EnableAlternatePlayer");
-    gc->setLabel(QObject::tr("Enable Alternate Video Player"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If checked, you can select an alternate "
-                                "player command for videos when the default "
-                                "choice fails."));
-    return gc;
-}
-
-HostLineEdit *VideoAlternatePlayer()
-{
-    HostLineEdit *gc = new HostLineEdit("mythvideo.VideoAlternatePlayer");
-    gc->setLabel(QObject::tr("Alternate Player"));
-    gc->setValue("Internal");
-    gc->setHelpText(QObject::tr("If for some reason the default player "
-                    "doesn't play a video, you can play it in an alternate "
-                    "player by selecting 'Play in Alternate Player.'"));
-    return gc;
-};
-
-class AlternatePlayerSettings : public TriggeredConfigurationGroup
-{
-    public:
-        AlternatePlayerSettings():
-            TriggeredConfigurationGroup(false, false, true, true)
-        {
-            Setting *altplayerSettings = EnableAlternatePlayer();
-            addChild(altplayerSettings);
-            setTrigger(altplayerSettings);
-
-            ConfigurationGroup *settings =
-                    new VerticalConfigurationGroup(false);
-            settings->addChild(VideoAlternatePlayer());
-            addTarget("1", settings);
-            addTarget("0", new VerticalConfigurationGroup(true));
-        }
-};
-
 ///////////////////////////////////////////////////////////
 //// DVD Settings
 ///////////////////////////////////////////////////////////
@@ -395,30 +341,6 @@ class DVDBookmarkSettings : public TriggeredConfigurationGroup
             addTarget("0", new VerticalConfigurationGroup(true));
         }
 };
-
-// Player Settings
-
-HostLineEdit *PlayerCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("mythdvd.DVDPlayerCommand");
-    gc->setLabel(QObject::tr("DVD Player Command"));
-    gc->setValue("Internal");
-    gc->setHelpText(QObject::tr("This can be any command to launch a DVD "
-                    " player (e.g. MPlayer, ogle, etc.). If present, %d will "
-                    "be substituted for the DVD device (e.g. /dev/dvd)."));
-    return gc;
-}
-
-HostLineEdit *VCDPlayerCommand()
-{
-    HostLineEdit *gc = new HostLineEdit("VCDPlayerCommand");
-    gc->setLabel(QObject::tr("VCD Player Command"));
-    gc->setValue("mplayer vcd:// -cdrom-device %d -fs -zoom -vo xv");
-    gc->setHelpText(QObject::tr("This can be any command to launch a VCD "
-                    "player (e.g. MPlayer, xine, etc.). If present, %d will "
-                    "be substituted for the VCD device (e.g. /dev/cdrom)."));
-    return gc;
-}
 
 // Ripper Settings
 
@@ -742,18 +664,6 @@ VideoGeneralSettings::VideoGeneralSettings()
                        .arg(pages.size()));
         addChild(*p);
     }
-}
-
-VideoPlayerSettings::VideoPlayerSettings()
-{
-    VerticalConfigurationGroup *videoplayersettings =
-            new VerticalConfigurationGroup(false);
-    videoplayersettings->setLabel(QObject::tr("Player Settings"));
-    videoplayersettings->addChild(VideoDefaultPlayer());
-    videoplayersettings->addChild(PlayerCommand());
-    videoplayersettings->addChild(VCDPlayerCommand());
-    videoplayersettings->addChild(new AlternatePlayerSettings());
-    addChild(videoplayersettings);
 }
 
 DVDRipperSettings::DVDRipperSettings()

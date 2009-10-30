@@ -1319,5 +1319,77 @@
         </button>
 
     </window>
+
+    <window name="playersettings">
+
+        <textarea name="title" from="basetextarea">
+            <area>10,10,1260,50</area>
+            <value>Player Settings</value>
+            <font>baselarge</font>
+            <align>hcenter,vcenter</align>
+        </textarea>
+
+        <textarea name="default_text" from="basetextarea">
+            <area>350,125,200,30</area>
+            <value>Default Player:</value>
+        </textarea>
+
+        <textedit name="defaultplayer" from="basetextedit">
+            <position>600,115</position>
+        </textedit>
+
+        <textarea name="dvd_text" from="basetextarea">
+            <area>350,205,200,30</area>
+            <value>DVD Player:</value>
+        </textarea>
+
+        <textedit name="dvdplayer" from="basetextedit">
+            <position>600,195</position>
+        </textedit>
+
+        <textarea name="vcd_text" from="basetextarea">
+            <area>350,285,200,30</area>
+            <value>VCD Player:</value>
+        </textarea>
+
+        <textedit name="vcdplayer" from="basetextedit">
+            <position>600,275</position>
+        </textedit>
+
+        <checkbox name="altcheck" from="basecheckbox">
+            <position>600,365</position>
+        </checkbox>
+
+        <textarea name="altcheck_text" from="basetextarea">
+            <area>300,365,300,30</area>
+            <value>Enable Alternate Player:</value>
+        </textarea>
+
+        <textarea name="alt_text" from="basetextarea">
+            <area>350,445,200,30</area>
+            <value>Alternate Player:</value>
+        </textarea>
+
+        <textedit name="altplayer" from="basetextedit">
+            <position>600,435</position>
+        </textedit>
+
+        <textarea name="helptext" from="basetextarea">
+            <area>150,500,980,125</area>
+            <multiline>true</multiline>
+        </textarea>
+
+        <button name="ok" from="basebutton">
+            <position>415,630</position>
+            <value>OK</value>
+        </button>
+
+        <button name="cancel" from="basebutton">
+            <position>715,630</position>
+            <value>Cancel</value>
+        </button>
+
+    </window>
+
 </mythuitheme>
 <!-- vim: set expandtab ts=4 sw=4 : -->
