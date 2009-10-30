@@ -99,7 +99,7 @@ void PlayerSettings::slotSave(void)
     gContext->SaveSetting("VideoDefaultPlayer", m_defaultPlayerEdit->GetText());
     gContext->SaveSetting("mythdvd.DVDPlayerCommand", m_dvdPlayerEdit->GetText());
     gContext->SaveSetting("VCDPlayerCommand", m_vcdPlayerEdit->GetText());
-    gContext->SaveSetting("VideoAlternatePlayer", m_altPlayerEdit->GetText());
+    gContext->SaveSetting("mythvideo.VideoAlternatePlayer", m_altPlayerEdit->GetText());
 
     int checkstate = 0;
     if (m_altCheck->GetCheckState() == MythUIStateType::Full)
