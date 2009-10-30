@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="es">
 <context>
     <name></name>
     <message>
@@ -258,7 +258,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="160"/>
         <source>Delete all channels on currently selected source(s).</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar todos los canales en la o las fuentes seleccionadas.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="164"/>
@@ -285,42 +285,42 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="198"/>
         <source>Starts the icon downloader</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ejecutar el descargador de íconos</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="204"/>
         <source>Allows you to edit the transports directly. This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Te permite editar los trasportadores directamente. Este proceso rara vez es necesario a menos que estés utilizando una antena parabólica y necesites ingresar una frecuencia inicial para probar con el scanner de canales.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="256"/>
         <source>(Add New Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(Agregar Nuevo Canal)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="409"/>
         <source>Delete channel &apos;%1&apos;?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eliminar Canal &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="433"/>
         <source>Delete ALL channels?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eliminar TODOS los canales?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="434"/>
         <source>Delete all unassigned channels?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eliminar todos los canales no asignados?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="435"/>
         <source>Delete all channels on %1?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eliminar todos los canales en %1?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="548"/>
         <source>Icon Import Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opciones para la importación de íconos</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="561"/>
@@ -330,7 +330,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="473"/>
         <source>Channel Options</source>
-        <translation type="unfinished">Opciónes de canal</translation>
+        <translation type="unfinished">Opciones de canal</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="483"/>
