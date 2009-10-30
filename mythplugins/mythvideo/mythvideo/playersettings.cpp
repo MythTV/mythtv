@@ -68,9 +68,9 @@ bool PlayerSettings::Create()
     m_vcdPlayerEdit->SetText(gContext->GetSetting("VCDPlayerCommand",
                            "mplayer vcd:// -cdrom-device %d -fs -zoom -vo xv"));
     m_vcdDriveEdit->SetText(gContext->GetSetting("VCDDeviceLocation",
-                           "Internal"));
-    m_altPlayerEdit->SetText(gContext->GetSetting("mythvideo.VideoAlternatePlayer",
-                               "Internal"));
+                           "default"));
+    m_altPlayerEdit->SetText(gContext->GetSetting(
+                           "mythvideo.VideoAlternatePlayer", "Internal"));
 
     if (m_altCheck->GetCheckState() == MythUIStateType::Full)
         m_altPlayerEdit->SetVisible(true);
