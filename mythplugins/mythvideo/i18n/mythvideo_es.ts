@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="es">
 <context>
     <name></name>
     <message>
@@ -25,27 +25,27 @@
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configurar este valor para todos los números te hará la vida mucho más facil.</translation>
     </message>
     <message>
         <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Traté de escribir %1, pero parece ser un redireccionador HTML (tamaño de archivo %2).</translation>
     </message>
     <message>
         <source>Error writing image to file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error escribiendo la imagen al archivo %1.</translation>
     </message>
     <message>
         <source>Error writing data to file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error escribiendo datos en el archivo %1.</translation>
     </message>
     <message>
         <source>Error: file error &apos;%1&apos; for file %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error: error de archivo &apos;%1&apos; para el archivo %2</translation>
     </message>
     <message>
         <source>No command to run.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No hay comandos por ejecutar.</translation>
     </message>
 </context>
 <context>
@@ -68,31 +68,31 @@
     </message>
     <message>
         <source>No jobs and nothing else to do. You could rip a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No hay trabajos ni otra cosa que hacer. Podrías ripear un DVD.</translation>
     </message>
     <message>
         <source>New Rip</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nuevo Rip</translation>
     </message>
     <message>
         <source>Cancel Job</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cancelar trabajo</translation>
     </message>
     <message>
         <source>Attempting to launch mtd...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tratando de lanzar mtd...</translation>
     </message>
     <message>
         <source>Cannot connect to your Myth Transcoding Daemon.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No puedo conectar con tu Myth Transcoding Daemon.</translation>
     </message>
     <message>
         <source>Attempting to connect to your mtd said host not found. Unable to recover.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Al intentar conectar con tu mtd la respuesta fue &apos;host no encontrado&apos;. Imposible continuar.</translation>
     </message>
     <message>
         <source>Unknown connection error.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error desconocido de conección.</translation>
     </message>
 </context>
 <context>
@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Enter new category</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ingresar nueva categoría</translation>
     </message>
 </context>
 <context>
@@ -126,14 +126,14 @@
     </message>
     <message>
         <source>Enter the new extension:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ingresar nueva extension:</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>The MythVideo default view</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La vista por omisión de MythVideo</translation>
     </message>
     <message>
         <source>The MythVideo video manager</source>
@@ -149,15 +149,15 @@
     </message>
     <message>
         <source>The MythVideo video gallery</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">La galería de videos de MythVideo</translation>
     </message>
     <message>
         <source>Play selected item in alternate player</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reproducir el item seleccionado con el reproductor alternativo</translation>
     </message>
     <message>
         <source>Open video filter dialog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Abrir el diálogo de filtros de video</translation>
     </message>
     <message>
         <source>Change browsable in video manager</source>
@@ -165,7 +165,7 @@
     </message>
     <message>
         <source>Increase Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Subir el Nivel Parental</translation>
     </message>
     <message>
         <source>Decrease Parental Level</source>
@@ -173,11 +173,11 @@
     </message>
     <message>
         <source>Show Incremental Search Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostrar Diálogo de Búsqueda Incremental</translation>
     </message>
     <message>
         <source>Download metadata for current item</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bajar metadatos para el item actual</translation>
     </message>
     <message>
         <source>Display Item Detail Popup</source>
@@ -185,15 +185,15 @@
     </message>
     <message>
         <source>Go to the first video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ir al primer video</translation>
     </message>
     <message>
         <source>Go to the last video</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ir al último video</translation>
     </message>
     <message>
         <source>Play a DVD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reproducir un DVD</translation>
     </message>
     <message>
         <source>MythDVD DVD Media Handler</source>
@@ -201,7 +201,7 @@
     </message>
     <message>
         <source>Play a VCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reproducir un VCD</translation>
     </message>
     <message>
         <source>MythDVD VCD Media Handler</source>
@@ -209,7 +209,7 @@
     </message>
     <message>
         <source>Import a DVD into your MythVideo database</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Importar un DVD a tu base de datos de MythVideo</translation>
     </message>
 </context>
 <context>
