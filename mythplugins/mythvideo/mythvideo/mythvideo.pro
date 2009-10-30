@@ -19,7 +19,7 @@ installscriptstv.files = scripts/Television/*.py
 installscriptsttvdb.path = $${PREFIX}/share/mythtv/mythvideo/scripts/Television/ttvdb
 installscriptsttvdb.files = scripts/Television/ttvdb/*.py scripts/Television/ttvdb/*.conf
 
-installscriptmodules.path = $${PREFIX}/share/mythtv/mythvideo/scripts/MythTV
+installscriptmodules.path = $${PREFIX}/share/mythtv/mythvideo/scripts/Movie/MythTV
 installscriptmodules.files = scripts/MythTV/MythVideoCommon.pm
 
 INSTALLS += installscripts installscriptsmovie installscriptstv installscriptsttvdb installscriptmodules target
