@@ -55,7 +55,7 @@ class CdDecoder : public Decoder
     QString            devicename;
 
 #if CONFIG_DARWIN
-    void CdDecoder::lookupCDDB(const QString &hexID, uint tracks);
+    void lookupCDDB(const QString &hexID, uint tracks);
 
     uint32_t           m_diskID;        ///< For CDDB1/FreeDB lookup
     uint               m_firstTrack,    ///< First AUDIO track
