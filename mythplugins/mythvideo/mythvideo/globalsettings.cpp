@@ -119,8 +119,8 @@ HostComboBox *MovieGrabber()
     HostComboBox *gc = new HostComboBox("mythvideo.MovieGrabber");
     gc->setLabel(QObject::tr("Movie Grabber Script"));
 
-    for (QStringList::const_iterator i = MovieScripts.begin();
-            i != MovieScripts.end(); ++i)
+    for (QStringList::const_iterator i = MovieScripts.end() - 1;
+            i != MovieScripts.begin(); --i)
     {
         gc->addSelection(QString("%1").arg(*i),
                      QString("%1mythvideo/scripts/Movie/%2")
