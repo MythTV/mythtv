@@ -31,7 +31,7 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="25"/>
         <source>Stopping</source>
-        <translation type="unfinished">Parando</translation>
+        <translation type="unfinished">Deteniendose</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="26"/>
@@ -66,7 +66,7 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="36"/>
         <source>Aborted</source>
-        <translation type="unfinished">Abortado</translation>
+        <translation type="unfinished">Cancelado</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="37"/>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="361"/>
         <source>Shall I attempt to connect to this host with default database parameters?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Debo intentar conectar con este host utilizando los parametros de base de datos por omisión?</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="190"/>
@@ -94,7 +94,7 @@
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="146"/>
         <source>Backend uses a PIN. </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El backend utiliza un PIN</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="193"/>
@@ -275,7 +275,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="183"/>
         <source>(Unassigned)</source>
-        <translation type="unfinished">(SIn asignar)</translation>
+        <translation type="unfinished">(Sin asignar)</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="194"/>
@@ -315,12 +315,12 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="435"/>
         <source>Delete all channels on %1?</source>
-        <translation type="unfinished">Eliminar todos los canales en %1?</translation>
+        <translation>Eliminar todos los canales en %1?</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="548"/>
         <source>Icon Import Options</source>
-        <translation type="unfinished">Opciones para la importación de íconos</translation>
+        <translation>Opciones para la importación de íconos</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="561"/>
@@ -330,12 +330,12 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="473"/>
         <source>Channel Options</source>
-        <translation type="unfinished">Opciones de canal</translation>
+        <translation>Opciones de canal</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="483"/>
         <source>Edit</source>
-        <translation type="unfinished">Editar</translation>
+        <translation>Editar</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="488"/>
@@ -345,7 +345,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="558"/>
         <source>Download all icons..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Descargar todos los íconos..</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="559"/>
@@ -363,12 +363,12 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="134"/>
         <source>Channel Groups</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Grupos de canales</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="148"/>
         <source>Create New Channel Group</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Crear nuevo grupo de canales</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="149"/>
@@ -378,7 +378,7 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="176"/>
         <source>Delete &apos;%1&apos; Channel group?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Borrar el grupo de canales &apos;%1&apos;?</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="181"/>
@@ -406,7 +406,7 @@
     <message>
         <location filename="../programs/mythfrontend/channelrecpriority.cpp" line="190"/>
         <source>Program List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Listado de programas</translation>
     </message>
 </context>
 <context>
@@ -414,7 +414,7 @@
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui.cpp" line="64"/>
         <source>Scanning</source>
-        <translation type="unfinished">Explorando</translation>
+        <translation>Escaneando</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui.cpp" line="183"/>
@@ -443,7 +443,7 @@
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="62"/>
         <source>Rotor Movement</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Movimiento del rotor</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="72"/>
@@ -458,7 +458,7 @@
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="86"/>
         <source>Scan</source>
-        <translation type="unfinished">Explorar</translation>
+        <translation type="unfinished">Escanear</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="91"/>
