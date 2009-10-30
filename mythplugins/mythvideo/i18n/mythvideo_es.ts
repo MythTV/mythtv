@@ -336,7 +336,7 @@
     </message>
     <message>
         <source>If set, case is ignored when sorting entries in a view.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si se selecciona, No se distingue entre mayúsculas y minúsculas al ordenar las entradas de una vista.</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -572,7 +572,7 @@
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Habilitar Soporte de Bookmarks para DVD</translation>
     </message>
     <message>
         <source>DVD Bookmark Prompt</source>
@@ -580,7 +580,7 @@
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mostrar un dialogo para elegir si reproducir el DVD desde el comienzo o desde el bookmark</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD  player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
@@ -588,7 +588,7 @@
     </message>
     <message>
         <source>General Settings (%1/%2)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opciones Generales (%1/%2)</translation>
     </message>
     <message>
         <source>NR</source>
@@ -596,7 +596,7 @@
     </message>
     <message>
         <source>No files found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se encontraron archivos</translation>
     </message>
     <message>
         <source>Unknown Prefix</source>
@@ -620,7 +620,7 @@
     </message>
     <message>
         <source>Parental Level 3 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PIN de nivel parental 3</translation>
     </message>
     <message>
         <source>This PIN is used to enter Parental Control Level 3.</source>
@@ -628,7 +628,7 @@
     </message>
     <message>
         <source>Parental Level 2 PIN</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PIN de nivel parental 2</translation>
     </message>
     <message>
         <source>This PIN is used to enter Parental Control Level 2.</source>
@@ -640,35 +640,35 @@
     </message>
     <message>
         <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si se selecciona, la posición actual en el tree de video persiste.</translation>
     </message>
     <message>
         <source>Directories that hold videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Directorios que tienen videos</translation>
     </message>
     <message>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Multiples directorios pueden separarse con &apos;:&apos;. Cada directorio debe existir y tener permisos de lectura para el usuario que ejecuta MythVideo.</translation>
     </message>
     <message>
         <source>DVD Drive Speed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Velocidad del lector de DVDs</translation>
     </message>
     <message>
         <source>Let transcode determine frame rate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dejar que transcode determine el frame rate</translation>
     </message>
     <message>
         <source>If set, transcode will determine the frame rate automatically. If not set, 23.976 is assumed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si se selecciona, transcode determinará el frame rate automáticamente. Si no, se asumirá 23.976.</translation>
     </message>
     <message>
         <source>Enable automatic Parental Level from rating</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Habilitar nivel parental automático con respecto a la clasificación</translation>
     </message>
     <message>
         <source>If enabled, searches will automatically set the Parental Level to the one matching the rating below.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si se habilita, las búsquedas configurarán automáticamente el nivel parental a uno que coincida con la clasificación listada abajo.</translation>
     </message>
     <message>
         <source>Level %1</source>
@@ -688,7 +688,7 @@
     </message>
     <message>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Error: no se pudo agregar el nuevo tipo de archivo &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Manager</source>
@@ -696,11 +696,11 @@
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si se selecciona junto con &apos;Browse Files&apos;, la lista de video cargará cualquier metadata de video conocida desde la base de datos. Si no se selecciona puede aumentar considerablemente la velocidad de carga de la lista de videos.</translation>
     </message>
     <message>
         <source>Enable Metadata Browse Modes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Habilitar modos de búsqueda de metadatos</translation>
     </message>
     <message>
         <source>If set, metadata groupings of your video directory will be shown in supported views.  Default group is set below.</source>
@@ -708,15 +708,15 @@
     </message>
     <message>
         <source>Group based on</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agrupar con respecto a</translation>
     </message>
     <message>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Directorio</translation>
     </message>
     <message>
         <source>Genres</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Géneros</translation>
     </message>
     <message>
         <source>Category</source>
@@ -724,7 +724,7 @@
     </message>
     <message>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Director</translation>
     </message>
     <message>
         <source>Cast</source>
@@ -740,7 +740,7 @@
     </message>
     <message>
         <source>Group videos in the tree</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Agrupar videos en el tree</translation>
     </message>
     <message>
         <source>Command to search for movie fanart</source>
@@ -776,27 +776,27 @@
     </message>
     <message>
         <source>Directory that holds movie screenshots</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Directorio con screenshots de películas.</translation>
     </message>
     <message>
         <source>Directory that holds movie/TV Banners</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Directorio con banners de TV/Peliculas</translation>
     </message>
     <message>
         <source>Directory that holds movie fanart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Directorio con fanart de películas</translation>
     </message>
     <message>
         <source>Directory that holds movie trailers</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Directorio con trailers</translation>
     </message>
     <message>
         <source>Enable Alternate Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Habilitar Reproductor Alternativo de Video</translation>
     </message>
     <message>
         <source>If checked, you can select an alternate player command for videos when the default choice fails.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si está seleccionado, puedes elegir un reproductor de videos alternativo en caso que el por omisión falle.</translation>
     </message>
     <message>
         <source>Alternate Player</source>
@@ -804,7 +804,7 @@
     </message>
     <message>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si por alguna razón el reproductor por omisión no reproduce un video puedes reproducirlo con un reproductor alternativo seleccionando &apos;Reproducir en el reproductor alternativo&apos;</translation>
     </message>
     <message>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
@@ -816,7 +816,7 @@
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eliminar bookmarks de DVD que son más antiguos que el número de días señalado</translation>
     </message>
     <message>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
@@ -824,15 +824,15 @@
     </message>
     <message>
         <source>Enable random trailers before videos</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Habilitar trailer aleatorio antes de los videos</translation>
     </message>
     <message>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Si se selecciona, se habilitará un botón llamado &apos;Mirar con trailers&apos; que reproducirá un número definido por el usuario de trailers antes de la película.</translation>
     </message>
     <message>
         <source>Number of trailers to play</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Número de trailers a reproducir</translation>
     </message>
     <message>
         <source>The number of trailers to play before playing the film itself </source>
@@ -844,11 +844,11 @@
     </message>
     <message>
         <source>Loading videos ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargando videos ...</translation>
     </message>
     <message>
         <source>No directory %1 - DVD importing will fail</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No existe el directorio %1 - La importación del DVD fallará</translation>
     </message>
     <message>
         <source>You have no VCD Player command defined.</source>
@@ -864,7 +864,7 @@
     </message>
     <message>
         <source>Episode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Episodio</translation>
     </message>
     <message>
         <source>%1 failed
@@ -888,7 +888,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Películas</translation>
     </message>
     <message>
         <source>Season %1</source>
