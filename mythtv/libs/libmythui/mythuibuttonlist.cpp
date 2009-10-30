@@ -1535,7 +1535,37 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         if (text)
         {
             TextProperties textprop = string_it.value();
-            text->SetText(textprop.text);
+            
+            QString newText = text->GetTemplateText();
+            if (newText.isEmpty())
+                newText = text->GetDefaultText();
+            QRegExp regexp("%(\\|(.))?([^\\|]+)(\\|(.))?%");
+            regexp.setMinimal(true);
+            if (newText.contains(regexp))
+            {
+                int pos = 0;
+                QString tempString = newText;
+                while ((pos = regexp.indexIn(newText, pos)) != -1)
+                {
+                    QString key = regexp.cap(3).toLower().trimmed();
+                    QString replacement;
+                    QString value = m_strings.value(key).text;
+                    if (!value.isEmpty())
+                    {
+                        replacement = QString("%1%2%3")
+                                                .arg(regexp.cap(2))
+                                                .arg(m_strings.value(key).text)
+                                                .arg(regexp.cap(5));
+                    }
+                    tempString.replace(regexp.cap(0), replacement);
+                    pos += regexp.matchedLength();
+                }
+                newText = tempString;
+            }
+            else
+                newText = textprop.text;
+                
+            text->SetText(newText);
             text->SetFontState(textprop.state);
         }
         ++string_it;
