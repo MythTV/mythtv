@@ -568,7 +568,7 @@
     </message>
     <message>
         <source>Default Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reproductor de Video por Omisión</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
@@ -680,7 +680,7 @@
     </message>
     <message>
         <source>Command</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando</translation>
     </message>
     <message>
         <source>Transcode is thinking</source>
@@ -720,7 +720,7 @@
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Categoría</translation>
     </message>
     <message>
         <source>Director</source>
@@ -728,11 +728,11 @@
     </message>
     <message>
         <source>Cast</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reparto</translation>
     </message>
     <message>
         <source>Date Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Fecha en que se agregó</translation>
     </message>
     <message>
         <source>TV/Movies</source>
@@ -744,31 +744,31 @@
     </message>
     <message>
         <source>Command to search for movie fanart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando para buscar por fanart de películas</translation>
     </message>
     <message>
         <source>Command to search for TV shows in MythVideo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Commando para buscar por shows de TV en MythVideo</translation>
     </message>
     <message>
         <source>Command to search for TV Season posters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando para buscar por posters de temporada (TV)</translation>
     </message>
     <message>
         <source>Command to search for TV fanart</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando para buscar fanart de TV</translation>
     </message>
     <message>
         <source>Command to search for TV banners</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando para buscar banners de TV</translation>
     </message>
     <message>
         <source>Command to search for TV Screenshots</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando para buscar screenshots de TV</translation>
     </message>
     <message>
         <source>Command to extract data for TV Episodes</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comando para extraer datos para los episodios de TV</translation>
     </message>
     <message>
         <source>Command to search for TV by Title/Subtitle</source>
@@ -800,7 +800,7 @@
     </message>
     <message>
         <source>Alternate Player</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reproductor Alternativo</translation>
     </message>
     <message>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
@@ -808,7 +808,7 @@
     </message>
     <message>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&apos;default&apos; permitirá que MediaMonitor elija un dispositivo.</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older than (days)</source>
@@ -872,7 +872,11 @@
 %2
 
 Check VideoManager Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 falló!
+
+%2
+
+Revisa la configuración del VideoManager</translation>
     </message>
     <message>
         <source>Season/Episode</source>
@@ -1099,11 +1103,11 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Directed by:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dirigido por:</translation>
     </message>
     <message>
         <source>User Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Clasificación de usuario</translation>
     </message>
     <message>
         <source>Done</source>
@@ -1115,19 +1119,19 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Más bajo</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Bajo</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Medio</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alto</translation>
     </message>
     <message>
         <source>Video Num.:</source>
@@ -1135,27 +1139,27 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nivel Parental</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Título:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Subtítulo:</translation>
     </message>
     <message>
         <source>Season:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temporada:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Episodio:</translation>
     </message>
     <message>
         <source>Item has been watched:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El item ya ha sido visto:</translation>
     </message>
     <message>
         <source>Screenshot:</source>
@@ -1179,7 +1183,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Actor/Actress :</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Actor/Actriz</translation>
     </message>
     <message>
         <source>InetRef :</source>
@@ -1191,27 +1195,27 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Watched :</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ya vistos :</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Resultado</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished">Guardar por defecto</translation>
+        <translation type="unfinished">Guardar como valor por omisión</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opciones Generales</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished">Configuración de reproducción</translation>
+        <translation type="unfinished">Opciones del reproductor</translation>
     </message>
     <message>
         <source>File Types</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tipos de Archivo</translation>
     </message>
     <message>
         <source>Rip Settings</source>
@@ -1223,11 +1227,11 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Video List</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lstado de Videos</translation>
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Galería de Videos</translation>
     </message>
     <message>
         <source>Video Manager</source>
@@ -1239,7 +1243,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Play VCD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Reproducir VCD</translation>
     </message>
     <message>
         <source>Rip DVD</source>
@@ -1247,15 +1251,15 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Expulsar medio</translation>
     </message>
     <message>
         <source>Videos Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opciones para los videos</translation>
     </message>
     <message>
         <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Configurar reproducción y ripeado de DVD</translation>
     </message>
 </context>
 <context>
@@ -1286,7 +1290,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Begin Ripping</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comenzar a Ripear</translation>
     </message>
 </context>
 <context>
@@ -1313,7 +1317,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Video Search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Búsqueda de Video</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -1323,16 +1327,19 @@ Check VideoManager Settings</source>
         <source>Video Options
 %1
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opciones de Video
+%1
+%2</translation>
     </message>
     <message>
         <source>Video Options
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opciones de Video
+%1</translation>
     </message>
     <message>
         <source>Video Options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Opciones de Video</translation>
     </message>
     <message>
         <source>Play...</source>
@@ -1352,7 +1359,7 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>Video Info</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Información del video</translation>
     </message>
     <message>
         <source>Metadata Options</source>
@@ -1469,11 +1476,11 @@ Check VideoManager Settings</source>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished">Ver Info Completa</translation>
+        <translation type="unfinished">Ver Argumento Completo</translation>
     </message>
     <message>
         <source>View Cast</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ver Reparto</translation>
     </message>
     <message>
         <source>Mark as Non-Browseable</source>
