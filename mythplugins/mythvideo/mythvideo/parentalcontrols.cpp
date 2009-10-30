@@ -303,7 +303,7 @@ class ParentalLevelChangeCheckerPrivate : public QObject
 
         MythTextInputDialog *pwd =
                 new MythTextInputDialog(popupStack,
-                        QObject::tr("Parental Pin:"), FilterNone, true);
+                        QObject::tr("Parental PIN:"), FilterNone, true);
 
         connect(pwd, SIGNAL(haveResult(QString)),
                 SLOT(OnPasswordEntered(QString)));
