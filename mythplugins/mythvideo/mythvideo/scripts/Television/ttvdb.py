@@ -35,7 +35,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="thetvdb.com Query Engine";
+__title__ ="thetvdb.com Query";
 __author__="R.D.Vaughan"
 __version__="v1.0.4"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
@@ -930,15 +930,8 @@ def main():
 
 	# Process version command line requests
 	if opts.version == True:
-		sys.stdout.write("\nTitle: (%s); Version: (%s); Author: (%s)\n" % (
+		sys.stdout.write("%s (%s) by %s\n" % (
 		__title__, __version__, __author__ ))
-		sys.stdout.write("This python script uses the included python module tvdb_api.py (v1.0 or higher). Also found at\n\
-'http://pypi.python.org/pypi?%3Aaction=search&term=tvnamer&submit=search' thanks to the authors 'dbr/Ben' for this excellant module.\n\n\
-The tvdb_api.py module uses the full access XML api published by thetvdb.com see:\n\
-'http://thetvdb.com/wiki/index.php?title=Programmers_API'\n\n\
-Users of this script are encouraged to populate thetvdb.com with TV show information, posters,\n\
-fan art and banners. The richer the source the more valuable the script.\n\n"
-		)
 		sys.exit(True)
 
 	# Process usage command line requests

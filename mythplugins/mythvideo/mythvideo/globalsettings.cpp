@@ -120,11 +120,22 @@ HostComboBox *MovieGrabber()
     gc->setLabel(QObject::tr("Movie Grabber Script"));
 
     for (QStringList::const_iterator i = MovieScripts.end() - 1;
-            i != MovieScripts.begin(); --i)
+            i != MovieScripts.begin() - 1; --i)
     {
-        gc->addSelection(QString("%1").arg(*i),
-                     QString("%1mythvideo/scripts/Movie/%2")
-                     .arg(GetShareDir()).arg(*i));
+        QProcess versionCheck;
+
+        QString commandline = QString("%1mythvideo/scripts/Movie/%2")
+                                      .arg(GetShareDir()).arg(*i);
+        versionCheck.setReadChannelMode(QProcess::MergedChannels);
+        versionCheck.start(commandline, QStringList() << "-v");
+        versionCheck.waitForFinished();
+        QByteArray result = versionCheck.readAll(); 
+        QString resultString(result);
+
+        if (resultString.isEmpty())
+            resultString = *i;
+
+        gc->addSelection(QString("%1").arg(resultString),commandline);
     }
     gc->setHelpText(QObject::tr("This is the script used to search "
                     "for and download Movie Metadata."));
@@ -139,9 +150,20 @@ HostComboBox *TVGrabber()
     for (QStringList::const_iterator i = TVScripts.begin();
             i != TVScripts.end(); ++i)
     {
-        gc->addSelection(QString("%1").arg(*i),
-                     QString("%1mythvideo/scripts/Television/%2")
-                     .arg(GetShareDir()).arg(*i));
+        QProcess versionCheck;
+
+        QString commandline = QString("%1mythvideo/scripts/Television/%2")
+                                      .arg(GetShareDir()).arg(*i);
+        versionCheck.setReadChannelMode(QProcess::MergedChannels);
+        versionCheck.start(commandline, QStringList() << "-v");
+        versionCheck.waitForFinished();
+        QByteArray result = versionCheck.readAll();
+        QString resultString(result);
+
+        if (resultString.isEmpty())
+            resultString = *i;
+
+        gc->addSelection(QString("%1").arg(resultString),commandline);
     }
     gc->setHelpText(QObject::tr("This is the script used to search "
                     "for and download Television Metadata."));
