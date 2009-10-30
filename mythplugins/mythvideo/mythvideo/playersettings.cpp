@@ -8,7 +8,6 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdirs.h>
 
-// mythbrowser
 #include "playersettings.h"
 
 using namespace std;
@@ -130,17 +129,17 @@ void PlayerSettings::slotFocusChanged(void)
     QString msg = "";
     if (GetFocusWidget() == m_defaultPlayerEdit)
         msg = tr("This is the command used for any file "
-                 "that the extension is not specifically defined. "
+                 "whose extension is not specifically defined. "
                  "You may also enter the name of one of the playback "
                  "plugins such as 'Internal'.");
     else if (GetFocusWidget() == m_dvdPlayerEdit)
         msg = tr("This can be any command to launch a DVD "
-                 " player (e.g. MPlayer, ogle, etc.). If present, %d will "
-                 "be substituted for the DVD device (e.g. /dev/dvd).");
+                 " player. Internal is the default.  For other players, %d "
+                 "will be substituted for the DVD device (e.g. /dev/dvd).");
     else if (GetFocusWidget() == m_vcdPlayerEdit)
         msg = tr("This can be any command to launch a VCD "
-                 "player (e.g. MPlayer, xine, etc.). If present, %d will "
-                 "be substituted for the VCD device (e.g. /dev/cdrom).");
+                 "player. The Internal player will not play VCDs. "
+                 "%d will be substituted for the VCD device (e.g. /dev/cdrom).");
     else if (GetFocusWidget() == m_altPlayerEdit)
         msg = tr("If for some reason the default player "
                  "doesn't play a video, you can play it in an alternate "
