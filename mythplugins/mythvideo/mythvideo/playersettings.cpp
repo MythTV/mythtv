@@ -46,7 +46,7 @@ bool PlayerSettings::Create()
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
     if (!m_defaultPlayerEdit || !m_dvdPlayerEdit || !m_vcdPlayerEdit ||
-        !m_altPlayerEdit || !m_okButton || !m_cancelButton)
+        !m_altCheck || !m_altPlayerEdit || !m_okButton || !m_cancelButton)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
         return false;
