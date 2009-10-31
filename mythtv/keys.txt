@@ -169,14 +169,14 @@ If you have two or more tuner cards:
 
 While watching a recording:
 
-- SPACE or ENTER will set a bookmark at that point.  Next time you start the 
-  recording, you will automatically jump forward to this point and clear the 
+- SPACE or ENTER will set a bookmark at that point.  Next time you start the
+  recording, you will automatically jump forward to this point and clear the
   bookmark.
 - E or M enters/exits edit mode.
   - The left and right keys move forward and backward.
   - The up and down arrow keys alter the amount of time you jump forward and
-    backward.  Increments are: nearest cutpoint, nearest video keyframe, 
-    1 frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes, and 
+    backward.  Increments are: nearest cutpoint, nearest video keyframe,
+    1 frame, 0.5 seconds, 1 second, 20 seconds, 1 minute, 5 minutes, and
     10 minutes.
   - The page up and down keys move forward and backward to the nearest cut
     point.
@@ -202,19 +202,20 @@ EPG
   highlight left or right by one page.
 - The keys 9, 3, 7 and 1 (like a numeric keypad) perform the same as PageUp,
   PageDown, Home and End.
-- I will bring up more information about a show, and allow you to schedule 
-  a recording.
+- U will bring up more information about a show.
+- I will allow you to schedule a recording.
   -  If you select "Record this showing" while watching Live TV you can
      "Instant Record" a program.
-- Space or Enter will allow you resolve conflicts or change overrides.
-  If the program is not already scheduled to record, it will act like 
-  pressing I instead.
-- Pressing M when on a channel will change to that channel.
+- Space or Enter when watching LiveTV will change to that channel and exit the
+  EPG if the selected show is in progress or starts within 15 minutes; or
+  otherwise will allow you to resolve conflicts or change overrides.  If the
+  program is not already scheduled to record, it will act like pressing I
+  instead.
+- Pressing X will change the channel to the currently selected channel without
+  leaving the EPG (Most useful in the alternate EPG)
 - Pressing ESC or C exits without changing the channel.
 - Pressing R will change the current item from Recording/Not-Recording.
   Successive keypresses cycle through the scheduled recording type list.
-- Pressing X will change the channel to the currently selected channel without
-  leaving the EPG (Most useful in the alternate EPG)
 - Pressing '?' will mark/unmark the current channel as a "favorite"
 - Pressing '/' or 4 will toggle the guide listing between all channels and
   "favorites".
@@ -244,7 +245,7 @@ Viewing Search Listings
 - Home to change to the previous view if applicable.
 - End to change to the next view if applicable.
 - M to select another view if applicable.
-  - In the title and description search popup, press M again to edit or 
+  - In the title and description search popup, press M again to edit or
     delete the selected view.
 
 Program Finder
