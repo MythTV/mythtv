@@ -4628,7 +4628,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
     {
         ctx->LockDeleteNVP(__FILE__, __LINE__);
         if (ctx->nvp)
-            ctx->nvp->GoToDVDMenu("menu");
+            ctx->nvp->GoToDVDMenu("root");
         ctx->UnlockDeleteNVP(__FILE__, __LINE__);
     }
     else if (has_action("FINDER", actions))
