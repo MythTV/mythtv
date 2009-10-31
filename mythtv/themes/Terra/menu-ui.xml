@@ -203,16 +203,20 @@
                             </imagetype>-->
                         </state>
 
-                        <state name="DVD_PLAY" from="DVD" />
+                        <state name="DVD_PLAY" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/play_dvd.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="VCD_PLAY" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/cd.png</filename>
                             </imagetype>
                         </state>
                         <state name="DVD_RIP" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/dvd_rip.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/import_dvd.png</filename>
+                            </imagetype>
                         </state>
 
                         <state name="DVD_SETTINGS_GENERAL" from="DVD" />
@@ -222,33 +226,37 @@
                         <state name="GAME_SETTINGS_GENERAL" from="GAME" />
                         <state name="GAME_SCAN" from="GAME" />
 
-                        <state name="NETFLIX" from="DVD" />
-                        <state name="NETFLIX_QUEUE" from="DVD" />
-                        <state name="NETFLIX_BROWSE" from="DVD" />
-                        <state name="NETFLIX_HISTORY" from="DVD" />
-                        <state name="SETTINGS_NETFLIX" from="DVD" />
+                        <state name="NETFLIX" from="default" >
+                            <imagetype name="icon">
+                                <filename>watermarks/netflix.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="NETFLIX_QUEUE" from="NETFLIX" />
+                        <state name="NETFLIX_BROWSE" from="NETFLIX" />
+                        <state name="NETFLIX_HISTORY" from="NETFLIX" />
+                        <state name="SETTINGS_NETFLIX" from="NETFLIX" />
 
                         <state name="SETTINGS_GENERAL" from="SETUP" />
                         <state name="SETTINGS_APPEARANCE" from="default">
-                            <!--                            <imagetype name="icon">
+                            <imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
-                            </imagetype>-->
+                            </imagetype>
                         </state>
                         <state name="SCREENSETUPWIZARD" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/screenwiz.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/screen_setup.png</filename>
+                            </imagetype>
                         </state>
                         <state name="SETTINGS_TV" from="TV" />
                         <state name="SETTINGS_MUSIC" from="default">
-                            <!--                            <imagetype name="icon">
+                            <imagetype name="icon">
                                 <filename>watermarks/music_settings.png</filename>
-                            </imagetype>-->
+                            </imagetype>
                         </state>
                         <state name="SETTINGS_VIDEO" from="default">
-                            <!--                            <imagetype name="icon">
+                            <imagetype name="icon">
                                 <filename>watermarks/video_settings.png</filename>
-                            </imagetype>-->
+                            </imagetype>
                         </state>
                         <state name="SETTINGS_DVD" from="DVD" />
                         <state name="SETTINGS_FM" from="FM" />
@@ -265,17 +273,38 @@
                             </imagetype>
                         </state>
 
-                        <state name="MUSIC_PLAY" from="MUSIC" />
-                        <state name="MUSIC_PLAYLIST" from="MUSIC" />
-                        <state name="MUSIC_RIP" from="VCD_PLAY" />
+                        <state name="MUSIC_PLAY" from="MUSIC">
+                            <imagetype name="icon">
+                                <filename>watermarks/play_music.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_PLAYLIST" from="MUSIC">
+                            <imagetype name="icon">
+                                <filename>watermarks/select_music.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_RIP" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/import_cd.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_IMPORT" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/import_files.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="MUSIC_SCAN" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/search.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/new_music.png</filename>
+                            </imagetype>
                         </state>
 
                         <state name="MUSIC_SETTINGS_GENERAL" from="SETTINGS_MUSIC" />
-                        <state name="MUSIC_SETTINGS_PLAYER" from="SETTINGS_MUSIC" />
+                        <state name="MUSIC_SETTINGS_PLAYER" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/player_settings.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="MUSIC_SETTINGS_RIP" from="MUSIC_RIP" />
 
                         <state name="TV_PROGRAM_GUIDE" from="default">
@@ -284,17 +313,17 @@
                             </imagetype>
                         </state>
                         <state name="TV_PROGFIND" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/search.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/program_finder.png</filename>
+                            </imagetype>
                         </state>
                         <state name="TV_SEARCH_LISTINGS" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_WORDS" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_LISTS" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_PEOPLE" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_POWER" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_KEYWORDS" from="TV_PROGFIND" />
-                        <state name="TV_CUSTOM_RECORD" from="default">
+                        <state name="TV_SEARCH_WORDS" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/search_words.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_CUSTOM_RECORD" from="TV">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/record.png</filename>
                             </imagetype>-->
@@ -304,8 +333,12 @@
                                 <filename>watermarks/clock.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_RECORDING_RULES" from="default" />
-                        <state name="TV_RECPRIORITIES" from="default">
+                        <state name="TV_RECORDING_RULES" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/stop_light.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_RECPRIORITIES" from="TV">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/priority.png</filename>
                             </imagetype>-->
@@ -335,9 +368,12 @@
                             </imagetype>
                         </state>
 
-                        <state name="TV_SEARCH_TITLES" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_KEYWORDS" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_PEOPLE" from="TV_PROGFIND" />
+                        <state name="TV_SEARCH_LISTS" from="TV_MANUAL_SCHEDULE" />
+                        <state name="TV_SEARCH_PEOPLE" from="TV_SEARCH_WORDS" />
+                        <state name="TV_SEARCH_KEYWORDS" from="TV_SEARCH_WORDS" />
+                        <state name="TV_SEARCH_TITLES" from="TV_SEARCH_WORDS" />
+                        <state name="TV_SEARCH_POWER" from="TV_SEARCH_WORDS" />
+                        <state name="TV_SEARCH_STORED" from="TV_SEARCH_WORDS" />
 
                         <state name="TV_SEARCH_NEW_TITLES" from="TV_PROGFIND" />
                         <state name="TV_SEARCH_MOVIES" from="TV_PROGFIND" />
@@ -348,8 +384,18 @@
                         <state name="TV_SETTINGS_GENERAL" from="SETUP" />
                         <state name="TV_SETTINGS_PROGRAM_GUIDE" from="TV_PROGRAM_GUIDE" />
                         <state name="TV_SETTINGS_PLAYBACK" from="TV" />
-                        <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV" />
+                        <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV">
+                            <imagetype name="icon">
+                                <filename>watermarks/osd_appearance.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SETTINGS_OSD_MENU_EDITOR" from="TV">
+                            <imagetype name="icon">
+                                <filename>watermarks/osd_editor.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
+                        <state name="TV_SETTINGS_CHANNEL_GROUP" from="TV" />
                         <state name="TV_SETTINGS_RECORDING_PROFILES" from="TV_CUSTOM_RECORD" />
                         <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
 
@@ -366,9 +412,9 @@
                             </imagetype>
                         </state>
                         <state name="TV_PREVIOUS" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/big_arrow_down.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/previously_recorded.png</filename>
+                            </imagetype>
                         </state>
                         <state name="TV_STATUS" from="default">
                             <imagetype name="icon">
@@ -387,14 +433,14 @@
 
                         <state name="TV_UPCOMING_RECORDINGS" from="TV_PROGRAM_GUIDE" />
                         <state name="SETTINGS_MEDIA" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/multimedia.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/media_settings.png</filename>
+                            </imagetype>
                         </state>
                         <state name="SETTINGS_INFO_CENTER" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/info_setup.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/info_settings.png</filename>
+                            </imagetype>
                         </state>
                         <state name="MENU_MEDIA_LIBRARY" from="default">
                             <imagetype name="icon">
@@ -426,9 +472,9 @@
                             </imagetype>-->
                         </state>
                         <state name="EJECT" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/dvd_eject.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/eject_media.png</filename>
+                            </imagetype>
                         </state>
                         <state name="ARCHIVE" from="default">
                             <!--                            <imagetype name="icon">
@@ -466,6 +512,21 @@
                             </imagetype>
                         </state>
                         <state name="SETTINGS_ZONEMINDER" from="ZONEMINDER" />
+                        <state name="ZM_CONSOLE" from="ZONEMINDER">
+                            <imagetype name="icon">
+                                <filename>watermarks/zm_console.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="ZM_LIVE_VIEWER" from="ZONEMINDER">
+                            <imagetype name="icon">
+                                <filename>watermarks/zm_live.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="ZM_EVENT_VIEWER" from="ZONEMINDER">
+                            <imagetype name="icon">
+                                <filename>watermarks/zm_events.png</filename>
+                            </imagetype>
+                        </state>
                     </statetype>
                 </state>
                 <state name="selected" from="active">
@@ -556,16 +617,20 @@
                             </imagetype>-->
                         </state>
 
-                        <state name="DVD_PLAY" from="DVD" />
+                        <state name="DVD_PLAY" from="DVD">
+                            <imagetype name="icon">
+                                <filename>watermarks/play_dvd.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="VCD_PLAY" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/cd.png</filename>
                             </imagetype>
                         </state>
                         <state name="DVD_RIP" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/dvd_rip.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/import_dvd.png</filename>
+                            </imagetype>
                         </state>
 
                         <state name="DVD_SETTINGS_GENERAL" from="DVD" />
@@ -575,33 +640,37 @@
                         <state name="GAME_SETTINGS_GENERAL" from="GAME" />
                         <state name="GAME_SCAN" from="GAME" />
 
-                        <state name="NETFLIX" from="DVD" />
-                        <state name="NETFLIX_QUEUE" from="DVD" />
-                        <state name="NETFLIX_BROWSE" from="DVD" />
-                        <state name="NETFLIX_HISTORY" from="DVD" />
-                        <state name="SETTINGS_NETFLIX" from="DVD" />
+                        <state name="NETFLIX" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/netflix.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="NETFLIX_QUEUE" from="NETFLIX" />
+                        <state name="NETFLIX_BROWSE" from="NETFLIX" />
+                        <state name="NETFLIX_HISTORY" from="NETFLIX" />
+                        <state name="SETTINGS_NETFLIX" from="NETFLIX" />
 
                         <state name="SETTINGS_GENERAL" from="SETUP" />
                         <state name="SETTINGS_APPEARANCE" from="default">
-                            <!--                            <imagetype name="icon">
+                            <imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
-                            </imagetype>-->
+                            </imagetype>
                         </state>
                         <state name="SCREENSETUPWIZARD" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/screenwiz.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/screen_setup.png</filename>
+                            </imagetype>
                         </state>
                         <state name="SETTINGS_TV" from="TV" />
                         <state name="SETTINGS_MUSIC" from="default">
-                            <!--                            <imagetype name="icon">
+                            <imagetype name="icon">
                                 <filename>watermarks/music_settings.png</filename>
-                            </imagetype>-->
+                            </imagetype>
                         </state>
                         <state name="SETTINGS_VIDEO" from="default">
-                            <!--                            <imagetype name="icon">
+                            <imagetype name="icon">
                                 <filename>watermarks/video_settings.png</filename>
-                            </imagetype>-->
+                            </imagetype>
                         </state>
                         <state name="SETTINGS_DVD" from="DVD" />
                         <state name="SETTINGS_FM" from="FM" />
@@ -618,17 +687,38 @@
                             </imagetype>
                         </state>
 
-                        <state name="MUSIC_PLAY" from="MUSIC" />
-                        <state name="MUSIC_PLAYLIST" from="MUSIC" />
-                        <state name="MUSIC_RIP" from="VCD_PLAY" />
+                        <state name="MUSIC_PLAY" from="MUSIC">
+                            <imagetype name="icon">
+                                <filename>watermarks/play_music.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_PLAYLIST" from="MUSIC">
+                            <imagetype name="icon">
+                                <filename>watermarks/select_music.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_RIP" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/import_cd.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="MUSIC_IMPORT" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/import_files.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="MUSIC_SCAN" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/search.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/new_music.png</filename>
+                            </imagetype>
                         </state>
 
                         <state name="MUSIC_SETTINGS_GENERAL" from="SETTINGS_MUSIC" />
-                        <state name="MUSIC_SETTINGS_PLAYER" from="SETTINGS_MUSIC" />
+                        <state name="MUSIC_SETTINGS_PLAYER" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/player_settings.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="MUSIC_SETTINGS_RIP" from="MUSIC_RIP" />
 
                         <state name="TV_PROGRAM_GUIDE" from="default">
@@ -637,17 +727,23 @@
                             </imagetype>
                         </state>
                         <state name="TV_PROGFIND" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/search.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/program_finder.png</filename>
+                            </imagetype>
                         </state>
                         <state name="TV_SEARCH_LISTINGS" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_WORDS" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_LISTS" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_PEOPLE" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_POWER" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_KEYWORDS" from="TV_PROGFIND" />
-                        <state name="TV_CUSTOM_RECORD" from="default">
+                        <state name="TV_SEARCH_WORDS" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/search_words.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SEARCH_LISTS" from="TV_MANUAL_SCHEDULE" />
+                        <state name="TV_SEARCH_PEOPLE" from="TV_SEARCH_WORDS" />
+                        <state name="TV_SEARCH_KEYWORDS" from="TV_SEARCH_WORDS" />
+                        <state name="TV_SEARCH_TITLES" from="TV_SEARCH_WORDS" />
+                        <state name="TV_SEARCH_POWER" from="TV_SEARCH_WORDS" />
+                        <state name="TV_SEARCH_STORED" from="TV_SEARCH_WORDS" />
+                        <state name="TV_CUSTOM_RECORD" from="TV">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/record.png</filename>
                             </imagetype>-->
@@ -657,8 +753,12 @@
                                 <filename>watermarks/clock.png</filename>
                             </imagetype>
                         </state>
-                        <state name="TV_RECORDING_RULES" from="default" />
-                        <state name="TV_RECPRIORITIES" from="default">
+                        <state name="TV_RECORDING_RULES" from="default">
+                            <imagetype name="icon">
+                                <filename>watermarks/stop_light.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_RECPRIORITIES" from="TV">
                             <!--                            <imagetype name="icon">
                                 <filename>watermarks/priority.png</filename>
                             </imagetype>-->
@@ -688,10 +788,6 @@
                             </imagetype>
                         </state>
 
-                        <state name="TV_SEARCH_TITLES" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_KEYWORDS" from="TV_PROGFIND" />
-                        <state name="TV_SEARCH_PEOPLE" from="TV_PROGFIND" />
-
                         <state name="TV_SEARCH_NEW_TITLES" from="TV_PROGFIND" />
                         <state name="TV_SEARCH_MOVIES" from="TV_PROGFIND" />
                         <state name="TV_SEARCH_CATEGORIES" from="TV_PROGFIND" />
@@ -701,8 +797,18 @@
                         <state name="TV_SETTINGS_GENERAL" from="SETUP" />
                         <state name="TV_SETTINGS_PROGRAM_GUIDE" from="TV_PROGRAM_GUIDE" />
                         <state name="TV_SETTINGS_PLAYBACK" from="TV" />
-                        <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV" />
+                        <state name="TV_SETTINGS_PLAYBACK_OSD" from="TV">
+                            <imagetype name="icon">
+                                <filename>watermarks/osd_appearance.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="TV_SETTINGS_OSD_MENU_EDITOR" from="TV">
+                            <imagetype name="icon">
+                                <filename>watermarks/osd_editor.png</filename>
+                            </imagetype>
+                        </state>
                         <state name="TV_SETTINGS_PLAYBACK_GROUPS" from="TV" />
+                        <state name="TV_SETTINGS_CHANNEL_GROUP" from="TV" />
                         <state name="TV_SETTINGS_RECORDING_PROFILES" from="TV_CUSTOM_RECORD" />
                         <state name="TV_SETTINGS_RECPRIORITIES" from="TV_RECPRIORITIES" />
 
@@ -719,9 +825,9 @@
                             </imagetype>
                         </state>
                         <state name="TV_PREVIOUS" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/big_arrow_down.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/previously_recorded.png</filename>
+                            </imagetype>
                         </state>
                         <state name="TV_STATUS" from="default">
                             <imagetype name="icon">
@@ -740,14 +846,14 @@
 
                         <state name="TV_UPCOMING_RECORDINGS" from="TV_PROGRAM_GUIDE" />
                         <state name="SETTINGS_MEDIA" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/multimedia.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/media_settings.png</filename>
+                            </imagetype>
                         </state>
                         <state name="SETTINGS_INFO_CENTER" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/info_setup.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/info_settings.png</filename>
+                            </imagetype>
                         </state>
                         <state name="MENU_MEDIA_LIBRARY" from="default">
                             <imagetype name="icon">
@@ -779,9 +885,9 @@
                             </imagetype>-->
                         </state>
                         <state name="EJECT" from="default">
-                            <!--                            <imagetype name="icon">
-                                <filename>watermarks/dvd_eject.png</filename>
-                            </imagetype>-->
+                            <imagetype name="icon">
+                                <filename>watermarks/eject_media.png</filename>
+                            </imagetype>
                         </state>
                         <state name="ARCHIVE" from="default">
                             <!--                            <imagetype name="icon">
@@ -815,6 +921,21 @@
                             </imagetype>
                         </state>
                         <state name="SETTINGS_ZONEMINDER" from="ZONEMINDER" />
+                        <state name="ZM_CONSOLE" from="ZONEMINDER">
+                            <imagetype name="icon">
+                                <filename>watermarks/zm_console.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="ZM_LIVE_VIEWER" from="ZONEMINDER">
+                            <imagetype name="icon">
+                                <filename>watermarks/zm_live.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="ZM_EVENT_VIEWER" from="ZONEMINDER">
+                            <imagetype name="icon">
+                                <filename>watermarks/zm_events.png</filename>
+                            </imagetype>
+                        </state>
                     </statetype>
                 </state>
                 <state name="inactive" from="selected" />
