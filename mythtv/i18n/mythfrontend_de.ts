@@ -253,19 +253,19 @@
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="279"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="326"/>
         <source>Channel Name</source>
-        <translation>Sendername</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="160"/>
         <source>Delete all channels on currently selected source(s).</source>
-        <translation>Alle Sender der ausgewählten Quelle löschen.</translation>
+        <translation>Alle Sender der gewählten Quelle(n) löschen.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="164"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="283"/>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="331"/>
         <source>Channel Number</source>
-        <translation>Senderplatz</translation>
+        <translation>Platz</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="171"/>
@@ -368,7 +368,7 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="148"/>
         <source>Create New Channel Group</source>
-        <translation>Neue Sendergruppe erstellen</translation>
+        <translation>Neue Sendergruppe anlegen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="149"/>
@@ -884,7 +884,7 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="204"/>
         <source>Priority for movies by the year of release (complete example)</source>
-        <translation>Priorität für Spielfilmen nach Erscheinungsjahr (vollst. Beispiel)</translation>
+        <translation>Priorität für Spielfilme nach Erscheinungsjahr (vollst. Beispiel)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="208"/>
@@ -2235,7 +2235,7 @@
         <location filename="../libs/libmythtv/tv_play.cpp" line="428"/>
         <location filename="../libs/libmythui/mythmainwindow.cpp" line="375"/>
         <source>Page Up</source>
-        <translation>vorige Seite</translation>
+        <translation>vorherige Seite</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="430"/>
@@ -2479,12 +2479,12 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="536"/>
         <source>Toggle Picture-in-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild-im-Bild-Ansicht ein/aus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="538"/>
         <source>Toggle Picture-by-Picture view</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild-an-Bild-Ansicht ein/aus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="540"/>
@@ -2504,7 +2504,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="546"/>
         <source>Swap PBP/PIP Windows</source>
-        <translation>PIP/PBP-Fenster austauschen</translation>
+        <translation>PIP/PBP-Fenster tauschen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="548"/>
@@ -2549,7 +2549,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="564"/>
         <source>Toggle Teletext Menu</source>
-        <translation type="unfinished">Teletext Menü Ein/Aus</translation>
+        <translation>Teletext-Menü Ein/Aus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="567"/>
@@ -2724,12 +2724,12 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="645"/>
         <source>Toggle the Sleep Timer</source>
-        <translation type="unfinished"></translation>
+        <translation>Einschlaftimer ein/aus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="647"/>
         <source>Play</source>
-        <translation type="unfinished">Abspielen</translation>
+        <translation>Wiedergabe</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="649"/>
@@ -3956,7 +3956,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="839"/>
         <source>W</source>
-        <translation>W</translation>
+        <translation>B</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="841"/>
@@ -4999,7 +4999,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1609"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1620"/>
         <source>Any</source>
-        <translation>Jede</translation>
+        <translation>Jeder</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="1543"/>
@@ -6690,7 +6690,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="458"/>
         <source>The amount of time the master backend will be woken up before a recording starts.</source>
-        <translation>Der Master Rechner wird um diese Zeitspanne vor dem Beginn einer Aufnahme gestartet. Diese Zeit sollte mindestens so lange sein, wie der Rechner für den Startvorgang benötigt.</translation>
+        <translation>Der Master-Rechner wird um diese Zeitspanne vor dem Beginn einer Aufnahme gestartet. Diese Zeit sollte mindestens so lange sein, wie der Rechner für den Startvorgang benötigt.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="466"/>
@@ -7248,7 +7248,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="322"/>
         <source>If enabled, the master backend will stream and delete files if it finds them in the video directory. Useful if you are using a central storage location, like a NFS share, and your slave backend isn&apos;t running.</source>
-        <translation>Falls gesetzt, wird der Master Rechner Aufnahmen löschen oder an ein Frontend übertragen. Nützlich wenn Sie Aufnahmen zentral speichern und ein Slave Rechner nicht eingeschaltet ist.</translation>
+        <translation>Falls gesetzt, wird das Master-Backend Aufnahmen löschen oder an ein Frontend übertragen. Nützlich wenn Sie Aufnahmen zentral speichern und ein Slave-Backend nicht eingeschaltet ist.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="3505"/>
@@ -7336,7 +7336,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="145"/>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
-        <translation>MythTV kann die Master/PCM Lautstärke regeln. Bitte abwählen falls Sie die Lautstärke extern steuern möchten.</translation>
+        <translation>MythTV kann die Master/PCM-Lautstärke regeln. Bitte abwählen falls Sie die Lautstärke extern steuern möchten.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="211"/>
@@ -7683,7 +7683,7 @@ Soll die folgende Sendung wirklich gelöscht werden?</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="147"/>
         <source>This will cause Myth to follow symlinks when recordings and related files are deleted, instead of deleting the symlink and leaving the actual file.</source>
-        <translation>Wenn Aufnahmen und andere Dateien gelöscht werden, wird Myth symbolischen Links folgen anstatt nur den symb. Link zu löschen und die eigentliche Datei zurück zu lassen.</translation>
+        <translation>Wenn Aufnahmen und andere Dateien gelöscht werden, wird MythTV symbolischen Links (symlinks) folgen anstatt sie einfach zu löschen und die eigentliche Datei zurück zu lassen.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="4418"/>
@@ -10553,7 +10553,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3204"/>
         <source>Set this to &apos;0&apos; unless you expect that the majority of your show times will not match your TV listings. This sets the initial start early or start late time when rules are created. These can then be adjusted per recording rule.</source>
-        <translation>Setzen Sie dies auf 0 (Minuten) außer Sie erwarten, dass ein Großteil Ihrer Sendugen nicht zur vorgesehenen Zeit anfangen. Dies legt nur den Vorgabewert für neue Aufnahmeregeln fest, und kann für jede Regel angepasst werden.</translation>
+        <translation>Setzen Sie dies auf 0 (Minuten) außer Sie erwarten, dass ein Großteil Ihrer Sendungen nicht zur vorgesehenen Zeit anfangen. Dies legt nur den Vorgabewert für neue Aufnahmeregeln fest, und kann für jede Regel angepasst werden.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3217"/>
@@ -10593,7 +10593,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3256"/>
         <source>Additional priority when a showing is marked as an HDTV broadcast in the TV listings.</source>
-        <translation>Zusätzliche Priorität wenn eine Austrahlung als HDTV-Sendung gekennzeichnet ist.</translation>
+        <translation>Zusätzliche Priorität wenn eine Ausstrahlung als HDTV-Sendung gekennzeichnet ist.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3736"/>
@@ -12862,7 +12862,7 @@ wird bereits verwendet.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3266"/>
         <source>Additional priority when a showing is marked as widescreen in the TV listings.</source>
-        <translation>Zusätzliche Priorität wenn eine Austrahlung im Breitbildformat erfolgt.</translation>
+        <translation>Zusätzliche Priorität wenn eine Ausstrahlung im Breitbildformat erfolgt.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3288"/>
@@ -13069,7 +13069,7 @@ wird bereits verwendet.</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="198"/>
         <source>Disable Firewire Reset</source>
-        <translation>FireWire Reset deaktivieren</translation>
+        <translation>FireWire-Reset deaktivieren</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="200"/>
@@ -14467,7 +14467,7 @@ Möchten Sie weitersehen?</translation>
     <message>
         <location filename="../libs/libmythtv/playercontext.cpp" line="833"/>
         <source>Play</source>
-        <translation>Abspielen</translation>
+        <translation>Wiedergabe</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="1867"/>
@@ -15050,12 +15050,12 @@ Bitte beenden Sie diese vor dem Upgrade.</translation>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="345"/>
         <source>Warning: MythTV wants to upgrade your database,</source>
-        <translation>Achtung: MythTV möchte Ihre Datenbank aktualisieren,</translation>
+        <translation>Achtung: MythTV möchte Ihre Datenbank aktualisieren, und zwar</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="346"/>
         <source>for the %1 schema, from %2 to %3.</source>
-        <translation>das %1 Schema von %2 nach %3.</translation>
+        <translation>das %1-Schema von %2 nach %3.</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/schemawizard.cpp" line="349"/>
@@ -15506,12 +15506,12 @@ Keine weiteren Informationen</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1086"/>
         <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation>Zeigt die Betriebsdaten dieses Rechners.</translation>
+        <translation>Zeigt die Betriebsdaten dieses Rechners</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1089"/>
         <source>and the MythTV server</source>
-        <translation>und der MythTV Server</translation>
+        <translation>und der MythTV Server.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1099"/>
@@ -15623,7 +15623,8 @@ Keine weiteren Informationen</translation>
         <translation>
             <numerusform>%n Aufnahme belegt %1 und wird Autom. gelöscht
 </numerusform>
-            <numerusform>%n Aufnahmen belegen %1 und werden Autom. gelöscht</numerusform>
+            <numerusform>%n Aufnahmen belegen %1 und werden Autom. gelöscht
+</numerusform>
         </translation>
     </message>
 </context>
@@ -16128,12 +16129,12 @@ aus der Speichergruppe entfernen?</translation>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10903"/>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10905"/>
         <source>Sleep</source>
-        <translation>Schlaf</translation>
+        <translation>Einschlaftimer</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10530"/>
         <source>Sleep Off</source>
-        <translation>Schlaf aus</translation>
+        <translation>Einschlaftimer aus</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="10466"/>
@@ -17191,6 +17192,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <location filename="../themes/themestrings.h" line="56"/>
         <source>Play Recordings</source>
+        <translatorcomment>no description needed</translatorcomment>
         <translation></translation>
     </message>
     <message>
@@ -18889,7 +18891,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <location filename="../themes/themestrings.h" line="394"/>
         <source>Contexts</source>
-        <translation>Kontexte</translation>
+        <translation>Kontext</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="395"/>
@@ -18919,7 +18921,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <location filename="../themes/themestrings.h" line="400"/>
         <source>Status Icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Statussymbole</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="401"/>
@@ -18953,7 +18955,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <location filename="../themes/themestrings.h" line="406"/>
         <source>Last Recorded</source>
-        <translation>Zuletzt aufgenommen am</translation>
+        <translation>Letzte Aufnahme am</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="407"/>
@@ -19005,7 +19007,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <location filename="../themes/themestrings.h" line="416"/>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Aufnahme</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="417"/>
@@ -19100,6 +19102,7 @@ Wählen Sie eine laufende Aufnahme</translation>
     <message>
         <location filename="../themes/themestrings.h" line="435"/>
         <source>Play recordings</source>
+        <translatorcomment>no description needed</translatorcomment>
         <translation></translation>
     </message>
     <message>
