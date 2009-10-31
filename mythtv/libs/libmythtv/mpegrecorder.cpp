@@ -1077,6 +1077,15 @@ void MpegRecorder::StartRecording(void)
 
     MythTimer elapsedTimer;
     float elapsed;
+    long long bytesRead = 0;
+    int dummyBPS = 0;  // Bytes per second, but env var is BITS PER SECOND
+
+    if (getenv("DUMMYBPS"))
+    {
+        dummyBPS = atoi(getenv("DUMMYBPS")) / 8;
+        VERBOSE(VB_IMPORTANT, LOC + QString("Throttling dummy recorder to %1 "
+                "bits per second").arg(dummyBPS * 8));
+    }
 
     struct timeval tv;
     fd_set rdset;
@@ -1104,7 +1113,16 @@ void MpegRecorder::StartRecording(void)
         
         if (deviceIsMpegFile)
         {
-            if (GetFramesWritten())
+            if (dummyBPS && bytesRead)
+            {
+                elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                while ((bytesRead / elapsed) > dummyBPS)
+                {
+                    usleep(50000);
+                    elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
+                }
+            }
+            else if (GetFramesWritten())
             {
                 elapsed = (elapsedTimer.elapsed() / 1000.0) + 1;
                 while ((GetFramesWritten() / elapsed) > 30)
@@ -1226,6 +1244,7 @@ void MpegRecorder::StartRecording(void)
         if (len > 0)
         {
             len += remainder;
+            bytesRead += len;
 
             if (driver == "hdpvr") {
                 remainder = _stream_data->ProcessData(buffer, len);
