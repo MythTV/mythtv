@@ -27,11 +27,11 @@
 
 // These aren't external, they are defined in this file.
 // The 'extern "C"' forces them in the C namespace, not the C++
-extern "C" static void diskAppearedCallback(DADiskRef disk, void *context);
-extern "C" static void diskDisappearedCallback(DADiskRef disk, void *context);
-extern "C" static void diskChangedCallback(DADiskRef disk,
-                                           CFArrayRef keys, void *context);
-extern "C" static MediaType MediaTypeForBSDName(const char *bsdName);
+extern "C" void diskAppearedCallback(DADiskRef disk, void *context);
+extern "C" void diskDisappearedCallback(DADiskRef disk, void *context);
+extern "C" void diskChangedCallback(DADiskRef disk,
+                                    CFArrayRef keys, void *context);
+extern "C" MediaType MediaTypeForBSDName(const char *bsdName);
 
 static mach_port_t sMasterPort;
 
