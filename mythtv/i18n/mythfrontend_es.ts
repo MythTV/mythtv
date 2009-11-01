@@ -16,7 +16,7 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="22"/>
         <source>Pending</source>
-        <translation type="unfinished">Pendiente</translation>
+        <translation>Pendiente</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="23"/>
@@ -46,7 +46,7 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="28"/>
         <source>Erroring</source>
-        <translation type="unfinished">Errores</translation>
+        <translation type="unfinished">Fallando</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="29"/>
@@ -56,7 +56,7 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="34"/>
         <source>Done (Invalid status!)</source>
-        <translation type="unfinished">Hecho (¡estado inválido!)</translation>
+        <translation type="unfinished">Hecho (¡Estado inválido!)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="35"/>
@@ -71,7 +71,7 @@
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="37"/>
         <source>Errored</source>
-        <translation type="unfinished">Errores</translation>
+        <translation type="unfinished">Falló</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/jobqueue.h" line="38"/>
@@ -280,7 +280,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="194"/>
         <source>Starts the channel scanner.</source>
-        <translation type="unfinished">Ejecuta el buscador de canales.</translation>
+        <translation type="unfinished">Inicia el escaner de canales.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="198"/>
@@ -290,7 +290,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="204"/>
         <source>Allows you to edit the transports directly. This is rarely required unless you are using a satellite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="unfinished">Te permite editar los trasportadores directamente. Este proceso rara vez es necesario a menos que estés utilizando una antena parabólica y necesites ingresar una frecuencia inicial para probar con el scanner de canales.</translation>
+        <translation type="unfinished">Te permite editar los transportadores directamente. Este proceso rara vez es necesario a menos que estés utilizando una antena parabólica y necesites ingresar una frecuencia inicial para probar con el escaner de canales.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="256"/>
@@ -325,7 +325,7 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="561"/>
         <source>Download icon for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Bajar ícono para %1</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="473"/>
@@ -345,17 +345,17 @@
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="558"/>
         <source>Download all icons..</source>
-        <translation type="unfinished">Descargar todos los íconos..</translation>
+        <translation>Descargar todos los íconos..</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="559"/>
         <source>Rescan for missing icons..</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Re-escanear íconos faltantes</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/channeleditor.cpp" line="527"/>
         <source>Add some channels first!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Debe agregar algunos canales primero!</translation>
     </message>
 </context>
 <context>
@@ -368,7 +368,7 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="148"/>
         <source>Create New Channel Group</source>
-        <translation type="unfinished">Crear nuevo grupo de canales</translation>
+        <translation type="unfinished">Crear Nuevo Grupo de Canales</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="149"/>
@@ -383,17 +383,17 @@
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="181"/>
         <source>Yes, delete group</source>
-        <translation type="unfinished">Sí, borrar grupo</translation>
+        <translation>Sí, borrar grupo</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="182"/>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished">No, no borrar grupo</translation>
+        <translation>No, No borrar grupo</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelgroupsettings.cpp" line="228"/>
         <source>(Create new group)</source>
-        <translation type="unfinished">(Crear nuevo grupo)</translation>
+        <translation>(Crear nuevo grupo)</translation>
     </message>
 </context>
 <context>
@@ -428,7 +428,7 @@
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="42"/>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="133"/>
         <source>Scan Progress</source>
-        <translation type="unfinished">Progreso de exploración</translation>
+        <translation type="unfinished">Progreso del escaneo</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="47"/>
@@ -463,7 +463,7 @@
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="91"/>
         <source>Stop Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Detener Escaneo</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelscanner_gui_scan_pane.cpp" line="122"/>
@@ -661,7 +661,7 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="739"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OK</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="663"/>
@@ -678,12 +678,12 @@
         <location filename="../programs/mythfrontend/customedit.cpp" line="673"/>
         <location filename="../programs/mythfrontend/customedit.cpp" line="836"/>
         <source>as a search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">como una búsqueda</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="676"/>
         <source>as an example</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">como un ejemplo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="682"/>
@@ -700,17 +700,17 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="703"/>
         <source>Power Search rules no longer reqiure a leading &quot;AND&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Las reglas de búsqueda avanzada ya no requieren un &quot;AND&quot; al comienzo.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="707"/>
         <source>Power Search rules can not include semicolon ( ; ) </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Las reglas de búsqueda avanzada no pueden incluir punto y comas ( ; ) </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="708"/>
         <source>statement terminators.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">terminadores de expresión.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="722"/>
@@ -741,7 +741,7 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="37"/>
         <source>stored search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">búsqueda almacenada</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="170"/>
@@ -751,17 +751,17 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="188"/>
         <source>Match words in the subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Buscar por palabras en el subtítulo</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="341"/>
         <source>Only shows marked as widescreen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Solo los shows marcados como de pantalla ancha.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="347"/>
         <source>Exclude H.264 encoded streams (EIT only)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Excluir streams codificados con H.264 (Sólo EIT)</translation>
     </message>
 </context>
 <context>
@@ -774,17 +774,17 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="152"/>
         <source>Modify priority for an input (Input priority)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modificar prioridad para una entrada (Prioridad de entrada)</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="154"/>
         <source>Modify priority for all inputs on a card</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modificar la prioridad de todas las entradas de una tarjeta</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="156"/>
         <source>Modify priority for every card on a host</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modificar la prioridad para todas las tarjetas de un host</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="158"/>
