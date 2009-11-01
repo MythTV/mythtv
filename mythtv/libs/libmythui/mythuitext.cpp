@@ -251,22 +251,27 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
 void MythUIText::FillCutMessage()
 {
-
-    bool isNumber;
-    int value = m_Message.toInt(&isNumber);
-    if (isNumber && m_TemplateText.contains("%n"))
+    m_CutMessage.clear();
+    
+    if (m_Message != m_DefaultMessage)
     {
-        m_CutMessage = qApp->translate("ThemeUI",
-                                       qPrintable(m_TemplateText), "",
-                                       QCoreApplication::CodecForTr,
-                                       qAbs(value));
+        bool isNumber;
+        int value = m_Message.toInt(&isNumber);
+        if (isNumber && m_TemplateText.contains("%n"))
+        {
+            m_CutMessage = qApp->translate("ThemeUI",
+                                        qPrintable(m_TemplateText), "",
+                                        QCoreApplication::CodecForTr,
+                                        qAbs(value));
+        }
+        else if (m_TemplateText.contains("%1"))
+        {
+            QString tmp = qApp->translate("ThemeUI", qPrintable(m_TemplateText));
+            m_CutMessage = tmp.arg(m_Message);
+        }
     }
-    else if (m_TemplateText.contains("%1"))
-    {
-        QString tmp = qApp->translate("ThemeUI", qPrintable(m_TemplateText));
-        m_CutMessage = tmp.arg(m_Message);
-    }
-    else
+    
+    if (m_CutMessage.isEmpty())
         m_CutMessage = m_Message;
 
     if (!m_CutMessage.isEmpty())
