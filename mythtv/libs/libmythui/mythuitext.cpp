@@ -1,7 +1,8 @@
 
 #include "mythuitext.h"
 
-#include <QApplication>
+#include <QCoreApplication>
+#include <QtGlobal>
 #include <QDomDocument>
 #include <QFontMetrics>
 #include <QString>
@@ -250,7 +251,23 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 
 void MythUIText::FillCutMessage()
 {
-    m_CutMessage = m_Message;
+
+    bool isNumber;
+    int value = m_Message.toInt(&isNumber);
+    if (isNumber && m_TemplateText.contains("%n"))
+    {
+        m_CutMessage = qApp->translate("ThemeUI",
+                                       qPrintable(m_TemplateText), "",
+                                       QCoreApplication::CodecForTr,
+                                       qAbs(value));
+    }
+    else if (m_TemplateText.contains("%1"))
+    {
+        QString tmp = qApp->translate("ThemeUI", qPrintable(m_TemplateText));
+        m_CutMessage = tmp.arg(m_Message);
+    }
+    else
+        m_CutMessage = m_Message;
 
     if (!m_CutMessage.isEmpty())
     {
