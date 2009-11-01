@@ -260,6 +260,7 @@ BLOCK_QUOTE
   echo "  --disable-audio-oss      disable OSS audio support"
   echo "  --disable-audio-alsa     disable ALSA audio support"
   echo "  --disable-audio-jack     disable JACK audio support"
+  echo "  --disable-audio-pulseoutput disable PulseAudio audio output support"
   echo "  --enable-valgrind        disables timeouts for valgrind memory debugging"
   # Don't print disable frontend/backend options, these
   # cause breakage and people use them inappropriately. -- dtk
@@ -1215,6 +1216,7 @@ MYTHTV_CONFIG_LIST='
 
 MYTHTV_LIST='
     audio_pulse
+    audio_pulseoutput
     audio_alsa
     audio_jack
     audio_oss
@@ -1588,6 +1590,7 @@ PROFILEFLAGS=""
 
 audio_pulse="default"
 audio_pulse_libs="-lpulse"
+audio_pulseoutput="default"
 audio_alsa="default"
 audio_alsa_libs="-lasound"
 audio_jack="default"
@@ -3313,6 +3316,13 @@ enabled jack_demuxer && check_lib2 jack/jack.h jack_client_open -ljack
     enable  audio_pulse ||
     disable audio_pulse
 
+# Enable Pulse Audio output iff not disabled and pulse audio is available
+if ! enabled audio_pulse ; then
+    disable audio_pulseoutput
+elif ! disabled audio_pulseoutput ; then
+    enable audio_pulseoutput
+fi
+
 # ALSA probe
 ! disabled audio_alsa &&
     check_lib alsa/asoundlib.h snd_asoundlib_version $audio_alsa_libs &&
@@ -3827,7 +3837,7 @@ fi
 if enabled frontend; then
   echo
   echo "# Sound Output Support"
-  echo "PulseAudio support        ${audio_pulse-no}"
+  echo "PulseAudio support        ${audio_pulseoutput-no}"
   echo "OSS support               ${audio_oss-no}"
   echo "ALSA support              ${audio_alsa-no}"
   echo "JACK support              ${audio_jack-no}"
@@ -4035,6 +4045,11 @@ fi
 if enabled darwin_da; then
   append CCONFIG "darwin_da"
   echo "SLIB_UNINSTALL_EXTRA_CMD=${SLIB_UNINSTALL_EXTRA_CMD}" >> $MYTH_CONFIG_MAK
+fi
+
+if enabled audio_pulseoutput; then
+  append CCONFIG "using_pulseoutput"
+  echo "CONFIG_AUDIO_PULSE_LIBS=$audio_pulse_libs" >> $MYTH_CONFIG_MAK
 fi
 
 if test $target_os = darwin; then

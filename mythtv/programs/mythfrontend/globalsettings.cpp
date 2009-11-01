@@ -54,6 +54,9 @@ static HostComboBox *AudioOutputDevice()
     gc->addSelection("ALSA:hdmi",          "ALSA:hdmi");
     gc->addSelection("ALSA:plughw:0,3",    "ALSA:plughw:0,3");
 #endif
+#ifdef USING_PULSEOUTPUT
+    gc->addSelection("PulseAudio:default", "PulseAudio:default");
+#endif
 #ifdef USING_OSS
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
     gc->fillSelectionsFromDir(dev);
@@ -79,6 +82,7 @@ static HostComboBox *AudioOutputDevice()
     gc->addSelection("Windows:");
     gc->addSelection("DirectX:");
 #endif
+
     gc->addSelection("NULL", "NULL");
 
     return gc;
@@ -164,6 +168,9 @@ static HostComboBox *PassThroughOutputDevice()
     gc->addSelection("ALSA:iec958:{ AES0 0x02 }", "ALSA:iec958:{ AES0 0x02 }");
     gc->addSelection("ALSA:hdmi", "ALSA:hdmi");
     gc->addSelection("ALSA:plughw:0,3", "ALSA:plughw:0,3");
+#endif
+#ifdef USING_PULSEOUTPUT
+    gc->addSelection("PulseAudio:default", "PulseAudio:default");
 #endif
 
     gc->setHelpText(QObject::tr("Audio output device to use for digital audio. Default is the same as Audio output "

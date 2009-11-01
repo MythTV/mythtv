@@ -111,6 +111,11 @@ using_oss {
 using_pulse {
     DEFINES += USING_PULSE
     LIBS += $$PULSE_LIBS
+    using_pulseoutput {
+        DEFINES += USING_PULSEOUTPUT
+        HEADERS += audiooutputpulse.h
+        SOURCES += audiooutputpulse.cpp
+    }
 }
 
 unix:!cygwin {

@@ -1219,10 +1219,6 @@ int main(int argc, char **argv)
     }
     QMap<QString,QString> settingsOverride = cmdline.GetSettingsOverride();
 
-    int pa_ret = pulseaudio_handle_startup();
-    if (pa_ret != GENERIC_EXIT_OK)
-        return pa_ret;
-
     if (logfile.size())
     {
         if (log_rotate(1) < 0)
@@ -1261,6 +1257,10 @@ int main(int argc, char **argv)
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
+
+    int pa_ret = pulseaudio_handle_startup();
+    if (pa_ret != GENERIC_EXIT_OK)
+        return pa_ret;
 
     for(int argpos = 1; argpos < a.argc(); ++argpos)
     {

@@ -23,6 +23,7 @@
 #include "util.h" // for IsPulseAudioRunning()
 #include "exitcodes.h"
 #include "mythverbose.h"
+#include "mythcontext.h"
 
 #ifdef USING_PULSE
 
@@ -33,7 +34,6 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -334,13 +334,18 @@ bool pulseaudio_unsuspend(void)
 int pulseaudio_handle_startup(void)
 {
 #ifdef USING_PULSE
-    if (getenv("EXPERIMENTALLY_ALLOW_PULSE_AUDIO"))
+    if (getenv("DEBUG_PULSE_AUDIO_ALSA_EMULATION"))
     {
         VERBOSE(VB_IMPORTANT, "WARNING: ");
         VERBOSE(VB_IMPORTANT, "WARNING: ***Pulse Audio is running!!!!***");
         VERBOSE(VB_IMPORTANT, "WARNING: ");
         VERBOSE(VB_IMPORTANT, "WARNING: You have told MythTV to ignore it.");
         VERBOSE(VB_IMPORTANT, "WARNING: ");
+    }
+    else if (gContext->GetSetting("AudioOutputDevice")
+             .toLower().contains("pulseaudio"))
+    {
+        // Don't disable PulseAudio if we're using it explicitly
     }
     else if (IsPulseAudioRunning() && !pulseaudio_suspend())
     {
@@ -366,7 +371,7 @@ int pulseaudio_handle_startup(void)
 int pulseaudio_handle_teardown(void)
 {
 #ifdef USING_PULSE
-    if (getenv("EXPERIMENTALLY_ALLOW_PULSE_AUDIO"))
+    if (getenv("DEBUG_PULSE_AUDIO_ALSA_EMULATION"))
         return GENERIC_EXIT_OK;
 
     {

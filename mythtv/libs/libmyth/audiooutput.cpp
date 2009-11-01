@@ -24,6 +24,9 @@ using namespace std;
 #ifdef USE_JACK
 #include "audiooutputjack.h"
 #endif
+#ifdef USING_PULSEOUTPUT
+#include "audiooutputpulse.h"
+#endif
 
 AudioOutput *AudioOutput::OpenAudio(
     const QString &main_device,
@@ -84,6 +87,16 @@ AudioOutput *AudioOutput::OpenAudio(
 #else
         VERBOSE(VB_IMPORTANT, "Audio output device is set to a Windows device "
                               "but Windows support is not compiled in!");
+        return NULL;
+#endif
+    }
+    else if (main_device.startsWith("PulseAudio:"))
+    {
+#ifdef USING_PULSEOUTPUT
+        return new AudioOutputPulseAudio(settings);
+#else
+        VERBOSE(VB_IMPORTANT, "Audio output device is set to PulseAudio "
+                              "but PulseAudio support is not compiled in!");
         return NULL;
 #endif
     }
