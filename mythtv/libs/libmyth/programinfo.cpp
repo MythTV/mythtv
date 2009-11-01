@@ -773,11 +773,15 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 
     QString minstring = QObject::tr("%n minute(s)","",minutes);
 
-    if (hours > 0)
+    if (hours > 0 && minutes > 0)
     {
         progMap["lentime"] = QString("%1 %2")
                                     .arg(QObject::tr("%n hour(s)","", hours))
                                     .arg(minstring);
+    }
+    else if (hours > 0)
+    {
+        progMap["lentime"] = QObject::tr("%n hour(s)","", hours);
     }
     else
         progMap["lentime"] = minstring;
