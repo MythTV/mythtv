@@ -67,7 +67,6 @@ using_vdpau:DEFINES += USING_VDPAU
 
 using_pulse:DEFINES += USING_PULSE
 using_alsa:DEFINES += USING_ALSA
-using_arts:DEFINES += USING_ARTS
 using_jack:DEFINES += USING_JACK
 using_oss: DEFINES += USING_OSS
 macx:      DEFINES += USING_COREAUDIO

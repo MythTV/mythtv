@@ -56,12 +56,6 @@ AudioOutput *AudioOutput::OpenAudio(
     {
         return new AudioOutputNULL(settings);
     }
-    else if (main_device.startsWith("ARTS:"))
-    {
-        VERBOSE(VB_IMPORTANT, "Audio output device is set to an ARTS device "
-                              "but ARTS is no longer supported !");
-        return NULL;
-    }
     else if (main_device.startsWith("JACK:"))
     {
 #ifdef USE_JACK
