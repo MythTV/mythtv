@@ -69,9 +69,6 @@ static HostComboBox *AudioOutputDevice()
         gc->fillSelectionsFromDir(dev);
     }
 #endif
-#ifdef USING_ARTS
-    gc->addSelection("ARTS:", "ARTS:");
-#endif
 #ifdef USING_JACK
     gc->addSelection("JACK:output", "JACK:output");
 #endif
