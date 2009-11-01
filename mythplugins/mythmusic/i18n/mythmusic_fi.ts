@@ -23,16 +23,36 @@
         <source>Inlay</source>
         <translation>Sisäkansi</translation>
     </message>
+    <message>
+        <source>front</source>
+        <translation type="obsolete">etu</translation>
+    </message>
+    <message>
+        <source>back</source>
+        <translation type="obsolete">taka</translation>
+    </message>
+    <message>
+        <source>inlay</source>
+        <translation type="obsolete">sisä</translation>
+    </message>
+    <message>
+        <source>cd</source>
+        <translation type="obsolete">cd</translation>
+    </message>
+    <message>
+        <source>cover</source>
+        <translation type="obsolete">kansi</translation>
+    </message>
 </context>
 <context>
     <name>DatabaseBox</name>
     <message>
         <source>Active Play Queue</source>
-        <translation>Aktiivinen soittolista</translation>
+        <translation>Aktiivinen Soittolista</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation>Kaikki soittolistat</translation>
+        <translation>Kaikki Soittolistat</translation>
     </message>
     <message>
         <source>Blechy Blech Blah</source>
@@ -40,39 +60,43 @@
     </message>
     <message>
         <source>All My Music</source>
-        <translation>Kaikki musiikki</translation>
+        <translation>Kaikki Musiikki</translation>
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
-        <translation>Kaikki musiikki ~ Haetaan musiikin tietoja </translation>
+        <translation>Kaikki Musiikki ~ Haetaan Musiikin Dataa</translation>
     </message>
     <message>
         <source>Loading Music Data</source>
-        <translation>Ladataan musiikkitietoja</translation>
+        <translation>Ladataan Musiikkidataa</translation>
     </message>
     <message>
         <source>Move to Active Play Queue</source>
-        <translation>Siirrä aktiiviseen soittolistaan</translation>
+        <translation>Siirrä Aktiiviseen Soittolistaan</translation>
     </message>
     <message>
         <source>Delete This Playlist</source>
-        <translation>Poista valittu soittolista</translation>
+        <translation>Tuhotaan Soittolista</translation>
     </message>
     <message>
         <source>Rename This Playlist</source>
-        <translation>Uudelleennimeä valittu soittolista</translation>
+        <translation>Uudelleennimetään Soittolista</translation>
     </message>
     <message>
         <source>Copy To New Playlist</source>
-        <translation>Kopioi uuteen soittolistaan</translation>
+        <translation>Kopioidaan Uuteen Soittolistaan</translation>
     </message>
     <message>
         <source>Clear the Active Play Queue</source>
-        <translation>Tyhjennä aktiivinen soittolista</translation>
+        <translation>Puhdista Aktiivinen Soittolista</translation>
     </message>
     <message>
         <source>Save Back to Playlist Tree</source>
-        <translation>Tallenna soittolistapuuhun</translation>
+        <translation>Tallenna Takaisin Soittolistapuuhun</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation type="obsolete">Teema ei tue &apos;musiikkipuu&apos; elementtiä. Seuraava ikkuna tulee olemaan tyhjä.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -80,31 +104,35 @@
     </message>
     <message>
         <source>Couldn&apos;t create CD</source>
-        <translation>CD:n luominen epäonnistui</translation>
+        <translation>Ei voitu luoda CD:tä</translation>
     </message>
     <message>
         <source>CD Created</source>
-        <translation>CD luotu</translation>
+        <translation>CD Luotu</translation>
     </message>
     <message>
         <source>CD-RW Blanking Progress</source>
-        <translation>CD-RW:n tyhjennys käynnissä</translation>
+        <translation>CD-RW Tyhjennys Käynnissä</translation>
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation>Luo ääni-CD soittolistasta</translation>
+        <translation>Tee Ääni-CD Soittolistasta</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation>Luo MP3-CD soittolistasta</translation>
+        <translation>Tee MP3-CD Soittolistasta</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
-        <translation>Tyhjennä CD-RW -levy</translation>
+        <translation>Tyhjennä CD-RW-levy</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
+        <translation type="obsolete">Teema ei sisällä tukea musiikin tiedoille. Seuraava ikkuna avautuu tyhjänä.</translation>
     </message>
     <message>
         <source>Artist:	</source>
-        <translation>Artisti:	</translation>
+        <translation>Esittäjä:	</translation>
     </message>
     <message>
         <source>Album:	</source>
@@ -124,11 +152,30 @@
     </message>
     <message>
         <source>Compilation Artist:	</source>
-        <translation>Kokoelman artisti:</translation>
+        <translation>Kokoelman Esittäjä:</translation>
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
-        <translation>Käyttämäsi teema ei sisällä tietolinjoja musiikkielementissä. Ota yhteyttä teeman tekijään ja kysy päivityksistä.</translation>
+        <translation>Käyttämäsi teema ei sisällä tietoalinjoja musiikkielementissä. Ole hyvä ja ota yhteyttä teeman tekijään ja kysy, jos he voisivat päivittää sen.</translation>
+    </message>
+</context>
+<context>
+    <name>DirectoryFinder</name>
+    <message>
+        <source>OK</source>
+        <translation type="obsolete">OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="obsolete">Peruuta</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation type="obsolete">Takaisin</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation type="obsolete">Koti</translation>
     </message>
 </context>
 <context>
@@ -138,24 +185,28 @@
         <translation>Valmis</translation>
     </message>
     <message>
+        <source>DB Statistics</source>
+        <translation type="obsolete">TK Tilastoja</translation>
+    </message>
+    <message>
         <source>Various Artists</source>
-        <translation>Useita artisteja</translation>
+        <translation>Useita Esittäjiä</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation>Valitse artisti</translation>
+        <translation>Valitse Esittäjä</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation>Valitse kokoelman artisti</translation>
+        <translation>Valitse Kokoelman Esittäjä</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation>Valitse albumi</translation>
+        <translation>Valitse Albumi</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation>Valitse laji</translation>
+        <translation>Valitse Laji</translation>
     </message>
     <message>
         <source>Save Changes?</source>
@@ -163,19 +214,19 @@
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation>Tallennus ainoastaan tietokantaan</translation>
+        <translation>Tallennus Ainoastaan TK:aan</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation>Tallennus ainoastaan tiedostoon</translation>
+        <translation>Tallennus Ainoastaan Tiedostoon</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation>Tallennus sekä tietokantaan että tiedostoon</translation>
+        <translation>Tallennus sekä TK:aan että Tiedostoon</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation>Ei tallennusta, poistu</translation>
+        <translation>Ei Tallennusta, Poistu</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -183,15 +234,15 @@
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation>Tallennetaanko muutettu tieto tiedostoon?</translation>
+        <translation>Tallennetaanko muutettu informaatio tiedostoon?</translation>
     </message>
     <message>
         <source>Track Info.</source>
-        <translation>Kappaleen tiedot.</translation>
+        <translation>Kappaleen Tiedot.</translation>
     </message>
     <message>
         <source>Album Art</source>
-        <translation>Albumin taide</translation>
+        <translation>Albumin Taide</translation>
     </message>
     <message>
         <source>Statistics</source>
@@ -199,15 +250,23 @@
     </message>
     <message>
         <source>Save Changes</source>
-        <translation>Tallenna muutokset</translation>
+        <translation>Tallenna Muutokset</translation>
     </message>
     <message>
         <source>Change Image Type</source>
-        <translation>Muokkaa kuvatyyppiä</translation>
+        <translation>Muokkaa Kuvatyyppiä</translation>
     </message>
 </context>
 <context>
     <name>ImportCoverArtDialog</name>
+    <message>
+        <source>Copy</source>
+        <translation type="obsolete">Kopioi</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="obsolete">PoistuPoistu</translation>
+    </message>
     <message>
         <source>Front Cover</source>
         <translation>Etukansi</translation>
@@ -236,6 +295,10 @@
         <source>New File</source>
         <translation>Uusi tiedosto</translation>
     </message>
+    <message>
+        <source>Non Found</source>
+        <translation type="obsolete">Ei löytynyt</translation>
+    </message>
 </context>
 <context>
     <name>ImportMusicDialog</name>
@@ -244,8 +307,56 @@
         <translation>Uusi tiedosto</translation>
     </message>
     <message>
+        <source>All Ready in Database</source>
+        <translation type="obsolete">On jo tietokannassa</translation>
+    </message>
+    <message>
+        <source>Non found</source>
+        <translation type="obsolete">Ei löytynyt</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation type="obsolete">Etsi</translation>
+    </message>
+    <message>
+        <source>Cover Art</source>
+        <translation type="obsolete">Kansitaide</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="obsolete">Toista</translation>
+    </message>
+    <message>
+        <source>Next New</source>
+        <translation type="obsolete">Seuraava uusi</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="obsolete">Lisää</translation>
+    </message>
+    <message>
+        <source>Add All New</source>
+        <translation type="obsolete">Lisää kaikki uudet</translation>
+    </message>
+    <message>
+        <source>Copy Failed</source>
+        <translation type="obsolete">Kopiointi epäonnistui</translation>
+    </message>
+    <message>
+        <source>Could not copy file to:</source>
+        <translation type="obsolete">Ei pystynyt kopioimaan tiedostoa kohteeseen:</translation>
+    </message>
+    <message>
+        <source>Duplicate Track</source>
+        <translation type="obsolete">Kaksinkertainen kappale</translation>
+    </message>
+    <message>
         <source>This track is already in the database</source>
         <translation>Tämä kappale on jo tietokannassa</translation>
+    </message>
+    <message>
+        <source>Add Tracks</source>
+        <translation type="obsolete">Lisää kappaleet</translation>
     </message>
     <message>
         <source>%1 new tracks were added to the database</source>
@@ -309,11 +420,11 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>Mute: On</source>
-        <translation>Hiljennys: Päällä</translation>
+        <translation>Hiljenny: Päällä</translation>
     </message>
     <message>
         <source>Mute: Off</source>
-        <translation>Hiljennys: Pois</translation>
+        <translation>Hiljenny: Pois</translation>
     </message>
     <message>
         <source>kbps</source>
@@ -365,7 +476,7 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>Auto Show Player: </source>
-        <translation>Näytä soitin automaattisesti: </translation>
+        <translation>Automaattisesti näytä soitin: </translation>
     </message>
     <message>
         <source>On</source>
@@ -463,6 +574,10 @@ Could not copy file to: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Toggle audio upmixer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Cycle visualizer mode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -515,7 +630,7 @@ Could not copy file to: %1</source>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation>Muokkaa soittolistaa</translation>
+        <translation>Muokkaa Soittolistaa</translation>
     </message>
     <message>
         <source>Visualize</source>
@@ -523,11 +638,63 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation>3 Muokkaa soittolista</translation>
+        <translation>3 Soittolista</translation>
     </message>
     <message>
         <source>4 Visualize</source>
         <translation>4 Visualisoi</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Smart</source>
+        <translation type="obsolete">1 Satunnaist: Älykäs</translation>
+    </message>
+    <message>
+        <source>Shuffle: Smart</source>
+        <translation type="obsolete">Satunnaist: Älykäs</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: Rand</source>
+        <translation type="obsolete">1 Satunnaist: Joku</translation>
+    </message>
+    <message>
+        <source>Shuffle: Rand</source>
+        <translation type="obsolete">Satunnaist: Joku</translation>
+    </message>
+    <message>
+        <source>1 Shuffle: None</source>
+        <translation type="obsolete">1 Satunnaist: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>Shuffle: None</source>
+        <translation type="obsolete">Satunnaist: Ei Mitään</translation>
+    </message>
+    <message>
+        <source>2 Repeat: All</source>
+        <translation type="obsolete">2 Toista: Kaikki</translation>
+    </message>
+    <message>
+        <source>Repeat: All</source>
+        <translation type="obsolete">Toista: Kaikki</translation>
+    </message>
+    <message>
+        <source>2 Repeat: Track</source>
+        <translation type="obsolete">2 Toista: Kappale</translation>
+    </message>
+    <message>
+        <source>Repeat: Track</source>
+        <translation type="obsolete">Toista: Kappale</translation>
+    </message>
+    <message>
+        <source>2 Repeat: None</source>
+        <translation type="obsolete">2 Toista: -</translation>
+    </message>
+    <message>
+        <source>Repeat: None</source>
+        <translation type="obsolete">Toista: -</translation>
+    </message>
+    <message>
+        <source>playlist root</source>
+        <translation type="obsolete">soittolistan juuri</translation>
     </message>
     <message>
         <source>Playing stream.</source>
@@ -575,23 +742,23 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation>Kaikki kappaleet</translation>
+        <translation>Kaikki Kappaleet</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation>Nykyisen esittäjän kappaleet</translation>
+        <translation>Nykyisen Esittäjän Kappaleet</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation>Nykyisen albumin kappaleet</translation>
+        <translation>Nykyisen Albumin Kappaleet</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation>Nykyisen lajin kappaleet</translation>
+        <translation>Nykyisen Lajin Kappaleet</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation>Tämän vuoden kappaleet</translation>
+        <translation>Tämän Vuoden Kappaleet</translation>
     </message>
     <message>
         <source>Search</source>
@@ -603,11 +770,11 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>Change Filter</source>
-        <translation>Vaihda suodatinta</translation>
+        <translation>Vaihda Suodatinta</translation>
     </message>
     <message>
         <source>Update Playlist Options</source>
-        <translation>Päivitä soittolistan valinnat</translation>
+        <translation>Päivitä Soittolistan Valinnat</translation>
     </message>
     <message>
         <source>Replace</source>
@@ -635,7 +802,7 @@ Could not copy file to: %1</source>
     </message>
     <message>
         <source>Remove Duplicates</source>
-        <translation>Poista kaksoiskappaleet</translation>
+        <translation>Poista Kaksoiskappaleet</translation>
     </message>
     <message>
         <source>Visualization: </source>
@@ -649,11 +816,11 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>No - Exit, Stop Playing</source>
-        <translation>Ei - Poistu ja lopeta toisto</translation>
+        <translation>Ei - Poistu ja Lopeta Toisto</translation>
     </message>
     <message>
         <source>Yes - Exit, Continue Playing</source>
-        <translation>Kyllä - Poistu ja jatka toistoa</translation>
+        <translation>Kyllä - Poistu ja Jatka Toistoa</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -661,7 +828,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Tracks with same Title</source>
-        <translation>Samannimiset kappaleet</translation>
+        <translation>Samannimiset Kappaleet</translation>
     </message>
     <message>
         <source>Speed: </source>
@@ -689,7 +856,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Shuffle</source>
-        <translation>Sekoita</translation>
+        <translation>Sekoit</translation>
     </message>
     <message>
         <source>All</source>
@@ -707,16 +874,24 @@ Jatketaanko musiikin toistoa taustalla?</translation>
 <context>
     <name>QObject</name>
     <message>
+        <source>BumpScope</source>
+        <translation type="obsolete">BumpScope</translation>
+    </message>
+    <message>
         <source>Various Artists</source>
-        <translation>Monia artisteja</translation>
+        <translation>Monia Esittäjiä</translation>
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
-        <translation>Ogg Vorbis ääni</translation>
+        <translation>Ogg Vorbis Ääni</translation>
     </message>
     <message>
         <source>Unknown</source>
         <translation>Tuntematon</translation>
+    </message>
+    <message>
+        <source>FLAC Audio</source>
+        <translation type="obsolete">FLAC Ääni</translation>
     </message>
     <message>
         <source>Directory to hold music</source>
@@ -731,6 +906,10 @@ Jatketaanko musiikin toistoa taustalla?</translation>
         <translation>Äänilaite</translation>
     </message>
     <message>
+        <source>Audio Device used for playback.</source>
+        <translation type="obsolete">Äänilaite jota käytetään soittoon.</translation>
+    </message>
+    <message>
         <source>CD device</source>
         <translation>CD-laite</translation>
     </message>
@@ -740,11 +919,11 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
-        <translation>Puun järjestäminen</translation>
+        <translation>Puun Järjestäminen</translation>
     </message>
     <message>
         <source>Script Path</source>
-        <translation>Komentojonon polku</translation>
+        <translation>Komentojonon Polku</translation>
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
@@ -752,7 +931,11 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Filename Format</source>
-        <translation>Tiedostonimien formaatti</translation>
+        <translation>Tiedostonimien Formaatti</translation>
+    </message>
+    <message>
+        <source>Directory and filename Format used to grab information if no ID3 information is found.</source>
+        <translation type="obsolete">Polku ja tiedostonimen formaatti, jota käytetään jos ID3-otsikkoa ei ole.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -772,7 +955,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
-        <translation>Käyttää näppäimistön ja kauko-ohjaimen pikavalintoja</translation>
+        <translation>Käyttää Näppäimistön ja Kauko-ohjaimen Pikavalintoja</translation>
     </message>
     <message>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
@@ -797,6 +980,18 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>File storage location</source>
         <translation>Tiedostojen talletuspaikka</translation>
+    </message>
+    <message>
+        <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
+        <translation type="obsolete">Määrittää kansion/nimen uusille kappaleille. Voidaan käyttää GENRE,ARTIST,ALBUM,TRACK,TITLE,YEAR,/ ja -. &apos;-&apos; korvataan erotusmerkillä</translation>
+    </message>
+    <message>
+        <source>Token separator</source>
+        <translation type="obsolete">Erotusmerkki</translation>
+    </message>
+    <message>
+        <source>Filename tokens will be separated by this string.</source>
+        <translation type="obsolete">Tiedostonimen alueet erotetaan tällä merkkijonolla.</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -832,7 +1027,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Rating Weight</source>
-        <translation>Oma painoarvo</translation>
+        <translation>Oma Painoarvo</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
@@ -840,7 +1035,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Play Count Weight</source>
-        <translation>Soiton laskuarvo</translation>
+        <translation>Soiton Laskuarvo</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
@@ -848,7 +1043,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Last Play Weight</source>
-        <translation>Viime soiton painoarvo</translation>
+        <translation>Viime Soiton Painoarvo</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
@@ -856,7 +1051,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Random Weight</source>
-        <translation>Satunnainen painoarvo</translation>
+        <translation>Satunnainen Painoarvo</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
@@ -864,7 +1059,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Show Song Ratings</source>
-        <translation>Näytä kappaleiden arvostelu</translation>
+        <translation>Näytä Kappaleiden Arvostelu</translation>
     </message>
     <message>
         <source>Show song ratings on the playback screen.</source>
@@ -872,7 +1067,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>List as Shuffled</source>
-        <translation>Näytä soittojärjestyksessä</translation>
+        <translation>Näytä Soittojärjestyksessä</translation>
     </message>
     <message>
         <source>List songs on the playback screen in the order they will be played.</source>
@@ -881,6 +1076,10 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>Show entire music tree</source>
         <translation>Näytä koko musiikkipuu</translation>
+    </message>
+    <message>
+        <source>If selected, you can navigate your entire music tree from the playing screen.</source>
+        <translation type="obsolete">Valittuna soittoikkunassa näkyy koko musiikkipuu.</translation>
     </message>
     <message>
         <source>Play mode</source>
@@ -899,6 +1098,10 @@ Jatketaanko musiikin toistoa taustalla?</translation>
         <translation>Älykäs</translation>
     </message>
     <message>
+        <source>Starting shuffle mode for the player.  Can be either normal, random, or intelligent (random).</source>
+        <translation type="obsolete">Satunnaistoiston tapa.</translation>
+    </message>
+    <message>
         <source>Delay before Visualizations start (seconds)</source>
         <translation>Viive visualisoinnin näyttöön (sekuntia)</translation>
     </message>
@@ -911,8 +1114,12 @@ Jatketaanko musiikin toistoa taustalla?</translation>
         <translation>Vaihda visualisointia joka kappaleella</translation>
     </message>
     <message>
+        <source>Change the visualizer when the song change.</source>
+        <translation type="obsolete">Vaihtaa visualisoinnin kun kappale vaihtuu.</translation>
+    </message>
+    <message>
         <source>Width for Visual Scaling</source>
-        <translation>Leveys visualisoinnin sovitukselle</translation>
+        <translation>Leveys Visualisoinnin Sovitukselle</translation>
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
@@ -920,15 +1127,47 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
-        <translation>Korkeus visualisoinnin sovitukselle</translation>
+        <translation>Korkeus Visualisoinnin Sovitukselle</translation>
     </message>
     <message>
         <source>Visualizations</source>
         <translation>Visualisoinnit</translation>
     </message>
     <message>
+        <source>List of visualizations to use during playback. Possible values are space-separated list of </source>
+        <translation type="obsolete">Lista visualisoinneista joita käytetään toistossa. Välilyönti erottaa</translation>
+    </message>
+    <message>
+        <source>MonoScope</source>
+        <translation type="obsolete">MonoScope</translation>
+    </message>
+    <message>
+        <source>StereoScope</source>
+        <translation type="obsolete">StereoScope</translation>
+    </message>
+    <message>
+        <source>Spectrum</source>
+        <translation type="obsolete">Spectrum</translation>
+    </message>
+    <message>
+        <source>Goom</source>
+        <translation type="obsolete">Goom</translation>
+    </message>
+    <message>
+        <source>Synaesthesia</source>
+        <translation type="obsolete">Synaesthesia</translation>
+    </message>
+    <message>
+        <source>Gears</source>
+        <translation type="obsolete">Rattaat</translation>
+    </message>
+    <message>
+        <source>Blank</source>
+        <translation type="obsolete">Tyhjä</translation>
+    </message>
+    <message>
         <source>Default Rip Quality</source>
-        <translation>Oletus tuontilaatu</translation>
+        <translation>Oletus Tuontilaatu</translation>
     </message>
     <message>
         <source>Low</source>
@@ -951,6 +1190,10 @@ Jatketaanko musiikin toistoa taustalla?</translation>
         <translation>Oletus laatu uusille CD-tuonneille.</translation>
     </message>
     <message>
+        <source>General Settings</source>
+        <translation type="obsolete">Yleiset Asetukset</translation>
+    </message>
+    <message>
         <source>Playback Settings</source>
         <translation>Soittoasetukset</translation>
     </message>
@@ -963,6 +1206,10 @@ Jatketaanko musiikin toistoa taustalla?</translation>
         <translation>CD-tuontiasetukset</translation>
     </message>
     <message>
+        <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
+        <translation type="obsolete">MPEG taso 1/2/3 Ääni (MAD purku)</translation>
+    </message>
+    <message>
         <source>Searching for music files</source>
         <translation>Haetaan kappaleita</translation>
     </message>
@@ -972,23 +1219,23 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Unknown Artist</source>
-        <translation>Tuntematon artisti</translation>
+        <translation>Tuntematon Esittäjä</translation>
     </message>
     <message>
         <source>Unknown Album</source>
-        <translation>Tuntematon albumi</translation>
+        <translation>Tuntematon Albumi</translation>
     </message>
     <message>
         <source>Unknown Genre</source>
-        <translation>Tuntematon musiikkilaji</translation>
+        <translation>Tuntematon Musiikkilaji</translation>
     </message>
     <message>
         <source>CD -- none</source>
-        <translation>CD -- Ei mitään</translation>
+        <translation>CD -- Ei Mitään</translation>
     </message>
     <message>
         <source>All My Music</source>
-        <translation>Kaikki musiikki</translation>
+        <translation>Kaikki Musiikki</translation>
     </message>
     <message>
         <source>%1 - %2</source>
@@ -1008,7 +1255,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Not Initialized</source>
-        <translation>Ei alustettu</translation>
+        <translation>Ei Alustettu</translation>
     </message>
     <message>
         <source>oops</source>
@@ -1016,19 +1263,19 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>All My Playlists</source>
-        <translation>Kaikki soittolistat</translation>
+        <translation>Kaikki Soittolistat</translation>
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Aktiivinen soittolista</translation>
+        <translation>Aktiivinen Soittolista</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation>Aktiivinen soittolista (%1)</translation>
+        <translation>Aktiivinen Soittolista (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
-        <translation>Jotain on pielessä</translation>
+        <translation>Jotain on Pielessä</translation>
     </message>
     <message>
         <source>Visualization requires FFT library</source>
@@ -1037,6 +1284,10 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>Did you run configure?</source>
         <translation>Ajoitko asetukset?</translation>
+    </message>
+    <message>
+        <source>and</source>
+        <translation type="obsolete">ja</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
@@ -1052,7 +1303,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation>Mahdollista CD:m kirjoitus.</translation>
+        <translation>Hyväksy CD Kirjoitus.</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
@@ -1064,11 +1315,11 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Disk Size</source>
-        <translation>Levyn koko</translation>
+        <translation>Levyn Koko</translation>
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation>650Mb/75min</translation>
+        <translation>650Mb/74min</translation>
     </message>
     <message>
         <source>700MB/80min</source>
@@ -1076,7 +1327,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
-        <translation>Oletus CD-kapasiteetti.</translation>
+        <translation>Oletus CD Kapasiteetti.</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
@@ -1084,7 +1335,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
-        <translation>CD:n kirjoitusnopeus</translation>
+        <translation>CD:n Kirjoitusnopeus</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -1096,7 +1347,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation>CD-RW:n tyhjennystapa</translation>
+        <translation>CD-RW:n Tyhjennystapa</translation>
     </message>
     <message>
         <source>Fast</source>
@@ -1112,11 +1363,11 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
-        <translation>CD:n polttoasetukset</translation>
+        <translation>CD Polttoasetukset</translation>
     </message>
     <message>
         <source>Artists</source>
-        <translation>Artistit</translation>
+        <translation>Artisti</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
@@ -1159,8 +1410,16 @@ Jatketaanko musiikin toistoa taustalla?</translation>
         <translation>Järjestetään musiikkitietokantaa</translation>
     </message>
     <message>
+        <source>Only Import new music.</source>
+        <translation type="obsolete">Tuo vain uutta musiikkia.</translation>
+    </message>
+    <message>
+        <source>Checks the database for duplicates when importing/ripping CDs.</source>
+        <translation type="obsolete">Tarkistaa tietokannan kaksoiskappaleiden varalta tuotaessa musiikkia CD:ltä.</translation>
+    </message>
+    <message>
         <source>Loading Music</source>
-        <translation>Ladataan musiikkia</translation>
+        <translation>Ladataan Musiikkia</translation>
     </message>
     <message>
         <source>default</source>
@@ -1172,7 +1431,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Unknown Title</source>
-        <translation>Tuntematon nimike</translation>
+        <translation>Tuntematon Nimike</translation>
     </message>
     <message>
         <source>Importing </source>
@@ -1300,7 +1559,7 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Edit Visualizations</source>
-        <translation>Muokkaa visualisointeja</translation>
+        <translation>Muokkaa Visualisointeja</translation>
     </message>
     <message>
         <source>Edit the list of visualizations to use during playback.</source>
@@ -1313,6 +1572,10 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     <message>
         <source>General Settings (2)</source>
         <translation>Yleiset asetukset (2)</translation>
+    </message>
+    <message>
+        <source>Windows Media Audio</source>
+        <translation type="obsolete">Windows Media -ääni</translation>
     </message>
     <message>
         <source>OSX Audio CD mount parser</source>
@@ -1355,6 +1618,14 @@ Jatketaanko musiikin toistoa taustalla?</translation>
         <translation>Sisäinen purkaja</translation>
     </message>
     <message>
+        <source>Upconvert stereo to 5.1 surround</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV can upconvert stereo tracks to 5.1 audio. Set this option to enable it by default. You can enable or disable the upconversion during playback at anytime.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1382,8 +1653,16 @@ Jatketaanko musiikin toistoa taustalla?</translation>
 <context>
     <name>RipStatus</name>
     <message>
+        <source>Stop Rip?</source>
+        <translation type="obsolete">Lopeta Tuonti?</translation>
+    </message>
+    <message>
         <source>Are you sure you want to cancel ripping the CD?</source>
         <translation>Lopetetaanko CD:n tuonti?</translation>
+    </message>
+    <message>
+        <source>Cancelled by the user</source>
+        <translation type="obsolete">Peruutettu käyttäjän toimesta</translation>
     </message>
     <message>
         <source>The encoder failed to create the file.
@@ -1394,6 +1673,10 @@ Ovatko kirjoitusoikeudet musiikkikansioon kunnossa?</translation>
 </context>
 <context>
     <name>Ripper</name>
+    <message>
+        <source>Please select a quality level and check the album information below:</source>
+        <translation type="obsolete">Tarvitaan laatuehdot, albumin tiedot alhaalla:</translation>
+    </message>
     <message>
         <source>Low</source>
         <translation>Alhainen</translation>
@@ -1411,6 +1694,78 @@ Ovatko kirjoitusoikeudet musiikkikansioon kunnossa?</translation>
         <translation>Täydellinen</translation>
     </message>
     <message>
+        <source>Artist: </source>
+        <translation type="obsolete">Esittäjä:</translation>
+    </message>
+    <message>
+        <source>Album: </source>
+        <translation type="obsolete">Albumi:</translation>
+    </message>
+    <message>
+        <source>Genre: </source>
+        <translation type="obsolete">Musiikinlaji:</translation>
+    </message>
+    <message>
+        <source>Import this CD</source>
+        <translation type="obsolete">Tuo tämä CD</translation>
+    </message>
+    <message>
+        <source>Importing CD:
+</source>
+        <translation type="obsolete">Tuodaan CD:
+</translation>
+    </message>
+    <message>
+        <source>Ripping...</source>
+        <translation type="obsolete">Kopioidaan...</translation>
+    </message>
+    <message>
+        <source>Copying from CD:
+</source>
+        <translation type="obsolete">Kopioidaan CD:ltä:
+</translation>
+    </message>
+    <message>
+        <source>Multi-Artist?</source>
+        <translation type="obsolete">Useita Esittäjiä?</translation>
+    </message>
+    <message>
+        <source>Switch Titles &amp;&amp; Artists</source>
+        <translation type="obsolete">Vaihda Kappaleita &amp;&amp; Esittäjiä</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="obsolete">Kappale</translation>
+    </message>
+    <message>
+        <source>Artist</source>
+        <translation type="obsolete">Esittäjä</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation type="obsolete">Pituus</translation>
+    </message>
+    <message>
+        <source>Quality: </source>
+        <translation type="obsolete">Laatu: </translation>
+    </message>
+    <message>
+        <source>Importing </source>
+        <translation type="obsolete">Tuodaan </translation>
+    </message>
+    <message>
+        <source>Switch Titles</source>
+        <translation type="obsolete">Vaihda Nimikkeitä</translation>
+    </message>
+    <message>
+        <source>Scan CD</source>
+        <translation type="obsolete">Selaa CD</translation>
+    </message>
+    <message>
+        <source>Rip CD</source>
+        <translation type="obsolete">Tuo CD</translation>
+    </message>
+    <message>
         <source>Artist: %1
 Album: %2
 Track: %3
@@ -1425,8 +1780,16 @@ Kappale on jo tietokannassa.
 Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
+        <source>No tracks</source>
+        <translation type="obsolete">Ei kappaleita</translation>
+    </message>
+    <message>
         <source>There are no tracks to rip?</source>
         <translation>Ei kappaleita tuotavaksi?</translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="obsolete">Onnistui</translation>
     </message>
     <message>
         <source>Rip completed successfully.</source>
@@ -1438,15 +1801,27 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation>Valitse artisti</translation>
+        <translation>Valitse Esittäjä</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation>Valitse albumi</translation>
+        <translation>Valitse Albumi</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation>Valitse laji</translation>
+        <translation>Valitse Laji</translation>
+    </message>
+    <message>
+        <source>Encoding Failed</source>
+        <translation type="obsolete">Pakkaus Epäonnistui</translation>
+    </message>
+    <message>
+        <source>Encoding failed with the following error:-
+
+</source>
+        <translation type="obsolete">Pakkaus epäonnistui seuraavan virheilmoituksen kanssa:-
+
+</translation>
     </message>
 </context>
 <context>
@@ -1472,34 +1847,34 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation>Valitse artisti</translation>
+        <translation>Valitse Esittäjä</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation>Valitse albumi</translation>
+        <translation>Valitse Albumi</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation>Valitse laji</translation>
+        <translation>Valitse Laji</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation>Valitse kappaleen nimellä</translation>
+        <translation>Valitse Kappaleen Nimellä</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation>Valitse kokoelman artisti</translation>
+        <translation>Valitse Kokoelman Esittäjä</translation>
     </message>
 </context>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
         <source>Edit Date</source>
-        <translation>Muokkaa päivämäärää</translation>
+        <translation>Muokkaa Päivämäärää</translation>
     </message>
     <message>
         <source>Fixed Date</source>
-        <translation>Kiinteä päivämäärä</translation>
+        <translation>Kiinteä Päivämäärä</translation>
     </message>
     <message>
         <source>Day</source>
@@ -1515,7 +1890,7 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Use Current Date</source>
-        <translation>Käytä nykyistä päivämäärää</translation>
+        <translation>Käytä Nykyistä Päivämäärää</translation>
     </message>
     <message>
         <source>+/- Days</source>
@@ -1531,14 +1906,14 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Invalid Date</source>
-        <translation>Virheellinen päivämäärä</translation>
+        <translation>Virheellinen Päivämäärä</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation>Järjestys sarakkeen mukaan</translation>
+        <translation>Järjestys Sarakkeen Mukaan</translation>
     </message>
     <message>
         <source>1 Add</source>
@@ -1601,7 +1976,7 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation>Älykkään soittolistan tulokset</translation>
+        <translation>Älykkään Soittolistan Tulokset</translation>
     </message>
     <message>
         <source>Exit</source>
@@ -1640,7 +2015,7 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation>Älykäs soittolista</translation>
+        <translation>Älykäs Soittolista</translation>
     </message>
     <message>
         <source>1 Select</source>
@@ -1676,14 +2051,14 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation>Poistetaanko tämä älysoittolista?</translation>
+        <translation>Poistetaanko tämä Älykäs Soittolista?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation>Älykkään soittolistan muokkaus</translation>
+        <translation>Älykkään Soittolistan Muokkaus</translation>
     </message>
     <message>
         <source>Category:</source>
@@ -1703,11 +2078,11 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation>Mikä vain</translation>
+        <translation>Mikä Vain</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation>Näistä ehdoista</translation>
+        <translation>Näistä Ehdoista</translation>
     </message>
     <message>
         <source>Order By:</source>
@@ -1731,27 +2106,27 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation>Näytä tulokset</translation>
+        <translation>Näytä Tulokset</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation>Älykkään soittolistan kategoriat</translation>
+        <translation>Älykkään Soittolistan Kategoriat</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation>Uusi kategoria</translation>
+        <translation>Uusi Kategoria</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation>Poista kategoria</translation>
+        <translation>Poista Kategoria</translation>
     </message>
     <message>
         <source>Rename Category</source>
-        <translation>Uudelleennimeä kategoria</translation>
+        <translation>Uudelleennimeä Kategoria</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation>Poistetaanko tämä kategoria?</translation>
+        <translation>Poistetaanko tämä Kategoria?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
@@ -1766,7 +2141,7 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Track Information</source>
-        <translation>Kappaleen tiedot</translation>
+        <translation>Kappaleen Tiedot</translation>
     </message>
     <message>
         <source>Artist:</source>
@@ -1798,11 +2173,11 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation>Soiton laskuarvo:</translation>
+        <translation>Soiton Laskuarvo:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation>Viimeisin soittokerta:</translation>
+        <translation>Viimeisin Soittokerta:</translation>
     </message>
     <message>
         <source>Compilation:</source>
@@ -1831,6 +2206,10 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     <message>
         <source>Type:</source>
         <translation>Tyyppi:</translation>
+    </message>
+    <message>
+        <source>Please select a quality level and check the album information below:</source>
+        <translation type="obsolete">Valitse laatutaso ja tarkista albumin tiedot alta:</translation>
     </message>
     <message>
         <source>Quality:</source>
@@ -1877,6 +2256,38 @@ Poistetaanko olemassaoleva tiedosto?</translation>
         <translation>Sijainti:</translation>
     </message>
     <message>
+        <source>123 of 345</source>
+        <translation type="obsolete">123/345</translation>
+    </message>
+    <message>
+        <source>All ready in database</source>
+        <translation type="obsolete">Löytyy jo tietokannasta</translation>
+    </message>
+    <message>
+        <source>/some/file/goes/here/test.mp3</source>
+        <translation type="obsolete">/some/file/goes/here/test.mp3</translation>
+    </message>
+    <message>
+        <source>Compilation Artist</source>
+        <translation type="obsolete">Koosteen artisti</translation>
+    </message>
+    <message>
+        <source>Album</source>
+        <translation type="obsolete">Albumi</translation>
+    </message>
+    <message>
+        <source>Genre</source>
+        <translation type="obsolete">Laji</translation>
+    </message>
+    <message>
+        <source>Year</source>
+        <translation type="obsolete">Vuosi</translation>
+    </message>
+    <message>
+        <source>Directory Finder</source>
+        <translation type="obsolete">Hakemiston etsin</translation>
+    </message>
+    <message>
         <source>Import Cover Art</source>
         <translation>Tuo kansitaidetta</translation>
     </message>
@@ -1906,7 +2317,7 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Switch Titles</source>
-        <translation type="unfinished">Vaihda nimikkeitä</translation>
+        <translation type="unfinished">Vaihda Nimikkeitä</translation>
     </message>
     <message>
         <source>Scan CD</source>
@@ -1946,7 +2357,7 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Yleiset Asetukset</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -1997,11 +2408,11 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Selected Visualizations</source>
-        <translation>Valitse visualisoinnit</translation>
+        <translation>Valitse Visualisoinnit</translation>
     </message>
     <message>
         <source>Available Visualizations</source>
-        <translation>Tarjolla olevat visualisoinnit</translation>
+        <translation>Tarjolla Olevat Visualisoinnit</translation>
     </message>
     <message>
         <source>Name</source>
