@@ -8,6 +8,7 @@
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdirs.h>
+#include <mythprogressdialog.h>
 
 #include "metadatasettings.h"
 
@@ -104,6 +105,23 @@ MetadataSettings::~MetadataSettings()
 
 void MetadataSettings::loadData(void)
 {
+    QString busymessage = tr("Searching for Grabbers...");
+
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+
+    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
+                                                       "metadatabusydialog");
+
+    if (busyPopup->Create())
+    {
+        popupStack->AddScreen(busyPopup, false);
+    }
+    else
+    {
+        delete busyPopup;
+        busyPopup = NULL;
+    }
+
     QDir TVScriptPath = QString("%1/mythvideo/scripts/Television/").arg(GetShareDir());
     QStringList TVScripts = TVScriptPath.entryList(QDir::Files);
     QDir MovieScriptPath = QString("%1/mythvideo/scripts/Movie/").arg(GetShareDir());
@@ -159,6 +177,12 @@ void MetadataSettings::loadData(void)
 
     m_movieGrabberButtonList->SetValueByData(qVariantFromValue(currentMovieGrabber));
     m_tvGrabberButtonList->SetValueByData(qVariantFromValue(currentTVGrabber));
+
+    if (busyPopup)
+    {
+        busyPopup->Close();
+        busyPopup = NULL;
+    }
 }
 
 void MetadataSettings::slotSave(void)
