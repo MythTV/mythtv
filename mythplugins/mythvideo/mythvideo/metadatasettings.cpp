@@ -180,7 +180,7 @@ void MetadataSettings::slotSave(void)
     int trailerState = 0;
     if (m_randomTrailerCheck->GetCheckState() == MythUIStateType::Full)
         trailerState = 1;
-    gContext->SaveSetting("mythvideo.EnableAlternatePlayer", trailerState);
+    gContext->SaveSetting("mythvideo.TrailersRandomEnabled", trailerState);
 
     Close();
 }
