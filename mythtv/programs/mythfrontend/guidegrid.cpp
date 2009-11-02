@@ -187,6 +187,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_player(player),
     m_usingNullVideo(false), m_embedVideo(embedVideo),
     m_previewVideoRefreshTimer(new QTimer(this)),
+    m_updateTimer(NULL),
     m_jumpToChannelLock(QMutex::Recursive),
     m_jumpToChannel(NULL),
     m_jumpToChannelEnabled(true)
@@ -286,7 +287,6 @@ bool GuideGrid::Create()
     fillProgramInfos();
     updateInfo();
 
-    m_updateTimer = NULL;
     m_updateTimer = new QTimer(this);
     connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimeout()) );
     m_updateTimer->start(60 * 1000);
