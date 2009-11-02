@@ -1,9 +1,9 @@
 #!/bin/sh
 #
 # small shell script to generate version.cpp
-# it expects two pareameters
+# it expects two parameters
 # first parameter is the root of the source directory
-# second paramater is the svn base folder (trunk, branches/release-0-21-fixes)
+# second parameter is the svn base folder (trunk, branches/release-0-21-fixes)
 
 if test $# -ne 2; then
     echo "Usage: version.sh SVN_TREE_DIR SVN_REPO_PATH"
