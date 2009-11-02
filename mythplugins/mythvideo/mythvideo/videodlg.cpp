@@ -4139,6 +4139,10 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
                 else
                     title = QString("%1 Season %2_%3").arg(metadata->GetTitle())
                             .arg(season).arg(suffix);
+
+                title.replace("?", "");
+                title.replace(",", " ");
+
                 if (!host.isEmpty())
                 {
                     QString combFileName = QString("%1.%2").arg(title)
