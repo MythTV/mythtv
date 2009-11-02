@@ -19,6 +19,7 @@
       <text lang="PL">Ustawienia ogólne</text>
       <text lang="NB">Generelle innstillinger</text>
       <action>MUSIC_SET_GENERAL</action>
+      <description>Music folders and general options</description>
    </button>
 
    <button>
@@ -40,6 +41,7 @@
       <text lang="PL">Ustaw odtwarzacz</text>
       <text lang="NB">Innstillinger for avspiller</text>
       <action>MUSIC_SET_PLAYER</action>
+      <description>Music playback options</description>
    </button>
 
    <button>
@@ -59,6 +61,7 @@
       <text lang="PL">Ustaw zrzucanie CD</text>
       <text lang="NB">Innstiller for importering</text>
       <action>MUSIC_SET_RIPPER</action>
+      <description>CD copying options</description>
    </button>
 
 </mythmenu>
