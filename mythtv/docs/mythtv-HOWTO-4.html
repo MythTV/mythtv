@@ -114,43 +114,13 @@ $ which qmake
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>For Mandriva, you should see a value like <CODE>/usr/lib/qt3</CODE> for
-<CODE>QTDIR</CODE> and <CODE>/usr/lib/qt3/bin</CODE> should be in $PATH.</P>
-<P>For Gentoo, you should see a value like <CODE>/usr/qt/3</CODE> for <CODE>QTDIR</CODE>
-and <CODE>/usr/qt/3/bin</CODE> should be in $PATH.</P>
-<P>If you don't, do not proceed past this step until you have resolved this
-error. You may need to manually specify the QTDIR and PATH at the shell
-prompt before compiling.</P>
+<P>If you don't see values like those above, do not proceed past this step
+until you have resolved this error.  You may need to manually specify the
+QTDIR and PATH at the shell prompt before compiling.</P>
 <P>Also, check that there has been a link created in
-<CODE>/usr/lib/qt3/mkspecs</CODE> (<CODE>/usr/share/qt3/mkspecs</CODE> for Debian)
-called <CODE>default</CODE>. If not, you'll get errors during the compile. See
-the Troubleshooting Section for more information.</P>
-
-<H3><A NAME="devperms"></A> Device Permissions </H3>
-
-<P>MythTV will need access to the video4linux devices on your system.  By
-default, your distribution may restrict access to these devices to the
-logged-in user, so if you will be automatically starting
-<B>mythbackend</B> from a script rather than an interactive terminal
-session you will need to make some adjustments.</P>
-<P><B>NOTE</B>: The following instructions are accurate for Mandriva.</P>
-<P>Check for a file called <CODE>/etc/security/console.perms</CODE>.  Open the file
-in your favorite text editor and look for a line that has:
-<BLOCKQUOTE><CODE>
-<PRE>
-&lt;console>  0600 &lt;v4l>        0600 root.video
-</PRE>
-</CODE></BLOCKQUOTE>
-
-and replace it with
-<BLOCKQUOTE><CODE>
-<PRE>
-&lt;console>  0666 &lt;v4l>        0666 root.video
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>What we're doing is allowing read and write access to the files in the
-video4linux directory.</P>
+<CODE>/usr/lib/qt4/mkspecs</CODE> called <CODE>default</CODE>.  If not, you'll get
+errors during the compile.  See the Troubleshooting Section for more
+information.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-5.html">Next</A>

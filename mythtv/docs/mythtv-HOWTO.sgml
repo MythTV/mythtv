@@ -949,65 +949,39 @@ $ which qmake
 /usr/bin/qmake
 </verb></tscreen>
 
-For Mandriva, you should see a value like <tt>/usr/lib/qt3</tt> for
-<tt>QTDIR</tt> and <tt>/usr/lib/qt3/bin</tt> should be in $PATH.
-
-For Gentoo, you should see a value like <tt>/usr/qt/3</tt> for <tt>QTDIR</tt>
-and <tt>/usr/qt/3/bin</tt> should be in $PATH.
-
-If you don't, do not proceed past this step until you have resolved this
-error. You may need to manually specify the QTDIR and PATH at the shell
-prompt before compiling.
+If you don't see values like those above, do not proceed past this step
+until you have resolved this error.  You may need to manually specify the
+QTDIR and PATH at the shell prompt before compiling.
 
 Also, check that there has been a link created in
-<tt>/usr/lib/qt3/mkspecs</tt> (<tt>/usr/share/qt3/mkspecs</tt> for Debian)
-called <tt>default</tt>. If not, you'll get errors during the compile. See
-the Troubleshooting Section for more information.
-
-<sect2>Device Permissions <label id="devperms">
-<p>MythTV will need access to the video4linux devices on your system.  By
-default, your distribution may restrict access to these devices to the
-logged-in user, so if you will be automatically starting
-<bf>mythbackend</bf> from a script rather than an interactive terminal
-session you will need to make some adjustments.
-
-<bf>NOTE</bf>: The following instructions are accurate for Mandriva.
-
-Check for a file called <tt>/etc/security/console.perms</tt>.  Open the file
-in your favorite text editor and look for a line that has:
-<tscreen><verb>
-<console>  0600 <v4l>        0600 root.video
-</verb></tscreen>
-and replace it with
-<tscreen><verb>
-<console>  0666 <v4l>        0666 root.video
-</verb></tscreen>
-
-What we're doing is allowing read and write access to the files in the
-video4linux directory.
+<tt>/usr/lib/qt4/mkspecs</tt> called <tt>default</tt>.  If not, you'll get
+errors during the compile.  See the Troubleshooting Section for more
+information.
 
 <sect>Downloading and compiling. <label id="DownloadAndCompile">
+
 <p>Get MythTV from the <url url="http://www.mythtv.org"
 name="http://www.mythtv.org"> web site.  There are two installation methods
 you may choose from.  The first is to download the latest release in tarball
-format and compile.  The tarball release of MythTV should work on a wide
-variety of systems and should be the preferred method for new users.  If you
-wish to use the <bf>subversion</bf> copy of MythTV you may obtain it from
-<url url="http://svn.mythtv.org" name="http://svn.mythtv.org">
+format and compile, but this is really only valid if you're reading this
+HOWTO on the very first day that a new release has been made, because the
+tarball is a static file and won't include any fixes for issues discovered
+after the tarball was created.
 
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>: If you are going to use <bf>subversion</bf> to
-compile MythTV rather than using the distribution tarball, you <em>must</em>
+The recommended solution is to download the source using
+<bf>subversion</bf> to ensure that you've got the latest fixes.
+
+When using subversion, there are some other choices that need to be made:
+<itemize>
+<item>Do you want to run the stable release of MythTV?  If yes, download from the "release-0-22-fixes" branch.
+<item>Do you want to run the absolute latest developer code?  If yes, you <em>must</em>
 join the <url url="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"> and <url
 url="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists to
 keep up to date with the current status of the code.  Code obtained from
-subversion has no guarantees regarding stability, etc.
-</caption>
-</figure>
+subversion has no guarantees regarding stability, etc.  The latest code will be in "trunk".
+</itemize>
 
 If you are in North America you will use the Schedules Direct grabber which is
 built-in to MythTV.  You <em>do not</em> need to install XMLTV (so you may
@@ -1035,19 +1009,23 @@ program.
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV
 <p>If you are going to use <bf>subversion</bf>, execute the following
-instructions to obtain the latest trunk version of MythTV:
+instructions to obtain the latest <em>trunk</em> version of MythTV.
 
-<tscreen><verb>
-$ mkdir mythtv
-$ svn co http://svn.mythtv.org/svn/trunk/ mythtv
-$ cd mythtv
-</verb></tscreen>
+To use the <em>release</em> version, you can execute the following.  You are
+strongly encouraged to use the release version.
 
-To use a release version, you can execute:
 <tscreen><verb>
 $ mkdir mythtv-release-0.22-fixes
 $ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-release-0.22-fixes
 $ cd mythtv-release-0.22-fixes
+</verb></tscreen>
+
+To download trunk:
+
+<tscreen><verb>
+$ mkdir mythtv-trunk
+$ svn co http://svn.mythtv.org/svn/trunk/ mythtv-trunk
+$ cd mythtv-trunk
 </verb></tscreen>
 
 <bf>NOTE</bf>:  Using a svn version of the code allows you to stay
@@ -1065,7 +1043,7 @@ $ ./configure
 </verb></tscreen>
 
 If you wish to change options, run <bf>./configure --help</bf> to
-see what is available and to override and automatically detected options.
+see what is available and to override any automatically detected options.
 See the <tt>config.log</tt> file after running <bf>configure</bf> to see
 previous runs.
 
@@ -1082,32 +1060,9 @@ recommended for a single CPU system.  Do not set the number of jobs too
 high, or your compile will actually take longer to complete than it would if
 you did a "normal" build.
 
-If you are using <bf>distcc</bf>, and you had two other host machines (red, blue)
-participating, you would do something like:
-<tscreen><verb>
-$ export DISTCC_HOSTS='localhost red blue'
-$ make -j 6 CXX=distcc
-</verb></tscreen>
-
-The actual speed-up, if any, is dependant on a number of factors, such as
-number of CPUs / hosts, etc.  The <bf>distcc</bf> documentation recommends
-using a <tt>-j</tt> value of twice the number of CPUs available to keep all
-of them busy.
-
-Some timing information.  The following should only be used for
-illustration; your actual results may vary.  The test involves a complete
-<tt>make distclean</tt> to the final binary.
-<itemize>
-<item>P4 3.2Ghz HT: "standard" make: 12m 49s
-<item>P4 3.2Ghz HT: make -j 2: 11m 24s
-</itemize>
-
-In the above example, we see that with a single CPU, a multi-stage
-<bf>make</bf> does not significantly decrease compile time.
-
 Once the compile is done, switch to superuser:
 <tscreen><verb>
-$ su
+$ sudo bash
 # make install
 # exit
 </verb></tscreen>
@@ -1129,10 +1084,10 @@ video display smoother, especially if you are decoding HDTV.
 
 <sect3>rlimits
 <p>The rlimits method is the preferred method and is included in Linux
-2.6.12 and above. Unfortunately, you need PAM version 0.79 or above, which
-may not be supported by your distribution yet. Assuming anyone running
-<bf>mythfrontend</bf> is in the audio group and rlimits are supported, all
-you need to do is place this in your <tt>/etc/security/limits.conf</tt>
+2.6.12 and above and requires PAM version 0.79 or above.  Assuming anyone
+running <bf>mythfrontend</bf> is in the audio group and rlimits are
+supported, all you need to do is place this in your
+<tt>/etc/security/limits.conf</tt>
 
 <tscreen><verb>
 *               -       rtprio     0
@@ -1143,7 +1098,7 @@ you need to do is place this in your <tt>/etc/security/limits.conf</tt>
 
 <sect3>realtime module
 <p>The second option is to use the Linux realtime kernel module.
-This is will be phased out over time, but is currently supported
+This will be phased out over time, but is currently supported
 by many distributions that do not yet support rlimits. If you are
 not using the distribution kernel you must configure your kernel
 with:
@@ -1172,7 +1127,7 @@ rlimits or the realtime module. This does not work on modern
 distributions either, and is <bf><em>not recommended</em></bf>
 on any system connected to the Internet. This may also make it
 impossible to debug MythTV without running <bf>gdb</bf> as root. If you
-would still like to do this, you just need to run this as root:
+would still like to do this, do the following as root:
 <tscreen><verb>
 # chmod a+s /usr/local/bin/mythfrontend /usr/local/bin/mythtv
 </verb></tscreen>
@@ -1202,7 +1157,7 @@ Once MythTV is compiled and installed:
 <item>
 Run the mythtv-setup program on your Master backend. Under the "General"
 menu, change the IP address of the current machine (by default, "127.0.0.1")
-to the real external IP address - 127.0.0.1 is the loopback address and no
+to the real external IP address - 127.0.0.1 is the internal loopback address and no
 external machine can access it. Change the Master Server IP setting to the
 same IP address as well.
 <item>
@@ -1211,18 +1166,6 @@ and a "Database Configuration" screen should appear.
 Set the "Host name" field to point to your Master backend's IP address.
 </list>
 
-<sect1>Gentoo <label id="Gentoo_build">
-<p>Installation of MythTV on Gentoo consists of simply emerging the desired
-ebuild because all of the packages are now part of the official Portage tree.
-<tscreen><verb>
-$ su -
-# emerge --sync # make sure portage is up to date.
-# vi /etc/make.conf
-</verb></tscreen>
-Add mysql to your USE variable.  i.e. <tt>USE="mysql ...."</tt>
-<tscreen><verb>
-# emerge mythtv
-</verb></tscreen>
 <sect>MySQL.<label id="mysql">
 <p>You will also want to comment out "log-bin" in your <tt>my.cnf</tt>
 configuration file.  This option will quickly fill your "/var" disk
@@ -1230,26 +1173,6 @@ partition with many gigabytes of data, unless you are doing database
 replication and deleting these files regularly.
 
 <sect1>Distribution-specific information
-<sect2>Mandriva
-<p>If this is the system maintaining the database, make sure that MySQL is
-running and started at boot.  Click on Mandriva Control
-Center->System->Services, find MySQL and click the "On Boot" button and the
-"Start" button if the MySQL status shows that it isn't running yet.
-
-<figure loc="here">
-<eps file="warning.eps" height="1cm">
-<img src="warning.png">
-<caption><bf>NOTE</bf>:  There have been reports that MySQL isn't starting at boot.
-If this is happening to you, try running the following commands.
-</caption>
-</figure>
-<tscreen><verb>
-$ su
-# chkconfig --level 35 mysql on
-# /etc/rc.d/init.d/mysql start
-# exit
-</verb></tscreen>
-
 <sect2>Red Hat Linux and Fedora Core
 <p>If this is the system maintaining the database, make sure that MySQL is
 running and started at boot. Click on Redhat menu>Server Settings>Services
@@ -1262,9 +1185,6 @@ This can be done from the command line by typing:
 # /sbin/service mysqld start
 </verb></tscreen>
 
-<sect2>Gentoo
-<p>After installing MySQL you need to initialize the database by running
-<bf>mysql_install_db</bf> as root.
 <sect1>Setting up the initial database <label id="setupdb">
 <p>This step is only required on the system maintaining the database, which
 may or may not be one of your MythTV boxes.  If the database is on a
@@ -1278,7 +1198,7 @@ $ cd database
 <p><tscreen><verb>
 $ mysql -u root < mc.sql
 </verb></tscreen>
-<sect2>Debian 3.0
+<sect2>Debian
 <p><tscreen><verb>
 $ mysql < mc.sql
 </verb></tscreen>
@@ -1302,9 +1222,9 @@ id="modify_perm_mysql">
 you must grant access to the database from remote systems.  By default, the
 <tt>mc.sql</tt> script is only granting access to the local host.
 
-To allow other hosts access to your master database, you can either set it
-up for no security at all, or with more granularity.  Note that the "%" is
-the wildcard character in MySQL.
+To allow other hosts access to your master database, you can either
+configure MySQL database access with no security or with additional
+granularity. 
 
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
@@ -1313,6 +1233,9 @@ the wildcard character in MySQL.
 you're in a controlled environment.
 </caption>
 </figure>
+
+The "%" is the wildcard character in MySQL.
+
 This example has no security at all, and allows access from any host.
 <tscreen><verb>
 $ mysql -u root mythconverg
@@ -1338,10 +1261,10 @@ mysql> flush privileges;
 </verb></tscreen>
 
 You'll also need to check that the "networking" feature of MySQL is turned
-on. Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
-<tt>skip-networking</tt>.  If it does, remove it.  Also verify that
-<tt>bind-address</tt> is set to your IP address instead of
-<tt>127.0.0.1</tt>.  If you change either of these items, restart
+on.  Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
+<tt>skip-networking</tt>.  If it does, either remove that line or comment it
+out.  Also verify that <tt>bind-address</tt> is set to your IP address
+instead of <tt>127.0.0.1</tt>.  If you change either of these items, restart
 <bf>MySQL</bf>.
 
 <bf>NOTE</bf>:  Your distribution may have a customized MySQL configuration
@@ -1349,25 +1272,24 @@ file; in Mandriva, check <tt>/etc/sysconfig/mysqld</tt> for additional
 configuration.
 
 <sect>Configuring Sound.
-<p>If your video doesn't appear to be in-sync with your audio and you're
-using an analog video capture card and a soundcard to capture audio, it
-could be because you are listening to the real-time audio from your video
-card rather than after it's been processed and synchronized to the video by
-MythTV.  Because MythTV is a personal video recorder, "Live TV" isn't really
-live - to let you pause live TV, MythTV is actually encoding the video,
-saving to disk, and then playing it back.  This procedure puts your MythTV
-"live" TV about 2 seconds behind real-time, so it's important that you're
-not listening to the live audio.  However, if you're having an issue where
-the audio and video aren't synchronized by small but varying amount, it's
-most likely because the sound driver that you're using doesn't have the
-DSP_CAP_REALTIME capability.  This was the case with ALSA (0.5), but not
-with newer versions.  See the <ref id="Troubleshooting_Audio"
-name="Troubleshooting Audio"> section for more information if you're having
-issues with sound.  Also, ensure that no other programs are grabbing the
-audio output, like <bf>arts</bf> or <bf>esd</bf>.
+<p>
+In the past, when analog frame buffer video capture cards were the primary
+means of obtaining video, many did not include audio capture circuitry, so a
+sound card was required to record the audio.  Now that most users will have
+a hardware capture device which multiplexes the audio and video into a
+single stream this is not as great a concern as it once was.
 
-What you need to do is to mute the "line-in" of your sound card and also
-set it as the recording source.
+<bf>NOTE</bf>: This portion of the HOWTO will be removed in MythTV v0.23.
+
+See the <ref id="Troubleshooting_Audio" name="Troubleshooting Audio">
+section for more information if you're having issues with sound.  Also,
+ensure that no other programs are grabbing the audio output, like
+<bf>arts</bf> or <bf>esd</bf>.
+
+You must mute the "line-in" of your sound card and also set it as the
+recording source.  Muting the line-in will ensure that you don't hear a
+time-delayed version of any live programs you may be watching if you have a
+combined frontend/backend system.
 
 There are two ways to do this.  Graphically, and from the command line.
 
@@ -1826,7 +1748,7 @@ Your <tt>/etc/fstab</tt> would look like this:
 
 Because the Storage Group path is <tt>/mnt/video/drive1/video</tt>, if the
 mythbackend can only find <tt>/mnt/video/drive1</tt> it will <em>not</em>
-write files to that share.
+write files to that share, because the "video" directory doesn't exist.
 
 After you create the desired directory or directories for storing your video
 files, you will need to add them to the proper Storage Group using
@@ -5786,20 +5708,13 @@ libmp3lame library.
 <sect2>Can't change the channel when watching Live TV.
 <p>Something's wrong with your program database.  Did mythfilldatabase run
 with no major errors?  Or, MythTV may not have permissions to the
-appropriate video4linux devices.  See the section titled <ref id="devperms"
-name="Device Permissions"> for an example.
+appropriate video4linux devices. 
 
 <sect2>Screen goes black when you try to play something
 <p>MythTV prints error and status messages to the shell that was used to
 start the application.  If nothing seems to be happening when you try to
 view a program, try switching back to the shell and look for error messages
 there, or, if you're running from a startup script, check the log file.
-
-<sect2>Poor performance with NVidia cards and XvMC
-<p>XvMC is a NVidia driver feature which is supposed to help with decoding
-video.  Users have reported that rather than speeding up their video it
-appears to be doing the opposite.  You may want to check that your color
-depth is set for 24bpp.
 
 <sect2>Computer is loading a media player application when you insert a CD or DVD
 <p>You need to disable any sort of auto-running media player in your
