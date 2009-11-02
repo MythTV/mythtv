@@ -843,9 +843,9 @@ namespace
                     ext != image_exts.end(); ++ext)
             {
                 QStringList sfn;
-                if (season > 0)
+                if (season > 0 || episode > 0)
                 {
-                    if (episode > 0 && isScreenshot)
+                    if (isScreenshot)
                         sfn += fntm.arg(*dir).arg(QString("%1 Season %2x%3_%4")
                                  .arg(title).arg(QString::number(season))
                                  .arg(QString::number(episode))
