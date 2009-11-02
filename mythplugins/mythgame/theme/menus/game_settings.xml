@@ -18,6 +18,7 @@
       <text lang="RU">Настройки игр</text>
       <text lang="PL">Ustawienia ogólne</text>
       <action>GAME_SETTINGS</action>
+      <description>Game folders and general options</description>
    </button>
 
    <button>
@@ -38,6 +39,7 @@
       <text lang="RU">Игроки</text>
       <text lang="PL">Gracze</text>
       <action>GAME_PLAYERS</action>
+      <description>Configure an emulator</description>
    </button>
 
    <button>
@@ -55,6 +57,7 @@
       <text lang="RU">Искать игры</text>
       <text lang="PL">Wyszukaj gry</text>
       <action>SEARCH_FOR_GAMES</action>
+      <description>Add games to your library</description>
    </button>
 
    <button>
@@ -75,6 +78,7 @@
       <text lang="RU">Очистить данные игр</text>
       <text lang="PL">Wyczyść dane gry</text>
       <action>CLEAR_GAME_DATA</action>
+      <description>Empty your game library</description>
    </button>
 
 
