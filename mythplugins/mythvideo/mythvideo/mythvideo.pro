@@ -10,6 +10,8 @@ target.path = $${LIBDIR}/mythtv/plugins
 
 installscripts.path = $${PREFIX}/share/mythtv/mythvideo/scripts
 installscripts.files = scripts/*.pl scripts/*.py scripts/README scripts/jamu-example.conf scripts/jamu.README
+installscriptsjamumods.path = $${PREFIX}/share/mythtv/mythvideo/scripts/ttvdb                                           
+installscriptsjamumods.files = scripts/Television/ttvdb/*.py scripts/Television/ttvdb/*.conf
 
 installscriptsmovie.path = $${PREFIX}/share/mythtv/mythvideo/scripts/Movie
 installscriptsmovie.files = scripts/Movie/*.pl
@@ -22,7 +24,7 @@ installscriptsttvdb.files = scripts/Television/ttvdb/*.py scripts/Television/ttv
 installscriptmodules.path = $${PREFIX}/share/mythtv/mythvideo/scripts/Movie/MythTV
 installscriptmodules.files = scripts/MythTV/MythVideoCommon.pm
 
-INSTALLS += installscripts installscriptsmovie installscriptstv installscriptsttvdb installscriptmodules target
+INSTALLS += installscripts installscriptsmovie installscriptstv installscriptsttvdb installscriptsjamumods installscriptmodules target
 
 # Input
 
