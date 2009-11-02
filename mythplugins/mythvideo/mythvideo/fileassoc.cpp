@@ -370,10 +370,6 @@ bool FileAssocDialog::Create()
             SLOT(OnNewExtensionPressed()));
     connect(m_deleteButton, SIGNAL(Clicked()), SLOT(OnDeletePressed()));
 
-    m_deleteButton->SetText(tr("Delete"));
-    m_doneButton->SetText(tr("Done"));
-    m_newButton->SetText(tr("New"));
-
     UpdateScreen();
 
     if (!BuildFocusList())
