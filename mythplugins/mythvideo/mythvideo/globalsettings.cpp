@@ -76,100 +76,6 @@ HostCheckBox *VideoAggressivePC()
     return gc;
 }
 
-HostCheckBox *VideoListUnknownFiletypes()
-{
-    HostCheckBox *gc = new HostCheckBox("VideoListUnknownFiletypes");
-    gc->setLabel(QObject::tr("Show Unknown File Types"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, all files below the Myth Video "
-                    "directory will be displayed unless their "
-                    "extension is explicitly set to be ignored. "));
-    return gc;
-}
-
-HostCheckBox *VideoTreeNoMetaData()
-{
-    HostCheckBox *gc = new HostCheckBox("VideoTreeLoadMetaData");
-    gc->setLabel(QObject::tr("Video List Loads Video Meta Data"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If set along with Browse Files, this "
-                    "will cause the Video List to load any known video meta"
-                    "data from the database. Turning this off can greatly "
-                    "speed up how long it takes to load the Video List tree."));
-    return gc;
-}
-
-HostCheckBox *VideoTreeRemember()
-{
-    HostCheckBox *gc = new HostCheckBox("mythvideo.VideoTreeRemember");
-    gc->setLabel(QObject::tr("Video Tree remembers last selected position"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If set, the current position in the Video "
-                                "Tree is persistent."));
-    return gc;
-}
-
-QDir TVScriptPath = QString("%1/mythvideo/scripts/Television/").arg(GetShareDir());
-QStringList TVScripts = TVScriptPath.entryList(QDir::Files);
-QDir MovieScriptPath = QString("%1/mythvideo/scripts/Movie/").arg(GetShareDir());
-QStringList MovieScripts = MovieScriptPath.entryList(QDir::Files);
-
-HostComboBox *MovieGrabber()
-{
-    HostComboBox *gc = new HostComboBox("mythvideo.MovieGrabber");
-    gc->setLabel(QObject::tr("Movie Grabber Script"));
-
-    for (QStringList::const_iterator i = MovieScripts.end() - 1;
-            i != MovieScripts.begin() - 1; --i)
-    {
-        QProcess versionCheck;
-
-        QString commandline = QString("%1mythvideo/scripts/Movie/%2")
-                                      .arg(GetShareDir()).arg(*i);
-        versionCheck.setReadChannelMode(QProcess::MergedChannels);
-        versionCheck.start(commandline, QStringList() << "-v");
-        versionCheck.waitForFinished();
-        QByteArray result = versionCheck.readAll(); 
-        QString resultString(result);
-
-        if (resultString.isEmpty())
-            resultString = *i;
-
-        gc->addSelection(QString("%1").arg(resultString),commandline);
-    }
-    gc->setHelpText(QObject::tr("This is the script used to search "
-                    "for and download Movie Metadata."));
-    return gc;
-}
-
-HostComboBox *TVGrabber()
-{
-    HostComboBox *gc = new HostComboBox("mythvideo.TVGrabber");
-    gc->setLabel(QObject::tr("Television Grabber Script"));
-    
-    for (QStringList::const_iterator i = TVScripts.begin();
-            i != TVScripts.end(); ++i)
-    {
-        QProcess versionCheck;
-
-        QString commandline = QString("%1mythvideo/scripts/Television/%2")
-                                      .arg(GetShareDir()).arg(*i);
-        versionCheck.setReadChannelMode(QProcess::MergedChannels);
-        versionCheck.start(commandline, QStringList() << "-v");
-        versionCheck.waitForFinished();
-        QByteArray result = versionCheck.readAll();
-        QString resultString(result);
-
-        if (resultString.isEmpty())
-            resultString = *i;
-
-        gc->addSelection(QString("%1").arg(resultString),commandline);
-    }
-    gc->setHelpText(QObject::tr("This is the script used to search "
-                    "for and download Television Metadata."));
-    return gc;
-}
-
 HostLineEdit *VideoStartupDirectory()
 {
     HostLineEdit *gc = new HostLineEdit("VideoStartupDir");
@@ -556,36 +462,6 @@ class RatingsToPL : public TriggeredConfigurationGroup
     }
 };
 
-class RandomTrailers : public TriggeredConfigurationGroup
-{
-  public:
-    RandomTrailers() : TriggeredConfigurationGroup(false)
-    {
-        HostCheckBox *rt = new HostCheckBox("mythvideo.TrailersRandomEnabled");
-        rt->setLabel(QObject::tr("Enable random trailers before videos"));
-        rt->setValue(false);
-        rt->setHelpText(QObject::tr("If set, this will enable a button "
-                        "called \"Watch With Trailers\" which will "
-                        "play a user-specified number of trailers "
-                        "before the movie."));
-
-        addChild(rt);
-        setTrigger(rt);
-
-        VerticalConfigurationGroup *vcg = new VerticalConfigurationGroup(true);
-        HostSpinBox *rc = new HostSpinBox("mythvideo.TrailersRandomCount", 0,
-                10, 1);
-        rc->setLabel(QObject::tr("Number of trailers to play"));
-        rc->setValue(3);
-        rc->setHelpText(QObject::tr("The number of trailers to play "
-                        "before playing the film itself."));
-        vcg->addChild(rc);
-
-        addTarget("0", new VerticalConfigurationGroup(true));
-        addTarget("1", vcg);
-    }
-};
-
 } // namespace
 
 VideoGeneralSettings::VideoGeneralSettings()
@@ -601,19 +477,11 @@ VideoGeneralSettings::VideoGeneralSettings()
     page1->addChild(VideoFanartDirectory());
 
     VConfigPage page2(pages, false);
-    page2->addChild(VideoListUnknownFiletypes());
-    page2->addChild(VideoTreeNoMetaData());
-    page2->addChild(VideoTreeRemember());
-    page2->addChild(MovieGrabber());
-    page2->addChild(TVGrabber());
+    page2->addChild(SetOnInsertDVD());
+    page2->addChild(SetDVDDriveSpeed());
+    page2->addChild(new DVDBookmarkSettings());
 
-    VConfigPage page3(pages, false);
-    page3->addChild(SetOnInsertDVD());
-    page3->addChild(SetDVDDriveSpeed());
-    page3->addChild(new DVDBookmarkSettings());
-    page3->addChild(new RandomTrailers());
-
-    // page 4
+    // page 3
     VerticalConfigurationGroup *pctrl =
             new VerticalConfigurationGroup(true, false);
     pctrl->setLabel(QObject::tr("Parental Control Settings"));
@@ -622,11 +490,11 @@ VideoGeneralSettings::VideoGeneralSettings()
     pctrl->addChild(VideoAdminPasswordThree());
     pctrl->addChild(VideoAdminPasswordTwo());
     pctrl->addChild(VideoAggressivePC());
-    VConfigPage page4(pages, false);
-    page4->addChild(pctrl);
+    VConfigPage page3(pages, false);
+    page3->addChild(pctrl);
 
-    VConfigPage page5(pages, false);
-    page5->addChild(new RatingsToPL());
+    VConfigPage page4(pages, false);
+    page4->addChild(new RatingsToPL());
 
     int page_num = 1;
     for (ConfigPage::PageList::const_iterator p = pages.begin();

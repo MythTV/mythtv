@@ -1160,7 +1160,7 @@ namespace
                                 .arg(GetDisplaySeasonEpisode(metadata->GetEpisode(), 2));
             }
             else
-                tmp["s##e##"] = tmp["##x##"] = "";
+                tmp["s##e##"] = tmp["##x##"] = QString();
 
             tmp["trailerstate"] = TrailerToState(metadata->GetTrailer());
             tmp["userratingstate"] =

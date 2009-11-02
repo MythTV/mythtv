@@ -19,6 +19,7 @@
       <text lang="PL">Ustawienia ogólne</text>
       <text lang="NB">Generelle innstillinger</text>
       <action>SETTINGS_GENERAL</action>
+      <description>File Paths and general options</description>
    </button>
 
    <button>
@@ -40,6 +41,14 @@
       <text lang="PL">Ustaw odtwarzacz</text>
       <text lang="NB"> Innstillinger for avpiller</text>
       <action>SETTINGS_PLAYER</action>
+      <description>Player Applications and DVD/VCD Drives</description>
+   </button>
+
+   <button>
+      <type>VIDEO_SETTINGS_METADATA</type>
+      <text>Metadata Settings</text>
+      <action>SETTINGS_METADATA</action>
+      <description>Grabber Setup and display preferences</description>
    </button>
 
    <button>
@@ -61,6 +70,7 @@
       <text lang="PL">Typy plików</text>
       <text lang="NB">Filtyper</text>
       <action>SETTINGS_ASSOCIATIONS</action>
+      <description>Associate new file extensions</description>
    </button>
 
    <!-- MythDVD -->
@@ -81,6 +91,7 @@
       <text lang="PL">Ustaw zrzucanie DVD</text>
       <text lang="NB">Innstillinger for import</text>
       <action>DVD_SETTINGS_RIP</action>
+      <description>DVD Rip and Transcode options</description>
    </button>
 
 </mythmenu>

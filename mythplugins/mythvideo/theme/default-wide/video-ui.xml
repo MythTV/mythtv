@@ -1415,5 +1415,93 @@
 
     </window>
 
+    <window name="metadatasettings">
+
+        <textarea name="title" from="basetextarea">
+            <area>20,40,1240,40</area>
+            <value>Video Metadata Settings</value>
+            <align>hcenter,vcenter</align>
+            <font>baselarge</font>
+        </textarea>
+        
+        <textarea name="helptext" from="basetextarea">
+            <area>90,400,1100,280</area>
+            <multiline>yes</multiline>
+            <font>basesmall</font>
+            <align>allcenter</align>
+        </textarea>
+        
+        <textarea name="movie_text" from="basetextarea">
+            <area>225,110,175,40</area>
+            <value>Movie Grabber:</value>
+            <align>right,vcenter</align>
+        </textarea>
+        
+        <textarea name="tv_text" from="movie_text">
+            <position>225,170</position>
+            <value>TV Grabber:</value>
+        </textarea>
+
+        <textarea name="trailercheck_text" from="movie_text">
+            <area>485,230,400,40</area>
+            <value>Enable Random Trailer Playback</value>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <textarea name="unknownfilecheck_text" from="movie_text">
+            <area>485,350,400,40</area>
+            <value>Display unknown file types</value>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <textarea name="treeloadsmetacheck_text" from="movie_text">
+            <area>485,410,400,40</area>
+            <value>Enable metadata in file browse mode</value>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <textarea name="trailerplay_text" from="movie_text">
+            <position>225,290</position>
+            <value>Trailers to Play:</value>
+        </textarea>
+
+    <!--Widgets-->
+        
+        <buttonlist name="moviegrabber" from="basewideselector">
+            <position>405,107</position>
+        </buttonlist>
+
+        <buttonlist name="tvgrabber" from="basewideselector">
+            <position>405,167</position>
+        </buttonlist>
+
+        <checkbox name="randomtrailercheck" from="basecheckbox">
+            <position>445,232</position>
+        </checkbox>
+
+        <spinbox name="trailernum" from="basewidespinbox">
+            <position>405,287</position>
+        </spinbox>
+
+        <checkbox name="unknownfilecheck" from="basecheckbox">
+            <position>445,352</position>
+        </checkbox>
+
+        <checkbox name="treeloadsmetacheck" from="basecheckbox">
+            <position>445,412</position>
+        </checkbox>
+
+        <button name="cancel" from="basebutton">
+            <position>438,600</position>
+            <value>Cancel</value>
+        </button>
+
+        <button name="ok" from="basebutton">
+            <position>685,600</position>
+            <value>OK</value>
+        </button>
+
+    </window>
+
 </mythuitheme>
 <!-- vim: set expandtab ts=4 sw=4 : -->

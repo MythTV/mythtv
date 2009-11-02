@@ -15,6 +15,7 @@
 #include "globalsettings.h"
 #include "fileassoc.h"
 #include "playersettings.h"
+#include "metadatasettings.h"
 #include "dbcheck.h"
 #include "cleanup.h"
 #include "globals.h"
@@ -444,6 +445,15 @@ namespace
 
             if (ps->Create())
                 mainStack->AddScreen(ps);
+        }
+        else if (sel == "settings_metadata")
+        {
+            MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+            MetadataSettings *ms = new MetadataSettings(mainStack, "metadata settings");
+
+            if (ms->Create())
+                mainStack->AddScreen(ms);
         }
         else if (sel == "settings_associations")
         {
