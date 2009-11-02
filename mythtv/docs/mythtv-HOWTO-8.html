@@ -20,18 +20,6 @@ with <B>lirc</B>, the Linux Infrared Remote Control program.  <B>lirc</B>
 handles the IR hardware and passes keystrokes to MythTV, which then acts as
 if the user had pressed the keys on the keyboard.  The file
 <CODE>keys.txt</CODE> describes the keys used to control MythTV.</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>: If you are running Mandriva, you may install
-<B>lirc</B> by executing: <CODE># urpmi lirc lirc-remotes</CODE> and bypass
-the manual compilation steps described below by jumping to the 
-<@@ref>completing_lirc_installCompleting the lirc install</A> section.
-See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
-configure lircd.</CAPTION>
-</FIGURE>
-</P>
 <P>Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
 build process.</P>

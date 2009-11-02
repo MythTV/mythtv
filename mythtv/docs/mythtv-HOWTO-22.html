@@ -373,46 +373,6 @@ which negatively impact XMLTV.</CAPTION>
 </FIGURE>
 </P>
 
-<H3><A NAME="Setting_DMA"></A> Fast CPU, choppy or jittery video </H3>
-
-<P>First, you should check that your kernel has been enabled for DMA:
-<BLOCKQUOTE><CODE>
-<PRE>
-[mythtv@pvr mythtv]$ dmesg |grep DMA
-    ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-    ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>From the listing above, you can see that hda, hdb and hdc are set for DMA,
-and hdd is set for pio.  If your kernel is not reporting DMA being enabled,
-you may need to recompile your kernel. Check your motherboard's chipset
-(look in the "ATA/IDE/MFM/RLL support" section in "make menuconfig") for more
-information.</P>
-<P>Next, check that the hard drive has DMA enabled.  Use the <B>hdparm</B>
-program to check and enable DMA.
-<BLOCKQUOTE><CODE>
-<PRE>
-# hdparm -d /dev/hd?
-</PRE>
-</CODE></BLOCKQUOTE>
- will tell you the DMA status for your hard drives.  If you run
-<B>hdparm</B> with the <CODE>-d1</CODE> parameter, it will turn DMA on.</P>
-
-<P>You may also setup your PC to do this at boot time, either by adding the
-command to your <CODE>/etc/rc.local</CODE> file, or by adding files to
-/etc/sysconfig.</P>
-<P>On Mandriva and other distributions, if you install <B>hdparm</B> from an RPM you
-will most likely get a <CODE>/etc/sysconfig/harddisks</CODE> file installed.
-This file will be parsed by the <CODE>/etc/rc.sysinit</CODE> script.  If you use
-the default <CODE>harddisks</CODE> file, your changes will affect all IDE devices
-(including CD ROMs).  If you wish to use different parameters for various
-devices, rename and/or copy the file to <CODE>harddiskhda</CODE>,
-<CODE>harddiskhdb</CODE>, etc.  Edit the file to your liking and on the next
-reboot your setting will be preserved.</P>
-
 <H3>Frontend appears to be slow at jumping / seeking.</H3>
 
 <H3>On-screen Display shows incorrect program length.</H3>

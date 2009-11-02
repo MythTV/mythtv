@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2009-10-12, v0.22.00
+<date>2009-11-02, v0.22.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -138,6 +138,8 @@ name="http://www.mythtv.org/wiki/index.php/Release_Notes_-_0.22">
 <item>Hacking MythTV, ISBN 978-0470037874 by Wilson, Tittel, Wright and Korelc
 <item>Practical MythTV: Building a PVR and Media Center PC, ISBN 978-1590597798 by Smith and Still
 </itemize>
+
+Note that these books cover earlier versions of MythTV.
 
 <sect1>Document conventions
 <p>The following conventions are used throughout this document.<newline>
@@ -294,17 +296,28 @@ hardware selection, mainly because there are so many tradeoffs which can be
 made.  For example, if you have plenty of CPU, you can use higher bitrates
 or capture sizes, etc.
 
-MythTV has two modes of operation.  First, it can function as a software
-video encoder, which means that it uses a fairly generic "dumb" video
-capture card to get frames of video, encodes them using the CPU on your
-motherboard and writes them to disk.  High-end video capture cards and
-devices like the TiVo and ReplayTV have dedicated encoder chips which use
-specialized hardware to convert the video stream to the MPEG-2 format
-without using the motherboard CPU.  The main CPU has the responsibility of
-running the Operating System and reading and writing the encoded frames to
-the disk.  These tasks have fairly low CPU requirements compared to encoding
-video, which is why a device like a Series 1 TiVo can run with only 16MB of
-RAM and a 54MHz CPU.
+<sect2>Software / CPU-based encoding.
+<p>
+MythTV has two modes of operation for capturing video.  First, it can
+function as a software video encoder, which means that it can use a fairly
+generic "dumb" video capture card to get frames of video, encodes them using
+the CPU on your motherboard and writes them to disk.  High-end video capture
+cards and devices like the TiVo and ReplayTV have dedicated encoder chips
+which use specialized hardware to convert the video stream to the MPEG-2
+format without using the motherboard CPU.  The main CPU has the
+responsibility of running the Operating System and reading and writing the
+encoded frames to the disk.  These tasks have fairly low CPU requirements
+compared to encoding video, which is why a device like a Series 1 TiVo can
+run with only 16MB of RAM and a 54MHz CPU.
+
+That being said, due to the digital conversion in the United States, there
+are fewer sources of NTSC analog video, and cheap silicon has
+made it easier to include MPEG-2 encoders into hardware capture cards.  In
+addition, the sale of "analog-only" cards has been severely curtailed in the
+United States, and one vendor received a fine for failing to include
+notification that their device was analog-only.  <url
+url="http://hraunfoss.fcc.gov/edocs_public/attachmatch/DA-08-493A1.txt"
+name="http://hraunfoss.fcc.gov/edocs_public/attachmatch/DA-08-493A1.txt">
 
 There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
@@ -334,22 +347,25 @@ created on a different system with 30% CPU usage.
 simultaneously serve content to a remote frontend.
 </itemize>
 
+<sect2>Hardware based encoding.
+<p>
 The second mode of operation is where MythTV is paired with a hardware-based
 video encoder, in which case MythTV will primarily be I/O bound.  There are
 several examples of such devices, like the Hauppauge
-WinTV-PVR-150/250/350/500 series, the Hauppauge HD-PVR, or the Silicon Dust
-HDHomerun.  In this mode, because the video encoding is being done by a
-dedicated video processor (the Hauppauges), or the device is simply writing
-the data to disk (the HDHR and other digital devices, such as DVB cards) the
-host CPU requirements are quite low.  See the <ref id="video_capture_device"
-name="Video Capture Device"> section for details.
+WinTV-PVR-150/250/350/500 series, the Hauppauge HD-PVR (H.264 High-Def
+capture using Component inputs), or the Silicon Dust HDHomerun.  In this mode,
+because the video encoding is being done by a dedicated video processor (the
+Hauppauge encoders), or the device is simply writing the data to disk (the
+HDHR and other digital devices, such as DVB cards) the host CPU requirements
+are quite low.  See the <ref id="video_capture_device" name="Video Capture
+Device"> section for details.
 
 Primary development in MythTV has transitioned to supporting MPEG-2 capture
-devices and HDTV, so if given the option, go with the hardware MPEG-2
-encoder or ATSC.  Because of the transition to digital broadcast in
-the United States, most television stations are now digital-only.  There are
-still analog stations in the U.S., but a majority are low-powered.  Canada
-still has analog broadcasts.  
+devices, H.264 and HDTV, so if given the option, go with the hardware encoder or
+choose a ATSC capture device.  Because of the transition to digital
+broadcast in the United States, most television stations are now
+digital-only.  There are still analog stations in the U.S., but a majority
+are low-powered.  Canada still has analog broadcasts.
 
 Analog encoding or hardware MPEG-2 encoding may still be required if you are
 trying to capture standard definition video sources, such as set-top-boxes.
@@ -366,23 +382,11 @@ on the encoding scheme, the size of the raw images and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour for
 MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7 GB/hour for ATSC HDTV.
 
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  You <em>must</em> use DMA for hard drive access to prevent
-choppy or jittery video.  Not all distributions enable DMA at boot time.
-See the Troubleshooting Section for <ref id="Setting_DMA"
-name="instructions"> on how to do this.</caption>
-</figure>
-
 Writing video to disk is sensitive to timing issues; RTjpeg requires less
 CPU with the tradeoff being larger files and needing to write to the disk
 faster.  MPEG-4 requires more CPU, but the files are smaller.  At the
 default resolution, MPEG-2 creates the largest files of all with almost no
 CPU impact.
-
-See the Troubleshooting <ref id="Setting_DMA" name="section"> for more
-information.
 
 <sect2>Filesystems
 <p>MythTV creates large files, many in excess of 4GB.  You <em>must</em>
@@ -504,10 +508,10 @@ for Live TV at 416x480.
 
 <sect3>DVB capture cards.
 <p>DVB is a video standard primarily found in Europe (where it comes in
-DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite) and
-is also used as the programming interface for HDTV capture cards in Linux.
-To see if your DVB card is supported, see the list of cards in the
-"Supported Hardware" section of the DVB Wiki at <url
+DVB-C, DVB-T and DVB-S and -S2 varieties for Cable, Terrestrial and
+Satellite) and is also used as the programming interface for HDTV capture
+cards in Linux.  To see if your DVB card is supported, see the list of cards
+in the "Supported Hardware" section of the DVB Wiki at <url
 url="http://www.linuxtv.org/wiki/index.php/Main_Page"
 name="http://www.linuxtv.org/wiki/index.php/Main_Page"> for more
 information.
@@ -515,15 +519,15 @@ information.
 In the United States, you may use a card such as the TwinHan to obtain
 unencrypted Free-To-Air satellite channels.  See <url
 url="http://www.lyngsat.com/" name="http://www.lyngsat.com/"> for the types
-of content which is available.
+of content which are available.
 
 <sect3>HDTV.
 <p>There are a number of HDTV cards with Linux drivers which are known to
 operate in the United States; a complete list of cards with DVB drivers can
 be found at <url url="http://www.linuxtv.org/"
-name="http://www.linuxtv.org/"> Some cards support
-capture of unencrypted digital cable TV (utilizing QAM256), others will only
-work with Over The Air signals captured with an antenna (with 8VSB).
+name="http://www.linuxtv.org/"> Some cards support capture of unencrypted
+digital cable TV (utilizing QAM64 or QAM256), others will only work with
+Over The Air signals captured with an antenna (with 8VSB).
 
 <em>None</em> of the capture devices listed above
 perform any encoding; they merely allow your computer to save a copy of a
@@ -562,13 +566,16 @@ deinterlacing, or if you have an NVIDIA card with video decode acceleration.
 binary driver; this is now officially supported in MythTV 0.22.  Use of
 VDPAU offloads the decompression and deinterlacing of video to the video GPU
 rather than the CPU of the frontend, so the CPU requirements are drastically
-lowered.  A fanless frontend using an Intel Atom CPU running a single-core at
-1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264.
+lowered.  A fanless frontend using an Intel Atom CPU running a single-core
+at 1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264 if it has
+VDPAU supported video.
 
 <sect3>Firewire.
-<p>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
+<p>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
 If your provider uses 5C encryption on a particular channel, you won't be
-able to get any content.
+able to get any content.  Many users have resorted to using Firewire to
+change channels on their set-top-box and capture the High Def video using
+the Component output fed into a Hauppauge HD PVR.
 
 <sect3>DBoxII or other devices running Neutrino
 <p>You may use the Ethernet port of an DBoxII or a similar device to capture
@@ -662,7 +669,7 @@ Note that with some video cards and X drivers, XVideo extensions are
 only supported on the VGA output, and not on the TV output.
 
 <sect2>Cards with TV-out
-<p>The next section deals with a number of cards that are known to have
+<p>This section deals with a number of cards that are known to have
 TV-out ports.  The list is unlikely to be complete, so if you know of
 others, please post a message to the mythtv-users mailing list so the
 information can be included in future versions of the HOWTO. The list is
@@ -714,9 +721,8 @@ configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
 important if you want to display HDTV.  VDPAU is another new feature and it
 provides an API for offloading MPEG-2 and H.264 to the GPU.
 
-
 <sect3>Hauppauge PVR-350 <label id="PVR-350">
-<p>As of MythTV 0.22, the  TV-out and MPEG-2 decoder functions of the
+<p>As of MythTV 0.22, the TV-out and MPEG-2 decoder functions of the
 PVR-350 are no longer supported.  This functionality is currently
 unmaintained, and will be removed in MythTV 0.23.
 
@@ -782,51 +788,7 @@ Fedora Core can be found in Jarod Wilson's (<url
 url="mailto:jcw@wilsonet.com" name="mailto:jcw@wilsonet.com">) HOWTO at <url
 url="http://wilsonet.com/mythtv/" name="http://wilsonet.com/mythtv/"> Just
 like 3rd-party packages, any 3rd-party documentation problems should be
-brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).  The
-installation instructions which follow should be used as a guide only; refer
-to Jarod's guide.
-
-Red Hat Linux and Fedora Core packages for MythTV and all of its add-on
-modules and some themes have been packaged by <url
-url="mailto:Axel.Thimm@ATrpms.net" name="mailto:Axel.Thimm@ATrpms.net"> and
-are available at <url url="http://ATrpms.net/topic/multimedia/"
-name="http://ATrpms.net/topic/multimedia/">. All of the prerequisites for
-MythTV (such as XMLTV) are available as RPM packages. If you have problems
-with the RPMs, please contact the ATrpms lists at <url
-url="http://lists.ATrpms.net/" name="http://lists.ATrpms.net/"> or file a
-bug against <url url="http://bugzilla.ATrpms.net/"
-name="http://bugzilla.ATrpms.net/">.
-
-Given the large number of dependent RPMs you are advised to use tools like
-apt or yum for automatic retrieval and installation of the required RPMs.
-(<url url="http://ATrpms.net/install.html"
-name="http://ATrpms.net/install.html">) In this case a
-special meta-package called mythtv-suite will allow you to install all of
-MythTV and its add-ons, plus all dependencies.
-
-If you don't have <bf>apt</bf> or <bf>yum</bf> on your machine, download and
-install the atrpms-kickstart package from <url
-url="http://ATrpms.net/name/atrpms-kickstart/"
-name="http://ATrpms.net/name/atrpms-kickstart/">.
-Install the package with:
-<tscreen><verb>
-# rpm -Uvh atrpms-kickstart*
-</verb></tscreen>
-Then run:
-<tscreen><verb>
-# apt-get update
-# apt-get dist-upgrade
-# apt-get update
-</verb></tscreen>
-And finally:
-<tscreen><verb>
-# apt-get install mythtv-suite
-</verb></tscreen>
-These steps however, do NOT perform the installation of any drivers required
-for <bf>ALSA</bf>, capture cards, <bf>lirc kernel modules</bf>, etc., nor do
-they set up your MythTV database. Check <url
-url="http://ATrpms.net/topic/multimedia/" name="http://ATrpms.net/topic/multimedia/"> for the drivers you
-need.
+brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
 
 <sect3>Debian
 <p>Debian packages for MythTV and most of its add-on modules are maintained
@@ -931,21 +893,41 @@ The reference compilation system for MythTV is Ubuntu.
 <p>The runtime manager for shared libraries, <bf>/lib/ld.so</bf>, gets
 information about the locations and contents of shared libraries from
 <tt>/etc/ld.so.cache</tt>, a file created by <bf>ldconfig</bf> from
-information in <tt>/etc/ld.so.conf</tt>.  Because MythTV installs some
+information in <tt>/etc/ld.so.conf</tt>.  Because MythTV installs 
 shared libraries in <tt>/usr/local/lib</tt>, that directory needs to be
 added to the list of directories for <bf>ld.so</bf> to search when doing
-runtime linking of programs, if it is not already there.
-You do this, as root, by editing <tt>/etc/ld.so.conf</tt>, then
-running <bf>ldconfig</bf>. There are many ways to do this; one that
-works is to enter this series of commands:
+runtime linking of programs, if it is not already there.  You do this, as
+root, by editing <tt>/etc/ld.so.conf</tt>, then running <bf>ldconfig</bf>. 
+There are many ways to do this; to determine the way that your distribution
+is configured, type:
 
 <tscreen><verb>
-$ su -
+$ cat /etc/ld.so.conf
+include /etc/ld.so.conf.d/*.conf
+$
+</verb></tscreen>
+
+If you see that your .conf file consists of just the "include" line, then
+execute the following as root:
+
+<tscreen><verb>
+$ sudo bash
+# echo /usr/local/lib >> /etc/ld.so.conf.d/mythtv.conf
+# /sbin/ldconfig
+# exit
+$
+</verb></tscreen>
+
+If your .conf file has many individual entries in it, then type:
+
+<tscreen><verb>
+$ sudo bash
 # echo /usr/local/lib >> /etc/ld.so.conf
 # /sbin/ldconfig
 # exit
 $
 </verb></tscreen>
+
 <sect1>Environment variable requirements for MythTV
 <sect2>General requirements
 <sect3>QT libraries and binaries
@@ -960,11 +942,11 @@ One way to do this is as follows: <label id="Checking_that_it_worked">
 Open a shell and execute the following:
 <tscreen><verb>
 $ echo $PATH
-/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt3/bin:/home/mythtv/bin:/usr/lib/qt3/bin
+/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/games:/usr/lib/qt4/bin:/home/mythtv/bin:
 $ echo $QTDIR
-/usr/lib/qt3
+/usr/lib/qt4
 $ which qmake
-/usr/lib/qt3/bin/qmake
+/usr/bin/qmake
 </verb></tscreen>
 
 For Mandriva, you should see a value like <tt>/usr/lib/qt3</tt> for
@@ -1475,18 +1457,6 @@ with <bf>lirc</bf>, the Linux Infrared Remote Control program.  <bf>lirc</bf>
 handles the IR hardware and passes keystrokes to MythTV, which then acts as
 if the user had pressed the keys on the keyboard.  The file
 <tt>keys.txt</tt> describes the keys used to control MythTV.
-
-<figure loc="here">
-<eps file="warning.eps" height="1cm">
-<img src="warning.png">
-<caption><bf>NOTE</bf>: If you are running Mandriva, you may install
-<bf>lirc</bf> by executing: <tt># urpmi lirc lirc-remotes</tt> and bypass
-the manual compilation steps described below by jumping to the <ref
-id="completing_lirc_install" name="Completing the lirc install"> section.
-See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
-configure lircd.
-</caption>
-</figure>
 
 Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
@@ -5652,45 +5622,6 @@ which negatively impact XMLTV.
 </caption>
 </figure>
 
-<sect2>Fast CPU, choppy or jittery video <label id="Setting_DMA">
-<p>First, you should check that your kernel has been enabled for DMA:
-<tscreen><verb>
-[mythtv@pvr mythtv]$ dmesg |grep DMA
-    ide0: BM-DMA at 0xd800-0xd807, BIOS settings: hda:DMA, hdb:DMA
-    ide1: BM-DMA at 0xd808-0xd80f, BIOS settings: hdc:DMA, hdd:pio
-hda: 156301488 sectors (80026 MB) w/2048KiB Cache, CHS=9729/255/63, UDMA(33)
-hdb: 80043264 sectors (40982 MB) w/2048KiB Cache, CHS=4982/255/63, UDMA(33)
-</verb></tscreen>
-
-From the listing above, you can see that hda, hdb and hdc are set for DMA,
-and hdd is set for pio.  If your kernel is not reporting DMA being enabled,
-you may need to recompile your kernel. Check your motherboard's chipset
-(look in the "ATA/IDE/MFM/RLL support" section in "make menuconfig") for more
-information.
-
-Next, check that the hard drive has DMA enabled.  Use the <bf>hdparm</bf>
-program to check and enable DMA.
-<tscreen><verb>
-# hdparm -d /dev/hd?
-</verb></tscreen> will tell you the DMA status for your hard drives.  If you run
-<bf>hdparm</bf> with the <tt>-d1</tt> parameter, it will turn DMA on.
-
-<!-- Next section adopted from a post by Dwaine Garden
-dwainegarden@rogers.com to the mailing list. -->
-
-You may also setup your PC to do this at boot time, either by adding the
-command to your <tt>/etc/rc.local</tt> file, or by adding files to
-/etc/sysconfig.
-
-On Mandriva and other distributions, if you install <bf>hdparm</bf> from an RPM you
-will most likely get a <tt>/etc/sysconfig/harddisks</tt> file installed.
-This file will be parsed by the <tt>/etc/rc.sysinit</tt> script.  If you use
-the default <tt>harddisks</tt> file, your changes will affect all IDE devices
-(including CD ROMs).  If you wish to use different parameters for various
-devices, rename and/or copy the file to <tt>harddiskhda</tt>,
-<tt>harddiskhdb</tt>, etc.  Edit the file to your liking and on the next
-reboot your setting will be preserved.
-
 <sect2>Frontend appears to be slow at jumping / seeking.
 <sect2>On-screen Display shows incorrect program length.
 <p>This may occur when MythTV doesn't have an accurate seek table.  Run
@@ -7161,8 +7092,7 @@ then press the TAB key until you reach Finish, then press ENTER to save.
 You can then press ESC until you return to the main screen.
 </article>
 <!-- Revision History
-v0.22.00, 2009-10-07.  Start prepping for 0.22.  Change required minimum
-MySQL to 5.0.15.  Change Qt to 4.3.
+v0.22.00, 2009-11-02.  Change required minimum MySQL to 5.0.15.  Change Qt to 4.3.
 
 -->
 
