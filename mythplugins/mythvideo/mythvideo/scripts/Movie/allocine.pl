@@ -18,6 +18,8 @@
 #   28-10-2009: Robert McNamara (Myth Dev)
 #   Fix issues in above patches-- files should never be downloaded to /tmp.
 #   Convert script to output in new grabber output format for .23.  Leave backwards compat.
+#   02-11-2009: Geoffroy Geerseau
+#   Allocine have, once again, change their templates...
    
 use File::Basename;
 use File::Copy;
@@ -117,7 +119,7 @@ sub getMovieData {
    $director = removeTag($director);
 
    # parse plot
-   my $plot = parseBetween($response,"Synopsis :</span>","</p>");
+   my $plot = parseBetween($response,"Synopsis : </span>","</p>");
    $plot =~ s/\n//g;
    $plot = trim(removeTag($plot));
   
@@ -163,7 +165,7 @@ sub getMovieData {
 
    my $castchunk;
 
-   $castchunk = parseBetween($response, "Avec ","<img class=");
+   $castchunk = parseBetween($response, "Avec ",", <a class=\"underline\" href=\"/film/casting_gen_cfilm=$movieid.html\">plus</a>");
    
    my $cast = "";
    $cast = trim(join(',', removeTag($castchunk)));
@@ -177,7 +179,10 @@ sub getMovieData {
    my $countries = parseBetween($response,"Long-métrage",".");
    $countries = trim(removeTag($countries));
    $countries =~ s/\s*(.*)\s*$/ $1/;
-
+   $countries = trim($countries);
+   $countries =~ s/\n//gm;
+   $countries =~ s/\s//gm;
+   $countries =~ s/,/, /gm;
    # parse for coverart
    my $mediafile = parseBetween($response,"<a href=\"/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=","\" >");
    $covrequest = "http://www.allocine.fr/film/fichefilm-".$movieid."/affiches/detail/?cmediafile=".$mediafile;
