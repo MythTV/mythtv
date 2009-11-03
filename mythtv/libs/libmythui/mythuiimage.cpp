@@ -809,32 +809,30 @@ void MythUIImage::Pulse(void)
         abs(m_LastDisplay.msecsTo(QTime::currentTime())) > m_Delay)
     {
         m_ImagesLock.lock();
-        unsigned int origPos = m_CurPos;
-        do
-        {
-             if (m_animationCycle == kCycleStart)
-             {
-                 ++m_CurPos;
-                 if (m_CurPos >= (uint)m_Images.size())
-                     m_CurPos = 0;
-             }
-             else if (m_animationCycle == kCycleReverse)
-             {
-                 if ((m_CurPos + 1) >= (uint)m_Images.size())
-                 {
-                     m_animationReverse = true;
-                 }
-                 else if (m_CurPos == 0)
-                 {
-                     m_animationReverse = false;
-                 }
 
-                 if (m_animationReverse)
-                     --m_CurPos;
-                 else
-                     ++m_CurPos;
-             }
-        } while (!m_Images[m_CurPos] && m_CurPos != origPos);
+        if (m_animationCycle == kCycleStart)
+        {
+            ++m_CurPos;
+            if (m_CurPos >= (uint)m_Images.size())
+                m_CurPos = 0;
+        }
+        else if (m_animationCycle == kCycleReverse)
+        {
+            if ((m_CurPos + 1) >= (uint)m_Images.size())
+            {
+                m_animationReverse = true;
+            }
+            else if (m_CurPos == 0)
+            {
+                m_animationReverse = false;
+            }
+
+            if (m_animationReverse)
+                --m_CurPos;
+            else
+                ++m_CurPos;
+        }
+             
         m_ImagesLock.unlock();
 
         SetRedraw();
