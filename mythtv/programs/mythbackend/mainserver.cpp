@@ -1369,7 +1369,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     if (!query.exec() || !query.isActive())
     {
-        MythDB::DBError("ProgramList::FromRecorded", query);
+        MythDB::DBError("MainServer::HandleQueryRecordings", query);
         outputlist << "0";
     }
     else
