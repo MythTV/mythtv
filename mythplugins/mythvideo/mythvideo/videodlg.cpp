@@ -3920,40 +3920,43 @@ void VideoDialog::ResetMetadata()
     if (metadata)
     {
         metadata->Reset();
+        QString inetref = metadata->GetInetRef();
+        QString filename = metadata->GetFilename();
+        QString title = metadata->GetTitle();
+        int season = metadata->GetSeason();
+        QString host = metadata->GetHost();
+        int episode = metadata->GetEpisode();
 
         QString cover_file;
-        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+        if (GetLocalVideoImage(inetref, filename,
                         QStringList(m_d->m_artDir), cover_file,
-                        metadata->GetTitle(), metadata->GetSeason(),
-                        metadata->GetHost(), "Coverart", metadata->GetEpisode()))
+                        title, season, host, "Coverart", episode))
         {
             metadata->SetCoverFile(cover_file);
         }
 
         QString screenshot_file;
-        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+        if (GetLocalVideoImage(inetref, filename,
                         QStringList(m_d->m_sshotDir), screenshot_file,
-                        metadata->GetTitle(), metadata->GetSeason(), metadata->GetHost(),
-                        "Screenshots", metadata->GetEpisode(), true))
+                        title, season, host, "Screenshots", episode,
+                        true))
         {   
             metadata->SetScreenshot(screenshot_file);
         }
 
 
         QString fanart_file;
-        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+        if (GetLocalVideoImage(inetref, filename,
                         QStringList(m_d->m_fanDir), fanart_file,
-                        metadata->GetTitle(), metadata->GetSeason(),
-                        metadata->GetHost(), "Fanart", metadata->GetEpisode()))
+                        title, season, host, "Fanart", episode))
         {
             metadata->SetFanart(fanart_file);
         }
 
         QString banner_file;
-        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
+        if (GetLocalVideoImage(inetref, filename,
                         QStringList(m_d->m_banDir), banner_file,
-                        metadata->GetTitle(), metadata->GetSeason(),
-                        metadata->GetHost(), "Banners", metadata->GetEpisode()))
+                        title, season, host, "Banners", episode))
         {
             metadata->SetBanner(banner_file);
         }
@@ -3985,7 +3988,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 cover_dirs, cover_file, metadata->GetTitle(),
                                 metadata->GetSeason(), metadata->GetHost(),
-                                "Coverart"))
+                                "Coverart", metadata->GetEpisode()))
         {
             metadata->SetCoverFile(cover_file);
             OnVideoImageSetDone(metadata);
@@ -4008,7 +4011,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 fanart_dirs, fanart_file, metadata->GetTitle(),
                                 metadata->GetSeason(), metadata->GetHost(),
-                                "Fanart"))
+                                "Fanart", metadata->GetEpisode()))
         {
             metadata->SetFanart(fanart_file);
             OnVideoImageSetDone(metadata);
@@ -4034,7 +4037,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 banner_dirs, banner_file, metadata->GetTitle(),
                                 metadata->GetSeason(), metadata->GetHost(),
-                                "Banners"))
+                                "Banners", metadata->GetEpisode()))
         {
             metadata->SetBanner(banner_file);
             OnVideoImageSetDone(metadata);
