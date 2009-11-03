@@ -3981,14 +3981,19 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
     cover_dirs += m_d->m_artDir;
 
     QString cover_file;
+    QString inetref = metadata->GetInetRef();
+    QString filename = metadata->GetFilename();
+    QString title = metadata->GetTitle();
+    int season = metadata->GetSeason();
+    QString host = metadata->GetHost();
+    int episode = metadata->GetEpisode();
 
     if (metadata->GetCoverFile().isEmpty() || 
         IsDefaultCoverFile(metadata->GetCoverFile()))
     {
-        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
-                                cover_dirs, cover_file, metadata->GetTitle(),
-                                metadata->GetSeason(), metadata->GetHost(),
-                                "Coverart", metadata->GetEpisode()))
+        if (GetLocalVideoImage(inetref, filename,
+                                cover_dirs, cover_file, title,
+                                season, host, "Coverart", episode))
         {
             metadata->SetCoverFile(cover_file);
             OnVideoImageSetDone(metadata);
@@ -4008,10 +4013,9 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
 
     if (metadata->GetFanart().isEmpty())
     {
-        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
-                                fanart_dirs, fanart_file, metadata->GetTitle(),
-                                metadata->GetSeason(), metadata->GetHost(),
-                                "Fanart", metadata->GetEpisode()))
+        if (GetLocalVideoImage(inetref, filename,
+                                fanart_dirs, fanart_file, title,
+                                season, host, "Fanart", episode))
         {
             metadata->SetFanart(fanart_file);
             OnVideoImageSetDone(metadata);
@@ -4034,10 +4038,9 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
         
     if (metadata->GetBanner().isEmpty())
     {
-        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
-                                banner_dirs, banner_file, metadata->GetTitle(),
-                                metadata->GetSeason(), metadata->GetHost(),
-                                "Banners", metadata->GetEpisode()))
+        if (GetLocalVideoImage(inetref, filename,
+                                banner_dirs, banner_file, title,
+                                season, host, "Banners", episode))
         {
             metadata->SetBanner(banner_file);
             OnVideoImageSetDone(metadata);
@@ -4056,10 +4059,10 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
 
     if (metadata->GetScreenshot().isEmpty())
     {
-        if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
-                                screenshot_dirs, screenshot_file, metadata->GetTitle(),
-                                metadata->GetSeason(), metadata->GetHost(), "Screenshots",
-                                metadata->GetEpisode(), true))
+        if (GetLocalVideoImage(inetref, filename,
+                                screenshot_dirs, screenshot_file, title,
+                                season, host, "Screenshots", episode,
+                                true))
         {
             metadata->SetScreenshot(screenshot_file);
             OnVideoImageSetDone(metadata);
