@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.6';
+    $VERSION        = '1.0.7';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -1221,7 +1221,7 @@ EOF
         my $command = "'${safe_mysqldump}'${defaults_arg}${host_arg}".
                       "${port_arg}${user_arg} --add-drop-table --add-locks ".
                       "--allow-keywords --complete-insert --extended-insert ".
-                      "--lock-tables --no-create-db --quick ".
+                      "--lock-tables --no-create-db --quick --add-drop-table ".
                       "'$safe_db_name' 2>&1 1>'$output_file'";
         verbose($verbose_level_debug,
                 '', 'Executing command:', $command);
