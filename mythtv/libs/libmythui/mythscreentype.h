@@ -8,6 +8,7 @@
 #include <QHash>
 
 class MythScreenStack;
+class MythUIBusyDialog;
 
 /**
  * Base Screen type
@@ -22,10 +23,12 @@ class MPUBLIC MythScreenType : public MythUIType
     virtual ~MythScreenType();
 
     virtual bool Create(void); // do the actual work of making the screen.
-    virtual void Init(void);
     virtual bool keyPressEvent(QKeyEvent *);
     virtual bool gestureEvent(MythGestureEvent *);
     virtual void ShowMenu(void);
+
+    void doInit(void);
+    void LoadInForeground(void);
 
     // if the widget is full screen and obscures widgets below it
     bool IsFullscreen(void) const;
@@ -43,6 +46,9 @@ class MPUBLIC MythScreenType : public MythUIType
 
     bool IsDeleting(void) const;
     void SetDeleting(bool deleting);
+
+    bool IsLoading(void) { return m_IsLoading; }
+    bool IsLoaded(void) { return m_IsLoaded; }
 
     void SetTextFromMap(QHash<QString, QString> &infoMap);
     void ResetMap(QHash<QString, QString> &infoMap);
@@ -62,8 +68,15 @@ class MPUBLIC MythScreenType : public MythUIType
     virtual void CreateCopy(MythUIType *parent);
     virtual bool ParseElement(QDomElement &element);
 
+    virtual void Load(void);   // ONLY to be used for loading data, NO UI WORK
+    virtual void Init(void);   // UI work to draw data loaded
+
+    void LoadInBackground(void);
+
     bool m_FullScreen;
     bool m_IsDeleting;
+    bool m_IsLoading;
+    bool m_IsLoaded;
 
     MythUIType *m_CurrentFocusWidget;
     //TODO We are currently dependant on the internal sorting of QMap for
@@ -72,6 +85,7 @@ class MPUBLIC MythScreenType : public MythUIType
     QMap<int, MythUIType *> m_FocusWidgetList;
 
     MythScreenStack *m_ScreenStack;
+    MythUIBusyDialog *m_BusyPopup;
     
     QRegion m_SavedMask;
 

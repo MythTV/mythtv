@@ -180,7 +180,8 @@ void MythScreenStack::GetDrawOrder(QVector<MythScreenType *> &screens)
 void MythScreenStack::ScheduleInitIfNeeded(void)
 {
     // make sure Init() is called outside the paintEvent
-    if (m_DoInit && m_topScreen && !m_InitTimerStarted)
+    if (m_DoInit && m_topScreen && !m_InitTimerStarted &&
+        !m_topScreen->IsLoading())
     {
         m_InitTimerStarted = true;
         QTimer::singleShot(100, this, SLOT(doInit()));
@@ -192,7 +193,11 @@ void MythScreenStack::doInit(void)
     if (m_DoInit && m_topScreen)
     {
         m_DoInit = false;
-        m_topScreen->Init();
+
+        if (!m_topScreen->IsLoaded())
+            m_topScreen->LoadInForeground();
+
+        m_topScreen->doInit();
     }
     m_InitTimerStarted = false;
 }

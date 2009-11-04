@@ -2,12 +2,31 @@
 #include "mythscreentype.h"
 
 #include <QDomDocument>
+#include <QRunnable>
+#include <QThreadPool>
 
 #include "mythverbose.h"
 
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
 #include "mythuihelper.h"
+#include "mythprogressdialog.h"
+
+class ScreenLoadTask : public QRunnable
+{
+  public:
+    ScreenLoadTask(MythScreenType *parent) : m_parent(parent) {}
+
+  private:
+    void run()
+    {
+        if (m_parent)
+            m_parent->LoadInForeground();
+    }
+
+    MythScreenType *m_parent;
+};
+
 
 MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
                                bool fullscreen)
@@ -17,7 +36,10 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
     m_CurrentFocusWidget = NULL;
 
     m_ScreenStack = parent;
+    m_BusyPopup = NULL;
     m_IsDeleting = false;
+    m_IsLoading = false;
+    m_IsLoaded = false;
 
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
@@ -226,12 +248,57 @@ bool MythScreenType::Create(void)
     return true;
 }
 
+// This method should only load data, it should never perform UI routines
+void MythScreenType::Load(void)
+{
+    // Virtual
+}
+
+void MythScreenType::LoadInBackground(void)
+{
+    m_IsLoading = true;
+
+    MythScreenStack *popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+    QString message(tr("Loading..."));
+    m_BusyPopup =
+        new MythUIBusyDialog(message, popupStack, "mythscreentypebusydialog");
+
+    if (m_BusyPopup->Create())
+        popupStack->AddScreen(m_BusyPopup, false);
+
+    ScreenLoadTask *loadTask = new ScreenLoadTask(this);
+    QThreadPool::globalInstance()->start(loadTask);
+}
+
+void MythScreenType::LoadInForeground(void)
+{
+    m_IsLoading = true;
+    Load();
+    m_IsLoaded = true;
+    m_IsLoading = false;
+}
+
+void MythScreenType::doInit(void)
+{
+    if (m_BusyPopup)
+        m_BusyPopup->Close();
+    m_BusyPopup = NULL;
+
+    Init();
+}
+
 void MythScreenType::Init(void)
 {
+    // Virtual
 }
 
 void MythScreenType::Close(void)
 {
+    if (m_BusyPopup)
+        m_BusyPopup->Close();
+    m_BusyPopup = NULL;
+
     GetScreenStack()->PopScreen(this);
 }
 
