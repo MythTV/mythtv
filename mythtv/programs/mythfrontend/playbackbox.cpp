@@ -469,7 +469,15 @@ bool PlaybackBox::Create()
     connect(m_fillListTimer, SIGNAL(timeout()), SLOT(listChanged()));
 
     BuildFocusList();
+    LoadInBackground();
+
     return true;
+}
+
+void PlaybackBox::Load()
+{
+    QMutexLocker locker(&m_progCacheLock);
+    m_progCache = RemoteGetRecordedList(m_allOrder == 0 || m_type == Delete);
 }
 
 void PlaybackBox::Init()
