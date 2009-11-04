@@ -4,14 +4,14 @@
 
         <font name="menufont" face="Trebuchet MS">
             <color>#FFFFFF</color>
-            <size>17</size>
+            <size>16</size>
             <bold>yes</bold>
             <shadowcolor>#000000</shadowcolor>
             <shadowoffset>2,2</shadowoffset>
             <shadowalpha>50</shadowalpha>
         </font>
 
-        <font name="clock" from="small">
+        <font name="clock" from="menufont">
             <size>20</size>
         </font>
 
@@ -138,7 +138,7 @@
                     <area>0,0,300,50</area>
                     <imagetype name="background" />
                     <textarea name="buttontext">
-                        <area>5,0,300,50</area>
+                        <area>14,0,300,50</area>
                         <font>menufont</font>
                         <align>left,vcenter</align>
                         <cutdown>yes</cutdown>
