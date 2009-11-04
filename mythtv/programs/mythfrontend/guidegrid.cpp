@@ -273,18 +273,46 @@ bool GuideGrid::Create()
     m_timeCount = m_guideGrid->getTimeCount() * 6;
     m_verticalLayout = m_guideGrid->isVerticalLayout();
 
+    m_currentEndTime = m_currentStartTime.addSecs(m_timeCount * 60 * 5);
+
+    LoadInBackground();
+    return true;
+}
+
+void GuideGrid::Load(void)
+{
+    m_recList.FromScheduler();
+    fillChannelInfos();
+
+    int maxchannel = max((int)GetChannelCount() - 1, 0);
+    setStartChannel((int)(m_currentStartChannel) - (int)(m_channelCount / 2));
+    m_channelCount = min(m_channelCount, maxchannel + 1);
+
+    for (int y = 0; y < m_channelCount; ++y)
+    {
+        int chanNum = y + m_currentStartChannel;
+        if (chanNum >= (int) m_channelInfos.size())
+            chanNum -= (int) m_channelInfos.size();
+        if (chanNum >= (int) m_channelInfos.size())
+            continue;
+
+        if (chanNum < 0)
+            chanNum = 0;
+
+        m_programs[y] = getProgramListFromProgram(chanNum);
+    }
+}
+
+void GuideGrid::Init(void)
+{
     m_currentRow = (int)(m_channelCount / 2);
     m_currentCol = 0;
 
     fillTimeInfos();
-    fillChannelInfos();
-    int maxchannel = max((int)GetChannelCount() - 1, 0);
-    setStartChannel((int)(m_currentStartChannel) - (int)(m_channelCount / 2));
-    m_channelCount = min(m_channelCount, maxchannel + 1);
+
     updateChannels();
 
-    m_recList.FromScheduler();
-    fillProgramInfos();
+    fillProgramInfos(true);
     updateInfo();
 
     m_updateTimer = new QTimer(this);
@@ -300,8 +328,6 @@ bool GuideGrid::Create()
         m_changroupname->SetText(changrpname);
 
     gContext->addListener(this);
-
-    return true;
 }
 
 GuideGrid::~GuideGrid()
@@ -958,25 +984,49 @@ void GuideGrid::fillTimeInfos()
     m_currentEndTime = t;
 }
 
-void GuideGrid::fillProgramInfos(void)
+void GuideGrid::fillProgramInfos(bool useExistingData)
 {
     m_guideGrid->ResetData();
 
     for (int y = 0; y < m_channelCount; ++y)
     {
-        fillProgramRowInfos(y);
+        fillProgramRowInfos(y, useExistingData);
     }
 }
 
-void GuideGrid::fillProgramRowInfos(unsigned int row)
+ProgramList *GuideGrid::getProgramListFromProgram(int chanNum)
+{
+    ProgramList *proglist = new ProgramList();
+
+    if (proglist)
+    {
+        MSqlBindings bindings;
+        QString querystr = "WHERE program.chanid = :CHANID "
+                           "  AND program.endtime >= :STARTTS "
+                           "  AND program.starttime <= :ENDTS "
+                           "  AND program.manualid = 0 ";
+        bindings[":CHANID"]  = GetChannelInfo(chanNum)->chanid;
+        bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-ddThh:mm:00");
+        bindings[":ENDTS"] = m_currentEndTime.toString("yyyy-MM-ddThh:mm:00");
+
+        proglist->FromProgram(querystr, bindings, m_recList);
+    }
+
+    return proglist;
+}
+
+void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
 {
     m_guideGrid->ResetRow(row);
 
     ProgramList *proglist;
 
-    if (m_programs[row])
-        delete m_programs[row];
-    m_programs[row] = NULL;
+    if (!useExistingData)
+    {
+        if (m_programs[row])
+            delete m_programs[row];
+        m_programs[row] = NULL;
+    }
 
     for (int x = 0; x < m_timeCount; ++x)
     {
@@ -995,18 +1045,10 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     if (chanNum < 0)
         chanNum = 0;
 
-    m_programs[row] = proglist = new ProgramList();
-
-    MSqlBindings bindings;
-    QString querystr = "WHERE program.chanid = :CHANID "
-                       "  AND program.endtime >= :STARTTS "
-                       "  AND program.starttime <= :ENDTS "
-                       "  AND program.manualid = 0 ";
-    bindings[":CHANID"]  = GetChannelInfo(chanNum)->chanid;
-    bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-ddThh:mm:00");
-    bindings[":ENDTS"] = m_currentEndTime.toString("yyyy-MM-ddThh:mm:00");
-
-    proglist->FromProgram(querystr, bindings, m_recList);
+    if (useExistingData)
+        proglist = m_programs[row];
+    else
+        m_programs[row] = proglist = getProgramListFromProgram(chanNum);
 
     QDateTime ts = m_currentStartTime;
 

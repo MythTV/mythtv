@@ -94,6 +94,8 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
     virtual void SetJumpToChannel(JumpToChannel *ptr);
 
     bool Create(void);
+    virtual void Load(void);
+    virtual void Init(void);
     bool keyPressEvent(QKeyEvent *event);
 
     virtual void aboutToShow();
@@ -163,8 +165,9 @@ class GuideGrid : public ScheduleCommon, public JumpToChannelListener
 
     void fillChannelInfos(bool gotostartchannel = true);
     void fillTimeInfos(void);
-    void fillProgramInfos(void);
-    void fillProgramRowInfos(unsigned int row);
+    void fillProgramInfos(bool useExistingData = false);
+    void fillProgramRowInfos(unsigned int row, bool useExistingData = false);
+    ProgramList *getProgramListFromProgram(int chanNum);
 
     void setStartChannel(int newStartChannel);
 
