@@ -35,6 +35,9 @@ class MoviesUI : public MythScreenType
     void showMenu();
 
   private:
+    virtual void Load();
+    virtual void Init();
+
     void updateDataTrees();
     void updateMovieTimes();
     void setupTheme(void);

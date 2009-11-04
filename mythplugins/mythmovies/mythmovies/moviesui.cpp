@@ -172,6 +172,14 @@ bool MoviesUI::Create()
     connect(m_movieTreeUI, SIGNAL(nodeChanged(MythGenericTree*)),
             this, SLOT(nodeChanged(MythGenericTree*)));
 
+    BuildFocusList();
+    LoadInBackground();
+
+    return true;
+}
+
+void MoviesUI::Load()
+{
     gContext->ActivateSettingsCache(false);
     QString currentDate = QDate::currentDate().toString();
     QString lastDate = gContext->GetSetting("MythMovies.LastGrabDate");
@@ -184,11 +192,11 @@ bool MoviesUI::Create()
     gContext->ActivateSettingsCache(true);
 
     updateDataTrees();
+}
+
+void MoviesUI::Init()
+{
     drawDisplayTree();
-
-    BuildFocusList();
-
-    return true;
 }
 
 void MoviesUI::updateMovieTimes()
