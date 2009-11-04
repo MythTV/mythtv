@@ -53,8 +53,11 @@ class ViewScheduled : public ScheduleCommon
     void Close(void);
 
   private:
+    virtual void Load(void);
+    virtual void Init(void);
+
     void FillList(void);
-    void LoadList(void);
+    void LoadList(bool useExistingData = false);
     void setShowAll(bool all);
     void viewCards(void);
     void viewInputs(void);

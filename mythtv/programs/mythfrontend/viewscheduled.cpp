@@ -97,8 +97,6 @@ bool ViewScheduled::Create()
 
     m_schedulesList->SetLCDTitles(tr("Scheduled Recordings"), "shortstarttimedate|channel|titlesubtitle|card");
 
-    LoadList();
-
     if (m_groupList)
     {
         connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
@@ -112,8 +110,19 @@ bool ViewScheduled::Create()
         EmbedTVWindow();
 
     BuildFocusList();
+    LoadInBackground();
 
     return true;
+}
+
+void ViewScheduled::Load()
+{
+    m_recList.FromScheduler(m_conflictBool);
+}
+
+void ViewScheduled::Init()
+{
+    LoadList(true);
 }
 
 void ViewScheduled::Close()
@@ -222,7 +231,7 @@ void ViewScheduled::ShowMenu(void)
     }
 }
 
-void ViewScheduled::LoadList(void)
+void ViewScheduled::LoadList(bool useExistingData)
 {
     if (m_inFill)
         return;
@@ -256,7 +265,8 @@ void ViewScheduled::LoadList(void)
 
     m_recgroupList.clear();
 
-    m_recList.FromScheduler(m_conflictBool);
+    if (!useExistingData)
+        m_recList.FromScheduler(m_conflictBool);
 
     ProgramList::iterator pit = m_recList.begin();
     QString currentDate;
