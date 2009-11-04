@@ -92,8 +92,14 @@ bool ProgFinder::Create()
     m_timesList->SetLCDTitles(tr("Times"), "buttontext");
 
     BuildFocusList();
+    LoadInBackground();
 
     return true;
+}
+
+void ProgFinder::Load(void)
+{
+    getShowNames();
 }
 
 void ProgFinder::Init(void)
@@ -529,9 +535,9 @@ void ProgFinder::updateTimesList()
     }
 }
 
-void ProgFinder::updateShowList()
+void ProgFinder::getShowNames()
 {
-    m_showList->Reset();
+    m_showNames.clear();
 
     QString thequery;
     MSqlBindings bindings;
@@ -543,28 +549,36 @@ void ProgFinder::updateShowList()
     query.bindValues(bindings);
     if (!query.exec())
     {
-        MythDB::DBError("updateShowList", thequery);
+        MythDB::DBError("getShowNames", thequery);
         return;
     }
 
     QString data;
-    typedef QMap<QString,QString> ShowData;
-    ShowData tempList; // Assign to temporary map for sorting
     while (query.next())
     {
         data = query.value(0).toString();
 
         if (formatSelectedData(data))
-            tempList[data.toLower()] = data;
+            m_showNames[data.toLower()] = data;
     }
+}
 
-    ShowData::Iterator it;
-    for (it = tempList.begin(); it != tempList.end(); ++it)
+void ProgFinder::updateShowList()
+{
+    m_showList->Reset();
+
+    if (m_showNames.isEmpty())
+        getShowNames();
+
+    ShowName::Iterator it;
+    for (it = m_showNames.begin(); it != m_showNames.end(); ++it)
     {
         QString tmpProgData = *it;
         restoreSelectedData(tmpProgData);
         new MythUIButtonListItem(m_showList, tmpProgData);
     }
+
+    m_showNames.clear();
 }
 
 void ProgFinder::selectShowData(QString progTitle, int newCurShow)
@@ -605,6 +619,9 @@ void ProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindings
 {
     QDateTime progStart = QDateTime::currentDateTime();
     QString searchChar = m_alphabetList->GetValue();
+
+    if (searchChar.isEmpty())
+        searchChar = "A";
 
     if (searchChar.contains('@'))
     {
@@ -880,6 +897,9 @@ void HeProgFinder::whereClauseGetSearchData(QString &where, MSqlBindings &bindin
 {
     QDateTime progStart = QDateTime::currentDateTime();
     QString searchChar = m_alphabetList->GetValue();
+
+    if (searchChar.isEmpty())
+        searchChar = searchChars[0];
 
     where = "SELECT DISTINCT title FROM program ";
 

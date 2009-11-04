@@ -50,6 +50,9 @@ class ProgFinder : public ScheduleCommon
     void edit(void);
 
   protected:
+    typedef QMap<QString,QString> ShowName;
+
+    virtual void Load(void);
     virtual void Init(void);
 
     virtual void initAlphabetList(void);
@@ -59,9 +62,12 @@ class ProgFinder : public ScheduleCommon
     virtual void whereClauseGetSearchData(QString &where, MSqlBindings &bindings);
 
     void ShowMenu(void);
+    void getShowNames(void);
     void updateShowList();
     void updateTimesList();
     void selectShowData(QString, int);
+
+    ShowName m_showNames;
 
     QString m_searchStr;
 
