@@ -7,6 +7,7 @@
       <text lang="FI">Yleiset Sääasetukset</text>
       <text lang="NB">Globale innstillinger</text>
       <action>SETTINGS_GENERAL</action>
+      <description>General weather plugin options</description>
    </button>
 
    <button>
@@ -16,6 +17,7 @@
       <text lang="FI">Sääasetukset</text>
       <text lang="NB">Innstillinger for skjermer</text>
       <action>SETTINGS_SCREEN</action>
+      <description>Choose which weather forecasts to display</description>
    </button>
 
    <button>
@@ -25,6 +27,7 @@
       <text lang="FI">Sääasetusten Lähteet</text>
       <text lang="NB">Innstillinger for kilder</text>
       <action>SETTINGS_SOURCE</action>
+      <description>Configure the behavior of weather scripts</description>
    </button>
 
 </mythmenu>
