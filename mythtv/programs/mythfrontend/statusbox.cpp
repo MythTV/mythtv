@@ -743,7 +743,9 @@ void StatusBox::doTunerStatus()
             gContext->SendReceiveStringList(strlist);
             state = strlist[0].toInt();
 
-            if (state == sStatus_Undefined)
+            if (state == -1)
+                status = tr("has an error");
+            else if (state == sStatus_Undefined)
                 status = tr("is unavailable");
             else
                 status = tr("is asleep");
