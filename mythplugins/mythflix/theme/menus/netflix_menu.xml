@@ -10,6 +10,7 @@
     <text lang="RU">Просмотреть очередь</text>
     <text lang="PL">Zobacz kolejkę</text>
     <action>NETFLIX_QUEUE</action>
+    <description>View your current Netflix queue</description>
   </button>
 
   <button>
@@ -22,6 +23,7 @@
     <text lang="RU">Список фильмов</text>
     <text lang="PL">Przeglądaj Filmy</text>
     <action>NETFLIX_BROWSE</action>
+    <description>Browse available Netflix films</description>
   </button>
 
   <button>
@@ -34,6 +36,7 @@
     <text lang="RU">История платежей</text>
     <text lang="PL">Historia operacji</text>
     <action>NETFLIX_HISTORY</action>
+    <description>See what you have viewed in the past</description>
   </button>
 
 </mythmenu>
