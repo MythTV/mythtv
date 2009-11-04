@@ -6,49 +6,42 @@
     <font name="active_font" face="Trebuchet MS">
       <color>#ffffff</color>
       <size>16</size>
-      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="inactive_font" face="Trebuchet MS">
       <color>#9999cc</color>
       <size>16</size>
-      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="record_font" face="Trebuchet MS">
       <color>#33FF33</color>
       <size>16</size>
-      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="recording_font" face="Trebuchet MS">
       <color>#FF33FF</color>
       <size>16</size>
-      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="norecordfnt" face="Trebuchet MS">
       <color>#999999</color>
       <size>16</size>
-      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="conflictfnt" face="Trebuchet MS">
       <color>#ffff33</color>
       <size>16</size>
-      <size:small>11</size:small>
       <bold>yes</bold>
     </font>
 
     <font name="currenttitle" face="Trebuchet MS">
       <color>#ffff33</color>
       <size>18</size>
-      <size:small>12</size:small>
       <bold>yes</bold>
     </font>
 
@@ -56,7 +49,6 @@
       <color>#ffffff</color>
       <dropcolor>#000000</dropcolor>
       <size>27</size>
-      <size:small>13</size:small>
       <shadow>3,3</shadow>
       <bold>yes</bold>
     </font>
@@ -64,7 +56,6 @@
     <font name="info" face="Trebuchet MS">
       <color>#ffffff</color>
       <size>17</size>
-      <size:small>8</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -72,7 +63,6 @@
     <font name="message" face="Trebuchet MS">
       <color>#ffffff</color>
       <size>16</size>
-      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -80,7 +70,6 @@
     <font name="messagegray" face="Trebuchet MS">
       <color>#999999</color>
       <size>16</size>
-      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
@@ -88,7 +77,6 @@
     <font name="messageyellow" face="Trebuchet MS">
       <color>#ffff33</color>
       <size>16</size>
-      <size:small>10</size:small>
       <shadow>1,1</shadow>
       <bold>yes</bold>
     </font>
