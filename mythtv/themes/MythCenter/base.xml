@@ -17,6 +17,10 @@
     </font>
 
     <font name="basesmallboldgrey" from="basesmallbold">
+        <color>#555555</color>
+    </font>
+
+    <font name="basesmallboldgreyhighlight" from="basesmallbold">
         <color>#888888</color>
     </font>
 
@@ -228,7 +232,7 @@
                     <cornerradius>4</cornerradius>
                 </shape>
             </state>
-            <state name="dinactive" from="active" /> 
+            <state name="inactive" from="active" /> 
         </statetype>
         <statetype name="upscrollarrow">
             <position>710,268</position>

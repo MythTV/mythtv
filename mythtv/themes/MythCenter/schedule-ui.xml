@@ -493,16 +493,34 @@
                         <area>5,1,155,24</area>
                     </textarea>
                     <textarea name="channel" from="shortstarttimedate">
-                        <area>170,1,150,24</area>
+                        <area>170,1,155,24</area>
                     </textarea>
                     <textarea name="title" from="shortstarttimedate">
-                        <area>325,1,380,24</area>
+                        <area>335,1,370,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
                         <area>720,1,30,24</area>
                     </textarea>
                 </state>
-                <state name="selected" from="active" />
+                <state name="selected" from="active">
+                    <textarea name="shortstarttimedate" from="buttontext">
+                        <area>5,1,155,24</area>
+                        <font state="disabled">basesmallboldgreyhighlight</font>
+                    </textarea>
+                    <textarea name="channel" from="shortstarttimedate">
+                        <area>170,1,155,24</area>
+                    </textarea>
+                    <textarea name="title" from="shortstarttimedate">
+                        <area>335,1,370,24</area>
+                    </textarea>
+                    <textarea name="card" from="shortstarttimedate">
+                        <area>720,1,30,24</area>
+                    </textarea>
+                    <shape name="selectbar">
+                        <area>3,-5,755,35</area>
+                        <font>basesmallbold</font>
+                    </shape>
+                </state>
                 <state name="inactive" from="active" />
             </statetype>
         </buttonlist>
