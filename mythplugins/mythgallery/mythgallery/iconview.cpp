@@ -645,7 +645,7 @@ bool IconView::HandleSubDirEscape(const QString &parent)
 
     QDir curdir(m_currDir);
     QDir pdir(parent);
-    if ((curdir != pdir) && is_subdir(pdir, curdir))
+    if ((curdir != pdir) && is_subdir(pdir, curdir) && m_history.size())
     {
         QString oldDirName = curdir.dirName();
         curdir.cdUp();
