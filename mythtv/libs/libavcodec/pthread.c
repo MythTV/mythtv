@@ -23,7 +23,6 @@
  */
 #include <pthread.h>
 
-#include "../libmythdb/compat.h"
 #include "avcodec.h"
 
 typedef int (action_func)(AVCodecContext *c, void *arg);
