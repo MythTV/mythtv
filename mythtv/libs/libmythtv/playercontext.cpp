@@ -484,47 +484,12 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
 
     if (pipState == kPIPOff || pipState == kPBPLeft)
     {
-        //int ret = 1;
         if (nvp->HasAudioOut() ||
             (nvp->IsIVTVDecoder() &&
             !gContext->GetNumSetting("PVR350InternalAudioOnly")))
         {
             QString errMsg = nvp->ReinitAudio();
-            /*
-            if ((errMsg != QString::null) &&
-                gContext->GetNumSetting("AudioNag", 1))
-            {
-                DialogBox *dlg = new DialogBox(gContext->GetMainWindow(), errMsg);
-
-                QString noaudio  = QObject::tr("Continue WITHOUT AUDIO!");
-                QString dontask  = noaudio + " " +
-                        QObject::tr("And, never ask again.");
-                QString neverask = noaudio + " " +
-                        QObject::tr("And, don't ask again in this session.");
-                QString quit     = QObject::tr("Return to menu.");
-
-                dlg->AddButton(noaudio);
-                dlg->AddButton(dontask);
-                dlg->AddButton(neverask);
-                dlg->AddButton(quit);
-
-                qApp->lock();
-                ret = dlg->exec();
-                dlg->deleteLater();
-                qApp->unlock();
-            }
-
-            if (kDialogCodeButton1 == ret)
-                gContext->SaveSetting("AudioNag", 0);
-            if (kDialogCodeButton2 == ret)
-                gContext->SetSetting("AudioNag", 0);
-            else if ((kDialogCodeButton3 == ret) ||
-                    (kDialogCodeRejected == ret))
-            {
-                return false;
-            } */
         }
-
     }
     else if (pipState == kPBPRight)
         nvp->SetMuted(true);
