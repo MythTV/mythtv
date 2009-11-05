@@ -3636,9 +3636,12 @@ NULL
                 for (column = columns.constBegin();
                      column != columns.constEnd(); ++column)
                 {
-                    thequery.append(QString(" MODIFY %1 varbinary(255) "
+                    QString new_type = "VARBINARY(255)";
+                    if ("description" == *column)
+                        new_type = "BLOB";
+                    thequery.append(QString(" MODIFY %1 %2 "
                                             "           NOT NULL default '',")
-                                            .arg(*column));
+                                            .arg(*column).arg(new_type));
                 }
                 thequery.chop(1);
                 thequery.append(";");
@@ -3651,11 +3654,14 @@ NULL
                 for (column = columns.constBegin();
                      column != columns.constEnd(); ++column)
                 {
-                    thequery.append(QString("  MODIFY %1 char(255) "
+                    QString new_type = "CHAR(255)";
+                    if ("description" == *column)
+                        new_type = "TEXT";
+                    thequery.append(QString("  MODIFY %1 %2 "
                                             "            CHARACTER SET utf8 "
                                             "            COLLATE utf8_bin "
                                             "            NOT NULL default '',")
-                                            .arg(*column));
+                                            .arg(*column).arg(new_type));
                 }
                 thequery.chop(1);
                 thequery.append(";");
