@@ -65,6 +65,9 @@ class ProgramRecPriority : public ScheduleCommon
     void scheduleChanged(int recid);
 
   private:
+    virtual void Load(void);
+    virtual void Init(void);
+
     void FillList(void);
     void SortList(void);
     void UpdateList();
