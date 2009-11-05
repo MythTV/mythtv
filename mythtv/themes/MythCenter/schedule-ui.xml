@@ -680,7 +680,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>15,50,770,332</area>
+            <area>15,50,770,367</area>
         </shape>
 
         <textarea name="prioritylabel" from="basetextarea">
@@ -696,16 +696,16 @@
         </textarea>
 
         <buttonlist name="programs" from="basebuttonlist2">
-            <area>20,59,760,370</area>
+            <area>20,64,760,370</area>
             <buttonarea>0,0,760,340</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="rectypechar" from="buttontext">
-                        <area>30,1,20,24</area>
+                        <area>10,1,20,24</area>
                         <align>allcenter</align>
                     </textarea>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>60,1,550,24</area>
+                        <area>40,1,550,24</area>
                     </textarea>
                     <textarea name="progpriority" from="buttontext">
                         <area>620,1,40,24</area>
@@ -715,24 +715,29 @@
                         <position>710,1</position>
                     </textarea>
                 </state>
-                <state name="selected" from="active" />
+                <state name="selected" from="active">
+                    <shape name="selectbar">
+                        <area>3,-5,755,35</area>
+                        <font>basesmallbold</font>
+                    </shape>
+                </state>
                 <state name="inactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>710,340</position>
+                <position>710,355</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>740,340</position>
+                <position>740,355</position>
             </statetype>
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>30,400,740,40</area>
+            <area>30,420,740,40</area>
             <font>basemedium</font>
         </textarea>
 
         <textarea name="scheduleinfo" from="basetextarea">
-            <area>30,440,740,30</area>
+            <area>30,450,740,30</area>
         </textarea>
 
         <textarea name="rec_str" from="basetextarea">
@@ -771,7 +776,7 @@
             <position>670,500</position>
         </textarea>
 
-        <textarea name="keyinstr">
+        <textarea name="keyinstr" from="basetextarea">
             <area>0,570,800,30</area>
             <value>(1) Title (2) Priority (4) Type</value>
             <align>allcenter</align>
