@@ -742,7 +742,7 @@ namespace
             }
 
             connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
-                    SLOT(sendResult(MythUIButtonListItem *, m_item)));
+                    SLOT(sendResult(MythUIButtonListItem *)));
 
             if (!BuildFocusList())
                 VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
@@ -759,9 +759,9 @@ namespace
         MythUIButtonList *m_resultsList;
 
       private slots:
-        void sendResult(MythUIButtonListItem* item, MythUIButtonListItem *button)
+        void sendResult(MythUIButtonListItem* item)
         {
-            emit haveResult(item->GetData().toString(), button);
+            emit haveResult(item->GetData().toString(), m_item);
             Close();
         }
     };
