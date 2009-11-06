@@ -3628,6 +3628,7 @@ NULL
             QString thequery    = QString("CREATE TEMPORARY TABLE temp_%1 "
                                           "SELECT * FROM %2;")
                                           .arg(table).arg(table);
+            QString modify;
             ok &= query.exec(thequery);
             if (ok)
             {
@@ -3636,12 +3637,12 @@ NULL
                 for (column = columns.constBegin();
                      column != columns.constEnd(); ++column)
                 {
-                    QString new_type = "VARBINARY(255)";
                     if ("description" == *column)
-                        new_type = "BLOB";
-                    thequery.append(QString(" MODIFY %1 %2 "
-                                            "           NOT NULL default '',")
-                                            .arg(*column).arg(new_type));
+                        modify = " MODIFY %1 BLOB NOT NULL,";
+                    else
+                        modify = " MODIFY %1 VARBINARY(255)"
+                                 "    NOT NULL default '',";
+                    thequery.append(modify.arg(*column));
                 }
                 thequery.chop(1);
                 thequery.append(";");
@@ -3654,14 +3655,16 @@ NULL
                 for (column = columns.constBegin();
                      column != columns.constEnd(); ++column)
                 {
-                    QString new_type = "CHAR(255)";
                     if ("description" == *column)
-                        new_type = "TEXT";
-                    thequery.append(QString("  MODIFY %1 %2 "
-                                            "            CHARACTER SET utf8 "
-                                            "            COLLATE utf8_bin "
-                                            "            NOT NULL default '',")
-                                            .arg(*column).arg(new_type));
+                        modify = " MODIFY %1 TEXT"
+                                 "           CHARACTER SET utf8 "
+                                 "           COLLATE utf8_bin ";
+                    else
+                        modify = " MODIFY %1 CHAR(255)"
+                                 "           CHARACTER SET utf8 "
+                                 "           COLLATE utf8_bin "
+                                 "    NOT NULL default '',";
+                    thequery.append(modify.arg(*column));
                 }
                 thequery.chop(1);
                 thequery.append(";");
