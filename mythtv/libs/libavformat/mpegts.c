@@ -25,8 +25,8 @@
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/bytestream.h"
 #include "avformat.h"
+#include "libmythdb/compat.h"  // for uint on MinGW (Windows)
 #include <pthread.h>
-#include "libmythdb/compat.h"
 #include "mpegts.h"
 #include "internal.h"
 
