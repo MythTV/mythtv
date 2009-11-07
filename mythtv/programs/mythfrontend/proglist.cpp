@@ -73,7 +73,8 @@ ProgLister::ProgLister(MythScreenStack *parent, ProgListType pltype,
     m_useGenres = false;
 
     m_curView = -1;
-    fillViewList(view);
+    m_view = view;
+    m_view.detach();
 }
 
 // previously recorded ctor
@@ -106,7 +107,7 @@ ProgLister::ProgLister(MythScreenStack *parent, int recid, const QString &title)
     m_useGenres = false;
 
     m_curView = -1;
-    fillViewList("reverse time");
+    m_view = "reverse time";
 }
 
 ProgLister::~ProgLister()
@@ -166,17 +167,23 @@ bool ProgLister::Create()
     if (m_schedText)
         m_schedText->SetText(value);
 
-    fillItemList(false);
-
     gContext->addListener(this);
+
+    LoadInBackground();
 
     return true;
 }
 
-void ProgLister::Init(void)
+void ProgLister::Load(void)
 {
-    if (m_curView < 0 && m_type != plPreviouslyRecorded)
-        QApplication::postEvent(this, new MythEvent("CHOOSE_VIEW"));
+    if (m_curView < 0)
+        fillViewList(m_view);
+
+    fillItemList(false, false);
+
+    ScreenLoadCompletionEvent *slce =
+        new ScreenLoadCompletionEvent(objectName());
+    QApplication::postEvent(this, slce);
 }
 
 bool ProgLister::keyPressEvent(QKeyEvent *e)
@@ -255,7 +262,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
         handled = true;
 
     if (needUpdate)
-        fillItemList(false);
+        LoadInBackground();
 
     m_allowEvents = true;
 
@@ -333,7 +340,7 @@ void ProgLister::prevView(void)
         m_curView = 0;
         m_viewList[m_curView] = m_searchTime.toString(m_fullDateFormat);
         m_viewTextList[m_curView] = m_viewList[m_curView];
-        fillItemList(false);
+        LoadInBackground();
 
         return;
     }
@@ -345,7 +352,7 @@ void ProgLister::prevView(void)
     if (m_curView < 0)
         m_curView = m_viewList.count() - 1;
 
-    fillItemList(false);
+    LoadInBackground();
 }
 
 void ProgLister::nextView(void)
@@ -356,7 +363,7 @@ void ProgLister::nextView(void)
         m_curView = 0;
         m_viewList[m_curView] = m_searchTime.toString(m_fullDateFormat);
         m_viewTextList[m_curView] = m_viewList[m_curView];
-        fillItemList(false);
+        LoadInBackground();
 
         return;
     }
@@ -367,7 +374,7 @@ void ProgLister::nextView(void)
     if (m_curView >= (int)m_viewList.count())
         m_curView = 0;
 
-    fillItemList(false);
+    LoadInBackground();
 }
 
 void ProgLister::updateKeywordInDB(const QString &text, const QString &oldValue)
@@ -521,13 +528,13 @@ void ProgLister::setViewFromTime(QDateTime searchTime)
     m_viewList[m_curView] = m_searchTime.toString(m_fullDateFormat);
     m_viewTextList[m_curView] = m_viewList[m_curView];
 
-    fillItemList(false);
+    LoadInBackground();
 }
 
 void ProgLister::setViewFromList(QString item)
 {
     m_curView = m_viewTextList.indexOf(item);
-    fillItemList(false);
+    LoadInBackground();
 }
 
 bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
@@ -1155,7 +1162,7 @@ class plTimeSort
         }
 };
 
-void ProgLister::fillItemList(bool restorePosition)
+void ProgLister::fillItemList(bool restorePosition, bool updateDisp)
 {
     if (m_type == plPreviouslyRecorded && m_curviewText)
     {
@@ -1177,17 +1184,6 @@ void ProgLister::fillItemList(bool restorePosition)
 
     if (m_curView < 0)
          return;
-
-    MythUIButtonListItem *currentItem = m_progList->GetItemCurrent();
-    ProgramInfo *selected = NULL;
-    if (currentItem)
-        selected = new ProgramInfo(*(qVariantValue<ProgramInfo*>
-                                        (currentItem->GetData())));
-    int selectedOffset =
-        m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
-
-    if (m_curviewText && m_curView >= 0)
-        m_curviewText->SetText(m_viewTextList[m_curView]);
 
     bool oneChanid = false;
     QString where;
@@ -1478,6 +1474,12 @@ void ProgLister::fillItemList(bool restorePosition)
             m_itemList.append(*i);
     }
 
+    if (updateDisp)
+        updateDisplay(restorePosition);
+}
+
+void ProgLister::updateDisplay(bool restorePosition)
+{
     if (m_messageText)
         m_messageText->SetVisible((m_itemList.count() == 0));
 
@@ -1485,6 +1487,18 @@ void ProgLister::fillItemList(bool restorePosition)
     ProgramInfo pginfo;
     pginfo.ToMap(infoMap);
     ResetMap(infoMap);
+
+    MythUIButtonListItem *currentItem = m_progList->GetItemCurrent();
+    ProgramInfo *selected = NULL;
+    if (currentItem)
+        selected = new ProgramInfo(*(qVariantValue<ProgramInfo*>
+                                        (currentItem->GetData())));
+    int selectedOffset =
+        m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
+
+    if (m_curviewText && m_curView >= 0)
+        m_curviewText->SetText(m_viewTextList[m_curView]);
+
     if (m_positionText)
         m_positionText->Reset();
 
@@ -1531,7 +1545,8 @@ void ProgLister::updateButtonList(void)
     ProgramList::const_iterator it = m_itemList.begin();
     for (; it != m_itemList.end(); ++it)
     {
-        ProgramInfo *pginfo = *it;
+        ProgramInfo *pginfo = new ProgramInfo;
+        pginfo->clone(*(*it)); // deep copy since we reload in the background
 
         if (pginfo->recstatus == rsRecorded          ||
             pginfo->recstatus == rsWillRecord)
@@ -1726,6 +1741,22 @@ void ProgLister::customEvent(QEvent *event)
         }
         else
             ScheduleCommon::customEvent(event);
+    }
+    else if (event->type() == kMythScreenLoadCompletionEventType)
+    {
+        ScreenLoadCompletionEvent *slce =
+            dynamic_cast<ScreenLoadCompletionEvent*>(event);
+        QString id = slce->GetId();
+
+        if (id == objectName())
+        {
+            CloseBusyPopup(); // opened by LoadInBackground()
+            updateDisplay(false);
+
+            if (m_curView < 0 && m_type != plPreviouslyRecorded)
+                chooseView();
+            return;
+        }
     }
     else if ((MythEvent::Type)(event->type()) == MythEvent::MythEventMessage)
     {

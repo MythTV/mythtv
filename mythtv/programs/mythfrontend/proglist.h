@@ -190,7 +190,6 @@ class ProgLister : public ScheduleCommon
     void customEvent(QEvent *);
 
   protected slots:
-    void Init(void);
     void prevView(void);
     void nextView(void);
     void setViewFromTime(QDateTime searchTime);
@@ -215,8 +214,11 @@ class ProgLister : public ScheduleCommon
     void quickRecord(void);
 
   private:
+    void Load(void);
+
     void fillViewList(const QString &view);
-    void fillItemList(bool restorePosition);
+    void fillItemList(bool restorePosition, bool updateDisp = true);
+    void updateDisplay(bool restorePosition);
     void updateButtonList(void);
 
     bool powerStringToSQL(const QString &qphrase, QString &output,
@@ -241,6 +243,7 @@ class ProgLister : public ScheduleCommon
 
     RecSearchType m_searchType;
 
+    QString       m_view;
     int           m_curView;
     QStringList   m_viewList;
     QStringList   m_viewTextList;
