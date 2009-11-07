@@ -10,6 +10,27 @@
 class MythScreenStack;
 class MythUIBusyDialog;
 
+const int kMythScreenLoadCompletionEventType = 34110;
+
+/**
+ *  \class ScreenLoadCompletionEvent
+ *
+ *  \brief Event that can be dispatched from a MythScreenType when it has
+ *         completed loading.
+ */
+class MPUBLIC ScreenLoadCompletionEvent : public QEvent
+{
+  public:
+    ScreenLoadCompletionEvent(const QString &id)
+        : QEvent((QEvent::Type)kMythScreenLoadCompletionEventType),
+          m_id(id) { }
+
+    QString GetId() { return m_id; }
+
+  private:
+    QString m_id;
+};
+
 /**
  * Base Screen type
  */
