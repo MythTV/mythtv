@@ -303,7 +303,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     if (resample && src_quality >= 0)
     {
         int error;
-        audio_samplerate = *(rates.end());
+        audio_samplerate = rates.back();
         VERBOSE(VB_GENERAL, LOC + QString("Using resampler. From: %1 to %2")
             .arg(settings.samplerate).arg(audio_samplerate));
         src_ctx = src_new(2-src_quality, source_audio_channels, &error);
