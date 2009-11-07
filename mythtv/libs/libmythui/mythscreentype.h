@@ -73,6 +73,9 @@ class MPUBLIC MythScreenType : public MythUIType
 
     void LoadInBackground(void);
 
+    void OpenBusyPopup(QString message = "");
+    void CloseBusyPopup(void);
+
     bool m_FullScreen;
     bool m_IsDeleting;
     bool m_IsLoading;

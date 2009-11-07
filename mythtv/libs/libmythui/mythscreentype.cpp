@@ -258,14 +258,7 @@ void MythScreenType::LoadInBackground(void)
 {
     m_IsLoading = true;
 
-    MythScreenStack *popupStack =
-                GetMythMainWindow()->GetStack("popup stack");
-    QString message(tr("Loading..."));
-    m_BusyPopup =
-        new MythUIBusyDialog(message, popupStack, "mythscreentypebusydialog");
-
-    if (m_BusyPopup->Create())
-        popupStack->AddScreen(m_BusyPopup, false);
+    OpenBusyPopup();
 
     ScreenLoadTask *loadTask = new ScreenLoadTask(this);
     QThreadPool::globalInstance()->start(loadTask);
@@ -279,12 +272,34 @@ void MythScreenType::LoadInForeground(void)
     m_IsLoading = false;
 }
 
-void MythScreenType::doInit(void)
+void MythScreenType::OpenBusyPopup(QString message)
+{
+    if (m_BusyPopup)
+        return;
+
+    QString msg(tr("Loading..."));
+    if (!message.isEmpty())
+        msg = message;
+
+    MythScreenStack *popupStack =
+                GetMythMainWindow()->GetStack("popup stack");
+    m_BusyPopup =
+        new MythUIBusyDialog(msg, popupStack, "mythscreentypebusydialog");
+
+    if (m_BusyPopup->Create())
+        popupStack->AddScreen(m_BusyPopup, false);
+}
+
+void MythScreenType::CloseBusyPopup(void)
 {
     if (m_BusyPopup)
         m_BusyPopup->Close();
     m_BusyPopup = NULL;
+}
 
+void MythScreenType::doInit(void)
+{
+    CloseBusyPopup();
     Init();
 }
 
@@ -295,10 +310,7 @@ void MythScreenType::Init(void)
 
 void MythScreenType::Close(void)
 {
-    if (m_BusyPopup)
-        m_BusyPopup->Close();
-    m_BusyPopup = NULL;
-
+    CloseBusyPopup();
     GetScreenStack()->PopScreen(this);
 }
 
