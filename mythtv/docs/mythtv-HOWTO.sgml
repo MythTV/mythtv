@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2009-11-02, v0.22.00
+<date>2009-11-06, v0.22.00
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1015,15 +1015,13 @@ To use the <em>release</em> version, you can execute the following.  You are
 strongly encouraged to use the release version.
 
 <tscreen><verb>
-$ mkdir mythtv-release-0.22-fixes
-$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-release-0.22-fixes
-$ cd mythtv-release-0.22-fixes
+$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-0.22
+$ cd mythtv-0.22
 </verb></tscreen>
 
 To download trunk:
 
 <tscreen><verb>
-$ mkdir mythtv-trunk
 $ svn co http://svn.mythtv.org/svn/trunk/ mythtv-trunk
 $ cd mythtv-trunk
 </verb></tscreen>
@@ -1031,7 +1029,7 @@ $ cd mythtv-trunk
 <bf>NOTE</bf>:  Using a svn version of the code allows you to stay
 up-to-date with changes.  So, if there's an update to the 0.22 release and
 you originally obtained it using svn, you could enter the
-mythtv-release-0.22-fixes directory and type "svn up", which will update your copy
+mythtv-0.22 directory and type "svn up", which will update your copy
 with the fixed version from the website.  You would then recompile and
 install the updated 0.22 code.
 

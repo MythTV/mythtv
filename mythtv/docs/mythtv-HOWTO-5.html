@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.65">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
  <TITLE>Installing and using MythTV: Downloading and compiling. </TITLE>
  <LINK HREF="mythtv-HOWTO-6.html" REL=next>
  <LINK HREF="mythtv-HOWTO-4.html" REL=previous>
@@ -67,9 +67,8 @@ strongly encouraged to use the release version.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mkdir mythtv-release-0.22-fixes
-$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-release-0.22-fixes
-$ cd mythtv-release-0.22-fixes
+$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-0.22
+$ cd mythtv-0.22
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -77,7 +76,6 @@ $ cd mythtv-release-0.22-fixes
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mkdir mythtv-trunk
 $ svn co http://svn.mythtv.org/svn/trunk/ mythtv-trunk
 $ cd mythtv-trunk
 </PRE>
@@ -86,7 +84,7 @@ $ cd mythtv-trunk
 <P><B>NOTE</B>:  Using a svn version of the code allows you to stay
 up-to-date with changes.  So, if there's an update to the 0.22 release and
 you originally obtained it using svn, you could enter the
-mythtv-release-0.22-fixes directory and type "svn up", which will update your copy
+mythtv-0.22 directory and type "svn up", which will update your copy
 with the fixed version from the website.  You would then recompile and
 install the updated 0.22 code.</P>
 <P>If you are using the tarball, then unpack it:
