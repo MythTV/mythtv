@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.5.6"
+__version__=u"v0.5.7"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -221,6 +221,8 @@ __version__=u"v0.5.6"
  #		 adding a hostname when the video had an absolute path. This caused issues with playback.
  #		 Added more informative error messages when TMDB is returning bad xml responses.
  #		 Fixed an error in the graphic file naming convention when graphics share the same download directory.
+ # 0.5.7 Remove the override of the TVDB graphics URL to the mirror site. See Kobe's comment:
+ #       http://forums.thetvdb.com/viewtopic.php?f=4&t=2161#p9089
 
 
 usage_txt=u'''
@@ -2157,8 +2159,8 @@ class Tvdatabase(object):
 			if url_dict.has_key(x[:i]):
 				temp_array = [x[i+1:],'']
 				url_dict[x[:i]].append(temp_array)# Collect a list of the same graphics type of URLs
-			else: # The first URL of a new graphics type
-				url_dict[x[:i]]=[[(x[i+1:]).replace(u"http://www.thetvdb.com",u"http://images.thetvdb.com"),'']]
+			else: # The first URL of a new graphics type. Also URL replacement code left in place just in case
+				url_dict[x[:i]]=[[(x[i+1:]).replace(u"http://www.thetvdb.com",u"http://www.thetvdb.com"),'']]
 
 		unique_dir={u'poster': ['posterdir', True], u'banner': ['bannerdir', True], u'fanart': ['fanartdir', True], u'filename': ['episodeimagedir', True]}
 		# If a graphics directory was not specified then default to the 'allgraphics' directory
