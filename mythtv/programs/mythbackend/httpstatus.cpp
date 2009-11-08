@@ -1160,7 +1160,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                 os << "      Disk Usage Summary:<br />\r\n";
                 os << "      <ul>\r\n";
 
-                os << "        <li>Total Disk Space:</li>\r\n"
+                os << "        <li>Total Disk Space:\r\n"
                 << "          <ul>\r\n";
                 QLocale c(QLocale::C);
 
@@ -1182,20 +1182,21 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                           "After Auto-expire: ";
                     sRep = c.toString(nFree + nLiveTV +
                                       nDeleted + nExpirable) + " MB";
-                    os << sRep << "</li>\r\n";
-                    os << "            <ul>\r\n";
-                    os << "              <li>Space Used by LiveTV: ";
+                    os << sRep << "\r\n";
+                    os << "              <ul>\r\n";
+                    os << "                <li>Space Used by LiveTV: ";
                     sRep = c.toString(nLiveTV) + " MB";
                     os << sRep << "</li>\r\n";
-                    os << "              <li>Space Used by "
+                    os << "                <li>Space Used by "
                           "Deleted Recordings: ";
                     sRep = c.toString(nDeleted) + " MB";
                     os << sRep << "</li>\r\n";
-                    os << "              <li>Space Used by "
+                    os << "                <li>Space Used by "
                           "Auto-expirable Recordings: ";
                     sRep = c.toString(nExpirable) + " MB";
                     os << sRep << "</li>\r\n";
-                    os << "            </ul>\r\n";
+                    os << "              </ul>\r\n";
+                    os << "            </li>\r\n";
                 }
 
                 os << "          </ul>\r\n"
@@ -1235,7 +1236,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
             {
 
                 os << "        <li>MythTV Drive #" << id << ":"
-                << "</li>\r\n"
+                << "\r\n"
                 << "          <ul>\r\n";
 
                 if (nDir.contains(','))
