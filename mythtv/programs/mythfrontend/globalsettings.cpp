@@ -31,6 +31,7 @@
 #include "libmythtv/recordingprofile.h"
 #include "mythxdisplay.h"
 #include "DisplayRes.h"
+#include "libmythtv/videodisplayprofile.h"
 #include "uitypes.h"
 #include "libmythtv/cardutil.h"
 #include "themeinfo.h"
