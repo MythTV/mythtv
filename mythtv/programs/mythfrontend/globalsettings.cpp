@@ -2019,16 +2019,6 @@ static HostCheckBox *UsePicControls()
 }
 #endif
 
-static HostCheckBox *AudioNagSetting()
-{
-    HostCheckBox *gc = new HostCheckBox("AudioNag");
-    gc->setLabel(QObject::tr("Warn on no audio output"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will warn you "
-                    "if it can't access the soundcard."));
-    return gc;
-}
-
 static HostLineEdit *UDPNotifyPort()
 {
     HostLineEdit *ge = new HostLineEdit("UDPNotifyPort");
@@ -4702,17 +4692,16 @@ PlaybackSettings::PlaybackSettings()
         new VerticalConfigurationGroup(false, false, true, true);
     column1->addChild(RealtimePriority());
     column1->addChild(DecodeExtraAudio());
-    column1->addChild(AudioNagSetting());
     column1->addChild(UseVideoTimebase());
+    column1->addChild(JumpToProgramOSD());
     columns->addChild(column1);
 
     VerticalConfigurationGroup *column2 =
         new VerticalConfigurationGroup(false, false, true, true);
     column2->addChild(ClearSavedPosition());
     column2->addChild(AltClearSavedPosition());
-    column2->addChild(JumpToProgramOSD());
-    column2->addChild(ContinueEmbeddedTVPlay());
     column2->addChild(AutomaticSetWatched());
+    column2->addChild(ContinueEmbeddedTVPlay());
     columns->addChild(column2);
 
     general1->addChild(columns);
