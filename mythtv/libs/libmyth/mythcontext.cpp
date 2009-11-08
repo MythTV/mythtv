@@ -1895,9 +1895,9 @@ QString MythContext::GetMasterHostName(void)
     return ret;
 }
 
-void MythContext::ClearSettingsCache(QString myKey, QString newVal)
+void MythContext::ClearSettingsCache(const QString &myKey)
 {
-    d->m_database->ClearSettingsCache(myKey, newVal);
+    d->m_database->ClearSettingsCache(myKey);
 }
 
 void MythContext::ActivateSettingsCache(bool activate)

@@ -114,7 +114,7 @@ class MPUBLIC MythContext : public MythObservable, public MythSocketCBs
 
     QString GetHostName(void);
 
-    void ClearSettingsCache(QString myKey = "", QString newVal = "");
+    void ClearSettingsCache(const QString &myKey = QString(""));
     void ActivateSettingsCache(bool activate = true);
     void OverrideSettingForSession(const QString &key, const QString &newValue);
 

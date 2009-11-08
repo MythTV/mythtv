@@ -1,4 +1,5 @@
 #include <QMutex>
+#include <QReadWriteLock>
 #include <QHash>
 #include <QSqlError>
 
@@ -44,6 +45,7 @@ void DestroyMythDB(void)
     MythDB::destroyMythDB();
 }
 
+typedef QHash<QString,QString> SettingsMap;
 
 class MythDBPrivate
 {
@@ -58,18 +60,21 @@ class MythDBPrivate
     Settings *m_settings;
 
     bool ignoreDatabase;
-    bool useSettingsCache;
     bool suppressDBMessages;
-    QMutex settingsCacheLock;
-    QHash <QString, QString> settingsCache;      // permanent settings in the DB
-    QHash <QString, QString> overriddenSettings; // overridden this session only
+
+    QReadWriteLock settingsCacheLock;
+    volatile bool useSettingsCache;
+    /// Permanent settings in the DB and overridden settings
+    SettingsMap settingsCache;
+    /// Overridden this session only
+    SettingsMap overriddenSettings;
 };
 
 static const int settings_reserve = 61;
 
 MythDBPrivate::MythDBPrivate()
     : m_settings(new Settings()),
-      ignoreDatabase(false), useSettingsCache(false), suppressDBMessages(true)
+      ignoreDatabase(false), suppressDBMessages(true), useSettingsCache(false)
 {
     m_localhostname.clear();
     settingsCache.reserve(settings_reserve);
@@ -174,15 +179,18 @@ void MythDB::SetDatabaseParams(const DatabaseParams &params)
     d->m_DBparams = params;
 }
 
-void MythDB::SetLocalHostname(QString name)
+void MythDB::SetLocalHostname(const QString &name)
 {
-    d->m_localhostname = name;
+    if (d->m_localhostname != name.toLower())
+    {
+        d->m_localhostname = name.toLower();
+        ClearSettingsCache();
+    }
 }
 
 QString MythDB::GetHostName(void)
 {
-    QString tmp = d->m_localhostname;
-    return tmp;
+    return d->m_localhostname;
 }
 
 void MythDB::IgnoreDatabase(bool bIgnore)
@@ -218,16 +226,16 @@ void MythDB::SaveSetting(const QString &key, const QString &newValue)
 }
 
 bool MythDB::SaveSettingOnHost(const QString &key,
-                                    const QString &newValue,
-                                    const QString &host)
+                               const QString &newValue,
+                               const QString &host)
 {
     QString LOC  = QString("SaveSettingOnHost('%1') ").arg(key);
     bool success = false;
 
     if (d->ignoreDatabase)
     {
-        ClearSettingsCache(key, newValue);
-        ClearSettingsCache(host + ' ' + key, newValue);
+        if (host.toLower() == d->m_localhostname)
+            OverrideSettingForSession(key, newValue);
         return true;
     }
 
@@ -284,82 +292,89 @@ bool MythDB::SaveSettingOnHost(const QString &key,
         VERBOSE(VB_IMPORTANT, LOC + "- database not open");
     }
 
-    ClearSettingsCache(key, newValue);
-    ClearSettingsCache(host + ' ' + key, newValue);
+    ClearSettingsCache(host + ' ' + key);
 
     return success;
 }
 
-QString MythDB::GetSetting(const QString &key, const QString &defaultval)
+QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
 {
+    QString key = _key.toLower();
     QString value;
-    
-    if (d->overriddenSettings.contains(key))
+
+    d->settingsCacheLock.lockForRead();
+    if (d->useSettingsCache)
     {
-        value = d->overriddenSettings[key];
-        return value;
+        SettingsMap::const_iterator it = d->settingsCache.find(key);
+        if (it != d->settingsCache.end())
+        {
+            value = *it;
+            d->settingsCacheLock.unlock();
+            return value;
+        }
     }
-    
-    d->settingsCacheLock.lock();
-
-    value = d->settingsCache.value(key, "_cold_");
-
+    else
+    {
+        SettingsMap::const_iterator it = d->overriddenSettings.find(key);
+        if (it != d->overriddenSettings.end())
+        {
+            value = *it;
+            d->settingsCacheLock.unlock();
+            return value;
+        }
+    }
     d->settingsCacheLock.unlock();
 
-    if (value != "_cold_" && d->useSettingsCache)
+    if (d->ignoreDatabase)
         return value;
 
-    bool found = false;
-    if (!d->ignoreDatabase)
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        if (query.isConnected())
+        VERBOSE(VB_IMPORTANT,
+                QString("Database not open while trying to load setting: %1")
+                .arg(key));
+        return d->m_settings->GetSetting(key, defaultval);
+    }
+
+    query.prepare(
+        "SELECT data "
+        "FROM settings "
+        "WHERE value = :KEY AND hostname = :HOSTNAME");
+    query.bindValue(":KEY", key);
+    query.bindValue(":HOSTNAME", d->m_localhostname);
+    
+    if (query.exec() && query.next())
+    {
+        value = query.value(0).toString();
+    }
+    else
+    {
+        query.prepare(
+            "SELECT data "
+            "FROM settings "
+            "WHERE value = :KEY AND hostname IS NULL");
+        query.bindValue(":KEY", key);
+
+        if (query.exec() && query.next())
         {
-            query.prepare("SELECT data FROM settings WHERE value "
-                          "= :KEY AND hostname = :HOSTNAME ;");
-            query.bindValue(":KEY", key);
-            query.bindValue(":HOSTNAME", d->m_localhostname);
-
-            if (query.exec() && query.next())
-            {
-                found = true;
-                value = query.value(0).toString();
-            }
-            else
-            {
-                query.prepare("SELECT data FROM settings "
-                              "WHERE value = :KEY AND "
-                              "hostname IS NULL;");
-                query.bindValue(":KEY", key);
-
-                if (query.exec() && query.next())
-                {
-                    found = true;
-                    value = query.value(0).toString();
-                }
-                else
-                {
-                    value = defaultval;
-                }
-            }
+            value = query.value(0).toString();
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Database not open while trying to "
-                            "load setting: %1")
-                    .arg(key));
+            return d->m_settings->GetSetting(key, defaultval);
         }
     }
 
-    if (!found)
-        return d->m_settings->GetSetting(key, defaultval);
-
-    // Do not store default values since they may not have been specified.
-    if (!value.isNull() && d->useSettingsCache)
+    if (d->useSettingsCache)
     {
-        d->settingsCacheLock.lock();
-        d->settingsCache[key] = value;
+        key.squeeze();
+        value.squeeze();
+        d->settingsCacheLock.lockForWrite();
+        // another thread may have inserted a value into the cache
+        // while we did not have the lock, check first then save
+        if (d->settingsCache.find(key) == d->settingsCache.end())
+            d->settingsCache[key] = value;
         d->settingsCacheLock.unlock();
     }
 
@@ -382,72 +397,69 @@ double MythDB::GetFloatSetting(const QString &key, double defaultval)
     return retval.toDouble();
 }
 
-QString MythDB::GetSettingOnHost(const QString &key, const QString &host,
-                                      const QString &defaultval)
+QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
+                                 const QString &defaultval)
 {
-    bool found = false;
+    QString key   = _key.toLower();
+    QString host  = _host.toLower();
     QString value = defaultval;
     QString myKey = host + ' ' + key;
 
-    if (d->overriddenSettings.contains(myKey))
-    {
-        value = d->overriddenSettings[myKey];
-        return value;
-    }
-
-    if ((host == d->m_localhostname) &&
-        (d->overriddenSettings.contains(key)))
-    {
-
-        value = d->overriddenSettings[key];
-        return value;
-    }
-
+    d->settingsCacheLock.lockForRead();
     if (d->useSettingsCache)
     {
-        d->settingsCacheLock.lock();
-        if (d->settingsCache.contains(myKey))
+        SettingsMap::const_iterator it = d->settingsCache.find(myKey);
+        if (it != d->settingsCache.end())
         {
-            value = d->settingsCache[myKey];
+            value = *it;
             d->settingsCacheLock.unlock();
             return value;
         }
-        d->settingsCacheLock.unlock();
     }
-
-    if (!d->ignoreDatabase)
+    else
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        if (query.isConnected())
+        SettingsMap::const_iterator it = d->overriddenSettings.find(myKey);
+        if (it != d->overriddenSettings.end())
         {
-            query.prepare("SELECT data FROM settings WHERE value = :VALUE "
-                          "AND hostname = :HOSTNAME ;");
-            query.bindValue(":VALUE", key);
-            query.bindValue(":HOSTNAME", host);
-
-            if (query.exec() && query.isActive() && query.size() > 0)
-            {
-                if (query.next())
-                {
-                    value = query.value(0).toString();
-                    found = true;
-                }
-            }
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Database not open while trying to "
-                            "load setting: %1")
-                    .arg(key));
+            value = *it;
+            d->settingsCacheLock.unlock();
+            return value;
         }
     }
+    d->settingsCacheLock.unlock();
 
-    if (found && d->useSettingsCache)
+    if (d->ignoreDatabase)
+        return value;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
     {
-        d->settingsCacheLock.lock();
-        d->settingsCache[host + ' ' + key] = value;
-        d->settingsCacheLock.unlock();
+        VERBOSE(VB_IMPORTANT,
+                QString("Database not open while trying to "
+                        "load setting: %1").arg(key));
+        return value;
+    }
+
+    query.prepare(
+        "SELECT data "
+        "FROM settings "
+        "WHERE value = :VALUE AND hostname = :HOSTNAME");
+    query.bindValue(":VALUE", key);
+    query.bindValue(":HOSTNAME", host);
+
+    if (query.exec() && query.next())
+    {
+        value = query.value(0).toString();
+
+        if (d->useSettingsCache)
+        {
+            myKey.squeeze();
+            value.squeeze();
+            d->settingsCacheLock.lockForWrite();
+            if (d->settingsCache.find(myKey) == d->settingsCache.end())
+                d->settingsCache[myKey] = value;
+            d->settingsCacheLock.unlock();
+        }
     }
 
     return value;
@@ -474,7 +486,7 @@ double MythDB::GetFloatSettingOnHost(
 void MythDB::SetSetting(const QString &key, const QString &newValue)
 {
     d->m_settings->SetSetting(key, newValue);
-    ClearSettingsCache(key, newValue);
+    ClearSettingsCache(key);
 }
 
 void MythDB::GetResolutionSetting(const QString &type,
@@ -550,28 +562,75 @@ void MythDB::GetResolutionSetting(const QString &t, int &w, int &h, int i)
  * This allows defining settings for the session only, without touching the
  * settings in the data base.
  */
-void MythDB::OverrideSettingForSession(const QString &key,
-                                            const QString &value)
+void MythDB::OverrideSettingForSession(
+    const QString &key, const QString &value)
 {
-    d->overriddenSettings[key] = value;
+    QString mk = key.toLower(), mk2 = d->m_localhostname + ' ' + mk, mv = value;
+    mk.squeeze();
+    mk2.squeeze();
+    mv.squeeze();
+
+    d->settingsCacheLock.lockForWrite();
+    d->overriddenSettings[mk] = mv;
+    d->settingsCache[mk]      = mv;
+    d->settingsCache[mk2]     = mv;
+    d->settingsCacheLock.unlock();
 }
 
-void MythDB::ClearSettingsCache(QString myKey, QString newVal)
+static void clear(
+    SettingsMap &cache, SettingsMap &overrides, const QString &myKey)
 {
-    d->settingsCacheLock.lock();
-    if (!myKey.isEmpty() && d->settingsCache.contains(myKey))
+    // Do the actual clearing..
+    SettingsMap::iterator it = cache.find(myKey);
+    if (it != cache.end())
     {
-        VERBOSE(VB_DATABASE, QString("Clearing Settings Cache for '%1'.")
-                                    .arg(myKey));
-        d->settingsCache.remove(myKey);
-        d->settingsCache[myKey] = newVal;
+        SettingsMap::const_iterator oit = overrides.find(myKey);
+        if (oit == overrides.end())
+        {
+            VERBOSE(VB_DATABASE,
+                    QString("Clearing Settings Cache for '%1'.").arg(myKey));
+            cache.erase(it);
+        }
+        else
+        {
+            VERBOSE(VB_DATABASE,
+                    QString("Clearing Cache of overridden '%1' ignored.")
+                    .arg(myKey));
+        }
     }
-    else
+}
+
+void MythDB::ClearSettingsCache(const QString &_key)
+{
+    d->settingsCacheLock.lockForWrite();
+
+    if (_key.isEmpty())
     {
         VERBOSE(VB_DATABASE, "Clearing Settings Cache.");
         d->settingsCache.clear();
         d->settingsCache.reserve(settings_reserve);
+
+        SettingsMap::const_iterator it = d->overriddenSettings.begin();
+        for (; it != d->overriddenSettings.end(); ++it)
+        {
+            QString mk2 = d->m_localhostname + ' ' + it.key();
+            mk2.squeeze();
+
+            d->settingsCache[it.key()] = *it;
+            d->settingsCache[mk2] = *it;
+        }
     }
+    else
+    {
+        QString myKey = _key.toLower();
+        clear(d->settingsCache, d->overriddenSettings, myKey);
+
+        // To be safe always clear any local[ized] version too
+        QStringList mkl = myKey.split(QChar(' '));
+        if (mkl.size() == 2)
+            clear(d->settingsCache, d->overriddenSettings, mkl[1]);        
+    }
+
     d->settingsCacheLock.unlock();
 }
 
@@ -585,4 +644,3 @@ void MythDB::ActivateSettingsCache(bool activate)
     d->useSettingsCache = activate;
     ClearSettingsCache();
 }
-

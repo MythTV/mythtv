@@ -23,7 +23,7 @@ class MPUBLIC MythDB
     DatabaseParams GetDatabaseParams(void);
     void SetDatabaseParams(const DatabaseParams &params);
 
-    void SetLocalHostname(QString name);
+    void SetLocalHostname(const QString &name);
     QString GetHostName(void);
 
     void IgnoreDatabase(bool bIgnore);
@@ -32,7 +32,7 @@ class MPUBLIC MythDB
     void SetSuppressDBMessages(bool bUpgraded);
     bool SuppressDBMessages(void) const;
 
-    void ClearSettingsCache(QString myKey = "", QString newVal = "");
+    void ClearSettingsCache(const QString &key = QString());
     void ActivateSettingsCache(bool activate = true);
     void OverrideSettingForSession(const QString &key, const QString &newValue);
 
