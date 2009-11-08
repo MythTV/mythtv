@@ -3404,8 +3404,7 @@ if $(pkg-config --atleast-version 4.4.0 QtWebKit) ; then
     enable qtwebkit
 else
     # For environments that don't have pkg-config, we do a compile test.
-    # Sadly, this requires some guesses about Qt's install location:
-    qt_inc="-I/usr/local/include/Qt -I/usr/include/Qt -I${prefix}/include/Qt -I${QTDIR}/include"
+    qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
 
     check_cxx ${qt_inc} <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
@@ -3415,7 +3414,7 @@ die
 EOF
 fi
 
-enabled qtwebkit || echo "Warning! QtWebkit headers not found, MythBrowser will not work."
+enabled qtwebkit || die "Error! QtWebkit headers not found"
 
 if enabled firewire; then
     firewire="no"
