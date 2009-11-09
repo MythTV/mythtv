@@ -94,6 +94,7 @@ sub getMovieData {
 
    # get the search results  page
    my $request = "http://www.allocine.fr/film/fichefilm_gen_cfilm=" . $movieid . ".html";
+   my $allocineurl = $request;
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my ($rc, $response) = myth_url_get($request);
    from_to($response,'utf-8','iso-8859-1');
@@ -209,7 +210,8 @@ sub getMovieData {
    print "Title:$title\n";
    if (!(defined $opt_originaltitle)){
     print "OriginalTitle:$original_title\n";
-   }  
+   }
+   print "URL:$allocineurl\n";
    print "Year:$year\n";
    print "Director:$director\n";
    print "Plot:$plot\n";

@@ -109,6 +109,7 @@ sub getMovieData {
 
 	# get the search results  page
 	my $request = "http://www.kinox.ru/index.asp?comm=4&num=" . $movieid;
+        my $kinoxurl = $request;
 	if (defined $opt_d) { printf("# request: '%s'\n", $request); }
 	my ($rc, $response) = myth_url_get($request);
 
@@ -210,6 +211,7 @@ sub getMovieData {
 	if (!(defined $opt_originaltitle)){
 		print "OriginalTitle:$original_title\n";
 	}  
+        print "URL:$kinoxurl\n";
 	print "Year:$year\n";
 	print "Director:$director\n";
 	print "Plot:$plot\n";

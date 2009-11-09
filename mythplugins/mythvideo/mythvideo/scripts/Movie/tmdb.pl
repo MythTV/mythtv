@@ -182,6 +182,7 @@ sub getMovieData {
         my $revenue     = $movie->{revenue};
         my $trailer     = $movie->{trailer}->{content};
         my $homepage    = $movie->{homepage};
+        my $tmdburl     = $movie->{url};
 
         # Country
         my @countrylist =
@@ -259,6 +260,7 @@ sub getMovieData {
         if ($revenue) {print "Revenue: $revenue\n";}
         if ($trailer) {print "trailer: $trailer\n";}
         if ($homepage) {print "Homepage: $homepage\n";}
+        if ($tmdburl) {print "URL: $tmdburl\n";}
         if ($coverart) {print "Coverart: $coverart\n";}
         if ($fanart) {print "Fanart: $fanart\n";}
     }

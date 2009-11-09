@@ -86,6 +86,7 @@ sub getMovieData {
 
    # get the search results  page
    my $request = "http://www.alpacine.com/pelicula/" . $movieid . "/";
+   my $alpacineurl = $request;
    if (defined $opt_d) { printf("# request: '%s'\n", $request); }
    my $ua = LWP::UserAgent->new;
    $ua->timeout(10);
@@ -208,6 +209,7 @@ sub getMovieData {
    }
 
    print "Plot:$plot\n";
+   print "URL:$alpacineurl\n";
    print "UserRating:$userrating\n";
    print "MovieRating:$movierating\n";
    print "Runtime:$runtime\n";
