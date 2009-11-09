@@ -103,16 +103,16 @@ bool MythNews::Create(void)
     bool err = false;
     UIUtilE::Assign(this, m_sitesList, "siteslist", &err);
     UIUtilE::Assign(this, m_articlesList, "articleslist", &err);
-
-    UIUtilW::Assign(this, m_nositesText, "nosites", &err);
-    UIUtilE::Assign(this, m_updatedText, "updated", &err);
     UIUtilE::Assign(this, m_titleText, "title", &err);
     UIUtilE::Assign(this, m_descText, "description", &err);
 
-    UIUtilE::Assign(this, m_thumbnailImage, "thumbnail", &err);
-    UIUtilE::Assign(this, m_enclosureImage, "enclosures", &err);
-    UIUtilE::Assign(this, m_downloadImage, "download", &err);
-    UIUtilE::Assign(this, m_podcastImage, "ispodcast", &err);
+    // these are all optional
+    UIUtilW::Assign(this, m_nositesText, "nosites", &err);
+    UIUtilW::Assign(this, m_updatedText, "updated", &err);
+    UIUtilW::Assign(this, m_thumbnailImage, "thumbnail", &err);
+    UIUtilW::Assign(this, m_enclosureImage, "enclosures", &err);
+    UIUtilW::Assign(this, m_downloadImage, "download", &err);
+    UIUtilW::Assign(this, m_podcastImage, "ispodcast", &err);
 
     if (err)
     {
@@ -156,12 +156,19 @@ void MythNews::clearSites(void)
 
     m_titleText->SetText("");
     m_descText->SetText("");
+
     if (m_updatedText)
         m_updatedText->SetText("");
 
-    m_downloadImage->Hide();
-    m_enclosureImage->Hide();
-    m_podcastImage->Hide();
+    if (m_downloadImage)
+        m_downloadImage->Hide();
+
+    if (m_enclosureImage)
+        m_enclosureImage->Hide();
+
+    if (m_podcastImage)
+        m_podcastImage->Hide();
+
     if (m_thumbnailImage)
         m_thumbnailImage->Hide();
 }
@@ -352,30 +359,42 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
                 }
             }
 
-            if (!article.enclosure().isEmpty())
+            if (m_downloadImage)
             {
-                if (!m_downloadImage->IsVisible())
-                    m_downloadImage->Show();
+                if (!article.enclosure().isEmpty())
+                {
+                    if (!m_downloadImage->IsVisible())
+                        m_downloadImage->Show();
+                }
+                else
+                    m_downloadImage->Hide();
             }
-            else
-                m_downloadImage->Hide();
 
-            if (!article.enclosure().isEmpty())
+            if (m_enclosureImage)
             {
-                if (!m_enclosureImage->IsVisible())
-                    m_enclosureImage->Show();
+                if (!article.enclosure().isEmpty())
+                {
+                    if (!m_enclosureImage->IsVisible())
+                        m_enclosureImage->Show();
+                }
+                else
+                    m_enclosureImage->Hide();
             }
-            else
-                m_enclosureImage->Hide();
 
-            m_podcastImage->Hide();
+            if (m_podcastImage)
+                m_podcastImage->Hide();
         }
     }
     else
     {
-        m_downloadImage->Hide();
-        m_enclosureImage->Hide();
-        m_podcastImage->Hide();
+        if (m_downloadImage)
+            m_downloadImage->Hide();
+
+        if (m_enclosureImage)
+            m_enclosureImage->Hide();
+
+        if (m_podcastImage)
+            m_podcastImage->Hide();
 
         if (site)
         {
@@ -388,7 +407,7 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             if (m_thumbnailImage && m_thumbnailImage->IsVisible())
                 m_thumbnailImage->Hide();
 
-            if (site->podcast() == 1)
+            if (m_podcastImage && site->podcast() == 1)
                 m_podcastImage->Show();
 
             if (!site->imageURL().isEmpty())
@@ -715,7 +734,8 @@ bool MythNews::getHttpFile(QString sFilename, QString cmdURL)
                         .arg(formatSize(progress, 2))
                         .arg(formatSize(total, 2))
                         .arg(floor(fProgress*100));
-                m_updatedText->SetText(text);
+                if (m_updatedText)
+                    m_updatedText->SetText(text);
             }
             qApp->processEvents();
             usleep(100000);
