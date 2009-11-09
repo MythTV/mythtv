@@ -63,7 +63,7 @@ class MPUBLIC TVOSDMenuEntryList
         TVOSDMenuEntry* FindEntry(QString category);
 
     private:
-        void GetEntriesFromDB(void);
+        int GetEntriesFromDB(void);
         void InitDefaultEntries(void);
 
         QList<TVOSDMenuEntry*> curMenuEntries;

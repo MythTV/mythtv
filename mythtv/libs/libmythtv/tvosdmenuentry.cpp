@@ -240,54 +240,67 @@ void TVOSDMenuEntryList::InitDefaultEntries(void)
     curMenuEntries.append(new TVOSDMenuEntry(
         "SLEEP",              1,  1,  1,  1, "Sleep"));
 
-    GetEntriesFromDB();
-    if (GetCount() != curMenuEntries.count())
+    int preload_cnt = curMenuEntries.size();
+    int loaded_cnt  = GetEntriesFromDB();
+    if (preload_cnt != loaded_cnt)
         UpdateDB();
 }
 
 int TVOSDMenuEntryList::GetCount(void)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (!query.isConnected())
-        return curMenuEntries.count();
-
-    query.prepare ("SELECT COUNT(osdcategory) FROM tvosdmenu;");
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-        return query.value(0).toUInt();
-    }
-
-    MythDB::DBError(LOC + "GetCount()", query);
-    return 0;
+    return (int) curMenuEntries.size();
 }
 
-void TVOSDMenuEntryList::GetEntriesFromDB(void)
+// Returns the number of entries intialized from database.
+int TVOSDMenuEntryList::GetEntriesFromDB(void)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (!query.isConnected())
-        return;
-
-    TVOSDMenuEntry *entry = NULL;
-    QString osdcategory;
-    QListIterator<TVOSDMenuEntry *> cm = GetIterator();
-    while (cm.hasNext())
+    typedef QList<TVOSDMenuEntry*>::iterator Lit;
+    QMap<QString,Lit> catmap;
+    Lit it = curMenuEntries.begin();
+    QString catlist("");
+    for (; it != curMenuEntries.end(); ++it)
     {
-        entry = cm.next();
-        osdcategory = entry->GetCategory();
-        query.prepare("SELECT livetv, recorded, video, dvd "
-                    "FROM tvosdmenu WHERE osdcategory = :OSDCATEGORY;");
-        query.bindValue(":OSDCATEGORY", osdcategory);
-
-        if (query.exec() && query.isActive() && query.size() == 1)
-        {
-            query.next();
-            entry->UpdateEntry(query.value(0).toInt(),
-                               query.value(1).toInt(),
-                               query.value(2).toInt(),
-                               query.value(3).toInt());
-        }
+        QString cat = (*it)->GetCategory();
+        catlist += QString("'%1',").arg(cat);
+        catmap[cat] = it;
     }
+
+    if (catlist.isEmpty())
+        return 0;
+
+    catlist = catlist.left(catlist.length() - 1);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString(
+            "SELECT osdcategory, livetv, recorded, video, dvd "
+            "FROM tvosdmenu "
+            "WHERE osdcategory IN (%1)").arg(catlist));
+
+    if (!query.exec())
+    {
+        MythDB::DBError("TVOSDMenuEntryList::GetEntriesFromDB()", query);
+        return 0;
+    }
+
+    int cnt = 0;
+    while (query.next())
+    {
+        QString cat = query.value(0).toString();
+        QMap<QString,Lit>::iterator mit = catmap.find(cat);
+        if (mit == catmap.end())
+        {
+            VERBOSE(VB_IMPORTANT, QString("TVOSDMenuEntryList, Error: ") +
+                    QString("Unable to find category '%1'").arg(cat));
+            continue;
+        }
+
+        (**mit)->UpdateEntry(query.value(1).toInt(),
+                             query.value(2).toInt(),
+                             query.value(3).toInt(),
+                             query.value(4).toInt());
+        cnt++;
+    }
+    return cnt;
 }
 
 void TVOSDMenuEntryList::UpdateDB(void)
