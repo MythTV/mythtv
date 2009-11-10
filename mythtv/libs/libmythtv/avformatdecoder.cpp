@@ -536,6 +536,7 @@ AvFormatDecoder::~AvFormatDecoder()
         lcd->setVideoFormatLEDs(VIDEO_MPG, false);
         lcd->setVariousLEDs(VARIOUS_HDTV, false);
         lcd->setVariousLEDs(VARIOUS_SPDIF, false);
+        lcd->setSpeakerLEDs(SPEAKER_71, false);    // should clear any and all speaker LEDs
     }
 }
 
@@ -4478,7 +4479,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
 
         lcd->setAudioFormatLEDs(audio_format, true);
 
-        if (using_passthru)
+        if (audioOut.do_passthru)
             lcd->setVariousLEDs(VARIOUS_SPDIF, true);
         else
             lcd->setVariousLEDs(VARIOUS_SPDIF, false);
