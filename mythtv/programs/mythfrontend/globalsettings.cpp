@@ -3636,17 +3636,6 @@ static HostComboBox *ISO639PreferredLanguage(uint i)
     return gc;
 }
 
-static HostCheckBox *EnableXbox()
-{
-    HostCheckBox *gc = new HostCheckBox("EnableXbox");
-    gc->setLabel(QObject::tr("Enable Xbox Hardware"));
-    gc->setHelpText(QObject::tr("This enables support for Xbox specific "
-                    "hardware. Requires a frontend restart for changes to "
-                    "take effect."));
-    gc->setValue(false);
-    return gc;
-}
-
 static HostCheckBox *NetworkControlEnabled()
 {
     HostCheckBox *gc = new HostCheckBox("NetworkControlEnabled");
@@ -3677,66 +3666,6 @@ static HostCheckBox *RealtimePriority()
                     "playback."));
     gc->setValue(true);
     return gc;
-}
-
-static HostComboBox *XboxBlinkBIN()
-{
-    HostComboBox *gc = new HostComboBox("XboxBlinkBIN");
-    gc->setLabel(QObject::tr("Xbox Linux Distribution"));
-    gc->addSelection("GentooX","led");
-    gc->addSelection(QObject::tr("Other"),"blink");
-    gc->setHelpText(QObject::tr("The program used to control the "
-                    "LED on the Xbox is dependant on which distribution is "
-                    "installed. \"led\" will be used on GentooX, \"blink\" "
-                    "on other Xbox distributions."));
-    return gc;
-}
-
-static HostComboBox *XboxLEDDefault()
-{
-    HostComboBox *gc = new HostComboBox("XboxLEDDefault");
-    gc->setLabel(QObject::tr("Default LED color"));
-    gc->addSelection(QObject::tr("Off"), "nnnn");
-    gc->addSelection(QObject::tr("Green"),"gggg");
-    gc->addSelection(QObject::tr("Orange"),"oooo");
-    gc->addSelection(QObject::tr("Red"),"rrrr");
-    gc->setHelpText(QObject::tr("Sets the LED color when it is not "
-                    "being used for status indication."));
-    return gc;
-}
-
-static HostComboBox *XboxLEDRecording()
-{
-    HostComboBox *gc = new HostComboBox("XboxLEDRecording");
-    gc->setLabel(QObject::tr("Recording LED mode"));
-    gc->addSelection(QObject::tr("Off"), "nnnn");
-    gc->addSelection(QObject::tr("Green"),"gggg");
-    gc->addSelection(QObject::tr("Orange"),"oooo");
-    gc->addSelection(QObject::tr("Red"),"rrrr");
-    gc->setHelpText(QObject::tr("Sets the LED color when a backend is "
-                    "recording."));
-    return gc;
-}
-
-static HostCheckBox *XboxLEDNonLiveTV()
-{
-    HostCheckBox *gc = new HostCheckBox("XboxLEDNonLiveTV");
-    gc->setLabel(QObject::tr("Ignore LiveTV Recordings"));
-    gc->setHelpText(QObject::tr("Recording monitoring will "
-                    "ignore LiveTV recordings."));
-    gc->setValue(false);
-    return gc;
-}
-
-static HostSpinBox *XboxCheckRec()
-{
-    HostSpinBox *gs = new HostSpinBox("XboxCheckRec", 1, 600, 2);
-    gs->setLabel(QObject::tr("Recording Check Frequency"));
-    gs->setValue(5);
-    gs->setHelpText(QObject::tr("This specifies how frequently "
-                    "(in seconds) to check if a recording is in "
-                    "progress in order to update the Xbox LED."));
-    return gs;
 }
 
 static HostCheckBox *EnableMediaMon()
@@ -4491,7 +4420,6 @@ MainGeneralSettings::MainGeneralSettings()
         new VerticalConfigurationGroup(false, true, false, false);
     general->setLabel(QObject::tr("General"));
     general->addChild(UseArrowAccels());
-    general->addChild(EnableXbox());
     general->addChild(ScreenShotPath());
     addChild(general);
 
@@ -4949,19 +4877,6 @@ AppearanceSettings::AppearanceSettings()
     addChild(qttheme );
 
     addChild(new LcdSettings());
-}
-
-XboxSettings::XboxSettings()
-{
-    VerticalConfigurationGroup* xboxset = new VerticalConfigurationGroup(false);
-
-    xboxset->setLabel(QObject::tr("Xbox"));
-    xboxset->addChild(XboxBlinkBIN());
-    xboxset->addChild(XboxLEDDefault());
-    xboxset->addChild(XboxLEDRecording());
-    xboxset->addChild(XboxLEDNonLiveTV());
-    xboxset->addChild(XboxCheckRec());
-    addChild(xboxset);
 }
 
 // vim:set sw=4 ts=4 expandtab:

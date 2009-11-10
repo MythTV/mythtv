@@ -47,7 +47,6 @@ using namespace std;
 #include "guidegrid.h"
 #include "mythplugin.h"
 #include "remoteutil.h"
-#include "xbox.h"
 #include "dbcheck.h"
 #include "mythmediamonitor.h"
 #include "statusbox.h"
@@ -73,7 +72,6 @@ static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
 static MythThemeBase  *themeBase = NULL;
 
-static XBox           *xbox      = NULL;
 static QString         logfile;
 static MediaRenderer  *g_pUPnp   = NULL;
 
@@ -567,13 +565,6 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "settings custompriority")
     {
         startCustomPriority();
-    }
-    else if (xbox && sel == "settings xboxsettings")
-    {
-        XboxSettings settings;
-        settings.exec();
-
-        xbox->GetSettings();
     }
     else if (sel == "tv_status")
         showStatus();
@@ -1433,14 +1424,6 @@ int main(int argc, char **argv)
 
     MythPluginManager *pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);
-
-    if (gContext->GetNumSetting("EnableXbox") == 1)
-    {
-        xbox = new XBox();
-        xbox->GetSettings();
-    }
-    else
-        xbox = NULL;
 
     if (pluginname.size())
     {

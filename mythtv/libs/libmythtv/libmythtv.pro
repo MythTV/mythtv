@@ -238,10 +238,6 @@ using_frontend {
     HEADERS += profilegroup.h
     SOURCES += profilegroup.cpp
 
-    # XBox LED control
-    HEADERS += xbox.h
-    SOURCES += xbox.cpp
-
     # Video playback
     HEADERS += tv_play.h                NuppelVideoPlayer.h
     HEADERS += DVDRingBuffer.h          playercontext.h
