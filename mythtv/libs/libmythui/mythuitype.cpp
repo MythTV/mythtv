@@ -570,9 +570,6 @@ void MythUIType::customEvent(QEvent *)
 
 bool MythUIType::gestureEvent(MythGestureEvent *ge)
 {
-    if (m_Parent)
-        return m_Parent->gestureEvent(ge);
-
     return false;
 }
 
