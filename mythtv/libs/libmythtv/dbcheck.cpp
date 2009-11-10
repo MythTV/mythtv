@@ -3,7 +3,6 @@ using namespace std;
 
 #include <QString>
 #include <QSqlError>
-
 #include "dbcheck.h"
 #include "datadirect.h"          // for DataDirectProcessor::FixProgramIDs
 #include "videodisplayprofile.h" // for "1214"
@@ -18,7 +17,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1244";
+const QString currentDatabaseVersion = "1245";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -4905,19 +4904,16 @@ NULL
             return false;
     }
 
-if (0) // apply at or near 0.22 release..
-{
-    if (dbver == "XXXX")
+    if (dbver == "1244")
     {
        const char *updates[] = {
 "ALTER TABLE cardinput DROP COLUMN freetoaironly;",
 "ALTER TABLE cardinput DROP COLUMN radioservices;",
 NULL
 };
-        if (!performActualUpdate(updates, "YYYY", dbver))
+        if (!performActualUpdate(updates, "1245", dbver))
             return false;
     }
-}
 
     return true;
 }
