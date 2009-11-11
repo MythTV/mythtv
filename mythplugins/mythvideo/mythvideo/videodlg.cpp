@@ -4234,7 +4234,7 @@ void VideoDialog::ResetMetadata()
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_artDir), cover_file,
                         metadata->GetTitle(), metadata->GetSeason(),
-                        metadata->GetHost(), "Coverart"))
+                        metadata->GetHost(), "Coverart", metadata->GetEpisode()))
         {
             metadata->SetCoverFile(cover_file);
         }
@@ -4253,7 +4253,7 @@ void VideoDialog::ResetMetadata()
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_fanDir), fanart_file,
                         metadata->GetTitle(), metadata->GetSeason(),
-                        metadata->GetHost(), "Fanart"))
+                        metadata->GetHost(), "Fanart", metadata->GetEpisode()))
         {
             metadata->SetFanart(fanart_file);
         }
@@ -4262,7 +4262,7 @@ void VideoDialog::ResetMetadata()
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                         QStringList(m_d->m_banDir), banner_file,
                         metadata->GetTitle(), metadata->GetSeason(),
-                        metadata->GetHost(), "Banners"))
+                        metadata->GetHost(), "Banners", metadata->GetEpisode()))
         {
             metadata->SetBanner(banner_file);
         }
