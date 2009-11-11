@@ -965,7 +965,7 @@ class Program(object):
 		string += BACKEND_SEP + self.seriesid
 		string += BACKEND_SEP + self.programid
 		string += BACKEND_SEP + self.lastmodified
-		string += BACKEND_SEP + locale.format("%0.6f" %self.stars)
+		string += BACKEND_SEP + locale.format("%0.6f", self.stars)
 		string += BACKEND_SEP + self.airdate
 		string += BACKEND_SEP + str(self.hasairdate)
 		string += BACKEND_SEP + self.playgroup
