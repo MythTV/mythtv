@@ -221,7 +221,7 @@ static bool is_subtitle_possible(const QString &extension)
 static QString local_sub_filename(QFileInfo &fileInfo)
 {
     // Subtitle handling
-    QString vidFileName = fileInfo.baseName();
+    QString vidFileName = fileInfo.fileName();
     QString dirName = fileInfo.absolutePath();
 
     QString baseName = vidFileName;
