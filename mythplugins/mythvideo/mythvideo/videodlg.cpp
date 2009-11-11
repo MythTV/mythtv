@@ -4292,7 +4292,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 cover_dirs, cover_file, metadata->GetTitle(),
                                 metadata->GetSeason(), metadata->GetHost(),
-                                "Coverart"))
+                                "Coverart", metadata->GetEpisode()))
         {
             metadata->SetCoverFile(cover_file);
             OnVideoImageSetDone(metadata);
@@ -4318,7 +4318,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 fanart_dirs, fanart_file, metadata->GetTitle(),
                                 metadata->GetSeason(), metadata->GetHost(),
-                                "Fanart"))
+                                "Fanart", metadata->GetEpisode()))
         {
             metadata->SetFanart(fanart_file);
             OnVideoImageSetDone(metadata);
@@ -4344,7 +4344,7 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata)
         if (GetLocalVideoImage(metadata->GetInetRef(), metadata->GetFilename(),
                                 banner_dirs, banner_file, metadata->GetTitle(),
                                 metadata->GetSeason(), metadata->GetHost(),
-                                "Banners"))
+                                "Banners", metadata->GetEpisode()))
         {
             metadata->SetBanner(banner_file);
             OnVideoImageSetDone(metadata);
@@ -4460,6 +4460,10 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
                 else
                     title = QString("%1 Season %2_%3").arg(metadata->GetTitle())
                             .arg(season).arg(suffix);
+
+                title.replace("?", "");
+                title.replace(",", " ");
+
                 if (!host.isEmpty())
                 {
                     QString combFileName = QString("%1.%2").arg(title)
