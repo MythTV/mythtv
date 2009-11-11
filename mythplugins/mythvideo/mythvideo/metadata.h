@@ -59,7 +59,9 @@ class Metadata
              const QString &title = QString(),
              const QString &subtitle = QString(),
              int year = VIDEO_YEAR_DEFAULT,
+             const QDate &releasedate = QDate(),
              const QString &inetref = QString(),
+             const QString &homepage = QString(),
              const QString &director = QString(),
              const QString &plot = QString(),
              float userrating = 0.0,
@@ -102,8 +104,14 @@ class Metadata
     int GetYear() const;
     void SetYear(int year);
 
+    QDate GetReleaseDate() const;
+    void SetReleaseDate(QDate releasedate);
+
     const QString &GetInetRef() const;
     void SetInetRef(const QString &inetRef);
+
+    const QString &GetHomepage() const;
+    void SetHomepage(const QString &homepage);
 
     const QString &GetDirector() const;
     void SetDirector(const QString &director);

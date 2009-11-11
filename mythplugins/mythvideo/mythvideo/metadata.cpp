@@ -94,8 +94,8 @@ class MetadataImp
     MetadataImp(const QString &filename, const QString &trailer, const QString &coverfile,
              const QString &screenshot, const QString &banner, const QString &fanart,
              const QString &title, const QString &subtitle, int year,
-             const QString &inetref, const QString &director,
-             const QString &plot, float userrating,
+             const QDate &releasedate, const QString &inetref, const QString &homepage,
+             const QString &director, const QString &plot, float userrating,
              const QString &rating, int length,
              int season, int episode, const QDate &insertdate,
              int id, ParentalLevel::Level showlevel, int categoryID,
@@ -106,13 +106,13 @@ class MetadataImp
              const cast_list &cast,
              const QString &host = "") :
         m_title(title), m_subtitle(subtitle),
-        m_inetref(inetref), m_director(director), m_plot(plot),
+        m_inetref(inetref), m_homepage(homepage), m_director(director), m_plot(plot),
         m_rating(rating), m_playcommand(playcommand), m_category(category),
         m_genres(genres), m_countries(countries), m_cast(cast),
         m_filename(filename), m_trailer(trailer), m_coverfile(coverfile),
         m_screenshot(screenshot), m_banner(banner), m_fanart(fanart),
         m_host(host), m_categoryID(categoryID), m_childID(childID),
-        m_year(year), m_length(length), m_season(season),
+        m_year(year), m_releasedate(releasedate), m_length(length), m_season(season),
         m_episode(episode), m_insertdate(insertdate), m_showlevel(showlevel),
         m_browse(browse), m_watched(watched), m_id(id), 
         m_userrating(userrating)
@@ -137,6 +137,7 @@ class MetadataImp
             m_title = rhs.m_title;
             m_subtitle = rhs.m_subtitle;
             m_inetref = rhs.m_inetref;
+            m_homepage = rhs.m_homepage;
             m_director = rhs.m_director;
             m_plot = rhs.m_plot;
             m_rating = rhs.m_rating;
@@ -155,6 +156,7 @@ class MetadataImp
             m_categoryID = rhs.m_categoryID;
             m_childID = rhs.m_childID;
             m_year = rhs.m_year;
+            m_releasedate = rhs.m_releasedate;
             m_length = rhs.m_length;
             m_season = rhs.m_season;
             m_episode = rhs.m_episode;
@@ -197,6 +199,9 @@ class MetadataImp
 
     const QString &GetInetRef() const { return m_inetref; }
     void SetInetRef(const QString &inetRef) { m_inetref = inetRef; }
+
+    const QString &GetHomepage() const { return m_homepage; }
+    void SetHomepage(const QString &homepage) { m_homepage = homepage; }
 
     const QString &getDirector() const { return m_director; }
     void SetDirector(const QString &director) { m_director = director; }
@@ -261,6 +266,9 @@ class MetadataImp
     int getYear() const { return m_year; }
     void SetYear(int year) { m_year = year; }
 
+    QDate getReleaseDate() const { return m_releasedate; }
+    void SetReleaseDate(QDate releasedate) { m_releasedate = releasedate; } 
+
     int GetLength() const { return m_length; }
     void SetLength(int length) { m_length = length; }
 
@@ -318,6 +326,7 @@ class MetadataImp
     QString m_title;
     QString m_subtitle;
     QString m_inetref;
+    QString m_homepage;
     QString m_director;
     QString m_plot;
     QString m_rating;
@@ -337,6 +346,7 @@ class MetadataImp
     int m_categoryID;
     int m_childID;
     int m_year;
+    QDate m_releasedate;
     int m_length;
     int m_season;
     int m_episode;
@@ -426,7 +436,7 @@ void MetadataImp::Reset()
                     VIDEO_SCREENSHOT_DEFAULT, VIDEO_BANNER_DEFAULT,
                     VIDEO_FANART_DEFAULT, Metadata::FilenameToMeta(m_filename, 1),
                     Metadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT, 
-                    VIDEO_INETREF_DEFAULT, VIDEO_DIRECTOR_DEFAULT, 
+                    QDate(), VIDEO_INETREF_DEFAULT, QString(), VIDEO_DIRECTOR_DEFAULT, 
                     VIDEO_PLOT_DEFAULT, 0.0,
                     VIDEO_RATING_DEFAULT, 0, 
                     Metadata::FilenameToMeta(m_filename, 2).toInt(), 
@@ -509,31 +519,33 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_plot = query.value(2).toString();
     m_rating = query.value(3).toString();
     m_year = query.value(4).toInt();
-    m_userrating = (float)query.value(5).toDouble();
+    m_releasedate = query.value(5).toDate();
+    m_userrating = (float)query.value(6).toDouble();
     if (isnan(m_userrating) || m_userrating < 0)
         m_userrating = 0.0;
     if (m_userrating > 10.0)
         m_userrating = 10.0;
-    m_length = query.value(6).toInt();
-    m_filename = query.value(7).toString();
-    m_showlevel = ParentalLevel(query.value(8).toInt()).GetLevel();
-    m_coverfile = query.value(9).toString();
-    m_inetref = query.value(10).toString();
-    m_childID = query.value(11).toUInt();
-    m_browse = query.value(12).toBool();
-    m_watched = query.value(13).toBool();
-    m_playcommand = query.value(14).toString();
-    m_categoryID = query.value(15).toInt();
-    m_id = query.value(16).toInt();
-    m_trailer = query.value(17).toString();
-    m_screenshot = query.value(18).toString();
-    m_banner = query.value(19).toString();
-    m_fanart = query.value(20).toString();
-    m_subtitle = query.value(21).toString();
-    m_season = query.value(22).toInt();
-    m_episode = query.value(23).toInt();
-    m_host = query.value(24).toString();
-    m_insertdate = query.value(25).toDate();
+    m_length = query.value(7).toInt();
+    m_filename = query.value(8).toString();
+    m_showlevel = ParentalLevel(query.value(9).toInt()).GetLevel();
+    m_coverfile = query.value(10).toString();
+    m_inetref = query.value(11).toString();
+    m_homepage = query.value(12).toString();
+    m_childID = query.value(13).toUInt();
+    m_browse = query.value(14).toBool();
+    m_watched = query.value(15).toBool();
+    m_playcommand = query.value(16).toString();
+    m_categoryID = query.value(17).toInt();
+    m_id = query.value(18).toInt();
+    m_trailer = query.value(19).toString();
+    m_screenshot = query.value(20).toString();
+    m_banner = query.value(21).toString();
+    m_fanart = query.value(22).toString();
+    m_subtitle = query.value(23).toString();
+    m_season = query.value(24).toInt();
+    m_episode = query.value(25).toInt();
+    m_host = query.value(26).toString();
+    m_insertdate = query.value(27).toDate();
 
     VideoCategory::GetCategory().get(m_categoryID, m_category);
 
@@ -575,6 +587,8 @@ void MetadataImp::saveToDatabase()
         m_userrating = 0.0;
     if (m_userrating < -10.0 || m_userrating > 10.0)
         m_userrating = 0.0;
+    if (m_releasedate.toString().isEmpty())
+        m_releasedate = QDate::fromString("0000-00-00", "YYYY-MM-DD");
 
     bool inserting = m_id == 0;
 
@@ -588,25 +602,25 @@ void MetadataImp::saveToDatabase()
 
         query.prepare("INSERT INTO videometadata (title,subtitle,director,plot,"
                       "rating,year,userrating,length,season,episode,filename,"
-                      "showlevel,coverfile,inetref,browse,watched,trailer,"
+                      "showlevel,coverfile,inetref,homepage,browse,watched,trailer,"
                       "screenshot,banner,fanart,host) VALUES (:TITLE, :SUBTITLE, "
-                      ":DIRECTOR, :PLOT, :RATING, :YEAR, :USERRATING, :LENGTH, "
-                      ":SEASON, :EPISODE, :FILENAME, :SHOWLEVEL, :COVERFILE, "
-                      ":INETREF, :BROWSE, :WATCHED, :TRAILER, :SCREENSHOT, "
+                      ":DIRECTOR, :PLOT, :RATING, :YEAR, :USERRATING, "
+                      ":LENGTH, :SEASON, :EPISODE, :FILENAME, :SHOWLEVEL, :COVERFILE, "
+                      ":INETREF, :HOMEPAGE, :BROWSE, :WATCHED, :TRAILER, :SCREENSHOT, "
                       ":BANNER, :FANART, :HOST)");
     }
     else
     {
         query.prepare("UPDATE videometadata SET title = :TITLE, subtitle = :SUBTITLE, "
                       "director = :DIRECTOR, plot = :PLOT, rating= :RATING, "
-                      "year = :YEAR, userrating = :USERRATING, "
+                      "year = :YEAR, releasedate = :RELEASEDATE, userrating = :USERRATING, "
                       "length = :LENGTH, season = :SEASON, episode = :EPISODE, "
                       "filename = :FILENAME, trailer = :TRAILER, "
                       "showlevel = :SHOWLEVEL, coverfile = :COVERFILE, "
                       "screenshot = :SCREENSHOT, banner = :BANNER, fanart = :FANART, "
-                      "inetref = :INETREF, browse = :BROWSE, watched = :WATCHED, "
-                      "host = :HOST, playcommand = :PLAYCOMMAND, childid = :CHILDID, "
-                      "category = :CATEGORY WHERE intid = :INTID");
+                      "inetref = :INETREF, homepage = :HOMEPAGE, browse = :BROWSE, "
+                      "watched = :WATCHED, host = :HOST, playcommand = :PLAYCOMMAND, "
+                      "childid = :CHILDID, category = :CATEGORY WHERE intid = :INTID");
 
         query.bindValue(":PLAYCOMMAND", m_playcommand);
         query.bindValue(":CHILDID", m_childID);
@@ -620,6 +634,7 @@ void MetadataImp::saveToDatabase()
     query.bindValue(":PLOT", m_plot);
     query.bindValue(":RATING", m_rating);
     query.bindValue(":YEAR", m_year);
+    query.bindValue(":RELEASEDATE", m_releasedate);
     query.bindValue(":USERRATING", m_userrating);
     query.bindValue(":LENGTH", m_length);
     query.bindValue(":SEASON", m_season);
@@ -632,6 +647,7 @@ void MetadataImp::saveToDatabase()
     query.bindValue(":BANNER", m_banner);
     query.bindValue(":FANART", m_fanart);
     query.bindValue(":INETREF", m_inetref);
+    query.bindValue(":HOMEPAGE", m_homepage);
     query.bindValue(":BROWSE", m_browse);
     query.bindValue(":WATCHED", m_watched);
     query.bindValue(":HOST", m_host);
@@ -955,10 +971,10 @@ Metadata::Metadata(const QString &filename, const QString &trailer,
              const QString &coverfile, const QString &screenshot, 
              const QString &banner, const QString &fanart, 
              const QString &title, const QString &subtitle, int year,
-             const QString &inetref, const QString &director,
-             const QString &plot, float userrating,
-             const QString &rating, int length,
-             int season, int episode, const QDate &insertdate,
+             const QDate &releasedate, const QString &inetref,
+             const QString &homepage, const QString &director,
+             const QString &plot, float userrating, const QString &rating,
+             int length, int season, int episode, const QDate &insertdate,
              int id, ParentalLevel::Level showlevel, int categoryID,
              int childID, bool browse, bool watched,
              const QString &playcommand, const QString &category,
@@ -968,9 +984,9 @@ Metadata::Metadata(const QString &filename, const QString &trailer,
              const QString &host)
 {
     m_imp = new MetadataImp(filename, trailer, coverfile, screenshot, banner,
-                            fanart, title, subtitle, year, inetref, director, plot,
-                            userrating, rating, length, season, episode, insertdate, id, 
-                            showlevel, categoryID, childID, browse, watched, 
+                            fanart, title, subtitle, year, releasedate, inetref, homepage,
+                            director, plot, userrating, rating, length, season, episode,
+                            insertdate, id, showlevel, categoryID, childID, browse, watched, 
                             playcommand, category, genres, countries, cast, host);
 }
 
@@ -1054,6 +1070,16 @@ void Metadata::SetYear(int year)
     m_imp->SetYear(year);
 }
 
+QDate Metadata::GetReleaseDate() const
+{
+    return m_imp->getReleaseDate();
+}
+             
+void Metadata::SetReleaseDate(QDate releasedate)
+{
+    m_imp->SetReleaseDate(releasedate);
+}
+
 const QString &Metadata::GetInetRef() const
 {
     return m_imp->GetInetRef();
@@ -1062,6 +1088,16 @@ const QString &Metadata::GetInetRef() const
 void Metadata::SetInetRef(const QString &inetRef)
 {
     m_imp->SetInetRef(inetRef);
+}
+
+const QString &Metadata::GetHomepage() const
+{
+    return m_imp->GetHomepage();
+}
+
+void Metadata::SetHomepage(const QString &homepage)
+{
+    m_imp->SetHomepage(homepage);
 }
 
 const QString &Metadata::GetDirector() const

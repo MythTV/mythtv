@@ -116,6 +116,7 @@ class VideoDialog : public MythScreenType
 
     void ViewPlot();
     void ShowCastDialog();
+    void ShowHomepage();
     bool DoItemDetailShow();
 
     void OnParentalChange(int amount);

@@ -28,11 +28,11 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         const MetadataListManager &cache) : MythScreenType(lparent, lname),
     m_origMetadata(source_metadata), m_titleEdit(0), m_subtitleEdit(0),
     m_playerEdit(0), m_ratingEdit(0), m_directorEdit(0), m_inetrefEdit(0),
-    m_plotEdit(0), m_seasonSpin(0), m_episodeSpin(0), m_yearSpin(0),
-    m_userRatingSpin(0), m_lengthSpin(0), m_categoryList(0), m_levelList(0),
-    m_childList(0), m_browseCheck(0), m_watchedCheck(0), m_coverartButton(0), 
-    m_coverartText(0), m_screenshotButton(0), m_screenshotText(0),
-    m_bannerButton(0), m_bannerText(0),
+    m_homepageEdit(0), m_plotEdit(0), m_seasonSpin(0), m_episodeSpin(0),
+    m_yearSpin(0), m_userRatingSpin(0), m_lengthSpin(0), m_categoryList(0),
+    m_levelList(0), m_childList(0), m_browseCheck(0), m_watchedCheck(0),
+    m_coverartButton(0), m_coverartText(0), m_screenshotButton(0),
+    m_screenshotText(0), m_bannerButton(0), m_bannerText(0),
     m_fanartButton(0), m_fanartText(0),
     m_trailerButton(0), m_trailerText(0),
     m_coverart(0), m_screenshot(0),
@@ -88,11 +88,10 @@ bool EditMetadataDialog::Create()
         return false;
     }
 
-    // FIXME: Make the following widgets non-optional once 
-    //        defaults have made the switch.
     UIUtilW::Assign(this, m_ratingEdit, "rating_edit");
     UIUtilW::Assign(this, m_directorEdit, "director_edit");
     UIUtilW::Assign(this, m_inetrefEdit, "inetref_edit");
+    UIUtilW::Assign(this, m_homepageEdit, "homepage_edit");
     UIUtilW::Assign(this, m_plotEdit, "description_edit");
     UIUtilW::Assign(this, m_yearSpin, "year_spin");
     UIUtilW::Assign(this, m_userRatingSpin, "userrating_spin");
@@ -117,6 +116,8 @@ bool EditMetadataDialog::Create()
         connect(m_directorEdit, SIGNAL(valueChanged()), SLOT(SetDirector()));
     if (m_inetrefEdit)
         connect(m_inetrefEdit, SIGNAL(valueChanged()), SLOT(SetInetRef()));
+    if (m_homepageEdit)
+        connect(m_homepageEdit, SIGNAL(valueChanged()), SLOT(SetHomepage()));
     if (m_plotEdit)
         connect(m_plotEdit, SIGNAL(valueChanged()), SLOT(SetPlot()));
 
@@ -391,6 +392,8 @@ void EditMetadataDialog::fillWidgets()
         m_directorEdit->SetText(m_workingMetadata->GetDirector());
     if (m_inetrefEdit)
         m_inetrefEdit->SetText(m_workingMetadata->GetInetRef());
+    if (m_homepageEdit)
+        m_homepageEdit->SetText(m_workingMetadata->GetHomepage());
     if (m_plotEdit)
         m_plotEdit->SetText(m_workingMetadata->GetPlot());
 
@@ -522,6 +525,11 @@ void EditMetadataDialog::SetDirector()
 void EditMetadataDialog::SetInetRef()
 {
     m_workingMetadata->SetInetRef(m_inetrefEdit->GetText());
+}
+
+void EditMetadataDialog::SetHomepage()
+{
+    m_workingMetadata->SetHomepage(m_homepageEdit->GetText());
 }
 
 void EditMetadataDialog::SetPlot()

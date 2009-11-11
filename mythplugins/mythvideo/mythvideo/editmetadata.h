@@ -39,6 +39,7 @@ class EditMetadataDialog : public MythScreenType
     void SetRating();
     void SetDirector();
     void SetInetRef();
+    void SetHomepage();
     void SetPlot();
     void SetYear();
     void SetUserRating();
@@ -79,6 +80,7 @@ class EditMetadataDialog : public MythScreenType
     MythUITextEdit      *m_ratingEdit;
     MythUITextEdit      *m_directorEdit;
     MythUITextEdit      *m_inetrefEdit;
+    MythUITextEdit      *m_homepageEdit;
     MythUITextEdit      *m_plotEdit;
 
     MythUISpinBox       *m_seasonSpin;

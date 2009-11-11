@@ -1157,6 +1157,10 @@ namespace
             tmp["rating"] = GetDisplayRating(metadata->GetRating());
             tmp["length"] = GetDisplayLength(metadata->GetLength());
             tmp["year"] = GetDisplayYear(metadata->GetYear());
+
+            QString formatLongDate = gContext->GetSetting("DateFormat", "ddd MMMM d");
+            tmp["releasedate"] = metadata->GetReleaseDate().toString(formatLongDate);
+
             tmp["userrating"] = GetDisplayUserRating(metadata->GetUserRating());
             tmp["season"] = GetDisplaySeasonEpisode(metadata->GetSeason(), 1);
             tmp["episode"] = GetDisplaySeasonEpisode(metadata->GetEpisode(), 1);
@@ -1183,6 +1187,7 @@ namespace
             tmp["insertdate"] = metadata->GetInsertdate()
                                      .toString(gContext->GetSetting("DateFormat"));
             tmp["inetref"] = metadata->GetInetRef();
+            tmp["homepage"] = metadata->GetHomepage();
             tmp["child_id"] = QString::number(metadata->GetChildID());
             tmp["browseable"] = GetDisplayBrowse(metadata->GetBrowse());
             tmp["watched"] = GetDisplayWatched(metadata->GetWatched());
@@ -1241,10 +1246,12 @@ namespace
         h.handleText("##x##");
         h.handleText("episode");
         h.handleText("year");
+        h.handleText("releasedate");
         h.handleText("userrating");
 
         h.handleText("insertdate");
         h.handleText("inetref");
+        h.handleText("homepage");
         h.handleText("child_id");
         h.handleText("browseable");
         h.handleText("watched");
@@ -3159,8 +3166,13 @@ void VideoDialog::InfoMenu()
     m_menuPopup->AddButton(tr("View Full Plot"), SLOT(ViewPlot()));
 
     Metadata *metadata = GetMetadata(GetItemCurrent());
-    if (metadata && metadata->GetCast().size())
-        m_menuPopup->AddButton(tr("View Cast"), SLOT(ShowCastDialog()));
+    if (metadata)
+    {
+        if (metadata->GetCast().size())
+            m_menuPopup->AddButton(tr("View Cast"), SLOT(ShowCastDialog()));
+        if (!metadata->GetHomepage().isEmpty())
+            m_menuPopup->AddButton(tr("View Homepage"), SLOT(ShowHomepage()));
+    }
 }
 
 /** \fn VideoDialog::VideoOptionMenu()
@@ -3488,6 +3500,49 @@ void VideoDialog::ShowCastDialog()
 
     if (castdialog->Create())
         m_popupStack->AddScreen(castdialog);
+}
+
+void VideoDialog::ShowHomepage()
+{
+    Metadata *metadata = GetMetadata(GetItemCurrent());
+
+    if (!metadata)
+        return;
+
+    QString url = metadata->GetHomepage();
+
+    if (url.isEmpty())
+        return;
+
+    QString browser = gContext->GetSetting("WebBrowserCommand", "");
+    QString zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.0");
+
+    if (browser.isEmpty())
+    {
+        ShowOkPopup(tr("No browser command set! MythVideo needs MythBrowser "
+                       "installed to display the homepage."));
+        return;
+    }
+
+    if (browser.toLower() == "internal")
+    {
+        GetMythMainWindow()->HandleMedia("WebBrowser", url);
+        return;
+    }
+    else
+    {
+        QString cmd = browser;
+        cmd.replace("%ZOOM%", zoom);
+        cmd.replace("%URL%", url);
+        cmd.replace('\'', "%27");
+        cmd.replace("&","\\&");
+        cmd.replace(";","\\;");
+
+        GetMythMainWindow()->AllowInput(false);
+        myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
+        gContext->GetMainWindow()->AllowInput(true);
+        return;
+    }
 }
 
 /** \fn VideoDialog::playVideo()
@@ -4361,6 +4416,8 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
 
         if (metadata->GetYear() == 1895 || metadata->GetYear() == 0)
             metadata->SetYear(data["Year"].toInt());
+        if (metadata->GetReleaseDate() == QDate())
+            metadata->SetReleaseDate(QDate::fromString(data["ReleaseDate"], "yyyy-MM-dd"));
         if (metadata->GetDirector() == VIDEO_DIRECTOR_UNKNOWN ||
             metadata->GetDirector().isEmpty())
             metadata->SetDirector(data["Director"]);
@@ -4393,6 +4450,9 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
             metadata->SetInetRef(data["InetRef"]);
         else
             metadata->SetInetRef(video_uid);
+
+        if (metadata->GetHomepage().isEmpty())
+            metadata->SetHomepage(data["URL"].trimmed());
 
         // Cast
         Metadata::cast_list cast;
