@@ -13,8 +13,7 @@ using namespace std;
 #include "mythsystem.h"
 #include "mythverbose.h"
 #include "mythversion.h"
-#include "programinfo.h"
-#include "programlist.h"
+#include "programdetail.h"
 #include "jobqueue.h"
 #include "tv.h"
 #include "remoteutil.h"
@@ -412,7 +411,7 @@ int setScheduledWakeupTime()
     }
 
     QDateTime nextRecordingStart;
-    ProgramList::GetProgramDetailList(nextRecordingStart);
+    GetProgramDetailList(nextRecordingStart);
 
     // set the wakeup time for the next scheduled recording
     if (!nextRecordingStart.isNull())

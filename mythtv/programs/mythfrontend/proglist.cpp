@@ -8,26 +8,20 @@
 #include <algorithm>
 using namespace std;
 
-// qt
+// Qt
 #include <QApplication>
 #include <QRegExp>
 
-// libmyth
+// MythTV
 #include "mythcontext.h"
 #include "remoteutil.h"
-
-// libmythtv
 #include "scheduledrecording.h"
 #include "recordingrule.h"
 #include "channelutil.h"
 #include "recordinginfo.h"
-
-// libmythdb
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythverbose.h"
-
-// libmythui
 #include "mythuitext.h"
 #include "mythuibutton.h"
 #include "mythuibuttonlist.h"
@@ -289,7 +283,7 @@ void ProgLister::ShowMenu(void)
         menuPopup->AddButton(tr("Upcoming"));
         menuPopup->AddButton(tr("Custom Edit"));
 
-        ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+        ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
         if (m_type != plPreviouslyRecorded)
         {
             if (pi && pi->recordid > 0)
@@ -612,7 +606,7 @@ bool ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
 
 void ProgLister::quickRecord()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi)
         return;
@@ -624,7 +618,7 @@ void ProgLister::quickRecord()
 
 void ProgLister::select()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi)
         return;
@@ -637,14 +631,14 @@ void ProgLister::select()
 
 void ProgLister::edit()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     EditScheduled(pi);
 }
 
 void ProgLister::customEdit()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     EditCustom(pi);
 }
@@ -659,7 +653,7 @@ void ProgLister::deleteItem()
 
 void ProgLister::deleteRule()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi || pi->recordid <= 0)
         return;
@@ -690,7 +684,7 @@ void ProgLister::deleteRule()
 
 void ProgLister::deleteOldEpisode()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi)
         return;
@@ -705,7 +699,7 @@ void ProgLister::doDeleteOldEpisode(bool ok)
     if (!ok)
         return;
 
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi)
         return;
@@ -724,7 +718,7 @@ void ProgLister::doDeleteOldEpisode(bool ok)
 
 void ProgLister::deleteOldTitle()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi)
         return;
@@ -739,7 +733,7 @@ void ProgLister::doDeleteOldTitle(bool ok)
     if (!ok)
         return;
 
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi)
         return;
@@ -756,7 +750,7 @@ void ProgLister::doDeleteOldTitle(bool ok)
 
 void ProgLister::oldRecordedActions()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi)
         return;
@@ -797,7 +791,7 @@ void ProgLister::oldRecordedActions()
 
 void ProgLister::upcoming()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     if (!pi || m_type == plTitle)
         return;
@@ -807,7 +801,7 @@ void ProgLister::upcoming()
 
 void ProgLister::details()
 {
-    ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+    ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
 
     ShowDetails(pi);
 }
@@ -1407,11 +1401,13 @@ void ProgLister::fillItemList(bool restorePosition, bool updateDisp)
     }
 
     if (m_type == plPreviouslyRecorded)
-        m_itemList.FromOldRecorded(where, bindings);
+    {
+        LoadFromOldRecorded(m_itemList, where, bindings);
+    }
     else
     {
-        m_schedList.FromScheduler();
-        m_itemList.FromProgram(where, bindings, m_schedList, oneChanid);
+        LoadFromScheduler(m_schedList);
+        LoadFromProgram(m_itemList, where, bindings, m_schedList, oneChanid);
     }
 
     ProgramInfo *s;
@@ -1465,13 +1461,13 @@ void ProgLister::fillItemList(bool restorePosition, bool updateDisp)
     {
         vector<ProgramInfo *>::reverse_iterator r = sortedList.rbegin();
         for (; r != sortedList.rend(); r++)
-            m_itemList.append(*r);
+            m_itemList.push_back(*r);
     }
     else
     {
         vector<ProgramInfo *>::iterator i = sortedList.begin();
         for (; i != sortedList.end(); ++i)
-            m_itemList.append(*i);
+            m_itemList.push_back(*i);
     }
 
     if (updateDisp)
@@ -1481,7 +1477,7 @@ void ProgLister::fillItemList(bool restorePosition, bool updateDisp)
 void ProgLister::updateDisplay(bool restorePosition)
 {
     if (m_messageText)
-        m_messageText->SetVisible((m_itemList.count() == 0));
+        m_messageText->SetVisible(m_itemList.empty());
 
     InfoMap infoMap;
     ProgramInfo pginfo;
@@ -1516,7 +1512,7 @@ void ProgLister::updateDisplay(bool restorePosition)
             comp = new plTitleSort();
 
         int i;
-        for (i = m_itemList.count() - 2; i >= 0; i--)
+        for (i = m_itemList.size() - 2; i >= 0; i--)
         {
             bool dobreak;
             if (m_reverseSort)
@@ -1699,7 +1695,7 @@ void ProgLister::customEvent(QEvent *event)
         {
             if (resulttext == tr("Allow this episode to re-record"))
             {
-                ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+                ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
                 if (pi)
                 {
                     RecordingInfo ri(*pi);
@@ -1709,7 +1705,7 @@ void ProgLister::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Never record this episode"))
             {
-                ProgramInfo *pi = m_itemList.at(m_progList->GetCurrentPos());
+                ProgramInfo *pi = m_itemList[m_progList->GetCurrentPos()];
                 if (pi)
                 {
                     RecordingInfo ri(*pi);

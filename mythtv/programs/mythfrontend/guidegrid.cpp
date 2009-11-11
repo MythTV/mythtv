@@ -281,7 +281,7 @@ bool GuideGrid::Create()
 
 void GuideGrid::Load(void)
 {
-    m_recList.FromScheduler();
+    LoadFromScheduler(m_recList);
     fillChannelInfos();
 
     int maxchannel = max((int)GetChannelCount() - 1, 0);
@@ -642,7 +642,7 @@ ProgramList GuideGrid::GetProgramList(uint chanid) const
     bindings[":CHANID"]  = chanid;
 
     ProgramList dummy;
-    proglist.FromProgram(querystr, bindings, dummy);
+    LoadFromProgram(proglist, querystr, bindings, dummy, false);
 
     return proglist;
 }
@@ -1009,7 +1009,7 @@ ProgramList *GuideGrid::getProgramListFromProgram(int chanNum)
         bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-ddThh:mm:00");
         bindings[":ENDTS"] = m_currentEndTime.toString("yyyy-MM-ddThh:mm:00");
 
-        proglist->FromProgram(querystr, bindings, m_recList);
+        LoadFromProgram(*proglist, querystr, bindings, m_recList, false);
     }
 
     return proglist;
@@ -1120,7 +1120,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
 
     vector<ProgramInfo*>::iterator it = unknownlist.begin();
     for (; it != unknownlist.end(); ++it)
-        proglist->append(*it);
+        proglist->push_back(*it);
 
     MythRect programRect = m_guideGrid->GetArea();
 
@@ -1264,7 +1264,7 @@ void GuideGrid::customEvent(QEvent *event)
 
         if (message == "SCHEDULE_CHANGE")
         {
-            m_recList.FromScheduler();
+            LoadFromScheduler(m_recList);
             fillProgramInfos();
             updateInfo();
         }
@@ -1570,7 +1570,7 @@ void GuideGrid::generateListings()
     maxchannel = max((int)GetChannelCount() - 1, 0);
     m_channelCount = min(m_guideGrid->getChannelCount(), maxchannel + 1);
 
-    m_recList.FromScheduler();
+    LoadFromScheduler(m_recList);
     fillProgramInfos();
 }
 
@@ -1956,7 +1956,7 @@ void GuideGrid::quickRecord()
     ri.ToggleRecord();
     *pginfo = ri;
 
-    m_recList.FromScheduler();
+    LoadFromScheduler(m_recList);
     fillProgramInfos();
     updateInfo();
 }

@@ -1077,7 +1077,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             {
                 if (!pinfo.FromStringList(sit, slist.end()))
                     break;
-                slavelist.append(new RecordingInfo(pinfo));
+                slavelist.push_back(new RecordingInfo(pinfo));
             }
             m_sched->SlaveConnected(slavelist);
         }
@@ -1276,311 +1276,107 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     MythSocket *pbssock = pbs->getSocket();
     QString playbackhost = pbs->getHostname();
 
-    QString fs_db_name = "";
-
-    QDateTime rectime = QDateTime::currentDateTime().addSecs(
-                            -gContext->GetNumSetting("RecordOverTime"));
-    RecIter ri;
-    RecList schedList;
+    RecList rlSchedList;
     if (m_sched)
-        m_sched->getAllPending(&schedList);
+        m_sched->getAllPending(&rlSchedList);
+    ProgramList schedList;
+    while (!rlSchedList.empty())
+    {
+        schedList.push_front(rlSchedList.front());
+        rlSchedList.pop_front();
+    }
 
-    QString ip = gContext->GetSetting("BackendServerIP");
-    QString port = gContext->GetSetting("BackendServerPort");
+    ProgramList destination;
+    LoadFromRecorded(
+        destination, (type == "Delete"), (type == "Recording"), schedList);
 
-    QMap<QString, int> inUseMap;
-    QString inUseKey;
-    QString inUseForWhat;
-    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT DISTINCT chanid, starttime, recusage "
-                  " FROM inuseprograms WHERE lastupdatetime >= :ONEHOURAGO ;");
-    query.bindValue(":ONEHOURAGO", oneHourAgo);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-        while (query.next())
-        {
-            inUseKey = query.value(0).toString() + " " +
-                       query.value(1).toDateTime().toString(Qt::ISODate);
-            inUseForWhat = query.value(2).toString();
-
-            if (!inUseMap.contains(inUseKey))
-                inUseMap[inUseKey] = 0;
-
-            if ((inUseForWhat == "player") ||
-                (inUseForWhat == "preview player") ||
-                (inUseForWhat == "pipplayer") ||
-                (inUseForWhat == "pbpplayer"))
-                inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSEPLAYING;
-            else if (inUseForWhat == "recorder")
-                inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSERECORDING;
-        }
-
-
-    QString thequery =
-        "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
-        "recorded.title,recorded.subtitle,recorded.description,"
-        "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
-        "recorded.autoexpire,editing,bookmark,recorded.category,"
-        "recorded.recgroup,record.dupin,record.dupmethod,"
-        "recorded.recordid,channel.outputfilters,"
-        "recorded.seriesid,recorded.programid,recorded.filesize, "
-        "recorded.lastmodified, recorded.findid, "
-        "recorded.originalairdate, recorded.playgroup, "
-        "recorded.basename, recorded.progstart, "
-        "recorded.progend, recorded.stars, "
-        "recordedprogram.audioprop+0, recordedprogram.videoprop+0, "
-        "recordedprogram.subtitletypes+0, transcoded, "
-        "recorded.recpriority, watched, recorded.preserve, "
-        "recorded.storagegroup, recordedprogram.airdate "
-        "FROM recorded "
-        "LEFT JOIN record ON recorded.recordid = record.recordid "
-        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-        "LEFT JOIN recordedprogram ON "
-        " ( recorded.chanid = recordedprogram.chanid AND "
-        "  recorded.progstart = recordedprogram.starttime ) "
-        "WHERE ( recorded.deletepending = 0 OR "
-        "        DATE_ADD(recorded.lastmodified, INTERVAL 5 MINUTE) <= NOW() "
-        "      ) ";
-
-    if (type == "Recording")
-        thequery += "AND recorded.endtime >= NOW() AND "
-            "recorded.starttime <= NOW()";
-
-    thequery += "ORDER BY recorded.starttime";
-
-    if (type == "Delete")
-        thequery += " DESC";
-
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
-    if (chanorder != "channum")
-        thequery += ", " + chanorder;
-    else // approximation which the DB can handle
-        thequery += ",atsc_major_chan,atsc_minor_chan,channum,callsign";
-
-    QStringList outputlist;
-    QString fileprefix = gContext->GetFilePrefix();
+    QStringList outputlist(QString::number(destination.size()));
     QMap<QString, QString> backendIpMap;
     QMap<QString, QString> backendPortMap;
+    QString ip   = gContext->GetSetting("BackendServerIP");
+    QString port = gContext->GetSetting("BackendServerPort");
 
-    query.prepare(thequery);
-
-    if (!query.exec() || !query.isActive())
+    ProgramList::iterator it = destination.begin();
+    for (it = destination.begin(); it != destination.end(); ++it)
     {
-        MythDB::DBError("MainServer::HandleQueryRecordings", query);
-        outputlist << "0";
-    }
-    else
-    {
-        outputlist << QString::number(query.size());
+        ProgramInfo *proginfo = *it;
+        PlaybackSock *slave = NULL;
 
-        while (query.next())
+        if (proginfo->hostname != gContext->GetHostName())
+            slave = getSlaveByHostname(proginfo->hostname);
+
+        if ((proginfo->hostname == gContext->GetHostName()) ||
+            (!slave && masterBackendOverride))
         {
-            ProgramInfo *proginfo = new ProgramInfo;
-
-            proginfo->chanid = query.value(0).toString();
-            proginfo->startts = query.value(29).toDateTime();
-            proginfo->endts = query.value(30).toDateTime();
-            proginfo->recstartts = query.value(1).toDateTime();
-            proginfo->recendts = query.value(2).toDateTime();
-            proginfo->title = query.value(3).toString();
-            proginfo->subtitle = query.value(4).toString();
-            proginfo->description = query.value(5).toString();
-            proginfo->hostname = query.value(6).toString();
-
-            proginfo->dupin = RecordingDupInType(query.value(17).toInt());
-            proginfo->dupmethod = RecordingDupMethodType(query.value(18).toInt());
-            proginfo->recordid = query.value(19).toInt();
-            proginfo->chanOutputFilters = query.value(20).toString();
-            proginfo->seriesid = query.value(21).toString();
-            proginfo->programid = query.value(22).toString();
-            proginfo->filesize = stringToLongLong(query.value(23).toString());
-            proginfo->lastmodified =
-                      QDateTime::fromString(query.value(24).toString(),
-                                            Qt::ISODate);
-            proginfo->findid = query.value(25).toInt();
-
-            if (query.value(26).isNull() ||
-                query.value(26).toString().isEmpty())
+            proginfo->pathname = QString("myth://") + ip + ":" + port
+                + "/" + proginfo->pathname;
+            if (proginfo->filesize == 0)
             {
-                proginfo->originalAirDate = QDate (0, 1, 1);
-                proginfo->hasAirDate      = false;
-            }
-            else
-            {
-                proginfo->originalAirDate =
-                    QDate::fromString(query.value(26).toString(),Qt::ISODate);
-
-                if (proginfo->originalAirDate > QDate(1940, 1, 1))
-                    proginfo->hasAirDate  = true;
-                else
-                    proginfo->hasAirDate  = false;
-            }
-
-            proginfo->pathname = query.value(28).toString();
-
-            if (proginfo->hostname.isEmpty())
-                proginfo->hostname = gContext->GetHostName();
-
-            if (!query.value(7).toString().isEmpty())
-            {
-                proginfo->chanstr = query.value(7).toString();
-                proginfo->channame = query.value(8).toString();
-                proginfo->chansign = query.value(9).toString();
-            }
-            else
-            {
-                proginfo->chanstr = "#" + proginfo->chanid;
-                proginfo->channame = "#" + proginfo->chanid;
-                proginfo->chansign = "#" + proginfo->chanid;
-            }
-
-            // Taken out of programinfo.cpp just to reduce the number of queries
-            int flags = 0;
-            flags |= (query.value(10).toInt() == 1) ? FL_COMMFLAG : 0;
-            flags |= (query.value(11).toInt() == 1) ? FL_CUTLIST : 0;
-            flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
-            flags |= (query.value(14).toInt() == 1) ? FL_BOOKMARK : 0;
-            flags |= (query.value(35).toInt() == TRANSCODING_COMPLETE) ?
-                      FL_TRANSCODED : 0;
-            flags |= (query.value(37).toInt() == 1) ? FL_WATCHED : 0;
-            flags |= (query.value(38).toInt() == 1) ? FL_PRESERVED : 0;
-
-            inUseKey = query.value(0).toString() + " " +
-                       query.value(1).toDateTime().toString(Qt::ISODate);
-            if (inUseMap.contains(inUseKey))
-                flags |= inUseMap[inUseKey];
-
-            if (query.value(13).toInt())
-            {
-                flags |= FL_EDITING;
-            }
-            else if (query.value(10).toInt() == COMM_FLAG_PROCESSING)
-            {
-                if (JobQueue::IsJobRunning(JOB_COMMFLAG, proginfo))
-                    flags |= FL_EDITING;
-                else
-                    proginfo->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
-            }
-
-            proginfo->audioproperties = query.value(32).toInt();
-            proginfo->videoproperties = query.value(33).toInt();
-            proginfo->subtitleType = query.value(34).toInt();
-
-            proginfo->programflags = flags;
-
-            proginfo->category = query.value(15).toString();
-
-            proginfo->recgroup = query.value(16).toString();
-            proginfo->playgroup = query.value(27).toString();
-            proginfo->storagegroup =
-                query.value(39).toString();
-
-            proginfo->recpriority = query.value(36).toInt();
-            proginfo->year = query.value(40).toString();
-
-            proginfo->recstatus = rsRecorded;
-            if (proginfo->recendts > rectime)
-            {
-                for (ri = schedList.begin(); ri != schedList.end(); ri++)
+                QString tmpURL = GetPlaybackURL(proginfo);
+                QFile checkFile(tmpURL);
+                if (!tmpURL.isEmpty() && checkFile.exists())
                 {
-                    if ((*ri) && (*ri)->recstatus == rsRecording &&
-                        proginfo->chanid == (*ri)->chanid &&
-                        proginfo->recstartts == (*ri)->recstartts)
-                    {
-                        proginfo->recstatus = rsRecording;
-                        break;
-                    }
+                    proginfo->filesize = checkFile.size();
+                    if (proginfo->recendts < QDateTime::currentDateTime())
+                        proginfo->SetFilesize(proginfo->filesize);
                 }
             }
-
-            proginfo->stars = query.value(31).toDouble();
-
-            PlaybackSock *slave = NULL;
-
-            if (proginfo->hostname != gContext->GetHostName())
-                slave = getSlaveByHostname(proginfo->hostname);
-
-            if ((proginfo->hostname == gContext->GetHostName()) ||
-                (!slave && masterBackendOverride))
+        }
+        else if (!slave)
+        {
+            proginfo->pathname = GetPlaybackURL(proginfo);
+            if (proginfo->pathname.isEmpty())
             {
-                proginfo->pathname = QString("myth://") + ip + ":" + port
-                                     + "/" + proginfo->pathname;
-                if (proginfo->filesize == 0)
-                {
-                    QString tmpURL = GetPlaybackURL(proginfo);
-                    QFile checkFile(tmpURL);
-                    if (!tmpURL.isEmpty() && checkFile.exists())
-                    {
-                        proginfo->filesize = checkFile.size();
-                        if (proginfo->recendts < QDateTime::currentDateTime())
-                            proginfo->SetFilesize(proginfo->filesize);
-                    }
-                }
+                VERBOSE(VB_IMPORTANT,
+                        "MainServer::HandleQueryRecordings()"
+                        "\n\t\t\tCouldn't find backend for: " +
+                        QString("\n\t\t\t%1 : \"%2\"")
+                        .arg(proginfo->title).arg(proginfo->subtitle));
+
+                proginfo->filesize = 0;
+                proginfo->pathname = "file not found";
             }
-            else if (!slave)
+        }
+        else
+        {
+            if (proginfo->filesize == 0)
             {
-                proginfo->pathname = GetPlaybackURL(proginfo);
-                if (proginfo->pathname.isEmpty())
+                if (!slave->FillProgramInfo(proginfo, playbackhost))
                 {
                     VERBOSE(VB_IMPORTANT,
                             "MainServer::HandleQueryRecordings()"
-                            "\n\t\t\tCouldn't find backend for: " +
-                            QString("\n\t\t\t%1 : \"%2\"")
-                            .arg(proginfo->title).arg(proginfo->subtitle));
-
-                    proginfo->filesize = 0;
-                    proginfo->pathname = "file not found";
+                            "\n\t\t\tCould not fill program info "
+                            "from backend");
+                }
+                else
+                {
+                    if (proginfo->recendts < QDateTime::currentDateTime())
+                        proginfo->SetFilesize(proginfo->filesize);
                 }
             }
             else
             {
-                if (proginfo->filesize == 0)
-                {
-                    if (!slave->FillProgramInfo(proginfo, playbackhost))
-                    {
-                        VERBOSE(VB_IMPORTANT,
-                                "MainServer::HandleQueryRecordings()"
-                                "\n\t\t\tCould not fill program info "
-                                "from backend");
-                    }
-                    else
-                    {
-                        if (proginfo->recendts < QDateTime::currentDateTime())
-                            proginfo->SetFilesize(proginfo->filesize);
-                    }
-                }
-                else
-                {
-                    ProgramInfo *p = proginfo;
-                    if (!backendIpMap.contains(p->hostname))
-                        backendIpMap[p->hostname] =
-                            gContext->GetSettingOnHost("BackendServerIp",
-                                                       p->hostname);
-                    if (!backendPortMap.contains(p->hostname))
-                        backendPortMap[p->hostname] =
-                            gContext->GetSettingOnHost("BackendServerPort",
-                                                       p->hostname);
-                    p->pathname = QString("myth://") +
-                                  backendIpMap[p->hostname] + ":" +
-                                  backendPortMap[p->hostname] + "/" +
-                                  p->pathname;
-                }
+                ProgramInfo *p = proginfo;
+                if (!backendIpMap.contains(p->hostname))
+                    backendIpMap[p->hostname] =
+                        gContext->GetSettingOnHost("BackendServerIp",
+                                                   p->hostname);
+                if (!backendPortMap.contains(p->hostname))
+                    backendPortMap[p->hostname] =
+                        gContext->GetSettingOnHost("BackendServerPort",
+                                                   p->hostname);
+                p->pathname = QString("myth://") +
+                    backendIpMap[p->hostname] + ":" +
+                    backendPortMap[p->hostname] + "/" +
+                    p->pathname;
             }
-
-            if (slave)
-                slave->DownRef();
-
-            proginfo->ToStringList(outputlist);
-
-            delete proginfo;
         }
-    }
 
-    for (ri = schedList.begin(); ri != schedList.end(); ri++)
-        delete (*ri);
+        if (slave)
+            slave->DownRef();
+
+        proginfo->ToStringList(outputlist);
+    }
 
     SendResponse(pbssock, outputlist);
 }

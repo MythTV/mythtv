@@ -1,7 +1,4 @@
-
-#include "progfind.h"
-
-// qt
+// Qt
 #include <QDateTime>
 #include <QApplication>
 #include <QStringList>
@@ -9,20 +6,14 @@
 #include <QKeyEvent>
 #include <QEvent>
 
-// libmythdb
+// MythTV
 #include "oldsettings.h"
 #include "mythdb.h"
 #include "mythdbcon.h"
 #include "mythdirs.h"
-
-// libmyth
 #include "mythcontext.h"
-
-// libmythtv
 #include "recordinginfo.h"
 #include "tv.h"
-
-// libmythui
 #include "mythuitext.h"
 #include "mythuitextedit.h"
 #include "mythuibuttonlist.h"
@@ -33,6 +24,7 @@
 #include "guidegrid.h"
 #include "proglist.h"
 #include "customedit.h"
+#include "progfind.h"
 
 #define LOC      QString("ProgFinder: ")
 #define LOC_ERR  QString("ProgFinder, Error: ")
@@ -587,15 +579,14 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
 
     QDateTime progStart = QDateTime::currentDateTime();
 
-    m_schedList.FromScheduler();
-
     MSqlBindings bindings;
     QString querystr = "WHERE program.title = :TITLE "
                        "  AND program.endtime > :ENDTIME ";
     bindings[":TITLE"] = progTitle;
     bindings[":ENDTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
 
-    m_showData.FromProgram(querystr, bindings, m_schedList);
+    LoadFromScheduler(m_schedList);
+    LoadFromProgram(m_showData, querystr, bindings, m_schedList, false);
 
     updateTimesList();
 

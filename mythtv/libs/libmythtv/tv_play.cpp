@@ -7681,9 +7681,10 @@ void TV::GetNextProgram(int direction, InfoMap &infoMap) const
     };
 
     ProgramList progList;
-    progList.FromProgram(querystr, bindings);
+    ProgramList dummySched;
+    LoadFromProgram(progList, querystr, bindings, dummySched, false);
 
-    if (progList.isEmpty())
+    if (progList.empty())
     {
         infoMap["dbstarttime"] = "";
         return;
@@ -11525,7 +11526,7 @@ void TV::DoDisplayJumpMenu(void)
         for (Iprog = progLists.begin(); Iprog != progLists.end(); Iprog++)
         {
             const ProgramList &plist = *Iprog;
-            int progIndex = plist.count();
+            uint progIndex = (uint) plist.size();
 
             if (plist[0]->recgroup != currecgroup)
             {

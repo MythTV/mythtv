@@ -213,12 +213,23 @@ class MPUBLIC PMapDBReplacement
  *  view or record.
  */
 
+class MSqlQuery;
+class ProgramList;
+
 class MPUBLIC ProgramInfo
 {
+    friend class ProgramList;
+
   public:
-    // Constructors and bulk set methods.
+    // Constructors
     ProgramInfo(void);
     ProgramInfo(const ProgramInfo &other);
+    ProgramInfo(const MSqlQuery   &query,
+                const ProgramList &schedList,
+                bool               oneChanid);
+
+    // Bulk set methods
+  public:
 
     typedef enum {
         kNoProgram           = 0,
@@ -461,17 +472,6 @@ class MPUBLIC ProgramInfo
 };
 
 Q_DECLARE_METATYPE(ProgramInfo*)
-
-class MPUBLIC ProgramDetail
-{
-  public:
-    QString   channame;
-    QString   title;
-    QString   subtitle;
-    QDateTime startTime;
-    QDateTime endTime;
-};
-typedef vector<ProgramDetail> ProgramDetailList;
 
 #endif // MYTHPROGRAM_H_
 

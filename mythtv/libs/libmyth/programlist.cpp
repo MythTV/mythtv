@@ -5,6 +5,7 @@
 #include "mythdb.h"
 #include "util.h"
 #include "programlist.h"
+#include "programinfo.h"
 
 ProgramList::~ProgramList(void)
 {
@@ -33,22 +34,6 @@ ProgramInfo *ProgramList::operator[](uint index)
 const ProgramInfo *ProgramList::operator[](uint index) const
 {
     return (*(const_cast<ProgramList*>(this)))[index];
-}
-
-bool ProgramList::operator==(const ProgramList &b) const
-{
-    const_iterator it_a  = pglist.begin();
-    const_iterator it_b  = b.pglist.begin();
-    const_iterator end_a = pglist.end();
-    const_iterator end_b = b.pglist.end();
-
-    for (; it_a != end_a && it_b != end_b; ++it_a, ++it_b)
-    {
-        if (*it_a != *it_b)
-            return false;
-    }
-
-    return (it_a == end_a) && (it_b == end_b);
 }
 
 ProgramInfo *ProgramList::take(uint index)
@@ -110,63 +95,11 @@ void ProgramList::sort(bool (&f)(const ProgramInfo*, const ProgramInfo*))
 #endif
 }
 
-bool ProgramList::FromScheduler(bool &hasConflicts, QString tmptable,
-                                int recordid)
+//////////////////////////////////////////////////////////////////////
+
+static bool FromProgramQuery(
+    const QString &sql, const MSqlBindings &bindings, MSqlQuery &query)
 {
-    clear();
-    hasConflicts = false;
-
-    if (gContext->IsBackend())
-        return false;
-
-    QString query;
-    if (tmptable != "")
-    {
-        query = QString("QUERY_GETALLPENDING %1 %2")
-                        .arg(tmptable).arg(recordid);
-    } else {
-        query = QString("QUERY_GETALLPENDING");
-    }
-
-    QStringList slist( query );
-    if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "ProgramList::FromScheduler(): Error querying master.");
-        return false;
-    }
-
-    hasConflicts = slist[0].toInt();
-
-    bool result = true;
-    QStringList::const_iterator sit = slist.begin()+2;
-
-    while (result && sit != slist.end())
-    {
-        ProgramInfo *p = new ProgramInfo();
-        result = p->FromStringList(sit, slist.end());
-        if (result)
-            pglist.push_back(p);
-        else
-            delete p;
-    }
-
-    if (pglist.size() != slist[1].toUInt())
-    {
-        VERBOSE(VB_IMPORTANT,
-                "ProgramList::FromScheduler(): Length mismatch");
-        clear();
-        result = false;
-    }
-
-    return result;
-}
-
-bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
-                              ProgramList &schedList, bool oneChanid)
-{
-    clear();
-
     QString querystr = QString(
         "SELECT DISTINCT program.chanid, program.starttime, program.endtime, "
         "    program.title, program.subtitle, program.description, "
@@ -200,16 +133,68 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
     if (!sql.contains(" LIMIT "))
         querystr += " LIMIT 20000 ";
 
-    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
     MSqlBindings::const_iterator it;
     for (it = bindings.begin(); it != bindings.end(); ++it)
+    {
         if (querystr.contains(it.key()))
             query.bindValue(it.key(), it.value());
+    }
 
     if (!query.exec())
     {
-        MythDB::DBError("ProgramList::FromProgram", query);
+        MythDB::DBError("LoadFromProgramQuery", query);
+        return false;
+    }
+
+    return true;
+}
+
+bool LoadFromProgram(
+    ProgramList &destination,
+    const QString &sql, const MSqlBindings &bindings,
+    const ProgramList &schedList, bool oneChanid)
+{
+    destination.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!FromProgramQuery(sql, bindings, query))
+        return false;
+
+    while (query.next())
+        destination.push_back(new ProgramInfo(query, schedList, oneChanid));
+
+    return true;
+}
+
+bool LoadFromOldRecorded(
+    ProgramList &destination, const QString &sql, const MSqlBindings &bindings)
+{
+    destination.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    QString querystr =
+        "SELECT oldrecorded.chanid, starttime, endtime, "
+        "       title, subtitle, description, category, seriesid, "
+        "       programid, channel.channum, channel.callsign, "
+        "       channel.name, findid, rectype, recstatus, recordid, "
+        "       duplicate "
+        " FROM oldrecorded "
+        " LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
+        + sql;
+
+    query.prepare(querystr);
+    MSqlBindings::const_iterator it;
+    for (it = bindings.begin(); it != bindings.end(); ++it)
+    {
+        if (querystr.contains(it.key()))
+            query.bindValue(it.key(), it.value());
+    }
+
+    if (!query.exec())
+    {
+        MythDB::DBError("LoadFromOldRecorded", query);
         return false;
     }
 
@@ -228,84 +213,30 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         p->subtitle = query.value(4).toString();
         p->description = query.value(5).toString();
         p->category = query.value(6).toString();
-        p->chanstr = query.value(7).toString();
-        p->chansign = query.value(8).toString();
-        p->channame = query.value(9).toString();
-        p->repeat = query.value(10).toInt();
-        p->chancommfree = COMM_DETECT_COMMFREE == query.value(11).toInt();
-        p->chanOutputFilters = query.value(12).toString();
-        p->seriesid = query.value(13).toString();
-        p->programid = query.value(14).toString();
-        p->year = query.value(15).toString();
-        p->stars = query.value(16).toString().toFloat();
+        p->seriesid = query.value(7).toString();
+        p->programid = query.value(8).toString();
+        p->chanstr = query.value(9).toString();
+        p->chansign = query.value(10).toString();
+        p->channame = query.value(11).toString();
+        p->findid = query.value(12).toInt();
+        p->rectype = RecordingType(query.value(13).toInt());
+        p->recstatus = RecStatusType(query.value(14).toInt());
+        p->recordid = query.value(15).toInt();
+        p->duplicate = query.value(16).toInt();
 
-        if (query.value(17).isNull() || query.value(17).toString().isEmpty())
-        {
-            p->originalAirDate = QDate (0, 1, 1);
-            p->hasAirDate = false;
-        }
-        else
-        {
-            p->originalAirDate =
-                QDate::fromString(query.value(17).toString(),Qt::ISODate);
-
-            if (p->originalAirDate > QDate(1940, 1, 1))
-                p->hasAirDate = true;
-            else
-                p->hasAirDate = false;
-        }
-        p->catType = query.value(18).toString();
-        p->recordid = query.value(19).toInt();
-        p->rectype = RecordingType(query.value(20).toInt());
-        p->recstatus = RecStatusType(query.value(21).toInt());
-        p->findid = query.value(22).toInt();
-
-        iterator it = schedList.pglist.begin();
-        for (; it != schedList.pglist.end(); ++it)
-        {
-            ProgramInfo *s = *it;
-            if (p->IsSameTimeslot(*s))
-            {
-                p->recordid = s->recordid;
-                p->recstatus = s->recstatus;
-                p->rectype = s->rectype;
-                p->recpriority = s->recpriority;
-                p->recstartts = s->recstartts;
-                p->recendts = s->recendts;
-                p->cardid = s->cardid;
-                p->inputid = s->inputid;
-                p->dupin = s->dupin;
-                p->dupmethod = s->dupmethod;
-                p->findid = s->findid;
-
-                if (s->recstatus == rsWillRecord ||
-                    s->recstatus == rsRecording)
-                {
-                    if (oneChanid)
-                    {
-                        p->chanid   = s->chanid;
-                        p->chanstr  = s->chanstr;
-                        p->chansign = s->chansign;
-                        p->channame = s->channame;
-                    }
-                    else if ((p->chanid != s->chanid) &&
-                             (p->chanstr != s->chanstr))
-                    {
-                        p->recstatus = rsOtherShowing;
-                    }
-                }
-            }
-        }
-
-        pglist.push_back(p);
+        destination.push_back(p);
     }
 
     return true;
 }
 
-bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
+bool LoadFromRecorded(
+    ProgramList &destination,
+    bool orderDescending,
+    bool possiblyInProgressTecordingsOnly,
+    const ProgramList &schedList)
 {
-    clear();
+    destination.clear();
 
     QString     fs_db_name = "";
     QDateTime   rectime    = QDateTime::currentDateTime().addSecs(
@@ -317,12 +248,11 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
     // ----------------------------------------------------------------------
 
     QMap<QString, int> inUseMap;
+    QString   inUseKey;
+    QString   inUseForWhat;
+    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
 
-    QString     inUseKey;
-    QString     inUseForWhat;
-    QDateTime   oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
-
-    MSqlQuery   query(MSqlQuery::InitCon());
+    MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT DISTINCT chanid, starttime, recusage "
                   " FROM inuseprograms WHERE lastupdatetime >= :ONEHOURAGO ;");
@@ -341,7 +271,8 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
 
             if ((inUseForWhat == "player") ||
                 (inUseForWhat == "preview player") ||
-                (inUseForWhat == "PIP player"))
+                (inUseForWhat == "pipplayer") ||
+                (inUseForWhat == "pbpplayer"))
                 inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSEPLAYING;
             else if (inUseForWhat == "recorder")
                 inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSERECORDING;
@@ -380,7 +311,7 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
         "recorded.autoexpire,editing,bookmark,recorded.category,"
         "recorded.recgroup,record.dupin,record.dupmethod,"
-        "record.recordid,outputfilters,"
+        "recorded.recordid,channel.outputfilters,"
         "recorded.seriesid,recorded.programid,recorded.filesize, "
         "recorded.lastmodified, recorded.findid, "
         "recorded.originalairdate, recorded.playgroup, "
@@ -388,7 +319,9 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         "recorded.progend, recorded.stars, "
         "recordedprogram.audioprop+0, recordedprogram.videoprop+0, "
         "recordedprogram.subtitletypes+0, recorded.watched, "
-        "recorded.storagegroup "
+        "recorded.storagegroup, "
+        "recorded.transcoded, recorded.recpriority, "
+        "recorded.preserve, recordedprogram.airdate "
         "FROM recorded "
         "LEFT JOIN record ON recorded.recordid = record.recordid "
         "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -396,12 +329,18 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         " ( recorded.chanid    = recordedprogram.chanid AND "
         "   recorded.progstart = recordedprogram.starttime ) "
         "WHERE ( recorded.deletepending = 0 OR "
-        "        recorded.lastmodified <= DATE_SUB(NOW(), INTERVAL 5 MINUTE) "
-        "      ) "
-        "ORDER BY recorded.starttime";
+        "        DATE_ADD(recorded.lastmodified, INTERVAL 5 MINUTE) <= NOW() "
+        "      ) ";
 
-    if ( bDescending )
-        thequery += " DESC";
+    if (possiblyInProgressTecordingsOnly)
+    {
+        thequery +=
+            " AND recorded.endtime   >= NOW() "
+            " AND recorded.starttime <= NOW() ";
+    }
+
+    thequery += "ORDER BY recorded.starttime";
+    thequery += (orderDescending) ? " DESC " : "";
 
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum");
     if (chanorder != "channum")
@@ -449,19 +388,15 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         }
         else
         {
-            proginfo->originalAirDate =
-                QDate::fromString(query.value(26).toString(),Qt::ISODate);
-
-            if (proginfo->originalAirDate > QDate(1940, 1, 1))
-                proginfo->hasAirDate  = true;
-            else
-                proginfo->hasAirDate  = false;
+            QDate oad = QDate::fromString(
+                query.value(26).toString(), Qt::ISODate);
+            proginfo->originalAirDate = oad;
+            proginfo->hasAirDate = oad.isValid() && (oad > QDate(1940, 1, 1));
         }
 
         proginfo->pathname = query.value(28).toString();
 
-
-        if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
+        if (proginfo->hostname.isEmpty())
             proginfo->hostname = gContext->GetHostName();
 
         if (!query.value(7).toString().isEmpty())
@@ -484,6 +419,9 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         flags |=  query.value(12).toInt()                 ? FL_AUTOEXP  : 0;
         flags |= (query.value(14).toInt() == 1)           ? FL_BOOKMARK : 0;
         flags |= (query.value(35).toInt() == 1)           ? FL_WATCHED  : 0;
+        flags |= (query.value(37).toInt() == TRANSCODING_COMPLETE) ?
+            FL_TRANSCODED : 0;
+        flags |= (query.value(39).toInt() == 1)           ? FL_PRESERVED: 0;
 
         inUseKey = query.value(0).toString() + " " +
             query.value(1).toDateTime().toString(Qt::ISODate);
@@ -520,16 +458,18 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
         proginfo->playgroup    = query.value(27).toString();
         proginfo->storagegroup = query.value(36).toString();
         proginfo->recstatus    = rsRecorded;
+        proginfo->recpriority  = query.value(38).toInt();
+        proginfo->year         = query.value(40).toString();
 
-        if ((pSchedList != NULL) && (proginfo->recendts > rectime))
+        if (proginfo->recendts > rectime)
         {
-            iterator it = pSchedList->pglist.begin();
-            for (; it != pSchedList->pglist.end(); ++it)
+            ProgramList::const_iterator it = schedList.begin();
+            for (; it != schedList.end(); ++it)
             {
-                ProgramInfo *s = *it;
-                if (s && s->recstatus    == rsRecording &&
-                    proginfo->chanid     == s->chanid   &&
-                    proginfo->recstartts == s->recstartts)
+                const ProgramInfo &s = **it;
+                if (s.recstatus          == rsRecording &&
+                    proginfo->chanid     == s.chanid    &&
+                    proginfo->recstartts == s.recstartts)
                 {
                     proginfo->recstatus = rsRecording;
                     break;
@@ -539,108 +479,69 @@ bool ProgramList::FromRecorded( bool bDescending, ProgramList *pSchedList )
 
         proginfo->stars = query.value(31).toDouble();
 
-        pglist.push_back(proginfo);
+        destination.push_back(proginfo);
     }
 
     return true;
 }
 
-
-bool ProgramList::FromOldRecorded(const QString &sql, MSqlBindings &bindings)
+bool LoadFromScheduler(
+    ProgramList &destination, bool &hasConflicts,
+    QString tmptable, int recordid)
 {
-    clear();
-    MSqlQuery query(MSqlQuery::InitCon());
+    destination.clear();
+    hasConflicts = false;
 
-    query.prepare("SELECT oldrecorded.chanid, starttime, endtime, "
-                  " title, subtitle, description, category, seriesid, "
-                  " programid, channel.channum, channel.callsign, "
-                  " channel.name, findid, rectype, recstatus, recordid, "
-                  " duplicate "
-                  " FROM oldrecorded "
-                  " LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
-                  + sql);
-    query.bindValues(bindings);
+    if (gContext->IsBackend())
+        return false;
 
-    if (!query.exec() || !query.isActive())
+    QString query;
+    if (!tmptable.isEmpty())
     {
-        MythDB::DBError("ProgramList::FromOldRecorded", query);
+        query = QString("QUERY_GETALLPENDING %1 %2")
+            .arg(tmptable).arg(recordid);
+    }
+    else
+    {
+        query = QString("QUERY_GETALLPENDING");
+    }
+
+    QStringList slist( query );
+    if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "LoadFromScheduler(): Error querying master.");
         return false;
     }
 
-    while (query.next())
-    {
-        ProgramInfo *p = new ProgramInfo;
-        p->chanid = query.value(0).toString();
-        p->startts = QDateTime::fromString(query.value(1).toString(),
-                                           Qt::ISODate);
-        p->endts = QDateTime::fromString(query.value(2).toString(),
-                                         Qt::ISODate);
-        p->recstartts = p->startts;
-        p->recendts = p->endts;
-        p->lastmodified = p->startts;
-        p->title = query.value(3).toString();
-        p->subtitle = query.value(4).toString();
-        p->description = query.value(5).toString();
-        p->category = query.value(6).toString();
-        p->seriesid = query.value(7).toString();
-        p->programid = query.value(8).toString();
-        p->chanstr = query.value(9).toString();
-        p->chansign = query.value(10).toString();
-        p->channame = query.value(11).toString();
-        p->findid = query.value(12).toInt();
-        p->rectype = RecordingType(query.value(13).toInt());
-        p->recstatus = RecStatusType(query.value(14).toInt());
-        p->recordid = query.value(15).toInt();
-        p->duplicate = query.value(16).toInt();
+    hasConflicts = slist[0].toInt();
 
-        pglist.push_back(p);
+    bool result = true;
+    QStringList::const_iterator sit = slist.begin()+2;
+
+    while (result && sit != slist.end())
+    {
+        ProgramInfo *p = new ProgramInfo();
+        result = p->FromStringList(sit, slist.end());
+        if (result)
+            destination.push_back(p);
+        else
+            delete p;
     }
 
-    return true;
+    if (destination.size() != slist[1].toUInt())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "LoadFromScheduler(): Length mismatch.");
+        destination.clear();
+        result = false;
+    }
+
+    return result;
 }
 
-bool ProgramList::GetProgramDetailList(
-    QDateTime &nextRecordingStart, bool *hasConflicts, ProgramDetailList *list)
+bool LoadFromScheduler(ProgramList &destination)
 {
-    nextRecordingStart = QDateTime();
-
-    bool dummy;
-    bool *conflicts = (hasConflicts) ? hasConflicts : &dummy;
-
-    ProgramList progList;
-    if (!progList.FromScheduler(*conflicts))
-        return false;
-
-    // find the earliest scheduled recording
-    ProgramList::const_iterator it = progList.begin();
-    for (; it != progList.end(); ++it)
-    {
-        if (((*it)->recstatus == rsWillRecord) &&
-            (nextRecordingStart.isNull() ||
-             nextRecordingStart > (*it)->recstartts))
-        {
-            nextRecordingStart = (*it)->recstartts;
-        }
-    }
-
-    if (!list)
-        return true;
-
-    // save the details of the earliest recording(s)
-    for (it = progList.begin(); it != progList.end(); ++it)
-    {
-        if (((*it)->recstatus  == rsWillRecord) &&
-            ((*it)->recstartts == nextRecordingStart))
-        {
-            ProgramDetail prog;
-            prog.channame  = (*it)->channame;
-            prog.title     = (*it)->title;
-            prog.subtitle  = (*it)->subtitle;
-            prog.startTime = (*it)->recstartts;
-            prog.endTime   = (*it)->recendts;
-            list->push_back(prog);
-        }
-    }
-
-    return true;
+    bool dummyConflicts;
+    return LoadFromScheduler(destination, dummyConflicts, "", -1);
 }

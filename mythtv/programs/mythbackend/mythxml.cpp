@@ -571,14 +571,13 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
     for (RecIter itRecList =  recList.begin();
                  itRecList != recList.end();   itRecList++)
     {
-        schedList.append( *itRecList );
+        schedList.push_back( *itRecList );
     }
 
     // ----------------------------------------------------------------------
 
     ProgramList progList;
-
-    progList.FromProgram( sSQL, bindings, schedList );
+    LoadFromProgram( progList, sSQL, bindings, schedList, false );
 
     // Build Response
 
@@ -623,7 +622,7 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
     list.push_back( NameValue( "NumOfChannels", iChanCount   ));
     list.push_back( NameValue( "Details"      , bDetails     ));
 
-    list.push_back( NameValue( "Count"        , (int)progList.count() ));
+    list.push_back( NameValue( "Count"        , (int)progList.size() ));
     list.push_back( NameValue( "AsOf"         , QDateTime::currentDateTime()
                                                 .toString( Qt::ISODate )));
     list.push_back( NameValue( "Version"      , MYTH_BINARY_VERSION ));
@@ -684,14 +683,13 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
     for (RecIter itRecList =  recList.begin();
                  itRecList != recList.end();   itRecList++)
     {
-        schedList.append( *itRecList );
+        schedList.push_back( *itRecList );
     }
 
     // ----------------------------------------------------------------------
 
     ProgramList progList;
-
-    progList.FromProgram( sSQL, bindings, schedList );
+    LoadFromProgram( progList, sSQL, bindings, schedList, false );
 
     ProgramList::iterator pgit = progList.begin();
 
@@ -971,14 +969,13 @@ void MythXML::GetRecorded( HTTPRequest *pRequest )
     for (RecIter itRecList =  recList.begin();
                  itRecList != recList.end();   itRecList++)
     {
-        schedList.append( *itRecList );
+        schedList.push_back( *itRecList );
     }
 
     // ----------------------------------------------------------------------
 
     ProgramList progList;
-
-    progList.FromRecorded( bDescending, &schedList );
+    LoadFromRecorded( progList, bDescending, false, schedList );
 
     // Build Response XML
 
@@ -995,7 +992,7 @@ void MythXML::GetRecorded( HTTPRequest *pRequest )
 
     NameValues list;
 
-    list.push_back( NameValue( "Count"    , (int)progList.count()));
+    list.push_back( NameValue( "Count"    , (int)progList.size()));
     list.push_back( NameValue( "AsOf"     , QDateTime::currentDateTime()
                                             .toString( Qt::ISODate )));
     list.push_back( NameValue( "Version"  , MYTH_BINARY_VERSION ));

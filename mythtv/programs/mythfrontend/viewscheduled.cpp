@@ -115,9 +115,9 @@ bool ViewScheduled::Create()
     return true;
 }
 
-void ViewScheduled::Load()
+void ViewScheduled::Load(void)
 {
-    m_recList.FromScheduler(m_conflictBool);
+    LoadFromScheduler(m_recList, m_conflictBool);
 }
 
 void ViewScheduled::Init()
@@ -266,7 +266,7 @@ void ViewScheduled::LoadList(bool useExistingData)
     m_recgroupList.clear();
 
     if (!useExistingData)
-        m_recList.FromScheduler(m_conflictBool);
+        LoadFromScheduler(m_recList, m_conflictBool);
 
     ProgramList::iterator pit = m_recList.begin();
     QString currentDate;
@@ -294,10 +294,10 @@ void ViewScheduled::LoadList(bool useExistingData)
                 m_maxinput = pginfo->inputid;
 
             QDate date = (pginfo->recstartts).date();
-            m_recgroupList[date].append(pginfo);
+            m_recgroupList[date].push_back(pginfo);
             m_recgroupList[date].setAutoDelete(false);
 
-            m_recgroupList[m_defaultGroup].append(pginfo);
+            m_recgroupList[m_defaultGroup].push_back(pginfo);
 
             ++pit;
         }
@@ -339,7 +339,7 @@ void ViewScheduled::LoadList(bool useExistingData)
 
         plist = m_recgroupList[m_currentGroup];
 
-        int listPos = plist.count() - 1;
+        int listPos = ((int) plist.size()) - 1;
         int i;
         for (i = listPos; i >= 0; --i)
         {
@@ -363,7 +363,7 @@ void ViewScheduled::LoadList(bool useExistingData)
 
 void ViewScheduled::ChangeGroup(MythUIButtonListItem* item)
 {
-    if (!item || m_recList.isEmpty())
+    if (!item || m_recList.empty())
         return;
 
     QDate group = qVariantValue<QDate>(item->GetData());
@@ -382,9 +382,9 @@ void ViewScheduled::FillList()
                                                 (GetChild("norecordings_info"));
 
     if (norecordingText)
-        norecordingText->SetVisible(m_recList.isEmpty());
+        norecordingText->SetVisible(m_recList.empty());
 
-    if (m_recList.isEmpty())
+    if (m_recList.empty())
         return;
 
     ProgramList plist;

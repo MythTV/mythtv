@@ -16,7 +16,6 @@
 #include "mythdbcon.h"
 #include "lcddevice.h"
 #include "tv.h"
-#include "programlist.h"
 #include "uitypes.h"
 #include "compat.h"
 #include "mythdirs.h"
@@ -520,7 +519,7 @@ bool WelcomeDialog::updateScheduledList()
         return false;
     }
 
-    ProgramList::GetProgramDetailList(
+    GetProgramDetailList(
         m_nextRecordingStart, &m_hasConflicts, &m_scheduledList);
 
     updateStatus();

@@ -154,7 +154,7 @@ HEADERS += channelsettings.h        previewgenerator.h
 HEADERS += transporteditor.h        listingsources.h
 HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
-HEADERS += recordingrule.h
+HEADERS += recordingrule.h          programdetail.h
 
 SOURCES += recordinginfo.cpp        recordinglist.cpp
 SOURCES += RingBuffer.cpp           avfringbuffer.cpp
@@ -175,7 +175,7 @@ SOURCES += channelsettings.cpp      previewgenerator.cpp
 SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 SOURCES += myth_imgconvert.cpp
-SOURCES += recordingrule.cpp
+SOURCES += recordingrule.cpp        programdetail.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h

@@ -397,8 +397,8 @@ void ViewScheduleDiff::FillList(void)
         }
     }
 
-    recListBefore.FromScheduler(conflictBool);
-    recListAfter.FromScheduler(conflictBool, altTable, recordid);
+    LoadFromScheduler(recListBefore, conflictBool);
+    LoadFromScheduler(recListAfter,  conflictBool, altTable, recordid);
 
     recListBefore.sort(comp_recstart_less_than);
     recListAfter.sort(comp_recstart_less_than);

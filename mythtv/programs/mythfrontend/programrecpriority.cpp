@@ -1257,7 +1257,7 @@ void ProgramRecPriority::countMatches()
     m_nowMatch.clear();
     m_recMatch.clear();
     ProgramList schedList;
-    schedList.FromScheduler();
+    LoadFromScheduler(schedList);
     QDateTime now = QDateTime::currentDateTime();
 
     ProgramList::const_iterator it = schedList.begin();

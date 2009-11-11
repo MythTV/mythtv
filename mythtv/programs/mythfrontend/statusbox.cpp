@@ -624,9 +624,9 @@ void StatusBox::doScheduleStatus()
     }
 
     ProgramList schedList;
-    schedList.FromScheduler();
+    LoadFromScheduler(schedList);
 
-    tmpstr = tr("%n matching showing(s)", "", schedList.count());
+    tmpstr = tr("%n matching showing(s)", "", schedList.size());
     AddLogLine(tmpstr, tmpstr);
 
     ProgramList::const_iterator it = schedList.begin();

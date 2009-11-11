@@ -1110,7 +1110,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     if (m_noRecordingsText)
     {
-        if (!progList.isEmpty())
+        if (!progList.empty())
             m_noRecordingsText->SetVisible(false);
         else
         {
@@ -1257,7 +1257,7 @@ bool PlaybackBox::FillList(bool useCachedData)
 
                 if (m_viewMask != VIEW_NONE &&
                     (p->recgroup != "LiveTV" || m_recGroup == "LiveTV"))
-                    m_progLists[""].prepend(p);
+                    m_progLists[""].push_front(p);
 
                 asKey = p->MakeUniqueKey();
                 if (asCache.contains(asKey))
@@ -1271,7 +1271,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                 {
                     QString tmpTitle = tr("LiveTV");
                     sortedList[tmpTitle.toLower()] = tmpTitle;
-                    m_progLists[tmpTitle.toLower()].prepend(p);
+                    m_progLists[tmpTitle.toLower()].push_front(p);
                     m_progLists[tmpTitle.toLower()].setAutoDelete(false);
                     continue;
                 }
@@ -1285,7 +1285,7 @@ bool PlaybackBox::FillList(bool useCachedData)
 
                     if (!sortedList.contains(sTitle))
                         sortedList[sTitle] = p->title;
-                    m_progLists[sortedList[sTitle].toLower()].prepend(p);
+                    m_progLists[sortedList[sTitle].toLower()].push_front(p);
                     m_progLists[sortedList[sTitle].toLower()].setAutoDelete(false);
                 }
 
@@ -1293,7 +1293,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                     !p->recgroup.isEmpty()) // Show recording groups
                 {
                     sortedList[p->recgroup.toLower()] = p->recgroup;
-                    m_progLists[p->recgroup.toLower()].prepend(p);
+                    m_progLists[p->recgroup.toLower()].push_front(p);
                     m_progLists[p->recgroup.toLower()].setAutoDelete(false);
                 }
 
@@ -1301,7 +1301,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                     !p->category.isEmpty()) // Show categories
                 {
                     sortedList[p->category.toLower()] = p->category;
-                    m_progLists[p->category.toLower()].prepend(p);
+                    m_progLists[p->category.toLower()].push_front(p);
                     m_progLists[p->category.toLower()].setAutoDelete(false);
                 }
 
@@ -1312,7 +1312,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                     QString tmpTitle = QString("(%1)")
                                                .arg(searchRule[p->recordid]);
                     sortedList[tmpTitle.toLower()] = tmpTitle;
-                    m_progLists[tmpTitle.toLower()].prepend(p);
+                    m_progLists[tmpTitle.toLower()].push_front(p);
                     m_progLists[tmpTitle.toLower()].setAutoDelete(false);
                 }
 
@@ -1337,7 +1337,7 @@ bool PlaybackBox::FillList(bool useCachedData)
                         if (recidEpisodes[p->recordid] == 1 ||
                             p->recordid == 0 )
                         {
-                            m_progLists[m_watchGroupLabel].prepend(p);
+                            m_progLists[m_watchGroupLabel].push_front(p);
                             m_progLists[m_watchGroupLabel].setAutoDelete(false);
                         }
                         else
@@ -4072,9 +4072,9 @@ void PlaybackBox::showGroupFilter(void)
     }
 
     // Create and add the "All Programs" entry
-    displayNames.prepend(tr("%1 [%n item(s)]", 0, totalItems)
-                         .arg(ProgramInfo::i18n("All Programs")));
-    groupNames.prepend("All Programs");
+    displayNames.push_front(tr("%1 [%n item(s)]", 0, totalItems)
+                            .arg(ProgramInfo::i18n("All Programs")));
+    groupNames.push_front("All Programs");
     m_recGroupType["All Programs"] = "recgroup";
 
     // Find each category, and the number of recordings in each

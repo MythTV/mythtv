@@ -9,7 +9,7 @@
 // of the list while the linked list erase() is always O(1), but all other
 // operations are faster with the deque.
 
-#define PGLIST_USE_LINKED_LIST
+//#define PGLIST_USE_LINKED_LIST
 
 // C++ headers
 #ifdef PGLIST_USE_LINKED_LIST
@@ -29,7 +29,13 @@ using namespace std;
 // MythTV headers
 #include "mythexp.h"
 #include "mythdbcon.h"
-#include "programinfo.h" // for ProgramDetailList
+
+class RecordingList;
+MPUBLIC bool LoadFromScheduler(
+    RecordingList      &destination,
+    bool               &hasConflicts,
+    QString             altTable = "",
+    int                 recordid = -1);
 
 /** \class RecordingList
  *  \brief List of RecordingInfo instances, with helper functions.
@@ -45,35 +51,6 @@ class MPUBLIC RecordingList
 
     RecordingInfo *operator[](uint index);
     const RecordingInfo *operator[](uint index) const;
-    bool operator==(const RecordingList &b) const;
-
-    bool FromScheduler(bool    &hasConflicts,
-                       QString  altTable = "",
-                       int      recordid = -1);
-
-    bool FromScheduler(void)
-    {
-        bool dummyConflicts;
-        return FromScheduler(dummyConflicts, "", -1);
-    };
-
-    bool FromProgram(const QString &sql, MSqlBindings &bindings,
-                     RecordingList &schedList, bool oneChanid = false);
-
-    bool FromProgram(const QString &sql, MSqlBindings &bindings)
-    {
-        RecordingList dummySched;
-        return FromProgram(sql, bindings, dummySched);
-    }
-
-    bool FromRecorded( bool bDescending, RecordingList *pSchedList);
-
-    bool FromOldRecorded(const QString &sql, MSqlBindings &bindings);
-
-    static bool GetProgramDetailList(
-        QDateTime         &nextRecordingStart,
-        bool              *hasConflicts = NULL,
-        ProgramDetailList *list = NULL);
 
     RecordingInfo *take(uint i);
     iterator erase(iterator it);
@@ -91,11 +68,6 @@ class MPUBLIC RecordingList
     void push_back(RecordingInfo *pginfo) { pglist.push_back(pginfo); }
 
     // compatibility with old Q3PtrList
-    bool isEmpty(void) const { return empty(); }
-    size_t count(void) const { return size(); }
-    RecordingInfo *at(uint index) { return (*this)[index]; }
-    void prepend(RecordingInfo *pginfo) { push_front(pginfo); }
-    void append(RecordingInfo *pginfo) { push_back(pginfo); }
     void setAutoDelete(bool auto_delete) { autodelete = auto_delete; }
 
   protected:

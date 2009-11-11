@@ -21,12 +21,22 @@ class RecordingRule;
 
 class MPUBLIC RecordingInfo : public ProgramInfo
 {
+    friend class RecordingList;
+
   public:
     RecordingInfo(void) : record(NULL) {}
     RecordingInfo(const RecordingInfo &other) :
         ProgramInfo(other), record(NULL) {}
     RecordingInfo(const ProgramInfo &other) :
         ProgramInfo(other), record(NULL) {}
+
+  protected:
+    RecordingInfo(const MSqlQuery   &query,
+                  const ProgramList &schedList,
+                  bool               oneChanid) :
+        ProgramInfo(query, schedList, oneChanid), record(NULL) {}
+
+  public:
     RecordingInfo &operator=(const RecordingInfo &other) {return clone(other);}
     RecordingInfo &operator=(const ProgramInfo &other) { return clone(other); }
 

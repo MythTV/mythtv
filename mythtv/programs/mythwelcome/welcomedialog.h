@@ -6,7 +6,7 @@
 
 // myth
 #include "tvremoteutil.h"
-#include "programinfo.h"
+#include "programdetail.h"
 #include "mythscreentype.h"
 #include "mythuibutton.h"
 #include "mythuitext.h"

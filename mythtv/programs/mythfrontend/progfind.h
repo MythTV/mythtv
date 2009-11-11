@@ -1,14 +1,15 @@
 #ifndef PROGFIND_H_
 #define PROGFIND_H_
 
-// qt
+// Qt
 #include <QDateTime>
 #include <QEvent>
 
-// myth
+// MythTV
 #include "mythscreentype.h"
 #include "programlist.h"
 #include "mythdialogbox.h"
+#include "playercontext.h"
 
 // mythfrontend
 #include "schedulecommon.h"

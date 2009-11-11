@@ -439,7 +439,8 @@ void Scheduler::FillRecordListFromDB(int recordid)
 void Scheduler::FillRecordListFromMaster(void)
 {
     RecordingList schedList(false);
-    schedList.FromScheduler();
+    bool dummy;
+    LoadFromScheduler(schedList, dummy);
 
     QMutexLocker lockit(reclist_lock);
 

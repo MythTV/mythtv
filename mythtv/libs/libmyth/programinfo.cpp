@@ -224,6 +224,96 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 {
 }
 
+ProgramInfo::ProgramInfo(
+    const MSqlQuery &query, const ProgramList &schedList, bool oneChanid)
+{
+    if (!query.isValid())
+    {
+        ProgramInfo blank;
+        *this = blank;
+    }
+
+    chanid = query.value(0).toString();
+    startts = QDateTime::fromString(query.value(1).toString(),
+                                    Qt::ISODate);
+    endts = QDateTime::fromString(query.value(2).toString(),
+                                  Qt::ISODate);
+    recstartts = startts;
+    recendts = endts;
+    lastmodified = startts;
+    title = query.value(3).toString();
+    subtitle = query.value(4).toString();
+    description = query.value(5).toString();
+    category = query.value(6).toString();
+    chanstr = query.value(7).toString();
+    chansign = query.value(8).toString();
+    channame = query.value(9).toString();
+    repeat = query.value(10).toInt();
+    chancommfree = COMM_DETECT_COMMFREE == query.value(11).toInt();
+    chanOutputFilters = query.value(12).toString();
+    seriesid = query.value(13).toString();
+    programid = query.value(14).toString();
+    year = query.value(15).toString();
+    stars = query.value(16).toString().toFloat();
+
+    if (query.value(17).isNull() || query.value(17).toString().isEmpty())
+    {
+        originalAirDate = QDate (0, 1, 1);
+        hasAirDate = false;
+    }
+    else
+    {
+        originalAirDate =
+            QDate::fromString(query.value(17).toString(),Qt::ISODate);
+
+        if (originalAirDate > QDate(1940, 1, 1))
+            hasAirDate = true;
+        else
+            hasAirDate = false;
+    }
+    catType = query.value(18).toString();
+    recordid = query.value(19).toInt();
+    rectype = RecordingType(query.value(20).toInt());
+    recstatus = RecStatusType(query.value(21).toInt());
+    findid = query.value(22).toInt();
+
+
+    ProgramList::const_iterator it = schedList.begin();
+    for (; it != schedList.end(); ++it)
+    {
+        if (!IsSameTimeslot(**it))
+            continue;
+
+        const ProgramInfo &s = **it;
+        recordid    = s.recordid;
+        recstatus   = s.recstatus;
+        rectype     = s.rectype;
+        recpriority = s.recpriority;
+        recstartts  = s.recstartts;
+        recendts    = s.recendts;
+        cardid      = s.cardid;
+        inputid     = s.inputid;
+        dupin       = s.dupin;
+        dupmethod   = s.dupmethod;
+        findid      = s.findid;
+
+        if (s.recstatus == rsWillRecord || s.recstatus == rsRecording)
+        {
+            if (oneChanid)
+            {
+                chanid   = s.chanid;
+                chanstr  = s.chanstr;
+                chansign = s.chansign;
+                channame = s.channame;
+            }
+            else if ((chanid != s.chanid) && (chanstr != s.chanstr))
+            {
+                recstatus = rsOtherShowing;
+            }
+        }
+    }
+}
+
 /** \fn ProgramInfo::operator=(const ProgramInfo &other)
  *  \brief Copies important fields from other ProgramInfo.
  */
@@ -936,10 +1026,10 @@ ProgramInfo::LPADT ProgramInfo::LoadProgramAtDateTime(
     bindings[":STARTTS1"] = str_startts;
     bindings[":STARTTS2"] = str_startts;
 
-    schedList.FromScheduler();
-    progList.FromProgram(querystr, bindings, schedList);
+    LoadFromScheduler(schedList);
+    LoadFromProgram(progList, querystr, bindings, schedList, false);
 
-    if (!progList.isEmpty())
+    if (!progList.empty())
     {
         ProgramInfo *pginfo = progList[0];
 
@@ -1016,9 +1106,9 @@ ProgramInfo::LPADT ProgramInfo::LoadProgramAtDateTime(
     bindings[":CHANID"]  = QString::number(_chanid);
     bindings[":STARTTS"] = dtime.toString("yyyy-MM-ddThh:mm:50");
 
-    progList.FromProgram(querystr, bindings, schedList);
+    LoadFromProgram(progList, querystr, bindings, schedList, false);
 
-    if (!progList.isEmpty())
+    if (!progList.empty())
         nextstart = (*progList.begin())->startts;
 
     if (nextstart > startts && nextstart < recendts)
