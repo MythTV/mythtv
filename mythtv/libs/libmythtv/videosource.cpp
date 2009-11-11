@@ -1362,61 +1362,6 @@ class FirewireConfigurationGroup : public VerticalConfigurationGroup
     FirewireModel *model;
 };
 
-class DBOX2Port : public LineEditSetting, public CaptureCardDBStorage
-{
-  public:
-    DBOX2Port(const CaptureCard &parent) :
-        LineEditSetting(this),
-        CaptureCardDBStorage(this, parent, "dbox2_port")
-    {
-        setValue("31338");
-        setLabel(QObject::tr("DBOX2 Streaming Port"));
-        setHelpText(QObject::tr("DBOX2 streaming port on your DBOX2."));
-    }
-};
-
-class DBOX2HttpPort : public LineEditSetting, public CaptureCardDBStorage
-{
-  public:
-    DBOX2HttpPort(const CaptureCard &parent) :
-        LineEditSetting(this),
-        CaptureCardDBStorage(this, parent, "dbox2_httpport")
-    {
-        setValue("80");
-        setLabel(QObject::tr("DBOX2 HTTP Port"));
-        setHelpText(QObject::tr("DBOX2 http port on your DBOX2."));
-    }
-};
-
-class DBOX2Host : public LineEditSetting, public CaptureCardDBStorage
-{
-  public:
-    DBOX2Host(const CaptureCard &parent) :
-        LineEditSetting(this),
-        CaptureCardDBStorage(this, parent, "dbox2_host")
-    {
-        setValue("dbox");
-        setLabel(QObject::tr("DBOX2 Host IP"));
-        setHelpText(QObject::tr("DBOX2 Host IP is the remote device."));
-    }
-};
-
-class DBOX2ConfigurationGroup : public VerticalConfigurationGroup
-{
-  public:
-    DBOX2ConfigurationGroup(CaptureCard& a_parent):
-        VerticalConfigurationGroup(false, true, false, false),
-        parent(a_parent)
-    {
-        addChild(new DBOX2Port(parent));
-        addChild(new DBOX2HttpPort(parent));
-        addChild(new DBOX2Host(parent));
-        addChild(new SingleCardInput(parent));
-    };
-  private:
-    CaptureCard &parent;
- };
-
 // -----------------------
 // HDHomeRun Configuration
 // -----------------------
@@ -2045,10 +1990,6 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
     addTarget("FIREWIRE",  new FirewireConfigurationGroup(parent));
 #endif // USING_FIREWIRE
 
-#ifdef USING_DBOX2
-    addTarget("DBOX2",     new DBOX2ConfigurationGroup(parent));
-#endif // USING_DBOX2
-
 #ifdef USING_HDHOMERUN
     addTarget("HDHOMERUN", new HDHomeRunConfigurationGroup(parent));
 #endif // USING_HDHOMERUN
@@ -2111,9 +2052,7 @@ void CaptureCard::fillSelections(SelectSetting *setting)
         if (sharable && (1 != ++device_refs[videodevice]))
             continue;
 
-        QString label = CardUtil::GetDeviceLabel(
-            cardid, cardtype, videodevice);
-
+        QString label = CardUtil::GetDeviceLabel(cardtype, videodevice);
         setting->addSelection(label, QString::number(cardid));
     }
 }
@@ -2252,11 +2191,6 @@ void CardType::fillSelections(SelectSetting* setting)
         QObject::tr("USB MPEG-4 encoder box (Plextor ConvertX, etc)"),
         "GO7007");
 #endif // USING_V4L
-
-#ifdef USING_DBOX2
-    setting->addSelection(
-        QObject::tr("DBox2 TCP/IP cable box"), "DBOX2");
-#endif // USING_DBOX2
 
 #ifdef USING_HDHOMERUN
     setting->addSelection(

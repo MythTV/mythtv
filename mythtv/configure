@@ -270,7 +270,6 @@ BLOCK_QUOTE
   echo "  --disable-joystick-menu  disable joystick menu"
   echo "  --disable-firewire       disable support for FireWire cable boxes"
   echo "  --disable-iptv           disable support for recording RTSP/UDP/RTP streams"
-#  echo "  --enable-dbox2           enable support for Nokia DBOX2 DVB boxes (or compatibles)"
   echo "  --disable-hdhomerun      disable support for HDHomeRun boxes"
   echo "  --disable-v4l            disable Video4Linux support"
   echo "  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support"
@@ -1184,7 +1183,6 @@ MYTHTV_CONFIG_LIST='
     backend
     cygwin
     darwin
-    dbox2
     directfb
     disable_mmx_for_debugging
     dvb
@@ -1492,7 +1490,6 @@ ffserver_extralibs='$ldl'
 
 # mythtv dependencies
 audio_oss_deps_any="soundcard_h sys_soundcard_h"
-dbox2_deps="backend"
 dvb_deps="backend"
 firewire_deps="backend"
 iptv_deps="backend"
@@ -1599,7 +1596,6 @@ audio_jack_libs="-ljack"
 enable audio_oss
 enable bindings_perl
 enable bindings_python
-disable dbox2
 enable directfb
 enable dvb
 enable ffmpeg_pthreads
@@ -3829,7 +3825,6 @@ if enabled backend; then
   echo "FireWire support          ${firewire-no}"
   echo "DVB support               ${dvb-no} [$dvb_path]"
   echo "DVB-S2 support            ${fe_can_2g_modulation-no}"
-#  echo "DBox2 support             ${dbox2-no}"
   echo "HDHomeRun support         ${hdhomerun-no}"
   echo "IPTV support              ${iptv-no}"
 fi

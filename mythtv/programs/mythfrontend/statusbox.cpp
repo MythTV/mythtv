@@ -762,7 +762,7 @@ void StatusBox::doTunerStatus()
 
         QString tun = tr("Tuner %1 %2 %3");
         QString devlabel = CardUtil::GetDeviceLabel(
-            cardid, query.value(1).toString(), query.value(2).toString());
+            query.value(1).toString(), query.value(2).toString());
 
         QString shorttuner = tun.arg(cardid).arg("").arg(status);
         QString longtuner = tun.arg(cardid).arg(devlabel).arg(status);

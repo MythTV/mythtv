@@ -17,7 +17,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1245";
+const QString currentDatabaseVersion = "1246";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -109,8 +109,7 @@ cards supported by the bttv driver.
 
 The 'cardtype' is an important field for all cards as it guides the
 interpretation of the rest of the fields, it has several possible
-values: "V4L", "MJPEG", "DVB", "MPEG", "FIREWIRE", "GO7007"
-and  "DBOX2".
+values: "V4L", "MJPEG", "DVB", "MPEG", "FIREWIRE", and "GO7007".
 "V4L" indicates a V4L compatible device, this could be a
 true V4L device or something like a Firewire camera with the
 "firewire->v4l" driver.
@@ -130,15 +129,13 @@ IR transmitter; in some cases, it also allows you to digitally
 capture video.
 The "GO7008" card type describes a USB MPEG-4 encoder such
 as the Plextor ConvertX.
-Finally, the "DBOX2" card type describes connection to a
-networkable cable box manufactured by Nokia and Sagem for use
-in Germany.
 
 The 'hostname' field is another important field for all cards
 as it specifies which backend the capture card is connected to.
 
 The 'defaultinput' field is a another important field for all
-cards except "FIREWIRE" and "DBOX2" cards. It specifies which
+cards except "FIREWIRE", "FREEBOX" and "HDHOMERUN" cards.
+It specifies which
 input of the card to use. This does not have to mean a specific
 physical input, but may also indicate a different use for the
 same phyicial input.
@@ -4912,6 +4909,20 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1245", dbver))
+            return false;
+    }
+
+    if (dbver == "1245")
+    {
+       const char *updates[] = {
+"DELETE FROM capturecard WHERE cardtype = 'DBOX2';",
+"DELETE FROM profilegroups WHERE cardtype = 'DBOX2';",
+"ALTER TABLE capturecard DROP COLUMN dbox2_port;",
+"ALTER TABLE capturecard DROP COLUMN dbox2_httpport;",
+"ALTER TABLE capturecard DROP COLUMN dbox2_host;",
+NULL
+};
+       if (!performActualUpdate(updates, "1246", dbver))
             return false;
     }
 

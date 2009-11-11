@@ -1,7 +1,6 @@
 include ( ../../settings.pro )
   
 QT += network xml sql
-using_dbox2:QT *= qt3support
 
 TEMPLATE = lib
 TARGET = mythtv-$$LIBVERSION
@@ -478,11 +477,6 @@ using_backend {
         DEFINES += USING_FIREWIRE
         using_libavc_5_3:DEFINES += USING_LIBAVC_5_3
     }
-
-    # Support for set top boxes (Nokia DBox2 etc.)
-    using_dbox2:SOURCES += dbox2recorder.cpp dbox2channel.cpp dbox2epg.cpp
-    using_dbox2:HEADERS += dbox2recorder.h dbox2channel.h dbox2epg.h
-    using_dbox2:DEFINES += USING_DBOX2
 
     # Support for MPEG2 TS streams (including FreeBox http://adsl.free.fr/)
     using_iptv {

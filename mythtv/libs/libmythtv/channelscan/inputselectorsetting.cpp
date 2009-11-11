@@ -73,7 +73,7 @@ void InputSelector::Load(void)
         QString inputname  = query.value(3).toString();
 
         QString desc = CardUtil::GetDeviceLabel(
-            cardid, query.value(1).toString(), query.value(2).toString());
+            query.value(1).toString(), query.value(2).toString());
 
         desc += QString(" (%1)").arg(inputname);
 

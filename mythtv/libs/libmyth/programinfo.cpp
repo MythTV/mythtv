@@ -3416,8 +3416,6 @@ static int init_tr(void)
     QString rec_profile_groups =
         QObject::tr("CRC IP Recorders",
                     "Recording Profile Group Name") +
-        QObject::tr("DBOX2 Input",
-                    "Recording Profile Group Name") +
         QObject::tr("FireWire Input",
                     "Recording Profile Group Name") +
         QObject::tr("Freebox Input",

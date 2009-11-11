@@ -2,17 +2,20 @@
 #ifndef _CARDUTIL_H_
 #define _CARDUTIL_H_
 
-#include "settings.h"
-#include "mythexp.h"
+// ANSI C
+#include <stdint.h>
 
 // C++ headers
-#include <stdint.h>
 #include <vector>
 using namespace std;
 
 // Qt headers
-#include <qstringlist.h>
-#include <qmap.h>
+#include <QStringList>
+#include <QMap>
+
+// MythTV headers
+#include "settings.h"
+#include "mythexp.h"
 
 class InputInfo;
 class CardInput;
@@ -95,7 +98,7 @@ class MPUBLIC CardUtil
     {
         return
             (rawtype != "DVB")       &&
-            (rawtype != "FIREWIRE")  && (rawtype != "DBOX2")   &&
+            (rawtype != "FIREWIRE")  &&
             (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX");
     }
 
@@ -107,7 +110,7 @@ class MPUBLIC CardUtil
     static bool         IsUnscanable(const QString &rawtype)
     {
         return
-            (rawtype == "FIREWIRE")  || (rawtype == "DBOX2") ||
+            (rawtype == "FIREWIRE")  ||
             (rawtype == "HDPVR"      || (rawtype == "V4L"));
     }
 
@@ -212,9 +215,8 @@ class MPUBLIC CardUtil
     static vector<uint> GetGroupCardIDs(uint inputgroupid);
     static vector<uint> GetConflictingCards(uint inputid, uint exclude_cardid);
 
-    static QString      GetDeviceLabel(uint    cardid,
-                                       QString cardtype,
-                                       QString videodevice);
+    static QString      GetDeviceLabel(const QString &cardtype,
+                                       const QString &videodevice);
 
     static QString      ProbeSubTypeName(uint cardid);
 

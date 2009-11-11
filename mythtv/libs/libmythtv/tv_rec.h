@@ -39,7 +39,6 @@ class SignalMonitor;
 class DTVSignalMonitor;
 
 class ChannelBase;
-class DBox2Channel;
 class DTVChannel;
 class DVBChannel;
 class FirewireChannel;
@@ -102,16 +101,6 @@ class FireWireDBOptions
     int speed;
     int connection;
     QString model;
-};
-
-class DBox2DBOptions
-{
-  public:
-    DBox2DBOptions() : port(-1), httpport(-1), host("") {;}
-
-    int port;
-    int httpport;
-    QString host;
 };
 
 class TuningRequest
@@ -273,8 +262,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     static bool GetDevices(int cardid,
                            GeneralDBOptions   &general_opts,
                            DVBDBOptions       &dvb_opts,
-                           FireWireDBOptions  &firewire_opts,
-                           DBox2DBOptions     &dbox2_opts);
+                           FireWireDBOptions  &firewire_opts);
 
     static QString GetStartChannel(int cardid, const QString &defaultinput);
 
@@ -287,7 +275,6 @@ class MPUBLIC TVRec : public SignalMonitorListener
     bool CreateChannel(const QString &startChanNum);
     void InitChannel(const QString &inputname, const QString &startchannel);
     void CloseChannel(void);
-    DBox2Channel *GetDBox2Channel(void);
     DTVChannel   *GetDTVChannel(void);
     HDHRChannel  *GetHDHRChannel(void);
     DVBChannel   *GetDVBChannel(void);
@@ -370,7 +357,6 @@ class MPUBLIC TVRec : public SignalMonitorListener
     GeneralDBOptions   genOpt;
     DVBDBOptions       dvbOpt;
     FireWireDBOptions  fwOpt;
-    DBox2DBOptions     dboxOpt;
 
     // State variables
     mutable QMutex stateChangeLock;

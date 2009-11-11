@@ -46,7 +46,6 @@ using namespace std;
 #include "dummychannel.h"
 #include "dtvchannel.h"
 #include "dvbchannel.h"
-#include "dbox2channel.h"
 #include "hdhrchannel.h"
 #include "iptvchannel.h"
 #include "firewirechannel.h"
@@ -55,7 +54,6 @@ using namespace std;
 #include "NuppelVideoRecorder.h"
 #include "mpegrecorder.h"
 #include "dvbrecorder.h"
-#include "dbox2recorder.h"
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
 #include "firewirerecorder.h"
@@ -173,16 +171,6 @@ bool TVRec::CreateChannel(const QString &startchannel)
         init_run = true;
 #endif
     }
-    else if (genOpt.cardtype == "DBOX2")
-    {
-#ifdef USING_DBOX2
-        channel = new DBox2Channel(this, &dboxOpt, cardid);
-        if (!channel->Open())
-            return false;
-        InitChannel(genOpt.defaultinput, startchannel);
-        init_run = true;
-#endif
-    }
     else if (genOpt.cardtype == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
@@ -253,7 +241,7 @@ bool TVRec::Init(void)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (!GetDevices(cardid, genOpt, dvbOpt, fwOpt, dboxOpt))
+    if (!GetDevices(cardid, genOpt, dvbOpt, fwOpt))
         return false;
 
     // configure the Channel instance
@@ -1004,15 +992,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder = new FirewireRecorder(this, GetFirewireChannel());
 #endif // USING_FIREWIRE
     }
-    else if (genOpt.cardtype == "DBOX2")
-    {
-#ifdef USING_DBOX2
-        recorder = new DBox2Recorder(this, GetDBox2Channel());
-        recorder->SetOption("port",     dboxOpt.port);
-        recorder->SetOption("host",     dboxOpt.host);
-        recorder->SetOption("httpport", dboxOpt.httpport);
-#endif // USING_DBOX2
-    }
     else if (genOpt.cardtype == "HDHOMERUN")
     {
 #ifdef USING_HDHOMERUN
@@ -1215,15 +1194,6 @@ void TVRec::CloseChannel(void)
         return;
 
     channel->Close();
-}
-
-DBox2Channel *TVRec::GetDBox2Channel(void)
-{
-#ifdef USING_DBOX2
-    return dynamic_cast<DBox2Channel*>(channel);
-#else
-    return NULL;
-#endif // USING_DBOX2
 }
 
 DTVChannel *TVRec::GetDTVChannel(void)
@@ -1690,8 +1660,7 @@ void TVRec::HandlePendingRecordings(void)
 bool TVRec::GetDevices(int cardid,
                        GeneralDBOptions   &gen_opts,
                        DVBDBOptions       &dvb_opts,
-                       FireWireDBOptions  &firewire_opts,
-                       DBox2DBOptions     &dbox2_opts)
+                       FireWireDBOptions  &firewire_opts)
 {
     int testnum = 0;
     QString test;
@@ -1705,9 +1674,7 @@ bool TVRec::GetDevices(int cardid,
         ""
         "       dvb_on_demand,    dvb_tuning_delay,    dvb_eitscan,"
         ""
-        "       firewire_speed,   firewire_model,      firewire_connection, "
-        ""
-        "       dbox2_port,       dbox2_host,          dbox2_httpport   "
+        "       firewire_speed,   firewire_model,      firewire_connection "
         ""
         "FROM capturecard "
         "WHERE cardid = :CARDID");
@@ -1773,16 +1740,6 @@ bool TVRec::GetDevices(int cardid,
         firewire_opts.model = test;
 
     firewire_opts.connection  = query.value(fireoff + 2).toUInt();
-
-    // DBOX2/HDHomeRun options
-    uint dbox2off = fireoff + 3;
-    dbox2_opts.port = query.value(dbox2off + 0).toUInt();
-
-    test = query.value(dbox2off + 1).toString();
-    if (test != QString::null)
-        dbox2_opts.host = test;
-
-    dbox2_opts.httpport = query.value(dbox2off + 2).toUInt();
 
     return true;
 }
@@ -2665,8 +2622,6 @@ long long TVRec::GetMaxBitrate(void) const
         bitrate = 10080000LL; // use DVD max bit rate
     if (genOpt.cardtype == "HDPVR")
         bitrate = 20200000LL; // Peek bit rate for HD-PVR
-    else if (genOpt.cardtype == "DBOX2")
-        bitrate = 10080000LL; // use DVD max bit rate
     else if (!CardUtil::IsEncoder(genOpt.cardtype))
         bitrate = 19400000LL; // 1080i
     else // frame grabber
@@ -3676,7 +3631,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         delete channel;
         channel = NULL;
 
-        GetDevices(newCardID, genOpt, dvbOpt, fwOpt, dboxOpt);
+        GetDevices(newCardID, genOpt, dvbOpt, fwOpt);
         genOpt.defaultinput = inputname;
         CreateChannel(channum);
         if (!(request.flags & kFlagNoRec))

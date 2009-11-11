@@ -1623,7 +1623,6 @@ QStringList CardUtil::ProbeVideoInputs(QString device, QString cardtype)
 
     if (("FIREWIRE"  == cardtype) ||
         ("FREEBOX"   == cardtype) ||
-        ("DBOX2"     == cardtype) ||
         ("HDHOMERUN" == cardtype))
     {
         ret += "MPEG2TS";
@@ -1735,39 +1734,10 @@ QStringList CardUtil::ProbeDVBInputs(QString device)
     return ret;
 }
 
-QString CardUtil::GetDeviceLabel(uint cardid,
-                                 QString cardtype,
-                                 QString videodevice)
+QString CardUtil::GetDeviceLabel(const QString &cardtype,
+                                 const QString &videodevice)
 {
-    QString label = QString::null;
-
-    if (cardtype == "DBOX2")
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(
-            "SELECT dbox2_host, dbox2_port, dbox2_httpport "
-            "FROM capturecard "
-            "WHERE cardid = :CARDID");
-        query.bindValue(":CARDID", cardid);
-
-        if (!query.exec() || !query.isActive() || !query.next())
-            label = "[ DB ERROR ]";
-        else
-            label = QString("[ DBOX2 : IP %1 Port %2 HttpPort %3 ]")
-                .arg(query.value(0).toString())
-                .arg(query.value(1).toString())
-                .arg(query.value(2).toString());
-    }
-    else if (cardtype == "HDHOMERUN")
-    {
-        label = QString("[ HDHomeRun : %1 ]").arg(videodevice);
-    }
-    else
-    {
-        label = QString("[ %1 : %2 ]").arg(cardtype).arg(videodevice);
-    }
-
-    return label;
+    return QString("[ %1 : %2 ]").arg(cardtype).arg(videodevice);
 }
 
 void CardUtil::GetCardInputs(
@@ -1782,7 +1752,6 @@ void CardUtil::GetCardInputs(
 
     if (("FIREWIRE"  == cardtype) ||
         ("FREEBOX"   == cardtype) ||
-        ("DBOX2"     == cardtype) ||
         ("HDHOMERUN" == cardtype))
     {
         inputs += "MPEG2TS";
@@ -1790,7 +1759,7 @@ void CardUtil::GetCardInputs(
     else if ("DVB" != cardtype)
         inputs += ProbeV4LVideoInputs(device);
 
-    QString dev_label = GetDeviceLabel(cardid, cardtype, device);
+    QString dev_label = GetDeviceLabel(cardtype, device);
 
     QStringList::iterator it = inputs.begin();
     for (; it != inputs.end(); ++it)
