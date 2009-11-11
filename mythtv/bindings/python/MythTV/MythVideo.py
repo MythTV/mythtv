@@ -9,7 +9,7 @@ from socket import gethostname
 
 log = MythLog(CRITICAL, '#%(levelname)s - %(message)s', 'MythVideo')
 
-MVSCHEMA_VERSION = 1028
+MVSCHEMA_VERSION = 1029
 
 class MythVideo(object):
 	"""
