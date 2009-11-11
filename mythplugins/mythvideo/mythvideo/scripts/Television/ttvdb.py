@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="thetvdb.com Query";
 __author__="R.D.Vaughan"
-__version__="v1.0.4"        # Version .1 Initial development
+__version__="v1.0.5"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
 							# Version .3 Cleaned up the documentation and added a usage display option
 							# Version .4 Added override formating of the number option (-N)
@@ -115,6 +115,7 @@ __version__="v1.0.4"        # Version .1 Initial development
 							#               with text meta data. Also Posters, Banners and Fan art have one or
 							#               comma separated URLs as one continuous string.
 							# Version 1.0.4 Poster Should be Coverart instead.
+							# Version 1.0.5 Added the TVDB URL to the episode metadata
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -769,6 +770,13 @@ def Getseries_episode_data(t, opts, series_season_ep, language = None):
 			if genres != '':
 				print u"Genres:%s" % genres
 			print u"Runtime:%s" % search_for_series(t, series_name)[u'runtime']
+
+			# URL to TVDB web site episode web page for this series
+			for url_data in [u'seriesid', u'seasonid', u'id']:
+				if not url_data in available_keys:
+					break
+			else:
+				print u'URL:http://www.thetvdb.com/?tab=episode&seriesid=%s&seasonid=%s&id=%s' % (search_for_series(t, series_name)[season][episode][u'seriesid'], search_for_series(t, series_name)[season][episode][u'seasonid'],search_for_series(t, series_name)[season][episode][u'id'])
 # end Getseries_episode_data
 
 # Get Series Season and Episode numbers
