@@ -5,9 +5,8 @@
 #include <unistd.h>
 
 // qt
-#include <qapplication.h>
+#include <QApplication>
 #include <QKeyEvent>
-#include <QLabel>
 #include <QEvent>
 
 // myth
@@ -570,8 +569,8 @@ void WelcomeDialog::updateStatusMessage(void)
     if (m_statusList.empty())
     {
         if (m_bWillShutdown && m_secondsToShutdown != -1)
-            m_statusList.append(tr("MythTV is idle and will shutdown in %1 seconds.")
-                    .arg(m_secondsToShutdown));
+            m_statusList.append(tr("MythTV is idle and will shutdown in %n "
+                                   "second(s).", "", m_secondsToShutdown));
         else
             m_statusList.append(tr("MythTV is idle."));
     }
