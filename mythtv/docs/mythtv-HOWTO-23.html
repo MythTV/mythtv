@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.65">
  <TITLE>Installing and using MythTV: Miscellaneous.</TITLE>
  <LINK HREF="mythtv-HOWTO-24.html" REL=next>
  <LINK HREF="mythtv-HOWTO-22.html" REL=previous>
@@ -415,15 +415,17 @@ want to edit your <CODE>/etc/exports</CODE> file and use something like:
 add something like:
 <BLOCKQUOTE><CODE>
 <PRE>
-masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3,actimeo=0
+masterbackend:/var/video /var/video nfs hard,intr,nfsvers=3,actimeo=0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>Then run <CODE># mount -a</CODE> to re-read the file to mount the file system.</P>
+<P><B>NOTE</B>:  Previous versions of this HOWTO gave specific values for 
+variables like the "rsize".  Best common practice at this point is to <EM>not</EM>
+specify these and allow the server and the client to autonegotiate.</P>
 <P>In this case, the source is a machine called "masterbackend" which is
 exporting the directory "/var/video", which we're mounting locally at
-"/var/video".  The rsize and wsize options are used to increase the
-performance of NFS; "hard,intr" is there because that's the recommendation
+"/var/video".  "hard,intr" is there because that's the recommendation
 of the NFS-HOWTO, the nfsvers is required for filesizes over 2GB and actimeo
 is used to turn off file attribute caching.  Attribute caching for a shared
 media point causes problems; you always want to see the latest state of the
