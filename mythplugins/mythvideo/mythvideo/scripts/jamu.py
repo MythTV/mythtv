@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.5.7"
+__version__=u"v0.5.8"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -223,6 +223,7 @@ __version__=u"v0.5.7"
  #		 Fixed an error in the graphic file naming convention when graphics share the same download directory.
  # 0.5.7 Remove the override of the TVDB graphics URL to the mirror site. See Kobe's comment:
  #       http://forums.thetvdb.com/viewtopic.php?f=4&t=2161#p9089
+ # 0.5.8 The issue fixed in v0.5.5 with invalid file name creation did not fully cover TV shows It does now.
 
 
 usage_txt=u'''
@@ -971,7 +972,6 @@ class MovieDb:
 		id_url = urllib.quote(by_id.encode("utf-8"))
 		url = self.tmdb_config[u'urls'][u'imdb.search'] % (id_url)
 		etree = XmlHandler(url).getEt()
-
 		if self._parseMovie(etree.find(u"moviematches").find(u"movie")).has_key(u'inetref'):
 			return self.searchTMDB(self._parseMovie(etree.find(u"moviematches").find(u"movie"))[u'inetref'], graphics=graphics)
 		else:
@@ -1324,6 +1324,9 @@ class Configuration(object):
 			# foo.0103*
 			re.compile(u'''^(.+)[ \._\-]([0-9]{2})([0-9]{2,3})[\._ -][^\\/]*$''' , re.UNICODE),
 		]
+
+		# Initalize a valriable used by the -MW option
+		self.program_seriesid = None
 	# end __init__
 
 	# Local variable
@@ -3344,7 +3347,10 @@ class MythTvMetaData(VideoFiles):
 
 		self.config['sid']=None
 		if watched:
-			self.config['g_series'] = cfile['file_seriesname']+self.graphic_suffix[rel_type]+u'.%(ext)s'
+			if self.program_seriesid == None:
+				self.config['g_series'] = sanitiseFileName(cfile['file_seriesname'])+self.graphic_suffix[rel_type]+u'.%(ext)s'
+			else:
+				self.config['g_series'] = sanitiseFileName(self.program_seriesid)+self.graphic_suffix[rel_type]+u'.%(ext)s'
 		else:
 			self.config['g_series'] = cfile['inetref']+self.graphic_suffix[rel_type]+u'.%(ext)s'
 		if graphic_type == '-P':
@@ -3446,7 +3452,10 @@ class MythTvMetaData(VideoFiles):
 			if fileExtension == u'jpeg':
 				fileExtension = u'jpg'
 			if watched:
-				filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], sanitiseFileName(cfile['file_seriesname']), self.graphic_suffix[rel_type], fileExtension)
+				if self.program_seriesid == None:
+					filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], sanitiseFileName(cfile['file_seriesname']), self.graphic_suffix[rel_type], fileExtension)
+				else:
+					filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], sanitiseFileName(self.program_seriesid), self.graphic_suffix[rel_type], fileExtension)
 			else:
 				filename = u'%s/%s%s.%s' % (self.config['posterdir'][0], cfile['inetref'], self.graphic_suffix[rel_type], fileExtension)
 
@@ -3477,9 +3486,12 @@ class MythTvMetaData(VideoFiles):
 
 			self.config['sid']=None
 			if watched:
-				self.config['g_series'] = cfile['file_seriesname']+self.graphic_suffix[rel_type]+'.%(ext)s'
+				if self.program_seriesid == None:
+					self.config['g_series'] = sanitiseFileName(cfile['file_seriesname'])+self.graphic_suffix[rel_type]+'.%(ext)s'
+				else:
+					self.config['g_series'] = sanitiseFileName(self.program_seriesid)+self.graphic_suffix[rel_type]+'.%(ext)s'
 			else:
-				self.config['g_series'] = cfile['inetref']+self.graphic_suffix[rel_type]+'.%(ext)s'
+				self.config['g_series'] = sanitiseFileName(cfile['inetref'])+self.graphic_suffix[rel_type]+'.%(ext)s'
 			g_type = graphic_type
 
 			self.config['season_num']= None	# Needed to get graphics named in 'g_series' format
@@ -3784,11 +3796,15 @@ class MythTvMetaData(VideoFiles):
 				return None
 
 		if watched:
-			self.config['g_series'] = cfile['file_seriesname']+self.graphic_suffix[rel_type]+u'.%(ext)s'
-			self.config['g_season'] = cfile['file_seriesname']+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
+			if self.program_seriesid == None:
+				self.config['g_series'] = sanitiseFileName(cfile['file_seriesname'])+self.graphic_suffix[rel_type]+u'.%(ext)s'
+				self.config['g_season'] = sanitiseFileName(cfile['file_seriesname'])+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
+			else:
+				self.config['g_series'] = sanitiseFileName(self.program_seriesid)+self.graphic_suffix[rel_type]+u'.%(ext)s'
+				self.config['g_season'] = sanitiseFileName(self.program_seriesid)+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
 		else:
-			self.config['g_series'] = self.config['series_name']+self.graphic_suffix[rel_type]+u'.%(ext)s'
-			self.config['g_season'] = self.config['series_name']+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
+			self.config['g_series'] = sanitiseFileName(self.config['series_name'])+self.graphic_suffix[rel_type]+u'.%(ext)s'
+			self.config['g_season'] = sanitiseFileName(self.config['series_name'])+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
 		if toprated:
 			typegetGraphics=self.getTopRatedGraphics
 			self.config['season_num']= None	# Needed to get toprated graphics named in 'g_series' format
@@ -5039,6 +5055,7 @@ class MythTvMetaData(VideoFiles):
 		self.config['season_num'] = None
 		self.config['episode_num'] = None
 		series_graphics = self.getGraphics(graphics_type)
+
 		if series_graphics != None:
 			cfile = { 'file_seriesname': program['title'],
 					'inetref': self.config['sid'],
@@ -5138,8 +5155,11 @@ class MythTvMetaData(VideoFiles):
 				else:
 					filename = mirodetails[u'inetref']
 
+				# Deal with TV series names that would generate invalid file names for images TV and movies
+				self.program_seriesid = None
 				if not isValidPosixFilename(filename) and program['seriesid'] != u'':
 					filename = program['seriesid']
+					self.program_seriesid = program['seriesid']
 
 				# Actual check for existing graphics
 				for dirct in self.config[graphicsDirectories[directory]]:
@@ -5210,16 +5230,6 @@ class MythTvMetaData(VideoFiles):
 							filename = program['title']
 						else:
 							filename = mirodetails[u'moviename']
-						if not isValidPosixFilename(filename) and program['seriesid'] != u'' and not self.config['simulation']:
-							abs_results = self.rtnAbsolutePath(results, graphicsDirectories[key])
-							(dirName, fileName) = os.path.split(abs_results)
-							(fileBaseName, fileExtension) = os.path.splitext(fileName)
-							# Take graphics name apart and get new name with seriesid
-							newfilename = u"%s/%s%s" % (dirName, program['seriesid'], fileExtension)
-							if not os.path.isfile(newfilename):
-								os.rename(abs_results, newfilename)
-								results = self.rtnRelativePath(newfilename, graphicsDirectories[key])
-
 						if key == 'coverfile':
 							total_posters_downloaded +=1
 						elif key == 'banner':
@@ -5253,16 +5263,6 @@ class MythTvMetaData(VideoFiles):
 					if not results:
 						results = self._getSecondarySourceGraphics(cfile, key, watched=True)
 					if results:
-						if not miromovieflag:
-							if not isValidPosixFilename(title) and program['seriesid'] != u'' and not self.config['simulation']:
-								abs_results = self.rtnAbsolutePath(results, graphicsDirectories[key])
-								(dirName, fileName) = os.path.split(abs_results)
-								(fileBaseName, fileExtension) = os.path.splitext(fileName)
-								# Take graphics name apart and get new name with seriesid
-								newfilename = u"%s/%s%s" % (dirName, program['seriesid'], fileExtension)
-								if not os.path.isfile(newfilename):
-									os.rename(abs_results, newfilename)
-									results = self.rtnRelativePath(newfilename, graphicsDirectories[key])
 						if key == 'coverfile':
 							total_posters_downloaded +=1
 						elif key == 'banner':

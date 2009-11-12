@@ -2138,6 +2138,7 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
             "(?:_%2)?" // optional Suffix portion
             "\\.(?:png|gif|jpg)" // file extension
             ).arg(titleIn).arg(imagetype),
+        QString("%1_%2\\.(?:png|jpg|gif)").arg(seriesID).arg(imagetype),
         QString("%1\\.(?:png|jpg|gif)").arg(seriesID),
         "" };  // This blank entry must exist, do not remove.
 
