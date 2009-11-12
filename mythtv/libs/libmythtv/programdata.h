@@ -224,8 +224,7 @@ class MPUBLIC ProgInfo : public DBEvent
         showtype(QString::null),
         colorcode(QString::null),
         clumpidx(QString::null),
-        clumpmax(QString::null),
-        content(QString::null) /*ratings*/ { }
+        clumpmax(QString::null) { }
 
     ProgInfo(const ProgInfo &other);
 
@@ -246,7 +245,6 @@ class MPUBLIC ProgInfo : public DBEvent
     QString       colorcode;
     QString       clumpidx;
     QString       clumpmax;
-    QString       content;
     QList<ProgRating> ratings;
 };
 

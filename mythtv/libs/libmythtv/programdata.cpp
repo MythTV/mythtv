@@ -784,7 +784,6 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
     colorcode       = other.colorcode;
     clumpidx        = other.clumpidx;
     clumpmax        = other.clumpmax;
-    content         = other.content;
     ratings         = other.ratings;
 
     squeeze_str(channel);
@@ -796,7 +795,6 @@ ProgInfo &ProgInfo::operator=(const ProgInfo &other)
     squeeze_str(colorcode);
     squeeze_str(clumpidx);
     squeeze_str(clumpmax);
-    squeeze_str(content);
 
     return *this;
 }
@@ -813,7 +811,6 @@ void ProgInfo::Squeeze(void)
     squeeze_str(colorcode);
     squeeze_str(clumpidx);
     squeeze_str(clumpmax);
-    squeeze_str(content);
 }
 
 uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const

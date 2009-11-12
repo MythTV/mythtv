@@ -17,8 +17,8 @@
 #include "util.h"
 
 // libmythtv headers
-#include "programdata.h"
 #include "programinfo.h"
+#include "programdata.h"
 #include "dvbdescriptors.h"
 
 // filldata headers
@@ -337,10 +337,6 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 pginfo->subtitle = getFirstText(info);
             }
-            else if (info.tagName() == "content")
-            {
-                pginfo->content = getFirstText(info);
-            }
             else if (info.tagName() == "desc" && pginfo->description.isEmpty())
             {
                 pginfo->description = getFirstText(info);
@@ -510,24 +506,6 @@ ProgInfo *XMLTVParser::parseProgram(
 
     if (pginfo->category.isEmpty() && pginfo->categoryType != kCategoryNone)
         pginfo->category = myth_category_type_to_string(pginfo->categoryType);
-
-    /* Hack for teveblad grabber to do something with the content tag*/
-    if (!pginfo->content.isEmpty())
-    {
-        if (pginfo->category == "film")
-        {
-            pginfo->subtitle = pginfo->description;
-            pginfo->description = pginfo->content;
-        }
-        else if (!pginfo->description.isEmpty())
-        {
-            pginfo->description = pginfo->description + " - " + pginfo->content;
-        }
-        else if (pginfo->description.isEmpty())
-        {
-            pginfo->description = pginfo->content;
-        }
-    }
 
     if (!pginfo->airdate)
         pginfo->airdate = current_year;
