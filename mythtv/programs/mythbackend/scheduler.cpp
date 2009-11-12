@@ -1602,19 +1602,25 @@ void Scheduler::RunScheduler(void)
             while (!reschedQueue.empty())
             {
                 int recordid = reschedQueue.dequeue();
+                reschedLock.unlock();
+
                 VERBOSE(VB_GENERAL, QString("Reschedule requested for id %1.")
                         .arg(recordid));
 
                 if (recordid != 0)
                 {
                     if (recordid == -1)
+                    {
+                        reschedLock.lock();
                         reschedQueue.clear();
+                        reschedLock.unlock();
+                    }
 
-                    reschedLock.unlock();
                     QMutexLocker locker(&recordmatchLock);
                     UpdateMatches(recordid);
-                    reschedLock.lock();
                 }
+
+                reschedLock.lock();
             }
             reschedLock.unlock();
 
