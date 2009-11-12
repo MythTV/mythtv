@@ -1,8 +1,9 @@
+#include "xmltvparser.h"
+
 // Qt headers
 #include <QFile>
 #include <QStringList>
 #include <QDateTime>
-#include <QUrl>
 #include <QDomDocument>
 #include <QUrl>
 
@@ -23,7 +24,6 @@
 // filldata headers
 #include "channeldata.h"
 #include "fillutil.h"
-#include "xmltvparser.h"
 
 XMLTVParser::XMLTVParser() : isJapan(false), current_year(0)
 {
@@ -37,7 +37,7 @@ unsigned int ELFHash(const char *s)
     unsigned long h = 0, g;
 
     while (*name)
-    { /* do some fancy bitwanking on the string */
+    {
         h = (h << 4) + (unsigned long)(*name++);
         if ((g = (h & 0xF0000000UL))!=0)
             h ^= (g >> 24);
@@ -57,7 +57,7 @@ QString getFirstText(QDomElement element)
         if (!t.isNull())
             return t.data();
     }
-    return QString::null;
+    return QString();
 }
 
 ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
@@ -67,13 +67,7 @@ ChanInfo *XMLTVParser::parseChannel(QDomElement &element, QUrl &baseUrl)
     QString xmltvid = element.attribute("id", "");
     QStringList split = xmltvid.simplified().split(" ");
 
-    chaninfo->callsign = "";
-    chaninfo->chanstr = "";
     chaninfo->xmltvid = xmltvid;
-
-    chaninfo->iconpath = "";
-    chaninfo->name = "";
-    chaninfo->finetune = "";
     chaninfo->tvformat = "Default";
 
     for (QDomNode child = element.firstChild(); !child.isNull();
@@ -309,7 +303,7 @@ ProgInfo *XMLTVParser::parseProgram(
     text = element.attribute("clumpidx", "");
     if (!text.isEmpty())
     {
-        split = text.split("/");
+        split = text.split('/');
         pginfo->clumpidx = split[0];
         pginfo->clumpmax = split[1];
     }
@@ -385,7 +379,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 float avg = 0.0;
                 // not sure why the XML suggests multiple ratings,
                 // but the following will average them anyway.
-                for (unsigned int i = 0; i < values.length(); i++)
+                for (unsigned int i = 0; i < values.length(); ++i)
                 {
                     item = values.item(i).toElement();
                     if (item.isNull())
@@ -411,7 +405,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 ProgRating rating;
                 rating.system = info.attribute("system", "");
                 rating.rating = getFirstText(item);
-                if ("" != rating.system)
+                if (rating.system.isEmpty())
                     pginfo->ratings.append(rating);
             }
             else if (info.tagName() == "previously-shown")
@@ -475,14 +469,14 @@ ProgInfo *XMLTVParser::parseProgram(
                 {
                     tmp = episode.toInt() + 1;
                     episode = QString::number(tmp);
-                    pginfo->syndicatedepisodenumber = QString("E" + episode);
+                    pginfo->syndicatedepisodenumber = QString('E' + episode);
                 }
 
                 if (!season.isEmpty())
                 {
                     tmp = season.toInt() + 1;
                     season = QString::number(tmp);
-                    pginfo->syndicatedepisodenumber.append(QString("S" + season));
+                    pginfo->syndicatedepisodenumber.append(QString('S' + season));
                 }
 
                 uint partno = 0;
@@ -577,7 +571,7 @@ ProgInfo *XMLTVParser::parseProgram(
             /* No ep/season info? Well then remove the programid and rely on
                normal dupchecking methods instead. */
             if (kCategoryMovie != pginfo->categoryType)
-                programid = "";
+                programid.clear();
         }
     }
     if (dd_progid_done == 0)
@@ -686,13 +680,13 @@ bool XMLTVParser::parseFile(
                         if (!groupingTitle.isEmpty())
                         {
                             pginfo->title.prepend(groupingTitle);
-                            groupingTitle = "";
+                            groupingTitle.clear();
                         }
 
                         if (!groupingDesc.isEmpty())
                         {
                             pginfo->description.prepend(groupingDesc);
-                            groupingDesc = "";
+                            groupingDesc.clear();
                         }
 
                         (*proglist)[pginfo->channel].push_back(*pginfo);
@@ -702,8 +696,8 @@ bool XMLTVParser::parseFile(
                         /* append all titles/descriptions from one clump */
                         if (pginfo->clumpidx.toInt() == 0)
                         {
-                            aggregatedTitle = "";
-                            aggregatedDesc = "";
+                            aggregatedTitle.clear();
+                            aggregatedDesc.clear();
                         }
 
                         if (!pginfo->title.isEmpty())

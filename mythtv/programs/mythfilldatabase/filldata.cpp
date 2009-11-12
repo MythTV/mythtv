@@ -505,7 +505,6 @@ bool FillData::GrabDataFromDDFile(
     ddprocessor.SetInputFile(filename);
     Source s;
     s.id = id;
-    s.name = "";
     s.xmltvgrabber = "datadirect";
     s.userid = "fromfile";
     s.password = "fromfile";
@@ -662,14 +661,14 @@ bool FillData::Run(SourceList &sourcelist)
                     QProcess::NormalExit ==
                     grabber_capabilities_proc.exitStatus())
                 {
-                    QString capabilites = "";
+                    QString capabilities;
                     grabber_capabilities_proc
                         .setReadChannel(QProcess::StandardOutput);
                     while (grabber_capabilities_proc.canReadLine())
                     {
                         QString capability
                             = grabber_capabilities_proc.readLine().simplified();
-                        capabilites += capability + " ";
+                        capabilities += capability + ' ';
 
                         if (capability == "baseline")
                             (*it).xmltvgrabber_baseline = true;
@@ -685,7 +684,7 @@ bool FillData::Run(SourceList &sourcelist)
                     }
 
                     VERBOSE(VB_GENERAL, QString("Grabber has capabilities: %1")
-                        .arg(capabilites));
+                        .arg(capabilities));
                 }
                 else
                 {
@@ -1068,7 +1067,6 @@ ChanInfo *FillData::xawtvChannel(QString &id, QString &channel, QString &fine)
         chaninfo->chanstr = channel;
     chaninfo->finetune = fine;
     chaninfo->freqid = channel;
-    chaninfo->iconpath = "";
     chaninfo->tvformat = "Default";
 
     return chaninfo;
@@ -1108,8 +1106,8 @@ void FillData::readXawtvChannels(int id, QString xawrcfile)
                         delete chinfo;
                     }
                     xawid = strLine.substr(1, nSplitPoint - 1).c_str();
-                    channel = "";
-                    fine = "";
+                    channel.clear();
+                    fine.clear();
                 }
             }
             else if ((nSplitPoint = strLine.find('=') + 1) > 0)

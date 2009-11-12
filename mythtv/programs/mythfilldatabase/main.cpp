@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
             {
                 if (!isatty(fileno(stdout)))
                 {
-                    export_icon_data_filename = "-";
+                    export_icon_data_filename = '-';
                 }
             }
             else
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
             {
                 if (!isatty(fileno(stdin)))
                 {
-                    import_icon_data_filename = "-";
+                    import_icon_data_filename = '-';
                 }
             }
             else
@@ -539,10 +539,8 @@ int main(int argc, char *argv[])
                       "AND manualid = 0;");
         query.bindValue(":SRCID", fromfile_id);
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
-
             if (!query.isNull(0))
                 GuideDataBefore = QDateTime::fromString(query.value(0).toString(),
                                                     Qt::ISODate);
@@ -561,10 +559,8 @@ int main(int argc, char *argv[])
                       "AND manualid = 0;");
         query.bindValue(":SRCID", fromfile_id);
 
-        if (query.exec() && query.size() > 0)
+        if (query.exec() && query.next())
         {
-            query.next();
-
             if (!query.isNull(0))
                 GuideDataAfter = QDateTime::fromString(query.value(0).toString(),
                                                    Qt::ISODate);

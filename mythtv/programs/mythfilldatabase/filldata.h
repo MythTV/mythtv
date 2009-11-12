@@ -44,8 +44,6 @@ class FillData
 {
   public:
     FillData() :
-        logged_in(""),
-        lastdduserid(QString::null),    graboptions(""),
         raw_lineup(0),                  maxDays(0),
         interrupted(false),             endofdata(false),
         refresh_tba(true),              dd_grab_all(false),
