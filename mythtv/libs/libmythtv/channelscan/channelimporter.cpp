@@ -162,7 +162,7 @@ uint ChannelImporter::DeleteChannels(
     // ask user whether to delete all or some of these stale channels
     //   if some is selected ask about each individually
     QString msg = QObject::tr(
-        "Found %1 off-air channels.").arg(off_air_list.size());
+        "Found %n off-air channel(s).", "", off_air_list.size());
     DeleteAction action = QueryUserDelete(msg);
     if (kDeleteIgnoreAll == action)
         return 0;
@@ -238,13 +238,13 @@ uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
         return 0;
     }
 
-    VERBOSE(VB_IMPORTANT, 
-            QObject::tr("Found %1 unused transports.").arg(query.size()));
+    QString msg = QObject::tr("Found %n unused transport(s).", "", query.size());
+
+    VERBOSE(VB_IMPORTANT, msg);
 
     if (query.size() == 0)
         return 0;
-
-    QString msg = QObject::tr("Found %1 unused transports.").arg(query.size());
+    
     DeleteAction action = QueryUserDelete(msg);
     if (kDeleteIgnoreAll == action)
         return 0;
@@ -295,8 +295,8 @@ void ChannelImporter::InsertChannels(
 
         if (old_chan)
         {
-            QString msg = QObject::tr("Found %1 old %2 channels.")
-                .arg(old_chan).arg(toString(type));
+            QString msg = QObject::tr("Found %n old %1 channel(s).", "", old_chan)
+                                    .arg(toString(type));
 
             UpdateAction action = QueryUserUpdate(msg);
             list = UpdateChannels(list, info, action, type, filtered);
@@ -304,8 +304,8 @@ void ChannelImporter::InsertChannels(
         if (new_chan)
         {
             QString msg = QObject::tr(
-                "Found %1 new non-conflicting %2 channels.")
-                .arg(new_chan).arg(toString(type));
+                    "Found %n new non-conflicting %1 channel(s).", "", new_chan)
+                        .arg(toString(type));
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, filtered);
@@ -339,16 +339,16 @@ void ChannelImporter::InsertChannels(
         if (new_chan)
         {
             QString msg = QObject::tr(
-                "Found %1 new conflicting %2 channels.")
-                .arg(new_chan).arg(toString(type));
+                        "Found %n new conflicting %1 channel(s).", "", new_chan)
+                            .arg(toString(type));
 
             InsertAction action = QueryUserInsert(msg);
             list = InsertChannels(list, info, action, type, filtered);
         }
         if (old_chan)
         {
-            QString msg = QObject::tr("Found %1 conflicting old %2 channels.")
-                .arg(old_chan).arg(toString(type));
+            QString msg = QObject::tr("Found %n conflicting old %1 channel(s).",
+                                      "", old_chan).arg(toString(type));
 
             UpdateAction action = QueryUserUpdate(msg);
             list = UpdateChannels(list, info, action, type, filtered);
@@ -1031,7 +1031,7 @@ QString ChannelImporter::GetSummary(
     const ChannelImporterUniquenessStats &stats)
 {
     
-    QString msg = QObject::tr("Found %1 transports:\n").arg(transport_count);
+    QString msg = QObject::tr("Found %n transport(s):\n", "", transport_count);
     msg += QObject::tr("Channels: FTA Enc Dec\n") +
         QString("ATSC      %1 %2 %3\n")
         .arg(info.atsc_channels[0],3).arg(info.atsc_channels[1],3)
