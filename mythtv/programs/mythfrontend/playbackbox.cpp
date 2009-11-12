@@ -4260,10 +4260,7 @@ void PlaybackBox::showRecGroupChanger(void)
             else if (dispGroup == "Deleted")
                 dispGroup = tr("Deleted");
 
-            if (query.value(1).toInt() == 1)
-                itemStr = tr("item");
-            else
-                itemStr = tr("items");
+            itemStr = tr("item(s)", "", query.value(1).toInt());
 
             displayNames.append(QString("%1 [%2 %3]").arg(dispGroup)
                               .arg(query.value(1).toInt()).arg(itemStr));
