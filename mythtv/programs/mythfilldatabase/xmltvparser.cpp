@@ -416,15 +416,18 @@ ProgInfo *XMLTVParser::parseProgram(
             {
                 parseCredits(info, pginfo);
             }
-            else if (info.tagName() == "subtitles" && info.attribute("type") == "teletext")
+            else if (info.tagName() == "subtitles" &&
+                     info.attribute("type") == "teletext")
             {
                 pginfo->subtitleType |= SUB_NORMAL;
             }
-            else if (info.tagName() == "subtitles" && info.attribute("type") == "onscreen")
+            else if (info.tagName() == "subtitles" &&
+                     info.attribute("type") == "onscreen")
             {
                 pginfo->subtitleType |= SUB_ONSCREEN;
             }
-            else if (info.tagName() == "subtitles" && info.attribute("type") == "deaf-signed")
+            else if (info.tagName() == "subtitles" &&
+                     info.attribute("type") == "deaf-signed")
             {
                 pginfo->subtitleType |= SUB_SIGNED;
             }
@@ -437,7 +440,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 parseVideo(info, pginfo);
             }
             else if (info.tagName() == "episode-num" &&
-                info.attribute("system") == "dd_progid")
+                     info.attribute("system") == "dd_progid")
             {
                 QString episodenum(getFirstText(info));
                 // if this field includes a dot, strip it out
