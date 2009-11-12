@@ -38,7 +38,6 @@ const char *kPreviewGeneratorInUseID = "preview_generator";
 static const uint kUnknownProgramLength = 30;
 
 static int init_tr(void);
-static QString strip_html_tags(const QString &src);
 
 QMutex ProgramInfo::staticDataLock;
 QString ProgramInfo::unknownTitle;
@@ -761,7 +760,7 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 
     progMap["titlesubtitle"] = tempSubTitle;
 
-    progMap["description"] = strip_html_tags(description);
+    progMap["description"] = description;
     progMap["category"] = category;
     progMap["callsign"] = chansign;
     progMap["commfree"] = chancommfree;
@@ -925,7 +924,7 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
     progMap["starttimedate"] =
                           recstartts.date().toString(dateFormat) + ", " +
                           recstartts.time().toString(timeFormat);
-                          
+
     progMap["shortstarttimedate"] =
                           recstartts.date().toString(shortDateFormat) + " " +
                           recstartts.time().toString(timeFormat);
@@ -3134,7 +3133,7 @@ QString ProgramInfo::RecStatusDesc(void) const
  *  \brief Returns channel info using "format".
  *
  *   There are three tags in "format" that will be replaced
- *   with the approriate info. These tags are "<num>", "<sign>",
+ *   with the appropriate info. These tags are "<num>", "<sign>",
  *   and "<name>", they replaced with the channel number,
  *   channel call sign, and channel name, respectively.
  *  \param format formatting string.
@@ -3559,37 +3558,6 @@ QString ProgramInfo::i18n(const QString &msg)
     QString msg_i18n = QObject::tr(msg_arr.constData());
     QByteArray msg_i18n_arr = msg_i18n.toLatin1();
     return (msg_arr == msg_i18n_arr) ? msg : msg_i18n;
-}
-
-/** \fn strip_html_tags(const QString&)
- *  \brief Returns a copy of "src" with all the HTML tags removed.
- *
- *   Three tags are respected: <br> and <p> are replaced with newlines,
- *   and <li> is replaced with a newline followed by "- ".
- *  \param src String to be processed.
- *  \return Stripped string.
- */
-static QString strip_html_tags(const QString &src)
-{
-    static QMutex lock;
-    static QRegExp br("<br[^>]*>");
-    static QRegExp p("<p[^>]*>");
-    static QRegExp li("<li[^>]*>");
-    static QRegExp tags("<[^>]*>");
-
-    QString dst(src);
-    dst.detach();
-
-    QMutexLocker locker(&lock);
-
-    // First replace some tags with some ASCII formatting
-    dst.replace( br, "\n" );
-    dst.replace( p,  "\n" );
-    dst.replace( li, "\n- " );
-    // And finally remve any remaining tags
-    dst.replace( tags, "" );
-
-    return dst;
 }
 
 QString SkipTypeToString(int flags)
