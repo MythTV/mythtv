@@ -3759,8 +3759,44 @@ MythUIButtonListItem *VideoDialog::GetItemCurrent()
     return m_videoButtonList->GetItemCurrent();
 }
 
-void VideoDialog::VideoSearch()
+MythUIButtonListItem *VideoDialog::GetItemByMetadata(Metadata *metadata)
 {
+    if (m_videoButtonTree)
+    {
+        return m_videoButtonTree->GetItemCurrent();
+    }
+
+    MythGenericTree *parent = m_d->m_currentNode->getParent();
+    QList<MythGenericTree*>::iterator it;
+    QList<MythGenericTree*> *children;
+    QMap<int, int> idPosition;
+
+    if (parent && m_d->m_type == DLG_TREE)
+        children = parent->getAllChildren();
+    else
+        children = m_d->m_currentNode->getAllChildren();
+
+    for (it = children->begin(); it != children->end(); ++it)
+    {
+        MythGenericTree *child = *it;
+        int nodeInt = child->getInt();
+        if (nodeInt != kSubFolder && nodeInt != kUpFolder)
+        {
+            Metadata *listmeta = 
+                        GetMetadataPtrFromNode(child);
+            if (listmeta)
+            {
+                int position = child->getPosition();
+                int id = listmeta->GetID();
+                idPosition.insert(id, position);
+            }
+        }
+    }
+
+    return m_videoButtonList->GetItemAt(idPosition.value(metadata->GetID()));
+}
+
+void VideoDialog::VideoSearch() {
     Metadata *metadata = GetMetadata(GetItemCurrent());
 
     if (metadata)
@@ -4353,7 +4389,9 @@ void VideoDialog::OnVideoImageSetDone(Metadata *metadata)
     }
 
     metadata->UpdateDatabase();
-    UpdateItem(GetItemCurrent());
+    MythUIButtonListItem *item = GetItemByMetadata(metadata);
+    if (item != NULL)
+        UpdateItem(item);
 }
 
 void VideoDialog::StartVideoSearchByUID(QString video_uid, Metadata *metadata)
@@ -4486,7 +4524,9 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
         metadata->SetCountries(video_countries);
 
         metadata->UpdateDatabase();
-        UpdateItem(GetItemCurrent());
+        MythUIButtonListItem *item = GetItemByMetadata(metadata);
+        if (item != NULL)
+            UpdateItem(item);
 
         StartVideoImageSet(metadata, coverart, fanart, banner, screenshot);
 
@@ -4495,7 +4535,9 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
     {
         metadata->Reset();
         metadata->UpdateDatabase();
-        UpdateItem(GetItemCurrent());
+        MythUIButtonListItem *item = GetItemByMetadata(metadata);
+        if (item != NULL)
+            UpdateItem(item);
     }
 }
 
@@ -4563,7 +4605,9 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
         {
             metadata->Reset();
             metadata->UpdateDatabase();
-            UpdateItem(GetItemCurrent());
+            MythUIButtonListItem *item = GetItemByMetadata(metadata);
+            if (item != NULL)
+                UpdateItem(item);
             return;
         }
         StartVideoSearchByUID(key, metadata);

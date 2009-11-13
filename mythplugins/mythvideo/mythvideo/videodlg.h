@@ -139,6 +139,7 @@ class VideoDialog : public MythScreenType
     void customEvent(QEvent *levent);
 
     virtual MythUIButtonListItem *GetItemCurrent();
+    virtual MythUIButtonListItem *GetItemByMetadata(Metadata *metadata);
 
     virtual void loadData();
     void fetchVideos();
