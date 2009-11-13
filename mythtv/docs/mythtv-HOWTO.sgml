@@ -2952,19 +2952,21 @@ Ctrl+Left or &lt;  | move the highlight left by one page 				@
 Ctrl+Right or &gt; | move the highlight right by one page 				@
 9, 3, 7, 1         | (like a numeric keypad) perform the same as PageUp, PageDown,&nbsp;
                      Home and End 							@
-I	           | bring up more information about a show, and allow you to&nbsp;
-                     schedule a recording.  If you select "Record this showing"&nbsp;
-                     while watching Live TV you can "Instant Record" a program.		@
-Space/Enter        | allow you resolve conflicts or change overrides. If the&nbsp;
-                     program is not already scheduled to record, it will instead act like&nbsp;
-                     pressing 'I'.						@
-M	           | when on a channel will change to that channel			@
+U                  | bring up more information about a show				@
+I                  | allow you to schedule a recording.  If you select "Record&nbsp;
+                     this showing" while watching Live TV you can "Instant&nbsp;
+                     Record" a program.							@
+Space/Enter        | when watching LiveTV will change to that channel and exit the&nbsp;
+                     EPG if the selected show is in progress or starts within 15&nbsp;
+                     minutes; or otherwise will allow you to resolve conflicts&nbsp;
+                     or change overrides. If the program is not already scheduled&nbsp;
+                     to record, it will instead act like pressing I			@
+X                  | change the channel to the currently selected channel without&nbsp;
+                     leaving the EPG (Most useful in the alternate EPG)			@
 ESC or C           | exits without changing the channel				@
 R	           | change the current item from Recording/Not-Recording.&nbsp;
                      Successive keypresses cycle through the scheduled recording&nbsp;
                      type list.								@
-X	           | change the channel to the currently selected channel without&nbsp;
-                     leaving the EPG (Most useful in the alternate EPG)			@
 ?	           | mark/unmark the current channel as a "favorite"			@
 / or 4	           | toggle the guide listing between all channels and filtered&nbsp;
                      "favorites"
