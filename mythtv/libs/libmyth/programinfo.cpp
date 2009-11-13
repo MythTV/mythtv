@@ -537,7 +537,7 @@ ProgramInfo::~ProgramInfo()
  */
 QString ProgramInfo::MakeUniqueKey(void) const
 {
-    return chanid + "_" + recstartts.toString(Qt::ISODate);
+    return chanid + '_' + recstartts.toString(Qt::ISODate);
 }
 
 #define INT_TO_LIST(x)       sprintf(tmp, "%i", (x)); list << tmp;
@@ -799,6 +799,23 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
         progMap["recenddate"] = recendts.toString(shortDateFormat);
     }
 
+    progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
+                          recstartts.time().toString(timeFormat) + " - " +
+                          recendts.time().toString(timeFormat);
+
+    progMap["shorttimedate"] =
+                          recstartts.date().toString(shortDateFormat) + ", " +
+                          recstartts.time().toString(timeFormat) + " - " +
+                          recendts.time().toString(timeFormat);
+
+    progMap["starttimedate"] =
+                          recstartts.date().toString(dateFormat) + ", " +
+                          recstartts.time().toString(timeFormat);
+
+    progMap["shortstarttimedate"] =
+                          recstartts.date().toString(shortDateFormat) + " " +
+                          recstartts.time().toString(timeFormat);
+
     progMap["lastmodifiedtime"] = lastmodified.toString(timeFormat);
     progMap["lastmodifieddate"] = lastmodified.toString(dateFormat);
     progMap["lastmodified"] = lastmodified.toString(dateFormat) + " " +
@@ -825,12 +842,12 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
         if (query.exec() && query.next()) 
             result = query.value(0).toString();
 
-        if (!result.startsWith("/") && pathname.startsWith("myth://"))
+        if (!result.startsWith('/') && pathname.startsWith("myth://"))
         {
             QString workURL = pathname;
             QUrl baseURL(workURL);
             baseURL.setUserName("Coverart");
-            QString finalURL = baseURL.toString(QUrl::RemovePath) + "/" + result;
+            QString finalURL = baseURL.toString(QUrl::RemovePath) + '/' + result;
             progMap["coverartpath"] = finalURL;
         }
         else
@@ -911,23 +928,6 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
     progMap["audioproperties"] = audioproperties;
     progMap["videoproperties"] = videoproperties;
     progMap["subtitleType"] = subtitleType;
-
-    progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
-                          recstartts.time().toString(timeFormat) + " - " +
-                          recendts.time().toString(timeFormat);
-
-    progMap["shorttimedate"] =
-                          recstartts.date().toString(shortDateFormat) + ", " +
-                          recstartts.time().toString(timeFormat) + " - " +
-                          recendts.time().toString(timeFormat);
-
-    progMap["starttimedate"] =
-                          recstartts.date().toString(dateFormat) + ", " +
-                          recstartts.time().toString(timeFormat);
-
-    progMap["shortstarttimedate"] =
-                          recstartts.date().toString(shortDateFormat) + " " +
-                          recstartts.time().toString(timeFormat);
 
     progMap["recstatus"] = RecStatusText();
 
@@ -1546,8 +1546,8 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
         (RemoteCheckFile(this, false)))
     {
         tmpURL = QString("myth://") +
-                 gContext->GetSetting("MasterServerIP") + ":" +
-                 gContext->GetSetting("MasterServerPort") + "/" + basename;
+                 gContext->GetSetting("MasterServerIP") + ':' +
+                 gContext->GetSetting("MasterServerPort") + '/' + basename;
         VERBOSE(VB_FILE, LOC +
                 QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
         return tmpURL;
@@ -1555,8 +1555,8 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
 
     // Fallback to streaming from the backend the recording was created on
     tmpURL = QString("myth://") +
-             gContext->GetSettingOnHost("BackendServerIP", hostname) + ":" +
-             gContext->GetSettingOnHost("BackendServerPort", hostname) + "/" +
+             gContext->GetSettingOnHost("BackendServerIP", hostname) + ':' +
+             gContext->GetSettingOnHost("BackendServerPort", hostname) + '/' +
              basename;
 
     VERBOSE(VB_FILE, LOC + QString("GetPlaybackURL: Using default of: '%1'")
@@ -2247,7 +2247,7 @@ void ProgramInfo::ClearMarkupMap(int type, long long min_frame,
         query.prepare("DELETE FROM recordedmarkup"
                       " WHERE chanid = :CHANID"
                       " AND STARTTIME = :STARTTIME"
-                      + comp + ";");
+                      + comp + ';');
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
     }
@@ -2538,7 +2538,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
         query.prepare("DELETE FROM filemarkup"
                       " WHERE filename = :PATH"
                       " AND type = :TYPE"
-                      + comp + ";");
+                      + comp + ';');
         query.bindValue(":PATH", videoPath);
     }
     else
@@ -2547,7 +2547,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE"
-                      + comp + ";");
+                      + comp + ';');
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
     }
@@ -3354,8 +3354,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         if (!usedFor.isEmpty())
             inUseForWhat = usedFor;
         else
-            inUseForWhat = QObject::tr("Unknown") + " [" +
-                           QString::number(getpid()) + "]";
+            inUseForWhat = QString("%1 [%2]").arg(QObject::tr("Unknown"))
+                                             .arg(getpid());
 
         notifyOfChange = true;
     }
