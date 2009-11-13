@@ -397,7 +397,7 @@ try:
 	import xml
 except Exception:
 	print '''The python module xml must be installed.'''
-	sys.exit(False)
+	sys.exit(1)
 if xml.__version__ < u'41660':
 	print '''
 \n! Warning - The module xml (v41660 or greater) must be installed. Your version is different (v%s) than what Jamu was tested with. Jamu may not work on your installation.\nIt is recommended that you upgrade.\n''' % xml.__version__
@@ -408,7 +408,7 @@ try:
 except Exception:
 	print '''
 The module MySQLdb (v1.2.2 or greater) must be installed.'''
-	sys.exit(False)
+	sys.exit(1)
 if MySQLdb.__version__ < u'1.2.2':
 	print '''
 \n! Warning - The module MySQLdb (v1.2.2 or greater) must be installed. Your version is different (v%s) than what Jamu was tested with. Jamu may not work on your installation.\nIt is recommended that you upgrade.\n''' % MySQLdb.__version__
@@ -462,7 +462,7 @@ except Exception:
 The modules tvdb_api.py (v1.0.0 or greater), tvdb_ui.py, tvdb_exceptions.py and cache.py must be
 in the same directory as ttvdb.py. They should have been included with the distribution of ttvdb.py.
 '''
-	sys.exit(False)
+	sys.exit(1)
 
 imdb_lib = True
 try:			# Check if the installation is equiped to directly search IMDB for movies
@@ -471,14 +471,14 @@ except ImportError:
 	sys.stderr.write("\n! Error: To search for movies movies the IMDbPy library must be installed."\
 		"Check your installation's repository or check the following link."\
 		"from (http://imdbpy.sourceforge.net/?page=download)\n")
-	sys.exit(False)
+	sys.exit(1)
 
 if imdb_lib:
 	if imdb.__version__ < "3.8":
 		sys.stderr.write("\n! Error: You version the IMDbPy library (%s) is too old. You must use version 3.8 of higher." % imdb.__version__)
 		sys.stderr.write("Check your installation's repository or check the following link."\
 			"from (http://imdbpy.sourceforge.net/?page=download)\n")
-		sys.exit(False)
+		sys.exit(1)
 
 
 def isValidPosixFilename(name, NAME_MAX=255):
@@ -642,7 +642,7 @@ def getStorageGroups():
 					sys.stderr.write(u"\n! Error: The local Storage group (%s) directory (%s) does not exist or there is a permissions restriction\n" % (key, directory))
 					storagegroup_ok = False
 		if not storagegroup_ok:
-			sys.exit(False)
+			sys.exit(1)
 # end getStorageGroups
 
 # Start of code used to access themoviedb.com api
@@ -1361,7 +1361,7 @@ class Configuration(object):
 			sys.stderr.write(
 				"\n! Error: The specified user configuration file (%s) is not a file\n" % useroptions
 			)
-			sys.exit(False)
+			sys.exit(1)
 		cfg = ConfigParser.SafeConfigParser()
 		cfg.read(useroptions)
 		for section in cfg.sections():
@@ -1400,7 +1400,7 @@ class Configuration(object):
 					tmp =cfg.get(section, option).split(',')
 					if len(tmp)%2 and len(cfg.get(section, option)) != 0:
 						sys.stderr.write(u"\n! Error: For (%s) 'ep_name_massage' values must be in pairs\n" % option)
-						sys.exit(False)
+						sys.exit(1)
 					tmp_array=[]
 					i=0
 					while i != len(tmp):
@@ -1472,7 +1472,7 @@ class Configuration(object):
 ################### Used to create the example configuration file "jamu-example-conf"
 #		for key in keys:	# Used to create the example configuration file "jamu-example-conf"
 #			print "#%s: %s" % (key, self.config[key])
-#		sys.exit(True)
+#		sys.exit(0)
 ##################
 
 		for key in keys:
@@ -1513,7 +1513,7 @@ class Configuration(object):
 			localip = gethostbyname(localhostname) # Get the local hosts IP address
 		except:
 			sys.stderr.write("\n! Error: There is no valid address-to-host mapping for the host (%s)\nThe Jamu Janitor (-MJ) option cannot be used while this issue remains un-resolved.\n" % localhostname)
-			sys.exit(False)
+			sys.exit(1)
 
 		# Get all curently mounted NFS shares
 		tmp_mounts = callCommandLine("mount -l | grep '//'").split('\n')
@@ -1566,7 +1566,7 @@ class Configuration(object):
 		# Make sure Jamu is being run on a MythTV backend
 		if not mythdb.getSetting('BackendServerIP', hostname = localhostname):
  			sys.stderr.write(u"\n! Error: Jamu must be run on a MythTV backend. Local host (%s) is not a MythTV backend.\n" % localhostname)
-			sys.exit(False)
+			sys.exit(1)
 
 		global dir_dict
 		for key in dir_dict.keys():
@@ -1625,7 +1625,7 @@ class Configuration(object):
 				self.config[key] = storagegroups[u'mythvideo']
 			if not len(self.config[key]):
 	 			sys.stderr.write(u"\n! Error: There must be a directory for Videos and each graphic type. The (%s) directory is missing.\n" % (key))
-				sys.exit(False)
+				sys.exit(1)
 
 		# Make sure that the directory sets for Videos and other graphics directories are RW able
 		accessable = True
@@ -1636,13 +1636,13 @@ class Configuration(object):
 					accessable = False
 
 		if not accessable:
-			sys.exit(False)
+			sys.exit(1)
 
 		# Check if any Video files are on a NFS shares
 		if not self.config['mythtvNFS']:	# Maybe the NFS check is to be skipped
 			if self._checkNFS(self.config['mythvideo'], self.config['video_file_exts']):
 				sys.stderr.write(u"\n! Error: Your video files reside on a NFS mount.\nIn the case where you have more than one MythTV backend using the same directories to store either video files\nor graphics any Jamu's option (-M) can adversly effect your MythTV database by mistakenly adding videos\nfor other backends or with the Janitor (-J) option mistakenly remove graphics files.\n\nIf you only have one backend or do not mix the Video or graphic file directories between backends and still want to use\nJamu add the options (N) to your option string e.g. (-MJN), which will skip this check.\n\n")
-				sys.exit(False)
+				sys.exit(1)
 	# end _getMythtvDirectories
 
 
@@ -1736,7 +1736,7 @@ class Configuration(object):
 		if self.config['mythtvmeta']:
 			if mythdb == None or mythvideo == None:
 				sys.stderr.write(u"\n! Error: The MythTV python interface is not installed or Cannot connect to MythTV Backend. MythTV meta data cannot be updated\n\n")
-				sys.exit(False)
+				sys.exit(1)
 			try:
 				import Image
 				self.config['image_library'] = Image
@@ -1746,29 +1746,29 @@ the fetched poster images.
 
 In Debian/Ubuntu it is packaged as 'python-imaging'.
 http://www.pythonware.com/products/pil/\n""")
-				sys.exit(False)
+				sys.exit(1)
 
 		if not _can_int(self.config['min_poster_size']):
 			sys.stderr.write(u"\n! Error: The poster minimum value must be an integer (%s)\n" % self.config['min_poster_size'])
-			sys.exit(False)
+			sys.exit(1)
 		else:
 			self.config['min_poster_size'] = int(self.config['min_poster_size'])
 
 		if self.config['maximum'] != None:
 			if _can_int(self.config['maximum']) == False:
 				sys.stderr.write(u"\n! Error: Maximum option is not an integer (%s)\n" % self.config['maximum'])
-				sys.exit(False)
+				sys.exit(1)
 
 		if self.config['mythtvdir']:
 			if mythdb == None or mythvideo == None:
 	 			sys.stderr.write(u"\n! Error: MythTV python interface is not available\n")
-				sys.exit(False)
+				sys.exit(1)
 		if self.config['mythtvdir'] or self.config['mythtvmeta']:
 			self._addMythtvUserFileTypes() # add user filetypes from the "videotypes" table
 			self._getMythtvDirectories()
 		if self.config['mythtvjanitor']: # Check for graphic directory conflicts with other plugins
 			if self._JanitorConflicts():
-				sys.exit(False)
+				sys.exit(1)
 			if not self.config['mythtvNFS']:
 				global graphicsDirectories, image_extensions
 				dirs = []
@@ -1779,19 +1779,19 @@ http://www.pythonware.com/products/pil/\n""")
 				# Check if any Graphics files are on NFS shares
 				if self._checkNFS(dirs, image_extensions):
 					sys.stderr.write(u"\n! Error: Your metadata graphics reside on a NFS mount.\nIn the case where you have more than one MythTV backend using the same directories to store your graphics\nthe Jamu's Janitor option (-MJ) will be destructive removing graphics used by the other backend(s).\n\nIf you only have one backend or do not mix the graphics directories between backends and still want to use\nJamu's Janitor use the options (-MJN) which will skip this check.\n\n")
-					sys.exit(False)
+					sys.exit(1)
 
 		if self.config['posterresize'] != False or self.config['fanartresize'] != False:
 			if _useImageMagick("-version"):
 				sys.stderr.write(u"\n! Error: ImageMagick is not installed, graphics cannot be resized. posterresize(%s), fanartresize(%s)\n" % (str(self.config['posterresize']), str(self.config['fanartresize'])))
-				sys.exit(False)
+				sys.exit(1)
 
 		if self.config['mythtvmeta'] and len(args) == 0:
 			args=['']
 
 		if len(args) == 0:
 			sys.stderr.write(u"\n! Error: At least a video directory, SID or season name must be supplied\n")
-			sys.exit(False)
+			sys.exit(1)
 
 		if os.path.isfile(args[0]) or os.path.isdir(args[0]) or args[0][-1:] == '*':
 			self.config['video_dir'] = []
@@ -1812,13 +1812,13 @@ http://www.pythonware.com/products/pil/\n""")
 				if len(args) > 3:
 					sys.stderr.write("\n! Error: Too many arguments (%d), maximum is three.\n" % len(args))
 					print "! args:", args
-					sys.exit(False)
+					sys.exit(1)
 				if len(args) == 3 and _can_int(args[1]) and _can_int(args[2]):
 					self.config['season_num'] = args[1]
 					self.config['episode_num'] = args[2]
 				elif len(args) == 3:
 					sys.stderr.write(u"\n! Error: Season name(%s), season number(%s), episode number (%s) combination is invalid\n" % (args[0], args[1], args[2]))
-					sys.exit(False)
+					sys.exit(1)
 				elif len(args) == 2 and _can_int(args[1]):
 					self.config['season_num'] = args[1]
 				else:
@@ -1846,7 +1846,7 @@ http://www.pythonware.com/products/pil/\n""")
 				for lang in valid_languages: valid_langs+= lang+', '
 				valid_langs=valid_langs[:-2]
 				sys.stderr.write(u"\n! Error: Specified language(%s) must match one of the following languages supported by thetvdb.com wiki:\n (%s)\n" % (self.config['local_language'], valid_langs))
-				sys.exit(False)
+				sys.exit(1)
 		global UI_search_language
 		UI_search_language = self.config['local_language']
 
@@ -2672,7 +2672,7 @@ class Tvdatabase(object):
 			sys.stderr.write(
 				u'\n! Error: There must be at least "season and episode numbers" or "episode name" to request a filename\n'
 			)
-			sys.exit(False)
+			sys.exit(1)
 
 		# Special logic must be used if the (-MG) guessing option has been requested
 		if not self.config['sid'] and self.config['mythtv_guess']:
@@ -2694,7 +2694,7 @@ class Tvdatabase(object):
 			sys.stderr.write(
 				u'\n! Error: The episode was not found for series(%s), Episode name(%s)\n' % (series_name, episode_name)
 			)
-			sys.exit(False)
+			sys.exit(1)
 
 		sid=self.config['sid']
 
@@ -2991,7 +2991,7 @@ class VideoFiles(Tvdatabase):
 
 		if len(validFiles) == 0:
 			sys.stderr.write(u"\n! Error: No valid video files found\n")
-			sys.exit(False)
+			sys.exit(1)
 
 		path_flag = self.config['metadatadir']
 		for cfile in validFiles:
@@ -3445,7 +3445,7 @@ class MythTvMetaData(VideoFiles):
 			tmp_files=tmp_array[0].replace(u'file://', u'')
 			if not os.path.isfile(tmp_files):
 				sys.stderr.write(u'\n! Error: The graphic file does not exist (%s)\n' % tmp_files)
-				sys.exit(False)
+				sys.exit(1)
 
 			# Fix file extentions in all caps or 4 character JPEG extentions
 			fileExtension = (_getExtention(tmp_files)).lower()
@@ -4111,7 +4111,7 @@ class MythTvMetaData(VideoFiles):
 					# Destinations must all be directories
 					if not os.path.isdir(file_dir):
 						sys.stderr.write(u"\n! Error: Destinations must all be directories.\nThis destination is not a directory (%s)\n" % (file_dir,))
-						sys.exit(False)
+						sys.exit(1)
 					else:
 						tmp_dir = file_dir
 						for directory in self.config['mythvideo']:
@@ -4120,7 +4120,7 @@ class MythTvMetaData(VideoFiles):
 								break
 						else:
 							sys.stderr.write(u"\n! Error: Destinations must all be a mythvideo directory or subdirectory.\nThis destination (%s) is not one of the Mythvideo directories(%s)\n" % (file_dir, self.config['mythvideo'], ))
-							sys.exit(False)
+							sys.exit(1)
 				# Verify that a target file is really a video file.
 				if file_dir[-1:] != '*': # Skip wildcard file name targets
 					if os.access(file_dir, os.F_OK | os.R_OK | os.W_OK):	# Confirm that the file actually exists
@@ -4131,7 +4131,7 @@ class MythTvMetaData(VideoFiles):
 									break
 							else:
 								sys.stderr.write(u"\n! Error: Target files must be video files(%s).\nSupported video file extentions(%s)\n" % (file_dir, self.config['video_file_exts'],))
-								sys.exit(False)
+								sys.exit(1)
 					count+=1
 
 		# Stats counters
@@ -4326,7 +4326,7 @@ class MythTvMetaData(VideoFiles):
 
 		if not len(directories):
 			sys.stderr.write(u"\n! Error: There must be a video directory specified in MythTv\n")
-			sys.exit(False)
+			sys.exit(1)
 
 		allFiles = self._findFiles(directories, self.config['recursive'] , verbose = self.config['debug_enabled'])
 		validFiles = self._processNames(allFiles, verbose = self.config['debug_enabled'], movies=True)
@@ -4681,7 +4681,7 @@ class MythTvMetaData(VideoFiles):
 		except MySQLdb.Error, e:
 			logger.error(u"SELECT intid FROM videometadata WHERE inetref = 99999999 and category = %d failed: %d: %s" % (category_id, e.args[0], e.args[1]))
 			c.close()
-			sys.exit(False)
+			sys.exit(1)
 		intids=[]
 		while True:
 			row = c.fetchone()
@@ -5381,17 +5381,17 @@ class MythTvMetaData(VideoFiles):
 				validFiles = self._moveVideoFiles(self.config['video_dir'])
 			else:
 				sys.stderr.write(u"\n! Error: When specifying target (file or directory) to move to a destination (directory) they must always be in pairs (target and destination directory).\nYou specified an uneven number of variables (%d) for target and destination pairs.\nVariable count (%s)\n" % (len(self.config['video_dir']), self.config['video_dir']))
-				sys.exit(False)
+				sys.exit(1)
 
 		# Check if only missing inetref video's should be processed
 		if self.config['mythtv_inetref']:
 			validFiles = self._findMissingInetref()
 			if validFiles == None:
 				sys.stderr.write(u"\n! Warning: There were no missing interef video files found.\n\n")
-				sys.exit(True)
+				sys.exit(0)
 			elif not len(validFiles):
 				sys.stderr.write(u"\n! Warning: There were no missing interef video files found.\n\n")
-				sys.exit(True)
+				sys.exit(0)
 
 		# Verify that the proper fields are present
 		db_version = mythdb.getSetting('DBSchemaVer')
@@ -5399,23 +5399,23 @@ class MythTvMetaData(VideoFiles):
 		for field in ['season', 'episode', 'coverfile', 'screenshot', 'banner', 'fanart']:
 			if not field in field_names:
 				sys.stderr.write(u"\n! Error: Your MythTv data base scheme version (%s) does not have the necessary fields at least (%s) is missing\n\n" % (db_version, field))
-				sys.exit(False)
+				sys.exit(1)
 
 		# Check if this is a Scheduled and Recorded graphics download request
 		if self.config['mythtv_watched']:
 			self._downloadScheduledRecordedGraphics()
-			sys.exit(True)
+			sys.exit(0)
 
 		# Check if this is just a Janitor (clean up unused graphics files) request
 		if self.config['mythtvjanitor']:
 			self._graphicsCleanup()
-			sys.exit(True)
+			sys.exit(0)
 
 		directories=self.config['mythvideo']
 
 		if not len(directories):
 			sys.stderr.write(u"\n! Error: There must be a video directory specified in MythTv\n")
-			sys.exit(False)
+			sys.exit(1)
 
 		# Set statistics
 		num_processed=0
@@ -5440,7 +5440,7 @@ class MythTvMetaData(VideoFiles):
 
 		if len(validFiles) == 0:
 			sys.stderr.write(u"\n! Error: No valid video files found\n")
-			sys.exit(False)
+			sys.exit(1)
 
 		tv_series_season_format=u"%s/%s Season %d.%s"
 		tv_series_format=u"%s/%s.%s"
@@ -6272,16 +6272,16 @@ def main():
 
 	if opts.usage:					# Display usage information
 		sys.stdout.write(usage_txt+'\n')
-		sys.exit(True)
+		sys.exit(0)
 
 	if opts.examples:					# Display example information
 		sys.stdout.write(examples_txt+'\n')
-		sys.exit(True)
+		sys.exit(0)
 
 	if opts.version == True:		# Display program information
 		sys.stdout.write(u"\nTitle: (%s); Version: (%s); Author: (%s)\n%s\n" % (
 		__title__, __version__, __author__, __purpose__ ))
-		sys.exit(True)
+		sys.exit(0)
 
 	# Apply any command line switches
 	configuration.changeVariable('local_language', opts.language)
@@ -6319,7 +6319,7 @@ def main():
 		else:
 			configuration.validate_setVariables(['FAKE SERIES NAME','FAKE EPISODE NAME'])
 		configuration.displayOptions()
-		sys.exit(True)
+		sys.exit(0)
 
 	# Validate specific variables
 	configuration.validate_setVariables(series_season_ep)
