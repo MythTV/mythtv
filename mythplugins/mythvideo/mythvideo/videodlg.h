@@ -122,8 +122,7 @@ class VideoDialog : public MythScreenType
     void OnParentalChange(int amount);
 
     // Called when the underlying data for an item changes
-    void OnVideoSearchListSelection(QString video_uid,
-                                    MythUIButtonListItem *item);
+    void OnVideoSearchListSelection(QString video_uid);
 
     void OnManualVideoUID(QString video_uid);
     void OnManualVideoTitle(QString title);
@@ -173,52 +172,45 @@ class VideoDialog : public MythScreenType
     //       OnVideoPosterSetDone()
     //       OnPosterCopyFinished()
     // OnVideoPosterSetDone() stop wait background
-    void StartVideoImageSet(Metadata *metadata, MythUIButtonListItem *item, 
-                            QStringList coverart = QStringList(),
+    void StartVideoImageSet(Metadata *metadata, QStringList coverart = QStringList(),
                             QStringList fanart = QStringList(), QStringList banner = QStringList(),
                             QStringList screenshot = QStringList());
 
     // StartVideoSearchByUID() start wait background
     //   OnVideoSearchByUIDDone() stop wait background
     //     StartVideoPosterSet()
-    void StartVideoSearchByUID(QString video_uid, Metadata *metadata,
-                               MythUIButtonListItem *item);
+    void StartVideoSearchByUID(QString video_uid, Metadata *metadata);
 
     // StartVideoSearchByTitle()
     //   OnVideoSearchByTitleDone()
     void StartVideoSearchByTitle(QString video_uid, QString title,
-            Metadata *metadata, MythUIButtonListItem *item);
+            Metadata *metadata);
     void StartVideoSearchByTitleSubtitle(QString title,
-            QString subtitle, Metadata *metadata, MythUIButtonListItem *item);
+            QString subtitle, Metadata *metadata);
 
   private slots:
     // called during StartVideoPosterSet
-    void OnImageURL(QString uri, Metadata *metadata, QString type,
-                    MythUIButtonListItem *item);
+    void OnImageURL(QString uri, Metadata *metadata, QString type);
     void OnImageCopyFinished(ImageDownloadErrorState error, QString errorMsg,
-                              Metadata *metadata, const QString &imagePath,
-                              MythUIButtonListItem *item);
+                              Metadata *metadata, const QString &imagePath);
 
     // called during StartVideoSearchByTitle
     void OnVideoSearchByTitleDone(bool normal_exit,
                                   const QStringList &results,
-                                  Metadata *metadata,
-                                  MythUIButtonListItem *item);
+                                  Metadata *metadata);
     void OnVideoSearchByTitleSubtitleDone(bool normal_exit,
                                   QStringList result,
-                                  Metadata *metadata,
-                                  MythUIButtonListItem *item);
+                                  Metadata *metadata);
 
 // and now the end points
 
     // StartVideoPosterSet end
-    void OnVideoImageSetDone(Metadata *metadata, MythUIButtonListItem *item);
+    void OnVideoImageSetDone(Metadata *metadata);
 
     // StartVideoSearchByUID end
     void OnVideoSearchByUIDDone(bool normal_exit,
                                 QStringList output,
-                                Metadata *metadata, QString video_uid,
-                                MythUIButtonListItem *item);
+                                Metadata *metadata, QString video_uid);
 
 // End asynchronous functions.
 

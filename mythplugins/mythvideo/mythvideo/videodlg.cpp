@@ -104,14 +104,13 @@ namespace
 
       signals:
         void SigFinished(ImageDownloadErrorState reason, QString errorMsg,
-                         Metadata *item, const QString &, MythUIButtonListItem *button);
+                         Metadata *item, const QString &);
       public:
         static ImageDownloadProxy *Create(const QUrl &url, const QString &dest,
                                           Metadata *item,
-                                          const QString &db_value,
-                                          MythUIButtonListItem *button)
+                                          const QString &db_value)
         {
-            return new ImageDownloadProxy(url, dest, item, db_value, button);
+            return new ImageDownloadProxy(url, dest, item, db_value);
         }
 
       public:
@@ -151,9 +150,8 @@ namespace
 
       private:
         ImageDownloadProxy(const QUrl &url, const QString &dest,
-                           Metadata *item, const QString &db_value,
-                           MythUIButtonListItem *button)
-          : m_item(item), m_dest_file(dest), m_db_value(db_value), m_button(button),
+                           Metadata *item, const QString &db_value)
+          : m_item(item), m_dest_file(dest), m_db_value(db_value),
             m_id(0), m_url(url), m_error_state(esOK), m_redirectCount(0)
         {
             connect(&m_http,
@@ -279,7 +277,7 @@ namespace
                     }
                 }
 
-                emit SigFinished(m_error_state, errorMsg, m_item, m_db_value, m_button);
+                emit SigFinished(m_error_state, errorMsg, m_item, m_db_value);
             }
         }
 
@@ -289,7 +287,6 @@ namespace
         QBuffer m_data_buffer;
         QString m_dest_file;
         QString m_db_value;
-        MythUIButtonListItem *m_button;
         int m_id;
         QTimer m_timer;
         QUrl m_url;
@@ -468,16 +465,15 @@ namespace
 
       signals:
         void SigSearchResults(bool normal_exit, const QStringList &items,
-                Metadata *item, MythUIButtonListItem *button);
+                Metadata *item);
 
       public:
         VideoTitleSearch(QObject *oparent) :
             ExecuteExternalCommand(oparent), m_item(0) {}
 
-        void Run(QString title, Metadata *item, MythUIButtonListItem *button)
+        void Run(QString title, Metadata *item)
         {
             m_item = item;
-            m_button = button;
             int m_season, m_episode; 
             QString cmd;
             m_season = m_item->GetSeason();
@@ -514,13 +510,12 @@ namespace
         {
             (void) err;
 
-            emit SigSearchResults(normal_exit, out, m_item, m_button);
+            emit SigSearchResults(normal_exit, out, m_item);
             deleteLater();
         }
 
       private:
         Metadata *m_item;
-        MythUIButtonListItem *m_button;
     };
 
     /** \class VideoTitleSubtitleSearch
@@ -534,17 +529,15 @@ namespace
 
       signals:
         void SigSearchResults(bool normal_exit, QStringList result,
-                Metadata *item, MythUIButtonListItem *button);
+                Metadata *item);
 
       public:
         VideoTitleSubtitleSearch(QObject *oparent) :
             ExecuteExternalCommand(oparent), m_item(0) {}
 
-        void Run(QString title, QString subtitle, Metadata *item,
-                 MythUIButtonListItem *button)
+        void Run(QString title, QString subtitle, Metadata *item)
         {
             m_item = item;
-            m_button = button;
             QString cmd;
 
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
@@ -566,13 +559,12 @@ namespace
         {
             (void) err;
 
-            emit SigSearchResults(normal_exit, out, m_item, m_button);
+            emit SigSearchResults(normal_exit, out, m_item);
             deleteLater();
         }
 
       private:
         Metadata *m_item;
-        MythUIButtonListItem *m_button;
     };
 
     /** \class VideoUIDSearch
@@ -586,16 +578,15 @@ namespace
 
       signals:
         void SigSearchResults(bool normal_exit, QStringList results,
-                Metadata *item, QString video_uid, MythUIButtonListItem *button);
+                Metadata *item, QString video_uid);
 
       public:
         VideoUIDSearch(QObject *oparent) :
-            ExecuteExternalCommand(oparent), m_item(0), m_button(0) {}
+            ExecuteExternalCommand(oparent), m_item(0) {}
 
-        void Run(QString video_uid, Metadata *item, MythUIButtonListItem *button)
+        void Run(QString video_uid, Metadata *item)
         {
             m_item = item;
-            m_button = button;
             m_video_uid = video_uid;            
             int m_season, m_episode;
             m_season = m_item->GetSeason();
@@ -632,13 +623,12 @@ namespace
         void OnExecDone(bool normal_exit, QStringList out, QStringList err)
         {
             (void) err;
-            emit SigSearchResults(normal_exit, out, m_item, m_video_uid, m_button);
+            emit SigSearchResults(normal_exit, out, m_item, m_video_uid);
             deleteLater();
         }
 
       private:
         Metadata *m_item;
-        MythUIButtonListItem *m_button;
         QString m_video_uid;
     };
 
@@ -712,9 +702,9 @@ namespace
 
       public:
         SearchResultsDialog(MythScreenStack *lparent,
-                const QStringList &results, MythUIButtonListItem *item) :
+                const QStringList &results) :
             MythScreenType(lparent, "videosearchresultspopup"),
-            m_results(results), m_item(item), m_resultsList(0)
+            m_results(results), m_resultsList(0)
         {
         }
 
@@ -751,17 +741,16 @@ namespace
         }
 
      signals:
-        void haveResult(QString, MythUIButtonListItem *);
+        void haveResult(QString);
 
       private:
         QStringList m_results;
-        MythUIButtonListItem *m_item;
         MythUIButtonList *m_resultsList;
 
       private slots:
         void sendResult(MythUIButtonListItem* item)
         {
-            emit haveResult(item->GetData().toString(), m_item);
+            emit haveResult(item->GetData().toString());
             Close();
         }
     };
@@ -3772,22 +3761,20 @@ MythUIButtonListItem *VideoDialog::GetItemCurrent()
 
 void VideoDialog::VideoSearch()
 {
-    MythUIButtonListItem *item = GetItemCurrent();
-    Metadata *metadata = GetMetadata(item);
+    Metadata *metadata = GetMetadata(GetItemCurrent());
 
     if (metadata)
         StartVideoSearchByTitle(metadata->GetInetRef(), metadata->GetTitle(),
-                                metadata, item);
+                                metadata);
 }
 
 void VideoDialog::TitleSubtitleSearch()
 {
-    MythUIButtonListItem *item = GetItemCurrent();
-    Metadata *metadata = GetMetadata(item);
+    Metadata *metadata = GetMetadata(GetItemCurrent());
 
     if (metadata)
         StartVideoSearchByTitleSubtitle(metadata->GetTitle(),
-                                metadata->GetSubtitle(), metadata, item);
+                                metadata->GetSubtitle(), metadata);
 }
 
 void VideoDialog::ToggleBrowseable()
@@ -3836,13 +3823,12 @@ void VideoDialog::ToggleWatched()
 //     }
 // }
 
-void VideoDialog::OnVideoSearchListSelection(QString video_uid,
-                                             MythUIButtonListItem *item)
+void VideoDialog::OnVideoSearchListSelection(QString video_uid)
 {
-    Metadata *metadata = GetMetadata(item);
+    Metadata *metadata = GetMetadata(GetItemCurrent());
     if (metadata && !video_uid.isEmpty())
     {
-        StartVideoSearchByUID(video_uid, metadata, item);
+        StartVideoSearchByUID(video_uid, metadata);
     }
 }
 
@@ -3880,10 +3866,9 @@ void VideoDialog::ManualVideoUID()
 
 void VideoDialog::OnManualVideoUID(QString video_uid)
 {
-    MythUIButtonListItem *item = GetItemCurrent();
-    Metadata *metadata = GetMetadata(item);
+    Metadata *metadata = GetMetadata(GetItemCurrent());
     if (video_uid.length())
-        StartVideoSearchByUID(video_uid, metadata, item);
+        StartVideoSearchByUID(video_uid, metadata);
 }
 
 void VideoDialog::ManualVideoTitle()
@@ -3902,12 +3887,10 @@ void VideoDialog::ManualVideoTitle()
 
 void VideoDialog::OnManualVideoTitle(QString title)
 {
-    MythUIButtonListItem *item = GetItemCurrent();
-    Metadata *metadata = GetMetadata(item);
+    Metadata *metadata = GetMetadata(GetItemCurrent());
     if (title.length() && metadata)
     {
-        StartVideoSearchByTitle(VIDEO_INETREF_DEFAULT, title,
-                                metadata, item);
+        StartVideoSearchByTitle(VIDEO_INETREF_DEFAULT, title, metadata);
     }
 }
 
@@ -4042,9 +4025,9 @@ void VideoDialog::ResetMetadata()
 // Copy video images to appropriate directory and set the item's image files.
 // This is the start of an async operation that needs to always complete
 // to OnVideo*SetDone.
-void VideoDialog::StartVideoImageSet(Metadata *metadata, MythUIButtonListItem *item,
-                                     QStringList coverart, QStringList fanart,
-                                     QStringList banner, QStringList screenshot)
+void VideoDialog::StartVideoImageSet(Metadata *metadata, QStringList coverart,
+                                     QStringList fanart, QStringList banner,
+                                     QStringList screenshot)
 {
     //createBusyDialog(QObject::tr("Fetching poster for %1 (%2)")
     //                    .arg(metadata->InetRef())
@@ -4068,13 +4051,13 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, MythUIButtonListItem *i
                                 season, host, "Coverart", episode))
         {
             metadata->SetCoverFile(cover_file);
-            OnVideoImageSetDone(metadata, item);
+            OnVideoImageSetDone(metadata);
         }
 
         if (!coverart.isEmpty() && (cover_file.isEmpty() ||
             IsDefaultCoverFile(cover_file)))
         {
-            OnImageURL(coverart.takeAt(0).trimmed(), metadata, "Coverart", item);
+            OnImageURL(coverart.takeAt(0).trimmed(), metadata, "Coverart");
         }
     }
 
@@ -4090,16 +4073,16 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, MythUIButtonListItem *i
                                 season, host, "Fanart", episode))
         {
             metadata->SetFanart(fanart_file);
-            OnVideoImageSetDone(metadata, item);
+            OnVideoImageSetDone(metadata);
         }
 
         if (!fanart.isEmpty() && metadata->GetFanart().isEmpty())
         {
             if (metadata->GetSeason() >= 1 && fanart.count() >= metadata->GetSeason())
                 OnImageURL(fanart.takeAt(metadata->GetSeason() - 1), metadata,
-                           "Fanart", item);
+                           "Fanart");
             else
-                OnImageURL(fanart.takeAt(0).trimmed(), metadata, "Fanart", item);
+                OnImageURL(fanart.takeAt(0).trimmed(), metadata, "Fanart");
         }
     }
 
@@ -4115,12 +4098,12 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, MythUIButtonListItem *i
                                 season, host, "Banners", episode))
         {
             metadata->SetBanner(banner_file);
-            OnVideoImageSetDone(metadata, item);
+            OnVideoImageSetDone(metadata);
         }
 
         if (!banner.isEmpty() && metadata->GetBanner().isEmpty())
         {
-            OnImageURL(banner.takeAt(0).trimmed(), metadata, "Banners", item);
+            OnImageURL(banner.takeAt(0).trimmed(), metadata, "Banners");
         }
     }
 
@@ -4133,21 +4116,21 @@ void VideoDialog::StartVideoImageSet(Metadata *metadata, MythUIButtonListItem *i
     {
         if (GetLocalVideoImage(inetref, filename,
                                 screenshot_dirs, screenshot_file, title,
-                                season, host, "Screenshots", episode))
+                                season, host, "Screenshots", episode,
+                                true))
         {
             metadata->SetScreenshot(screenshot_file);
-            OnVideoImageSetDone(metadata, item);
+            OnVideoImageSetDone(metadata);
         }
 
         if (!screenshot.isEmpty() && metadata->GetScreenshot().isEmpty())
         {
-            OnImageURL(screenshot.takeAt(0).trimmed(), metadata, "Screenshots", item);
+            OnImageURL(screenshot.takeAt(0).trimmed(), metadata, "Screenshots");
         }
     }
 }
 
-void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type,
-                             MythUIButtonListItem *item)
+void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
 {
     if (metadata)
     {
@@ -4270,16 +4253,14 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type,
 
             ImageDownloadProxy *id =
                     ImageDownloadProxy::Create(url, dest_file, metadata,
-                                               db_value, item);
+                                               db_value);
 
             connect(id, SIGNAL(SigFinished(ImageDownloadErrorState,
                                            QString, Metadata *,
-                                           const QString &,
-                                           MythUIButtonListItem *)),
+                                           const QString &)),
                     SLOT(OnImageCopyFinished(ImageDownloadErrorState,
                                               QString, Metadata *,
-                                              const QString &,
-                                              MythUIButtonListItem *)));
+                                              const QString &)));
 
             id->StartCopy();
             m_d->AddImageDownload(id);
@@ -4295,17 +4276,16 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type,
             if (type == "Screenshot")
                 metadata->SetScreenshot("");
 
-            OnVideoImageSetDone(metadata, item);
+            OnVideoImageSetDone(metadata);
         }
     }
     else
-        OnVideoImageSetDone(metadata, item);
+        OnVideoImageSetDone(metadata);
 }
 
 void VideoDialog::OnImageCopyFinished(ImageDownloadErrorState error,
                                        QString errorMsg, Metadata *item,
-                                       const QString &imagePath,
-                                       MythUIButtonListItem *button)
+                                       const QString &imagePath)
 {
     QObject *src = sender();
     if (src)
@@ -4359,11 +4339,11 @@ void VideoDialog::OnImageCopyFinished(ImageDownloadErrorState error,
                             .arg(type));
     }
 
-    OnVideoImageSetDone(item, button);
+    OnVideoImageSetDone(item);
 }
 
 // This is the final call as part of a StartVideoImageSet
-void VideoDialog::OnVideoImageSetDone(Metadata *metadata, MythUIButtonListItem *item)
+void VideoDialog::OnVideoImageSetDone(Metadata *metadata)
 {
     // The metadata has some cover file set
     if (m_busyPopup)
@@ -4373,24 +4353,23 @@ void VideoDialog::OnVideoImageSetDone(Metadata *metadata, MythUIButtonListItem *
     }
 
     metadata->UpdateDatabase();
-    UpdateItem(item);
+    UpdateItem(GetItemCurrent());
 }
 
-void VideoDialog::StartVideoSearchByUID(QString video_uid, Metadata *metadata,
-                                        MythUIButtonListItem *item)
+void VideoDialog::StartVideoSearchByUID(QString video_uid, Metadata *metadata)
 {
     // Starting the busy dialog here triggers a bizarre segfault
     //createBusyDialog(video_uid);
     VideoUIDSearch *vns = new VideoUIDSearch(this);
     connect(vns, SIGNAL(SigSearchResults(bool, QStringList, Metadata *,
-                            QString, MythUIButtonListItem *)),
+                            QString)),
             SLOT(OnVideoSearchByUIDDone(bool, QStringList, Metadata *,
-                            QString, MythUIButtonListItem *)));
-    vns->Run(video_uid, metadata, item);
+                            QString)));
+    vns->Run(video_uid, metadata);
 }
 
 void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
-        Metadata *metadata, QString video_uid, MythUIButtonListItem *item)
+        Metadata *metadata, QString video_uid)
 {
     if (m_busyPopup)
     {
@@ -4507,22 +4486,21 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
         metadata->SetCountries(video_countries);
 
         metadata->UpdateDatabase();
-        UpdateItem(item);
+        UpdateItem(GetItemCurrent());
 
-        StartVideoImageSet(metadata, item, coverart, fanart, banner, screenshot);
+        StartVideoImageSet(metadata, coverart, fanart, banner, screenshot);
 
     }
     else
     {
         metadata->Reset();
         metadata->UpdateDatabase();
-        UpdateItem(item);
+        UpdateItem(GetItemCurrent());
     }
 }
 
 void VideoDialog::StartVideoSearchByTitle(QString video_uid, QString title,
-                                            Metadata *metadata,
-                                            MythUIButtonListItem *item)
+                                            Metadata *metadata)
 {
     if (video_uid.isEmpty())
     {
@@ -4536,10 +4514,10 @@ void VideoDialog::StartVideoSearchByTitle(QString video_uid, QString title,
 
         VideoTitleSearch *vts = new VideoTitleSearch(this);
         connect(vts, SIGNAL(SigSearchResults(bool, const QStringList &,
-                                Metadata *, MythUIButtonListItem *)),
+                                Metadata *)),
                 SLOT(OnVideoSearchByTitleDone(bool, const QStringList &,
-                                Metadata *, MythUIButtonListItem *)));
-        vts->Run(title, metadata, item);
+                                Metadata *)));
+        vts->Run(title, metadata);
     }
     else if (video_uid == VIDEO_INETREF_DEFAULT)
     {
@@ -4547,22 +4525,21 @@ void VideoDialog::StartVideoSearchByTitle(QString video_uid, QString title,
 
         VideoTitleSearch *vts = new VideoTitleSearch(this);
         connect(vts, SIGNAL(SigSearchResults(bool, const QStringList &,
-                                Metadata *, MythUIButtonListItem *)),
+                                Metadata *)),
                 SLOT(OnVideoSearchByTitleDone(bool, const QStringList &,
-                                Metadata *, MythUIButtonListItem *)));
-        vts->Run(title, metadata, item);
+                                Metadata *)));
+        vts->Run(title, metadata);
     }
     else
     {
         QStringList videos;
         videos.append(QString("%1:%2").arg(video_uid).arg(title));
-        OnVideoSearchByTitleDone(true, videos, metadata, item);
+        OnVideoSearchByTitleDone(true, videos, metadata);
     }
 }
 
 void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
-        const QStringList &results, Metadata *metadata,
-        MythUIButtonListItem *item)
+        const QStringList &results, Metadata *metadata)
 {
     if (m_busyPopup)
     {
@@ -4586,10 +4563,10 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
         {
             metadata->Reset();
             metadata->UpdateDatabase();
-            UpdateItem(item);
+            UpdateItem(GetItemCurrent());
             return;
         }
-        StartVideoSearchByUID(key, metadata, item);
+        StartVideoSearchByUID(key, metadata);
     }
     else if (results.size() < 1)
     {
@@ -4598,34 +4575,33 @@ void VideoDialog::OnVideoSearchByTitleDone(bool normal_exit,
     else
     {
         SearchResultsDialog *resultsdialog =
-                new SearchResultsDialog(m_popupStack, results, item);
+                new SearchResultsDialog(m_popupStack, results);
 
         if (resultsdialog->Create())
             m_popupStack->AddScreen(resultsdialog);
 
-        connect(resultsdialog, SIGNAL(haveResult(QString, MythUIButtonListItem *)),
-                SLOT(OnVideoSearchListSelection(QString, MythUIButtonListItem *)),
+        connect(resultsdialog, SIGNAL(haveResult(QString)),
+                SLOT(OnVideoSearchListSelection(QString)),
                 Qt::QueuedConnection);
     }
 }
 
 void VideoDialog::StartVideoSearchByTitleSubtitle(QString title,
-                                            QString subtitle, Metadata *metadata,
-                                            MythUIButtonListItem *item)
+                                            QString subtitle, Metadata *metadata)
 {
         createBusyDialog(title);
 
         VideoTitleSubtitleSearch *vtss = new VideoTitleSubtitleSearch(this);
 
         connect(vtss, SIGNAL(SigSearchResults(bool, QStringList,
-                                Metadata *, MythUIButtonListItem *)),
+                                Metadata *)),
                 SLOT(OnVideoSearchByTitleSubtitleDone(bool, QStringList,
-                                Metadata *, MythUIButtonListItem *)));
-        vtss->Run(title, subtitle, metadata, item);
+                                Metadata *)));
+        vtss->Run(title, subtitle, metadata);
 }
 
 void VideoDialog::OnVideoSearchByTitleSubtitleDone(bool normal_exit,
-        QStringList result, Metadata *metadata, MythUIButtonListItem *item)
+        QStringList result, Metadata *metadata)
 {
     if (m_busyPopup)
     {
@@ -4666,8 +4642,7 @@ void VideoDialog::OnVideoSearchByTitleSubtitleDone(bool normal_exit,
             metadata->SetSeason(season.toInt());
             metadata->SetEpisode(episode.toInt());
             StartVideoSearchByTitle(VIDEO_INETREF_DEFAULT, 
-                                metadata->GetTitle(), metadata,
-                                item);
+                                metadata->GetTitle(), metadata);
         }
     }
     else
