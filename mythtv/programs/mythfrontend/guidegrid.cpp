@@ -203,7 +203,6 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
 
     m_jumpToChannelEnabled = gContext->GetNumSetting("EPGEnableJumpToChannel", 1);
     m_sortReverse = gContext->GetNumSetting("EPGSortReverse", 0);
-    m_selectChangesChannel = gContext->GetNumSetting("SelectChangesChannel", 0);
     m_selectRecThreshold = gContext->GetNumSetting("SelChangeRecThreshold", 16);
 
     m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
@@ -463,10 +462,11 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             Close();
         else if (action == "SELECT")
         {
-            if (m_player && m_selectChangesChannel)
+            if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
             {
-                // See if this show is far enough into the future that it's probable
-                // that the user wanted to schedule it to record instead of changing the channel.
+                // See if this show is far enough into the future that it's
+                // probable that the user wanted to schedule it to record
+                // instead of changing the channel.
                 ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
                 if (pginfo && (pginfo->title != m_unknownTitle) &&
                     ((pginfo->SecsTillStart() / 60) >= m_selectRecThreshold))
@@ -535,13 +535,18 @@ void GuideGrid::showMenu(void)
     {
         menuPopup->SetReturnEvent(this, "menu");
 
+        ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
+
+        if (m_player && (m_player->GetState(-1) == kState_WatchingLiveTV))
+            menuPopup->AddButton(tr("Change Channel"));
         menuPopup->AddButton(tr("Record"));
+        if (pginfo && pginfo->recordid > 0)
+            menuPopup->AddButton(tr("Edit Recording Status"));
         menuPopup->AddButton(tr("Edit Schedule"));
         menuPopup->AddButton(tr("Program Details"));
         menuPopup->AddButton(tr("Upcoming"));
         menuPopup->AddButton(tr("Custom Edit"));
 
-        ProgramInfo *pginfo = m_programInfos[m_currentRow][m_currentCol];
         if (pginfo && pginfo->recordid > 0)
             menuPopup->AddButton(tr("Delete Rule"));
 
@@ -1258,6 +1263,14 @@ void GuideGrid::customEvent(QEvent *event)
             if (resulttext == tr("Record"))
             {
                 quickRecord();
+            }
+            if (resulttext == tr("Change Channel"))
+            {
+                enter();
+            }
+            if (resulttext == tr("Edit Recording Status"))
+            {
+                editRecSchedule();
             }
             else if (resulttext == tr("Edit Schedule"))
             {

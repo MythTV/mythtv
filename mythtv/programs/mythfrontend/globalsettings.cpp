@@ -3410,19 +3410,6 @@ static HostLineEdit *UnknownCategory()
     return ge;
 }
 
-static HostCheckBox *SelectChangesChannel()
-{
-    HostCheckBox *gc = new HostCheckBox("SelectChangesChannel");
-    gc->setLabel(QObject::tr("Use select to change the channel in the program "
-                 "guide"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, the Select key will change the "
-                    "channel while using the program guide during live TV.  "
-                    "If disabled, the select key will bring up the recording "
-                    "options screen."));
-    return gc;
-}
-
 static HostSpinBox *EPGRecThreshold()
 {
     HostSpinBox *gs = new HostSpinBox("SelChangeRecThreshold", 1, 600, 1);
@@ -4967,7 +4954,6 @@ EPGSettings::EPGSettings()
     gen->addChild(UnknownTitle());
     gen->addChild(UnknownCategory());
     gen->addChild(DefaultTVChannel());
-    gen->addChild(SelectChangesChannel());
     gen->addChild(EPGRecThreshold());
     gen->addChild(EPGEnableJumpToChannel());
     addChild(gen);
