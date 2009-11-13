@@ -78,6 +78,7 @@ class MPUBLIC MythDialogBox : public MythScreenType
                    bool newMenu = false, bool setCurrent = false);
 
     virtual bool keyPressEvent(QKeyEvent *event);
+    virtual bool gestureEvent(MythGestureEvent *event);
 
   public slots:
     void Select(MythUIButtonListItem* item);

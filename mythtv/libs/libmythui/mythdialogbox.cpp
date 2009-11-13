@@ -147,7 +147,7 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
         if (action == "ESCAPE" || action == "LEFT" || action == "MENU")
         {
             SendEvent(-1);
-            m_ScreenStack->PopScreen();
+            Close();
         }
         else if (action == "RIGHT")
         {
@@ -159,6 +159,29 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
     }
 
     if (!handled && MythScreenType::keyPressEvent(event))
+        handled = true;
+
+    return handled;
+}
+
+bool MythDialogBox::gestureEvent(MythGestureEvent *event)
+{
+    bool handled = false;
+    if (event->gesture() == MythGestureEvent::Click)
+    {
+        switch (event->GetButton())
+        {
+            case MythGestureEvent::RightButton :
+                Close();
+                handled = true;
+                break;
+            default :
+                break;
+        }
+
+    }
+
+    if (!handled && MythScreenType::gestureEvent(event))
         handled = true;
 
     return handled;
