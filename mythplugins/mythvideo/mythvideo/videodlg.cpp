@@ -3771,10 +3771,7 @@ MythUIButtonListItem *VideoDialog::GetItemByMetadata(Metadata *metadata)
     QList<MythGenericTree*> *children;
     QMap<int, int> idPosition;
 
-    if (parent && m_d->m_type == DLG_TREE)
-        children = parent->getAllChildren();
-    else
-        children = m_d->m_currentNode->getAllChildren();
+    children = m_d->m_currentNode->getAllChildren();
 
     for (it = children->begin(); it != children->end(); ++it)
     {
