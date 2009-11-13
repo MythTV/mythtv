@@ -3655,16 +3655,16 @@ void PlaybackBox::customEvent(QEvent *event)
                         // We've set this recording to be deleted locally
                         // it's no longer in the recording list, so don't
                         // trigger a list reload which would cause a UI lag
-                        if ((*i)->availableStatus == asPendingDelete
-                             && m_currentGroup != m_watchGroupLabel)
+                        if ((*i)->availableStatus != asPendingDelete
+                             || m_currentGroup == m_watchGroupLabel)
                         {
-                            (*i)->availableStatus = asDeleted;
-                            m_progCacheLock.unlock();
-                            return;
+                            m_recordingList->RemoveItem(
+                                            m_recordingList->GetItemByData(
+                                                        qVariantFromValue(*i)));
                         }
-                        else
-                            (*i)->availableStatus = asDeleted;
-                        break;
+                        (*i)->availableStatus = asDeleted;
+                        m_progCacheLock.unlock();
+                        return;
                    }
                 }
 
