@@ -1304,7 +1304,7 @@ void RecordingProfile::FiltersChanged(const QString &val)
       return;
 
     // If there are filters, we can not do lossless transcoding
-    if (val.trimmed().isEmpty())
+    if (!val.trimmed().isEmpty())
     {
        tr_lossless->setValue(false);
        tr_lossless->setEnabled(false);
