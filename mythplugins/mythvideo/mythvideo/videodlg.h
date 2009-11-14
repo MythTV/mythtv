@@ -107,6 +107,7 @@ class VideoDialog : public MythScreenType
     void PlayMenu();
     void DisplayMenu();
     void ViewMenu();
+    void SettingsMenu();
     void MetadataBrowseMenu();
 
     void ChangeFilter();
@@ -118,6 +119,9 @@ class VideoDialog : public MythScreenType
     void ShowCastDialog();
     void ShowHomepage();
     bool DoItemDetailShow();
+    void ShowPlayerSettings();
+    void ShowExtensionSettings();
+    void ShowMetadataSettings();
 
     void OnParentalChange(int amount);
 

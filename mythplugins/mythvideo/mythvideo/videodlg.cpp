@@ -44,6 +44,9 @@
 #include "dirscan.h"
 #include "playercommand.h"
 #include "videodlg.h"
+#include "fileassoc.h"
+#include "playersettings.h"
+#include "metadatasettings.h"
 
 namespace
 {
@@ -3049,6 +3052,8 @@ void VideoDialog::DisplayMenu()
     else
         m_menuPopup->AddButton(tr("Enable Flat View"),
                                                     SLOT(ToggleFlatView()));
+
+    m_menuPopup->AddButton(tr("Settings"), SLOT(SettingsMenu()), true);
 }
 
 /** \fn VideoDialog::ViewMenu()
@@ -3080,6 +3085,68 @@ void VideoDialog::ViewMenu()
     if (!(m_d->m_type & DLG_MANAGER))
         m_menuPopup->AddButton(tr("Switch to Manage View"),
                 SLOT(SwitchManager()));
+}
+
+/** \fn VideoDialog::SettingsMenu()
+ *  \brief Pop up a MythUI Menu for MythVideo Settings.
+ *  \return void.
+ */
+void VideoDialog::SettingsMenu()
+{
+    QString label = tr("Video Settings");
+
+    m_menuPopup = new MythDialogBox(label, m_popupStack, "videosettingspopup");
+
+    if (m_menuPopup->Create())
+        m_popupStack->AddScreen(m_menuPopup);
+
+    m_menuPopup->SetReturnEvent(this, "view");
+
+    m_menuPopup->AddButton(tr("Player Settings"), SLOT(ShowPlayerSettings()));
+    m_menuPopup->AddButton(tr("Metadata Settings"), SLOT(ShowMetadataSettings()));
+    m_menuPopup->AddButton(tr("File Type Settings"), SLOT(ShowExtensionSettings()));
+}
+
+/** \fn VideoDialog::ShowPlayerSettings()
+ *  \brief Pop up a MythUI Menu for MythVideo Player Settings.
+ *  \return void.
+ */
+void VideoDialog::ShowPlayerSettings()
+{
+    PlayerSettings *ps = new PlayerSettings(m_popupStack, "player settings");
+
+    if (ps->Create())
+        m_popupStack->AddScreen(ps);
+    else
+        delete ps;
+}
+
+/** \fn VideoDialog::ShowMetadataSettings()
+ *  \brief Pop up a MythUI Menu for MythVideo Metadata Settings.
+ *  \return void.
+ */
+void VideoDialog::ShowMetadataSettings()
+{
+    MetadataSettings *ms = new MetadataSettings(m_popupStack, "metadata settings");
+    
+    if (ms->Create())
+        m_popupStack->AddScreen(ms);
+    else
+        delete ms;
+}
+
+/** \fn VideoDialog::ShowExtensionSettings()
+ *  \brief Pop up a MythUI Menu for MythVideo filte Type Settings.
+ *  \return void.
+ */
+void VideoDialog::ShowExtensionSettings()
+{
+    FileAssocDialog *fa = new FileAssocDialog(m_popupStack, "fa dialog");
+
+    if (fa->Create())
+        m_popupStack->AddScreen(fa);
+    else
+        delete fa;
 }
 
 /** \fn VideoDialog::MetadataBrowseMenu()
@@ -3766,7 +3833,6 @@ MythUIButtonListItem *VideoDialog::GetItemByMetadata(Metadata *metadata)
         return m_videoButtonTree->GetItemCurrent();
     }
 
-    MythGenericTree *parent = m_d->m_currentNode->getParent();
     QList<MythGenericTree*>::iterator it;
     QList<MythGenericTree*> *children;
     QMap<int, int> idPosition;
