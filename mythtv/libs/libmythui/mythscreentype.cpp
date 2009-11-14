@@ -424,24 +424,25 @@ bool MythScreenType::gestureEvent(MythGestureEvent *event)
     {
         switch (event->GetButton())
         {
-            case MythGestureEvent::LeftButton :
-            {
-                MythUIType *clicked = GetChildAt(event->GetPosition());
-                if (clicked && clicked->IsEnabled())
-                {
-                    SetFocusWidget(clicked);
-                    if (clicked->gestureEvent(event))
-                        handled = true;
-                }
-                break;
-            }
             case MythGestureEvent::RightButton :
                 ShowMenu();
+                handled = true;
                 break;
             default :
                 break;
         }
             
+    }
+
+    if (!handled)
+    {
+        MythUIType *clicked = GetChildAt(event->GetPosition());
+        if (clicked && clicked->IsEnabled())
+        {
+            SetFocusWidget(clicked);
+            if (clicked->gestureEvent(event))
+                handled = true;
+        }
     }
 
     return handled;
