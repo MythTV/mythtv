@@ -13,6 +13,8 @@ using namespace std;
 #define LOC_WARN QString("ALSA, Warning: ")
 #define LOC_ERR QString("ALSA, Error: ")
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof *(a))
+
 // redefine assert as no-op to quiet some compiler warnings
 // about assert always evaluating true in alsa headers.
 #undef assert
@@ -92,10 +94,10 @@ vector<int> AudioOutputALSA::GetSupportedRates()
 {
     snd_pcm_hw_params_t *params;
     int err;
-    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000 };
+    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000, 64000, 88200, 96000, 176400, 192000 };
     vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
     QString real_device;
-    
+
     if (audio_passthru || audio_enc)
         real_device = audio_passthru_device;
     else 
@@ -116,7 +118,7 @@ vector<int> AudioOutputALSA::GetSupportedRates()
         rates.clear();
         return rates;
     }
-    
+
     snd_pcm_hw_params_alloca(&params);
 
     if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
@@ -128,7 +130,7 @@ vector<int> AudioOutputALSA::GetSupportedRates()
         rates.clear();
         return rates;
     }
-    
+
     vector<int>::iterator it = rates.begin();
 
     while (it != rates.end())
@@ -138,11 +140,74 @@ vector<int> AudioOutputALSA::GetSupportedRates()
         else
             it++;
     }
-    
+
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
 
     return rates;
+}
+
+vector<int> AudioOutputALSA::GetSupportedFormats()
+{
+    snd_pcm_hw_params_t *params;
+    int err;
+    const snd_pcm_format_t sformats[] = {
+        SND_PCM_FORMAT_S8,
+#ifdef WORDS_BIGENDIAN
+        SND_PCM_FORMAT_S16_BE,
+        SND_PCM_FORMAT_S32_BE,
+#else
+        SND_PCM_FORMAT_S16_LE,
+        SND_PCM_FORMAT_S32_LE,
+#endif
+    };
+    vector<int> formats;
+
+    QString real_device;
+
+    if (audio_passthru || audio_enc)
+        real_device = audio_passthru_device;
+    else 
+        real_device = audio_main_device;
+
+    if((err = snd_pcm_open(&pcm_handle, real_device.toAscii(),
+                           SND_PCM_STREAM_PLAYBACK, 
+                           SND_PCM_NONBLOCK|SND_PCM_NO_AUTO_RESAMPLE)) < 0)
+    { 
+        Error(QString("snd_pcm_open(%1): %2")
+              .arg(real_device).arg(snd_strerror(err)));
+        
+        if (pcm_handle)
+        {
+            snd_pcm_close(pcm_handle);
+            pcm_handle = NULL;
+        }
+        return formats;
+    }
+
+    snd_pcm_hw_params_alloca(&params);
+
+    if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
+    {
+        Error(QString("Broken configuration for playback; no configurations"
+                      " available: %1").arg(snd_strerror(err)));
+        snd_pcm_close(pcm_handle);
+        pcm_handle = NULL;
+        return formats;
+    }
+
+    int bsize = 4;
+    for (int i = 0; i < ARRAY_SIZE(formats); i++)
+    {
+        bsize *= 2;
+        if(snd_pcm_hw_params_test_format(pcm_handle, params, formats[i]) >= 0)
+            formats.push(bsize);
+    }
+
+    snd_pcm_close(pcm_handle);
+    pcm_handle = NULL;
+
+    return formats;
 }
 
 bool AudioOutputALSA::OpenDevice()
@@ -228,6 +293,12 @@ bool AudioOutputALSA::OpenDevice()
         format = SND_PCM_FORMAT_S24;
 #else
         format = SND_PCM_FORMAT_S24_LE;
+#endif
+    else if (audio_bits == 32)
+#ifdef WORDS_BIGENDIAN
+    format = SND_PCM_FORMAT_S32;
+#else
+    format = SND_PCM_FORMAT_S32_LE;
 #endif
     else
     {

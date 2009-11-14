@@ -155,7 +155,7 @@ bool VDPAUContext::Init(MythXDisplay *disp, Window win, QSize screen_size,
     if (!ok)
         return ok;
 
-    if (color_control || studio || colorspace==0 || colorspace==2)
+    if (color_control || studio || colorspace < 0 || colorspace==VDP_COLOR_STANDARD_ITUR_BT_709)
         useColorControl = InitColorControl();
 
     return ok;
