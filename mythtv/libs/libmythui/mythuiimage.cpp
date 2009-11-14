@@ -167,8 +167,7 @@ MythUIImage::~MythUIImage()
     if (m_maskImage)
         m_maskImage->DownRef();
 
-    if (d)
-        delete d;
+    delete d;
 }
 
 /**
