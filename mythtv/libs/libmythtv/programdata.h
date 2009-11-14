@@ -110,7 +110,7 @@ class MPUBLIC DBEvent
     {
     }
 
-    virtual ~DBEvent() { if (credits) delete credits; }
+    virtual ~DBEvent() { delete credits; }
 
     void AddPerson(DBPerson::Role, const QString &name);
     void AddPerson(const QString &role, const QString &name);

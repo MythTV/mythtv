@@ -1062,7 +1062,7 @@ class ImageSize : public VerticalConfigurationGroup
                bool transcoding = false):
             SpinBoxSetting(this, transcoding ? 0 : 160,
                            maxheight, 16, false,
-                           transcoding ? QObject::tr("Auto") : ""),
+                           transcoding ? QObject::tr("Auto") : QString()),
             CodecParamStorage(this, parent, "height")
         {
             setLabel(QObject::tr("Height"));
@@ -1254,7 +1254,7 @@ void RecordingProfile::loadByID(int profileId)
         "      recordingprofiles.id = :PROFILEID");
     result.bindValue(":PROFILEID", profileId);
 
-    QString type = "";
+    QString type;
     if (!result.exec())
     {
         MythDB::DBError("RecordingProfile::loadByID -- cardtype", result);
@@ -1304,7 +1304,7 @@ void RecordingProfile::FiltersChanged(const QString &val)
       return;
 
     // If there are filters, we can not do lossless transcoding
-    if (val.trimmed().length() > 0)
+    if (val.trimmed().isEmpty())
     {
        tr_lossless->setValue(false);
        tr_lossless->setEnabled(false);
@@ -1435,7 +1435,7 @@ void RecordingProfileEditor::open(int id)
     }
     else
     {
-        QString profName = "";
+        QString profName;
         RPPopupResult result = RecordingProfilePopup::showPopup(
             gContext->GetMainWindow(),
             tr("Add Recording Profile"),

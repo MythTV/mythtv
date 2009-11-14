@@ -186,7 +186,7 @@ DBEvent &DBEvent::operator=(const DBEvent &other)
 static void squeeze_str(QString &str)
 {
     if (str.isEmpty())
-        str = QString::null;
+        str.squeeze();
     else
     {
         str.detach();
@@ -889,7 +889,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
     }
 
     QList<ProgRating>::const_iterator j = ratings.begin();
-    for (; j != ratings.end(); j++)
+    for (; j != ratings.end(); ++j)
     {
         query.prepare(
             "INSERT INTO programrating "
@@ -906,7 +906,7 @@ uint ProgInfo::InsertDB(MSqlQuery &query, uint chanid) const
 
     if (credits)
     {
-        for (uint i = 0; i < credits->size(); i++)
+        for (uint i = 0; i < credits->size(); ++i)
             (*credits)[i].InsertDB(query, chanid, starttime);
     }
 
@@ -989,7 +989,7 @@ void ProgramData::FixProgramList(QList<ProgInfo*> &fixlist)
         ++it;
 
         // fill in miss stop times
-        if ((*cur)->endts == "" || (*cur)->startts > (*cur)->endts)
+        if ((*cur)->endts.isEmpty() || (*cur)->startts > (*cur)->endts)
         {
             if (it != fixlist.end())
             {
@@ -1077,7 +1077,7 @@ void ProgramData::HandlePrograms(
     {
         if (mapiter.key().isEmpty())
             continue;
-
+        
         query.prepare(
             "SELECT chanid "
             "FROM channel "
@@ -1112,7 +1112,7 @@ void ProgramData::HandlePrograms(
 
         FixProgramList(sortlist);
 
-        for (uint i = 0; i < chanids.size(); i++)
+        for (uint i = 0; i < chanids.size(); ++i)
         {
             HandlePrograms(query, chanids[i], sortlist, unchanged, updated);
         }

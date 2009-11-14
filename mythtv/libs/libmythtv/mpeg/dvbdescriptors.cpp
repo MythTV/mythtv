@@ -199,7 +199,7 @@ QString myth_category_type_to_string(uint category_type)
     if ((category_type > kCategoryNone) && (category_type < kCategoryLast))
         return QString(cattype[category_type]);
 
-    return QString("");
+    return QString();
 }
 
 MythCategoryType string_to_myth_category_type(const QString &category_type)
