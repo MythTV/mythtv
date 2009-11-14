@@ -6498,8 +6498,7 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
         }
         else
         {
-            QByteArray tmp = QObject::tr("seconds").toAscii();
-            text3.sprintf("%d %s", sbsecs, tmp.constData());
+            text3 = QObject::tr("%n second(s)", "", sbsecs);
         }
     }
 
