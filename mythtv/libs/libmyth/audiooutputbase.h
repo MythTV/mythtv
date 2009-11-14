@@ -91,9 +91,6 @@ class AudioOutputBase : public AudioOutput, public QThread
     virtual int  GetBufferedOnSoundcard(void) const = 0;
     virtual vector<int> GetSupportedRates(void) 
         { vector<int> rates; return rates; }
-    virtual vector<int> GetSupportedFormats(void) 
-    { vector<int> formats = (1,16); return formats; }
-
     /// You need to call this from any implementation in the dtor.
     void KillAudio(void);
 
@@ -167,10 +164,6 @@ class AudioOutputBase : public AudioOutput, public QThread
     // resampler
     bool need_resampler;
     SRC_STATE *src_ctx;
-
-    // audio conversion
-    bool need_convert;
-    int  format_convert;
 
     // timestretch
     soundtouch::SoundTouch    *pSoundStretch;

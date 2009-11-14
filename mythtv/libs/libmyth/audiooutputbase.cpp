@@ -265,9 +265,9 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     audio_passthru = settings.use_passthru;
     needs_upmix = lneeds_upmix;
 
-    if (audio_bits != 8 && audio_bits != 16 && audio_bits != 32)
+    if (audio_bits != 8 && audio_bits != 16)
     {
-        Error("AudioOutput only supports 8, 16bit or 32 bits audio.");
+        Error("AudioOutput only supports 8 or 16bit audio.");
         return;
     }
     
@@ -320,23 +320,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         need_resampler = true;
     }
     
-    // Find out what format (8, 16, 24, 32 bits) we can output (if output layer supports it)
-    need_convert = true;
-    vector<int> formats = GetSupportedRates();
-    for (it = formats.begin(); it < formats.end(); it++)
-    {
-        VERBOSE(VB_AUDIO, LOC + QString("format %1 bits is supported")
-                .arg(*it));
-        if (*it == audio_bits)
-            need_convert = false;
-        format_convert = *it;
-    }
-    if (!need_convert)
-    {
-        VERBOSE(VB_GENERAL, LOC + QString("Converting format. From: %1 to %2 bits")
-                .arg(audio_bits).arg(format_convert));
-    }
-
     // Encode to AC-3 if not passing thru , there's > 2 channels
     // and a passthru device is defined
     if (!audio_passthru && allow_ac3_passthru &&
@@ -356,7 +339,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     if(audio_passthru || audio_enc)
         // AC-3 output - soundcard expects a 2ch 48k stream
-        audio_channels = 2;
+	audio_channels = 2;
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
     source_audio_bytes_per_sample = source_audio_channels * audio_bits / 8;
@@ -702,8 +685,6 @@ void AudioOutputBase::AdjustVolume(void *buffer, int len, bool music)
         _AdjustVolume<char>((char *)buffer, len, music);
     else if (audio_bits == 16)
         _AdjustVolume<short>((short *)buffer, len, music);
-    else if (audio_bits == 32)
-        _AdjustVolume<long>((long *)buffer, len, music);
 }
 
 template <class AudioDataType>
@@ -924,8 +905,6 @@ void *AudioOutputBase::MonoToStereo(void *s1, void *s2, int samples)
         return _MonoToStereo((unsigned char *)s1, (unsigned char *)s2, samples);
     else if (audio_bits == 16)
         return _MonoToStereo((short *)s1, (short *)s2, samples);
-    else if (audio_bits == 32)
-        return _MonoToStereo((long *)s1, (long *)s2, samples);
     else
         return NULL; // 0
 }
