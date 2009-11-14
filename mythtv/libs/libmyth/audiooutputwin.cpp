@@ -138,6 +138,15 @@ AudioOutputWin::~AudioOutputWin()
     }
 }
 
+vector<int> AudioOutputWin::GetSupportedRates(void)
+{
+    // We use WAVE_MAPPER to find a compatible device,
+    // so just return a set of standard rates
+    const int srates[] = { 11025, 22050, 44100, 48000 };
+    vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
+    return rates;
+}
+
 bool AudioOutputWin::OpenDevice(void)
 {
     CloseDevice();
@@ -145,6 +154,7 @@ bool AudioOutputWin::OpenDevice(void)
     SetBlocking(true);
     fragment_size = (AUDIOOUTPUT_TELEPHONY == source) ? 320 : 6144;
     soundcard_buffer_size = kPacketCnt * fragment_size;
+    m_UseSPDIF = audio_passthru || audio_enc;
 
     WAVEFORMATEXTENSIBLE wf;
     wf.Format.wFormatTag =

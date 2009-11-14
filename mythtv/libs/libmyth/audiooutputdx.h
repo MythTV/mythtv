@@ -23,6 +23,7 @@ class AudioOutputDX : public AudioOutputBase
     virtual void Pause(bool pause);
     virtual int GetSpaceOnSoundcard(void) const;
     virtual int GetBufferedOnSoundcard(void) const;    
+    vector<int> GetSupportedRates(void);
 
   protected:
     AudioOutputDXPrivate    *m_priv;

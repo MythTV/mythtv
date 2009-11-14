@@ -280,6 +280,37 @@ void AudioOutputDXPrivate::StopPlayback(bool reset)
     }
 }
 
+vector<int> AudioOutputDX::GetSupportedRates(void)
+{
+    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000 };
+    vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
+    DSCAPS devcaps;
+    devcaps.dwSize = sizeof(DSCAPS);
+
+    if ((!m_priv->dsobject || !m_priv->dsound_dll) ||
+        FAILED(IDirectSound_GetCaps(m_priv->dsobject, &devcaps)) )
+    {
+        rates.clear();
+        return rates;
+    }
+
+    VERBOSE(VB_AUDIO, QString(LOC + "GetCaps sample rate min: %1 max: %2")
+                .arg(devcaps.dwMinSecondarySampleRate)
+                .arg(devcaps.dwMaxSecondarySampleRate));
+
+    vector<int>::iterator it = rates.begin();
+    while (it != rates.end())
+    {
+        if(((DWORD)*it < devcaps.dwMinSecondarySampleRate) ||
+           ((DWORD)*it > devcaps.dwMaxSecondarySampleRate) )
+            it = rates.erase(it);
+        else
+            it++;
+    }
+
+    return rates;
+}
+
 bool AudioOutputDX::OpenDevice(void)
 {
     WAVEFORMATEXTENSIBLE wf;
@@ -299,6 +330,7 @@ bool AudioOutputDX::OpenDevice(void)
         fragment_size *= 2;
     soundcard_buffer_size = kFramesNum * fragment_size;
     audio_bytes_per_sample = audio_bits / 8 * audio_channels;
+    m_UseSPDIF = audio_passthru || audio_enc;
     if (m_UseSPDIF && (audio_channels != 2))
     {
         Error("SPDIF passthru requires 2 channel data");
