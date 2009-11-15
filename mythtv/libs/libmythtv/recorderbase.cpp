@@ -224,16 +224,12 @@ void RecorderBase::CheckForRingBufferSwitch(void)
 
         m_videoAspect = m_videoWidth = m_videoHeight = 0;
 
-        if (weMadeBuffer && ringBuffer)
-            delete ringBuffer;
         SetRingBuffer(nextRingBuffer);
-        nextRingBuffer = NULL;
+        SetRecording(nextRecording);
 
-        ProgramInfo *oldrec = curRecording;
-        curRecording        = nextRecording;
-        nextRecording       = NULL;
-        if (oldrec)
-            delete oldrec;
+        nextRingBuffer = NULL;
+        nextRecording = NULL;
+
         rb_changed = true;
 
         StartNewFile();
