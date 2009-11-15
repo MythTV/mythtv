@@ -45,11 +45,7 @@ RecorderBase::~RecorderBase(void)
         delete ringBuffer;
         ringBuffer = NULL;
     }
-    if (curRecording)
-    {
-        delete curRecording;
-        curRecording = NULL;
-    }
+    SetRecording(NULL);
 }
 
 void RecorderBase::SetRingBuffer(RingBuffer *rbuf)

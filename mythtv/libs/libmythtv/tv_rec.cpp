@@ -4140,9 +4140,8 @@ void TVRec::TuningRestartRecorder(void)
     {
         recorder->SetRingBuffer(ringBuffer);
         ProgramInfo *progInfo = tvchain->GetProgramAt(-1);
-        RecordingInfo recInfo(*progInfo);
+        recorder->SetRecording(progInfo);
         delete progInfo;
-        recorder->SetRecording(&recInfo);
     }
     recorder->Reset();
 
