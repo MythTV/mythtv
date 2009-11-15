@@ -1331,7 +1331,7 @@ class ServiceDescriptorMapping
         kServiceTypePALCodedSignal           = 0x07,
         kServiceTypeSECAMCodedSignal         = 0x08,
         kServiceTypeD_D2_MAC                 = 0x09,
-        kServiceTypeFMRadio                  = 0x0A,
+        kServiceTypeAdvancedCodecDigitalRadioSound        = 0x0A,
         kServiceTypeNTSCCodedSignal          = 0x0B,
         kServiceTypeDataBroadcast            = 0x0C,
         kServiceTypeCommonInterface          = 0x0D,
@@ -1339,7 +1339,8 @@ class ServiceDescriptorMapping
         kServiceTypeRCS_FLS                  = 0x0F,
         kServiceTypeDVB_MHP                  = 0x10,
         kServiceTypeHDTV                     = 0x11,
-        kServiceTypeHDTV2                    = 0x19,
+        kServiceTypeAdvancedCodecSDDigitalTelevision       = 0x16,
+        kServiceTypeAdvancedCodecHDDigitalTelevision       = 0x19,
         kServiceTypeEchoStarTV1              = 0x91,
         kServiceTypeEchoStarTV2              = 0x9a,
         kServiceTypeEchoStarTV3              = 0xa4,
@@ -1358,6 +1359,7 @@ class ServiceDescriptorMapping
     uint ServiceType() const { return m_serviceid; }
     bool IsDTV(void) const
         { return ((ServiceType() ==  kServiceTypeDigitalTelevision) ||
+                  (ServiceType() ==  kServiceTypeAdvancedCodecSDDigitalTelevision) ||
                   IsHDTV() ||
                   (ServiceType() ==  kServiceTypeEchoStarTV1) ||
                   (ServiceType() ==  kServiceTypeEchoStarTV2) ||
@@ -1373,11 +1375,12 @@ class ServiceDescriptorMapping
                   (ServiceType() ==  kServiceTypeNimiqTV8) ||
                   (ServiceType() ==  kServiceTypeNimiqTV9)); }
     bool IsDigitalAudio(void) const
-        { return ServiceType() ==  kServiceTypeDigitalRadioSound; }
+        { return ((ServiceType() ==  kServiceTypeDigitalRadioSound) ||
+                  (ServiceType() ==  kServiceTypeAdvancedCodecDigitalRadioSound)); }
     bool IsHDTV(void) const
         { return
         (ServiceType() ==  kServiceTypeHDTV) ||
-        (ServiceType() ==  kServiceTypeHDTV2); }
+        (ServiceType() ==  kServiceTypeAdvancedCodecHDDigitalTelevision); }
     bool IsTeletext(void) const
         { return ServiceType() ==  kServiceTypeDataBroadcast; }
     QString toString(void) const;
