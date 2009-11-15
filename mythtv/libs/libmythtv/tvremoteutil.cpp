@@ -126,7 +126,7 @@ void RemoteCancelNextRecording(uint cardid, bool cancel)
     QStringList strlist(QString("QUERY_RECORDER %1").arg(cardid));
     strlist << "CANCEL_NEXT_RECORDING";
     strlist << QString::number((cancel) ? 1 : 0);
-                          
+
     gContext->SendReceiveStringList(strlist);
 }
 
@@ -157,7 +157,7 @@ RemoteEncoder *RemoteRequestFreeRecorderFromList(
         return NULL;
 
     for (QStringList::const_iterator recIter = qualifiedRecorders.begin();
-         recIter != qualifiedRecorders.end(); ++recIter) 
+         recIter != qualifiedRecorders.end(); ++recIter)
     {
         if (!strlist.contains(*recIter))
         {
