@@ -594,6 +594,9 @@ void MythOpenGLPainter::DrawRoundRect(const QRect &area, int radius,
         h = area.height();
     }
 
+    if (area.width() <= 0 || area.height() <= 0)
+        return;
+
     QImage image(QSize(area.width(), area.height()), QImage::Format_ARGB32);
     image.fill(0x00000000);
     QPainter painter(&image);
