@@ -155,6 +155,7 @@ HEADERS += transporteditor.h        listingsources.h
 HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
 HEADERS += recordingrule.h          programdetail.h
+HEADERS += iso639.h
 
 SOURCES += recordinginfo.cpp        recordinglist.cpp
 SOURCES += RingBuffer.cpp           avfringbuffer.cpp
@@ -176,6 +177,7 @@ SOURCES += transporteditor.cpp
 SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 SOURCES += myth_imgconvert.cpp
 SOURCES += recordingrule.cpp        programdetail.cpp
+SOURCES += iso639.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h
@@ -198,7 +200,7 @@ HEADERS += mpeg/dvbstreamdata.h     mpeg/scanstreamdata.h
 HEADERS += mpeg/mpegdescriptors.h   mpeg/atscdescriptors.h
 HEADERS += mpeg/dvbdescriptors.h    mpeg/dishdescriptors.h
 HEADERS += mpeg/premieredescriptors.h
-HEADERS += mpeg/atsc_huffman.h      mpeg/iso639.h
+HEADERS += mpeg/atsc_huffman.h
 HEADERS += mpeg/freesat_huffman.h   mpeg/freesat_tables.h
 HEADERS += mpeg/iso6937tables.h
 HEADERS += mpeg/tsstats.h           mpeg/streamlisteners.h
@@ -212,7 +214,7 @@ SOURCES += mpeg/dvbstreamdata.cpp   mpeg/scanstreamdata.cpp
 SOURCES += mpeg/mpegdescriptors.cpp mpeg/atscdescriptors.cpp
 SOURCES += mpeg/dvbdescriptors.cpp  mpeg/dishdescriptors.cpp
 SOURCES += mpeg/premieredescriptors.cpp
-SOURCES += mpeg/atsc_huffman.cpp    mpeg/iso639.cpp
+SOURCES += mpeg/atsc_huffman.cpp
 SOURCES += mpeg/freesat_huffman.cpp
 SOURCES += mpeg/iso6937tables.cpp
 SOURCES += mpeg/H264Parser.cpp

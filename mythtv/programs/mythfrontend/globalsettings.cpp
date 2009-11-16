@@ -26,7 +26,7 @@
 #include "mythverbose.h"
 #include "dbsettings.h"
 #include "langsettings.h"
-#include "libmythtv/mpeg/iso639.h"
+#include "iso639.h"
 #include "playbackbox.h"
 #include "globalsettings.h"
 #include "recordingprofile.h"
