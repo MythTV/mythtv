@@ -33,13 +33,11 @@
 #include <pthread.h> 
 
 // Qt includes
-#include <qobject.h>
-#include <qstring.h>
-#include <qmap.h>
-#include <qmutex.h>
+#include <QString>
 #include <QList>
 #include <QPair>
-#include <qdatetime.h>
+#include <QMap>
+#include <QSet>
 
 // MythTV includes
 #include "frequencytables.h"

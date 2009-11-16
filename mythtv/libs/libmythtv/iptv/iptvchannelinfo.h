@@ -6,8 +6,8 @@
 #ifndef _IPTV_CHANNELINFO_H_
 #define _IPTV_CHANNELINFO_H_
 
-#include <qmap.h>
-#include <qstring.h>
+#include <QString>
+#include <QMap>
 
 class IPTVChannelInfo
 {

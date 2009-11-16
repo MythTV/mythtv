@@ -5,7 +5,7 @@
 #include <cstdio>
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 class QFile;
 

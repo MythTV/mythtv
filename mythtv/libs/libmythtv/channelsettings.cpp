@@ -1,3 +1,5 @@
+#include <QWidget>
+
 #include "channelsettings.h"
 #include "cardutil.h"
 #include "channelutil.h"

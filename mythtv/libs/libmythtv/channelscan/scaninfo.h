@@ -10,8 +10,8 @@ typedef unsigned uint;
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
-#include <qdatetime.h>
+#include <QString>
+#include <QDateTime>
 
 // MythTV headers
 #include "mythexp.h"

@@ -1,8 +1,8 @@
 #ifndef UPnpMSRR_H_
 #define UPnpMSRR_H_
 
-#include <qdom.h>
-#include <qdatetime.h> 
+#include <QDomDocument>
+#include <QString>
 
 #include "httpserver.h"
 #include "eventing.h"

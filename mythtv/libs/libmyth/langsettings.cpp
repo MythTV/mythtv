@@ -1,11 +1,7 @@
-#include <qapplication.h>
-#include <qsqldatabase.h>
+#include <QApplication>
 #include <QTranslator>
 
-using namespace std;
-
 #include "langsettings.h"
-#include "settings.h"
 #include "mythcontext.h"
 #include "mythdirs.h"
 #include "mythverbose.h"

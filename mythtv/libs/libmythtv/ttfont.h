@@ -5,9 +5,9 @@
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 
-#include <qstring.h>
-#include <qmap.h>
-#include <qcolor.h>
+#include <QString>
+#include <QColor>
+#include <QMap>
 
 #include "mythconfig.h"
 

@@ -7,10 +7,11 @@
 #ifndef _IPTV_CHANNEL_H_
 #define _IPTV_CHANNEL_H_
 
+#include <QString>
+#include <QMutex>
+
 #include "dtvchannel.h"
 #include "iptvchannelinfo.h"
-
-#include <qmutex.h>
 
 class IPTVFeederWrapper;
 

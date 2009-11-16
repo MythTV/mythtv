@@ -2,10 +2,11 @@
 #ifndef TFW_H_
 #define TFW_H_
 
+#include <QWaitCondition>
+#include <QString>
+#include <QMutex>
+
 #include <pthread.h>
-#include <qmutex.h>
-#include <qwaitcondition.h>
-#include <qstring.h>
 #include <stdint.h>
 
 class ThreadedFileWriter

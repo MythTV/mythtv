@@ -3,8 +3,8 @@
 #define _INPUTINFO_H_
 
 // Qt headers
-#include <qstringlist.h>
-#include <qmap.h>
+#include <QStringList>
+#include <QMap>
 
 // MythTV headers
 #include "channelutil.h" // for DBChanList

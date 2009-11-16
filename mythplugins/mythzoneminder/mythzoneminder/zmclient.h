@@ -1,15 +1,14 @@
 #ifndef ZMCLIENT_H_
 #define ZMCLIENT_H_
 
-using namespace std;
-
 #include <iostream>
 #include <vector>
+using namespace std;
 
 // myth
-#include "mythtv/mythsocket.h"
-#include "mythtv/mythexp.h"
-#include <libmythui/mythimage.h>
+#include <mythsocket.h>
+#include <mythexp.h>
+#include <mythimage.h>
 
 // zm
 #include "zmdefines.h"

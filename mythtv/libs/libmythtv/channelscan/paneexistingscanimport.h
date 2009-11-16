@@ -30,8 +30,8 @@
 #define _PANE_EXISTING_SCAN_IMPORT_H_
 
 // Qt headers
-#include <qstring.h>
-#include <qobject.h>
+#include <QString>
+#include <QObject>
 
 // MythTV headers
 #include "channelscanmiscsettings.h"

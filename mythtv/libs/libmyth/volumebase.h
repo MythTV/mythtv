@@ -1,11 +1,7 @@
-#ifndef VOLUMEBASE
-#define VOLUMEBASE
+#ifndef __VOLUME_BASE__
+#define __VOLUME_BASE__
 
-#include <iostream>
-using namespace std;
-
-#include <qstring.h>
-#include "mythcontext.h"
+#include "mythexp.h"
 
 typedef enum {
     kMuteOff = 0,
@@ -53,5 +49,4 @@ class MPUBLIC VolumeBase
 
 };
 
-#endif
-
+#endif // __VOLUME_BASE__

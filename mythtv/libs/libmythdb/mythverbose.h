@@ -2,12 +2,14 @@
 #define MYTHVERBOSE_H_
 
 #ifdef __cplusplus
+#   include <cerrno>
 #   include <QDateTime>
 #   include <QString>
 #   include <QTextStream>
 #   include <QMutex>
 #   include <iostream>
 #else
+#   include <errno.h>
 # if HAVE_GETTIMEOFDAY
 #   include <sys/time.h>
 #   include <time.h> // for localtime()

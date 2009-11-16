@@ -8,11 +8,12 @@
 #ifndef _IPTV_RECORDER_H_
 #define _IPTV_RECORDER_H_
 
-#include <qwaitcondition.h>
+#include <QWaitCondition>
 
 #include "dtvrecorder.h"
 #include "streamlisteners.h"
 
+class QString;
 class IPTVChannel;
 
 /** \brief Processes data from a IPTVFeeder and writes it to disk.

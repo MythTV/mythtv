@@ -1,7 +1,7 @@
 #ifndef VIDEOOUT_NULL_H_
 #define VIDEOOUT_NULL_H_
 
-#include <qmutex.h>
+#include <QMutex>
 
 #include "videooutbase.h"
 

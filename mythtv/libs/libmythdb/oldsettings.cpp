@@ -8,22 +8,21 @@
     email                : sward@relatable.com
  ***************************************************************************/
 
+#include <sys/time.h>
 
-#include "oldsettings.h"
-#include "mythverbose.h"
-
-#include <qstring.h>
-#include <fstream>
 #include <cstdlib>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <string>
-#include <sys/time.h>
 
+#include <fstream>
+#include <string>
 using namespace std;
 
-#include <qdir.h>
+#include <QDir>
+
+#include "oldsettings.h"
+#include "mythverbose.h"
 
 Settings::Settings(QString strSettingsFile)
 {

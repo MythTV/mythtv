@@ -31,6 +31,8 @@
 #include "mythdbcon.h"
 #include "compat.h"
 #include "mythconfig.h"
+#include "autoexpire.h"
+#include "mainserver.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //

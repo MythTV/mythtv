@@ -1,23 +1,25 @@
 #ifndef OSD_H
 #define OSD_H
 
+// ANSI C
+#include <ctime>
+
+// C++
 #include <deque>
 #include <vector>
 using namespace std;
 
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qrect.h>
-#include <qpoint.h>
+// Qt
 #include <QKeyEvent>
-#include <ctime>
-#include <qmap.h>
-#include <qdom.h>
-#include <qmutex.h>
-#include <qobject.h>
-#include <qregexp.h>
+#include <QObject>
+#include <QRegExp>
+#include <QString>
+#include <QMutex>
+#include <QPoint>
+#include <QRect>
+#include <QMap>
 
-// Mythtv Headers
+// MythTV Headers
 #include "themeinfo.h"
 
 enum OSDFunctionalType
@@ -65,6 +67,8 @@ class OSDGenericTree;
 class ccText;
 class CC708Service;
 class TeletextViewer;
+class QStringList;
+class QDomElement;
 
 class OSD : public QObject
 {

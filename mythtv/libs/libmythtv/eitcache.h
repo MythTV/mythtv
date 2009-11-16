@@ -9,10 +9,11 @@
 #include <stdint.h>
 
 // Qt headers
-#include <qmap.h>
-#include <qmutex.h>
-#include <qstring.h>
+#include <QString>
+#include <QMutex>
+#include <QMap>
 
+// MythTV headers
 #include "mythexp.h"
 
 typedef QMap<uint, uint64_t> event_map_t;

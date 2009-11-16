@@ -10,7 +10,8 @@
 /* Base class for commercial flagging video frame analyzers. */
 
 #include <limits.h>
-#include <qmap.h>
+
+#include <QMap>
 
 /*  
  * At least FreeBSD doesn't define LONG_LONG_MAX, but it does define  

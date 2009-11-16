@@ -28,7 +28,7 @@
 using namespace std;
 
 // Qt headers
-#include <qdatetime.h>
+#include <QDateTime>
 
 // MythTV headers
 #include "linuxfirewiredevice.h"

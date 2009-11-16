@@ -3,11 +3,16 @@
 #ifndef MPEGSTREAMDATA_H_
 #define MPEGSTREAMDATA_H_
 
+// POSIX
+#include <stdint.h>  // uint64_t
+
+// C++
 #include <vector>
 using namespace std;
 
-#include <qmap.h>
-#include <stdint.h>  // uint64_t
+// Qt
+#include <QMap>
+
 #include "tspacket.h"
 #include "util.h"
 #include "streamlisteners.h"

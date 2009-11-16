@@ -7,8 +7,8 @@
 
 */
 
-#include <qobject.h>
-#include <qstringlist.h>
+#include <QStringList>
+#include <QObject>
 
 #include "serversocket.h"
 #include "lcdprocclient.h"

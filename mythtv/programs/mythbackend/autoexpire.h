@@ -8,13 +8,14 @@
 #include <list>
 #include <vector>
 #include <set>
-
-#include <qmap.h> 
-#include <qmutex.h>
-#include <qwaitcondition.h>
-#include <qobject.h>
-
 using namespace std;
+
+#include <QWaitCondition>
+#include <QObject>
+#include <QString>
+#include <QMutex>
+#include <QMap>
+
 class ProgramInfo;
 class EncoderLink;
 class FileSystemInfo;

@@ -8,14 +8,17 @@ extern "C" {
 }
 #include <vector>
 #include <map>
-#include <qmutex.h>
-#include <qstring.h>
-#include <qwaitcondition.h>
-#include "mythdeque.h"
+using namespace std;
+
+#include <QMutex>
+#include <QString>
+#include <QWaitCondition>
 
 #ifdef USING_XVMC
 #include <qwindowdefs.h>
 #endif // USING_XVMC
+
+#include "mythdeque.h"
 
 #ifdef USING_VDPAU
 class VDPAUContext;

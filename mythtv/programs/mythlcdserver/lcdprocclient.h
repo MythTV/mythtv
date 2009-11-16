@@ -1,13 +1,11 @@
 #ifndef LCDPROCCLIENT_H_
 #define LCDPROCCLIENT_H_
 
-#include <qobject.h>
-#include <qstringlist.h>
-#include <q3valuevector.h>
-#include <q3socket.h>
-#include <qtimer.h>
-#include <qdatetime.h>
-#include <QEvent>
+#include <QStringList>
+#include <QObject>
+
+#include <Q3ValueVector>
+#include <Q3Socket>
 #include <Q3PtrList>
 
 #include "tvremoteutil.h"
@@ -15,6 +13,8 @@
 class LCDServer;
 class LCDTextItem;
 class LCDMenuItem;
+class QEvent;
+class QTimer;
 
 class LCDProcClient : public QObject
 {

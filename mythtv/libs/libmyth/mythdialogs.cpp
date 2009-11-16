@@ -31,6 +31,7 @@ using namespace std;
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "mythverbose.h"
+#include "mythcontext.h"
 
 #ifdef USING_MINGW
 #undef LoadImage
@@ -117,8 +118,9 @@ void MythDialog::setResult(DialogCode r)
     if ((r < kDialogCodeRejected) ||
         ((kDialogCodeAccepted < r) && (r < kDialogCodeListStart)))
     {
-        VERBOSE(VB_IMPORTANT, "Programmer Error: MythDialog::setResult("
-                <<r<<") called with invalid DialogCode");
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Programmer Error: MythDialog::setResult(%1) "
+                    "called with invalid DialogCode").arg(r));
     }
 
     rescode = r;
@@ -135,8 +137,9 @@ void MythDialog::AcceptItem(int i)
 {
     if (i < 0)
     {
-        VERBOSE(VB_IMPORTANT, "Programmer Error: MythDialog::AcceptItem("
-                <<i<<") called with negative index");
+        VERBOSE(VB_IMPORTANT,
+                QString("Programmer Error: MythDialog::AcceptItem(%1) "
+                        "called with negative index").arg(i));
         reject();
         return;
     }

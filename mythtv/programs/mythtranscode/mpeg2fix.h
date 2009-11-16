@@ -7,15 +7,15 @@
 extern "C"
 {
 //AVFormat/AVCodec
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
+#include "avcodec.h"
+#include "avformat.h"
 
 //replex
 #include "replex/ringbuffer.h"
 #include "replex/multiplex.h"
 
 //libmpeg2
-#include "libmythmpeg2/mpeg2.h"
+#include "mpeg2.h"
 }
 
 //Qt
@@ -23,9 +23,9 @@ extern "C"
 #include <QStringList>
 #include <QDateTime>
 
-#include <q3ptrlist.h>
-#include <q3ptrqueue.h>
-#include <q3valuelist.h>
+#include <Q3PtrList>
+#include <Q3PtrQueue>
+#include <Q3ValueList>
 
 #include "transcodedefs.h"
 
@@ -265,7 +265,7 @@ class MPEG2fixup
 };
 
 #ifdef NO_MYTH
-    #include <qdatetime.h>
+    #include <QDateTime>
     #include <iostream>
 
     using namespace std;

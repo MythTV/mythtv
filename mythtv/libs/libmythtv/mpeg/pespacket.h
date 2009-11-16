@@ -8,6 +8,9 @@
   max length of private_section = 4096 bytes
 */
 
+#include <vector>
+using namespace std;
+
 #include "tspacket.h"
 #include "mythverbose.h"
 

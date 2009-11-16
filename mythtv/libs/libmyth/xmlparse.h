@@ -1,12 +1,9 @@
 #ifndef XMLPARSE_H_
 #define XMLPARSE_H_
 
-#include "uitypes.h"
-#include "mythcontext.h"
-#include <qimage.h>
-#include <qrect.h>
-#include <qlabel.h>
-#include <qdom.h>
+#include <QDomDocument>
+#include <QString>
+#include <QRect>
 
 class MythUIHelper;
 

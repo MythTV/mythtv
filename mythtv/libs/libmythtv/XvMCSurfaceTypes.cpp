@@ -1,4 +1,8 @@
 #ifdef USING_XVMC
+
+#include <sstream>
+using namespace std;
+
 #include "XvMCSurfaceTypes.h"
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>

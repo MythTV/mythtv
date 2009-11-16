@@ -7,6 +7,9 @@
 // C++ headers
 #include <algorithm>
 
+// Qt headers
+#include <QMap>
+
 // MythTV headers
 #include "linuxfirewiredevice.h"
 #include "darwinfirewiredevice.h"

@@ -4,9 +4,8 @@
 #include <list>
 using namespace std;
 
-#include <QMap>
+#include <QString>
 
-#include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
 
@@ -17,6 +16,7 @@ extern "C" {
 #include "avcodec.h"
 }
 
+class ProgramInfo;
 class RawDataList
 {
   public:

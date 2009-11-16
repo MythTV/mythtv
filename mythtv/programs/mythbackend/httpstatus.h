@@ -11,16 +11,11 @@
 #ifndef HTTPSTATUS_H_
 #define HTTPSTATUS_H_
 
-#include <qdom.h>
-#include <qdatetime.h> 
+#include <QDomDocument>
+#include <QMutex>
+#include <QMap>
 
 #include "httpserver.h"
-#include "mainserver.h"
-#include "autoexpire.h"
-#include "mythcontext.h"
-#include "jobqueue.h"
-#include "programinfo.h"
-
 
 typedef enum 
 {
@@ -37,6 +32,10 @@ typedef enum
 //
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
+
+class Scheduler;
+class AutoExpire;
+class EncoderLink;
 
 class HttpStatus : public HttpServerExtension
 {

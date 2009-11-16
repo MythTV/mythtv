@@ -24,8 +24,8 @@
 #ifndef __CONFIGURATION_H__
 #define __CONFIGURATION_H__
 
-#include <qdom.h>
-#include <qstringlist.h>
+#include <QDomDocument>
+#include <QStringList>
 
 class Configuration 
 {

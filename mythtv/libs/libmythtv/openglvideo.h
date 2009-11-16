@@ -5,8 +5,7 @@
 #include <map>
 using namespace std;
 
-#include <qrect.h>
-#include <qmap.h>
+#include <QRect>
 
 #include "videooutbase.h"
 #include "videoouttypes.h"

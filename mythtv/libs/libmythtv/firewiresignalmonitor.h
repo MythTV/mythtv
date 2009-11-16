@@ -3,10 +3,15 @@
 #ifndef _FIREWIRESIGNALMONITOR_H_
 #define _FIREWIRESIGNALMONITOR_H_
 
-#include <qmap.h>
-#include <qmutex.h>
-#include <qdatetime.h>
+// C++ headers
+#include <vector>
+using namespace std;
 
+// Qt headers
+#include <QMutex>
+#include <QMap>
+
+// MythTV headers
 #include "dtvsignalmonitor.h"
 #include "firewiredevice.h"
 #include "util.h"

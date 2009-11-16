@@ -1,7 +1,8 @@
 #include "tvosdmenuentry.h"
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "mythdb.h"
+#include "mythcontext.h"
+#include "mythverbose.h"
+
 #define LOC QString("OSDMenuEntry:")
 #define LOC_ERR QString("OSDMenuEntry Error:")
 

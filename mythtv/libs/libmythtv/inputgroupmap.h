@@ -7,7 +7,7 @@
 using namespace std;
 
 // Qt headers
-#include <qmap.h>
+#include <QMap>
 
 // MythTV headers
 #include "mythexp.h"

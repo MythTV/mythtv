@@ -1,8 +1,9 @@
 #ifndef OSDSURFACE_H_
 #define OSDSURFACE_H_
 
-#include <qregion.h>
-#include <qmutex.h>
+#include <QRegion>
+#include <QMutex>
+
 #include "blend.h"
 
 #define MAX_NEG_CROP 1024
@@ -16,6 +17,7 @@ static inline unsigned char blendColorsAlpha(int src, int dest, int alpha)
     return tmp2 & 0xff;
 }
 
+class QRect;
 class OSDSurface
 {
   public:

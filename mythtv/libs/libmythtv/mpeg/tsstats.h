@@ -3,8 +3,8 @@
 #ifndef __TS_STATS__
 #define __TS_STATS__
 
-#include <qstring.h>
-#include <qmap.h>
+#include <QString>
+#include <QMap>
 
 /** \class TSStats
  *  \brief Collects statistics on the number of TSPacket's seen on each PID.

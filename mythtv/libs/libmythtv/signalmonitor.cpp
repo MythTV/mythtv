@@ -79,7 +79,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     SignalMonitor *signalMonitor = NULL;
 
     {
-        QMutexLocker locker(&avcodeclock);
+        QMutexLocker locker(avcodeclock);
         avcodec_init();
     }
 

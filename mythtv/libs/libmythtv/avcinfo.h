@@ -1,14 +1,14 @@
 #ifndef _AVC_INFO_H_
 #define _AVC_INFO_H_
 
+#include <stdint.h>
+
 // C++ headers
 #include <vector>
 using namespace std;
 
-#include <stdint.h>
-
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 QString guid_to_string(uint64_t guid);
 uint64_t string_to_guid(const QString &guid);

@@ -9,9 +9,8 @@
 using namespace std;
 
 // Qt includes
-#include <qmap.h>
-#include <qstring.h>
-#include <qmutex.h>
+#include <QString>
+#include <QMap>
 
 // MythTV includes
 #include "dtvchannel.h"

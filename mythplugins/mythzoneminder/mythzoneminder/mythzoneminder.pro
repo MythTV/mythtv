@@ -2,6 +2,7 @@ include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
+QT += network
 TEMPLATE = lib
 CONFIG += plugin thread
 TARGET = mythzoneminder

@@ -3,6 +3,7 @@
 
 // c/c++
 #include <vector>
+using namespace std;
 
 // qt
 #include <QString>

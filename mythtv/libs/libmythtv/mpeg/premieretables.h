@@ -2,7 +2,7 @@
 #ifndef _PRIVATE_TABLES_H_
 #define _PRIVATE_TABLES_H_
 
-#include <qstring.h>
+#include <QString>
 #include <stdint.h>  // uint32_t
 #include "mpegtables.h"
 #include "dvbdescriptors.h"

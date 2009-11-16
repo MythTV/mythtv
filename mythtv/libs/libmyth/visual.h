@@ -7,7 +7,7 @@
 #ifndef __visual_h
 #define __visual_h
 
-#include <qmutex.h>
+#include <QMutex>
 
 class Decoder;
 class AudioOutput;

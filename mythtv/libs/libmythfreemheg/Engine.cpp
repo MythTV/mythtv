@@ -20,7 +20,7 @@
 */
 
 #include <QStringList>
-#include <qregexp.h>
+#include <QRegExp>
 
 #include "Engine.h"
 #include "ParseNode.h"

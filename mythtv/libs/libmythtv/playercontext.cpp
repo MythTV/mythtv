@@ -11,6 +11,7 @@
 #include "util-osx-cocoa.h"
 #include "videoouttypes.h"
 #include "storagegroup.h"
+#include "mythcontext.h"
 
 #define LOC QString("playCtx: ")
 #define LOC_ERR QString("playCtx, Error: ")

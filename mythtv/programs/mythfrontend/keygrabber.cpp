@@ -1,13 +1,14 @@
 // -*- Mode: c++ -*-
 // Qt headers
+#include <QKeyEvent>
 #include <QString>
 
 // MythTV headers
-#include <mythcontext.h>
+#include "mythcontext.h"
 
 // MythUI headers
-#include <mythuitext.h>
-#include <mythuibutton.h>
+#include "mythuitext.h"
+#include "mythuibutton.h"
 
 // MythControls headers
 #include "keygrabber.h"

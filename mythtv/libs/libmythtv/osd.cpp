@@ -8,7 +8,8 @@
 using namespace std;
 
 // Qt headers
-#include <QString>
+#include <QDomDocument>
+#include <QStringList>
 #include <QImage>
 #include <QPixmap>
 #include <QBitmap>

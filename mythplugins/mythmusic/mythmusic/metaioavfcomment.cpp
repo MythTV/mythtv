@@ -4,7 +4,7 @@
 #include "metadata.h"
 
 // libmyth
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 extern "C" {
 #include <mythtv/libavformat/avformat.h>
@@ -14,7 +14,7 @@ extern "C" {
 MetaIOAVFComment::MetaIOAVFComment(void)
     : MetaIO()
 {
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
     av_register_all();
 }
 

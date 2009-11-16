@@ -1,27 +1,16 @@
 #ifndef MYTHCONTEXT_H_
 #define MYTHCONTEXT_H_
 
-#include <cerrno>
-#include <iostream>
-#include <sstream>
-#include <vector>
-
 #include <QObject>
 #include <QString>
-#include <QMutex>
-#include <QList>
-
-#include <qevent.h>
 
 #include "mythexp.h"
 #include "mythobservable.h"
-#include "mythsocket.h"
-
+#include "mythsocket_cb.h"
 #include "mythverbose.h"
 
-using namespace std;
-
 class QFont;
+class QKeyEvent;
 
 class Settings;
 class MythMainWindow;
@@ -30,6 +19,7 @@ class MDBManager;
 class MythContextPrivate;
 class UPnp;
 class MythImage;
+class MythSocket;
 struct DatabaseParams;
 
 /// These are the database logging priorities used for filterig the logs.
@@ -199,7 +189,7 @@ class MPUBLIC MythContext : public MythObservable, public MythSocketCBs
 
     static bool CheckProtoVersion(
         MythSocket *socket,
-        uint timeout_ms = MythSocket::kLongTimeout,
+        uint timeout_ms = kMythSocketLongTimeout,
         MythContextPrivate *error_dialog_desired = NULL);
 
     void addPrivRequest(MythPrivRequest::Type t, void *data);
@@ -226,7 +216,7 @@ class MPUBLIC MythContext : public MythObservable, public MythSocketCBs
 extern MPUBLIC MythContext *gContext;
 
 /// This global variable is used to makes certain calls to avlib threadsafe.
-extern MPUBLIC QMutex avcodeclock;
+extern MPUBLIC QMutex *avcodeclock;
 
 /// Service type for the backend's UPnP server
 extern MPUBLIC const QString gBackendURI;

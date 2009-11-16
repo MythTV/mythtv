@@ -22,8 +22,8 @@
 #if !defined(LOGGING_H)
 #define LOGGING_H
 
-#include <qglobal.h> // For Q_ASSERT
-#include <qstring.h> // For QString
+#include <QtGlobal> // For Q_ASSERT
+#include <QString> // For QString
 
 #include "freemheg.h" // For MHLogError
 

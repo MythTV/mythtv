@@ -46,7 +46,7 @@
 #include "mythdb.h"
 #include "mythdirs.h"
 #include "mythevent.h"
-
+#include "mythsocket.h"
 
 // Necessary for codec icon support
 extern "C" {

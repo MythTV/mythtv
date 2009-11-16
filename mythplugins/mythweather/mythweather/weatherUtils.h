@@ -7,6 +7,7 @@
 #include <QString>
 #include <QDomElement>
 #include <QFile>
+#include <QMetaType>
 
 // MythTV headers
 #include <mythcontext.h>

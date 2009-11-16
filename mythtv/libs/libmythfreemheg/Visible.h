@@ -21,7 +21,7 @@
 
 #if !defined(VISIBLE_H)
 #define VISIBLE_H
-#include <qregion.h>
+#include <QRegion>
 
 #include "Presentable.h"
 // Dependencies

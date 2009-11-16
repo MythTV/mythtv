@@ -1,8 +1,8 @@
 #ifndef DBUTIL_H_
 #define DBUTIL_H_
 
-#include <qstringlist.h>
-#include <qmap.h>
+#include <QStringList>
+#include <QMap>
 
 #include "mythexp.h"
 #include "mythdbcon.h"

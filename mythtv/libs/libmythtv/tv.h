@@ -1,7 +1,8 @@
 #ifndef TV_H
 #define TV_H
 
-#include <qstring.h>
+#include <QString>
+
 #include "videoouttypes.h"
 
 /** \brief ChannelChangeDirection is an enumeration of possible channel

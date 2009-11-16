@@ -30,9 +30,9 @@
 #include "Visible.h"
 #include "Actions.h"
 #include "Link.h"
-#include <qstring.h>
-#include <qrect.h>
-#include <qregion.h>
+#include <QString>
+#include <QRect>
+#include <QRegion>
 #include <QList>
 #include <QStack>
 #include <QQueue>

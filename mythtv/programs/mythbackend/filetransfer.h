@@ -9,13 +9,13 @@
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
-#include <qmutex.h>
-#include <qwaitcondition.h>
+#include <QMutex>
+#include <QWaitCondition>
 
 class ProgramInfo;
 class RingBuffer;
 class MythSocket;
+class QString;
 
 class FileTransfer
 {

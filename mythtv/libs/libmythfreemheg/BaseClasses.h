@@ -27,7 +27,7 @@
 #include <malloc.h>
 #endif
 
-#include <qstring.h>
+#include <QString>
 
 #include "Logging.h" // For MHASSERT
 

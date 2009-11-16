@@ -6,8 +6,9 @@
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
-#include <qrect.h>
+#include <QString>
+#include <QMutex>
+#include <QRect>
 
 #ifdef USING_X11
 // MythTV headers

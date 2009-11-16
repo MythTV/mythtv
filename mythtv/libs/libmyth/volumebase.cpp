@@ -1,10 +1,13 @@
-#include <qstring.h>
 #include <cstdio>
 #include <cstdlib>
 
 #include <algorithm>
 using namespace std;
+
+#include <QString>
+
 #include "volumebase.h"
+#include "mythcontext.h"
 
 VolumeBase::VolumeBase() :
     internal_vol(false), volume(80), 

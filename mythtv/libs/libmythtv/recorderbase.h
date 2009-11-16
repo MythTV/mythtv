@@ -2,11 +2,10 @@
 #ifndef RECORDERBASE_H_
 #define RECORDERBASE_H_
 
-#include <qmutex.h>
-#include <qstring.h>
-#include <qmap.h>
-#include <qsqldatabase.h>
-#include <qwaitcondition.h>
+#include <QWaitCondition>
+#include <QString>
+#include <QMutex>
+#include <QMap>
 
 #include <pthread.h>
 

@@ -22,7 +22,8 @@
 #if !defined(FREEMHEG_H)
 #define FREEMHEG_H
 
-#include <qregion.h>
+#include <QRegion>
+
 #include <stdio.h>
 #include <stdlib.h>
 

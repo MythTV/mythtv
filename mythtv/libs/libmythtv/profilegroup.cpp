@@ -5,10 +5,6 @@
 #include "mythdb.h"
 #include "mythuihelper.h"
 #include "cardutil.h"
-#include <qsqldatabase.h>
-#include <qcursor.h>
-#include <qlayout.h>
-#include <iostream>
 
 QString ProfileGroupStorage::GetWhereClause(MSqlBindings &bindings) const
 {

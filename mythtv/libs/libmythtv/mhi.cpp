@@ -1,8 +1,7 @@
 #include <unistd.h>
 
 #include <QRegion>
-#include <qbitarray.h>
-
+#include <QBitArray>
 #include <QVector>
 
 #include "mhi.h"

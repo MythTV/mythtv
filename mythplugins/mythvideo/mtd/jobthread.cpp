@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <vector>
 using namespace std;
 
 #include <QDateTime>
@@ -500,7 +501,7 @@ bool DVDThread::ripTitle(int            title_number,
     QTime job_time;
     job_time.start();
 
-    std::vector<unsigned char> video_data(1024 * DVD_VIDEO_LB_LEN);
+    vector<unsigned char> video_data(1024 * DVD_VIDEO_LB_LEN);
 
     int next_cell = start_cell;
     for (int cur_cell = start_cell; next_cell < cur_pgc->nr_of_cells; )

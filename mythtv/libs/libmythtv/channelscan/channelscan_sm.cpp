@@ -36,7 +36,7 @@
 using namespace std;
 
 // Qt includes
-#include <QMutex>
+#include <QObject>
 
 // MythTV includes - General
 #include "channelscan_sm.h"

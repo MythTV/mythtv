@@ -4,16 +4,17 @@
 #define _DVB_DESCRIPTORS_H_
 
 #include <cassert>
+
 #include <vector>
 #include <map>
-#include <qmutex.h>
-#include <qstring.h>
-#include "mythcontext.h"
+using namespace std;
+
+#include <QMutex>
+#include <QString>
+
 #include "mythexp.h" // MPUBLIC - Symbol Visibility
 #include "mpegdescriptors.h"
 #include "programinfo.h" // for subtitle types and audio and video properties
-
-using namespace std;
 
 /*
 // needed for scanning

@@ -26,8 +26,7 @@ extern "C" {
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
-#include <qmap.h>
+#include <QString>
 
 // MythTV headers
 #include "recorderbase.h"

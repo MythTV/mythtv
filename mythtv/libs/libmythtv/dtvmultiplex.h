@@ -11,7 +11,7 @@
 #include <stdint.h>
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 // MythTV headers
 #include "dtvconfparserhelpers.h"

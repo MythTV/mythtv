@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 // Qt header
-#include <qstring.h>
+#include <QString>
 
 QString atsc_huffman1_to_string(const unsigned char *compressed,
                                 uint size, uint table);

@@ -3,10 +3,6 @@
 
 #include <stdint.h>
 
-#include <qwaitcondition.h>
-#include <qobject.h>
-#include <qmutex.h>
-
 class OSDType;
 
 class TeletextReader

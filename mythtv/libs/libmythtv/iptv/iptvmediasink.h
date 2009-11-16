@@ -10,7 +10,7 @@
 #include <vector>
 using namespace std;
 
-#include <qmutex.h>
+#include <QMutex>
 
 #include <MediaSink.hh>
 

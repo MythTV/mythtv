@@ -6,7 +6,7 @@
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 // libmythtv headers
 #include "datadirect.h"

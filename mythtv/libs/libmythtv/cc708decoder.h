@@ -6,8 +6,6 @@
 
 #include <stdint.h>
 
-#include <qstringlist.h>
-
 #include "format.h"
 #include "compat.h"
 

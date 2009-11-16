@@ -12,8 +12,8 @@
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
-#include <qmutex.h>
+#include <QString>
+#include <QMutex>
 
 // MythTV headers
 #include "streamlisteners.h"

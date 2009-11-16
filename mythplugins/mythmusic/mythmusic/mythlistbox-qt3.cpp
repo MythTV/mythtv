@@ -1,3 +1,5 @@
+#include <QKeyEvent>
+
 #include "mythcontext.h"
 #include "mythlistbox-qt3.h"
 

@@ -10,8 +10,8 @@
 #include <QMutex>
 #include <QList>
 
-#include "mythsocket.h"
 #include "mythexp.h"
+#include "mythsocket_cb.h"
 
 enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
 

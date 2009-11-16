@@ -828,7 +828,7 @@ QStringList DecoderBase::GetTracks(uint type) const
 {
     QStringList list;
 
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
 
     for (uint i = 0; i < tracks[type].size(); i++)
         list += GetTrackDesc(type, i);
@@ -849,7 +849,7 @@ QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
     if (trackNo >= tracks[type].size())
         return "";
 
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
 
     QString type_msg = track_type_to_string(type);
     int lang = tracks[type][trackNo].language;
@@ -871,7 +871,7 @@ int DecoderBase::SetTrack(uint type, int trackNo)
     if (trackNo >= (int)tracks[type].size())
         return false;
 
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
 
     currentTrack[type] = max(-1, trackNo);
 
@@ -888,7 +888,7 @@ int DecoderBase::SetTrack(uint type, int trackNo)
 
 StreamInfo DecoderBase::GetTrackInfo(uint type, uint trackNo) const
 {
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
 
     if (trackNo >= tracks[type].size())
     {
@@ -901,7 +901,7 @@ StreamInfo DecoderBase::GetTrackInfo(uint type, uint trackNo) const
 
 bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
 {
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
 
     for (uint i = 0; i < tracks[type].size(); i++)
         if (info.stream_id == tracks[type][i].stream_id)

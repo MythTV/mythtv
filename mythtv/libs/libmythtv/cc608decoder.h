@@ -8,8 +8,9 @@
 #include <vector>
 using namespace std;
 
-#include <qmutex.h>
-#include <qstringlist.h>
+#include <QString>
+#include <QMutex>
+#include <QChar>
 
 #include "format.h"
 

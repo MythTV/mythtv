@@ -1,7 +1,7 @@
 #ifndef _LOGODETECTORBASE_H_
 #define _LOGODETECTORBASE_H_
 
-#include "qobject.h"
+#include <QObject>
 
 class NuppelVideoPlayer;
 

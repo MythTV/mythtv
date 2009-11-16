@@ -12,7 +12,7 @@
 #include <vector>
 using namespace std;
 
-#include <qdatetime.h>
+#include <QString>
 
 #include "recorderbase.h"
 #include "H264Parser.h"

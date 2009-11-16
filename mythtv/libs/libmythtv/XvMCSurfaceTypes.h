@@ -4,6 +4,9 @@
 
 #ifdef USING_XVMC
 
+#include <ostream>
+using namespace std;
+
 #include <QString>
 
 #include <qwindowdefs.h>

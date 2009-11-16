@@ -31,7 +31,7 @@
 
 // Qt headers
 #include <QTextStream>
-#include <qfile.h>
+#include <QFile>
 
 // MythTV headers
 #include "mythcontext.h"

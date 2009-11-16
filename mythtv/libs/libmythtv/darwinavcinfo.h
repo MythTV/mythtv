@@ -16,7 +16,7 @@ using namespace std;
 #include <IOKit/avc/IOFireWireAVCLib.h>
 
 // Qt headers
-#include <qmap.h>
+#include <QMap>
 
 // MythTV headers
 #include "avcinfo.h"

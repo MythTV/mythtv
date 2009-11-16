@@ -19,20 +19,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
+#include <cmath>
+
 #include <iostream>
 #include <sstream>
-#include "compat.h"
-#include "freesurround.h"
-#include "el_processor.h"
 #include <vector>
 #include <list>
 #include <map>
-#include <math.h>
-
-#include <qstring.h>
-#include <qdatetime.h>
-
 using namespace std;
+
+#include "compat.h"
+#include "freesurround.h"
+#include "el_processor.h"
+
+#include <QString>
+#include <QDateTime>
 
 #if 0
 #define VERBOSE(args...) \

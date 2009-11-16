@@ -6315,7 +6315,7 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
         islive = true;
     }
 
-    float secsplayed = 0;
+    float secsplayed = 0.0f;
     if (player_ctx->buffer->isDVD())
     {
         if (!player_ctx->buffer->DVD()->IsInMenu())
@@ -6323,7 +6323,7 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
             secsplayed = player_ctx->buffer->DVD()->GetCurrentTime();
 #else
             // DVD playing non-functional under windows for now
-            secsplayed = 0;
+            secsplayed = 0.0f;
 #endif
     }
     else
@@ -6332,7 +6332,7 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
     playbackLen = max(playbackLen, 1);
     secsplayed  = min((float)playbackLen, max(secsplayed, 0.0f));
 
-    posInfo.position = (int)(1000.0 * (secsplayed / (float)playbackLen));
+    posInfo.position = (int)(1000.0f * (secsplayed / (float)playbackLen));
 
     int phours = (int)secsplayed / 3600;
     int pmins = ((int)secsplayed - phours * 3600) / 60;

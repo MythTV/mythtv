@@ -1,15 +1,15 @@
-#include <iostream>
-
-#include <qfile.h>
-#include <qapplication.h>
-#include <qregexp.h>
 #include <unistd.h>
+
+#include <iostream>
+using namespace std;
+
+#include <QApplication>
+#include <QRegExp>
+#include <QTimer>
+#include <QFile>
 
 #include "mythverbose.h"
 #include "compat.h"
-
-using namespace std;
-
 #include "qcodecs.h"
 #include "httpcomms.h"
 

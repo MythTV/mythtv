@@ -4,17 +4,21 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+// ANSI C
 #include <cstdio>
 #include <cstring>
 #include <climits>
+
+// C++
 #include <algorithm>
-#include <qtextcodec.h>
-
-#include "mythcontext.h"
-#include "RingBuffer.h"
-
 using std::lower_bound;
 
+// Qt
+#include <QTextCodec>
+
+// MythTV
+#include "mythcontext.h"
+#include "RingBuffer.h"
 #include "textsubtitleparser.h"
 #include "xine_demux_sputext.h"
 

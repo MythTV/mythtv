@@ -10,7 +10,6 @@ using namespace std;
 #include "encoderlink.h"
 #include "playbacksock.h"
 #include "tv_rec.h"
-#include "programinfo.h"
 #include "util.h"
 #include "previewgenerator.h"
 #include "storagegroup.h"

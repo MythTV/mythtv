@@ -2,7 +2,7 @@
 #define _CHANNELDATA_H_
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 #include <QList>
 
 class ChanInfo

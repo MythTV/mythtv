@@ -1,16 +1,20 @@
 #ifndef CHANNELSETTINGS_H
 #define CHANNELSETTINGS_H
 
-#include <qwidget.h>
-#include <qsqldatabase.h>
-
+// ANSI C
 #include <cstdlib>
 
+// Qt
+#include <QString>
+
+// MythTV
 #include "settings.h"
 #include "mythwidgets.h"
 #include "mythwizard.h"
 #include "mythdb.h"
 #include "mythverbose.h"
+
+class QWidget;
 
 class ChannelID : public IntegerSetting, public TransientStorage
 {

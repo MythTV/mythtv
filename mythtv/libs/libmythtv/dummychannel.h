@@ -6,7 +6,8 @@
 #ifndef DUMMYCHANNEL_H
 #define DUMMYCHANNEL_H
 
-#include <qstring.h>
+#include <QString>
+
 #include "tv_rec.h"
 #include "channelbase.h"
 

@@ -6,10 +6,10 @@
 #include <vector>
 using namespace std;
 
-#include <qstringlist.h>
-#include <qmutex.h>
-#include <qsize.h>
-#include <qmap.h>
+#include <QStringList>
+#include <QMutex>
+#include <QSize>
+#include <QMap>
 
 #include "mythcontext.h"
 

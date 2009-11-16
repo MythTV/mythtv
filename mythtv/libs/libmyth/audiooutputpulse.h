@@ -20,10 +20,7 @@
 #ifndef AUDIOOUTPUTPULSE
 #define AUDIOOUTPUTPULSE
 
-#include <qstring.h>
 #include <pulse/pulseaudio.h>
-
-using namespace std;
 
 #include "audiooutputbase.h"
 

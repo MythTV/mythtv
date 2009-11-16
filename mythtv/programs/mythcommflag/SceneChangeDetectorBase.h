@@ -1,7 +1,7 @@
 #ifndef _SCENECHANGEDETECTORBASE_H_
 #define _SCENECHANGEDETECTORBASE_H_
 
-#include "qobject.h"
+#include <QObject>
 
 class SceneChangeDetectorBase : public QObject
 {

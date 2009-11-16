@@ -1,7 +1,8 @@
 #ifndef ENCODERLINK_H_
 #define ENCODERLINK_H_
 
-#include <qstring.h>
+#include <QString>
+#include <QMap>
 
 #include "tv.h"
 #include "programinfo.h"

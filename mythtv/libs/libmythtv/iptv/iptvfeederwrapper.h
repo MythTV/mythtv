@@ -10,8 +10,8 @@
 #include <vector>
 using namespace std;
 
-#include <qmutex.h>
-#include <qstring.h>
+#include <QString>
+#include <QMutex>
 
 class IPTVFeeder;
 class TSDataListener;

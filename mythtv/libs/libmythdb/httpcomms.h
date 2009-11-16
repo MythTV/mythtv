@@ -1,15 +1,15 @@
 #ifndef HTTPCOMMS_H_
 #define HTTPCOMMS_H_
 
-#include <qurl.h>
-#include <qobject.h>
 #include <QByteArray>
 #include <QString>
-#include <QTimer>
+#include <QObject>
 #include <QHttp>
+#include <QUrl>
 
 #include "mythexp.h"
 
+class QTimer;
 class MPUBLIC HttpComms : public QObject
 {
     Q_OBJECT

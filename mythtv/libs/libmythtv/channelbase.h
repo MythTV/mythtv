@@ -4,8 +4,7 @@
 #define CHANNELBASE_H
 
 // Qt headers
-#include <qmap.h>
-#include <qstringlist.h>
+#include <QStringList>
 
 // MythTV headers
 #include "channelutil.h"

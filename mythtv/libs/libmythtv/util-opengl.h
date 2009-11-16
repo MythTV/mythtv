@@ -25,7 +25,7 @@
 #endif
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 #ifndef GL_TEXTTURE0
 #define GL_TEXTURE0 0x84C0

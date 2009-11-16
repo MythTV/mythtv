@@ -1,13 +1,12 @@
 #ifndef MYTH_MEDIA_MONITOR_H
 #define MYTH_MEDIA_MONITOR_H
 
-#include <QList>
-#include <qpointer.h>
-#include <qthread.h>
-#include <qstring.h>
 #include <QStringList>
+#include <QPointer>
+#include <QThread>
 #include <QMutex>
 #include <QEvent>
+#include <QList>
 
 #include "mythmedia.h"
 

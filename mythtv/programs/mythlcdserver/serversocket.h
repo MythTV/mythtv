@@ -10,10 +10,8 @@
 
 */
 
-#include <q3socket.h>
-#include <q3serversocket.h>
-
-
+#include <Q3Socket>
+#include <Q3ServerSocket>
 
 class LCDServerSocket : public Q3ServerSocket
 {

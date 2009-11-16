@@ -24,7 +24,9 @@
 #ifndef SOAPCLIENT_H_
 #define SOAPCLIENT_H_
 
-#include <qdom.h>
+#include <QDomDocument>
+#include <QString>
+#include <QUrl>
 
 #include "httpcomms.h"
 #include "upnputil.h"

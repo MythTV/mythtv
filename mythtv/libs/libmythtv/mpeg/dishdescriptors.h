@@ -5,10 +5,8 @@
 
 #include <cassert>
 
-using namespace std;
-#include <qstring.h>
+#include <QString>
 
-#include "mythcontext.h"
 #include "atscdescriptors.h"
 
 class DishEventNameDescriptor : public MPEGDescriptor

@@ -12,8 +12,8 @@
 using namespace std;
 
 // Qt headers
-#include <qwaitcondition.h>
-#include <qmutex.h>
+#include <QWaitCondition>
+#include <QMutex>
 
 // Mythtv headers
 #include "iptvfeeder.h"

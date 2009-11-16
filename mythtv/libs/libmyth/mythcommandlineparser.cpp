@@ -1,3 +1,6 @@
+#include <iostream>
+using namespace std;
+
 #include <QFile>
 
 #include "mythcommandlineparser.h"

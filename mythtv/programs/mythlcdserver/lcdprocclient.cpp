@@ -11,8 +11,11 @@
 #include <stdlib.h>
 #include <cmath>
 
-#include <qapplication.h>
-#include <q3textstream.h>
+#include <QApplication>
+#include <QEvent>
+#include <QTimer>
+
+#include <Q3TextStream>
 
 #include "lcdprocclient.h"
 #include "mythcontext.h"

@@ -41,7 +41,7 @@
 using namespace std;
 
 // Qt headers
-#include <qstring.h>
+#include <QString>
 
 // MythTV headers
 #include "dtvchannel.h"

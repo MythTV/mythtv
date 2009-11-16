@@ -33,9 +33,6 @@
  *
  */
 
-#include <qdatetime.h>
-#include <qvariant.h>
-
 #include <iostream>
 #include <vector>
 #include <map>

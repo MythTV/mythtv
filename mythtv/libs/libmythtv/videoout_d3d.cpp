@@ -20,7 +20,7 @@ using namespace std;
 #include "mmsystem.h"
 #include "tv.h"
 
-#include <qapplication.h>
+#include <QApplication>
 
 #undef UNICODE
 

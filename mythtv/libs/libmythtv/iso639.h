@@ -2,12 +2,13 @@
 #ifndef _ISO_639_2_H_
 #define _ISO_639_2_H_
 
-#include <qmap.h>
-#include <qstring.h>
-#include <qstringlist.h>
 #include <vector>
-#include "mythexp.h"
 using namespace std;
+
+#include <QStringList>
+#include <QMap>
+
+#include "mythexp.h"
 
 extern MPUBLIC QMap<int, QString> _iso639_key_to_english_name;
 

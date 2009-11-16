@@ -1,7 +1,6 @@
 #ifndef VIDEOOUT_XV_H_
 #define VIDEOOUT_XV_H_
 
-#include <set>
 #include <qwindowdefs.h>
 
 #include "videooutbase.h"

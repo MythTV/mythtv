@@ -4,7 +4,8 @@
 #include <deque>
 using namespace std;
 
-#include <qmutex.h>
+#include <QString>
+#include <QMutex>
 
 #include "mpegtables.h"
 

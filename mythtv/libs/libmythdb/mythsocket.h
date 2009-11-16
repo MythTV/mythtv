@@ -5,22 +5,12 @@
 #include <QStringList>
 #include <QMutex>
 
-#include "mythexp.h"
 #include "msocketdevice.h"
+#include "mythsocket_cb.h"
+#include "mythexp.h"
 
 class QHostAddress;
-class MythSocket;
 class MythSocketThread;
-
-class MPUBLIC MythSocketCBs
-{
-  public:
-    virtual ~MythSocketCBs() {}
-    virtual void connected(MythSocket*) = 0;
-    virtual void readyRead(MythSocket*) = 0;
-    virtual void connectionFailed(MythSocket*) = 0;
-    virtual void connectionClosed(MythSocket*) = 0;
-};
 
 class MPUBLIC MythSocket : public MSocketDevice
 {

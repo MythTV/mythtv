@@ -5,8 +5,7 @@
  * License: GPL v2
  */
 
-
-#include <qdatetime.h>
+#include <QDateTime>
 
 #include "eitcache.h"
 #include "mythcontext.h"

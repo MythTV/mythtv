@@ -1,14 +1,15 @@
 #ifndef REMOTEENCODER_H_
 #define REMOTEENCODER_H_
 
-#include <qstringlist.h>
-#include <qmutex.h>
-#include <qmap.h>
+#include <QString>
+#include <QMutex>
+#include <QMap>
 
 #include "mythexp.h"
 #include "videoouttypes.h"
 #include "tv.h"
 
+class QStringList;
 class ProgramInfo;
 class MythSocket;
 

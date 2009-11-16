@@ -4,8 +4,8 @@
 #include "metadata.h"
 
 // Libmyth
-#include <mythtv/mythverbose.h>
-#include <mythtv/mythcontext.h>
+#include <mythverbose.h>
+#include <mythcontext.h>
 
 // Libav*
 extern "C" {
@@ -16,7 +16,7 @@ extern "C" {
 MetaIOMP4::MetaIOMP4(void)
     : MetaIO()
 {
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
     av_register_all();
 }
 

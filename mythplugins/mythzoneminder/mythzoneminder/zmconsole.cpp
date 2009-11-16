@@ -20,9 +20,9 @@
 #include <QTimer>
 
 // myth
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
-#include <libmythui/mythmainwindow.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythmainwindow.h>
 
 // zoneminder
 #include "zmconsole.h"

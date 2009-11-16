@@ -1,8 +1,5 @@
 // -*- Mode: c++ -*-
 
-// Qt headers
-#include <qstring.h>
-
 // MythTV headers
 #include "dvbtypes.h"
 

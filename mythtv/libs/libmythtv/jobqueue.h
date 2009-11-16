@@ -1,15 +1,13 @@
 #ifndef JOBQUEUE_H_
 #define JOBQUEUE_H_
 
-#include <qobject.h>
-#include <qmap.h>
-#include <qmutex.h>
-#include <qobject.h>
-#include <qsqldatabase.h>
-#include <QEvent>
-#include <qwaitcondition.h>
 #include <pthread.h>
 
+#include <QWaitCondition>
+#include <QObject>
+#include <QEvent>
+#include <QMutex>
+#include <QMap>
 
 #include "programinfo.h"
 

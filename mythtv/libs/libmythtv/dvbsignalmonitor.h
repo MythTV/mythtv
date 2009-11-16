@@ -3,8 +3,9 @@
 #ifndef DVBSIGNALMONITOR_H
 #define DVBSIGNALMONITOR_H
 
+#include <QStringList>
+
 #include "dtvsignalmonitor.h"
-#include "qstringlist.h"
 
 class DVBChannel;
 class DVBStreamHandler;

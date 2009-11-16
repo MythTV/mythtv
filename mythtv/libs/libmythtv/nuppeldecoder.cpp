@@ -12,6 +12,9 @@
 #include <iostream>
 using namespace std;
 
+// Qt headers
+#include <QMutex>
+
 // MythTV headers
 #include "mythconfig.h"
 #include "nuppeldecoder.h"
@@ -20,6 +23,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "myth_imgconvert.h"
+#include "programinfo.h"
 
 #include "minilzo.h"
 
@@ -68,10 +72,11 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent,
     int format = RTJ_YUV420;
     rtjd->SetFormat(&format);
 
-    avcodeclock.lock();
-    avcodec_init();
-    avcodec_register_all();
-    avcodeclock.unlock();
+    {
+        QMutexLocker locker(avcodeclock);
+        avcodec_init();
+        avcodec_register_all();
+    }
 
     if (lzo_init() != LZO_E_OK)
     {
@@ -683,7 +688,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
         mpa_vidctx->extradata_size = ffmpeg_extradatasize;
     }
 
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
     if (avcodec_open(mpa_vidctx, mpa_vidcodec) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Couldn't find lavc video codec");
@@ -695,7 +700,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
 
 void NuppelDecoder::CloseAVCodecVideo(void)
 {
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
 
     if (mpa_vidcodec)
     {
@@ -742,7 +747,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
 
     mpa_audctx->codec_id = (enum CodecID)codec;
 
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
     if (avcodec_open(mpa_audctx, mpa_audcodec) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC + "Couldn't find lavc audio codec");
@@ -754,7 +759,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
 
 void NuppelDecoder::CloseAVCodecAudio(void)
 {
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
 
     if (mpa_audcodec)
     {
@@ -867,7 +872,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         AVFrame mpa_pic;
 
         {
-            QMutexLocker locker(&avcodeclock);
+            QMutexLocker locker(avcodeclock);
             // if directrendering, writes into buf
             int gotpicture = 0;
             int ret = avcodec_decode_video(mpa_vidctx, &mpa_pic, &gotpicture,
@@ -1220,7 +1225,7 @@ bool NuppelDecoder::GetFrame(int avignore)
                 int data_size;
                 unsigned char *ptr = strm;
 
-                QMutexLocker locker(&avcodeclock);
+                QMutexLocker locker(avcodeclock);
 
                 while (packetlen > 0)
                 {

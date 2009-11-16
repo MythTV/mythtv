@@ -3,7 +3,8 @@
 #ifndef _UTIL_XV_H_
 #define _UTIL_XV_H_
 
-#include <qmap.h>
+#include <QString>
+#include <QMap>
 
 #include "videobuffers.h"
 #include "exitcodes.h"

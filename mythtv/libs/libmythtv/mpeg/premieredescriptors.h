@@ -5,8 +5,8 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include <qstring.h>
-#include <qdatetime.h>
+#include <QString>
+#include <QDateTime>
 
 #include "mpegdescriptors.h"
 

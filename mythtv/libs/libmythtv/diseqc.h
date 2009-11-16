@@ -15,9 +15,9 @@
 using namespace std;
 
 // Qt headers
-#include <qmap.h>
-#include <qstring.h>
-#include <qmutex.h>
+#include <QString>
+#include <QMutex>
+#include <QMap>
 
 class DTVMultiplex;
 

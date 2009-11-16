@@ -1,6 +1,8 @@
 #ifndef PROFILEGROUP_H
 #define PROFILEGROUP_H
 
+#include <QString>
+
 #include "settings.h"
 #include "mythwidgets.h"
 

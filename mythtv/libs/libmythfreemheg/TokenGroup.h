@@ -31,7 +31,7 @@
 #include "BaseActions.h"
 #include "Actions.h"
 
-#include <qpoint.h>
+#include <QPoint>
 #include <QList>
 
 class MHEngine;

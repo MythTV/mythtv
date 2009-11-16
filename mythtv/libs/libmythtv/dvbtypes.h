@@ -27,7 +27,9 @@
 #    error "DVB driver includes with API version 3.1 or later not found!"
 #endif
 
-class QString;
+// Qt headers
+#include <QString>
+
 QString toString(fe_status);
 
 #endif // DVB_TYPES_H

@@ -24,8 +24,7 @@
 #ifndef MYTHXMLCLIENT_H_
 #define MYTHXMLCLIENT_H_
 
-#include <qdom.h>
-#include <qbuffer.h>
+#include <QDomDocument>
 
 #include "httpcomms.h"
 

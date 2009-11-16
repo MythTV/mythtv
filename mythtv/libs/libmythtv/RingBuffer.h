@@ -3,10 +3,11 @@
 #ifndef RINGBUFFER
 #define RINGBUFFER
 
-#include <qstring.h>
-#include <qwaitcondition.h>
-#include <qmutex.h>
 #include <pthread.h>
+
+#include <QWaitCondition>
+#include <QString>
+#include <QMutex>
 
 extern "C" {
 #include "avcodec.h"

@@ -1,17 +1,20 @@
-#include "config.h"
+#include <algorithm>
+using namespace std;
+
+#include <QVector>
+#include <QRect>
+
+#include "mythconfig.h"
 #include "osdsurface.h"
 #include "dithertable.h"
 #include "mythcontext.h"
 #include "compat.h"
 
-#include <algorithm>
-using namespace std;
-
 #ifdef MMX
 
 extern "C" {
 #include "mythconfig.h"
-#include "libavutil/declare_aligned.h"
+#include "declare_aligned.h"
 #include "dsputil.h"
 #include "x86/mmx.h"
 }

@@ -1,9 +1,5 @@
 #include "mythcontext.h"
 #include "mythdb.h"
-#include <qsqldatabase.h>
-#include <qcursor.h>
-#include <qlayout.h>
-#include <iostream>
 #include "playgroup.h"
 #include "programinfo.h"
 

@@ -7,6 +7,8 @@
 #ifndef __SCENECHANGEDETECTOR_H__
 #define __SCENECHANGEDETECTOR_H__
 
+#include <QString>
+
 #include "FrameAnalyzer.h"
 
 typedef struct AVPicture AVPicture;

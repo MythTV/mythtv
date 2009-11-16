@@ -3,12 +3,11 @@
 #define EITSCANNER_H
 
 // Qt includes
-#include <qmutex.h>
-#include <qobject.h>
-#include <qdatetime.h>
-#include <qstringlist.h>
-#include <qwaitcondition.h>
-#include <qthread.h>
+#include <QWaitCondition>
+#include <QStringList>
+#include <QDateTime>
+#include <QThread>
+#include <QMutex>
 
 class TVRec;
 class ChannelBase;

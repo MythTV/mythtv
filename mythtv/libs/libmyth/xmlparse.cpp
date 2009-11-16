@@ -12,7 +12,7 @@ using namespace std;
 #include "uilistbtntype.h"
 #include "xmlparse.h"
 #include "util.h"
-
+#include "mythcontext.h"
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 #include "x11colors.h"

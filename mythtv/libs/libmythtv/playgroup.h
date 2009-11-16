@@ -1,7 +1,8 @@
 #ifndef PLAYGROUP_H
 #define PLAYGROUP_H
 
-#include "qstringlist.h"
+#include <QStringList>
+
 #include "settings.h"
 #include "mythwidgets.h"
 

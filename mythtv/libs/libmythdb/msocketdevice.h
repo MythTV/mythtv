@@ -44,8 +44,8 @@
 #ifndef MSOCKETDEVICE_H
 #define MSOCKETDEVICE_H
 
-#include <QtCore/qiodevice.h>
-#include <QtNetwork/qhostaddress.h> // int->QHostAddress conversion
+#include <QIODevice>
+#include <QHostAddress> // int->QHostAddress conversion
 
 #include "mythexp.h"
 

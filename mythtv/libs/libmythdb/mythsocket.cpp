@@ -32,8 +32,8 @@
 #define LOC SLOC(this)
 
 const uint MythSocket::kSocketBufferSize = 128000;
-const uint MythSocket::kShortTimeout = 7000;
-const uint MythSocket::kLongTimeout  = 30000;
+const uint MythSocket::kShortTimeout = kMythSocketShortTimeout;
+const uint MythSocket::kLongTimeout  = kMythSocketLongTimeout;
 
 MythSocketThread *MythSocket::s_readyread_thread = new MythSocketThread();
 

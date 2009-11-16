@@ -1,3 +1,5 @@
+#include <QMutex>
+
 #include "frequencies.h"
 #include "frequencytables.h"
 #include "channelutil.h"

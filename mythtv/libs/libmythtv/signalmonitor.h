@@ -13,8 +13,7 @@
 using namespace std;
 
 // Qt headers
-#include <qobject.h>
-#include <qmutex.h>
+#include <QMutex>
 
 // MythTV headers
 #include "signalmonitorvalue.h"

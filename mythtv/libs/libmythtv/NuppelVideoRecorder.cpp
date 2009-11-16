@@ -230,7 +230,7 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
 
     if (mpa_vidcodec)
     {
-        QMutexLocker locker(&avcodeclock);
+        QMutexLocker locker(avcodeclock);
         avcodec_close(mpa_vidctx);
     }
 
@@ -484,7 +484,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
 
     if (mpa_vidcodec)
     {
-        QMutexLocker locker(&avcodeclock);
+        QMutexLocker locker(avcodeclock);
         avcodec_close(mpa_vidctx);
     }
 
@@ -583,7 +583,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     if (videocodec.toLower() == "huffyuv" || videocodec.toLower() == "mjpeg")
         mpa_vidctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
 
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
 
 #ifdef USING_FFMPEG_THREADS
     if ((encoding_thread_count > 1) &&
@@ -2989,7 +2989,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
         if (!hardware_encode)
         {
-            QMutexLocker locker(&avcodeclock);
+            QMutexLocker locker(avcodeclock);
             tmp = avcodec_encode_video(mpa_vidctx, (unsigned char *)strm, 
                                        len, &mpa_picture); 
             if (tmp == -1)

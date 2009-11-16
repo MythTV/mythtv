@@ -1,17 +1,20 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
+// POSIX headers
+#include <pthread.h>
+
 // C++ headers
 #include <deque>
 #include <vector>
-#include <pthread.h>
 using namespace std;
 
 // Qt headers
-#include <qmutex.h>
-#include <qwaitcondition.h>
-#include <qmap.h> 
-#include <qobject.h>
+#include <QWaitCondition>
+#include <QObject>
+#include <QString>
+#include <QMutex>
+#include <QMap>
 
 // MythTV headers
 #include "recordinginfo.h"

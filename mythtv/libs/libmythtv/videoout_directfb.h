@@ -1,11 +1,12 @@
 #ifndef VIDEOOUT_DIRECTFB_H
 #define VIDEOOUT_DIRECTFB_H
 
-#include <qobject.h>
 #include "videooutbase.h"
 
 class NuppelVideoPlayer;
 class DirectfbData;
+class QObject;
+class QSize;
 
 class VideoOutputDirectfb: public VideoOutput
 {

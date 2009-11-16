@@ -3,20 +3,29 @@
 #ifndef TVPLAY_H
 #define TVPLAY_H
 
-#include <qstring.h>
-#include <qmap.h>
-#include <QHash>
-#include <qdatetime.h>
-#include <QKeyEvent>
-#include <QEvent>
-#include <pthread.h>
-#include <qmutex.h>
-#include <qstringlist.h>
-#include <qregexp.h>
-#include <qwaitcondition.h>
-#include <QThread>
-#include <QReadWriteLock>
+// C++
+#include <vector>
+using namespace std;
 
+// POSIX
+#include <pthread.h>
+
+// Qt
+#include <QReadWriteLock>
+#include <QWaitCondition>
+#include <QStringList>
+#include <QDateTime>
+#include <QKeyEvent>
+#include <QObject>
+#include <QRegExp>
+#include <QString>
+#include <QThread>
+#include <QEvent>
+#include <QMutex>
+#include <QHash>
+#include <QMap>
+
+// MythTV
 #include "mythdeque.h"
 #include "tv.h"
 #include "util.h"
@@ -27,11 +36,6 @@
 #include "volumebase.h"
 #include "inputinfo.h"
 #include "channelgroup.h"
-
-#include <qobject.h>
-
-#include <vector>
-using namespace std;
 
 class QDateTime;
 class OSD;

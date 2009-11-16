@@ -1,9 +1,7 @@
 #ifndef _CUSTOMEVENTRELAYER_H_
 #define _CUSTOMEVENTRELAYER_H_
 
-#include "qobject.h"
-#include "qstring.h"
-#include <QEvent>
+#include <QObject>
 
 #include "mythcontext.h"
 
@@ -12,6 +10,7 @@
  * you don't want to wrap inside a class. 
  */
 
+class QEvent;
 class CustomEventRelayer : public QObject
 {
     Q_OBJECT

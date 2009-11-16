@@ -1,3 +1,6 @@
+#include <algorithm>
+using namespace std;
+
 #include "signalmonitorvalue.h"
 #include "mythverbose.h"
 

@@ -7,6 +7,7 @@
 #include <QDesktopWidget>
 #include <QPainter>
 #include <QDebug>
+#include <QMutex>
 
 #include <cmath>
 
@@ -16,6 +17,7 @@ using namespace std;
 
 #include "config.h"
 #include "mythcontext.h"
+#include "mythsocket.h"
 #include "exitcodes.h"
 #include "oldsettings.h"
 #include "util.h"
@@ -53,7 +55,7 @@ using namespace std;
 #define LOC_ERR  QString("MythContext, Error: ")
 
 MythContext *gContext = NULL;
-QMutex avcodeclock(QMutex::Recursive);
+QMutex *avcodeclock = new QMutex(QMutex::Recursive);
 
 // Some common UPnP search and XML value strings
 const QString gBackendURI = "urn:schemas-mythtv-org:device:MasterMediaServer:1";

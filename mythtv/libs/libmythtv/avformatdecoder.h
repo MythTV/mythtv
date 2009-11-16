@@ -1,8 +1,7 @@
 #ifndef AVFORMATDECODER_H_
 #define AVFORMATDECODER_H_
 
-#include <qstring.h>
-#include <qmap.h>
+#include <QString>
 #include <QList>
 
 #include "programinfo.h"

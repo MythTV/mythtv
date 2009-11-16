@@ -1,6 +1,11 @@
 #ifndef UTIL_VDPAU_H_
 #define UTIL_VDPAU_H_
 
+#include <QString>
+#include <QSize>
+#include <QRect>
+#include <QMap>
+
 extern "C" {
 #include "libavcodec/vdpau.h"
 }

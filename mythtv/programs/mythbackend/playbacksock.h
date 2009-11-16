@@ -1,15 +1,20 @@
 #ifndef PLAYBACKSOCK_H_
 #define PLAYBACKSOCK_H_
 
-#include <qstring.h>
-#include <qmutex.h>
+#include <vector>
+using namespace std;
 
-#include "programinfo.h"
+#include <QStringList>
+#include <QDateTime>
+#include <QMutex>
+#include <QSize>
+
+#include "programinfo.h" // For RecStatusType
+#include "inputinfo.h"
 
 class MythSocket;
 class MainServer;
 class ProgramInfo;
-class InputInfo;
 
 class PlaybackSock
 {

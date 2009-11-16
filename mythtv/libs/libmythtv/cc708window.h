@@ -7,9 +7,9 @@
 #include <vector>
 using namespace std;
 
-#include <qstring.h>
-#include <qmutex.h>
-#include <qcolor.h>
+#include <QString>
+#include <QMutex>
+#include <QColor>
 
 class CC708CharacterAttribute
 {

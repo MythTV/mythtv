@@ -31,8 +31,7 @@
 #define _PANE_DVB_UTILS_IMPORT_H_
 
 // Qt headers
-#include <qstring.h>
-#include <qobject.h>
+#include <QString>
 
 // MythTV headers
 #include "channelscanmiscsettings.h"

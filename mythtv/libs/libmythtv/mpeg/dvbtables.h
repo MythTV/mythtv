@@ -3,7 +3,7 @@
 #ifndef _DVB_TABLES_H_
 #define _DVB_TABLES_H_
 
-#include <qstring.h>
+#include <QString>
 #include <stdint.h>  // uint32_t
 #include "mpegtables.h"
 #include "dvbdescriptors.h"

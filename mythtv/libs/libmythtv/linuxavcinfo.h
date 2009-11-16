@@ -10,8 +10,12 @@
 #include <libavc1394/avc1394.h>
 #include <libavc1394/rom1394.h>
 
+// C++ headers
+#include <vector>
+using namespace std;
+
 // Qt headers
-#include <qmap.h>
+#include <QMap>
 
 // MythTV headers
 #include "avcinfo.h"

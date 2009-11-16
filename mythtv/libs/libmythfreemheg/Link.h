@@ -28,7 +28,7 @@
 #include "Actions.h"
 #include "BaseActions.h"
 
-#include <qstring.h>
+#include <QString>
 
 class MHParseNode;
 

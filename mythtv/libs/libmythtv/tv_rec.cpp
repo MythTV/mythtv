@@ -11,8 +11,7 @@
 using namespace std;
 
 // Qt headers
-#include <qapplication.h>
-#include <qsqldatabase.h>
+#include <QApplication>
 
 // MythTV headers
 #include "mythconfig.h"

@@ -22,8 +22,8 @@
 
 #if !defined(GROUPCLASS_H)
 #define GROUPCLASS_H
-#include <qstring.h>
-#include <qdatetime.h> 
+#include <QString>
+#include <QDateTime>
 #include <QList>
 
 #include "Root.h"

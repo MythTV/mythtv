@@ -1,10 +1,10 @@
 #ifndef TVOSDMENUENTRY_H_
 #define TVOSDMENUENTRY_H_
 
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qmutex.h>
-#include <QVariant>
+#include <QStringList>
+#include <QMetaType>
+#include <QMutex>
+
 #include "tv.h"
 #include "mythexp.h"
 

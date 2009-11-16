@@ -11,15 +11,12 @@
 #ifndef __MEDIASERVER_H__
 #define __MEDIASERVER_H__
 
-#include <qobject.h>
-#include <qmutex.h>
+#include <QString>
 
-#include "libmythupnp/upnp.h"
-
-#include "libmythupnp/upnpcds.h"
-#include "libmythupnp/upnpcmgr.h"
-#include "libmythupnp/upnpmsrr.h"
-
+#include "upnp.h"
+#include "upnpcds.h"
+#include "upnpcmgr.h"
+#include "upnpmsrr.h"
 #include "upnpmedia.h"
 
 //////////////////////////////////////////////////////////////////////////////

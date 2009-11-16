@@ -32,7 +32,7 @@
 #ifndef _DTVCONFPARSERHELPERS_H_
 #define _DTVCONFPARSERHELPERS_H_
 
-#include <qstring.h>
+#include <QString>
 
 // The following are a set of helper classes to allow easy translation
 // between the different string representations of various tuning params.

@@ -14,12 +14,13 @@
 using namespace std;
 
 // Qt includes
-#include <qmutex.h>
+#include <QMutex>
 
 #include "dtvrecorder.h"
 #include "tspacket.h"
 #include "DeviceReadBuffer.h"
 
+class QString;
 class DVBChannel;
 class MPEGStreamData;
 class ProgramAssociationTable;

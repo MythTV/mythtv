@@ -43,6 +43,7 @@ using namespace std;
 #include "mythmediamonitor.h"
 #include "mythverbose.h"
 #include "msocketdevice.h"
+#include "mythsocket.h"
 
 #include "mythconfig.h" // for CONFIG_DARWIN
 

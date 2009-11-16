@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 // Qt header
-#include <qstring.h>
+#include <QString>
 
 QString freesat_huffman_to_string(const unsigned char *compressed, uint size);
 

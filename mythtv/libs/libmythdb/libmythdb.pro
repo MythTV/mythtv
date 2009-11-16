@@ -10,7 +10,7 @@ INSTALLS = target
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-HEADERS += mythsocket.h mythsocketthread.h msocketdevice.h
+HEADERS += mythsocket.h mythsocket_cb.h mythsocketthread.h msocketdevice.h
 HEADERS += mythexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
 HEADERS += mythverbose.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h httpcomms.h qcodecs.h
@@ -33,8 +33,8 @@ inc.path = $${PREFIX}/include/mythtv/
 inc.files  = mythverbose.h mythdbcon.h mythdbparams.h mythexp.h mythdb.h
 inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak
 inc.files += mythobservable.h mythevent.h httpcomms.h qcodecs.h
-inc.files += mythtimer.h lcddevice.h mythsocket.h exitcodes.h mythdirs.h
-inc.files += msocketdevice.h mythstorage.h
+inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
+inc.files += mythsocket.h mythsocket_cb.h msocketdevice.h
 
 # Allow both #include <blah.h> and #include <libmyth/blah.h>
 inc2.path  = $${PREFIX}/include/mythtv/libmyth

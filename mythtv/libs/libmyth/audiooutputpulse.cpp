@@ -16,6 +16,8 @@
  * 02110-1301, USA.
  */
 
+#include <QString>
+
 #include "audiooutputpulse.h"
 
 #define LOC     QString("PulseAudio: ")

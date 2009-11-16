@@ -3,8 +3,11 @@
 #define SIGNALMONITORVALUES_H
 
 #include <vector>
-#include <qstringlist.h>
-#include <mythcontext.h>
+using namespace std;
+
+#include <QStringList>
+
+#include "mythcontext.h"
 
 class SignalMonitorValue
 {

@@ -34,7 +34,7 @@ RecorderBase::RecorderBase(TVRec *rec)
       request_pause(false), paused(false), nextRingBuffer(NULL), nextRecording(NULL),
       positionMapType(MARK_GOP_BYFRAME), positionMapLock()
 {
-    QMutexLocker locker(&avcodeclock);
+    QMutexLocker locker(avcodeclock);
     avcodec_init(); // init CRC's
 }
 

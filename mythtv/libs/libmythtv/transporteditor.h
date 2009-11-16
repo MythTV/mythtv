@@ -32,7 +32,8 @@
 #ifndef _TRANSPORT_EDITOR_H_
 #define _TRANSPORT_EDITOR_H_
 
-#include <qobject.h>
+#include <QObject>
+
 #include "settings.h"
 
 class VideoSourceSelector;

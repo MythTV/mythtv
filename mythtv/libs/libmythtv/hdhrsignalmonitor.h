@@ -3,8 +3,9 @@
 #ifndef HDHRSIGNALMONITOR_H
 #define HDHRSIGNALMONITOR_H
 
+#include <QMap>
+
 #include "dtvsignalmonitor.h"
-#include "qstringlist.h"
 
 class HDHRChannel;
 class HDHRStreamHandler;

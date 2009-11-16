@@ -21,8 +21,7 @@
 #include "lcddevice.h"
 #include "myththemebase.h"
 #include "mythcommandlineparser.h"
-
-#include "libmythtv/tv.h"
+#include "tv.h"
 
 // mythwelcome
 #include "welcomedialog.h"
