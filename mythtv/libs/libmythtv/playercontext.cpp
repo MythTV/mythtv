@@ -484,11 +484,11 @@ bool PlayerContext::CreateNVP(TV *tv, QWidget *widget,
 
     if (pipState == kPIPOff || pipState == kPBPLeft)
     {
-        if (nvp->HasAudioOut() ||
-            (nvp->IsIVTVDecoder() &&
-            !gContext->GetNumSetting("PVR350InternalAudioOnly")))
+        if (nvp->HasAudioOut())
         {
             QString errMsg = nvp->ReinitAudio();
+            if (!errMsg.isEmpty())
+                VERBOSE(VB_IMPORTANT, LOC_ERR + errMsg);
         }
     }
     else if (pipState == kPBPRight)

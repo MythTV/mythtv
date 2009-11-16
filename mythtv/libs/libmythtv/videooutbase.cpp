@@ -18,10 +18,6 @@
 #include "videoout_xv.h"
 #endif
 
-#ifdef USING_IVTV
-#include "videoout_ivtv.h"
-#endif
-
 #ifdef USING_DIRECTFB
 #include "videoout_directfb.h"
 #endif
@@ -75,10 +71,6 @@ VideoOutput *VideoOutput::Create(
     (void) codec_priv;
 
     QStringList renderers;
-
-#ifdef USING_IVTV
-    renderers += VideoOutputIvtv::GetAllowedRenderers(codec_id, video_dim);
-#endif // USING_IVTV
 
 #ifdef USING_DIRECTFB
     renderers += VideoOutputDirectfb::GetAllowedRenderers(codec_id, video_dim);
@@ -144,10 +136,6 @@ VideoOutput *VideoOutput::Create(
             break;
 
         VideoOutput *vo = NULL;
-#ifdef USING_IVTV
-        if (renderer == "ivtv")
-            vo = new VideoOutputIvtv();
-#endif // USING_IVTV
 
 #ifdef USING_DIRECTFB
         if (renderer == "directfb")

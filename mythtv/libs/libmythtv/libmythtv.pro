@@ -255,9 +255,6 @@ using_frontend {
     SOURCES += decoderbase.cpp
     SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp
 
-    using_ivtv:HEADERS += ivtvdecoder.h
-    using_ivtv:SOURCES += ivtvdecoder.cpp
-
     # On screen display (video output overlay)
     using_fribidi:DEFINES += USING_FRIBIDI
     HEADERS += osd.h                    osdtypes.h
@@ -295,9 +292,6 @@ using_frontend {
     using_directfb:HEADERS +=     videoout_directfb.h
     using_directfb:SOURCES +=     videoout_directfb.cpp
     using_directfb:DEFINES +=     USING_DIRECTFB
-
-    using_ivtv:HEADERS +=         videoout_ivtv.h
-    using_ivtv:SOURCES +=         videoout_ivtv.cpp
 
     using_x11:DEFINES += USING_X11
 

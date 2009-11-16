@@ -71,11 +71,6 @@ extern "C" {
 
 #include "videoout_null.h"
 
-#ifdef USING_IVTV
-#include "videoout_ivtv.h"
-#include "ivtvdecoder.h"
-#endif
-
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
 #endif
@@ -518,7 +513,7 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     if (GetDecoder() && videoOutput)
     {
         //cout << "updating frames played" << endl;
-        if (using_null_videoout || IsIVTVDecoder())
+        if (using_null_videoout)
             GetDecoder()->UpdateFramesPlayed();
         else
             framesPlayed = videoOutput->GetFramesPlayed();
@@ -1011,7 +1006,7 @@ void NuppelVideoPlayer::FallbackDeint(void)
      if (videosync)
          videosync->SetFrameInterval(frame_interval, false);
 
-     if (osd && !IsIVTVDecoder())
+     if (osd)
          osd->SetFrameInterval(frame_interval);
 
      if (videoOutput)
@@ -1124,7 +1119,7 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         }
     }
 
-    if (osd && !IsIVTVDecoder())
+    if (osd)
     {
         osd->SetFrameInterval(
             (m_double_framerate && m_double_process) ?
@@ -1242,25 +1237,6 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         player_ctx->LockPlayingInfo(__FILE__, __LINE__);
         if (NuppelDecoder::CanHandle(testbuf, testreadsize))
             SetDecoder(new NuppelDecoder(this, *player_ctx->playingInfo));
-#ifdef USING_IVTV
-        else if (!using_null_videoout && IvtvDecoder::CanHandle(
-                 testbuf, player_ctx->buffer->GetFilename(), testreadsize))
-        {
-            SetDecoder(new IvtvDecoder(this, *player_ctx->playingInfo));
-            no_audio_out = true; // no audio with ivtv.
-            audio_bits = 16;
-            audio_samplerate = 44100;
-            audio_channels = 2;
-        }
-        else if (IsIVTVDecoder())
-        {
-            VERBOSE(VB_IMPORTANT,
-                QString("NVP: Couldn't open '%1' with ivtv decoder")
-                .arg(player_ctx->buffer->GetFilename()));
-            player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
-            return -1;
-        }
-#endif
         else if (AvFormatDecoder::CanHandle(
                      testbuf, player_ctx->buffer->GetFilename(), testreadsize))
         {
@@ -1522,9 +1498,6 @@ void NuppelVideoPlayer::AddTextData(unsigned char *buffer, int len,
 
 void NuppelVideoPlayer::CheckPrebuffering(void)
 {
-    if (IsIVTVDecoder())
-        return;
-
     if (videoOutput->hasHWAcceleration() &&
         videoOutput->EnoughPrebufferedFrames())
     {
@@ -1606,9 +1579,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
     bool ret = false;
 
     // Wait for frames to be available for decoding onto
-    if ((!IsIVTVDecoder()) &&
-        !videoOutput->EnoughFreeFrames()        &&
-        !unsafe)
+    if (!videoOutput->EnoughFreeFrames() && !unsafe)
     {
         //VERBOSE(VB_PLAYBACK, "Waiting for video buffer to drain.");
         SetPrebuffering(false);
@@ -3024,7 +2995,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                 FallbackDeint();
             }
 
-            if (osd && !IsIVTVDecoder())
+            if (osd)
             {
                 osd->SetFrameInterval(
                     (m_double_framerate && m_double_process) ?
@@ -3111,66 +3082,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     ShutdownAVSync();
 }
 
-#ifdef USING_IVTV
-/** \fn NuppelVideoPlayer::IvtvVideoLoop(void)
- *  \brief Handles the compositing of the OSD and PiP window.
- *
- *   Unlike OutputVideoLoop(void) this loop does not actually handle
- *   the display of the video, but only handles things that go on the
- *   composited OSD surface.
- */
-void NuppelVideoPlayer::IvtvVideoLoop(void)
-{
-    refreshrate = frame_interval;
-    int delay = frame_interval;
-
-    VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-    vidout->SetFPS(GetFrameRate());
-
-    while (!killvideo)
-    {
-        HandlePIPPlayerLists(1);
-
-        resetvideo = false;
-        SetVideoActuallyPaused(pausevideo);
-
-        if (pausevideo)
-        {
-            videofiltersLock.lock();
-            videoOutput->ProcessFrame(NULL, osd, videoFilters, pip_players);
-            videofiltersLock.unlock();
-        }
-        else
-        {
-            // handle EIA-608 and Teletext
-            if (textDisplayMode & kDisplayNUVCaptions)
-                ShowText();
-
-            videofiltersLock.lock();
-            videoOutput->ProcessFrame(NULL, osd, videoFilters, pip_players);
-            videofiltersLock.unlock();
-        }
-
-        usleep(delay);
-    }
-
-    // no need to lock this, we don't have any video frames
-    delete videoOutput;
-    videoOutput = NULL;
-}
-#endif
-
 void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
 {
     NuppelVideoPlayer *nvp = (NuppelVideoPlayer *)player;
-
-#ifdef USING_IVTV
-    if (nvp->IsIVTVDecoder())
-    {
-        nvp->IvtvVideoLoop();
-        return NULL;
-    }
-#endif
 
     // OS X needs a garbage collector allocated..
     void *video_thread_pool = CreateOSXCocoaPool();
@@ -3852,7 +3766,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 
         GetFrame(audioOutput == NULL || !normal_speed);
 
-        if (using_null_videoout || IsIVTVDecoder())
+        if (using_null_videoout)
             GetDecoder()->UpdateFramesPlayed();
         else
             framesPlayed = videoOutput->GetFramesPlayed();
@@ -4396,14 +4310,6 @@ void NuppelVideoPlayer::DoPause(void)
     VERBOSE(VB_PLAYBACK, LOC + "DoPause() -- begin");
     bool skip_changed;
 
-#ifdef USING_IVTV
-    if (IsIVTVDecoder())
-    {
-        VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-        vidout->Pause();
-    }
-#endif
-
     skip_changed = (ffrew_skip != 1);
     ffrew_skip = 1;
 
@@ -4423,7 +4329,7 @@ void NuppelVideoPlayer::DoPause(void)
     VERBOSE(VB_PLAYBACK, QString("rate: %1 speed: %2 skip: %3 = interval %4")
                                  .arg(video_frame_rate).arg(temp_speed)
                                  .arg(ffrew_skip).arg(frame_interval));
-    if (osd && !IsIVTVDecoder())
+    if (osd)
     {
         osd->SetFrameInterval(
             (m_double_framerate && m_double_process) ?
@@ -4475,15 +4381,6 @@ void NuppelVideoPlayer::DoPlay(void)
         //cout << "handling skip change" << endl;
         videoOutput->SetPrebuffering(ffrew_skip == 1);
 
-#ifdef USING_IVTV
-        if (IsIVTVDecoder())
-        {
-            VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-            vidout->NextPlay(play_speed / ffrew_skip, normal_speed,
-                             (ffrew_skip == 1) ? 2 : 0);
-        }
-#endif
-
         GetDecoder()->setExactSeeks(exactseeks && ffrew_skip == 1);
         GetDecoder()->DoRewind(framesPlayed);
         SaveAudioTimecodeOffset(GetAudioTimecodeOffset());
@@ -4521,21 +4418,12 @@ void NuppelVideoPlayer::DoPlay(void)
         videosync->SetFrameInterval(frame_interval, m_double_framerate);
     }
 
-    if (osd && !IsIVTVDecoder())
+    if (osd)
     {
         osd->SetFrameInterval(
             (m_double_framerate && m_double_process) ?
             (frame_interval>>1) : frame_interval);
     }
-
-#ifdef USING_IVTV
-    if (IsIVTVDecoder() && videoOutput)
-    {
-        VideoOutputIvtv *vidout = (VideoOutputIvtv *)videoOutput;
-        vidout->Play(play_speed / ffrew_skip, normal_speed,
-                     (ffrew_skip == 1) ? 2 : 0);
-    }
-#endif
 
     if (normal_speed && audioOutput)
     {
@@ -5705,15 +5593,6 @@ bool NuppelVideoPlayer::IsInDelete(long long testframe) const
         ret = true;
 
     return ret;
-}
-
-bool NuppelVideoPlayer::IsIVTVDecoder(void) const
-{
-#ifdef USING_IVTV
-    return dynamic_cast<const IvtvDecoder*>(decoder);
-#else // if !USING_IVTV
-    return false;
-#endif // !USING_IVTV
 }
 
 bool NuppelVideoPlayer::HasTVChainNext(void) const

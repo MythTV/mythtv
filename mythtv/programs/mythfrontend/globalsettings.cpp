@@ -11,6 +11,7 @@
 #include <QApplication>
 #include <QEvent>
 #include <qnamespace.h>
+#include <QFileInfo>
 #include <QFile>
 #include <QDialog>
 #include <QCursor>
@@ -28,11 +29,11 @@
 #include "libmythtv/mpeg/iso639.h"
 #include "playbackbox.h"
 #include "globalsettings.h"
-#include "libmythtv/recordingprofile.h"
+#include "recordingprofile.h"
 #include "mythxdisplay.h"
 #include "DisplayRes.h"
 #include "uitypes.h"
-#include "libmythtv/cardutil.h"
+#include "cardutil.h"
 #include "themeinfo.h"
 #include "mythconfig.h"
 #include "mythdirs.h"
@@ -3820,127 +3821,6 @@ class WatchListSettings : public TriggeredConfigurationGroup
     };
 };
 
-#ifdef USING_IVTV
-static HostCheckBox *PVR350OutputEnable()
-{
-    HostCheckBox *gc = new HostCheckBox("PVR350OutputEnable");
-    gc->setLabel(QObject::tr("Use the PVR-350's TV out / MPEG decoder"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("MythTV can use the PVR-350's TV out and MPEG "
-                    "decoder for high quality playback.  This requires that "
-                    "the ivtv-fb kernel module is also loaded and configured "
-                    "properly."));
-    return gc;
-}
-#endif
-
-#ifdef USING_IVTV
-PVR350VideoDevice::PVR350VideoDevice() :
-    PathSetting(this, false),
-    HostDBStorage(this, "PVR350VideoDev")
-{
-    setLabel(QObject::tr("Video device for the PVR-350 MPEG decoder"));
-
-    QDir dev("/dev/v4l", "video*", QDir::Name, QDir::System);
-    fillSelectionsFromDir(dev, 16, 31, QString(), "ivtv", false);
-
-    dev.setPath("/dev");
-    fillSelectionsFromDir(dev, 16, 31, QString(), "ivtv", false);
-}
-#endif // USING_IVTV
-
-#ifdef USING_IVTV
-uint PVR350VideoDevice::fillSelectionsFromDir(const QDir &dir,
-                                              uint minor_min, uint minor_max,
-                                              QString card, QString driver,
-                                              bool allow_duplicates)
-{
-    uint cnt = 0;
-
-    QFileInfoList il = dir.entryInfoList();
-
-    for( QFileInfoList::iterator it =  il.begin();
-                                 it != il.end();
-                               ++it )
-    {
-        QFileInfo  &fi = *it;
-
-        struct stat st;
-        QString filepath = fi.absoluteFilePath();
-        int err = lstat(filepath.toLocal8Bit().constData(), &st);
-
-        if (0 != err)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Could not stat file: %1").arg(filepath));
-            continue;
-        }
-
-        // is this is a character device?
-        if (!S_ISCHR(st.st_mode))
-            continue;
-
-        // is this device is in our minor range?
-        uint minor_num = minor(st.st_rdev);
-        if (minor_min > minor_num || minor_max < minor_num)
-            continue;
-
-        // ignore duplicates if allow_duplicates not set
-        if (!allow_duplicates && minor_list[minor_num])
-            continue;
-
-        // if the driver returns any info add this device to our list
-        QByteArray fpath = filepath.toAscii();
-        int videofd = open(fpath.constData(), O_RDWR);
-        if (videofd >= 0)
-        {
-            QString cn, dn;
-            if (CardUtil::GetV4LInfo(videofd, cn, dn) &&
-                (driver.isEmpty() || (dn == driver))  &&
-                (card.isEmpty()   || (cn == card)))
-            {
-                addSelection(filepath);
-                cnt++;
-            }
-            close(videofd);
-        }
-
-        // add to list of minors discovered to avoid duplicates
-        minor_list[minor_num] = 1;
-    }
-
-    return cnt;
-};
-#endif
-
-#ifdef USING_IVTV
-static HostSpinBox *PVR350EPGAlphaValue()
-{
-    HostSpinBox *gs = new HostSpinBox("PVR350EPGAlphaValue", 0, 255, 1);
-    gs->setLabel(QObject::tr("Program Guide Alpha"));
-    gs->setValue(164);
-    gs->setHelpText(QObject::tr("How much to blend the program guide over the "
-                    "live TV image.  Higher numbers mean more guide and less "
-                    "TV."));
-    return gs;
-}
-#endif
-
-#ifdef USING_IVTV
-static HostCheckBox *PVR350UseInternalSound()
-{
-    HostCheckBox *gc = new HostCheckBox("PVR350InternalAudioOnly");
-    gc->setLabel(QObject::tr("TV audio through PVR-350 only"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr(
-                        "Normally, PVR-350 audio is looped into a sound card; "
-                        "here you can indicate when that is not the case. "
-                        "MythTV cannot control TV volume when this option "
-                        "is checked."));
-    return gc;
-}
-#endif
-
 #ifdef USING_OPENGL_VSYNC
 static HostCheckBox *UseOpenGLVSync()
 {
@@ -3953,30 +3833,6 @@ static HostCheckBox *UseOpenGLVSync()
                         "video timing, reducing frame jitter."));
     return gc;
 }
-#endif
-
-#ifdef USING_IVTV
-class PVR350HWDecoderSettings : public TriggeredConfigurationGroup
-{
-  public:
-     PVR350HWDecoderSettings(const QString &tmp) :
-         TriggeredConfigurationGroup(false, true, false, false)
-     {
-         setLabel(QObject::tr("PVR-350 Hardware Decoder Settings") + tmp);
-
-         Setting *pvr350output = PVR350OutputEnable();
-         addChild(pvr350output);
-         setTrigger(pvr350output);
-
-         ConfigurationGroup* settings = new VerticalConfigurationGroup(false);
-         settings->addChild(new PVR350VideoDevice());
-         settings->addChild(PVR350EPGAlphaValue());
-         settings->addChild(PVR350UseInternalSound());
-
-         addTarget("1", settings);
-         addTarget("0", new VerticalConfigurationGroup(true));
-    };
-};
 #endif
 
 static HostCheckBox *LCDShowTime()
@@ -4460,9 +4316,6 @@ MainGeneralSettings::MainGeneralSettings()
 PlaybackSettings::PlaybackSettings()
 {
     uint i = 0, total = 8;
-#ifdef USING_IVTV
-    total += 1;
-#endif // USING_IVTV
 #if CONFIG_DARWIN
     total += 2;
 #endif // USING_DARWIN
@@ -4588,11 +4441,6 @@ PlaybackSettings::PlaybackSettings()
     comms->addChild(MergeShortCommBreaks());
     comms->addChild(CommSkipAllBlanks());
     addChild(comms);
-
-#ifdef USING_IVTV
-    QString tmp2 = QString(" (%1/%2)").arg(++i).arg(total);
-    addChild(new PVR350HWDecoderSettings(tmp2));
-#endif // USING_IVTV
 
 #if CONFIG_DARWIN
     VerticalConfigurationGroup* mac1 = new VerticalConfigurationGroup(false);

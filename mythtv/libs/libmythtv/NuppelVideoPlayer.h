@@ -228,7 +228,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool    IsPIPActive(void) const           { return pip_active; }
     bool    IsPIPVisible(void) const          { return pip_visible; }
     bool    IsMuted(void)              { return GetMuteState() == kMuteAll; }
-    bool    IsIVTVDecoder(void) const;
     bool    UsingNullVideo(void) const { return using_null_videoout; }
     bool    HasTVChainNext(void) const;
 
@@ -431,7 +430,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void DisplayPauseFrame(void);
     void DisplayNormalFrame(void);
     void OutputVideoLoop(void);
-    void IvtvVideoLoop(void);
 
     static void *kickoffOutputVideoLoop(void *player);
 

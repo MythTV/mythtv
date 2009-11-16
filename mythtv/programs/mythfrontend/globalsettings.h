@@ -1,10 +1,15 @@
 #ifndef MYTHSETTINGS_H
 #define MYTHSETTINGS_H
 
-#include "libmyth/settings.h"
-#include "libmyth/mythcontext.h"
-#include "libmythtv/videodisplayprofile.h"
+#include <QStringList>
+#include <QObject>
+
+#include "settings.h"
+#include "mythcontext.h"
+#include "videodisplayprofile.h"
 #include "themeinfo.h"
+
+class QFileInfo;
 
 class ThemeSelector : public HostImageSelect
 {
@@ -149,20 +154,5 @@ class PlaybackProfileConfigs : public TriggeredConfigurationGroup
     QStringList   profiles;
     HostComboBox *grouptrigger;
 };
-
-#ifdef USING_IVTV
-class PVR350VideoDevice : public PathSetting, public HostDBStorage
-{
-  public:
-    PVR350VideoDevice();
-
-    uint fillSelectionsFromDir(const QDir &dir,
-                               uint minor_min, uint minor_max,
-                               QString card, QString driver,
-                               bool allow_duplicates);
-  private:
-    QMap<uint, uint> minor_list;
-};
-#endif // USING_IVTV
 
 #endif
