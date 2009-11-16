@@ -6315,7 +6315,7 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo,
         islive = true;
     }
 
-    float secsplayed;
+    float secsplayed = 0;
     if (player_ctx->buffer->isDVD())
     {
         if (!player_ctx->buffer->DVD()->IsInMenu())
