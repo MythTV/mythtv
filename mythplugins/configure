@@ -60,9 +60,6 @@ MythArchive related options:
 MythBrowser related options:
   --enable-mythbrowser     build the mythbrowser plugin [$browser]
 
-MythFlix related options:
-  --enable-mythflix        build the mythflix plugin [$flix]
-
 MythGallery related options:
   --enable-mythgallery     build the mythgallery plugin [$gallery]
   --enable-exif            enable reading of EXIF headers [$exif]
@@ -171,10 +168,6 @@ for opt do
   --enable-mythzoneminder) zoneminder="yes"
   ;;
   --disable-mythzoneminder) zoneminder="no"
-  ;;
-  --enable-mythflix) flix="yes"
-  ;;
-  --disable-mythflix) flix="no"
   ;;
   --enable-mythmovies) movies="yes"
   ;;
@@ -519,13 +512,6 @@ if test "$browser" = "yes" ; then
   echo "SUBDIRS += mythbrowser" >> ./config.pro
 else
   echo "        MythBrowser    plugin will not be built"
-fi
-
-if test "$flix" = "yes" ; then
-  echo "        MythFlix       plugin will be built"
-  echo "SUBDIRS += mythflix" >> ./config.pro
-else
-  echo "        MythFlix       plugin will not be built"
 fi
 
 if test "$gallery" = "yes" ; then
