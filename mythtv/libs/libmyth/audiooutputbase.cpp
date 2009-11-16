@@ -270,7 +270,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         Error("AudioOutput only supports 8 or 16bit audio.");
         return;
     }
-    
+
     VERBOSE(VB_AUDIO, LOC + QString("Original audio codec was %1")
                             .arg(codec_id_string((CodecID)audio_codec)));
 
@@ -281,7 +281,13 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     internal_vol = gContext->GetNumSetting("MythControlsVolume", 0);
 
     numlowbuffer = 0;
-    
+
+    // Encode to AC-3 if not passing thru , there's > 2 channels
+    // and a passthru device is defined
+    if (!audio_passthru && allow_ac3_passthru &&
+        (audio_channels > 2 || audio_reenc))
+        audio_enc = true;
+
     // Find out what sample rates we can output (if output layer supports it)
     vector<int> rates = GetSupportedRates();
     vector<int>::iterator it;
@@ -290,7 +296,7 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
     // Assume 48k if we can't get supported rates
     if (rates.empty())
         rates.push_back(48000);
-    
+
     for (it = rates.begin(); it < rates.end(); it++)
     {
         VERBOSE(VB_AUDIO, LOC + QString("Sample rate %1 is supported")
@@ -319,11 +325,8 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         src_data.output_frames = 16384*6;
         need_resampler = true;
     }
-    
-    // Encode to AC-3 if not passing thru , there's > 2 channels
-    // and a passthru device is defined
-    if (!audio_passthru && allow_ac3_passthru &&
-        (audio_channels > 2 || audio_reenc))
+
+    if (audio_enc)
     {
         VERBOSE(VB_AUDIO, LOC + "Creating AC-3 Encoder");
         encoder = new AudioOutputDigitalEncoder();
@@ -333,13 +336,11 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             delete encoder;
             encoder = NULL;
         }
-
-        audio_enc = true;
     }
 
     if(audio_passthru || audio_enc)
         // AC-3 output - soundcard expects a 2ch 48k stream
-	audio_channels = 2;
+        audio_channels = 2;
 
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
     source_audio_bytes_per_sample = source_audio_channels * audio_bits / 8;

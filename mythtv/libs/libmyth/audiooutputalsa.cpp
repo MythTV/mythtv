@@ -92,14 +92,17 @@ vector<int> AudioOutputALSA::GetSupportedRates()
 {
     snd_pcm_hw_params_t *params;
     int err;
-    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000 };
+    const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000, 64000, 88200, 96000, 176400, 192000 };
     vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
     QString real_device;
-    
+
     if (audio_passthru || audio_enc)
         real_device = audio_passthru_device;
-    else 
+    else
         real_device = audio_main_device;
+
+    VERBOSE(VB_AUDIO, QString("AudioOutputALSA::GetSupportedRates opening %1")
+            .arg(real_device));
 
     if((err = snd_pcm_open(&pcm_handle, real_device.toAscii(),
                            SND_PCM_STREAM_PLAYBACK, 
@@ -116,7 +119,7 @@ vector<int> AudioOutputALSA::GetSupportedRates()
         rates.clear();
         return rates;
     }
-    
+
     snd_pcm_hw_params_alloca(&params);
 
     if ((err = snd_pcm_hw_params_any(pcm_handle, params)) < 0)
@@ -128,7 +131,7 @@ vector<int> AudioOutputALSA::GetSupportedRates()
         rates.clear();
         return rates;
     }
-    
+
     vector<int>::iterator it = rates.begin();
 
     while (it != rates.end())
@@ -138,7 +141,7 @@ vector<int> AudioOutputALSA::GetSupportedRates()
         else
             it++;
     }
-    
+
     snd_pcm_close(pcm_handle);
     pcm_handle = NULL;
 
