@@ -1,7 +1,5 @@
 #include "freesat_huffman.h"
 
-#include <qstring.h>
-
 struct fsattab {
     unsigned int value;
     short bits;

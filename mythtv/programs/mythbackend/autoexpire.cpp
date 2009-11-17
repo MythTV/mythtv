@@ -1,17 +1,4 @@
-#include <cstdlib>
-#include <unistd.h>
-#include <signal.h>
-
-
-#include <qregexp.h>
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qfileinfo.h>
-
-#include <iostream>
-#include <algorithm>
-using namespace std;
-
+// System headers
 #include <sys/stat.h>
 #ifdef __linux__
 #  include <sys/vfs.h>
@@ -22,6 +9,23 @@ using namespace std;
 #  endif // USING_MINGW
 #endif // !__linux__
 
+// POSIX headers
+#include <unistd.h>
+#include <signal.h>
+
+// C headers
+#include <cstdlib>
+
+// C++ headers
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+// Qt headers
+#include <QDateTime>
+#include <QFileInfo>
+
+// MythTV headers
 #include "autoexpire.h"
 #include "programinfo.h"
 #include "mythcontext.h"

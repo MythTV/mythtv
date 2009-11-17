@@ -55,11 +55,12 @@
 
 */
 
-#include <stdlib.h>
-#include <qstringlist.h>
-#include <qregexp.h>
-#include <qdir.h>
-#include <qapplication.h>
+#include <cstdlib>
+
+#include <QApplication>
+#include <QStringList>
+#include <QRegExp>
+#include <QDir>
 #include <Q3PtrList>
 
 #include "util.h"

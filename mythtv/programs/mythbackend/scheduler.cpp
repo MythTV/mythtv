@@ -1,10 +1,4 @@
 #include <unistd.h>
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
-#include <qregexp.h>
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qfile.h>
 
 #include <iostream>
 #include <algorithm>
@@ -22,6 +16,13 @@ using namespace std;
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
+
+#include <QStringList>
+#include <QDateTime>
+#include <QRegExp>
+#include <QMutex>
+#include <QFile>
+#include <QMap>
 
 #include "scheduler.h"
 #include "encoderlink.h"

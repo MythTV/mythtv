@@ -1,29 +1,31 @@
+// POSIX headers
 #include <unistd.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
-#include <qstring.h>
-#include <qdatetime.h>
-#include <qstringlist.h>
-#include <qfileinfo.h>
 
-#include <iostream>
+// ANSI C headers
 #include <cstdlib>
+
+// C++ headers
+#include <iostream>
 using namespace std;
 
+// Qt headers
+#include <QStringList>
+#include <QDateTime>
+#include <QFileInfo>
+
+// MythTV headers
 #include "housekeeper.h"
 #include "jobqueue.h"
-
-#include "libmyth/mythcontext.h"
-#include "libmythdb/mythdb.h"
-#include "libmyth/util.h"
-#include "libmythdb/compat.h"
-#include "libmythdb/mythdirs.h"
-
+#include "mythcontext.h"
+#include "mythdb.h"
+#include "util.h"
+#include "compat.h"
+#include "mythdirs.h"
 #include "programinfo.h"
-
-#include "libmythtv/eitcache.h"
+#include "eitcache.h"
+#include "scheduler.h"
 
 static bool HouseKeeper_filldb_running = false;
 

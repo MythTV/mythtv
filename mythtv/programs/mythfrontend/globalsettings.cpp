@@ -10,7 +10,6 @@
 // Qt headers
 #include <QApplication>
 #include <QEvent>
-#include <qnamespace.h>
 #include <QFileInfo>
 #include <QFile>
 #include <QDialog>

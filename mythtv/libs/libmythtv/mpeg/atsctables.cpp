@@ -2,7 +2,6 @@
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
 #include "atsctables.h"
 #include "atscdescriptors.h"
-#include "qstring.h"
 
 QString MasterGuideTable::TableClassString(uint i) const 
 {

@@ -11,12 +11,12 @@
 using namespace std;
 
 // Qt headers
-#include <qmap.h>
-#include <qdatetime.h>
-#include <qdir.h>
-#include <qfile.h>
+#include <QDateTime>
 #include <QProcess>
+#include <QFile>
 #include <QList>
+#include <QMap>
+#include <QDir>
 
 // libmyth headers
 #include "exitcodes.h"

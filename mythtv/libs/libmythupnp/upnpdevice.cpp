@@ -28,7 +28,7 @@
 #include <unistd.h>
 #include <cerrno>
 
-#include <qfile.h>
+#include <QFile>
 #include <QTextStream>
 
 int DeviceLocation::g_nAllocated   = 0;       // Debugging only

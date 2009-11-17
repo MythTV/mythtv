@@ -30,7 +30,7 @@
 #include "frequencytablesetting.h"
 
 // Qt headers
-#include <qlocale.h>
+#include <QLocale>
 
 ScanFrequencyTable::ScanFrequencyTable() : ComboBoxSetting(this)
 {

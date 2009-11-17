@@ -1,5 +1,5 @@
-#include <qobject.h>
-#include <qapplication.h>
+#include <QObject>
+#include <QApplication>
 
 #include "mythobservable.h"
 

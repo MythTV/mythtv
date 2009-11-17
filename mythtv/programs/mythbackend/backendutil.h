@@ -1,11 +1,15 @@
 #ifndef _BACKENDUTIL_H
 #define _BACKENDUTIL_H
 
-#include <QStringList>
+#include <vector>
+using namespace std;
+
+#include <QMap>
 
 #include "remoteutil.h"
-#include "encoderlink.h"
-#include "programinfo.h"
+
+class QStringList;
+class EncoderLink;
 
 void BackendQueryDiskSpace(QStringList &strlist,
                            QMap <int, EncoderLink *> *encoderList,

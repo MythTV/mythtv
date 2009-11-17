@@ -27,7 +27,7 @@
 #include <cerrno>
 
 // Qt headers
-#include <quuid.h>
+#include <QUuid>
 
 // MythTV headers
 #include "upnputil.h"

@@ -5,7 +5,6 @@
 
 #include "dvbtables.h"
 #include "dvbdescriptors.h"
-#include "qstring.h"
 
 void NetworkInformationTable::Parse(void) const
 {

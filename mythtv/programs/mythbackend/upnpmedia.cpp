@@ -1,17 +1,16 @@
-#include "httprequest.h"
-#include <qfileinfo.h>
-#include <qregexp.h>
-#include <qurl.h>
-#include <qdir.h>
 #include <limits.h>
 #include <unistd.h>
-#include "util.h"
 
 #include <cstdlib>
 
-#include "mythdb.h"
-#include "upnpmedia.h"
+#include <QFileInfo>
+#include <QDir>
+
 #include "mythcontext.h"
+#include "httprequest.h"
+#include "upnpmedia.h"
+#include "mythdb.h"
+#include "util.h"
 
 #define LOC QString("UPnpMedia: ")
 

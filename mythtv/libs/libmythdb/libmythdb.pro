@@ -13,13 +13,13 @@ QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 HEADERS += mythsocket.h mythsocket_cb.h mythsocketthread.h msocketdevice.h
 HEADERS += mythexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
 HEADERS += mythverbose.h mythversion.h compat.h mythconfig.h
-HEADERS += mythobservable.h mythevent.h httpcomms.h qcodecs.h
+HEADERS += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 HEADERS += mythtimer.h mythdirs.h exitcodes.h
 HEADERS += lcddevice.h mythstorage.h remotefile.h decodeencode.h
 
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp 
 SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp mythverbose.cpp
-SOURCES += mythobservable.cpp httpcomms.cpp qcodecs.cpp mythdirs.cpp
+SOURCES += mythobservable.cpp httpcomms.cpp mcodecs.cpp mythdirs.cpp
 SOURCES += lcddevice.cpp mythstorage.cpp remotefile.cpp decodeencode.cpp
 
 win32:SOURCES += msocketdevice_win.cpp
@@ -32,7 +32,7 @@ unix {
 inc.path = $${PREFIX}/include/mythtv/
 inc.files  = mythverbose.h mythdbcon.h mythdbparams.h mythexp.h mythdb.h
 inc.files += compat.h mythversion.h mythconfig.h mythconfig.mak
-inc.files += mythobservable.h mythevent.h httpcomms.h qcodecs.h
+inc.files += mythobservable.h mythevent.h httpcomms.h mcodecs.h
 inc.files += mythtimer.h lcddevice.h exitcodes.h mythdirs.h mythstorage.h
 inc.files += mythsocket.h mythsocket_cb.h msocketdevice.h
 

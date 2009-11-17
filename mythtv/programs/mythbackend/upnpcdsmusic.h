@@ -11,13 +11,14 @@
 #ifndef UPnpCDSMusic_H_
 #define UPnpCDSMusic_H_
 
-#include "mainserver.h"
+#include <QString>
+
 #include "upnpcds.h"
               
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
-
+class MSqlQuery;
 class UPnpCDSMusic : public UPnpCDSExtension
 {
     private:

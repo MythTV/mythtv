@@ -1,6 +1,6 @@
 // Qt headers
-#include <qfile.h>
-#include <qdir.h>
+#include <QFile>
+#include <QDir>
 
 // libmyth headers
 #include "mythcontext.h"

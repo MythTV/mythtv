@@ -3,8 +3,8 @@
 
 #include <QDateTime>
 
-#include "scheduler.h"
-
+class Scheduler;
+class QString;
 class HouseKeeper
 {
   public:

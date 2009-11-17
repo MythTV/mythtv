@@ -8,10 +8,12 @@
 //                                                                            
 //////////////////////////////////////////////////////////////////////////////
 
+#include <climits>
+
+#include <QFileInfo>
+
 #include "upnpcdsmusic.h"
 #include "httprequest.h"
-#include <qfileinfo.h>
-#include <limits.h>
 #include "mythcontext.h"
 
 /*

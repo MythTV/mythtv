@@ -10,7 +10,7 @@ using namespace std;
 
 #include "mythverbose.h"
 #include "compat.h"
-#include "qcodecs.h"
+#include "mcodecs.h"
 #include "httpcomms.h"
 
 HttpComms::HttpComms()

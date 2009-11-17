@@ -43,9 +43,9 @@
 
 #include "msocketdevice.h"
 #include "qwindowdefs.h"
-#include "qdatetime.h"
+#include <QDateTime>
 
-#include <qcoreapplication.h>
+#include <QCoreApplication>
 
 #include <string.h>
 

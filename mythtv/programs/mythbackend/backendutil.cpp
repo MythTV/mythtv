@@ -8,13 +8,14 @@
 #include <sys/vfs.h>
 #endif
 
-#include <qdir.h>
-#include <qmutex.h>
-#include <qmap.h>
+#include <QStringList>
+#include <QMutex>
+#include <QDir>
+#include <QMap>
 
 #include "backendutil.h"
-#include "remoteutil.h"
-
+#include "encoderlink.h"
+#include "programinfo.h"
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythdbcon.h"

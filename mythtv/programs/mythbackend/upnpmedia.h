@@ -1,8 +1,9 @@
 #ifndef UPnpMEDIA_H_
 #define UPnpMEDIA_H_
 
-#include "mainserver.h"
-#include "upnpcds.h"
+#include <QString>
+
+#include "upnputil.h" // for QStringMap
 
 #define STARTING_VIDEO_OBJECTID 100000
               
@@ -10,35 +11,33 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+class MSqlQuery;
 class UPnpMedia
 {
-    private:
+  private:
+    QStringMap           m_mapTitleNames;
+    QStringMap           m_mapCoverArt;
+    //QString              sMediaType;
 
-	QStringMap	       m_mapTitleNames;
-	QStringMap             m_mapCoverArt;
-	//QString                sMediaType;
+    void FillMetaMaps(void);
+    int GetBaseCount(void);
+    QString GetTitleName(QString fPath, QString fName);
+    QString GetCoverArt(QString fPath);
 
-        void FillMetaMaps (void);
-	int GetBaseCount(void);
-	QString GetTitleName(QString fPath, QString fName);
-	QString GetCoverArt(QString fPath);
+    int buildFileList(QString directory, int rootID, int itemID,
+                      MSqlQuery &query);
 
-        int buildFileList(QString directory, int rootID, int itemID, MSqlQuery &query);
+    void RunRebuildLoop(void);
+    static void *doUPnpMediaThread(void *param);
 
-	void RunRebuildLoop(void);
-        static void *doUPnpMediaThread(void *param);
+  public:
+    UPnpMedia(bool runthread, bool master);
+    ~UPnpMedia();
 
-    public:
+    void SetMediaType(QString mediatype) { sMediaType = mediatype; }
 
-	UPnpMedia(bool runthread, bool master);
-
-	~UPnpMedia();
-
-
-	void SetMediaType( QString mediatype) { sMediaType = mediatype; };
-
-        void BuildMediaMap(void);
-	QString sMediaType;
+    void BuildMediaMap(void);
+    QString sMediaType;
 };
 
 #endif

@@ -33,7 +33,7 @@
 #include "channelscanner.h"
 
 // Qt headers
-#include <qapplication.h>
+#include <QApplication>
 
 /// Percentage to set to after the transports have been scanned
 #define TRANSPORT_PCT 6

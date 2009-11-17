@@ -8,8 +8,8 @@
 #include "upnp.h"
 #include "upnpmsrr.h"
 
-#include <math.h>
-#include <qregexp.h>
+#include <cmath>
+#include <QRegExp>
 
 /////////////////////////////////////////////////////////////////////////////
 //

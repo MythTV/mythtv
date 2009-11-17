@@ -9,11 +9,11 @@
 using namespace std;
 
 // Qt headers
-#include <qapplication.h>
+#include <QApplication>
+#include <QHostAddress>
 #include <QUdpSocket>
-#include <qstring.h>
-#include <qfile.h>
-#include <qhostaddress.h>
+#include <QString>
+#include <QFile>
 
 // MythTV headers
 #include "exitcodes.h"

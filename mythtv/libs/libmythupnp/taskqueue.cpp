@@ -23,7 +23,7 @@
 
 #include "taskqueue.h"
 #include <sys/time.h>
-#include <qdatetime.h>
+#include <QDateTime>
 
 #include <iostream>
 

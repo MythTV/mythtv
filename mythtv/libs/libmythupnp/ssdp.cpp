@@ -29,11 +29,11 @@
 #include "multicast.h"
 #include "broadcast.h"
 
-#include <qregexp.h>
+#include <QRegExp>
+#include <QStringList>
 
 #include <unistd.h>
 #include <stdlib.h>
-#include <qstringlist.h>
 #include <sys/time.h>
 
 /////////////////////////////////////////////////////////////////////////////
