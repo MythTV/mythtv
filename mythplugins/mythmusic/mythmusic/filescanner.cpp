@@ -2,17 +2,15 @@
 #include <sys/stat.h>
 
 // Qt headers
-#include <qapplication.h>
-#include <qdir.h>
+#include <QApplication>
+#include <QDir>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
-#include <mythtv/mythdialogs.h>
-
-// MythUI headers
-#include <mythtv/libmythui/mythscreenstack.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <mythdialogs.h>
+#include <mythscreenstack.h>
+#include <mythprogressdialog.h>
 
 // MythMusic headers
 #include "decoder.h"

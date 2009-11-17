@@ -1,20 +1,29 @@
-#include <qstring.h>
-#include <qapplication.h>
+// System
+#include <vorbis/vorbisfile.h>
 
+// POSIX
+#include <time.h>
+
+// ANSI C
+#include <cstdlib>
+
+// C++
+#include <iostream>
+using namespace std;
+
+// Qt
+#include <QApplication>
+#include <QString>
+
+// MythTV
+#include <mythcontext.h>
+
+// MythMusic
 #include "metadata.h"
 #include "encoder.h"
 #include "vorbisencoder.h"
 #include "metaiooggvorbis.h"
 
-#include <vorbis/vorbisfile.h>
-
-#include <iostream>
-#include <stdlib.h>
-#include <time.h>
-
-#include <mythtv/mythcontext.h>
-
-using namespace std;
 
 int write_page(ogg_page *page, FILE *fp)
 {

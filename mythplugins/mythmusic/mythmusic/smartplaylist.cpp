@@ -1,32 +1,25 @@
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qlabel.h>
-#include <qsqlrecord.h>
-#include <qsqlfield.h>
-#include <qsqldriver.h>
-#include <q3sqlcursor.h>
-#include <q3hbox.h>
-//Added by qt3to4:
-#include <Q3HBoxLayout>
-#include <QKeyEvent>
-#include <Q3Frame>
-#include <Q3VBoxLayout>
-
 #include <unistd.h>
-#include <iostream>
 
+#include <iostream>
 using namespace std;
+
+#include <QSqlDriver>
+#include <QKeyEvent>
+#include <QSqlField>
+#include <QLabel>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
+#include <Q3Frame>
 
 #include "smartplaylist.h"
 #include "metadata.h"
 #include "mythlistview-qt3.h"
 #include "mythlistbox-qt3.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/dialogbox.h>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/mythdb.h>
-
+#include <mythcontext.h>
+#include <dialogbox.h>
+#include <mythdialogs.h>
+#include <mythdb.h>
 
 struct SmartPLField
 {

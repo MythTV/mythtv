@@ -1,11 +1,13 @@
 // Qt includes
-#include <qlayout.h>
-#include <qfontmetrics.h>
-#include <qpainter.h>
+#include <QFontMetrics>
+#include <QPainter>
+#include <QLayout>
+#include <QRegExp>
+#include <QLabel>
 
 // MythTV plugin includes
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
+#include <mythcontext.h>
+#include <mythdb.h>
 
 // MythMusic includes
 #include "search.h"

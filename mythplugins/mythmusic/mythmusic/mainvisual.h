@@ -10,25 +10,25 @@
 #include <vector>
 using namespace std;
 
-#include <mythtv/visual.h>
 #include "polygon.h"
 #include "constants.h"
 
-#include <qwidget.h>
-#include <qdialog.h>
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qstringlist.h>
-#include <qtimer.h>
-#include <QPaintEvent>
 #include <QResizeEvent>
+#include <QPaintEvent>
+#include <QStringList>
 #include <QHideEvent>
+#include <QWidget>
+#include <QPixmap>
+#include <QTimer>
+#include <QList>
+
+// MythTV headers
+#include <visual.h>
 
 class Buffer;
 class Output;
 class VisualNode;
 class LogScale;
-class QTimer;
 class InfoWidget;
 class Metadata;
 class MainVisual;

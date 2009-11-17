@@ -1,7 +1,7 @@
 #include "mythcontext.h"
 
 #include "mythlistview-qt3.h"
-#include "q3header.h"
+#include "Q3Header"
 
 Q3MythListView::Q3MythListView(QWidget *parent) : Q3ListView(parent)
 {

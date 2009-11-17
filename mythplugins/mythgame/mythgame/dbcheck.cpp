@@ -1,15 +1,13 @@
-#include <qstring.h>
-//Added by qt3to4:
-#include <QSqlError>
-
 #include <iostream>
 using namespace std;
 
+#include <QString>
+#include <QSqlError>
+
+#include <mythcontext.h>
+#include <mythdb.h>
+
 #include "dbcheck.h"
-
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdb.h"
-
 #include "gamesettings.h"
 
 const QString currentDatabaseVersion = "1016";

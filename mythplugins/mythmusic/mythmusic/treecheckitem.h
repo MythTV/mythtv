@@ -1,9 +1,9 @@
 #ifndef TREECHECKITEM_H_
 #define TREECHECKITEM_H_
 
-#include <mythtv/uilistbtntype.h>
-//Added by qt3to4:
-#include <QPixmap>
+#include <QString>
+
+#include <uilistbtntype.h>
 
 class QPixmap;
 class PlaylistContainer;

@@ -6,28 +6,29 @@
 // modified 12-2004 by Kyle Schlansker to add 64 bit support
 //
 
-#include "mainvisual.h"
-#include "synaesthesia.h"
-
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qimage.h>
-
-#include <math.h>
-#include <stdlib.h>
-
 #include "config.h"
-#ifdef HAVE_STDINT_H
 #include <stdint.h>
-#endif
-
 #include <inttypes.h>
 
+// C
+#include <cmath>
+#include <cstdlib>
+
+// C++
 #include <iostream>
 using namespace std;
 
-#include <mythtv/compat.h>
-#include <mythtv/mythverbose.h>
+// Qt
+#include <QPainter>
+#include <QImage>
+
+// MythTV
+#include <compat.h>
+#include <mythverbose.h>
+
+// MythMusic
+#include "mainvisual.h"
+#include "synaesthesia.h"
 
 Synaesthesia::Synaesthesia(long int winid)
 {

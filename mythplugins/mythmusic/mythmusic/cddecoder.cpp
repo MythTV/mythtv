@@ -1,20 +1,27 @@
-#include <stdio.h>
-#include <stdlib.h>
+// C
+#include <cstdio>
+#include <cstdlib>
+
+// C++
 #include <iostream>
 #include <string>
-#include <qobject.h>
-#include <qiodevice.h>
-#include <qfile.h>
 using namespace std;
 
+// Qt
+#include <QIODevice>
+#include <QObject>
+#include <QFile>
+
+// MythTV
+#include <audiooutput.h>
+#include <mythcontext.h>
+#include <mythmediamonitor.h>
+#include <mythtv/libavcodec/avcodec.h>
+
+// MythMusic
 #include "cddecoder.h"
 #include "constants.h"
-#include <mythtv/audiooutput.h>
 #include "metadata.h"
-
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/libavcodec/avcodec.h>
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                      AudioOutput *o) :

@@ -1,7 +1,7 @@
-#include <qfile.h>
+#include <QFile>
 
-#include <mythtv/mythdb.h>
-#include <mythtv/mythcontext.h>
+#include <mythdb.h>
+#include <mythcontext.h>
 
 #include "rominfo.h"
 #include "romedit.h"
@@ -131,7 +131,7 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
     graphic_formats.append("tiff");
 
     int dotLocation = BaseFileName.findRev('.');
-    if(dotLocation == -1)
+    if (dotLocation == -1)
     {
         BaseFileName.append('.');
         dotLocation = BaseFileName.length();
@@ -142,7 +142,7 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
     for (QStringList::Iterator i = graphic_formats.begin(); i != graphic_formats.end(); i++)
     {
         *result = BaseFileName + *i;
-        if(QFile::exists(*result))
+        if (QFile::exists(*result))
             return true;
     }
     return false;

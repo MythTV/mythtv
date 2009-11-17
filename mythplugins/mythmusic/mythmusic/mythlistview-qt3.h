@@ -1,7 +1,7 @@
 #ifndef _MYTHLISTVIEW_H_
 #define _MYTHLISTVIEW_H_
 
-#include <q3listview.h>
+#include <Q3ListView>
 
 class Q3MythListView : public Q3ListView
 {

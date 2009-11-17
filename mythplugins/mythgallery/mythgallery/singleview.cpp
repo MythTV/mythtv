@@ -26,7 +26,6 @@
 using namespace std;
 
 // Qt headers
-//#include <qevent.h>
 #include <QImage>
 #include <QTimer>
 #include <QPainter>
@@ -34,11 +33,10 @@ using namespace std;
 #include <QPixmap>
 #include <QPaintEvent>
 
-                 
 // MythTV plugin headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/util.h>
-#include <mythtv/libmythui/mythuihelper.h>
+#include <mythuihelper.h>
+#include <mythcontext.h>
+#include <util.h>
 
 // MythGallery headers
 #include "singleview.h"

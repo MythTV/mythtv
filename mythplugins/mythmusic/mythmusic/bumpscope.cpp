@@ -1,8 +1,8 @@
 #include "mainvisual.h"
 #include "bumpscope.h"
 
-#include <mythtv/compat.h>
-#include <mythtv/mythverbose.h>
+#include <compat.h>
+#include <mythverbose.h>
 
 // This was:
 // Bump Scope - Visualization Plugin for XMMS
@@ -10,13 +10,13 @@
 
 #ifdef SDL_SUPPORT
 
-#include <qpainter.h>
-
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 
 #include <iostream>
 using namespace std;
+
+#include <QPainter>
 
 BumpScope::BumpScope(long int winid)
 {

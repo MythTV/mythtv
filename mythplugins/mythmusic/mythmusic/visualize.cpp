@@ -9,19 +9,20 @@
         music visualizers
 */
 
-// c/c++
+// C
 #include <cmath>
+
+// C++
 #include <iostream>
+using namespace std;
 
-// qt
-#include <qpainter.h>
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qdir.h>
+// Qt
+#include <QPainter>
+#include <QImage>
 
-// mythtv
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythcontext.h>
+// MythTV
+#include <mythdbcon.h>
+#include <mythcontext.h>
 
 // mythmusic
 #include "mainvisual.h"
@@ -29,8 +30,6 @@
 #include "inlines.h"
 #include "decoder.h"
 #include "metadata.h"
-
-using namespace std;
 
 
 #define FFTW_N 512

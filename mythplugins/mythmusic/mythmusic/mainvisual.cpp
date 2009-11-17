@@ -4,31 +4,29 @@
 // warranty, or liability of any kind.
 //
 
-// c/c++
+// C
 #include <cmath>
 #include <cstdio>
+
+// C++
 #include <algorithm>
 #include <iostream>
+using namespace std;
 
-// qt
-#include <qtimer.h>
-#include <qpainter.h>
-#include <qevent.h>
-#include <qapplication.h>
-#include <qspinbox.h>
-#include <qpixmap.h>
-#include <qcursor.h>
-#include <qstring.h>
-#include <qregexp.h>
-#include <QHideEvent>
+// Qt
 #include <QResizeEvent>
 #include <QPaintEvent>
+#include <QHideEvent>
+#include <QPainter>
+#include <QCursor>
+#include <QPixmap>
+#include <QEvent>
 
 // mythtv
-#include <mythtv/audiooutput.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/libmythui/mythuihelper.h>
+#include <audiooutput.h>
+#include <mythcontext.h>
+#include <mythdialogs.h>
+#include <mythuihelper.h>
 
 // mythmusic
 #include "visualize.h"
@@ -37,9 +35,6 @@
 
 // fast inlines
 #include "inlines.h"
-
-
-using namespace std;
 
 VisFactory* VisFactory::g_pVisFactories = 0;
 

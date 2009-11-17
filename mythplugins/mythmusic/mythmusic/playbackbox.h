@@ -3,7 +3,7 @@
 
 // qt
 #include <QKeyEvent>
-#include <q3valuevector.h>
+#include <Q3ValueVector>
 
 // mythtv
 #include <mythtv/mythwidgets.h>

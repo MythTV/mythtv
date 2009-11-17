@@ -2,23 +2,19 @@
 #include "rominfo.h"
 #include "rom_metadata.h"
 
-#include <qobject.h>
-#include <q3ptrlist.h>
-#include <qstringlist.h>
-#include <iostream>
-#include <qdir.h>
-#include <qregexp.h>
+#include <QObject>
+#include <QRegExp>
+#include <QDir>
+#include <Q3PtrList>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/util.h>
-#include <mythtv/mythdb.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythdialogs.h>
+#include <util.h>
+#include <mythdb.h>
 
 #define LOC_ERR QString("MythGame:GAMEHANDLER Error: ")
 #define LOC QString("MythGame:GAMEHANDLER: ")
-
-using namespace std;
 
 static Q3PtrList<GameHandler> *handlers = NULL;
 

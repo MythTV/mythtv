@@ -2,13 +2,14 @@
 #ifndef GAMEHANDLER_H_
 #define GAMEHANDLER_H_
 
-#include <qstring.h>
-#include <qwidget.h>
+#include <QStringList>
+#include <QMap>
+
+#include <mythdbcon.h>
+//#include <mythdialogs.h>
 
 #include "rom_metadata.h"
 #include "rominfo.h"
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythdialogs.h>
 
 class MythMainWindow;
 class GameHandler;
@@ -48,6 +49,7 @@ class GameScan
 
 typedef QMap<QString, GameScan> GameScanMap;
 
+class MythProgressDialog;
 class GameHandler
 {
   public:

@@ -1,16 +1,15 @@
 #include <iostream>
+using namespace std;
 
-// qt
-#include <qstring.h>
+// Qt
+#include <QString>
 
-// myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythdirs.h>
+// MythTV
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythdirs.h>
 
 #include "playersettings.h"
-
-using namespace std;
 
 // ---------------------------------------------------
 

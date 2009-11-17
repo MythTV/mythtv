@@ -1,14 +1,15 @@
 #ifndef DECODER_H_
 #define DECODER_H_
 
-#include "config.h"
-#include <qstring.h>
-#include <qevent.h>
-#include <qthread.h>
-#include <qwaitcondition.h>
-#include <qmutex.h>
+#include <QWaitCondition>
+#include <QStringList>
+#include <QThread>
+#include <QEvent>
+#include <QMutex>
 
-#include <mythtv/mythobservable.h>
+#include "config.h"
+
+#include <mythobservable.h>
 
 class Metadata;
 class MetaIO;
@@ -17,7 +18,6 @@ class DecoderFactory;
 
 class QObject;
 class QIODevice;
-class QThread;
 class OutputEvent;
 
 class Buffer;

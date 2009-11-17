@@ -1,10 +1,9 @@
 #ifndef VORBISENCODER_H_
 #define VORBISENCODER_H_
 
-#include <qstring.h>
-
 class Metadata;
 class Encoder;
+class QString;
 
 #include <vorbis/vorbisenc.h>
 

@@ -23,8 +23,8 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include <qstring.h>
-#include <qapplication.h>
+#include <QApplication>
+#include <QString>
 
 #include "metadata.h"
 #include "lameencoder.h"
@@ -32,7 +32,7 @@
 
 #include <iostream>
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 using namespace std;
 

@@ -12,19 +12,19 @@
 #include <QImage>
 #include <QApplication>
 #include <QObject>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
-#include <q3header.h>
 #include <QLabel>
 #include <QKeyEvent>
 #include <QEvent>
 #include <QProcess>
 #include <QStringList>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
+#include <Q3Header>
 
 // mythtv
-#include <mythtv/mythcontext.h>
-#include <mythtv/util.h>
-#include <mythtv/compat.h>
+#include <mythcontext.h>
+#include <util.h>
+#include <compat.h>
 
 // mythmusic
 #include "globalsettings.h"

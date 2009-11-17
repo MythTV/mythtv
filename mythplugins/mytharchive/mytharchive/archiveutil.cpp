@@ -1,4 +1,3 @@
-
 // POSIX headers
 #include <sys/wait.h> // for WIF macros
 #include <unistd.h>
@@ -8,10 +7,11 @@
 
 // C++ headers
 #include <iostream>
+using namespace std;
 
 // qt
-#include <qdir.h>
-#include <qdom.h>
+#include <QDomDocument>
+#include <QDir>
 
 // myth
 #include <mythcontext.h>

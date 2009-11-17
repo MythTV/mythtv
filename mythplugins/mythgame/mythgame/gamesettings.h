@@ -1,8 +1,10 @@
 #ifndef GAMESETTINGS_H
 #define GAMESETTINGS_H
 
-#include "mythtv/settings.h"
-#include "mythtv/mythcontext.h"
+#include <QString>
+
+#include <settings.h>
+#include <mythcontext.h>
 
 // The real work.
 

@@ -12,13 +12,14 @@ using namespace std;
 #include "gamesettings.h"
 #include "dbcheck.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/libmythui/myththemedmenu.h>
-#include <mythtv/mythpluginapi.h>
-#include <mythtv/libmythui/mythuihelper.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythversion.h>
+#include <lcddevice.h>
+#include <myththemedmenu.h>
+#include <mythpluginapi.h>
+#include <mythuihelper.h>
+#include <mythdialogs.h>
 
 #define LOC_ERR QString("MythGame:MAIN Error: ")
 #define LOC QString("MythGame:MAIN: ")

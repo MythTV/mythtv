@@ -8,16 +8,12 @@
 #include "constants.h"
 #include "metadata.h"
 #include "metaio.h"
-#include <mythtv/output.h>
-#include <mythtv/visual.h>
 
-#include <qapplication.h>
-#include <qobject.h>
-#include <qdir.h>
-#include <qstringlist.h>
-#include <qregexp.h>
+#include <QDir>
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
+#include <output.h>
+#include <visual.h>
 
 DecoderEvent* DecoderEvent::clone()
 {

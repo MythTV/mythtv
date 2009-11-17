@@ -2,22 +2,21 @@
 
 #ifdef SDL_SUPPORT
 
-extern "C" {
-#include "goom_tools.h"
-#include "goom_core.h"
-}
-
-#include <qpainter.h>
-
-#include <math.h>
-#include <stdlib.h>
-
-#include <mythtv/compat.h>
+#include <cmath>
+#include <cstdlib>
 
 #include <iostream>
 using namespace std;
 
-#include <mythtv/mythcontext.h>
+#include <QPainter>
+
+#include <compat.h>
+#include <mythcontext.h>
+
+extern "C" {
+#include "goom_tools.h"
+#include "goom_core.h"
+}
 
 Goom::Goom(long int winid)
 {

@@ -1,17 +1,9 @@
-#include <qobject.h>
-#include <q3ptrlist.h>
-#include <qstringlist.h>
-#include <iostream>
-#include <qdir.h>
-#include <qstring.h>
-#include <qwidget.h>
-
-
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythdialogs.h>
-
 #include "rom_metadata.h"
+
+#include <QFile>
+
+#include <mythcontext.h>
+
 #include "unzip.h"
 
 int calcOffset(QString GameType, uLong filesize) {

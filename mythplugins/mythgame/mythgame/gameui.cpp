@@ -1,11 +1,13 @@
-
-#include "gameui.h"
+#include <QStringList>
+#include <QMetaType>
+#include <QTimer>
 
 #include <mythcontext.h>
 #include <mythuibuttontree.h>
 #include <mythuiimage.h>
 #include <mythuitext.h>
 #include <mythuistatetype.h>
+#include <mythmainwindow.h>
 #include <mythdialogbox.h>
 #include <mythgenerictree.h>
 
@@ -14,6 +16,7 @@
 #include "rominfo.h"
 #include "gamedetails.h"
 #include "romedit.h"
+#include "gameui.h"
 
 class GameTreeInfo 
 {

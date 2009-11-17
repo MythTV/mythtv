@@ -1,16 +1,14 @@
-#include <qapplication.h>
-#include <qstring.h>
-#include <qpixmap.h>
-#include <qimage.h>
-#include <qpainter.h>
 #include <iostream>
 using namespace std;
 
+#include <QPixmap>
+#include <QImage>
+
+#include <mythcontext.h>
+#include <mythuihelper.h>
+
 #include "treecheckitem.h"
 #include "playlist.h"
-
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythui/mythuihelper.h>
 
 #include "res/album_pix.xpm"
 #include "res/artist_pix.xpm"

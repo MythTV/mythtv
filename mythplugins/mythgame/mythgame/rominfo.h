@@ -1,7 +1,8 @@
 #ifndef ROMINFO_H_
 #define ROMINFO_H_
 
-#include <qstring.h>
+#include <QMetaType>
+#include <QString>
 
 int romInDB(QString rom, QString gametype);
 

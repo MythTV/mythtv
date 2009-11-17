@@ -1,18 +1,16 @@
 #include <iostream>
+using namespace std;
 
-// qt
-#include <qstring.h>
-#include <qdir.h>
-//Added by qt3to4:
+// Qt
+#include <QString>
 #include <QSqlError>
 
-// myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
+// MythTV
+#include <mythcontext.h>
+#include <mythdb.h>
 
 // mytharchive
 #include "dbcheck.h"
-
 
 const QString currentDatabaseVersion = "1005";
 

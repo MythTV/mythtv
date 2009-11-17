@@ -1,14 +1,8 @@
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <mythdirs.h>
 
 #include "gamesettings.h"
-#include <qfile.h>
-#include <qdialog.h>
-#include <qcursor.h>
-#include <qdir.h>
-#include <qimage.h>
-
 
 const QString GetGameExtensions(const QString GameType)
 {

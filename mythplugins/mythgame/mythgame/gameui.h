@@ -1,7 +1,7 @@
 #ifndef GAMEUI_H_
 #define GAMEUI_H_
 
-#include <qtimer.h>
+#include <QString>
 
 // myth
 #include <mythscreentype.h>
@@ -11,6 +11,9 @@ class MythGenericTree;
 class MythUIText;
 class MythUIStateType;
 class RomInfo;
+class QTimer;
+class QKeyEvent;
+class QEvent;
 
 class GameUI : public MythScreenType
 {

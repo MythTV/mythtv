@@ -1,14 +1,13 @@
 #ifndef SEARCH_H_
 #define SEARCH_H_
 
-#include <qregexp.h>
-//Added by qt3to4:
-#include <QLabel>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/mythwidgets.h>
+#include <QString>
+#include <mythdialogs.h>
+#include <mythwidgets.h>
 
 #include "mythlistbox-qt3.h"
 
+class QLabel;
 class SearchListBoxItem: public Q3ListBoxText
 {
   public:

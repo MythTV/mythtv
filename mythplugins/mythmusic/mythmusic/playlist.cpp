@@ -9,7 +9,7 @@ using namespace std;
 #include <QApplication>
 #include <QTextStream>
 #include <QFileInfo>
-#include <q3process.h>
+#include <Q3Process>
 
 #include "playlist.h"
 #include "playlistcontainer.h"

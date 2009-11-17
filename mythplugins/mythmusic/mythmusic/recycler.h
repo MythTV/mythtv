@@ -7,8 +7,8 @@
 #ifndef __recycler_h
 #define __recycler_h
 
-#include <qmutex.h>
-#include <qwaitcondition.h>
+#include <QWaitCondition>
+#include <QMutex>
 
 class Buffer;
 

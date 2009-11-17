@@ -26,8 +26,7 @@
 #ifndef LAMEENCODER_H_
 #define LAMEENCODER_H_
 
-#include <qstring.h>
-
+class QString;
 class Metadata;
 class Encoder;
 

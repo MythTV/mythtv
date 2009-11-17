@@ -12,21 +12,22 @@
  *
  * ============================================================ */
 
-#include <iostream>
+// C
 #include <cstdlib>
 
-// qt
-#include <qdatetime.h>
-#include <qpainter.h>
-#include <qdir.h>
-#include <qtimer.h>
-#include <QKeyEvent>
+// C++
+#include <iostream>
+using namespace std;
 
-// myth
-#include "mythtv/mythcontext.h"
-#include "mythtv/mythdbcon.h"
-#include <mythtv/libmythui/mythuihelper.h>
-#include <libmythui/mythmainwindow.h>
+// Qt
+#include <QKeyEvent>
+#include <QTimer>
+
+// MythTV
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythuihelper.h>
+#include <mythmainwindow.h>
 
 // zoneminder
 #include "zmplayer.h"

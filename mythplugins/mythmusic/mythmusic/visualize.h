@@ -12,10 +12,14 @@
 #ifndef VISUALIZE_H
 #define VISUALIZE_H
 
+// C++ headers
 #include <vector>
 using namespace std;
 
-#include <mythtv/visual.h>
+// MythTV headers
+#include <visual.h>
+
+// MythMusic headers
 #include "mainvisual.h"
 #include "metadata.h"
 #include "constants.h"
@@ -40,7 +44,7 @@ extern "C" {
 }
 
 #ifdef OPENGL_SUPPORT
-#include <qgl.h>
+#include <QGLWidget>
 #endif
 
 class Spectrum : public VisualBase

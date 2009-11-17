@@ -1,8 +1,6 @@
 #ifndef FLACENCODER_H_
 #define FLACENCODER_H_
 
-#include <qstring.h>
-
 #define HAVE_INTTYPES_H
 
 #include <FLAC/export.h>
@@ -79,6 +77,7 @@
 #define NUM_CHANNELS 2
 
 class Metadata;
+class QString;
 
 class FlacEncoder : public Encoder
 {

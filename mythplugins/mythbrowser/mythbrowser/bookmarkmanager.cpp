@@ -1,20 +1,20 @@
+// C++
 #include <iostream>
+using namespace std;
 
-// qt
-#include <qstring.h>
+// Qt
+#include <QString>
 
-// myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythdirs.h>
+// MythTV
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythdirs.h>
 
 // mythbrowser
 #include "bookmarkmanager.h"
 #include "bookmarkeditor.h"
 #include "browserdbutil.h"
 #include "mythbrowser.h"
-
-using namespace std;
 
 // ---------------------------------------------------
 

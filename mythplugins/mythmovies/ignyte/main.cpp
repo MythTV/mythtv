@@ -1,13 +1,12 @@
-#include <qapplication.h>
+#include <QApplication>
+#include <QString>
 #include "ignytegrabber.h"
-
-using namespace std;
 
 int main(int argc, char **argv)
 {
     QString zip;
     QString radius;
-    for(int i = 1; i + 1 < argc; ++i)
+    for (int i = 1; i + 1 < argc; ++i)
     {
         if (!strcmp(argv[i], "--zip"))
         {
@@ -23,5 +22,3 @@ int main(int argc, char **argv)
     new IgnyteGrabber(zip, radius, &app);
     return app.exec();
 }
-
-
