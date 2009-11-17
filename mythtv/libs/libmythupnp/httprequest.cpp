@@ -93,6 +93,8 @@ static MIMETypes g_MIMETypes[] =
     { "wmv" , "video/x-ms-wmv"             },
     // This should be application/ogg, but most clients don't understand that.
     { "ogg" , "audio/ogg"                  },
+    // Similarly, this could be audio/flac or application/flac:
+    { "flac", "audio/x-flac"               },
 };
 
 static const int g_nMIMELength = sizeof( g_MIMETypes) / sizeof( MIMETypes );
