@@ -1140,7 +1140,7 @@ void VideoDisplayProfile::CreateVDPAUProfiles(const QString &hostname)
     groupid = CreateProfileGroup("VDPAU Slim", hostname);
     CreateProfile(groupid, 1, ">", 0, 0, "", 0, 0,
                   "vdpau", 1, "vdpau", "vdpau", false,
-                  "vdpaubobdeint", "vdpauonefield", "vdpauskipchroma,colorspace=auto");
+                  "vdpaubobdeint", "vdpauonefield", "vdpauskipchroma,vdpaucolorspace=auto");
 }
 
 void VideoDisplayProfile::CreateProfiles(const QString &hostname)
