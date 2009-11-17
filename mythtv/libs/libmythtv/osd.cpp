@@ -32,7 +32,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "util.h"
 #include "channelutil.h"
-#include "playercontext.h"
+
 #include "x11colors.h"
 #include "mythdirs.h"
 

@@ -1,27 +1,31 @@
 #ifndef OSDDATATYPES_H_
 #define OSDDATATYPES_H_
 
-// c/c++
+// ANSI C
 #include <cmath>
+
+// C++
 #include <vector>
+using namespace std;
 
 // qt
 #include <QString>
+#include <QEvent>
+#include <QColor>
+#include <QMutex>
+#include <QRegExp>
+#include <QHash>
 #include <QRect>
 #include <QMap>
-#include <QEvent>
-#include <QKeyEvent>
-#include <QObject>
-#include <QRegExp>
-#include <QColor>
 
 // myth
 #include "mythexp.h"
 #include "cc708window.h"
 #include "osdimagecache.h"
 
-using namespace std;
-
+class QImage;
+class QObject;
+class QKeyEvent;
 class TTFFont;
 class OSDType;
 class OSDTypeText;

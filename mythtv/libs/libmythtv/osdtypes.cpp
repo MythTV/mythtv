@@ -3,7 +3,6 @@
 using namespace std;
 
 #include <QImage>
-#include <QMap>
 #include <QRegExp>
 #include <QKeyEvent>
 #include <QApplication>
