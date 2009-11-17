@@ -55,6 +55,7 @@ ProgramInfo::ProgramInfo(void) :
     chanstr(""),
     chansign(""),
     channame(""),
+    m_videoWidth(0),
     m_videoHeight(0),
 
     recpriority(0),
@@ -95,7 +96,7 @@ ProgramInfo::ProgramInfo(void) :
 
     prefinput(0),
     recpriority2(0),
-    reactivate(false),
+    reactivate(0),
     recordid(0),
     parentid(0),
 
@@ -146,6 +147,7 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     chanstr(other.chanstr),
     chansign(other.chansign),
     channame(other.channame),
+    m_videoWidth(other.m_videoWidth),
     m_videoHeight(other.m_videoHeight),
 
     recpriority(other.recpriority),
@@ -224,13 +226,95 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
 }
 
 ProgramInfo::ProgramInfo(
-    const MSqlQuery &query, const ProgramList &schedList, bool oneChanid)
+    const MSqlQuery &query, const ProgramList &schedList, bool oneChanid) :
+    title(""),
+    subtitle(""),
+    description(""),
+    category(""),
+
+    chanid(""),
+    chanstr(""),
+    chansign(""),
+    channame(""),
+    m_videoWidth(0),
+    m_videoHeight(0),
+
+    recpriority(0),
+    recgroup(QString("Default")),
+    playgroup(QString("Default")),
+    chancommfree(0),
+
+    pathname(""),
+    filesize(0),
+    hostname(""),
+    storagegroup(QString("Default")),
+
+    startts(mythCurrentDateTime()),
+    endts(startts),
+    recstartts(startts),
+    recendts(startts),
+
+    availableStatus(asAvailable),
+    isVideo(false),
+    lenMins(0),
+
+    year(""),
+    stars(0.0f),
+
+    originalAirDate(QDate(0, 1, 1)),
+    lastmodified(startts),
+    lastInUseTime(startts.addSecs(-4 * 60 * 60)),
+
+    hasAirDate(false),
+    repeat(false),
+
+    spread(-1),
+    startCol(-1),
+
+    recstatus(rsUnknown),
+    oldrecstatus(rsUnknown),
+    savedrecstatus(rsUnknown),
+
+    prefinput(0),
+    recpriority2(0),
+    reactivate(0),
+    recordid(0),
+    parentid(0),
+
+    rectype(kNotRecording),
+    dupin(kDupsInAll),
+    dupmethod(kDupCheckSubDesc),
+
+    sourceid(0),
+    inputid(0),
+    cardid(0),
+    shareable(false),
+    duplicate(false),
+
+    schedulerid(""),
+    findid(0),
+
+    programflags(0),
+    subtitleType(0),
+    videoproperties(0),
+    audioproperties(0),
+    transcoder(0),
+    chanOutputFilters(""),
+
+    seriesid(""),
+    programid(""),
+    catType(""),
+
+    sortTitle(""),
+
+    // Private
+    ignoreBookmark(false),
+
+    inUseForWhat(""),
+    positionMapDBReplacement(NULL)
 {
     if (!query.isValid())
-    {
-        ProgramInfo blank;
-        *this = blank;
-    }
+        return;
 
     chanid = query.value(0).toString();
     startts = QDateTime::fromString(query.value(1).toString(),
@@ -326,42 +410,60 @@ ProgramInfo &ProgramInfo::operator=(const ProgramInfo &other)
  */
 ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 {
-    isVideo = other.isVideo;
-    lenMins = other.lenMins;
-
     title = other.title;
     subtitle = other.subtitle;
     description = other.description;
     category = other.category;
+
     chanid = other.chanid;
     chanstr = other.chanstr;
     chansign = other.chansign;
     channame = other.channame;
+    m_videoWidth = other.m_videoWidth;
+    m_videoHeight = other.m_videoHeight;
+
+    recpriority = other.recpriority;
+    recgroup = other.recgroup;
+    playgroup = other.playgroup;
     chancommfree = other.chancommfree;
-    chanOutputFilters = other.chanOutputFilters;
 
     pathname = other.pathname;
-    storagegroup = other.storagegroup;
     filesize = other.filesize;
     hostname = other.hostname;
+    storagegroup = other.storagegroup;
 
     startts = other.startts;
     endts = other.endts;
     recstartts = other.recstartts;
     recendts = other.recendts;
-    lastmodified = other.lastmodified;
-    spread = other.spread;
-    startCol = other.startCol;
 
     availableStatus = other.availableStatus;
+    isVideo = other.isVideo;
+    lenMins = other.lenMins;
+
+    year = other.year;
+    stars = other.stars;
+
+    originalAirDate = other.originalAirDate;
+    lastmodified = other.lastmodified;
+    lastInUseTime = other.lastInUseTime;
+
+    hasAirDate = other.hasAirDate;
+    repeat = other.repeat;
+
+    spread = other.spread;
+    startCol = other.startCol;
 
     recstatus = other.recstatus;
     oldrecstatus = other.oldrecstatus;
     savedrecstatus = other.savedrecstatus;
+
+    prefinput = other.prefinput;
     recpriority2 = other.recpriority2;
     reactivate = other.reactivate;
     recordid = other.recordid;
     parentid = other.parentid;
+
     rectype = other.rectype;
     dupin = other.dupin;
     dupmethod = other.dupmethod;
@@ -371,19 +473,15 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     cardid = other.cardid;
     shareable = other.shareable;
     duplicate = other.duplicate;
+
     schedulerid = other.schedulerid;
     findid = other.findid;
-    recpriority = other.recpriority;
-    recgroup = other.recgroup;
-    playgroup = other.playgroup;
     programflags = other.programflags;
-    transcoder = other.transcoder;
-    audioproperties = other.audioproperties;
-    videoproperties = other.videoproperties;
     subtitleType = other.subtitleType;
-
-    hasAirDate = other.hasAirDate;
-    repeat = other.repeat;
+    videoproperties = other.videoproperties;
+    audioproperties = other.audioproperties;
+    transcoder = other.transcoder;
+    chanOutputFilters = other.chanOutputFilters;
 
     seriesid = other.seriesid;
     programid = other.programid;
@@ -391,17 +489,9 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
 
     sortTitle = other.sortTitle;
 
-    originalAirDate = other.originalAirDate;
-    stars = other.stars;
-    year = other.year;
     ignoreBookmark = other.ignoreBookmark;
 
     inUseForWhat = other.inUseForWhat;
-    lastInUseTime = other.lastInUseTime;
-
-    m_videoWidth = other.m_videoWidth;
-    m_videoHeight = other.m_videoHeight;
-
     positionMapDBReplacement = other.positionMapDBReplacement;
 
     title.detach();
