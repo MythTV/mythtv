@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2009-11-06, v0.22.01
+<date>2009-11-18, v0.22.02
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -2870,12 +2870,11 @@ will discuss in detail two possibilities:
 <item>Use another server that runs 24/7 and have it send a WakeOnLAN (WOL)
 packet to wake the Master backend.  This assumes that you have the WOL tools
 installed, and that your Master backend motherboard supports WOL.
-<item>Use your motherboard's BIOS wakeup capability.  You'll need a motherboard
-that supports BIOS wakeup, and some tools.  Two that work are: <url
-url="http://sourceforge.net/projects/nvram-wakeup"
-name="http://sourceforge.net/projects/nvram-wakeup"> and <url
-url="http://www.malloc.de/tools/wakeup_clock.html"
-name="http://www.malloc.de/tools/wakeup_clock.html">
+<item>Use your motherboard's BIOS wakeup capability.  You'll need a
+motherboard that supports BIOS wakeup, and some tools.  See <url
+url="http://www.mythtv.org/wiki/ACPI_Wakeup"
+name="http://www.mythtv.org/wiki/ACPI_Wakeup"> for details on the best ways
+to accomplish this.
 </itemize>
 
 <sect2>A deeper look into the operation
@@ -3026,9 +3025,8 @@ Be sure to secure $SERVER:$PORT from untrusted networks, because this
 allows 3rd parties to run arbitrary code on your server!
 
 <sect3>Using BIOS wakeup to wake your Master backend.
-<p>Since I don't use this, I cannot say much about this. If your motherboard
-supports any wakeup tool you have to call that tool as "Set wakeuptime
-command" with the "Wakeup time format" suitable for that tool.
+<p>See <url url="http://www.mythtv.org/wiki/ACPI_Wakeup" name="http://www.mythtv.org/wiki/ACPI_Wakeup">
+for the best ways to accomplish this.
 <sect2>Wakeup the MySQL server using WOL
 <p>If your MySQL server and your Master backend are not on the same machine,
 you can have the Master backend wake your MySQL server using WOL. You will
@@ -6870,6 +6868,9 @@ You can then press ESC until you return to the main screen.
 v0.22.00, 2009-11-02.  Change required minimum MySQL to 5.0.15.  Change Qt to 4.3.
 v0.22.01, 2009-11-12.  Remove the "rsize" stuff from the NFS example. 
 Autonegotiation is best.
+v0.22.02, 2009-11-18.  Point shutdown/wakeup at wiki - better docs there
+than in the HOWTO.
+
 
 
 -->

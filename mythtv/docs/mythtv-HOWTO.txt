@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2009-11-06, v0.22.01
+  2009-11-18, v0.22.02
 
   Initially, installation of MythTV seems like a huge task. There are
   lots of dependencies, and various distributions seem to do the same
@@ -3216,12 +3216,12 @@
    Ctrl+Left or <     move the highlight left by one page
   Ctrl+Right or >     move the highlight right by one page
        9, 3, 7, 1     (like a numeric keypad) perform the same as PageUp, PageDown, Home and End
-                I     bring up more information about a show, and allow you to schedule a recording. If you select "Record this showing" while watching Live TV you can "Instant Record" a program.
-      Space/Enter     allow you resolve conflicts or change overrides. If the program is not already scheduled to record, it will instead act like pressing 'I'.
-                M     when on a channel will change to that channel
+                U     bring up more information about a show
+                I     allow you to schedule a recording. If you select "Record this showing" while watching Live TV you can "Instant Record" a program.
+      Space/Enter     when watching LiveTV will change to that channel and exit the EPG if the selected show is in progress or starts within 15 minutes; or otherwise will allow you to resolve conflicts or change overrides. If the program is not already scheduled to record, it will instead act like pressing I
+                X     change the channel to the currently selected channel without leaving the EPG (Most useful in the alternate EPG)
          ESC or C     exits without changing the channel
                 R     change the current item from Recording/Not-Recording. Successive keypresses cycle through the scheduled recording type list.
-                X     change the channel to the currently selected channel without leaving the EPG (Most useful in the alternate EPG)
                 ?     mark/unmark the current channel as a "favorite"
            / or 4     toggle the guide listing between all channels and filtered "favorites"
 
@@ -3376,11 +3376,10 @@
      supports WOL.
 
   +o  Use your motherboard's BIOS wakeup capability. You'll need a
-     motherboard that supports BIOS wakeup, and some tools. Two that
-     work are: http://sourceforge.net/projects/nvram-wakeup
-     <http://sourceforge.net/projects/nvram-wakeup> and
-     http://www.malloc.de/tools/wakeup_clock.html
-     <http://www.malloc.de/tools/wakeup_clock.html>
+     motherboard that supports BIOS wakeup, and some tools. See
+     http://www.mythtv.org/wiki/ACPI_Wakeup
+     <http://www.mythtv.org/wiki/ACPI_Wakeup> for details on the best
+     ways to accomplish this.
 
   1111..44..11..  AA ddeeeeppeerr llooookk iinnttoo tthhee ooppeerraattiioonn
 
@@ -3425,6 +3424,7 @@
 
   +o  "Idle timeout (secs)" is the time the server waits while idle until
      a shutdown occurs.
+
 
   +o  "Max. wait for recording (min)" is the time the Master backend
      waits for a recording without shutting down. For example, this
@@ -3565,10 +3565,9 @@
 
   1111..44..22..22..  UUssiinngg BBIIOOSS wwaakkeeuupp ttoo wwaakkee yyoouurr MMaasstteerr bbaacckkeenndd..
 
-  Since I don't use this, I cannot say much about this. If your
-  motherboard supports any wakeup tool you have to call that tool as
-  "Set wakeuptime command" with the "Wakeup time format" suitable for
-  that tool.
+  See http://www.mythtv.org/wiki/ACPI_Wakeup
+  <http://www.mythtv.org/wiki/ACPI_Wakeup> for the best ways to
+  accomplish this.
 
   1111..44..33..  WWaakkeeuupp tthhee MMyySSQQLL sseerrvveerr uussiinngg WWOOLL
 
