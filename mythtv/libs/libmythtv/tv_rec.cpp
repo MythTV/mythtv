@@ -535,6 +535,11 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     // Flush out events...
     WaitForEventThreadSleep();
 
+    // Rescan pending recordings since the event loop may have deleted  
+    // a stale entry.  If this happens the info pointer will not be valid 
+    // since the HandlePendingRecordings loop will have deleted it. 
+    it = pendingRecordings.find(cardid); 
+
     // If the needed input is in a shared input group, and we are
     // not canceling the recording anyway, check other recorders
     if (!cancelNext &&
