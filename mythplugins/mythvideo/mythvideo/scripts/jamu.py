@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.5.8"
+__version__=u"v0.5.9"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -224,6 +224,12 @@ __version__=u"v0.5.8"
  # 0.5.7 Remove the override of the TVDB graphics URL to the mirror site. See Kobe's comment:
  #       http://forums.thetvdb.com/viewtopic.php?f=4&t=2161#p9089
  # 0.5.8 The issue fixed in v0.5.5 with invalid file name creation did not fully cover TV shows It does now.
+ # 0.5.9 Changed permissions checks on video directories to only require RW for the destination directories
+ #		 involved in the move. With this change if a user requested a file rename (-F) option and the video
+ #		 file does not have RW access the rename will be ignored.
+ #		 Uses that have their Video directories set to access and read-only can now use Jamu.
+ #       Added a stdout display of the directories that Jamu will use for processing. This information may help
+ #       users resolve issues. The display happens ONLY when the -V (verbose) option is used.
 
 
 usage_txt=u'''
@@ -638,8 +644,8 @@ def getStorageGroups():
 		storagegroup_ok = True
 		for key in storagegroups.keys():
 			for directory in storagegroups[key]:
-				if not os.access(directory, os.F_OK | os.R_OK | os.W_OK):
-					sys.stderr.write(u"\n! Error: The local Storage group (%s) directory (%s) does not exist or there is a permissions restriction\n" % (key, directory))
+				if not os.access(directory, os.F_OK):
+					sys.stderr.write(u"\n! Error: The local Storage group (%s) directory (%s) does not exist\n" % (key, directory))
 					storagegroup_ok = False
 		if not storagegroup_ok:
 			sys.exit(1)
@@ -1327,6 +1333,7 @@ class Configuration(object):
 
 		# Initalize a valriable used by the -MW option
 		self.program_seriesid = None
+		self.config[u'file_move_flag'] = False
 	# end __init__
 
 	# Local variable
@@ -1583,10 +1590,14 @@ class Configuration(object):
 								self.config[key].append(tmp_directories[i])
 								continue
 							else:
-						 		sys.stderr.write(u"\n! Warning: MythTV video directory (%s) is not set or does not exist(%s).\n" % (key, tmp_directories[i]))
+						 		sys.stderr.write(u"\n! Warning: MythTV video directory (%s) does not exist.\n" % (tmp_directories[i]))
+						 		continue
 
 			if key != 'mythvideo' and graphics_dir:
-				self.config[key] = [graphics_dir]
+				if os.path.os.access(graphics_dir, os.F_OK):
+					self.config[key] = [graphics_dir]
+				else:
+					sys.stderr.write(u"\n! Warning: MythTV (%s) directory (%s) does not exist.\n" % (key, tmp_directories[i]))
 
 		# Save the FE path settings local to this backend
 		self.config['localpaths'] = {}
@@ -1595,8 +1606,7 @@ class Configuration(object):
 			local_paths = []
 			if len(self.config[key]):
 				for path in self.config[key]:
-					if os.path.os.access(path, os.F_OK | os.R_OK | os.W_OK):
-						local_paths.append(path)
+					local_paths.append(path)
 				self.config['localpaths'][key] = local_paths
 
 		# If there is a Videos SG then there is always a Graphics SG using Videos as a fallback
@@ -1607,16 +1617,23 @@ class Configuration(object):
 			if storagegroups.has_key(u'mythvideo') and not storagegroups.has_key(key):
 				storagegroups[key] = list(storagegroups[u'mythvideo'])		# Set fall back
 
-		# Get Storage Groups and add as the prority but append any FE directory settings that
-		# are local to this BE but are not already considered a backend
+		# Use Storage Groups as the priority but append any FE directory settings that
+		# are local to this BE but are not already used as a storage group
 		if storagegroups.has_key(u'mythvideo'):
 			for key in storagegroups.keys():
 				self.config[key] = list(storagegroups[key])
 				for k in self.config['localpaths'][key]:
 					if not k in self.config[key]:
 						self.config[key].append(k)	# Add any FE settings local directories not already included
+					else:
+						if key == 'mythvideo':
+							sys.stdout.write(u"\n! Warning: You have a front end video directory path that is a duplicate of this backend's 'Videos' storage group.\nFront end directory (%s)\nThe Front end setting has been ignored.\nThis Front end video directory will cause duplicate entires in MythVideo.\n" % (k))
+						else:
+							sys.stdout.write(u"\n! Info: You have a front end directory path that is a duplicate of this backend's storage group.\nFront end directory (%s)\nThe Front end setting has been ignored.\n" % (k))
+					continue
 
 		# Make sure there is a directory set for Videos and other graphics directories on this host
+		exists = True
 		for key in dir_dict.keys():
 			if key == 'episodeimagedir': # Jamu does nothing with Screenshots
 				continue
@@ -1625,18 +1642,71 @@ class Configuration(object):
 				self.config[key] = storagegroups[u'mythvideo']
 			if not len(self.config[key]):
 	 			sys.stderr.write(u"\n! Error: There must be a directory for Videos and each graphic type. The (%s) directory is missing.\n" % (key))
-				sys.exit(1)
+				exists = False
+		if not exists:
+			sys.exit(1)
 
-		# Make sure that the directory sets for Videos and other graphics directories are RW able
+		# Make sure that the directory set for Videos and other graphics directories have the proper permissions
 		accessable = True
 		for key in dir_dict.keys():
 			for directory in self.config[key]:
+				if key == 'episodeimagedir': # Jamu does nothing with Screenshots
+					continue
+				if key == 'mythvideo':
+					if not os.access(directory, os.F_OK | os.R_OK):
+			 			sys.stderr.write(u"\n! Error: This video directory must have read access for Jamu to function.\nThere is a permissions issue with (%s).\n" % (directory, ))
+						accessable = False
+					continue
 				if not os.access(directory, os.F_OK | os.R_OK | os.W_OK):
-		 			sys.stderr.write(u"\n! Error: Every Video and graphics directory must be read/writable for Jamu to function.\nThere is a permissions issue with (%s).\n" % (directory, ))
+		 			sys.stderr.write(u"\n! Error: The (%s) directory (%s) must be read/writable for Jamu to function.\n" % (key, directory, ))
 					accessable = False
-
 		if not accessable:
 			sys.exit(1)
+
+		# Print out the video and image directories that will be used for processing
+		if self.config['mythtv_verbose']:
+			dir_types={'posterdir': "Cover art  ", 'bannerdir': 'Banners    ', 'fanartdir': 'Fan art    ', 'episodeimagedir': 'Screenshots', 'mythvideo': 'Video      '}
+			sys.stdout.write(u"\n==========================================================================================\n")
+			sys.stdout.write(u"Listed below are the types and base directories Jamu will use for processing.\nThe list reflects your current configuration for the '%s' back end\nand whether a directory is a 'SG' (storage group) or not.\n" % localhostname)
+			sys.stdout.write(u"Note: All directories are from settings in the MythDB specific to hostname (%s).\n" % localhostname)
+			sys.stdout.write(u"Note: Screenshot directories are not listed as Jamu does not process Screenshots.\n")
+			sys.stdout.write(u"------------------------------------------------------------------------------------------\n")
+			for key in dir_dict.keys():
+				if key == 'episodeimagedir':
+					continue
+				for directory in self.config[key]:
+					sg_flag = 'NO '
+					if storagegroups.has_key(key):
+						if directory in storagegroups[key]:
+							sg_flag = 'YES'
+					sys.stdout.write(u"Type: %s - SG-%s - Directory: (%s)\n" % (dir_types[key], sg_flag, directory))
+			sys.stdout.write(u"------------------------------------------------------------------------------------------\n")
+			sys.stdout.write(u"If a directory you set from a separate Front end is not displayed it means\nthat the directory is not accessible from this backend OR\nyou must add the missing directories using the Front end on this Back end.\nFront end settings are host machine specific.\n")
+			sys.stdout.write(u"==========================================================================================\n\n")
+
+		if self.config[u'file_move_flag']:	# verify the destination directory in a move is read/writable
+			index = 0
+			accessable = True
+			for arg in self.args:
+				if index % 2 == 0:
+					index+=1
+					continue
+				if not os.access(arg, os.F_OK):
+					for dirct in self.config['mythvideo']:
+						if arg.startswith(dirct):
+							if not os.access(dirct, os.F_OK | os.R_OK | os.W_OK):
+					 			sys.stderr.write(u"! Error: Your move destination root MythVideo directory (%s) must be read/writable for Jamu to function.\n\n" % (dirct, ))
+								accessable = False
+							break
+					else:
+			 			sys.stderr.write(u"! Error: Your move destination directory (%s) must be a MythVideo directory OR a subdirectory of a MythVideo directory.\n\n" % (arg, ))
+						accessable = False
+				elif not os.access(arg, os.F_OK | os.R_OK | os.W_OK):
+		 			sys.stderr.write(u"! Error: Your move destination directory (%s) must be read/writable for Jamu to function.\n\n" % (arg, ))
+					accessable = False
+				index+=1
+			if not accessable:
+				sys.exit(1)
 
 		# Check if any Video files are on a NFS shares
 		if not self.config['mythtvNFS']:	# Maybe the NFS check is to be skipped
@@ -1758,6 +1828,13 @@ http://www.pythonware.com/products/pil/\n""")
 			if _can_int(self.config['maximum']) == False:
 				sys.stderr.write(u"\n! Error: Maximum option is not an integer (%s)\n" % self.config['maximum'])
 				sys.exit(1)
+
+		# Detect if this is a move request
+		self.config[u'file_move_flag'] = False
+		if len(args) != 0:
+			if os.path.isfile(args[0]) or os.path.isdir(args[0]) or args[0][-1:] == '*':
+				self.config[u'file_move_flag'] = True
+				self.args = list(args)
 
 		if self.config['mythtvdir']:
 			if mythdb == None or mythvideo == None:
@@ -2811,10 +2888,10 @@ class VideoFiles(Tvdatabase):
 		allfiles = []
 
 		for cfile in args: # Directories must exist and be both readable and writable
-			if os.path.isdir(cfile) and not os.access(cfile, os.F_OK | os.R_OK | os.W_OK):
-				sys.stderr.write(u"\n! Error: Video directory (%s) does not exist or the permissions are not read and writable.\n" % (cfile))
+			if os.path.isdir(cfile) and not os.access(cfile, os.F_OK | os.R_OK):
+				sys.stderr.write(u"\n! Error: Video directory (%s) does not exist or the permissions are not at least readable. Skipping this directory.\n" % (cfile))
 				continue
-			if os.path.isdir(cfile) and os.access(cfile, os.F_OK | os.R_OK | os.W_OK):
+			if os.path.isdir(cfile):
 				try:
 					cfile = unicode(cfile, u'utf8')
 				except (UnicodeEncodeError, TypeError):
@@ -2837,8 +2914,10 @@ class VideoFiles(Tvdatabase):
 						#end if recursive
 					#end if isfile
 				#end for sf
-			elif os.path.isfile(cfile) and os.access(cfile, os.F_OK | os.R_OK | os.W_OK):
-				allfiles.append(cfile) # Files must exist and be both readable and writable
+			elif self.config[u'file_move_flag'] and not os.access(cfile, os.F_OK | os.R_OK | os.W_OK):
+				sys.stderr.write(u"\n! Error: The Video file (%s) to be moved must have the read and write permissions. Skipping this video file.\n" % (cfile))
+			elif os.path.isfile(cfile) and os.access(cfile, os.F_OK | os.R_OK):
+				allfiles.append(cfile) # Files must exist and be at least readable
 			#end if isdir
 		#end for cfile
 		return allfiles
@@ -3625,7 +3704,10 @@ class MythTvMetaData(VideoFiles):
 			element = (element.rstrip('\n')).strip()
 			if element == '' or element == None:
 				continue
-			index = element.index(':')
+			try:
+				index = element.index(':')
+			except:
+				continue
 			key = element[:index].lower()
 			data = element[index+1:]
 			if data == None or data == '':
@@ -4034,6 +4116,7 @@ class MythTvMetaData(VideoFiles):
 			dstname = os.path.join(dst, name)
 
 			if not os.access(srcname, os.F_OK | os.R_OK | os.W_OK): # Skip any file that is not RW able
+				sys.stderr.write(u"\n! Error: The Source video directory or file (%s) must have read and write permissions for be moved. File or directory has been skipped\n" % (srcname))
 				continue
 			try:
 				if symlinks and os.path.islink(srcname):
@@ -4106,7 +4189,7 @@ class MythTvMetaData(VideoFiles):
 		# Validate that the targets and destinations actually exist.
 		count=1
 		for file_dir in target_destination_array:
-			if os.access(file_dir, os.F_OK | os.R_OK | os.W_OK):
+			if os.access(file_dir, os.F_OK | os.R_OK):
 				if count % 2 == 0:
 					# Destinations must all be directories
 					if not os.path.isdir(file_dir):
@@ -4123,7 +4206,7 @@ class MythTvMetaData(VideoFiles):
 							sys.exit(1)
 				# Verify that a target file is really a video file.
 				if file_dir[-1:] != '*': # Skip wildcard file name targets
-					if os.access(file_dir, os.F_OK | os.R_OK | os.W_OK):	# Confirm that the file actually exists
+					if os.access(file_dir, os.F_OK | os.R_OK):	# Confirm that the file actually exists
 						if not os.path.isdir(file_dir):
 							ext = _getExtention(file_dir)
 							for tmp_ext in self.config['video_file_exts']:
@@ -4156,7 +4239,7 @@ class MythTvMetaData(VideoFiles):
 			else:
 				results = self._moveDirectoryTree(src, dst, symlinks=False, ignore=None)
 			if len(results[1]):			# Check if there are any errors
-				sys.stderr.write(u"\n! Warning: There where errors during moving, with these directories/files\n")
+				sys.stderr.write(u"\n! Warning: There were errors during moving, with these directories/files\n")
 				for error in results[1]:
 					sys.stderr.write(u'\n! Warning: Source(%s), Destination(%s), Reason:(%s)\n' % (error[0], error[1], error[2]))
 			tmp_cfile_array=[]
@@ -4264,6 +4347,9 @@ class MythTvMetaData(VideoFiles):
 					if self.config['simulation']:
 						sys.stdout.write(u"Simulation file renamed from(%s) to(%s)\n" % (video_file, tmp_filename))
 					else:
+						if not os.access(video_file, os.F_OK | os.R_OK | os.W_OK):
+							sys.stdout.write(u"Cannot rename this file as it does not have read/write permissions set (%s)\n" % video_file)
+							continue
 						self._displayMessage(u"File renamed from(%s) to(%s)\n" % (video_file, tmp_filename))
 						os.rename(video_file, tmp_filename)
 					num_renamed_files+=1
@@ -4811,7 +4897,7 @@ class MythTvMetaData(VideoFiles):
 					# A graphics was downloaded
 					changed_fields[key] = mirodetails[key]
 
-			if not mirodetails[u'tv'] and not mirodetails[u'symlink'] and os.path.isfile(mirodetails[u'pathfilename']):
+			if not mirodetails[u'tv'] and not mirodetails[u'symlink'] and os.access(mirodetails[u'pathfilename'], os.F_OK | os.R_OK | os.W_OK):
 				changed_fields[u'inetref'] = mirodetails[u'inetref']
 				changed_fields[u'subtitle'] = u''
 				changed_fields[u'year'] = mirodetails[u'year']
@@ -5379,6 +5465,7 @@ class MythTvMetaData(VideoFiles):
 		if self.config['video_dir']:
 			if len(self.config['video_dir']) % 2 == 0:
 				validFiles = self._moveVideoFiles(self.config['video_dir'])
+				self.config[u'file_move_flag'] = False
 			else:
 				sys.stderr.write(u"\n! Error: When specifying target (file or directory) to move to a destination (directory) they must always be in pairs (target and destination directory).\nYou specified an uneven number of variables (%d) for target and destination pairs.\nVariable count (%s)\n" % (len(self.config['video_dir']), self.config['video_dir']))
 				sys.exit(1)
@@ -6020,6 +6107,9 @@ class MythTvMetaData(VideoFiles):
 		# Fix all the directory cover images
 		if self.config['folderart']:
 			for cfile in validFiles:
+				# Skip directories that do not have RW access because folder art files cannot be created
+				if not os.access(cfile['filepath'], os.F_OK | os.R_OK | os.W_OK):
+					continue
 				videopath = tv_series_format % (cfile['filepath'], cfile['filename'], cfile['ext'])
 				# Find the MythTV meta data
 				intid = mythvideo.getMetadataId(videopath, localhostname.lower())
