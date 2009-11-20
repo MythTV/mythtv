@@ -30,12 +30,14 @@
 #-------------------------------------
 __title__ ="TheMovieDB APIv2 Query";
 __author__="R.D.Vaughan"
-__version__="v0.1.2"
+__version__="v0.1.3"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 New movie data fields now have proper key names
 #       Dynamic CamelCoding of keys if they are not already in the translation list
 #       Fixed and re-arranged some code for minor issues.
+# 0.1.3 Fixed an abort when there is no data found for Movie and People information display
+#       Added CamelCase to all People information keys
 
 __usage_examples__='''
 Request tmdb.py verison number:
@@ -102,23 +104,23 @@ Request a list of People matching a name:
 
 Request a Person's information using their TMDB id number:
 > ./tmdb.py -I 500
-name:Tom Cruise
-also_known_as:Thomas Cruise Mapother IV
-birthday:1962-07-03
-birthplace:Syracuse, New York, USA
-filmography:"War of the Worlds","character:Ray Ferrier"
-filmography:"War of the Worlds","id:74"
-filmography:"War of the Worlds","job:Actor"
-filmography:"War of the Worlds","url:http://www.themoviedb.org/movie/74"
+Name:Tom Cruise
+AlsoKnownAs:Thomas Cruise Mapother IV
+Birthday:1962-07-03
+Birthplace:Syracuse, New York, USA
+Filmography:"War of the Worlds","Character:Ray Ferrier"
+Filmography:"War of the Worlds","Id:74"
+Filmography:"War of the Worlds","Job:Actor"
+Filmography:"War of the Worlds","URL:http://www.themoviedb.org/movie/74"
 ...
-filmography:"All the Right Moves","character:Stefen Djordjevic"
-filmography:"All the Right Moves","id:18172"
-filmography:"All the Right Moves","job:Actor"
-filmography:"All the Right Moves","url:http://www.themoviedb.org/movie/18172"
-id:500
-known_movies:33
-popularity:2
-url:http://www.themoviedb.org/person/500
+Filmography:"All the Right Moves","Character:Stefen Djordjevic"
+Filmography:"All the Right Moves","Id:18172"
+Filmography:"All the Right Moves","Job:Actor"
+Filmography:"All the Right Moves","URL:http://www.themoviedb.org/movie/18172"
+Id:500
+KnownMovies:33
+Popularity:2
+URL:http://www.themoviedb.org/person/500
 
 Request Movie details using a Hash value:
 > ./tmdb.py -H "00277ff46533b155"
@@ -154,8 +156,6 @@ Imdb:0096446
 ArtDirection:Tim Hutchinson, Jim Pohl, Tony Reading, Kim Sinclair, Malcolm Stone
 
 '''
-
-# Version 0.1.0 Initial development
 
 import sys, os
 from optparse import OptionParser
@@ -301,12 +301,18 @@ class moviedbQueries():
     def camelcase(self, value):
         '''Make a string CamelCase
         '''
+        if not value.strip(u'ABCEDFGHIJKLMNOPQRSTUVWXYZ'):
+            return value
+        if value == u'url':
+            return u'URL'
         return u"".join([capitalize(w) for w in re.split(re.compile(u"[\W_]*"), value)])
     # end camelcase()
 
     def displayMovieData(self, data):
         '''Display movie data to stdout # u'ArtDirection'
         '''
+        if data == None:
+            return
         data_keys = data.keys()
         data_keys_org = data.keys()
         for index in range(len(data_keys)):
@@ -338,7 +344,9 @@ class moviedbQueries():
         '''Get People data by TMDB people id number and display "key:value" pairs to stdout
         '''
         data = self.config['moviedb'].personInfo(tmdb_id)
-        sys.stdout.write(u'%s:%s\n' % (u'name', data[u'name']))
+        if data == None:
+            return
+        sys.stdout.write(u'%s:%s\n' % (u'Name', data[u'name']))
         keys = sorted(data.keys())
         for key in keys:
             if key == u'name':
@@ -346,21 +354,21 @@ class moviedbQueries():
             if key in ['also_known_as', 'filmography', 'images' ]:
                 for k in data[key]:
                     if key == 'also_known_as':
-                        sys.stdout.write(u'%s:%s\n' % (key, k))
+                        sys.stdout.write(u'%s:%s\n' % (self.camelcase(key), k))
                     elif key == 'filmography':
                         kys = sorted(k.keys())
                         for c in kys:
                             if c == u'name':
                                 continue
-                            sys.stdout.write(u'%s:"%s","%s:%s"\n' % (key, k[u'name'], c, k[c]))
+                            sys.stdout.write(u'%s:"%s","%s:%s"\n' % (self.camelcase(key), k[u'name'], self.camelcase(c), k[c]))
                     else:
                         kys = sorted(k.keys())
                         for c in kys:
                             if c == u'name':
                                 continue
-                            sys.stdout.write(u'%s:"%s"","%s:%s"\n' % (key, k[u'name'], c, k[c]))
+                            sys.stdout.write(u'%s:"%s"","%s:%s"\n' % (self.camelcase(key), k[u'name'], self.camelcase(c), k[c]))
             else:
-                sys.stdout.write(u'%s:%s\n' % (key, data[key]))
+                sys.stdout.write(u'%s:%s\n' % (self.camelcase(key), data[key]))
     # end peopleData()
 
     def hashData(self, hash_value):
