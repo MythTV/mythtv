@@ -203,7 +203,7 @@
             <area>25,485,890,220</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <value>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</value>
+            <template>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</template>
         </textarea>
 
         <imagetype name="preview">
