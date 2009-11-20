@@ -262,6 +262,7 @@ class VideoScannerThread : public QThread
     {
         int ret = 0;
         uint counter = 0;
+        QList<int> preservelist;
         SendProgressEvent(counter, (uint)(add.size() + remove.size()),
                           tr("Updating video database"));
 
@@ -270,29 +271,47 @@ class VideoScannerThread : public QThread
             // add files not already in the DB
             if (!p->second.check)
             {
-                Metadata newFile(p->first, VIDEO_TRAILER_DEFAULT,
-                                 VIDEO_COVERFILE_DEFAULT, 
-                                 VIDEO_SCREENSHOT_DEFAULT,
-                                 VIDEO_BANNER_DEFAULT,
-                                 VIDEO_FANART_DEFAULT,
-                                 Metadata::FilenameToMeta(p->first, 1),
-                                 Metadata::FilenameToMeta(p->first, 4),
-                                 VIDEO_YEAR_DEFAULT,
-                                 QDate::fromString("0000-00-00","YYYY-MM-DD"), 
-                                 VIDEO_INETREF_DEFAULT, QString(),
-                                 VIDEO_DIRECTOR_DEFAULT, VIDEO_PLOT_DEFAULT,
-                                 0.0, VIDEO_RATING_DEFAULT, 0,
-                                 Metadata::FilenameToMeta(p->first, 2).toInt(), 
-                                 Metadata::FilenameToMeta(p->first, 3).toInt(), 
-                                 QDate::currentDate(),
-                                 0, ParentalLevel::plLowest);
+                // Are we sure this needs adding?  Let's check our Hash list.
+                QString hash = Metadata::FileHash(p->first, p->second.host);
+                if (!hash.isEmpty())
+                {
+                    int id = Metadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
+                    if (id != -1)
+                    {
+                        // Whew, that was close.  Let's remove that thing from
+                        // our purge list, too.
+                        VERBOSE(VB_IMPORTANT, QString("Hash %1 already exists in the "
+                                                      "database, updating record: %2")
+                                                      .arg(hash).arg(id));
+                        preservelist.append(id);
+                    }
+                }
+                else
+                {
+                    Metadata newFile(p->first, hash,
+                                     VIDEO_TRAILER_DEFAULT,
+                                     VIDEO_COVERFILE_DEFAULT, 
+                                     VIDEO_SCREENSHOT_DEFAULT,
+                                     VIDEO_BANNER_DEFAULT,
+                                     VIDEO_FANART_DEFAULT,
+                                     Metadata::FilenameToMeta(p->first, 1),
+                                     Metadata::FilenameToMeta(p->first, 4),
+                                     VIDEO_YEAR_DEFAULT,
+                                     QDate::fromString("0000-00-00","YYYY-MM-DD"), 
+                                     VIDEO_INETREF_DEFAULT, QString(),
+                                     VIDEO_DIRECTOR_DEFAULT, VIDEO_PLOT_DEFAULT,
+                                     0.0, VIDEO_RATING_DEFAULT, 0,
+                                     Metadata::FilenameToMeta(p->first, 2).toInt(), 
+                                     Metadata::FilenameToMeta(p->first, 3).toInt(), 
+                                     QDate::currentDate(),
+                                     0, ParentalLevel::plLowest);
 
-                VERBOSE(VB_GENERAL, QString("Adding : %1 : %2 : %3")
-                        .arg(newFile.GetHost()).arg(newFile.GetFilename())
-                        .arg(Metadata::FileHash(p->first)));
-                newFile.SetHost(p->second.host);
-
-                newFile.SaveToDatabase();
+                    VERBOSE(VB_GENERAL, QString("Adding : %1 : %2 : %3")
+                            .arg(newFile.GetHost()).arg(newFile.GetFilename())
+                            .arg(hash));
+                    newFile.SetHost(p->second.host);
+                    newFile.SaveToDatabase();
+                }
                 ret += 1;
             }
             SendProgressEvent(++counter);
@@ -303,7 +322,8 @@ class VideoScannerThread : public QThread
         for (PurgeList::const_iterator p = remove.begin(); p != remove.end();
                 ++p)
         {
-            promptForRemoval(p->first, p->second);
+            if (!preservelist.contains(p->first))
+                promptForRemoval(p->first, p->second);
             SendProgressEvent(++counter);
         }
 

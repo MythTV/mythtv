@@ -46,12 +46,15 @@ class Metadata
 
   public:
     static SortKey GenerateDefaultSortKey(const Metadata &m, bool ignore_case);
-    static QString FileHash(const QString &file_name);
+    static int UpdateHashedDBRecord(const QString &hash, const QString &file_name,
+                                    const QString &host);
+    static QString FileHash(const QString &file_name, const QString &host);
     static QString FilenameToMeta(const QString &file_name, int position);
     static QString TrimTitle(const QString &title, bool ignore_case);
 
   public:
     Metadata(const QString &filename = QString(),
+             const QString &hash = QString(),
              const QString &trailer = QString(),
              const QString &coverfile = QString(),
              const QString &screenshot = QString(),
@@ -161,6 +164,9 @@ class Metadata
 
     const QString &GetFilename() const;
     void SetFilename(const QString &filename);
+
+    const QString &GetHash() const;
+    void SetHash(const QString &hash);
 
     const QString &GetTrailer() const;
     void SetTrailer(const QString &trailer);
