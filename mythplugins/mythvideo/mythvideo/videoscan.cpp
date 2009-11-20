@@ -287,8 +287,9 @@ class VideoScannerThread : public QThread
                                  QDate::currentDate(),
                                  0, ParentalLevel::plLowest);
 
-                VERBOSE(VB_GENERAL, QString("Adding : %1 : %2")
-                        .arg(newFile.GetHost()).arg(newFile.GetFilename()));
+                VERBOSE(VB_GENERAL, QString("Adding : %1 : %2 : %3")
+                        .arg(newFile.GetHost()).arg(newFile.GetFilename())
+                        .arg(Metadata::FileHash(p->first)));
                 newFile.SetHost(p->second.host);
 
                 newFile.SaveToDatabase();

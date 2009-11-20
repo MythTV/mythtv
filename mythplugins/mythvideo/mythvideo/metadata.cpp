@@ -868,6 +868,43 @@ namespace
     }
 }
 
+QString Metadata::FileHash(const QString &file_name)
+{
+    if (!file_name.startsWith("/"))
+        return QString();
+
+    QFile file(file_name);
+    QFileInfo fileinfo(file);
+    qint64 initialsize = fileinfo.size();
+
+    if (initialsize == 0)
+        return QString();
+
+    file.open(QIODevice::ReadOnly);
+    quint64 hash = initialsize;
+
+    file.seek(0);
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    for (quint64 tmp = 0, i = 0; i < 65536/sizeof(tmp); i++)
+    {
+        stream >> tmp;
+        hash += tmp;
+    }
+
+    file.seek(initialsize - 65536);
+    for (quint64 tmp = 0, i = 0; i < 65536/sizeof(tmp); i++)
+    {
+        stream >> tmp;
+        hash += tmp;
+    }
+
+    file.close();
+
+    QString output = QString("%1").arg(hash, 0, 16);
+    return output;
+}
+
 QString Metadata::FilenameToMeta(const QString &file_name, int position)
 {
     // position 1 returns title, 2 returns season,

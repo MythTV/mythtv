@@ -46,6 +46,7 @@ class Metadata
 
   public:
     static SortKey GenerateDefaultSortKey(const Metadata &m, bool ignore_case);
+    static QString FileHash(const QString &file_name);
     static QString FilenameToMeta(const QString &file_name, int position);
     static QString TrimTitle(const QString &title, bool ignore_case);
 
