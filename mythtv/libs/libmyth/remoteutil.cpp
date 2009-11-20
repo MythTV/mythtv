@@ -507,8 +507,10 @@ void RemoteClearSGMap(void)
 
 QString GetHostSGToUse(QString host, QString sgroup)
 {
+    host.detach();
+    sgroup.detach();
     QString tmpGroup = sgroup;
-    QString groupKey = QString("%1:%2").arg(sgroup, host);
+    QString groupKey = QString("%1:%2").arg(sgroup).arg(host);
 
     QMutexLocker locker(&sgroupMapLock);
 
