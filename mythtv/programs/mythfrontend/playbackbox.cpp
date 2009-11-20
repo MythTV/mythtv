@@ -3661,6 +3661,9 @@ void PlaybackBox::customEvent(QEvent *event)
                             m_recordingList->RemoveItem(
                                             m_recordingList->GetItemByData(
                                                         qVariantFromValue(*i)));
+                            if (m_recordingList->GetCount() == 0)
+                                m_groupList->RemoveItem(
+                                            m_groupList->GetItemCurrent());
                         }
                         (*i)->availableStatus = asDeleted;
                         m_progCacheLock.unlock();
