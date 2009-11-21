@@ -214,7 +214,7 @@ class MPUBLIC MythPopupBox : public MythDialog
     QColor       popupForegroundColor;
     int          hpadding, wpadding;
     bool         arrowAccel;
-} __attribute__ ((deprecated));
+};
 
 /** The MythTV progress bar dialog.
 
@@ -280,7 +280,7 @@ class MPUBLIC MythProgressDialog: public MythDialog
     void setTotalSteps(int totalSteps);
     int steps;
     int m_totalSteps;
-} __attribute__ ((deprecated));
+};
 
 /** MythDialog box that displays a busy spinner-style dialog box to
     indicate the program is busy, but that the number of steps needed
@@ -336,7 +336,7 @@ class MPUBLIC MythBusyDialog : public MythProgressDialog
 
   private:
     QTimer *timer;
-} __attribute__ ((deprecated));
+};
 
 class MPUBLIC MythThemedDialog : public MythDialog
 {
@@ -457,7 +457,7 @@ class MPUBLIC MythPasswordDialog: public MythDialog
     MythLineEdit        *password_editor;
     QString              target_text;
     bool                *success_flag;
-} __attribute__ ((deprecated));
+};
 
 class MPUBLIC MythSearchDialog: public MythPopupBox
 {
@@ -492,6 +492,6 @@ class MPUBLIC MythSearchDialog: public MythPopupBox
     MythListBox         *listbox;
     QAbstractButton     *ok_button;
     QAbstractButton     *cancel_button;
-} __attribute__ ((deprecated));
+};
 
 #endif
