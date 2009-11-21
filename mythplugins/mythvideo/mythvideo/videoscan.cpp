@@ -271,11 +271,13 @@ class VideoScannerThread : public QThread
             // add files not already in the DB
             if (!p->second.check)
             {
+                int id = -1;
+
                 // Are we sure this needs adding?  Let's check our Hash list.
                 QString hash = Metadata::FileHash(p->first, p->second.host);
                 if (!hash.isEmpty())
                 {
-                    int id = Metadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
+                    id = Metadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
                     if (id != -1)
                     {
                         // Whew, that was close.  Let's remove that thing from
@@ -286,7 +288,7 @@ class VideoScannerThread : public QThread
                         preservelist.append(id);
                     }
                 }
-                else
+                if (id == -1)
                 {
                     Metadata newFile(p->first, hash,
                                      VIDEO_TRAILER_DEFAULT,
