@@ -35,7 +35,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="thetvdb.com Query";
+__title__ ="TheTVDB.com Query";
 __author__="R.D.Vaughan"
 __version__="v1.0.6"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
