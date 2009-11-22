@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="thetvdb.com Query";
 __author__="R.D.Vaughan"
-__version__="v1.0.5"        # Version .1 Initial development
+__version__="v1.0.6"        # Version .1 Initial development
 							# Version .2 Add an option to get season and episode numbers from ep name
 							# Version .3 Cleaned up the documentation and added a usage display option
 							# Version .4 Added override formating of the number option (-N)
@@ -116,6 +116,9 @@ __version__="v1.0.5"        # Version .1 Initial development
 							#               comma separated URLs as one continuous string.
 							# Version 1.0.4 Poster Should be Coverart instead.
 							# Version 1.0.5 Added the TVDB URL to the episode metadata
+							# Version 1.0.6 When the language is invalid ignore language and continue processing
+							#				Changed all exit codes to be 0 for passed and 1 for failed
+							#				Removed duplicates when using the -M option and the -l option
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -291,7 +294,7 @@ from optparse import OptionParser
 
 # Verify that tvdb_api.py, tvdb_ui.py and tvdb_exceptions.py are available
 try:
-	import ttvdb.tvdb_ui as tvdb_ui
+ 	import ttvdb.tvdb_ui as tvdb_ui
 	# thetvdb.com specific modules
 	from ttvdb.tvdb_api import (tvdb_error, tvdb_shownotfound, tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_episodenotfound, tvdb_attributenotfound, tvdb_userabort)
 # from tvdb_api import Tvdb
@@ -306,7 +309,7 @@ except Exception:
 The modules tvdb_api.py (v1.0.0 or greater), tvdb_ui.py, tvdb_exceptions.py and cache.py must be
 in the same directory as ttvdb.py. They should have been included with the distribution of ttvdb.py.
 '''
-	sys.exit(False)
+	sys.exit(1)
 
 # Global variables
 http_find="http://www.thetvdb.com"
@@ -510,7 +513,7 @@ def searchseries(t, opts, series_season_ep):
 		sys.stderr.write("! Warning: Series (%s) not found\n" % (
 			series_name )
 		)
-		sys.exit(False)
+		sys.exit(1)
 	except (tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_attributenotfound):
 		# The season, episode or name wasn't found, but the show was.
 		# Use the corrected show-name, but no episode name.
@@ -522,7 +525,7 @@ def searchseries(t, opts, series_season_ep):
 			sys.stderr.write("! Warning: For Series (%s), season (%s) not found \n" % (
 				series_name, series_season_ep[1] )
 			)
-		sys.exit(False)
+		sys.exit(1)
 	except tvdb_error, errormsg:
 		# Error communicating with thetvdb.com
 		if SID == True: # Maybe the digits were a series name (e.g. 90210)
@@ -531,11 +534,11 @@ def searchseries(t, opts, series_season_ep):
 		sys.stderr.write(
 			"! Warning: Error contacting www.thetvdb.com:\n%s\n" % (errormsg)
 		)
-		sys.exit(False)
+		sys.exit(1)
 	except tvdb_userabort, errormsg:
 		# User aborted selection (q or ^c)
 		print "\n", errormsg
-		sys.exit(False)
+		sys.exit(1)
 	else:
 		if opts.raw==True:
 			print "="*20
@@ -824,7 +827,7 @@ def initialize_override_dictionary(useroptions):
 		sys.stderr.write(
 			"! The specified user configuration file (%s) is not a file\n" % useroptions
 		)
-		sys.exit(False)
+		sys.exit(1)
 	massage = {}
 	overrides = {}
 	cfg = ConfigParser.SafeConfigParser()
@@ -841,7 +844,7 @@ def initialize_override_dictionary(useroptions):
 				tmp =cfg.get(section, option).split(',')
 				if len(tmp)%2 and len(cfg.get(section, option)) != 0:
 					sys.stderr.write("! For (%s) 'ep_name_massage' values must be in pairs\n" % option)
-					sys.exit(False)
+					sys.exit(1)
 				tmp_array=[]
 				i=0
 				while i != len(tmp):
@@ -861,18 +864,18 @@ def initialize_override_dictionary(useroptions):
 					dummy = int(sid)
 				except:
 					sys.stdout.write("! Series (%s) Invalid SID (not numeric) [%s] in config file\n" % (key, sid))
-					sys.exit(False)
+					sys.exit(1)
 				# Make sure that the series name is not empty or all blanks
 				if len(key.replace(' ','')) == 0:
 					sys.stdout.write("! Invalid Series name (must have some non-blank characters) [%s] in config file\n" % key)
 					print parts
-					sys.exit(False)
+					sys.exit(1)
 
 				try:
 					series_name_sid=tvdb.series_by_sid(sid)
 				except:
 					sys.stdout.write("! Invalid Series (no matches found in thetvdb,com) (%s) sid (%s) in config file\n" % (key, sid))
-					sys.exit(False)
+					sys.exit(1)
 				overrides[key]=series_name_sid[u'seriesname'].encode('utf-8')
 			continue
 
@@ -940,16 +943,16 @@ def main():
 	if opts.version == True:
 		sys.stdout.write("%s (%s) by %s\n" % (
 		__title__, __version__, __author__ ))
-		sys.exit(True)
+		sys.exit(0)
 
 	# Process usage command line requests
 	if opts.usage == True:
 		sys.stdout.write(usage_txt)
-		sys.exit(True)
+		sys.exit(0)
 
 	if len(series_season_ep) == 0:
 		parser.error("! No series or series season episode supplied")
-		sys.exit(False)
+		sys.exit(1)
 
 	# Default output format of season and episode numbers
 	global season_and_episode_num, screenshot_request
@@ -959,15 +962,15 @@ def main():
 		if len(series_season_ep) > 1:
 			if not _can_int(series_season_ep[1]):
 				parser.error("! Season is not numeric")
-				sys.exit(False)
+				sys.exit(1)
 		if len(series_season_ep) > 2:
 			if not _can_int(series_season_ep[2]):
 				parser.error("! Episode is not numeric")
-				sys.exit(False)
+				sys.exit(1)
 	else:
 		if len(series_season_ep) < 2:
 			parser.error("! An Episode name must be included")
-			sys.exit(False)
+			sys.exit(1)
 		if len(series_season_ep) == 3:
 			season_and_episode_num = series_season_ep[2] # Override default output format
 
@@ -975,14 +978,14 @@ def main():
 		if len(series_season_ep) > 1:
 			if not _can_int(series_season_ep[1]):
 				parser.error("! Season is not numeric")
-				sys.exit(False)
+				sys.exit(1)
 		if len(series_season_ep) > 2:
 			if not _can_int(series_season_ep[2]):
 				parser.error("! Episode is not numeric")
-				sys.exit(False)
+				sys.exit(1)
 		if not len(series_season_ep) > 2:
 			parser.error("! Option (-S), episode screenshot search requires Season and Episode numbers")
-			sys.exit(False)
+			sys.exit(1)
 		screenshot_request = True
 
 	if opts.debug == True:
@@ -1003,15 +1006,12 @@ def main():
 	valid_languages = ["da", "fi", "nl", "de", "it", "es", "fr","pl", "hu","el","tr", "ru","he","ja","pt","zh","cs","sl", "hr","ko","en","sv","no"]
 
 	# Validate language as specified by user
-	if opts.language:
-		for lang in valid_languages:
-			if opts.language == lang: break
-		else:
-			valid_langs = ''
-			for lang in valid_languages: valid_langs+= lang+', '
-			valid_langs=valid_langs[:-2]
-			sys.stdout.write("! Specified language(%s) must match one of the following languages supported by thetvdb.com wiki:\n (%s)\n" % (opts.language, valid_langs))
-			sys.exit(False)
+	if not opts.language in valid_languages:
+		valid_langs = ''
+		for lang in valid_languages: valid_langs+= lang+', '
+		valid_langs=valid_langs[:-2]
+		sys.stderr.write("! Specified language(%s) must match one of the following languages supported by thetvdb.com wiki:\n(%s)\nDefaulting to English 'en' and ignoring specified language code.\n" % (opts.language, valid_langs))
+		opts.language = 'en'	# Set the default to English when an invalid language was specified
 
 	# Access thetvdb.com API with banners (Posters, Fanart, banners, screenshots) data retrieval enabled
 	if opts.list ==True:
@@ -1044,7 +1044,7 @@ def main():
 			initialize_override_dictionary(opts.configure)
 		else:
 			debuglog("! The specified override file (%s) does not exist" % opts.configure)
-			sys.exit(False)
+			sys.exit(1)
 	if len(override) == 0:
 		opts.configure = False # Turn off the override option as there is nothing to override
 
@@ -1060,14 +1060,18 @@ def main():
 				break # Matched - to the next file!
 
 	# Fetch a list of matching series names
-	if (opts.list ==True ):
+	if opts.list ==True:
 		try:
 			allSeries=t._getSeries(series_season_ep[0])
 		except tvdb_shownotfound:
-			sys.exit(True) # No matching series
+			sys.exit(0) # No matching series
+		match_list = []
 		for series_name_sid in allSeries: # list search results
-			print u"%s:%s" % (series_name_sid['sid'], series_name_sid['name'])
-		sys.exit(True) # The Series list option (-M) is the only option honoured when used
+			key_value = u"%s:%s" % (series_name_sid['sid'], series_name_sid['name'])
+			if not key_value in match_list: # Do not add duplicates
+				match_list.append(key_value)
+				print key_value
+		sys.exit(0) # The Series list option (-M) is the only option honoured when used
 
 	# Verify that thetvdb.com has the desired series_season_ep.
 	# Exit this module if series_season_ep is not found
@@ -1085,7 +1089,7 @@ def main():
 		for x in seriesfound.keys():
 			season_numbers+='%d,' % x
 		print season_numbers[:-1]
-		sys.exit(True) # Option (-n) is the only option honoured when used
+		sys.exit(0) # Option (-n) is the only option honoured when used
 
 	# Dump information accessable for a Series and ONLY first season of episoded data
 	if opts.debug == True:
@@ -1118,7 +1122,7 @@ def main():
 
 	if opts.numbers == True: # Fetch and output season and episode numbers
 		Getseries_episode_numbers(t, opts, series_season_ep)
-		sys.exit(True) # The Numbers option (-N) is the only option honoured when used
+		sys.exit(0) # The Numbers option (-N) is the only option honoured when used
 
 	if opts.data or screenshot_request: # Fetch and output episode data
 		if opts.mythvideo:
@@ -1154,7 +1158,7 @@ def main():
 
 	# Make sure that some graphics URL(s) (Posters, FanArt or Banners) are available
 	if ( fanart!=True and poster!=True and banner!=True ):
-		sys.exit(True)
+		sys.exit(0)
 
 	if opts.debug == True:
 		print "#"*20
@@ -1204,14 +1208,14 @@ def main():
 					print (search_for_series(t, series_name)['banner']).replace(http_find, http_replace)
 				else:
 					print u"Banner:%s" % (search_for_series(t, series_name)['banner']).replace(http_find, http_replace)
-		sys.exit(True) # Only the top rated for a TV Series is returned
+		sys.exit(0) # Only the top rated for a TV Series is returned
 
 	if (poster==True and opts.poster==True and opts.raw!=True): # Get posters and send to stdout
 		season_poster_found = False
 		if opts.mythvideo:
 			if len(series_season_ep) < 2:
 				print u"Season and Episode numbers required."
-				sys.exit(True)
+				sys.exit(0)
 		all_posters = u'Coverart:'
 		all_empty = len(all_posters)
 		for p in get_graphics(t, opts, series_season_ep, poster_type, single_option, opts.language):
@@ -1247,7 +1251,7 @@ def main():
 		if opts.mythvideo:
 			if len(series_season_ep) < 2:
 				print u"Season and Episode numbers required."
-				sys.exit(True)
+				sys.exit(0)
 		all_banners = u'Banner:'
 		all_empty = len(all_banners)
 		for b in get_graphics(t, opts, series_season_ep, banner_type, single_option, opts.language):
@@ -1271,7 +1275,7 @@ def main():
 		print "#"*20
 		print "# Processing complete"
 		print "#"*20
-	sys.exit(True)
+	sys.exit(0)
 #end main
 
 if __name__ == "__main__":
