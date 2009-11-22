@@ -22,8 +22,8 @@ use Encode;
 
 eval "use DateTime::Format::Strptime"; my $has_date_format = $@ ? 0 : 1;
 
-use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M);
-use Getopt::Std; 
+use vars qw($opt_h $opt_r $opt_d $opt_l $opt_i $opt_v $opt_D $opt_M);
+use Getopt::Long;
 
 $title = "Alpacine Query"; 
 $version = "v1.1";
@@ -323,11 +323,20 @@ sub getMovieList {
 #
 
 # parse command line arguments 
-getopts('ohrdivDMP');
+
+    GetOptions( "version" => \$opt_v,
+                "info" => \$opt_i,
+                "language" => \$opt_l,
+                "Data" => \$opt_D,
+                "Movie" => \$opt_M,
+                );
 
 # print out info 
 if (defined $opt_v) { version(); exit 1; }
 if (defined $opt_i) { info(); exit 1; }
+if (defined $opt_l) {
+    my $lang = shift;
+}
 
 # print out usage if needed
 if (defined $opt_h || $#ARGV<0) { help(); }
