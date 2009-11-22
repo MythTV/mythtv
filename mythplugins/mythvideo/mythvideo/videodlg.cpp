@@ -496,7 +496,7 @@ namespace
             {
                 QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/Movie/tmdb.pl"));
+                    .arg("mythvideo/scripts/Movie/tmdb.py"));
 
                 cmd = gContext->GetSetting("mythvideo.MovieGrabber", def_cmd);
                 cmd.append(" -M");
@@ -612,7 +612,7 @@ namespace
             {
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
-                    .arg("mythvideo/scripts/Movie/tmdb.pl"));
+                    .arg("mythvideo/scripts/Movie/tmdb.py"));
                 QString cmd = gContext->GetSetting("mythvideo.MovieGrabber",
                                                         def_cmd);
                 cmd.append(" -D");

@@ -131,7 +131,7 @@ void MetadataSettings::loadData(void)
                                          .arg(GetShareDir()).arg("ttvdb.py"));
     QString currentMovieGrabber = gContext->GetSetting("mythvideo.MovieGrabber",
                                          QString("%1mythvideo/scripts/Movie/%2")
-                                         .arg(GetShareDir()).arg("tmdb.pl"));
+                                         .arg(GetShareDir()).arg("tmdb.py"));
 
     for (QStringList::const_iterator i = MovieScripts.end() - 1;
             i != MovieScripts.begin() - 1; --i)
