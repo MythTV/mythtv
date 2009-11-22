@@ -864,6 +864,16 @@ void MythMainWindow::Init(void)
         VERBOSE(VB_GENERAL, "Using the OpenGL painter");
         d->painter = new MythOpenGLPainter();
         d->paintwin = new MythPainterWindowGL(this, d);
+        QGLWidget *qgl = dynamic_cast<QGLWidget *>(d->paintwin);
+        if (qgl && !qgl->isValid())
+        {
+            VERBOSE(VB_IMPORTANT, "Failed to create OpenGL painter. "
+                                  "Check your OpenGL installation.");
+            delete d->painter;
+            d->painter = NULL;
+            delete d->paintwin;
+            d->paintwin = NULL;
+        }
     }
     else
 #endif
@@ -874,8 +884,9 @@ void MythMainWindow::Init(void)
         d->painter = new MythVDPAUPainter();
         d->paintwin = new MythPainterWindowVDPAU(this, d);
     }
-    else
 #endif
+
+    if (!d->painter && !d->paintwin)
     {
         VERBOSE(VB_GENERAL, "Using the Qt painter");
         d->painter = new MythQtPainter();
