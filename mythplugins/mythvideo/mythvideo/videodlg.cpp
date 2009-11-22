@@ -4596,7 +4596,6 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
     }
     else
     {
-        metadata->Reset();
         metadata->UpdateDatabase();
         MythUIButtonListItem *item = GetItemByMetadata(metadata);
         if (item != NULL)
