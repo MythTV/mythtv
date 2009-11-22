@@ -29,7 +29,7 @@ use utf8;
 use Encode 'from_to';
 use MythTV::MythVideoCommon;
 
-use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_M $opt_P $opt_originaltitle $opt_casting $opt_u_dummy);
+use vars qw($opt_h $opt_r $opt_d $opt_i $opt_v $opt_D $opt_l $opt_M $opt_P $opt_originaltitle $opt_casting $opt_u_dummy);
 use Getopt::Long;
 
 $title = "Allocine Query"; 
@@ -336,6 +336,7 @@ sub getMovieList {
     GetOptions( "utf8" => \$opt_u_dummy,
                 "version" => \$opt_v,
                 "info" => \$opt_i,
+                "language" => \$opt_l,
                 "originaltitle" => \$opt_originaltitle,
                 "casting" => \$opt_casting,
                 "Data" => \$opt_D,
@@ -347,6 +348,9 @@ sub getMovieList {
 # print out info 
 if (defined $opt_v) { version(); exit 1; }
 if (defined $opt_i) { info(); exit 1; }
+if (defined $opt_l) {
+    my $lang = shift;
+}
 
 # print out usage if needed
 if (defined $opt_h || $#ARGV<0) { help(); }
