@@ -144,14 +144,19 @@ void VideoSync::Start(void)
  */
 void VideoSync::SetFrameInterval(int fr, bool intr)
 {
+    bool changed = (fr != m_frame_interval) && (m_interlaced != intr);
     m_frame_interval = fr;
     m_interlaced = intr;
-    int tolerance = m_refresh_interval / 200;
-    if (m_interlaced && m_refresh_interval > ((m_frame_interval/2) + tolerance))
-        m_interlaced = false; // can't display both fields at 2x rate
 
-    VERBOSE(VB_PLAYBACK, QString("Set video sync frame interval to %1")
+    if (changed)
+    {
+        int tolerance = m_refresh_interval / 200;
+        if (m_interlaced &&
+            m_refresh_interval > ((m_frame_interval/2) + tolerance))
+            m_interlaced = false; // can't display both fields at 2x rate
+        VERBOSE(VB_PLAYBACK, QString("Set video sync frame interval to %1")
                                  .arg(m_frame_interval));
+    }
 }
 
 void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
