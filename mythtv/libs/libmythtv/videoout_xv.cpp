@@ -2471,7 +2471,7 @@ void VideoOutputXv::Show(FrameScanType scan)
     }
 
     if ((windows[0].IsRepaintNeeded() || xv_need_bobdeint_repaint) &&
-        (VideoOutputSubType() >= XVideo) && !windows[0].IsEmbedding())
+         VideoOutputSubType() >= XVideo)
     {
         DrawUnusedRects(/* don't do a sync*/false);
     }
