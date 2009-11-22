@@ -19,10 +19,12 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.2"
+__version__="v0.1.3"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
+# 0.1.3 Added display of URL to TMDB XML when debug was specified
+#       Added check and skipping any empty data from TMDB
 
 import os, struct, sys
 import urllib, urllib2
@@ -451,26 +453,30 @@ class MovieDb:
         if cur_poster.largest() != None:
             tmp = u''
             for imagedata in cur_poster.largest():
-                tmp+=u"%s," % imagedata[0]
+                if imagedata[0]:
+                    tmp+=u"%s," % imagedata[0]
             if len(tmp):
                 tmp = tmp[:-1]
-            cur_movie[u'poster'] = tmp
+                cur_movie[u'poster'] = tmp
         if cur_backdrop.largest() != None:
             tmp = u''
             for imagedata in cur_backdrop.largest():
-                tmp+=u"%s," % imagedata[0]
+                if imagedata[0]:
+                    tmp+=u"%s," % imagedata[0]
             if len(tmp):
                 tmp = tmp[:-1]
-            cur_movie[u'backdrop'] = tmp
+                cur_movie[u'backdrop'] = tmp
         if cur_people.has_key(u'people'):
             if cur_people[u'people'] != None:
                 for key in cur_people[u'people']:
-                    cur_movie[key] = cur_people[u'people'][key]
+                    if cur_people[u'people'][key]:
+                        cur_movie[key] = cur_people[u'people'][key]
 
         if self._tmdbDetails == self.movieDetails:
             data = {}
             for key in cur_movie.keys():
-                data[key] = cur_movie[key]
+                if cur_movie[key]:
+                    data[key] = cur_movie[key]
             return data
         else:
             return cur_movie
@@ -506,7 +512,8 @@ class MovieDb:
             else:
                 translated[key] = cur_movie[key]
             for key in translated.keys():
-                translated[key] = translated[key].replace(u'\n',u' ') # Remove any line-feeds from data
+                if translated[key]:
+                    translated[key] = translated[key].replace(u'\n',u' ') # Remove any line-feeds from data
         return translated
     # end _mythtvDetails()
 
@@ -520,14 +527,19 @@ class MovieDb:
             URL = self.config[u'urls'][u'movie.search']
         title = urllib.quote(title.encode("utf-8"))
         url = URL % (title)
+        if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
+            sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
 
         etree = XmlHandler(url).getEt()
         if etree is None:
-            return []
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the title (%s)' % title)
+
         search_results = SearchResults()
         for cur_result in etree.find(u"movies").findall(u"movie"):
             cur_movie = self._tmdbDetails(cur_result)
             search_results.append(cur_movie)
+        if not len(search_results):
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the title (%s)' % title)
 
         # Check if no ui has been requested and therefore just return the raw search results.
         if (self.config['interactive'] == False and self.config['select_first'] == False and self.config['custom_ui'] == None) or not len(search_results):
@@ -557,14 +569,17 @@ class MovieDb:
             URL = self.config[u'urls'][u'tmdbid.search']
         id_url = urllib.quote(by_id.encode("utf-8"))
         url = URL % (id_url)
+        if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
+            sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
+
         etree = XmlHandler(url).getEt()
 
         if etree is None:
-            return None
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the TMDB number (%s)' % by_id)
         if etree.find(u"movies").find(u"movie"):
             return self.movieDetails(etree.find(u"movies").find(u"movie"))
         else:
-            return None
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the TMDB number (%s)' % by_id)
 
     def searchIMDB(self, by_id, lang=False):
         """Searches for a film by its IMDB number.
@@ -576,14 +591,17 @@ class MovieDb:
             URL = self.config[u'urls'][u'imdb.search']
         id_url = urllib.quote(by_id.encode("utf-8"))
         url = URL % (id_url)
+        if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
+            sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
+
         etree = XmlHandler(url).getEt()
 
         if etree is None:
-            return None
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the IMDB number (%s)' % by_id)
         if self._tmdbDetails(etree.find(u"movies").find(u"movie")).has_key(u'id'):
             return self.searchTMDB(self._tmdbDetails(etree.find(u"movies").find(u"movie"))[u'id'],)
         else:
-            return None
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the IMDB number (%s)' % by_id)
 
     def searchHash(self, by_hash, lang=False):
         """Searches for a film by its TMDB id number.
@@ -595,19 +613,21 @@ class MovieDb:
             URL = self.config[u'urls'][u'hash.info']
         id_url = urllib.quote(by_hash.encode("utf-8"))
         url = URL % (id_url)
-        #print url # Used to get a link to the raw TMDB xml
+        if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
+            sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
+
         etree = XmlHandler(url).getEt()
 
         if etree is None:
-            return None
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the hash value (%s)' % by_hash)
         if etree.find(u"movies").find(u"movie"):
             return self.movieDetails(etree.find(u"movies").find(u"movie"))
         else:
-            return None
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the hash value (%s)' % by_hash)
 
 
     def searchImage(self, by_id, lang=False, filterout=False):
-        """Searches for a film's images URLs by TVDB number.
+        """Searches for a film's images URLs by TMDB number.
         Returns a image URL dictionary
         """
         if lang: # Override language
@@ -616,11 +636,14 @@ class MovieDb:
             URL = self.config[u'urls'][u'image.search']
         id_url = urllib.quote(by_id.encode("utf-8"))
         url = URL % (id_url)
+        if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
+            sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
+
         etree = XmlHandler(url).getEt()
         if etree is None:
-            return {}
+            raise TmdbMovieOrPersonNotFound(u'No Movie matching the TMDB number (%s)' % by_id)
         if not etree.find(u"movies").find(u"movie"):
-            return {}
+            raise TmdbMovieOrPersonNotFound(u'No Movie matching the TMDB number (%s)' % by_id)
 
         cur_poster = {}
         cur_backdrop = {}
@@ -687,12 +710,14 @@ class MovieDb:
         else:
             URL = self.config[u'urls'][u'person.search']
         url = URL % (id_url)
-        #print url # Used to get the url to check the raw xml from TMDB
+        if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
+            sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
+
         etree = XmlHandler(url).getEt()
         if etree is None:
-            return []
+            raise TmdbMovieOrPersonNotFound(u'No People matches found for the name (%s)' % name)
         if not etree.find(u"people").find(u"person"):
-            return []
+            raise TmdbMovieOrPersonNotFound(u'No People matches found for the name (%s)' % name)
 
         people = []
         for item in etree.find(u"people").getchildren():
@@ -736,12 +761,14 @@ class MovieDb:
             URL = self.config[u'urls'][u'person.info']
         id_url = urllib.quote(by_id)
         url = URL % (id_url)
-        #print url # Used to get a link to the raw TMDB xml
+        if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
+            sys.stderr.write(u'\nDEBUG: XML URL:%s\n\n' % url)
+
         etree = XmlHandler(url).getEt()
         if etree is None:
-            return {}
+            raise TmdbMovieOrPersonNotFound(u'No Person match found for the Person ID (%s)' % by_id)
         if not etree.find(u"people").find(u"person"):
-            return {}
+            raise TmdbMovieOrPersonNotFound(u'No Person match found for the Person ID (%s)' % by_id)
         person = {}
         elements = ['also_known_as', 'filmography', 'images' ]
 
@@ -750,20 +777,30 @@ class MovieDb:
                 if elem.tag == 'also_known_as':
                     alias = []
                     for a in elem.getchildren():
-                        alias.append(self.textUtf8(a.text).replace(u'\n',u' '))
-                    person[elem.tag] = alias
+                        if a.text:
+                            alias.append(self.textUtf8(a.text).replace(u'\n',u' '))
+                    if alias:
+                        person[elem.tag] = alias
                 elif elem.tag == 'filmography':
                     movies = []
                     for a in elem.getchildren():
-                        movies.append({'job': a.get('job').replace(u'\n',u' '), 'name': a.get('name').replace(u'\n',u' '), 'url': a.get('url').replace(u'\n',u' '), 'id': a.get('id').replace(u'\n',u' '), 'character': a.get('character').replace(u'\n',u' ')})
-                    person[elem.tag] = movies
+                        details = {}
+                        for tag in a:
+                            if a.get(tag):
+                                details[tag] = a.get(tag).replace(u'\n',u' ')
+                        if details:
+                            movies.append(details)
+                    if movies:
+                        person[elem.tag] = movies
                 elif len(elem.getchildren()):
                     images = {}
                     for image in elem.getchildren():
                         images[image.get('size')] = image.get('url')
-                    person[elem.tag] = images
+                    if images:
+                        person[elem.tag] = images
             else:
-                person[elem.tag] = self.textUtf8(elem.text).replace(u'\n',u' ')
+                if elem.text:
+                    person[elem.tag] = self.textUtf8(elem.text).replace(u'\n',u' ')
         return person
     # end personInfo()
 

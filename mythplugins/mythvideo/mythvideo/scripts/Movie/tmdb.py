@@ -30,7 +30,7 @@
 #-------------------------------------
 __title__ ="TheMovieDB APIv2 Query";
 __author__="R.D.Vaughan"
-__version__="v0.1.3"
+__version__="v0.1.4"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 New movie data fields now have proper key names
@@ -38,11 +38,14 @@ __version__="v0.1.3"
 #       Fixed and re-arranged some code for minor issues.
 # 0.1.3 Fixed an abort when there is no data found for Movie and People information display
 #       Added CamelCase to all People information keys
+# 0.1.4 Added handling of all of the tmdb_api exceptions and information process exceptions with proper exit
+#       codes (0-Script Normal exit; 1-Script Exception exit)
+
 
 __usage_examples__='''
 Request tmdb.py verison number:
 > ./tmdb.py -v
-themoviedb.org Query (v0.1.0) by R.D.Vaughan
+themoviedb.org Query (v0.1.x) by R.D.Vaughan
 
 Request a list of matching movie titles:
 > ./tmdb.py -M "Avatar"
@@ -200,8 +203,8 @@ They should have been included with the distribution of tmdb.py.
 ''')
     sys.exit(1)
 
-if tmdb_api.__version__ < '0.1.1':
-    sys.stderr.write("\n! Error: Your current installed tmdb_api.py version is (%s)\nYou must at least have version (0.1.1) or higher.\n" % tmdb_api.__version__)
+if tmdb_api.__version__ < '0.1.3':
+    sys.stderr.write("\n! Error: Your current installed tmdb_api.py version is (%s)\nYou must at least have version (0.1.3) or higher.\n" % tmdb_api.__version__)
     sys.exit(1)
 
 
@@ -266,6 +269,7 @@ class moviedbQueries():
                 language = language,
                 search_all_languages = search_all_languages,)
         self.mythtvgrabber = [u'Title', u'Subtitle', u'Year', u'ReleaseDate', u'InetRef', u'URL', u'Director', u'Plot', u'UserRating', u'MovieRating', u'Runtime', u'Season', u'Episode', u'Coverart', u'Fanart', u'Banner', u'Screenshot', u'Cast', u'Genres', u'Countries', u'ScreenPlay', u'Studios', u'Producer', u'ProductionDesign', u'DirectorOfPhotography', u'OriginalMusicComposer', u'Story', u'CostumeDesign', u'Editor', u'Type', u'Casting', u'AssociateProducer', u'Popularity', u'Budget', u'Imdb', u'ArtDirection']
+        self.error_messages = {'TmdHttpError': u"! Error: A connection error to themoviedb.org was raised (%s)\n", 'TmdXmlError': u"! Error: Invalid XML was received from themoviedb.org (%s)\n", 'TmdBaseError': u"! Error: A user interface error was raised (%s)\n", 'TmdbUiAbort': u"! Error: A user interface input error was raised (%s)\n", }
     # end __init__()
 
     def movieSearch(self, title):
@@ -280,10 +284,24 @@ class moviedbQueries():
                 else:
                     name = match['name']
                 sys.stdout.write( u'%s:%s\n' % (match[u'id'], name))
+        except TmdbMovieOrPersonNotFound, msg:
+            sys.stderr.write(u"%s\n" % msg)
+            return
+        except TmdHttpError, msg:
+            sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
+            sys.exit(1)
+        except TmdXmlError, msg:
+            sys.stderr.write(self.error_messages['TmdXmlError'] % msg)
+            sys.exit(1)
+        except TmdBaseError, msg:
+            sys.stderr.write(self.error_messages['TmdBaseError'] % msg)
+            sys.exit(1)
         except TmdbUiAbort, msg:
-            sys.stderr.write(u"! Error: An tmdb exception was raised (%s)\n" % msg)
+            sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
+            sys.exit(1)
         except:
-            sys.stderr.write(u"! Error: Unknown tmdb_api Title search error\n")
+            sys.stderr.write(u"! Error: Unknown error during a Title search\n")
+            sys.exit(1)
     # end movieSearch()
 
     def peopleSearch(self, persons_name):
@@ -292,10 +310,24 @@ class moviedbQueries():
         try:
             for match in self.config['moviedb'].searchPeople(persons_name):
                 sys.stdout.write( u'%s:%s\n' % (match[u'id'], match['name']))
+        except TmdbMovieOrPersonNotFound, msg:
+            sys.stderr.write(u"%s\n" % msg)
+            return
+        except TmdHttpError, msg:
+            sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
+            sys.exit(1)
+        except TmdXmlError, msg:
+            sys.stderr.write(self.error_messages['TmdXmlError'] % msg)
+            sys.exit(1)
+        except TmdBaseError, msg:
+            sys.stderr.write(self.error_messages['TmdBaseError'] % msg)
+            sys.exit(1)
         except TmdbUiAbort, msg:
-            sys.stderr.write(u"! Error: An tmdb exception was raised (%s)\n" % msg)
+            sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
+            sys.exit(1)
         except:
-            sys.stderr.write(u"! Error: Unknown tmdb_api People search error\n")
+            sys.stderr.write(u"! Error: Unknown error during a People search\n")
+            sys.exit(1)
     # end moviePeople()
 
     def camelcase(self, value):
@@ -309,7 +341,7 @@ class moviedbQueries():
     # end camelcase()
 
     def displayMovieData(self, data):
-        '''Display movie data to stdout # u'ArtDirection'
+        '''Display movie data to stdout
         '''
         if data == None:
             return
@@ -334,16 +366,55 @@ class moviedbQueries():
     def movieData(self, tmdb_id):
         '''Get Movie data by IMDB or TMDB number and display "key:value" pairs to stdout
         '''
-        if len(tmdb_id) == 7:
-            self.displayMovieData(self.config['moviedb'].searchIMDB(tmdb_id))
-        else:
-            self.displayMovieData(self.config['moviedb'].searchTMDB(tmdb_id))
+        try:
+            if len(tmdb_id) == 7:
+                self.displayMovieData(self.config['moviedb'].searchIMDB(tmdb_id))
+            else:
+                self.displayMovieData(self.config['moviedb'].searchTMDB(tmdb_id))
+        except TmdbMovieOrPersonNotFound, msg:
+            sys.stderr.write(u"%s\n" % msg)
+            return
+        except TmdHttpError, msg:
+            sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
+            sys.exit(1)
+        except TmdXmlError, msg:
+            sys.stderr.write(self.error_messages['TmdXmlError'] % msg)
+            sys.exit(1)
+        except TmdBaseError, msg:
+            sys.stderr.write(self.error_messages['TmdBaseError'] % msg)
+            sys.exit(1)
+        except TmdbUiAbort, msg:
+            sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
+            sys.exit(1)
+        except:
+            sys.stderr.write(u"! Error: Unknown error during a Movie information display\n")
+            sys.exit(1)
     # end movieData()
 
     def peopleData(self, tmdb_id):
         '''Get People data by TMDB people id number and display "key:value" pairs to stdout
         '''
-        data = self.config['moviedb'].personInfo(tmdb_id)
+        try:
+            data = self.config['moviedb'].personInfo(tmdb_id)
+        except TmdbMovieOrPersonNotFound, msg:
+            sys.stderr.write(u"%s\n" % msg)
+            return
+        except TmdHttpError, msg:
+            sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
+            sys.exit(1)
+        except TmdXmlError, msg:
+            sys.stderr.write(self.error_messages['TmdXmlError'] % msg)
+            sys.exit(1)
+        except TmdBaseError, msg:
+            sys.stderr.write(self.error_messages['TmdBaseError'] % msg)
+            sys.exit(1)
+        except TmdbUiAbort, msg:
+            sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
+            sys.exit(1)
+        except:
+            sys.stderr.write(u"! Error: Unknown error during a Person information display\n")
+            sys.exit(1)
+
         if data == None:
             return
         sys.stdout.write(u'%s:%s\n' % (u'Name', data[u'name']))
@@ -374,7 +445,26 @@ class moviedbQueries():
     def hashData(self, hash_value):
         '''Get Movie data by Hash value and display "key:value" pairs to stdout
         '''
-        self.displayMovieData(self.config['moviedb'].searchHash(hash_value))
+        try:
+            self.displayMovieData(self.config['moviedb'].searchHash(hash_value))
+        except TmdbMovieOrPersonNotFound, msg:
+            sys.stderr.write(u"%s\n" % msg)
+            return
+        except TmdHttpError, msg:
+            sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
+            sys.exit(1)
+        except TmdXmlError, msg:
+            sys.stderr.write(self.error_messages['TmdXmlError'] % msg)
+            sys.exit(1)
+        except TmdBaseError, msg:
+            sys.stderr.write(self.error_messages['TmdBaseError'] % msg)
+            sys.exit(1)
+        except TmdbUiAbort, msg:
+            sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
+            sys.exit(1)
+        except:
+            sys.stderr.write(u"! Error: Unknown error during a Hash value Movie information display\n")
+            sys.exit(1)
     # end hashData()
 
 # end Class moviedbQueries()

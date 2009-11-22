@@ -16,10 +16,11 @@ __title__ ="tmdb_ui - Is a simple console user interface for the tmdb_api. The i
 __author__="dbr/Ben modified by R.D. Vaughan"
 __purpose__='''Console interface for selecting a movie from themoviedb.org. This interface would be invoked when an exact match is not found and the invoking script has specified the "interactive = True" when creating an instance of MovieDb().
 '''
-__version__="v0.1.2"
+__version__="v0.1.3"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Release bump - no changes to this code
+# 0.1.3 Release bump - no changes to this code
 
 
 """Contains included user interfaces for tmdb movie/person selection.
