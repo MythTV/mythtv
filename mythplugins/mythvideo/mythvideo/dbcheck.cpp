@@ -7,6 +7,9 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdbparams.h>
 #include <mythtv/schemawizard.h>
+#include <mythtv/libmyth/remotefile.h>
+#include <mythtv/libmyth/remoteutil.h>
+#include <mythtv/libmyth/util.h>
 
 #include "storagegroup.h"
 
@@ -38,10 +41,51 @@ namespace
         }
     }
 
+    void UpdateHashes(void)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT `filename`, `host` FROM videometadata WHERE "
+                      "`hash` = \"\"");
+        if (query.exec() && query.size())
+        {
+            while (query.next())
+            {
+                QString filename = query.value(0).toString();
+                QString host = query.value(1).toString();
+                QString hash;
+
+                if (!host.isEmpty())
+                {
+                    QString url = RemoteGenFileURL("Videos", host, filename);
+                    hash =  RemoteFile::GetFileHash(url);
+                }
+                else
+                    hash = FileHash(filename);
+
+                MSqlQuery updatequery(MSqlQuery::InitCon());
+
+                updatequery.prepare("UPDATE videometadata set `hash` = :HASH "
+                              "WHERE `filename` = :FILENAME AND "
+                              "`host` = :HOST");
+                updatequery.bindValue(":HASH", hash);
+                updatequery.bindValue(":FILENAME", filename);
+                updatequery.bindValue(":HOST", host);
+                if (!updatequery.exec())
+                    MythDB::DBError(QObject::tr("Error: failed to hash file "
+                                                "'%1'").arg(filename), updatequery);
+                else
+                    VERBOSE(VB_GENERAL,
+                        QString("Hash (%1) generated for file (%2)")
+                        .arg(hash).arg(filename));
+            }
+        }
+    }
+
+
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1030";
+    const QString currentDatabaseVersion = "1031";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -1059,6 +1103,15 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
             if (!performActualUpdate(updates, "1030", dbver,
                                      MythVideoVersionName))
                 return false;
+        }
+
+        if (dbver == "1030")
+        {
+            UpdateHashes();
+            if (!UpdateDBVersionNumber(MythVideoVersionName, "1031"))
+                return false;
+
+            dbver = "1031";
         }
 
         return true;

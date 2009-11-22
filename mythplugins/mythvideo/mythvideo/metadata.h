@@ -48,7 +48,7 @@ class Metadata
     static SortKey GenerateDefaultSortKey(const Metadata &m, bool ignore_case);
     static int UpdateHashedDBRecord(const QString &hash, const QString &file_name,
                                     const QString &host);
-    static QString FileHash(const QString &file_name, const QString &host);
+    static QString VideoFileHash(const QString &file_name, const QString &host);
     static QString FilenameToMeta(const QString &file_name, int position);
     static QString TrimTitle(const QString &title, bool ignore_case);
 

@@ -9,6 +9,7 @@
 #include <mythtv/mythdb.h>
 #include <mythtv/libmyth/remotefile.h>
 #include <mythtv/libmyth/remoteutil.h>
+#include <mythtv/libmyth/util.h>
 #include <mythtv/libmythdb/mythverbose.h>
 
 #include "globals.h"
@@ -437,7 +438,7 @@ bool MetadataImp::DeleteFile(class VideoList &dummy)
 
 void MetadataImp::Reset()
 {
-    MetadataImp tmp(m_filename, Metadata::FileHash(m_filename, m_host), VIDEO_TRAILER_DEFAULT,
+    MetadataImp tmp(m_filename, Metadata::VideoFileHash(m_filename, m_host), VIDEO_TRAILER_DEFAULT,
                     VIDEO_COVERFILE_DEFAULT, VIDEO_SCREENSHOT_DEFAULT, VIDEO_BANNER_DEFAULT,
                     VIDEO_FANART_DEFAULT, Metadata::FilenameToMeta(m_filename, 1),
                     Metadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT, 
@@ -570,7 +571,7 @@ void MetadataImp::saveToDatabase()
     if (m_title.isEmpty())
         m_title = Metadata::FilenameToMeta(m_filename, 1);
     if (m_hash.isEmpty())
-        m_hash = Metadata::FileHash(m_filename, m_host);
+        m_hash = Metadata::VideoFileHash(m_filename, m_host);
     if (m_subtitle.isEmpty())
         m_subtitle = Metadata::FilenameToMeta(m_filename, 4);
     if (m_director.isEmpty())
@@ -913,49 +914,16 @@ int Metadata::UpdateHashedDBRecord(const QString &hash,
     return intid;
 }
 
-QString Metadata::FileHash(const QString &file_name,
+QString Metadata::VideoFileHash(const QString &file_name,
                            const QString &host)
 {
     if (!host.isEmpty())
-        return QString();
-
-    QFile file(file_name);
-    QFileInfo fileinfo(file);
-    qint64 initialsize = fileinfo.size();
-    quint64 hash = 0;
-
-    if (initialsize == 0)
-        return QString();
-
-    if (file.open(QIODevice::ReadOnly))
-        hash = initialsize;
+    {
+        QString url = RemoteGenFileURL("Videos", host, file_name);
+        return RemoteFile::GetFileHash(url);
+    }
     else
-    {
-        VERBOSE(VB_GENERAL, QString("Error: Unable to open "
-                "selected file, missing read permissions?"));
-        return QString();
-    }
-
-    file.seek(0);
-    QDataStream stream(&file);
-    stream.setByteOrder(QDataStream::LittleEndian);
-    for (quint64 tmp = 0, i = 0; i < 65536/sizeof(tmp); i++)
-    {
-        stream >> tmp;
-        hash += tmp;
-    }
-
-    file.seek(initialsize - 65536);
-    for (quint64 tmp = 0, i = 0; i < 65536/sizeof(tmp); i++)
-    {
-        stream >> tmp;
-        hash += tmp;
-    }
-
-    file.close();
-
-    QString output = QString("%1").arg(hash, 0, 16);
-    return output;
+        return FileHash(file_name);
 }
 
 QString Metadata::FilenameToMeta(const QString &file_name, int position)

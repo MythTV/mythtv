@@ -274,7 +274,7 @@ class VideoScannerThread : public QThread
                 int id = -1;
 
                 // Are we sure this needs adding?  Let's check our Hash list.
-                QString hash = Metadata::FileHash(p->first, p->second.host);
+                QString hash = Metadata::VideoFileHash(p->first, p->second.host);
                 if (!hash.isEmpty())
                 {
                     id = Metadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
@@ -283,8 +283,9 @@ class VideoScannerThread : public QThread
                         // Whew, that was close.  Let's remove that thing from
                         // our purge list, too.
                         VERBOSE(VB_IMPORTANT, QString("Hash %1 already exists in the "
-                                                      "database, updating record: %2")
-                                                      .arg(hash).arg(id));
+                                                      "database, updating record %2 "
+                                                      "with new filename %3")
+                                                      .arg(hash).arg(id).arg(p->first));
                         preservelist.append(id);
                     }
                 }
