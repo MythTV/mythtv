@@ -74,6 +74,7 @@ inline int   sq(int   a) { return a*a; }
 
 MPUBLIC bool IsMACAddress(QString MAC);
 MPUBLIC bool WakeOnLAN(QString MAC);
+MPUBLIC QString FileHash(QString filename);
 
 /// Is A/V Sync destruction daemon is running on this host?
 MPUBLIC bool IsPulseAudioRunning(void);

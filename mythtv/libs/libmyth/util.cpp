@@ -1325,6 +1325,47 @@ bool IsMACAddress(QString MAC)
     return true;
 }
 
+QString FileHash(QString filename)
+{
+    QFile file(filename);
+    QFileInfo fileinfo(file);
+    qint64 initialsize = fileinfo.size();
+    quint64 hash = 0;
+
+    if (initialsize == 0)
+        return QString();
+
+    if (file.open(QIODevice::ReadOnly))
+        hash = initialsize;
+    else
+    {
+        VERBOSE(VB_GENERAL, QString("Error: Unable to open "
+                "selected file, missing read permissions?"));
+        return QString();
+    }
+
+    file.seek(0);
+    QDataStream stream(&file);
+    stream.setByteOrder(QDataStream::LittleEndian);
+    for (quint64 tmp = 0, i = 0; i < 65536/sizeof(tmp); i++)
+    {
+        stream >> tmp;
+        hash += tmp;
+    }
+
+    file.seek(initialsize - 65536);
+    for (quint64 tmp = 0, i = 0; i < 65536/sizeof(tmp); i++)
+    {
+        stream >> tmp;
+        hash += tmp;
+    }
+
+    file.close();
+
+    QString output = QString("%1").arg(hash, 0, 16);
+    return output;
+}
+
 bool WakeOnLAN(QString MAC)
 {
     char msg[1024] = "\xFF\xFF\xFF\xFF\xFF\xFF";

@@ -246,6 +246,22 @@ bool RemoteFile::DeleteFile(void)
     return result;
 }
 
+QString RemoteFile::GetFileHash(const QString &url)
+{
+    RemoteFile *rf = new RemoteFile();
+
+    if (!rf)
+        return false;
+
+    rf->SetURL(url);
+    QString ret = rf->GetFileHash();
+
+    delete rf;
+
+    return ret;
+}
+
+
 bool RemoteFile::Exists(const QString &url)
 {
     RemoteFile *rf = new RemoteFile();
@@ -259,6 +275,46 @@ bool RemoteFile::Exists(const QString &url)
     delete rf;
 
     return ret;
+}
+
+QString RemoteFile::GetFileHash(void)
+{
+    QString result;
+    QUrl qurl(path);
+    QString filename = qurl.path();
+    QString sgroup   = qurl.userName();
+
+    if (!qurl.fragment().isEmpty() || path.right(1) == "#")
+        filename = filename + "#" + qurl.fragment();
+
+    if (filename.left(1) == "/")
+        filename = filename.right(filename.length()-1);
+
+    if (filename.isEmpty() || sgroup.isEmpty())
+        return false;
+
+    sock = openSocket(true);
+
+    if (!sock)
+        return false;
+
+    QStringList strlist("QUERY_FILE_HASH");
+    strlist << filename;
+    strlist << sgroup;
+
+    sock->writeStringList(strlist);
+    if (!sock->readStringList(strlist, false))
+    {
+        VERBOSE(VB_IMPORTANT, "Remote check file hash timeout.");
+        result = QString();
+    }
+    else
+        result = strlist[0];
+
+    sock->DownRef();
+    sock = NULL;
+
+    return result;
 }
 
 bool RemoteFile::Exists(void)

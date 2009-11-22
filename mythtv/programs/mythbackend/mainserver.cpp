@@ -398,6 +398,13 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         else
             HandleQueryFileExists(listline, pbs);
     }
+    else if (command == "QUERY_FILE_HASH")
+    {
+        if (listline.size() < 3)
+            VERBOSE(VB_IMPORTANT, "Bad QUERY_FILE_HASH command");
+        else
+            HandleQueryFileHash(listline, pbs);
+    }
     else if (command == "QUERY_GUIDEDATATHROUGH")
     {
         HandleQueryGuideDataThrough(pbs);
@@ -2523,6 +2530,43 @@ void MainServer::HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs)
     delete pginfo;
 }
 
+
+/**
+ * \addtogroup myth_network_protocol
+ * \par        QUERY_FILE_HASH \e storagegroup \e filename
+ */
+void MainServer::HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs)
+{
+    QString filename = slist[1];
+    QString storageGroup = "Default";
+    QStringList retlist;
+
+    if (slist.size() > 2)
+        storageGroup = slist[2];
+
+    if ((filename.isEmpty()) ||
+        (filename.contains("/../")) ||
+        (filename.startsWith("../")))
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR checking for file, filename '%1' "
+                "fails sanity checks").arg(filename));
+        retlist << "";
+        SendResponse(pbs->getSocket(), retlist);
+        return;
+    }
+
+    if (storageGroup.isEmpty())
+        storageGroup = "Default";
+
+    StorageGroup sgroup(storageGroup, gContext->GetHostName());
+
+    QString fullname = sgroup.FindRecordingFile(filename);
+    QString hash = FileHash(fullname);
+
+    retlist << hash;
+
+    SendResponse(pbs->getSocket(), retlist);
+}
 
 /**
  * \addtogroup myth_network_protocol

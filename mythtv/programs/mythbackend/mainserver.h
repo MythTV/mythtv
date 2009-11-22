@@ -105,6 +105,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleQueryFreeSpaceSummary(PlaybackSock *pbs);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryFileExists(QStringList &slist, PlaybackSock *pbs);
+    void HandleQueryFileHash(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryGuideDataThrough(PlaybackSock *pbs);
     void HandleGetPendingRecordings(PlaybackSock *pbs, QString table = "", int recordid=-1);
     void HandleGetScheduledRecordings(PlaybackSock *pbs);
