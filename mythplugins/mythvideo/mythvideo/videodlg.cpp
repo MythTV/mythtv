@@ -499,7 +499,7 @@ namespace
                     .arg("mythvideo/scripts/Movie/tmdb.py"));
 
                 cmd = gContext->GetSetting("mythvideo.MovieGrabber", def_cmd);
-                cmd.append(" -M");
+                cmd.append(QString(" -l %1 -M").arg(GetMythUI()->GetLanguage()));
             }
                 QStringList args;
                 args += title;
@@ -615,7 +615,7 @@ namespace
                     .arg("mythvideo/scripts/Movie/tmdb.py"));
                 QString cmd = gContext->GetSetting("mythvideo.MovieGrabber",
                                                         def_cmd);
-                cmd.append(" -D");
+                cmd.append(QString(" -l %1 -D").arg(GetMythUI()->GetLanguage()));
                 StartRun(cmd, QStringList(video_uid), "Video Data Query");
             }
         }
