@@ -28,14 +28,35 @@ extern "C" {
 
 #define ARSIZE(x) (sizeof(x) / sizeof((x)[0]))
 
+static const QString kVDPAUWarning =
+"WARNING - please read the following carefully:-\n\n"
+"* The VDPAU device has reported that you have run out of video memory.   *\n"
+"* MythTV requires at least 512Mb of video memory for full functionality. *\n"
+"* If you are using an integrated GPU, please ensure you have allocated   *\n"
+"* the maximum amount of shared memory in the BIOS settings.              *\n"
+"* Systems with only 256Mb of video memory are not supported.             *\n\n"
+"* If this message continues to appear and you have at least 512Mb of     *\n"
+"* video memory:-                                                         *\n"
+"*  - reduce the number of VDPAU video buffers by adding                  *\n"
+"*    'vdpaubuffersize=X' to your Playback Profile custom filter entry,   *\n"
+"*    where X is a value between 6 (minimum) and 17 (default). Playback   *\n"
+"*    of certain H.264 streams will fail with a reduced buffer size.      *\n"
+"*  - disable any VDPAU options (e.g. deinterlacing, sharpen and denoise) *\n"
+"*  - ensure the composite extension is disabled in your xorg.conf        *\n"
+"*  - disable the use of OpenGL Vsync (Setup->TV Settings->Playback)      *\n"
+"*  - use the Qt Paint Engine (Setup->Appearance)                         *\n"
+"*  - switch to a 'lightweight' theme such as MythCenter                  *\n"
+"*  - run MythTV at a lower screen resolution                             *\n";
+
 /* MACRO for error check */
 #define CHECK_ST \
   ok &= (vdp_st == VDP_STATUS_OK); \
-  if (!ok) { \
-      VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Error at %1:%2 (#%3, %4)") \
+  if (!ok) \
+      VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Error at %1:%2 (#%3, %4)") \
               .arg(__FILE__).arg( __LINE__).arg(vdp_st) \
               .arg(vdp_get_error_string(vdp_st))); \
-  }
+  if (vdp_st == VDP_STATUS_RESOURCES) \
+      VERBOSE(VB_IMPORTANT, LOC + kVDPAUWarning); \
 
 static const VdpChromaType vdp_chroma_type = VDP_CHROMA_TYPE_420;
 static const VdpOutputSurfaceRenderBlendState osd_blend =
