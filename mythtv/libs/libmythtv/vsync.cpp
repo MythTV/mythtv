@@ -144,7 +144,7 @@ void VideoSync::Start(void)
  */
 void VideoSync::SetFrameInterval(int fr, bool intr)
 {
-    bool changed = (fr != m_frame_interval) && (m_interlaced != intr);
+    bool changed = (fr != m_frame_interval) || (m_interlaced != intr);
     m_frame_interval = fr;
     m_interlaced = intr;
 
