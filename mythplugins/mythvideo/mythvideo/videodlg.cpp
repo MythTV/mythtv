@@ -490,7 +490,7 @@ namespace
 
                 cmd = gContext->GetSetting("mythvideo.TVGrabber",
                                                         def_cmd);
-                cmd.append(" -M");
+                cmd.append(QString(" -l %1 -M").arg(GetMythUI()->GetLanguage()));
             }
             else
             {
@@ -602,7 +602,7 @@ namespace
                     .arg("mythvideo/scripts/Television/ttvdb.py"));
                 QString cmd = gContext->GetSetting("mythvideo.TVGrabber",
                                                         def_cmd);
-                cmd.append(" -D");
+                cmd.append(QString(" -l %1 -D").arg(GetMythUI()->GetLanguage()));
                 QStringList args;
                 args << video_uid << QString::number(m_season) 
                                   << QString::number(m_episode);
