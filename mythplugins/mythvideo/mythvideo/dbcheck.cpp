@@ -62,6 +62,9 @@ namespace
                 else
                     hash = FileHash(filename);
 
+                if (hash == "NULL")
+                    hash = QString();
+
                 MSqlQuery updatequery(MSqlQuery::InitCon());
 
                 updatequery.prepare("UPDATE videometadata set `hash` = :HASH "

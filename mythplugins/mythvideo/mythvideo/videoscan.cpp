@@ -275,7 +275,7 @@ class VideoScannerThread : public QThread
 
                 // Are we sure this needs adding?  Let's check our Hash list.
                 QString hash = Metadata::VideoFileHash(p->first, p->second.host);
-                if (!hash.isEmpty())
+                if (hash != "NULL" && !hash.isEmpty())
                 {
                     id = Metadata::UpdateHashedDBRecord(hash, p->first, p->second.host);
                     if (id != -1)
