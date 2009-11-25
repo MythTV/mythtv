@@ -607,6 +607,9 @@ void NuppelVideoPlayer::UnpauseVideo(bool wait)
         if ((i % 10) == 9)
             VERBOSE(VB_IMPORTANT, "Waited too long for video out to unpause");
     }
+
+    if (videoOutput)
+        videoOutput->ExposeEvent();
 }
 
 void NuppelVideoPlayer::SetVideoActuallyPaused(bool val)
