@@ -56,7 +56,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_seekpos(0), m_seekwhence(0),
       m_dvdname(NULL), m_serialnumber(NULL),
       m_seeking(false), m_seektime(0),
-      m_currentTime(0),
+      m_currentTime(0), m_isInMenu(true),
       m_parent(0)
 {
     memset(&m_dvdMenuButton, 0, sizeof(AVSubtitle));
@@ -87,11 +87,14 @@ void DVDRingBufferPriv::CloseDVD(void)
     }
 }
 
-bool DVDRingBufferPriv::IsInMenu(void) const
+bool DVDRingBufferPriv::IsInMenu(bool update)
 {
     if (m_dvdnav)
-        return (!dvdnav_is_domain_vts(m_dvdnav));
-    return true;
+    {
+        if (update)
+            m_isInMenu = !dvdnav_is_domain_vts(m_dvdnav);
+    }
+    return m_isInMenu;
 }
 
 long long DVDRingBufferPriv::NormalSeek(long long time)
@@ -136,7 +139,7 @@ long long DVDRingBufferPriv::Seek(long long time)
                 QString("Seek() to time %1 failed").arg(time));
         return -1;
     }
-    else if (!IsInMenu() && !m_runningCellStart)
+    else if (!IsInMenu(true) && !m_runningCellStart)
     {
         m_gotStop = false;
         if (time > 0 && ffrewSkip == 1)
@@ -146,7 +149,7 @@ long long DVDRingBufferPriv::Seek(long long time)
     return m_currentpos;
 }
 
-void DVDRingBufferPriv::GetDescForPos(QString &desc) const
+void DVDRingBufferPriv::GetDescForPos(QString &desc)
 {
     if (IsInMenu())
     {
@@ -262,7 +265,8 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
         dvdStat = dvdnav_get_next_cache_block(
             m_dvdnav, &blockBuf, &dvdEvent, &dvdEventSize);
-
+        
+        bool isInMenu = IsInMenu(true);
         if (dvdStat == DVDNAV_STATUS_ERR)
         {
             VERBOSE(VB_IMPORTANT, QString("Error reading block from DVD: %1")
@@ -342,7 +346,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 m_menupktpts = 0;
                 InStillFrame(false);
 
-                if (IsInMenu())
+                if (isInMenu)
                 {
                     if (m_parent)
                         m_parent->HideDVDButton(true);
@@ -375,7 +379,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
                 ClearSubtitlesOSD();
 
-                if (IsInMenu())
+                if (isInMenu)
                 {
                     m_buttonstreamid = 32;
                     int aspect = dvdnav_get_video_aspect(m_dvdnav);
@@ -430,7 +434,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     m_vobid  = dsi->dsi_gi.vobu_vob_idn;
                     m_cellid = dsi->dsi_gi.vobu_c_idn;
                     if ((m_lastvobid == m_vobid) && (m_lastcellid == m_cellid)
-                            && IsInMenu())
+                            && isInMenu)
                     {
                         m_cellRepeated = true;
                     }
