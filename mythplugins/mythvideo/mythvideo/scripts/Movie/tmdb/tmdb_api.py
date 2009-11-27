@@ -19,12 +19,14 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.3"
+__version__="v0.1.4"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
 # 0.1.3 Added display of URL to TMDB XML when debug was specified
 #       Added check and skipping any empty data from TMDB
+# 0.1.4 More data validation added (e.g. valid image file extentions)
+#       More data massaging added.
 
 import os, struct, sys
 import urllib, urllib2
@@ -138,9 +140,13 @@ class Poster(MovieAttribute):
         ..becomes:
         poster['cover'] = ['http://example.org/poster_original.jpg, '36431']
         """
-        size = poster_et.get(u"size")
-        url = poster_et.get(u"url")
-        imageid = poster_et.get(u"id")
+        size = poster_et.get(u"size").strip()
+        url = poster_et.get(u"url").strip()
+        (dirName, fileName) = os.path.split(url)
+        (fileBaseName, fileExtension)=os.path.splitext(fileName)
+        if not fileExtension[1:] in self.image_extentions:
+            return
+        imageid = poster_et.get(u"id").strip()
         if not self.has_key(size):
             self[size] = [[url, imageid]]
         else:
@@ -194,15 +200,15 @@ class People(MovieAttribute):
                 try:
                     key = unicode(node.get(u"job").lower(), 'utf8')
                 except (UnicodeEncodeError, TypeError):
-                    key = node.get(u"job").lower()
+                    key = node.get(u"job").lower().strip()
                 try:
                     data = unicode(node.get(u'name'), 'utf8')
                 except (UnicodeEncodeError, TypeError):
                     data = node.get(u'name')
                 if people.has_key(key):
-                    people[key]=u"%s, %s" % (people[key], data)
+                    people[key]=u"%s,%s" % (people[key], data.strip())
                 else:
-                    people[key]=data
+                    people[key]=data.strip()
 
 class MovieDb:
     """Main interface to www.themoviedb.org
@@ -321,6 +327,7 @@ class MovieDb:
 
         # Translation of TMDB elements into MythTV keys/db grabber names
         self.config[u'mythtv_translation'] = {u'actor': u'cast', u'backdrop': u'fanart', u'categories': u'genres', u'director':  u'director', u'id': u'inetref', u'name': u'title', u'overview': u'plot', u'rating': u'userrating', u'poster': u'coverart', u'production_countries': u'countries', u'released': u'releasedate', u'runtime': u'runtime', u'url': u'url', u'imdb_id': u'imdb', }
+        self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
     # end __init__()
 
 
@@ -371,7 +378,7 @@ class MovieDb:
         cat = u''
         for category in categories_et.getchildren():
             if category.get(u'name') != None:
-                cat+=u"%s," % self.textUtf8(category.get(u'name'))
+                cat+=u"%s," % self.textUtf8(category.get(u'name').strip())
         if len(cat):
             cat=cat[:-1]
         return cat
@@ -394,7 +401,7 @@ class MovieDb:
         cat = u''
         for studio in studios_et.getchildren():
             if studio.get(u'name') != None:
-                cat+=u"%s," % self.textUtf8(studio.get(u'name'))
+                cat+=u"%s," % self.textUtf8(studio.get(u'name').strip())
         if len(cat):
             cat=cat[:-1]
         return cat
@@ -415,9 +422,9 @@ class MovieDb:
         for country in countries_et.getchildren():
             if country.get(u'name') != None:
                 if len(countries):
-                    countries+=u", %s" % self.textUtf8(country.get(u'name'))
+                    countries+=u", %s" % self.textUtf8(country.get(u'name').strip())
                 else:
-                    countries=self.textUtf8(country.get(u'name'))
+                    countries=self.textUtf8(country.get(u'name').strip())
         return countries
 
 
@@ -428,6 +435,8 @@ class MovieDb:
         cur_movie = Movie()
         cur_poster = Poster()
         cur_backdrop = Backdrop()
+        cur_poster.image_extentions = self.config[u'image_extentions']
+        cur_backdrop.image_extentions = self.config[u'image_extentions']
         cur_people = People()
 
         for item in movie_element.getchildren():
@@ -447,8 +456,8 @@ class MovieDb:
                 cur_people.set(item)
             else:
                 if item.text != None:
-                    tag = self.textUtf8(item.tag)
-                    cur_movie[tag] = self.textUtf8(item.text)
+                    tag = self.textUtf8(item.tag.strip())
+                    cur_movie[tag] = self.textUtf8(item.text.strip())
 
         if cur_poster.largest() != None:
             tmp = u''
@@ -487,6 +496,8 @@ class MovieDb:
         '''Massage the movie details into key value pairs as compatible with MythTV
         return a dictionary of massaged movie details
         '''
+        if movie_element == None:
+            return {}
         cur_movie = self._tmdbDetails(movie_element)
         translated={}
         for key in cur_movie:
@@ -525,6 +536,7 @@ class MovieDb:
             URL = self.config[u'urls'][u'movie.search'].replace(self.lang_url % self.config['language'], self.lang_url % lang)
         else:
             URL = self.config[u'urls'][u'movie.search']
+        org_title = title
         title = urllib.quote(title.encode("utf-8"))
         url = URL % (title)
         if self.config['debug_enabled']:        # URL so that raw TMDB XML data can be viewed in a browser
@@ -532,14 +544,16 @@ class MovieDb:
 
         etree = XmlHandler(url).getEt()
         if etree is None:
-            raise TmdbMovieOrPersonNotFound(u'No Movies matching the title (%s)' % title)
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the title (%s)' % org_title)
 
         search_results = SearchResults()
         for cur_result in etree.find(u"movies").findall(u"movie"):
+            if cur_result == None:
+                continue
             cur_movie = self._tmdbDetails(cur_result)
             search_results.append(cur_movie)
         if not len(search_results):
-            raise TmdbMovieOrPersonNotFound(u'No Movies matching the title (%s)' % title)
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the title (%s)' % org_title)
 
         # Check if no ui has been requested and therefore just return the raw search results.
         if (self.config['interactive'] == False and self.config['select_first'] == False and self.config['custom_ui'] == None) or not len(search_results):
@@ -598,6 +612,9 @@ class MovieDb:
 
         if etree is None:
             raise TmdbMovieOrPersonNotFound(u'No Movies matching the IMDB number (%s)' % by_id)
+        if etree.find(u"movies").find(u"movie") == None:
+            raise TmdbMovieOrPersonNotFound(u'No Movies matching the IMDB number (%s)' % by_id)
+
         if self._tmdbDetails(etree.find(u"movies").find(u"movie")).has_key(u'id'):
             return self.searchTMDB(self._tmdbDetails(etree.find(u"movies").find(u"movie"))[u'id'],)
         else:
@@ -655,16 +672,16 @@ class MovieDb:
                         for poster in image.getchildren():
                             key = poster.get('size')
                             if key in cur_poster.keys():
-                                cur_poster[key].append(poster.get('url'))
+                                cur_poster[key.strip()].append(poster.get('url').strip())
                             else:
-                                cur_poster[key] = [poster.get('url')]
+                                cur_poster[key.strip()] = [poster.get('url').strip()]
                     elif image.tag == u"backdrop":
                         for backdrop in image.getchildren():
                             key = backdrop.get('size')
                             if key in cur_backdrop.keys():
-                                cur_backdrop[key].append(backdrop.get('url'))
+                                cur_backdrop[key.strip()].append(backdrop.get('url').strip())
                             else:
-                                cur_backdrop[key] = [backdrop.get('url')]
+                                cur_backdrop[key.strip()] = [backdrop.get('url').strip()]
         images = {}
         if cur_poster.keys():
             for cur_size in [u"original", u"mid", u"cover", u"thumb"]:
@@ -700,7 +717,7 @@ class MovieDb:
         """Searches for a People by name.
         Returns a list if matching persons and a dictionary of their attributes
         """
-        tmp_name = name.replace(u' ',u'+')
+        tmp_name = name.strip().replace(u' ',u'+')
         try:
             id_url = urllib.quote(tmp_name.encode("utf-8"))
         except (UnicodeEncodeError, TypeError):
@@ -725,11 +742,11 @@ class MovieDb:
                 person = {}
                 for p in item.getchildren():
                     if p.tag != u'images':
-                        person[p.tag] = self.textUtf8(p.text)
+                        person[p.tag] = self.textUtf8(p.text.strip())
                     elif len(p.getchildren()):
                         person[p.tag] = {}
                         for image in p.getchildren():
-                            person[p.tag][image.get('size')] = image.get('url')
+                            person[p.tag][image.get('size')] = image.get('url').strip()
                 people.append(person)
 
         # Check if no ui has been requested and therefore just return the raw search results.
@@ -778,16 +795,15 @@ class MovieDb:
                     alias = []
                     for a in elem.getchildren():
                         if a.text:
-                            alias.append(self.textUtf8(a.text).replace(u'\n',u' '))
+                            alias.append(self.textUtf8(a.text.strip()).replace(u'\n',u' '))
                     if alias:
                         person[elem.tag] = alias
                 elif elem.tag == 'filmography':
                     movies = []
                     for a in elem.getchildren():
                         details = {}
-                        for tag in a:
-                            if a.get(tag):
-                                details[tag] = a.get(tag).replace(u'\n',u' ')
+                        for get in ['url', 'name', 'character', 'job', 'id']:
+                            details[get] = a.get(get).strip()
                         if details:
                             movies.append(details)
                     if movies:
@@ -795,12 +811,19 @@ class MovieDb:
                 elif len(elem.getchildren()):
                     images = {}
                     for image in elem.getchildren():
-                        images[image.get('size')] = image.get('url')
+                        (dirName, fileName) = os.path.split(image.get('url'))
+                        (fileBaseName, fileExtension) = os.path.splitext(fileName)
+                        if not fileExtension[1:] in self.config[u'image_extentions']:
+                            continue
+                        if image.get('size') in images.keys():
+                            images[image.get('size')]+= u',%s' % image.get('url').strip()
+                        else:
+                            images[image.get('size')] = u'%s' % image.get('url').strip()
                     if images:
                         person[elem.tag] = images
             else:
                 if elem.text:
-                    person[elem.tag] = self.textUtf8(elem.text).replace(u'\n',u' ')
+                    person[elem.tag] = self.textUtf8(elem.text.strip()).replace(u'\n',u' ')
         return person
     # end personInfo()
 

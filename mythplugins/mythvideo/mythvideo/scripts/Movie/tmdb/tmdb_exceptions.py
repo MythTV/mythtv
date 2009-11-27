@@ -11,11 +11,12 @@
 #-------------------------------------
 __title__ ="tmdb_exceptions - Custom exceptions used or raised by tmdb_api";
 __author__="dbr/Ben modified by R.D. Vaughan"
-__version__="v0.1.3"
+__version__="v0.1.4"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Release bump - no changes to this code
 # 0.1.3 Release bump - no changes to this code
+# 0.1.4 Release bump - no changes to this code
 
 __all__ = ["TmdBaseError", "TmdHttpError", "TmdXmlError", "TmdbUiAbort", "TmdbMovieOrPersonNotFound", ]
 

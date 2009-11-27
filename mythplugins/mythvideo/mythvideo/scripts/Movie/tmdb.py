@@ -30,7 +30,7 @@
 #-------------------------------------
 __title__ ="TheMovieDB APIv2 Query";
 __author__="R.D.Vaughan"
-__version__="v0.1.4"
+__version__="v0.1.5"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 New movie data fields now have proper key names
@@ -40,12 +40,15 @@ __version__="v0.1.4"
 #       Added CamelCase to all People information keys
 # 0.1.4 Added handling of all of the tmdb_api exceptions and information process exceptions with proper exit
 #       codes (0-Script Normal exit; 1-Script Exception exit)
+# 0.1.5 Corrected processing of Person images
+#       Added a specific check and error when there is an empty argument passed
+#       Changed the formatting of person information for AlsoKnownAs and Filmography
 
 
 __usage_examples__='''
 Request tmdb.py verison number:
 > ./tmdb.py -v
-themoviedb.org Query (v0.1.x) by R.D.Vaughan
+TheMovieDB APIv2 Query Query (v0.x.x) by R.D.Vaughan
 
 Request a list of matching movie titles:
 > ./tmdb.py -M "Avatar"
@@ -106,24 +109,22 @@ Request a list of People matching a name:
 77716:Cruise Moylan
 
 Request a Person's information using their TMDB id number:
-> ./tmdb.py -I 500
-Name:Tom Cruise
-AlsoKnownAs:Thomas Cruise Mapother IV
-Birthday:1962-07-03
-Birthplace:Syracuse, New York, USA
-Filmography:"War of the Worlds","Character:Ray Ferrier"
-Filmography:"War of the Worlds","Id:74"
-Filmography:"War of the Worlds","Job:Actor"
-Filmography:"War of the Worlds","URL:http://www.themoviedb.org/movie/74"
+> ./tmdb.py -I 2638
+Name:Cary Grant
+AlsoKnownAs:Alexander Archibald Leach|Archibald Alec Leach
+Birthday:1904-01-18
+Birthplace:Bristol, England
+Filmography:North by Northwest|Character:Roger O. Thornhill|Id:213|Job:Actor|URL:http://www.themoviedb.org/movie/213
+Filmography:Arsenic and Old Lace|Character:Mortimer Brewster|Id:212|Job:Actor|URL:http://www.themoviedb.org/movie/212
 ...
-Filmography:"All the Right Moves","Character:Stefen Djordjevic"
-Filmography:"All the Right Moves","Id:18172"
-Filmography:"All the Right Moves","Job:Actor"
-Filmography:"All the Right Moves","URL:http://www.themoviedb.org/movie/18172"
-Id:500
-KnownMovies:33
+Filmography:The Grass Is Greener|Character:Victor Rhyall, Earl|Id:25767|Job:Actor|URL:http://www.themoviedb.org/movie/25767
+Id:2638
+Profile:http://images.themoviedb.org/profiles/11078/CG_profile.jpg,http://images.themoviedb.org/profiles/11075/CG_profile.jpg,http://images.themoviedb.org/profiles/10994/CG_profile.jpg,http://images.themoviedb.org/profiles/10991/CG_profile.jpg,http://images.themoviedb.org/profiles/10988/CG_profile.jpg,http://images.themoviedb.org/profiles/10985/CG_profile.jpg,http://images.themoviedb.org/profiles/4414/Cary_Grant_profile.jpg
+Original:http://images.themoviedb.org/profiles/11078/CG.jpg,http://images.themoviedb.org/profiles/11075/CG.jpg,http://images.themoviedb.org/profiles/10994/CG.jpg,http://images.themoviedb.org/profiles/10991/CG.jpg,http://images.themoviedb.org/profiles/10988/CG.jpg,http://images.themoviedb.org/profiles/10985/CG.jpg,http://images.themoviedb.org/profiles/4414/Cary_Grant.jpg
+Thumb:http://images.themoviedb.org/profiles/11078/CG_thumb.jpg,http://images.themoviedb.org/profiles/11075/CG_thumb.jpg,http://images.themoviedb.org/profiles/10994/CG_thumb.jpg,http://images.themoviedb.org/profiles/10991/CG_thumb.jpg,http://images.themoviedb.org/profiles/10988/CG_thumb.jpg,http://images.themoviedb.org/profiles/10985/CG_thumb.jpg,http://images.themoviedb.org/profiles/4414/Cary_Grant_thumb.jpg
+KnownMovies:25
 Popularity:2
-URL:http://www.themoviedb.org/person/500
+URL:http://www.themoviedb.org/person/2638
 
 Request Movie details using a Hash value:
 > ./tmdb.py -H "00277ff46533b155"
@@ -191,6 +192,8 @@ sys.stdout = OutStreamEncoder(sys.stdout)
 sys.stderr = OutStreamEncoder(sys.stderr)
 
 # Verify that the tmdb_api modules are installed and accessable
+
+
 try:
     import tmdb.tmdb_api as tmdb_api
     from tmdb.tmdb_exceptions import (TmdBaseError, TmdHttpError, TmdXmlError, TmdbUiAbort, TmdbMovieOrPersonNotFound,)
@@ -276,14 +279,7 @@ class moviedbQueries():
         '''Search for movies that match the title and output their "tmdb#:Title" to stdout
         '''
         try:
-            for match in self.config['moviedb'].searchTitle(title):
-                if not match.has_key('released'):
-                    name = match['name']
-                elif len(match['released']) > 3:
-                    name = u"%s (%s)" % (match['name'], match['released'][:4])
-                else:
-                    name = match['name']
-                sys.stdout.write( u'%s:%s\n' % (match[u'id'], name))
+            data = self.config['moviedb'].searchTitle(title)
         except TmdbMovieOrPersonNotFound, msg:
             sys.stderr.write(u"%s\n" % msg)
             return
@@ -300,8 +296,18 @@ class moviedbQueries():
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
         except:
-            sys.stderr.write(u"! Error: Unknown error during a Title search\n")
+            sys.stderr.write(u"! Error: Unknown error during a Title search (%s)\n" % title)
             sys.exit(1)
+
+        if data != None:
+            for match in data:
+                if not match.has_key('released'):
+                    name = match['name']
+                elif len(match['released']) > 3:
+                    name = u"%s (%s)" % (match['name'], match['released'][:4])
+                else:
+                    name = match['name']
+                sys.stdout.write( u'%s:%s\n' % (match[u'id'], name))
     # end movieSearch()
 
     def peopleSearch(self, persons_name):
@@ -387,15 +393,15 @@ class moviedbQueries():
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
         except:
-            sys.stderr.write(u"! Error: Unknown error during a Movie information display\n")
+            sys.stderr.write(u"! Error: Unknown error during a Movie (%s) information display\n" % tmdb_id)
             sys.exit(1)
     # end movieData()
 
-    def peopleData(self, tmdb_id):
+    def peopleData(self, person_id):
         '''Get People data by TMDB people id number and display "key:value" pairs to stdout
         '''
         try:
-            data = self.config['moviedb'].personInfo(tmdb_id)
+            data = self.config['moviedb'].personInfo(person_id)
         except TmdbMovieOrPersonNotFound, msg:
             sys.stderr.write(u"%s\n" % msg)
             return
@@ -412,32 +418,41 @@ class moviedbQueries():
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
         except:
-            sys.stderr.write(u"! Error: Unknown error during a Person information display\n")
+            sys.stderr.write(u"! Error: Unknown error during a Person (%s) information display\n" % person_id)
             sys.exit(1)
 
         if data == None:
             return
         sys.stdout.write(u'%s:%s\n' % (u'Name', data[u'name']))
         keys = sorted(data.keys())
+        images = {}
         for key in keys:
             if key == u'name':
                 continue
             if key in ['also_known_as', 'filmography', 'images' ]:
+                if key == 'images':
+                    images = {}
+                    for k in data[key].keys():
+                        images[k] = u''
+                if key == 'also_known_as':
+                    alias = u''
+                    for k in data[key]:
+                        alias+=u'%s|' % k.replace(u'|', u' ')
+                    if alias:
+                       sys.stdout.write(u'%s:%s\n' % (self.camelcase(key), alias[:-1]))
+                    continue
                 for k in data[key]:
-                    if key == 'also_known_as':
-                        sys.stdout.write(u'%s:%s\n' % (self.camelcase(key), k))
-                    elif key == 'filmography':
+                    if key == 'filmography':
                         kys = sorted(k.keys())
+                        filmography = u''
                         for c in kys:
                             if c == u'name':
                                 continue
-                            sys.stdout.write(u'%s:"%s","%s:%s"\n' % (self.camelcase(key), k[u'name'], self.camelcase(c), k[c]))
-                    else:
-                        kys = sorted(k.keys())
-                        for c in kys:
-                            if c == u'name':
-                                continue
-                            sys.stdout.write(u'%s:"%s"","%s:%s"\n' % (self.camelcase(key), k[u'name'], self.camelcase(c), k[c]))
+                            filmography+=u'%s:%s|' % (self.camelcase(c.replace(u'|', u' ')), k[c].replace(u'|', u' '))
+                        if filmography:
+                            sys.stdout.write(u'%s:%s|%s\n' % (self.camelcase(key), k[u'name'].replace(u'|', u' '), filmography[:-1]))
+                    elif key == 'images':
+                        sys.stdout.write(u'%s:%s\n' % (self.camelcase(k), data[key][k]))
             else:
                 sys.stdout.write(u'%s:%s\n' % (self.camelcase(key), data[key]))
     # end peopleData()
@@ -523,7 +538,11 @@ def main():
         sys.exit(0)
 
     if not len(args) == 1:
-        sys.stderr.write("\n! Error: There must be one value for any option, Your options are (%s)\n\n" % (args))
+        sys.stderr.write("! Error: There must be one value for any option. Your options are (%s)\n" % (args))
+        sys.exit(1)
+
+    if args[0] == u'':
+        sys.stderr.write("! Error: There must be a non-empty argument, yours is empty.\n")
         sys.exit(1)
 
     Queries = moviedbQueries(apikey,
