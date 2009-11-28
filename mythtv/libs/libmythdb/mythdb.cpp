@@ -13,6 +13,9 @@ static QMutex dbLock;
 
 unsigned int db_messages = VB_IMPORTANT | VB_GENERAL;
 
+// For thread safety reasons this is not a QString
+const char *kSentinelValue = "<settings_sentinel_value>";
+
 MythDB *MythDB::getMythDB(void)
 {
     if (mythdb)
@@ -362,11 +365,11 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
         }
         else
         {
-            return d->m_settings->GetSetting(key, defaultval);
+            value = d->m_settings->GetSetting(key, defaultval);
         }
     }
 
-    if (d->useSettingsCache)
+    if (d->useSettingsCache && value != kSentinelValue)
     {
         key.squeeze();
         value.squeeze();
@@ -395,6 +398,27 @@ double MythDB::GetFloatSetting(const QString &key, double defaultval)
     QString retval = GetSetting(key, val);
 
     return retval.toDouble();
+}
+
+QString MythDB::GetSetting(const QString &key)
+{
+    QString sentinel = QString(kSentinelValue);
+    QString retval = GetSetting(key, sentinel);
+    return (retval == sentinel) ? "" : retval;
+}
+
+int MythDB::GetNumSetting(const QString &key)
+{
+    QString sentinel = QString(kSentinelValue);
+    QString retval = GetSetting(key, sentinel);
+    return (retval == sentinel) ? 0 : retval.toInt();
+}
+
+double MythDB::GetFloatSetting(const QString &key)
+{
+    QString sentinel = QString(kSentinelValue);
+    QString retval = GetSetting(key, sentinel);
+    return (retval == sentinel) ? 0.0 : retval.toDouble();
 }
 
 QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
@@ -450,16 +474,16 @@ QString MythDB::GetSettingOnHost(const QString &_key, const QString &_host,
     if (query.exec() && query.next())
     {
         value = query.value(0).toString();
+    }
 
-        if (d->useSettingsCache)
-        {
-            myKey.squeeze();
-            value.squeeze();
-            d->settingsCacheLock.lockForWrite();
-            if (d->settingsCache.find(myKey) == d->settingsCache.end())
-                d->settingsCache[myKey] = value;
-            d->settingsCacheLock.unlock();
-        }
+    if (d->useSettingsCache && value != kSentinelValue)
+    {
+        myKey.squeeze();
+        value.squeeze();
+        d->settingsCacheLock.lockForWrite();
+        if (d->settingsCache.find(myKey) == d->settingsCache.end())
+            d->settingsCache[myKey] = value;
+        d->settingsCacheLock.unlock();
     }
 
     return value;
@@ -481,6 +505,27 @@ double MythDB::GetFloatSettingOnHost(
     QString retval = GetSettingOnHost(key, host, val);
 
     return retval.toDouble();
+}
+
+QString MythDB::GetSettingOnHost(const QString &key, const QString &host)
+{
+    QString sentinel = QString(kSentinelValue);
+    QString retval = GetSettingOnHost(key, host, sentinel);
+    return (retval == sentinel) ? "" : retval;
+}
+
+int MythDB::GetNumSettingOnHost(const QString &key, const QString &host)
+{
+    QString sentinel = QString(kSentinelValue);
+    QString retval = GetSettingOnHost(key, host, sentinel);
+    return (retval == sentinel) ? 0 : retval.toInt();
+}
+
+double MythDB::GetFloatSettingOnHost(const QString &key, const QString &host)
+{
+    QString sentinel = QString(kSentinelValue);
+    QString retval = GetSettingOnHost(key, host, sentinel);
+    return (retval == sentinel) ? 0.0 : retval.toDouble();
 }
 
 void MythDB::SetSetting(const QString &key, const QString &newValue)

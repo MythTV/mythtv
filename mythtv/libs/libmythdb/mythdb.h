@@ -41,21 +41,30 @@ class MPUBLIC MythDB
     bool SaveSettingOnHost(const QString &key, const QString &newValue,
                            const QString &host);
 
-    QString GetSetting(const QString &key, const QString &defaultval = "");
-    int GetNumSetting(const QString &key, int defaultval = 0);
-    double GetFloatSetting(const QString &key, double defaultval = 0.0);
+    QString GetSetting(     const QString &key, const QString &defaultval);
+    int     GetNumSetting(  const QString &key, int            defaultval);
+    double  GetFloatSetting(const QString &key, double         defaultval);
+
+    QString GetSetting(     const QString &key);
+    int     GetNumSetting(  const QString &key);
+    double  GetFloatSetting(const QString &key);
+
+    QString GetSettingOnHost(
+        const QString &key, const QString &host, const QString &defaultval);
+    int     GetNumSettingOnHost(
+        const QString &key, const QString &host, int            defaultval);
+    double  GetFloatSettingOnHost(
+        const QString &key, const QString &host, double         defaultval);
+
+    QString GetSettingOnHost(     const QString &key, const QString &host);
+    int     GetNumSettingOnHost(  const QString &key, const QString &host);
+    double  GetFloatSettingOnHost(const QString &key, const QString &host);
+
     void GetResolutionSetting(const QString &type, int &width, int &height,
                               double& forced_aspect, double &refreshrate,
                               int index=-1);
     void GetResolutionSetting(const QString &type, int &width, int &height,
                               int index=-1);
-
-    QString GetSettingOnHost(const QString &key, const QString &host,
-                             const QString &defaultval = "");
-    int GetNumSettingOnHost(const QString &key, const QString &host,
-                            int defaultval = 0);
-    double GetFloatSettingOnHost(const QString &key, const QString &host,
-                                 double defaultval = 0.0);
 
     void SetSetting(const QString &key, const QString &newValue);
 
