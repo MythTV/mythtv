@@ -28,6 +28,14 @@
     </button>
 
     <button>
+        <type>MYTHTWITTER_TIMELINE</type>
+        <text>Twitter</text>
+        <description>Send and receive tweets</description>
+        <action>JUMP MythTwitter_Timeline</action>
+        <depends>mythtwitter</depends>
+    </button>
+
+    <button>
         <type>MOVIETIMES</type>
         <text>Movie Times</text>
         <text lang="IT">Orari</text>
