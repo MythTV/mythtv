@@ -5,9 +5,9 @@
 #include <QDir>
 
 // mythtv
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdb.h>
+#include <mythcontext.h>
+#include <mythwidgets.h>
+#include <mythdb.h>
 
 // mythmusic
 #include "metadata.h"

@@ -6,7 +6,7 @@
 #include <apetag.h>
 #include <apeitem.h>
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 MetaIOWavPack::MetaIOWavPack(void)
     : MetaIOTagLib()

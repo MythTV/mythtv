@@ -23,9 +23,9 @@ using namespace std;
 //#include <QKeyEvent>
 
 // mythtv
-#include <libmythui/mythscreentype.h>
-#include <libmythui/mythuiimage.h>
-#include <libmythui/mythuitext.h>
+#include <mythscreentype.h>
+#include <mythuiimage.h>
+#include <mythuitext.h>
 
 // mythzoneminder
 #include "zmdefines.h"

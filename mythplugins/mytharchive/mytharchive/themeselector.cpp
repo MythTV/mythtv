@@ -11,14 +11,14 @@
 #include <QTextStream>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdirs.h>
-#include <mythtv/libmythui/mythuihelper.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuiimage.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythmainwindow.h>
+#include <mythcontext.h>
+#include <mythdirs.h>
+#include <mythuihelper.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuiimage.h>
+#include <mythuibuttonlist.h>
+#include <mythmainwindow.h>
 
 // mytharchive
 #include "mythburn.h"

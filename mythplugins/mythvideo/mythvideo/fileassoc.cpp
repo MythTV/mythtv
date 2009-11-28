@@ -3,13 +3,13 @@
 #include <iterator>
 #include <map>
 
-#include <mythtv/mythverbose.h>
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
-#include <mythtv/libmythui/mythuibutton.h>
+#include <mythverbose.h>
+#include <mythmainwindow.h>
+#include <mythdialogbox.h>
+#include <mythuibuttonlist.h>
+#include <mythuitextedit.h>
+#include <mythuicheckbox.h>
+#include <mythuibutton.h>
 
 #include "dbaccess.h"
 #include "videoutils.h"

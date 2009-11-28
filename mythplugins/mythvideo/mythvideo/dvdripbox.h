@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <QTcpSocket>
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 #include "dvdinfo.h"
 

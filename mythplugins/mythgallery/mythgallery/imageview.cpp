@@ -22,9 +22,9 @@
 #include <QDir>
 
 // MythTV plugin headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/libmythui/mythuihelper.h>
+#include <mythcontext.h>
+#include <lcddevice.h>
+#include <mythuihelper.h>
 
 // MythGallery headers
 #include "imageview.h"

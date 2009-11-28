@@ -30,8 +30,8 @@
 // myth
 #include "mythtv/mythcontext.h"
 #include "mythtv/util.h"
-#include <mythtv/libmythui/mythuihelper.h>
-#include <mythtv/mythdirs.h>
+#include <mythuihelper.h>
+#include <mythdirs.h>
 
 // mythgallery
 #include "config.h"

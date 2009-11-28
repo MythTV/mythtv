@@ -1,10 +1,10 @@
 #include <map>
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythscreenstack.h>
-#include <mythtv/libmythui/mythdialogbox.h>
+#include <mythmainwindow.h>
+#include <mythscreenstack.h>
+#include <mythdialogbox.h>
 
 #include "parentalcontrols.h"
 

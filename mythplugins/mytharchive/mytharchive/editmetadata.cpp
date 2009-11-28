@@ -1,9 +1,9 @@
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuitextedit.h>
+#include <mythcontext.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuitextedit.h>
 
 // mytharchive
 #include "editmetadata.h"

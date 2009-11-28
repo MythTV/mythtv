@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 // myth
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 // mythzoneminder
 #include "zmsettings.h"

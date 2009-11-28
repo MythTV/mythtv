@@ -1,7 +1,7 @@
 #ifndef EDITMETADATA_H_
 #define EDITMETADATA_H_
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 class Metadata;
 class MetadataListManager;

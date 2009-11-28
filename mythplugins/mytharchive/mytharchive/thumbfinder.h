@@ -6,10 +6,10 @@
 #include <QStringList>
 
 // mythtv
-#include <libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 extern "C" {
-#include <mythtv/libavcodec/avcodec.h>
-#include <mythtv/libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 }
 
 // mytharchive

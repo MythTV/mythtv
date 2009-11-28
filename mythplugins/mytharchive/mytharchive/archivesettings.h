@@ -5,7 +5,7 @@
 #ifndef ARCHIVESETTINGS_H
 #define ARCHIVESETTINGS_H
 
-#include <mythtv/settings.h>
+#include <settings.h>
 
 
 class ArchiveSettings : public ConfigurationWizard

@@ -10,7 +10,7 @@
 
 #include <mythcontext.h>
 #include <mythdbcon.h>
-#include <libmythui/mythuihelper.h>
+#include <mythuihelper.h>
 
 EditMetadataDialog::EditMetadataDialog(Metadata       *source_metadata,
                                        MythMainWindow *parent,

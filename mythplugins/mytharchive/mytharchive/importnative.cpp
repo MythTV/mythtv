@@ -7,15 +7,15 @@
 #include <QDomDocument>
 
 // Myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <libmythui/mythuihelper.h>
-#include <libmythui/mythmainwindow.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuitextedit.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythuihelper.h>
+#include <mythmainwindow.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
+#include <mythuibutton.h>
+#include <mythuibuttonlist.h>
+#include <mythdialogbox.h>
 
 // mytharchive
 #include "importnative.h"

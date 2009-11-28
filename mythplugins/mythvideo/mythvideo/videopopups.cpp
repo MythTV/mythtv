@@ -1,10 +1,10 @@
 #include <QStringList>
 
-#include <mythtv/libmythdb/mythverbose.h>
+#include <mythverbose.h>
 
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuibutton.h>
+#include <mythuibuttonlist.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
 
 #include "metadata.h"
 #include "videoutils.h"

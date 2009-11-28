@@ -6,9 +6,9 @@
 #include <Q3ValueVector>
 
 // mythtv
-#include <mythtv/mythwidgets.h>
-#include <mythtv/dialogbox.h>
-#include <mythtv/audiooutput.h>
+#include <mythwidgets.h>
+#include <dialogbox.h>
+#include <audiooutput.h>
 
 // mythmusic
 #include "mainvisual.h"

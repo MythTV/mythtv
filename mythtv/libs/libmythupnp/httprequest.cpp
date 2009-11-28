@@ -48,8 +48,8 @@
 
 #include "upnp.h"
 
-#include "libmythdb/compat.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythverbose.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0

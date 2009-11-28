@@ -28,12 +28,12 @@
 #include <QThread>
 
 // MythTV headers
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuiimage.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/mythmedia.h>
+#include <mythscreentype.h>
+#include <mythuitext.h>
+#include <mythuibuttonlist.h>
+#include <mythuiimage.h>
+#include <mythdialogbox.h>
+#include <mythmedia.h>
 
 // MythGallery headers
 #include "thumbview.h"

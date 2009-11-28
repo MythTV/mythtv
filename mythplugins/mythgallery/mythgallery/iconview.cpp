@@ -35,13 +35,13 @@ using namespace std;
 #include <QFileInfo>
 
 // MythTV headers
-#include <mythtv/util.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/httpcomms.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
-#include <mythtv/mythmediamonitor.h>
+#include <util.h>
+#include <mythdbcon.h>
+#include <httpcomms.h>
+#include <mythcontext.h>
+#include <mythmainwindow.h>
+#include <mythprogressdialog.h>
+#include <mythmediamonitor.h>
 
 // MythGallery headers
 #include "galleryutil.h"

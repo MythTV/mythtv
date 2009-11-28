@@ -1,7 +1,7 @@
 #ifndef VIDEOFILTER_H_
 #define VIDEOFILTER_H_
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 #include "parentalcontrols.h"
 

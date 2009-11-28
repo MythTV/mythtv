@@ -1,7 +1,7 @@
 #ifndef GOOM_MMX_H
 
-#include <mythtv/mythconfig.h>
-#include <mythtv/libavcodec/mmx.h>
+#include <mythconfig.h>
+#include <libavcodec/mmx.h>
 
 int mm_support(void);
 

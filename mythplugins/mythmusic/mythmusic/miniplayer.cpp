@@ -1,12 +1,12 @@
 // mythtv
-#include <mythtv/mythcontext.h>
-#include <mythtv/lcddevice.h>
+#include <mythcontext.h>
+#include <lcddevice.h>
 
 // mythui
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuiimage.h>
-#include <mythtv/libmythui/mythuistatetype.h>
-#include <mythtv/libmythui/mythuiprogressbar.h>
+#include <mythuitext.h>
+#include <mythuiimage.h>
+#include <mythuistatetype.h>
+#include <mythuiprogressbar.h>
 //#include "mythdialogbox.h"
 
 // mythmusic

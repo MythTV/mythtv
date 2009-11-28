@@ -3,7 +3,7 @@
 
 #include <QDir>
 
-#include <mythtv/mythdirs.h>
+#include <mythdirs.h>
 
 #include "globals.h"
 #include "videodlg.h"

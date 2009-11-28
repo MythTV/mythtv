@@ -10,9 +10,9 @@ using namespace std;
 
 #include "metadata.h"
 #include "playlist.h"
-#include <mythtv/mythwidgets.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/uilistbtntype.h>
+#include <mythwidgets.h>
+#include <lcddevice.h>
+#include <uilistbtntype.h>
 
 class TreeCheckItem;
 class QTimer;

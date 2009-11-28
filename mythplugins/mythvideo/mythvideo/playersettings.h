@@ -1,17 +1,17 @@
 #ifndef PLAYERSETTINGS_H
 #define PLAYERSETTINGS_H
 
-#include <mythtv/uitypes.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/oldsettings.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdialogs.h>
+#include <uitypes.h>
+#include <xmlparse.h>
+#include <oldsettings.h>
+#include <mythwidgets.h>
+#include <mythdialogs.h>
 
 // libmythui
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuicheckbox.h>
-#include <libmythui/mythscreentype.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythuibutton.h>
+#include <mythuicheckbox.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
 
 class PlayerSettings : public MythScreenType
 {

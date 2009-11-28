@@ -1,7 +1,7 @@
 #ifndef MYTHSETTINGS_H_
 #define MYTHSETTINGS_H_
 
-#include <mythtv/settings.h>
+#include <settings.h>
 
 class VideoGeneralSettings : public ConfigurationWizard
 {

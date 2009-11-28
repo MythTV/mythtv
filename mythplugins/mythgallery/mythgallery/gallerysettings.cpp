@@ -3,7 +3,7 @@
 #include <QDir>
 
 // myth
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 // mythgallery
 #include "config.h"

@@ -14,7 +14,7 @@
 #include <QDateTime>
 
 #include "compat.h"
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 #define LOC      QString("MTDLogger: ")
 #define LOC_WARN QString("MTDLogger, Warning: ")

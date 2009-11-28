@@ -249,9 +249,9 @@ int main(int argc, char *argv[])
 // 
 //                 dstream << "    <message>\n"
 //                         << "        <location filename=\"" << qPrintable(outfile) << "\" line=\"" << lineCount << "\"/>\n"
-//                         << "        <source>" << Qt::escape(*strit).replace("\"", "&quot;") << "</source>\n"
-//                         << "        <translation>" << Qt::escape(translation).replace("\"", "&quot;") << "</translation>\n"
-//                         << "    </message>\n";
+//                         << "        <source>" << Qt::escape(*strit).replace("\"", "&quot;") << "<source>\n"
+//                         << "        <translation>" << Qt::escape(translation).replace("\"", "&quot;") << "<translation>\n"
+//                         << "    <message>\n";
 //             }
 //         }
         ++lineCount;

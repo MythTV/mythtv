@@ -5,11 +5,11 @@
 #include <QDir>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/mythpluginapi.h>
+#include <mythcontext.h>
+#include <mythversion.h>
+#include <mythdialogs.h>
+#include <mythmediamonitor.h>
+#include <mythpluginapi.h>
 
 // mythgallery
 #include "iconview.h"

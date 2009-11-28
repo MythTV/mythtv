@@ -14,17 +14,17 @@
 #include <QTextStream>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/libmythdb/mythdb.h>
-#include <mythtv/mythdirs.h>
-#include <libmythui/mythprogressdialog.h>
-#include <libmythui/mythuihelper.h>
-#include <libmythui/mythdialogbox.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuicheckbox.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythuiprogressbar.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <mythdirs.h>
+#include <mythprogressdialog.h>
+#include <mythuihelper.h>
+#include <mythdialogbox.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuicheckbox.h>
+#include <mythuibuttonlist.h>
+#include <mythuiprogressbar.h>
 
 // mytharchive
 #include "archiveutil.h"

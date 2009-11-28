@@ -1,8 +1,8 @@
 #ifndef MUSICPLAYER_H_
 #define MUSICPLAYER_H_
 
-#include <mythtv/mythdialogs.h>
-#include <mythtv/audiooutput.h>
+#include <mythdialogs.h>
+#include <audiooutput.h>
 
 #include "metadata.h"
 

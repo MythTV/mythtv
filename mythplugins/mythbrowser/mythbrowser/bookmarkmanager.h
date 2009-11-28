@@ -1,16 +1,16 @@
 #ifndef BOOKMARKMANAGER_H
 #define BOOKMARKMANAGER_H
 
-#include <mythtv/uitypes.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/oldsettings.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdialogs.h>
+#include <uitypes.h>
+#include <xmlparse.h>
+#include <oldsettings.h>
+#include <mythwidgets.h>
+#include <mythdialogs.h>
 
 // libmythui
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythscreentype.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythuibuttonlist.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
 
 class MythBrowser;
 

@@ -1,19 +1,19 @@
 #ifndef METADATASETTINGS_H
 #define METADATASETTINGS_H
 
-#include <mythtv/uitypes.h>
-#include <mythtv/xmlparse.h>
-#include <mythtv/oldsettings.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdialogs.h>
+#include <uitypes.h>
+#include <xmlparse.h>
+#include <oldsettings.h>
+#include <mythwidgets.h>
+#include <mythdialogs.h>
 
 // libmythui
-#include <libmythui/mythuispinbox.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythuicheckbox.h>
-#include <libmythui/mythscreentype.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythuispinbox.h>
+#include <mythuibutton.h>
+#include <mythuibuttonlist.h>
+#include <mythuicheckbox.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
 
 class MetadataSettings : public MythScreenType
 {

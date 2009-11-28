@@ -9,8 +9,8 @@ using namespace std;
 
 #include "metadata.h"
 #include "treecheckitem.h"
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
+#include <uitypes.h>
+#include <uilistbtntype.h>
 
 class PlaylistContainer;
 

@@ -8,7 +8,7 @@ using namespace std;
 #include <QThread>
 #include <QStringList>
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 class Metadata;
 class ImportMusicDialog;

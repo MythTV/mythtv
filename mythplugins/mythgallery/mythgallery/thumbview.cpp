@@ -6,7 +6,7 @@
 #include <QDir>
 
 // MythTV plugin headers
-#include <mythtv/mythdb.h>
+#include <mythdb.h>
 
 // MythGallery headers
 #include "thumbview.h"

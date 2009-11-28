@@ -3,7 +3,7 @@
 
 #include <QList>
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 #include "dvdinfo.h"
 

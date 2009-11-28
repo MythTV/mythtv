@@ -5,12 +5,12 @@
 #include <QApplication>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/langsettings.h>
-#include <mythtv/mythpluginapi.h>
+#include <mythcontext.h>
+#include <mythversion.h>
+#include <mythdialogs.h>
+#include <mythplugin.h>
+#include <langsettings.h>
+#include <mythpluginapi.h>
 
 // mythbrowser
 #include "bookmarkmanager.h"

@@ -1,7 +1,7 @@
 #ifndef FILEASSOC_H_
 #define FILEASSOC_H_
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 class MythScreenStack;
 class MythUIButtonListItem;

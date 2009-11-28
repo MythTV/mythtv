@@ -21,7 +21,7 @@
 // myth
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
-#include <libmythui/mythmainwindow.h>
+#include <mythmainwindow.h>
 
 // zoneminder
 #include "zmevents.h"

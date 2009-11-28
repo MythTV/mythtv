@@ -6,8 +6,8 @@
 #include "dbaccess.h"
 #include "dirscan.h"
 
-#include <mythtv/libmyth/remoteutil.h>
-#include <mythtv/mythcontext.h>
+#include <remoteutil.h>
+#include <mythcontext.h>
 #include "mythverbose.h"
 #include "videoutils.h"
 

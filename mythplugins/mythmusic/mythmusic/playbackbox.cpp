@@ -14,12 +14,12 @@ using namespace std;
 #include <Q3ValueList>
 
 // MythTV plugin includes
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/mythmedia.h>
-#include <mythtv/audiooutput.h>
-#include <mythtv/compat.h>
+#include <mythcontext.h>
+#include <mythwidgets.h>
+#include <lcddevice.h>
+#include <mythmedia.h>
+#include <audiooutput.h>
+#include <compat.h>
 
 // MythMusic includes
 #include "metadata.h"

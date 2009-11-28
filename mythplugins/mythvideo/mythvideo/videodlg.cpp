@@ -14,23 +14,23 @@
 #include <QImage>
 #include <QImageReader>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/compat.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <compat.h>
+#include <mythdirs.h>
 
-#include <mythtv/libmythui/mythuihelper.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuibuttontree.h>
-#include <mythtv/libmythui/mythuiimage.h>
-#include <mythtv/libmythui/mythuistatetype.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythgenerictree.h>
-#include <mythtv/libmythui/mythsystem.h>
-#include <mythtv/libmyth/remotefile.h>
-#include <mythtv/libmyth/remoteutil.h>
+#include <mythuihelper.h>
+#include <mythprogressdialog.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuibuttonlist.h>
+#include <mythuibuttontree.h>
+#include <mythuiimage.h>
+#include <mythuistatetype.h>
+#include <mythdialogbox.h>
+#include <mythgenerictree.h>
+#include <mythsystem.h>
+#include <remotefile.h>
+#include <remoteutil.h>
 
 #include "videoscan.h"
 #include "globals.h"

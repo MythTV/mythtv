@@ -17,14 +17,14 @@ using namespace std;
 #include <QTimer>
 
 // mythtv
-#include <mythtv/mythpluginapi.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/util.h>
-#include <libmythui/myththemedmenu.h>
-#include <libmythui/mythuihelper.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythpluginapi.h>
+#include <mythcontext.h>
+#include <mythversion.h>
+#include <mythplugin.h>
+#include <util.h>
+#include <myththemedmenu.h>
+#include <mythuihelper.h>
+#include <mythdialogbox.h>
 
 // mytharchive
 #include "archivesettings.h"

@@ -1,11 +1,11 @@
 #include <QDir>
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythsystem.h>
-#include <mythtv/libmyth/remoteutil.h>
-#include <mythtv/lcddevice.h>
+#include <mythmainwindow.h>
+#include <mythsystem.h>
+#include <remoteutil.h>
+#include <lcddevice.h>
 
 #include "dbaccess.h"
 #include "metadata.h"

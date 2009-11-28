@@ -5,7 +5,7 @@
 #include <QTimer>
 
 // myth
-#include <libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 class MythUIButton;
 class MythUIButtonList;

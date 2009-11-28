@@ -23,8 +23,8 @@
 
 // myth
 #include "mythtv/mythcontext.h"
-#include <libmythui/mythuihelper.h>
-#include <libmythui/mythmainwindow.h>
+#include <mythuihelper.h>
+#include <mythmainwindow.h>
 
 
 // zoneminder

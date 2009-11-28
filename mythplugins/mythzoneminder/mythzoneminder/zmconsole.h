@@ -19,11 +19,11 @@
 #include <QKeyEvent>
 
 // libmythui
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuicheckbox.h>
-#include <libmythui/mythscreentype.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythuibuttonlist.h>
+#include <mythuibutton.h>
+#include <mythuicheckbox.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
 
 // zm
 #include "zmdefines.h"

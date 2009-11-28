@@ -4,9 +4,9 @@
 #include <QApplication>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/audiooutput.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <audiooutput.h>
 
 // mythmusic
 #include "importmusic.h"

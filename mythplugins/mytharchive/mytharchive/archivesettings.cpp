@@ -5,8 +5,8 @@
 #include <unistd.h>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdirs.h>
 
 // mytharchive
 #include "archivesettings.h"

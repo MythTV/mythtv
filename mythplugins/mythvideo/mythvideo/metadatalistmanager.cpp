@@ -1,6 +1,6 @@
 #include <map>
 
-#include <mythtv/mythdb.h>
+#include <mythdb.h>
 
 #include "metadatalistmanager.h"
 

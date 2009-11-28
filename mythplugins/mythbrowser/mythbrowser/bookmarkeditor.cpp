@@ -1,9 +1,9 @@
 
 // myth
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/util.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythmainwindow.h>
+#include <util.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
 
 // mythbrowser
 #include "bookmarkeditor.h"

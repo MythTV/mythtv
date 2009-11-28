@@ -3,19 +3,19 @@
 #include <QImageReader>
 #include <QUrl>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdirs.h>
 
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
-#include <mythtv/libmythui/mythuispinbox.h>
-#include <mythtv/libmyth/mythuifilebrowser.h>
-#include <mythtv/libmyth/remoteutil.h>
+#include <mythmainwindow.h>
+#include <mythdialogbox.h>
+#include <mythuibuttonlist.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
+#include <mythuibutton.h>
+#include <mythuicheckbox.h>
+#include <mythuispinbox.h>
+#include <mythuifilebrowser.h>
+#include <remoteutil.h>
 
 #include "globals.h"
 #include "dbaccess.h"

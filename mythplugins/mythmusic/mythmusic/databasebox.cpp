@@ -13,12 +13,12 @@ using namespace std;
 #include <QEvent>
 
 // mythtv
-#include <mythtv/dialogbox.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/uilistbtntype.h>
-#include <mythtv/mythmediamonitor.h>
+#include <dialogbox.h>
+#include <mythcontext.h>
+#include <lcddevice.h>
+#include <uitypes.h>
+#include <uilistbtntype.h>
+#include <mythmediamonitor.h>
 
 // mythmusic
 #include "metadata.h"

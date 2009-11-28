@@ -5,11 +5,11 @@
 #include <QUrl>
 
 // myth
-#include <libmythui/mythuiwebbrowser.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythscreentype.h>
-#include <libmythui/mythdialogbox.h>
-#include <libmythui/mythuiprogressbar.h>
+#include <mythuiwebbrowser.h>
+#include <mythuibuttonlist.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
+#include <mythuiprogressbar.h>
 
 class MythBrowser;
 

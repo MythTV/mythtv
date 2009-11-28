@@ -8,9 +8,9 @@
 #include <QList>
 
 // mythtv
-#include <mythtv/mythcontext.h>
-#include <mythtv/audiooutput.h>
-#include <mythtv/mythdb.h>
+#include <mythcontext.h>
+#include <audiooutput.h>
+#include <mythdb.h>
 
 // mythmusic
 #include "musicplayer.h"

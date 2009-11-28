@@ -2,14 +2,14 @@
 #include <QRegExp>
 #include <QStringList>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythdbparams.h>
-#include <mythtv/schemawizard.h>
-#include <mythtv/libmyth/remotefile.h>
-#include <mythtv/libmyth/remoteutil.h>
-#include <mythtv/libmyth/util.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <mythdbcon.h>
+#include <mythdbparams.h>
+#include <schemawizard.h>
+#include <remotefile.h>
+#include <remoteutil.h>
+#include <util.h>
 
 #include "storagegroup.h"
 

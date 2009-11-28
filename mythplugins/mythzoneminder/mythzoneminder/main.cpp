@@ -16,12 +16,12 @@
 #include <unistd.h>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/mythpluginapi.h>
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/myththemedmenu.h>
-#include <mythtv/libmythui/mythuihelper.h>
+#include <mythcontext.h>
+#include <mythversion.h>
+#include <mythpluginapi.h>
+#include <mythmainwindow.h>
+#include <myththemedmenu.h>
+#include <mythuihelper.h>
 
 //zone minder
 #include "zmsettings.h"

@@ -25,10 +25,10 @@
 #include <QDir>
 
 // MythTV headers
-#include <mythtv/util.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/compat.h>
-#include <mythtv/util.h>
+#include <util.h>
+#include <mythcontext.h>
+#include <compat.h>
+#include <util.h>
 
 // MythTranscodeDaemon headers
 #include "mtd.h"

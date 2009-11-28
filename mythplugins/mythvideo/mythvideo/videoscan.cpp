@@ -8,11 +8,11 @@
 #include <QStringList>
 #include <QUrl>
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
-#include <mythtv/libmythui/mythscreenstack.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
-#include <mythtv/libmythui/mythdialogbox.h>
+#include <mythscreenstack.h>
+#include <mythprogressdialog.h>
+#include <mythdialogbox.h>
 
 #include "globals.h"
 #include "dbaccess.h"

@@ -15,10 +15,10 @@ using namespace std;
 #include <audiooutput.h>
 #include "metadata.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/httpcomms.h>
+#include <mythcontext.h>
+#include <mythmediamonitor.h>
+#include <mythversion.h>
+#include <httpcomms.h>
 
 CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
                      AudioOutput *o)

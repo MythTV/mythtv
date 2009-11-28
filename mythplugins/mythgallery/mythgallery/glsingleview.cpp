@@ -33,9 +33,9 @@ using namespace std;
 #include <QPainter>
 
 // MythTV plugin headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/util.h>
-#include <mythtv/libmythui/mythuihelper.h>
+#include <mythcontext.h>
+#include <util.h>
+#include <mythuihelper.h>
 
 // MythGallery headers
 #include "glsingleview.h"

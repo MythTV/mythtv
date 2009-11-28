@@ -9,8 +9,8 @@
 
 // Libav*
 extern "C" {
-#include <mythtv/libavformat/avformat.h>
-#include <mythtv/libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
 
 MetaIOMP4::MetaIOMP4(void)

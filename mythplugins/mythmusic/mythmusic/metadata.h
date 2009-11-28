@@ -11,7 +11,7 @@ using namespace std;
 #include <QThread>
 
 // mythtv
-#include <mythtv/uitypes.h>
+#include <uitypes.h>
 
 // mythmusic
 #include "treecheckitem.h"

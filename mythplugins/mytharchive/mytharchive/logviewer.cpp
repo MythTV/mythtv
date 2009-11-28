@@ -7,13 +7,13 @@
 #include <QFile>
 
 // mythtv
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <libmythui/mythmainwindow.h>
-#include <libmythui/mythdialogbox.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythuitext.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythmainwindow.h>
+#include <mythdialogbox.h>
+#include <mythuibutton.h>
+#include <mythuibuttonlist.h>
+#include <mythuitext.h>
 
 // mytharchive
 #include "archiveutil.h"

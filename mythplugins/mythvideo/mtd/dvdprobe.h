@@ -19,10 +19,10 @@
 #define MAXDEFS
 #endif
 
-#include <mythtv/dvdread/ifo_types.h>
-#include <mythtv/dvdread/ifo_read.h>
-#include <mythtv/dvdread/dvd_reader.h>
-#include <mythtv/dvdread/nav_read.h>
+#include <dvdread/ifo_types.h>
+#include <dvdread/ifo_read.h>
+#include <dvdread/dvd_reader.h>
+#include <dvdread/nav_read.h>
 
 #ifdef MAXDEFS
 #undef UINT8_MAX

@@ -14,12 +14,12 @@
 #include <QSqlDatabase>
 #include <QFile>
 
-#include <mythtv/exitcodes.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/langsettings.h>
-#include <mythtv/compat.h>
+#include <exitcodes.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythversion.h>
+#include <langsettings.h>
+#include <compat.h>
 
 #include "../mythvideo/dbcheck.h"
 #include "mtd.h"

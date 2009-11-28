@@ -21,7 +21,7 @@ using namespace std;
 #endif
 
 #include <FLAC/assert.h>
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 FlacEncoder::FlacEncoder(const QString &outfile, int qualitylevel,
                          Metadata *metadata)

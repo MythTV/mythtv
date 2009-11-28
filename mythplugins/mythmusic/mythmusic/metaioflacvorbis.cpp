@@ -4,7 +4,7 @@
 #include "metadata.h"
 
 // Libmyth
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 // Taglib
 #include <xiphcomment.h>

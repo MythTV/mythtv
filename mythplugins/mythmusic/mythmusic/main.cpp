@@ -10,18 +10,18 @@
 #include <QRegExp>
 
 // MythTV headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythplugin.h>
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythdb.h>
-#include <mythtv/mythpluginapi.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/libmythui/myththemedmenu.h>
-#include <mythtv/compat.h>
-#include <mythtv/libmythui/mythuihelper.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
-#include <mythtv/lcddevice.h>
+#include <mythcontext.h>
+#include <mythplugin.h>
+#include <mythmediamonitor.h>
+#include <mythdbcon.h>
+#include <mythdb.h>
+#include <mythpluginapi.h>
+#include <mythversion.h>
+#include <myththemedmenu.h>
+#include <compat.h>
+#include <mythuihelper.h>
+#include <mythprogressdialog.h>
+#include <lcddevice.h>
 
 // MythMusic headers
 #include "decoder.h"

@@ -10,14 +10,14 @@
 #include <QKeyEvent>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/util.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuicheckbox.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythuitextedit.h>
-#include <libmythui/mythmainwindow.h>
+#include <mythcontext.h>
+#include <util.h>
+#include <mythuitext.h>
+#include <mythuibutton.h>
+#include <mythuicheckbox.h>
+#include <mythuibuttonlist.h>
+#include <mythuitextedit.h>
+#include <mythmainwindow.h>
 
 // mytharchive
 #include "selectdestination.h"

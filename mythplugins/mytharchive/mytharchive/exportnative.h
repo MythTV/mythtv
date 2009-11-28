@@ -8,7 +8,7 @@
 #include <QKeyEvent>
 
 // mythtv
-#include <libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 // mytharchive
 #include "archiveutil.h"

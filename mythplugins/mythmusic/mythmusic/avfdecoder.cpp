@@ -27,9 +27,9 @@
 #include <QFile>
 
 // Myth headers
-#include <mythtv/mythcontext.h>
-#include <mythtv/audiooutput.h>
-#include <mythtv/mythverbose.h>
+#include <mythcontext.h>
+#include <audiooutput.h>
+#include <mythverbose.h>
 
 using namespace std;
 

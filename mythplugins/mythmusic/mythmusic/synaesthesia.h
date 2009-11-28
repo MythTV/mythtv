@@ -1,7 +1,7 @@
 #ifndef SYNAETHESIA
 #define SYNAETHESIA
 
-#include <mythtv/visual.h>
+#include <visual.h>
 #include "polygon.h"
 #include "mainvisual.h"
 #include "config.h"

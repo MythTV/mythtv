@@ -11,7 +11,7 @@
 
 #include <unistd.h>
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 #include "fileobs.h"
 #include <QDir>
 

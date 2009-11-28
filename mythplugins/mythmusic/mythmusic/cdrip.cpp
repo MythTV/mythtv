@@ -29,20 +29,20 @@ using namespace std;
 #include <QEvent>
 
 // MythTV plugin includes
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/dialogbox.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <lcddevice.h>
+#include <mythmediamonitor.h>
+#include <dialogbox.h>
 
 // MythUI
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuiprogressbar.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
+#include <mythdialogbox.h>
+#include <mythuitext.h>
+#include <mythuicheckbox.h>
+#include <mythuitextedit.h>
+#include <mythuibutton.h>
+#include <mythuiprogressbar.h>
+#include <mythuibuttonlist.h>
 
 // MythMusic includes
 #include "cdrip.h"

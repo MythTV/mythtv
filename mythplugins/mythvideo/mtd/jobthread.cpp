@@ -23,10 +23,10 @@ using namespace std;
 #include <QWaitCondition>
 #include <QProcess>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/compat.h>
-#include <mythtv/util.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <compat.h>
+#include <util.h>
 
 #include "jobthread.h"
 #include "mtd.h"

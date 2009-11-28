@@ -1,11 +1,11 @@
 #include <set>
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythuibuttonlist.h>
+#include <mythuibutton.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
 
 #include "globals.h"
 #include "videolist.h"

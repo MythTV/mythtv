@@ -20,9 +20,9 @@
 #include <QKeyEvent>
 
 // mythtv
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythscreentype.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythuibuttonlist.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
 
 // zm
 #include <zmdefines.h>

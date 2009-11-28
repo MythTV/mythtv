@@ -3,7 +3,7 @@
 #include "metadata.h"
 #include "encoder.h"
 
-#include <mythtv/mythcontext.h>
+#include <mythcontext.h>
 
 using namespace std;
 

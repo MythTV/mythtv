@@ -14,8 +14,8 @@ using namespace std;
 #include <Q3HBoxLayout>
 #include <Q3VBoxLayout>
 
-#include <mythtv/mythwidgets.h>
-#include <mythtv/mythdialogs.h>
+#include <mythwidgets.h>
+#include <mythdialogs.h>
 
 class Q3MythListView;
 class Q3ListBoxItem;

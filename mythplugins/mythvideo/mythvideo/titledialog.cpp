@@ -2,15 +2,15 @@
 
 #include <QTcpSocket>
 
-#include <mythtv/util.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythmediamonitor.h>
+#include <util.h>
+#include <mythcontext.h>
+#include <mythmediamonitor.h>
 
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuibuttonlist.h>
-#include <mythtv/libmythui/mythuicheckbox.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
+#include <mythuibutton.h>
+#include <mythuibuttonlist.h>
+#include <mythuicheckbox.h>
 
 #include "videoutils.h"
 #include "titledialog.h"

@@ -5,9 +5,9 @@
 #include <QProcess>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <mythdirs.h>
 #include <mythprogressdialog.h>
 
 #include "metadatasettings.h"

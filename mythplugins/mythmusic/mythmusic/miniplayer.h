@@ -1,7 +1,7 @@
 #ifndef MINIPLAYER_H_
 #define MINIPLAYER_H_
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 class MusicPlayer;
 class QTimer;

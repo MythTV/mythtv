@@ -2,11 +2,11 @@
 #define BOOKMARKEDITOR_H
 
 // myth
-#include <mythtv/libmythui/mythscreentype.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuitextedit.h>
+#include <mythscreentype.h>
+#include <mythdialogbox.h>
+#include <mythuibutton.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
 
 
 class Bookmark;

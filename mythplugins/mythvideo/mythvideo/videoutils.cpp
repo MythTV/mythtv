@@ -1,13 +1,13 @@
 #include <QDir>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythdirs.h>
 
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythsystem.h>
-#include <mythtv/libmythui/mythdialogbox.h>
-#include <mythtv/libmythui/mythuistatetype.h>
-#include <mythtv/libmythui/mythuiimage.h>
+#include <mythmainwindow.h>
+#include <mythsystem.h>
+#include <mythdialogbox.h>
+#include <mythuistatetype.h>
+#include <mythuiimage.h>
 
 #include "globals.h"
 #include "metadatalistmanager.h"

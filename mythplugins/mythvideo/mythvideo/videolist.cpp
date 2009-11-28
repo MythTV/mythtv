@@ -6,10 +6,10 @@
 #include <QFileInfo>
 #include <QList>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythmediamonitor.h>
+#include <mythcontext.h>
+#include <mythmediamonitor.h>
 
-#include <mythtv/libmythui/mythgenerictree.h>
+#include <mythgenerictree.h>
 
 #include "videofilter.h"
 #include "metadatalistmanager.h"

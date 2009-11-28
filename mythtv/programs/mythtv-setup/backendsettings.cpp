@@ -2,8 +2,8 @@
 
 #include "backendsettings.h"
 #include "frequencies.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/settings.h"
+#include "mythcontext.h"
+#include "settings.h"
 #include "channelsettings.h" // for ChannelTVFormat::GetFormats()
 #include <unistd.h>
 

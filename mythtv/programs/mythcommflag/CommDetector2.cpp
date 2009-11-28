@@ -14,9 +14,9 @@ using namespace std;
 #include <QFileInfo>
 
 // MythTV headers
-#include "libmythdb/compat.h"
-#include "libmythdb/mythdb.h"
-#include "libmythdb/mythverbose.h"
+#include "compat.h"
+#include "mythdb.h"
+#include "mythverbose.h"
 #include "NuppelVideoPlayer.h"
 #include "programinfo.h"
 #include "channelutil.h"

@@ -1,15 +1,15 @@
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythversion.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/mythpluginapi.h>
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/util.h>
+#include <mythcontext.h>
+#include <mythversion.h>
+#include <lcddevice.h>
+#include <mythpluginapi.h>
+#include <mythmediamonitor.h>
+#include <util.h>
 
-#include <mythtv/libmythui/myththemedmenu.h>
-#include <mythtv/libmythui/mythuihelper.h>
-#include <mythtv/libmythui/mythmainwindow.h>
-#include <mythtv/libmythui/mythprogressdialog.h>
-#include <mythtv/libmythui/mythdialogbox.h>
+#include <myththemedmenu.h>
+#include <mythuihelper.h>
+#include <mythmainwindow.h>
+#include <mythprogressdialog.h>
+#include <mythdialogbox.h>
 
 #include "videodlg.h"
 #include "globalsettings.h"

@@ -20,11 +20,11 @@
 #include <QDir>
 
 // myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/util.h>
-#include <mythtv/mythdirs.h>
-#include <mythtv/mythdb.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
+#include <util.h>
+#include <mythdirs.h>
+#include <mythdb.h>
 
 // mythgallery
 #include "config.h"

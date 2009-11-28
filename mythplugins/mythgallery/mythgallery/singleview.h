@@ -34,7 +34,7 @@ using namespace std;
 
 
 // MythTV plugin headers
-#include <mythtv/mythdialogs.h>
+#include <mythdialogs.h>
 
 #include "imageview.h"
 #include "iconview.h"

@@ -7,7 +7,7 @@
 #include <QKeyEvent>
 using namespace std;
 
-#include <mythtv/mythdialogs.h>
+#include <mythdialogs.h>
 
 class Metadata;
 class ImageGridItem;

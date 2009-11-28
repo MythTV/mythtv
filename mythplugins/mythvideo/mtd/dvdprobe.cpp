@@ -24,8 +24,8 @@
 
 #include "dvdprobe.h"
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
 
 namespace
 {

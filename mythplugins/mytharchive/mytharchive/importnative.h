@@ -11,7 +11,7 @@
 #include <QDateTime>
 
 // myth
-#include <libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 // mytharchive
 #include "fileselector.h"

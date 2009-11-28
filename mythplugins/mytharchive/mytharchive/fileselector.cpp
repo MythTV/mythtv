@@ -7,16 +7,16 @@
 #include <QVariant>
 
 // Myth
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdb.h>
-#include <mythtv/libmythui/mythuihelper.h>
-#include <libmythui/mythuitext.h>
-#include <libmythui/mythuitextedit.h>
-#include <libmythui/mythuibutton.h>
-#include <libmythui/mythuiimage.h>
-#include <libmythui/mythuibuttonlist.h>
-#include <libmythui/mythmainwindow.h>
-#include <libmythui/mythdialogbox.h>
+#include <mythcontext.h>
+#include <mythdb.h>
+#include <mythuihelper.h>
+#include <mythuitext.h>
+#include <mythuitextedit.h>
+#include <mythuibutton.h>
+#include <mythuiimage.h>
+#include <mythuibuttonlist.h>
+#include <mythmainwindow.h>
+#include <mythdialogbox.h>
 
 // mytharchive
 #include "fileselector.h"

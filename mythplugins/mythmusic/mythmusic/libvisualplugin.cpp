@@ -2,8 +2,8 @@
 #include <iostream>
 using namespace std;
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/compat.h>
+#include <mythcontext.h>
+#include <compat.h>
 
 #include "libvisualplugin.h"
 

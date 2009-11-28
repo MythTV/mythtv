@@ -3,7 +3,7 @@
 
 #include "decoder.h"
 
-#include <mythtv/mythconfig.h>
+#include <mythconfig.h>
 
 #if CONFIG_DARWIN
 #include <vector>

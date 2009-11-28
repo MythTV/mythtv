@@ -4,7 +4,7 @@
 #include <QPointer>
 #include <QStringList>
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 #include "parentalcontrols.h"
 #include "quicksp.h"

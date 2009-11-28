@@ -7,8 +7,8 @@
 #include <mythcontext.h>
 
 extern "C" {
-#include <mythtv/libavformat/avformat.h>
-#include <mythtv/libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 }
 
 MetaIOAVFComment::MetaIOAVFComment(void)

@@ -3,14 +3,14 @@
 #include <QRegExp>
 #include <QTimer>
 
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythmediamonitor.h>
-#include <mythtv/mythdirs.h>
+#include <mythcontext.h>
+#include <mythmediamonitor.h>
+#include <mythdirs.h>
 
-#include <mythtv/libmythui/mythscreenstack.h>
-#include <mythtv/libmythui/mythuibutton.h>
-#include <mythtv/libmythui/mythuitext.h>
-#include <mythtv/libmythui/mythuiprogressbar.h>
+#include <mythscreenstack.h>
+#include <mythuibutton.h>
+#include <mythuitext.h>
+#include <mythuiprogressbar.h>
 
 #include "titledialog.h"
 #include "videoutils.h"

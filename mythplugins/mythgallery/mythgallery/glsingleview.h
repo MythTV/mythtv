@@ -24,8 +24,8 @@
 #ifdef USING_OPENGL
 
 // MythTV plugin headers
-#include <mythtv/util.h>
-#include <mythtv/mythdialogs.h>
+#include <util.h>
+#include <mythdialogs.h>
 
 // MythGallery headers
 #include "imageview.h"

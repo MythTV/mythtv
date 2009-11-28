@@ -1,7 +1,7 @@
 #ifndef BACKENDSETTINGS_H
 #define BACKENDSETTINGS_H
 
-#include "libmyth/settings.h"
+#include "settings.h"
 
 class BackendSettings : public ConfigurationWizard
 {

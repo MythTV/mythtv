@@ -6,7 +6,7 @@
 #include <QEvent>
 #include <QVector>
 
-#include <mythtv/libmythui/mythscreentype.h>
+#include <mythscreentype.h>
 
 class MythUIText;
 class MythUITextEdit;
