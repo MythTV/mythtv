@@ -8,11 +8,9 @@ using namespace std;
 #include <pthread.h>
 
 // Qt headers
-#include <QApplication>
-#include <QMutex>
+#include <QWidget>
 #include <QString>
-#include <QVector>
-#include <QMap>
+#include <QMutex>
 #include <QHash>
 #include <QRect>
 
@@ -28,6 +26,7 @@ class RingBuffer;
 class ProgramInfo;
 class LiveTVChain;
 class MythDialog;
+class QPainter;
 
 typedef enum
 {

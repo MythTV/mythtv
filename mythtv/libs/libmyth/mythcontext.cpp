@@ -1,7 +1,7 @@
+#include <QCoreApplication>
 #include <QPixmap>
 #include <QImage>
 #include <QUrl>
-#include <QApplication>
 #include <QDir>
 #include <QFileInfo>
 #include <QDesktopWidget>

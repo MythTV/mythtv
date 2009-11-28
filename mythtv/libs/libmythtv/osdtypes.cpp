@@ -5,7 +5,7 @@ using namespace std;
 #include <QImage>
 #include <QRegExp>
 #include <QKeyEvent>
-#include <QApplication>
+#include <QCoreApplication>
 
 #include "yuv2rgb.h"
 #include "osdtypes.h"
@@ -572,7 +572,7 @@ void OSDSet::SendOSDClosed(int OSDType)
         return;
 
     OSDCloseEvent *event = new OSDCloseEvent(m_name, OSDType);
-    QApplication::postEvent(m_listener, event);
+    QCoreApplication::postEvent(m_listener, event);
 }
 
 void OSDSet::Hide(void)

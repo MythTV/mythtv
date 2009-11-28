@@ -4,7 +4,7 @@
 // QT
 #include <QString>
 #include <QHash>
-#include <QApplication>
+#include <QCoreApplication>
 
 // Libmyth
 #include "mythcontext.h"

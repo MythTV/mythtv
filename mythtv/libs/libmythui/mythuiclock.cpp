@@ -1,7 +1,7 @@
 
 #include "mythuiclock.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDomDocument>
 
 #include "mythpainter.h"

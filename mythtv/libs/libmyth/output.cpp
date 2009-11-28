@@ -7,11 +7,12 @@
 #include <algorithm>
 using namespace std;
 
-#include <QObject>
-#include <QApplication>
+#include <QCoreApplication>
 
 #include "output.h"
 #include "visual.h"
+
+class QObject;
 
 OutputListeners::OutputListeners()
 {
@@ -28,7 +29,7 @@ void OutputListeners::error(const QString &e) {
     QObject *object = firstListener();
     while (object)
     {
-        QApplication::postEvent(object, new OutputEvent(e));
+        QCoreApplication::postEvent(object, new OutputEvent(e));
         object = nextListener();
     }
 }

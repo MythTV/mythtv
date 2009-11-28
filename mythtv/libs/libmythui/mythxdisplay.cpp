@@ -21,7 +21,7 @@ std::map<Display*, XErrorVectorType>   xerrors;
 std::map<Display*, XErrorCallbackType> xerror_handlers;
 std::map<Display*, MythXDisplay*>      xdisplays;
 #else
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDesktopWidget>
 #endif // USING_X11
 
@@ -46,8 +46,8 @@ int GetNumberXineramaScreens(void)
 #else // if !USING_X11
 #if CONFIG_DARWIN
     // Mac OS X when not using X11 server supports Xinerama.
-    if (QApplication::desktop())
-        nr_xinerama_screens = QApplication::desktop()->numScreens();
+    if (QCoreApplication::desktop())
+        nr_xinerama_screens = QCoreApplication::desktop()->numScreens();
 #endif // CONFIG_DARWIN
 #endif // !USING_X11
     return nr_xinerama_screens;

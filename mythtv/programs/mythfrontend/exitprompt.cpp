@@ -1,5 +1,5 @@
 
-#include <QApplication>
+#include <QCoreApplication>
 
 #include "exitprompt.h"
 #include "mythcontext.h"

@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include <QRegExp>
 #include <QBuffer>
 #include <QDir>

@@ -13,7 +13,7 @@
 using namespace std;
 
 // QT headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QPixmap>
 #include <QPainter>
 #include <QGLWidget>

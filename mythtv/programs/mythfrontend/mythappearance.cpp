@@ -3,7 +3,7 @@
 
 /* QT includes */
 #include <QStringList>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QString>
 
 /* MythTV includes */

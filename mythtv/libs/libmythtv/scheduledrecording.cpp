@@ -1,9 +1,5 @@
-#include <QApplication>
-
 #include "scheduledrecording.h"
 #include "mythcontext.h"
-#include "mythdb.h"
-#include "mythverbose.h"
 
 ScheduledRecording::ScheduledRecording()
 {

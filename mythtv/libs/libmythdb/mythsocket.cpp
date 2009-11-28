@@ -15,7 +15,6 @@
 #endif
 
 // Qt
-#include <QApplication>
 #include <QByteArray>
 #include <QHostInfo>
 #include <QMap>

@@ -5,10 +5,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-// qt
+// Qt
 #include <QApplication>
 
-// myth
+// MythTV
 #include "mythcontext.h"
 #include "mythverbose.h"
 #include "mythversion.h"

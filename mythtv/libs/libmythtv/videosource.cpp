@@ -11,7 +11,7 @@
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QStringList>
 #include <QCursor>
 #include <QLayout>

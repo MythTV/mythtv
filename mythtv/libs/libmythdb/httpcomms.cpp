@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QRegExp>
 #include <QTimer>
 #include <QFile>

@@ -1,6 +1,5 @@
 #include <QPixmap>
 #include <QImage>
-#include <QApplication>
 #include <QFrame>
 #include <QKeyEvent>
 

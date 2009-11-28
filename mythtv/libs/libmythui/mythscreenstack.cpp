@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QTimer>
 #include <QString>
 
@@ -122,7 +122,7 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
 
         mainwindow->update();
         if (mainwindow->IsExitingToMain())
-            QApplication::postEvent(mainwindow, new ExitToMainMenuEvent());
+            QCoreApplication::postEvent(mainwindow, new ExitToMainMenuEvent());
     }
 
     m_topScreen = NULL;

@@ -1,7 +1,7 @@
 
 #include "lircevent.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QString>
 
 #include "mythmainwindow.h"
@@ -25,7 +25,7 @@ void LircEventLock::lock()
     if (mw)
     {
         events_locked = true;
-        QApplication::postEvent((QObject *)mw,
+        QCoreApplication::postEvent((QObject *)mw,
                                 new LircMuteEvent(events_locked));
     }
 }
@@ -36,7 +36,7 @@ void LircEventLock::unlock()
     if (mw)
     {
         events_locked = false;
-        QApplication::postEvent((QObject *)mw,
+        QCoreApplication::postEvent((QObject *)mw,
                                 new LircMuteEvent(events_locked));
     }
 }

@@ -358,8 +358,9 @@ void LCD::handleKeyPress(QString key_pressed)
     else if (mykey == lcd_keystring.at(5))
         key = Qt::Key_Escape;
 
-    QApplication::postEvent((QObject *)(QApplication::activeWindow()),
-                            new ExternalKeycodeEvent(key));
+    QCoreApplication::postEvent(
+        (QObject *)(QApplication::activeWindow()),
+        new ExternalKeycodeEvent(key));
 }
 
 void LCD::init()

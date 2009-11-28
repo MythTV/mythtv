@@ -9,7 +9,7 @@
 using namespace std;
 
 //qt
-#include <QApplication>
+#include <QCoreApplication>
 #include <QKeyEvent>
 #include <QDateTime>
 

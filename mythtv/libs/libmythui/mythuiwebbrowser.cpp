@@ -789,11 +789,11 @@ void MythUIWebBrowser::HandleMouseAction(const QString &action)
 
             QMouseEvent *me = new QMouseEvent(QEvent::MouseButtonPress, curPos,
                                 Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-            QApplication::postEvent(widget, me);
+            QCoreApplication::postEvent(widget, me);
 
             me = new QMouseEvent(QEvent::MouseButtonRelease, curPos,
                                 Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-            QApplication::postEvent(widget, me);
+            QCoreApplication::postEvent(widget, me);
         }
     }
 }

@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 // qt
-#include <QApplication>
+#include <QCoreApplication>
 #include <QKeyEvent>
 #include <QEvent>
 

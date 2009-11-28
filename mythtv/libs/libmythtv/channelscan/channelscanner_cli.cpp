@@ -24,7 +24,7 @@
  */
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 
 // MythTv headers
 #include "channelscanner_cli.h"
@@ -73,7 +73,7 @@ void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
                 Process(transports);
 
             done = true;
-            QApplication::exit(0);
+            QCoreApplication::exit(0);
         }
         break;
 

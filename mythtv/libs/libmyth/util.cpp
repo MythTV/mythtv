@@ -31,7 +31,6 @@ using namespace std;
 #endif
 
 // Qt headers
-#include <QApplication>
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>

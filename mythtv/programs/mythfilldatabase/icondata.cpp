@@ -10,7 +10,7 @@ using namespace std;
 #include <signal.h>
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDomElement>
 #include <QFileInfo>
 #include <QFile>

@@ -11,11 +11,10 @@
 using namespace std;
 
 // Qt headers
-#include <QRegExp>
-#include <QMap>
-#include <QApplication>
-#include <QFile>
 #include <QFileInfo>
+#include <QRegExp>
+#include <QFile>
+#include <QMap>
 
 // MythTV headers
 #include "recordinginfo.h"

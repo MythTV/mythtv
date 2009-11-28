@@ -6,7 +6,7 @@
 #include "mythdb.h"
 
 #include <QSqlDatabase>
-#include <QApplication>
+#include <QCoreApplication>
 
 #include <mythwizard.h>
 

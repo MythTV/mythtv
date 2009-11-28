@@ -5,7 +5,6 @@
 #include <QLabel>
 #include <QCursor>
 #include <QDateTime>
-#include <QApplication>
 #include <QRegExp>
 #include <QPaintEvent>
 #include <QPixmap>

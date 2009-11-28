@@ -8,7 +8,7 @@
 #include <algorithm>
 using namespace std;
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QRegExp>
 #include <QFile>
 #include <QTimer>

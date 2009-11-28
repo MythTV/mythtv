@@ -1,5 +1,4 @@
-
-#include <QApplication>
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QString>
@@ -305,7 +304,7 @@ void MythUIFileBrowser::PathClicked(MythUIButtonListItem *item)
             DialogCompletionEvent *dce =
                 new DialogCompletionEvent(m_id, 0, finfo.filePath(),
                                           item->GetData());
-            QApplication::postEvent(m_retObject, dce);
+            QCoreApplication::postEvent(m_retObject, dce);
         }
         Close();
         return;
@@ -411,7 +410,7 @@ void MythUIFileBrowser::OKPressed()
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
                                                             selectedPath,
                                                             item->GetData());
-        QApplication::postEvent(m_retObject, dce);
+        QCoreApplication::postEvent(m_retObject, dce);
     }
 
     Close();

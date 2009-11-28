@@ -1,25 +1,19 @@
+#include <QCoreApplication>
 
-#include "viewscheduled.h"
-
-// Libmythtv
 #include "customedit.h"
 #include "recordinginfo.h"
 #include "proglist.h"
 #include "tv_play.h"
 #include "recordingrule.h"
-
-// Libmythdb
 #include "mythverbose.h"
-
-// Libmyth
 #include "mythcontext.h"
 #include "remoteutil.h"
-
-// Libmythui
 #include "mythuitext.h"
 #include "mythuistatetype.h"
 #include "mythuibuttonlist.h"
 #include "mythdialogbox.h"
+
+#include "viewscheduled.h"
 
 void *ViewScheduled::RunViewScheduled(void *player, bool showTV)
 {

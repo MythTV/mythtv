@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <cmath>
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QEvent>
 #include <QTimer>
 

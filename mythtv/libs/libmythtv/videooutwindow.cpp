@@ -23,6 +23,7 @@
 #include <cmath>
 
 #include <QDesktopWidget>
+#include <QApplication>
 
 #include "videooutwindow.h"
 #include "osd.h"

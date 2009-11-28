@@ -6,7 +6,7 @@
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QPainter>
 #include <QLabel>
 
@@ -4460,7 +4460,7 @@ void UIKeyboardType::leftCursor()
     {
         QKeyEvent *key = new QKeyEvent(
             QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier, "", false, 1);
-        QApplication::postEvent(m_parentEdit, key);
+        QCoreApplication::postEvent(m_parentEdit, key);
     }
 }
 
@@ -4484,7 +4484,7 @@ void UIKeyboardType::rightCursor()
     {
         QKeyEvent *key = new QKeyEvent(
             QEvent::KeyPress, Qt::Key_Right, Qt::NoModifier, "", false, 1);
-        QApplication::postEvent(m_parentEdit, key);
+        QCoreApplication::postEvent(m_parentEdit, key);
     }
 }
 
@@ -4507,7 +4507,7 @@ void UIKeyboardType::backspaceKey()
     {
         QKeyEvent *key = new QKeyEvent(
             QEvent::KeyPress, Qt::Key_Backspace, Qt::NoModifier, "", false, 1);
-        QApplication::postEvent(m_parentEdit, key);
+        QCoreApplication::postEvent(m_parentEdit, key);
     }
 }
 
@@ -4530,7 +4530,7 @@ void UIKeyboardType::delKey()
     {
         QKeyEvent *key = new QKeyEvent(
             QEvent::KeyPress, Qt::Key_Delete, Qt::NoModifier, "", false, 1);
-        QApplication::postEvent(m_parentEdit, key);
+        QCoreApplication::postEvent(m_parentEdit, key);
     }
 }
 
@@ -4582,7 +4582,7 @@ void UIKeyboardType::insertChar(QString c)
 #else // if !QT3_SUPPORT
             QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, 0, Qt::NoModifier, c, false, c.length());
 #endif //!QT3_SUPPORT
-            QApplication::postEvent(m_parentEdit, key);
+            QCoreApplication::postEvent(m_parentEdit, key);
         }
     }
     else
@@ -4616,7 +4616,7 @@ void UIKeyboardType::insertChar(QString c)
                             QEvent::KeyPress, 0, Qt::NoModifier,
                             comps[i][2], false, comps[i][2].length());
 #endif // !QT3_SUPPORT
-                        QApplication::postEvent(m_parentEdit, key);
+                        QCoreApplication::postEvent(m_parentEdit, key);
                     }
 
                     break;
@@ -4745,7 +4745,7 @@ void UIKeyboardType::keyPressEvent(QKeyEvent *e)
         QKeyEvent *key = new QKeyEvent(
             e->type(), e->key(), e->modifiers(),
             e->text(), e->isAutoRepeat(), e->count());
-        QApplication::postEvent(m_parentEdit, key);
+        QCoreApplication::postEvent(m_parentEdit, key);
         m_parentEdit->setFocus();
     }
 }

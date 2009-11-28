@@ -1,4 +1,4 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include <QTranslator>
 
 #include "langsettings.h"

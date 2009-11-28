@@ -8,7 +8,7 @@
 #include "jsmenuevent.h"
 
 // QT headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QString>
 
 // Mythui headers
@@ -33,7 +33,7 @@ void JoystickMenuEventLock::lock()
     if (mw)
     {
         m_eventsLocked = true;
-        QApplication::postEvent((QObject *)mw,
+        QCoreApplication::postEvent((QObject *)mw,
                                 new JoystickMenuMuteEvent(m_eventsLocked));
     }
 }
@@ -44,7 +44,7 @@ void JoystickMenuEventLock::unlock()
     if (mw)
     {
         m_eventsLocked = false;
-        QApplication::postEvent((QObject *)mw,
+        QCoreApplication::postEvent((QObject *)mw,
                                 new JoystickMenuMuteEvent(m_eventsLocked));
     }
 }

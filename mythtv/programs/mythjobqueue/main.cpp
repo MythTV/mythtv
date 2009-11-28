@@ -13,7 +13,7 @@
 #include <ctime>
 #include <cmath>
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QString>
 #include <QRegExp>
 #include <QDir>
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    QApplication a(argc, argv, false);
+    QCoreApplication a(argc, argv);
     QMap<QString, QString> settingsOverride;
     int argpos = 1;
     bool daemonize = false;

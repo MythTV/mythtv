@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QEvent>
 #include <QFileInfo>
 #include <QFile>

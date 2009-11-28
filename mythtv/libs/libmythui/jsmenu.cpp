@@ -25,7 +25,7 @@
 #include "jsmenu.h"
 
 // QT headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QEvent>
 #include <QKeySequence>
 #include <QTextStream>
@@ -312,16 +312,16 @@ void JoystickMenuThread::EmitKey(QString code)
     // This is done so the main code can output a warning for bad
     // mappings.
     if (!a.count())
-        QApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
+        QCoreApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
                                 keycode, true));
 
     for (unsigned int i = 0; i < a.count(); i++)
     {
         keycode = a[i];
 
-        QApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
+        QCoreApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
                                 keycode, true));
-        QApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
+        QCoreApplication::postEvent(m_mainWindow, new JoystickKeycodeEvent(code,
                                 keycode, false));
     }
 }

@@ -12,7 +12,7 @@
 #include <fcntl.h>
 
 // QT headers
-#include <QApplication>
+#include <QCoreApplication>
 
 # ifdef linux
 #   include <sys/vfs.h>

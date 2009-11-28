@@ -4,7 +4,7 @@
 // QT
 #include <QTimer>
 #include <QDomDocument>
-#include <QApplication>
+#include <QCoreApplication>
 
 // Myth headers
 #include "mythverbose.h"
@@ -145,7 +145,7 @@ bool MythUIButton::keyPressEvent(QKeyEvent *e)
 }
 
 /** \brief Mouse click/movement handler, receives mouse gesture events from the
- *         QApplication event loop. Should not be used directly.
+ *         QCoreApplication event loop. Should not be used directly.
  *
  *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event

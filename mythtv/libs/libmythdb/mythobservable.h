@@ -21,7 +21,7 @@ class QObject;
        {
            QObject *listener = firstListener();
                while (listener) {
-                   QApplication::postEvent (listener, new QEvent(100));
+                   QCoreApplication::postEvent (listener, new QEvent(100));
                listener = nextListener();
            }
        }
@@ -29,8 +29,8 @@ class QObject;
 
     MythEvents can be dispatched to all listeners by calling dispatch
     or dispatchNow. The former is much preferred as it uses
-    QApplication::postEvent() while the latter uses the blocking
-    QApplication::sendEvent().
+    QCoreApplication::postEvent() while the latter uses the blocking
+    QCoreApplication::sendEvent().
 
     The name MythObservable is 'wrong', since all the methods refer to
     the observers as listeners (ie. addListener), however,
@@ -116,7 +116,7 @@ class MPUBLIC MythObservable
 
         Makes a copy of the event on the heap by calling
         MythEvent::clone and dispatches is by calling
-        QApplication::postEvent.
+        QCoreApplication::postEvent.
 
         \param event a MythEvent to dispatch.
     */
@@ -126,7 +126,7 @@ class MPUBLIC MythObservable
 
         See dispatch.
 
-        \note This uses QApplication::sendEvent, which is
+        \note This uses QCoreApplication::sendEvent, which is
         blocking. It's preferred to use dispatch instead.
 
         \param event a MythEvent to dispatch.

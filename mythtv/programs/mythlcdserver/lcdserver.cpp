@@ -57,7 +57,7 @@
 
 #include <cstdlib>
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QStringList>
 #include <QRegExp>
 #include <QDir>

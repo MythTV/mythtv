@@ -6,7 +6,7 @@
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 
 // libmyth headers
 #include "exitcodes.h"
@@ -27,7 +27,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv, false);
+    QCoreApplication a(argc, argv);
     FillData fill_data;
     int argpos = 1;
     int fromfile_id = 1;

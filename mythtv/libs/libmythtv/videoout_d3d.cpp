@@ -20,8 +20,6 @@ using namespace std;
 #include "mmsystem.h"
 #include "tv.h"
 
-#include <QApplication>
-
 #undef UNICODE
 
 extern "C" {

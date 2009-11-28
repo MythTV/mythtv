@@ -2,7 +2,7 @@
 #include "schedulecommon.h"
 
 // QT
-#include <QApplication>
+#include <QCoreApplication>
 
 // libmyth
 #include "mythcontext.h"

@@ -30,7 +30,7 @@
 
 // Qt headers
 #include <QStringList>
-#include <QApplication>
+#include <QCoreApplication>
 
 // MythTV headers
 #include <mythcontext.h>

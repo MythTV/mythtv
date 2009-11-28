@@ -37,7 +37,7 @@
 
 #include "mythwizard.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 
 #include <QLayout>
 #include <QKeyEvent>
@@ -161,7 +161,7 @@ void MythWizard::Show()
 
 void MythWizard::setFont( const QFont & font )
 {
-    QApplication::postEvent( this, new QEvent( QEvent::LayoutRequest ) );
+    QCoreApplication::postEvent( this, new QEvent( QEvent::LayoutRequest ) );
     setFont( font );
 }
 
@@ -586,8 +586,8 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
             else
             {
                 back();
-                QApplication::postEvent(gContext->GetMainWindow(), 
-                                        new ExitToMainMenuEvent());
+                QCoreApplication::postEvent(gContext->GetMainWindow(), 
+                                            new ExitToMainMenuEvent());
             }
         }
         else

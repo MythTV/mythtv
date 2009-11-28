@@ -14,7 +14,6 @@ using namespace std;
 #include <QRegExp>
 #include <QMap>
 #include <QUrl>
-#include <QApplication>
 #include <QFile>
 #include <QFileInfo>
 

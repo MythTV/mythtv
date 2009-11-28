@@ -9,7 +9,7 @@
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QHostAddress>
 #include <QUdpSocket>
 #include <QString>
@@ -87,7 +87,7 @@ void printHelp(void)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv, false);
+    QCoreApplication a(argc, argv);
 
     QHostAddress address = QHostAddress::Broadcast;
     unsigned short port = 6948;

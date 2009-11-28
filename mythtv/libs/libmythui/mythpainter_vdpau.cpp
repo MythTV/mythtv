@@ -6,7 +6,7 @@
 #include "mythpainter_vdpau.h"
 
 // QT headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QPixmap>
 #include <QPainter>
 #include <QMutex>

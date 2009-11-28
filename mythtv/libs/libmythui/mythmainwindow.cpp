@@ -1,4 +1,3 @@
-
 #include "mythmainwindow.h"
 #include "mythmainwindow_internal.h"
 
@@ -675,7 +674,7 @@ void MythMainWindow::closeEvent(QCloseEvent *e)
 {
     QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
                                    Qt::NoModifier);
-    QApplication::postEvent(this, key);
+    QCoreApplication::postEvent(this, key);
     e->ignore();
 }
 
@@ -770,7 +769,7 @@ bool MythMainWindow::screenShot(void)
 bool MythMainWindow::event(QEvent *e)
 {
     if (e->type() == QEvent::Show && !e->spontaneous())
-        QApplication::postEvent(this, new MythPostShowEvent());
+        QCoreApplication::postEvent(this, new MythPostShowEvent());
 
     if (e->type() == (QEvent::Type)kMythPostShowEventType)
     {
@@ -977,7 +976,7 @@ void MythMainWindow::detach(QWidget *child)
     }
 
     if (d->exitingtomain)
-        QApplication::postEvent(this, new ExitToMainMenuEvent());
+        QCoreApplication::postEvent(this, new ExitToMainMenuEvent());
 }
 
 QWidget *MythMainWindow::currentWidget(void)
@@ -1020,14 +1019,14 @@ void MythMainWindow::ExitToMainMenu(void)
             if (current->objectName() == QString("video playback window"))
             {
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
-                QApplication::postEvent(current, me);
+                QCoreApplication::postEvent(current, me);
             }
             else if (current->inherits("MythDialog"))
             {
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
                                                Qt::NoModifier);
                 QObject *key_target = getTarget(*key);
-                QApplication::postEvent(key_target, key);
+                QCoreApplication::postEvent(key_target, key);
             }
             return;
         }
@@ -1044,13 +1043,13 @@ void MythMainWindow::ExitToMainMenu(void)
             if (screen->objectName() == QString("video playback window"))
             {
                 MythEvent *me = new MythEvent("EXIT_TO_MENU");
-                QApplication::postEvent(screen, me);
+                QCoreApplication::postEvent(screen, me);
             }
             else
             {
                 QKeyEvent *key = new QKeyEvent(QEvent::KeyPress, d->escapekey,
                                                Qt::NoModifier);
-                QApplication::postEvent(this, key);
+                QCoreApplication::postEvent(this, key);
             }
             return;
         }
@@ -1118,7 +1117,7 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     {
         d->exitingtomain = true;
         d->exitmenucallback = d->jumpMap[keynum]->callback;
-        QApplication::postEvent(this, new ExitToMainMenuEvent());
+        QCoreApplication::postEvent(this, new ExitToMainMenuEvent());
         return true;
     }
 
@@ -1377,7 +1376,7 @@ void MythMainWindow::JumpTo(const QString& destination, bool pop)
         d->exitingtomain = true;
         d->popwindows = pop;
         d->exitmenucallback = d->destinationMap[destination].callback;
-        QApplication::postEvent(this, new ExitToMainMenuEvent());
+        QCoreApplication::postEvent(this, new ExitToMainMenuEvent());
         return;
     }
 }
@@ -1447,7 +1446,7 @@ void MythMainWindow::mouseTimeout(void)
     e = d->gesture.gesture();
 
     if (e->gesture() < MythGestureEvent::Click)
-        QApplication::postEvent(this, e);
+        QCoreApplication::postEvent(this, e);
 }
 
 bool MythMainWindow::eventFilter(QObject *, QEvent *e)
@@ -1583,7 +1582,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                     delete ge;
                 }
                 else
-                    QApplication::postEvent(this, ge);
+                    QCoreApplication::postEvent(this, ge);
 
                 return true;
             }
@@ -1613,9 +1612,9 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                                                Qt::NoModifier);
                 QObject *key_target = getTarget(*key);
                 if (!key_target)
-                    QApplication::postEvent(this, key);
+                    QCoreApplication::postEvent(this, key);
                 else
-                    QApplication::postEvent(key_target, key);
+                    QCoreApplication::postEvent(key_target, key);
             }
             if (delta<0)
             {
@@ -1624,9 +1623,9 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
                                                Qt::NoModifier);
                 QObject *key_target = getTarget(*key);
                 if (!key_target)
-                    QApplication::postEvent(this, key);
+                    QCoreApplication::postEvent(this, key);
                 else
-                    QApplication::postEvent(key_target, key);
+                    QCoreApplication::postEvent(key_target, key);
             }
             break;
         }
@@ -1665,9 +1664,9 @@ void MythMainWindow::customEvent(QEvent *ce)
 
         QObject *key_target = getTarget(key);
         if (!key_target)
-            QApplication::sendEvent(this, &key);
+            QCoreApplication::sendEvent(this, &key);
         else
-            QApplication::sendEvent(key_target, &key);
+            QCoreApplication::sendEvent(key_target, &key);
     }
 #if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
     else if (ce->type() ==
@@ -1694,9 +1693,9 @@ void MythMainWindow::customEvent(QEvent *ce)
 
             QObject *key_target = getTarget(key);
             if (!key_target)
-                QApplication::sendEvent(this, &key);
+                QCoreApplication::sendEvent(this, &key);
             else
-                QApplication::sendEvent(key_target, &key);
+                QCoreApplication::sendEvent(key_target, &key);
         }
     }
     else if (ce->type() == (QEvent::Type) LircMuteEvent::LircMuteEventType)
@@ -1734,9 +1733,9 @@ void MythMainWindow::customEvent(QEvent *ce)
 
             QObject *key_target = getTarget(key);
             if (!key_target)
-                QApplication::sendEvent(this, &key);
+                QCoreApplication::sendEvent(this, &key);
             else
-                QApplication::sendEvent(key_target, &key);
+                QCoreApplication::sendEvent(key_target, &key);
         }
         else
         {

@@ -3,7 +3,7 @@
 #include "mythuitextedit.h"
 
 // QT headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QRegExp>
 #include <QChar>
 #include <QKeyEvent>

@@ -1,7 +1,7 @@
 
 #include "mythdialogbox.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QString>
@@ -193,7 +193,7 @@ void MythDialogBox::SendEvent(int res, QString text, QVariant data)
         return;
 
     DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, text, data);
-    QApplication::postEvent(m_retObject, dce);
+    QCoreApplication::postEvent(m_retObject, dce);
 }
 
 /////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ void MythConfirmationDialog::sendResult(bool ok)
 
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, res, "",
                                                                m_resultData);
-        QApplication::postEvent(m_retObject, dce);
+        QCoreApplication::postEvent(m_retObject, dce);
     }
 
     Close();
@@ -428,7 +428,7 @@ void MythTextInputDialog::sendResult()
     {
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
                                                             inputString, "");
-        QApplication::postEvent(m_retObject, dce);
+        QCoreApplication::postEvent(m_retObject, dce);
     }
 
     Close();
@@ -535,7 +535,7 @@ void MythUISearchDialog::slotSendResult()
     {
         DialogCompletionEvent *dce = new DialogCompletionEvent(m_id, 0,
                                                             result, "");
-        QApplication::postEvent(m_retObject, dce);
+        QCoreApplication::postEvent(m_retObject, dce);
     }
 
     Close();

@@ -25,7 +25,7 @@ using namespace std;
 #  endif // USING_MINGW
 #endif // !__linux__
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QFile>
 #include <QDir>
@@ -4930,7 +4930,7 @@ void MainServer::SetExitCode(int exitCode, bool closeApplication)
 {
     m_exitCode = exitCode;
     if (closeApplication)
-        QApplication::exit(m_exitCode);
+        QCoreApplication::exit(m_exitCode);
 }
 
 QString MainServer::LocalFilePath(const QUrl &url, const QString wantgroup)

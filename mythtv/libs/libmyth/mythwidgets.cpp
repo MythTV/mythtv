@@ -4,7 +4,6 @@ using namespace std;
 #include <QStyle>
 #include <QPainter>
 #include <QCursor>
-#include <QApplication>
 #include <QLayout>
 #include <QKeyEvent>
 #include <QHideEvent>

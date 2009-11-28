@@ -1,7 +1,7 @@
 
 #include "mythfontproperties.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDomDocument>
 
 #include "mythverbose.h"
@@ -187,7 +187,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         // NOTE: exactMatch() is broken and always returns false
 //         if (!newFont->m_face.exactMatch())
 //         {
-//             QFont tmp = QApplication::font();
+//             QFont tmp = QCoreApplication::font();
 //             newFont->m_face.setFamily(tmp.family());
 //         }
     }

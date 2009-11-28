@@ -8,7 +8,7 @@
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 
 // MythTV headers
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     QMap<long long, long long> posMap;
     srand(time(NULL));
 
-    QApplication a(argc, argv, false);
+    QCoreApplication a(argc, argv);
 
     print_verbose_messages = VB_IMPORTANT;
     verboseString = "important";

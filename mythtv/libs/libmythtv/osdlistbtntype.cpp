@@ -27,7 +27,7 @@
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QPixmap>
 #include <QPainter>
 #include <QImage>
@@ -360,8 +360,9 @@ void OSDListTreeType::SendItemSelected(OSDListTreeType *parent, OSDGenericTree *
     if (!m_listener)
         return;
 
-    OSDListTreeItemSelectedEvent *event = new OSDListTreeItemSelectedEvent(item->getString(), item->getAction());
-    QApplication::postEvent(m_listener, event);
+    OSDListTreeItemSelectedEvent *event =
+        new OSDListTreeItemSelectedEvent(item->getString(), item->getAction());
+    QCoreApplication::postEvent(m_listener, event);
 }
 
 void OSDListTreeType::SendItemEntered(OSDListTreeType *parent, OSDGenericTree *item)
@@ -369,8 +370,9 @@ void OSDListTreeType::SendItemEntered(OSDListTreeType *parent, OSDGenericTree *i
     if (!m_listener)
         return;
 
-    OSDListTreeItemEnteredEvent *event = new OSDListTreeItemEnteredEvent(item->getString(), item->getAction());
-    QApplication::postEvent(m_listener, event);
+    OSDListTreeItemEnteredEvent *event =
+        new OSDListTreeItemEnteredEvent(item->getString(), item->getAction());
+    QCoreApplication::postEvent(m_listener, event);
 }
 
 #undef LOC_ERR
@@ -791,8 +793,9 @@ void OSDListBtnType::SendItemSelected(OSDListBtnTypeItem* item)
     if (!m_listener)
         return;
 
-    OSDListBtnItemSelectedEvent *event = new OSDListBtnItemSelectedEvent(item->text());
-    QApplication::postEvent(m_listener, event);
+    OSDListBtnItemSelectedEvent *event =
+        new OSDListBtnItemSelectedEvent(item->text());
+    QCoreApplication::postEvent(m_listener, event);
 }
 
 /////////////////////////////////////////////////////////////////////////////

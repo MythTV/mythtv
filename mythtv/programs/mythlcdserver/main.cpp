@@ -11,7 +11,7 @@ using namespace std;
 #include <fcntl.h>
 #include <signal.h>
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QFile>
 #include <Q3TextStream>
 
@@ -30,7 +30,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    QApplication a(argc, argv, false);
+    QCoreApplication a(argc, argv);
     bool daemon_mode = false;
     int  special_port = -1;
     QString startup_message = "";          // default to no startup message

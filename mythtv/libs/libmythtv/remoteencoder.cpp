@@ -1,7 +1,6 @@
 #include <unistd.h>
 using namespace std;
 
-#include <QApplication>
 #include <QStringList>
 
 #include "remoteencoder.h"

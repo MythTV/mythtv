@@ -9,7 +9,7 @@
 using namespace std;
 
 // Qt
-#include <QApplication>
+#include <QCoreApplication>
 #include <QRegExp>
 
 // MythTV
@@ -177,7 +177,7 @@ void ProgLister::Load(void)
 
     ScreenLoadCompletionEvent *slce =
         new ScreenLoadCompletionEvent(objectName());
-    QApplication::postEvent(this, slce);
+    QCoreApplication::postEvent(this, slce);
 }
 
 bool ProgLister::keyPressEvent(QKeyEvent *e)

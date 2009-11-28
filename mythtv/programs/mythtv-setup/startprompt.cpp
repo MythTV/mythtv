@@ -1,5 +1,5 @@
 // Qt
-#include <QApplication>
+#include <QCoreApplication>
 
 // MythTV stuff
 #include "exitcodes.h"

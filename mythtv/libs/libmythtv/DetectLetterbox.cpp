@@ -1,9 +1,5 @@
 // -*- Mode: c++ -*-
 
-// Qt headers
-#include <QApplication>
-#include <QKeyEvent>
-
 // MythTV headers
 #include "DetectLetterbox.h"
 #include "NuppelVideoPlayer.h"

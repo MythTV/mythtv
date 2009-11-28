@@ -3,10 +3,10 @@
 #include <algorithm>
 using namespace std;
 
+#include <QCoreApplication>
 #include <QCursor>
 #include <QDialog>
 #include <QDir>
-#include <QApplication>
 #include <QLayout>
 #include <QRegExp>
 #include <QImageReader>

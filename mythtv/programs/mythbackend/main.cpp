@@ -19,7 +19,12 @@
 #include <cerrno>
 using namespace std;
 
+#ifndef _WIN32
+#include <QCoreApplication>
+#else
 #include <QApplication>
+#endif
+
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
@@ -508,17 +513,15 @@ int main(int argc, char **argv)
         }
     }
 
-    bool need_gui = false;
 #ifndef _WIN32
     for (int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
         close(i);
+    QCoreApplication a(argc, argv);
 #else
     // MINGW application needs a window to receive messages
     // such as socket notifications :[
-    need_gui = true;
+    QApplication a(argc, argv);
 #endif
-
-    QApplication a(argc, argv, need_gui);
 
     QString binname = basename(a.argv()[0]);
     extern const char *myth_source_version;

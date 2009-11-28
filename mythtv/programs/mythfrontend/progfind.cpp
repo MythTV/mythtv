@@ -1,6 +1,6 @@
 // Qt
 #include <QDateTime>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QStringList>
 #include <QRegExp>
 #include <QKeyEvent>
@@ -994,7 +994,7 @@ void SearchInputDialog::editChanged(void)
         //FIXME: add a new event type for this?
         DialogCompletionEvent *dce =
                 new DialogCompletionEvent(m_id, 0, inputString, "");
-        QApplication::postEvent(m_retObject, dce);
+        QCoreApplication::postEvent(m_retObject, dce);
     }
 }
 

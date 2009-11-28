@@ -3,7 +3,7 @@
 #include "mythuiprogressbar.h"
 
 // QT
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDomDocument>
 
 // MythDB

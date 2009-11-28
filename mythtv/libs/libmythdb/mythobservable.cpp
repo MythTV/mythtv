@@ -1,5 +1,5 @@
+#include <QCoreApplication>
 #include <QObject>
-#include <QApplication>
 
 #include "mythobservable.h"
 
@@ -48,7 +48,7 @@ void MythObservable::dispatch(MythEvent &event)
     QList<QObject*>::const_iterator it = m_listeners.begin();
     while (it != m_listeners.end())
     {
-        QApplication::postEvent(*it, event.clone());
+        QCoreApplication::postEvent(*it, event.clone());
         ++it;
     }
 }
@@ -58,7 +58,7 @@ void MythObservable::dispatchNow(MythEvent &event)
     QList<QObject*>::const_iterator it = m_listeners.begin();
     while (it != m_listeners.end())
     {
-        QApplication::sendEvent(*it, event.clone());
+        QCoreApplication::sendEvent(*it, event.clone());
         ++it;
     }
 }

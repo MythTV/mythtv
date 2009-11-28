@@ -784,7 +784,7 @@ void gotoMainMenu(void)
     // to cause the menu to reload
     QKeyEvent *event =
         new QKeyEvent(QEvent::KeyPress, Qt::Key_L, Qt::ControlModifier);
-    QApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
+    QCoreApplication::postEvent((QObject*)(gContext->GetMainWindow()), event);
 }
 
 // If the theme specified in the DB is somehow broken, try a standard one:

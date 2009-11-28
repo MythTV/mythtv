@@ -1,6 +1,6 @@
 #include <unistd.h>
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QRegExp>
 #include <QStringList>
 #include <QTextStream>
@@ -305,7 +305,7 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
     else if (is_abbrev("help", tokens[0]))
         result = processHelp(tokens);
     else if ((tokens[0].toLower() == "exit") || (tokens[0].toLower() == "quit"))
-        QApplication::postEvent(this, 
+        QCoreApplication::postEvent(this, 
                                 new NetworkControlCloseEvent(nc->getClient()));
     else if (! tokens[0].isEmpty())
         result = QString("INVALID command '%1', try 'help' for more info")
@@ -500,11 +500,11 @@ QString NetworkControl::processKey(QStringList tokens)
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, Qt::NoModifier,
                                   keyText);
-            QApplication::postEvent(keyDest, event);
+            QCoreApplication::postEvent(keyDest, event);
 
             event = new QKeyEvent(QEvent::KeyRelease, keyCode, Qt::NoModifier,
                                   keyText);
-            QApplication::postEvent(keyDest, event);
+            QCoreApplication::postEvent(keyDest, event);
         }
         else if (((tokenLen == 1) &&
                   (tokens[curToken][0].isLetterOrNumber())) ||
@@ -544,11 +544,11 @@ QString NetworkControl::processKey(QStringList tokens)
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, modifiers,
                                   tokens[curToken]);
-            QApplication::postEvent(keyDest, event);
+            QCoreApplication::postEvent(keyDest, event);
 
             event = new QKeyEvent(QEvent::KeyRelease, keyCode, modifiers,
                                   tokens[curToken]);
-            QApplication::postEvent(keyDest, event);
+            QCoreApplication::postEvent(keyDest, event);
         }
         else
             return QString("ERROR: Invalid syntax at '%1', see 'help %2' for "
@@ -588,7 +588,7 @@ QString NetworkControl::processPlay(QStringList tokens, int clientID)
         {
             QString msg = QString("HANDLE_MEDIA Internal %1").arg(tokens[2]);
             MythEvent me(msg);
-            QApplication::postEvent(gContext->GetMainWindow(), me.clone());
+            QCoreApplication::postEvent(gContext->GetMainWindow(), me.clone());
         }
         else
             return QString("Unable to change to main menu to start playback!");
@@ -1033,7 +1033,7 @@ QString NetworkControl::processHelp(QStringList tokens)
 
 void NetworkControl::notifyDataAvailable(void)
 {
-    QApplication::postEvent(this, new QEvent(
+    QCoreApplication::postEvent(this, new QEvent(
         (QEvent::Type)kNetworkControlDataReadyEvent));
 }
 

@@ -35,8 +35,8 @@ bool TvPlayWindow::Create()
     return true;
 }
 
-/** \brief Mouse click/movement handler, recieves mouse gesture events from the
- *         QApplication event loop. Should not be used directly.
+/** \brief Mouse click/movement handler, recieves mouse gesture events
+ *         from event loop. Should not be used directly.
  *
  *  \param uitype The mythuitype receiving the event
  *  \param event Mouse event

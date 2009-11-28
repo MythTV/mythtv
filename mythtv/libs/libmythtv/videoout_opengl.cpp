@@ -1,6 +1,3 @@
-#include <QApplication>
-#include <QDesktopWidget>
-
 #include "mythcontext.h"
 #include "NuppelVideoPlayer.h"
 #include "videooutbase.h"

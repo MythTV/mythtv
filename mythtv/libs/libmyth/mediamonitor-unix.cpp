@@ -24,7 +24,6 @@ using namespace std;
 // Qt headers
 #include <QList>
 #include <QTextStream>
-#include <QApplication>
 #include <QProcess>
 #include <QDir>
 #include <QFile>

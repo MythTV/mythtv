@@ -14,7 +14,6 @@ using namespace std;
 #include "compat.h"
 
 // Qt headers
-#include <QApplication>
 #include <QImage>
 #include <QPainter>
 #include <QPixmap>

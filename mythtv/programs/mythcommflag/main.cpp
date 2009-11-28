@@ -15,7 +15,7 @@
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QString>
 #include <QRegExp>
 #include <QDir>
@@ -806,7 +806,7 @@ int FlagCommercials(
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv, false);
+    QCoreApplication a(argc, argv);
     int argpos = 1;
     bool isVideo = false;
     int result = COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;

@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 #include <QDir>
-#include <QApplication>
+#include <QCoreApplication>
 
 #include "mythconfig.h"  // for CONFIG_DARWIN
 #include "mythdirs.h"
@@ -37,7 +37,8 @@ void InitializeMythDirs(void)
     if (QDir(installprefix).isRelative())
     {
         // If the PREFIX is relative, evaluate it relative to our
-        // executable directory. This can be fragile on Unix, so
+        // executable directory. This can be fragile on Unix, so#include <QMutex>
+
         // use relative PREFIX values with care.
 
         VERBOSE(VB_IMPORTANT+VB_EXTRA,

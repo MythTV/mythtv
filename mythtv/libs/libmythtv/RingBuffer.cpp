@@ -13,7 +13,6 @@
 
 // Qt headers
 #include <QFile>
-#include <QApplication>
 #include <QDateTime>
 #include <QFileInfo>
 #include <QDir>

@@ -33,7 +33,7 @@
 #include "channelscanner.h"
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 
 /// Percentage to set to after the transports have been scanned
 #define TRANSPORT_PCT 6
@@ -44,7 +44,7 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
 {
     ScannerEvent *e = new ScannerEvent(type);
     e->intValue(val);
-    QApplication::postEvent(dest, e);
+    QCoreApplication::postEvent(dest, e);
 }
 
 void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val)
@@ -52,7 +52,7 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val)
     ScannerEvent *e = new ScannerEvent(type);
     QString tmp = val; tmp.detach();
     e->strValue(tmp);
-    QApplication::postEvent(dest, e);
+    QCoreApplication::postEvent(dest, e);
 }
 
 void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
@@ -61,7 +61,7 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
     ScannerEvent *e = new ScannerEvent(type);
     e->intValue(val);
     e->ConfigurableValue(spp);
-    QApplication::postEvent(dest, e);
+    QCoreApplication::postEvent(dest, e);
 }
 
 void ScanMonitor::deleteLater(void)

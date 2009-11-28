@@ -13,7 +13,7 @@
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QEvent>
 #include <QKeySequence>
 #include <QStringList>
@@ -365,7 +365,7 @@ void LIRC::Process(const QByteArray &data)
         // mappings.
         if (!a.count())
         {
-            QApplication::postEvent(
+            QCoreApplication::postEvent(
                 m_mainWindow, new LircKeycodeEvent(
                     QEvent::KeyPress, 0,
                     (Qt::KeyboardModifiers)
@@ -387,7 +387,7 @@ void LIRC::Process(const QByteArray &data)
             if (!mod)
                 text = QString(QChar(keycode));
 
-            QApplication::postEvent(
+            QCoreApplication::postEvent(
                 m_mainWindow, new LircKeycodeEvent(
                     QEvent::KeyPress, keycode, mod, text, lirctext));
 
@@ -397,7 +397,7 @@ void LIRC::Process(const QByteArray &data)
         }
 
         for (int i = (int)keyReleases.size() - 1; i>=0; i--)
-            QApplication::postEvent(m_mainWindow, keyReleases[i]);
+            QCoreApplication::postEvent(m_mainWindow, keyReleases[i]);
 
         SpawnApp();
 

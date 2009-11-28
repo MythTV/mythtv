@@ -5,7 +5,6 @@
  * \author   Andrew Kimpton, Nigel Pearson
  */
 
-#include <QApplication>
 #include <QMetaType>
 
 #include "mythmediamonitor.h"

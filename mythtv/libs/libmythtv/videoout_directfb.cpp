@@ -21,7 +21,7 @@ extern "C" {
 using namespace std;
 
 // Qt headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QWidget>
 #include <QMutex>
 #include <QKeyEvent>
@@ -838,7 +838,7 @@ void VideoOutputDirectfb::Show(FrameScanType)
 #endif
 
     if (keyevent)
-        QApplication::postEvent(widget, keyevent);
+        QCoreApplication::postEvent(widget, keyevent);
 }
 
 void VideoOutputDirectfb::UpdatePauseFrame(void)

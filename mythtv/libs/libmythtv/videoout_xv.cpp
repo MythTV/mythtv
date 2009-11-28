@@ -23,10 +23,6 @@
 #include <iostream>
 using namespace std;
 
-// Qt headers
-#include <QApplication>
-#include <QTextStream>
-
 // MythTV OSD headers
 #include "yuv2rgb.h"
 #include "osd.h"

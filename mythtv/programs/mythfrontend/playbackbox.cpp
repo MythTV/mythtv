@@ -4,7 +4,7 @@
 // QT
 #include <QDateTime>
 #include <QDir>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QTimer>
 #include <QFile>
 #include <QFileInfo>
@@ -3700,12 +3700,12 @@ void PlaybackBox::customEvent(QEvent *event)
                     Qt::KeypadModifier;
                 event = new QKeyEvent(QEvent::KeyPress, Qt::Key_LaunchMedia,
                                       modifiers);
-                QApplication::postEvent((QObject*)(gContext->GetMainWindow()),
+                QCoreApplication::postEvent((QObject*)(gContext->GetMainWindow()),
                                         event);
 
                 event = new QKeyEvent(QEvent::KeyRelease, Qt::Key_LaunchMedia,
                                       modifiers);
-                QApplication::postEvent((QObject*)(gContext->GetMainWindow()),
+                QCoreApplication::postEvent((QObject*)(gContext->GetMainWindow()),
                                         event);
             }
         }

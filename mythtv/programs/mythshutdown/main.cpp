@@ -4,7 +4,7 @@
 using namespace std;
 #include <unistd.h>
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QFile>
 
 #include "exitcodes.h"
@@ -778,8 +778,7 @@ int main(int argc, char **argv)
     // by default we don't output any messages
     print_verbose_messages = VB_NONE;
 
-    QApplication a(argc, argv, false);
-
+    QCoreApplication a(argc, argv);
 
     bool bLockShutdown = false;
     bool bUnlockShutdown = false;

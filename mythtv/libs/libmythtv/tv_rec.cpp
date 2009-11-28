@@ -10,9 +10,6 @@
 #include <iostream>
 using namespace std;
 
-// Qt headers
-#include <QApplication>
-
 // MythTV headers
 #include "mythconfig.h"
 #include "tv_rec.h"

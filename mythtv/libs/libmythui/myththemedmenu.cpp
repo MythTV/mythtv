@@ -2,7 +2,7 @@
 #include "myththemedmenu.h"
 
 // QT headers
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 #include <QKeyEvent>
 #include <QDomDocument>
@@ -260,7 +260,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                 {
                     if (callbacks)
                         m_state->m_callback(m_state->m_callbackdata, selExit);
-                    QApplication::exit();
+                    QCoreApplication::exit();
                 }
             }
             else if (m_exitModifier >= 0 && fullexit && lastScreen)
@@ -269,7 +269,7 @@ bool MythThemedMenu::keyPressEvent(QKeyEvent *event)
                     m_state->m_callback(m_state->m_callbackdata, selExit);
                 else
                 {
-                    QApplication::exit();
+                    QCoreApplication::exit();
                     m_wantpop = true;
                 }
             }

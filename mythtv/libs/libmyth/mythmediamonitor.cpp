@@ -8,10 +8,10 @@
 using namespace std;
 
 // Qt headers
-#include <QList>
-#include <QApplication>
-#include <QDir>
+#include <QCoreApplication>
 #include <QFile>
+#include <QList>
+#include <QDir>
 
 // MythTV headers
 #include "mythmediamonitor.h"
@@ -679,7 +679,7 @@ void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
         // postEvent() would result in pDevice's media type changing
         // ... before the plugin's event chain would process it.
         // Another way would be to send an exact copy of pDevice instead.
-        QApplication::sendEvent((QObject*)gContext->GetMainWindow(), e);
+        QCoreApplication::sendEvent((QObject*)gContext->GetMainWindow(), e);
         delete e;
     }
     else
