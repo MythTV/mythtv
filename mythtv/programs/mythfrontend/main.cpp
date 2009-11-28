@@ -1121,6 +1121,18 @@ int main(int argc, char **argv)
         kCLPExtra                |
         kCLPGeometry);
 
+    // Handle --help before QApplication is created, so that
+    // we can print help even if X11 is absent.
+    for (int argpos = 1; argpos < argc; ++argpos)
+    {
+        QString arg(argv[argpos]);
+        if (arg == "-h" || arg == "--help" || arg == "--usage")
+        {
+            ShowUsage(cmdline);
+            return FRONTEND_EXIT_OK;
+        }
+    }
+
     for (int argpos = 1; argpos < argc; ++argpos)
     {
         if (cmdline.PreParse(argc, argv, argpos, cmdline_err))
@@ -1160,15 +1172,8 @@ int main(int argc, char **argv)
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
-        if (!strcmp(a.argv()[argpos],"-h") ||
-                !strcmp(a.argv()[argpos],"--help") ||
-                !strcmp(a.argv()[argpos],"--usage"))
-        {
-            ShowUsage(cmdline);
-            return FRONTEND_EXIT_OK;
-        }
-        else if (!strcmp(a.argv()[argpos],"--prompt") ||
-                 !strcmp(a.argv()[argpos],"-p" ))
+        if (!strcmp(a.argv()[argpos],"--prompt") ||
+            !strcmp(a.argv()[argpos],"-p" ))
         {
             bPromptForBackend = true;
         }
@@ -1303,10 +1308,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            if (!(!strcmp(a.argv()[argpos],"-h") ||
-                !strcmp(a.argv()[argpos],"--help") ||
-                !strcmp(a.argv()[argpos],"--usage")))
-                cerr << "Invalid argument: " << a.argv()[argpos] << endl;
+            cerr << "Invalid argument: " << a.argv()[argpos] << endl;
             ShowUsage(cmdline);
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }
