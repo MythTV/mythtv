@@ -49,11 +49,11 @@
     </font>
 
     <font name="basesmallblue" from="basesmall">
-        <color>#0492A7</color>
+        <color>#54d6e9</color>
     </font>
 
     <font name="basesmallred" from="basesmall">
-        <color>#800900</color>
+        <color>#ff6b48</color>
     </font>
 
     <font name="basemediumgrey" from="basemedium">
@@ -65,7 +65,7 @@
     </font>
 
     <font name="basemediumred" from="basemedium">
-        <color>#800900</color>
+        <color>#ff6b48</color>
     </font>
 
     <font name="basemediumyellow" from="basemedium">
