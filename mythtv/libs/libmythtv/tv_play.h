@@ -23,6 +23,7 @@ using namespace std;
 #include <QEvent>
 #include <QMutex>
 #include <QHash>
+#include <QTime>
 #include <QMap>
 
 // MythTV
@@ -638,6 +639,7 @@ class MPUBLIC TV : public QThread
 
     uint    vbimode;
 
+    QTime ctorTime;
     uint switchToInputId;
     /// True if the user told MythTV to stop plaback. If this is false
     /// when we exit the player, we display an error screen.

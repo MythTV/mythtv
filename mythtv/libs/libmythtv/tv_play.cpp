@@ -842,6 +842,7 @@ TV::TV(void)
       errorRecoveryTimerId(0),      exitPlayerTimerId(0)
 {
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
+    ctorTime.start();
 
     setObjectName("TV");
     keyRepeatTimer.start();
@@ -5102,9 +5103,13 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
 {
     bool wantPiP = ctx->IsPIP();
 
-    VERBOSE(VB_IMPORTANT, LOC + QString("StartPlayer(%1, %2, %3) -- begin")
+    VERBOSE(VB_PLAYBACK, LOC + QString("StartPlayer(%1, %2, %3) -- begin")
             .arg(find_player_index(ctx)).arg(StateToString(desiredState))
             .arg((wantPiP) ? "PiP" : "main"));
+
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("Elapsed time since TV constructor was called: %1 ms")
+            .arg(ctorTime.elapsed()));
 
     if (wantPiP)
     {
@@ -5143,7 +5148,7 @@ bool TV::StartPlayer(PlayerContext *mctx, PlayerContext *ctx,
         SetSpeedChangeTimer(25, __LINE__);
     }
 
-    VERBOSE(VB_IMPORTANT, LOC + QString("StartPlayer(%1, %2, %3) -- end %4")
+    VERBOSE(VB_PLAYBACK, LOC + QString("StartPlayer(%1, %2, %3) -- end %4")
             .arg(find_player_index(ctx)).arg(StateToString(desiredState))
             .arg((wantPiP) ? "PiP" : "main").arg((ok) ? "ok" : "error"));
 
