@@ -1,7 +1,9 @@
 #ifndef MYTHDB_H_
 #define MYTHDB_H_
 
+#include <QMap>
 #include <QString>
+#include <QVariant>
 #include "mythexp.h"
 #include "mythdbcon.h"
 #include "mythdbparams.h"
@@ -13,7 +15,6 @@ class MDBManager;
 class MPUBLIC MythDB
 {
   public:
-
     MDBManager *GetDBManager(void);
     Settings *GetOldSettings(void);
 
@@ -40,6 +41,8 @@ class MPUBLIC MythDB
     void SaveSetting(const QString &key, const QString &newValue);
     bool SaveSettingOnHost(const QString &key, const QString &newValue,
                            const QString &host);
+
+    bool GetSettings(QMap<QString,QString> &_key_value_pairs);
 
     QString GetSetting(     const QString &key, const QString &defaultval);
     int     GetNumSetting(  const QString &key, int            defaultval);

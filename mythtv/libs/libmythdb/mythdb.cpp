@@ -1,3 +1,6 @@
+#include <vector>
+using namespace std;
+
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QHash>
@@ -216,6 +219,7 @@ bool MythDB::SuppressDBMessages(void) const
     return d->suppressDBMessages;
 }
 
+typedef QHash<QString,QString> SettingsMap;
 
 void MythDB::SaveSetting(const QString &key, int newValue)
 {
@@ -383,6 +387,129 @@ QString MythDB::GetSetting(const QString &_key, const QString &defaultval)
 
     return value;
 }
+
+bool MythDB::GetSettings(QMap<QString,QString> &_key_value_pairs)
+{
+    QMap<QString,bool> done;
+    typedef QMap<QString,QString>::iterator KVIt;
+    KVIt kvit = _key_value_pairs.begin();
+    for (; kvit != _key_value_pairs.end(); ++kvit)
+        done[kvit.key().toLower()] = false;
+
+    QMap<QString,bool>::iterator dit = done.begin();
+    kvit = _key_value_pairs.begin();
+
+    {
+        uint done_cnt = 0;
+        d->settingsCacheLock.lockForRead();
+        if (d->useSettingsCache)
+        {
+            for (; kvit != _key_value_pairs.end(); ++dit, ++kvit)
+            {
+                SettingsMap::const_iterator it = d->settingsCache.find(dit.key());
+                if (it != d->settingsCache.end())
+                {
+                    *kvit = *it;
+                    *dit = true;
+                    done_cnt++;
+                }
+            }
+        }
+        else
+        {
+            for (; kvit != _key_value_pairs.end(); ++dit, ++kvit)
+            {
+                SettingsMap::const_iterator it =
+                    d->overriddenSettings.find(dit.key());
+                if (it != d->overriddenSettings.end())
+                {
+                    *kvit = *it;
+                    *dit = true;
+                    done_cnt++;
+                }
+            }
+        }
+        d->settingsCacheLock.unlock();
+
+        // Avoid extra work if everything was in the caches and
+        // also don't try to access the DB if ignoreDatabase is set
+        if (((uint)done.size()) == done_cnt || d->ignoreDatabase)
+            return true;
+    }
+
+    dit = done.begin();
+    kvit = _key_value_pairs.begin();
+
+    QString keylist("");
+    QMap<QString,KVIt> keymap;
+    for (; kvit != _key_value_pairs.end(); ++dit, ++kvit)
+    {
+        if (*dit)
+            continue;
+
+        QString key = dit.key();
+        if (!key.contains("'"))
+        {
+            keylist += QString("'%1',").arg(key);
+            keymap[key] = kvit;
+        }
+        else
+        {   // hopefully no one actually uses quotes for in a settings key.
+            // but in case they do, just get that value inefficiently..
+            *kvit = GetSetting(key, *kvit);
+        }
+    }
+
+    if (keylist.isEmpty())
+        return true;
+
+    keylist = keylist.left(keylist.length() - 1);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.exec(
+            QString(
+                "SELECT value, data, hostname "
+                "FROM settings "
+                "WHERE (hostname = '%1' OR hostname IS NULL) AND "
+                "      value IN (%2) "
+                "ORDER BY hostname DESC")
+            .arg(d->m_localhostname).arg(keylist)))
+    {
+        DBError("GetSettings", query);
+        return false;
+    }
+
+    while (query.next())
+    {
+        QString key = query.value(0).toString().toLower();
+        QMap<QString,KVIt>::const_iterator it = keymap.find(key);
+        if (it != keymap.end())
+            **it = query.value(1).toString();
+    }
+  
+    if (d->useSettingsCache)
+    {
+        d->settingsCacheLock.lockForWrite();
+        QMap<QString,KVIt>::const_iterator it = keymap.begin();
+        for (; it != keymap.end(); ++it)
+        {
+            QString key = it.key(), value = **it;
+
+            // another thread may have inserted a value into the cache
+            // while we did not have the lock, check first then save
+            if (d->settingsCache.find(key) == d->settingsCache.end())
+            {
+                key.squeeze();
+                value.squeeze();
+                d->settingsCache[key] = value;
+            }
+        }
+        d->settingsCacheLock.unlock();
+    }
+  
+    return true;
+}
+
 
 int MythDB::GetNumSetting(const QString &key, int defaultval)
 {

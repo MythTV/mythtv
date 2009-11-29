@@ -841,45 +841,117 @@ TV::TV(void)
       pseudoChangeChanTimerId(0),   speedChangeTimerId(0),
       errorRecoveryTimerId(0),      exitPlayerTimerId(0)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "ctor");
+    VERBOSE(VB_PLAYBACK, LOC + "ctor -- begin");
     ctorTime.start();
 
     setObjectName("TV");
     keyRepeatTimer.start();
 
-    db_idle_timeout = gContext->GetNumSetting("LiveTVIdleTimeout", 0);
-    db_idle_timeout *= 60 * 1000; // convert from minutes to ms.
-    db_udpnotify_port      = gContext->GetNumSetting("UDPNotifyPort", 0);
-    db_browse_max_forward  = gContext->GetNumSetting("BrowseMaxForward",240)*60;
-    db_playback_exit_prompt= gContext->GetNumSetting("PlaybackExitPrompt", 0);
-    db_autoexpire_default  = gContext->GetNumSetting("AutoExpireDefault", 0);
+    QMap<QString,QString> kv;
+    kv["LiveTVIdleTimeout"]        = "0";
+    kv["UDPNotifyPort"]            = "0";
+    kv["BrowseMaxForward"]         = "240";
+    kv["PlaybackExitPrompt"]       = "0";
+    kv["AutoExpireDefault"]        = "0";
+    kv["AutomaticSetWatched"]      = "0";
+    kv["EndOfRecordingExitPrompt"] = "0";
+    kv["JumpToProgramOSD"]         = "1";
+    kv["GuiSizeForTV"]             = "0";
+    kv["WatchTVGuide"]             = "0";
+    kv["AltClearSavedPosition"]    = "1";
+    kv["JobsRunOnRecordHost"]      = "0";
+    kv["EnableDVDBookmark"]        = "0";
+    kv["ContinueEmbeddedTVPlay"]   = "0";
+    kv["UseFixedWindowSize"]       = "1";
+    kv["PersistentBrowseMode"]     = "0";
+    kv["BrowseAllTuners"]          = "0";
+    kv["ChannelOrdering"]          = "channum";
 
-    db_auto_set_watched     = gContext->GetNumSetting("AutomaticSetWatched", 0);
-    db_end_of_rec_exit_prompt =
-        gContext->GetNumSetting("EndOfRecordingExitPrompt", 0);
-    db_jump_prefer_osd     = gContext->GetNumSetting("JumpToProgramOSD", 1);
-    db_use_gui_size_for_tv = gContext->GetNumSetting("GuiSizeForTV", 0);
-    db_start_in_guide      = gContext->GetNumSetting("WatchTVGuide", 0);
-    db_toggle_bookmark     = gContext->GetNumSetting("AltClearSavedPosition",1);
-    db_run_jobs_on_remote  = gContext->GetNumSetting("JobsRunOnRecordHost", 0);
-    db_use_dvd_bookmark    = gContext->GetNumSetting("EnableDVDBookmark", 0);
-    db_continue_embedded   = gContext->GetNumSetting(
-        "ContinueEmbeddedTVPlay", 0);
-    db_use_fixed_size      = gContext->GetNumSettingOnHost(
-        "UseFixedWindowSize", gContext->GetHostName(), 1);
-    db_browse_always       = gContext->GetNumSetting("PersistentBrowseMode", 0);
-    db_browse_all_tuners   = gContext->GetNumSetting("BrowseAllTuners", 0);
+    kv["CustomFilters"]            = "";
+    kv["ChannelFormat"]            = "<num> <sign>";
+    kv["TimeFormat"]               = "h:mm AP";
+    kv["ShortDateFormat"]          = "M/d";
+    kv["SmartChannelChange"]       = "0";
+
+    kv["IndividualMuteControl"]    = "0";
+    kv["UseArrowAccels"]           = "1";
+    kv["OSDGeneralTimeout"]        = "2";
+    kv["OSDProgramInfoTimeout"]    = "3";
+    kv["TryUnflaggedSkip"]         = "0";
+
+    kv["ChannelGroupDefault"]      = "-1";
+    kv["BrowseChannelGroup"]       = "0";
+    kv["SmartForward"]             = "0";
+    kv["StickyKeys"]               = "0";
+    kv["FFRewReposTime"]           = "100";
+    kv["FFRewReverse"]             = "1";
+
+    kv["ChannelGroupDefault"]      = "-1";
+    kv["BrowseChannelGroup"]       = "0";
+    kv["VbiFormat"]                = "";
+    kv["DecodeVBIFormat"]          = "";
+
+    int ff_rew_def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
+    for (uint i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
+        kv[QString("FFRewSpeed%1").arg(i)] = QString::number(ff_rew_def[i]);
+
+    bool ok = MythDB::getMythDB()->GetSettings(kv);
+
+    // convert from minutes to ms.
+    db_idle_timeout        = kv["LiveTVIdleTimeout"].toInt() * 60 * 1000;
+    db_udpnotify_port      = kv["UDPNotifyPort"].toInt();
+    db_browse_max_forward  = kv["BrowseMaxForward"].toInt() * 60;
+    db_playback_exit_prompt= kv["PlaybackExitPrompt"].toInt();
+    db_autoexpire_default  = kv["AutoExpireDefault"].toInt();
+    db_auto_set_watched    = kv["AutomaticSetWatched"].toInt();
+    db_end_of_rec_exit_prompt = kv["EndOfRecordingExitPrompt"].toInt();
+    db_jump_prefer_osd     = kv["JumpToProgramOSD"].toInt();
+    db_use_gui_size_for_tv = kv["GuiSizeForTV"].toInt();
+    db_start_in_guide      = kv["WatchTVGuide"].toInt();
+    db_toggle_bookmark     = kv["AltClearSavedPosition"].toInt();
+    db_run_jobs_on_remote  = kv["JobsRunOnRecordHost"].toInt();
+    db_use_dvd_bookmark    = kv["EnableDVDBookmark"].toInt();
+    db_continue_embedded   = kv["ContinueEmbeddedTVPlay"].toInt();
+    db_use_fixed_size      = kv["UseFixedWindowSize"].toInt();
+    db_browse_always       = kv["PersistentBrowseMode"].toInt();
+    db_browse_all_tuners   = kv["BrowseAllTuners"].toInt();
+    QString channelOrdering= kv["ChannelOrdering"];
+    baseFilters           += kv["CustomFilters"];
+    db_channel_format      = kv["ChannelFormat"];
+    db_time_format         = kv["TimeFormat"];
+    db_short_date_format   = kv["ShortDateFormat"];
+    smartChannelChange     = kv["SmartChannelChange"].toInt();
+    MuteIndividualChannels = kv["IndividualMuteControl"].toInt();
+    arrowAccel             = kv["UseArrowAccels"].toInt();
+    osd_general_timeout    = kv["OSDGeneralTimeout"].toInt();
+    osd_prog_info_timeout  = kv["OSDProgramInfoTimeout"].toInt();
+    tryUnflaggedSkip       = kv["TryUnflaggedSkip"].toInt();
+    channel_group_id       = kv["ChannelGroupDefault"].toInt();
+    browse_changrp         = kv["BrowseChannelGroup"].toInt();
+    smartForward           = kv["SmartForward"].toInt();
+    stickykeys             = kv["StickyKeys"].toInt();
+    ff_rew_repos           = kv["FFRewReposTime"].toFloat() * 0.01f;
+    ff_rew_reverse         = kv["FFRewReverse"].toInt();
+    channel_group_id       = kv["ChannelGroupDefault"].toInt();
+    browse_changrp         = kv["BrowseChannelGroup"].toInt();
+    QString beVBI          = kv["VbiFormat"];
+    QString feVBI          = kv["DecodeVBIFormat"];
+
+    for (uint i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
+        ff_rew_speeds.push_back(kv[QString("FFRewSpeed%1").arg(i)].toInt());
+
+    // process it..
 
     if (db_browse_all_tuners)
     {
         QMutexLocker locker(&browseLock);
-        QString channelOrdering = gContext->GetSetting(
-            "ChannelOrdering", "channum");
         db_browse_all_channels = ChannelUtil::GetChannels(
             0, true, "channum, callsign");
         ChannelUtil::SortChannels(
             db_browse_all_channels, channelOrdering, true);
     }
+
+    vbimode = VBIMode::Parse(!feVBI.isEmpty() ? feVBI : beVBI);
 
     sleep_times.push_back(SleepTimerInfo(QObject::tr("Off"),       0));
     sleep_times.push_back(SleepTimerInfo(QObject::tr("30m"),   30*60));
@@ -895,6 +967,7 @@ TV::TV(void)
     player.push_back(new PlayerContext("player"));
     playerActive = 0;
     playerLock.unlock();
+    VERBOSE(VB_PLAYBACK, LOC + "ctor -- end");
 }
 
 /** \fn TV::Init(bool)
@@ -905,42 +978,7 @@ TV::TV(void)
  */
 bool TV::Init(bool createWindow)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    if (!query.isConnected())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Init(): Could not open DB connection in player");
-        return false;
-    }
-
-    baseFilters         += gContext->GetSetting("CustomFilters");
-    db_channel_format    =gContext->GetSetting("ChannelFormat","<num> <sign>");
-    db_time_format       = gContext->GetSetting("TimeFormat", "h:mm AP");
-    db_short_date_format = gContext->GetSetting("ShortDateFormat", "M/d");
-    smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
-    MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
-    arrowAccel           = gContext->GetNumSetting("UseArrowAccels", 1);
-    osd_general_timeout  = gContext->GetNumSetting("OSDGeneralTimeout", 2);
-    osd_prog_info_timeout= gContext->GetNumSetting("OSDProgramInfoTimeout", 3);
-    tryUnflaggedSkip     = gContext->GetNumSetting("TryUnflaggedSkip", 0);
-    channel_group_id     = gContext->GetNumSetting("ChannelGroupDefault", -1);
-    browse_changrp       = gContext->GetNumSetting("BrowseChannelGroup", 0);
-    smartForward         = gContext->GetNumSetting("SmartForward", 0);
-    stickykeys           = gContext->GetNumSetting("StickyKeys");
-    ff_rew_repos         = gContext->GetNumSetting("FFRewReposTime", 100)/100.0;
-    ff_rew_reverse       = gContext->GetNumSetting("FFRewReverse", 1);
-    int def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
-    for (uint i = 0; i < sizeof(def)/sizeof(def[0]); i++)
-        ff_rew_speeds.push_back(
-            gContext->GetNumSetting(QString("FFRewSpeed%1").arg(i), def[i]));
-
-    vbimode = VBIMode::Parse(gContext->GetSetting("VbiFormat"));
-    QString feVBI = gContext->GetSetting("DecodeVBIFormat", "");
-    if (!feVBI.isEmpty())
-        vbimode = VBIMode::Parse(gContext->GetSetting(feVBI));
-
-    channel_group_id     = gContext->GetNumSetting("ChannelGroupDefault", -1);
-    browse_changrp       = gContext->GetNumSetting("BrowseChannelGroup", 0);
+    VERBOSE(VB_PLAYBACK, LOC + "Init -- begin");
 
     if (browse_changrp && (channel_group_id > -1))
     {
@@ -949,6 +987,8 @@ bool TV::Init(bool createWindow)
     }
 
     m_changrplist  = ChannelGroup::GetChannelGroups();
+
+    VERBOSE(VB_PLAYBACK, LOC + "Init -- end channel groups");
 
     if (createWindow)
     {
@@ -1043,6 +1083,7 @@ bool TV::Init(bool createWindow)
 
     mainLoopCondLock.unlock();
 
+    VERBOSE(VB_PLAYBACK, LOC + "Init -- end");
     return true;
 }
 
