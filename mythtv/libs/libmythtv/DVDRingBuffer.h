@@ -33,11 +33,11 @@ class MPUBLIC DVDRingBufferPriv
     // gets
     int  GetTitle(void) const { return m_title;        }
     int  GetPart(void)  const { return m_part;         }
-    bool IsInMenu(void) const;
+    bool IsInMenu(bool update = false);
     bool IsOpen(void)   const { return m_dvdnav;       }
     long long GetReadPosition(void);
     long long GetTotalReadPosition(void) { return m_titleLength; }
-    void GetDescForPos(QString &desc) const;
+    void GetDescForPos(QString &desc);
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = m_part; _title = m_title; }
     uint GetTotalTimeOfTitle(void);
@@ -168,6 +168,7 @@ class MPUBLIC DVDRingBufferPriv
     uint64_t       m_seektime;
     uint           m_currentTime;
     QMap<uint, uint> m_seekSpeedMap;
+    bool           m_isInMenu;
 //    QMap<uint, uint> m_audioTrackMap;
 //    QMap<uint, uint> m_subTrackMap;
 
