@@ -547,7 +547,7 @@ bool MythUIButtonTree::ParseElement(QDomElement &element)
     {
         m_listSpacing = NormX(getFirstText(element).toInt());
     }
-    if (element.tagName() == "numlists")
+    else if (element.tagName() == "numlists")
     {
         m_numLists = getFirstText(element).toInt();
     }
