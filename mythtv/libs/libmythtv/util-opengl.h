@@ -25,6 +25,7 @@
 #endif
 
 // Qt headers
+#include <QSize>
 #include <QString>
 
 #ifndef GL_TEXTTURE0
