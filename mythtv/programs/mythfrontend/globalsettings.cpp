@@ -2167,20 +2167,6 @@ static GlobalSpinBox *PreviewPixmapOffset()
     return bs;
 }
 
-static HostCheckBox *PreviewFromBookmark()
-{
-    HostCheckBox *gc = new HostCheckBox("PreviewFromBookmark");
-    gc->setLabel(QObject::tr("Generate preview image from a bookmark "
-                 "if possible"));
-    gc->setValue(true);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will ignore the above "
-                    "time offset, and use the bookmark inside the recording "
-                    "as the offset for creating a thumbnail image. "
-                    "As with the above, MythTV will honour cutlists "
-                    "and increase this offset if necessary."));
-    return gc;
-}
-
 static HostCheckBox *PlaybackPreview()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackPreview");
@@ -4396,7 +4382,6 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(PlayBoxEpisodeSort());
     pbox->addChild(GeneratePreviewRemotely());
     pbox->addChild(PreviewPixmapOffset());
-    pbox->addChild(PreviewFromBookmark());
     pbox->addChild(PlaybackPreview());
     pbox->addChild(HWAccelPlaybackPreview());
     pbox->addChild(PBBStartInTitle());

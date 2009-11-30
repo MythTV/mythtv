@@ -164,7 +164,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       hasFullPositionMap(false),    limitKeyRepeat(false),
       errorMsg(QString::null),      errorType(kError_None),
       // Bookmark stuff
-      bookmarkseek(0),              previewFromBookmark(false),
+      bookmarkseek(0),
       // Seek
       fftime(0),                    seekamountpos(4),
       seekamount(30),               exactseeks(false),
@@ -5857,10 +5857,7 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
 
         if (!absolute && hasFullPositionMap)
         {
-            bookmarkseek = 0;
-            previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
-            if (previewFromBookmark != 0)
-                bookmarkseek = GetBookmark();
+            bookmarkseek = GetBookmark();
 
             // Use the bookmark if we should, otherwise make sure we aren't
             // in the cutlist or a commercial break

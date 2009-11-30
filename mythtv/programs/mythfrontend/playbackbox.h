@@ -440,7 +440,6 @@ class PlaybackBox : public ScheduleCommon
     int                 m_freeSpaceUsed;
 
     // Preview Pixmap Variables ///////////////////////////////////////////////
-    bool                m_previewFromBookmark;
     uint                m_previewGeneratorMode;
     QMap<QString,QDateTime> m_previewFileTS;
     bool                m_previewSuspend;

@@ -597,7 +597,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Bookmark stuff
     long long bookmarkseek;
-    bool      previewFromBookmark;
 
     // Seek
     /// If fftime>0, number of frames to seek forward.

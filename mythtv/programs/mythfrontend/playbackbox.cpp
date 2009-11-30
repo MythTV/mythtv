@@ -315,7 +315,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     m_watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
     m_watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
     m_groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
-    m_previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
     m_previewGeneratorMode =
             gContext->GetNumSetting("GeneratePreviewRemotely", 0) ?
             PreviewGenerator::kRemote : PreviewGenerator::kLocalAndRemote;
@@ -3993,9 +3992,7 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
     bool locally_accessible = false;
     bool bookmark_updated = false;
 
-    m_previewFromBookmark = true;
-
-    if (m_previewFromBookmark || streaming)
+    if (streaming)
     {
         QDateTime bookmark_ts = pginfo->GetBookmarkTimeStamp();
         QDateTime cmp_ts = bookmark_ts.isValid() ?
@@ -4007,9 +4004,7 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
                 .arg(GetConfDir()).arg(filename.section('/', -1));
 
             QFileInfo finfo(ret_file);
-            if (finfo.exists() &&
-                (!m_previewFromBookmark ||
-                 (finfo.lastModified() >= cmp_ts)))
+            if (finfo.exists() && finfo.lastModified() >= cmp_ts)
             {
                 // This is just an optimization to avoid
                 // hitting the backend if our cached copy
@@ -4031,7 +4026,7 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
                 previewLastModified = fi.lastModified();
         }
 
-        bookmark_updated = m_previewFromBookmark &&
+        bookmark_updated =
             (!previewLastModified.isValid() || (previewLastModified < cmp_ts));
 
         if (bookmark_updated && bookmark_ts.isValid() &&
