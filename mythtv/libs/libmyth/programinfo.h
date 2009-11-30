@@ -302,6 +302,7 @@ class MPUBLIC ProgramInfo
                            bool forceCheckLocal = false);
     long long GetFilesize(void);
     int GetMplexID(void) const;
+    QDateTime GetBookmarkTimeStamp(void) const;
     long long GetBookmark(void) const;
     QStringList GetDVDBookmark(QString serialid, bool delbookmark) const;
     bool IsEditing(void) const;
@@ -378,6 +379,8 @@ class MPUBLIC ProgramInfo
   protected:
     // Creates a basename from the start and end times
     QString CreateRecordBasename(const QString &ext) const;
+    /// Sends event out that the ProgramInfo should be reloaded.
+    void Update(void) const;
 
   public:
     // data

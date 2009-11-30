@@ -10,6 +10,7 @@ using namespace std;
 #include "mythexp.h"
 
 class ProgramInfo;
+class MythEvent;
 
 /** \class FileSystemInfo
  *  \brief Holds hostname, total space, and used space in kilobytes.
@@ -49,6 +50,7 @@ MPUBLIC int RemoteGetRecordingList(vector<ProgramInfo *> *reclist,
                                    QStringList &strList);
 MPUBLIC vector<ProgramInfo *> *RemoteGetConflictList(const ProgramInfo *pginfo);
 MPUBLIC void RemoteSendMessage(const QString &message);
+MPUBLIC void RemoteSendEvent(const MythEvent &event);
 MPUBLIC vector<uint> RemoteRequestFreeRecorderList(void);
 MPUBLIC void RemoteGeneratePreviewPixmap(const ProgramInfo *pginfo);
 MPUBLIC QDateTime RemoteGetPreviewLastModified(const ProgramInfo *pginfo);

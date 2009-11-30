@@ -1550,6 +1550,7 @@ bool ProgramInfo::SetRecordBasename(const QString &basename)
         return false;
     }
 
+    Update();
     return true;
 }
 
@@ -1671,6 +1672,8 @@ void ProgramInfo::SetFilesize(long long fsize)
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("File size update", query);
+
+    Update();
 }
 
 /** \fn ProgramInfo::GetFilesize(void)
@@ -1729,28 +1732,66 @@ int ProgramInfo::GetMplexID(void) const
 void ProgramInfo::SetBookmark(long long pos) const
 {
     ClearMarkupMap(MARK_BOOKMARK);
-    frm_dir_map_t bookmarkmap;
-    bookmarkmap[pos] = MARK_BOOKMARK;
-    SetMarkupMap(bookmarkmap);
+
+    bool is_valid = (pos > 0);
+    if (is_valid)
+    {
+        frm_dir_map_t bookmarkmap;
+        bookmarkmap[pos] = MARK_BOOKMARK;
+        SetMarkupMap(bookmarkmap);
+    }
 
     if (!isVideo)
     {
         MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "UPDATE recorded "
+            "SET bookmarkupdate = CURRENT_TIMESTAMP, "
+            "    bookmark       = :BOOKMARKFLAG "
+            "WHERE chanid    = :CHANID AND "
+            "      starttime = :STARTTIME");
 
-        // For the time being, note whether a bookmark
-        // exists in the recorded table
-        query.prepare("UPDATE recorded"
-                      " SET bookmark = :BOOKMARKFLAG"
-                      " WHERE chanid = :CHANID"
-                      " AND starttime = :STARTTIME ;");
+        query.bindValue(":BOOKMARKFLAG", is_valid ? 1 : 0);
+        query.bindValue(":CHANID",       chanid);
+        query.bindValue(":STARTTIME",    recstartts);
 
-        query.bindValue(":BOOKMARKFLAG", pos == 0 ? 0 : 1);
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts);
-
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
             MythDB::DBError("bookmark flag update", query);
     }
+
+    Update();
+}
+
+void ProgramInfo::Update(void) const
+{
+    QStringList list;
+    ToStringList(list);
+    MythEvent me(QString("UPDATE_PROG_INFO"), list);
+    RemoteSendEvent(me);
+}
+
+/** \brief Queries Latest bookmark timestamp from the database.
+ *  If the timestamp has not been set this returns an invalid QDateTime.
+ */
+QDateTime ProgramInfo::GetBookmarkTimeStamp(void) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT bookmarkupdate "
+        "FROM recorded "
+        "WHERE chanid    = :CHANID AND"
+        "      starttime = :STARTTIME");
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    QDateTime ts;
+
+    if (!query.exec())
+        MythDB::DBError("ProgramInfo::GetBookmarkTimeStamp()", query);
+    else if (query.next())
+        ts = query.value(0).toDateTime();
+
+    return ts;
 }
 
 /** \fn ProgramInfo::GetBookmark(void) const
@@ -1855,6 +1896,8 @@ void ProgramInfo::SetDVDBookmark(QStringList fields) const
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("SetDVDBookmark updating", query);
+
+    Update();
 }
 /** \fn ProgramInfo::SetWatchedFlag(bool) const
  *  \brief Set "watched" field in recorded/videometadata to "watchedFlag".
@@ -1914,6 +1957,8 @@ void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
         if (!query.exec() || !query.isActive())
             MythDB::DBError("Set watched flag", query);
     }
+
+    Update();
 }
 
 /** \fn ProgramInfo::IsEditing(void) const
@@ -1957,6 +2002,8 @@ void ProgramInfo::SetEditing(bool edit) const
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Edit status update", query);
+
+    Update();
 }
 
 /** \fn ProgramInfo::SetDeleteFlag(bool) const
@@ -1981,6 +2028,8 @@ void ProgramInfo::SetDeleteFlag(bool deleteFlag) const
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Set delete flag", query);
+
+    Update();
 }
 
 /** \fn ProgramInfo::IsCommFlagged(void) const
@@ -2096,6 +2145,8 @@ void ProgramInfo::SetTranscoded(int transFlag) const
 
     if(!query.exec() || !query.isActive())
         MythDB::DBError("Transcoded status update", query);
+
+    Update();
 }
 
 /** \fn ProgramInfo::SetCommFlagged(int) const
@@ -2116,6 +2167,8 @@ void ProgramInfo::SetCommFlagged(int flag) const
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Commercial Flagged status update", query);
+
+    Update();
 }
 
 /** \fn ProgramInfo::SetPreserveEpisode(bool) const
@@ -2138,6 +2191,8 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
         MythDB::DBError("PreserveEpisode update", query);
     else
         UpdateLastDelete(false);
+
+    Update();
 }
 
 /**
@@ -2160,6 +2215,8 @@ void ProgramInfo::SetAutoExpire(int autoExpire, bool updateDelete) const
         MythDB::DBError("AutoExpire update", query);
     else if (updateDelete)
         UpdateLastDelete(true);
+
+    Update();
 }
 
 /** \fn ProgramInfo::UpdateLastDelete(bool) const
@@ -2286,6 +2343,8 @@ void ProgramInfo::SetCutList(frm_dir_map_t &delMap) const
         if (!query.exec() || !query.isActive())
             MythDB::DBError("cutlist flag update", query);
     }
+
+    Update();
 }
 
 void ProgramInfo::SetCommBreakList(frm_dir_map_t &frames) const
@@ -3429,6 +3488,8 @@ void ProgramInfo::UpdateRecGroup(void)
     {
         recgroup = query.value(0).toString();
     }
+
+    Update();
 }
 
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)

@@ -9,6 +9,7 @@
 #include "mythcontext.h"
 #include "decodeencode.h"
 #include "storagegroup.h"
+#include "mythevent.h"
 
 vector<ProgramInfo *> *RemoteGetRecordedList(bool deltype)
 {
@@ -259,6 +260,15 @@ void RemoteSendMessage(const QString &message)
 {
     QStringList strlist( "MESSAGE" );
     strlist << message;
+
+    gContext->SendReceiveStringList(strlist);
+}
+
+void RemoteSendEvent(const MythEvent &event)
+{
+    QStringList strlist( "MESSAGE" );
+    strlist << event.Message();
+    strlist<< event.ExtraDataList();
 
     gContext->SendReceiveStringList(strlist);
 }

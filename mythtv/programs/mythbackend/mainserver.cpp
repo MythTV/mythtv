@@ -4237,12 +4237,26 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
 
 void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
 {
+    if (slist.size() < 2)
+        return;
+
     MythSocket *pbssock = pbs->getSocket();
 
     QString message = slist[1];
+    QStringList extra_data;
+    for (uint i = 2; i < slist.size(); i++)
+        extra_data.push_back(slist[i]);
 
-    MythEvent me(message);
-    gContext->dispatch(me);
+    if (extra_data.empty())
+    {
+        MythEvent me(message);
+        gContext->dispatch(me);
+    }
+    else
+    {
+        MythEvent me(message, extra_data);
+        gContext->dispatch(me);
+    }
 
     QStringList retlist( "OK" );
 

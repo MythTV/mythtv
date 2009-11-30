@@ -8,7 +8,7 @@
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythdb, libmyth and libmythui class methods
 /// used by plug-ins.
-#define MYTH_BINARY_VERSION "0.23.20091128-2"
+#define MYTH_BINARY_VERSION "0.23.20091129-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -27,7 +27,7 @@
  *       mythtv/bindings/python/MythTV/MythTV.py (version number)
  *       mythtv/bindings/python/MythTV/MythTV.py (layout)
  */
-#define MYTH_PROTO_VERSION "51"
+#define MYTH_PROTO_VERSION "52"
 
 #endif
 

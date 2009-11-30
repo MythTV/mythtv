@@ -17,7 +17,7 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1246";
+const QString currentDatabaseVersion = "1247";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -4924,6 +4924,21 @@ NULL
 };
        if (!performActualUpdate(updates, "1246", dbver))
             return false;
+    }
+
+    if (dbver == "1246")
+    {
+       const char *updates[] = {
+"ALTER TABLE recorded ADD COLUMN bookmarkupdate timestamp default 0 NOT NULL",
+"UPDATE recorded SET bookmarkupdate = lastmodified+1 WHERE bookmark = 1",
+"UPDATE recorded SET bookmarkupdate = lastmodified WHERE bookmark = 0",
+NULL
+};
+       if (!performActualUpdate(updates, "1247", dbver))
+            return false;
+
+       
+
     }
 
     return true;

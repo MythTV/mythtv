@@ -271,6 +271,7 @@ class PlaybackBox : public ScheduleCommon
     void UpdatePreviewGeneratorThreads(void);
     bool IsGeneratingPreview(const QString &fn, bool really = false) const;
     uint IncPreviewGeneratorAttempts(const QString &fn);
+    void ClearPreviewGeneratorAttempts(const QString &fn);
   private:
     bool FillList(bool useCachedData = false);
     void UpdateProgressBar(void);
@@ -319,6 +320,7 @@ class PlaybackBox : public ScheduleCommon
     void updateIcons(const ProgramInfo *pginfo = NULL);
     void updateUsage();
     void updateGroupInfo(const QString &groupname, const QString &grouplabel);
+    void UpdateProgramInfo(const ProgramInfo &pginfo);
     void UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel,
                            bool force_preview_reload = false);
 

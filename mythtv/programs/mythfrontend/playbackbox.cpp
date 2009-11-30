@@ -3149,31 +3149,71 @@ void PlaybackBox::doDeleteForgetHistory()
 
 ProgramInfo *PlaybackBox::findMatchingProg(const ProgramInfo *pginfo)
 {
-    ProgramList::iterator it;
-    ProgramList::iterator end;
-    
-    if (pginfo->recgroup == "LiveTV")
+    // LiveTV ProgramInfo's are not in the aggregated list
+    ProgramList::iterator _it[2] = {
+        m_progLists[tr("LiveTV").toLower()].begin(), m_progLists[""].begin() };
+    ProgramList::iterator _end[2] = {
+        m_progLists[tr("LiveTV").toLower()].end(),   m_progLists[""].end()   };
+
+    if (pginfo->recgroup != "LiveTV")
     {
-        // LiveTV ProgramInfo's are not in the aggregated list
-        it  = m_progLists[tr("LiveTV").toLower()].begin();
-        end = m_progLists[tr("LiveTV").toLower()].end();
-    }
-    else
-    {
-        it  = m_progLists[""].begin();
-        end = m_progLists[""].end();
+        swap( _it[0],  _it[1]);
+        swap(_end[0], _end[1]);
     }
 
-    for (; it != end; ++it)
+    for (uint i = 0; i < 2; i++)
     {
-        if ((*it)->recstartts == pginfo->recstartts &&
-            (*it)->chanid == pginfo->chanid)
+        ProgramList::iterator it = _it[i], end = _end[i];
+        for (; it != end; ++it)
         {
-            return *it;
+            if ((*it)->recstartts == pginfo->recstartts &&
+                (*it)->chanid == pginfo->chanid)
+            {
+                return *it;
+            }
         }
     }
 
     return NULL;
+}
+
+void PlaybackBox::UpdateProgramInfo(const ProgramInfo &pginfo)
+{
+    // LiveTV ProgramInfo's are not in the aggregated list
+    ProgramList::iterator _it[2] = {
+        m_progLists[tr("LiveTV").toLower()].begin(), m_progLists[""].begin() };
+    ProgramList::iterator _end[2] = {
+        m_progLists[tr("LiveTV").toLower()].end(),   m_progLists[""].end()   };
+
+    for (uint i = 0; i < 2; i++)
+    {
+        ProgramList::iterator it = _it[i], end = _end[i];
+        for (; it != end; ++it)
+        {
+            if (pginfo.chanid     == (*it)->chanid &&
+                pginfo.recstartts == (*it)->recstartts)
+            {
+                **it = pginfo;
+                break;
+            }
+        }
+    }
+
+    // now do the cache..
+    QMutexLocker locker(&m_progCacheLock);
+    if (m_progCache)
+    {
+        vector<ProgramInfo *>::iterator it = m_progCache->begin();
+        for ( ; it != m_progCache->end(); ++it)
+        {
+            if ((pginfo.chanid     == (*it)->chanid) &&
+                (pginfo.recstartts == (*it)->recstartts))
+            {
+                **it = pginfo;
+                break;
+            }
+        }
+    }
 }
 
 ProgramInfo *PlaybackBox::findMatchingProg(const QString &key)
@@ -3715,6 +3755,39 @@ void PlaybackBox::customEvent(QEvent *event)
             if (evinfo.FromStringList(me->ExtraDataList(), 0))
                 HandlePreviewEvent(evinfo);
         }
+        else if (message == "UPDATE_PROG_INFO")
+        {
+            ProgramInfo evinfo;
+            if (evinfo.FromStringList(me->ExtraDataList(), 0))
+            {
+                UpdateProgramInfo(evinfo);
+
+                ProgramInfo *dst = findMatchingProg(&evinfo);
+                MythUIButtonListItem *item = NULL;
+                if (dst)
+                {
+                    item = m_recordingList->GetItemByData(
+                        qVariantFromValue(dst));
+                }
+
+                if (item)
+                {
+                    MythUIButtonListItem *sel_item =
+                        m_recordingList->GetItemCurrent();
+                    UpdateProgramInfo(item, item == sel_item, true);
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            "Got UPDATE_PROG_INFO, but the program "
+                            "is unknown to us.");
+                }
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, "Failed to parse UPDATE_PROG_INFO");
+            }
+        }
     }
     else
         ScheduleCommon::customEvent(event);
@@ -3832,6 +3905,20 @@ uint PlaybackBox::IncPreviewGeneratorAttempts(const QString &xfn)
     return m_previewGenerator[fn].attempts++;
 }
 
+/** \fn PlaybackBox::ClearPreviewGeneratorAttempts(const QString&)
+ *  \brief Clears the number of times we have
+ *         started a PreviewGenerator to create this file.
+ */
+void PlaybackBox::ClearPreviewGeneratorAttempts(const QString &xfn)
+{
+    QMutexLocker locker(&m_previewGeneratorLock);
+    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
+    m_previewGenerator[fn].attempts = 0;
+    m_previewGenerator[fn].lastBlockTime = 0;
+    m_previewGenerator[fn].blockRetryUntil =
+        QDateTime::currentDateTime().addSecs(-60);
+}
+
 void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
 {
     success = SetPreviewGenerator(fn, NULL);
@@ -3906,8 +3993,14 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
     bool locally_accessible = false;
     bool bookmark_updated = false;
 
+    m_previewFromBookmark = true;
+
     if (m_previewFromBookmark || streaming)
     {
+        QDateTime bookmark_ts = pginfo->GetBookmarkTimeStamp();
+        QDateTime cmp_ts = bookmark_ts.isValid() ?
+            bookmark_ts : pginfo->lastmodified;
+
         if (streaming)
         {
             ret_file = QString("%1/remotecache/%2")
@@ -3916,7 +4009,7 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
             QFileInfo finfo(ret_file);
             if (finfo.exists() &&
                 (!m_previewFromBookmark ||
-                 (finfo.lastModified() >= pginfo->lastmodified)))
+                 (finfo.lastModified() >= cmp_ts)))
             {
                 // This is just an optimization to avoid
                 // hitting the backend if our cached copy
@@ -3938,11 +4031,25 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
                 previewLastModified = fi.lastModified();
         }
 
-        bookmark_updated =
-            m_previewFromBookmark &&
-            ((!previewLastModified.isValid() ||
-              (previewLastModified <  pginfo->lastmodified &&
-               previewLastModified >= pginfo->recendts)));
+        bookmark_updated = m_previewFromBookmark &&
+            (!previewLastModified.isValid() || (previewLastModified < cmp_ts));
+
+        if (bookmark_updated && bookmark_ts.isValid() &&
+            previewLastModified.isValid())
+        {
+            ClearPreviewGeneratorAttempts(filename);
+        }
+
+        if (0)
+        {
+            VERBOSE(VB_IMPORTANT, QString(
+                        "previewLastModified:  %1\n\t\t\t"
+                        "bookmark_ts:          %2\n\t\t\t"
+                        "pginfo->lastmodified: %3")
+                    .arg(previewLastModified.toString(Qt::ISODate))
+                    .arg(bookmark_ts.toString(Qt::ISODate))
+                    .arg(pginfo->lastmodified.toString(Qt::ISODate)));
+        }
     }
     else
     {
@@ -3955,6 +4062,8 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
     if (0)
     {
         VERBOSE(VB_IMPORTANT,
+                QString("Title: %1:%2\n\t\t\t")
+                .arg(pginfo->title).arg(pginfo->subtitle) +
                 QString("File  '%1' \n\t\t\tCache '%2'")
                 .arg(filename).arg(ret_file) +
                 QString("\n\t\t\tPreview Exists: %1, "
