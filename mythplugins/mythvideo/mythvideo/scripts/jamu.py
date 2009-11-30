@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.0"
+__version__=u"v0.6.1"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -241,6 +241,8 @@ __version__=u"v0.6.0"
  #       spotted and correct by Mathieu Brabant (thanks).
  #		 Added the ability for a user to filter additional characters from a file name this is important for
  #		 users using MS-Windows file systems as a CIFS mount.
+ # 0.6.1 Added directory name parsing support for TV series title, series number and episode numbers. Patch
+ #		 contributed by Mitko Haralanov (thanks).
 
 
 usage_txt=u'''
@@ -1390,9 +1392,60 @@ class Configuration(object):
 			re.compile(u'''^(.+)[ \._\-]([0-9]{2})([0-9]{2,3})[\._ -][^\\/]*$''' , re.UNICODE),
 		]
 
+		# regex strings to parse folder names for TV series title, season and episode numbers
+		self.config['fullname_parse_season_episode_translation'] = {u'slash': u'\\', u'season': u'Season', u'episode': u'Episode'}
+		self.config['fullname_parse_regex'] = [
+			# Title/Season 1/01 Subtitle
+			u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
+				   u'''(?P<seasno>[0-9]+)/(?P<epno>[0-9]+).+$''',
+			# Title/Season 1/s01e01 Subtitle
+			u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
+				   u'''(?P<seasno>[0-9]+)/[Ss][0-9]+[Ee](?P<epno>[0-9]+).+$''',
+			# Title/Season 1/1x01 Subtitle
+			u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
+				   u'''(?P<seasno>[0-9]+)/(?:(?P=seasno))[Xx](?P<epno>[0-9]+).+$''',
+			# Title/Season 1/Title s01e01 Subtitle
+			u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
+				   u'''(?P<seasno>[0-9]+)/(?:(?P=seriesname))%(slash)s [Ss][0-9]+'''+
+				   u'''[Ee](?P<epno>[0-9]+).+$''',
+			# Title/Season 1/Title 1x01 Subtitle
+			u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
+				   u'''(?P<seasno>[0-9]+)/(?:(?P=seriesname))%(slash)s (?:(?P=seasno))'''+
+				   u'''[Xx](?P<epno>[0-9]+).+$''',
+			# Title/Season 1/Episode 1 Subtitle
+			u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
+				   u'''(?P<seasno>[0-9]+)/%(episode)s%(slash)s (?P<epno>[0-9]+).+$''',
+			# Title/Season 1/Season 1 Episode 1 Subtitle
+			u'''^.+?/(?P<seriesname>[^/]+)/%(season)s%(slash)s '''+
+				   u'''(?P<seasno>[0-9]+)/%(season)s%(slash)s (?:(?P=seasno))%(slash)s '''+
+				   u'''%(episode)s%(slash)s (?P<epno>[0-9]+).+$''',
+			# Title Season 1/01 Subtitle
+			u'''^.+?/(?P<seriesname>[^/]+)%(slash)s %(season)s%(slash)s (?P<seasno>[0-9]+)'''+
+				   u'''/(?P<epno>[0-9]+).+$''',
+			# Title Season 1/s01e01 Subtitle
+			u'''^.*?/(?P<seriesname>[^/]+)%(slash)s %(season)s%(slash)s (?P<seasno>[0-9]+)'''+
+				   u'''/[Ss][0-9]+[Ee](?P<epno>[0-9]+).+''',
+			# Title Season 1/1x01 Subtitle
+			u'''^.*?/(?P<seriesname>[^/]+)%(slash)s %(season)s%(slash)s (?P<seasno>[0-9]+)'''+
+				   u'''/(?:(?P=seasno))[Xx](?P<epno>[0-9]+).+$''',
+			# Title Season 1/Title s01e01 Subtitle
+			u'''^.*?/(?P<seriesname>[^/]+)%(slash)s %(season)s%(slash)s (?P<seasno>[0-9]+)'''+
+				   u'''/(?:(?P=seriesname))%(slash)s [Ss][0-9]+[Ee](?P<epno>[0-9]+).+$''',
+			# Title Season 1/Title 1x01 Subtitle
+			u'''^.*?/(?P<seriesname>[^/]+)%(slash)s %(season)s%(slash)s (?P<seasno>[0-9]+)'''+
+				   u'''/(?:(?P=seriesname))%(slash)s (?:(?P=seasno))[Xx](?P<epno>[0-9]+).+$''',
+			# Title Season 1/Episode 1 Subtitle
+			u'''^.*?/(?P<seriesname>[^/]+)%(slash)s %(season)s%(slash)s (?P<seasno>[0-9]+)'''+
+				   u'''/%(episode)s%(slash)s (?P<epno>[0-9]+).+$''',
+			# Title Season 1/Season 1 Episode 1 Subtitle
+			u'''^.*?/(?P<seriesname>[^/]+)%(slash)s %(season)s%(slash)s (?P<seasno>[0-9]+)'''+
+				   u'''/%(season)s%(slash)s (?:(?P=seasno))%(slash)s %(episode)s%(slash)s (?P<epno>[0-9]+).+$'''
+			]
+
 		# Initalize a valriable used by the -MW option
 		self.program_seriesid = None
 		self.config[u'file_move_flag'] = False
+
 	# end __init__
 
 	# Local variable
@@ -1446,6 +1499,15 @@ class Configuration(object):
 						for char in cfg.get(section, option):
 							self.config['filename_char_filter']+=char
 						continue
+					if option == 'translate':
+						s_e = (cfg.get(section, option).rstrip()).split(',')
+						if not len(s_e) == 2:
+							continue
+						for index in range(len(s_e)):
+							s_e[index] = s_e[index].strip()
+						self.config['fullname_parse_season_episode_translation'] = {u'slash': u'\\', u'season': s_e[0], u'episode': s_e[1]}
+						continue
+
 					# Ignore user settings for Myth Video and graphics file directories
 					# when the MythTV metadata option (-M) is selected
 					if self.config['mythtvmeta'] and option in ['posterdir', 'bannerdir', 'fanartdir', 'episodeimagedir', 'mythvideo']:
@@ -1865,6 +1927,11 @@ class Configuration(object):
 			for literal in types.keys():
 				if self.config[key] == literal:
 					self.config[key] = types[literal]
+
+		# Compile regex strings to parse folder names for TV series title, season and episode numbers
+		self.config['fullname_parse'] = []
+		for index in range(len(self.config['fullname_parse_regex'])):
+			self.config['fullname_parse'].append(re.compile(self.config['fullname_parse_regex'][index] % self.config['fullname_parse_season_episode_translation'], re.UNICODE))
 
 		if self.config['mythtvmeta']:
 			if mythdb == None or mythvideo == None:
@@ -3004,6 +3071,7 @@ class VideoFiles(Tvdatabase):
 		return allfiles
 	#end findFiles
 
+
 	def _processNames(self, names, verbose=False, movies=False):
 		"""
 		Takes list of names, runs them though the self.config['name_parse'] regex parsing strings
@@ -3026,70 +3094,80 @@ class VideoFiles(Tvdatabase):
 					sys.stderr.write(u"\n! Warning: Skipping non-video file name: (%s)\n" % (f))
 				continue
 
+			match = None
 			for r in self.config['name_parse']:
 				match = r.match(filename)
-				categories=''
-				if match:
-					seriesname, seasno, epno = match.groups()
+				if match: break
+			# If the filename does not match the default regular
+			# expressions, try to match the file path + filename with the
+			# extended fullpath regular expression so we can extract the
+			# needed information out of the pathname
+			if not match:
+				for r in self.config['fullname_parse']:
+					match = r.match(os.path.join(filepath, filename))
+					if match: break
 
-		            #remove ._- characters from name (- removed only if next to end of line)
-					seriesname = re.sub("[\._]|\-(?=$)", " ", seriesname).strip()
-					seasno, epno = int(seasno), int(epno)
+			categories=''
+			if match:
+				self.config['log'].debug(u'matched reg:%s'%match.re.pattern)
+				seriesname, seasno, epno = match.groups()
 
-					if self.config['series_name_override']:
-						if self.config['series_name_override'].has_key(seriesname.lower()):
-							if len((self.config['series_name_override'][seriesname.lower()]).strip()) == 7:
-								categories+=u', Movie'
-								movie = filename
-								if movie.endswith(self.config['hd_dvd']):
-									movie = movie.replace(self.config['hd_dvd'], '')
+		                #remove ._- characters from name (- removed only if next to end of line)
+				seriesname = re.sub("[\._]|\-(?=$)", " ", seriesname).strip()
+				seasno, epno = int(seasno), int(epno)
+
+				if self.config['series_name_override']:
+					if self.config['series_name_override'].has_key(seriesname.lower()):
+						if len((self.config['series_name_override'][seriesname.lower()]).strip()) == 7:
+							categories+=u', Movie'
+							movie = filename
+							if movie.endswith(self.config['hd_dvd']):
+								movie = movie.replace(self.config['hd_dvd'], '')
+								categories+=u', DVD'
+								categories+=u', HD'
+							else:
+								if movie.endswith(self.config['dvd']):
+									movie = movie.replace(self.config['dvd'], '')
 									categories+=u', DVD'
-									categories+=u', HD'
-								else:
-									if movie.endswith(self.config['dvd']):
-										movie = movie.replace(self.config['dvd'], '')
-										categories+=u', DVD'
-								movie = re.sub("[\._]|\-(?=$)", " ", movie).strip()
-								try:
-									allEps.append({ 'file_seriesname':movie,
-													'seasno':0,
-													'epno':0,
-													'filepath':filepath,
-													'filename':filename,
-													'ext':ext,
-													'categories': categories
-													})
-								except UnicodeDecodeError:
-									allEps.append({ 'file_seriesname':unicode(movie,'utf8'),
-													'seasno':0,
-													'epno':0,
-													'filepath':unicode(filepath,'utf8'),
-													'filename':unicode(filename,'utf8'),
-													'ext':unicode(ext,'utf8'),
-													'categories': categories
-													})
-								break
-
-					categories+=u', TV Series'
-					try:
-						allEps.append({ 'file_seriesname':seriesname,
-										'seasno':seasno,
-										'epno':epno,
+							movie = re.sub("[\._]|\-(?=$)", " ", movie).strip()
+							try:
+								allEps.append({ 'file_seriesname':movie,
+										'seasno':0,
+										'epno':0,
 										'filepath':filepath,
 										'filename':filename,
 										'ext':ext,
 										'categories': categories
 										})
-					except UnicodeDecodeError:
-						allEps.append({ 'file_seriesname':unicode(seriesname,'utf8'),
-										'seasno':seasno,
-										'epno':epno,
+							except UnicodeDecodeError:
+								allEps.append({ 'file_seriesname':unicode(movie,'utf8'),
+										'seasno':0,
+										'epno':0,
 										'filepath':unicode(filepath,'utf8'),
 										'filename':unicode(filename,'utf8'),
 										'ext':unicode(ext,'utf8'),
 										'categories': categories
 										})
-					break # Matched - to the next file!
+
+				categories+=u', TV Series'
+				try:
+					allEps.append({ 'file_seriesname':seriesname,
+							'seasno':seasno,
+							'epno':epno,
+							'filepath':filepath,
+							'filename':filename,
+							'ext':ext,
+							'categories': categories
+							})
+				except UnicodeDecodeError:
+					allEps.append({ 'file_seriesname':unicode(seriesname,'utf8'),
+							'seasno':seasno,
+							'epno':epno,
+							'filepath':unicode(filepath,'utf8'),
+							'filename':unicode(filename,'utf8'),
+							'ext':unicode(ext,'utf8'),
+							'categories': categories
+							})
 			else:
 				if movies: # Account for " - On DVD" and " HD - On DVD" extra text on file names
 					categories+=u', Movie'
@@ -4587,6 +4665,7 @@ class MythTvMetaData(VideoFiles):
 				continue
 			file_list = _getFileList(self.config[graphicsDirectories[directory]])
 			if not len(file_list):
+				graphics_file_dict[directory] = []
 				continue
 			for g_file in list(file_list):		# Cull the list removing dirs and non-graphics files
 				if os.path.isdir(g_file):
@@ -4668,7 +4747,7 @@ class MythTvMetaData(VideoFiles):
 
 		c.close()
 		if not atleast_one_video_file:
-			sys.stderr.write(u"\n! Error: Janitor - did not find any video files to process so skipping\nimage clean up to protect your image files, in case this is an configuration or NFS error.\nIf you do not use MythVideo then the Janitor option (-MJ) is not of value to you on this MythTV back end.\n")
+			sys.stderr.write(u"\n! Error: Janitor - did not find any video files to process so skipping\nimage clean up to protect your image files, in case this is a configuration or NFS error.\nIf you do not use MythVideo then the Janitor option (-MJ) is not of value to you on this MythTV back end.\n")
 			return
 		# end reading videometadata records to remove their graphics from the image orphan list
 
