@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.1"
+__version__=u"v0.6.2"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -243,6 +243,9 @@ __version__=u"v0.6.1"
  #		 users using MS-Windows file systems as a CIFS mount.
  # 0.6.1 Added directory name parsing support for TV series title, series number and episode numbers. Patch
  #		 contributed by Mitko Haralanov (thanks).
+ # 0.6.2 Added updating the 'homepage', 'releasedata' and 'hash' fields in the videometadata table
+ #		 is the field exists. These fields is only present in trunk.
+ #		 Properly initalize the homepage, hash, releasedate fields when adding a new videometadata record.
 
 
 usage_txt=u'''
@@ -381,7 +384,7 @@ without_ep_name (%(series)s - S%(seasonnumber)02dE%(episodenumber)02d.%(ext)s)
 import sys, os, re, locale, subprocess, locale, ConfigParser, urllib, codecs, shutil, datetime, fnmatch, string
 from optparse import OptionParser
 from socket import gethostname, gethostbyname
-import tempfile
+import tempfile, struct
 import logging
 
 class OutStreamEncoder(object):
@@ -3303,6 +3306,51 @@ class MythTvMetaData(VideoFiles):
 	# end _getSubtitle
 
 
+	def hashFile(self, name):
+		'''Create metadata hash values for mythvideo files
+		return a hash value
+		return u'' if the was an error with the video file or the video file length was zero bytes
+		'''
+		filename = self.rtnRelativePath(name, u'mythvideo')
+		# Use the MythVideo hashing protocol when the video is in a storage groups
+		# Later on this call should be replaced with a specific hash routine in the new MythTV.py bindings
+		if filename[0] != u'/':
+			# Example: QUERY_FILE_HASH[]:[]Movies/Apollo 13.mp4[]:[]Videos
+			hash_value = mythtv.backendCommand('[]:[]'.join(['QUERY_FILE_HASH', filename, u'Videos']))
+			if hash_value == u'NULL':
+				return u''
+			else:
+				return hash_value
+
+		# Use a local hashing routine when video is not in a Videos storage group
+		# For original code: http://trac.opensubtitles.org/projects/opensubtitles/wiki/HashSourceCodes#Python
+		try:
+			longlongformat = 'q'  # long long
+			bytesize = struct.calcsize(longlongformat)
+			f = open(name, "rb")
+			filesize = os.path.getsize(name)
+			hash = filesize
+			if filesize < 65536 * 2:	# Video file is too small
+				   return u''
+			for x in range(65536/bytesize):
+					buffer = f.read(bytesize)
+					(l_value,)= struct.unpack(longlongformat, buffer)
+					hash += l_value
+					hash = hash & 0xFFFFFFFFFFFFFFFF #to remain as 64bit number
+			f.seek(max(0,filesize-65536),0)
+			for x in range(65536/bytesize):
+					buffer = f.read(bytesize)
+					(l_value,)= struct.unpack(longlongformat, buffer)
+					hash += l_value
+					hash = hash & 0xFFFFFFFFFFFFFFFF
+			f.close()
+			returnedhash =  "%016x" % hash
+			return returnedhash
+
+		except(IOError):	# Accessing to this video file caused and error
+			return u''
+	# end hashFile()
+
 	def rtnRelativePath(self, abpath, filetype):
 		'''Check if there is a Storage Group for the file type (video, coverfile, banner, fanart, screenshot)
 		and form an apprioriate relative path and file name.
@@ -3973,6 +4021,9 @@ class MythTvMetaData(VideoFiles):
 				except:
 					pass
 				continue
+			if key == 'tmdb_url':
+				meta_dict['homepage'] = data
+				continue
 			if key == 'runtime':
 				try:
 					meta_dict['length'] = long(data)
@@ -3984,6 +4035,16 @@ class MythTvMetaData(VideoFiles):
 				meta_dict['rating'] = 'Unknown'
 
 		if len(meta_dict):
+			if self.trunk:
+				hashing = False
+				if not available_metadata.has_key('hash'):
+					hashing = True
+				elif available_metadata['hash'] == u'':
+					hashing = True
+				if hashing:
+					filename = u'%s/%s.%s' % (cfile['filepath'], cfile['filename'], cfile['ext'])
+					if os.path.getsize(filename):
+						meta_dict['hash'] = self.hashFile(filename)
 			available_metadata = self.combineMetaData(available_metadata, meta_dict, vid_type=True)
 			return self._getSecondarySourceMetadata(cfile, available_metadata)
 		else:
@@ -4102,6 +4163,7 @@ class MythTvMetaData(VideoFiles):
 
 		meta_dict={}
 		tmp_array=(self.getSeriesEpisodeData()).split('\n')
+
 		for element in tmp_array:
 			element = (element.rstrip('\n')).strip()
 			if element == '':
@@ -4141,6 +4203,7 @@ class MythTvMetaData(VideoFiles):
 				except:
 					pass
 				meta_dict['firstaired'] = data
+				meta_dict['releasedate'] = data
 				continue
 			if key == 'year':
 				try:
@@ -4150,6 +4213,7 @@ class MythTvMetaData(VideoFiles):
 				continue
 			if key == 'seriesid':
 				meta_dict['inetref'] = data
+				meta_dict[key] = data
 				continue
 			if key == 'rating':
 				try:
@@ -4171,6 +4235,22 @@ class MythTvMetaData(VideoFiles):
 			if not meta_dict.has_key('director'):
 				meta_dict['director'] = u''
 			meta_dict['rating'] = u'TV Show'
+			# URL to TVDB web site episode web page for this series
+			for url_data in [u'seriesid', u'seasonid', u'id']:
+				if not url_data in meta_dict.keys():
+					break
+			else:
+				meta_dict['homepage'] = u'http://www.thetvdb.com/?tab=episode&seriesid=%s&seasonid=%s&id=%s' % (meta_dict['seriesid'], meta_dict['seasonid'], meta_dict['id'])
+			if self.trunk:
+				hashing = False
+				if not available_metadata.has_key('hash'):
+					hashing = True
+				elif available_metadata['hash'] == u'':
+					hashing = True
+				if hashing:
+					filename = u'%s/%s.%s' % (cfile['filepath'], cfile['filename'], cfile['ext'])
+					if os.path.getsize(filename):
+						meta_dict['hash'] = self.hashFile(filename)
 			available_metadata = self.combineMetaData(available_metadata, meta_dict, vid_type=False)
 			return self._getSecondarySourceMetadata(cfile, available_metadata)
 		else:
@@ -5625,6 +5705,24 @@ class MythTvMetaData(VideoFiles):
 		'''Check each video file in the mythvideo directories download graphics files and meta data then
 		update MythTV data base meta data with any new information.
 		'''
+		# Verify that the proper fields are present
+		self.trunk = False
+		db_version = mythdb.getSetting('DBSchemaVer')
+		field_names = mythvideo.getTableFieldNames('videometadata')
+		for field in ['season', 'episode', 'coverfile', 'screenshot', 'banner', 'fanart']:
+			if not field in field_names:
+				sys.stderr.write(u"\n! Error: Your MythTv data base scheme version (%s) does not have the necessary fields at least (%s) is missing\n\n" % (db_version, field))
+				sys.exit(1)
+
+		# Check if videometadata fields include those post the MythTV 0.22 release
+		for field in ['homepage', 'hash', 'releasedate']:
+			if field in field_names:
+				self.trunk = True
+				self.initialize_record['homepage'] = u''
+				self.initialize_record['hash'] = u''
+				self.initialize_record['releasedate'] = '0000-00-00'
+				break
+
 		# If there were directories specified move them and update the MythTV db meta data accordingly
 		if self.config['video_dir']:
 			if len(self.config['video_dir']) % 2 == 0:
@@ -5643,14 +5741,6 @@ class MythTvMetaData(VideoFiles):
 			elif not len(validFiles):
 				sys.stderr.write(u"\n! Warning: There were no missing interef video files found.\n\n")
 				sys.exit(0)
-
-		# Verify that the proper fields are present
-		db_version = mythdb.getSetting('DBSchemaVer')
-		field_names = mythvideo.getTableFieldNames('videometadata')
-		for field in ['season', 'episode', 'coverfile', 'screenshot', 'banner', 'fanart']:
-			if not field in field_names:
-				sys.stderr.write(u"\n! Error: Your MythTv data base scheme version (%s) does not have the necessary fields at least (%s) is missing\n\n" % (db_version, field))
-				sys.exit(1)
 
 		# Check if this is a Scheduled and Recorded graphics download request
 		if self.config['mythtv_watched']:
@@ -6123,6 +6213,16 @@ class MythTvMetaData(VideoFiles):
 							self._displayMessage(
 							u"The plot is less than 10 words check if a better plot exists\n")
 							break
+					if key == 'releasedate' and available_metadata[key] == None:
+						self._displayMessage(
+						u"At least (%s) needs updating\n" % (key))
+						break
+					if key == 'hash' and available_metadata[key] == u'':
+						if (os.path.getsize(u'%s/%s.%s' % (cfile['filepath'], cfile['filename'], cfile['ext'])) < 65536 * 2):
+							continue
+						self._displayMessage(
+						u"At least (%s) needs updating\n" % (key))
+						break
 					if available_metadata[key] == None or available_metadata[key] == '' or available_metadata[key] == 'None' or available_metadata[key] == 'Unknown':
 						self._displayMessage(
 						u"At least (%s) needs updating\n" % (key))
