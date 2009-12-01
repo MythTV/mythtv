@@ -264,14 +264,6 @@ InputInfo RemoteRequestBusyInputID(uint cardid)
     return blank;
 }
 
-void RemoteSendMessage(const QString &message)
-{
-    QStringList strlist( "MESSAGE" );
-    strlist << message;
-
-    gContext->SendReceiveStringList(strlist);
-}
-
 void RemoteGeneratePreviewPixmap(ProgramInfo *pginfo)
 {
     QStringList strlist( "QUERY_GENPIXMAP" );
