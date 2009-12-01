@@ -143,7 +143,7 @@
         <description>Configure weather, news, movie info, web, and recipes</description>
         <description lang="DE">Einstellungen der Plugins (Wetter, Nachrichten etc)</description>
         <action>MENU info_settings.xml</action>
-        <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends>
+        <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythbrowser mythmovies</depends>
     </button>
 
     <button>
