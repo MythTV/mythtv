@@ -2027,8 +2027,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         if (tracks[kTrackTypeAudio].size() > 1)
         {
-            stable_sort(tracks[kTrackTypeAudio].begin(),
-                        tracks[kTrackTypeAudio].end());
             sinfo_vec_t::iterator it = tracks[kTrackTypeAudio].begin();
             for (; it != tracks[kTrackTypeAudio].end(); ++it)
             {
@@ -2037,8 +2035,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                     "Stream id #%1 ")
                                     .arg(it->stream_id));
             }
-            stable_sort(tracks[kTrackTypeAudio].begin(),
-                        tracks[kTrackTypeAudio].end());
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
             if (trackNo >= (int)GetTrackCount(kTrackTypeAudio))
                 trackNo = GetTrackCount(kTrackTypeAudio) - 1;
