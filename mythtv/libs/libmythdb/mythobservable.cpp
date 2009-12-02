@@ -43,7 +43,7 @@ QList<QObject*> MythObservable::getListeners()
     return m_listeners;
 }
 
-void MythObservable::dispatch(MythEvent &event)
+void MythObservable::dispatch(const MythEvent &event)
 {
     QList<QObject*>::const_iterator it = m_listeners.begin();
     while (it != m_listeners.end())
@@ -53,7 +53,7 @@ void MythObservable::dispatch(MythEvent &event)
     }
 }
 
-void MythObservable::dispatchNow(MythEvent &event)
+void MythObservable::dispatchNow(const MythEvent &event)
 {
     QList<QObject*>::const_iterator it = m_listeners.begin();
     while (it != m_listeners.end())

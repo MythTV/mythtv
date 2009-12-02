@@ -120,7 +120,7 @@ class MPUBLIC MythObservable
 
         \param event a MythEvent to dispatch.
     */
-    void dispatch(MythEvent &event);
+    void dispatch(const MythEvent &event);
 
     /** \brief Dispatch an event to all listeners
 
@@ -131,7 +131,7 @@ class MPUBLIC MythObservable
 
         \param event a MythEvent to dispatch.
     */
-    void dispatchNow(MythEvent &event);
+    void dispatchNow(const MythEvent &event);
 
   private:
     QList<QObject*> m_listeners;

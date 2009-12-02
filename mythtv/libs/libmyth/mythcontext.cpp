@@ -2478,14 +2478,14 @@ bool MythContext::SaveDatabaseParams(const DatabaseParams &params)
     return ret;
 }
 
-void MythContext::dispatch(MythEvent &event)
+void MythContext::dispatch(const MythEvent &event)
 {
     VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
 
     MythObservable::dispatch(event);
 }
 
-void MythContext::dispatchNow(MythEvent &event)
+void MythContext::dispatchNow(const MythEvent &event)
 {
     VERBOSE(VB_NETWORK, QString("MythEvent: %1").arg(event.Message()));
 

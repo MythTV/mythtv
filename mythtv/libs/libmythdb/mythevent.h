@@ -48,7 +48,8 @@ class MPUBLIC MythEvent : public QEvent
     const QStringList& ExtraDataList() const { return extradata; }
     int ExtraDataCount() const { return extradata.size(); }
 
-    virtual MythEvent* clone() { return new MythEvent(message, extradata); }
+    virtual MythEvent *clone() const
+    { return new MythEvent(message, extradata); }
 
   private:
     QString message;
