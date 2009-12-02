@@ -6725,8 +6725,12 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
         QString msg = "";
 
         if (decoder)
+        {
             msg = decoder->GetTrackDesc(type, GetTrack(type));
-
+            
+            if (player_ctx->buffer->isDVD())
+                player_ctx->buffer->DVD()->SetTrack(type, trackNo);
+        }
         if (osd)
             osd->SetSettingsText(msg, 3);
     }
