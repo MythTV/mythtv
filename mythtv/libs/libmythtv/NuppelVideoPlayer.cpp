@@ -1071,14 +1071,12 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
 
     m_scan_locked = (scan != kScan_Detect);
 
-    if (scan == m_scan)
-        return;
-
     bool interlaced = is_interlaced(scan);
 
     if (interlaced && !m_deint_possible)
     {
         m_scan = scan;
+        videosync->SetFrameInterval(frame_interval, false);
         return;
     }
 
@@ -1112,11 +1110,8 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
         if (kScan_Progressive == scan)
         {
             m_double_process = false;
-            if (m_double_framerate)
-            {
-                m_double_framerate = false;
-                videosync->SetFrameInterval(frame_interval, false);
-            }
+            m_double_framerate = false;
+            videosync->SetFrameInterval(frame_interval, false);
             videoOutput->SetDeinterlacingEnabled(false);
             VERBOSE(VB_PLAYBACK, "Disabled deinterlacing");
         }
