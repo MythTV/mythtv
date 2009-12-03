@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.8';
+    $VERSION        = '1.0.9';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -724,8 +724,18 @@ EOF
     # Let tempfile handle unlinking on exit so we don't have to verify that the
     # file with $filename is the file we created
         my ($fh, $filename) = tempfile(UNLINK => 1);
-        print $fh  "[client]\npassword=$mysql_conf{'db_pass'}\n".
-                   "[mysql]\npassword=$mysql_conf{'db_pass'}\n";
+    # Quote the password if it contains # or whitespace or quotes.
+    # Quoting of values in MySQL options files is only supported on MySQL
+    # 4.0.16 and above, so only quote if required.
+        my $quote = '';
+        my $safe_password = $mysql_conf{'db_pass'};
+        if ($safe_password =~ /[#'"\s]/)
+        {
+            $quote = "'";
+            $safe_password =~ s/'/\\'/g;
+        }
+        print $fh "[client]\npassword=${quote}${safe_password}${quote}\n".
+                  "[mysqldump]\npassword=${quote}${safe_password}${quote}\n";
         return $filename;
     }
 
