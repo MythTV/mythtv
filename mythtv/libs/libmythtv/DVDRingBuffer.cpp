@@ -1097,19 +1097,16 @@ void DVDRingBufferPriv::InStillFrame(bool change)
 uint DVDRingBufferPriv::GetAudioLanguage(int id)
 {
     uint16_t lang = dvdnav_audio_stream_to_lang(m_dvdnav, id);
-    //DEBUG
-    VERBOSE(VB_PLAYBACK, LOC_ERR + QString("StreamID: %1; lang: %2").arg(id).arg(lang));
+    VERBOSE(VB_PLAYBACK, LOC + QString("StreamID: %1; lang: %2").arg(id).arg(lang));
     return ConvertLangCode(lang);
 }
-
 
 /** \brief get the subtitle language from the dvd
  */
 uint DVDRingBufferPriv::GetSubtitleLanguage(int id)
 {
     uint16_t lang = dvdnav_spu_stream_to_lang(m_dvdnav, id);
-    //DEBUG
-    VERBOSE(VB_PLAYBACK, LOC_ERR + QString("StreamID: %1; lang: %2").arg(id).arg(lang));
+    VERBOSE(VB_PLAYBACK, LOC + QString("StreamID: %1; lang: %2").arg(id).arg(lang));
     return ConvertLangCode(lang);
 }
 
@@ -1125,8 +1122,7 @@ uint DVDRingBufferPriv::ConvertLangCode(uint16_t code)
     str2[1] = QChar(code & 0xff);
     QString str3 = iso639_str2_to_str3(QString(str2, 2));
 
-    //DEBUG
-    VERBOSE(VB_PLAYBACK, LOC_ERR + QString("code: %1; iso639: %2").arg(code).arg(str3));
+    VERBOSE(VB_PLAYBACK, LOC + QString("code: %1; iso639: %2").arg(code).arg(str3));
 
     if (!str3.isEmpty())
         return iso639_str3_to_key(str3);
