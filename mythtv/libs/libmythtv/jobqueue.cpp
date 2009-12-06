@@ -1855,7 +1855,8 @@ void JobQueue::DoTranscodeThread(int jobID)
         subtitle = QString(" \"%1\"").arg(program_info->subtitle);
 
     ChangeJobStatus(jobID, JOB_RUNNING);
-    bool hasCutlist = !!(program_info->getProgramFlags() & FL_CUTLIST);
+    program_info->LoadRecordedAncillaryData(); // make sure flags are up to date
+    bool hasCutlist = !!(program_info->GetProgramFlags() & FL_CUTLIST);
     bool useCutlist = !!(GetJobFlags(jobID) & JOB_USE_CUTLIST) && hasCutlist;
 
     int transcoder = program_info->transcoder;
@@ -2012,9 +2013,6 @@ void JobQueue::DoTranscodeThread(int jobID)
                                .arg(comment)).toLocal8Bit();
                 }
 
-                MythEvent me("RECORDING_LIST_CHANGE");
-                gContext->dispatch(me);
-
                 program_info->SetTranscoded(TRANSCODING_COMPLETE);
             }
             else
@@ -2165,8 +2163,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         comment = tr("%n commercial break(s)", "", breaksFound);
         ChangeJobStatus(jobID, JOB_FINISHED, comment);
 
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
+        program_info->SendUpdateEvent();
 
         program_info->pathname = program_info->GetPlaybackURL();
         (new PreviewGenerator(program_info, PreviewGenerator::kLocal))->Run();
@@ -2284,8 +2281,8 @@ void JobQueue::DoUserJobThread(int jobID)
 
         ChangeJobStatus(jobID, JOB_FINISHED, "Successfully Completed.");
 
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
+        if (pginfo)
+            pginfo->SendUpdateEvent();
     }
 
     RemoveRunningJob(jobID);

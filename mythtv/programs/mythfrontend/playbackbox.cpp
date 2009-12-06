@@ -1137,6 +1137,7 @@ void PlaybackBox::listChanged(void)
     }
 
     m_connected = FillList(m_fillListFromCache);
+    m_fillListFromCache = true;
 }
 
 bool PlaybackBox::FillList(bool useCachedData)
@@ -3661,63 +3662,23 @@ void PlaybackBox::customEvent(QEvent *event)
         if (message.left(21) == "RECORDING_LIST_CHANGE")
         {
             QStringList tokens = message.simplified().split(" ");
-            if (tokens.size() == 1)
+            if ((tokens.size() == 4) && (tokens[1] == "ADD"))
+            {
+                ProgramInfo evinfo;
+                if (evinfo.FromStringList(me->ExtraDataList(), 0))
+                    HandleRecordingAddEvent(evinfo);
+            }
+            if ((tokens.size() == 4) && (tokens[1] == "DELETE"))
+            {
+                uint chanid = tokens[2].toUInt();
+                QDateTime recstartts = QDateTime::fromString(tokens[3]);
+                if (chanid && recstartts.isValid())
+                    HandleRecordingRemoveEvent(chanid, recstartts);
+            }
+            else
             {
                 m_fillListFromCache = false;
-                if (!m_fillListTimer->isActive())
-                {
-                    m_fillListTimer->stop();
-                    m_fillListTimer->setSingleShot(true);
-                    m_fillListTimer->start(1000);
-                }
-            }
-            else if ((tokens[1] == "DELETE") && (tokens.size() == 4))
-            {
-                m_freeSpaceNeedsUpdate = true;
-                m_progCacheLock.lock();
-                if (!m_progCache)
-                {
-                    m_progCacheLock.unlock();
-                    m_freeSpaceNeedsUpdate = true;
-                    m_fillListFromCache = false;
-                    m_fillListTimer->stop();
-                    m_fillListTimer->setSingleShot(true);
-                    m_fillListTimer->start(1000);
-                    return;
-                }
-                vector<ProgramInfo *>::iterator i = m_progCache->begin();
-                for ( ; i != m_progCache->end(); ++i)
-                {
-                   if (((*i)->chanid == tokens[2]) &&
-                       ((*i)->recstartts.toString(Qt::ISODate) == tokens[3]))
-                   {
-                        // We've set this recording to be deleted locally
-                        // it's no longer in the recording list, so don't
-                        // trigger a list reload which would cause a UI lag
-                        if ((*i)->availableStatus != asPendingDelete
-                             || m_currentGroup == m_watchGroupLabel)
-                        {
-                            m_recordingList->RemoveItem(
-                                            m_recordingList->GetItemByData(
-                                                        qVariantFromValue(*i)));
-                            if (m_recordingList->GetCount() == 0)
-                                m_groupList->RemoveItem(
-                                            m_groupList->GetItemCurrent());
-                        }
-                        (*i)->availableStatus = asDeleted;
-                        m_progCacheLock.unlock();
-                        return;
-                   }
-                }
-
-                m_progCacheLock.unlock();
-                if (!m_fillListTimer->isActive())
-                {
-                    m_fillListFromCache = true;
-                    m_fillListTimer->stop();
-                    m_fillListTimer->setSingleShot(true);
-                    m_fillListTimer->start(1000);
-                }
+                ScheduleFillList();
             }
         }
         else if (message.left(15) == "NETWORK_CONTROL")
@@ -3758,38 +3719,138 @@ void PlaybackBox::customEvent(QEvent *event)
         {
             ProgramInfo evinfo;
             if (evinfo.FromStringList(me->ExtraDataList(), 0))
-            {
-                UpdateProgramInfo(evinfo);
-
-                ProgramInfo *dst = findMatchingProg(&evinfo);
-                MythUIButtonListItem *item = NULL;
-                if (dst)
-                {
-                    item = m_recordingList->GetItemByData(
-                        qVariantFromValue(dst));
-                }
-
-                if (item)
-                {
-                    MythUIButtonListItem *sel_item =
-                        m_recordingList->GetItemCurrent();
-                    UpdateProgramInfo(item, item == sel_item, true);
-                }
-                else
-                {
-                    VERBOSE(VB_IMPORTANT,
-                            "Got UPDATE_PROG_INFO, but the program "
-                            "is unknown to us.");
-                }
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, "Failed to parse UPDATE_PROG_INFO");
-            }
+                HandleUpdateProgramInfoEvent(evinfo);
         }
     }
     else
         ScheduleCommon::customEvent(event);
+}
+
+void PlaybackBox::HandleRecordingRemoveEvent(
+    uint chanid, const QDateTime &recstartts)
+{
+    bool found = false;
+
+    m_freeSpaceNeedsUpdate = true;
+
+    m_progCacheLock.lock();
+    if (m_progCache)
+    {
+        vector<ProgramInfo *>::iterator it = m_progCache->begin();
+        for ( ; it != m_progCache->end(); ++it)
+        {
+            if ((chanid     == (*it)->chanid.toUInt()) &&
+                (recstartts == (*it)->recstartts))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (it != m_progCache->end())
+        {
+            if (((*it)->availableStatus != asPendingDelete) ||
+                (m_currentGroup == m_watchGroupLabel))
+            {
+                m_recordingList->RemoveItem(
+                    m_recordingList->GetItemByData(
+                        qVariantFromValue(*it)));
+                if (m_recordingList->GetCount() == 0)
+                    m_groupList->RemoveItem(
+                        m_groupList->GetItemCurrent());
+            }
+            (*it)->availableStatus = asDeleted;
+        }
+    }
+    else
+    {
+        m_fillListFromCache = false;
+    }
+    m_progCacheLock.unlock();
+
+    if (!found)
+        ScheduleFillList();
+}
+
+void PlaybackBox::HandleRecordingAddEvent(const ProgramInfo &evinfo)
+{
+    m_progCacheLock.lock();
+    if (m_progCache)
+    {
+        vector<ProgramInfo *>::iterator it = m_progCache->begin();
+        for ( ; it != m_progCache->end(); ++it)
+        {
+            if ((evinfo.chanid     == (*it)->chanid) &&
+                (evinfo.recstartts == (*it)->recstartts))
+            {
+                **it = evinfo;
+                break;
+            }
+        }
+
+        if (it == m_progCache->end())
+            m_progCache->push_back(new ProgramInfo(evinfo));
+    }
+    m_progCacheLock.unlock();
+
+    ScheduleFillList();
+}
+
+void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
+{
+    ProgramInfo *dst = findMatchingProg(&evinfo);
+    QString old_recgroup;
+    if (dst)
+        old_recgroup = dst->recgroup;
+
+    UpdateProgramInfo(evinfo);
+
+    // If the program is not in the the recording lists, then it
+    // is either a program that was just removed from the "LiveTV"
+    // recording list and should possibly be displayed now, or it
+    // is still in the "LiveTV" recording group and we're not
+    // displaying programs in that group. Handle appropriately..
+    if (!dst)
+    {
+        if (evinfo.recgroup != "LiveTV")
+            ScheduleFillList();
+        return;
+    }
+
+    // If the recording group has changed, reload lists from the
+    // recently updated cache..
+    if (dst->recgroup != old_recgroup)
+    {
+        ScheduleFillList();
+        return;
+    }
+
+    MythUIButtonListItem *item =
+        m_recordingList->GetItemByData(qVariantFromValue(dst));
+
+    if (item)
+    {
+        MythUIButtonListItem *sel_item =
+            m_recordingList->GetItemCurrent();
+        UpdateProgramInfo(item, item == sel_item, true);
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, LOC +
+                QString("Got UPDATE_PROG_INFO event about a title unknown "
+                        "to us only in m_recordingList\n %1:%2")
+                .arg(evinfo.title).arg(evinfo.subtitle));
+    }
+}
+
+void PlaybackBox::ScheduleFillList(void)
+{
+    if (!m_fillListTimer->isActive())
+    {
+        m_fillListTimer->stop();
+        m_fillListTimer->setSingleShot(true);
+        m_fillListTimer->start(1000);
+    }
 }
 
 bool PlaybackBox::fileExists(ProgramInfo *pginfo)

@@ -114,9 +114,8 @@ QString RecordingInfo::GetProgramRecordingProfile(void) const
     return record->m_recProfile;
 }
 
-/** \fn RecordingInfo::GetAutoRunJobs()
- *  \brief Returns a bitmap of which jobs are attached to this RecordingInfo.
- *  \sa JobTypes, getProgramFlags()
+/** \brief Returns a bitmap of which jobs are attached to this RecordingInfo.
+ *  \sa JobTypes, GetProgramFlags()
  */
 int RecordingInfo::GetAutoRunJobs(void) const
 {
@@ -223,6 +222,8 @@ void RecordingInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
         MythDB::DBError("RecGroup update", query);
 
     recgroup = newrecgroup;
+
+    SendUpdateEvent();
 }
 
 /** \fn RecordingInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
@@ -246,6 +247,8 @@ void RecordingInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
         MythDB::DBError("PlayGroup update", query);
 
     playgroup = newplaygroup;
+
+    SendUpdateEvent();
 }
 
 /** \fn RecordingInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
@@ -269,6 +272,8 @@ void RecordingInfo::ApplyStorageGroupChange(const QString &newstoragegroup)
         MythDB::DBError("StorageGroup update", query);
 
     storagegroup = newstoragegroup;
+
+    SendUpdateEvent();
 }
 
 /** \fn RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
@@ -295,6 +300,8 @@ void RecordingInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QSt
 
     title = newTitle;
     subtitle = newSubtitle;
+
+    SendUpdateEvent();
 }
 
 /** \brief Sets the transcoder profile for a recording
@@ -546,6 +553,8 @@ void RecordingInfo::StartedRecording(QString ext)
     query.bindValue(":START", startts);
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Copy program ratings on record", query);
+
+    SendAddedEvent();
 }
 
 static bool insert_program(const RecordingInfo        *pg,
@@ -705,6 +714,8 @@ void RecordingInfo::FinishedRecording(bool prematurestop)
         VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details));
         gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
     }
+
+    SendUpdateEvent();
 }
 
 /** \fn RecordingInfo::UpdateRecordingEnd(void)
@@ -724,6 +735,8 @@ void RecordingInfo::UpdateRecordingEnd(void)
 
     if (!query.exec())
         MythDB::DBError("UpdateRecordingEnd update", query);
+
+    SendUpdateEvent();
 }
 
 /** \fn RecordingInfo::ReactivateRecording(void)

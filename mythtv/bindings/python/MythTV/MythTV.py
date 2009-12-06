@@ -48,7 +48,7 @@ RECSTATUS = {
 		}
 
 BACKEND_SEP = '[]:[]'
-PROTO_VERSION = 52
+PROTO_VERSION = 53
 PROGRAM_FIELDS = 47
 
 class MythTV(object):

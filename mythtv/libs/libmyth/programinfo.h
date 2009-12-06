@@ -1,6 +1,9 @@
 #ifndef MYTHPROGRAM_H_
 #define MYTHPROGRAM_H_
 
+// ANSI C
+#include <stdint.h> // for uint32_t (C99)
+
 // C++ headers
 #include <vector>
 #include <deque>
@@ -107,6 +110,9 @@ enum FlagMask {
     FL_BOOKMARK       = 0x0010,
     FL_INUSERECORDING = 0x0020,
     FL_INUSEPLAYING   = 0x0040,
+    FL_REALLYEDITING  = 0x0080,
+    FL_COMMPROCESSING = 0x0100,
+    FL_DELETEPENDING  = 0x0200,
     FL_TRANSCODED     = 0x0400,
     FL_WATCHED        = 0x0800,
     FL_PRESERVED      = 0x1000,
@@ -260,6 +266,8 @@ class MPUBLIC ProgramInfo
 
     bool FillInRecordInfo(const vector<ProgramInfo *> &reclist);
 
+    bool LoadRecordedAncillaryData(void);
+
     // Destructor
     virtual ~ProgramInfo();
 
@@ -290,6 +298,8 @@ class MPUBLIC ProgramInfo
     void UpdateInUseMark(bool force = false);
     bool PathnameExists(void);
     QString GetFileName(void) const { return pathname; }
+    uint32_t GetProgramFlags(void) const { return programflags; }
+    QString toString(void) const;
 
     // Quick sets
     /// \brief If "ignore" is true GetBookmark() will return 0, otherwise
@@ -312,22 +322,19 @@ class MPUBLIC ProgramInfo
     int GetTranscodedStatus(void) const;
     bool GetPreserveEpisodeFromRecorded(void) const;
     bool UsesMaxEpisodes(void) const;
-    int getProgramFlags(void) const;
-    void getProgramProperties(void);
     bool GetChannel(QString &channum, QString &input) const;
-    QString toString(void) const;
 
     // Slow DB sets
     void SetFilesize(long long fsize);
-    void SetBookmark(long long pos) const;
+    void SetBookmark(long long pos);
     void SetDVDBookmark(QStringList fields) const;
-    void SetEditing(bool edit) const;
-    void SetTranscoded(int transFlag) const;
-    void SetWatchedFlag(bool watchedFlag) const;
-    void SetDeleteFlag(bool deleteFlag) const;
-    void SetCommFlagged(int flag) const; // 1 = flagged, 2 = processing
-    void SetAutoExpire(int autoExpire, bool updateDelete = false) const;
-    void SetPreserveEpisode(bool preserveEpisode) const;
+    void SetEditing(bool edit);
+    void SetTranscoded(int transFlag);
+    void SetWatchedFlag(bool watchedFlag);
+    void SetDeleteFlag(bool deleteFlag);
+    void SetCommFlagged(int flag); // 1 = flagged, 2 = processing
+    void SetAutoExpire(int autoExpire, bool updateDelete = false);
+    void SetPreserveEpisode(bool preserveEpisode);
     bool SetRecordBasename(const QString &basename);
     void UpdateLastDelete(bool setTime) const;
 
@@ -376,11 +383,16 @@ class MPUBLIC ProgramInfo
     // Translations for play,recording, & storage groups +
     static QString i18n(const QString&);
 
+    /// Sends event out that the ProgramInfo should be reloaded.
+    void SendUpdateEvent(void) const;
+    /// Sends event out that the ProgramInfo should be added to lists.
+    void SendAddedEvent(void) const;
+    /// Sends event out that the ProgramInfo should be delete from lists.
+    void SendDeletedEvent(void) const;
+
   protected:
     // Creates a basename from the start and end times
     QString CreateRecordBasename(const QString &ext) const;
-    /// Sends event out that the ProgramInfo should be reloaded.
-    void Update(void) const;
 
   public:
     // data
@@ -451,7 +463,7 @@ class MPUBLIC ProgramInfo
     QString schedulerid;
     int findid;
 
-    int programflags;
+    uint32_t programflags;
     int subtitleType;
     int videoproperties;
     int audioproperties;

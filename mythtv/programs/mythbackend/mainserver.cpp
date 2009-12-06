@@ -735,7 +735,7 @@ void MainServer::customEvent(QEvent *e)
                 if (recInfo.recgroup != "LiveTV" &&
                     recInfo.recgroup != "Deleted" &&
                     (gContext->GetNumSetting("RerecordWatched", 0) ||
-                     !(recInfo.getProgramFlags() & FL_WATCHED)))
+                     !(recInfo.GetProgramFlags() & FL_WATCHED)))
                 {
                     recInfo.ForgetHistory();
                 }
@@ -1519,19 +1519,17 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         (pginfo->filesize > 0) &&
         (!ds->forceMetadataDelete))
     {
-        VERBOSE(VB_IMPORTANT, QString("ERROR when trying to delete file: %1. File "
-                                "doesn't exist.  Database metadata"
-                                "will not be removed.")
-                                .arg(ds->filename));
+        VERBOSE(VB_IMPORTANT, QString(
+                    "ERROR when trying to delete file: %1. File "
+                    "doesn't exist.  Database metadata"
+                    "will not be removed.")
+                .arg(ds->filename));
         gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
                            QString("File %1 does not exist for %2 when trying "
                                    "to delete recording.")
-                                   .arg(ds->filename).arg(logInfo));
+                           .arg(ds->filename).arg(logInfo));
 
         pginfo->SetDeleteFlag(false);
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
-
         return;
     }
 
@@ -1577,10 +1575,6 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                                    .arg(ds->filename).arg(logInfo));
 
         pginfo->SetDeleteFlag(false);
-
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
-
         return;
     }
 
@@ -1715,10 +1709,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
 
     // Notify the frontend so it can requery for Free Space
     QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
-                          .arg(ds->chanid)
-                          .arg(ds->recstartts.toString(Qt::ISODate));
-    MythEvent me(msg);
-    gContext->dispatch(me);
+        .arg(ds->chanid).arg(ds->recstartts.toString(Qt::ISODate));
+    RemoteSendEvent(MythEvent(msg));
 
     // sleep a little to let frontends reload the recordings list
     sleep(3);
@@ -2109,8 +2101,6 @@ void MainServer::DoHandleDeleteRecording(
             DoHandleStopRecording(recinfo, NULL);
         QStringList outputlist( QString::number(0) );
         SendResponse(pbssock, outputlist);
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
         return;
     }
 
@@ -2233,11 +2223,7 @@ void MainServer::DoHandleDeleteRecording(
     // Tell MythTV frontends that the recording list needs to be updated.
     if ((fileExists) || (recinfo.filesize == 0) || (forceMetadataDelete))
     {
-        QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
-                              .arg(recinfo.chanid)
-                              .arg(recinfo.recstartts.toString(Qt::ISODate));
-        MythEvent me(msg);
-        gContext->dispatch(me);
+        recinfo.SendDeletedEvent();
     }
 }
 
@@ -2264,8 +2250,6 @@ void MainServer::DoHandleUndeleteRecording(
         recinfo.UpdateLastDelete(false);
         recinfo.SetAutoExpire(kDisableAutoExpire);
         ret = 0;
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
     }
 
     QStringList outputlist( QString::number(ret) );
@@ -4244,7 +4228,7 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
 
     QString message = slist[1];
     QStringList extra_data;
-    for (uint i = 2; i < slist.size(); i++)
+    for (uint i = 2; i < (uint) slist.size(); i++)
         extra_data.push_back(slist[i]);
 
     if (extra_data.empty())

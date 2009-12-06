@@ -2376,7 +2376,8 @@ void LCDProcClient::customEvent(QEvent *e)
     {
         MythEvent *me = (MythEvent *) e;
 
-        if (me->Message().left(21) == "RECORDING_LIST_CHANGE")
+        if (me->Message().left(21) == "RECORDING_LIST_CHANGE" ||
+            me->Message() == "UPDATE_PROG_INFO")
         {
             if (lcd_showrecstatus && !updateRecInfoTimer->isActive())
             {

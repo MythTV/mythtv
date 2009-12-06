@@ -327,6 +327,10 @@ class PlaybackBox : public ScheduleCommon
     void clearProgramCache(void);
 
     void HandlePreviewEvent(const ProgramInfo &evinfo);
+    void HandleRecordingRemoveEvent(uint chanid, const QDateTime &recstartts);
+    void HandleRecordingAddEvent(const ProgramInfo &evinfo);
+    void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
+    void ScheduleFillList(void);
 
     void ShowMenu(void);
 

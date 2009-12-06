@@ -504,8 +504,6 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         curRecording->recordid = rcinfo->recordid;
         curRecording->recendts = rcinfo->recendts;
         curRecording->UpdateRecordingEnd();
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
 
         recordEndTime = curRecording->recendts.addSecs(post_roll_seconds);
 
@@ -785,8 +783,7 @@ TVState TVRec::RemovePlaying(TVState state)
 }
 
 /** \fn TVRec::StartedRecording(RecordingInfo *curRec)
- *  \brief Inserts a "curRec" into the database, and issues a
- *         "RECORDING_LIST_CHANGE" event.
+ *  \brief Inserts a "curRec" into the database
  *  \param curRec Recording to add to database.
  *  \sa ProgramInfo::StartedRecording(const QString&)
  */
@@ -801,9 +798,6 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
 
     if (curRec->chancommfree != 0)
         curRec->SetCommFlagged(COMM_FLAG_COMMFREE);
-
-    MythEvent me("RECORDING_LIST_CHANGE");
-    gContext->dispatch(me);
 }
 
 /** \fn TVRec::FinishedRecording(RecordingInfo *curRec)
@@ -1069,8 +1063,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
  *
  *   If killfile is true, the recording is deleted.
  *
- *   A "RECORDING_LIST_CHANGE" message is dispatched.
- *
  *   Finally, if there was a recording and it was not deleted,
  *   schedule any post-processing jobs.
  *
@@ -1140,8 +1132,6 @@ void TVRec::TeardownRecorder(bool killFile)
         curRecording = NULL;
     }
 
-    MythEvent me("RECORDING_LIST_CHANGE");
-    gContext->dispatch(me);
     pauseNotify = true;
 
     if (GetDTVChannel())

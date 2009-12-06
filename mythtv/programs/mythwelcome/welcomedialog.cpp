@@ -151,9 +151,11 @@ void WelcomeDialog::customEvent(QEvent *e)
     {
         MythEvent *me = (MythEvent *) e;
 
-        if (me->Message().left(21) == "RECORDING_LIST_CHANGE")
+        if (me->Message().left(21) == "RECORDING_LIST_CHANGE" ||
+            me->Message() == "UPDATE_PROG_INFO")
         {
-            VERBOSE(VB_GENERAL, "MythWelcome received a RECORDING_LIST_CHANGE event");
+            VERBOSE(VB_GENERAL, "MythWelcome received a "
+                    "recording list change event");
 
             QMutexLocker lock(&m_RecListUpdateMuxtex);
 

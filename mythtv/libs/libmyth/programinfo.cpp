@@ -41,6 +41,13 @@ static int init_tr(void);
 QMutex ProgramInfo::staticDataLock;
 QString ProgramInfo::unknownTitle;
 
+static void set_flag(uint32_t &flags, int flag_to_set, bool is_set)
+{
+    flags &= ~flag_to_set;
+    if (is_set)
+        flags |= flag_to_set;
+}
+
 /** \fn ProgramInfo::ProgramInfo(void)
  *  \brief Null constructor.
  */
@@ -1301,6 +1308,9 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->stars = query.value(15).toDouble();
         proginfo->repeat = query.value(16).toInt();
 
+        //proginfo->spread = -1;
+        //proginfo->startCol = -1;
+
         if (query.value(17).toString().isEmpty())
         {
             proginfo->originalAirDate = QDate (0, 1, 1);
@@ -1321,11 +1331,10 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->recordid = query.value(19).toInt();
         proginfo->transcoder = query.value(20).toInt();
 
-        proginfo->spread = -1;
-
-        proginfo->programflags = proginfo->getProgramFlags();
-
-        proginfo->getProgramProperties();
+        //proginfo->programflags = 0;
+        //proginfo->subtitleType = 0;
+        //proginfo->videoproperties = 0;
+        //proginfo->audioproperties = 0;
 
         proginfo->recgroup = query.value(26).toString();
         proginfo->storagegroup = query.value(27).toString();
@@ -1334,7 +1343,12 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 
         proginfo->pathname = query.value(25).toString();
 
-        return proginfo;
+        // TODO this call should be eliminated so that the
+        // ProgramInfo can be loaded in a single DB query.
+        if (proginfo->LoadRecordedAncillaryData())
+            return proginfo;
+        else
+            delete proginfo;
     }
 
     return NULL;
@@ -1550,7 +1564,7 @@ bool ProgramInfo::SetRecordBasename(const QString &basename)
         return false;
     }
 
-    Update();
+    SendUpdateEvent();
     return true;
 }
 
@@ -1673,7 +1687,7 @@ void ProgramInfo::SetFilesize(long long fsize)
     if (!query.exec() || !query.isActive())
         MythDB::DBError("File size update", query);
 
-    Update();
+    SendUpdateEvent();
 }
 
 /** \fn ProgramInfo::GetFilesize(void)
@@ -1725,11 +1739,11 @@ int ProgramInfo::GetMplexID(void) const
     return ret;
 }
 
-/** \fn ProgramInfo::SetBookmark(long long pos) const
+/** \fn ProgramInfo::SetBookmark(long long)
  *  \brief Sets a bookmark position in database.
  *
  */
-void ProgramInfo::SetBookmark(long long pos) const
+void ProgramInfo::SetBookmark(long long pos)
 {
     ClearMarkupMap(MARK_BOOKMARK);
 
@@ -1751,7 +1765,7 @@ void ProgramInfo::SetBookmark(long long pos) const
             "WHERE chanid    = :CHANID AND "
             "      starttime = :STARTTIME");
 
-        query.bindValue(":BOOKMARKFLAG", is_valid ? 1 : 0);
+        query.bindValue(":BOOKMARKFLAG", is_valid);
         query.bindValue(":CHANID",       chanid);
         query.bindValue(":STARTTIME",    recstartts);
 
@@ -1759,15 +1773,30 @@ void ProgramInfo::SetBookmark(long long pos) const
             MythDB::DBError("bookmark flag update", query);
     }
 
-    Update();
+    set_flag(programflags, FL_BOOKMARK, is_valid);
+
+    SendUpdateEvent();
 }
 
-void ProgramInfo::Update(void) const
+void ProgramInfo::SendUpdateEvent(void) const
 {
     QStringList list;
     ToStringList(list);
-    MythEvent me(QString("UPDATE_PROG_INFO"), list);
-    RemoteSendEvent(me);
+    RemoteSendEvent(MythEvent(QString("UPDATE_PROG_INFO"), list));
+}
+
+void ProgramInfo::SendAddedEvent(void) const
+{
+    QStringList list;
+    ToStringList(list);
+    RemoteSendEvent(MythEvent(QString("RECORDING_LIST_CHANGE ADD"), list));
+}
+
+void ProgramInfo::SendDeletedEvent(void) const
+{
+    QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
+        .arg(chanid).arg(recstartts.toString(Qt::ISODate));
+    RemoteSendEvent(MythEvent(msg));
 }
 
 /** \brief Queries Latest bookmark timestamp from the database.
@@ -1897,15 +1926,14 @@ void ProgramInfo::SetDVDBookmark(QStringList fields) const
     if (!query.exec() || !query.isActive())
         MythDB::DBError("SetDVDBookmark updating", query);
 
-    Update();
+    SendUpdateEvent();
 }
-/** \fn ProgramInfo::SetWatchedFlag(bool) const
+/** \fn ProgramInfo::SetWatchedFlag(bool)
  *  \brief Set "watched" field in recorded/videometadata to "watchedFlag".
  *  \param watchedFlag value to set watched field to.
  */
-void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
+void ProgramInfo::SetWatchedFlag(bool watchedFlag)
 {
-
     if (!isVideo)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -1916,21 +1944,23 @@ void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
                     " AND starttime = :STARTTIME ;");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
+        query.bindValue(":WATCHEDFLAG", watchedFlag);
 
-        if (watchedFlag)
-            query.bindValue(":WATCHEDFLAG", 1);
-        else
-            query.bindValue(":WATCHEDFLAG", 0);
-
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
             MythDB::DBError("Set watched flag", query);
         else
             UpdateLastDelete(watchedFlag);
     }
     else if (isVideo && !pathname.startsWith("dvd:"))
     {
-        MSqlQuery query(MSqlQuery::InitCon());
+        QString url = pathname;
+        if (url.startsWith("myth://"))
+        {
+            url = QUrl(url).path();
+            url.remove(0,1);
+        }
 
+        MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("UPDATE videometadata"
                     " SET watched = :WATCHEDFLAG"
                     " WHERE title = :TITLE"
@@ -1938,27 +1968,16 @@ void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
                     " AND filename = :FILENAME ;");
         query.bindValue(":TITLE", title);
         query.bindValue(":SUBTITLE", subtitle); 
+        query.bindValue(":FILENAME", url);
+        query.bindValue(":WATCHEDFLAG", watchedFlag);
 
-        QString url = pathname;
-        if (url.startsWith("myth://"))
-        {
-            url = QUrl(url).path();
-            url.remove(0,1);
-            query.bindValue(":FILENAME", url);
-        }
-        else
-            query.bindValue(":FILENAME", url);
-
-        if (watchedFlag)
-            query.bindValue(":WATCHEDFLAG", 1);
-        else
-            query.bindValue(":WATCHEDFLAG", 0);
-                           
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
             MythDB::DBError("Set watched flag", query);
     }
 
-    Update();
+    set_flag(programflags, FL_WATCHED, watchedFlag);
+
+    SendUpdateEvent();
 }
 
 /** \fn ProgramInfo::IsEditing(void) const
@@ -1968,6 +1987,8 @@ void ProgramInfo::SetWatchedFlag(bool watchedFlag) const
  */
 bool ProgramInfo::IsEditing(void) const
 {
+    bool editing = programflags & FL_REALLYEDITING;
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT editing FROM recorded"
@@ -1977,18 +1998,21 @@ bool ProgramInfo::IsEditing(void) const
     query.bindValue(":STARTTIME", recstartts);
 
     if (query.exec() && query.next())
-    {
-        return query.value(0).toBool();
-    }
+        editing = query.value(0).toBool();
 
-    return false;
+    /*
+    set_flag(programflags, FL_REALLYEDITING, editing);
+    set_flag(programflags, FL_EDITING, ((programflags & FL_REALLYEDITING) ||
+                                        (programflags & COMM_FLAG_PROCESSING)));
+    */
+    return editing;
 }
 
-/** \fn ProgramInfo::SetEditing(bool) const
+/** \fn ProgramInfo::SetEditing(bool)
  *  \brief Sets "editing" field in "recorded" table to "edit"
  *  \param edit Editing state to set.
  */
-void ProgramInfo::SetEditing(bool edit) const
+void ProgramInfo::SetEditing(bool edit)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2000,17 +2024,21 @@ void ProgramInfo::SetEditing(bool edit) const
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythDB::DBError("Edit status update", query);
 
-    Update();
+    set_flag(programflags, FL_REALLYEDITING, edit);
+    set_flag(programflags, FL_EDITING, ((programflags & FL_REALLYEDITING) ||
+                                        (programflags & COMM_FLAG_PROCESSING)));
+
+    SendUpdateEvent();
 }
 
-/** \fn ProgramInfo::SetDeleteFlag(bool) const
+/** \fn ProgramInfo::SetDeleteFlag(bool)
  *  \brief Set "deletepending" field in "recorded" table to "deleteFlag".
  *  \param deleteFlag value to set delete pending field to.
  */
-void ProgramInfo::SetDeleteFlag(bool deleteFlag) const
+void ProgramInfo::SetDeleteFlag(bool deleteFlag)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2020,16 +2048,17 @@ void ProgramInfo::SetDeleteFlag(bool deleteFlag) const
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":DELETEFLAG", deleteFlag);
 
-    if (deleteFlag)
-        query.bindValue(":DELETEFLAG", 1);
-    else
-        query.bindValue(":DELETEFLAG", 0);
-
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythDB::DBError("Set delete flag", query);
 
-    Update();
+    set_flag(programflags, FL_DELETEPENDING, deleteFlag);
+
+    if (!deleteFlag)
+        SendAddedEvent();
+
+    SendUpdateEvent();
 }
 
 /** \fn ProgramInfo::IsCommFlagged(void) const
@@ -2127,11 +2156,11 @@ int ProgramInfo::GetTranscodedStatus(void) const
     return false;
 }
 
-/** \fn ProgramInfo::SetTranscoded(int transFlag) const
+/** \fn ProgramInfo::SetTranscoded(int)
  *  \brief Set "transcoded" field in "recorded" table to "transFlag".
  *  \param transFlag value to set transcoded field to.
  */
-void ProgramInfo::SetTranscoded(int transFlag) const
+void ProgramInfo::SetTranscoded(int transFlag)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2146,14 +2175,16 @@ void ProgramInfo::SetTranscoded(int transFlag) const
     if(!query.exec() || !query.isActive())
         MythDB::DBError("Transcoded status update", query);
 
-    Update();
+    set_flag(programflags, FL_TRANSCODED, 1 == transFlag);
+
+    SendUpdateEvent();
 }
 
-/** \fn ProgramInfo::SetCommFlagged(int) const
+/** \fn ProgramInfo::SetCommFlagged(int)
  *  \brief Set "commflagged" field in "recorded" table to "flag".
  *  \param flag value to set commercial flagging field to.
  */
-void ProgramInfo::SetCommFlagged(int flag) const
+void ProgramInfo::SetCommFlagged(int flag)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2168,14 +2199,18 @@ void ProgramInfo::SetCommFlagged(int flag) const
     if (!query.exec() || !query.isActive())
         MythDB::DBError("Commercial Flagged status update", query);
 
-    Update();
+    set_flag(programflags, FL_COMMFLAG,       COMM_FLAG_DONE == flag);
+    set_flag(programflags, FL_COMMPROCESSING, COMM_FLAG_PROCESSING == flag);
+    set_flag(programflags, FL_EDITING, ((programflags & FL_REALLYEDITING) ||
+                                        (programflags & COMM_FLAG_PROCESSING)));
+    SendUpdateEvent();
 }
 
-/** \fn ProgramInfo::SetPreserveEpisode(bool) const
+/** \fn ProgramInfo::SetPreserveEpisode(bool)
  *  \brief Set "preserve" field in "recorded" table to "preserveEpisode".
  *  \param preserveEpisode value to set preserve field to.
  */
-void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
+void ProgramInfo::SetPreserveEpisode(bool preserveEpisode)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2192,14 +2227,16 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
     else
         UpdateLastDelete(false);
 
-    Update();
+    set_flag(programflags, FL_PRESERVED, preserveEpisode);
+
+    SendUpdateEvent();
 }
 
 /**
  *  \brief Set "autoexpire" field in "recorded" table to "autoExpire".
  *  \param autoExpire value to set auto expire field to.
  */
-void ProgramInfo::SetAutoExpire(int autoExpire, bool updateDelete) const
+void ProgramInfo::SetAutoExpire(int autoExpire, bool updateDelete)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -2216,7 +2253,9 @@ void ProgramInfo::SetAutoExpire(int autoExpire, bool updateDelete) const
     else if (updateDelete)
         UpdateLastDelete(true);
 
-    Update();
+    set_flag(programflags, FL_AUTOEXP, autoExpire);
+
+    SendUpdateEvent();
 }
 
 /** \fn ProgramInfo::UpdateLastDelete(bool) const
@@ -2344,7 +2383,7 @@ void ProgramInfo::SetCutList(frm_dir_map_t &delMap) const
             MythDB::DBError("cutlist flag update", query);
     }
 
-    Update();
+    SendUpdateEvent();
 }
 
 void ProgramInfo::SetCommBreakList(frm_dir_map_t &frames) const
@@ -2947,7 +2986,9 @@ void ProgramInfo::SetVidpropHeight(int width)
 
     if (width > 1300)
     {
-        VERBOSE(VB_IMPORTANT, QString("Recording designated 1080i/p because width was %1").arg(width));
+        VERBOSE(VB_GENERAL, LOC +
+                QString("Recording designated 1080i/p because width was %1")
+                .arg(width));
         videoproperties |= VID_1080;
 
         query.bindValue(":VALUE", "1080");
@@ -2959,7 +3000,9 @@ void ProgramInfo::SetVidpropHeight(int width)
     }
     else if (width > 800)
     {
-        VERBOSE(VB_IMPORTANT, QString("Recording designated 720p because width was %1").arg(width));
+        VERBOSE(VB_GENERAL, LOC +
+                QString("Recording designated 720p because width was %1")
+                .arg(width));
         videoproperties |= VID_720;
 
         query.bindValue(":VALUE", "720");
@@ -2971,11 +3014,14 @@ void ProgramInfo::SetVidpropHeight(int width)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Unknown type, recording width was %1").arg(width));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unknown type, recording width was %1").arg(width));
         return;
     }
 
     m_videoWidth = width;
+
+    SendUpdateEvent();
 }
 
 /** \fn ProgramInfo::RecTypeChar(void) const
@@ -3373,61 +3419,58 @@ void ProgramInfo::Save(void) const
         MythDB::DBError("Saving program", query);
 }
 
-/** \fn ProgramInfo::getProgramFlags(void) const
- *  \brief Returns a bitmap of the recorded programmes flags
+/** \brief Loads bitmap of the recorded program flags,
+ *         and loads audio and video properties.
  *  \sa GetAutoRunJobs(void)
  */
-int ProgramInfo::getProgramFlags(void) const
+bool ProgramInfo::LoadRecordedAncillaryData(void)
 {
-    int flags = 0;
     MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT commflagged, cutlist, autoexpire, "
-                  "editing, bookmark, watched, preserve, transcoded "
-                  "FROM recorded LEFT JOIN recordedprogram ON "
-                  "(recorded.chanid = recordedprogram.chanid AND "
-                  "recorded.progstart = recordedprogram.starttime) "
-                  "WHERE recorded.chanid = :CHANID AND recorded.starttime = :STARTTIME ;");
+    query.prepare(
+        "SELECT commflagged, cutlist,     autoexpire, "
+        "       editing,     bookmark,    watched,    "
+        "       preserve,    transcoded,  deletepending, "
+        "       audioprop+0, videoprop+0, subtitletypes+0 "
+        "FROM recorded LEFT JOIN recordedprogram "
+        "ON (recorded.chanid    = recordedprogram.chanid AND "
+        "    recorded.progstart = recordedprogram.starttime) "
+        "WHERE recorded.chanid    = :CHANID AND "
+        "      recorded.starttime = :STARTTIME");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (query.exec() && query.next())
+    if (!query.exec())
     {
-        flags |= (query.value(0).toInt() == COMM_FLAG_DONE) ? FL_COMMFLAG : 0;
-        flags |= (query.value(1).toInt() == 1) ? FL_CUTLIST : 0;
-        flags |= query.value(2).toInt() ? FL_AUTOEXP : 0;
-        if ((query.value(3).toInt()) ||
-            (query.value(0).toInt() == COMM_FLAG_PROCESSING))
-            flags |= FL_EDITING;
-        flags |= (query.value(4).toInt() == 1) ? FL_BOOKMARK : 0;
-        flags |= (query.value(5).toInt() == 1) ? FL_WATCHED : 0;
-        flags |= (query.value(6).toInt() == 1) ? FL_PRESERVED : 0;
-        flags |= (query.value(7).toInt() == 1) ? FL_TRANSCODED : 0;
+        MythDB::DBError("LoadRecordedAncillaryData", query);
+        return false;
     }
 
-    return flags;
-}
+    if (!query.next())
+        return false;
 
-void ProgramInfo::getProgramProperties(void)
-{
+    uint32_t flags = 0;
+    flags |= (query.value(0).toInt() == COMM_FLAG_DONE) ? FL_COMMFLAG : 0;
+    flags |= (query.value(0).toInt() == COMM_FLAG_PROCESSING) ?
+        FL_COMMPROCESSING : 0;
+    flags |= (query.value(7).toInt() == 1) ? FL_TRANSCODED    : 0;
 
-    MSqlQuery query(MSqlQuery::InitCon());
+    flags |= query.value(1).toInt() ? FL_CUTLIST       : 0;
+    flags |= query.value(2).toInt() ? FL_AUTOEXP       : 0;
+    flags |= query.value(3).toInt() ? FL_REALLYEDITING : 0;
+    flags |= query.value(4).toInt() ? FL_BOOKMARK      : 0;
+    flags |= query.value(5).toInt() ? FL_WATCHED       : 0;
+    flags |= query.value(6).toInt() ? FL_PRESERVED     : 0;
+    flags |= query.value(8).toInt() ? FL_DELETEPENDING : 0;
 
-    query.prepare("SELECT audioprop+0, videoprop+0, subtitletypes+0 "
-                  "FROM recorded LEFT JOIN recordedprogram ON "
-                  "(recorded.chanid = recordedprogram.chanid AND "
-                  "recorded.progstart = recordedprogram.starttime) "
-                  "WHERE recorded.chanid = :CHANID AND recorded.starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
+    flags |= ((flags & FL_REALLYEDITING) ||
+              (flags & COMM_FLAG_PROCESSING)) ? FL_EDITING : 0;
+    programflags = flags;
 
-    if (query.exec() && query.next())
-    {
-        audioproperties = query.value(0).toInt();
-        videoproperties = query.value(1).toInt();
-        subtitleType = query.value(2).toInt();
-    }
+    audioproperties = query.value(9).toInt();
+    videoproperties = query.value(10).toInt();
+    subtitleType    = query.value(11).toInt();
 
+    return true;
 }
 
 void ProgramInfo::UpdateInUseMark(bool force)
@@ -3489,7 +3532,7 @@ void ProgramInfo::UpdateRecGroup(void)
         recgroup = query.value(0).toString();
     }
 
-    Update();
+    SendUpdateEvent();
 }
 
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
@@ -3528,9 +3571,8 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     if (!inuse)
     {
-        if (!gContext->IsBackend())
-            RemoteSendMessage("RECORDING_LIST_CHANGE");
         inUseForWhat.clear();
+        SendUpdateEvent();
         return;
     }
 
@@ -3593,12 +3635,12 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     query.bindValue(":RECHOST", hostname);
     query.bindValue(":RECDIR", recDir);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythDB::DBError("SetInUse", query);
 
     // Let others know we changed status
-    if (notifyOfChange && !gContext->IsBackend())
-        RemoteSendMessage("RECORDING_LIST_CHANGE");
+    if (notifyOfChange)
+        SendUpdateEvent();
 }
 
 /** \fn ProgramInfo::GetChannel(QString&,QString&) const
