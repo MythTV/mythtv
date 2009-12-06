@@ -47,6 +47,10 @@ namespace
     }
 }
 
+#define LOC_ERR  QString("dvdprobe.cpp, Error: ")
+#define LOC_WARN QString("dvdprobe.cpp, Warning: ")
+#define LOC      QString("dvdprobe.cpp: ")
+
 DVDSubTitle::DVDSubTitle(int subtitle_id, const QString &a_language) :
     id(subtitle_id), language(a_language.toUtf8())
 {
@@ -431,25 +435,47 @@ bool DVDProbe::Probe(void)
     //  Before touching libdvdread stuff
     //  (below), see if there's actually
     //  a drive with media in it
-    QFile dvdDevice(device);
-    if (!dvdDevice.exists())
     {
-        //  Device doesn't exist. Silly user
-        Reset();
-        return false;
+        QFile dvdDevice(device);
+        if (!dvdDevice.exists())
+        {
+            //  Device doesn't exist. Silly user
+            Reset();
+            return false;
+        }
     }
 
-    if (!dvdDevice.open(QIODevice::ReadOnly))
+    // On UNIX like file systems O_NONBLOCK should be used to
+    // indicate we don't want to do reading or writing, we
+    // just want to issue some ioctls. This will prevent the
+    // OS from helping out and shearing the fingers off any
+    // person's attempting to place a DVD in the drive when
+    // we call open.
+    int flags = O_RDONLY;
+#ifdef O_NONBLOCK
+    flags |= O_NONBLOCK;
+#endif
+
+    // Ideally we can open with exclusive flag.
+#ifdef O_EXCL
+    flags |= O_EXCL;
+#endif
+    
+    int drive_handle = open(device.toLocal8Bit().constData(), flags);
+
+#ifdef O_EXCL
+    // If this failed with exclusive, try without.
+    if (drive_handle < 0)
     {
-        // Can't open device.
-        Reset();
-        return false;
+        flags &= ~O_EXCL;
+        drive_handle = open(device.toLocal8Bit().constData(), flags);
     }
+#endif
 
-    int drive_handle = dvdDevice.handle();
-
-    if (drive_handle == -1)
+    if (drive_handle < 0)
     {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "Failed to open file descriptor for DVD." + ENO);
         Reset();
         return false;
     }
@@ -470,6 +496,7 @@ bool DVDProbe::Probe(void)
     if (status < 0)
     {
         Reset();
+        close(drive_handle);
         return false;
     }
 
@@ -483,6 +510,7 @@ bool DVDProbe::Probe(void)
         //  3 = not ready
         //
         Reset();
+        close(drive_handle);
         return false;
     }
 
@@ -493,11 +521,13 @@ bool DVDProbe::Probe(void)
         //  the disc has not changed. but if this is our
         //  first time running, we still need to check it
         //  so return whatever we returned before
+        close(drive_handle);
         return titles.size();
     }
 #endif
 
-    dvdDevice.close();
+    close(drive_handle);
+    drive_handle = -1;
 
     //
     //  Try to open the disc
