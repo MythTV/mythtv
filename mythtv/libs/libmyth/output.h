@@ -65,7 +65,7 @@ public:
     const int &precision() const { return prec; }
     const int &channels() const { return chan; }
 
-    virtual OutputEvent *clone() { return new OutputEvent(*this); };
+    virtual OutputEvent *clone(void) const { return new OutputEvent(*this); }
 
 private:
     QString *error_msg;

@@ -15,7 +15,7 @@
 #include <output.h>
 #include <visual.h>
 
-DecoderEvent* DecoderEvent::clone()
+DecoderEvent* DecoderEvent::clone(void) const
 {
     DecoderEvent *result = new DecoderEvent(*this);
 

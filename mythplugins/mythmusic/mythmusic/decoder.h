@@ -45,7 +45,7 @@ public:
 
     const QString *errorMessage() const { return error_msg; }
 
-    virtual DecoderEvent *clone();
+    virtual DecoderEvent *clone() const;
 
 private:
     QString *error_msg;
