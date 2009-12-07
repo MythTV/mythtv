@@ -34,7 +34,8 @@
 #include "mythverbose.h"
 #include "mythevent.h"
 #include "mythdirs.h"
-#include "compat.h" // for usleep on MS Windows.
+#include "compat.h"
+#include "unistd.h"
 
 // Libmythui headers
 #include "screensaver.h"

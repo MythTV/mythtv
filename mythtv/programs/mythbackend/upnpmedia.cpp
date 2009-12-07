@@ -11,6 +11,7 @@
 #include "upnpmedia.h"
 #include "mythdb.h"
 #include "util.h"
+#include "pthread.h"
 
 #define LOC QString("UPnpMedia: ")
 
