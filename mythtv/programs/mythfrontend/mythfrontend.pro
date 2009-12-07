@@ -19,7 +19,7 @@ INSTALLS += setting
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS += main.h playbackbox.h viewscheduled.h globalsettings.h
+HEADERS += playbackbox.h viewscheduled.h globalsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h
 HEADERS += statusbox.h networkcontrol.h custompriority.h
 HEADERS += mediarenderer.h mythfexml.h playbackboxlistitem.h
@@ -27,6 +27,7 @@ HEADERS += mythappearance.h exitprompt.h proglist.h
 HEADERS += action.h mythcontrols.h keybindings.h keygrabber.h
 HEADERS += mythosdmenueditor.h progfind.h guidegrid.h customedit.h
 HEADERS += schedulecommon.h progdetails.h scheduleeditor.h
+HEADERS += backendconnectionmanager.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -36,6 +37,7 @@ SOURCES += custompriority.cpp mythappearance.cpp exitprompt.cpp proglist.cpp
 SOURCES += action.cpp actionset.cpp  mythcontrols.cpp keybindings.cpp
 SOURCES += keygrabber.cpp mythosdmenueditor.cpp progfind.cpp guidegrid.cpp
 SOURCES += customedit.cpp schedulecommon.cpp progdetails.cpp scheduleeditor.cpp
+SOURCES += backendconnectionmanager.cpp
 
 macx {
     mac_bundle {

@@ -2248,6 +2248,8 @@ void MythContext::connectionClosed(MythSocket *sock)
     }
 
     d->serverSockLock.unlock();
+
+    dispatch(MythEvent(QString("BACKEND_SOCKETS_CLOSED")));
 }
 
 void MythContext::SetMainWindow(MythMainWindow *mainwin)

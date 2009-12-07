@@ -3721,6 +3721,11 @@ void PlaybackBox::customEvent(QEvent *event)
             if (evinfo.FromStringList(me->ExtraDataList(), 0))
                 HandleUpdateProgramInfoEvent(evinfo);
         }
+        else if (message == "RECONNECT_SUCCESS")
+        {
+            m_fillListFromCache = false;
+            ScheduleFillList();
+        }
     }
     else
         ScheduleCommon::customEvent(event);

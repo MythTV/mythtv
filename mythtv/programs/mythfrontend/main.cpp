@@ -66,7 +66,7 @@ using namespace std;
 #include "mythosdmenueditor.h"
 #include "audiopulseutil.h"
 #include "mythdb.h"
-#include "main.h"
+#include "backendconnectionmanager.h"
 
 static ExitPrompter   *exitPopup = NULL;
 static MythThemedMenu *menu;
@@ -1058,48 +1058,6 @@ void log_rotate_handler(int)
     log_rotate(0);
 }
 
-ConnectToBackend::ConnectToBackend()
-{
-    timer = new QTimer(qApp);
-
-    connect(timer, SIGNAL(timeout()),
-            this,  SLOT(  Connect()));
-
-    timer->start(1);
-}
-
-ConnectToBackend::~ConnectToBackend()
-{
-    if (timer)
-    {
-        timer->disconnect();
-        timer->stop();
-    }
-}
-
-void ConnectToBackend::Connect(void)
-{
-    if (timer)
-    {
-        timer->disconnect();
-        timer->stop();
-    }
-
-    bool blocking = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
-    if (gContext->ConnectToMasterServer(blocking) && !checkTimeZone())
-    {
-        // Check for different time zones, different offsets, different times
-        VERBOSE(VB_IMPORTANT, "The time and/or time zone settings on this "
-                "system do not match those in use on the master backend. "
-                "Please ensure all frontend and backend systems are "
-                "configured to use the same time zone and have the current "
-                "time properly set.");
-        VERBOSE(VB_IMPORTANT, "Unable to run with invalid time settings. "
-                              "Exiting.");
-        qApp->exit(FRONTEND_EXIT_INVALID_TIMEZONE);
-    }
-}
-
 int main(int argc, char **argv)
 {
     bool bPromptForBackend    = false;
@@ -1478,7 +1436,7 @@ int main(int argc, char **argv)
     // Setup handler for USR2 signals to restart LIRC
     signal(SIGUSR2, &signal_USR2_handler);
 
-    ConnectToBackend ctb;
+    BackendConnectionManager bcm;
 
     int ret = qApp->exec();
 
