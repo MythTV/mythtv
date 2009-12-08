@@ -266,7 +266,7 @@ void RemoteSendMessage(const QString &message)
 
 void RemoteSendEvent(const MythEvent &event)
 {
-    if (gContext->IsMasterBackend())
+    if (gContext->IsBackend())
     {
         gContext->dispatch(event);
         return;
@@ -274,7 +274,7 @@ void RemoteSendEvent(const MythEvent &event)
 
     QStringList strlist( "MESSAGE" );
     strlist << event.Message();
-    strlist<< event.ExtraDataList();
+    strlist << event.ExtraDataList();
 
     gContext->SendReceiveStringList(strlist);
 }
