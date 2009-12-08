@@ -1855,7 +1855,11 @@ void JobQueue::DoTranscodeThread(int jobID)
         subtitle = QString(" \"%1\"").arg(program_info->subtitle);
 
     ChangeJobStatus(jobID, JOB_RUNNING);
-    program_info->LoadRecordedAncillaryData(); // make sure flags are up to date
+
+    // make sure flags are up to date
+    program_info->LoadProgramFromRecorded(
+        program_info->chanid.toUInt(), program_info->recstartts);
+
     bool hasCutlist = !!(program_info->GetProgramFlags() & FL_CUTLIST);
     bool useCutlist = !!(GetJobFlags(jobID) & JOB_USE_CUTLIST) && hasCutlist;
 

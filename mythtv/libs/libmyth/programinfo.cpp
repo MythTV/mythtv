@@ -1253,7 +1253,11 @@ ProgramInfo *ProgramInfo::GetProgramFromBasename(const QString filename)
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                                                  const QDateTime &dtime)
 {
-    return GetProgramFromRecorded(channel, dtime.toString(Qt::ISODate));
+    ProgramInfo *pi = new ProgramInfo();
+    if (pi->LoadProgramFromRecorded(channel.toUInt(), dtime))
+        return pi;
+    delete pi;
+    return NULL;
 }
 
 /** \fn ProgramInfo::GetProgramFromRecorded(const QString&, const QString&)
@@ -1263,95 +1267,175 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                                                  const QString &starttime)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT recorded.chanid,starttime,endtime,title, "
-                  "subtitle,description,channel.channum, "
-                  "channel.callsign,channel.name,channel.commmethod, "
-                  "channel.outputfilters,seriesid,programid,filesize, "
-                  "lastmodified,stars,previouslyshown,originalairdate, "
-                  "hostname,recordid,transcoder,playgroup, "
-                  "recorded.recpriority,progstart,progend,basename,recgroup, "
-                  "storagegroup "
-                  "FROM recorded "
-                  "LEFT JOIN channel "
-                  "ON recorded.chanid = channel.chanid "
-                  "WHERE recorded.chanid = :CHANNEL "
-                  "AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANNEL", channel);
-    query.bindValue(":STARTTIME", starttime);
-
-    if (query.exec() && query.next())
+    QDateTime recstartts;
+    if (!starttime.contains("-") && starttime.length() == 14)
     {
-        ProgramInfo *proginfo = new ProgramInfo;
-        proginfo->chanid = query.value(0).toString();
-        proginfo->startts = query.value(23).toDateTime();
-        proginfo->endts = query.value(24).toDateTime();
-        proginfo->recstartts = query.value(1).toDateTime();
-        proginfo->recendts = query.value(2).toDateTime();
-        proginfo->title = query.value(3).toString();
-        proginfo->subtitle = query.value(4).toString();
-        proginfo->description = query.value(5).toString();
+        // must be in YYYYMMDDhhmmss format, convert to ISODate
+        QString isodate =
+            QString("%1-%2-%3T%4:%5:%6")
+            .arg(starttime.mid( 0,4), 4, QLatin1Char('0'))
+            .arg(starttime.mid( 4,2), 2, QLatin1Char('0'))
+            .arg(starttime.mid( 6,2), 2, QLatin1Char('0'))
+            .arg(starttime.mid( 8,2), 2, QLatin1Char('0'))
+            .arg(starttime.mid(10,2), 2, QLatin1Char('0'))
+            .arg(starttime.mid(12,2), 2, QLatin1Char('0'));
+        recstartts = QDateTime::fromString(isodate, Qt::ISODate);
+    }
+    else
+        recstartts = QDateTime::fromString(starttime, Qt::ISODate);
 
-        proginfo->chanstr = query.value(6).toString();
-        proginfo->chansign = query.value(7).toString();
-        proginfo->channame = query.value(8).toString();
-        proginfo->chancommfree = COMM_DETECT_COMMFREE == query.value(9).toInt();
-        proginfo->chanOutputFilters = query.value(10).toString();
-        proginfo->seriesid = query.value(11).toString();
-        proginfo->programid = query.value(12).toString();
-        proginfo->filesize = stringToLongLong(query.value(13).toString());
+    ProgramInfo *pi = new ProgramInfo();
+    if (pi->LoadProgramFromRecorded(channel.toUInt(), recstartts))
+        return pi;
+    delete pi;
+    return NULL;
+}
 
-        proginfo->lastmodified =
-                  QDateTime::fromString(query.value(14).toString(),
-                                        Qt::ISODate);
+/*
+SELECT r.chanid,           r.starttime,     r.endtime,         
+       r.title,            r.subtitle,      r.description,     
+       c.channum,          c.callsign,      c.name,    
+       c.commmethod,       c.outputfilters,             
+       r.seriesid,         r.programid,     r.filesize,        
+       r.lastmodified,     r.stars,         r.previouslyshown, 
+       r.originalairdate,  r.hostname,      r.recordid,        
+       r.transcoder,       r.playgroup,     r.recpriority,
+       r.progstart,        r.progend,       r.basename,        
+       r.recgroup,         r.storagegroup,                      
+       r.commflagged,      r.cutlist,       r.autoexpire,      
+       r.editing,          r.bookmark,      r.watched,         
+       r.preserve,         r.transcoded,    r.deletepending,   
+       p.audioprop+0,        p.videoprop+0,     p.subtitletypes+0  
+FROM recorded AS r 
+LEFT JOIN (channel AS c, recordedprogram AS p) 
+ON (r.chanid    = c.chanid AND 
+    r.chanid    = p.chanid AND 
+    r.progstart = p.starttime) 
+WHERE r.chanid    = '2051' AND 
+      r.starttime = '2009-12-08T00:30:00';
+*/
 
-        proginfo->stars = query.value(15).toDouble();
-        proginfo->repeat = query.value(16).toInt();
+/** \brief Loads ProgramInfo for an existing recording.
+ *  \return true iff sucessful
+ */
+bool ProgramInfo::LoadProgramFromRecorded(
+    const uint _chanid, const QDateTime &_recstartts)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT r.chanid,           r.starttime,   r.endtime,         "// 0-2
+        "       r.title,            r.subtitle,    r.description,     "// 3-5
+        "       c.channum,          c.callsign,    c.name,            "// 6-8
+        "       c.commmethod,       c.outputfilters,                  "// 9-10
+        "       r.seriesid,         r.programid,   r.filesize,        "//11-13
+        "       r.lastmodified,     r.stars,       r.previouslyshown, "//14-16
+        "       r.originalairdate,  r.hostname,    r.recordid,        "//17-19
+        "       r.transcoder,       r.playgroup,   r.recpriority,     "//20-22
+        "       r.progstart,        r.progend,     r.basename,        "//23-25
+        "       r.recgroup,         r.storagegroup,                   "//26-27
+        "       r.commflagged,      r.cutlist,     r.autoexpire,      "//28-30
+        "       r.editing,          r.bookmark,    r.watched,         "//31-33
+        "       r.preserve,         r.transcoded,  r.deletepending,   "//34-36
+        "       p.audioprop+0,      p.videoprop+0, p.subtitletypes+0  "//37-39
+        "FROM recorded AS r "
+        "LEFT JOIN (channel AS c, recordedprogram AS p) "
+        "ON (r.chanid    = c.chanid AND "
+        "    r.chanid    = p.chanid AND "
+        "    r.progstart = p.starttime) "
+        "WHERE r.chanid    = :CHANID AND "
+        "      r.starttime = :RECSTARTTS");
+    query.bindValue(":CHANID",     _chanid);
+    query.bindValue(":RECSTARTTS", _recstartts);
 
-        //proginfo->spread = -1;
-        //proginfo->startCol = -1;
-
-        if (query.value(17).toString().isEmpty())
-        {
-            proginfo->originalAirDate = QDate (0, 1, 1);
-            proginfo->hasAirDate = false;
-        }
-        else
-        {
-            proginfo->originalAirDate =
-                QDate::fromString(query.value(17).toString(),Qt::ISODate);
-
-            if (proginfo->originalAirDate > QDate(1940, 1, 1))
-                proginfo->hasAirDate = true;
-            else
-                proginfo->hasAirDate = false;
-        }
-        proginfo->hostname = query.value(18).toString();
-        proginfo->recstatus = rsRecorded;
-        proginfo->recordid = query.value(19).toInt();
-        proginfo->transcoder = query.value(20).toInt();
-
-        //proginfo->programflags = 0;
-        //proginfo->subtitleType = 0;
-        //proginfo->videoproperties = 0;
-        //proginfo->audioproperties = 0;
-
-        proginfo->recgroup = query.value(26).toString();
-        proginfo->storagegroup = query.value(27).toString();
-        proginfo->playgroup = query.value(21).toString();
-        proginfo->recpriority = query.value(22).toInt();
-
-        proginfo->pathname = query.value(25).toString();
-
-        // TODO this call should be eliminated so that the
-        // ProgramInfo can be loaded in a single DB query.
-        if (proginfo->LoadRecordedAncillaryData())
-            return proginfo;
-        else
-            delete proginfo;
+    if (!query.exec())
+    {
+        MythDB::DBError("LoadProgramFromRecorded", query);
+        return false;
     }
 
-    return NULL;
+    if (!query.next())
+        return false;
+
+    chanid       = QString::number(_chanid);
+    startts      = query.value(23).toDateTime();
+    endts        = query.value(24).toDateTime();
+    recstartts   = query.value(1).toDateTime();
+    recendts     = query.value(2).toDateTime();
+    title        = query.value(3).toString();
+    subtitle     = query.value(4).toString();
+    description  = query.value(5).toString();
+
+    chanstr      = query.value(6).toString();
+    chansign     = query.value(7).toString();
+    channame     = query.value(8).toString();
+    chancommfree = COMM_DETECT_COMMFREE == query.value(9).toInt();
+    chanOutputFilters = query.value(10).toString();
+    seriesid     = query.value(11).toString();
+    programid    = query.value(12).toString();
+    filesize     = query.value(13).toLongLong();
+
+    lastmodified =
+        QDateTime::fromString(query.value(14).toString(),
+                              Qt::ISODate);
+
+    stars        = query.value(15).toDouble();
+    repeat       = query.value(16).toInt();
+
+    //spread = -1;
+    //startCol = -1;
+
+    if (query.value(17).toString().isEmpty())
+    {
+        originalAirDate = QDate (0, 1, 1);
+        hasAirDate = false;
+    }
+    else
+    {
+        originalAirDate =
+            QDate::fromString(query.value(17).toString(),Qt::ISODate);
+
+        if (originalAirDate > QDate(1940, 1, 1))
+            hasAirDate = true;
+        else
+            hasAirDate = false;
+    }
+    hostname     = query.value(18).toString();
+    recstatus    = rsRecorded;
+    recordid     = query.value(19).toInt();
+    transcoder   = query.value(20).toInt();
+
+    // ancillary data -- begin
+    programflags = 0;
+    programflags |= (query.value(28).toInt() == COMM_FLAG_DONE) ?
+        FL_COMMFLAG       : 0;
+    programflags |= (query.value(28).toInt() == COMM_FLAG_PROCESSING) ?
+        FL_COMMPROCESSING : 0;
+    programflags |= (query.value(35).toInt() == 1) ? FL_TRANSCODED    : 0;
+
+    programflags |= query.value(29).toInt() ? FL_CUTLIST       : 0;
+    programflags |= query.value(30).toInt() ? FL_AUTOEXP       : 0;
+    programflags |= query.value(31).toInt() ? FL_REALLYEDITING : 0;
+    programflags |= query.value(32).toInt() ? FL_BOOKMARK      : 0;
+    programflags |= query.value(33).toInt() ? FL_WATCHED       : 0;
+    programflags |= query.value(34).toInt() ? FL_PRESERVED     : 0;
+    programflags |= query.value(36).toInt() ? FL_DELETEPENDING : 0;
+
+    programflags |= ((programflags & FL_REALLYEDITING) ||
+                     (programflags & COMM_FLAG_PROCESSING)) ? FL_EDITING : 0;
+
+    audioproperties = query.value(37).toInt();
+    videoproperties = query.value(38).toInt();
+    subtitleType    = query.value(39).toInt();
+    // ancillary data -- end
+
+    recgroup     = query.value(26).toString();
+    storagegroup = query.value(27).toString();
+    playgroup    = query.value(21).toString();
+    recpriority  = query.value(22).toInt();
+
+    pathname     = query.value(25).toString();
+
+    return true;
 }
 
 /** \fn ProgramInfo::IsProgramRecurring(void) const
@@ -1650,21 +1734,21 @@ QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
         (RemoteCheckFile(this, false)))
     {
         tmpURL = QString("myth://") +
-                 gContext->GetSetting("MasterServerIP") + ':' +
-                 gContext->GetSetting("MasterServerPort") + '/' + basename;
+        gContext->GetSetting("MasterServerIP") + ':' +
+        gContext->GetSetting("MasterServerPort") + '/' + basename;
         VERBOSE(VB_FILE, LOC +
                 QString("GetPlaybackURL: Found @ '%1'").arg(tmpURL));
         return tmpURL;
-    }
+        }
 
     // Fallback to streaming from the backend the recording was created on
     tmpURL = QString("myth://") +
-             gContext->GetSettingOnHost("BackendServerIP", hostname) + ':' +
-             gContext->GetSettingOnHost("BackendServerPort", hostname) + '/' +
-             basename;
+        gContext->GetSettingOnHost("BackendServerIP", hostname) + ':' +
+        gContext->GetSettingOnHost("BackendServerPort", hostname) + '/' +
+        basename;
 
     VERBOSE(VB_FILE, LOC + QString("GetPlaybackURL: Using default of: '%1'")
-                                   .arg(tmpURL));
+            .arg(tmpURL));
 
     return tmpURL;
 }
@@ -1778,11 +1862,17 @@ void ProgramInfo::SetBookmark(long long pos)
     SendUpdateEvent();
 }
 
-void ProgramInfo::SendUpdateEvent(void) const
+void ProgramInfo::SendUpdateEvent(void)
 {
-    QStringList list;
-    ToStringList(list);
-    RemoteSendEvent(MythEvent(QString("UPDATE_PROG_INFO"), list));
+    // Make sure we are up to date first..
+    if (LoadProgramFromRecorded(chanid.toUInt(), recstartts))
+    {
+        // if we successfully loaded the program from the recorded
+        // table send an update event..
+        QStringList list;
+        ToStringList(list);
+        RemoteSendEvent(MythEvent(QString("UPDATE_PROG_INFO"), list));
+    }
 }
 
 void ProgramInfo::SendAddedEvent(void) const
@@ -1925,8 +2015,6 @@ void ProgramInfo::SetDVDBookmark(QStringList fields) const
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("SetDVDBookmark updating", query);
-
-    SendUpdateEvent();
 }
 /** \fn ProgramInfo::SetWatchedFlag(bool)
  *  \brief Set "watched" field in recorded/videometadata to "watchedFlag".
@@ -2359,7 +2447,7 @@ void ProgramInfo::GetCutList(frm_dir_map_t &delMap) const
     GetMarkupMap(delMap, MARK_CUT_END, true);
 }
 
-void ProgramInfo::SetCutList(frm_dir_map_t &delMap) const
+void ProgramInfo::SetCutList(frm_dir_map_t &delMap)
 {
     ClearMarkupMap(MARK_CUT_START);
     ClearMarkupMap(MARK_CUT_END);
@@ -3417,60 +3505,6 @@ void ProgramInfo::Save(void) const
 
     if (!query.exec())
         MythDB::DBError("Saving program", query);
-}
-
-/** \brief Loads bitmap of the recorded program flags,
- *         and loads audio and video properties.
- *  \sa GetAutoRunJobs(void)
- */
-bool ProgramInfo::LoadRecordedAncillaryData(void)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT commflagged, cutlist,     autoexpire, "
-        "       editing,     bookmark,    watched,    "
-        "       preserve,    transcoded,  deletepending, "
-        "       audioprop+0, videoprop+0, subtitletypes+0 "
-        "FROM recorded LEFT JOIN recordedprogram "
-        "ON (recorded.chanid    = recordedprogram.chanid AND "
-        "    recorded.progstart = recordedprogram.starttime) "
-        "WHERE recorded.chanid    = :CHANID AND "
-        "      recorded.starttime = :STARTTIME");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
-
-    if (!query.exec())
-    {
-        MythDB::DBError("LoadRecordedAncillaryData", query);
-        return false;
-    }
-
-    if (!query.next())
-        return false;
-
-    uint32_t flags = 0;
-    flags |= (query.value(0).toInt() == COMM_FLAG_DONE) ? FL_COMMFLAG : 0;
-    flags |= (query.value(0).toInt() == COMM_FLAG_PROCESSING) ?
-        FL_COMMPROCESSING : 0;
-    flags |= (query.value(7).toInt() == 1) ? FL_TRANSCODED    : 0;
-
-    flags |= query.value(1).toInt() ? FL_CUTLIST       : 0;
-    flags |= query.value(2).toInt() ? FL_AUTOEXP       : 0;
-    flags |= query.value(3).toInt() ? FL_REALLYEDITING : 0;
-    flags |= query.value(4).toInt() ? FL_BOOKMARK      : 0;
-    flags |= query.value(5).toInt() ? FL_WATCHED       : 0;
-    flags |= query.value(6).toInt() ? FL_PRESERVED     : 0;
-    flags |= query.value(8).toInt() ? FL_DELETEPENDING : 0;
-
-    flags |= ((flags & FL_REALLYEDITING) ||
-              (flags & COMM_FLAG_PROCESSING)) ? FL_EDITING : 0;
-    programflags = flags;
-
-    audioproperties = query.value(9).toInt();
-    videoproperties = query.value(10).toInt();
-    subtitleType    = query.value(11).toInt();
-
-    return true;
 }
 
 void ProgramInfo::UpdateInUseMark(bool force)

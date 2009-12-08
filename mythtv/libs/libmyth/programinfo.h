@@ -249,6 +249,9 @@ class MPUBLIC ProgramInfo
                                 bool genUnknown = false,
                                 int clampHoursMax = 0);
 
+    bool  LoadProgramFromRecorded(
+        const uint chanid, const QDateTime &recstarttime);
+
     static ProgramInfo *GetProgramFromBasename(const QString filename);
     static ProgramInfo *GetProgramFromRecorded(const QString &channel,
                                                const QString &starttime);
@@ -265,8 +268,6 @@ class MPUBLIC ProgramInfo
     bool FromStringList(const QStringList &list, uint offset);
 
     bool FillInRecordInfo(const vector<ProgramInfo *> &reclist);
-
-    bool LoadRecordedAncillaryData(void);
 
     // Destructor
     virtual ~ProgramInfo();
@@ -342,7 +343,7 @@ class MPUBLIC ProgramInfo
     void GetCutList(frm_dir_map_t &) const;
     void GetCommBreakList(frm_dir_map_t &) const;
 
-    void SetCutList(frm_dir_map_t &) const;
+    void SetCutList(frm_dir_map_t &);
     void SetCommBreakList(frm_dir_map_t &) const;
 
     // Flagging map support methods
@@ -384,7 +385,7 @@ class MPUBLIC ProgramInfo
     static QString i18n(const QString&);
 
     /// Sends event out that the ProgramInfo should be reloaded.
-    void SendUpdateEvent(void) const;
+    void SendUpdateEvent(void);
     /// Sends event out that the ProgramInfo should be added to lists.
     void SendAddedEvent(void) const;
     /// Sends event out that the ProgramInfo should be delete from lists.
