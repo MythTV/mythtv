@@ -3185,6 +3185,9 @@ void PlaybackBox::UpdateProgramInfo(const ProgramInfo &pginfo)
     ProgramList::iterator _end[2] = {
         m_progLists[tr("LiveTV").toLower()].end(),   m_progLists[""].end()   };
 
+    // We do not update the pathname as it may be localized
+    // in the remote ProgramInfo.
+
     for (uint i = 0; i < 2; i++)
     {
         ProgramList::iterator it = _it[i], end = _end[i];
@@ -3193,7 +3196,9 @@ void PlaybackBox::UpdateProgramInfo(const ProgramInfo &pginfo)
             if (pginfo.chanid     == (*it)->chanid &&
                 pginfo.recstartts == (*it)->recstartts)
             {
+                QString pathname = (**it).pathname;
                 **it = pginfo;
+                (**it).pathname = pathname;
                 break;
             }
         }
@@ -3209,7 +3214,9 @@ void PlaybackBox::UpdateProgramInfo(const ProgramInfo &pginfo)
             if ((pginfo.chanid     == (*it)->chanid) &&
                 (pginfo.recstartts == (*it)->recstartts))
             {
+                QString pathname = (**it).pathname;
                 **it = pginfo;
+                (**it).pathname = pathname;
                 break;
             }
         }
