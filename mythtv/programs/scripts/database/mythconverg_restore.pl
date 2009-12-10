@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.9';
+    $VERSION        = '1.0.10';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -76,7 +76,7 @@
                'change_hostname'                    => \$change_hostname,
                'new_hostname=s'                     => \$new_hostname,
                'old_hostname=s'                     => \$old_hostname,
-               'usage|help|h'                       => \$usage,
+               'usage|help|h+'                      => \$usage,
                'version'                            => \$show_version,
                'script_version|v'                   => \$show_version_script,
                'verbose|debug|d+'                   => \$debug
@@ -113,6 +113,62 @@ Usage:
 
 Restores a backup of the MythTV database.
 
+QUICK START:
+
+Create a file ~/.mythtv/backuprc with a single line,
+"DBBackupDirectory=/home/mythtv" (no quotes). For example:
+
+# echo "DBBackupDirectory=/home/mythtv" > ~/.mythtv/backuprc
+
+To do a full restore:
+Ensure you have an empty database. If you are replacing an existing database,
+you must first drop the old database. You may do this using the mysql client
+executable by issuing the command:
+
+# mysql -umythtv -p mythconverg -e "DROP DATABASE IF EXISTS mythconverg;"
+
+(fix the database name, username, and password, as required). Then, execute the
+mc.sql script as described in the MythTV HOWTO ( http://www.mythtv.org/docs/ )
+to prepare a new (empty) database (or see the description of the
+--create_database argument in the detailed help).
+
+Then, run this script to restore the most-recent backup in the directory
+specified in ~/.mythtv/backuprc . Use the --verbose argument to see what is
+happening:
+
+# $0 --verbose
+
+or specify a backup file with:
+
+# $0 --directory=/path/to/backups/ --filename=backup_file.sql.gz --verbose
+
+(You may leave out the --directory argument if you've specified the directory
+in the ~/.mythtv/backuprc .)
+
+Once the restore completes successfully, you may start mythtv-setup or
+mythbackend. If you restored a backup from an older version of MythTV,
+mythtv-setup will upgrade the database for you.
+
+To change the hostname of a MythTV frontend or backend:
+
+Ensure that the database exists (restore an old database, as above, if
+necessary) and execute the following command, replacing "XXXX" and "YYYY"
+with appropriate values for the old and new hostnames, respectively:
+
+# $0 --change_hostname --old_hostname="XXXX" --new_hostname="YYYY"
+
+To restore xmltvids:
+
+Ensure you have a ~/.mythtv/backuprc file, as described above, and execute this
+script with the --restore_xmltvids argument.
+
+# $0 --restore_xmltvids
+
+EOF
+
+        if ($usage > 1)
+        {
+            print <<EOF;
 DETAILED DESCRIPTION:
 
 This script is used to restore a backup of the MythTV database (as created by
@@ -125,7 +181,7 @@ configuration files (including config.xml, mysql.txt) are ignored, but the
 backup resource file (see RESOURCE FILE, below) and the MySQL option files
 (i.e. /etc/my.cnf or ~/.my.cnf) will be honored.
 
-The script can also be called  using command-line arguments to specify the
+The script can also be called using command-line arguments to specify the
 required information. If no database information file is specified, the script
 will attempt to determine the appropriate configuration by using the MythTV
 configuration file(s) (prefering config.xml, but falling back to mysql.txt if
@@ -166,6 +222,26 @@ tables), or--if the script is allowed to create the initial database, as
 explained above--must not exist. If attempting to do a partial or "new
 hardware" restore, the database must exist and must have tables. See QUICK
 START, below, for more information.
+
+If you have a corrupt database, you may be able to recover some information
+using a partial restore. To do a partial restore, you must have a
+fully-populated database schema (but without the data you wish to import) from
+the version of MythTV used to create the backup. You may create and populate
+the database by running the mc.sql script (see the description of the
+--create_database argument) to create the database. Then, start and exit
+mythtv-setup to populate the database. And, finally, do the partial restore
+with:
+
+# $0 --partial_restore
+
+Include the --with_plugin_data argument if you would like to keep the data
+used by MythTV plugins.
+
+If you would like to do a partial/new-hardware restore and have upgraded
+MythTV, you must first do a full restore, then start and exit mythtv-setup (to
+upgrade the database), then create a backup, then drop the database, then
+follow the instructions for doing a partial restore with the new (upgraded)
+backup file.
 
 DATABASE INFORMATION FILE
 
@@ -212,7 +288,7 @@ files. The following variables are recognized:
                      after the restore completes.
   mysql_client     - The path (including filename) of the mysql client
                      executable.
-  uncompress       - The command (including path, if necessary)  to use to
+  uncompress       - The command (including path, if necessary) to use to
                      uncompress the backup. If you specify an uncompress
                      program, the backup file will be assumed to be compressed,
                      so the command will be run on the file regardless.
@@ -359,67 +435,12 @@ options:
     Show script version information. This is primarily useful for scripts
     or programs needing to parse the version information.
 
-QUICK START:
-
-Create a file ~/.mythtv/backuprc with a single line,
-"DBBackupDirectory=/home/mythtv" (no quotes). For example:
-
-# echo "DBBackupDirectory=/home/mythtv" > ~/.mythtv/backuprc
-
-To do a full restore:
-Ensure you have an empty database. If you a replacing a corrupt database, you
-must first drop the existing database. You may do this using the mysql client
-executable by issuing the statement, "DROP DATABASE mythconverg;" (no quotes;
-fix the database name, as required). Then, execute the mc.sql script as
-described in the MythTV HOWTO ( http://www.mythtv.org/docs/ ) to prepare a new
-(empty) database (or see the above description of the --create_database
-argument).
-
-Run this script to restore the backup. Use the --verbose argument to see what
-is happening.
-
-# $0
-
-At this point, you may start mythtv-setup or mythbackend. If you restored a
-backup from an older version of MythTV, mythtv-setup will upgrade the database
-for you.
-
-To do a partial restore:
-
-You must have a fully-populated database schema (but without the data you wish
-to import) from the version of MythTV used to create the backup. You may
-create and populate the database by running the mc.sql script (see the above
-description of the --create_database argument) to create the database. Then,
-start and exit mythtv-setup to populate the database. And, finally, do the
-partial restore with:
-
-# $0 --partial_restore
-
-Include the --with_plugin_data argument if you would like to keep the data
-used by MythTV plugins.
-
-If you would like to do a partial/new-hardware restore and have upgraded
-MythTV, you must first do a full restore, then start and exit mythtv-setup (to
-upgrade the database), then create a backup, then drop the database, then
-follow the instructions for doing a partial restore with the new (upgraded)
-backup file.
-
-To change the hostname of a MythTV frontend or backend:
-
-Ensure that the database exists (restore an old database, as above, if
-necessary) and execute the following command, replacing "XXXX" and "YYYY"
-with appropriate values for the old and new hostnames, respectively:
-
-# $0 --change_hostname --old_hostname="XXXX" --new_hostname="YYYY"
-
-To restore xmltvids:
-
-Ensure you have a ~/.mythtv/backuprc file, as described above, and execute this
-script with the --restore_xmltvids argument.
-
-# $0 --restore_xmltvids
-
 EOF
+        }
+        else
+        {
+            print "For detailed help:\n\n# $0 --help --help\n\n";
+        }
         exit;
     }
 
@@ -683,6 +704,12 @@ EOF
                     $database_information_file);
             unless (-T "$database_information_file")
             {
+                verbose($verbose_level_always,
+                        '', 'The argument you supplied for the database'.
+                        ' information file is invalid.',
+                        'If you were trying to specify a backup filename,'.
+                        ' please use the --directory ',
+                        'and --filename arguments.');
                 die("\nERROR: Invalid database information file, stopped");
             }
         # When using a database information file, parse the resource file first

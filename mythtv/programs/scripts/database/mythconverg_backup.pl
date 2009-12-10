@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Backup Script';
-    $VERSION        = '1.0.8';
+    $VERSION        = '1.0.9';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -84,7 +84,7 @@
                'rotate=i'                           => \$rotate,
                'rotateglob|glob=s'                  => \$rotateglob,
                'backup_xmltvids|xmltvids'           => \$backup_xmltvids,
-               'usage|help|h'                       => \$usage,
+               'usage|help|h+'                      => \$usage,
                'version'                            => \$show_version,
                'script_version|v'                   => \$show_version_script,
                'verbose|debug|d+'                   => \$debug
@@ -120,6 +120,30 @@ Usage:
 
 Creates a backup of the MythTV database.
 
+QUICK START:
+
+Create a file ~/.mythtv/backuprc with a single line,
+"DBBackupDirectory=/home/mythtv" (no quotes), and run this script to create a
+database backup. Use the --verbose argument to see what is happening.
+
+# echo "DBBackupDirectory=/home/mythtv" > ~/.mythtv/backuprc
+# $0 --verbose
+
+Make sure you keep the backuprc file for next time. Once you have successfully
+created a backup, the script may be run without the --verbose argument.
+
+To backup xmltvids:
+
+Ensure you have a ~/.mythtv/backuprc file, as described above, and execute this
+script with the --backup_xmltvids argument.
+
+# $0 --backup_xmltvids
+
+EOF
+
+        if ($usage > 1)
+        {
+            print <<EOF;
 DETAILED DESCRIPTION:
 
 This script can be called by MythTV for creating automatic database backups.
@@ -359,26 +383,12 @@ options:
     Show script version information. This is primarily useful for scripts
     or programs needing to parse the version information.
 
-QUICK START:
-
-Create a file ~/.mythtv/backuprc with a single line,
-"DBBackupDirectory=/home/mythtv" (no quotes), and run this script to create a
-database backup. Use the --verbose argument to see what is happening.
-
-# echo "DBBackupDirectory=/home/mythtv" > ~/.mythtv/backuprc
-# $0 --verbose
-
-Make sure you keep the backuprc file for next time. Once you have successfully
-created a backup, the script may be run without the --verbose argument.
-
-To backup xmltvids:
-
-Ensure you have a ~/.mythtv/backuprc file, as described above, and execute this
-script with the --backup_xmltvids argument.
-
-# $0 --backup_xmltvids
-
 EOF
+        }
+        else
+        {
+            print "For detailed help:\n\n# $0 --help --help\n\n";
+        }
         exit;
     }
 
@@ -618,6 +628,12 @@ EOF
                     $database_information_file);
             unless (-T "$database_information_file")
             {
+                verbose($verbose_level_always,
+                        '', 'The argument you supplied for the database'.
+                        ' information file is invalid.',
+                        'If you were trying to specify a backup filename,'.
+                        ' please use the --directory ',
+                        'and --filename arguments.');
                 die("\nERROR: Invalid database information file, stopped");
             }
         # When using a database information file, parse the resource file first
