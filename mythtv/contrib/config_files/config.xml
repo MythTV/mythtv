@@ -3,16 +3,13 @@
     <MythFrontend>
       <DefaultBackend>
 <!--
-Uncomment the <LocalHostName> hostname override only if you want to use
+Set the <LocalHostName> hostname override below only if you want to use
 something other than the machine's real hostname for identifying settings
 in the database.  This is useful if your hostname changes often, as
 otherwise you'll need to reconfigure mythtv every time.
 
 NO TWO HOSTS MAY USE THE SAME VALUE
 -->
-<!--
-        <LocalHostName>my-unique-identifier-goes-here</LocalHostName>
-  -->
         <DBHostName>127.0.0.1</DBHostName>
         <DBUserName>mythtv</DBUserName>
         <DBPassword>mythtv</DBPassword>
