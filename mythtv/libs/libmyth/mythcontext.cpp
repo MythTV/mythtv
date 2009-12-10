@@ -635,8 +635,8 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
       << "# Set the following if you want to use something other than this\n"
       << "# machine's real hostname for identifying settings in the database.\n"
       << "# This is useful if your hostname changes often, as otherwise you\n"
-      << "# will need to reconfigure mythtv (or futz with the DB) every time.\n"
-      << "# TWO HOSTS MUST NOT USE THE SAME VALUE\n"
+      << "# will need to reconfigure mythtv every time.\n"
+      << "# NO TWO HOSTS MAY USE THE SAME VALUE\n"
       << "#\n";
 
     if (params.localEnabled)
