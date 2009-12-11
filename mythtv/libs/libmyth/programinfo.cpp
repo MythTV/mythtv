@@ -1433,7 +1433,16 @@ bool ProgramInfo::LoadProgramFromRecorded(
     playgroup    = query.value(21).toString();
     recpriority  = query.value(22).toInt();
 
-    pathname     = query.value(25).toString();
+    QString old_basename = pathname.section('/', -1);
+    QString new_basename = query.value(25).toString();
+
+    if (new_basename != old_basename)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("Updated pathname '%1':'%2' -> '%3'")
+                .arg(pathname).arg(old_basename).arg(new_basename));
+        pathname = new_basename;
+    }
 
     return true;
 }
