@@ -1566,7 +1566,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
                 newText = textprop.text;
                 
             text->SetText(newText);
-            text->SetFontState(textprop.state);
+            text->SetFontState(textprop.state.isEmpty() ? m_fontState : textprop.state);
         }
         ++string_it;
     }
