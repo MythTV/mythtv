@@ -719,12 +719,13 @@ void PlaybackBox::UpdateUIListItem(
 
     QString state = extract_main_state(*pginfo, m_player);
 
-    // Re-set the text so that the text color updates..
+    // Update the text, e.g. Title or subtitle may have been changed on another
+    // frontend
     if (m_groupList && m_groupList->GetItemCurrent())
     {
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
-        item->SetTextFromMap(infoMap, state);
+        item->SetTextFromMap(infoMap);
 
         QString groupname =
             m_groupList->GetItemCurrent()->GetData().toString();
@@ -733,10 +734,13 @@ void PlaybackBox::UpdateUIListItem(
         QString tempShortDate = pginfo->recstartts.toString(m_formatShortDate);
         QString tempLongDate  = pginfo->recstartts.toString(m_formatLongDate);
         if (groupname == pginfo->title.toLower())
-            item->SetText(tempSubTitle,       "titlesubtitle", state);
-        item->SetText(tempLongDate,       "longdate",      state);
-        item->SetText(tempShortDate,      "shortdate",     state);
+            item->SetText(tempSubTitle, "titlesubtitle");
+        item->SetText(tempLongDate, "longdate");
+        item->SetText(tempShortDate, "shortdate");
     }
+    
+    item->SetFontState(state);
+    item->DisplayState(state, "status");
 
     QString job = extract_job_state(*pginfo);
     item->DisplayState(job, "jobstate");
@@ -1109,17 +1113,19 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
         QString state = extract_main_state(**it, m_player);
 
+        item->SetFontState(state);
+
         InfoMap infoMap;
         (*it)->ToMap(infoMap);
-        item->SetTextFromMap(infoMap, state);
+        item->SetTextFromMap(infoMap);
 
         QString tempSubTitle  = extract_subtitle(**it, groupname);
         QString tempShortDate = ((*it)->recstartts).toString(m_formatShortDate);
         QString tempLongDate  = ((*it)->recstartts).toString(m_formatLongDate);
         if (groupname == (*it)->title.toLower())
-            item->SetText(tempSubTitle,       "titlesubtitle", state);
-        item->SetText(tempLongDate,       "longdate",      state);
-        item->SetText(tempShortDate,      "shortdate",     state);
+            item->SetText(tempSubTitle,       "titlesubtitle");
+        item->SetText(tempLongDate,       "longdate");
+        item->SetText(tempShortDate,      "shortdate");
 
         item->DisplayState(state, "status");
 
