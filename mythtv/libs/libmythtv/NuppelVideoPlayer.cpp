@@ -7082,8 +7082,14 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                     }
                 }
 
-                float hmult = osd->GetSubtitleBounds().width() / (float) video_disp_dim.width();
-                float vmult = osd->GetSubtitleBounds().height() / (float) video_disp_dim.height();
+                // scale the subtitle images which are scaled and positioned for
+                // a 720x576 video resolution to fit the current OSD resolution
+                float vsize = 576.0;
+                if (player_ctx->buffer->isDVD())
+                    vsize = (float) video_disp_dim.height();
+
+                float hmult = osd->GetSubtitleBounds().width() / 720.0;
+                float vmult = osd->GetSubtitleBounds().height() / vsize;
 
                 rect->x = (int)(rect->x * hmult);
                 rect->y = (int)(rect->y * vmult);
