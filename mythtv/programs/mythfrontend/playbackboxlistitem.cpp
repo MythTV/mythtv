@@ -15,7 +15,7 @@ void PlaybackBoxListItem::SetToRealButton(
 {
     if (needs_update)
     {
-        pbbox->UpdateProgramInfo(this, selected);
+        pbbox->UpdateUIListItem(this, selected);
         needs_update = false;
     }
     MythUIButtonListItem::SetToRealButton(button, selected);

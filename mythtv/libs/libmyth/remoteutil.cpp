@@ -258,6 +258,12 @@ vector<uint> RemoteRequestFreeRecorderList(void)
 
 void RemoteSendMessage(const QString &message)
 {
+    if (gContext->IsBackend())
+    {
+        gContext->dispatch(MythEvent(message));
+        return;
+    }
+
     QStringList strlist( "MESSAGE" );
     strlist << message;
 

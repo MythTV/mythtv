@@ -133,7 +133,7 @@ class PlaybackBox : public ScheduleCommon
   protected slots:
     void updateRecList(MythUIButtonListItem *);
     void ItemSelected(MythUIButtonListItem *item)
-        { UpdateProgramInfo(item, true); }
+        { UpdateUIListItem(item, true); }
     void selected(MythUIButtonListItem *item);
     void playSelected(MythUIButtonListItem *item = NULL);
     void deleteSelected(MythUIButtonListItem *item);
@@ -293,10 +293,11 @@ class PlaybackBox : public ScheduleCommon
     void processNetworkControlCommands(void);
     void processNetworkControlCommand(const QString &command);
 
-    ProgramInfo *findMatchingProg(const ProgramInfo *);
-    ProgramInfo *findMatchingProg(const QString &key);
-    ProgramInfo *findMatchingProg(const QString &chanid,
-                                  const QString &recstartts);
+    ProgramInfo *FindProgramInUILists(const ProgramInfo&);
+    ProgramInfo *FindProgramInUILists(const QString &key);
+    ProgramInfo *FindProgramInUILists(
+        uint chanid, const QDateTime &recstartts,
+        QString recgroup = "NotLiveTV");
 
     bool doRemove(ProgramInfo *, bool forgetHistory, bool forceMetadataDelete);
     void showDeletePopup(deletePopupType);
@@ -321,8 +322,13 @@ class PlaybackBox : public ScheduleCommon
     void updateUsage();
     void updateGroupInfo(const QString &groupname, const QString &grouplabel);
     void UpdateProgramInfo(const ProgramInfo &pginfo);
-    void UpdateProgramInfo(MythUIButtonListItem *item, bool is_sel,
-                           bool force_preview_reload = false);
+    void UpdateProgramInfo(
+        uint chanid, const QDateTime &recstartts, long long filesize);
+
+    void UpdateUIListItem(
+        ProgramInfo *ProgramInfo_pointer_from_FindProgramInUILists);
+    void UpdateUIListItem(MythUIButtonListItem *item, bool is_sel,
+                          bool force_preview_reload = false);
 
     void clearProgramCache(void);
 
@@ -330,6 +336,8 @@ class PlaybackBox : public ScheduleCommon
     void HandleRecordingRemoveEvent(uint chanid, const QDateTime &recstartts);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
+    void HandleUpdateProgramInfoFileSizeEvent(
+        uint chanid, const QDateTime &recstartts,  long long filesize);
     void ScheduleFillList(void);
 
     void ShowMenu(void);

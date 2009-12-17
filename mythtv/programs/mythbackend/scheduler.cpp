@@ -1409,6 +1409,20 @@ bool Scheduler::getAllPending(RecList *retList)
     return hasconflicts;
 }
 
+RecStatusType Scheduler::GetRecStatus(const ProgramInfo &pginfo) const
+{
+    QMutexLocker lockit(reclist_lock);
+
+    for (RecConstIter it = reclist.begin(); it != reclist.end(); ++it)
+    {
+        const ProgramInfo &s = **it;
+        if (pginfo.chanid == s.chanid && pginfo.recstartts == s.recstartts)
+            return (rsRecording==s.recstatus) ? rsRecording : pginfo.recstatus;
+    }
+
+    return pginfo.recstatus;
+}
+
 void Scheduler::getAllPending(QStringList &strList)
 {
     RecList retlist;

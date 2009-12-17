@@ -1770,17 +1770,21 @@ void ProgramInfo::SetFilesize(long long fsize)
     filesize = fsize;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE recorded SET filesize = :FILESIZE"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":FILESIZE", longLongToString(fsize));
-    query.bindValue(":CHANID", chanid);
+    query.prepare(
+        "UPDATE recorded "
+        "SET filesize = :FILESIZE "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+    query.bindValue(":FILESIZE",  fsize);
+    query.bindValue(":CHANID",    chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythDB::DBError("File size update", query);
 
-    SendUpdateEvent();
+    QString msg = QString("UPDATE_FILE_SIZE %1 %2 %3")
+        .arg(chanid).arg(recstartts.toString(Qt::ISODate)).arg(fsize);
+    RemoteSendMessage(msg);
 }
 
 /** \fn ProgramInfo::GetFilesize(void)
@@ -1880,7 +1884,7 @@ void ProgramInfo::SendUpdateEvent(void)
         // table send an update event..
         QStringList list;
         ToStringList(list);
-        RemoteSendEvent(MythEvent(QString("UPDATE_PROG_INFO"), list));
+        RemoteSendEvent(MythEvent(QString("MASTER_UPDATE_PROG_INFO"), list));
     }
 }
 

@@ -80,6 +80,8 @@ class Scheduler : public QObject
 
     bool WasStartedAutomatically();
 
+    RecStatusType GetRecStatus(const ProgramInfo &pginfo) const;
+
     int GetError(void) const { return error; }
 
   protected:

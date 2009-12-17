@@ -874,6 +874,29 @@ void MainServer::customEvent(QEvent *e)
         if (me->Message().left(6) == "LOCAL_")
             return;
 
+        MythEvent mod_me("");
+        if (me->Message() == "MASTER_UPDATE_PROG_INFO" && m_sched)
+        {
+            ProgramInfo evinfo;
+            if (evinfo.FromStringList(me->ExtraDataList(), 0))
+            {
+                QDateTime rectime = QDateTime::currentDateTime().addSecs(
+                    -gContext->GetNumSetting("RecordOverTime"));
+
+                if (evinfo.recendts > rectime)
+                    evinfo.recstatus = m_sched->GetRecStatus(evinfo);
+
+                QStringList list;
+                evinfo.ToStringList(list);
+                mod_me = MythEvent("UPDATE_PROG_INFO", list);
+                me = &mod_me;
+            }
+            else
+            {
+                return;
+            }
+        }
+
         broadcast = QStringList( "BACKEND_MESSAGE" );
         broadcast << me->Message();
         broadcast += me->ExtraDataList();

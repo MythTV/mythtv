@@ -241,6 +241,61 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
     return sTitle;
 }
 
+static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
+{
+    QString state;
+    if (pginfo.recstatus == rsRecording)
+        state = "running";
+
+    if (((pginfo.recstatus != rsRecording) &&
+         (pginfo.availableStatus != asAvailable) &&
+         (pginfo.availableStatus != asNotYetAvailable)) ||
+        (player && player->IsSameProgram(0, &pginfo)))
+    {
+        state = "disabled";
+    }
+
+    return state;
+}
+
+static QString extract_job_state(const ProgramInfo &pginfo)
+{
+    QString job = "default";
+
+    if (pginfo.recstatus == rsRecording)
+        job = "recording";
+    else if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE, pginfo.chanid,
+                                            pginfo.recstartts))
+        job = "transcoding";
+    else if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG,  pginfo.chanid,
+                                            pginfo.recstartts))
+        job = "commflagging";
+
+    return job;
+}
+
+static QString extract_subtitle(
+    const ProgramInfo &pginfo, const QString &groupname)
+{
+    QString subtitle;
+    if (groupname != pginfo.title.toLower())
+    {
+        subtitle = pginfo.title;
+        if (!pginfo.subtitle.trimmed().isEmpty())
+        {
+            subtitle = QString("%1 - \"%2\"")
+                .arg(subtitle).arg(pginfo.subtitle);
+        }
+    }
+    else
+    {
+        subtitle = pginfo.subtitle;
+        if (subtitle.trimmed().isEmpty())
+            subtitle = pginfo.title;
+    }
+    return subtitle;
+}
+
 ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -628,7 +683,30 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
     updateIcons();
 }
 
-void PlaybackBox::UpdateProgramInfo(
+void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo)
+{
+    if (!pginfo)
+        return;
+
+    MythUIButtonListItem *item =
+        m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+
+    if (item)
+    {
+        MythUIButtonListItem *sel_item =
+            m_recordingList->GetItemCurrent();
+        UpdateUIListItem(item, item == sel_item, true);
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, LOC +
+                QString("UpdateUIListItem called with a title unknown "
+                        "to us in m_recordingList\n %1:%2")
+                .arg(pginfo->title).arg(pginfo->subtitle));
+    }
+}
+
+void PlaybackBox::UpdateUIListItem(
     MythUIButtonListItem *item, bool is_sel, bool force_preview_reload)
 {
     if (!item)
@@ -639,17 +717,28 @@ void PlaybackBox::UpdateProgramInfo(
     if (!pginfo)
         return;
 
-    QString job = "default";
+    QString state = extract_main_state(*pginfo, m_player);
 
-    if (pginfo->recstatus == rsRecording)
-        job = "recording";
-    else if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE, pginfo->chanid,
-                                            pginfo->recstartts))
-        job = "transcoding";
-    else if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG,  pginfo->chanid,
-                                            pginfo->recstartts))
-        job = "commflagging";
+    // Re-set the text so that the text color updates..
+    if (m_groupList && m_groupList->GetItemCurrent())
+    {
+        InfoMap infoMap;
+        pginfo->ToMap(infoMap);
+        item->SetTextFromMap(infoMap, state);
 
+        QString groupname =
+            m_groupList->GetItemCurrent()->GetData().toString();
+
+        QString tempSubTitle  = extract_subtitle(*pginfo, groupname);
+        QString tempShortDate = pginfo->recstartts.toString(m_formatShortDate);
+        QString tempLongDate  = pginfo->recstartts.toString(m_formatLongDate);
+        if (groupname == pginfo->title.toLower())
+            item->SetText(tempSubTitle,       "titlesubtitle", state);
+        item->SetText(tempLongDate,       "longdate",      state);
+        item->SetText(tempShortDate,      "shortdate",     state);
+    }
+
+    QString job = extract_job_state(*pginfo);
     item->DisplayState(job, "jobstate");
 
     QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
@@ -1018,42 +1107,15 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         MythUIButtonListItem *item =
             new PlaybackBoxListItem(this, m_recordingList, *it);
 
-        QString tempSubTitle;
-        if (groupname != (*it)->title.toLower())
-        {
-            tempSubTitle = (*it)->title;
-            if (!(*it)->subtitle.trimmed().isEmpty())
-            {
-                tempSubTitle = QString("%1 - \"%2\"")
-                    .arg(tempSubTitle).arg((*it)->subtitle);
-            }
-        }
-        else
-        {
-            tempSubTitle = (*it)->subtitle;
-            if (tempSubTitle.trimmed().isEmpty())
-                tempSubTitle = (*it)->title;
-        }
-
-        QString tempShortDate = ((*it)->recstartts).toString(m_formatShortDate);
-        QString tempLongDate  = ((*it)->recstartts).toString(m_formatLongDate);
-
-        QString state;
-        if ((*it)->recstatus == rsRecording)
-            state = "running";
-
-        if ((((*it)->recstatus != rsRecording) &&
-             ((*it)->availableStatus != asAvailable) &&
-             ((*it)->availableStatus != asNotYetAvailable)) ||
-            (m_player && m_player->IsSameProgram(0, *it)))
-        {
-            state = "disabled";
-        }
+        QString state = extract_main_state(**it, m_player);
 
         InfoMap infoMap;
         (*it)->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
+        QString tempSubTitle  = extract_subtitle(**it, groupname);
+        QString tempShortDate = ((*it)->recstartts).toString(m_formatShortDate);
+        QString tempLongDate  = ((*it)->recstartts).toString(m_formatLongDate);
         if (groupname == (*it)->title.toLower())
             item->SetText(tempSubTitle,       "titlesubtitle", state);
         item->SetText(tempLongDate,       "longdate",      state);
@@ -1666,7 +1728,7 @@ void PlaybackBox::playSelectedPlaylist(bool random)
 
         it = randomList.begin() + i;
 
-        tmpItem = findMatchingProg(*it);
+        tmpItem = FindProgramInUILists(*it);
 
         if ((tmpItem->availableStatus == asAvailable) ||
             (tmpItem->availableStatus == asNotYetAvailable))
@@ -1970,7 +2032,10 @@ void PlaybackBox::stop(ProgramInfo *rec)
 bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
                            bool forceMetadataDelete)
 {
-    ProgramInfo *delItem = findMatchingProg(rec);
+    if (!rec)
+        return false;
+
+    ProgramInfo *delItem = FindProgramInUILists(*rec);
 
     if (!delItem)
         return false;
@@ -2442,7 +2507,7 @@ void PlaybackBox::showPlaylistJobPopup()
 
     for(it = m_playList.begin(); it != m_playList.end(); ++it)
     {
-        tmpItem = findMatchingProg(*it);
+        tmpItem = FindProgramInUILists(*it);
         if (tmpItem)
         {
             if (!JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
@@ -2904,7 +2969,7 @@ void PlaybackBox::doClearPlaylist(void)
     QStringList::Iterator it;
     for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
-        ProgramInfo *tmpItem = findMatchingProg(*it);
+        ProgramInfo *tmpItem = FindProgramInUILists(*it);
 
         if (!tmpItem)
             continue;
@@ -3003,7 +3068,7 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
     if (!pginfo)
         return;
 
-    ProgramInfo *tmpItem = findMatchingProg(pginfo);
+    ProgramInfo *tmpItem = FindProgramInUILists(*pginfo);
 
     if (JobQueue::IsJobQueuedOrRunning(jobType, pginfo->chanid,
                                pginfo->recstartts))
@@ -3042,7 +3107,7 @@ void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
     for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
         jobID = 0;
-        tmpItem = findMatchingProg(*it);
+        tmpItem = FindProgramInUILists(*it);
         if (tmpItem &&
             (!JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
                                     tmpItem->recstartts)))
@@ -3066,7 +3131,7 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
     for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
         jobID = 0;
-        tmpItem = findMatchingProg(*it);
+        tmpItem = FindProgramInUILists(*it);
         if (tmpItem &&
             (JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
                                 tmpItem->recstartts)))
@@ -3112,7 +3177,7 @@ void PlaybackBox::playlistDelete(bool forgetHistory)
 
     for (it = m_playList.begin(); it != m_playList.end(); ++it )
     {
-        tmpItem = findMatchingProg(*it);
+        tmpItem = FindProgramInUILists(*it);
         if (tmpItem && (REC_CAN_BE_DELETED(tmpItem)))
             RemoteDeleteRecording(tmpItem, forgetHistory, false);
     }
@@ -3147,7 +3212,35 @@ void PlaybackBox::doDeleteForgetHistory()
     doRemove(m_delItem, true, false);
 }
 
-ProgramInfo *PlaybackBox::findMatchingProg(const ProgramInfo *pginfo)
+ProgramInfo *PlaybackBox::FindProgramInUILists(const ProgramInfo &pginfo)
+{
+    return FindProgramInUILists(
+        pginfo.chanid.toUInt(), pginfo.recstartts, pginfo.recgroup);
+}
+
+/// Extracts chanid and recstartts from a string constructed by
+/// ProgramInfo::MakeUniqueKey() returns the matching program info
+/// from the UI program info lists.
+ProgramInfo *PlaybackBox::FindProgramInUILists(const QString &key)
+{
+    if (!key.isEmpty())
+    {
+        QStringList keyParts = key.split('_');
+        if (keyParts.size() == 2)
+        {
+            uint      chanid     = keyParts[0].toUInt();
+            QDateTime recstartts = QDateTime::fromString(keyParts[1]);
+            if (chanid && recstartts.isValid())
+                return FindProgramInUILists(chanid, recstartts);
+        }
+    }
+
+    return NULL;
+}
+
+ProgramInfo *PlaybackBox::FindProgramInUILists(
+    uint chanid, const QDateTime &recstartts,
+    QString recgroup)
 {
     // LiveTV ProgramInfo's are not in the aggregated list
     ProgramList::iterator _it[2] = {
@@ -3155,7 +3248,7 @@ ProgramInfo *PlaybackBox::findMatchingProg(const ProgramInfo *pginfo)
     ProgramList::iterator _end[2] = {
         m_progLists[tr("LiveTV").toLower()].end(),   m_progLists[""].end()   };
 
-    if (pginfo->recgroup != "LiveTV")
+    if (recgroup != "LiveTV")
     {
         swap( _it[0],  _it[1]);
         swap(_end[0], _end[1]);
@@ -3166,8 +3259,8 @@ ProgramInfo *PlaybackBox::findMatchingProg(const ProgramInfo *pginfo)
         ProgramList::iterator it = _it[i], end = _end[i];
         for (; it != end; ++it)
         {
-            if ((*it)->recstartts == pginfo->recstartts &&
-                (*it)->chanid == pginfo->chanid)
+            if ((*it)->recstartts      == recstartts &&
+                (*it)->chanid.toUInt() == chanid)
             {
                 return *it;
             }
@@ -3223,52 +3316,44 @@ void PlaybackBox::UpdateProgramInfo(const ProgramInfo &pginfo)
     }
 }
 
-ProgramInfo *PlaybackBox::findMatchingProg(const QString &key)
+void PlaybackBox::UpdateProgramInfo(
+    uint chanid, const QDateTime &recstartts, long long filesize)
 {
-    QStringList keyParts;
-
-    if ((key.isEmpty()) || (key.indexOf('_') < 0))
-        return NULL;
-
-    keyParts = key.split('_');
-
-    // ProgramInfo::MakeUniqueKey() has 2 parts separated by '_' characters
-    if (keyParts.size() == 2)
-        return findMatchingProg(keyParts[0], keyParts[1]);
-    else
-        return NULL;
-}
-
-ProgramInfo *PlaybackBox::findMatchingProg(const QString &chanid,
-                                           const QString &recstartts)
-{
-    ProgramList::iterator it = m_progLists[""].begin();
-    ProgramList::iterator end = m_progLists[""].end();
-    for (; it != end; ++it)
-    {
-        if ((*it)->recstartts.toString(Qt::ISODate) == recstartts &&
-            (*it)->chanid == chanid)
-        {
-            return *it;
-        }
-    }
-
     // LiveTV ProgramInfo's are not in the aggregated list
-    if (m_progLists.contains(tr("LiveTV").toLower()))
+    ProgramList::iterator _it[2] = {
+        m_progLists[tr("LiveTV").toLower()].begin(), m_progLists[""].begin() };
+    ProgramList::iterator _end[2] = {
+        m_progLists[tr("LiveTV").toLower()].end(),   m_progLists[""].end()   };
+
+    for (uint i = 0; i < 2; i++)
     {
-        it  = m_progLists[tr("LiveTV").toLower()].begin();
-        end = m_progLists[tr("LiveTV").toLower()].end();
+        ProgramList::iterator it = _it[i], end = _end[i];
         for (; it != end; ++it)
         {
-            if ((*it)->recstartts.toString(Qt::ISODate) == recstartts &&
-                (*it)->chanid == chanid)
+            if (chanid     == (*it)->chanid.toUInt() &&
+                recstartts == (*it)->recstartts)
             {
-                return *it;
+                (*it)->filesize = filesize;
+                break;
             }
         }
     }
 
-    return NULL;
+    // now do the cache..
+    QMutexLocker locker(&m_progCacheLock);
+    if (m_progCache)
+    {
+        vector<ProgramInfo *>::iterator it = m_progCache->begin();
+        for ( ; it != m_progCache->end(); ++it)
+        {
+            if ((chanid     == (*it)->chanid.toUInt()) &&
+                (recstartts == (*it)->recstartts))
+            {
+                (*it)->filesize = filesize;
+                break;
+            }
+        }
+    }
 }
 
 void PlaybackBox::toggleWatched(void)
@@ -3728,6 +3813,25 @@ void PlaybackBox::customEvent(QEvent *event)
             if (evinfo.FromStringList(me->ExtraDataList(), 0))
                 HandleUpdateProgramInfoEvent(evinfo);
         }
+        else if (message.left(17) == "UPDATE_FILE_SIZE")
+        {
+            QStringList tokens = message.simplified().split(" ");
+            bool ok = false;
+            uint chanid = 0;
+            QDateTime recstartts;
+            long long filesize = 0;
+            if (tokens.size() >= 4)
+            {
+                chanid     = tokens[1].toUInt();
+                recstartts = QDateTime::fromString(tokens[2]);
+                filesize   = tokens[3].toLongLong(&ok);
+            }
+            if (chanid && recstartts.isValid() && ok)
+            {
+                HandleUpdateProgramInfoFileSizeEvent(
+                    chanid, recstartts, filesize);
+            }
+        }
         else if (message == "RECONNECT_SUCCESS")
         {
             m_fillListFromCache = false;
@@ -3810,7 +3914,7 @@ void PlaybackBox::HandleRecordingAddEvent(const ProgramInfo &evinfo)
 
 void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
 {
-    ProgramInfo *dst = findMatchingProg(&evinfo);
+    ProgramInfo *dst = FindProgramInUILists(evinfo);
     QString old_recgroup;
     if (dst)
         old_recgroup = dst->recgroup;
@@ -3837,22 +3941,17 @@ void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
         return;
     }
 
-    MythUIButtonListItem *item =
-        m_recordingList->GetItemByData(qVariantFromValue(dst));
+    UpdateUIListItem(dst);
+}
 
-    if (item)
-    {
-        MythUIButtonListItem *sel_item =
-            m_recordingList->GetItemCurrent();
-        UpdateProgramInfo(item, item == sel_item, true);
-    }
-    else
-    {
-        VERBOSE(VB_GENERAL, LOC +
-                QString("Got UPDATE_PROG_INFO event about a title unknown "
-                        "to us only in m_recordingList\n %1:%2")
-                .arg(evinfo.title).arg(evinfo.subtitle));
-    }
+void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(
+    uint chanid, const QDateTime &recstartts, const long long filesize)
+{
+    UpdateProgramInfo(chanid, recstartts, filesize);
+
+    ProgramInfo *dst = FindProgramInUILists(chanid, recstartts);
+    if (dst)
+        UpdateUIListItem(dst);
 }
 
 void PlaybackBox::ScheduleFillList(void)
@@ -4032,7 +4131,7 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
 
 void PlaybackBox::HandlePreviewEvent(const ProgramInfo &evinfo)
 {
-    ProgramInfo *info = findMatchingProg(&evinfo);
+    ProgramInfo *info = FindProgramInUILists(evinfo);
 
     if (!info)
         return;
@@ -4044,7 +4143,7 @@ void PlaybackBox::HandlePreviewEvent(const ProgramInfo &evinfo)
         return;
 
     MythUIButtonListItem *sel_item = m_recordingList->GetItemCurrent();
-    UpdateProgramInfo(item, item == sel_item, true);
+    UpdateUIListItem(item, item == sel_item, true);
 }
 
 QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
@@ -4525,7 +4624,7 @@ void PlaybackBox::doPlaylistExpireSetting(bool turnOn)
 
     for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
-        if ((tmpItem = findMatchingProg(*it)))
+        if ((tmpItem = FindProgramInUILists(*it)))
         {
             tmpItem->SetAutoExpire(turnOn, true);
         }
@@ -4579,7 +4678,7 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
         item->SetText(newTitle, "title");
         item->SetText(newSubtitle, "subtitle");
 
-        UpdateProgramInfo(item, true);
+        UpdateUIListItem(item, true);
     }
     else
         m_recordingList->RemoveItem(item);
@@ -4620,7 +4719,7 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 
         for (it = m_playList.begin(); it != m_playList.end(); ++it )
         {
-            tmpItem = findMatchingProg(*it);
+            tmpItem = FindProgramInUILists(*it);
             if (tmpItem)
             {
                 if ((tmpItem->recgroup == "LiveTV") && (newRecGroup != "LiveTV"))
@@ -4670,7 +4769,7 @@ void PlaybackBox::setPlayGroup(QString newPlayGroup)
 
         for (it = m_playList.begin(); it != m_playList.end(); ++it )
         {
-            tmpItem = findMatchingProg(*it);
+            tmpItem = FindProgramInUILists(*it);
             if (tmpItem)
             {
                 RecordingInfo ri(*tmpItem);
