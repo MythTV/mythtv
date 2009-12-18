@@ -322,7 +322,7 @@ void CC708Window::Scroll(int row, int col)
     if (!true_row_count || !true_column_count)
         return;
 
-    if ((k708DirBottomToTop == scroll_dir) &&
+    if (text && (k708DirBottomToTop == scroll_dir) &&
         (row >= (int)true_row_count))
     {
         for (uint j = 0; j < true_row_count - 1; j++)
