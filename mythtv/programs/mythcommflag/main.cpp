@@ -230,6 +230,27 @@ int CopySkipListToCutList(QString chanid, QString starttime)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
+int ClearSkipList(QString chanid, QString starttime)
+{
+    ProgramInfo *pginfo =
+        ProgramInfo::GetProgramFromRecorded(chanid, starttime);
+
+    if (!pginfo)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("No program data exists for channel %1 at %2")
+                .arg(chanid).arg(starttime));
+        return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
+    }
+
+    QMap<long long, int> skiplist;
+    pginfo->SetCommBreakList(skiplist);
+
+    VERBOSE(VB_IMPORTANT, "Commercial skip list cleared");
+
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+}
+
 int SetCutList(QString chanid, QString starttime, QString newCutList)
 {
     QMap<long long, int> cutlist;
@@ -827,6 +848,7 @@ int main(int argc, char *argv[])
     bool queueJobInstead = false;
     bool copyToCutlist = false;
     bool clearCutlist = false;
+    bool clearSkiplist = false;
     bool getCutlist = false;
     bool getSkipList = false;
     QString newCutList = QString::null;
@@ -974,6 +996,8 @@ int main(int argc, char *argv[])
             copyToCutlist = true;
         else if (!strcmp(a.argv()[argpos], "--clearcutlist"))
             clearCutlist = true;
+        else if (!strcmp(a.argv()[argpos], "--clearskiplist"))
+            clearSkiplist = true;
         else if (!strcmp(a.argv()[argpos], "--getcutlist"))
             getCutlist = true;
         else if (!strcmp(a.argv()[argpos], "--getskiplist"))
@@ -1123,6 +1147,7 @@ int main(int argc, char *argv[])
                     "--sleep                      Give up some CPU time after processing each frame\n"
                     "--nopercentage               Don't print percentage done\n"
                     "--rebuild                    Do not flag commercials, just rebuild seektable\n"
+                    "--clearskiplist              Clear the commercial skip list\n"
                     "--gencutlist                 Copy the commercial skip list to the cutlist\n"
                     "--clearcutlist               Clear the cutlist\n"
                     "--setcutlist CUTLIST         Set a new cutlist.  CUTLIST is of the form:\n"
@@ -1231,6 +1256,9 @@ int main(int argc, char *argv[])
                 "and the Start Time.");
         return COMMFLAG_EXIT_INVALID_CMDLINE;
     }
+
+    if (clearSkiplist)
+        return ClearSkipList(chanid, starttime);
 
     if (copyToCutlist)
         return CopySkipListToCutList(chanid, starttime);
