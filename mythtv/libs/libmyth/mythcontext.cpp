@@ -1660,7 +1660,7 @@ MythSocket *MythContext::ConnectCommandSocket(
             }
 
             myth_system(WOLcmd);
-            sleepms = WOLsleepTime * 1000000;
+            sleepms = WOLsleepTime * 1000;
         }
 
         serverSock->DownRef();
@@ -1673,7 +1673,7 @@ MythSocket *MythContext::ConnectCommandSocket(
         }
 
         if (sleepms)
-            usleep(sleepms / 1000);
+            usleep(sleepms * 1000);
     }
 
     if (we_attempted_wol)
