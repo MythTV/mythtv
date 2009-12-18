@@ -672,28 +672,42 @@ ushort CCtableG0[0x60] =
     '`', 'a', 'b', 'c',    'd', 'e', 'f', 'g',  /* 0x60-0x67 */
     'h', 'i', 'j', 'k',    'l', 'm', 'n', 'o',  /* 0x68-0x6f */
     'p', 'q', 'r', 's',    't', 'u', 'v', 'w',  /* 0x70-0x77 */
-    'x', 'y', 'z', '{',    '|', '}', '~',  0x1d16, // music note/* 0x78-0x7f */
+    'x', 'y', 'z', '{',    '|', '}', '~',  0x266a, // music note/* 0x78-0x7f */
 };
 
 ushort CCtableG1[0x60] =
 {
-//   0    1    2    3       4    5    6    7
-//   8    9    a    b       c    d    e    f  
+//          0           1           2           3
+//          4           5           6           7
+//          8           9           a           b
+//          c           d           e           f  
     0xA0, // unicode non-breaking space
-         '¡', '¢', '£',    '¤', '¥', '¦', '§', /* 0xa0-0xa7 */
-    '¨', '©', 'ª', '«',    '¬', '­', '®', '¯', /* 0xa8-0xaf */
-    '°', '±', '²', '³',    '´', 'µ', '¶', '·', /* 0xb0-0xb7 */
-    '¸', '¹', 'º', '»',    '¼', '½', '¾', '¿', /* 0xbf-0xbf */
+                (uchar)'¡', (uchar)'¢', (uchar)'£', /* 0xa0-0xa3 */
+    (uchar)'¤', (uchar)'¥', (uchar)'¦', (uchar)'§', /* 0xa4-0xa7 */
+    (uchar)'¨', (uchar)'©', (uchar)'ª', (uchar)'«', /* 0xa8-0xab */
+    (uchar)'¬', (uchar)'­', (uchar)'®', (uchar)'¯', /* 0xac-0xaf */
+    (uchar)'°', (uchar)'±', (uchar)'²', (uchar)'³', /* 0xb0-0xb3 */
+    (uchar)'´', (uchar)'µ', (uchar)'¶', (uchar)'·', /* 0xb4-0xb7 */
+    (uchar)'¸', (uchar)'¹', (uchar)'º', (uchar)'»', /* 0xb8-0xbb */
+    (uchar)'¼', (uchar)'½', (uchar)'¾', (uchar)'¿', /* 0xbc-0xbf */
 
-    'À', 'Á', 'Â', 'Ã',    'Ä', 'Å', 'Æ', 'Ç', /* 0xc0-0xc7 */
-    'È', 'É', 'Ê', 'Ë',    'Ì', 'Í', 'Î', 'Ï', /* 0xcf-0xcf */
-    'Ð', 'Ñ', 'Ò', 'Ó',    'Ô', 'Õ', 'Ö', '×', /* 0xd0-0xd7 */
-    'Ø', 'Ù', 'Ú', 'Û',    'Ü', 'Ý', 'Þ', 'ß', /* 0xdf-0xdf */
+    (uchar)'À', (uchar)'Á', (uchar)'Â', (uchar)'Ã', /* 0xc0-0xc3 */
+    (uchar)'Ä', (uchar)'Å', (uchar)'Æ', (uchar)'Ç', /* 0xc4-0xc7 */
+    (uchar)'È', (uchar)'É', (uchar)'Ê', (uchar)'Ë', /* 0xc8-0xcb */
+    (uchar)'Ì', (uchar)'Í', (uchar)'Î', (uchar)'Ï', /* 0xcc-0xcf */
+    (uchar)'Ð', (uchar)'Ñ', (uchar)'Ò', (uchar)'Ó', /* 0xd0-0xd3 */
+    (uchar)'Ô', (uchar)'Õ', (uchar)'Ö', (uchar)'×', /* 0xd4-0xd7 */
+    (uchar)'Ø', (uchar)'Ù', (uchar)'Ú', (uchar)'Û', /* 0xd8-0xdb */
+    (uchar)'Ü', (uchar)'Ý', (uchar)'Þ', (uchar)'ß', /* 0xdc-0xdf */
 
-    'à', 'á', 'â', 'ã',    'ä', 'å', 'æ', 'ç', /* 0xe0-0xe7 */
-    'è', 'é', 'ê', 'ë',    'ì', 'í', 'î', 'ï', /* 0xef-0xef */
-    'ð', 'ñ', 'ò', 'ó',    'ô', 'õ', 'ö', '÷', /* 0xf0-0xf7 */
-    'ø', 'ù', 'ú', 'û',    'ü', 'ý', 'þ', 'ÿ', /* 0xff-0xff */
+    (uchar)'à', (uchar)'á', (uchar)'â', (uchar)'ã', /* 0xe0-0xe3 */
+    (uchar)'ä', (uchar)'å', (uchar)'æ', (uchar)'ç', /* 0xe4-0xe7 */
+    (uchar)'è', (uchar)'é', (uchar)'ê', (uchar)'ë', /* 0xe8-0xeb */
+    (uchar)'ì', (uchar)'í', (uchar)'î', (uchar)'ï', /* 0xec-0xef */
+    (uchar)'ð', (uchar)'ñ', (uchar)'ò', (uchar)'ó', /* 0xf0-0xf3 */
+    (uchar)'ô', (uchar)'õ', (uchar)'ö', (uchar)'÷', /* 0xf4-0xf7 */
+    (uchar)'ø', (uchar)'ù', (uchar)'ú', (uchar)'û', /* 0xf8-0xfb */
+    (uchar)'ü', (uchar)'ý', (uchar)'þ', (uchar)'ÿ', /* 0xfc-0xff */
 };
 
 ushort CCtableG2[0x60] =
