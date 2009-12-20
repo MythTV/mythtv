@@ -314,6 +314,7 @@ void NewsSite::parseRSS(QDomDocument domDoc)
         QDomNode enclosureNode = itemNode.namedItem("enclosure");
         QString enclosure = QString::null;
         QString enclosure_type = QString::null;
+        QString thumbnail = QString::null;
         if (!enclosureNode.isNull())
         {
             QDomAttr enclosureURL = enclosureNode.toElement()
@@ -324,8 +325,16 @@ void NewsSite::parseRSS(QDomDocument domDoc)
 
             QDomAttr enclosureType = enclosureNode.toElement()
                 .attributeNode("type");
-            if (!enclosureType.isNull())
+            if (!enclosureType.isNull()) 
+            {
                 enclosure_type  = enclosureType.value();
+
+                if (enclosure_type == "image/jpeg")
+                {
+                    thumbnail = enclosure;
+                    enclosure = QString::null;
+                }
+            }
         }
 
         //////////////////////////////////////////////////////////////
@@ -341,7 +350,6 @@ void NewsSite::parseRSS(QDomDocument domDoc)
             itemNode = mediaGroup;
 
         QDomNode thumbNode = itemNode.namedItem("media:thumbnail");
-        QString thumbnail = QString::null;
         if (!thumbNode.isNull())
         {
             QDomAttr thumburl = thumbNode.toElement().attributeNode("url");
