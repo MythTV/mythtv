@@ -27,6 +27,7 @@ using namespace std;
 #include "mythverbose.h"
 #include "storagegroup.h"
 #include "programlist.h"
+#include "programinfoupdater.h"
 
 #define LOC QString("ProgramInfo: ")
 #define LOC_ERR QString("ProgramInfo, Error: ")
@@ -40,6 +41,7 @@ static int init_tr(void);
 
 QMutex ProgramInfo::staticDataLock;
 QString ProgramInfo::unknownTitle;
+ProgramInfoUpdater *ProgramInfo::updater;
 
 static void set_flag(uint32_t &flags, int flag_to_set, bool is_set)
 {
@@ -138,6 +140,9 @@ ProgramInfo::ProgramInfo(void) :
     inUseForWhat(""),
     positionMapDBReplacement(NULL)
 {
+    QMutexLocker locker(&staticDataLock);
+    if (!updater)
+        updater = new ProgramInfoUpdater();
 }
 
 /** \fn ProgramInfo::ProgramInfo(const ProgramInfo &other)
@@ -1782,9 +1787,7 @@ void ProgramInfo::SetFilesize(long long fsize)
     if (!query.exec())
         MythDB::DBError("File size update", query);
 
-    QString msg = QString("UPDATE_FILE_SIZE %1 %2 %3")
-        .arg(chanid).arg(recstartts.toString(Qt::ISODate)).arg(fsize);
-    RemoteSendMessage(msg);
+    updater->insert(chanid.toUInt(), recstartts, kPIUpdateFileSize, fsize);
 }
 
 /** \fn ProgramInfo::GetFilesize(void)
@@ -1877,29 +1880,17 @@ void ProgramInfo::SetBookmark(long long pos)
 
 void ProgramInfo::SendUpdateEvent(void)
 {
-    // Make sure we are up to date first..
-    if (LoadProgramFromRecorded(chanid.toUInt(), recstartts))
-    {
-        // if we successfully loaded the program from the recorded
-        // table send an update event..
-        QStringList list;
-        ToStringList(list);
-        RemoteSendEvent(MythEvent(QString("MASTER_UPDATE_PROG_INFO"), list));
-    }
+    updater->insert(chanid.toUInt(), recstartts, kPIUpdate);
 }
 
 void ProgramInfo::SendAddedEvent(void) const
 {
-    QStringList list;
-    ToStringList(list);
-    RemoteSendEvent(MythEvent(QString("RECORDING_LIST_CHANGE ADD"), list));
+    updater->insert(chanid.toUInt(), recstartts, kPIAdd);
 }
 
 void ProgramInfo::SendDeletedEvent(void) const
 {
-    QString msg = QString("RECORDING_LIST_CHANGE DELETE %1 %2")
-        .arg(chanid).arg(recstartts.toString(Qt::ISODate));
-    RemoteSendEvent(MythEvent(msg));
+    updater->insert(chanid.toUInt(), recstartts, kPIDelete);
 }
 
 /** \brief Queries Latest bookmark timestamp from the database.

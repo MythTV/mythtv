@@ -28,7 +28,8 @@ HEADERS += mythhdd.h mythcdrom.h storagegroup.h dbutil.h
 HEADERS += mythcommandlineparser.h mythterminal.h
 HEADERS += mythhttppool.h mythhttphandler.h
 HEADERS += audiopulseutil.h
-HEADERS += programinfo.h programlist.h recordingtypes.h remoteutil.h
+HEADERS += programinfo.h programlist.h programinfoupdater.h
+HEADERS += recordingtypes.h remoteutil.h
 
 # remove when everything is switched to mythui
 HEADERS += virtualkeyboard_qt.h
@@ -50,7 +51,8 @@ SOURCES += mythhdd.cpp mythcdrom.cpp storagegroup.cpp dbutil.cpp
 SOURCES += mythcommandlineparser.cpp mythterminal.cpp
 SOURCES += mythhttppool.cpp mythhttphandler.cpp
 SOURCES += audiopulseutil.cpp
-SOURCES += programinfo.cpp programlist.cpp recordingtypes.cpp remoteutil.cpp
+SOURCES += programinfo.cpp programlist.cpp programinfoupdater.cpp
+SOURCES += recordingtypes.cpp remoteutil.cpp
 
 # remove when everything is switched to mythui
 SOURCES += virtualkeyboard_qt.cpp

@@ -1,0 +1,68 @@
+#ifndef _PROGRAM_INFO_UPDATER_H_
+#define _PROGRAM_INFO_UPDATER_H_
+
+#include <vector>
+using namespace std;
+
+#include <QThreadPool>
+#include <QDateTime>
+#include <QMutex>
+#include <QHash>
+
+typedef enum PIAction {
+    kPIAdd,
+    kPIDelete,
+    kPIUpdate,
+    kPIUpdateFileSize,
+} PIAction;
+
+class PIKey
+{
+  public:
+    PIKey(uint c, const QDateTime &r) : chanid(c), recstartts(r) {}
+
+    uint      chanid;
+    QDateTime recstartts;
+
+    bool operator==(const PIKey &other) const
+    {
+        return (chanid     == other.chanid &&
+                recstartts == other.recstartts);
+    }
+};
+uint qHash(const PIKey &k);
+
+class PIKeyAction : public PIKey
+{
+  public:
+    PIKeyAction(uint c, const QDateTime &r, PIAction a) :
+        PIKey(c, r), action(a) { }
+
+    PIAction action;
+};
+
+class PIKeyData
+{
+  public:
+    PIKeyData(PIAction a, long long f) : action(a), filesize(f) { }
+    PIAction action;
+    long long filesize;
+};
+
+class ProgramInfoUpdater : public QRunnable
+{
+  public:
+    ProgramInfoUpdater() : isQueued(false) { setAutoDelete(false); }
+
+    void insert(uint     chanid, const QDateTime &recstartts,
+                PIAction action, long long        filesize = 0LL);
+    void run(void);
+
+  private:
+    QMutex        lock;
+    bool          isQueued;
+    vector<PIKeyAction>    needsAddDelete;
+    QHash<PIKey,PIKeyData> needsUpdate;
+};
+
+#endif // _PROGRAM_INFO_UPDATER_H_

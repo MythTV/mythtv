@@ -3760,16 +3760,31 @@ void PlaybackBox::customEvent(QEvent *event)
         if (message.left(21) == "RECORDING_LIST_CHANGE")
         {
             QStringList tokens = message.simplified().split(" ");
-            if ((tokens.size() == 4) && (tokens[1] == "ADD"))
+            uint chanid = 0;
+            QDateTime recstartts;
+            if (tokens.size() >= 4)
+            {
+                chanid = tokens[2].toUInt();
+                recstartts = QDateTime::fromString(tokens[3]);
+            }
+
+            if ((tokens.size() >= 2) && tokens[1] == "UPDATE")
             {
                 ProgramInfo evinfo;
                 if (evinfo.FromStringList(me->ExtraDataList(), 0))
-                    HandleRecordingAddEvent(evinfo);
+                    HandleUpdateProgramInfoEvent(evinfo);
             }
-            if ((tokens.size() == 4) && (tokens[1] == "DELETE"))
+            else if (chanid && recstartts.isValid() && (tokens[1] == "ADD"))
             {
-                uint chanid = tokens[2].toUInt();
-                QDateTime recstartts = QDateTime::fromString(tokens[3]);
+                ProgramInfo evinfo;
+                if (evinfo.LoadProgramFromRecorded(chanid, recstartts))
+                {
+                    evinfo.recstatus = rsRecording;
+                    HandleRecordingAddEvent(evinfo);
+                }
+            }
+            else if (chanid && recstartts.isValid() && (tokens[1] == "DELETE"))
+            {
                 if (chanid && recstartts.isValid())
                     HandleRecordingRemoveEvent(chanid, recstartts);
             }
@@ -3812,12 +3827,6 @@ void PlaybackBox::customEvent(QEvent *event)
             ProgramInfo evinfo;
             if (evinfo.FromStringList(me->ExtraDataList(), 0))
                 HandlePreviewEvent(evinfo);
-        }
-        else if (message == "UPDATE_PROG_INFO")
-        {
-            ProgramInfo evinfo;
-            if (evinfo.FromStringList(me->ExtraDataList(), 0))
-                HandleUpdateProgramInfoEvent(evinfo);
         }
         else if (message.left(17) == "UPDATE_FILE_SIZE")
         {

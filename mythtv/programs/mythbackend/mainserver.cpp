@@ -875,20 +875,30 @@ void MainServer::customEvent(QEvent *e)
             return;
 
         MythEvent mod_me("");
-        if (me->Message() == "MASTER_UPDATE_PROG_INFO" && m_sched)
+        if (me->Message().left(23) == "MASTER_UPDATE_PROG_INFO")
         {
+            QStringList tokens = me->Message().simplified().split(" ");
+            uint chanid = 0;
+            QDateTime recstartts;
+            if (tokens.size() >= 3)
+            {
+                chanid     = tokens[1].toUInt();
+                recstartts = QDateTime::fromString(tokens[2], Qt::ISODate);
+            }
+
             ProgramInfo evinfo;
-            if (evinfo.FromStringList(me->ExtraDataList(), 0))
+            if (chanid && recstartts.isValid() &&
+                evinfo.LoadProgramFromRecorded(chanid, recstartts))
             {
                 QDateTime rectime = QDateTime::currentDateTime().addSecs(
                     -gContext->GetNumSetting("RecordOverTime"));
 
-                if (evinfo.recendts > rectime)
+                if (m_sched && evinfo.recendts > rectime)
                     evinfo.recstatus = m_sched->GetRecStatus(evinfo);
 
                 QStringList list;
                 evinfo.ToStringList(list);
-                mod_me = MythEvent("UPDATE_PROG_INFO", list);
+                mod_me = MythEvent("RECORDING_LIST_CHANGE UPDATE", list);
                 me = &mod_me;
             }
             else

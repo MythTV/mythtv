@@ -221,6 +221,7 @@ class MPUBLIC PMapDBReplacement
 
 class MSqlQuery;
 class ProgramList;
+class ProgramInfoUpdater;
 
 class MPUBLIC ProgramInfo
 {
@@ -485,6 +486,7 @@ class MPUBLIC ProgramInfo
 
     static QMutex staticDataLock;
     static QString unknownTitle;
+    static ProgramInfoUpdater *updater;
 };
 
 Q_DECLARE_METATYPE(ProgramInfo*)
