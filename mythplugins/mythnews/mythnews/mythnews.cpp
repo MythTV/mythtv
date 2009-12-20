@@ -322,6 +322,9 @@ void MythNews::updateInfoView(MythUIButtonListItem *selected)
             }
             else
             {
+                if (m_thumbnailImage)
+                    m_thumbnailImage->Hide();
+
                 if (!site->imageURL().isEmpty())
                 {
                     QString fileprefix = GetConfDir();
