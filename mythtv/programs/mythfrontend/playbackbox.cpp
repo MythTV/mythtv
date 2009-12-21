@@ -471,10 +471,6 @@ PlaybackBox::~PlaybackBox(void)
         m_freeSpaceTimer = NULL;
     }
 
-    clearProgramCache();
-
-    delete m_currentItem;
-
     // disconnect preview generators
     QMutexLocker locker(&m_previewGeneratorLock);
     PreviewMap::iterator it = m_previewGenerator.begin();
@@ -483,6 +479,10 @@ PlaybackBox::~PlaybackBox(void)
         if ((*it).gen)
             (*it).gen->disconnectSafe();
     }
+
+    clearProgramCache();
+
+    delete m_currentItem;
 }
 
 bool PlaybackBox::Create()

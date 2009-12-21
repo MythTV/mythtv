@@ -155,6 +155,8 @@ class MythContextPrivate
     MythDB *m_database;
     MythUIHelper *m_ui;
     MythContextSlotHandler *m_sh;
+
+    QThread *m_UIThread;
 };
 
 static void exec_program_cb(const QString &cmd)
@@ -260,7 +262,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       pluginmanager(NULL),
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
       m_database(GetMythDB()), m_ui(NULL),
-      m_sh(new MythContextSlotHandler(this))
+      m_sh(new MythContextSlotHandler(this)),
+      m_UIThread(QThread::currentThread())
 {
     InitializeMythDirs();
 }
@@ -2026,6 +2029,16 @@ void MythContext::OverrideSettingForSession(const QString &key,
 bool MythContext::SendReceiveStringList(QStringList &strlist,
                                         bool quickTimeout, bool block)
 {
+    if (!IsBackend() && QThread::currentThread() == d->m_UIThread)
+    {
+        QString msg = "SendReceiveStringList(";
+        for (uint i=0; i<(uint)strlist.size() && i<2; i++)
+            msg += (i?",":"") + strlist[i];
+        msg += (strlist.size() > 2) ? "...)" : ")";
+        msg += " called from UI thread";
+        VERBOSE(VB_IMPORTANT, msg);
+    }
+
     QString query_type = "UNKNOWN";
 
     if (!strlist.isEmpty())

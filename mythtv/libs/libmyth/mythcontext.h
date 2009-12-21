@@ -197,7 +197,7 @@ class MPUBLIC MythContext : public MythObservable, public MythSocketCBs
     MythPrivRequest popPrivRequest();
 
     void dispatch(const MythEvent &event);
-    void dispatchNow(const MythEvent &event);
+    void dispatchNow(const MythEvent &event) MDEPRECATED;
 
     void sendPlaybackStart(void);
     void sendPlaybackEnd(void);
