@@ -305,6 +305,14 @@ void CC708Window::AddChar(QChar ch)
         return;
     }
 
+    if (ch.toAscii() == 0x08)
+    {
+        DecrPenLocation();
+        GetCCChar().attr      = pen.attr;
+        GetCCChar().character = QChar(' ');
+        return;
+    }
+
     GetCCChar().attr      = pen.attr;
     GetCCChar().character = ch;
     int c = pen.column;
@@ -373,6 +381,48 @@ void CC708Window::IncrPenLocation(void)
             new_row    += 1;
         }
         else if (new_column < 0)
+        {
+            new_column  = (int)true_column_count - 1;
+            new_row    -= 1;
+        }
+        Scroll(new_row, new_column);
+    }
+    else
+    {
+        pen.column = max(new_column, 0);
+        pen.row    = max(new_row,    0);
+    }
+    // TODO implement other 2 scroll directions...
+
+    LimitPenLocation();
+}
+
+void CC708Window::DecrPenLocation(void)
+{
+    // TODO: Scroll direction and up/down printing,
+    // and word wrap not handled yet...
+    int new_column = pen.column, new_row = pen.row;
+
+    new_column -= (print_dir == k708DirLeftToRight) ? +1 : 0;
+    new_column -= (print_dir == k708DirRightToLeft) ? -1 : 0;
+    new_row    -= (print_dir == k708DirTopToBottom) ? +1 : 0;
+    new_row    -= (print_dir == k708DirBottomToTop) ? -1 : 0;
+
+#if 0
+    VERBOSE(VB_VBI, QString("DecrPen dir%1: (c %2, r %3) -> (%4,%5)")
+            .arg(print_dir).arg(pen.column).arg(pen.row)
+            .arg(new_column).arg(new_row));
+#endif
+
+    if (k708DirLeftToRight == print_dir || k708DirRightToLeft == print_dir)
+    {
+        // basic wrapping for l->r, r->l languages
+        if (!row_lock && column_lock && (new_column >= (int)true_column_count))
+        {
+            new_column  = 0;
+            new_row    += 1;
+        }
+        else if (!row_lock && column_lock && (new_column < 0))
         {
             new_column  = (int)true_column_count - 1;
             new_row    -= 1;

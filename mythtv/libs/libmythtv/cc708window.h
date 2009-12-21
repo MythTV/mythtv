@@ -119,6 +119,7 @@ class CC708Window
 
     void AddChar(QChar);
     void IncrPenLocation(void);
+    void DecrPenLocation(void);
     void SetPenLocation(uint, uint);
     void LimitPenLocation(void);
 
