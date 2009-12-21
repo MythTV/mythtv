@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.10';
+    $VERSION        = '1.0.11';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -924,8 +924,38 @@ EOF
                             { PrintError => 0 });
         if (!defined($dbh))
         {
+            verbose($verbose_level_always,
+                    '', 'Unable to connect to database.',
+                    "           database: $mysql_conf{'db_name'}",
+                    "               host: $mysql_conf{'db_host'}",
+                    "           username: $mysql_conf{'db_user'}"
+                   );
+        if ($debug < $verbose_level_debug)
+        {
+            verbose($verbose_level_always,
+                    'To see the password used, please re-run the script with'.
+                    ' the --verbose',
+                    'argument.');
+        }
+        # Connection issues will only occur with improper user configuration
+        # Because they should be rare, output the password with --verbose
             verbose($verbose_level_debug,
-                    'Unable to connect to database.');
+                    "           password: $mysql_conf{'db_pass'}");
+            verbose($verbose_level_always,
+                    '', 'Please check your configuration files to verify the'.
+                    ' database connection',
+                    'information is correct.  The files that are used to'.
+                    ' retrieve connection',
+                    'information are prefixed with "parsing" in the "Parsing'.
+                    ' configuration files"',
+                    'section of the --verbose output.');
+            verbose($verbose_level_always,
+                    '', 'Also note that any [client] or [mysql] password'.
+                    ' specified in the MySQL options',
+                    'file (/etc/my.cnf or /etc/mysql/my.cnf or ~/.my.cnf)'.
+                    ' will take precedence over',
+                    'the password specified in the MythTV configuration'.
+                    ' files.');
             $result = 0;
         }
         return $result;
