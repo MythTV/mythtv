@@ -2247,8 +2247,6 @@ void VDPAUContext::ParseOptions(QString options)
 
         if (name.contains("vdpaucolorspace"))
         {
-            int tmp;
-
             if (opts.contains("auto"))
                 colorspace = -1;
             else if (opts.contains("601"))
