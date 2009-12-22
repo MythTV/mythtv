@@ -2,7 +2,7 @@
 #define MYTHPROGRAM_H_
 
 // ANSI C
-#include <stdint.h> // for uint32_t (C99)
+#include <stdint.h> // for [u]int[32,64]_t
 
 // C++ headers
 #include <vector>
@@ -11,7 +11,6 @@ using namespace std;
 
 #include <QStringList>
 #include <QDateTime>
-#include <QRegExp>
 #include <QMap>
 #include <QHash>
 
@@ -312,8 +311,8 @@ class MPUBLIC ProgramInfo
     QString GetRecordBasename(bool fromDB = false) const;
     QString GetPlaybackURL(bool checkMaster = false,
                            bool forceCheckLocal = false) const;
-    long long GetFilesize(void);
-    int GetMplexID(void) const;
+    uint64_t GetFilesize(void);
+    uint GetMplexID(void) const;
     QDateTime GetBookmarkTimeStamp(void) const;
     long long GetBookmark(void) const;
     QStringList GetDVDBookmark(QString serialid, bool delbookmark) const;
@@ -327,7 +326,7 @@ class MPUBLIC ProgramInfo
     bool GetChannel(QString &channum, QString &input) const;
 
     // Slow DB sets
-    void SetFilesize(long long fsize);
+    void SetFilesize(uint64_t fsize);
     void SetBookmark(long long pos);
     void SetDVDBookmark(QStringList fields) const;
     void SetEditing(bool edit);
@@ -371,8 +370,8 @@ class MPUBLIC ProgramInfo
 
     // Resolution Set/Get
     void SetResolution(uint width, uint height, long long frame);
-    int GetWidth(void);
-    int GetHeight(void);
+    uint GetWidth(void);
+    uint GetHeight(void);
     void SetVidpropHeight(int width);
 
     // In-use, autodeletion prevention stuff
@@ -407,16 +406,16 @@ class MPUBLIC ProgramInfo
     QString chanstr;
     QString chansign;
     QString channame;
-    uint m_videoWidth;
-    uint m_videoHeight;
+    uint16_t m_videoWidth;
+    uint16_t m_videoHeight;
 
-    int recpriority;
+    int32_t recpriority;
     QString recgroup;
     QString playgroup;
-    int chancommfree;
+    bool chancommfree;
 
     mutable QString pathname;
-    long long filesize;
+    uint64_t filesize;
     QString hostname;
     QString storagegroup;
 
@@ -428,7 +427,7 @@ class MPUBLIC ProgramInfo
     AvailableStatusType availableStatus;
 
     bool isVideo;
-    int lenMins;
+    uint16_t lenMins;
 
     QString year;
     float stars;
@@ -440,36 +439,36 @@ class MPUBLIC ProgramInfo
     bool hasAirDate;
     bool repeat;
 
-    int spread;
-    int startCol;
+    int32_t spread;
+    int32_t startCol;
 
     RecStatusType recstatus;
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
-    int prefinput;
-    int recpriority2;
-    int reactivate;
+    int32_t prefinput;
+    int32_t recpriority2;
+    int32_t reactivate;
 
-    int recordid;
-    int parentid;
+    int32_t recordid;
+    int32_t parentid;
     RecordingType rectype;
     RecordingDupInType dupin;
     RecordingDupMethodType dupmethod;
 
-    int sourceid;
-    int inputid;
-    int cardid;
+    uint32_t sourceid;
+    uint32_t inputid;
+    uint32_t cardid;
     bool shareable;
     bool duplicate;
 
     QString schedulerid;
-    int findid;
+    int32_t findid;
 
     uint32_t programflags;
-    int subtitleType;
-    int videoproperties;
-    int audioproperties;
-    int transcoder;
+    int32_t subtitleType;
+    int32_t videoproperties;
+    int32_t audioproperties;
+    int32_t transcoder;
     QString chanOutputFilters;
 
     QString seriesid;

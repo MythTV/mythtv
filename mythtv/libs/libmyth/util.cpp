@@ -617,35 +617,6 @@ QDateTime MythUTCToLocal(const QDateTime &utc)
     return localdt;
 }
 
-/** \fn stringToLongLong(const QString &str)
- *  \brief Converts QString representing long long to a long long.
- *
- *   This is needed to input 64 bit numbers with Qt 3.1.
- */
-long long stringToLongLong(const QString &str)
-{
-    long long retval = 0;
-    if (str != QString::null)
-    {
-        QByteArray tmp = str.toAscii();
-        retval = strtoll(tmp.constData(), NULL, 0);
-    }
-    return retval;
-}
-
-/** \fn longLongToString(long long)
- *  \brief Returns QString representation of long long.
- *
- *   This is needed to output 64 bit numbers with Qt 3.1.
- */
-QString longLongToString(long long ll)
-{
-    char str[21];
-    snprintf(str, 20, "%lld", ll);
-    str[20] = '\0';
-    return str;
-}
-
 /** \fn getUptime(time_t&)
  *  \brief Returns uptime statistics.
  *  \todo Update Statistics are not supported (by MythTV) on NT or DOS.

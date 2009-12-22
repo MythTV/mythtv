@@ -376,7 +376,7 @@ bool LoadFromRecorded(
         proginfo->chanOutputFilters = query.value(20).toString();
         proginfo->seriesid      = query.value(21).toString();
         proginfo->programid     = query.value(22).toString();
-        proginfo->filesize      = stringToLongLong(query.value(23).toString());
+        proginfo->filesize      = query.value(23).toULongLong();
         proginfo->lastmodified  = QDateTime::fromString(query.value(24).toString(), Qt::ISODate);
         proginfo->findid        = query.value(25).toInt();
 

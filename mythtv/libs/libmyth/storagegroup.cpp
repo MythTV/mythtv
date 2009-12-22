@@ -513,7 +513,7 @@ QString StorageGroup::FindNextDirMostFree(void)
         VERBOSE(VB_FILE, LOC +
                 QString("FindNextDirMostFree: '%1' has %2 KiB free")
                         .arg(m_dirlist[curDir])
-                        .arg(longLongToString(thisDirFree)));
+                .arg(QString::number(thisDirFree)));
 
         if (thisDirFree > nextDirFree)
         {

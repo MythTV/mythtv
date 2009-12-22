@@ -3324,7 +3324,7 @@ void PlaybackBox::UpdateProgramInfo(const ProgramInfo &pginfo)
 }
 
 void PlaybackBox::UpdateProgramInfo(
-    uint chanid, const QDateTime &recstartts, long long filesize)
+    uint chanid, const QDateTime &recstartts, uint64_t filesize)
 {
     // LiveTV ProgramInfo's are not in the aggregated list
     ProgramList::iterator _it[2] = {
@@ -3835,7 +3835,7 @@ void PlaybackBox::customEvent(QEvent *event)
             bool ok = false;
             uint chanid = 0;
             QDateTime recstartts;
-            long long filesize = 0;
+            uint64_t filesize = 0ULL;
             if (tokens.size() >= 4)
             {
                 chanid     = tokens[1].toUInt();
@@ -3961,7 +3961,7 @@ void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
 }
 
 void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(
-    uint chanid, const QDateTime &recstartts, const long long filesize)
+    uint chanid, const QDateTime &recstartts, uint64_t filesize)
 {
     UpdateProgramInfo(chanid, recstartts, filesize);
 

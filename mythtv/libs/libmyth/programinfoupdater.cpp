@@ -8,7 +8,7 @@ uint qHash(const PIKey &k)
 
 void ProgramInfoUpdater::insert(
     uint     chanid, const QDateTime &recstartts,
-    PIAction action, long long        filesize)
+    PIAction action, uint64_t         filesize)
 {
     QMutexLocker locker(&lock);
     if (kPIUpdate == action || kPIUpdateFileSize == action)

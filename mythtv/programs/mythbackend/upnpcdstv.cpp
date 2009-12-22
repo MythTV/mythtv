@@ -252,7 +252,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     QString        sCategory    = query.value( 6).toString();
     QString        sHostName    = query.value( 7).toString();
     QString        sRecGroup    = query.value( 8).toString();
-    long long      nFileSize    = stringToLongLong( query.value( 9).toString() );
+    size_t         nFileSize    = query.value( 9).toULongLong();
     QString        sBaseName    = query.value(10).toString();
 
     QDateTime      dtProgStart  = query.value(11).toDateTime();
@@ -362,7 +362,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
 
 
     pRes->AddAttribute( "duration"  , sDur      );
-    pRes->AddAttribute( "size"      , longLongToString( nFileSize) );
+    pRes->AddAttribute( "size"      , QString::number( nFileSize) );
 
 /*
     // ----------------------------------------------------------------------
@@ -377,7 +377,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     pRes = pItem->AddResource( sProtocol, sURI );
 
     pRes->AddAttribute( "duration"  , sDur      );
-    pRes->AddAttribute( "size"      , longLongToString( nFileSize) );
+    pRes->AddAttribute( "size"      , QString::number( nFileSize) );
 */
 
     // ----------------------------------------------------------------------

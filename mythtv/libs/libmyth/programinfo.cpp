@@ -69,10 +69,10 @@ ProgramInfo::ProgramInfo(void) :
     recpriority(0),
     recgroup(QString("Default")),
     playgroup(QString("Default")),
-    chancommfree(0),
+    chancommfree(false),
 
     pathname(""),
-    filesize(0),
+    filesize(0ULL),
     hostname(""),
     storagegroup(QString("Default")),
 
@@ -253,10 +253,10 @@ ProgramInfo::ProgramInfo(
     recpriority(0),
     recgroup(QString("Default")),
     playgroup(QString("Default")),
-    chancommfree(0),
+    chancommfree(false),
 
     pathname(""),
-    filesize(0),
+    filesize(0ULL),
     hostname(""),
     storagegroup(QString("Default")),
 
@@ -554,10 +554,10 @@ void ProgramInfo::clear(void)
     recpriority = 0;
     recgroup = "Default";
     playgroup = "Default";
-    chancommfree = 0;
+    chancommfree = false;
 
     pathname.clear();
-    filesize = 0;
+    filesize = 0ULL;
     hostname.clear();
     storagegroup = "Default";
 
@@ -957,11 +957,11 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
 
     QString tmpSize;
 
-    tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
+    tmpSize.sprintf("%0.2f ", filesize * (1.0 / (1024.0 * 1024.0 * 1024.0)));
     tmpSize += QObject::tr("GB", "GigaBytes");
     progMap["filesize_str"] = tmpSize;
 
-    progMap["filesize"] = longLongToString(filesize);
+    progMap["filesize"] = QString::number(filesize);
 
     if (isVideo)
     {
@@ -1377,7 +1377,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
     chanOutputFilters = query.value(10).toString();
     seriesid     = query.value(11).toString();
     programid    = query.value(12).toString();
-    filesize     = query.value(13).toLongLong();
+    filesize     = query.value(13).toULongLong();
 
     lastmodified =
         QDateTime::fromString(query.value(14).toString(),
@@ -1768,10 +1768,10 @@ QString ProgramInfo::GetPlaybackURL(
     return tmpURL;
 }
 
-/** \fn ProgramInfo::SetFilesize(long long)
+/** \fn ProgramInfo::SetFilesize(uint64_t)
  *  \brief Sets recording file size in database, and sets "filesize" field.
  */
-void ProgramInfo::SetFilesize(long long fsize)
+void ProgramInfo::SetFilesize(uint64_t fsize)
 {
     filesize = fsize;
 
@@ -1781,7 +1781,7 @@ void ProgramInfo::SetFilesize(long long fsize)
         "SET filesize = :FILESIZE "
         "WHERE chanid    = :CHANID AND "
         "      starttime = :STARTTIME");
-    query.bindValue(":FILESIZE",  fsize);
+    query.bindValue(":FILESIZE",  (unsigned long long)fsize);
     query.bindValue(":CHANID",    chanid);
     query.bindValue(":STARTTIME", recstartts);
 
@@ -1794,7 +1794,7 @@ void ProgramInfo::SetFilesize(long long fsize)
 /** \fn ProgramInfo::GetFilesize(void)
  *  \brief Gets recording file size from database, and sets "filesize" field.
  */
-long long ProgramInfo::GetFilesize(void)
+uint64_t ProgramInfo::GetFilesize(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1806,10 +1806,10 @@ long long ProgramInfo::GetFilesize(void)
 
     if (query.exec() && query.next())
     {
-        filesize = stringToLongLong(query.value(0).toString());
+        filesize = query.value(0).toULongLong();
     }
     else
-        filesize = 0;
+        filesize = 0ULL;
 
     return filesize;
 }
@@ -1817,9 +1817,9 @@ long long ProgramInfo::GetFilesize(void)
 /** \fn ProgramInfo::GetMplexID(void) const
  *  \brief Gets multiplex any recording would be made on, zero if unknown.
  */
-int ProgramInfo::GetMplexID(void) const
+uint ProgramInfo::GetMplexID(void) const
 {
-    int ret = 0;
+    uint ret = 0U;
     if (!chanid.isEmpty())
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -3005,7 +3005,7 @@ void ProgramInfo::SetResolution(uint width, uint height, long long frame)
 /** \fn ProgramInfo::GetHeight(void)
  *  \brief Gets overall average height.
  */
-int ProgramInfo::GetHeight(void)
+uint ProgramInfo::GetHeight(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -3037,7 +3037,7 @@ int ProgramInfo::GetHeight(void)
 /** \fn ProgramInfo::GetWidth(void) 
  *  \brief Gets overall average width. 
  */ 
-int ProgramInfo::GetWidth(void) 
+uint ProgramInfo::GetWidth(void) 
 { 
     MSqlQuery query(MSqlQuery::InitCon()); 
  

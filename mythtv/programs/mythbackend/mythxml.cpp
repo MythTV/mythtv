@@ -1634,7 +1634,7 @@ void MythXML::FillProgramInfo(QDomDocument *pDoc,
         program.setAttribute( "programId"   , pInfo->programid    );
         program.setAttribute( "stars"       , pInfo->stars        );
         program.setAttribute( "fileSize"    ,
-                              longLongToString( pInfo->filesize ));
+                              QString::number( pInfo->filesize ));
         program.setAttribute( "lastModified",
                               pInfo->lastmodified.toString(Qt::ISODate) );
         program.setAttribute( "programFlags", pInfo->programflags );

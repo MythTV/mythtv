@@ -689,7 +689,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                     (found > *maxIter))
                 {
                     long long spaceFreed =
-                        stringToLongLong(query.value(5).toString()) >> 20;
+                        query.value(5).toLongLong() >> 20;
                     QString msg =
                         QString("Expiring %1 MBytes for %2 @ %3 => %4.  Too "
                                 "many episodes, we only want to keep %5.")
@@ -1005,7 +1005,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
         proginfo->seriesid = query.value(10).toString();
         proginfo->programid = query.value(11).toString();
         proginfo->recpriority = query.value(12).toInt();
-        proginfo->filesize = stringToLongLong(query.value(15).toString());
+        proginfo->filesize = query.value(15).toULongLong();
         proginfo->recgroup = query.value(16).toString();
         proginfo->storagegroup = query.value(17).toString();
         proginfo->pathname = query.value(18).toString();

@@ -44,9 +44,9 @@ class PIKeyAction : public PIKey
 class PIKeyData
 {
   public:
-    PIKeyData(PIAction a, long long f) : action(a), filesize(f) { }
+    PIKeyData(PIAction a, uint64_t f) : action(a), filesize(f) { }
     PIAction action;
-    long long filesize;
+    uint64_t filesize;
 };
 
 class ProgramInfoUpdater : public QRunnable
@@ -55,7 +55,7 @@ class ProgramInfoUpdater : public QRunnable
     ProgramInfoUpdater() : isQueued(false) { setAutoDelete(false); }
 
     void insert(uint     chanid, const QDateTime &recstartts,
-                PIAction action, long long        filesize = 0LL);
+                PIAction action, uint64_t         filesize = 0ULL);
     void run(void);
 
   private:

@@ -4,6 +4,9 @@
 // POSIX headers
 #include <pthread.h>
 
+// ANSI C headers
+#include <stdint.h>
+
 // C++ headers
 #include <vector>
 using namespace std;
@@ -42,7 +45,7 @@ class FileTransfer
 
     long long Seek(long long curpos, long long pos, int whence);
 
-    long long GetFileSize(void);
+    uint64_t GetFileSize(void);
 
     void SetTimeout(bool fast);
 

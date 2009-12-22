@@ -3,6 +3,9 @@
 #ifndef PLAYBACKBOX_H_
 #define PLAYBACKBOX_H_
 
+// ANSI C headers
+#include <stdint.h> // for [u]int[32,64]_t
+
 // C++ headers
 #include <vector>
 #include <deque>
@@ -324,7 +327,7 @@ class PlaybackBox : public ScheduleCommon
     void updateGroupInfo(const QString &groupname, const QString &grouplabel);
     void UpdateProgramInfo(const ProgramInfo &pginfo);
     void UpdateProgramInfo(
-        uint chanid, const QDateTime &recstartts, long long filesize);
+        uint chanid, const QDateTime &recstartts, uint64_t filesize);
 
     void UpdateUIListItem(
         ProgramInfo *ProgramInfo_pointer_from_FindProgramInUILists);
@@ -338,7 +341,7 @@ class PlaybackBox : public ScheduleCommon
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoFileSizeEvent(
-        uint chanid, const QDateTime &recstartts,  long long filesize);
+        uint chanid, const QDateTime &recstartts, uint64_t filesize);
     void ScheduleFillList(void);
 
     void ShowMenu(void);

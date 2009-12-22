@@ -232,7 +232,7 @@ long long FileTransfer::Seek(long long curpos, long long pos, int whence)
     return ret;
 }
 
-long long FileTransfer::GetFileSize(void)
+uint64_t FileTransfer::GetFileSize(void)
 {
     if (pginfo)
         pginfo->UpdateInUseMark();

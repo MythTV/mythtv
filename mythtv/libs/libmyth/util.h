@@ -25,9 +25,6 @@ MPUBLIC bool checkTimeZone(const QStringList &master_settings);
 MPUBLIC QDateTime MythUTCToLocal(const QDateTime &utc);
 MPUBLIC int MythSecsTo(const QDateTime &from, const QDateTime &to);
 
-MPUBLIC long long stringToLongLong(const QString &str);
-MPUBLIC QString longLongToString(long long ll);
-
 MPUBLIC long long getDiskSpace(const QString&,long long&,long long&);
 MPUBLIC bool getUptime(time_t &uptime);
 MPUBLIC bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
