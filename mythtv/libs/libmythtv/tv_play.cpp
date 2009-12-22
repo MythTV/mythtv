@@ -2668,8 +2668,7 @@ void TV::timerEvent(QTimerEvent *te)
 
         if (jumpToProgram && lastProgram)
         {
-            bool fileExists = lastProgram->PathnameExists();
-            if (!fileExists)
+            if (!lastProgram->IsFileReadable())
             {
                 OSD *osd = GetOSDLock(mctx);
                 if (osd)

@@ -36,7 +36,8 @@ MPUBLIC bool RemoteGetLoad(float load[3]);
 MPUBLIC bool RemoteGetUptime(time_t &uptime);
 MPUBLIC
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM);
-MPUBLIC bool RemoteCheckFile(ProgramInfo *pginfo, bool checkSlaves = true);
+MPUBLIC bool RemoteCheckFile(
+    const ProgramInfo *pginfo, bool checkSlaves = true);
 MPUBLIC
 bool RemoteDeleteRecording(const ProgramInfo *pginfo, bool forgetHistory,
                            bool forceMetadataDelete = false);

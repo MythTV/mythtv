@@ -1707,7 +1707,8 @@ QString ProgramInfo::GetRecordBasename(bool fromDB) const
  *         If the file is accessible locally, the filename will be returned,
  *         otherwise a myth:// URL will be returned.
  */
-QString ProgramInfo::GetPlaybackURL(bool checkMaster, bool forceCheckLocal)
+QString ProgramInfo::GetPlaybackURL(
+    bool checkMaster, bool forceCheckLocal) const
 {
     QString tmpURL;
     QString basename = GetRecordBasename(true);
@@ -3523,14 +3524,22 @@ void ProgramInfo::UpdateInUseMark(bool force)
         MarkAsInUse(true);
 }
 
-bool ProgramInfo::PathnameExists(void)
+/// \return true iff file is readable
+bool ProgramInfo::IsFileReadable(void) const
 {
+    if (pathname.left(1) == "/" && QFileInfo(pathname).isReadable())
+        return true;
+
+    if (pathname.left(7) != "myth://")
+        pathname = GetPlaybackURL(true, false);
+
     if (pathname.left(7) == "myth://")
-       return RemoteCheckFile(this);
+        return RemoteCheckFile(this);
 
-    QFile checkFile(pathname);
+    if (pathname.left(1) == "/")
+        return QFileInfo(pathname).isReadable();
 
-    return checkFile.exists();
+    return false;
 }
 
 QString ProgramInfo::GetRecGroupPassword(QString group)

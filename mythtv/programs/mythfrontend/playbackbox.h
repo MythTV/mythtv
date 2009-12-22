@@ -1,4 +1,3 @@
-
 // -*- Mode: c++ -*-
 // vim:set sw=4 ts=4 expandtab:
 #ifndef PLAYBACKBOX_H_
@@ -6,25 +5,29 @@
 
 // C++ headers
 #include <vector>
+#include <deque>
 using namespace std;
 
+#include <QStringList>
 #include <QDateTime>
+#include <QObject>
 #include <QMutex>
+#include <QMap>
 
-#include "programinfo.h"
 #include "jobqueue.h"
 #include "tv_play.h"
-
-#include <pthread.h>
 
 #include "mythscreentype.h"
 
 // mythfrontend
 #include "schedulecommon.h"
 
+class QKeyEvent;
+class QEvent;
+class QTimer;
+
 class NuppelVideoPlayer;
 class RingBuffer;
-class QTimer;
 class ProgramInfo;
 class PreviewGenerator;
 
@@ -306,8 +309,6 @@ class PlaybackBox : public ScheduleCommon
     void popupString(ProgramInfo *program, QString &message);
 
     void showAvailablePopup(ProgramInfo *rec);
-
-    bool fileExists(ProgramInfo *pginfo);
 
     QString getRecGroupPassword(const QString &recGroup);
     void fillRecGroupPasswordCache(void);

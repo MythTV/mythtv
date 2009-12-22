@@ -31,6 +31,7 @@
 #include "remoteutil.h"
 #include "util.h"
 #include "storagegroup.h"
+#include "programinfo.h"
 
 // libmythui
 #include "mythuihelper.h"
@@ -1979,7 +1980,7 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     if (rec->availableStatus == asNotYetAvailable)
         rec->availableStatus = asAvailable;
 
-    if (fileExists(rec) == false)
+    if (!rec->IsFileReadable())
     {
         VERBOSE(VB_IMPORTANT, QString("PlaybackBox::play(): Error, %1 file "
                                       "not found").arg(rec->pathname));
@@ -2264,7 +2265,7 @@ void PlaybackBox::showActions(ProgramInfo *pginfo)
     if (!pginfo)
         return;
 
-    if (fileExists(pginfo) == false)
+    if (!pginfo->IsFileReadable())
     {
         VERBOSE(VB_IMPORTANT, QString("PlaybackBox::showActions(): Error, %1 "
                                       "file not found").arg(pginfo->pathname));
@@ -3977,13 +3978,6 @@ void PlaybackBox::ScheduleFillList(void)
         m_fillListTimer->setSingleShot(true);
         m_fillListTimer->start(1000);
     }
-}
-
-bool PlaybackBox::fileExists(ProgramInfo *pginfo)
-{
-    if (pginfo)
-       return pginfo->PathnameExists();
-    return false;
 }
 
 void PlaybackBox::IncPreviewGeneratorPriority(const QString &xfn)

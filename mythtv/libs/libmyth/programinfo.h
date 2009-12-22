@@ -298,7 +298,7 @@ class MPUBLIC ProgramInfo
     QString RecStatusText(void) const;
     QString RecStatusDesc(void) const;
     void UpdateInUseMark(bool force = false);
-    bool PathnameExists(void);
+    bool IsFileReadable(void) const;
     QString GetFileName(void) const { return pathname; }
     uint32_t GetProgramFlags(void) const { return programflags; }
     QString toString(void) const;
@@ -311,7 +311,7 @@ class MPUBLIC ProgramInfo
     // Slow DB gets
     QString GetRecordBasename(bool fromDB = false) const;
     QString GetPlaybackURL(bool checkMaster = false,
-                           bool forceCheckLocal = false);
+                           bool forceCheckLocal = false) const;
     long long GetFilesize(void);
     int GetMplexID(void) const;
     QDateTime GetBookmarkTimeStamp(void) const;
@@ -415,7 +415,7 @@ class MPUBLIC ProgramInfo
     QString playgroup;
     int chancommfree;
 
-    QString pathname;
+    mutable QString pathname;
     long long filesize;
     QString hostname;
     QString storagegroup;
