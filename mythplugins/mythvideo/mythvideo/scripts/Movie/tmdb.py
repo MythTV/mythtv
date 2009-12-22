@@ -30,7 +30,7 @@
 #-------------------------------------
 __title__ ="TheMovieDB APIv2 Query";
 __author__="R.D.Vaughan"
-__version__="v0.1.5"
+__version__="v0.1.6"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 New movie data fields now have proper key names
@@ -43,6 +43,8 @@ __version__="v0.1.5"
 # 0.1.5 Corrected processing of Person images
 #       Added a specific check and error when there is an empty argument passed
 #       Changed the formatting of person information for AlsoKnownAs and Filmography
+# 0.1.6 Stopped stderr output when any TMDB meta data search or access does not find anything.
+#       This was causing issues for MythVideo.
 
 
 __usage_examples__='''
@@ -281,7 +283,7 @@ class moviedbQueries():
         try:
             data = self.config['moviedb'].searchTitle(title)
         except TmdbMovieOrPersonNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+            #sys.stderr.write(u"%s\n" % msg)
             return
         except TmdHttpError, msg:
             sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
@@ -317,7 +319,7 @@ class moviedbQueries():
             for match in self.config['moviedb'].searchPeople(persons_name):
                 sys.stdout.write( u'%s:%s\n' % (match[u'id'], match['name']))
         except TmdbMovieOrPersonNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+            #sys.stderr.write(u"%s\n" % msg)
             return
         except TmdHttpError, msg:
             sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
@@ -378,7 +380,7 @@ class moviedbQueries():
             else:
                 self.displayMovieData(self.config['moviedb'].searchTMDB(tmdb_id))
         except TmdbMovieOrPersonNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+            #sys.stderr.write(u"%s\n" % msg)
             return
         except TmdHttpError, msg:
             sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
@@ -403,7 +405,7 @@ class moviedbQueries():
         try:
             data = self.config['moviedb'].personInfo(person_id)
         except TmdbMovieOrPersonNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+            #sys.stderr.write(u"%s\n" % msg)
             return
         except TmdHttpError, msg:
             sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
@@ -463,7 +465,7 @@ class moviedbQueries():
         try:
             self.displayMovieData(self.config['moviedb'].searchHash(hash_value))
         except TmdbMovieOrPersonNotFound, msg:
-            sys.stderr.write(u"%s\n" % msg)
+            #sys.stderr.write(u"%s\n" % msg)
             return
         except TmdHttpError, msg:
             sys.stderr.write(self.error_messages['TmdHttpError'] % msg)

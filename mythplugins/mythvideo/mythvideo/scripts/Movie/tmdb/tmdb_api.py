@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.4"
+__version__="v0.1.5"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -27,8 +27,9 @@ __version__="v0.1.4"
 #       Added check and skipping any empty data from TMDB
 # 0.1.4 More data validation added (e.g. valid image file extentions)
 #       More data massaging added.
+# 0.1.5 Added a superclass to perform TMDB Trailer searches for the Mythnetvison grabber tmdb_nv.py
 
-import os, struct, sys
+import os, struct, sys, time
 import urllib, urllib2
 import logging
 
@@ -144,7 +145,7 @@ class Poster(MovieAttribute):
         url = poster_et.get(u"url").strip()
         (dirName, fileName) = os.path.split(url)
         (fileBaseName, fileExtension)=os.path.splitext(fileName)
-        if not fileExtension[1:] in self.image_extentions:
+        if not fileExtension[1:].lower() in self.image_extentions:
             return
         imageid = poster_et.get(u"id").strip()
         if not self.has_key(size):
@@ -156,6 +157,13 @@ class Poster(MovieAttribute):
         """Attempts to return largest image.
         """
         for cur_size in [u"original", u"mid", u"cover", u"thumb"]:
+            if cur_size in self:
+                return self[cur_size]
+
+    def medium(self):
+        """Attempts to return medium size image.
+        """
+        for cur_size in [u"cover", u"thumb", u"mid", u"original", ]:
             if cur_size in self:
                 return self[cur_size]
 
@@ -210,7 +218,7 @@ class People(MovieAttribute):
                 else:
                     people[key]=data.strip()
 
-class MovieDb:
+class MovieDb(object):
     """Main interface to www.themoviedb.org
 
     Supports several search TMDB search methods and a number of TMDB data retrieval methods.
@@ -328,6 +336,7 @@ class MovieDb:
         # Translation of TMDB elements into MythTV keys/db grabber names
         self.config[u'mythtv_translation'] = {u'actor': u'cast', u'backdrop': u'fanart', u'categories': u'genres', u'director':  u'director', u'id': u'inetref', u'name': u'title', u'overview': u'plot', u'rating': u'userrating', u'poster': u'coverart', u'production_countries': u'countries', u'released': u'releasedate', u'runtime': u'runtime', u'url': u'url', u'imdb_id': u'imdb', }
         self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
+        self.thumbnails = False
     # end __init__()
 
 
@@ -467,6 +476,14 @@ class MovieDb:
             if len(tmp):
                 tmp = tmp[:-1]
                 cur_movie[u'poster'] = tmp
+        if self.thumbnails and cur_poster.medium() != None:
+            tmp = u''
+            for imagedata in cur_poster.medium():
+                if imagedata[0]:
+                    tmp+=u"%s," % imagedata[0]
+            if len(tmp):
+                tmp = tmp[:-1]
+                cur_movie[self.thumbnails] = tmp
         if cur_backdrop.largest() != None:
             tmp = u''
             for imagedata in cur_backdrop.largest():
@@ -527,6 +544,7 @@ class MovieDb:
                     translated[key] = translated[key].replace(u'\n',u' ') # Remove any line-feeds from data
         return translated
     # end _mythtvDetails()
+
 
     def searchTitle(self, title, lang=False):
         """Searches for a film by its title.
@@ -827,7 +845,141 @@ class MovieDb:
         return person
     # end personInfo()
 
-# end MovieDb
+# end MovieDb class
+
+class Videos(MovieDb):
+    """A super class of the MovieDB functionality for the MythTV Netvision plugin functionality.
+    This is done to support a common naming framework for all python Netvision plugins no matter their site
+    target.
+    """
+    def __init__(self, apikey, mythtv, interactive, select_first, debug, custom_ui, language, search_all_languages, ):
+        """Pass the configuration options
+        """
+        super(Videos, self).__init__(apikey, mythtv, interactive, select_first, debug, custom_ui, language, search_all_languages, )
+    # end __init__()
+
+    error_messages = {'TmdHttpError': u"! Error: A connection error to themoviedb.org was raised (%s)\n", 'TmdXmlError': u"! Error: Invalid XML was received from themoviedb.org (%s)\n", 'TmdBaseError': u"! Error: A user interface error was raised (%s)\n", 'TmdbUiAbort': u"! Error: A user interface input error was raised (%s)\n", }
+    key_translation = [{'channel_title': 'channel_title', 'channel_link': 'channel_link', 'channel_description': 'channel_description', 'channel_numresults': 'channel_numresults', 'channel_returned': 'channel_returned', 'channel_startindex': 'channel_startindex'}, {'title': 'item_title', 'item_author': 'item_author', 'releasedate': 'item_pubdate', 'overview': 'item_description', 'url': 'item_link', 'trailer': 'item_url', 'runtime': 'item_duration', 'userrating': 'item_rating', 'width': 'item_width', 'height': 'item_height', 'language': 'item_lang'}]
+
+    def searchForVideos(self, title, pagenumber):
+        """Common name for a video search. Used to interface with MythTV plugin NetVision
+        """
+        def displayMovieData(data):
+            '''Parse movie trailer metadata
+            return None if no valid data
+            return a dictionary of Movie trailer metadata
+            '''
+            if data == None:
+                return None
+            if not 'trailer' in data.keys():
+                return None
+            if data['trailer'] == u'':
+                return None
+
+            trailer_data = {}
+            for key in self.key_translation[1].keys():
+                if key in data.keys():
+                    if key == self.thumbnails:
+                        thumbnail = data[key].split(u',')
+                        trailer_data[self.key_translation[1][key]] = thumbnail[0]
+                        continue
+                    if key == 'url':    # themoviedb.org always uses Youtube for trailers
+                        trailer_data[self.key_translation[1][key]] = data['trailer']
+                        continue
+                    if key == 'releasedate':
+                        c = time.strptime(data[key],"%Y-%m-%d")
+                        trailer_data[self.key_translation[1][key]] = time.strftime("%a, %d %b %Y 00:%M:%S GMT",c) # <pubDate>Tue, 14 Jul 2009 17:05:00 GMT</pubDate> <pubdate>Wed, 24 Jun 2009 03:53:00 GMT</pubdate>
+                        continue
+                    trailer_data[self.key_translation[1][key]] = data[key]
+                else:
+                    trailer_data[self.key_translation[1][key]] = u''
+            trailer_data[self.key_translation[1][u'overview']] = self.overview
+
+            return trailer_data
+        # end displayMovieData()
+
+        def movieData(tmdb_id):
+            '''Get Movie data by IMDB or TMDB number and return the details
+            '''
+            try:
+                return displayMovieData(self.searchTMDB(tmdb_id))
+            except TmdbMovieOrPersonNotFound, msg:
+                sys.stderr.write(u"%s\n" % msg)
+                return None
+            except TmdHttpError, msg:
+                sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
+                sys.exit(1)
+            except TmdXmlError, msg:
+                sys.stderr.write(self.error_messages['TmdXmlError'] % msg)
+                sys.exit(1)
+            except TmdBaseError, msg:
+                sys.stderr.write(self.error_messages['TmdBaseError'] % msg)
+                sys.exit(1)
+            except TmdbUiAbort, msg:
+                sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
+                sys.exit(1)
+            except:
+                sys.stderr.write(u"! Error: Unknown error during a Movie (%s) information lookup\n" % tmdb_id)
+                sys.exit(1)
+        # end movieData()
+
+        try:
+            data = self.searchTitle(title)
+        except TmdbMovieOrPersonNotFound, msg:
+            sys.stderr.write(u"%s\n" % msg)
+            return []
+        except TmdHttpError, msg:
+            sys.stderr.write(self.error_messages['TmdHttpError'] % msg)
+            sys.exit(1)
+        except TmdXmlError, msg:
+            sys.stderr.write(self.error_messages['TmdXmlError'] % msg)
+            sys.exit(1)
+        except TmdBaseError, msg:
+            sys.stderr.write(self.error_messages['TmdBaseError'] % msg)
+            sys.exit(1)
+        except TmdbUiAbort, msg:
+            sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
+            sys.exit(1)
+        except:
+            sys.stderr.write(u"! Error: Unknown error during a Movie Trailer search (%s)\n" % title)
+            sys.exit(1)
+
+        if data == None:
+            return None
+
+        # Set the size of the thumbnail graphics that will be returned
+        self.thumbnails = 'mid'
+        self.key_translation[1][self.thumbnails] = 'item_thumbnail'
+
+        # Channel details and search results
+        channel = {'channel_title': u'themoviedb.org', 'channel_link': u'http://themoviedb.org', 'channel_description': u'themoviedb.org is an open “wiki-style” movie database', 'channel_numresults': 0, 'channel_returned': self.page_limit, u'channel_startindex': 0}
+
+        trailers = []
+        trailer_total = 0
+        starting_index = (int(pagenumber)-1) * self.page_limit
+        for match in data:
+            if match.has_key('overview'):
+                self.overview = match['overview']
+            else:
+                self.overview = u''
+            trailer = movieData(match[u'id'])
+            if trailer:
+                if starting_index != 0:
+                    if not trailer_total > starting_index:
+                        continue
+                trailers.append(trailer)
+                trailer_total+=1
+                if self.page_limit == trailer_total:
+                    break
+        channel['channel_numresults'] = trailer_total
+        startindex = trailer_total + starting_index
+        if startindex < int(pagenumber) * self.page_limit:
+            channel['channel_startindex'] = startindex + 1
+        else:
+            channel['channel_startindex'] = (int(pagenumber) * self.page_limit) + startindex - 1
+        return [[channel, trailers]]
+    # end searchForVideos()
+# end Videos() class
 
 def main():
     """Simple example of using tmdb_api - it just
