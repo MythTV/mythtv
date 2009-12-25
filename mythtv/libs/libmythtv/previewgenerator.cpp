@@ -74,6 +74,9 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
       timeInSeconds(true),  captureTime(-1),       outFileName(QString::null),
       outSize(0,0)
 {
+    if (!pathname.contains("/"))
+        pathname = programInfo.GetPlaybackURL(false, true);
+
     if (IsLocal() && !(mode & kRemote))
         return;
 
@@ -601,7 +604,8 @@ bool PreviewGenerator::IsLocal(void) const
 
     QString pathdir = QFileInfo(tmppathname).path();
 
-    return (QFileInfo(tmppathname).exists() && QFileInfo(pathdir).isWritable());
+    return (QFileInfo(tmppathname).isReadable() &&
+            QFileInfo(pathdir).isWritable());
 }
 
 /**
