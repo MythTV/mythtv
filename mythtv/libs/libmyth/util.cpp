@@ -8,10 +8,13 @@ using namespace std;
 
 // C headers
 #include <cerrno>
-#include <unistd.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <time.h>
+
+// POSIX
+#include <unistd.h>
+#include <fcntl.h>
+#include <sched.h>
 
 // System specific C headers
 #include "compat.h"
@@ -1407,6 +1410,16 @@ bool myth_nice(int val)
     }
 
     return true;
+}
+
+void myth_yield(void)
+{
+#ifdef _POSIX_PRIORITY_SCHEDULING
+    if (sched_yield()<0)
+        usleep(5000);
+#else
+    usleep(5000);
+#endif
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

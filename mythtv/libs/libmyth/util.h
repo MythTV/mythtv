@@ -77,6 +77,7 @@ MPUBLIC QString FileHash(QString filename);
 MPUBLIC bool IsPulseAudioRunning(void);
 
 MPUBLIC bool myth_nice(int val);
+MPUBLIC void myth_yield(void);
 
 // CPU Tick timing function
 #ifdef MMX
