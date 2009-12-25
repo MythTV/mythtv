@@ -1505,6 +1505,12 @@ bool MythContext::Init(const bool gui, UPnp *UPnPclient,
 
 MythContext::~MythContext()
 {
+    if (QThreadPool::globalInstance()->activeThreadCount())
+    {
+        VERBOSE(VB_GENERAL,
+                "~MythContext waiting for threads to exit.");
+    }
+    QThreadPool::globalInstance()->waitForDone();
     delete d;
 }
 
