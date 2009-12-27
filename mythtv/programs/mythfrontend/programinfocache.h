@@ -1,0 +1,69 @@
+// -*- Mode: c++ -*-
+
+#include <vector>
+#include <map>
+using namespace std;
+
+#include <QWaitCondition>
+#include <QDateTime>
+#include <QMutex>
+
+class ProgramInfoLoader;
+class ProgramInfo;
+class QObject;
+
+class ProgramInfoCache
+{
+    friend class ProgramInfoLoader;
+  public:
+    ProgramInfoCache(QObject *o);
+    ~ProgramInfoCache();
+
+    void ScheduleLoad(void);
+    bool IsLoadInProgress(void) const;
+    void WaitForLoadToComplete(void) const;
+
+    // All the following public methods must only be called from the UI Thread.
+    void Refresh(void);
+    void Add(const ProgramInfo&);
+    bool Remove(uint chanid, const QDateTime &recstartts);
+    bool Update(const ProgramInfo&);
+    bool UpdateFileSize(uint chanid, const QDateTime &recstartts,
+                        uint64_t filesize);
+    void GetOrdered(vector<ProgramInfo*> &list, bool newest_first = false);
+    /// \note This must only be called from the UI thread.
+    bool empty(void) const { return m_cache.empty(); }
+
+  private:
+    void Load(void);
+    void Clear(void);
+
+  private:
+    class PICKey
+    {
+      public:
+        PICKey(uint c, const QDateTime &r) : chanid(c), recstartts(r) { }
+        uint      chanid;
+        QDateTime recstartts;
+    };
+
+    struct ltkey
+    {
+        bool operator()(const PICKey &a, const PICKey &b) const
+        {
+            if (a.recstartts == b.recstartts)
+                return a.chanid < b.chanid;
+            return (a.recstartts < b.recstartts);
+        }
+    };
+
+    typedef map<PICKey,ProgramInfo*,ltkey> Cache;
+
+    mutable QMutex          m_lock;
+    Cache                   m_cache;
+    vector<ProgramInfo*>   *m_next_cache;
+    QObject                *m_listener;
+    bool                    m_load_is_queued;
+    uint                    m_loads_in_progress;
+    mutable QWaitCondition  m_load_wait;
+};

@@ -70,9 +70,6 @@ MPUBLIC vector<ProgramInfo *> *RemoteGetCurrentlyRecordingList(void);
 
 MPUBLIC bool RemoteGetFileList(QString host, QString path, QStringList* list,
                        QString sgroup, bool fileNamesOnly = false);
-MPUBLIC void RemoteClearSGMap(void);
-MPUBLIC QString RemoteGenFileURL(QString sgroup, QString host, QString path);
-
 
 #endif
 

@@ -24,6 +24,7 @@ using namespace std;
 
 // mythfrontend
 #include "schedulecommon.h"
+#include "programinfocache.h"
 
 class QKeyEvent;
 class QEvent;
@@ -213,7 +214,6 @@ class PlaybackBox : public ScheduleCommon
     void toggleLiveTVView(bool setOn)    { toggleView(VIEW_LIVETVGRP, setOn); }
     void toggleWatchedView(bool setOn)   { toggleView(VIEW_WATCHED, setOn); }
 
-    void listChanged(void);
     void setUpdateFreeSpace() { m_freeSpaceNeedsUpdate = true; }
 
     void setGroupFilter(const QString &newRecGroup);
@@ -279,7 +279,7 @@ class PlaybackBox : public ScheduleCommon
     uint IncPreviewGeneratorAttempts(const QString &fn);
     void ClearPreviewGeneratorAttempts(const QString &fn);
   private:
-    bool FillList(bool useCachedData = false);
+    bool UpdateUILists(void);
     void UpdateProgressBar(void);
 
     QString cutDown(const QString &, QFont *, int);
@@ -334,15 +334,14 @@ class PlaybackBox : public ScheduleCommon
     void UpdateUIListItem(MythUIButtonListItem *item, bool is_sel,
                           bool force_preview_reload = false);
 
-    void clearProgramCache(void);
-
     void HandlePreviewEvent(const ProgramInfo &evinfo);
     void HandleRecordingRemoveEvent(uint chanid, const QDateTime &recstartts);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoFileSizeEvent(
         uint chanid, const QDateTime &recstartts, uint64_t filesize);
-    void ScheduleFillList(void);
+
+    void ScheduleUpdateUIList(void);
 
     void ShowMenu(void);
 
@@ -413,9 +412,6 @@ class PlaybackBox : public ScheduleCommon
 
     // State Variables ////////////////////////////////////////////////////////
     // Main Recording List support
-    QTimer             *m_fillListTimer; // audited ref #5318
-    bool                m_fillListFromCache;
-    bool                m_connected;  ///< true if last FillList() succeeded
     QStringList         m_titleList;  ///< list of pages
     ProgramMap          m_progLists;  ///< lists of programs by page
     int                 m_progsInDB;  ///< total number of recordings in DB
@@ -436,9 +432,7 @@ class PlaybackBox : public ScheduleCommon
     // Play List support
     QStringList         m_playList;   ///< list of selected items "play list"
 
-    /// ProgramInfo cache for FillList()
-    mutable QMutex      m_progCacheLock;
-    vector<ProgramInfo *> *m_progCache;
+    ProgramInfoCache    m_programInfoCache;
 
     /// playingSomething is set to true iff a full screen recording is playing
     bool                m_playingSomething;

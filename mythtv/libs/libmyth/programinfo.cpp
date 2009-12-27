@@ -633,12 +633,11 @@ ProgramInfo::~ProgramInfo()
 {
 }
 
-/** \fn ProgramInfo::MakeUniqueKey(void) const
- *  \brief Creates a unique string that can be used to identify a recording.
- */
-QString ProgramInfo::MakeUniqueKey(void) const
+/// \brief Creates a unique string that can be used to identify a recording.
+QString ProgramInfo::MakeUniqueKey(
+    uint chanid, const QDateTime &recstartts)
 {
-    return chanid + '_' + recstartts.toString(Qt::ISODate);
+    return QString("%1_%2").arg(chanid).arg(recstartts.toString(Qt::ISODate));
 }
 
 #define INT_TO_LIST(x)       sprintf(tmp, "%i", (x)); list << tmp;

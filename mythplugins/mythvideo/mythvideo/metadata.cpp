@@ -411,7 +411,7 @@ bool MetadataImp::DeleteFile(class VideoList &dummy)
 
     if (!m_host.isEmpty())
     {
-        QString url = RemoteGenFileURL("Videos", m_host, m_filename);
+        QString url = generate_file_url("Videos", m_host, m_filename);
         isremoved = RemoteFile::DeleteFile(url);
     }
     else
@@ -919,7 +919,7 @@ QString Metadata::VideoFileHash(const QString &file_name,
 {
     if (!host.isEmpty())
     {
-        QString url = RemoteGenFileURL("Videos", host, file_name);
+        QString url = generate_file_url("Videos", host, file_name);
         return RemoteFile::GetFileHash(url);
     }
     else

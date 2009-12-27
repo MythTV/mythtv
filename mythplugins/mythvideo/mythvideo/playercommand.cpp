@@ -203,7 +203,7 @@ class VideoPlayerCommandPrivate
             QString filename;
 
             if (item->IsHostSet())
-                filename = RemoteGenFileURL("Videos", item->GetHost(),
+                filename = generate_file_url("Videos", item->GetHost(),
                         item->GetFilename());
             else
                 filename = item->GetFilename();
@@ -231,7 +231,7 @@ class VideoPlayerCommandPrivate
             QString filename;
 
             if (item->IsHostSet())
-                filename = RemoteGenFileURL("Videos", item->GetHost(),
+                filename = generate_file_url("Videos", item->GetHost(),
                         item->GetFilename());
             else
                 filename = item->GetFilename();

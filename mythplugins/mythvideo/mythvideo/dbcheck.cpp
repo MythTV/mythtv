@@ -10,9 +10,9 @@
 #include <remotefile.h>
 #include <remoteutil.h>
 #include <util.h>
+#include <storagegroup.h>
 
-#include "storagegroup.h"
-
+#include "videoutils.h"
 #include "videodlg.h"
 #include "dbcheck.h"
 
@@ -56,7 +56,7 @@ namespace
 
                 if (!host.isEmpty())
                 {
-                    QString url = RemoteGenFileURL("Videos", host, filename);
+                    QString url = generate_file_url("Videos", host, filename);
                     hash =  RemoteFile::GetFileHash(url);
                 }
                 else

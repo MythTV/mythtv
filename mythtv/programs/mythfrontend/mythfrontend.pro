@@ -27,7 +27,7 @@ HEADERS += mythappearance.h exitprompt.h proglist.h
 HEADERS += action.h mythcontrols.h keybindings.h keygrabber.h
 HEADERS += mythosdmenueditor.h progfind.h guidegrid.h customedit.h
 HEADERS += schedulecommon.h progdetails.h scheduleeditor.h
-HEADERS += backendconnectionmanager.h
+HEADERS += backendconnectionmanager.h programinfocache.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp
 SOURCES += globalsettings.cpp manualschedule.cpp programrecpriority.cpp
@@ -37,7 +37,7 @@ SOURCES += custompriority.cpp mythappearance.cpp exitprompt.cpp proglist.cpp
 SOURCES += action.cpp actionset.cpp  mythcontrols.cpp keybindings.cpp
 SOURCES += keygrabber.cpp mythosdmenueditor.cpp progfind.cpp guidegrid.cpp
 SOURCES += customedit.cpp schedulecommon.cpp progdetails.cpp scheduleeditor.cpp
-SOURCES += backendconnectionmanager.cpp
+SOURCES += backendconnectionmanager.cpp programinfocache.cpp
 
 macx {
     mac_bundle {

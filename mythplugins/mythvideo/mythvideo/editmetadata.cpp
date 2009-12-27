@@ -403,7 +403,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetCoverFile().isEmpty() &&
             !m_workingMetadata->GetCoverFile().startsWith("/"))
         {
-            m_coverart->SetFilename(RemoteGenFileURL("Coverart",
+            m_coverart->SetFilename(generate_file_url("Coverart",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetCoverFile()));
         }
@@ -419,7 +419,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetScreenshot().isEmpty() &&
             !m_workingMetadata->GetScreenshot().startsWith("/"))
         {
-            m_screenshot->SetFilename(RemoteGenFileURL("Screenshots",
+            m_screenshot->SetFilename(generate_file_url("Screenshots",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetScreenshot()));
         }
@@ -435,7 +435,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetBanner().isEmpty() &&
             !m_workingMetadata->GetBanner().startsWith("/"))
         {
-            m_banner->SetFilename(RemoteGenFileURL("Banners",
+            m_banner->SetFilename(generate_file_url("Banners",
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetBanner()));
         }
@@ -451,7 +451,7 @@ void EditMetadataDialog::fillWidgets()
             !m_workingMetadata->GetFanart().isEmpty() &&
             !m_workingMetadata->GetFanart().startsWith("/"))
         {
-            m_fanart->SetFilename(RemoteGenFileURL("Fanart", 
+            m_fanart->SetFilename(generate_file_url("Fanart", 
                                   m_workingMetadata->GetHost(),
                                   m_workingMetadata->GetFanart()));
         }
@@ -595,7 +595,7 @@ void EditMetadataDialog::FindCoverArt()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = RemoteGenFileURL("Coverart",
+        QString url = generate_file_url("Coverart",
                       m_workingMetadata->GetHost(),
                       "");
         FindImagePopup(url,"",
@@ -631,7 +631,7 @@ void EditMetadataDialog::FindBanner()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = RemoteGenFileURL("Banners",
+        QString url = generate_file_url("Banners",
                       m_workingMetadata->GetHost(),
                       "");
         FindImagePopup(url,"",
@@ -667,7 +667,7 @@ void EditMetadataDialog::FindFanart()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = RemoteGenFileURL("Fanart",
+        QString url = generate_file_url("Fanart",
                       m_workingMetadata->GetHost(),
                       "");
         FindImagePopup(url,"",
@@ -703,7 +703,7 @@ void EditMetadataDialog::FindScreenshot()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = RemoteGenFileURL("Screenshots",
+        QString url = generate_file_url("Screenshots",
                       m_workingMetadata->GetHost(),
                       "");
         FindImagePopup(url,"",
@@ -739,7 +739,7 @@ void EditMetadataDialog::FindTrailer()
 {
     if (!m_workingMetadata->GetHost().isEmpty())
     {
-        QString url = RemoteGenFileURL("Trailers",
+        QString url = generate_file_url("Trailers",
                       m_workingMetadata->GetHost(),
                       "");
         FindVideoFilePopup(url,"",

@@ -22,13 +22,11 @@
 #include "tv.h"
 #include "NuppelVideoPlayer.h"
 #include "recordinginfo.h"
-#include "tvremoteutil.h"
 #include "previewgenerator.h"
 #include "playgroup.h"
 
 // libmyth
 #include "mythcontext.h"
-#include "remoteutil.h"
 #include "util.h"
 #include "storagegroup.h"
 #include "programinfo.h"
@@ -44,6 +42,9 @@
 #include "mythuiimage.h"
 #include "mythuicheckbox.h"
 #include "mythuiprogressbar.h"
+
+#include "tvremoteutil.h"
+#include "remoteutil.h"
 
 //  Mythfrontend
 #include "playbackboxlistitem.h"
@@ -341,11 +342,10 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       // General m_popupMenu support
       m_popupMenu(NULL),
       // Main Recording List support
-      m_fillListTimer(new QTimer(this)),  m_fillListFromCache(false),
-      m_connected(false),                 m_progsInDB(0),
+      m_progsInDB(0),
       // Other state
       m_delItem(NULL),                    m_currentItem(NULL),
-      m_progCache(NULL),                  m_playingSomething(false),
+      m_programInfoCache(this),           m_playingSomething(false),
       // Selection state variables
       m_needUpdate(false),
       // Free disk space tracking
@@ -417,8 +417,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
             m_recGroup = tmp;
     }
 
-    // Clear SG Map
-    RemoteClearSGMap();
+    StorageGroup::ClearGroupToUseCache();
 
     // recording group stuff
     m_recGroupIdx = -1;
@@ -460,12 +459,6 @@ PlaybackBox::~PlaybackBox(void)
         m_coverartTimer = NULL;
     }
 
-    if (m_fillListTimer)
-    {
-        m_fillListTimer->disconnect(this);
-        m_fillListTimer = NULL;
-    }
-
     if (m_freeSpaceTimer)
     {
         m_freeSpaceTimer->disconnect(this);
@@ -480,8 +473,6 @@ PlaybackBox::~PlaybackBox(void)
         if ((*it).gen)
             (*it).gen->disconnectSafe();
     }
-
-    clearProgramCache();
 
     delete m_currentItem;
 }
@@ -521,18 +512,17 @@ bool PlaybackBox::Create()
     connect(m_bannerTimer, SIGNAL(timeout()), SLOT(bannerLoad()));
     connect(m_coverartTimer, SIGNAL(timeout()), SLOT(coverartLoad()));
     connect(m_freeSpaceTimer, SIGNAL(timeout()), SLOT(setUpdateFreeSpace()));
-    connect(m_fillListTimer, SIGNAL(timeout()), SLOT(listChanged()));
 
     BuildFocusList();
+    m_programInfoCache.ScheduleLoad();
     LoadInBackground();
 
     return true;
 }
 
-void PlaybackBox::Load()
+void PlaybackBox::Load(void)
 {
-    QMutexLocker locker(&m_progCacheLock);
-    m_progCache = RemoteGetRecordedList(m_allOrder == 0 || m_type == Delete);
+    m_programInfoCache.WaitForLoadToComplete();
 }
 
 void PlaybackBox::Init()
@@ -546,7 +536,7 @@ void PlaybackBox::Init()
         showGroupFilter();
     else
     {
-        FillList(true);
+        UpdateUILists();
 
         if ((m_titleList.size() <= 1) && (m_progsInDB > 0))
         {
@@ -958,7 +948,7 @@ void PlaybackBox::updateUsage()
     if (!freereportText && !usedProgress)
         return;
 
-    if (m_freeSpaceNeedsUpdate || m_connected)
+    if (m_freeSpaceNeedsUpdate)
     {
         m_freeSpaceNeedsUpdate = false;
         m_freeSpaceTotal = 0;
@@ -1182,38 +1172,18 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             m_noRecordingsText->SetVisible(false);
         else
         {
-            QMutexLocker locker(&m_progCacheLock);
-            QString txt = (m_progCache && !m_progCache->empty()) ?
-                tr("There are no recordings in your current view") :
-                tr("There are no recordings available");
+            QString txt = m_programInfoCache.empty() ?
+                tr("There are no recordings available") :
+                tr("There are no recordings in your current view");
             m_noRecordingsText->SetText(txt);
             m_noRecordingsText->SetVisible(true);
         }
     }
 }
 
-void PlaybackBox::listChanged(void)
-{
-    if (m_playingSomething)
-        return;
-
-    // If we are in the middle of filling the list, then wait
-    if (m_isFilling)
-    {
-        m_fillListTimer->setSingleShot(true);
-        m_fillListTimer->start(1000);
-        return;
-    }
-
-    m_connected = FillList(m_fillListFromCache);
-    m_fillListFromCache = true;
-}
-
-bool PlaybackBox::FillList(bool useCachedData)
+bool PlaybackBox::UpdateUILists(void)
 {
     m_isFilling = true;
-
-    ProgramInfo *p;
 
     if (m_currentItem)
     {
@@ -1256,30 +1226,9 @@ bool PlaybackBox::FillList(bool useCachedData)
     QMap<int, QString> searchRule;
     QMap<int, int> recidEpisodes;
 
-    m_progCacheLock.lock();
-    if (!useCachedData || !m_progCache || m_progCache->empty())
-    {
-        clearProgramCache();
+    m_programInfoCache.Refresh();
 
-        m_progCache = RemoteGetRecordedList(m_allOrder == 0 || m_type == Delete);
-    }
-    else
-    {
-        // Validate the cache
-        vector<ProgramInfo *>::iterator i = m_progCache->begin();
-        for ( ; i != m_progCache->end(); )
-        {
-            if ((*i)->availableStatus == asDeleted)
-            {
-                delete *i;
-                i = m_progCache->erase(i);
-            }
-            else
-                ++i;
-        }
-    }
-
-    if (m_progCache)
+    if (!m_programInfoCache.empty())
     {
         QString sTitle;
 
@@ -1301,11 +1250,14 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
 
-        vector<ProgramInfo *>::iterator i = m_progCache->begin();
-        for ( ; i != m_progCache->end(); ++i)
+        vector<ProgramInfo*> list;
+        bool newest_first = (0==m_allOrder) || (Delete==m_type);
+        m_programInfoCache.GetOrdered(list, newest_first);
+        vector<ProgramInfo*>::const_iterator it = list.begin();
+        for ( ; it != list.end(); ++it)
         {
             m_progsInDB++;
-            p = *i;
+            ProgramInfo *p = *it;
 
             if (p->title.isEmpty())
                 p->title = tr("_NO_TITLE_");
@@ -1420,9 +1372,8 @@ bool PlaybackBox::FillList(bool useCachedData)
             }
         }
     }
-    m_progCacheLock.unlock();
 
-    if (sortedList.size() == 0)
+    if (sortedList.empty())
     {
         VERBOSE(VB_IMPORTANT, "SortedList is Empty");
         m_progLists[""];
@@ -1478,7 +1429,7 @@ bool PlaybackBox::FillList(bool useCachedData)
         }
     }
 
-    if (m_progLists[m_watchGroupLabel].size() > 1)
+    if (!m_progLists[m_watchGroupLabel].empty())
     {
         QDateTime now = QDateTime::currentDateTime();
         int baseValue = m_watchListMaxAge * 2 / 3;
@@ -1674,7 +1625,7 @@ bool PlaybackBox::FillList(bool useCachedData)
     m_titleList << sortedList.values();
 
     // Populate list of recording groups
-    if (m_progCache)
+    if (!m_programInfoCache.empty())
     {
         QMutexLocker locker(&m_recGroupsLock);
 
@@ -1717,7 +1668,7 @@ bool PlaybackBox::FillList(bool useCachedData)
 
     m_isFilling = false;
 
-    return (m_progCache != NULL);
+    return true;
 }
 
 void PlaybackBox::playSelectedPlaylist(bool random)
@@ -2021,12 +1972,7 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 
     delete tvrec;
 
-    // TODO 1) Potentially duplicate refill, watching a recording will normally
-    //      trigger a recording list change event which also triggers a refill
-    //
-    //      2) We really don't need to do a refill here, but just update that
-    //      one programinfo object
-    m_connected = FillList();
+    m_freeSpaceNeedsUpdate |= UpdateUILists();
 
     return playCompleted;
 }
@@ -2240,7 +2186,16 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
         {
             if (re.exactMatch(*it))
             {
-                foundFile = RemoteGenFileURL(sgroup, host, *it);
+                // TODO FIXME get rid of GetSettingOnHost calls
+                // TODO FIXME get rid of string concatenation
+                foundFile =
+                    QString("myth://%1@")
+                    .arg(StorageGroup::GetGroupToUse(host, sgroup)) +
+                    gContext->GetSettingOnHost("BackendServerIP", host) +
+                    QString(":") +
+                    gContext->GetSettingOnHost("BackendServerPort", host) +
+                    QString("/") +
+                    *it;
                 break;
             }
         }
@@ -3191,7 +3146,7 @@ void PlaybackBox::playlistDelete(bool forgetHistory)
 
     m_playList.clear();
 
-    m_connected = FillList(true);
+    m_freeSpaceNeedsUpdate |= UpdateUILists();
 }
 
 void PlaybackBox::doUndelete(void)
@@ -3305,22 +3260,7 @@ void PlaybackBox::UpdateProgramInfo(const ProgramInfo &pginfo)
     }
 
     // now do the cache..
-    QMutexLocker locker(&m_progCacheLock);
-    if (m_progCache)
-    {
-        vector<ProgramInfo *>::iterator it = m_progCache->begin();
-        for ( ; it != m_progCache->end(); ++it)
-        {
-            if ((pginfo.chanid     == (*it)->chanid) &&
-                (pginfo.recstartts == (*it)->recstartts))
-            {
-                QString pathname = (**it).pathname;
-                **it = pginfo;
-                (**it).pathname = pathname;
-                break;
-            }
-        }
-    }
+    m_programInfoCache.Update(pginfo);
 }
 
 void PlaybackBox::UpdateProgramInfo(
@@ -3347,20 +3287,7 @@ void PlaybackBox::UpdateProgramInfo(
     }
 
     // now do the cache..
-    QMutexLocker locker(&m_progCacheLock);
-    if (m_progCache)
-    {
-        vector<ProgramInfo *>::iterator it = m_progCache->begin();
-        for ( ; it != m_progCache->end(); ++it)
-        {
-            if ((chanid     == (*it)->chanid.toUInt()) &&
-                (recstartts == (*it)->recstartts))
-            {
-                (*it)->filesize = filesize;
-                break;
-            }
-        }
-    }
+    m_programInfoCache.UpdateFileSize(chanid, recstartts, filesize);
 }
 
 void PlaybackBox::toggleWatched(void)
@@ -3397,7 +3324,7 @@ void PlaybackBox::toggleWatched(void)
         // A refill affects the responsiveness of the UI and we only
         // need to rebuild the list if the watch list is displayed
         if (m_viewMask & VIEW_WATCHLIST)
-            m_connected = FillList(true);
+            m_freeSpaceNeedsUpdate |= UpdateUILists();
     }
 }
 
@@ -3472,7 +3399,7 @@ void PlaybackBox::toggleView(ViewMask itemMask, bool setOn)
     else
         m_viewMask = (ViewMask)(m_viewMask & ~itemMask);
 
-    m_connected = FillList(true);
+    m_freeSpaceNeedsUpdate |= UpdateUILists();
 }
 
 void PlaybackBox::togglePlayListTitle(void)
@@ -3681,12 +3608,12 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         else if (action == "TOGGLEFAV")
         {
             m_playList.clear();
-            m_connected = FillList(true);
+            m_freeSpaceNeedsUpdate |= UpdateUILists();
         }
         else if (action == "TOGGLERECORD")
         {
             m_viewMask = m_viewMaskToggle(m_viewMask, VIEW_TITLES);
-            m_connected = FillList(true);
+            m_freeSpaceNeedsUpdate |= UpdateUILists();
         }
         else if (action == "PAGERIGHT")
         {
@@ -3791,8 +3718,7 @@ void PlaybackBox::customEvent(QEvent *event)
             }
             else
             {
-                m_fillListFromCache = false;
-                ScheduleFillList();
+                m_programInfoCache.ScheduleLoad();
             }
         }
         else if (message.left(15) == "NETWORK_CONTROL")
@@ -3848,10 +3774,13 @@ void PlaybackBox::customEvent(QEvent *event)
                     chanid, recstartts, filesize);
             }
         }
+        else if (message == "UPDATE_UI_LIST")
+        {
+            UpdateUILists();
+        }
         else if (message == "RECONNECT_SUCCESS")
         {
-            m_fillListFromCache = false;
-            ScheduleFillList();
+            m_programInfoCache.ScheduleLoad();
         }
     }
     else
@@ -3861,71 +3790,28 @@ void PlaybackBox::customEvent(QEvent *event)
 void PlaybackBox::HandleRecordingRemoveEvent(
     uint chanid, const QDateTime &recstartts)
 {
-    bool found = false;
+    ProgramInfo *pginfo = FindProgramInUILists(chanid, recstartts);
+    if (pginfo && ((pginfo->availableStatus != asPendingDelete) ||
+                   (m_currentGroup == m_watchGroupLabel)))
+    {
+        m_recordingList->RemoveItem(
+            m_recordingList->GetItemByData(qVariantFromValue(pginfo)));
+        if (m_recordingList->GetCount() == 0)
+            m_groupList->RemoveItem(m_groupList->GetItemCurrent());
+    }
+
+    if (!m_programInfoCache.Remove(chanid, recstartts))
+        m_programInfoCache.ScheduleLoad();
+    else
+        ScheduleUpdateUIList();
 
     m_freeSpaceNeedsUpdate = true;
-
-    m_progCacheLock.lock();
-    if (m_progCache)
-    {
-        vector<ProgramInfo *>::iterator it = m_progCache->begin();
-        for ( ; it != m_progCache->end(); ++it)
-        {
-            if ((chanid     == (*it)->chanid.toUInt()) &&
-                (recstartts == (*it)->recstartts))
-            {
-                found = true;
-                break;
-            }
-        }
-
-        if (it != m_progCache->end())
-        {
-            if (((*it)->availableStatus != asPendingDelete) ||
-                (m_currentGroup == m_watchGroupLabel))
-            {
-                m_recordingList->RemoveItem(
-                    m_recordingList->GetItemByData(
-                        qVariantFromValue(*it)));
-                if (m_recordingList->GetCount() == 0)
-                    m_groupList->RemoveItem(
-                        m_groupList->GetItemCurrent());
-            }
-            (*it)->availableStatus = asDeleted;
-        }
-    }
-    else
-    {
-        m_fillListFromCache = false;
-    }
-    m_progCacheLock.unlock();
-
-    if (!found)
-        ScheduleFillList();
 }
 
 void PlaybackBox::HandleRecordingAddEvent(const ProgramInfo &evinfo)
 {
-    m_progCacheLock.lock();
-    if (m_progCache)
-    {
-        vector<ProgramInfo *>::iterator it = m_progCache->begin();
-        for ( ; it != m_progCache->end(); ++it)
-        {
-            if ((evinfo.chanid     == (*it)->chanid) &&
-                (evinfo.recstartts == (*it)->recstartts))
-            {
-                **it = evinfo;
-                break;
-            }
-        }
-
-        if (it == m_progCache->end())
-            m_progCache->push_back(new ProgramInfo(evinfo));
-    }
-    m_progCacheLock.unlock();
-
-    ScheduleFillList();
+    m_programInfoCache.Add(evinfo);
+    ScheduleUpdateUIList();
 }
 
 void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
@@ -3945,19 +3831,16 @@ void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
     if (!dst)
     {
         if (evinfo.recgroup != "LiveTV")
-            ScheduleFillList();
+            ScheduleUpdateUIList();
         return;
     }
 
-    // If the recording group has changed, reload lists from the
-    // recently updated cache..
+    // If the recording group has changed, reload lists from the recently
+    // updated cache; if not, only update UI for the updated item
     if (dst->recgroup != old_recgroup)
-    {
-        ScheduleFillList();
-        return;
-    }
-
-    UpdateUIListItem(dst);
+        ScheduleUpdateUIList();
+    else
+        UpdateUIListItem(dst);
 }
 
 void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(
@@ -3970,14 +3853,10 @@ void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(
         UpdateUIListItem(dst);
 }
 
-void PlaybackBox::ScheduleFillList(void)
+void PlaybackBox::ScheduleUpdateUIList(void)
 {
-    if (!m_fillListTimer->isActive())
-    {
-        m_fillListTimer->stop();
-        m_fillListTimer->setSingleShot(true);
-        m_fillListTimer->start(1000);
-    }
+    if (!m_programInfoCache.IsLoadInProgress())
+        QCoreApplication::postEvent(this, new MythEvent("UPDATE_UI_LIST"));
 }
 
 void PlaybackBox::IncPreviewGeneratorPriority(const QString &xfn)
@@ -4457,7 +4336,7 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
     if (m_groupnameAsAllProg)
         m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
-    m_connected = FillList(true);
+    m_freeSpaceNeedsUpdate |= UpdateUILists();
 
     if (gContext->GetNumSetting("RememberRecGroup",1))
         gContext->SaveSetting("DisplayRecGroup", m_recGroup);
@@ -4759,7 +4638,7 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
 
     // TODO May not rebuild the list here, check current filter and removeitem
     //      if it shouldn't be visible any more
-    FillList(true);
+    UpdateUILists();
 }
 
 void PlaybackBox::setPlayGroup(QString newPlayGroup)
@@ -4852,18 +4731,6 @@ void PlaybackBox::SetRecGroupPassword(const QString &newPassword)
     }
 
     m_recGroupPassword = newPassword;
-}
-
-void PlaybackBox::clearProgramCache(void)
-{
-    if (!m_progCache)
-        return;
-
-    vector<ProgramInfo *>::iterator i = m_progCache->begin();
-    for ( ; i != m_progCache->end(); ++i)
-        delete *i;
-    delete m_progCache;
-    m_progCache = NULL;
 }
 
 ///////////////////////////////////////////////////

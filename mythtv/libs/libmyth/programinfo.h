@@ -287,7 +287,9 @@ class MPUBLIC ProgramInfo
     static int GetRecordingTypeRecPriority(RecordingType type);//sched only
 
     // Quick gets
-    QString MakeUniqueKey(void) const;
+    /// Creates a unique string that can be used to identify a recording.
+    QString MakeUniqueKey(void) const
+        { return MakeUniqueKey(chanid.toUInt(), recstartts); }
     int CalculateLength(void) const;
     int SecsTillStart(void) const;
     QString ChannelText(const QString&) const;
@@ -381,8 +383,10 @@ class MPUBLIC ProgramInfo
     static QString GetRecGroupPassword(QString group);
     void   UpdateRecGroup(void);
 
-    // Translations for play,recording, & storage groups +
+    /// Translations for play,recording, & storage groups +
     static QString i18n(const QString&);
+
+    static QString MakeUniqueKey(uint chanid, const QDateTime &recstartts);
 
     /// Sends event out that the ProgramInfo should be reloaded.
     void SendUpdateEvent(void);

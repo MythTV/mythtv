@@ -31,6 +31,7 @@
 #include <mythsystem.h>
 #include <remotefile.h>
 #include <remoteutil.h>
+#include <storagegroup.h>
 
 #include "videoscan.h"
 #include "globals.h"
@@ -1070,7 +1071,7 @@ namespace
                 && !metadata->GetCoverFile().isEmpty()
                 && !IsDefaultCoverFile(metadata->GetCoverFile()))
             {
-                coverfile = RemoteGenFileURL("Coverart", metadata->GetHost(),
+                coverfile = generate_file_url("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
             }
             else
@@ -1087,7 +1088,7 @@ namespace
             if (metadata->IsHostSet() && !metadata->GetScreenshot().startsWith("/")
                 && !metadata->GetScreenshot().isEmpty())
             {
-                screenshotfile = RemoteGenFileURL("Screenshots",
+                screenshotfile = generate_file_url("Screenshots",
                         metadata->GetHost(), metadata->GetScreenshot());
             }
             else
@@ -1104,7 +1105,7 @@ namespace
             if (metadata->IsHostSet() && !metadata->GetBanner().startsWith("/")
                 && !metadata->GetBanner().isEmpty())
             {
-                bannerfile = RemoteGenFileURL("Banners", metadata->GetHost(),
+                bannerfile = generate_file_url("Banners", metadata->GetHost(),
                         metadata->GetBanner());
             }
             else
@@ -1121,7 +1122,7 @@ namespace
             if (metadata->IsHostSet() && !metadata->GetFanart().startsWith("/")
                 && !metadata->GetFanart().isEmpty())
             {
-                fanartfile = RemoteGenFileURL("Fanart", metadata->GetHost(),
+                fanartfile = generate_file_url("Fanart", metadata->GetHost(),
                         metadata->GetFanart());
             }
             else
@@ -1583,7 +1584,7 @@ VideoDialog::VideoDialog(MythScreenStack *lparent, QString lname,
 
     srand(time(NULL));
 
-    RemoteClearSGMap();
+    StorageGroup::ClearGroupToUseCache();
 }
 
 VideoDialog::~VideoDialog()
@@ -2014,7 +2015,7 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
             }
 
             if ((list.size() > 0) && (list.at(0) == fname))
-                result = RemoteGenFileURL("Videos", host, filename);
+                result = generate_file_url("Videos", host, filename);
 
             if (!result.isEmpty())
             {
@@ -2147,7 +2148,7 @@ QString VideoDialog::GetImageFromFolder(Metadata *metadata)
                                 .arg(prefix)
                                 .arg(fList.at(0));
             else
-                icon_file = RemoteGenFileURL("Videos", host, fList.at(0));
+                icon_file = generate_file_url("Videos", host, fList.at(0));
         }
     }
 
@@ -2305,7 +2306,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                                 if (!metadata->GetHost().isEmpty() && 
                                     !metadata->GetCoverFile().startsWith("/"))
                                 {
-                                    QString test_file = RemoteGenFileURL("Coverart",
+                                    QString test_file = generate_file_url("Coverart",
                                                 metadata->GetHost(), metadata->GetCoverFile());
                                     if (!test_file.endsWith("/") && !test_file.isEmpty() &&
                                         !IsDefaultCoverFile(test_file))
@@ -2337,7 +2338,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                                     .arg(folder_path)
                                     .arg(fList.at(0));
                 else
-                    icon_file = RemoteGenFileURL("Videos", host, fList.at(0));
+                    icon_file = generate_file_url("Videos", host, fList.at(0));
             }
         }
 
@@ -2359,7 +2360,7 @@ QString VideoDialog::GetCoverImage(MythGenericTree *node)
                 !metadata->GetCoverFile().startsWith("/") &&
                 !IsDefaultCoverFile(metadata->GetCoverFile()))
             {
-                icon_file = RemoteGenFileURL("Coverart", metadata->GetHost(),
+                icon_file = generate_file_url("Coverart", metadata->GetHost(),
                         metadata->GetCoverFile());
             }
             else
@@ -2415,7 +2416,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                     if (type == "Coverart" && !host.isEmpty() &&
                         !metadata->GetCoverFile().startsWith("/"))
                     {
-                        test_file = RemoteGenFileURL("Coverart",
+                        test_file = generate_file_url("Coverart",
                                     host, metadata->GetCoverFile());
                     }
                     else if (type == "Coverart")
@@ -2432,7 +2433,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                     if (type == "Fanart" && !host.isEmpty() &&
                         !metadata->GetFanart().startsWith("/"))
                     {
-                        test_file = RemoteGenFileURL("Fanart",
+                        test_file = generate_file_url("Fanart",
                                     host, metadata->GetFanart());
                     }
                     else if (type == "Fanart")
@@ -2449,7 +2450,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                     if (type == "Banners" && !host.isEmpty() &&
                         !metadata->GetBanner().startsWith("/"))
                     {
-                        test_file = RemoteGenFileURL("Banners",
+                        test_file = generate_file_url("Banners",
                                     host, metadata->GetBanner());
                     }
                     else if (type == "Banners")
@@ -2466,7 +2467,7 @@ QString VideoDialog::GetFirstImage(MythGenericTree *node, QString type,
                     if (type == "Screenshots" && !host.isEmpty() &&
                         !metadata->GetScreenshot().startsWith("/"))
                     {
-                        test_file = RemoteGenFileURL("Screenshots",
+                        test_file = generate_file_url("Screenshots",
                                     host, metadata->GetScreenshot());
                     }
                     else if (type == "Screenshots")
@@ -2528,7 +2529,7 @@ QString VideoDialog::GetScreenshot(MythGenericTree *node)
                     !metadata->GetScreenshot().startsWith("/") &&
                     !metadata->GetScreenshot().isEmpty())
             {
-                icon_file = RemoteGenFileURL("Screenshots", metadata->GetHost(),
+                icon_file = generate_file_url("Screenshots", metadata->GetHost(),
                         metadata->GetScreenshot());
             }
             else
@@ -2564,7 +2565,7 @@ QString VideoDialog::GetBanner(MythGenericTree *node)
                !metadata->GetBanner().startsWith("/") &&
                !metadata->GetBanner().isEmpty())
         {
-            icon_file = RemoteGenFileURL("Banners", metadata->GetHost(),
+            icon_file = generate_file_url("Banners", metadata->GetHost(),
                     metadata->GetBanner());
         }
         else
@@ -2599,7 +2600,7 @@ QString VideoDialog::GetFanart(MythGenericTree *node)
                 !metadata->GetFanart().startsWith("/") &&
                 !metadata->GetFanart().isEmpty())
         {
-            icon_file = RemoteGenFileURL("Fanart", metadata->GetHost(),
+            icon_file = generate_file_url("Fanart", metadata->GetHost(),
                     metadata->GetFanart());
         }
         else
@@ -3741,7 +3742,7 @@ void VideoDialog::playTrailer()
     QString url;
 
     if (metadata->IsHostSet() && !metadata->GetTrailer().startsWith("/"))
-        url = RemoteGenFileURL("Trailers", metadata->GetHost(),
+        url = generate_file_url("Trailers", metadata->GetHost(),
                         metadata->GetTrailer());
     else
         url = metadata->GetTrailer();
@@ -4317,7 +4318,7 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
                 {
                     QString combFileName = QString("%1.%2").arg(title)
                                                     .arg(ext);
-                    dest_file = RemoteGenFileURL(type, host,
+                    dest_file = generate_file_url(type, host,
                         combFileName);
                     db_value = combFileName;
                 }
@@ -4335,7 +4336,7 @@ void VideoDialog::OnImageURL(QString uri, Metadata *metadata, QString type)
                     QString combFileName = QString("%1_%2.%3")
                                            .arg(metadata->GetInetRef())
                                            .arg(suffix).arg(ext);
-                    dest_file = RemoteGenFileURL(type, host,
+                    dest_file = generate_file_url(type, host,
                         combFileName);
                     db_value = combFileName;
                 }

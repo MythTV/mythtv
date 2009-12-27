@@ -47,4 +47,19 @@ int editDistance(const QString& s, const QString& t);
 QString nearestName(const QString& actual, const QStringList& candidates,
                     bool mythvideomode = false);
 
+// this needs to be an inline and pull in the storage group and context
+// headers since it this used in dbcheck.cpp, and it is pulled into mtd.
+#include <storagegroup.h>
+#include <mythcontext.h>
+inline QString generate_file_url(
+    const QString &storage_group, const QString &host, const QString &path)
+{
+    QString ip = gContext->GetSettingOnHost("BackendServerIP", host);
+    uint port = gContext->GetSettingOnHost("BackendServerPort", host).toUInt();
+
+    return QString("myth://%1@%2:%3/%4")
+        .arg(StorageGroup::GetGroupToUse(host, storage_group))
+        .arg(ip).arg(port).arg(path);
+}
+
 #endif // VIDEOUTILS_H_

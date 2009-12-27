@@ -2,9 +2,12 @@
 #define _STORAGEGROUP_H
 
 #include <QStringList>
+#include <QMutex>
+#include <QHash>
 
 #include "settings.h"
 #include "mythwidgets.h"
+#include "mythexp.h"
 
 class MPUBLIC StorageGroup: public ConfigurationWizard
 {
@@ -44,11 +47,18 @@ class MPUBLIC StorageGroup: public ConfigurationWizard
     static QStringList getRecordingsGroups(void);
     static QStringList getGroupDirs(QString groupname, QString host);
 
+    static void ClearGroupToUseCache(void);
+    static QString GetGroupToUse(
+        const QString &host, const QString &sgroup);
+
   private:
     QString      m_groupname;
     QString      m_hostname;
     bool         m_allowFallback;
     QStringList  m_dirlist;
+
+    static QMutex                 s_groupToUseLock;
+    static QHash<QString,QString> s_groupToUseCache;
 };
 
 class MPUBLIC StorageGroupEditor :
