@@ -1,4 +1,8 @@
 // -*- Mode: c++ -*-
+// vim:set sw=4 ts=4 expandtab:
+// Copyright (c) 2009, Daniel Thor Kristjansson
+// Distributed as part of MythTV under GPL version 2
+// (or at your option a later version)
 
 #include <QCoreApplication>
 #include <QThreadPool>

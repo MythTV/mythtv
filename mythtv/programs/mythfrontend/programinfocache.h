@@ -1,9 +1,17 @@
 // -*- Mode: c++ -*-
+// vim:set sw=4 ts=4 expandtab:
+#ifndef _PROGRAM_INFO_CACHE_H_
+#define _PROGRAM_INFO_CACHE_H_
 
+// ANSI C headers
+#include <stdint.h>
+
+// C++ headers
 #include <vector>
 #include <map>
 using namespace std;
 
+// Qt headers
 #include <QWaitCondition>
 #include <QDateTime>
 #include <QMutex>
@@ -67,3 +75,5 @@ class ProgramInfoCache
     uint                    m_loads_in_progress;
     mutable QWaitCondition  m_load_wait;
 };
+
+#endif // _PROGRAM_INFO_CACHE_H_
