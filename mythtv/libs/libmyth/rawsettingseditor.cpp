@@ -49,7 +49,7 @@ bool RawSettingsEditor::Create(void)
     m_saveButton = dynamic_cast<MythUIButton *> (GetChild("save"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
 
-    if (!m_saveButton || !m_cancelButton)
+    if (!m_settingsList || !m_textLabel || !m_saveButton || !m_cancelButton)
     {
         VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
         return false;
