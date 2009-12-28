@@ -1,7 +1,7 @@
 
 #include "mythscreentype.h"
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QDomDocument>
 #include <QRunnable>
 #include <QThreadPool>
@@ -416,7 +416,7 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
         {
             MythEvent me(QString("GLOBAL_SYSTEM_EVENT KEY_%1")
                                  .arg(action.mid(8)));
-            QApplication::postEvent(
+            QCoreApplication::postEvent(
                 GetMythMainWindow()->GetSystemEventHandler(), me.clone());
         }
         else
