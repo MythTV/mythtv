@@ -24,7 +24,7 @@ class MythUIButton;
  *  Any inheritting class must set the title and list of settings names in
  *  its constructor.
  */
-class RawSettingsEditor : public MythScreenType
+class MPUBLIC RawSettingsEditor : public MythScreenType
 {
     Q_OBJECT
 
