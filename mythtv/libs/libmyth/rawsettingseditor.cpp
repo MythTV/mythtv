@@ -48,6 +48,7 @@ bool RawSettingsEditor::Create(void)
 
     m_saveButton = dynamic_cast<MythUIButton *> (GetChild("save"));
     m_cancelButton = dynamic_cast<MythUIButton *> (GetChild("cancel"));
+    m_textLabel = dynamic_cast<MythUIText *> (GetChild("label-text"));
 
     if (!m_settingsList || !m_textLabel || !m_saveButton || !m_cancelButton)
     {
@@ -59,9 +60,8 @@ bool RawSettingsEditor::Create(void)
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
     MythUIText *text = dynamic_cast<MythUIText *> (GetChild("heading"));
-    text->SetText(m_title);
-
-    m_textLabel = dynamic_cast<MythUIText *> (GetChild("label-text"));
+    if (text)
+        text->SetText(m_title);
 
     MythUIShape *shape = NULL;
 
