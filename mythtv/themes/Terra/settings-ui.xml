@@ -1,0 +1,62 @@
+<mythuitheme>
+
+    <window name="rawsettingseditor">
+        <textarea name="heading" from="basetextarea">
+            <area>20,20,1240,40</area>
+            <align>allcenter</align>
+            <font>baselarge</font>
+        </textarea>
+
+        <buttonlist name="settings" from="basebuttonlist">
+            <area>20,80,400,400</area>
+            <layout>vertical</layout>
+            <spacing>5</spacing>
+            <scrollstyle>free</scrollstyle>
+            <wrapstyle>none</wrapstyle>
+            <buttonarea>0,0,400,97%</buttonarea>
+        </buttonlist>
+
+        <shape name="label-shape">
+            <area>20,500,400,30</area>
+            <type>roundbox</type>
+            <fill color="#000000" alpha="130" />
+            <cornerradius>4</cornerradius>
+        </shape>
+
+        <textarea name="label-text">
+            <area>24,500,392,30</area>
+            <font>basesmallgreen</font>
+            <align>left,vcenter</align>
+        </textarea>
+
+        <shape name="background">
+            <area>428,500,830,30</area>
+            <type>roundbox</type>
+            <fill color="#FFFFFF" />
+            <cornerradius>4</cornerradius>
+        </shape>
+
+        <textedit name="settingvalue">
+            <area>428,500,830,30</area>
+            <imagetype name="cursor">
+                <filename>cursor.png</filename>
+            </imagetype>
+            <textarea name="text">
+                <area>5,0,820,30</area>
+                <font>basesmallblack</font>
+            </textarea>
+        </textedit>
+
+        <button name="cancel" from="basebutton">
+            <position>20,630</position>
+            <value>Cancel</value>
+        </button>
+    
+        <button name="save" from="basebutton">
+            <position>1037,630</position>
+            <value>Save</value>
+        </button>
+
+    </window>
+
+</mythuitheme>

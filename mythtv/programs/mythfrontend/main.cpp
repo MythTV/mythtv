@@ -37,6 +37,7 @@ using namespace std;
 #include "networkcontrol.h"
 #include "DVDRingBuffer.h"
 #include "scheduledrecording.h"
+#include "mythsystemevent.h"
 
 #include "compat.h"  // For SIG* on MinGW
 #include "exitcodes.h"
@@ -565,6 +566,18 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "settings custompriority")
     {
         startCustomPriority();
+    }
+    else if (sel == "system_events")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        MythSystemEventEditor *msee = new MythSystemEventEditor(
+                                    mainStack, "System Event Editor");
+
+        if (msee->Create())
+            mainStack->AddScreen(msee);
+        else
+            delete msee;
     }
     else if (sel == "tv_status")
         showStatus();
@@ -1436,9 +1449,15 @@ int main(int argc, char **argv)
     // Setup handler for USR2 signals to restart LIRC
     signal(SIGUSR2, &signal_USR2_handler);
 
+    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+    GetMythMainWindow()->RegisterSystemEventHandler(sysEventHandler);
+
     BackendConnectionManager bcm;
 
     int ret = qApp->exec();
+
+    if (sysEventHandler)
+        delete sysEventHandler;
 
     pmanager->DestroyAllPlugins();
 

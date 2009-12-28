@@ -40,6 +40,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "cardutil.h"
 #include "mythdb.h"
+#include "mythsystemevent.h"
 
 #define LOC QString("Scheduler: ")
 #define LOC_WARN QString("Scheduler, Warning: ")
@@ -1570,6 +1571,10 @@ void Scheduler::RunScheduler(void)
     int idleWaitForRecordingTime = 0;
     bool firstRun = true;
 
+    QString sysEventKey;
+    int sysEventSecs[5] = { 120, 90, 60, 30, 0 };
+    QList<QString>sysEvents[4];
+
     struct timeval fillstart, fillend;
     float matchTime, placeTime;
 
@@ -1725,6 +1730,8 @@ void Scheduler::RunScheduler(void)
 
             PutInactiveSlavesToSleep();
             lastSleepCheck = QDateTime::currentDateTime();
+
+            SendMythSystemEvent("SCHEDULER_RAN");
         }
       }
 
@@ -1755,6 +1762,26 @@ void Scheduler::RunScheduler(void)
 
             if (m_tvList->find(nextRecording->cardid) == m_tvList->end())
                 continue;
+
+            sysEventKey = QString("%1:%2").arg(nextRecording->chanid)
+                                  .arg(nextrectime.toString(Qt::ISODate));
+            int i = 0;
+            bool pendingEventSent = false;
+            while (sysEventSecs[i] != 0)
+            {
+                if ((secsleft <= sysEventSecs[i]) &&
+                    (!sysEvents[i].contains(sysEventKey)))
+                {
+                    if (!pendingEventSent)
+                        SendMythSystemRecEvent(
+                            QString("REC_PENDING SECS %1").arg(secsleft),
+                            nextRecording);
+
+                    sysEvents[i].append(sysEventKey);
+                    pendingEventSent = true;
+                }
+                i++;
+            }
 
             nexttv = (*m_tvList)[nextRecording->cardid];
 
@@ -1969,7 +1996,14 @@ void Scheduler::RunScheduler(void)
             gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
             if (is_rec)
+            {
                 UpdateNextRecord();
+                SendMythSystemEvent(QString("REC_STARTED CARDID %1 CHANID %2 "
+                                    "STARTTIME %3").arg(nextRecording->cardid)
+                                    .arg(nextRecording->chanid)
+                                    .arg(nextRecording->recstartts
+                                                      .toString(Qt::ISODate)));
+            }
 
             if (nextRecording->recstatus == rsFailed)
             {

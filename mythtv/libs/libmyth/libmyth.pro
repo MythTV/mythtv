@@ -30,6 +30,7 @@ HEADERS += mythhttppool.h mythhttphandler.h
 HEADERS += audiopulseutil.h
 HEADERS += programinfo.h programlist.h programinfoupdater.h
 HEADERS += recordingtypes.h remoteutil.h
+HEADERS += rawsettingseditor.h
 
 # remove when everything is switched to mythui
 HEADERS += virtualkeyboard_qt.h
@@ -53,6 +54,7 @@ SOURCES += mythhttppool.cpp mythhttphandler.cpp
 SOURCES += audiopulseutil.cpp
 SOURCES += programinfo.cpp programlist.cpp programinfoupdater.cpp
 SOURCES += recordingtypes.cpp remoteutil.cpp
+SOURCES += rawsettingseditor.cpp
 
 # remove when everything is switched to mythui
 SOURCES += virtualkeyboard_qt.cpp

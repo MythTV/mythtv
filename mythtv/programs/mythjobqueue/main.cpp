@@ -26,6 +26,7 @@
 #include "mythversion.h"
 #include "mythcommandlineparser.h"
 #include "compat.h"
+#include "mythsystemevent.h"
 
 #define LOC      QString("MythJobQueue: ")
 #define LOC_WARN QString("MythJobQueue, Warning: ")
@@ -322,7 +323,12 @@ int main(int argc, char *argv[])
 
     jobqueue = new JobQueue(false);
 
+    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+
     int exitCode = a.exec();
+
+    if (sysEventHandler)
+        delete sysEventHandler;
 
     return exitCode ? exitCode : JOBQUEUE_EXIT_OK;
 }

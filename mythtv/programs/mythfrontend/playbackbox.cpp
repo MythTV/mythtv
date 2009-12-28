@@ -24,6 +24,7 @@
 #include "recordinginfo.h"
 #include "previewgenerator.h"
 #include "playgroup.h"
+#include "mythsystemevent.h"
 
 // libmyth
 #include "mythcontext.h"

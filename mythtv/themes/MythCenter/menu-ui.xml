@@ -283,6 +283,7 @@
 
             <!--   main_settings.xml  -->
             <state name="SETTINGS_GENERAL" from="SETUP" />
+            <state name="SETTINGS_SYSTEM_EVENTS" from="SETUP" />
             <state name="SETTINGS_APPEARANCE" from="DEFAULT">
                 <imagetype name="watermark">
                     <filename>watermark/appearance.png</filename>
@@ -376,6 +377,7 @@
 
             <!--   setup.xml  -->
             <state name="SETUP_GENERAL" from="SETUP" />
+            <state name="SETUP_SYSTEM_EVENTS" from="SETUP" />
             <state name="SETUP_STORAGE_GROUPS" from="SETUP" />
             <state name="SETUP_CAPTURE_CARDS" from="DEFAULT">
                 <imagetype name="watermark">

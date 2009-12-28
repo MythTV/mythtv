@@ -938,4 +938,20 @@ void RecordingInfo::SetDupHistory(void)
     ScheduledRecording::signalChange(0);
 }
 
+/** \fn RecordingInfo::SubstituteMatches(QString)
+ *  \brief Replace %MATCH% vars in the specified string
+ *  \param str QString containing matches to be substituted
+ */
+void RecordingInfo::SubstituteMatches(QString &str)
+{
+    str.replace("%RECID%", QString::number(getRecordID()));
+    str.replace("%PARENTID%", QString::number(parentid));
+    str.replace("%FINDID%", QString::number(findid));
+    str.replace("%RECSTATUS%", QString::number(recstatus));
+    str.replace("%RECTYPE%", QString::number(rectype));
+    str.replace("%REACTIVATE%", QString::number(reactivate));
+
+    ProgramInfo::SubstituteMatches(str);
+}
+
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -3798,6 +3798,42 @@ QString ProgramInfo::i18n(const QString &msg)
     return (msg_arr == msg_i18n_arr) ? msg : msg_i18n;
 }
 
+/** \fn ProgramInfo::SubstituteMatches(QString &str)
+ *  \brief Subsitute %MATCH% type variable names in the given string
+ *  \param str QString to substitute matches in
+ */
+void ProgramInfo::SubstituteMatches(QString &str)
+{
+    QString pburl = GetPlaybackURL(false, true);
+    if (pburl.left(7) == "myth://")
+    {
+        str.replace(QString("%DIR%"), pburl);
+    }
+    else
+    {
+        QFileInfo dirInfo(pburl);
+        str.replace(QString("%DIR%"), dirInfo.path());
+    }
+
+    str.replace(QString("%FILE%"), GetRecordBasename(true));
+    str.replace(QString("%TITLE%"), title);
+    str.replace(QString("%SUBTITLE%"), subtitle);
+    str.replace(QString("%DESCRIPTION%"), description);
+    str.replace(QString("%HOSTNAME%"), hostname);
+    str.replace(QString("%CATEGORY%"), category);
+    str.replace(QString("%RECGROUP%"), recgroup);
+    str.replace(QString("%PLAYGROUP%"), playgroup);
+    str.replace(QString("%CHANID%"), chanid);
+    str.replace(QString("%STARTTIME%"), recstartts.toString("yyyyMMddhhmmss"));
+    str.replace(QString("%ENDTIME%"), recendts.toString("yyyyMMddhhmmss"));
+    str.replace(QString("%STARTTIMEISO%"), recstartts.toString(Qt::ISODate));
+    str.replace(QString("%ENDTIMEISO%"), recendts.toString(Qt::ISODate));
+    str.replace(QString("%PROGSTART%"), startts.toString("yyyyMMddhhmmss"));
+    str.replace(QString("%PROGEND%"), endts.toString("yyyyMMddhhmmss"));
+    str.replace(QString("%PROGSTARTISO%"), startts.toString(Qt::ISODate));
+    str.replace(QString("%PROGENDISO%"), endts.toString(Qt::ISODate));
+}
+
 QString SkipTypeToString(int flags)
 {
     if (COMM_DETECT_COMMFREE == flags)

@@ -100,4 +100,10 @@
      <action>STORAGE GROUPS</action>
    </button>
 
+   <button>
+     <type>SETUP_SYSTEM_EVENTS</type>
+     <text>7. System Events</text>
+     <action>SYSTEMEVENTEDITOR</action>
+   </button>
+
 </mythmenu>

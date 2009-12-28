@@ -19,6 +19,7 @@
 #include "compat.h"
 #include "mythverbose.h"
 #include "mythuihelper.h"
+#include "mythsystemevent.h"
 
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
@@ -326,6 +327,8 @@ void NetworkControl::deleteClient(void)
     VERBOSE(VB_GENERAL, LOC + "Client Socket disconnected");
     QMutexLocker locker(&clientLock);
 
+    SendMythSystemEvent("NET_CTRL_DISCONNECTED");
+
     QList<NetworkControlClient *>::const_iterator it;
     for (it = clients.begin(); it != clients.end(); ++it)
     {
@@ -358,6 +361,8 @@ void NetworkControl::newConnection()
 
     VERBOSE(VB_GENERAL, LOC +
             QString("New connection established."));
+
+    SendMythSystemEvent("NET_CTRL_CONNECTED");
 
     QTcpSocket           *client = this->nextPendingConnection();
     NetworkControlClient *ncc = new NetworkControlClient(client);

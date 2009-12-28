@@ -31,12 +31,41 @@
 #include "backendsettings.h"
 #include "checksetup.h"
 #include "startprompt.h"
+#include "rawsettingseditor.h"
+#include "mythsystemevent.h"
 
 using namespace std;
 
 static MythThemeBase *themeBase   = NULL;
 ExitPrompter   *exitPrompt  = NULL;
 StartPrompter  *startPrompt = NULL;
+
+class ExpertSettingsEditor : public RawSettingsEditor
+{
+  public:
+    ExpertSettingsEditor(MythScreenStack *parent, const char *name = 0)
+      : RawSettingsEditor(parent, name)
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+
+        query.prepare("SELECT value, data "
+                        "FROM settings "
+                        "WHERE hostname = :HOSTNAME");
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+        if (query.exec())
+        {
+            while (query.next())
+            {
+                m_settings[query.value(0).toString()] =
+                    query.value(0).toString();
+            }
+        }
+
+        m_title = tr("Expert Settings Editor");
+        m_settings["EventCmdRecPending"] = tr("Recording Pending");
+    }
+};
 
 void SetupMenuCallback(void* data, QString& selection)
 {
@@ -79,6 +108,18 @@ void SetupMenuCallback(void* data, QString& selection)
     {
         StorageGroupListEditor sge;
         sge.exec();
+    }
+    else if (sel == "systemeventeditor")
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+        MythSystemEventEditor *msee = new MythSystemEventEditor(
+                                    mainStack, "System Event Editor");
+
+        if (msee->Create())
+            mainStack->AddScreen(msee);
+        else
+            delete msee;
     }
     else if (sel == "exiting_app")
     {
@@ -165,6 +206,7 @@ int main(int argc, char *argv[])
     bool    doScanList = false;
     bool    doScanSaveOnly = false;
     bool    scanInteractive = true;
+    bool    expertMode = false;
     uint    scanImport = 0;
     bool    scanFTAOnly = false;
     ServiceRequirements scanServiceRequirements = kRequireAV;
@@ -298,6 +340,10 @@ int main(int argc, char *argv[])
             }
 
             ++argpos;
+        }
+        else if (!strcmp(a.argv()[argpos],"--expert"))
+        {
+            expertMode = true;
         }
         else if (!strcmp(a.argv()[argpos],"--scan-list"))
         {
@@ -587,6 +633,24 @@ int main(int argc, char *argv[])
     // Let the user select buttons, type values, scan for channels, etc.
     if (!SetupMenu(themedir, themename) && !resetTheme(themedir, themename))
         return FRONTEND_BUGGY_EXIT_NO_THEME;
+
+    ExpertSettingsEditor *expertEditor = NULL;
+    if (expertMode)
+    {
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        expertEditor =
+            new ExpertSettingsEditor(mainStack, "Expert Settings Editor");
+        if (expertEditor->Create())
+            mainStack->AddScreen(expertEditor);
+        else
+        {
+            delete expertEditor;
+            expertEditor = NULL;
+            VERBOSE(VB_IMPORTANT, "Unable to create expert settings editor "
+                    "window");
+            return BACKEND_EXIT_OK;
+        }
+    }
 
     qApp->exec();
     // Main menu callback to ExitPrompter does CheckSetup(), cleanup and exit.

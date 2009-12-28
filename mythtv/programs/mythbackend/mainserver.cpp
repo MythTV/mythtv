@@ -60,6 +60,7 @@ using namespace std;
 #include "compat.h"
 #include "RingBuffer.h"
 #include "remotefile.h"
+#include "mythsystemevent.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -728,8 +729,11 @@ void MainServer::customEvent(QEvent *e)
                                                                      startts);
             if (pinfo)
             {
+                SendMythSystemPlayEvent("REC_EXPIRED", pinfo);
+
                 RecordingInfo recInfo(*pinfo);
                 delete pinfo;
+
                 // allow re-record if auto expired but not expired live
                 // or already "deleted" programs
                 if (recInfo.recgroup != "LiveTV" &&
@@ -937,6 +941,9 @@ void MainServer::customEvent(QEvent *e)
 
         vector<PlaybackSock*> sentSet;
 
+        bool isSystemEvent = broadcast[1].startsWith("SYSTEM_EVENT ");
+        QStringList sentSetSystemEvent(gContext->GetHostName());
+
         vector<PlaybackSock*>::const_iterator iter;
         for (iter = localPBSList.begin(); iter != localPBSList.end(); iter++)
         {
@@ -965,6 +972,14 @@ void MainServer::customEvent(QEvent *e)
             else if (pbs->wantsEvents())
             {
                 reallysendit = true;
+            }
+
+            if (reallysendit && isSystemEvent)
+            {
+                if (sentSetSystemEvent.contains(pbs->getHostname()))
+                    continue;
+
+                sentSetSystemEvent << pbs->getHostname();
             }
 
             MythSocket *sock = pbs->getSocket();
@@ -1090,6 +1105,10 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         sockListLock.lockForWrite();
         playbackList.push_back(pbs);
         sockListLock.unlock();
+
+        if (wantevents && commands[2] != "tzcheck")
+            SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
+                                        .arg(commands[2]));
     }
     else if (commands[1] == "SlaveBackend")
     {
@@ -1150,6 +1169,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         sockListLock.unlock();
 
         autoexpireUpdateTimer->start(1000);
+
+        SendMythSystemEvent(QString("SLAVE_CONNECTED HOSTNAME %1")
+                                    .arg(commands[2]));
     }
     else if (commands[1] == "FileTransfer")
     {
@@ -2256,6 +2278,10 @@ void MainServer::DoHandleDeleteRecording(
     // Tell MythTV frontends that the recording list needs to be updated.
     if ((fileExists) || (recinfo.filesize == 0) || (forceMetadataDelete))
     {
+        SendMythSystemEvent(QString("REC_DELETED CHANID %1 STARTTIME %2")
+                            .arg(recinfo.chanid)
+                            .arg(recinfo.recstartts.toString(Qt::ISODate)));
+
         recinfo.SendDeletedEvent();
     }
 }
@@ -4744,6 +4770,14 @@ void MainServer::connectionClosed(MythSocket *socket)
 
                 MythEvent me2("RECORDING_LIST_CHANGE");
                 gContext->dispatch(me2);
+
+                SendMythSystemEvent(QString("SLAVE_DISCONNECTED HOSTNAME %1")
+                                    .arg(pbs->getHostname()));
+            }
+            else if (ismaster && pbs->getHostname() != "tzcheck")
+            {
+                SendMythSystemEvent(QString("CLIENT_DISCONNECTED HOSTNAME %1")
+                                    .arg(pbs->getHostname()));
             }
 
             LiveTVChain *chain;

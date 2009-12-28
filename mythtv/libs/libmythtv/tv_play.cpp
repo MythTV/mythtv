@@ -59,6 +59,7 @@ using namespace std;
 #include "tvosdmenuentry.h"
 #include "tv_play_win.h"
 #include "recordinginfo.h"
+#include "mythsystemevent.h"
 
 #if ! HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -194,6 +195,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
     bool showDialogs = true;
     bool playCompleted = false;
     ProgramInfo *curProgram = NULL;
+    bool startSysEventSent = false;
 
 
     if (tvrec)
@@ -217,6 +219,12 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
     gContext->sendPlaybackStart();
 
+    if (curProgram)
+    {
+        startSysEventSent = true;
+        SendMythSystemPlayEvent("PLAY_STARTED", curProgram);
+    }
+
     QString nvpError = QString::null;
     while (!quitAll)
     {
@@ -224,7 +232,15 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
         {
             VERBOSE(VB_PLAYBACK, LOC + "tv->Playback() -- begin");
             if (!tv->Playback(*curProgram))
+            {
                 quitAll = true;
+            }
+            else if (!startSysEventSent)
+            {
+                startSysEventSent = true;
+                SendMythSystemPlayEvent("PLAY_STARTED", curProgram);
+            }
+
             VERBOSE(VB_PLAYBACK, LOC + "tv->Playback() -- end");
         }
         else if (RemoteGetFreeRecorderCount())
@@ -342,6 +358,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
             curProgram = nextProgram;
 
+            SendMythSystemPlayEvent("PLAY_CHANGED", curProgram);
             continue;
         }
 
@@ -372,6 +389,8 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
     if (curProgram)
     {
+        SendMythSystemPlayEvent("PLAY_STOPPED", curProgram);
+
         if (deleterecording)
         {
             curProgram->UpdateLastDelete(true);
@@ -385,6 +404,8 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
         delete curProgram;
     }
+    else
+        SendMythSystemEvent("PLAY_STOPPED");
 
     if (!nvpError.isEmpty())
     {
@@ -4150,7 +4171,13 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     else if (has_action("PLAY", actions))
         DoPlay(ctx);
     else if (has_action("PAUSE", actions))
+    {
+        if (ctx->paused)
+            SendMythSystemPlayEvent("PLAY_UNPAUSED", ctx->playingInfo);
+        else
+            SendMythSystemPlayEvent("PLAY_PAUSED", ctx->playingInfo);
         DoTogglePause(ctx, true);
+    }
     else if (has_action("SPEEDINC", actions) && !isDVDStill)
         ChangeSpeed(ctx, 1);
     else if (has_action("SPEEDDEC", actions) && !isDVDStill)

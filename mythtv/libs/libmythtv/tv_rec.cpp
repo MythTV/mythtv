@@ -30,6 +30,7 @@ using namespace std;
 #include "storagegroup.h"
 #include "remoteutil.h"
 #include "tvremoteutil.h"
+#include "mythsystemevent.h"
 
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
@@ -798,6 +799,8 @@ void TVRec::StartedRecording(RecordingInfo *curRec)
 
     if (curRec->chancommfree != 0)
         curRec->SetCommFlagged(COMM_FLAG_COMMFREE);
+
+    SendMythSystemRecEvent("REC_STARTED", curRec);
 }
 
 /** \fn TVRec::FinishedRecording(RecordingInfo *curRec)
@@ -1126,6 +1129,8 @@ void TVRec::TeardownRecorder(bool killFile)
         }
 
         FinishedRecording(curRecording);
+
+        SendMythSystemRecEvent("REC_FINISHED", curRecording);
 
         curRecording->MarkAsInUse(false);
         delete curRecording;

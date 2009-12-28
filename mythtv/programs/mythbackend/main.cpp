@@ -52,6 +52,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "previewgenerator.h"
 #include "mythcommandlineparser.h"
+#include "mythsystemevent.h"
 
 #include "mediaserver.h"
 #include "httpstatus.h"
@@ -488,7 +489,9 @@ void showUsage(const MythCommandLineParser &cmdlineparser, const QString &versio
     "--infile                       Input file for preview generation" << endl <<
     "--outfile                      Optional output file for preview generation" << endl <<
     "--chanid                       Channel ID for preview generation" << endl <<
-    "--starttime                    Recording start time for preview generation" << endl
+    "--starttime                    Recording start time for preview generation" << endl <<
+    "--event EVENTTEXT              Send a backend event test message" << endl <<
+    "--systemevent EVENTTEXT        Send a backend SYSTEM_EVENT test message" << endl
     << endl;
 
 }
@@ -553,6 +556,7 @@ int main(int argc, char **argv)
     QString printexpire = "";
     bool clearsettingscache = false;
     bool wantupnprebuild = false;
+    QString eventString;
 
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -675,6 +679,22 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--clearcache"))
         {
             clearsettingscache = true;
+        }
+        else if (!strcmp(a.argv()[argpos],"--event"))
+        {
+            if ((a.argc()-1 > argpos) && a.argv()[argpos+1][0] != '-')
+            {
+                eventString = a.argv()[argpos+1];
+                ++argpos;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"--systemevent"))
+        {
+            if ((a.argc()-1 > argpos) && a.argv()[argpos+1][0] != '-')
+            {
+                eventString = QString("SYSTEM_EVENT ") + a.argv()[argpos+1];
+                ++argpos;
+            }
         }
         else if (!strcmp(a.argv()[argpos],"--generate-preview"))
         {
@@ -831,6 +851,21 @@ int main(int argc, char **argv)
         return BACKEND_EXIT_NO_MYTHCONTEXT;
     }
     gContext->SetBackend(true);
+
+    if (!eventString.isEmpty())
+    {
+        gContext->SetBackend(false);
+        if (gContext->ConnectToMasterServer())
+        {
+            if (eventString.startsWith("SYSTEM_EVENT"))
+                eventString += QString(" SENDER %1")
+                                       .arg(gContext->GetHostName());
+
+            RemoteSendMessage(eventString);
+            return BACKEND_EXIT_OK;
+        }
+        return BACKEND_EXIT_NO_MYTHCONTEXT;
+    }
 
     if (wantupnprebuild)
     {
@@ -1029,6 +1064,8 @@ int main(int argc, char **argv)
         return ret;
     }
 
+    MythSystemEventHandler *sysEventHandler = new MythSystemEventHandler();
+
     int port = gContext->GetNumSetting("BackendServerPort", 6543);
 
     QString myip = gContext->GetSetting("BackendServerIP");
@@ -1147,9 +1184,21 @@ int main(int argc, char **argv)
 
     StorageGroup::CheckAllStorageGroupDirs();
 
+    if (gContext->IsMasterBackend())
+        SendMythSystemEvent("MASTER_STARTED");
+
     exitCode = a.exec();
 
+    if (gContext->IsMasterBackend())
+    {
+        SendMythSystemEvent("MASTER_SHUTDOWN");
+        a.processEvents();
+    }
+
     gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
+
+    if (sysEventHandler)
+        delete sysEventHandler;
 
     return exitCode ? exitCode : BACKEND_EXIT_OK;
 }

@@ -1,11 +1,13 @@
 
 #include "mythscreentype.h"
 
+#include <QApplication>
 #include <QDomDocument>
 #include <QRunnable>
 #include <QThreadPool>
 
 #include "mythverbose.h"
+#include "mythobservable.h"
 
 #include "mythscreenstack.h"
 #include "mythmainwindow.h"
@@ -410,6 +412,13 @@ bool MythScreenType::keyPressEvent(QKeyEvent *event)
             Close();
         else if (action == "MENU")
             ShowMenu();
+        else if (action.startsWith("SYSEVENT"))
+        {
+            MythEvent me(QString("GLOBAL_SYSTEM_EVENT KEY_%1")
+                                 .arg(action.mid(8)));
+            QApplication::postEvent(
+                GetMythMainWindow()->GetSystemEventHandler(), me.clone());
+        }
         else
             handled = false;
     }

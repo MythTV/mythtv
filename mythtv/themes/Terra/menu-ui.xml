@@ -237,6 +237,7 @@
                         <state name="SETTINGS_NETFLIX" from="NETFLIX" />
 
                         <state name="SETTINGS_GENERAL" from="SETUP" />
+                        <state name="SETTINGS_SYSTEM_EVENTS" from="SETUP" />
                         <state name="SETTINGS_APPEARANCE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
@@ -350,6 +351,7 @@
                         <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECPRIORITIES" />
 
                         <state name="SETUP_GENERAL" from="SETUP" />
+                        <state name="SETUP_SYSTEM_EVENTS" from="SETUP" />
                         <state name="SETUP_STORAGE_GROUPS" from="SETUP" />
                         <state name="SETUP_CAPTURE_CARDS" from="default">
                             <imagetype name="icon">
@@ -651,6 +653,7 @@
                         <state name="SETTINGS_NETFLIX" from="NETFLIX" />
 
                         <state name="SETTINGS_GENERAL" from="SETUP" />
+                        <state name="SETTINGS_SYSTEM_EVENTS" from="SETUP" />
                         <state name="SETTINGS_APPEARANCE" from="default">
                             <imagetype name="icon">
                                 <filename>watermarks/appearance.png</filename>
@@ -770,6 +773,7 @@
                         <state name="TV_RECPRIORITIES_CUSTOM" from="TV_RECPRIORITIES" />
 
                         <state name="SETUP_GENERAL" from="SETUP" />
+                        <state name="SETUP_SYSTEM_EVENTS" from="SETUP" />
                         <state name="SETUP_STORAGE_GROUPS" from="SETUP" />
                         <state name="SETUP_CAPTURE_CARDS" from="default">
                             <imagetype name="icon">

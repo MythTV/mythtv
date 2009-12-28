@@ -156,6 +156,7 @@ HEADERS += myth_imgconvert.h
 HEADERS += channelgroup.h           channelgroupsettings.h
 HEADERS += recordingrule.h          programdetail.h
 HEADERS += iso639.h
+HEADERS += mythsystemevent.h
 
 SOURCES += recordinginfo.cpp        recordinglist.cpp
 SOURCES += RingBuffer.cpp           avfringbuffer.cpp
@@ -178,6 +179,7 @@ SOURCES += channelgroup.cpp         channelgroupsettings.cpp
 SOURCES += myth_imgconvert.cpp
 SOURCES += recordingrule.cpp        programdetail.cpp
 SOURCES += iso639.cpp
+SOURCES += mythsystemevent.cpp
 
 # DiSEqC
 HEADERS += diseqc.h                 diseqcsettings.h

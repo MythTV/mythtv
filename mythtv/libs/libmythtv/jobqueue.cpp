@@ -1720,43 +1720,8 @@ QString JobQueue::GetJobCommand(int id, int jobType, ProgramInfo *tmpInfo)
 
     if (!command.isEmpty() && tmpInfo)
     {
-        QString pburl = tmpInfo->GetPlaybackURL(false, true);
-        if (pburl.left(7) == "myth://")
-        {
-            // If the file isn't accessible locally, at least show where it is.
-            command.replace(QRegExp("%DIR%"), pburl);
-        }
-        else
-        {
-            QFileInfo dirInfo(pburl);
-            command.replace(QRegExp("%DIR%"), dirInfo.path());
-        }
+        tmpInfo->SubstituteMatches(command);
 
-        command.replace(QRegExp("%FILE%"), tmpInfo->GetRecordBasename(true));
-        command.replace(QRegExp("%TITLE%"), tmpInfo->title);
-        command.replace(QRegExp("%SUBTITLE%"), tmpInfo->subtitle);
-        command.replace(QRegExp("%DESCRIPTION%"), tmpInfo->description);
-        command.replace(QRegExp("%HOSTNAME%"), tmpInfo->hostname);
-        command.replace(QRegExp("%CATEGORY%"), tmpInfo->category);
-        command.replace(QRegExp("%RECGROUP%"), tmpInfo->recgroup);
-        command.replace(QRegExp("%PLAYGROUP%"), tmpInfo->playgroup);
-        command.replace(QRegExp("%CHANID%"), tmpInfo->chanid);
-        command.replace(QRegExp("%STARTTIME%"),
-                        tmpInfo->recstartts.toString("yyyyMMddhhmmss"));
-        command.replace(QRegExp("%ENDTIME%"),
-                        tmpInfo->recendts.toString("yyyyMMddhhmmss"));
-        command.replace(QRegExp("%STARTTIMEISO%"),
-                        tmpInfo->recstartts.toString(Qt::ISODate));
-        command.replace(QRegExp("%ENDTIMEISO%"),
-                        tmpInfo->recendts.toString(Qt::ISODate));
-        command.replace(QRegExp("%PROGSTART%"),
-                        tmpInfo->startts.toString("yyyyMMddhhmmss"));
-        command.replace(QRegExp("%PROGEND%"),
-                        tmpInfo->endts.toString("yyyyMMddhhmmss"));
-        command.replace(QRegExp("%PROGSTARTISO%"),
-                        tmpInfo->startts.toString(Qt::ISODate));
-        command.replace(QRegExp("%PROGENDISO%"),
-                        tmpInfo->endts.toString(Qt::ISODate));
         command.replace(QRegExp("%VERBOSELEVEL%"),
                         QString("%1").arg(print_verbose_messages));
 

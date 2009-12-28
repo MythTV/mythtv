@@ -277,6 +277,7 @@ class MPUBLIC ProgramInfo
     void ToStringList(QStringList &list) const;
     virtual void ToMap(QHash<QString, QString> &progMap,
                        bool showrerecord = false) const;
+    virtual void SubstituteMatches(QString &str);
 
     // Used for scheduling recordings
     //int IsProgramRecurring(void) const; //not used...

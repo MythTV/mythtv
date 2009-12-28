@@ -49,6 +49,7 @@ class MPUBLIC RecordingInfo : public ProgramInfo
     // Serializers
     virtual void ToMap(QHash<QString, QString> &progMap,
                        bool showrerecord = false) const;
+    virtual void SubstituteMatches(QString &str);
 
     // Used to query and set RecordingRule info
     RecordingRule *GetRecordingRule(void);

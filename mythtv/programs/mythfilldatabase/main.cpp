@@ -21,6 +21,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "videosource.h" // for is_grabber..
 #include "dbcheck.h"
+#include "mythsystemevent.h"
 
 // filldata headers
 #include "filldata.h"
@@ -949,6 +950,8 @@ int main(int argc, char *argv[])
         ScheduledRecording::signalChange(-1);
 
     RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+
+    SendMythSystemEvent("MYTHFILLDATABASE_RAN");
 
     delete gContext;
 

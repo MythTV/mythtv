@@ -147,6 +147,8 @@ class MythMainWindowPrivate
 
     int escapekey;
 
+    QObject *sysEventHandler;
+
     QTimer *drawTimer;
     QVector<MythScreenStack *> stackList;
     MythScreenStack *mainStack;
@@ -319,6 +321,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->mediadeviceforcallback = NULL;
     d->escapekey = Qt::Key_Escape;
     d->mainStack = NULL;
+    d->sysEventHandler = NULL;
 
     installEventFilter(this);
 
@@ -404,6 +407,27 @@ MythMainWindow::MythMainWindow(const bool useDB)
     RegisterKey("Global", "7", QT_TRANSLATE_NOOP("MythControls","7"), "7");
     RegisterKey("Global", "8", QT_TRANSLATE_NOOP("MythControls","8"), "8");
     RegisterKey("Global", "9", QT_TRANSLATE_NOOP("MythControls","9"), "9");
+
+    RegisterKey("Global", "SYSEVENT01", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #1"), "");
+    RegisterKey("Global", "SYSEVENT02", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #2"), "");
+    RegisterKey("Global", "SYSEVENT03", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #3"), "");
+    RegisterKey("Global", "SYSEVENT04", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #4"), "");
+    RegisterKey("Global", "SYSEVENT05", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #5"), "");
+    RegisterKey("Global", "SYSEVENT06", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #6"), "");
+    RegisterKey("Global", "SYSEVENT07", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #7"), "");
+    RegisterKey("Global", "SYSEVENT08", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #8"), "");
+    RegisterKey("Global", "SYSEVENT09", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #9"), "");
+    RegisterKey("Global", "SYSEVENT10", QT_TRANSLATE_NOOP("MythControls",
+        "Trigger System Key Event #10"), "");
 
     // these are for the html viewer widget (MythUIWebBrowser)
     RegisterKey("Browser", "ZOOMIN",          QT_TRANSLATE_NOOP("MythControls",
@@ -543,6 +567,16 @@ MythScreenStack *MythMainWindow::GetStack(const QString &stackname)
             return *it;
     }
     return NULL;
+}
+
+void MythMainWindow::RegisterSystemEventHandler(QObject *eventHandler)
+{
+    d->sysEventHandler = eventHandler;
+}
+
+QObject *MythMainWindow::GetSystemEventHandler(void)
+{
+    return d->sysEventHandler;
 }
 
 void MythMainWindow::animate(void)

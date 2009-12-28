@@ -187,4 +187,11 @@
         <depends>mythzoneminder</depends>
     </button>
 
+    <button>
+        <type>SETTINGS_SYSTEM_EVENTS</type>
+        <text>System Event Handlers</text>
+        <description>Configure System Event handler commands</description>
+        <action>SYSTEM_EVENTS</action>
+    </button>
+
 </mythmenu>
