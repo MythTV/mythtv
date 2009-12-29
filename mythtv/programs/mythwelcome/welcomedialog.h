@@ -80,6 +80,7 @@ class WelcomeDialog : public MythScreenType
     uint           m_screenScheduledNo;
     uint           m_statusListNo;
     QStringList    m_statusList;
+    bool           m_frontendIsRunning;
 
     vector<TunerStatus> m_tunerList;
     ProgramDetailList   m_scheduledList;

@@ -37,8 +37,8 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
     m_hasConflicts(false),        m_bWillShutdown(false), m_secondsToShutdown(-1),
     m_preRollSeconds(0),          m_idleWaitForRecordingTime(0),
     m_screenTunerNo(0),           m_screenScheduledNo(0), m_statusListNo(0),
-    m_pendingRecListUpdate(false),m_pendingSchedUpdate(false)
-
+    m_frontendIsRunning(false),   m_pendingRecListUpdate(false),
+    m_pendingSchedUpdate(false)
 {
     gContext->addListener(this);
 
@@ -116,10 +116,16 @@ void WelcomeDialog::startFrontend(void)
 
     myth_system(startFECmd);
     updateAll();
+    m_frontendIsRunning = false;
 }
 
 void WelcomeDialog::startFrontendClick(void)
 {
+    if (m_frontendIsRunning)
+        return;
+
+    m_frontendIsRunning = true;
+
     // this makes sure the button appears to click properly
     QTimer::singleShot(500, this, SLOT(startFrontend()));
 }
@@ -139,7 +145,7 @@ void WelcomeDialog::checkAutoStart(void)
     bool bAutoStartFrontend = gContext->GetNumSetting("AutoStartFrontend", 1);
 
     if (state == 1 && bAutoStartFrontend)
-        QTimer::singleShot(500, this, SLOT(startFrontend()));
+        startFrontendClick();
 
     // update status now
     updateAll();
