@@ -13,7 +13,6 @@
 
 // libmythtv
 #include "scheduledrecording.h"
-#include "viewschdiff.h"
 #include "channelutil.h"
 
 // libmythui
@@ -22,6 +21,10 @@
 #include "mythuitextedit.h"
 #include "mythuibutton.h"
 #include "mythdialogbox.h"
+#include "mythmainwindow.h"
+
+//mythfrontend
+#include "viewschedulediff.h"
 
 CustomPriority::CustomPriority(MythScreenStack *parent, ProgramInfo *proginfo)
               : MythScreenType(parent, "CustomPriority")
@@ -450,8 +453,13 @@ void CustomPriority::testSchedule(void)
     if (!m_titleEdit->GetText().isEmpty())
         ltitle = m_titleEdit->GetText();
 
-    ViewScheduleDiff vsd(gContext->GetMainWindow(), "Preview Schedule Changes",
-                         ttable, 0, ltitle);
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ViewScheduleDiff *vsd = new ViewScheduleDiff(mainStack, ttable, 0, ltitle);
+
+    if (vsd->Create())
+        mainStack->AddScreen(vsd);
+    else
+        delete vsd;
 
     thequery = "SELECT RELEASE_LOCK(:LOCK);";
     query.prepare(thequery);
@@ -464,7 +472,5 @@ void CustomPriority::testSchedule(void)
             .arg(thequery)
             .arg(MythDB::DBErrorMessage(query.lastError()));
         VERBOSE(VB_IMPORTANT, msg);
-        return;
     }
-    vsd.exec();
 }

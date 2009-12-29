@@ -12,7 +12,6 @@
 
 // Libmythtv
 #include "playgroup.h"
-#include "viewschdiff.h"
 #include "tv_play.h"
 
 // Libmythui
@@ -29,6 +28,7 @@
 
 // Mythfrontend
 #include "proglist.h"
+#include "viewschedulediff.h"
 
 #define ENUM_TO_QVARIANT(a) qVariantFromValue(static_cast<int>(a))
 
@@ -423,14 +423,17 @@ void ScheduleEditor::ShowPreview(void)
 {
     QString ttable = "record_tmp";
     m_recordingRule->UseTempTable(true, ttable);
-    
-    ViewScheduleDiff vsd(gContext->GetMainWindow(), "Preview Schedule Changes",
-                         ttable, m_recordingRule->m_tempID,
-                         m_recordingRule->m_title);
+
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+    ViewScheduleDiff *vsd = new ViewScheduleDiff(mainStack, ttable, 
+                                                 m_recordingRule->m_tempID,
+                                                 m_recordingRule->m_title);
+    if (vsd->Create())
+        mainStack->AddScreen(vsd);
+    else
+        delete vsd;
 
     m_recordingRule->UseTempTable(false);
-
-    vsd.exec();
 }
 
 ////////////////////////////////////////////////////////

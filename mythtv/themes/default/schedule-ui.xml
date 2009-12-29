@@ -1900,5 +1900,88 @@
             <value>Back</value>
         </button>
     </window>
-    
+
+    <window name="schedulediff">
+
+        <textarea name="sched" from="basetextarea">
+            <area>20,5,380,40</area>
+            <font>baselarge</font>
+            <align>left,bottom</align>
+            <value>Preview Schedule Changes</value>
+        </textarea>
+
+        <shape name="list_background" from="basebackground">
+            <area>15,55,770,330</area>
+        </shape>
+
+        <textarea name="titletext" from="basetextarea">
+            <area>410,5,360,40</area>
+            <align>right,bottom</align>
+        </textarea>
+
+        <buttonlist name="conflictlist" from="basebuttonlist2">
+            <area>20,62,760,370</area>
+            <buttonarea>0,0,760,325</buttonarea>
+            <statetype name="buttonitem">
+                <area>0,0,760,25</area>
+                <state name="active">
+                    <textarea name="shortstarttimedate" from="buttontext">
+                        <area>32,1,148,24</area>
+                    </textarea>
+                    <textarea name="channel" from="shortstarttimedate">
+                        <area>190,1,140,24</area>
+                    </textarea>
+                    <textarea name="titlesubtitle" from="shortstarttimedate">
+                        <area>340,1,350,24</area>
+                    </textarea>
+                    <textarea name="statusbefore" from="shortstarttimedate">
+                        <area>700,1,30,24</area>
+                    </textarea>
+                    <textarea name="statusafter" from="shortstarttimedate">
+                        <area>730,1,30,24</area>
+                    </textarea>
+                </state>
+                <state name="selected" from="active" />
+                <state name="inactive" from="active" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <position>700,330</position>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <position>730,330</position>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="title" from="basetextarea">
+            <area>30,405,760,50</area>
+            <font>baselarge</font>
+        </textarea>
+        <textarea name="channel" from="basetextarea">
+            <area>30,445,160,30</area>
+        </textarea>
+        <textarea name="timedate" from="basetextarea">
+            <area>210,445,420,30</area>
+        </textarea>
+        <textarea name="description" from="basetextarea">
+            <area>30,475,720,90</area>
+            <multiline>yes</multiline>
+            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
+        </textarea>
+        <textarea name="type" from="basetextarea">
+            <area>30,560,560,30</area>
+            <font>basemediumyellow</font>
+        </textarea>
+        <textarea name="programid" from="basetextarea">
+            <area>560,560,200,30</area>
+            <align>right</align>
+        </textarea>
+        <textarea name="nochanges" from="basetextarea">
+            <area>0,110,800,70</area>
+            <align>allcenter</align>
+            <value>You Haven't Scheduled Any Programs To Be Recorded</value>
+            <multiline>yes</multiline>
+        </textarea>
+
+    </window>
+
 </mythuitheme>
