@@ -442,12 +442,16 @@ void StatusBox::customEvent(QEvent *event)
 
             if ((buttonnum == 0) && REC_CAN_BE_DELETED(rec))
             {
-                RemoteDeleteRecording(rec, false, false);
+                RemoteDeleteRecording(
+                    rec->chanid.toUInt(), rec->recstartts, false);
             }
             else if (buttonnum == 1)
             {
                 if ((rec)->recgroup == "Deleted")
-                    RemoteUndeleteRecording(rec);
+                {
+                    RemoteUndeleteRecording(
+                        rec->chanid.toUInt(), rec->recstartts);
+                }
                 else
                 {
                     rec->SetAutoExpire(0);

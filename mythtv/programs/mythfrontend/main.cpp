@@ -398,8 +398,8 @@ void startPlaybackWithGroup(QString recGroup = "")
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    PlaybackBox *pbb = new PlaybackBox(mainStack, "playbackbox",
-                                        PlaybackBox::Play);
+    PlaybackBox *pbb = new PlaybackBox(
+        mainStack, "playbackbox", PlaybackBox::kPlayBox);
 
     if (pbb->Create())
     {
@@ -421,8 +421,8 @@ void startDelete(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    PlaybackBox *pbb = new PlaybackBox(mainStack, "deletebox",
-                                        PlaybackBox::Delete);
+    PlaybackBox *pbb = new PlaybackBox(
+        mainStack, "deletebox", PlaybackBox::kDeleteBox);
 
     if (pbb->Create())
         mainStack->AddScreen(pbb);

@@ -1701,10 +1701,12 @@ QString ProgramInfo::GetRecordBasename(bool fromDB) const
     return retval;
 }
 
-/**
- *  \brief Returns filename or URL to be used to play back this recording.
+/** \brief Returns filename or URL to be used to play back this recording.
  *         If the file is accessible locally, the filename will be returned,
  *         otherwise a myth:// URL will be returned.
+ *
+ *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
+ *        call and so should not be called from the UI thread.
  */
 QString ProgramInfo::GetPlaybackURL(
     bool checkMaster, bool forceCheckLocal) const
@@ -3523,7 +3525,12 @@ void ProgramInfo::UpdateInUseMark(bool force)
         MarkAsInUse(true);
 }
 
-/// \return true iff file is readable
+/** \brief Attempts to ascertain if the main file for this ProgramInfo
+ *         is readable.
+ *  \note This method often initiates a QUERY_CHECKFILE MythProto
+ *        call and so should not be called from the UI thread.
+ *  \return true iff file is readable
+ */
 bool ProgramInfo::IsFileReadable(void) const
 {
     if (pathname.left(1) == "/" && QFileInfo(pathname).isReadable())
@@ -3581,6 +3588,10 @@ void ProgramInfo::UpdateRecGroup(void)
     SendUpdateEvent();
 }
 
+/**
+ *  \note This method sometimes initiates a QUERY_CHECKFILE MythProto
+ *        call and so should not be called from the UI thread.
+ */
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 {
     if (isVideo)

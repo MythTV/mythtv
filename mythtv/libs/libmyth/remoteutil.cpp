@@ -133,13 +133,15 @@ bool RemoteCheckFile(const ProgramInfo *pginfo, bool checkSlaves)
 }
 
 bool RemoteDeleteRecording(
-    const ProgramInfo *pginfo, bool forgetHistory, bool forceMetadataDelete)
+    uint chanid, const QDateTime &recstartts, bool forceMetadataDelete)
 {
     bool result = true;
-    QStringList strlist(
-        forceMetadataDelete ? "FORCE_DELETE_RECORDING" : "DELETE_RECORDING");
-
-    pginfo->ToStringList(strlist);
+    QString cmd =
+        QString("DELETE_RECORDING %1 %2 %3")
+        .arg(chanid)
+        .arg(recstartts.toString(Qt::ISODate))
+        .arg(forceMetadataDelete ? "FORCE" : "NO_FORCE");
+    QStringList strlist(cmd);
 
     if (!gContext->SendReceiveStringList(strlist) || strlist.empty())
         result = false;
@@ -149,26 +151,13 @@ bool RemoteDeleteRecording(
     if (!result)
     {
         VERBOSE(VB_IMPORTANT, QString("Failed to delete recording %1:%2")
-                .arg(pginfo->title).arg(pginfo->subtitle));
-    }
-
-    // We don't care if the recording is successfully deleted..
-    if (forgetHistory)
-    {
-        strlist = QStringList("FORGET_RECORDING");
-        pginfo->ToStringList(strlist);
-
-        if (!gContext->SendReceiveStringList(strlist))
-        {
-            VERBOSE(VB_IMPORTANT, QString("Failed to forget recording %1:%2")
-                    .arg(pginfo->title).arg(pginfo->subtitle));
-        }
+                .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
     }
 
     return result;
 }
 
-bool RemoteUndeleteRecording(const ProgramInfo *pginfo)
+bool RemoteUndeleteRecording(uint chanid, const QDateTime &recstartts)
 {
     bool result = false;
 
@@ -179,7 +168,8 @@ bool RemoteUndeleteRecording(const ProgramInfo *pginfo)
         return result;
 
     QStringList strlist(QString("UNDELETE_RECORDING"));
-    pginfo->ToStringList(strlist);
+    strlist.push_back(QString::number(chanid));
+    strlist.push_back(recstartts.toString(Qt::ISODate));
 
     gContext->SendReceiveStringList(strlist);
 

@@ -382,6 +382,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
     bool allowrerecord = tv->getAllowRerecord();
     bool deleterecording = tv->getRequestDelete();
+    bool force = false;
 
     tv->SaveChannelGroup();
 
@@ -394,7 +395,13 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
         if (deleterecording)
         {
             curProgram->UpdateLastDelete(true);
-            RemoteDeleteRecording(curProgram, allowrerecord, false);
+            if (allowrerecord)
+            {
+                RecordingInfo recInfo(*curProgram);
+                recInfo.ForgetHistory();
+            }
+            RemoteDeleteRecording(
+                curProgram->chanid.toUInt(), curProgram->recstartts, force);
         }
         else if (!curProgram->isVideo)
         {

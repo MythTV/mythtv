@@ -176,7 +176,11 @@ bool ProgramInfoCache::UpdateFileSize(
     Cache::iterator it = m_cache.find(PICKey(chanid,recstartts));
 
     if (it != m_cache.end())
+    {
         it->second->filesize = filesize;
+        if (filesize)
+            it->second->availableStatus = asAvailable;
+    }
 
     return it != m_cache.end();
 }

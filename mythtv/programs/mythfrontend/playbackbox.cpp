@@ -44,7 +44,6 @@
 #include "mythuicheckbox.h"
 #include "mythuiprogressbar.h"
 
-#include "tvremoteutil.h"
 #include "remoteutil.h"
 
 //  Mythfrontend
@@ -52,8 +51,9 @@
 #include "proglist.h"
 #include "customedit.h"
 
-#define LOC QString("PlaybackBox: ")
-#define LOC_ERR QString("PlaybackBox Error: ")
+#define LOC      QString("PlaybackBox: ")
+#define LOC_WARN QString("PlaybackBox Warning: ")
+#define LOC_ERR  QString("PlaybackBox Error: ")
 
 #define REC_CAN_BE_DELETED(rec) \
     ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
@@ -299,13 +299,42 @@ static QString extract_subtitle(
     return subtitle;
 }
 
+static void push_onto_del(QStringList &list, const ProgramInfo &pginfo)
+{
+    list.clear();
+    list.push_back(pginfo.chanid);
+    list.push_back(pginfo.recstartts.toString(Qt::ISODate));
+    list.push_back(false /* force Delete */);
+}
+
+static bool extract_one_del(
+    QStringList &list, uint &chanid, QDateTime &recstartts)
+{
+    if (list.size() < 3)
+    {
+        list.clear();
+        return false;
+    }
+
+    chanid     = list[0].toUInt();
+    recstartts = QDateTime::fromString(list[1], Qt::ISODate);
+
+    list.pop_front();
+    list.pop_front();
+    list.pop_front();
+
+    if (!chanid || !recstartts.isValid())
+        VERBOSE(VB_IMPORTANT, "extract_one_del() invalid entry");
+
+    return chanid && recstartts.isValid();
+}
+
 ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    PlaybackBox *pbb = new PlaybackBox(mainStack,"playbackbox",
-                                        PlaybackBox::Play, (TV *)player,
-                                        showTV);
+    PlaybackBox *pbb = new PlaybackBox(
+        mainStack,"playbackbox", PlaybackBox::kPlayBox, (TV *)player, showTV);
 
     if (pbb->Create())
         mainStack->AddScreen(pbb);
@@ -345,18 +374,17 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       // Main Recording List support
       m_progsInDB(0),
       // Other state
-      m_delItem(NULL),                    m_currentItem(NULL),
+      m_currentItem(NULL),                m_op_on_playlist(false),
       m_programInfoCache(this),           m_playingSomething(false),
       // Selection state variables
       m_needUpdate(false),
-      // Free disk space tracking
-      m_freeSpaceNeedsUpdate(true),       m_freeSpaceTimer(new QTimer(this)),
-      m_freeSpaceTotal(0),                m_freeSpaceUsed(0),
       // Preview Image Variables
       m_previewGeneratorRunning(0),
       // Network Control Variables
       m_underNetworkControl(false),
-      m_player(NULL)
+      // Other
+      m_player(NULL),
+      m_helper(this)
 {
     m_formatShortDate    = gContext->GetSetting("ShortDateFormat", "M/d");
     m_formatLongDate     = gContext->GetSetting("DateFormat", "ddd MMMM d");
@@ -460,12 +488,6 @@ PlaybackBox::~PlaybackBox(void)
         m_coverartTimer = NULL;
     }
 
-    if (m_freeSpaceTimer)
-    {
-        m_freeSpaceTimer->disconnect(this);
-        m_freeSpaceTimer = NULL;
-    }
-
     // disconnect preview generators
     QMutexLocker locker(&m_previewGeneratorLock);
     PreviewMap::iterator it = m_previewGenerator.begin();
@@ -512,7 +534,6 @@ bool PlaybackBox::Create()
     connect(m_fanartTimer, SIGNAL(timeout()), SLOT(fanartLoad()));
     connect(m_bannerTimer, SIGNAL(timeout()), SLOT(bannerLoad()));
     connect(m_coverartTimer, SIGNAL(timeout()), SLOT(coverartLoad()));
-    connect(m_freeSpaceTimer, SIGNAL(timeout()), SLOT(setUpdateFreeSpace()));
 
     BuildFocusList();
     m_programInfoCache.ScheduleLoad();
@@ -701,6 +722,8 @@ void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo)
 void PlaybackBox::UpdateUIListItem(
     MythUIButtonListItem *item, bool is_sel, bool force_preview_reload)
 {
+    // TODO Make sure playlist DisplayState is respected..
+
     if (!item)
         return;
 
@@ -937,47 +960,37 @@ void PlaybackBox::updateIcons(const ProgramInfo *pginfo)
         iconState->Reset();
 }
 
-void PlaybackBox::updateUsage()
+bool PlaybackBox::IsUsageUIVisible(void) const
 {
-    MythUIText        *freereportText = dynamic_cast<MythUIText *>
-                                        (GetChild("freereport"));
-    MythUIProgressBar *usedProgress   = dynamic_cast<MythUIProgressBar *>
-                                        (GetChild("usedbar"));
+    return GetChild("freereport") || GetChild("usedbar");
+}
+
+void PlaybackBox::UpdateUsageUI(void)
+{
+    MythUIText        *freereportText =
+        dynamic_cast<MythUIText*>(GetChild("freereport"));
+    MythUIProgressBar *usedProgress   =
+        dynamic_cast<MythUIProgressBar *>(GetChild("usedbar"));
 
     // If the theme doesn't have these widgets,
     // don't waste time querying the backend...
     if (!freereportText && !usedProgress)
         return;
 
-    if (m_freeSpaceNeedsUpdate)
-    {
-        m_freeSpaceNeedsUpdate = false;
-        m_freeSpaceTotal = 0;
-        m_freeSpaceUsed = 0;
-
-        vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
-        for (unsigned int i = 0; i < fsInfos.size(); ++i)
-        {
-            if (fsInfos[i].directory == "TotalDiskSpace")
-            {
-                m_freeSpaceTotal = (int) (fsInfos[i].totalSpaceKB >> 10);
-                m_freeSpaceUsed = (int) (fsInfos[i].usedSpaceKB >> 10);
-            }
-        }
-        m_freeSpaceTimer->start(15000);
-    }
+    double freeSpaceTotal = (double) m_helper.GetFreeSpaceTotalMB();
+    double freeSpaceUsed  = (double) m_helper.GetFreeSpaceUsedMB();
 
     QString usestr;
 
     double perc = 0.0;
-    if (m_freeSpaceTotal > 0)
-        perc = (100.0 * m_freeSpaceUsed) / (double) m_freeSpaceTotal;
+    if (freeSpaceTotal > 0.0)
+        perc = (100.0 * freeSpaceUsed) / freeSpaceTotal;
 
     usestr.sprintf("%d", (int)perc);
     usestr = usestr + tr("% used");
 
     QString size;
-    size.sprintf("%0.2f", (m_freeSpaceTotal - m_freeSpaceUsed) / 1024.0);
+    size.sprintf("%0.2f", (freeSpaceTotal - freeSpaceUsed) / 1024.0);
     QString rep = tr(", %1 GB free").arg(size);
     usestr = usestr + rep;
 
@@ -986,8 +999,8 @@ void PlaybackBox::updateUsage()
 
     if (usedProgress)
     {
-        usedProgress->SetTotal(m_freeSpaceTotal);
-        usedProgress->SetUsed(m_freeSpaceUsed);
+        usedProgress->SetTotal(freeSpaceTotal);
+        usedProgress->SetUsed(freeSpaceUsed);
     }
 }
 
@@ -1184,6 +1197,8 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
 bool PlaybackBox::UpdateUILists(void)
 {
+    // TODO Make sure playlist DisplayState is respected..
+
     m_isFilling = true;
 
     if (m_currentItem)
@@ -1252,7 +1267,7 @@ bool PlaybackBox::UpdateUILists(void)
         }
 
         vector<ProgramInfo*> list;
-        bool newest_first = (0==m_allOrder) || (Delete==m_type);
+        bool newest_first = (0==m_allOrder) || (kDeleteBox==m_type);
         m_programInfoCache.GetOrdered(list, newest_first);
         vector<ProgramInfo*>::const_iterator it = list.begin();
         for ( ; it != list.end(); ++it)
@@ -1394,7 +1409,7 @@ bool PlaybackBox::UpdateUILists(void)
         {
             if (!Iprog.key().isEmpty())
             {
-                if (m_listOrder == 0 || m_type == Delete)
+                if (m_listOrder == 0 || m_type == kDeleteBox)
                     (*Iprog).sort(comp_originalAirDate_rev_less_than);
                 else
                     (*Iprog).sort(comp_originalAirDate_less_than);
@@ -1408,7 +1423,7 @@ bool PlaybackBox::UpdateUILists(void)
         {
             if (!Iprog.key().isEmpty())
             {
-                if (m_listOrder == 0 || m_type == Delete)
+                if (m_listOrder == 0 || m_type == kDeleteBox)
                     (*Iprog).sort(comp_programid_rev_less_than);
                 else
                     (*Iprog).sort(comp_programid_less_than);
@@ -1422,7 +1437,7 @@ bool PlaybackBox::UpdateUILists(void)
         {
             if (!it.key().isEmpty())
             {
-                if (!m_listOrder || m_type == Delete)
+                if (!m_listOrder || m_type == kDeleteBox)
                     (*it).sort(comp_recordDate_rev_less_than);
                 else
                     (*it).sort(comp_recordDate_less_than);
@@ -1659,7 +1674,7 @@ bool PlaybackBox::UpdateUILists(void)
     }
 
     updateGroupList();
-    updateUsage();
+    UpdateUsageUI();
 
     if (m_currentItem)
     {
@@ -1724,14 +1739,11 @@ void PlaybackBox::playSelected(MythUIButtonListItem *item)
 
 }
 
-void PlaybackBox::stopSelected()
+void PlaybackBox::StopSelected(void)
 {
     ProgramInfo *pginfo = CurrentItem();
-
-    if (!pginfo)
-        return;
-
-    stop(pginfo);
+    if (pginfo)
+        m_helper.StopRecording(*pginfo);
 }
 
 void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
@@ -1744,26 +1756,22 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
     if (!pginfo)
         return;
 
-    if (m_delItem)
-    {
-        delete m_delItem;
-        m_delItem = NULL;
-    }
-
-    m_delItem = new ProgramInfo(*pginfo);
-
     bool undelete_possible =
             gContext->GetNumSetting("AutoExpireInsteadOfDelete", 0);
 
     if (pginfo->recgroup == "Deleted" && undelete_possible)
     {
-        doRemove(m_delItem, false, false);
+        RemoveProgram(pginfo->chanid.toUInt(), pginfo->recstartts,
+                      /*forgetHistory*/ false, /*force*/ false);
     }
-    else if ((m_delItem->availableStatus != asPendingDelete) &&
-        (REC_CAN_BE_DELETED(m_delItem)))
-        askDelete();
+    else if ((pginfo->availableStatus != asPendingDelete) &&
+             (REC_CAN_BE_DELETED(pginfo)))
+    {
+        push_onto_del(m_delList, *pginfo);
+        ShowDeletePopup(kDeleteRecording);
+    }
     else
-        showAvailablePopup(m_delItem);
+        showAvailablePopup(pginfo);
 }
 
 void PlaybackBox::upcoming()
@@ -1835,8 +1843,8 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
 
     switch (m_type)
     {
-        case Play: playSelected(item); break;
-        case Delete: deleteSelected(item); break;
+        case kPlayBox:   playSelected(item);   break;
+        case kDeleteBox: deleteSelected(item); break;
     }
 }
 
@@ -1927,11 +1935,13 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     if (m_player)
         return true;
 
+    // TODO do this in another thread
     rec->pathname = rec->GetPlaybackURL(true);
 
     if (rec->availableStatus == asNotYetAvailable)
         rec->availableStatus = asAvailable;
 
+    // TODO do this in another thread
     if (!rec->IsFileReadable())
     {
         VERBOSE(VB_IMPORTANT, QString("PlaybackBox::play(): Error, %1 file "
@@ -1973,33 +1983,34 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 
     delete tvrec;
 
-    m_freeSpaceNeedsUpdate |= UpdateUILists();
+    UpdateUILists();
 
     return playCompleted;
 }
 
-void PlaybackBox::stop(ProgramInfo *rec)
+void PlaybackBox::RemoveProgram(
+    uint chanid, const QDateTime &recstartts,
+    bool forgetHistory, bool forceMetadataDelete)
 {
-    RemoteStopRecording(rec);
-}
+    ProgramInfo *delItem = FindProgramInUILists(chanid, recstartts);
 
-bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
-                           bool forceMetadataDelete)
-{
-    if (!rec)
-        return false;
-
-    ProgramInfo *delItem = FindProgramInUILists(*rec);
+    VERBOSE(VB_IMPORTANT,
+            QString("RemoveProgram(%1,%2,%3,%4) 0x%5")
+            .arg(chanid)
+            .arg(recstartts.toString(Qt::ISODate))
+            .arg(forgetHistory?"forget":"")
+            .arg(forceMetadataDelete?"force":"")
+            .arg((uint64_t)delItem,0,16));
 
     if (!delItem)
-        return false;
+        return;
 
     if (!forceMetadataDelete &&
         ((delItem->availableStatus == asPendingDelete) ||
         (!REC_CAN_BE_DELETED(delItem))))
     {
-        showAvailablePopup(m_delItem);
-        return false;
+        showAvailablePopup(delItem);
+        return;
     }
 
     if (m_playList.filter(delItem->MakeUniqueKey()).size())
@@ -2008,25 +2019,14 @@ bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
     if (!forceMetadataDelete)
         delItem->UpdateLastDelete(true);
 
-    bool result = RemoteDeleteRecording(delItem, forgetHistory,
-                                        forceMetadataDelete);
+    m_helper.DeleteRecording(
+        delItem->chanid.toUInt(), delItem->recstartts, forceMetadataDelete);
 
-    if (result)
+    if (forgetHistory)
     {
-        delItem->availableStatus = asPendingDelete;
-        m_recordingList->RemoveItem(
-                        m_recordingList->GetItemByData(qVariantFromValue(delItem)));
-
-        if (m_delItem)
-        {
-            delete m_delItem;
-            m_delItem = NULL;
-        }
+        RecordingInfo recInfo(*delItem);
+        recInfo.ForgetHistory();
     }
-    else if (!forceMetadataDelete)
-        showDeletePopup(ForceDeleteRecording);
-
-    return result;
 }
 
 void PlaybackBox::fanartLoad(void)
@@ -2142,6 +2142,7 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
     QStringList entries = dir.entryList();
     QStringList sgEntries;
 
+    // TODO do this in another thread
     RemoteGetFileList(host, "", &sgEntries, sgroup, true); 
 
     int regIndex = 0;
@@ -2221,6 +2222,7 @@ void PlaybackBox::showActions(ProgramInfo *pginfo)
     if (!pginfo)
         return;
 
+    // TODO do this in another thread (IsFileReadable remote check)
     if (!pginfo->IsFileReadable())
     {
         VERBOSE(VB_IMPORTANT, QString("PlaybackBox::showActions(): Error, %1 "
@@ -2257,28 +2259,42 @@ void PlaybackBox::doPIPPlay(PIPState state)
     }
 }
 
-void PlaybackBox::showDeletePopup(deletePopupType types)
+void PlaybackBox::ShowDeletePopup(DeletePopupType type)
 {
     if (m_popupMenu)
         return;
 
     QString label;
-    switch (types)
+    switch (type)
     {
-        case DeleteRecording:
-             label = tr("Are you sure you want to delete:"); break;
-        case ForceDeleteRecording:
-             label = tr("Recording file does not exist.\n"
-                        "Are you sure you want to delete:");
-             break;
-        case StopRecording:
-             label = tr("Are you sure you want to stop:"); break;
+        case kDeleteRecording:
+            label = tr("Are you sure you want to delete:"); break;
+        case kForceDeleteRecording:
+            label = tr("Recording file does not exist.\n"
+                       "Are you sure you want to delete:");
+            break;
+        case kStopRecording:
+            label = tr("Are you sure you want to stop:"); break;
     }
 
-    if (!m_delItem)
-        m_delItem = new ProgramInfo(*(CurrentItem()));
+    ProgramInfo *delItem = NULL;
+    if (m_delList.empty() && (delItem = CurrentItem()))
+    {
+        push_onto_del(m_delList, *delItem);
+    }
+    else if (m_delList.size() >= 3)
+    {
+        delItem = FindProgramInUILists(
+            m_delList[0].toUInt(),
+            QDateTime::fromString(m_delList[1], Qt::ISODate));
+    }
 
-    popupString(m_delItem, label);
+    if (!delItem)
+        return;
+
+    uint other_delete_cnt = (m_delList.size() / 3) - 1;
+
+    popupString(delItem, label);
 
     m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
@@ -2294,56 +2310,68 @@ void PlaybackBox::showDeletePopup(deletePopupType types)
 
     m_popupMenu->SetReturnEvent(this, "slotmenu");
 
-    m_freeSpaceNeedsUpdate = true;
-
     QString tmpmessage;
     const char *tmpslot = NULL;
 
-    if ((types == DeleteRecording) &&
-        (m_delItem->recgroup != "LiveTV"))
+    if ((kDeleteRecording == type) && (delItem->recgroup != "LiveTV"))
     {
         tmpmessage = tr("Yes, and allow re-record");
-        tmpslot = SLOT(doDeleteForgetHistory());
+        tmpslot = SLOT(DeleteForgetHistory());
         m_popupMenu->AddButton(tmpmessage, tmpslot);
     }
 
-    switch (types)
+    switch (type)
     {
-        case DeleteRecording:
-             tmpmessage = tr("Yes, delete it");
-             tmpslot = SLOT(doDelete());
-             break;
-        case ForceDeleteRecording:
-             tmpmessage = tr("Yes, delete it");
-             tmpslot = SLOT(doForceDelete());
-             break;
-        case StopRecording:
-             tmpmessage = tr("Yes, stop recording");
-             tmpslot = SLOT(doStop());
-             break;
+        case kDeleteRecording:
+            tmpmessage = tr("Yes, delete it");
+            tmpslot = SLOT(Delete());
+            break;
+        case kForceDeleteRecording:
+            tmpmessage = tr("Yes, delete it");
+            tmpslot = SLOT(DeleteForce());
+            break;
+        case kStopRecording:
+            tmpmessage = tr("Yes, stop recording");
+            tmpslot = SLOT(StopSelected());
+            break;
     }
 
-    bool defaultIsYes = true;
-    if ((types == DeleteRecording) ||
-        (types == ForceDeleteRecording) ||
-        (!m_delItem->GetAutoExpireFromRecorded()))
-        defaultIsYes = false;
+    bool defaultIsYes =
+        ((kDeleteRecording      != type) &&
+         (kForceDeleteRecording != type) &&
+         delItem->GetAutoExpireFromRecorded());
 
     m_popupMenu->AddButton(tmpmessage, tmpslot, false, defaultIsYes);
 
-    switch (types)
+    if ((kForceDeleteRecording == type) && other_delete_cnt)
     {
-        case DeleteRecording:
-        case ForceDeleteRecording:
-             tmpmessage = tr("No, keep it");
-             tmpslot = NULL;
-             break;
-        case StopRecording:
-             tmpmessage = tr("No, continue recording");
-             tmpslot = NULL;
-             break;
+        tmpmessage = tr("Yes, delete it and the remaining %1 list items")
+            .arg(other_delete_cnt);
+        tmpslot = SLOT(DeleteForceAllRemaining());
+        m_popupMenu->AddButton(tmpmessage, tmpslot, false, false);
+    }
+
+    switch (type)
+    {
+        case kDeleteRecording:
+        case kForceDeleteRecording:
+            tmpmessage = tr("No, keep it");
+            tmpslot = SLOT(DeleteIgnore());
+            break;
+        case kStopRecording:
+            tmpmessage = tr("No, continue recording");
+            tmpslot = SLOT(DeleteIgnore());
+            break;
     }
     m_popupMenu->AddButton(tmpmessage, tmpslot, false, !defaultIsYes);
+
+    if ((type == kForceDeleteRecording) && other_delete_cnt)
+    {
+        tmpmessage = tr("No, and keep the remaining %1 list items")
+            .arg(other_delete_cnt);
+        tmpslot = SLOT(DeleteIgnoreAllRemaining());
+        m_popupMenu->AddButton(tmpmessage, tmpslot, false, false);
+    }
 }
 
 void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
@@ -2426,9 +2454,9 @@ void PlaybackBox::showPlaylistPopup()
                      SLOT(showPlaylistStoragePopup()), true);
     m_popupMenu->AddButton(tr("Job Options"),
                      SLOT(showPlaylistJobPopup()), true);
-    m_popupMenu->AddButton(tr("Delete"), SLOT(doPlaylistDelete()));
+    m_popupMenu->AddButton(tr("Delete"), SLOT(PlaylistDelete()));
     m_popupMenu->AddButton(tr("Delete, and allow re-record"),
-                     SLOT(doPlaylistDeleteForgetHistory()));
+                     SLOT(PlaylistDeleteForgetHistory()));
 }
 
 void PlaybackBox::showPlaylistStoragePopup()
@@ -2440,13 +2468,13 @@ void PlaybackBox::showPlaylistStoragePopup()
         return;
 
     m_popupMenu->AddButton(tr("Change Recording Group"),
-                     SLOT(doPlaylistChangeRecGroup()));
+                           SLOT(ShowRecGroupChangerUsePlaylist()));
     m_popupMenu->AddButton(tr("Change Playback Group"),
-                     SLOT(doPlaylistChangePlayGroup()));
+                           SLOT(ShowPlayGroupChangerUsePlaylist()));
     m_popupMenu->AddButton(tr("Disable Auto Expire"),
-                     SLOT(doPlaylistExpireSetOff()));
+                           SLOT(doPlaylistExpireSetOff()));
     m_popupMenu->AddButton(tr("Enable Auto Expire"),
-                     SLOT(doPlaylistExpireSetOn()));
+                           SLOT(doPlaylistExpireSetOn()));
 }
 
 void PlaybackBox::showPlaylistJobPopup()
@@ -2643,10 +2671,10 @@ void PlaybackBox::showStoragePopup()
         return;
 
     m_popupMenu->AddButton(tr("Change Recording Group"),
-                            SLOT(showRecGroupChanger()));
+                           SLOT(ShowRecGroupChanger()));
 
     m_popupMenu->AddButton(tr("Change Playback Group"),
-                            SLOT(showPlayGroupChanger()));
+                           SLOT(ShowPlayGroupChanger()));
 
     ProgramInfo *pginfo = CurrentItem();
     if (pginfo)
@@ -2870,9 +2898,11 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
     {
         if (pginfo->recgroup == "Deleted")
         {
-            m_delItem = pginfo;
-            m_popupMenu->AddButton(tr("Undelete"), SLOT(doUndelete()));
-            m_popupMenu->AddButton(tr("Delete Forever"), SLOT(doDelete()));
+            push_onto_del(m_delList, *pginfo);
+            m_popupMenu->AddButton(
+                tr("Undelete"),       SLOT(Undelete()));
+            m_popupMenu->AddButton(
+                tr("Delete Forever"), SLOT(Delete()));
         }
         else
         {
@@ -2967,22 +2997,11 @@ void PlaybackBox::doPlayListRandom(void)
 void PlaybackBox::askStop(void)
 {
     ProgramInfo *pginfo = CurrentItem();
-
-    if (m_delItem)
+    if (pginfo)
     {
-        delete m_delItem;
-        m_delItem = NULL;
+        push_onto_del(m_delList, *pginfo);
+        ShowDeletePopup(kStopRecording);
     }
-
-    m_delItem = new ProgramInfo(*pginfo);
-
-    showDeletePopup(StopRecording);
-}
-
-void PlaybackBox::doStop(void)
-{
-    ProgramInfo *pginfo = CurrentItem();
-    stop(pginfo);
 }
 
 void PlaybackBox::showProgramDetails()
@@ -3112,67 +3131,72 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
 
 void PlaybackBox::askDelete()
 {
-    if (m_delItem)
+    ProgramInfo *pginfo = CurrentItem();
+    if (pginfo)
     {
-        delete m_delItem;
-        m_delItem = NULL;
+        push_onto_del(m_delList, *pginfo);
+        ShowDeletePopup(kDeleteRecording);
     }
-
-    m_delItem = new ProgramInfo(*(CurrentItem()));
-
-    showDeletePopup(DeleteRecording);
 }
 
-void PlaybackBox::doPlaylistDelete(void)
+void PlaybackBox::PlaylistDelete(bool forgetHistory)
 {
-    playlistDelete(false);
-}
+    QString forceDeleteStr("0");
 
-void PlaybackBox::doPlaylistDeleteForgetHistory(void)
-{
-    playlistDelete(true);
-}
-
-void PlaybackBox::playlistDelete(bool forgetHistory)
-{
-    ProgramInfo *tmpItem;
-    QStringList::Iterator it;
-
-    for (it = m_playList.begin(); it != m_playList.end(); ++it )
+    QStringList::const_iterator it;
+    QStringList list;
+    for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
-        tmpItem = FindProgramInUILists(*it);
+        const ProgramInfo *tmpItem = FindProgramInUILists(*it);
         if (tmpItem && (REC_CAN_BE_DELETED(tmpItem)))
-            RemoteDeleteRecording(tmpItem, forgetHistory, false);
+        {
+            list.push_back(tmpItem->chanid);
+            list.push_back(tmpItem->recstartts.toString(Qt::ISODate));
+            list.push_back(forceDeleteStr);
+            if (forgetHistory)
+            {
+                RecordingInfo recInfo(*tmpItem);
+                recInfo.ForgetHistory();
+            }
+        }
     }
-
     m_playList.clear();
 
-    m_freeSpaceNeedsUpdate |= UpdateUILists();
+    m_helper.DeleteRecordings(list);
+
+    doClearPlaylist();
 }
 
-void PlaybackBox::doUndelete(void)
+void PlaybackBox::Undelete(void)
 {
-   ProgramInfo *pginfo = CurrentItem();
-
-    if (!pginfo)
-        return;
-
-    RemoteUndeleteRecording(pginfo);
+    uint chanid;
+    QDateTime recstartts;
+    if (extract_one_del(m_delList, chanid, recstartts))
+        m_helper.UndeleteRecording(chanid, recstartts);
 }
 
-void PlaybackBox::doDelete()
+void PlaybackBox::Delete(DeleteFlags flags)
 {
-    doRemove(m_delItem, false, false);
-}
+    uint chanid;
+    QDateTime recstartts;
+    while (extract_one_del(m_delList, chanid, recstartts))
+    {
+        if (flags & kIgnore)
+            continue;
 
-void PlaybackBox::doForceDelete()
-{
-    doRemove(m_delItem, true, true);
-}
+        RemoveProgram(chanid, recstartts,
+                      flags & kForgetHistory, flags & kForce);
 
-void PlaybackBox::doDeleteForgetHistory()
-{
-    doRemove(m_delItem, true, false);
+        if (!(flags & kAllRemaining))
+            break;
+    }
+
+    if (!m_delList.empty())
+    {
+        MythEvent *e = new MythEvent("DELETE_FAILURES", m_delList);
+        m_delList.clear();
+        QCoreApplication::postEvent(this, e);
+    }
 }
 
 ProgramInfo *PlaybackBox::FindProgramInUILists(const ProgramInfo &pginfo)
@@ -3186,17 +3210,18 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(const ProgramInfo &pginfo)
 /// from the UI program info lists.
 ProgramInfo *PlaybackBox::FindProgramInUILists(const QString &key)
 {
-    if (!key.isEmpty())
+    QStringList keyParts = key.split('_');
+    if (keyParts.size() == 2)
     {
-        QStringList keyParts = key.split('_');
-        if (keyParts.size() == 2)
-        {
-            uint      chanid     = keyParts[0].toUInt();
-            QDateTime recstartts = QDateTime::fromString(keyParts[1]);
-            if (chanid && recstartts.isValid())
-                return FindProgramInUILists(chanid, recstartts);
-        }
+        uint      chanid     = keyParts[0].toUInt();
+        QDateTime recstartts = QDateTime::fromString(keyParts[1], Qt::ISODate);
+        if (chanid && recstartts.isValid())
+            return FindProgramInUILists(chanid, recstartts);
     }
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("FindProgramInUILists(%1) "
+                    "called with invalid key").arg(key));
 
     return NULL;
 }
@@ -3282,6 +3307,8 @@ void PlaybackBox::UpdateProgramInfo(
                 recstartts == (*it)->recstartts)
             {
                 (*it)->filesize = filesize;
+                if (filesize)
+                    (*it)->availableStatus = asAvailable;
                 break;
             }
         }
@@ -3325,7 +3352,7 @@ void PlaybackBox::toggleWatched(void)
         // A refill affects the responsiveness of the UI and we only
         // need to rebuild the list if the watch list is displayed
         if (m_viewMask & VIEW_WATCHLIST)
-            m_freeSpaceNeedsUpdate |= UpdateUILists();
+            UpdateUILists();
     }
 }
 
@@ -3400,7 +3427,7 @@ void PlaybackBox::toggleView(ViewMask itemMask, bool setOn)
     else
         m_viewMask = (ViewMask)(m_viewMask & ~itemMask);
 
-    m_freeSpaceNeedsUpdate |= UpdateUILists();
+    UpdateUILists();
 }
 
 void PlaybackBox::togglePlayListTitle(void)
@@ -3459,7 +3486,7 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
     if (m_playList.filter(key).size())
     {
         if (item)
-          item->DisplayState("no", "playlist");
+            item->DisplayState("no", "playlist");
 
         QStringList tmpList;
         QStringList::Iterator it;
@@ -3609,12 +3636,12 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
         else if (action == "TOGGLEFAV")
         {
             m_playList.clear();
-            m_freeSpaceNeedsUpdate |= UpdateUILists();
+            UpdateUILists();
         }
         else if (action == "TOGGLERECORD")
         {
             m_viewMask = m_viewMaskToggle(m_viewMask, VIEW_TITLES);
-            m_freeSpaceNeedsUpdate |= UpdateUILists();
+            UpdateUILists();
         }
         else if (action == "PAGERIGHT")
         {
@@ -3778,10 +3805,35 @@ void PlaybackBox::customEvent(QEvent *event)
         else if (message == "UPDATE_UI_LIST")
         {
             UpdateUILists();
+            m_helper.ForceFreeSpaceUpdate();
         }
         else if (message == "RECONNECT_SUCCESS")
         {
             m_programInfoCache.ScheduleLoad();
+        }
+        else if (message == "DELETE_SUCCESSES")
+        {
+            m_helper.ForceFreeSpaceUpdate();
+        }
+        else if (message == "DELETE_FAILURES")
+        {
+            if (m_popupMenu)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        "Delete failures not handled due to "
+                        "pre-existing popup.");
+                return;
+            }
+
+            if (me->ExtraDataList().size() < 3)
+                return;
+
+            m_delList = me->ExtraDataList();
+            bool forceDelete = m_delList[2].toUInt();
+            if (!forceDelete)
+                ShowDeletePopup(kForceDeleteRecording);
+            else
+                m_delList.clear();
         }
     }
     else
@@ -3806,7 +3858,7 @@ void PlaybackBox::HandleRecordingRemoveEvent(
     else
         ScheduleUpdateUIList();
 
-    m_freeSpaceNeedsUpdate = true;
+    m_helper.ForceFreeSpaceUpdate();
 }
 
 void PlaybackBox::HandleRecordingAddEvent(const ProgramInfo &evinfo)
@@ -4040,6 +4092,7 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
     if (!pginfo || pginfo->availableStatus == asPendingDelete)
         return QString();
 
+    // TODO do this in another thread
     QString filename = pginfo->GetPlaybackURL() + ".png";
 
     // If someone is asking for this preview it must be on screen
@@ -4076,6 +4129,7 @@ QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
             }
             else
             {
+                // TODO do this in another thread
                 previewLastModified =
                     RemoteGetPreviewIfModified(*pginfo, ret_file);
             }
@@ -4337,7 +4391,7 @@ void PlaybackBox::setGroupFilter(const QString &recGroup)
     if (m_groupnameAsAllProg)
         m_groupDisplayName = ProgramInfo::i18n(m_recGroup);
 
-    m_freeSpaceNeedsUpdate |= UpdateUILists();
+    UpdateUILists();
 
     if (gContext->GetNumSetting("RememberRecGroup",1))
         gContext->SaveSetting("DisplayRecGroup", m_recGroup);
@@ -4384,21 +4438,10 @@ void PlaybackBox::fillRecGroupPasswordCache(void)
                                 gContext->GetSetting("AllRecGroupPassword", "");
 }
 
-void PlaybackBox::doPlaylistChangeRecGroup(void)
+/// \brief Used to change the recording group of a program or playlist.
+void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
 {
-    // If m_delItem is not NULL, then the Recording Group changer will operate
-    // on just that recording, otherwise it operates on the items in theplaylist
-    if (m_delItem)
-    {
-        delete m_delItem;
-        m_delItem = NULL;
-    }
-
-    showRecGroupChanger();
-}
-
-void PlaybackBox::showRecGroupChanger(void)
-{
+    m_op_on_playlist = use_playlist;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT recgroup, COUNT(title) FROM recorded "
@@ -4455,21 +4498,10 @@ void PlaybackBox::showRecGroupChanger(void)
         delete rgChanger;
 }
 
-void PlaybackBox::doPlaylistChangePlayGroup(void)
+/// \brief Used to change the play group of a program or playlist.
+void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
 {
-    // If m_delItem is not NULL, then the Playback Group changer will operate
-    // on just that recording, otherwise it operates on the items in theplaylist
-    if (m_delItem)
-    {
-        delete m_delItem;
-        m_delItem = NULL;
-    }
-
-    showPlayGroupChanger();
-}
-
-void PlaybackBox::showPlayGroupChanger(void)
-{
+    m_op_on_playlist = use_playlist;
     QStringList groupNames;
     QStringList displayNames;
     QString selected;
@@ -4575,11 +4607,9 @@ void PlaybackBox::saveRecMetadata(const QString &newTitle,
 
 void PlaybackBox::setRecGroup(QString newRecGroup)
 {
-    ProgramInfo *tmpItem = CurrentItem();
-
     newRecGroup = newRecGroup.simplified();
 
-    if (newRecGroup.isEmpty() || !tmpItem)
+    if (newRecGroup.isEmpty())
         return;
 
     if (newRecGroup == "addnewgroup")
@@ -4602,44 +4632,43 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
         return;
     }
 
-    if (m_playList.size() > 0)
-    {
-        QStringList::Iterator it;
+    int defaultAutoExpire = gContext->GetNumSetting("AutoExpireDefault", 0);
 
+    if (m_op_on_playlist)
+    {
+        QStringList::const_iterator it;
         for (it = m_playList.begin(); it != m_playList.end(); ++it )
         {
-            tmpItem = FindProgramInUILists(*it);
-            if (tmpItem)
-            {
-                if ((tmpItem->recgroup == "LiveTV") && (newRecGroup != "LiveTV"))
-                    tmpItem->SetAutoExpire(
-                        gContext->GetNumSetting("AutoExpireDefault", 0));
-                else if ((tmpItem->recgroup != "LiveTV") && (newRecGroup == "LiveTV"))
-                    tmpItem->SetAutoExpire(kLiveTVAutoExpire);
+            ProgramInfo *p = FindProgramInUILists(*it);
+            if (!p)
+                continue;
 
-                RecordingInfo ri(*tmpItem);
-                ri.ApplyRecordRecGroupChange(newRecGroup);
-                *tmpItem = ri;
-                
-            }
+            if ((p->recgroup == "LiveTV") && (newRecGroup != "LiveTV"))
+                p->SetAutoExpire(defaultAutoExpire);
+            else if ((p->recgroup != "LiveTV") && (newRecGroup == "LiveTV"))
+                p->SetAutoExpire(kLiveTVAutoExpire);
+
+            RecordingInfo ri(*p);
+            ri.ApplyRecordRecGroupChange(newRecGroup);
+            *p = ri;
         }
         doClearPlaylist();
-    }
-    else
-    {
-        if ((tmpItem->recgroup == "LiveTV") && (newRecGroup != "LiveTV"))
-            tmpItem->SetAutoExpire(gContext->GetNumSetting("AutoExpireDefault", 0));
-        else if ((tmpItem->recgroup != "LiveTV") && (newRecGroup == "LiveTV"))
-            tmpItem->SetAutoExpire(kLiveTVAutoExpire);
-
-        RecordingInfo ri(*tmpItem);
-        ri.ApplyRecordRecGroupChange(newRecGroup);
-        *tmpItem = ri;
+        UpdateUILists();
+        return;
     }
 
-    // TODO May not rebuild the list here, check current filter and removeitem
-    //      if it shouldn't be visible any more
-    UpdateUILists();
+    ProgramInfo *p = CurrentItem();
+    if (!p)
+        return;
+
+    if ((p->recgroup == "LiveTV") && (newRecGroup != "LiveTV"))
+        p->SetAutoExpire(defaultAutoExpire);
+    else if ((p->recgroup != "LiveTV") && (newRecGroup == "LiveTV"))
+        p->SetAutoExpire(kLiveTVAutoExpire);
+
+    RecordingInfo ri(*p);
+    ri.ApplyRecordRecGroupChange(newRecGroup);
+    *p = ri;
 }
 
 void PlaybackBox::setPlayGroup(QString newPlayGroup)
@@ -4652,7 +4681,7 @@ void PlaybackBox::setPlayGroup(QString newPlayGroup)
     if (newPlayGroup == tr("Default"))
         newPlayGroup = "Default";
 
-    if (m_playList.size() > 0)
+    if (m_op_on_playlist)
     {
         QStringList::Iterator it;
 

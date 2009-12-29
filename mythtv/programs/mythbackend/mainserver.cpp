@@ -427,8 +427,11 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "DELETE_RECORDING")
     {
-        if (tokens.size() == 3)
-            HandleDeleteRecording(tokens[1], tokens[2], pbs, false);
+        if (3 <= tokens.size() && tokens.size() <= 4)
+        {
+            bool force = (tokens.size() >= 4) && (tokens[3] == "FORCE");
+            HandleDeleteRecording(tokens[1], tokens[2], pbs, force);
+        }
         else
             HandleDeleteRecording(listline, pbs, false);
     }
@@ -2288,8 +2291,18 @@ void MainServer::DoHandleDeleteRecording(
 
 void MainServer::HandleUndeleteRecording(QStringList &slist, PlaybackSock *pbs)
 {
+    bool ok = false;
     RecordingInfo recinfo;
-    if (recinfo.FromStringList(slist, 1))
+    if (slist.size() == 3)
+    {
+        ok = recinfo.LoadProgramFromRecorded(
+            slist[1].toUInt(), QDateTime::fromString(slist[2], Qt::ISODate));
+    }
+    else
+    {
+        ok = recinfo.FromStringList(slist, 1);
+    }
+    if (ok)
         DoHandleUndeleteRecording(recinfo, pbs);
 }
 

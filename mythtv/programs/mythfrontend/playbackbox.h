@@ -25,6 +25,7 @@ using namespace std;
 // mythfrontend
 #include "schedulecommon.h"
 #include "programinfocache.h"
+#include "playbackboxhelper.h"
 
 class QKeyEvent;
 class QEvent;
@@ -72,8 +73,8 @@ class PlaybackBox : public ScheduleCommon
   public:
     typedef enum
     {
-        Play,
-        Delete,
+        kPlayBox,
+        kDeleteBox,
     } BoxType;
 
     // ViewType values cannot change; they are stored in the database.
@@ -109,10 +110,19 @@ class PlaybackBox : public ScheduleCommon
 
     typedef enum
     {
-        DeleteRecording,
-        StopRecording,
-        ForceDeleteRecording,
-    } deletePopupType;
+        kDeleteRecording,
+        kStopRecording,
+        kForceDeleteRecording,
+    } DeletePopupType;
+
+    typedef enum
+    {
+        kNoFlags       = 0x00,
+        kForgetHistory = 0x01,
+        kForce         = 0x02,
+        kIgnore        = 0x04,
+        kAllRemaining  = 0x08,
+    } DeleteFlags;
 
     typedef enum
     {
@@ -150,10 +160,8 @@ class PlaybackBox : public ScheduleCommon
     void customEdit();
     void upcoming();
     void details();
-    void stopSelected();
+    void StopSelected(void);
     void showActionsSelected();
-    void showRecGroupChanger();
-    void showPlayGroupChanger();
     void showMetadataEditor();
     void showGroupFilter();
     void showRecGroupPasswordChanger();
@@ -180,6 +188,10 @@ class PlaybackBox : public ScheduleCommon
     void showPlaylistJobPopup();
     void showProgramDetails();
     void showIconHelp();
+    void ShowRecGroupChangerUsePlaylist(void)  { ShowRecGroupChanger(true);  }
+    void ShowPlayGroupChangerUsePlaylist(void) { ShowPlayGroupChanger(true); }
+    void ShowRecGroupChanger(bool use_playlist = false);
+    void ShowPlayGroupChanger(bool use_playlist = false);
 
     void popupClosed();
 
@@ -190,16 +202,20 @@ class PlaybackBox : public ScheduleCommon
     void doPBPPlay(void);
 
     void askStop();
-    void doStop();
 
     void doEditScheduled();
     void doAllowRerecord();
 
     void askDelete();
-    void doUndelete();
-    void doDelete();
-    void doDeleteForgetHistory();
-    void doForceDelete();
+    void Undelete(void);
+    void Delete(DeleteFlags = kNoFlags);
+    void DeleteForgetHistory(void)      { Delete(kForgetHistory); }
+    void DeleteForce(void)              { Delete(kForce);         }
+    void DeleteIgnore(void)             { Delete(kIgnore);        }
+    void DeleteForceAllRemaining(void)
+        { Delete((DeleteFlags)((int)kForce |(int)kAllRemaining)); }
+    void DeleteIgnoreAllRemaining(void)
+        { Delete((DeleteFlags)((int)kIgnore|(int)kAllRemaining)); }
 
     void toggleWatched();
     void toggleAutoExpire();
@@ -213,8 +229,6 @@ class PlaybackBox : public ScheduleCommon
     void toggleSearchView(bool setOn)    { toggleView(VIEW_SEARCHES, setOn); }
     void toggleLiveTVView(bool setOn)    { toggleView(VIEW_LIVETVGRP, setOn); }
     void toggleWatchedView(bool setOn)   { toggleView(VIEW_WATCHED, setOn); }
-
-    void setUpdateFreeSpace() { m_freeSpaceNeedsUpdate = true; }
 
     void setGroupFilter(const QString &newRecGroup);
     void setRecGroup(QString newRecGroup);
@@ -248,10 +262,8 @@ class PlaybackBox : public ScheduleCommon
     void doPlaylistBeginUserJob4()    {   doPlaylistJobQueueJob(JOB_USERJOB4); }
     void stopPlaylistUserJob4()       { stopPlaylistJobQueueJob(JOB_USERJOB4); }
     void doClearPlaylist();
-    void doPlaylistDelete();
-    void doPlaylistDeleteForgetHistory();
-    void doPlaylistChangeRecGroup();
-    void doPlaylistChangePlayGroup();
+    void PlaylistDeleteForgetHistory(void) { PlaylistDelete(true); }
+    void PlaylistDelete(bool forgetHistory = false);
     void doPlaylistExpireSetting(bool turnOn);
     void doPlaylistExpireSetOn()      { doPlaylistExpireSetting(true);  }
     void doPlaylistExpireSetOff()     { doPlaylistExpireSetting(false); }
@@ -286,12 +298,8 @@ class PlaybackBox : public ScheduleCommon
     QString GetPreviewImage(ProgramInfo *);
 
     bool play(ProgramInfo *rec, bool inPlaylist = false);
-    void stop(ProgramInfo *);
-    void remove(ProgramInfo *);
     void showActions(ProgramInfo *);
     ProgramInfo *CurrentItem(void);
-
-    void playlistDelete(bool forgetHistory = false);
 
     void togglePlayListItem(ProgramInfo *pginfo);
     void randomizePlayList(void);
@@ -305,8 +313,9 @@ class PlaybackBox : public ScheduleCommon
         uint chanid, const QDateTime &recstartts,
         QString recgroup = "NotLiveTV");
 
-    bool doRemove(ProgramInfo *, bool forgetHistory, bool forceMetadataDelete);
-    void showDeletePopup(deletePopupType);
+    void RemoveProgram(uint chanid, const QDateTime &recstartts,
+                       bool forgetHistory, bool forceMetadataDelete);
+    void ShowDeletePopup(DeletePopupType);
     void showActionPopup(ProgramInfo *program);
     void showFileNotFoundActionPopup(ProgramInfo *program);
     void popupString(ProgramInfo *program, QString &message);
@@ -321,9 +330,11 @@ class PlaybackBox : public ScheduleCommon
     QString findArtworkFile(QString &seriesID, QString &titleIn,
                             QString imagetype, QString host);
 
+    bool IsUsageUIVisible(void) const;
+
     void updateGroupList();
     void updateIcons(const ProgramInfo *pginfo = NULL);
-    void updateUsage();
+    void UpdateUsageUI(void);
     void updateGroupInfo(const QString &groupname, const QString &grouplabel);
     void UpdateProgramInfo(const ProgramInfo &pginfo);
     void UpdateProgramInfo(
@@ -422,8 +433,8 @@ class PlaybackBox : public ScheduleCommon
     int                 m_recGroupIdx;
 
     // Other state
-    /// Program currently selected for deletion
-    ProgramInfo *m_delItem;
+    /// Program[s] currently selected for deletion
+    QStringList m_delList;
     /// Program currently selected during an update
     ProgramInfo *m_currentItem;
     /// Group currently selected
@@ -431,6 +442,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Play List support
     QStringList         m_playList;   ///< list of selected items "play list"
+    bool                m_op_on_playlist;
 
     ProgramInfoCache    m_programInfoCache;
 
@@ -442,12 +454,6 @@ class PlaybackBox : public ScheduleCommon
 
     // Selection state variables
     bool                m_haveGroupInfoSet;
-
-    // Free disk space tracking
-    bool                m_freeSpaceNeedsUpdate;
-    QTimer             *m_freeSpaceTimer; // audited ref #5318
-    int                 m_freeSpaceTotal;
-    int                 m_freeSpaceUsed;
 
     // Preview Pixmap Variables ///////////////////////////////////////////////
     uint                m_previewGeneratorMode;
@@ -464,7 +470,10 @@ class PlaybackBox : public ScheduleCommon
     deque<QString>      m_networkControlCommands;
     bool                m_underNetworkControl;
 
-    TV                  *m_player;
+    TV                 *m_player;
+
+    /// Main helper thread
+    PlaybackBoxHelper   m_helper;
 };
 
 class GroupSelector : public MythScreenType

@@ -28,6 +28,7 @@ HEADERS += action.h mythcontrols.h keybindings.h keygrabber.h
 HEADERS += mythosdmenueditor.h progfind.h guidegrid.h customedit.h
 HEADERS += schedulecommon.h progdetails.h scheduleeditor.h
 HEADERS += backendconnectionmanager.h programinfocache.h
+HEADERS += playbackboxhelper.h
 HEADERS += viewschedulediff.h
 
 SOURCES += main.cpp playbackbox.cpp viewscheduled.cpp
@@ -39,6 +40,7 @@ SOURCES += action.cpp actionset.cpp  mythcontrols.cpp keybindings.cpp
 SOURCES += keygrabber.cpp mythosdmenueditor.cpp progfind.cpp guidegrid.cpp
 SOURCES += customedit.cpp schedulecommon.cpp progdetails.cpp scheduleeditor.cpp
 SOURCES += backendconnectionmanager.cpp programinfocache.cpp
+SOURCES += playbackboxhelper.cpp
 SOURCES += viewschedulediff.cpp
 
 macx {
