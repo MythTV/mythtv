@@ -156,10 +156,10 @@ int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
                         }
                     }
                     // Can't find exact frame rate, so try rounding to the nearest integer, so 23.97Hz will work with 24Hz etc
-                    for (uint j=0; j < rates.size(); ++j)
+                    for (double precision = 0.01; precision < 2.0; precision *= 10.0)
                     {
                         double rounded = (double) ((int) (videorate + 0.5));
-                        for (double precision = 0.01; precision < 2.0; precision *= 10.0)
+                        for (uint j=0; j < rates.size(); ++j)
                         {
                             // Multiple of target_rate will do
                             if (compare_rates(rounded,rates[j], precision) ||
