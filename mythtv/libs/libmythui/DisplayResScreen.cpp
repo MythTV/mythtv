@@ -124,7 +124,7 @@ int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
     bool rate2x = false;
     bool end = false;
 
-    // We will give priority to refresh rates that a twice what is looked for
+    // We will give priority to refresh rates that are twice what is looked for
     if ((videorate > 24.5) && (videorate < 30.5))
     {
         rate2x = true;
@@ -159,13 +159,16 @@ int DisplayResScreen::FindBestMatch(const std::vector<DisplayResScreen>& dsr,
                     for (uint j=0; j < rates.size(); ++j)
                     {
                         double rounded = (double) ((int) (videorate + 0.5));
-                        // Multiple of target_rate will do
-                        if (compare_rates(rounded,rates[j]) ||
-                            (fabs(rounded - fmod(rates[j],rounded)) <= 0.01) ||
-                            (fmod(rates[j],rounded) <= 0.01))
+                        for (double precision = 0.01; precision < 2.0; precision *= 10.0)
                         {
-                            target_rate = rates[j];
-                            return i;
+                            // Multiple of target_rate will do
+                            if (compare_rates(rounded,rates[j], precision) ||
+                                (fabs(rounded - fmod(rates[j],rounded)) <= precision) ||
+                                (fmod(rates[j],rounded) <= precision))
+                            {
+                                target_rate = rates[j];
+                                return i;
+                            }
                         }
                     }
                     if (rate2x)
