@@ -80,6 +80,65 @@ static void handleExit(void);
 
 namespace
 {
+    class BookmarkDialog : MythScreenType
+    {
+      public:
+        BookmarkDialog(ProgramInfo *pginfo, MythScreenStack *parent) :
+                MythScreenType(parent, "bookmarkdialog"),
+                pgi(pginfo)
+        {
+        }
+
+        bool Create()
+        {
+            QString msg = QObject::tr("DVD/Video contains a bookmark"); 
+            QString btn0msg = QObject::tr("Play from bookmark"); 
+            QString btn1msg = QObject::tr("Play from beginning"); 
+
+            MythDialogBox *popup = new MythDialogBox(msg, GetScreenStack(), "bookmarkdialog");
+            if (!popup->Create())
+            {
+                delete popup;
+                return false;
+            }
+
+            GetScreenStack()->AddScreen(popup);
+
+            popup->SetReturnEvent(this, "bookmarkdialog");
+            popup->AddButton(btn0msg);
+            popup->AddButton(btn1msg);
+            return true;
+        }
+
+        void customEvent(QEvent *event)
+        {
+            if (event->type() == kMythDialogBoxCompletionEventType)
+            {
+                DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+                int buttonnum = dce->GetResult();
+
+                if (dce->GetId() == "bookmarkdialog")
+                {
+                    if (buttonnum == 1)
+                        pgi->setIgnoreBookmark(true); 
+                    else if (buttonnum != 0)
+                    {
+                        delete pgi;
+                        return;
+                    }
+
+                    TV::StartTV(pgi);
+
+                    sleep(1);
+                    delete pgi;
+                }
+            }
+        }
+
+      private:
+        ProgramInfo* pgi;
+    };
+
     void cleanup()
     {
         delete exitPopup;
@@ -678,9 +737,7 @@ int internal_play_media(const QString &mrl, const QString &plot,
                                         "Check if the video exists")
                                         .arg(mrl.section("/", -1))
                                         .arg(mrl.section("/", 0, -2));
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                    "Open Failed",
-                                    errorText);
+        ShowOkPopup(errorText);
         return res;
     }
 
@@ -762,31 +819,23 @@ int internal_play_media(const QString &mrl, const QString &plot,
  
     if (pos > 0) 
     { 
-        QString msg = QObject::tr("DVD/Video contains a bookmark"); 
-        QString btn0msg = QObject::tr("Play from bookmark"); 
-        QString btn1msg = QObject::tr("Play from beginning"); 
- 
-        DialogCode ret = MythPopupBox::Show2ButtonPopup( 
-            gContext->GetMainWindow(), 
-            "", msg, 
-            btn0msg, 
-            btn1msg, 
-            kDialogCodeButton0); 
-        if (kDialogCodeButton1 == ret) 
-            pginfo->setIgnoreBookmark(true); 
-        else if (kDialogCodeRejected == ret) 
-        { 
-            delete pginfo;
+        MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+        BookmarkDialog *bookmarkdialog = new BookmarkDialog(pginfo, mainStack);
+        if (!bookmarkdialog->Create())
+        {
+            delete bookmarkdialog;
             return res;
-        } 
+        }
     }
+    else
+    {
+        TV::StartTV(pginfo);
 
-    TV::StartTV(pginfo);
+        res = 0;
 
-    res = 0;
-
-    sleep(1);
-    delete pginfo;
+        sleep(1);
+        delete pginfo;
+    }
 
     return res;
 }
