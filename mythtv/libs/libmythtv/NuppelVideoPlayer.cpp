@@ -7726,6 +7726,9 @@ void NuppelVideoPlayer::DisplayWindows(uint service_num, int window_map)
         if ((1<<i) & window_map)
             GetCCWin(service_num, i).visible = true;
     }
+
+    if (GetOSD())
+        GetOSD()->CC708Updated();
 }
 
 void NuppelVideoPlayer::HideWindows(uint service_num, int window_map)

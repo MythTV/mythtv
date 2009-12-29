@@ -2728,6 +2728,9 @@ void OSDType708CC::Draw(OSDSurface *surface,
                         const CC708Window &win,
                         const vector<CC708String*> &list)
 {
+    if (!win.visible)
+        return;
+
     int maxx = surface->width;
     int maxy = surface->height;
     uint max_width = 0, total_height = 0, i = 0;

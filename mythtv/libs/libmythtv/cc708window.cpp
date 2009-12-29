@@ -155,8 +155,23 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     true_row_count    = (row_lock) ? row_count : max(row_count + 1, (uint)2);
     true_column_count = column_count;
 
-    if (text && (!exists || (old_row != true_row_count) ||
-                 (old_col != true_column_count)))
+    if (text && exists && (old_col == true_column_count) &&
+        (old_row < true_row_count))
+    {
+        // We need to add more rows to an existing window
+        uint num = true_row_count * true_column_count;
+        CC708Character *new_text = new CC708Character[num];
+        pen.column = 0;
+        pen.row = 0;
+        for (uint i = 0; i < old_row * old_col; i++)
+            new_text[i] = text[i];
+        for (uint i = old_row * old_col; i < num; i++)
+            new_text[i].attr = pen.attr;
+        delete [] text;
+        text = new_text;
+    }
+    else if (text && (!exists || (old_row != true_row_count) ||
+                      (old_col != true_column_count)))
     {
         delete [] text;
         text = NULL;
@@ -375,12 +390,12 @@ void CC708Window::IncrPenLocation(void)
     if (k708DirLeftToRight == print_dir || k708DirRightToLeft == print_dir)
     {
         // basic wrapping for l->r, r->l languages
-        if (new_column >= (int)true_column_count)
+        if (!row_lock && column_lock && (new_column >= (int)true_column_count))
         {
             new_column  = 0;
             new_row    += 1;
         }
-        else if (new_column < 0)
+        else if (!row_lock && column_lock && (new_column < 0))
         {
             new_column  = (int)true_column_count - 1;
             new_row    -= 1;
