@@ -34,7 +34,6 @@ class QTimer;
 class NuppelVideoPlayer;
 class RingBuffer;
 class ProgramInfo;
-class PreviewGenerator;
 
 class MythUIButtonList;
 class MythUIButtonListItem;
@@ -44,26 +43,8 @@ class MythUITextEdit;
 class MythUIButton;
 class MythDialogBox;
 
-class PreviewGenState
-{
-  public:
-    PreviewGenState() :
-        gen(NULL), genStarted(false), ready(false),
-        attempts(0), lastBlockTime(0) {}
-    PreviewGenerator *gen;
-    bool              genStarted;
-    bool              ready;
-    uint              attempts;
-    uint              lastBlockTime;
-    QDateTime         blockRetryUntil;
-
-    static const uint maxAttempts;
-    static const uint minBlockSeconds;
-};
-
 typedef QMap<QString,ProgramList>       ProgramMap;
 typedef QMap<QString,QString>           Str2StrMap;
-typedef QMap<QString,PreviewGenState>   PreviewMap;
 
 class PlaybackBox : public ScheduleCommon
 {
@@ -274,28 +255,17 @@ class PlaybackBox : public ScheduleCommon
     void showViewChanger(void);
     void saveViewChanges(void);
 
-    void previewThreadDone(const QString &fn, bool &success);
-    void previewReady(const ProgramInfo *pginfo);
-
     void checkPassword(const QString &password);
 
     void fanartLoad(void);
     void bannerLoad(void);
     void coverartLoad(void);
 
-  protected:
-    bool SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
-    void IncPreviewGeneratorPriority(const QString &fn);
-    void UpdatePreviewGeneratorThreads(void);
-    bool IsGeneratingPreview(const QString &fn, bool really = false) const;
-    uint IncPreviewGeneratorAttempts(const QString &fn);
-    void ClearPreviewGeneratorAttempts(const QString &fn);
   private:
     bool UpdateUILists(void);
     void UpdateProgressBar(void);
 
     QString cutDown(const QString &, QFont *, int);
-    QString GetPreviewImage(ProgramInfo *);
 
     bool play(ProgramInfo *rec, bool inPlaylist = false);
     void showActions(ProgramInfo *);
@@ -345,7 +315,7 @@ class PlaybackBox : public ScheduleCommon
     void UpdateUIListItem(MythUIButtonListItem *item, bool is_sel,
                           bool force_preview_reload = false);
 
-    void HandlePreviewEvent(const ProgramInfo &evinfo);
+    void HandlePreviewEvent(const QString &piKey, const QString &previewFile);
     void HandleRecordingRemoveEvent(uint chanid, const QDateTime &recstartts);
     void HandleRecordingAddEvent(const ProgramInfo &evinfo);
     void HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo);
@@ -455,23 +425,13 @@ class PlaybackBox : public ScheduleCommon
     // Selection state variables
     bool                m_haveGroupInfoSet;
 
-    // Preview Pixmap Variables ///////////////////////////////////////////////
-    uint                m_previewGeneratorMode;
-    QMap<QString,QDateTime> m_previewFileTS;
-    bool                m_previewSuspend;
-    mutable QMutex      m_previewGeneratorLock;
-    PreviewMap          m_previewGenerator;
-    vector<QString>     m_previewGeneratorQueue;
-    uint                m_previewGeneratorRunning;
-    static const uint   PREVIEW_GEN_MAX_RUN;
-
     // Network Control Variables //////////////////////////////////////////////
     mutable QMutex      m_ncLock;
     deque<QString>      m_networkControlCommands;
     bool                m_underNetworkControl;
 
+    // Other
     TV                 *m_player;
-
     /// Main helper thread
     PlaybackBoxHelper   m_helper;
 };

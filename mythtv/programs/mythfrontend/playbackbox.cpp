@@ -2,14 +2,12 @@
 #include "playbackbox.h"
 
 // QT
-#include <QDateTime>
-#include <QDir>
 #include <QCoreApplication>
-#include <QTimer>
-#include <QFile>
-#include <QFileInfo>
-#include <QMap>
 #include <QWaitCondition>
+#include <QDateTime>
+#include <QTimer>
+#include <QDir>
+#include <QMap>
 
 // libmythdb
 #include "oldsettings.h"
@@ -22,7 +20,6 @@
 #include "tv.h"
 #include "NuppelVideoPlayer.h"
 #include "recordinginfo.h"
-#include "previewgenerator.h"
 #include "playgroup.h"
 #include "mythsystemevent.h"
 
@@ -59,13 +56,6 @@
     ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
      ((((rec)->programflags & FL_INUSERECORDING) == 0) || \
       ((rec)->recgroup != "LiveTV")))
-
-#define USE_PREV_GEN_THREAD
-
-const uint PreviewGenState::maxAttempts     = 5;
-const uint PreviewGenState::minBlockSeconds = 60;
-
-const uint PlaybackBox::PREVIEW_GEN_MAX_RUN = 2;
 
 static int comp_programid(const ProgramInfo *a, const ProgramInfo *b)
 {
@@ -378,8 +368,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_programInfoCache(this),           m_playingSomething(false),
       // Selection state variables
       m_needUpdate(false),
-      // Preview Image Variables
-      m_previewGeneratorRunning(0),
       // Network Control Variables
       m_underNetworkControl(false),
       // Other
@@ -400,9 +388,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
     m_watchListMaxAge    = gContext->GetNumSetting("PlaybackWLMaxAge", 60);
     m_watchListBlackOut  = gContext->GetNumSetting("PlaybackWLBlackOut", 2);
     m_groupnameAsAllProg = gContext->GetNumSetting("DispRecGroupAsAllProg", 0);
-    m_previewGeneratorMode =
-            gContext->GetNumSetting("GeneratePreviewRemotely", 0) ?
-            PreviewGenerator::kRemote : PreviewGenerator::kLocalAndRemote;
 
     bool displayCat  = gContext->GetNumSetting("DisplayRecGroupIsCategory", 0);
 
@@ -486,15 +471,6 @@ PlaybackBox::~PlaybackBox(void)
     {
         m_coverartTimer->disconnect(this);
         m_coverartTimer = NULL;
-    }
-
-    // disconnect preview generators
-    QMutexLocker locker(&m_previewGeneratorLock);
-    PreviewMap::iterator it = m_previewGenerator.begin();
-    for (;it != m_previewGenerator.end(); ++it)
-    {
-        if ((*it).gen)
-            (*it).gen->disconnectSafe();
     }
 
     delete m_currentItem;
@@ -765,12 +741,8 @@ void PlaybackBox::UpdateUIListItem(
     item->DisplayState(rating, "ratingstate");
     
     QString oldimgfile = item->GetImage("preview");
-    QString imagefile;
     if (oldimgfile.isEmpty() || force_preview_reload)
-        imagefile = GetPreviewImage(pginfo);
-
-    if (!imagefile.isEmpty())
-        item->SetImage(imagefile, "preview", force_preview_reload);
+        m_helper.GetPreviewImage(*pginfo);
 
     if ((GetFocusWidget() == m_recordingList) && is_sel)
     {
@@ -793,8 +765,7 @@ void PlaybackBox::UpdateUIListItem(
 
         if (m_previewImage)
         {
-            imagefile = (imagefile.isEmpty()) ? oldimgfile : imagefile;
-            m_previewImage->SetFilename(imagefile);
+            m_previewImage->SetFilename(oldimgfile);
             m_previewImage->Load();
         }
 
@@ -839,6 +810,30 @@ void PlaybackBox::UpdateUIListItem(
         }
 
         updateIcons(pginfo);
+    }
+}
+
+void PlaybackBox::HandlePreviewEvent(
+    const QString &piKey, const QString &previewFile)
+{
+    if (previewFile.isEmpty())
+        return;
+
+    ProgramInfo          *info = FindProgramInUILists(piKey);
+    MythUIButtonListItem *item = NULL;
+
+    if (info)
+        item = m_recordingList->GetItemByData(qVariantFromValue(info));
+
+    if (item)
+    {
+        item->SetImage(previewFile, "preview", true);
+
+        if (item == m_recordingList->GetItemCurrent())
+        {
+            m_previewImage->SetFilename(previewFile);
+            m_previewImage->Load();
+        }
     }
 }
 
@@ -3777,12 +3772,6 @@ void PlaybackBox::customEvent(QEvent *event)
                                         event);
             }
         }
-        else if (message == "PREVIEW_READY")
-        {
-            ProgramInfo evinfo;
-            if (evinfo.FromStringList(me->ExtraDataList(), 0))
-                HandlePreviewEvent(evinfo);
-        }
         else if (message.left(17) == "UPDATE_FILE_SIZE")
         {
             QStringList tokens = message.simplified().split(" ");
@@ -3834,6 +3823,10 @@ void PlaybackBox::customEvent(QEvent *event)
                 ShowDeletePopup(kForceDeleteRecording);
             else
                 m_delList.clear();
+        }
+        else if (message == "PREVIEW_READY" && me->ExtraDataCount() == 2)
+        {
+            HandlePreviewEvent(me->ExtraData(0), me->ExtraData(1));
         }
     }
     else
@@ -3910,308 +3903,6 @@ void PlaybackBox::ScheduleUpdateUIList(void)
 {
     if (!m_programInfoCache.IsLoadInProgress())
         QCoreApplication::postEvent(this, new MythEvent("UPDATE_UI_LIST"));
-}
-
-void PlaybackBox::IncPreviewGeneratorPriority(const QString &xfn)
-{
-    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
-
-    QMutexLocker locker(&m_previewGeneratorLock);
-    vector<QString> &q = m_previewGeneratorQueue;
-    vector<QString>::iterator it = std::find(q.begin(), q.end(), fn);
-    if (it != q.end())
-        q.erase(it);
-
-    PreviewMap::iterator pit = m_previewGenerator.find(fn);
-    if (pit != m_previewGenerator.end() && (*pit).gen && !(*pit).genStarted)
-        q.push_back(fn);
-}
-
-void PlaybackBox::UpdatePreviewGeneratorThreads(void)
-{
-    QMutexLocker locker(&m_previewGeneratorLock);
-    vector<QString> &q = m_previewGeneratorQueue;
-    if ((m_previewGeneratorRunning < PREVIEW_GEN_MAX_RUN) && q.size())
-    {
-        QString fn = q.back();
-        q.pop_back();
-        PreviewMap::iterator it = m_previewGenerator.find(fn);
-        if (it != m_previewGenerator.end() && (*it).gen && !(*it).genStarted)
-        {
-            m_previewGeneratorRunning++;
-            (*it).gen->Start();
-            (*it).genStarted = true;
-        }
-    }
-}
-
-/** \fn PlaybackBox::SetPreviewGenerator(const QString&, PreviewGenerator*)
- *  \brief Sets the PreviewGenerator for a specific file.
- *  \return true iff call succeeded.
- */
-bool PlaybackBox::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
-{
-    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
-    QMutexLocker locker(&m_previewGeneratorLock);
-
-    if (!g)
-    {
-        m_previewGeneratorRunning = qMax(0, (int)m_previewGeneratorRunning - 1);
-        PreviewMap::iterator it = m_previewGenerator.find(fn);
-        if (it == m_previewGenerator.end())
-            return false;
-
-        (*it).gen        = NULL;
-        (*it).genStarted = false;
-        (*it).ready      = false;
-        (*it).lastBlockTime =
-            qMax(PreviewGenState::minBlockSeconds, (*it).lastBlockTime * 2);
-        (*it).blockRetryUntil =
-            QDateTime::currentDateTime().addSecs((*it).lastBlockTime);
-
-        return true;
-    }
-
-    g->AttachSignals(this);
-    m_previewGenerator[fn].gen = g;
-    m_previewGenerator[fn].genStarted = false;
-    m_previewGenerator[fn].ready = false;
-
-    m_previewGeneratorLock.unlock();
-    IncPreviewGeneratorPriority(xfn);
-    m_previewGeneratorLock.lock();
-
-    return true;
-}
-
-/** \fn PlaybackBox::IsGeneratingPreview(const QString&, bool) const
- *  \brief Returns true if we have already started a
- *         PreviewGenerator to create this file.
- */
-bool PlaybackBox::IsGeneratingPreview(const QString &xfn, bool really) const
-{
-    PreviewMap::const_iterator it;
-    QMutexLocker locker(&m_previewGeneratorLock);
-
-    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
-    if ((it = m_previewGenerator.find(fn)) == m_previewGenerator.end())
-        return false;
-
-    if (really)
-        return ((*it).gen && !(*it).ready);
-
-    if ((*it).blockRetryUntil.isValid())
-        return QDateTime::currentDateTime() < (*it).blockRetryUntil;
-
-    return (*it).gen;
-}
-
-/** \fn PlaybackBox::IncPreviewGeneratorAttempts(const QString&)
- *  \brief Increments and returns number of times we have
- *         started a PreviewGenerator to create this file.
- */
-uint PlaybackBox::IncPreviewGeneratorAttempts(const QString &xfn)
-{
-    QMutexLocker locker(&m_previewGeneratorLock);
-    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
-    return m_previewGenerator[fn].attempts++;
-}
-
-/** \fn PlaybackBox::ClearPreviewGeneratorAttempts(const QString&)
- *  \brief Clears the number of times we have
- *         started a PreviewGenerator to create this file.
- */
-void PlaybackBox::ClearPreviewGeneratorAttempts(const QString &xfn)
-{
-    QMutexLocker locker(&m_previewGeneratorLock);
-    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
-    m_previewGenerator[fn].attempts = 0;
-    m_previewGenerator[fn].lastBlockTime = 0;
-    m_previewGenerator[fn].blockRetryUntil =
-        QDateTime::currentDateTime().addSecs(-60);
-}
-
-void PlaybackBox::previewThreadDone(const QString &fn, bool &success)
-{
-    success = SetPreviewGenerator(fn, NULL);
-    UpdatePreviewGeneratorThreads();
-}
-
-/** \fn PlaybackBox::previewReady(const ProgramInfo*)
- *  \brief Callback used by PreviewGenerator to tell us a m_preview
- *         we requested has been returned from the backend.
- *  \param pginfo ProgramInfo describing the previewed recording.
- */
-void PlaybackBox::previewReady(const ProgramInfo *pginfo)
-{
-    if (!pginfo)
-        return;
-    
-    QString xfn = pginfo->pathname + ".png";
-    QString fn = xfn.mid(qMax(xfn.lastIndexOf('/') + 1,0));
-
-    m_previewGeneratorLock.lock();
-    PreviewMap::iterator it = m_previewGenerator.find(fn);
-    if (it != m_previewGenerator.end())
-    {
-        (*it).ready         = true;
-        (*it).attempts      = 0;
-        (*it).lastBlockTime = 0;
-    }
-    m_previewGeneratorLock.unlock();
-
-    if (pginfo)
-    {
-        QStringList extra;
-        pginfo->ToStringList(extra);
-        extra.detach();
-        MythEvent me("PREVIEW_READY", extra);
-        gContext->dispatch(me);
-    }
-}
-
-void PlaybackBox::HandlePreviewEvent(const ProgramInfo &evinfo)
-{
-    ProgramInfo *info = FindProgramInUILists(evinfo);
-
-    if (!info)
-        return;
-
-    MythUIButtonListItem *item =
-        m_recordingList->GetItemByData(qVariantFromValue(info));
-
-    if (!item)
-        return;
-
-    MythUIButtonListItem *sel_item = m_recordingList->GetItemCurrent();
-    UpdateUIListItem(item, item == sel_item, true);
-}
-
-QString PlaybackBox::GetPreviewImage(ProgramInfo *pginfo)
-{
-    if (!pginfo || pginfo->availableStatus == asPendingDelete)
-        return QString();
-
-    // TODO do this in another thread
-    QString filename = pginfo->GetPlaybackURL() + ".png";
-
-    // If someone is asking for this preview it must be on screen
-    // and hence higher priority than anything else we may have
-    // queued up recently....
-    IncPreviewGeneratorPriority(filename);
-
-    QDateTime previewLastModified;
-    QString ret_file = filename;
-    bool streaming = filename.left(1) != "/";
-    bool locally_accessible = false;
-    bool bookmark_updated = false;
-
-    if (streaming)
-    {
-        QDateTime bookmark_ts = pginfo->GetBookmarkTimeStamp();
-        QDateTime cmp_ts = bookmark_ts.isValid() ?
-            bookmark_ts : pginfo->lastmodified;
-
-        if (streaming)
-        {
-            ret_file = QString("%1/remotecache/%2")
-                .arg(GetConfDir()).arg(filename.section('/', -1));
-
-            QFileInfo finfo(ret_file);
-            if (finfo.exists() && finfo.lastModified() >= cmp_ts)
-            {
-                // This is just an optimization to avoid
-                // hitting the backend if our cached copy
-                // is newer than the bookmark, or if we have
-                // a preview and do not update it when the
-                // bookmark changes.
-                previewLastModified = finfo.lastModified();
-            }
-            else
-            {
-                // TODO do this in another thread
-                previewLastModified =
-                    RemoteGetPreviewIfModified(*pginfo, ret_file);
-            }
-        }
-        else
-        {
-            QFileInfo fi(filename);
-            if ((locally_accessible = fi.exists()))
-                previewLastModified = fi.lastModified();
-        }
-
-        bookmark_updated =
-            (!previewLastModified.isValid() || (previewLastModified < cmp_ts));
-
-        if (bookmark_updated && bookmark_ts.isValid() &&
-            previewLastModified.isValid())
-        {
-            ClearPreviewGeneratorAttempts(filename);
-        }
-
-        if (0)
-        {
-            VERBOSE(VB_IMPORTANT, QString(
-                        "previewLastModified:  %1\n\t\t\t"
-                        "bookmark_ts:          %2\n\t\t\t"
-                        "pginfo->lastmodified: %3")
-                    .arg(previewLastModified.toString(Qt::ISODate))
-                    .arg(bookmark_ts.toString(Qt::ISODate))
-                    .arg(pginfo->lastmodified.toString(Qt::ISODate)));
-        }
-    }
-    else
-    {
-        locally_accessible = QFileInfo(filename).exists();
-    }
-
-    bool up_to_date_preview_exists =
-        locally_accessible || previewLastModified.isValid();
-
-    if (0)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Title: %1:%2\n\t\t\t")
-                .arg(pginfo->title).arg(pginfo->subtitle) +
-                QString("File  '%1' \n\t\t\tCache '%2'")
-                .arg(filename).arg(ret_file) +
-                QString("\n\t\t\tPreview Exists: %1, "
-                        "Bookmark Updated: %2, "
-                        "Need Preview: %3")
-                .arg(up_to_date_preview_exists).arg(bookmark_updated)
-                .arg((bookmark_updated || !up_to_date_preview_exists)));
-    }
-
-    if ((bookmark_updated || !up_to_date_preview_exists) &&
-        !IsGeneratingPreview(filename))
-    {
-        uint attempts = IncPreviewGeneratorAttempts(filename);
-        if (attempts < PreviewGenState::maxAttempts)
-        {
-            PreviewGenerator::Mode mode =
-                (PreviewGenerator::Mode) m_previewGeneratorMode;
-            SetPreviewGenerator(filename, new PreviewGenerator(pginfo, mode));
-        }
-        else if (attempts == PreviewGenState::maxAttempts)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    QString("Attempted to generate preview for '%1' "
-                            "%2 times, giving up.")
-                    .arg(filename).arg(PreviewGenState::maxAttempts));
-        }
-    }
-
-    UpdatePreviewGeneratorThreads();
-
-    QString ret = (locally_accessible) ?
-        filename : (previewLastModified.isValid()) ?
-        ret_file : (QFileInfo(ret_file).exists()) ?
-        ret_file : QString();
-
-    //VERBOSE(VB_IMPORTANT, QString("Returning: '%1'").arg(ret));
-
-    return ret;
 }
 
 void PlaybackBox::showIconHelp(void)
