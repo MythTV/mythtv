@@ -4567,7 +4567,13 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
     }
     else if (has_action("NEXTFAV", actions) && islivetv)
         ChangeChannel(ctx, CHANNEL_DIRECTION_FAVORITE);
-    else if (has_action("SWITCHARDS", actions) && islivetv)
+    else if (has_action("NEXTSOURCE", actions) && islivetv)
+        SwitchSource(kNextSource);
+    else if (has_action("PREVSOURCE", actions) && islivetv)
+        SwitchSource(kPreviousSource);
+    else if (has_action("NEXTINPUT", actions) && islivetv)
+        ToggleInputs(ctx);
+    else if (has_action("NEXTCARD", actions) && islivetv)
         SwitchCards(ctx);
     else if (has_action("GUIDE", actions))
         EditSchedule(ctx, kScheduleProgramGuide);
