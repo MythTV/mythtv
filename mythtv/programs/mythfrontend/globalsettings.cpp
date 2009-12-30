@@ -3435,8 +3435,7 @@ static HostSpinBox *EPGRecThreshold()
     HostSpinBox *gs = new HostSpinBox("SelChangeRecThreshold", 1, 600, 1);
     gs->setLabel(QObject::tr("Record Threshold"));
     gs->setValue(16);
-    gs->setHelpText(QObject::tr("If the option to use Select to change the channel "
-                    "is on, pressing Select on a show that is at least "
+    gs->setHelpText(QObject::tr("Pressing Select on a show that is at least "
                     "this many minutes into the future will schedule a "
                     "recording."));
     return gs;
