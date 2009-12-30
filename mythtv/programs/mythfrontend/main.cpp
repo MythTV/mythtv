@@ -824,6 +824,7 @@ int internal_play_media(const QString &mrl, const QString &plot,
         if (!bookmarkdialog->Create())
         {
             delete bookmarkdialog;
+            delete pginfo;
             return res;
         }
     }
