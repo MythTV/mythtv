@@ -829,7 +829,9 @@ void PlaybackBox::HandlePreviewEvent(
     {
         item->SetImage(previewFile, "preview", true);
 
-        if (item == m_recordingList->GetItemCurrent())
+        if ((GetFocusWidget() == m_recordingList) &&
+            (m_recordingList->GetItemCurrent() == item) &&
+            m_previewImage)
         {
             m_previewImage->SetFilename(previewFile);
             m_previewImage->Load();
