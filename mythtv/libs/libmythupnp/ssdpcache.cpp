@@ -278,7 +278,7 @@ void SSDPCache::Add( const QString &sURI,
     // --------------------------------------------------------------
 
     TaskTime ttExpires;
-    gettimeofday        ( &ttExpires, NULL );
+    gettimeofday        ( (&ttExpires), NULL );
     AddSecondsToTaskTime(  ttExpires, sExpiresInSecs );
 
     // --------------------------------------------------------------
@@ -375,7 +375,7 @@ int SSDPCache::RemoveStale()
     TaskTime     ttNow;
     QStringList  lstKeys;
 
-    gettimeofday( &ttNow, NULL );
+    gettimeofday( (&ttNow), NULL );
 
     Lock();
 

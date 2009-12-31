@@ -24,16 +24,14 @@
 #ifndef __UPNPDEVICE_H__
 #define __UPNPDEVICE_H__
 
-#include <sys/time.h>
-
 #include <QDomDocument>
 #include <QUrl>
 
+#include "compat.h"
+#include "upnpexp.h"
 #include "upnputil.h"
 #include "refcounted.h"
 #include "mythversion.h"  // for MYTH_BINARY_VERSION
-
-extern const char *myth_source_version;
 
 class UPnpDeviceDesc;
 class UPnpDevice;
@@ -49,12 +47,11 @@ typedef QList< UPnpDevice*  >  UPnpDeviceList;
 typedef QList< UPnpService* >  UPnpServiceList;
 typedef QList< UPnpIcon*    >  UPnpIconList;
 
-
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-class UPnpIcon
+class UPNP_PUBLIC UPnpIcon
 {
     public:
 
@@ -69,7 +66,7 @@ class UPnpIcon
 
 /////////////////////////////////////////////////////////////////////////////
 
-class UPnpService
+class UPNP_PUBLIC UPnpService
 {
     public:
         QString     m_sServiceType;
@@ -83,7 +80,7 @@ class UPnpService
 
 /////////////////////////////////////////////////////////////////////////////
 
-class UPnpDevice
+class UPNP_PUBLIC UPnpDevice
 {
     public:
 
@@ -111,7 +108,7 @@ class UPnpDevice
         UPnpDevice()
         {
             m_sModelNumber  = MYTH_BINARY_VERSION;
-            m_sSerialNumber = myth_source_version;
+            m_sSerialNumber = "Must Set"; //GetMythSourceVersion();
         }
         ~UPnpDevice()
         {
@@ -150,7 +147,7 @@ class UPnpDevice
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-class UPnpDeviceDesc
+class UPNP_PUBLIC UPnpDeviceDesc
 {
     public:
 
@@ -202,7 +199,7 @@ class UPnpDeviceDesc
 // DeviceLocation Class Definition/Implementation
 /////////////////////////////////////////////////////////////////////////////
 
-class DeviceLocation : public RefCounted
+class UPNP_PUBLIC DeviceLocation : public RefCounted
 {
     public:
 
@@ -255,7 +252,7 @@ class DeviceLocation : public RefCounted
         int ExpiresInSecs()
         {
             TaskTime ttNow;
-            gettimeofday( &ttNow, NULL );
+            gettimeofday( (&ttNow), NULL );
 
             return m_ttExpires.tv_sec - ttNow.tv_sec;
         }

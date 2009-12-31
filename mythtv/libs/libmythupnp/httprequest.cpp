@@ -29,15 +29,12 @@
 #include <QStringList>
 
 #include "mythconfig.h"
-#if CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
-#include "darwin-sendfile.h"
-#else
+#if !( CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW))
 #define USE_SETSOCKOPT
 #include <sys/sendfile.h>
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <cerrno>
@@ -436,36 +433,7 @@ long HTTPRequest::SendResponseFile( QString sFileName )
     //VERBOSE(VB_UPNP, QString("SendResponseFile : size = %1, start = %2, end = %3").arg(llSize).arg(llStart).arg(llEnd));
     if (( m_eType != RequestTypeHead ) && (llSize != 0))
     {
-        __off64_t  offset = llStart;
-        int        file   = tmpFile.handle( );
-        ssize_t    sent   = 0;
-
-        if ( file == -1 )
-        {
-            VERBOSE(VB_UPNP, QString("SendResponseFile( %1 ) Error: %2 [%3]" )
-                                 .arg( sFileName )
-                                 .arg( tmpFile.error( ))
-                                 .arg( strerror( tmpFile.error( ) )));
-            nBytes = -1;
-        }
-        else
-        {
-            do
-            {
-                // SSIZE_MAX should work in kernels 2.6.16 and later.
-                // The loop is needed in any case.
-
-                sent = sendfile64(
-                    getSocketHandle(), file, &offset,
-                    (size_t) ((llSize > INT_MAX) ? INT_MAX : llSize));
-
-                llSize  = llEnd - offset;
-                //VERBOSE(VB_UPNP, QString("SendResponseFile : --- "
-                //"size = %1, offset = %2, sent = %3")
-                //.arg(llSize).arg(offset).arg(sent));
-            }
-            while (( sent >= 0 ) && ( llSize > 0 ));
-        }
+        long long sent = SendFile( tmpFile, llStart, llSize );
 
         if (sent == -1)
         {
@@ -491,6 +459,87 @@ long HTTPRequest::SendResponseFile( QString sFileName )
 
     return nBytes;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+//
+/////////////////////////////////////////////////////////////////////////////
+
+#define SENDFILE_BUFFER_SIZE 65536
+
+qint64 HTTPRequest::SendFile( QFile &file, qint64 llStart, qint64 llBytes )
+{
+    qint64 sent = 0;
+
+#if CONFIG_DARWIN || CONFIG_CYGWIN || defined(__FreeBSD__) || defined(USING_MINGW)
+
+    // ----------------------------------------------------------------------
+    // Set out file position to requested start location.
+    // ----------------------------------------------------------------------
+
+    if ( file.seek( llStart ) == false)
+        return -1;
+
+    char   aBuffer[ SENDFILE_BUFFER_SIZE ];
+
+    qint64 llBytesRemaining = llBytes;
+    qint64 llBytesToRead    = 0;
+    qint64 llBytesRead      = 0;
+    qint64 llBytesWritten   = 0;
+
+    while ((sent < llBytes) && !file.atEnd())
+    {
+        llBytesToRead  = std::min( (qint64)SENDFILE_BUFFER_SIZE, llBytesRemaining );
+        
+        if (( llBytesRead = file.read( aBuffer, llBytesToRead )) != -1 )
+        {
+            if (( llBytesWritten = WriteBlockDirect( aBuffer, llBytesRead )) == -1)
+                return -1;
+
+            // -=>TODO: We don't handle the situation where we read more than was sent.
+
+            sent             += llBytesRead;
+            llBytesRemaining -= llBytesRead;
+        }
+    }
+
+#else
+
+    __off64_t  offset = llStart; 
+    int        fd     = file.handle( ); 
+  
+    if ( fd == -1 ) 
+    { 
+        VERBOSE(VB_UPNP, QString("SendResponseFile( %1 ) Error: %2 [%3]" ) 
+                             .arg( file.fileName() ) 
+                             .arg( file.error( )) 
+                             .arg( strerror( file.error( ) ))); 
+        sent = -1; 
+    } 
+    else 
+    { 
+        do 
+        { 
+            // SSIZE_MAX should work in kernels 2.6.16 and later. 
+            // The loop is needed in any case. 
+  
+            sent = sendfile64( 
+                getSocketHandle(), fd, &offset, 
+                (size_t) ((llBytes > INT_MAX) ? INT_MAX : llBytes)); 
+  
+            llBytes  -= ( offset - llStart ); 
+            VERBOSE(VB_UPNP, QString("SendResponseFile : --- " 
+            "size = %1, offset = %2, sent = %3") 
+            .arg(llBytes).arg(offset).arg(sent)); 
+        } 
+        while (( sent >= 0 ) && ( llBytes > 0 )); 
+    } 
+
+#endif
+
+    return( sent );
+
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -1020,12 +1069,12 @@ void HTTPRequest::ProcessRequestLine( const QString &sLine )
         if (nCount > 1)
         {
             //m_sBaseUrl = tokens[1].section( '?', 0, 0).trimmed();
-	    m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toLatin1())).section( '?', 0, 0).trimmed();
+            m_sBaseUrl = (QUrl::fromPercentEncoding(tokens[1].toLatin1())).section( '?', 0, 0).trimmed();
 
             // Process any Query String Parameters
 
             //QString sQueryStr = tokens[1].section( '?', 1, 1   );
-	    QString sQueryStr = (QUrl::fromPercentEncoding(tokens[1].toLatin1())).section( '?', 1, 1 );
+            QString sQueryStr = (QUrl::fromPercentEncoding(tokens[1].toLatin1())).section( '?', 1, 1 );
 
             if (sQueryStr.length() > 0)
                 GetParameters( sQueryStr, m_mapParams );

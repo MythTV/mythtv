@@ -60,7 +60,7 @@
 
 #include "mythexp.h"
 
-class MPUBLIC MMembuf
+class MMembuf
 {
 public:
     MMembuf();

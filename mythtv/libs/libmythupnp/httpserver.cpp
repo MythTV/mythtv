@@ -26,8 +26,7 @@
 #include <cmath>
 
 // POSIX headers
-#include <unistd.h>
-#include <sys/time.h>
+#include <compat.h>
 #ifndef USING_MINGW
 #include <sys/utsname.h> 
 #endif

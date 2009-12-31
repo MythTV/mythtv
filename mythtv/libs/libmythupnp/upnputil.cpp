@@ -23,7 +23,9 @@
 
 // POSIX headers
 #include <sys/types.h>
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include <cerrno>
 
 // Qt headers
@@ -215,7 +217,7 @@ long GetIPAddressList( QStringList &sStrList )
 
 bool operator< ( TaskTime t1, TaskTime t2 )
 {
-    if ( (t1.tv_sec  < t2.tv_sec) or 
+    if ( (t1.tv_sec  < t2.tv_sec) || 
         ((t1.tv_sec == t2.tv_sec) && (t1.tv_usec < t2.tv_usec)))
     {
         return true;

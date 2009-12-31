@@ -25,7 +25,6 @@
 #include "upnpdevice.h"
 #include "httpcomms.h"
 
-#include <unistd.h>
 #include <cerrno>
 
 #include <QFile>

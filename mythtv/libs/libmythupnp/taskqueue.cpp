@@ -22,7 +22,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "taskqueue.h"
-#include <sys/time.h>
 #include <QDateTime>
 
 #include <iostream>
@@ -107,7 +106,7 @@ void TaskQueue::run( )
         // ------------------------------------------------------------------
 
         TaskTime ttNow;
-        gettimeofday( &ttNow, NULL );
+        gettimeofday( (&ttNow), NULL );
 
         if ((pTask = GetNextExpiredTask( ttNow )) != NULL)
         {
@@ -157,7 +156,7 @@ void TaskQueue::Clear( )
 void TaskQueue::AddTask( long msec, Task *pTask )
 {
     TaskTime tt;
-    gettimeofday( &tt, NULL );
+    gettimeofday( (&tt), NULL );
 
     AddMicroSecToTaskTime( tt, (msec * 1000) );
 
@@ -190,7 +189,7 @@ void TaskQueue::AddTask( Task *pTask )
     if (pTask != NULL)
     {
         TaskTime tt;
-        gettimeofday( &tt, NULL );
+        gettimeofday( (&tt), NULL );
 
         AddTask( tt, pTask );
     }

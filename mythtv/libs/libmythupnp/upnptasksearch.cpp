@@ -21,9 +21,8 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-#include <unistd.h>
+#include <compat.h>
 #include <stdlib.h>
-#include <sys/time.h>
 
 #include <QStringList>
 #include <QFile>
@@ -122,7 +121,7 @@ void UPnpSearchTask::SendMsg( MSocketDevice  *pSocket,
         // ------------------------------------------------------------------
 
         pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress, m_nPeerPort );
-        usleep( rand() % 250000 );
+		sleep( rand() % 250000 );
         pSocket->writeBlock( scPacket, scPacket.length(), m_PeerAddress, m_nPeerPort );
     }
 

@@ -24,10 +24,6 @@
 // ANSI C headers
 #include <cstdlib>
 
-// POSIX headers
-#include <unistd.h>
-#include <sys/time.h>
-
 // Qt headers
 #include <QStringList>
 #include <QUuid> 
@@ -138,7 +134,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
         // ------------------------------------------------------------------
 
         pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
-        usleep( rand() % 250000 );
+        usleep( rand() % 2500 ); //000 );
         pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
     }
     }

@@ -56,7 +56,7 @@ typedef enum
 
 //////////////////////////////////////////////////////////////////////////////
 
-class UPnpCDSRequest
+class UPNP_PUBLIC UPnpCDSRequest
 {
     public:
 
@@ -90,7 +90,7 @@ class UPnpCDSRequest
 
 //////////////////////////////////////////////////////////////////////////////
 
-class UPnpCDSExtensionResults
+class UPNP_PUBLIC UPnpCDSExtensionResults
 {
     public:
 
@@ -132,7 +132,7 @@ typedef struct
 
 } UPnpCDSRootInfo;
          
-class UPnpCDSExtension
+class UPNP_PUBLIC UPnpCDSExtension
 {
     public:
 
@@ -226,7 +226,7 @@ typedef QList<UPnpCDSExtension*> UPnpCDSExtensionList;
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-class UPnpCDS : public Eventing
+class UPNP_PUBLIC UPnpCDS : public Eventing
 {
     private:
 

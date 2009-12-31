@@ -24,11 +24,13 @@
 #ifndef HTTPREQUEST_H_
 #define HTTPREQUEST_H_
 
+#include <QFile>
 #include <QRegExp>
 #include <QTextStream>
 
 using namespace std;
 
+#include "upnpexp.h"
 #include "upnputil.h"
 #include "bufferedsocketdevice.h"
 
@@ -96,7 +98,7 @@ class IPostProcess
 // 
 /////////////////////////////////////////////////////////////////////////////
 
-class HTTPRequest
+class UPNP_PUBLIC HTTPRequest
 {
     protected:
 
@@ -167,6 +169,9 @@ class HTTPRequest
 
         QString         BuildHeader         ( long long nSize );
 
+        qint64          SendFile            ( QFile &file, qint64 llStart, qint64 llBytes );
+
+
     public:
         
                         HTTPRequest     ();
@@ -181,7 +186,7 @@ class HTTPRequest
                                               const QString &sDetails );
 
         void            FormatActionResponse( const NameValues &pArgs );
-        void            FormatFileResponse ( const QString &sFileName );
+        void            FormatFileResponse  ( const QString &sFileName );
 
         long            SendResponse    ( void );
         long            SendResponseFile( QString sFileName );
