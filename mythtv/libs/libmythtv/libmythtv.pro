@@ -424,6 +424,10 @@ using_backend {
     SOURCES += recorderbase.cpp            DeviceReadBuffer.cpp
     SOURCES += dtvrecorder.cpp
 
+    # Import recorder
+    HEADERS += importrecorder.h
+    SOURCES += importrecorder.cpp
+
     # Simple NuppelVideo Recorder
     using_ffmpeg_threads:DEFINES += USING_FFMPEG_THREADS
     HEADERS += NuppelVideoRecorder.h       fifowriter.h        audioinput.h

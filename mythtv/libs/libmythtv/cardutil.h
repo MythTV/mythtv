@@ -59,6 +59,7 @@ class MPUBLIC CardUtil
         FREEBOX   = 11,
         HDPVR     = 12,
         DVBS2     = 13,
+        IMPORT    = 14,
     };
 
     static enum CARD_TYPES toCardType(const QString &name)
@@ -91,6 +92,8 @@ class MPUBLIC CardUtil
             return HDPVR;
         if ("DVB_S2" == name)
             return DVBS2;
+        if ("IMPORT" == name)
+            return IMPORT;
         return ERROR_UNKNOWN;
     }
 
@@ -98,7 +101,7 @@ class MPUBLIC CardUtil
     {
         return
             (rawtype != "DVB")       &&
-            (rawtype != "FIREWIRE")  &&
+            (rawtype != "FIREWIRE")  && (rawtype != "IMPORT") &&
             (rawtype != "HDHOMERUN") && (rawtype != "FREEBOX");
     }
 
@@ -110,7 +113,7 @@ class MPUBLIC CardUtil
     static bool         IsUnscanable(const QString &rawtype)
     {
         return
-            (rawtype == "FIREWIRE")  ||
+            (rawtype == "FIREWIRE")  || (rawtype == "IMPORT") ||
             (rawtype == "HDPVR"      || (rawtype == "V4L"));
     }
 
@@ -138,6 +141,13 @@ class MPUBLIC CardUtil
         return
             (rawtype == "V4L")    || (rawtype == "MPEG") ||
             (rawtype == "HDPVR");
+    }
+
+    static bool         IsSingleInputCard(const QString &rawtype)
+    {
+        return
+            (rawtype == "FIREWIRE")  || (rawtype == "FREEBOX") ||
+            (rawtype == "HDHOMERUN") || (rawtype == "IMPORT");
     }
 
     /// Convenience function for GetCardIDs()

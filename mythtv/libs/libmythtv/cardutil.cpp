@@ -1621,12 +1621,8 @@ QStringList CardUtil::ProbeVideoInputs(QString device, QString cardtype)
 {
     QStringList ret;
 
-    if (("FIREWIRE"  == cardtype) ||
-        ("FREEBOX"   == cardtype) ||
-        ("HDHOMERUN" == cardtype))
-    {
+    if (IsSingleInputCard(cardtype))
         ret += "MPEG2TS";
-    }
     else if ("DVB" == cardtype)
         ret += ProbeDVBInputs(device);
     else
@@ -1750,12 +1746,8 @@ void CardUtil::GetCardInputs(
     QStringList inputs;
     bool is_dtv = !IsEncoder(cardtype) && !IsUnscanable(cardtype);
 
-    if (("FIREWIRE"  == cardtype) ||
-        ("FREEBOX"   == cardtype) ||
-        ("HDHOMERUN" == cardtype))
-    {
+    if (IsSingleInputCard(cardtype))
         inputs += "MPEG2TS";
-    }
     else if ("DVB" != cardtype)
         inputs += ProbeV4LVideoInputs(device);
 

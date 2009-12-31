@@ -54,6 +54,7 @@ using namespace std;
 #include "hdhrrecorder.h"
 #include "iptvrecorder.h"
 #include "firewirerecorder.h"
+#include "importrecorder.h"
 
 #include "channelgroup.h"
 
@@ -179,8 +180,9 @@ bool TVRec::CreateChannel(const QString &startchannel)
         init_run = true;
 #endif
     }
-    else if (genOpt.cardtype == "MPEG" &&
-             genOpt.videodev.toLower().left(5) == "file:")
+    else if ((genOpt.cardtype == "IMPORT") ||
+             (genOpt.cardtype == "MPEG" &&
+              genOpt.videodev.toLower().left(5) == "file:"))
     {
         channel = new DummyChannel(this);
         if (!channel->Open())
@@ -394,7 +396,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     pendingRecordings[rcinfo->cardid] = pending;
 
     // If this isn't a recording for this instance to make, we are done
-    if (rcinfo->cardid != cardid)
+    if (rcinfo->cardid != (uint)cardid)
         return;
 
     // We also need to check our input groups
@@ -1016,6 +1018,10 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOption("mrl", genOpt.videodev);
 #endif // USING_IPTV
     }
+    else if (genOpt.cardtype == "IMPORT")
+    {
+        recorder = new ImportRecorder(this);
+    }
     else
     {
 #ifdef USING_V4L
@@ -1617,7 +1623,7 @@ void TVRec::HandlePendingRecordings(void)
     it = pendingRecordings.begin();
     if ((1 == pendingRecordings.size()) &&
         (*it).ask &&
-        ((*it).info->cardid == cardid) &&
+        ((*it).info->cardid == (uint)cardid) &&
         (GetState() == kState_WatchingLiveTV))
     {
         CheckForRecGroupChange();
@@ -3991,8 +3997,11 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
 
     if (lastTuningRequest.flags & kFlagRecording)
     {
-        SetRingBuffer(new RingBuffer(rec->GetFileName(), true));
-        if (!ringBuffer->IsOpen())
+        bool write = genOpt.cardtype != "IMPORT";
+        VERBOSE(VB_IMPORTANT, LOC + QString("rec->GetFileName(): '%1'")
+                .arg(rec->GetFileName()));
+        SetRingBuffer(new RingBuffer(rec->GetFileName(), write));
+        if (!ringBuffer->IsOpen() && write)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("RingBuffer '%1' not open...")

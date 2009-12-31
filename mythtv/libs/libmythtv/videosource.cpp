@@ -1632,6 +1632,21 @@ class IPTVConfigurationGroup : public VerticalConfigurationGroup
     CaptureCard &parent;
 };
 
+class ImportConfigurationGroup : public VerticalConfigurationGroup
+{
+  public:
+    ImportConfigurationGroup(CaptureCard& a_parent):
+       VerticalConfigurationGroup(false, true, false, false),
+       parent(a_parent)
+    {
+        setUseLabel(false);
+        addChild(new SingleCardInput(parent));
+    };
+
+  private:
+    CaptureCard &parent;
+};
+
 class HDHomeRunExtra : public ConfigurationWizard
 {
   public:
@@ -1997,6 +2012,8 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard &parent) :
 #ifdef USING_IPTV
     addTarget("FREEBOX",   new IPTVConfigurationGroup(parent));
 #endif // USING_IPTV
+
+    addTarget("IMPORT",    new ImportConfigurationGroup(parent));
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value)
@@ -2200,6 +2217,8 @@ void CardType::fillSelections(SelectSetting* setting)
 #ifdef USING_IPTV
     setting->addSelection(QObject::tr("Network Recorder"), "FREEBOX");
 #endif // USING_IPTV
+
+    setting->addSelection(QObject::tr("Import Recorder"), "IMPORT");
 }
 
 class CardID : public SelectLabelSetting, public CardInputDBStorage
