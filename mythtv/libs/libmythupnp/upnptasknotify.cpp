@@ -134,7 +134,7 @@ void UPnpNotifyTask::SendNotifyMsg( MSocketDevice *pSocket,
         // ------------------------------------------------------------------
 
         pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
-        usleep( rand() % 2500 ); //000 );
+        usleep( rand() % 250000 );
         pSocket->writeBlock( scPacket, scPacket.length(), pSocket->address(), pSocket->port() );
     }
     }

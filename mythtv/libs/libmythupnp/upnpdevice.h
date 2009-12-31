@@ -33,6 +33,8 @@
 #include "refcounted.h"
 #include "mythversion.h"  // for MYTH_BINARY_VERSION
 
+extern const char *myth_source_version;
+
 class UPnpDeviceDesc;
 class UPnpDevice;
 class UPnpService;
@@ -108,7 +110,7 @@ class UPNP_PUBLIC UPnpDevice
         UPnpDevice()
         {
             m_sModelNumber  = MYTH_BINARY_VERSION;
-            m_sSerialNumber = "Must Set"; //GetMythSourceVersion();
+            m_sSerialNumber = myth_source_version;
         }
         ~UPnpDevice()
         {
