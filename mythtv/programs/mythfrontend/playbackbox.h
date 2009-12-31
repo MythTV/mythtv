@@ -326,6 +326,9 @@ class PlaybackBox : public ScheduleCommon
 
     void ShowMenu(void);
 
+    QString CreateProgramInfoString(const ProgramInfo &program) const;
+
+  private:
     MythUIButtonList *m_groupList;
     MythUIButtonList *m_recordingList;
 

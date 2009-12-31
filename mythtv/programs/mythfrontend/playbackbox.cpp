@@ -2954,6 +2954,31 @@ void PlaybackBox::popupString(ProgramInfo *program, QString &message)
         .arg(message).arg(title).arg(extra).arg(timedate);
 }
 
+QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
+{
+    QDateTime recstartts = pginfo.recstartts;
+    QDateTime recendts = pginfo.recendts;
+
+    QString timedate = QString("%1, %2 - %3")
+        .arg(recstartts.date().toString(m_formatLongDate))
+        .arg(recstartts.time().toString(m_formatTime))
+        .arg(recendts.time().toString(m_formatTime));
+
+    QString title = pginfo.title;
+
+    QString extra;
+
+    if (!pginfo.subtitle.isEmpty())
+    {
+        extra = QString('\n') + pginfo.subtitle;
+        int maxll = max(title.length(), 20);
+        if (extra.length() > maxll)
+            extra = extra.left(maxll - 3) + "...";
+    }
+
+    return QString("\n%1%2\n%3").arg(title).arg(extra).arg(timedate);
+}
+
 void PlaybackBox::doClearPlaylist(void)
 {
     QStringList::Iterator it;
@@ -4135,52 +4160,54 @@ void PlaybackBox::fillRecGroupPasswordCache(void)
 void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
 {
     m_op_on_playlist = use_playlist;
+
+    ProgramInfo *pginfo = NULL;
+    if (use_playlist)
+    {
+        if (!m_playList.empty())
+            pginfo = FindProgramInUILists(m_playList[0]);
+    }
+    else
+        pginfo = CurrentItem();
+
+    if (!pginfo)
+        return;
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT recgroup, COUNT(title) FROM recorded "
         "WHERE deletepending = 0 GROUP BY recgroup ORDER BY recgroup");
 
-    QStringList groupNames;
-    QStringList displayNames;
-    QString selected;
+    QStringList displayNames(tr("Add New"));
+    QStringList groupNames("addnewgroup");
 
-    groupNames.append("addnewgroup");
-    displayNames.append(tr("Add New"));
+    if (!query.exec())
+        return;
 
-    if (query.exec())
+    while (query.next())
     {
-        QString itemStr;
-        QString dispGroup;
-        while (query.next())
-        {
-            dispGroup = query.value(0).toString();
+        QString dispGroup = query.value(0).toString();
+        groupNames.push_back(dispGroup);
 
-            groupNames.append(dispGroup);
+        if (dispGroup == "Default")
+            dispGroup = tr("Default");
+        else if (dispGroup == "LiveTV")
+            dispGroup = tr("LiveTV");
+        else if (dispGroup == "Deleted")
+            dispGroup = tr("Deleted");
 
-            if (dispGroup == "Default")
-                dispGroup = tr("Default");
-            else if (dispGroup == "LiveTV")
-                dispGroup = tr("LiveTV");
-            else if (dispGroup == "Deleted")
-                dispGroup = tr("Deleted");
+        QString itemStr = tr("item(s)", "", query.value(1).toInt());
 
-            itemStr = tr("item(s)", "", query.value(1).toInt());
-
-            displayNames.append(QString("%1 [%2 %3]").arg(dispGroup)
-                              .arg(query.value(1).toInt()).arg(itemStr));
-        }
+        displayNames.push_back(
+            QString("%1 [%2 %3]")
+            .arg(dispGroup).arg(query.value(1).toInt()).arg(itemStr));
     }
 
-    ProgramInfo *pginfo = CurrentItem();
-    selected = pginfo->recgroup;
+    QString label = tr("Select Recording Group") +
+        CreateProgramInfoString(*pginfo);
 
-    QString label = tr("Select Recording Group");
-
-    popupString(pginfo, label);
-
-    GroupSelector *rgChanger = new GroupSelector(m_popupStack, label,
-                                                 displayNames, groupNames,
-                                                 selected);
+    GroupSelector *rgChanger = new GroupSelector(
+        m_popupStack, label, displayNames, groupNames, pginfo->recgroup);
 
     if (rgChanger->Create())
     {
@@ -4195,31 +4222,35 @@ void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
 void PlaybackBox::ShowPlayGroupChanger(bool use_playlist)
 {
     m_op_on_playlist = use_playlist;
-    QStringList groupNames;
-    QStringList displayNames;
-    QString selected;
 
-    displayNames.append(tr("Default"));
-    groupNames.append("Default");
-
-    QStringListIterator it(PlayGroup::GetNames());
-    while (it.hasNext())
+    ProgramInfo *pginfo = NULL;
+    if (use_playlist)
     {
-        QString group = it.next();
-        displayNames.append(group);
-        groupNames.append(group);
+        if (!m_playList.empty())
+            pginfo = FindProgramInUILists(m_playList[0]);
+    }
+    else
+        pginfo = CurrentItem();
+
+    if (!pginfo)
+        return;
+
+    QStringList groupNames(tr("Default"));
+    QStringList displayNames("Default");
+
+    QStringList list = PlayGroup::GetNames();
+    QStringList::const_iterator it = list.begin();
+    for (; it != list.end(); ++it)
+    {
+        displayNames.push_back(*it);
+        groupNames.push_back(*it);
     }
 
-    ProgramInfo *pginfo = CurrentItem();
-    selected = pginfo->playgroup;
+    QString label = tr("Select Playback Group") +
+        CreateProgramInfoString(*pginfo);
 
-    QString label = tr("Select Playback Group");
-
-    popupString(pginfo, label);
-
-    GroupSelector *pgChanger = new GroupSelector(m_popupStack, label,
-                                                 displayNames, groupNames,
-                                                 selected);
+    GroupSelector *pgChanger = new GroupSelector(
+        m_popupStack, label,displayNames, groupNames, pginfo->playgroup);
 
     if (pgChanger->Create())
     {
@@ -4308,12 +4339,10 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
     if (newRecGroup == "addnewgroup")
     {
         MythScreenStack *popupStack =
-                                GetMythMainWindow()->GetStack("popup stack");
+            GetMythMainWindow()->GetStack("popup stack");
 
-        QString label = tr("New Recording Group");
-
-        MythTextInputDialog *newgroup = new MythTextInputDialog(popupStack,
-                                                                label);
+        MythTextInputDialog *newgroup = new MythTextInputDialog(
+            popupStack, tr("New Recording Group"));
 
         connect(newgroup, SIGNAL(haveResult(QString)),
                 SLOT(setRecGroup(QString)));
@@ -4362,6 +4391,7 @@ void PlaybackBox::setRecGroup(QString newRecGroup)
     RecordingInfo ri(*p);
     ri.ApplyRecordRecGroupChange(newRecGroup);
     *p = ri;
+    UpdateUILists();
 }
 
 void PlaybackBox::setPlayGroup(QString newPlayGroup)
