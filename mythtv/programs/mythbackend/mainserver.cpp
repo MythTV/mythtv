@@ -1378,12 +1378,15 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             if (proginfo->filesize == 0)
             {
                 QString tmpURL = GetPlaybackURL(proginfo);
-                QFile checkFile(tmpURL);
-                if (!tmpURL.isEmpty() && checkFile.exists())
+                if (tmpURL.startsWith("/"))
                 {
-                    proginfo->filesize = checkFile.size();
-                    if (proginfo->recendts < QDateTime::currentDateTime())
-                        proginfo->SetFilesize(proginfo->filesize);
+                    QFile checkFile(tmpURL);
+                    if (!tmpURL.isEmpty() && checkFile.exists())
+                    {
+                        proginfo->filesize = checkFile.size();
+                        if (proginfo->recendts < QDateTime::currentDateTime())
+                            proginfo->SetFilesize(proginfo->filesize);
+                    }
                 }
             }
         }

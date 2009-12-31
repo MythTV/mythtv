@@ -1739,7 +1739,9 @@ QString ProgramInfo::GetPlaybackURL(
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     QString("GetPlaybackURL: '%1' should be local, but it can "
                             "not be found.").arg(basename));
-            return QString("/GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
+            // Note do not preceed with "/" that will cause existing code
+            // to look for a local file with this name...
+            return QString("GetPlaybackURL/UNABLE/TO/FIND/LOCAL/FILE/ON/%1/%2")
                            .arg(hostname).arg(basename);
         }
     }
@@ -3633,7 +3635,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         return;
     }
 
-    if (pathname.left(1) != "/")
+    if (pathname == GetRecordBasename())
         pathname = GetPlaybackURL(false, true);
 
     QString recDir;
