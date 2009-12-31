@@ -38,6 +38,7 @@ class ProgramInfoCache
     bool Update(const ProgramInfo&);
     bool UpdateFileSize(uint chanid, const QDateTime &recstartts,
                         uint64_t filesize);
+    QString GetRecGroup(uint chanid, const QDateTime &recstartts) const;
     void GetOrdered(vector<ProgramInfo*> &list, bool newest_first = false);
     /// \note This must only be called from the UI thread.
     bool empty(void) const { return m_cache.empty(); }

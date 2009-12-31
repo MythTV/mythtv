@@ -3280,66 +3280,6 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(
     return NULL;
 }
 
-void PlaybackBox::UpdateProgramInfo(const ProgramInfo &pginfo)
-{
-    // LiveTV ProgramInfo's are not in the aggregated list
-    ProgramList::iterator _it[2] = {
-        m_progLists[tr("LiveTV").toLower()].begin(), m_progLists[""].begin() };
-    ProgramList::iterator _end[2] = {
-        m_progLists[tr("LiveTV").toLower()].end(),   m_progLists[""].end()   };
-
-    // We do not update the pathname as it may be localized
-    // in the remote ProgramInfo.
-
-    for (uint i = 0; i < 2; i++)
-    {
-        ProgramList::iterator it = _it[i], end = _end[i];
-        for (; it != end; ++it)
-        {
-            if (pginfo.chanid     == (*it)->chanid &&
-                pginfo.recstartts == (*it)->recstartts)
-            {
-                QString pathname = (**it).pathname;
-                **it = pginfo;
-                (**it).pathname = pathname;
-                break;
-            }
-        }
-    }
-
-    // now do the cache..
-    m_programInfoCache.Update(pginfo);
-}
-
-void PlaybackBox::UpdateProgramInfo(
-    uint chanid, const QDateTime &recstartts, uint64_t filesize)
-{
-    // LiveTV ProgramInfo's are not in the aggregated list
-    ProgramList::iterator _it[2] = {
-        m_progLists[tr("LiveTV").toLower()].begin(), m_progLists[""].begin() };
-    ProgramList::iterator _end[2] = {
-        m_progLists[tr("LiveTV").toLower()].end(),   m_progLists[""].end()   };
-
-    for (uint i = 0; i < 2; i++)
-    {
-        ProgramList::iterator it = _it[i], end = _end[i];
-        for (; it != end; ++it)
-        {
-            if (chanid     == (*it)->chanid.toUInt() &&
-                recstartts == (*it)->recstartts)
-            {
-                (*it)->filesize = filesize;
-                if (filesize)
-                    (*it)->availableStatus = asAvailable;
-                break;
-            }
-        }
-    }
-
-    // now do the cache..
-    m_programInfoCache.UpdateFileSize(chanid, recstartts, filesize);
-}
-
 void PlaybackBox::toggleWatched(void)
 {
     MythUIButtonListItem *item = m_recordingList->GetItemCurrent();
@@ -3889,37 +3829,28 @@ void PlaybackBox::HandleRecordingAddEvent(const ProgramInfo &evinfo)
 
 void PlaybackBox::HandleUpdateProgramInfoEvent(const ProgramInfo &evinfo)
 {
-    ProgramInfo *dst = FindProgramInUILists(evinfo);
-    QString old_recgroup;
-    if (dst)
-        old_recgroup = dst->recgroup;
+    QString old_recgroup = m_programInfoCache.GetRecGroup(
+        evinfo.chanid.toUInt(), evinfo.recstartts);
 
-    UpdateProgramInfo(evinfo);
-
-    // If the program is not in the the recording lists, then it
-    // is either a program that was just removed from the "LiveTV"
-    // recording list and should possibly be displayed now, or it
-    // is still in the "LiveTV" recording group and we're not
-    // displaying programs in that group. Handle appropriately..
-    if (!dst)
-    {
-        if (evinfo.recgroup != "LiveTV")
-            ScheduleUpdateUIList();
-        return;
-    }
+    m_programInfoCache.Update(evinfo);
 
     // If the recording group has changed, reload lists from the recently
     // updated cache; if not, only update UI for the updated item
-    if (dst->recgroup != old_recgroup)
-        ScheduleUpdateUIList();
-    else
-        UpdateUIListItem(dst);
+    if (evinfo.recgroup == old_recgroup)
+    {
+        ProgramInfo *dst = FindProgramInUILists(evinfo);
+        if (dst)
+            UpdateUIListItem(dst);
+        return;
+    }
+
+    ScheduleUpdateUIList();
 }
 
 void PlaybackBox::HandleUpdateProgramInfoFileSizeEvent(
     uint chanid, const QDateTime &recstartts, uint64_t filesize)
 {
-    UpdateProgramInfo(chanid, recstartts, filesize);
+    m_programInfoCache.UpdateFileSize(chanid, recstartts, filesize);
 
     ProgramInfo *dst = FindProgramInUILists(chanid, recstartts);
     if (dst)

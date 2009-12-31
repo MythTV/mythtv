@@ -185,6 +185,23 @@ bool ProgramInfoCache::UpdateFileSize(
     return it != m_cache.end();
 }
 
+/** \brief Returns the ProgramInfo::recgroup or an empty string if not found.
+ *  \note This must only be called from the UI thread.
+ */
+QString ProgramInfoCache::GetRecGroup(
+    uint chanid, const QDateTime &recstartts) const
+{
+    QMutexLocker locker(&m_lock);
+
+    Cache::const_iterator it = m_cache.find(PICKey(chanid,recstartts));
+
+    QString recgroup;
+    if (it != m_cache.end())
+        recgroup = it->second->recgroup;
+
+    return recgroup;
+}
+
 /** \brief Adds a ProgramInfo to the cache.
  *  \note This must only be called from the UI thread.
  */

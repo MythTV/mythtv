@@ -306,9 +306,6 @@ class PlaybackBox : public ScheduleCommon
     void updateIcons(const ProgramInfo *pginfo = NULL);
     void UpdateUsageUI(void);
     void updateGroupInfo(const QString &groupname, const QString &grouplabel);
-    void UpdateProgramInfo(const ProgramInfo &pginfo);
-    void UpdateProgramInfo(
-        uint chanid, const QDateTime &recstartts, uint64_t filesize);
 
     void UpdateUIListItem(
         ProgramInfo *ProgramInfo_pointer_from_FindProgramInUILists);
