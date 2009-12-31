@@ -116,10 +116,9 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
     VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("SubstituteMatches: BEFORE: %1")
                                             .arg(command));
     QString args;
-    QString chanid;
-    QString starttime;
+    uint chanid = 0;
+    QDateTime recstartts;
     QString sender;
-    ProgramInfo *tmpInfo = NULL;
 
     QStringList::const_iterator it = tokens.begin();
     ++it;
@@ -163,7 +162,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
             if (++it == tokens.end())
                 break;
 
-            chanid = *it;
+            chanid = (*it).toUInt();
 
             if (!args.isEmpty())
                 args += " ";
@@ -175,7 +174,7 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
             if (++it == tokens.end())
                 break;
 
-            starttime = *it;
+            recstartts = QDateTime::fromString(*it, Qt::ISODate);
 
             if (!args.isEmpty())
                 args += " ";
@@ -187,21 +186,29 @@ void MythSystemEventHandler::SubstituteMatches(const QStringList &tokens,
 
     command.replace(QString("%ARGS%"), args);
 
-    if (!chanid.isEmpty() && !starttime.isEmpty())
-        tmpInfo = ProgramInfo::GetProgramFromRecorded(chanid, starttime);
-
-    if (tmpInfo)
+    ProgramInfo pginfo;
+    bool pginfo_loaded = pginfo.LoadProgramFromRecorded(chanid, recstartts);
+    if (!pginfo_loaded)
     {
-        tmpInfo->SubstituteMatches(command);
+        pginfo_loaded = ProgramInfo::kNoProgram !=
+            pginfo.LoadProgramAtDateTime(chanid, recstartts);
+    }
 
-        command.replace(QString("%VERBOSELEVEL%"),
-                        QString("%1").arg(print_verbose_messages));
+    if (pginfo_loaded)
+    {
+        pginfo.SubstituteMatches(command);
     }
     else
     {
-        command.replace(QString("%CHANID%"), chanid);
-        command.replace(QString("%STARTTIME%"), starttime);
+        command.replace(QString("%CHANID%"), QString::number(chanid));
+        command.replace(QString("%STARTTIME%"),
+                        recstartts.toString("yyyyMMddhhmmss"));
+        command.replace(QString("%STARTTIMEISO%"),
+                        recstartts.toString(Qt::ISODate));
     }
+
+    command.replace(QString("%VERBOSELEVEL%"),
+                    QString("%1").arg(print_verbose_messages));
 
     VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("SubstituteMatches: AFTER : %1")
                                             .arg(command));
