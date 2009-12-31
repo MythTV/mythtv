@@ -24,8 +24,6 @@
 #ifndef EVENTING_H_
 #define EVENTING_H_
 
-#include <sys/time.h>
-
 #include <QUrl>
 #include <QUuid>
 #include <QMap>
@@ -40,7 +38,7 @@ class QTextStream;
 //
 //////////////////////////////////////////////////////////////////////////////
         
-class SubscriberInfo
+class UPNP_PUBLIC SubscriberInfo
 {
     public:
         SubscriberInfo()
@@ -86,7 +84,7 @@ class SubscriberInfo
         void SetExpireTime( unsigned long nSecs )
         {
             TaskTime tt;
-            gettimeofday( &tt, NULL );
+            gettimeofday( (&tt), NULL );
 
             AddMicroSecToTaskTime( tt, (nSecs * 1000000) );
 
@@ -104,7 +102,7 @@ typedef QMap<QString,SubscriberInfo*> Subscribers;
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class StateVariableBase
+class UPNP_PUBLIC  StateVariableBase
 {
     public:
 
@@ -118,7 +116,7 @@ class StateVariableBase
         {
             m_bNotify = bNotify;
             m_sName   = sName;
-            gettimeofday( &m_ttLastChanged, NULL );
+            gettimeofday( (&m_ttLastChanged), NULL );
         }
 
         virtual QString ToString() = 0;
@@ -127,7 +125,7 @@ class StateVariableBase
 //////////////////////////////////////////////////////////////////////////////
 
 template< class T >
-class StateVariable : public StateVariableBase
+class UPNP_PUBLIC  StateVariable : public StateVariableBase
 {
     private:
         
@@ -168,15 +166,15 @@ class StateVariable : public StateVariableBase
             if ( m_value != value )
             {
                 m_value = value;
-                gettimeofday( &m_ttLastChanged, NULL );
+                gettimeofday( (&m_ttLastChanged), NULL );
             }
         }
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-class StateVariables
-{
+class UPNP_PUBLIC StateVariables
+{   
     protected:
 
         virtual void Notify() = 0;
@@ -257,10 +255,10 @@ class StateVariables
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-class Eventing : public HttpServerExtension,
-                 public StateVariables,
-                 public IPostProcess,
-                 public UPnpServiceImpl
+class UPNP_PUBLIC  Eventing : public HttpServerExtension,
+                              public StateVariables,
+                              public IPostProcess,
+                              public UPnpServiceImpl
 {
 
     protected:

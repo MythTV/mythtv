@@ -317,7 +317,7 @@ void Eventing::HandleUnsubscribe( HTTPRequest *pRequest )
 void Eventing::Notify()
 {
     TaskTime tt;
-    gettimeofday( &tt, NULL );
+    gettimeofday( (&tt), NULL );
 
     m_mutex.lock();
 
@@ -413,7 +413,7 @@ void Eventing::NotifySubscriber( SubscriberInfo *pInfo )
 
         pInfo->IncrementKey();
 
-        gettimeofday( &pInfo->ttLastNotified, NULL );
+        gettimeofday( (&pInfo->ttLastNotified), NULL );
     }
 
 }

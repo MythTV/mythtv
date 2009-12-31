@@ -22,7 +22,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
-using namespace std;
 
 #include "mythtimer.h"
 #include "bufferedsocketdevice.h"

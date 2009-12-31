@@ -21,7 +21,7 @@ HEADERS += upnpdevice.h upnptasknotify.h upnptasksearch.h threadpool.h upnputil.
 HEADERS += httpserver.h upnpcds.h upnpcdsobjects.h bufferedsocketdevice.h upnpmsrr.h
 HEADERS += eventing.h upnpcmgr.h upnptaskevent.h upnptaskcache.h ssdpcache.h
 HEADERS += upnpimpl.h multicast.h broadcast.h configuration.h
-HEADERS += soapclient.h mythxmlclient.h mmembuf.h
+HEADERS += soapclient.h mythxmlclient.h mmembuf.h upnpexp.h
 
 SOURCES += httprequest.cpp upnp.cpp ssdp.cpp taskqueue.cpp upnputil.cpp
 SOURCES += upnpdevice.cpp upnptasknotify.cpp upnptasksearch.cpp threadpool.cpp
@@ -36,8 +36,6 @@ LIBS      += -L../libmythdb -lmythdb-$$LIBVERSION
 LIBS += $$EXTRA_LIBS
 
 mingw {
-    HEADERS += darwin-sendfile.h
-    SOURCES += darwin-sendfile.c
 
     LIBS += -lws2_32
 }
@@ -53,15 +51,7 @@ inc.files += soapclient.h mythxmlclient.h mmembuf.h
 
 INSTALLS += inc
 
-cygwin:HEADERS += darwin-sendfile.h
-cygwin:SOURCES += darwin-sendfile.c
-
-freebsd:HEADERS += darwin-sendfile.h
-freebsd:SOURCES += darwin-sendfile.c
-
 macx {
-    HEADERS += darwin-sendfile.h
-    SOURCES += darwin-sendfile.c
 
     QMAKE_LFLAGS_SHLIB += -flat_namespace
 }

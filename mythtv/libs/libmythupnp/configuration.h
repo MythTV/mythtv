@@ -27,7 +27,9 @@
 #include <QDomDocument>
 #include <QStringList>
 
-class Configuration 
+#include "upnpexp.h"
+
+class UPNP_PUBLIC Configuration 
 {
     public:
 
@@ -55,7 +57,7 @@ class Configuration
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class XmlConfiguration : public Configuration
+class UPNP_PUBLIC XmlConfiguration : public Configuration
 {
     protected:
 
@@ -89,7 +91,7 @@ class XmlConfiguration : public Configuration
 //
 //////////////////////////////////////////////////////////////////////////////
 
-class DBConfiguration : public Configuration
+class UPNP_PUBLIC DBConfiguration : public Configuration
 {
     public:
 
