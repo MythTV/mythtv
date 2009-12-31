@@ -29,9 +29,6 @@
 #   endif
 # endif
 
-// POSIX headers
-#include <unistd.h>
-
 // Qt headers
 #include <QApplication>
 #include <QRegExp>
@@ -49,9 +46,13 @@
 #include "mythsocket.h"
 
 // Necessary for codec icon support
+
+#ifndef _MSC_VER
 extern "C" {
 #include <stdint.h>
 }
+#endif
+
 static QString LOC = "lcddevice: ";
 
 LCD::LCD()

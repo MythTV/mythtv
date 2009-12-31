@@ -3,21 +3,18 @@
 
 // C++
 #include <algorithm> // for min/max
-using namespace std;
+//using namespace std;
+
+#include "compat.h"
 
 // POSIX
 #ifndef USING_MINGW
 #include <sys/select.h> // for select
 #endif
 #include <sys/types.h>  // for fnctl
-#include <unistd.h>     // for fnctl & other
 #include <fcntl.h>      // for fnctl
 #include <errno.h>      // for checking errno
 
-// Microsoft
-#ifdef USING_MINGW
-#include <winsock2.h> // for select & fd_set
-#endif
 #ifndef O_NONBLOCK
 #define O_NONBLOCK 0 /* not actually supported in MINGW */
 #endif

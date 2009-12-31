@@ -3,15 +3,11 @@
 #include <cassert>
 #include <cerrno>
 
+#include "compat.h"
+
 // POSIX
 #ifndef USING_MINGW
 #include <sys/select.h> // for select
-#endif
-#include <unistd.h>
-
-// Microsoft
-#ifdef USING_MINGW
-#include <winsock2.h> // for select & fd_set
 #endif
 
 // Qt

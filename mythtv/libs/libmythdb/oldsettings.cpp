@@ -8,7 +8,7 @@
     email                : sward@relatable.com
  ***************************************************************************/
 
-#include <sys/time.h>
+#include "compat.h"
 
 #include <cstdlib>
 #include <cstdio>

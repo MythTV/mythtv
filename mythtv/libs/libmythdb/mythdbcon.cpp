@@ -1,9 +1,6 @@
 // ANSI C
 #include <cstdlib>
 
-// POSIX
-#include "unistd.h"
-
 // Qt
 #include <QVector>
 #include <QSqlDriver>

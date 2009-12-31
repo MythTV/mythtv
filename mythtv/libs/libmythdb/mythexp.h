@@ -8,9 +8,18 @@
 #define MDEPRECATED __attribute__((deprecated))
 #else
 #define MHIDDEN
-#define MPUBLIC
 #define MUNUSED
 #define MDEPRECATED
+#ifdef _MSC_VER
+  #ifdef MYTH_API
+    #define MPUBLIC __declspec( dllexport )
+  #else
+    #define MPUBLIC __declspec( dllimport )
+  #endif
+
+#else
+  #define MPUBLIC
+#endif
 #endif
 
 

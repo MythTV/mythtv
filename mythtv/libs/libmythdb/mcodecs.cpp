@@ -38,6 +38,7 @@
 #include <QtCore/QIODevice>
 #include <QtDebug>
 
+#include "compat.h"
 #include "mcodecs.h"
 
 #define QMD5_S11 7

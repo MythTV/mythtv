@@ -1,7 +1,10 @@
 #ifndef MYTHVERSION_H_
 #define MYTHVERSION_H_
 
-#if (QT_VERSION < 0x040400)
+#include "qglobal.h"
+#include "mythexp.h"
+
+#if ( QT_VERSION < 0x040400 )
 #error You need Qt version >= 4.4.0 to compile MythTV.
 #endif
 
@@ -28,6 +31,8 @@
  *       mythtv/bindings/python/MythTV/MythTV.py (layout)
  */
 #define MYTH_PROTO_VERSION "56"
+
+MPUBLIC const char *GetMythSourceVersion();
 
 #endif
 

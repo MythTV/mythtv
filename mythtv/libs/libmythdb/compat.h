@@ -10,15 +10,40 @@
 #pragma warning(disable:4786)
 #endif
 
-#ifdef _WIN32
-#define close wsock_close
+#ifdef _MSC_VER
+    typedef __int64             int64_t;    // Define it from MSVC's internal type
+
+    #define uint64_t            __int64
+    #define strtoll             _strtoi64
+    #define strncasecmp         _strnicmp
+    #define snprintf            _snprintf
+
+    #ifdef  _WIN64
+        typedef __int64    ssize_t;
+    #else
+        typedef int   ssize_t;
+    #endif
+
+#endif
+
+#ifdef _WIN32 
+#ifndef _MSC_VER 
+ #define close wsock_close
+#endif
+#define NOMINMAX 
 #include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#ifndef _MSC_VER
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+#else
+    #include <io.h>
+#endif
 #define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (const char*)(d), e)
 #undef close
 #include <stdio.h>        // for snprintf(), used by inline dlerror()
+#ifndef _MSC_VER
 #include <unistd.h>       // for usleep()
+#endif
 #else
 #include <sys/time.h>     // Mac OS X needs this before sys/resource
 #include <sys/resource.h> // for setpriority
@@ -87,6 +112,25 @@ inline int random(void)
 #if defined(__cplusplus) && defined(USING_MINGW)
 #define setenv(x, y, z) ::SetEnvironmentVariableA(x, y)
 #define unsetenv(x) 0
+#endif
+
+#if defined(__cplusplus) && defined(_MSC_VER)
+inline unsigned int usleep( unsigned int us ) 
+{ 
+    Sleep( us / 1000 ); 
+    return 0;
+}
+
+inline int close( int fd ) 
+{
+    return _close( fd );
+}
+
+inline int write( int fd, const void *buffer, unsigned int count ) 
+{
+    return _write( fd, buffer, count );
+}
+
 #endif
 
 #if defined(__cplusplus) && defined(USING_MINGW)
@@ -232,7 +276,9 @@ inline const char *dlerror(void)
 #endif // USING_MINGW
 
 
+#ifndef _MSC_VER
 #include <sys/param.h>  // Defines BSD on FreeBSD, Mac OS X
+#endif
 #include <sys/stat.h>   // S_IREAD/WRITE on MinGW, umask() on BSD
 
 
@@ -255,4 +301,29 @@ inline const char *dlerror(void)
     #define lseek64(f,o,w) lseek(f,o,w)
 #endif
 
+#if defined(_MSC_VER)
+#define EPOCHFILETIME (116444736000000000i64)
+
+#define gettimeofday( tv, tz )                   \
+{                                                \
+    FILETIME        ft;                          \
+    LARGE_INTEGER   li;                          \
+    __int64         t;                           \
+    static int      tzflag;                      \
+                                                 \
+    if (tv)                                      \
+    {                                            \
+        GetSystemTimeAsFileTime(&ft);            \
+        li.LowPart  = ft.dwLowDateTime;          \
+        li.HighPart = ft.dwHighDateTime;         \
+        t  = li.QuadPart;                        \
+        t -= EPOCHFILETIME;                      \
+        t /= 10;                                 \
+        tv->tv_sec  = (long)(t / 1000000);       \
+        tv->tv_usec = (long)(t % 1000000);       \
+    }                                            \
+                                                 \
+}
+
+#endif
 #endif // __COMPAT_H__

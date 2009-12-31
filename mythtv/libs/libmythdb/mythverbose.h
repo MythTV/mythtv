@@ -124,18 +124,34 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
 #ifndef MYTHCONTEXT_H_
     #ifdef  __cplusplus
-        #define VERBOSE(mask,args...)                        \
-        do {                                                 \
-            if ((print_verbose_messages & (mask)) == (mask)) \
-            {                                                \
-                QDateTime dtmp = QDateTime::currentDateTime(); \
-                QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
-                verbose_mutex.lock(); \
-                std::cout << dtime.toLocal8Bit().constData() << " " \
-                     << QString(args).toLocal8Bit().constData() << std::endl; \
-                verbose_mutex.unlock(); \
-            }                                                \
-       } while (0)
+        #ifdef WIN32
+            #define VERBOSE(mask, ...)                        \
+                do {                                                 \
+                    if ((print_verbose_messages & (mask)) == (mask)) \
+                    {                                                \
+                        QDateTime dtmp = QDateTime::currentDateTime(); \
+                        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
+                        verbose_mutex.lock(); \
+                        std::cout << dtime.toLocal8Bit().constData() << " " \
+                             << QString(__VA_ARGS__).toLocal8Bit().constData() << std::endl; \
+                        verbose_mutex.unlock(); \
+                    }                                                \
+               } while (0)
+
+        #else
+                #define VERBOSE(mask,args...)                        \
+                do {                                                 \
+                    if ((print_verbose_messages & (mask)) == (mask)) \
+                    {                                                \
+                        QDateTime dtmp = QDateTime::currentDateTime(); \
+                        QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
+                        verbose_mutex.lock(); \
+                        std::cout << dtime.toLocal8Bit().constData() << " " \
+                             << QString(args).toLocal8Bit().constData() << std::endl; \
+                        verbose_mutex.unlock(); \
+                    }                                                \
+               } while (0)
+        #endif
     #else
         #if HAVE_GETTIMEOFDAY
             #define VERBOSEDATE                              \

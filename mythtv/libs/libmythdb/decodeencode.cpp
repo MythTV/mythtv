@@ -5,7 +5,6 @@ using namespace std;
 
 // C headers
 #include <cerrno>
-#include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <time.h>
@@ -22,6 +21,7 @@ using namespace std;
 #include <QDir>
 #include <QFileInfo>
 
+#include "compat.h"
 #include "mythverbose.h"
 
 #include "decodeencode.h"
