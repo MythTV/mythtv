@@ -67,9 +67,7 @@ class MythContextSlotHandler : public QObject
 
   private slots:
     void ConnectFailurePopupClosed(void);
-    void ConnectFailurePopupDone(int);
     void VersionMismatchPopupClosed(void);
-    void VersionMismatchPopupDone(int);
 
   private:
     ~MythContextSlotHandler() {}

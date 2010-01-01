@@ -63,8 +63,10 @@ const QString kDefaultBE  = "UPnP/MythFrontend/DefaultBackend/";
 const QString kDefaultPIN = kDefaultBE + "SecurityPin";
 const QString kDefaultUSN = kDefaultBE + "USN";
 
-class MythContextPrivate
+class MythContextPrivate : public QObject
 {
+    friend class MythContextSlotHandler;
+
   public:
     MythContextPrivate(MythContext *lparent);
    ~MythContextPrivate();
@@ -100,11 +102,18 @@ class MythContextPrivate
     bool    UPnPconnect(const DeviceLocation *device, const QString &PIN);
 
     bool WaitForWOL(int timeout_ms = INT_MAX);
-    void ShowConnectionFailurePopup(bool blockingClient);
-    void HideConnectionFailurePopup(void);
-    void ShowVersionMismatchPopup(uint remoteVersion);
-    void HideVersionMismatchPopup(void);
 
+  protected:
+    bool event(QEvent*);
+
+    void ShowConnectionFailurePopup(bool persistent);
+    void HideConnectionFailurePopup(void);
+    void ConnectFailurePopupClosed(void);
+
+    void ShowVersionMismatchPopup(uint remoteVersion);
+    void VersionMismatchPopupClosed(void);
+
+  public:
     MythContext *parent;
 
     bool      m_gui;               ///< Should this context use GUI elements?
@@ -134,14 +143,6 @@ class MythContextPrivate
 
     bool disablelibrarypopup;
 
-    QMutex MBEconnectPopupLock;
-    MythPopupBox *oldMBEconnectPopup;
-    MythConfirmationDialog *MBEconnectPopup;
-
-    QMutex MBEversionPopupLock;
-    MythPopupBox *oldMBEversionPopup;
-    MythConfirmationDialog *MBEversionPopup;
-
     MythPluginManager *pluginmanager;
 
     int m_logenable, m_logmaxcount, m_logprintlevel;
@@ -157,6 +158,10 @@ class MythContextPrivate
     MythContextSlotHandler *m_sh;
 
     QThread *m_UIThread;
+
+  private:
+    MythConfirmationDialog *MBEconnectPopup;
+    MythConfirmationDialog *MBEversionPopup;
 };
 
 static void exec_program_cb(const QString &cmd)
@@ -255,15 +260,13 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       mainWindow(NULL),
       serverSock(NULL), eventSock(NULL),
       disablelibrarypopup(false),
-      oldMBEconnectPopup(NULL),
-      MBEconnectPopup(NULL),
-      oldMBEversionPopup(NULL),
-      MBEversionPopup(NULL),
       pluginmanager(NULL),
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
       m_database(GetMythDB()), m_ui(NULL),
       m_sh(new MythContextSlotHandler(this)),
-      m_UIThread(QThread::currentThread())
+      m_UIThread(QThread::currentThread()),
+      MBEconnectPopup(NULL),
+      MBEversionPopup(NULL)
 {
     InitializeMythDirs();
 }
@@ -1267,86 +1270,59 @@ bool MythContextPrivate::WaitForWOL(int timeout_in_ms)
     return !WOLInProgress;
 }
 
-void MythContextPrivate::ShowConnectionFailurePopup(bool blockingClient)
+bool MythContextPrivate::event(QEvent *e)
 {
-    QMutexLocker locker(&MBEconnectPopupLock);
-    if (MBEconnectPopup || oldMBEconnectPopup)
-        return;
-
-    bool manageLock = false;
-    if (!blockingClient)
+    if (e->type() == (QEvent::Type) MythEvent::MythEventMessage)
     {
-        if (!serverSockLock.tryLock())
-            manageLock = true;
-        serverSockLock.unlock();
+        MythEvent *me = (MythEvent*)e;
+        if (me->Message() == "VERSION_MISMATCH" && (1 == me->ExtraDataCount()))
+            ShowVersionMismatchPopup(me->ExtraData(0).toUInt());
+        else if (me->Message() == "CONNECTION_FAILURE")
+            ShowConnectionFailurePopup(false);
+        else if (me->Message() == "PERSISTENT_CONNECTION_FAILURE")
+            ShowConnectionFailurePopup(true);
+        else if (me->Message() == "CONNECTION_RESTABLISHED")
+            HideConnectionFailurePopup();
+        return true;
     }
 
-    QString message =
+    return QObject::event(e);
+}
+
+void MythContextPrivate::ShowConnectionFailurePopup(bool persistent)
+{
+    if (MBEconnectPopup)
+        return;
+
+    QString message = (persistent) ?
+        QObject::tr(
+            "The connection to the master backend "
+            "server has gone away for some reason.. "
+            "Is it running?") :
         QObject::tr(
             "Could not connect to the master backend server -- is "
             "it running?  Is the IP address set for it in the "
             "setup program correct?");
 
-    if (mainWindow && mainWindow->currentWidget())
-    {
-        // HACK. TODO: Remove when all old-style widgets are gone
-        MythPopupBox *popup =
-            new MythPopupBox(mainWindow, "connection failure");
-        oldMBEconnectPopup = popup;
-
-        popup->addLabel(message, MythPopupBox::Medium, true);
-        popup->addLabel("");
-        popup->addButton(MythPopupBox::tr("Ok"))->setFocus();
-        popup->ShowPopup(m_sh, SLOT(ConnectFailurePopupDone(int)));
-    }
-    else if (!MBEconnectPopup)
+    if (mainWindow && m_ui && m_ui->IsScreenSetup())
     {
         MBEconnectPopup = ShowOkPopup(
             message, m_sh, SLOT(ConnectFailurePopupClosed()));
     }
-
-    if (manageLock)
-        serverSockLock.lock();
 }
 
 void MythContextPrivate::HideConnectionFailurePopup(void)
 {
-    QMutexLocker locker(&MBEconnectPopupLock);
-
     if (MBEconnectPopup)
     {
         MBEconnectPopup->Close();
         MBEconnectPopup = NULL;
     }
-
-    if (oldMBEconnectPopup)
-    {
-        oldMBEconnectPopup->hide();
-        oldMBEconnectPopup->deleteLater();
-        oldMBEconnectPopup = NULL;
-    }
-}
-
-void MythContextSlotHandler::ConnectFailurePopupClosed(void)
-{
-    QMutexLocker locker(&d->MBEconnectPopupLock);
-
-    d->MBEconnectPopup = NULL;
-}
-
-void MythContextSlotHandler::ConnectFailurePopupDone(int)
-{
-    QMutexLocker locker(&d->MBEconnectPopupLock);
-
-    d->oldMBEconnectPopup->hide();
-    d->oldMBEconnectPopup->deleteLater();
-    d->oldMBEconnectPopup = NULL;
 }
 
 void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
 {
-    QMutexLocker locker(&MBEversionPopupLock);
-    if (MBEversionPopup || oldMBEversionPopup)
+    if (MBEversionPopup)
         return;
 
     QString message =
@@ -1357,60 +1333,26 @@ void MythContextPrivate::ShowVersionMismatchPopup(uint remote_version)
             "the backend and frontend.")
         .arg(remote_version).arg(MYTH_PROTO_VERSION);
 
-    if (mainWindow && mainWindow->currentWidget())
-    {
-        // HACK. TODO: Remove when all old-style widgets are gone
-        MythPopupBox *popup =
-            new MythPopupBox(mainWindow, "connection failure");
-        oldMBEversionPopup = popup;
-
-        popup->addLabel(message, MythPopupBox::Medium, true);
-        popup->addLabel("");
-        popup->addButton(MythPopupBox::tr("Ok"))->setFocus();
-        popup->ShowPopup(m_sh, SLOT(VersionMismatchPopupDone(int)));
-    }
-    else if (!MBEversionPopup)
+    if (mainWindow && m_ui && m_ui->IsScreenSetup())
     {
         MBEversionPopup = ShowOkPopup(
             message, m_sh, SLOT(VersionMismatchPopupClosed()));
     }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + message);
+        qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
+    }
 }
 
-void MythContextPrivate::HideVersionMismatchPopup(void)
+void MythContextSlotHandler::ConnectFailurePopupClosed(void)
 {
-    QMutexLocker locker(&MBEversionPopupLock);
-
-    if (MBEversionPopup)
-    {
-        MBEversionPopup->Close();
-        MBEversionPopup = NULL;
-    }
-
-    if (oldMBEversionPopup)
-    {
-        oldMBEversionPopup->hide();
-        oldMBEversionPopup->deleteLater();
-        oldMBEversionPopup = NULL;
-    }
+    d->MBEconnectPopup = NULL;
 }
 
 void MythContextSlotHandler::VersionMismatchPopupClosed(void)
 {
-    QMutexLocker locker(&d->MBEversionPopupLock);
-
     d->MBEversionPopup = NULL;
-
-    qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
-}
-
-void MythContextSlotHandler::VersionMismatchPopupDone(int)
-{
-    QMutexLocker locker(&d->MBEversionPopupLock);
-
-    d->oldMBEversionPopup->hide();
-    d->oldMBEversionPopup->deleteLater();
-    d->oldMBEversionPopup = NULL;
-
     qApp->exit(GENERIC_EXIT_SOCKET_ERROR);
 }
 
@@ -1549,9 +1491,9 @@ bool MythContext::ConnectToMasterServer(bool blockingClient)
         d->serverSock->DownRef();
         d->serverSock = NULL;
 
-        // inform the gui user of any event socket failure
-        if (d->m_ui && d->m_ui->IsScreenSetup() && d->mainWindow)
-            d->ShowConnectionFailurePopup(blockingClient);
+        QCoreApplication::postEvent(
+            d, new MythEvent("CONNECTION_FAILURE"));
+
         return false;
     }
 
@@ -1675,10 +1617,10 @@ MythSocket *MythContext::ConnectCommandSocket(
         serverSock->DownRef();
         serverSock = NULL;
 
-        if (!serverSock && (cnt == 1) && gui)
+        if (!serverSock && (cnt == 1))
         {
-            bool blockingClient = announce.contains("Playback");
-            d->ShowConnectionFailurePopup(blockingClient);
+            QCoreApplication::postEvent(
+                d, new MythEvent("CONNECTION_FAILURE"));
         }
 
         if (sleepms)
@@ -1702,7 +1644,8 @@ MythSocket *MythContext::ConnectCommandSocket(
     }
     else
     {
-        d->HideConnectionFailurePopup();
+        QCoreApplication::postEvent(
+            d, new MythEvent("CONNECTION_RESTABLISHED"));
     }
 
     return serverSock;
@@ -2108,28 +2051,9 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                 d->serverSockLock.unlock();
             VERBOSE(VB_IMPORTANT,
                     QString("Reconnection to backend server failed"));
-            if (d->m_ui && d->m_ui->IsScreenSetup())
-            {
-                // HACK. TODO: Remove when all old-style widgets are gone
-                if (d->mainWindow->currentWidget())
-                    MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
-                             QObject::tr(
-                                 "The connection to the master backend "
-                                 "server has gone away for some reason.. "
-                                 "Is it running?"));
-                else
-                {
-                    QMutexLocker locker(&d->MBEconnectPopupLock);
-                    if (!d->MBEconnectPopup)
-                    {
-                        d->MBEconnectPopup = ShowOkPopup(
-                            QObject::tr(
-                                "The connection to the master backend "
-                                "server has gone away for some reason.. "
-                                "Is it running?"));
-                    }
-                }
-            }
+
+            QCoreApplication::postEvent(
+                d, new MythEvent("PERSISTENT_CONNECTION_FAILURE"));
 
             if (!block)
                 d->serverSockLock.lock();
@@ -2213,8 +2137,10 @@ bool MythContext::CheckProtoVersion(
 
     if (!socket->readStringList(strlist, timeout_ms) || strlist.empty())
     {
-        VERBOSE(VB_IMPORTANT, "Protocol version check failure. The response "
-                "to MYTH_PROTO_VERSION was empty.");
+        VERBOSE(VB_IMPORTANT, "Protocol version check failure.\n\t\t\t"
+                "The response to MYTH_PROTO_VERSION was empty.\n\t\t\t"
+                "This happens when the backend is too busy to respond,\n\t\t\t"
+                "or has deadlocked in due to bugs or hardware failure.");
 
         return false;
     }
@@ -2224,8 +2150,9 @@ bool MythContext::CheckProtoVersion(
                                     "backend=%2)\n")
                                     .arg(MYTH_PROTO_VERSION).arg(strlist[1]));
 
-        if (d && d->mainWindow && d->m_ui && d->m_ui->IsScreenSetup())
-            d->ShowVersionMismatchPopup(strlist[1].toUInt());
+        QStringList list(strlist[1]);
+        QCoreApplication::postEvent(
+            d, new MythEvent("VERSION_MISMATCH", list));
 
         return false;
     }
