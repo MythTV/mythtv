@@ -1166,6 +1166,7 @@ void DVDRingBufferPriv::SetTrack(uint type, int trackNo)
     {
         m_curAudioTrack = trackNo;
         m_autoselectaudio = false;
+        dvdnav_set_active_audio_stream(m_dvdnav, trackNo);
     }
 }
 

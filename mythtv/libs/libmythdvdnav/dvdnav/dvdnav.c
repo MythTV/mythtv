@@ -1061,6 +1061,27 @@ int8_t dvdnav_get_active_audio_stream(dvdnav_t *this) {
   return retval;
 }
 
+int8_t dvdnav_set_active_audio_stream(dvdnav_t *this, int8_t stream) {
+  int8_t        retval;
+
+  if(!this->started) {
+    printerr("Virtual DVD machine not started.");
+    return -1;
+  }
+
+  pthread_mutex_lock(&this->vm_lock);
+  if (!this->vm->state.pgc) {
+    printerr("No current PGC.");
+    pthread_mutex_unlock(&this->vm_lock);
+    return -1;
+  }
+
+  retval = vm_set_audio_active_stream(this->vm, stream);
+  pthread_mutex_unlock(&this->vm_lock);
+
+  return retval;
+}
+
 int8_t dvdnav_get_active_spu_stream(dvdnav_t *this) {
   int8_t        retval;
 

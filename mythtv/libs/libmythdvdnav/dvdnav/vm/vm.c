@@ -775,6 +775,19 @@ int vm_get_audio_active_stream(vm_t *vm) {
   return streamN;
 }
 
+int vm_set_audio_active_stream(vm_t *vm, int audioN) {
+
+    if (audioN >= 8)
+      return -1;
+
+    /* verify that stream exists */
+    if(! (vm->state).pgc->audio_control[audioN] & (1<<15))
+        return -1;
+
+    (vm->state).AST_REG = audioN;
+    return 0;
+}
+
 int vm_get_subp_active_stream(vm_t *vm, int mode) {
   int subpN;
   int streamN;
