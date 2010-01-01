@@ -2088,13 +2088,11 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
 
 void MythContext::readyRead(MythSocket *sock)
 {
-    (void)sock;
-
-    while (d->eventSock->state() == MythSocket::Connected &&
-           d->eventSock->bytesAvailable() > 0)
+    while (sock->state() == MythSocket::Connected &&
+           sock->bytesAvailable() > 0)
     {
         QStringList strlist;
-        if (!d->eventSock->readStringList(strlist))
+        if (!sock->readStringList(strlist))
             continue;
 
         QString prefix = strlist[0];
