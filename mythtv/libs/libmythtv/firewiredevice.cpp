@@ -418,7 +418,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     const uint64_t motorola_vendor_ids[] =
     {
         /* DCH-3200, DCX-3200 */
-        0x1c11,    0x1cfb,    0x1fc4,    0x23a3,
+        0x1c11,    0x1cfb,    0x1fc4,    0x23a3,    0x23ee,
         /* DCH-3416 */
         0x1e46,
         /* DCT-3416 */
@@ -450,6 +450,7 @@ static void fw_init(QMap<uint64_t,QString> &id_to_model)
     for (uint i = 0; i < motorola_vendor_id_cnt; i++)
     {
         id_to_model[motorola_vendor_ids[i] << 32 | 0xf740] = "DCX-3200";
+        id_to_model[motorola_vendor_ids[i] << 32 | 0xfa07] = "DCX-3200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0xd330] = "DCH-3200";
         id_to_model[motorola_vendor_ids[i] << 32 | 0xb630] = "DCH-3416";
         id_to_model[motorola_vendor_ids[i] << 32 | 0x34cb] = "DCT-3412";
