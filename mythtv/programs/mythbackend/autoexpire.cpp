@@ -597,6 +597,8 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
                      .arg((*it)->recstartts.toString(Qt::ISODate)));
         gContext->dispatch(me);
 
+        deleted_set.insert((*it)->MakeUniqueKey());
+
         ++it; // move on to next program
     }
 }
@@ -672,7 +674,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
             int found = 1;
             while (query.next())
             {
-                QString chanid = query.value(0).toString();
+                uint chanid = query.value(0).toUInt();
                 QDateTime startts = query.value(1).toDateTime();
                 QString title = query.value(2).toString();
                 QDateTime progstart = query.value(3).toDateTime();
@@ -954,35 +956,35 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
 
     query.prepare(querystr);
 
-    if (!query.exec() || !query.isActive() || !query.size())
+    if (!query.exec())
         return;
 
     while (query.next())
     {
-        QString m_chanid = query.value(0).toString();
-        QDateTime m_recstartts = query.value(1).toDateTime();
+        uint chanid = query.value(0).toUInt();
+        QDateTime recstartts = query.value(1).toDateTime();
 
-        if (IsInDontExpireSet(m_chanid, m_recstartts))
+        if (IsInDontExpireSet(chanid, recstartts))
         {
             VERBOSE(VB_FILE, LOC + QString("    Skipping "
                              "%1 @ %2 because it is in Don't Expire List")
-                             .arg(m_chanid).arg(m_recstartts.toString()));
+                             .arg(chanid).arg(recstartts.toString()));
             continue;
         }
-        else if (IsInExpireList(expireList, m_chanid, m_recstartts))
+        else if (IsInExpireList(expireList, chanid, recstartts))
         {
             VERBOSE(VB_FILE, LOC + QString("    Skipping "
                              "%1 @ %2 because it is already in Expire List")
-                             .arg(m_chanid) .arg(m_recstartts.toString()));
+                             .arg(chanid) .arg(recstartts.toString()));
             continue;
         }
 
         ProgramInfo *proginfo = new ProgramInfo;
 
-        proginfo->chanid = m_chanid;
+        proginfo->chanid = QString::number(chanid);
         proginfo->startts = query.value(13).toDateTime();
         proginfo->endts = query.value(14).toDateTime();
-        proginfo->recstartts = m_recstartts;
+        proginfo->recstartts = recstartts;
         proginfo->recendts = query.value(2).toDateTime();
         proginfo->title = query.value(3).toString();
         proginfo->subtitle = query.value(4).toString();
@@ -1095,55 +1097,61 @@ void AutoExpire::Update(int encoder, int fsID, bool immediately)
 
 void AutoExpire::UpdateDontExpireSet(void)
 {
-    dont_expire_set.clear();
+    dont_expire_set = deleted_set;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, starttime, lastupdatetime, recusage, "
-                  " hostname "
-                  "FROM inuseprograms;");
+    query.prepare(
+        "SELECT chanid, starttime, lastupdatetime, recusage, hostname "
+        "FROM inuseprograms");
 
-    if (!query.exec() || !query.isActive() || !query.size())
+    if (!query.exec() || !query.next())
         return;
 
+    VERBOSE(VB_FILE, LOC + "Adding Programs to 'Do Not Expire' List");
     QDateTime curTime = QDateTime::currentDateTime();
 
-    VERBOSE(VB_FILE, LOC + "Adding Programs to 'Do Not Expire' List");
-    while (query.next())
+    do
     {
-        QString chanid = query.value(0).toString();
-        QDateTime startts = query.value(1).toDateTime();
+        uint chanid = query.value(0).toUInt();
+        QDateTime recstartts = query.value(1).toDateTime();
         QDateTime lastupdate = query.value(2).toDateTime();
-
+            
         if (lastupdate.secsTo(curTime) < 2 * 60 * 60)
         {
-            QString key = chanid + startts.toString(Qt::ISODate);
+            QString key = QString("%1_%2")
+                .arg(chanid).arg(recstartts.toString(Qt::ISODate));
             dont_expire_set.insert(key);
             VERBOSE(VB_FILE, QString("    %1 @ %2 in use by %3 on %4")
-                                     .arg(chanid)
-                                     .arg(startts.toString(Qt::ISODate))
-                                     .arg(query.value(3).toString())
-                                     .arg(query.value(4).toString()));
+                    .arg(chanid)
+                    .arg(recstartts.toString(Qt::ISODate))
+                    .arg(query.value(3).toString())
+                    .arg(query.value(4).toString()));
         }
     }
+    while (query.next());
 }
 
-bool AutoExpire::IsInDontExpireSet(QString chanid, QDateTime starttime)
+bool AutoExpire::IsInDontExpireSet(
+    uint chanid, const QDateTime &recstartts) const
 {
-    QString key = chanid + starttime.toString(Qt::ISODate);
+    QString key = QString("%1_%2")
+        .arg(chanid).arg(recstartts.toString(Qt::ISODate));
 
-    return (dont_expire_set.count(key));
+    return (dont_expire_set.find(key) != dont_expire_set.end());
 }
 
-bool AutoExpire::IsInExpireList(pginfolist_t &expireList, QString chanid,
-                                QDateTime starttime)
+bool AutoExpire::IsInExpireList(
+    const pginfolist_t &expireList, uint chanid, const QDateTime &recstartts)
 {
-    pginfolist_t::iterator it;
+    pginfolist_t::const_iterator it;
 
     for (it = expireList.begin(); it != expireList.end(); ++it)
     {
-        if (((*it)->chanid == chanid) &&
-            ((*it)->recstartts == starttime))
+        if (((*it)->chanid.toUInt() == chanid) &&
+            ((*it)->recstartts == recstartts))
+        {
             return true;
+        }
     }
     return false;
 }

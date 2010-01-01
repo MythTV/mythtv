@@ -5,15 +5,14 @@
 
 #include <pthread.h>
 
-#include <list>
 #include <vector>
-#include <set>
 using namespace std;
 
 #include <QWaitCondition>
 #include <QObject>
 #include <QString>
 #include <QMutex>
+#include <QSet>
 #include <QMap>
 
 class ProgramInfo;
@@ -72,12 +71,13 @@ class AutoExpire : public QObject
     void Sleep(int sleepTime);
 
     void UpdateDontExpireSet(void);
-    bool IsInDontExpireSet(QString chanid, QDateTime starttime);
-    bool IsInExpireList(pginfolist_t &expireList, QString chanid,
-                        QDateTime starttime);
+    bool IsInDontExpireSet(uint chanid, const QDateTime &recstartts) const;
+    static bool IsInExpireList(const pginfolist_t &expireList,
+                               uint chanid, const QDateTime &recstartts);
 
     // main expire info
-    set<QString>  dont_expire_set;
+    QSet<QString> dont_expire_set;
+    QSet<QString> deleted_set;
     pthread_t     expire_thread;
     uint          desired_freq;
     bool          expire_thread_running;
