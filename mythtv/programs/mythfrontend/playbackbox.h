@@ -258,6 +258,8 @@ class PlaybackBox : public ScheduleCommon
 
   private:
     bool UpdateUILists(void);
+    void UpdateUIGroupList(const QStringList &groupPreferences);
+
     void UpdateProgressBar(void);
 
     QString cutDown(const QString &, QFont *, int);
@@ -293,7 +295,6 @@ class PlaybackBox : public ScheduleCommon
 
     bool IsUsageUIVisible(void) const;
 
-    void updateGroupList();
     void updateIcons(const ProgramInfo *pginfo = NULL);
     void UpdateUsageUI(void);
     void updateGroupInfo(const QString &groupname, const QString &grouplabel);
@@ -401,8 +402,6 @@ class PlaybackBox : public ScheduleCommon
     // Other state
     /// Program[s] currently selected for deletion
     QStringList m_delList;
-    /// Program currently selected during an update
-    ProgramInfo *m_currentItem;
     /// Group currently selected
     QString m_currentGroup;
 

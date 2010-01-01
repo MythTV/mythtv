@@ -314,7 +314,7 @@ static bool extract_one_del(
     list.pop_front();
 
     if (!chanid || !recstartts.isValid())
-        VERBOSE(VB_IMPORTANT, "extract_one_del() invalid entry");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "extract_one_del() invalid entry");
 
     return chanid && recstartts.isValid();
 }
@@ -364,7 +364,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       // Main Recording List support
       m_progsInDB(0),
       // Other state
-      m_currentItem(NULL),                m_op_on_playlist(false),
+      m_op_on_playlist(false),
       m_programInfoCache(this),           m_playingSomething(false),
       // Selection state variables
       m_needUpdate(false),
@@ -408,11 +408,6 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
         m_viewMask = (ViewMask)(m_viewMask & ~VIEW_WATCHLIST);
         gContext->SaveSetting("DisplayGroupDefaultViewMask", (int)m_viewMask);
     }
-
-    // If user wants to start in watchlist and watchlist is displayed, then
-    // make it the current group
-    if (m_watchListStart && (m_viewMask & VIEW_WATCHLIST))
-        m_currentGroup = m_watchGroupLabel;
 
     // This setting is deprecated in favour of viewmask, this just ensures the
     // that it is converted over when upgrading from earlier versions
@@ -472,8 +467,6 @@ PlaybackBox::~PlaybackBox(void)
         m_coverartTimer->disconnect(this);
         m_coverartTimer = NULL;
     }
-
-    delete m_currentItem;
 }
 
 bool PlaybackBox::Create()
@@ -493,7 +486,8 @@ bool PlaybackBox::Create()
 
     if (!m_recordingList || !m_groupList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing critical theme elements.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Theme is missing critical theme elements.");
         return false;
     }
 
@@ -999,36 +993,32 @@ void PlaybackBox::UpdateUsageUI(void)
     }
 }
 
-void PlaybackBox::updateGroupList()
+void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 {
     m_groupList->Reset();
 
     if (!m_titleList.isEmpty())
     {
-        MythUIButtonListItem *item = NULL;
-
-        QString groupname;
-
-        bool foundGroup = false;
+        int best_pref = INT_MAX, sel_idx = 0;
         QStringList::iterator it;
         for (it = m_titleList.begin(); it != m_titleList.end(); ++it)
         {
-            groupname = (*it).simplified();
+            QString groupname = (*it).simplified();
+
+            MythUIButtonListItem *item =
+                new MythUIButtonListItem(
+                    m_groupList, "", qVariantFromValue(groupname.toLower()));
 
             // The first item added to the list will trigger an update of the
             // associated Recording List, m_needsUpdate should be false unless
             // this is the currently selected group
-            if (groupname.toLower() == m_currentGroup)
+            int pref = groupPreferences.indexOf(groupname.toLower());
+            if ((pref >= 0) && (pref < best_pref))
             {
-                m_needUpdate = true;
-                foundGroup = true;
+                best_pref = pref;
+                sel_idx = m_groupList->GetItemPos(item);
+                m_currentGroup = groupname.toLower();
             }
-
-            item = new MythUIButtonListItem(m_groupList, "",
-                                        qVariantFromValue(groupname.toLower()));
-
-            if (m_needUpdate)
-                m_groupList->SetItemCurrent(item);
 
             if (groupname.isEmpty())
                 groupname = m_groupDisplayName;
@@ -1040,11 +1030,8 @@ void PlaybackBox::updateGroupList()
             item->SetText(QString::number(count), "reccount");
         }
 
-        if (!foundGroup)
-        {
-            m_needUpdate = true;
-            m_groupList->SetItemCurrent(0);
-        }
+        m_needUpdate = true;
+        m_groupList->SetItemCurrent(sel_idx);
     }
 }
 
@@ -1166,13 +1153,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             if ((*it)->subtitleType & sit.key())
                 item->DisplayState(sit.value(), "subtitletypes");
         }
-
-        if (m_currentItem &&
-            (m_currentItem->chanid     == (*it)->chanid) &&
-            (m_currentItem->recstartts == (*it)->recstartts))
-        {
-            m_recordingList->SetItemCurrent(item);
-        }
     }
 
     if (m_noRecordingsText)
@@ -1194,16 +1174,48 @@ bool PlaybackBox::UpdateUILists(void)
 {
     m_isFilling = true;
 
-    if (m_currentItem)
+    // Save selection, including next few items & groups
+    QStringList groupSelPref;
+    QStringList itemSelPref;
+    MythUIButtonListItem *prefSelGroup = m_groupList->GetItemCurrent();
+    if (prefSelGroup)
     {
-        delete m_currentItem;
-        m_currentItem = NULL;
+        groupSelPref.push_back(prefSelGroup->GetData().toString());
+        for (int i = m_groupList->GetCurrentPos();
+             i < m_groupList->GetCount(); i++)
+        {
+            prefSelGroup = m_groupList->GetItemAt(i);
+            if (prefSelGroup)
+                groupSelPref.push_back(prefSelGroup->GetData().toString());
+        }
+
+        int curPos = m_recordingList->GetCurrentPos();
+        for (int i = curPos; i < m_recordingList->GetCount(); i++)
+        {
+            MythUIButtonListItem *item = m_recordingList->GetItemAt(i);
+            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+            itemSelPref.push_back(groupSelPref.front());
+            itemSelPref.push_back(pginfo->MakeUniqueKey());
+        }
+        if (curPos >= m_recordingList->GetCount())
+            curPos = -1;
+        for (int i = curPos; i >= 0; i--)
+        {
+            MythUIButtonListItem *item = m_recordingList->GetItemAt(i);
+            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+            itemSelPref.push_back(groupSelPref.front());
+            itemSelPref.push_back(pginfo->MakeUniqueKey());
+        }
+    }
+    else
+    {
+        // If user wants to start in watchlist and watchlist is displayed, then
+        // make it the current group
+        if (m_watchListStart && (m_viewMask & VIEW_WATCHLIST))
+            groupSelPref.push_back(m_watchGroupLabel);
     }
 
-    ProgramInfo *tmp = CurrentItem();
-    if (tmp)
-        m_currentItem = new ProgramInfo(*tmp);
-
+    // Cache available status for later restoration
     QMap<QString, AvailableStatusType> asCache;
     QString asKey;
 
@@ -1384,7 +1396,7 @@ bool PlaybackBox::UpdateUILists(void)
 
     if (sortedList.empty())
     {
-        VERBOSE(VB_IMPORTANT, "SortedList is Empty");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "SortedList is Empty");
         m_progLists[""];
         m_titleList << "";
         m_playList.clear();
@@ -1666,13 +1678,50 @@ bool PlaybackBox::UpdateUILists(void)
         }
     }
 
-    updateGroupList();
+    UpdateUIGroupList(groupSelPref);
     UpdateUsageUI();
 
-    if (m_currentItem)
+    QStringList::const_iterator it = m_playList.begin();
+    for (; it != m_playList.end(); ++it)
     {
-        delete m_currentItem;
-        m_currentItem = NULL;
+        ProgramInfo *pginfo = FindProgramInUILists(*it);
+        if (!pginfo)
+            continue;
+        MythUIButtonListItem *item =
+            m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+        if (item)
+            item->DisplayState("yes", "playlist");
+    }
+
+    // If possible reselect the item selected before,
+    // otherwise select the nearest available item.
+    prefSelGroup = m_groupList->GetItemCurrent();
+    if (prefSelGroup &&
+        groupSelPref.contains(prefSelGroup->GetData().toString()) &&
+        itemSelPref.contains(prefSelGroup->GetData().toString()))
+    {
+        // the group is selected above in UpdateUIGroupList()
+        QString groupname = prefSelGroup->GetData().toString();
+        for (uint i = 0; i+1 < (uint)itemSelPref.size(); i+=2)
+        {
+            if (itemSelPref[i] != groupname)
+                continue;
+
+            const QString key = itemSelPref[i+1];
+            for (uint j = 0; j < (uint)m_recordingList->GetCount(); j++)
+            {
+                MythUIButtonListItem *item = m_recordingList->GetItemAt(j);
+                ProgramInfo *pginfo =
+                    qVariantValue<ProgramInfo*>(item->GetData());
+                if (pginfo && (pginfo->MakeUniqueKey() == key))
+                {
+                    //VERBOSE(VB_IMPORTANT, "Reselect success");
+                    m_recordingList->SetItemCurrent(j);
+                    i = itemSelPref.size();
+                    break;
+                }
+            }
+        }
     }
 
     m_isFilling = false;
@@ -1907,14 +1956,6 @@ void PlaybackBox::RemoveProgram(
     bool forgetHistory, bool forceMetadataDelete)
 {
     ProgramInfo *delItem = FindProgramInUILists(chanid, recstartts);
-
-    VERBOSE(VB_IMPORTANT,
-            QString("RemoveProgram(%1,%2,%3,%4) 0x%5")
-            .arg(chanid)
-            .arg(recstartts.toString(Qt::ISODate))
-            .arg(forgetHistory?"forget":"")
-            .arg(forceMetadataDelete?"force":"")
-            .arg((uint64_t)delItem,0,16));
 
     if (!delItem)
         return;
@@ -3314,13 +3355,14 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
         {
             int clientID = tokens[5].toInt();
 
-            VERBOSE(VB_IMPORTANT,
+            VERBOSE(VB_IMPORTANT, LOC +
                     QString("NetworkControl: Trying to %1 program '%2' @ '%3'")
                             .arg(tokens[1]).arg(tokens[3]).arg(tokens[4]));
 
             if (m_playingSomething)
             {
-                VERBOSE(VB_IMPORTANT, "NetworkControl: ERROR: Already playing");
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "NetworkControl: Already playing");
 
                 QString msg = QString(
                     "NETWORK_CONTROL RESPONSE %1 ERROR: Unable to play, "
@@ -3615,6 +3657,16 @@ void PlaybackBox::customEvent(QEvent *event)
                 return;
 
             m_delList = me->ExtraDataList();
+            for (uint i = 0; i+2 < (uint)m_delList.size(); i+=3)
+            {
+                const ProgramInfo *pginfo =
+                    FindProgramInUILists(
+                        m_delList[i+0].toUInt(),
+                        QDateTime::fromString(m_delList[i+1], Qt::ISODate));
+                if (pginfo)
+                    m_helper.CheckAvailability(*pginfo, kCheckForCache);
+            }
+
             bool forceDelete = m_delList[2].toUInt();
             if (!forceDelete)
                 ShowDeletePopup(kForceDeleteRecording);
@@ -3711,20 +3763,76 @@ void PlaybackBox::customEvent(QEvent *event)
 void PlaybackBox::HandleRecordingRemoveEvent(
     uint chanid, const QDateTime &recstartts)
 {
-    ProgramInfo *pginfo = FindProgramInUILists(chanid, recstartts);
-    if (pginfo && ((pginfo->availableStatus != asPendingDelete) ||
-                   (m_currentGroup == m_watchGroupLabel)))
+    if (!m_programInfoCache.Remove(chanid, recstartts))
     {
-        m_recordingList->RemoveItem(
-            m_recordingList->GetItemByData(qVariantFromValue(pginfo)));
-        if (m_recordingList->GetCount() == 0)
-            m_groupList->RemoveItem(m_groupList->GetItemCurrent());
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Failed to remove %1:%2, reloading list")
+                .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
+        m_programInfoCache.ScheduleLoad();
+        return;
     }
 
-    if (!m_programInfoCache.Remove(chanid, recstartts))
-        m_programInfoCache.ScheduleLoad();
-    else
-        ScheduleUpdateUIList();
+    MythUIButtonListItem *sel_item = m_groupList->GetItemCurrent();
+    QString groupname;
+    if (sel_item)
+        groupname = sel_item->GetData().toString();
+
+    ProgramMap::iterator git = m_progLists.begin();
+    while (git != m_progLists.end())
+    {
+        ProgramList::iterator pit = (*git).begin();
+        while (pit != (*git).end())
+        {
+            if ((*pit)->recstartts      == recstartts &&
+                (*pit)->chanid.toUInt() == chanid)
+            {
+                if (!git.key().isEmpty() && git.key() == groupname)
+                {
+                    MythUIButtonListItem *item_by_data =
+                        m_recordingList->GetItemByData(
+                            qVariantFromValue(*pit));
+                    MythUIButtonListItem *item_cur =
+                        m_recordingList->GetItemCurrent();
+
+                    if (item_cur && (item_by_data == item_cur))
+                    {
+                        MythUIButtonListItem *item_next =
+                            m_recordingList->GetItemNext(item_cur);
+                        if (item_next)
+                            m_recordingList->SetItemCurrent(item_next);
+                    }
+
+                    m_recordingList->RemoveItem(item_by_data);
+                }
+                pit = (*git).erase(pit);
+            }
+            else
+            {
+                pit++;
+            }
+        }
+
+        if ((*git).empty())
+        {
+            if (!groupname.isEmpty() && (git.key() == groupname))
+            {
+                MythUIButtonListItem *next_item =
+                    m_groupList->GetItemNext(sel_item);
+                if (next_item)
+                    m_groupList->SetItemCurrent(next_item);
+
+                m_groupList->RemoveItem(sel_item);
+
+                sel_item = next_item;
+                groupname = "";
+                if (sel_item)
+                    groupname = sel_item->GetData().toString();
+            }
+            git = m_progLists.erase(git);
+        }
+        else
+            git++;
+    }
 
     m_helper.ForceFreeSpaceUpdate();
 }
@@ -4346,7 +4454,8 @@ bool GroupSelector::Create()
 
     if (!groupList)
     {
-        VERBOSE(VB_IMPORTANT, "Theme is missing 'groups' button list.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Theme is missing 'groups' button list.");
         return false;
     }
 
@@ -4363,7 +4472,7 @@ bool GroupSelector::Create()
     groupList->SetValueByData(qVariantFromValue(m_selected));
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
 
     connect(groupList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(AcceptItem(MythUIButtonListItem *)));
@@ -4470,7 +4579,7 @@ bool ChangeView::Create()
     connect(savebutton, SIGNAL(Clicked()), SLOT(SaveChanges()));
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
 
     return true;
 }
@@ -4502,8 +4611,8 @@ bool PasswordChange::Create()
 
     if (!m_oldPasswordEdit || !m_newPasswordEdit || !m_okButton)
     {
-        VERBOSE(VB_IMPORTANT, "Window 'passwordchanger' is missing required "
-                              "elements.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Window 'passwordchanger' is missing required elements.");
         return false;
     }
 
@@ -4511,7 +4620,7 @@ bool PasswordChange::Create()
     m_newPasswordEdit->SetPassword(true);
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
 
     connect(m_oldPasswordEdit, SIGNAL(valueChanged()),
                                SLOT(OldPasswordChanged()));
@@ -4554,8 +4663,8 @@ bool RecMetadataEdit::Create()
 
     if (!m_titleEdit || !m_subtitleEdit || !okButton)
     {
-        VERBOSE(VB_IMPORTANT, "Window 'editmetadata' is missing required "
-                              "elements.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Window 'editmetadata' is missing required elements.");
         return false;
     }
 
@@ -4565,7 +4674,7 @@ bool RecMetadataEdit::Create()
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
 
     return true;
 }
@@ -4601,13 +4710,13 @@ bool HelpPopup::Create()
 
     if (!m_iconList)
     {
-        VERBOSE(VB_IMPORTANT, "Window 'iconhelp' is missing required "
-                              "elements.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Window 'iconhelp' is missing required elements.");
         return false;
     }
 
     if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
 
     addItem("commflagged", tr("Commercials are flagged"));
     addItem("cutlist",     tr("An editing cutlist is present"));
