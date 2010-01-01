@@ -635,6 +635,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool     m_scan_locked;
     /// Used for tracking of scan type for auto-detection of interlacing
     int      m_scan_tracker;
+    /// Set when SetScanType runs the first time
+    bool     m_scan_initialized;
     /// Video (input) Number of frames between key frames (often inaccurate)
     int keyframedist;
 
@@ -785,6 +787,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     float      play_speed;    
     bool       normal_speed;  
     int        frame_interval;///< always adjusted for play_speed
+    int        m_frame_interval;///< used to detect changes to frame_interval
 
     int        ffrew_skip;    
 
