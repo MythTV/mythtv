@@ -1251,7 +1251,7 @@ bool MythContextPrivate::WaitForWOL(int timeout_in_ms)
     int timeout_remaining = timeout_in_ms;
     while (WOLInProgress && (timeout_remaining > 0))
     {
-        VERBOSE(VB_GENERAL, LOC + "Wake-On-Lan in progress, waiting...");
+        VERBOSE(VB_GENERAL, LOC + "Wake-On-LAN in progress, waiting...");
 
         int max_wait = min(1000, timeout_remaining);
         WOLInProgressWaitCondition.wait(
@@ -1646,6 +1646,7 @@ MythSocket *MythContext::ConnectCommandSocket(
         }
         else if (!WOLcmd.isEmpty() && (cnt < maxConnTry))
         {
+            if (!we_attempted_wol)
             {
                 QMutexLocker locker(&d->WOLInProgressLock);
                 if (d->WOLInProgress)
