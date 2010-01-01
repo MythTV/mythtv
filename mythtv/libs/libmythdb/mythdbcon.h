@@ -56,7 +56,8 @@ class MPUBLIC MDBManager
     QList<MSqlDatabase*> m_pool;
     QMutex m_lock;
     QSemaphore *m_sem;
-    int m_connID;
+    int m_nextConnID;
+    int m_connCount;
 
     MSqlDatabase *m_schedCon;
     MSqlDatabase *m_DDCon;
