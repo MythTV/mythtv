@@ -14,9 +14,7 @@
 #include "mythdb.h"
 #include "mythverbose.h"
 
-static const uint kPurgeTimeout = 10;
-
-//QMutex MSqlQuery::prepareLock;
+static const uint kPurgeTimeout = 60 * 60;
 
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
@@ -498,8 +496,6 @@ bool MSqlQuery::exec(const QString &query)
 
 bool MSqlQuery::prepare(const QString& query)
 {
-    QMutexLocker lock(&prepareLock);
-
     m_last_prepared_query = query;
 #ifdef DEBUG_QT4_PORT
     if (query.contains(m_testbindings))
@@ -537,8 +533,6 @@ void MSqlQuery::bindValue (const QString  & placeholder,
 {
 #ifdef DEBUG_QT4_PORT
     // XXX - HACK BEGIN
-    QMutexLocker lock(&prepareLock);
-
     // qt4 doesn't like to bind values without occurrence in the prepared query
     if (!m_last_prepared_query.contains(placeholder))
     {
