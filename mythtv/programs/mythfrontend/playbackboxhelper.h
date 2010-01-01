@@ -35,6 +35,13 @@ class PreviewGenState
 typedef QMap<QString,PreviewGenState> PreviewMap;
 typedef QMap<QString,QDateTime>       FileTimeStampMap;
 
+typedef enum CheckAvailabilityType {
+    kCheckForCache,
+    kCheckForMenuAction,
+    kCheckForPlayAction,
+    kCheckForPlaylistAction,
+} CheckAvailabilityType;
+
 class PlaybackBoxHelper : public QThread
 {
     friend class PBHEventHandler;
@@ -51,6 +58,8 @@ class PlaybackBoxHelper : public QThread
         uint chanid, const QDateTime &recstartts, bool forceDelete);
     void DeleteRecordings(const QStringList&);
     void UndeleteRecording(uint chanid, const QDateTime &recstartts);
+    void CheckAvailability(const ProgramInfo&,
+                           CheckAvailabilityType cat = kCheckForCache);
     void GetPreviewImage(const ProgramInfo&);
 
     virtual void run(void);      // QThread

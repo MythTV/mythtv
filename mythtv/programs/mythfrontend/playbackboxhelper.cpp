@@ -131,6 +131,56 @@ bool PBHEventHandler::event(QEvent *e)
                 }
             }
         }
+        else if (me->Message() == "CHECK_AVAILABILITY")
+        {
+            CheckAvailabilityType cat = kCheckForCache;
+            QTime tm;
+            if (me->ExtraDataCount() >= 5)
+            {
+                cat = (CheckAvailabilityType) me->ExtraData(0).toUInt();
+                tm.setHMS(
+                    me->ExtraData(1).toUInt(),
+                    me->ExtraData(2).toUInt(),
+                    me->ExtraData(3).toUInt(),
+                    me->ExtraData(4).toUInt());
+            }
+            ProgramInfo evinfo;
+            if (!evinfo.FromStringList(me->ExtraDataList(), 5))
+                return true;
+
+            AvailableStatusType availableStatus = asAvailable;
+            // Note IsFileReadable() implicitly calls GetPlaybackURL
+            // when necessary, we rely on this.
+            if (!evinfo.IsFileReadable())
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("CHECK_AVAILABILITY '%1' "
+                                "file not found")
+                        .arg(evinfo.pathname));
+                availableStatus = asFileNotFound;
+            }
+            else if (0 == evinfo.filesize)
+            {
+                evinfo.filesize = evinfo.GetFilesize();
+                if (0 == evinfo.filesize)
+                {
+                    availableStatus = (evinfo.recstatus == rsRecording) ?
+                        asNotYetAvailable : asZeroByte;
+                }
+            }
+
+            QStringList list;
+            list.push_back(evinfo.MakeUniqueKey());
+            list.push_back(QString::number((int)cat));
+            list.push_back(QString::number((int)availableStatus));
+            list.push_back(QString::number(evinfo.filesize));
+            list.push_back(QString::number(tm.hour()));
+            list.push_back(QString::number(tm.minute()));
+            list.push_back(QString::number(tm.second()));
+            list.push_back(QString::number(tm.msec()));
+            MythEvent *e = new MythEvent("AVAILABILITY", list);
+            QCoreApplication::postEvent(m_pbh.m_listener, e);
+        }
     }
 
     return QObject::event(e);
@@ -256,6 +306,20 @@ uint64_t PlaybackBoxHelper::GetFreeSpaceUsedMB(void) const
 {
     QMutexLocker locker(&m_lock);
     return m_freeSpaceUsedMB;
+}
+
+void PlaybackBoxHelper::CheckAvailability(
+    const ProgramInfo &pginfo, CheckAvailabilityType cat)
+{
+    QTime tm = QTime::currentTime();
+    QStringList list(QString::number((int)cat));
+    list.push_back(QString::number(tm.hour()));
+    list.push_back(QString::number(tm.minute()));
+    list.push_back(QString::number(tm.second()));
+    list.push_back(QString::number(tm.msec()));
+    pginfo.ToStringList(list);
+    MythEvent *e = new MythEvent("CHECK_AVAILABILITY", list);
+    QCoreApplication::postEvent(m_eventHandler, e);        
 }
 
 void PlaybackBoxHelper::GetPreviewImage(const ProgramInfo &pginfo)

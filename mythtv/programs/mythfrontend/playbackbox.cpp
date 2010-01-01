@@ -698,8 +698,6 @@ void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo)
 void PlaybackBox::UpdateUIListItem(
     MythUIButtonListItem *item, bool is_sel, bool force_preview_reload)
 {
-    // TODO Make sure playlist DisplayState is respected..
-
     if (!item)
         return;
 
@@ -1194,8 +1192,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
 bool PlaybackBox::UpdateUILists(void)
 {
-    // TODO Make sure playlist DisplayState is respected..
-
     m_isFilling = true;
 
     if (m_currentItem)
@@ -1686,27 +1682,24 @@ bool PlaybackBox::UpdateUILists(void)
 
 void PlaybackBox::playSelectedPlaylist(bool random)
 {
-    ProgramInfo *tmpItem;
-    QStringList::Iterator it = m_playList.begin();
-    QStringList randomList = m_playList;
-    bool playNext = true;
-    int i = 0;
-
-    while (randomList.size() && playNext)
+    if (random)
     {
-        if (random)
-            i = (int)(1.0 * randomList.size() * rand() / (RAND_MAX + 1.0));
-
-        it = randomList.begin() + i;
-
-        tmpItem = FindProgramInUILists(*it);
-
-        if ((tmpItem->availableStatus == asAvailable) ||
-            (tmpItem->availableStatus == asNotYetAvailable))
-            playNext = play(tmpItem, true);
-
-        randomList.erase(it);
+        m_playListPlay.clear();
+        QStringList tmp = m_playList;
+        while (!tmp.empty())
+        {
+            uint i = rand() % tmp.size();
+            m_playListPlay.push_back(tmp[i]);
+            tmp.removeAll(tmp[i]);
+        }
     }
+    else
+    {
+        m_playListPlay = m_playList;
+    }
+
+    QCoreApplication::postEvent(
+        this, new MythEvent("PLAY_PLAYLIST"));
 }
 
 void PlaybackBox::playSelected(MythUIButtonListItem *item)
@@ -1728,12 +1721,7 @@ void PlaybackBox::playSelected(MythUIButtonListItem *item)
         return;
     }
 
-    if ((pginfo->availableStatus == asAvailable) ||
-        (pginfo->availableStatus == asNotYetAvailable))
-        play(pginfo);
-    else
-        showAvailablePopup(pginfo);
-
+    Play(*pginfo, false);
 }
 
 void PlaybackBox::StopSelected(void)
@@ -1767,24 +1755,13 @@ void PlaybackBox::deleteSelected(MythUIButtonListItem *item)
         push_onto_del(m_delList, *pginfo);
         ShowDeletePopup(kDeleteRecording);
     }
-    else
-        showAvailablePopup(pginfo);
 }
 
 void PlaybackBox::upcoming()
 {
-   ProgramInfo *pginfo = CurrentItem();
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->availableStatus != asAvailable)
-    {
-        showAvailablePopup(pginfo);
-        return;
-    }
-
-    ShowUpcoming(pginfo);
+    ProgramInfo *pginfo = CurrentItem();
+    if (pginfo)
+        ShowUpcoming(pginfo);
 }
 
 ProgramInfo *PlaybackBox::CurrentItem(void)
@@ -1807,29 +1784,14 @@ ProgramInfo *PlaybackBox::CurrentItem(void)
 void PlaybackBox::customEdit()
 {
     ProgramInfo *pginfo = CurrentItem();
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->availableStatus != asAvailable)
-    {
-        showAvailablePopup(pginfo);
-        return;
-    }
-
-    EditCustom(pginfo);
+    if (pginfo)
+        EditCustom(pginfo);
 }
 
 void PlaybackBox::details()
 {
     ProgramInfo *pginfo = CurrentItem();
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->availableStatus != asAvailable)
-        showAvailablePopup(pginfo);
-    else
+    if (pginfo)
         ShowDetails(pginfo);
 }
 
@@ -1895,7 +1857,7 @@ void PlaybackBox::ShowMenu()
             m_popupMenu->AddButton(tr("Add this Group to Playlist"),
                              SLOT(togglePlayListTitle()));
         }
-        else if (pginfo && pginfo->availableStatus == asAvailable)
+        else if (pginfo)
         {
             m_popupMenu->AddButton(tr("Add this recording to Playlist"),
                                         SLOT(togglePlayListItem()));
@@ -1905,82 +1867,37 @@ void PlaybackBox::ShowMenu()
     m_popupMenu->AddButton(tr("Help (Status Icons)"), SLOT(showIconHelp()));
 }
 
-void PlaybackBox::showActionsSelected()
-{
-    if (GetFocusWidget() == m_groupList)
-        return;
-
-    ProgramInfo *pginfo = CurrentItem();
-
-    if (!pginfo)
-        return;
-
-    if ((pginfo->availableStatus != asAvailable) &&
-        (pginfo->availableStatus != asFileNotFound))
-        showAvailablePopup(pginfo);
-    else
-        showActions(pginfo);
-}
-
-bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
+bool PlaybackBox::Play(const ProgramInfo &rec, bool inPlaylist)
 {
     bool playCompleted = false;
-
-    if (!rec)
-        return false;
 
     if (m_player)
         return true;
 
-    // TODO do this in another thread
-    rec->pathname = rec->GetPlaybackURL(true);
-
-    if (rec->availableStatus == asNotYetAvailable)
-        rec->availableStatus = asAvailable;
-
-    // TODO do this in another thread
-    if (!rec->IsFileReadable())
+    if ((asAvailable != rec.availableStatus) || (0 == rec.filesize) ||
+        (rec.GetRecordBasename() == rec.pathname))
     {
-        VERBOSE(VB_IMPORTANT, QString("PlaybackBox::play(): Error, %1 file "
-                                      "not found").arg(rec->pathname));
-
-        if (rec->recstatus == rsRecording)
-            rec->availableStatus = asNotYetAvailable;
-        else
-            rec->availableStatus = asFileNotFound;
-
-        showAvailablePopup(rec);
-
+        m_helper.CheckAvailability(
+            rec, (inPlaylist) ? kCheckForPlaylistAction : kCheckForPlayAction);
         return false;
     }
 
-    if ((rec->filesize == 0) && (rec->GetFilesize() == 0))
-    {
-        VERBOSE(VB_IMPORTANT,
-            QString("PlaybackBox::play(): Error, %1 is zero-bytes in size")
-            .arg(rec->pathname));
-
-        if (rec->recstatus == rsRecording)
-            rec->availableStatus = asNotYetAvailable;
-        else
-            rec->availableStatus = asZeroByte;
-
-        showAvailablePopup(rec);
-
-        return false;
-    }
-
-    ProgramInfo *tvrec = new ProgramInfo(*rec);
+    ProgramInfo *tvrec = new ProgramInfo(rec);
 
     m_playingSomething = true;
 
-    playCompleted = TV::StartTV(tvrec, false, inPlaylist, m_underNetworkControl);
+    playCompleted = TV::StartTV(
+        tvrec, false, inPlaylist, m_underNetworkControl);
 
     m_playingSomething = false;
 
     delete tvrec;
 
-    UpdateUILists();
+    if (inPlaylist && !m_playListPlay.empty())
+    {
+        QCoreApplication::postEvent(
+            this, new MythEvent("PLAY_PLAYLIST"));
+    }
 
     return playCompleted;
 }
@@ -2006,7 +1923,6 @@ void PlaybackBox::RemoveProgram(
         ((delItem->availableStatus == asPendingDelete) ||
         (!REC_CAN_BE_DELETED(delItem))))
     {
-        showAvailablePopup(delItem);
         return;
     }
 
@@ -2016,6 +1932,7 @@ void PlaybackBox::RemoveProgram(
     if (!forceMetadataDelete)
         delItem->UpdateLastDelete(true);
 
+    delItem->availableStatus = asPendingDelete;
     m_helper.DeleteRecording(
         delItem->chanid.toUInt(), delItem->recstartts, forceMetadataDelete);
 
@@ -2214,26 +2131,6 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
         return QString();
 }
 
-void PlaybackBox::showActions(ProgramInfo *pginfo)
-{
-    if (!pginfo)
-        return;
-
-    // TODO do this in another thread (IsFileReadable remote check)
-    if (!pginfo->IsFileReadable())
-    {
-        VERBOSE(VB_IMPORTANT, QString("PlaybackBox::showActions(): Error, %1 "
-                                      "file not found").arg(pginfo->pathname));
-
-        pginfo->availableStatus = asFileNotFound;
-        showFileNotFoundActionPopup(pginfo);
-    }
-    else if (pginfo->availableStatus != asAvailable)
-        showAvailablePopup(pginfo);
-    else
-        showActionPopup(pginfo);
-}
-
 void PlaybackBox::doPIPPlay(void)
 {
     doPIPPlay(kPIPonTV);
@@ -2291,7 +2188,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
 
     uint other_delete_cnt = (m_delList.size() / 3) - 1;
 
-    popupString(delItem, label);
+    label += CreateProgramInfoString(*delItem);
 
     m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
@@ -2371,63 +2268,57 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     }
 }
 
-void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
+void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
 {
-    if (!rec)
-        return;
-
-    QString msg = rec->title;
-    if (!rec->subtitle.isEmpty())
-        msg += " \"" + rec->subtitle + "\"";
+    QString msg = pginfo.title;
+    if (!pginfo.subtitle.isEmpty())
+        msg += " \"" + pginfo.subtitle + "\"";
     msg += "\n";
 
-    switch (rec->availableStatus)
+    switch (pginfo.availableStatus)
     {
         case asAvailable:
-                 if (rec->programflags & (FL_INUSERECORDING | FL_INUSEPLAYING))
-                 {
-                     QString byWho;
-                     rec->IsInUse(byWho);
+            if (pginfo.programflags & (FL_INUSERECORDING | FL_INUSEPLAYING))
+            {
+                QString byWho;
+                pginfo.IsInUse(byWho);
 
-                     ShowOkPopup(tr("Recording Available\n") + msg +
-                                 tr("This recording is currently in "
-                                               "use by:") + "\n" + byWho);
-                 }
-                 else
-                 {
-                     ShowOkPopup(tr("Recording Available\n") + msg +
-                                 tr("This recording is currently "
-                                               "Available"));
-                 }
-                 break;
+                ShowOkPopup(tr("Recording Available\n") + msg +
+                            tr("This recording is currently in "
+                               "use by:") + "\n" + byWho);
+            }
+            else
+            {
+                ShowOkPopup(tr("Recording Available\n") + msg +
+                            tr("This recording is currently "
+                               "Available"));
+            }
+            break;
         case asPendingDelete:
-                 ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                             tr("This recording is currently being "
-                                           "deleted and is unavailable"));
-                 break;
+            ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                        tr("This recording is currently being "
+                           "deleted and is unavailable"));
+            break;
         case asFileNotFound:
-                 ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                             tr("The file for this recording can "
-                                           "not be found"));
-                 break;
+            ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                        tr("The file for this recording can "
+                           "not be found"));
+            break;
         case asZeroByte:
-                 ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                             tr("The file for this recording is "
-                                           "empty."));
-                 break;
+            ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                        tr("The file for this recording is "
+                           "empty."));
+            break;
         case asNotYetAvailable:
-                 ShowOkPopup(tr("Recording Unavailable\n") + msg +
-                             tr("This recording is not yet "
-                                           "available."));
+            ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                        tr("This recording is not yet "
+                           "available."));
     }
 }
 
 void PlaybackBox::showPlaylistPopup()
 {
-    if (m_popupMenu)
-        return;
-
-    if (!(m_popupMenu = createPlaylistPopupMenu()))
+    if (!CreatePopupMenuPlaylist())
         return;
 
     m_popupMenu->AddButton(tr("Play"), SLOT(doPlayList()));
@@ -2458,10 +2349,7 @@ void PlaybackBox::showPlaylistPopup()
 
 void PlaybackBox::showPlaylistStoragePopup()
 {
-    if (m_popupMenu)
-        return;
-
-    if (!(m_popupMenu = createPlaylistPopupMenu()))
+    if (!CreatePopupMenuPlaylist())
         return;
 
     m_popupMenu->AddButton(tr("Change Recording Group"),
@@ -2474,12 +2362,9 @@ void PlaybackBox::showPlaylistStoragePopup()
                            SLOT(doPlaylistExpireSetOn()));
 }
 
-void PlaybackBox::showPlaylistJobPopup()
+void PlaybackBox::showPlaylistJobPopup(void)
 {
-    if (m_popupMenu)
-        return;
-
-    if (!(m_popupMenu = createPlaylistPopupMenu()))
+    if (!CreatePopupMenuPlaylist())
         return;
 
     QString jobTitle;
@@ -2589,15 +2474,15 @@ void PlaybackBox::showPlaylistJobPopup()
     }
 }
 
-MythDialogBox *PlaybackBox::createPopupMenu(const QString &label)
+bool PlaybackBox::CreatePopupMenu(const QString &label)
 {
     if (m_popupMenu)
-        return NULL;
+        return false;
 
     m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
     if (!m_popupMenu)
-        return NULL;
+        return false;
 
     connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
 
@@ -2610,49 +2495,23 @@ MythDialogBox *PlaybackBox::createPopupMenu(const QString &label)
     {
         delete m_popupMenu;
         m_popupMenu = NULL;
-        return NULL;
+        return false;
     }
 
     return m_popupMenu;
 }
 
-MythDialogBox *PlaybackBox::createProgramPopupMenu(const QString &title,
-                                                   ProgramInfo *pginfo)
+bool PlaybackBox::CreatePopupMenuPlaylist(void)
 {
-    if (m_popupMenu)
-        return NULL;
-
-    QString label = title;
-    if (pginfo)
-    {
-        popupString(pginfo, label);
-    }
-    else
-    {
-        ProgramInfo *pginfo = CurrentItem();
-        popupString(pginfo, label);
-    }
-
-    return createPopupMenu(label);
-}
-
-MythDialogBox *PlaybackBox::createPlaylistPopupMenu()
-{
-    if (m_popupMenu)
-        return NULL;
-
-    QString label = tr("There is %n item(s) in the playlist. Actions affect "
-                       "all items in the playlist", "", m_playList.size());
-
-    return createPopupMenu(label);
+    return CreatePopupMenu(
+        tr("There is %n item(s) in the playlist. Actions affect "
+           "all items in the playlist", "", m_playList.size()));
 }
 
 void PlaybackBox::showPlayFromPopup()
 {
-    if (m_popupMenu)
-        return;
-
-    if (!(m_popupMenu = createProgramPopupMenu(tr("Play Options"))))
+    ProgramInfo *pginfo = CurrentItem();
+    if (!pginfo || !CreatePopupMenu(tr("Play Options"), *pginfo))
         return;
 
     m_popupMenu->AddButton(tr("Play from bookmark"), SLOT(playSelected()));
@@ -2661,10 +2520,8 @@ void PlaybackBox::showPlayFromPopup()
 
 void PlaybackBox::showStoragePopup()
 {
-    if (m_popupMenu)
-        return;
-
-    if (!(m_popupMenu = createProgramPopupMenu(tr("Storage Options"))))
+    ProgramInfo *pginfo = CurrentItem();
+    if (!pginfo || !CreatePopupMenu(tr("Storage Options"), *pginfo))
         return;
 
     m_popupMenu->AddButton(tr("Change Recording Group"),
@@ -2673,7 +2530,6 @@ void PlaybackBox::showStoragePopup()
     m_popupMenu->AddButton(tr("Change Playback Group"),
                            SLOT(ShowPlayGroupChanger()));
 
-    ProgramInfo *pginfo = CurrentItem();
     if (pginfo)
     {
         if (pginfo->programflags & FL_AUTOEXP)
@@ -2694,10 +2550,8 @@ void PlaybackBox::showStoragePopup()
 
 void PlaybackBox::showRecordingPopup()
 {
-    if (m_popupMenu)
-        return;
-
-    if (!(m_popupMenu = createProgramPopupMenu(tr("Scheduling Options"))))
+    ProgramInfo *pginfo = CurrentItem();
+    if (!pginfo || !CreatePopupMenu(tr("Scheduling Options"), *pginfo))
         return;
 
     m_popupMenu->AddButton(tr("Edit Recording Schedule"),
@@ -2715,14 +2569,8 @@ void PlaybackBox::showRecordingPopup()
 
 void PlaybackBox::showJobPopup()
 {
-    if (m_popupMenu)
-        return;
-
-    if (!(m_popupMenu = createProgramPopupMenu(tr("Job Options"))))
-        return;
-
     ProgramInfo *pginfo = CurrentItem();
-    if (!pginfo)
+    if (!pginfo || !CreatePopupMenu(tr("Job Options"), *pginfo))
         return;
 
     QString jobTitle;
@@ -2803,10 +2651,7 @@ void PlaybackBox::showJobPopup()
 
 void PlaybackBox::showTranscodingProfiles()
 {
-    if (m_popupMenu)
-        return;
-
-    if (!(m_popupMenu = createPopupMenu(tr("Transcoding profiles"))))
+    if (!CreatePopupMenu(tr("Transcoding profiles")))
         return;
 
     m_popupMenu->AddButton(tr("Default"), SLOT(doBeginTranscoding()));
@@ -2832,19 +2677,44 @@ void PlaybackBox::changeProfileAndTranscode(const QString &profile)
     doBeginTranscoding();
 }
 
-void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
+void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
 {
-    if (m_popupMenu || !pginfo)
+    QString label =
+        (asFileNotFound == pginfo.availableStatus) ?
+        tr("Recording file can not be found") :
+        (asZeroByte     == pginfo.availableStatus) ?
+        tr("Recording file contains no data") :
+        tr("Recording Options");
+
+    if (!CreatePopupMenu(label, pginfo))
         return;
 
-    QString label = tr("Recording Options");
-    if (!(m_popupMenu = createProgramPopupMenu(label, pginfo)))
+    if ((asFileNotFound  == pginfo.availableStatus) ||
+        (asZeroByte      == pginfo.availableStatus))
+    {
+        m_popupMenu->AddButton(
+            tr("Show Program Details"), SLOT(showProgramDetails()));
+        m_popupMenu->AddButton(
+            tr("Delete"),               SLOT(askDelete()));
+
+        if (m_playList.filter(pginfo.MakeUniqueKey()).size())
+        {
+            m_popupMenu->AddButton(
+                tr("Remove from Playlist"), SLOT(togglePlayListItem()));
+        }
+        else
+        {
+            m_popupMenu->AddButton(
+                tr("Add to Playlist"),      SLOT(togglePlayListItem()));
+        }
+
         return;
+    }
 
     bool sameProgram = false;
 
     if (m_player)
-        sameProgram = m_player->IsSameProgram(0, pginfo);
+        sameProgram = m_player->IsSameProgram(0, &pginfo);
 
     TVState tvstate = kState_None;
     if (m_player)
@@ -2858,13 +2728,13 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
     }
     else
     {
-        if (pginfo->programflags & FL_BOOKMARK)
+        if (pginfo.programflags & FL_BOOKMARK)
             m_popupMenu->AddButton(tr("Play from..."),
                                         SLOT(showPlayFromPopup()), true);
         else
             m_popupMenu->AddButton(tr("Play"), SLOT(playSelected()));
 
-        if (m_playList.filter(pginfo->MakeUniqueKey()).size())
+        if (m_playList.filter(pginfo.MakeUniqueKey()).size())
             m_popupMenu->AddButton(tr("Remove from Playlist"),
                                         SLOT(togglePlayListItem()));
         else
@@ -2872,7 +2742,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
                                         SLOT(togglePlayListItem()));
     }
 
-    if (pginfo->recstatus == rsRecording &&
+    if (pginfo.recstatus == rsRecording &&
         (!(sameProgram &&
             (tvstate == kState_WatchingLiveTV ||
                 tvstate == kState_WatchingRecording))))
@@ -2880,7 +2750,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
         m_popupMenu->AddButton(tr("Stop Recording"), SLOT(askStop()));
     }
 
-    if (pginfo->programflags & FL_WATCHED)
+    if (pginfo.programflags & FL_WATCHED)
         m_popupMenu->AddButton(tr("Mark as Unwatched"), SLOT(toggleWatched()));
     else
         m_popupMenu->AddButton(tr("Mark as Watched"), SLOT(toggleWatched()));
@@ -2893,9 +2763,9 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
 
     if (!sameProgram)
     {
-        if (pginfo->recgroup == "Deleted")
+        if (pginfo.recgroup == "Deleted")
         {
-            push_onto_del(m_delList, *pginfo);
+            push_onto_del(m_delList, pginfo);
             m_popupMenu->AddButton(
                 tr("Undelete"),       SLOT(Undelete()));
             m_popupMenu->AddButton(
@@ -2906,52 +2776,6 @@ void PlaybackBox::showActionPopup(ProgramInfo *pginfo)
             m_popupMenu->AddButton(tr("Delete"), SLOT(askDelete()));
         }
     }
-}
-
-void PlaybackBox::showFileNotFoundActionPopup(ProgramInfo *pginfo)
-{
-    if (m_popupMenu || !pginfo)
-        return;
-
-    QString label = tr("Recording file can not be found");
-    if (!(m_popupMenu = createProgramPopupMenu(label, pginfo)))
-        return;
-
-    m_popupMenu->AddButton(tr("Show Program Details"),
-                                SLOT(showProgramDetails()));
-    m_popupMenu->AddButton(tr("Delete"), SLOT(askDelete()));
-}
-
-void PlaybackBox::popupString(ProgramInfo *program, QString &message)
-{
-    if (!program)
-        return;
-
-    QDateTime recstartts = program->recstartts;
-    QDateTime recendts = program->recendts;
-
-    QString timedate = QString("%1, %2 - %3")
-                        .arg(recstartts.date().toString(m_formatLongDate))
-                        .arg(recstartts.time().toString(m_formatTime))
-                        .arg(recendts.time().toString(m_formatTime));
-
-    QString title = program->title;
-
-    QString extra;
-
-    if (!program->subtitle.isEmpty())
-    {
-        extra = program->subtitle;
-        extra = (title.length() + extra.length() + 2 <= message.length()) ?
-            QString(" -- ") + extra : QString('\n') + extra;
-
-        int maxll = max(max(message.length(),title.length()), 20);
-        if (extra.length() > maxll)
-            extra = extra.left(maxll - 3) + "...";
-    }
-
-    message = QString("%1\n%2%3\n%4")
-        .arg(message).arg(title).arg(extra).arg(timedate);
 }
 
 QString PlaybackBox::CreateProgramInfoString(const ProgramInfo &pginfo) const
@@ -2990,7 +2814,7 @@ void PlaybackBox::doClearPlaylist(void)
             continue;
 
         MythUIButtonListItem *item =
-                        m_recordingList->GetItemByData(qVariantFromValue(tmpItem));
+            m_recordingList->GetItemByData(qVariantFromValue(tmpItem));
 
         if (item)
             item->DisplayState("no", "playlist");
@@ -3001,8 +2825,11 @@ void PlaybackBox::doClearPlaylist(void)
 void PlaybackBox::doPlayFromBeg(void)
 {
     ProgramInfo *pginfo = CurrentItem();
-    pginfo->setIgnoreBookmark(true);
-    playSelected(m_recordingList->GetItemCurrent());
+    if (pginfo)
+    {
+        pginfo->setIgnoreBookmark(true);
+        playSelected(m_recordingList->GetItemCurrent());
+    }
 }
 
 void PlaybackBox::doPlayList(void)
@@ -3028,22 +2855,15 @@ void PlaybackBox::askStop(void)
 
 void PlaybackBox::showProgramDetails()
 {
-   ProgramInfo *pginfo = CurrentItem();
-
+    ProgramInfo *pginfo = CurrentItem();
     if (pginfo)
         ShowDetails(pginfo);
 }
 
 void PlaybackBox::doEditScheduled()
 {
-   ProgramInfo *pginfo = CurrentItem();
-
-    if (!pginfo)
-        return;
-
-    if (pginfo->availableStatus != asAvailable)
-        showAvailablePopup(pginfo);
-    else
+    ProgramInfo *pginfo = CurrentItem();
+    if (pginfo)
         EditScheduled(pginfo);
 }
 
@@ -3169,9 +2989,10 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
     QStringList list;
     for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
-        const ProgramInfo *tmpItem = FindProgramInUILists(*it);
+        ProgramInfo *tmpItem = FindProgramInUILists(*it);
         if (tmpItem && (REC_CAN_BE_DELETED(tmpItem)))
         {
+            tmpItem->availableStatus = asPendingDelete;
             list.push_back(tmpItem->chanid);
             list.push_back(tmpItem->recstartts.toString(Qt::ISODate));
             list.push_back(forceDeleteStr);
@@ -3184,7 +3005,8 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
     }
     m_playList.clear();
 
-    m_helper.DeleteRecordings(list);
+    if (!list.empty())
+        m_helper.DeleteRecordings(list);
 
     doClearPlaylist();
 }
@@ -3417,12 +3239,6 @@ void PlaybackBox::togglePlayListItem(void)
     if (!pginfo)
         return;
 
-    if (pginfo->availableStatus != asAvailable)
-    {
-        showAvailablePopup(pginfo);
-        return;
-    }
-
     togglePlayListItem(pginfo);
 
     if (GetFocusWidget() == m_recordingList)
@@ -3433,12 +3249,6 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
 {
     if (!pginfo)
         return;
-
-    if (pginfo->availableStatus != asAvailable)
-    {
-        showAvailablePopup(pginfo);
-        return;
-    }
 
     QString key = pginfo->MakeUniqueKey();
 
@@ -3648,7 +3458,27 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
             else if (action == "PLAYBACK")
                 playSelected(m_recordingList->GetItemCurrent());
             else if (action == "INFO")
-                showActionsSelected();
+            {
+                if (GetFocusWidget() != m_groupList)
+                {
+                    ProgramInfo *pginfo = CurrentItem();
+                    if (pginfo)
+                    {
+                        m_helper.CheckAvailability(
+                            *pginfo, kCheckForMenuAction);
+
+                        if ((asPendingDelete == pginfo->availableStatus) ||
+                            (asPendingDelete == pginfo->availableStatus))
+                        {
+                            ShowAvailabilityPopup(*pginfo);
+                        }
+                        else
+                        {
+                            ShowActionPopup(*pginfo);
+                        }
+                    }
+                }
+            }
             else if (action == "DETAILS")
                 details();
             else if (action == "CUSTOMEDIT")
@@ -3794,6 +3624,84 @@ void PlaybackBox::customEvent(QEvent *event)
         else if (message == "PREVIEW_READY" && me->ExtraDataCount() == 2)
         {
             HandlePreviewEvent(me->ExtraData(0), me->ExtraData(1));
+        }
+        else if (message == "AVAILABILITY" && me->ExtraDataCount() == 8)
+        {
+            const uint kMaxUIWaitTime = 100; // ms
+            QStringList list = me->ExtraDataList();
+            QString key = list[0];
+            CheckAvailabilityType cat =
+                (CheckAvailabilityType) list[1].toInt();
+            AvailableStatusType availableStatus =
+                (AvailableStatusType) list[2].toInt();
+            uint64_t fs = list[3].toULongLong();
+            QTime tm;
+            tm.setHMS(list[4].toUInt(), list[5].toUInt(),
+                      list[6].toUInt(), list[7].toUInt());
+            QTime now = QTime::currentTime();
+            int time_elapsed = tm.msecsTo(now);
+            if (time_elapsed < 0)
+                time_elapsed += 24 * 60 * 60 * 1000;
+
+            AvailableStatusType old_avail = availableStatus;
+            ProgramInfo *pginfo = FindProgramInUILists(key);
+            if (pginfo)
+            {
+                pginfo->filesize = max(pginfo->filesize, fs);
+                old_avail = pginfo->availableStatus;
+                pginfo->availableStatus = availableStatus;
+            }
+
+            if ((uint)time_elapsed >= kMaxUIWaitTime)
+                m_playListPlay.clear();
+
+            bool playnext = ((kCheckForPlaylistAction == cat) &&
+                             !m_playListPlay.empty());
+
+
+            if (((kCheckForPlayAction     == cat) ||
+                 (kCheckForPlaylistAction == cat)) &&
+                ((uint)time_elapsed < kMaxUIWaitTime))
+            {
+                if (asAvailable != availableStatus)
+                {
+                    if (kCheckForPlayAction == cat)
+                        ShowAvailabilityPopup(*pginfo);
+                }
+                else if (pginfo)
+                {
+                    playnext = false;
+                    Play(*pginfo, kCheckForPlaylistAction == cat);
+                }
+            }
+
+            if (playnext)
+            {
+                // failed to play this item, instead
+                // play the next item on the list..
+                QCoreApplication::postEvent(
+                    this, new MythEvent("PLAY_PLAYLIST"));
+            }
+
+            if (old_avail != availableStatus)
+                UpdateUIListItem(pginfo);
+        }
+        else if ((message == "PLAY_PLAYLIST") && !m_playListPlay.empty())
+        {
+            QString key = m_playListPlay.front();
+            m_playListPlay.pop_front();
+
+            if (!m_playListPlay.empty())
+            {
+                const ProgramInfo *pginfo =
+                    FindProgramInUILists(m_playListPlay.front());
+                if (pginfo)
+                    m_helper.CheckAvailability(*pginfo, kCheckForCache);
+            }
+
+            ProgramInfo *pginfo = FindProgramInUILists(key);
+            if (pginfo)
+                Play(*pginfo, true);
         }
     }
     else

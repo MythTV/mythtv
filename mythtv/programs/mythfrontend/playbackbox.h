@@ -142,14 +142,9 @@ class PlaybackBox : public ScheduleCommon
     void upcoming();
     void details();
     void StopSelected(void);
-    void showActionsSelected();
     void showMetadataEditor();
     void showGroupFilter();
     void showRecGroupPasswordChanger();
-    MythDialogBox *createPopupMenu(const QString &title);
-    MythDialogBox *createProgramPopupMenu(const QString &title,
-                                          ProgramInfo *pginfo = NULL);
-    MythDialogBox *createPlaylistPopupMenu();
     void showPlayFromPopup();
     void showRecordingPopup();
     void showJobPopup();
@@ -267,8 +262,7 @@ class PlaybackBox : public ScheduleCommon
 
     QString cutDown(const QString &, QFont *, int);
 
-    bool play(ProgramInfo *rec, bool inPlaylist = false);
-    void showActions(ProgramInfo *);
+    bool Play(const ProgramInfo &rec, bool inPlaylist);
     ProgramInfo *CurrentItem(void);
 
     void togglePlayListItem(ProgramInfo *pginfo);
@@ -286,11 +280,8 @@ class PlaybackBox : public ScheduleCommon
     void RemoveProgram(uint chanid, const QDateTime &recstartts,
                        bool forgetHistory, bool forceMetadataDelete);
     void ShowDeletePopup(DeletePopupType);
-    void showActionPopup(ProgramInfo *program);
-    void showFileNotFoundActionPopup(ProgramInfo *program);
-    void popupString(ProgramInfo *program, QString &message);
-
-    void showAvailablePopup(ProgramInfo *rec);
+    void ShowAvailabilityPopup(const ProgramInfo&);
+    void ShowActionPopup(const ProgramInfo&);
 
     QString getRecGroupPassword(const QString &recGroup);
     void fillRecGroupPasswordCache(void);
@@ -322,6 +313,11 @@ class PlaybackBox : public ScheduleCommon
     void ScheduleUpdateUIList(void);
 
     void ShowMenu(void);
+
+    bool CreatePopupMenu(const QString &title);
+    bool CreatePopupMenu(const QString &title, const ProgramInfo &pginfo)
+        { return CreatePopupMenu(title + CreateProgramInfoString(pginfo)); }
+    bool CreatePopupMenuPlaylist(void);
 
     QString CreateProgramInfoString(const ProgramInfo &program) const;
 
@@ -413,6 +409,7 @@ class PlaybackBox : public ScheduleCommon
     // Play List support
     QStringList         m_playList;   ///< list of selected items "play list"
     bool                m_op_on_playlist;
+    QStringList         m_playListPlay; ///< list of items being played.
 
     ProgramInfoCache    m_programInfoCache;
 
