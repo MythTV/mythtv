@@ -1047,11 +1047,10 @@ void UIListBtnType::RemoveItem(UIListBtnTypeItem *item)
     }
 
     m_itemList.removeAll(item);
-    delete item;
 
     m_itemCount--;
 
-    if (m_topItem != m_itemList.first())
+    if (!m_itemList.isEmpty() && m_topItem != m_itemList.first())
         m_showUpArrow = true;
     else
         m_showUpArrow = false;
