@@ -130,16 +130,15 @@ class MythContextPrivate : public QObject
     XmlConfiguration *m_XML;
     HttpServer       *m_HTTP;
 
-    QMutex serverSockLock;
-
     QMutex         WOLInProgressLock;
     QWaitCondition WOLInProgressWaitCondition;
     bool           WOLInProgress;
 
     MythMainWindow *mainWindow;
 
-    MythSocket *serverSock;
-    MythSocket *eventSock;
+    QMutex      sockLock;        ///< protects both serverSock and eventSock
+    MythSocket *serverSock;      ///< socket for sending MythProto requests
+    MythSocket *eventSock;       ///< socket events arrive on
 
     bool disablelibrarypopup;
 
@@ -255,9 +254,9 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_gui(false), m_backend(false),
       m_localhostname(QString::null),
       m_UPnP(NULL), m_XML(NULL), m_HTTP(NULL),
-      serverSockLock(QMutex::NonRecursive),
       WOLInProgress(false),
       mainWindow(NULL),
+      sockLock(QMutex::NonRecursive),
       serverSock(NULL), eventSock(NULL),
       disablelibrarypopup(false),
       pluginmanager(NULL),
@@ -274,10 +273,17 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
 MythContextPrivate::~MythContextPrivate()
 {
     DeleteUPnP();
+    QMutexLocker locker(&sockLock);
     if (serverSock)
+    {
         serverSock->DownRef();
+        serverSock = NULL;
+    }
     if (eventSock)
+    {
         eventSock->DownRef();
+        eventSock = NULL;
+    }
     if (m_database)
         DestroyMythDB();
     if (m_ui)
@@ -1456,6 +1462,8 @@ MythContext::~MythContext()
     delete d;
 }
 
+// Assumes that either sockLock is held, or the app is still single
+// threaded (i.e. during startup).
 bool MythContext::ConnectToMasterServer(bool blockingClient)
 {
     if (gContext->IsMasterBackend())
@@ -1702,6 +1710,7 @@ MythSocket *MythContext::ConnectEventSocket(const QString &hostname, int port)
 
 bool MythContext::IsConnectedToMaster(void)
 {
+    QMutexLocker locker(&d->sockLock);
     return d->serverSock;
 }
 
@@ -1709,6 +1718,7 @@ void MythContext::BlockShutdown(void)
 {
     QStringList strlist;
 
+    QMutexLocker locker(&d->sockLock);
     if (d->serverSock == NULL)
         return;
 
@@ -1734,6 +1744,7 @@ void MythContext::AllowShutdown(void)
 {
     QStringList strlist;
 
+    QMutexLocker locker(&d->sockLock);
     if (d->serverSock == NULL)
         return;
 
@@ -1816,12 +1827,11 @@ QString MythContext::GetMasterHostPrefix(void)
 {
     QString ret;
 
+    QMutexLocker locker(&d->sockLock);
     if (!d->serverSock)
     {
-        d->serverSockLock.lock();
         bool blockingClient = gContext->GetNumSetting("idleTimeoutSecs",0) > 0;
         ConnectToMasterServer(blockingClient);
-        d->serverSockLock.unlock();
     }
 
     if (d->serverSock)
@@ -1994,7 +2004,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
     if (!strlist.isEmpty())
         query_type = strlist[0];
     
-    d->serverSockLock.lock();
+    QMutexLocker locker(&d->sockLock);
 
     if (!d->serverSock)
     {
@@ -2048,20 +2058,13 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                 d->serverSock = NULL;
             }
 
-            if (!block)
-                d->serverSockLock.unlock();
             VERBOSE(VB_IMPORTANT,
                     QString("Reconnection to backend server failed"));
 
             QCoreApplication::postEvent(
                 d, new MythEvent("PERSISTENT_CONNECTION_FAILURE"));
-
-            if (!block)
-                d->serverSockLock.lock();
         }
     }
-
-    d->serverSockLock.unlock();
 
     if (ok)
     {
@@ -2179,7 +2182,7 @@ void MythContext::connectionClosed(MythSocket *sock)
     VERBOSE(VB_IMPORTANT, QString("Event socket closed. "
             "No connection to the backend."));
 
-    d->serverSockLock.lock();
+    QMutexLocker locker(&d->sockLock);
     if (d->serverSock)
     {
         d->serverSock->DownRef();
@@ -2191,8 +2194,6 @@ void MythContext::connectionClosed(MythSocket *sock)
         d->eventSock->DownRef();
         d->eventSock = NULL;
     }
-
-    d->serverSockLock.unlock();
 
     dispatch(MythEvent(QString("BACKEND_SOCKETS_CLOSED")));
 }
