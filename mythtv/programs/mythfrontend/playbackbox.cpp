@@ -2401,6 +2401,10 @@ void PlaybackBox::showPlaylistStoragePopup()
                            SLOT(doPlaylistExpireSetOff()));
     m_popupMenu->AddButton(tr("Enable Auto Expire"),
                            SLOT(doPlaylistExpireSetOn()));
+    m_popupMenu->AddButton(tr("Mark As Watched"),
+                           SLOT(doPlaylistWatchedSetOn()));
+    m_popupMenu->AddButton(tr("Mark As Unwatched"),
+                           SLOT(doPlaylistWatchedSetOff()));
 }
 
 void PlaybackBox::showPlaylistJobPopup(void)
@@ -4221,6 +4225,23 @@ void PlaybackBox::doPlaylistExpireSetting(bool turnOn)
             tmpItem->SetAutoExpire(turnOn, true);
         }
     }
+}
+
+void PlaybackBox::doPlaylistWatchedSetting(bool turnOn)
+{
+    ProgramInfo *tmpItem;
+    QStringList::Iterator it;
+
+    for (it = m_playList.begin(); it != m_playList.end(); ++it)
+    {
+        if ((tmpItem = FindProgramInUILists(*it)))
+        {
+            tmpItem->SetWatchedFlag(turnOn);
+        }
+    }
+    
+    doClearPlaylist();
+    UpdateUILists();    
 }
 
 void PlaybackBox::showMetadataEditor()
