@@ -183,7 +183,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),
       forced_video_aspect(-1),
       m_scan(kScan_Interlaced),     m_scan_locked(false),
-      m_scan_tracker(0),
+      m_scan_tracker(0),            m_scan_initialized(false),
       keyframedist(30),
       // Prebuffering (RingBuffer) control
       prebuffering(false), prebuffer_tries(0), prebuffer_tries_total(0),
@@ -244,7 +244,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       decoder_lock(QMutex::Recursive),
       next_play_speed(1.0f),        next_normal_speed(true),
       play_speed(1.0f),             normal_speed(true),
-      frame_interval((int)(1000000.0f / 30)), ffrew_skip(1),
+      frame_interval((int)(1000000.0f / 30)), m_frame_interval(0),
+      ffrew_skip(1),
       // Audio and video synchronization stuff
       videosync(NULL),              delay(0),
       vsynctol(30/4),               avsync_delay(0),
@@ -1074,7 +1075,15 @@ void NuppelVideoPlayer::SetScanType(FrameScanType scan)
     if (!videoOutput || !videosync)
         return; // hopefully this will be called again later...
 
+    if (m_scan_initialized &&
+        m_scan == scan &&
+        m_frame_interval == frame_interval)
+        return;
+
     m_scan_locked = (scan != kScan_Detect);
+
+    m_scan_initialized = true;
+    m_frame_interval = frame_interval;
 
     bool interlaced = is_interlaced(scan);
     if (interlaced && !m_deint_possible)
