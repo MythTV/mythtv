@@ -71,6 +71,7 @@ class ProgFinder : public ScheduleCommon
     ShowName m_showNames;
 
     QString m_searchStr;
+    QString m_currentLetter;
 
     TV  *m_player;
     bool m_embedVideo;

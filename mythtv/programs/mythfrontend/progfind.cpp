@@ -51,6 +51,7 @@ void RunProgramFinder(TV *player, bool embedVideo, bool allowEPG)
 ProgFinder::ProgFinder(MythScreenStack *parentStack, bool allowEPG,
                        TV *player, bool embedVideo)
           : ScheduleCommon(parentStack, "ProgFinder"),
+    m_currentLetter(""),
     m_player(player),            m_embedVideo(embedVideo),
     m_allowEPG(allowEPG),        m_allowKeypress(true),
     m_alphabetList(NULL),        m_showList(NULL),
@@ -139,6 +140,11 @@ ProgFinder::~ProgFinder()
 
 void ProgFinder::alphabetListItemSelected(MythUIButtonListItem *item)
 {
+    if (item && m_currentLetter == item->GetText())
+        return;
+
+    m_currentLetter = item->GetText();
+
     updateShowList();
     updateInfo();
 }
