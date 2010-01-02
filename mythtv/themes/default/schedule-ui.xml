@@ -1340,6 +1340,7 @@
         <buttonlist name="alphabet" from="basebuttonlist2">
             <area>25,290,50,288</area>
             <scrollstyle>center</scrollstyle>
+            <wrapstyle>items</wrapstyle>
             <spacing>6</spacing>
             <buttonarea>0,0,50,288</buttonarea>
             <statetype name="buttonitem">
@@ -1408,6 +1409,7 @@
 
         <buttonlist name="times" from="alphabet">
             <area>500,290,280,295</area>
+            <wrapstyle>captive</wrapstyle>
             <statetype name="buttonitem">
                 <area>0,0,30,25</area>
                 <state name="active">
