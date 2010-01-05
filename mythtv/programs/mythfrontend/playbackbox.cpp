@@ -1190,16 +1190,14 @@ bool PlaybackBox::UpdateUILists(void)
         }
 
         int curPos = m_recordingList->GetCurrentPos();
-        for (int i = curPos; i < m_recordingList->GetCount(); i++)
+        for (int i = curPos; (i >= 0) && (i < m_recordingList->GetCount()); i++)
         {
             MythUIButtonListItem *item = m_recordingList->GetItemAt(i);
             ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
             itemSelPref.push_back(groupSelPref.front());
             itemSelPref.push_back(pginfo->MakeUniqueKey());
         }
-        if (curPos >= m_recordingList->GetCount())
-            curPos = -1;
-        for (int i = curPos; i >= 0; i--)
+        for (int i = curPos; (i >= 0) && (i < m_recordingList->GetCount()); i--)
         {
             MythUIButtonListItem *item = m_recordingList->GetItemAt(i);
             ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
