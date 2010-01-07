@@ -2679,6 +2679,7 @@ bool VideoDialog::keyPressEvent(QKeyEvent *levent)
         else if (action == "ESCAPE")
         {
             if (m_d->m_type != DLG_TREE
+                    && !GetMythMainWindow()->IsExitingToMain()
                     && m_d->m_currentNode != m_d->m_rootNode)
                 handled = goBack();
             else
