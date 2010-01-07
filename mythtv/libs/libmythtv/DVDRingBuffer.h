@@ -157,7 +157,6 @@ class MPUBLIC DVDRingBufferPriv
     long long      m_menupktpts;
     int            m_curAudioTrack;
     int8_t         m_curSubtitleTrack;
-    bool           m_autoselectaudio;
     bool           m_autoselectsubtitle;
     bool           m_jumptotitle;
     long long      m_seekpos;
