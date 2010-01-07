@@ -1223,6 +1223,10 @@ void VideoListImp::buildDbList()
     prefix_to_node_map ptnm;
 
     QStringList dirs = GetVideoDirs();
+
+    if (!dirs.size())
+        return;
+
     QString test_prefix(dirs[0]);
 
     meta_dir_node *video_root = &m_metadata_tree;
