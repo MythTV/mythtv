@@ -2003,8 +2003,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             else
             {
+                int logical_stream_id;
+                if (ringBuffer && ringBuffer->isDVD())
+                    logical_stream_id = ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id);
+                else
+                    logical_stream_id = ic->streams[i]->id;
+
                 tracks[kTrackTypeAudio].push_back(
-                    StreamInfo(i, lang, lang_indx, ic->streams[i]->id));
+                    StreamInfo(i, lang, lang_indx, logical_stream_id));
             }
 
             VERBOSE(VB_AUDIO, LOC + QString(
@@ -2027,13 +2033,16 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         if (tracks[kTrackTypeAudio].size() > 1)
         {
+            sort(tracks[kTrackTypeAudio].begin(),
+                 tracks[kTrackTypeAudio].end());
             sinfo_vec_t::iterator it = tracks[kTrackTypeAudio].begin();
             for (; it != tracks[kTrackTypeAudio].end(); ++it)
             {
                 VERBOSE(VB_PLAYBACK, LOC +
                             QString("DVD Audio Track Map "
-                                    "Stream id #%1 ")
-                                    .arg(it->stream_id));
+                                    "Stream id #%1, MPEG stream %2")
+                                    .arg(it->stream_id)
+                                    .arg(ic->streams[it->av_stream_index]->id));
             }
             int trackNo = ringBuffer->DVD()->GetTrack(kTrackTypeAudio);
             if (trackNo >= (int)GetTrackCount(kTrackTypeAudio))
