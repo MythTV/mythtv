@@ -50,7 +50,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_buttonstreamid(0), m_runningCellStart(false),
       m_runSeekCellStart(false),
       m_menupktpts(0), m_curAudioTrack(0),
-      m_curSubtitleTrack(0), m_autoselectaudio(true),
+      m_curSubtitleTrack(0),
       m_autoselectsubtitle(true),
       m_jumptotitle(true),
       m_seekpos(0), m_seekwhence(0),
@@ -350,7 +350,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 {
                     if (m_parent)
                         m_parent->HideDVDButton(true);
-                    m_autoselectaudio = true;
                     m_autoselectsubtitle = true;
                     GetMythUI()->RestoreScreensaver();
                 }
@@ -408,7 +407,6 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
             break;
             case DVDNAV_AUDIO_STREAM_CHANGE:
             {
-                if (m_autoselectaudio)
                     m_curAudioTrack = dvdnav_get_active_audio_stream(m_dvdnav);
 
                 VERBOSE(VB_PLAYBACK,
@@ -1173,7 +1171,6 @@ void DVDRingBufferPriv::SetTrack(uint type, int trackNo)
     else if (type == kTrackTypeAudio)
     {
         m_curAudioTrack = trackNo;
-        m_autoselectaudio = false;
         dvdnav_set_active_audio_stream(m_dvdnav, trackNo);
     }
 }
