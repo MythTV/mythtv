@@ -153,6 +153,7 @@ int vm_get_current_title_part(vm_t *vm, int *title_result, int *part_result);
 int vm_get_audio_stream(vm_t *vm, int audioN);
 int vm_get_subp_stream(vm_t *vm, int subpN, int mode);
 int vm_get_audio_active_stream(vm_t *vm);
+int vm_set_audio_active_stream(vm_t *vm, int audioN);
 int vm_get_subp_active_stream(vm_t *vm, int mode);
 void vm_get_angle_info(vm_t *vm, int *current, int *num_avail);
 #if 0
