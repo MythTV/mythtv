@@ -1400,7 +1400,7 @@ void GuideGrid::customEvent(QEvent *event)
         }
         else if (resultid == "channelgroupmenu")
         {
-            if (resulttext != tr("Cancel"))
+            if (resulttext != tr("Cancel") && buttonnum >= 0)
             {
                 int changroupid;
 
