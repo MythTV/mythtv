@@ -570,10 +570,6 @@ lowered.  A fanless frontend using an Intel Atom CPU running a single-core at
 If your provider uses 5C encryption on a particular channel, you won't be
 able to get any content.
 
-<sect3>DBoxII or other devices running Neutrino
-<p>You may use the Ethernet port of an DBoxII or a similar device to capture
-MPEG-2. Your set top box has to be running the Neutrino GUI.
-
 <sect3>USB Capture Devices.
 <p>The Plextor ConvertX PVR devices are supported through Linux drivers
 available from <url url="http://go7007.imploder.org/"
@@ -6782,30 +6778,6 @@ impact the viewing experience on the frontend.
 
 <sect1>How can I burn shows that I have recorded to a DVD?
 <p>Use the mytharchive plugin.
-
-<sect1>Using the DBoxII within MythTV
-<p>The configuration of the DBoxII for use within MythTV is tricky (as of
-May 16 2005), that's why it's covered here. Your DBoxII has to be running
-linux and the Neutrino GUI instead of the stock BetaNova firmware.  For
-further information, please refer to <url url="http://www.tuxbox.org"
-name="http://www.tuxbox.org">. Additionally, you need to enable the SPTS
-mode in Neutrino.
-
-<itemize>
-<item>Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input",
-the other values have to be adjusted according to your setup.
-The default values, except for the "DBOX2 host ip", should work fine.
-<item>Define a new video source. It doesn't need to be configured,
-you just need to define it. MythTV grabs the EPG from the DBoxII.
-<item>Connect the DBoxII to the newly defined input source in "input connections".
-<item>Since channel scanning is not implemented yet, you need to define channels
-in the "Channel Editor". Make sure that you use the same value for
-"Channel Name" as on the DBoxII. You can get a list of available
-channels from the web interface of Neutrino at http://ip-of-your-box:80/.
-Associate the channel with your new video source and repeat when needed.
-</itemize>
-
-You may leave the Setup now and proceed as usual.
 
 <sect1>What do the icons on the Watch Recordings screen mean?
 <p>Press "1" or F1 to get a popup.
