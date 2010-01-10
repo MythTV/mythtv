@@ -2773,16 +2773,10 @@ ALT-F4	        | exit out of the application	                                @
 Space/Enter	| take action on the item under the highlight point	        @
 P       	| play in both "Watch a Recording" and "Delete a Recording"	@
 D       	| delete in both "Watch a Recording" and "Delete a Recording"	@
-U		| to view details for the currently selected show on the Watch&nbsp;
-		  or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;
-                  Conflicts" and search results screens                          @
 O		| to list the upcoming episodes for the currently selected show&nbsp;
                   on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;
                   "Fix Scheduling Conflicts" or search results screens          @
-I       	| edit recording options from the EPG, "Program Finder",&nbsp;
-                 "Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;
-                 screens. From the Playback and Delete screens, 'I' presents&nbsp;
-                 options for recorded shows such as Auto Expire or Stop Recording.&nbsp;
+I       	| to get additional information about the currently selected item.&nbsp;
                  Pressing 'I' while on the Recording Options screen will take you&nbsp;
                  to the Advanced Recording Options screen.
 </tabular>
@@ -2952,15 +2946,14 @@ Ctrl+Left or &lt;  | move the highlight left by one page 				@
 Ctrl+Right or &gt; | move the highlight right by one page 				@
 9, 3, 7, 1         | (like a numeric keypad) perform the same as PageUp, PageDown,&nbsp;
                      Home and End 							@
-U                  | bring up more information about a show				@
-I                  | allow you to schedule a recording.  If you select "Record&nbsp;
+E                  | allow you to schedule a recording.  If you select "Record&nbsp;
                      this showing" while watching Live TV you can "Instant&nbsp;
                      Record" a program.							@
 Space/Enter        | when watching LiveTV will change to that channel and exit the&nbsp;
                      EPG if the selected show is in progress or starts within 15&nbsp;
                      minutes; or otherwise will allow you to resolve conflicts&nbsp;
                      or change overrides. If the program is not already scheduled&nbsp;
-                     to record, it will instead act like pressing I			@
+                     to record, it will instead act like pressing E			@
 X                  | change the channel to the currently selected channel without&nbsp;
                      leaving the EPG (Most useful in the alternate EPG)			@
 ESC or C           | exits without changing the channel				@
@@ -2981,7 +2974,7 @@ Left	        | decreases priority value	@
 1	        | sorts by title		@
 2	        | sorts by priority		@
 Home/End	| toggle sort priority		@
-I	        | edit recording options	@
+E	        | edit recording options	@
 ESC	        | commits changes and exits
 </tabular>
 </table>
@@ -2992,7 +2985,7 @@ ESC	        | commits changes and exits
 1	        | show all recordings		      @
 2	        | show only important recordings     @
 Home/End	| toggle show showing all/important  @
-I	        | edit recording options	      @
+E	        | edit recording options	      @
 Space/Enter	| resolve conflict or override
 </tabular>
 </table>
@@ -3021,8 +3014,8 @@ This can be used to reduce clutter, or to segregate content if you use the
 PIN function.
 <table loc=p>
 <tabular ca="rll">
-M	| change the view or to set a group password		@
-I	| move a program from one Recording Group to another
+M	| to change the view or to set a group password or change recording and&nbsp;
+          storage options.  Press M again to toggle between menus.		@
 </tabular>
 </table>
 <sect2>Watch Recordings Screen

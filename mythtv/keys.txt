@@ -8,16 +8,11 @@ mythfrontend
 - Space or Enter to take action on the item under the highlight point.
 - P to play in both "Watch a Recording" and "Delete a Recording".
 - D to delete in both "Watch a Recording" and "Delete a Recording".
-- E to enter the Custom Record editor for the selected title on the EPG,
-    "Program Finder", "Upcoming Recordings" and search results screens.
-- U to view details for the currently selected show on the Watch or
-    Delete screens, EPG, "Program Finder", "Upcoming Recordings"
-    and search results screens.
+- E to edit recording options from any of the pages for scheduling
+    recordings, the Program Finder, the EPG, and the Watch and Delete screens.
 - O to list the upcoming episodes for the currently selected show
     on any page where a show title may be highlighed.
-- I to edit recording options from any of the pages for scheduling
-    recordings. From the Watch and Delete screens, 'I' presents options
-    for recorded shows such as Auto Expire or Stop Recording.
+- I to get additional information about the currently selected item
 - Y on the "Upcoming Recordings" page switches which capture cards'
     items are displayed in the highlight color.
 
@@ -202,14 +197,13 @@ EPG
   highlight left or right by one page.
 - The keys 9, 3, 7 and 1 (like a numeric keypad) perform the same as PageUp,
   PageDown, Home and End.
-- U will bring up more information about a show.
-- I will allow you to schedule a recording.
+- E will allow you to schedule a recording.
   -  If you select "Record this showing" while watching Live TV you can
      "Instant Record" a program.
 - Space or Enter when watching LiveTV will change to that channel and exit the
   EPG if the selected show is in progress or starts within 15 minutes; or
   otherwise will allow you to resolve conflicts or change overrides.  If the
-  program is not already scheduled to record, it will act like pressing I
+  program is not already scheduled to record, it will act like pressing E
   instead.
 - Pressing X will change the channel to the currently selected channel without
   leaving the EPG (Most useful in the alternate EPG)
@@ -228,7 +222,7 @@ Set Program Recording Priorities and Set Channel Recording Priorities
 - 1 sorts by title.
 - 2 sorts by priority.
 - Home/End to toggle sort priority.
-- I to edit recording options.
+- E to edit recording options.
 - ESC commits changes and exits.
 
 Viewing Scheduled Recordings/Resolving Conflicts
@@ -237,7 +231,7 @@ Viewing Scheduled Recordings/Resolving Conflicts
 - 1 to show all recordings.
 - 2 to show only important recordings.
 - Home/End to toggle show showing all/important.
-- I to edit recording options.
+- E to edit recording options.
 - Space or Enter to resolve conflict or override.
 
 Viewing Search Listings
@@ -268,8 +262,8 @@ categories, such as "Kids", "Alice", "Bob", etc.  This can be used to reduce
 clutter, or to segregate content if you use the PIN function.
 
 In the Watch Recordings Screen
-- M to change the view or to set a group password
-- I to move a program from one Recording Group to another
+- M to change the view or to set a group password or change recording and
+  storage options.  Press M again to toggle between menus.
 
 Watch Recordings Screen
 -----------------------

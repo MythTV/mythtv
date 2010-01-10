@@ -501,7 +501,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Frontend", "VIEWINPUT", QT_TRANSLATE_NOOP("MythControls",
             "Switch Capture Card view"), "C");
     REG_KEY("TV Frontend", "CUSTOMEDIT", QT_TRANSLATE_NOOP("MythControls",
-            "Edit Custom Record Rule"), "E");
+            "Edit Custom Record Rule"), "");
     REG_KEY("TV Frontend", "CHANGERECGROUP", QT_TRANSLATE_NOOP("MythControls",
             "Change Recording Group"), "");
     REG_KEY("TV Frontend", "CHANGEGROUPVIEW", QT_TRANSLATE_NOOP("MythControls",

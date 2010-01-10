@@ -194,7 +194,7 @@ bool ProgFinder::keyPressEvent(QKeyEvent *event)
             customEdit();
         else if (action == "UPCOMING")
             upcoming();
-        else if (action == "DETAILS")
+        else if (action == "DETAILS" || action == "INFO")
             details();
         else if (action == "TOGGLERECORD")
             quickRecord();

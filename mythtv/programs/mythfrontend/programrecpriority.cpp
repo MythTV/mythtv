@@ -577,7 +577,7 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
                 m_sortType = byTitle;
             SortList();
         }
-        else if (action == "SELECT" || action == "INFO")
+        else if (action == "SELECT" || action == "EDIT")
         {
             saveRecPriority();
             edit(m_programList->GetItemCurrent());
@@ -601,7 +601,7 @@ bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
             saveRecPriority();
             upcoming();
         }
-        else if (action == "DETAILS")
+        else if (action == "INFO" || action == "DETAILS")
             details();
         else
             handled = false;

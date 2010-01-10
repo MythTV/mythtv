@@ -540,15 +540,15 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
             else
                 editRecSchedule();
         }
-        else if (action == "EDIT" || action == "INFO") // TODO: Use of INFO
-            editSchedule();                           // is inconsistent
+        else if (action == "EDIT")
+            editSchedule();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "DELETE")
             deleteRule();
         else if (action == "UPCOMING")
             upcoming();
-        else if (action == "DETAILS")
+        else if (action == "DETAILS" || action == "INFO")
             details();
         else if (action == "TOGGLERECORD")
             quickRecord();

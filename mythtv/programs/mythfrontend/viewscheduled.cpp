@@ -159,15 +159,15 @@ bool ViewScheduled::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "EDIT" || action == "INFO") // TODO: Use of INFO
-            edit();                               // is inconsistent
+        if (action == "EDIT")
+            edit();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "DELETE")
             deleteRule();
         else if (action == "UPCOMING")
             upcoming();
-        else if (action == "DETAILS")
+        else if (action == "DETAILS" || action == "INFO")
             details();
         else if (action == "1")
             setShowAll(true);

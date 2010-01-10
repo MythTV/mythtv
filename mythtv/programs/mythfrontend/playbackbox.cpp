@@ -2647,6 +2647,9 @@ void PlaybackBox::showRecordingPopup()
 
     m_popupMenu->AddButton(tr("Change Recording Title"),
                             SLOT(showMetadataEditor()));
+
+    m_popupMenu->AddButton(tr("Custom Edit"),
+                            SLOT(customEdit()));
 }
 
 void PlaybackBox::showJobPopup()
