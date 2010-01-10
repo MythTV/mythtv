@@ -85,7 +85,7 @@ class MPUBLIC MythDialogBox : public MythScreenType
 
   signals:
     void Selected();
-    void Closed();
+    void Closed(QString, int);
 
   protected:
     void SendEvent(int res, QString text = "", QVariant data = 0);

@@ -144,9 +144,14 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
         QString action = actions[i];
         handled = true;
 
-        if (action == "ESCAPE" || action == "LEFT" || action == "MENU")
+        if (action == "ESCAPE" || action == "LEFT")
         {
             SendEvent(-1);
+            Close();
+        }
+        else if (action == "MENU")
+        {
+            SendEvent(-2);
             Close();
         }
         else if (action == "RIGHT")
@@ -189,6 +194,8 @@ bool MythDialogBox::gestureEvent(MythGestureEvent *event)
 
 void MythDialogBox::SendEvent(int res, QString text, QVariant data)
 {
+    emit Closed(m_id, res);
+
     if (!m_retObject)
         return;
 
