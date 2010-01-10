@@ -208,8 +208,6 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             prevView();
         else if (action == "NEXTVIEW")
             nextView();
-        else if (action == "INFO")
-            chooseView();
         else if (action == "CUSTOMEDIT")
             customEdit();
         else if (action == "EDIT")
@@ -218,7 +216,7 @@ bool ProgLister::keyPressEvent(QKeyEvent *e)
             deleteItem();
         else if (action == "UPCOMING")
             upcoming();
-        else if (action == "DETAILS")
+        else if (action == "DETAILS" || action == "INFO")
             details();
         else if (action == "TOGGLERECORD")
             quickRecord();
