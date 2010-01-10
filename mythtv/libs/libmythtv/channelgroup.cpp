@@ -137,13 +137,19 @@ bool ChannelGroup::DeleteChannel(uint chanid, int changrpid)
     return true;
 }
 
-ChannelGroupList ChannelGroup::GetChannelGroups(void)
+ChannelGroupList ChannelGroup::GetChannelGroups(bool includeEmpty)
 {
     ChannelGroupList list;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString qstr = "SELECT grpid, name FROM channelgroupnames order by name";
+    QString qstr;
+
+    if (includeEmpty)
+        qstr = "SELECT grpid, name FROM channelgroupnames ORDER BY name";
+    else
+        qstr = "SELECT DISTINCT t1.grpid, name FROM channelgroupnames t1,channelgroup t2 "
+               "WHERE t1.grpid = t2.grpid ORDER BY name";
 
     query.prepare(qstr);
 

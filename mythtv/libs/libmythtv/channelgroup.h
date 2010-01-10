@@ -36,14 +36,14 @@ class MPUBLIC ChannelGroup
 {
   public:
     // ChannelGroup 
-    static ChannelGroupList  GetChannelGroups(void);
+    static ChannelGroupList  GetChannelGroups(bool includeEmpty = true);
     static bool              ToggleChannel(uint chanid, int changrpid, int delete_chan);
     static bool              AddChannel(uint chanid, int changrpid);
     static bool              DeleteChannel(uint chanid, int changrpid);
     static int               GetNextChannelGroup(const ChannelGroupList &sorted, int grpid);
     static QString           GetChannelGroupName(int grpid);
     static int               GetChannelGroupId(QString changroupname);
-    
+
   private:
 
 };

@@ -166,6 +166,39 @@ bool JumpToChannel::Update(void)
 void GuideGrid::RunProgramGuide(uint chanid, const QString &channum,
                     TV *player, bool embedVideo, bool allowFinder, int changrpid)
 {
+    // check there are some channels setup
+    DBChanList channels = ChannelUtil::GetChannels(0, true, "", changrpid);
+    if (!channels.size())
+    {
+        QString message;
+        if (changrpid == -1)
+        {
+            message = tr("You don't have any channels defined in the database."
+                         "\n\t\t\tThe program guide will have nothing to show you.");
+        }
+        else
+        {
+            message = tr("Channel group '%1' doesn't have any channels defined."
+                         "\n\t\t\tThe program guide will have nothing to show you.")
+                         .arg(ChannelGroup::GetChannelGroupName(changrpid));
+        }
+
+        VERBOSE(VB_IMPORTANT, LOC_WARN + message);
+
+        if (!player)
+            ShowOkPopup(message);
+        else
+        {
+            if (player && allowFinder)
+            {
+                message = QString("EPG_EXITING");
+                qApp->postEvent(player, new MythEvent(message));
+            }
+        }
+
+        return;
+    }
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
     GuideGrid *gg = new GuideGrid(mainStack,
                                   chanid, channum,
@@ -199,7 +232,7 @@ GuideGrid::GuideGrid(MythScreenStack *parent,
     m_timeCount = 30;
     m_currentStartChannel = 0;
     m_changrpid = changrpid;
-    m_changrplist = ChannelGroup::GetChannelGroups();
+    m_changrplist = ChannelGroup::GetChannelGroups(false);
 
     m_jumpToChannelEnabled = gContext->GetNumSetting("EPGEnableJumpToChannel", 1);
     m_sortReverse = gContext->GetNumSetting("EPGSortReverse", 0);
@@ -1600,15 +1633,21 @@ void GuideGrid::ChannelGroupMenu(int mode)
     if (menuPopup->Create())
     {
         if (mode == 0)
+        {
+            // add channel to group menu
             menuPopup->SetReturnEvent(this, "channelgrouptogglemenu");
+            ChannelGroupList channels = ChannelGroup::GetChannelGroups(true);
+            for (uint i = 0; i < channels.size(); ++i)
+                menuPopup->AddButton(channels[i].name);
+        }
         else
         {
+            // switch to channel group menu
             menuPopup->SetReturnEvent(this, "channelgroupmenu");
             menuPopup->AddButton(QObject::tr("All Channels"));
+            for (uint i = 0; i < m_changrplist.size(); ++i)
+                menuPopup->AddButton(m_changrplist[i].name);
         }
-
-        for (uint i = 0; i < m_changrplist.size(); ++i)
-            menuPopup->AddButton(m_changrplist[i].name);
 
         menuPopup->AddButton(tr("Cancel"));
 
