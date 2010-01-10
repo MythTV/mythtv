@@ -26,7 +26,7 @@ RecordingRule::RecordingRule()
     m_recPriority(0),
     m_prefInput(0),
     m_startOffset(gContext->GetNumSetting("DefaultStartOffset", 0)),
-    m_endOffset(gContext->GetNumSetting("DefaultStartOffset", 0)),
+    m_endOffset(gContext->GetNumSetting("DefaultEndOffset", 0)),
     m_dupMethod(static_cast<RecordingDupMethodType>(
                 gContext->GetNumSetting("prefDupMethod", kDupCheckSubDesc))),
     m_dupIn(kDupsInAll),
