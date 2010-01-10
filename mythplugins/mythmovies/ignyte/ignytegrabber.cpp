@@ -19,7 +19,7 @@ IgnyteGrabber::IgnyteGrabber(QString zip, QString radius,
             "</tns:GetTheatersAndMovies>\n"
             "</soap:Body>\n"
             "</soap:Envelope>\n");
-    QString server("ignyte.com");
+    QString server("www.ignyte.com");
     QString path("/webservices/ignyte.whatsshowing.webservice/moviefunctions.asmx");
     QString soapAction("http://www.ignyte.com/whatsshowing/GetTheatersAndMovies");
     ms->doSoapRequest(server, path, soapAction, fields);
