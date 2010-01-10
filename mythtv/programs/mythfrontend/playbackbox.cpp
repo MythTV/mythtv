@@ -988,8 +988,8 @@ void PlaybackBox::UpdateUsageUI(void)
 
     if (usedProgress)
     {
-        usedProgress->SetTotal(freeSpaceTotal);
-        usedProgress->SetUsed(freeSpaceUsed);
+        usedProgress->SetTotal((int)freeSpaceTotal);
+        usedProgress->SetUsed((int)freeSpaceUsed);
     }
 }
 
