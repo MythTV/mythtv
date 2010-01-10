@@ -361,6 +361,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
 
       // General m_popupMenu support
       m_popupMenu(NULL),
+      m_doToggleMenu(true),
       // Main Recording List support
       m_progsInDB(0),
       // Other state
@@ -1854,23 +1855,59 @@ void PlaybackBox::selected(MythUIButtonListItem *item)
     }
 }
 
-void PlaybackBox::popupClosed()
+void PlaybackBox::popupClosed(QString which, int result)
 {
     m_popupMenu = NULL;
+
+    if (result == -2)
+    {
+        if (!m_doToggleMenu)
+        {
+            m_doToggleMenu = true;
+            return;
+        }
+
+        if (which == "groupmenu")
+        {
+            ProgramInfo *pginfo = CurrentItem();
+            if (pginfo)
+            {
+                m_helper.CheckAvailability(*pginfo, kCheckForMenuAction);
+
+                if ((asPendingDelete == pginfo->availableStatus) ||
+                    (asPendingDelete == pginfo->availableStatus))
+                {
+                    ShowAvailabilityPopup(*pginfo);
+                }
+                else
+                {
+                    ShowActionPopup(*pginfo);
+                    m_doToggleMenu = false;
+                }
+            }
+        }
+        else if (which == "actionmenu")
+        {
+            ShowGroupPopup();
+            m_doToggleMenu = false;
+        }
+    }
+    else
+        m_doToggleMenu = true;
 }
 
-void PlaybackBox::ShowMenu()
+void PlaybackBox::ShowGroupPopup()
 {
     if (m_popupMenu)
         return;
 
-    QString label = tr("Recording List Menu");
+    QString label = tr("Group List Menu");
 
     ProgramInfo *pginfo = CurrentItem();
 
     m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
+    connect(m_popupMenu, SIGNAL(Closed(QString, int)), SLOT(popupClosed(QString, int)));
 
     if (m_popupMenu->Create())
         m_popupStack->AddScreen(m_popupMenu);
@@ -1878,9 +1915,10 @@ void PlaybackBox::ShowMenu()
     {
         delete m_popupMenu;
         m_popupMenu = NULL;
+        return;
     }
 
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    m_popupMenu->SetReturnEvent(this, "groupmenu");
 
     m_popupMenu->AddButton(tr("Change Group Filter"),
                                  SLOT(showGroupFilter()));
@@ -2231,7 +2269,7 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
 
     m_popupMenu = new MythDialogBox(label, m_popupStack, "pbbmainmenupopup");
 
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
+    connect(m_popupMenu, SIGNAL(Closed(QString, int)), SLOT(popupClosed(QString, int)));
 
     if (m_popupMenu->Create())
         m_popupStack->AddScreen(m_popupMenu);
@@ -2239,9 +2277,10 @@ void PlaybackBox::ShowDeletePopup(DeletePopupType type)
     {
         delete m_popupMenu;
         m_popupMenu = NULL;
+        return;
     }
 
-    m_popupMenu->SetReturnEvent(this, "slotmenu");
+    m_popupMenu->SetReturnEvent(this, "deletemenu");
 
     QString tmpmessage;
     const char *tmpslot = NULL;
@@ -2527,7 +2566,7 @@ bool PlaybackBox::CreatePopupMenu(const QString &label)
     if (!m_popupMenu)
         return false;
 
-    connect(m_popupMenu, SIGNAL(Exiting()), SLOT(popupClosed()));
+    connect(m_popupMenu, SIGNAL(Closed(QString, int)), SLOT(popupClosed(QString, int)));
 
     if (m_popupMenu->Create())
     {
@@ -2541,7 +2580,7 @@ bool PlaybackBox::CreatePopupMenu(const QString &label)
         return false;
     }
 
-    return m_popupMenu;
+    return true;
 }
 
 bool PlaybackBox::CreatePopupMenuPlaylist(void)
@@ -2732,6 +2771,8 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
     if (!CreatePopupMenu(label, pginfo))
         return;
 
+    m_popupMenu->SetReturnEvent(this, "actionmenu");
+
     if ((asFileNotFound  == pginfo.availableStatus) ||
         (asZeroByte      == pginfo.availableStatus))
     {
@@ -2783,6 +2824,11 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         else
             m_popupMenu->AddButton(tr("Add to Playlist"),
                                         SLOT(togglePlayListItem()));
+        if (m_playList.size())
+        {
+            m_popupMenu->AddButton(tr("Playlist options"),
+                         SLOT(showPlaylistPopup()), true);
+        }
     }
 
     if (pginfo.recstatus == rsRecording &&
@@ -3442,6 +3488,30 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
 
         if (action == "1" || action == "HELP")
             showIconHelp();
+        else if (action == "MENU")
+        {
+             if (GetFocusWidget() == m_groupList)
+                 ShowGroupPopup();
+             else
+             {
+                 ProgramInfo *pginfo = CurrentItem();
+                 if (pginfo)
+                 {
+                     m_helper.CheckAvailability(
+                         *pginfo, kCheckForMenuAction);
+
+                     if ((asPendingDelete == pginfo->availableStatus) ||
+                         (asPendingDelete == pginfo->availableStatus))
+                     {
+                         ShowAvailabilityPopup(*pginfo);
+                     }
+                     else
+                     {
+                         ShowActionPopup(*pginfo);
+                     }
+                 }
+             }
+        }
         else if (action == "NEXTFAV")
         {
             if (GetFocusWidget() == m_groupList)
@@ -3501,29 +3571,7 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
                 deleteSelected(m_recordingList->GetItemCurrent());
             else if (action == "PLAYBACK")
                 playSelected(m_recordingList->GetItemCurrent());
-            else if (action == "INFO")
-            {
-                if (GetFocusWidget() != m_groupList)
-                {
-                    ProgramInfo *pginfo = CurrentItem();
-                    if (pginfo)
-                    {
-                        m_helper.CheckAvailability(
-                            *pginfo, kCheckForMenuAction);
-
-                        if ((asPendingDelete == pginfo->availableStatus) ||
-                            (asPendingDelete == pginfo->availableStatus))
-                        {
-                            ShowAvailabilityPopup(*pginfo);
-                        }
-                        else
-                        {
-                            ShowActionPopup(*pginfo);
-                        }
-                    }
-                }
-            }
-            else if (action == "DETAILS")
+            else if (action == "DETAILS" || action == "INFO")
                 details();
             else if (action == "CUSTOMEDIT")
                 customEdit();

@@ -138,6 +138,7 @@ class PlaybackBox : public ScheduleCommon
 
     void SwitchList(void);
 
+    void ShowGroupPopup(void);
     void customEdit();
     void upcoming();
     void details();
@@ -169,7 +170,7 @@ class PlaybackBox : public ScheduleCommon
     void ShowRecGroupChanger(bool use_playlist = false);
     void ShowPlayGroupChanger(bool use_playlist = false);
 
-    void popupClosed();
+    void popupClosed(QString which, int reason);
 
     void doPlayFromBeg();
     void doPlayListRandom();
@@ -316,8 +317,6 @@ class PlaybackBox : public ScheduleCommon
 
     void ScheduleUpdateUIList(void);
 
-    void ShowMenu(void);
-
     bool CreatePopupMenu(const QString &title);
     bool CreatePopupMenu(const QString &title, const ProgramInfo &pginfo)
         { return CreatePopupMenu(title + CreateProgramInfoString(pginfo)); }
@@ -385,7 +384,7 @@ class PlaybackBox : public ScheduleCommon
     MythDialogBox      *m_popupMenu;
     MythScreenStack    *m_popupStack;
 
-    bool m_expectingPopup;
+    bool m_doToggleMenu;
 
     // Recording Group popup support
     QMap<QString,QString> m_recGroupType;
