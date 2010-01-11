@@ -1553,19 +1553,6 @@ static HostComboBox *PlayBoxEpisodeSort()
     return gc;
 }
 
-static HostCheckBox *StickyKeys()
-{
-    HostCheckBox *gc = new HostCheckBox("StickyKeys");
-    gc->setLabel(QObject::tr("Sticky keys"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, fast forward and rewind "
-                    "continue after the key is released.  Pressing the key "
-                    "again increases the fast forward or rewind speed.  The "
-                    "alternate fast forward and rewind keys always behave in "
-                    "this way."));
-    return gc;
-}
-
 static HostSpinBox *FFRewReposTime()
 {
     HostSpinBox *gs = new HostSpinBox("FFRewReposTime", 0, 200, 5);
@@ -4408,7 +4395,6 @@ PlaybackSettings::PlaybackSettings()
     seek->setLabel(QObject::tr("Seeking") +
                    QString(" (%1/%2)").arg(++i).arg(total));
     seek->addChild(SmartForward());
-    seek->addChild(StickyKeys());
     seek->addChild(FFRewReposTime());
     seek->addChild(FFRewReverse());
     seek->addChild(ExactSeeking());

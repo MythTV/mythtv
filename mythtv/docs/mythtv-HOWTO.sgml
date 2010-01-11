@@ -2816,23 +2816,17 @@ W       	| cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom &
 F8		| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off @
 CTRL-B		| Jump to the beginning of the recording / ringbuffer @
 +		| Switch between audio streams @
-Left    	| (if a jump amount is entered) to jump back that amount		     @
-Right   	| (if a jump amount is entered) to jump ahead that amount		     @
+Left		| skip back the configured number of seconds (default is 5)&nbsp;
+                  If a jump amount is entered, jump back that amount				@
+Right		| skip forward the configured number of seconds (default is 30)&nbsp;
+                  If a jump amount is entered, jump ahead that amount				@
+&lt;		| starts sticky rewind mode&nbsp;
+                  If a jump amount is entered, jump to that position				@
+&gt;		| starts sticky fast forward mode&nbsp;
+                  If a jump amount is entered, jump that amount from the end			@
                 | @
                 | @
-                | <bf>Without the stickykeys option selected</bf>                            @
-Left            | rewind the configured number of seconds  (default is 5)	             @
-Right           | fast forward the configured number of seconds (default is 30)             @
-<               | starts rewind mode as if stickykeys are selected		             @
->               | starts fast forward mode as if stickykeys are selected	             @
-                | @
-                | @
-                | <BF>With Stickykeys option selected</BF>                                   @
-Right           | starts fast forward mode	                                             @
-Left            | starts rewind mode		                                             @
-                | @
-                | @
-                | <bf>In fast forward or rewind mode:</bf>                                   @
+                | <bf>In sticky fast forward or rewind mode:</bf>                                   @
 Left/Right	| increases the ff/rew speed					             @
 0       	| plays at normal speed, but leaves the time indicator on screen            @
 1 or 2	        | plays back more slowly than normal ff/rew speed (1 is slowest)            @

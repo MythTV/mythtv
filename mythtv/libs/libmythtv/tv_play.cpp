@@ -804,7 +804,7 @@ TV::TV(void)
       MuteIndividualChannels(false), arrowAccel(false),
       osd_general_timeout(2), osd_prog_info_timeout(3),
       tryUnflaggedSkip(false),
-      smartForward(false), stickykeys(0),
+      smartForward(false),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
       jumped_back(false),
       vbimode(VBIMode::None),
@@ -910,7 +910,6 @@ TV::TV(void)
     kv["ChannelGroupDefault"]      = "-1";
     kv["BrowseChannelGroup"]       = "0";
     kv["SmartForward"]             = "0";
-    kv["StickyKeys"]               = "0";
     kv["FFRewReposTime"]           = "100";
     kv["FFRewReverse"]             = "1";
 
@@ -957,7 +956,6 @@ TV::TV(void)
     channel_group_id       = kv["ChannelGroupDefault"].toInt();
     browse_changrp         = kv["BrowseChannelGroup"].toInt();
     smartForward           = kv["SmartForward"].toInt();
-    stickykeys             = kv["StickyKeys"].toInt();
     ff_rew_repos           = kv["FFRewReposTime"].toFloat() * 0.01f;
     ff_rew_reverse         = kv["FFRewReverse"].toInt();
     channel_group_id       = kv["ChannelGroupDefault"].toInt();
@@ -4252,15 +4250,13 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             if (!isDVD)
                 DoSeek(ctx, 1.001 / ctx->last_framerate, tr("Forward"));
         }
-        else if (!stickykeys)
+        else
         {
             if (smartForward && doSmartForward)
                 DoSeek(ctx, ctx->rewtime, tr("Skip Ahead"));
             else
                 DoSeek(ctx, ctx->fftime, tr("Skip Ahead"));
         }
-        else
-            ChangeFFRew(ctx, 1);
     }
     else if (has_action("FFWDSTICKY", actions) && !isDVDStill)
     {
@@ -4283,14 +4279,12 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             if (!isDVD)
                 DoSeek(ctx, -1.001 / ctx->last_framerate, tr("Rewind"));
         }
-        else if (!stickykeys)
+        else
         {
             if (smartForward)
                 doSmartForward = true;
             DoSeek(ctx, -ctx->rewtime, tr("Skip Back"));
         }
-        else
-            ChangeFFRew(ctx, -1);
     }
     else if (has_action("RWNDSTICKY", actions) && !isDVDStill)
     {

@@ -631,7 +631,6 @@ class MPUBLIC TV : public QThread
     bool    tryUnflaggedSkip;
 
     bool    smartForward;
-    int     stickykeys;
     float   ff_rew_repos;
     bool    ff_rew_reverse;
     bool    jumped_back; ///< Used by PromptDeleteRecording

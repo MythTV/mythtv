@@ -61,6 +61,19 @@ Watching TV or a recording
 - [ or F10    Decrease volume
 - ] or F11    Increase volume
 - Ctrl+B      Jump to the beginning of the recording / ringbuffer.
+- Left arrow to skip back the configured number of seconds (default is 5)
+- Right arrow to skip forward the configured number of seconds (default is 30)
+- < starts sticky rewind mode
+    If a jump amount is entered, jump to that position.
+- > starts sticky fast forward mode
+    If a jump amount is entered, jump that amount from the end.
+   While in sticky fast forward or rewind mode.
+   - Left/Right increases the ff/rew speed.
+   - 0 plays at normal speed, but leaves the time indicator on screen.
+   - 1 or 2 plays back more slowly than normal ff/rew speed (1 is slowest).
+   - 3 plays back at normal ff/rew speed.
+   - 4 - 9 plays back faster than normal ff/rew speed (9 is fastest).
+   - Space exits fast forward or rewind mode.
 
 When in Teletext Menu mode:
 - Up/Down     Previous/Next Page
@@ -77,27 +90,6 @@ When MHEG ITV is enabled:
 - F12         EPG key, enters EPG mode (New Zealand only).
   The effect of these keys depends on what is being displayed.  The arrow,
   Enter, and 0-9 keys may also be used.
-
-Without the stickykeys option selected:
-
-- Left arrow to rewind the configured number of seconds.  (default is 5)
-- Right arrow to fast forward the configured number of seconds. (default is 30)
-- < starts rewind mode as if stickykeys are selected.
-    If a jump amount is entered, jump to that position.
-- > starts fast forward mode as if stickykeys are selected.
-    If a jump amount is entered, jump that amount from the end.
-
-With the stickykeys option selected:
-
-- Right starts fast forward mode.
-- Left starts rewind mode.
-   While in fast forward or rewind mode.
-   - Left/Right increases the ff/rew speed.
-   - 0 plays at normal speed, but leaves the time indicator on screen.
-   - 1 or 2 plays back more slowly than normal ff/rew speed (1 is slowest).
-   - 3 plays back at normal ff/rew speed.
-   - 4 - 9 plays back faster than normal ff/rew speed (9 is fastest).
-   - Space exits fast forward or rewind mode.
 
 With the video paused:
 
@@ -295,7 +287,7 @@ Remote Control          LIRC Keystroke    Function
 --------------          --------------    --------
 
 0 - 9                   0 - 9             channel selection, EPG navigation,
-                                          ff/rew speed setting (with stickykeys)
+                                          ff/rew speed setting (sticky ffwd/rew)
 
 Left Arrow              Left              scroll left, rewind
 Right Arrow             Right             scroll right, fast forward
@@ -303,7 +295,7 @@ Right Arrow             Right             scroll right, fast forward
 Up Arrow                Up                scroll up, channel change up
 Down Arrow              Down              scroll down, channel change down
 
-Select / OK / Play      Space             Select item, play (with stickykeys)
+Select / OK / Play      Space             Select item, play (in sticky ffwd/rew)
                                           set bookmark
 
 Cancel                  Escape            Cancel, quit playback
