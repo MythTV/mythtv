@@ -13,7 +13,7 @@
 
 # Script info
     $NAME           = 'MythTV Database Restore Script';
-    $VERSION        = '1.0.11';
+    $VERSION        = '1.0.12';
 
 # Some variables we'll use here
     our ($username, $homedir, $mythconfdir, $database_information_file);
@@ -1331,12 +1331,13 @@ EOF
                 {
                 # If a hostname column exists, change its value.
                     $column_name = $column->{'COLUMN_NAME'};
-                    if ($column_name eq 'hostname')
+                    if (($column_name eq 'hostname') ||
+                        ($column_name eq 'host'))
                     {
                         verbose($verbose_level_debug,
-                                "Found 'hostname' column in $table_name.");
-                        $query = "UPDATE $table_name SET hostname = ?".
-                                 " WHERE hostname = ?";
+                                "Found '$column_name' column in $table_name.");
+                        $query = "UPDATE $table_name SET $column_name = ?".
+                                 " WHERE $column_name = ?";
                         $sth_update = $dbh->prepare($query);
                         $sth_update->bind_param(1, $new_hostname);
                         $sth_update->bind_param(2, $old_hostname);
@@ -1344,7 +1345,7 @@ EOF
                         if (!defined($result))
                         {
                             verbose($verbose_level_always,
-                                    'Unable to update hostname in table: '.
+                                    "Unable to update $column_name in table: ".
                                     $table_name,
                                     $sth_update->errstr);
                             $exit++;
