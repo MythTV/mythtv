@@ -22,7 +22,7 @@ class GameTreeInfo
 {
   public:
     GameTreeInfo(const QString& levels, const QString& filter)
-      : m_levels(QStringList::split(" ", levels))
+      : m_levels(levels.split(" "))
       , m_filter(filter)
     {
     }
@@ -111,7 +111,7 @@ bool GameUI::Create()
 
     QString levels = gContext->GetSetting("GameFavTreeLevels");
 
-    MythGenericTree *new_node = new MythGenericTree("Favourites", 1, true);
+    MythGenericTree *new_node = new MythGenericTree(tr("Favorites"), 1, true);
     new_node->SetData(qVariantFromValue(
                 new GameTreeInfo(levels, systemFilter + " and favorite=1")));
     m_favouriteNode = m_gameTree->addNode(new_node);
@@ -120,7 +120,7 @@ bool GameUI::Create()
 
     if (m_showHashed)
     {
-        int pos = levels.find("gamename",0);
+        int pos = levels.indexOf("gamename");
         if (pos >= 0)
             levels.insert(pos, " hash ");
     }
@@ -253,7 +253,7 @@ void GameUI::itemClicked(MythUIButtonListItem*)
             {
                 chooseSystemPopup->SetReturnEvent(this, "chooseSystemPopup");
                 QString all_systems = romInfo->AllSystems();
-                QStringList players = QStringList::split(",", all_systems);
+                QStringList players = all_systems.split(",");
                 for (QStringList::Iterator it = players.begin();
                      it != players.end(); ++it)
                 {
@@ -546,7 +546,8 @@ QString GameUI::getFillSql(MythGenericTree *node) const
             filter += " and romname like '" + layer + "%'";
 
     }
-    else if ((childLevel == "gamename") && (layer.length() == 1)) {
+    else if ((childLevel == "gamename") && (layer.length() == 1)) 
+    {
         columns = childIsLeaf
                     ? childLevel + ",system,year,genre,gamename"
                     : childLevel;
@@ -555,10 +556,12 @@ QString GameUI::getFillSql(MythGenericTree *node) const
             filter += " and gamename like '" + layer + "%'";
 
     }
-    else if (childLevel == "hash") {
+    else if (childLevel == "hash") 
+    {
         columns = "left(gamename,1)";
     }
-    else {
+    else 
+    {
 
         columns = childIsLeaf
                     ? childLevel + ",system,year,genre,gamename"
@@ -567,7 +570,8 @@ QString GameUI::getFillSql(MythGenericTree *node) const
 
     //  this whole section ought to be in rominfo.cpp really, but I've put it
     //  in here for now to minimise the number of files changed by this mod
-    if (romInfo) {
+    if (romInfo) 
+    {
         if (!romInfo->System().isEmpty())
         {
             filter += conj + "trim(system)=:SYSTEM";
@@ -605,7 +609,7 @@ QString GameUI::getFillSql(MythGenericTree *node) const
     QString sql;
 
     if ((childLevel == "gamename") && (m_gameShowFileName))
-    {   
+    {
         sql = "select distinct "
                 + columns
                 + " from gamemetadata "
@@ -613,7 +617,8 @@ QString GameUI::getFillSql(MythGenericTree *node) const
                 + " order by romname"
                 + ";";
     }
-    else if (childLevel == "hash") {
+    else if (childLevel == "hash") 
+    {
         sql = "select distinct "
                 + columns
                 + " from gamemetadata "
@@ -697,16 +702,16 @@ void GameUI::fillNode(MythGenericTree *node)
     {
         while (query.next())
         {
-            QString current = query.value(0).toString().stripWhiteSpace();
+            QString current = query.value(0).toString().trimmed();
             MythGenericTree *new_node =
                 new MythGenericTree(current, node->getInt() + 1, false);
             if (IsLeaf)
             {
                 RomInfo *temp = new RomInfo();
-                temp->setSystem(query.value(1).toString().stripWhiteSpace());
+                temp->setSystem(query.value(1).toString().trimmed());
                 temp->setYear(query.value(2).toString());
-                temp->setGenre(query.value(3).toString().stripWhiteSpace());
-                temp->setGamename(query.value(4).toString().stripWhiteSpace());
+                temp->setGenre(query.value(3).toString().trimmed());
+                temp->setGamename(query.value(4).toString().trimmed());
                 new_node->SetData(qVariantFromValue(temp));
                 node->addNode(new_node);
             }

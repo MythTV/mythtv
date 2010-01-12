@@ -37,7 +37,7 @@ QString crcStr(uLong crc) {
     if (tmpcrc == "0")
         tmpcrc = "";
     else
-        tmpcrc = tmpcrc.rightJustify( 8,'0');
+        tmpcrc = tmpcrc.rightJustified(8, '0');
 
     return tmpcrc;
 }
@@ -59,7 +59,7 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
     blocksize = 8192;
     // VERBOSE(VB_GENERAL, QString("crcinfo : %1 : %2 :").arg(romname).arg(GameType));
 
-    if ((zf = unzOpen(romname)))
+    if ((zf = unzOpen(qPrintable(romname))))
     {
         int FoundFile;
         for (FoundFile = unzGoToFirstFile(zf); FoundFile == UNZ_OK;
@@ -105,14 +105,14 @@ QString crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB
             offset = calcOffset(GameType, f.size());
 
             if (offset > 0)
-                f.readBlock(block, offset);
+                f.read(block, offset);
 
             // Get CRC of rom data
-            Q_LONG count;
-            while ((count = f.readBlock(block, blocksize)) > 0)
+            qint64 count;
+            while ((count = f.read(block, blocksize)) > 0)
             {
                 crc = crc32(crc, (Bytef *)block, (uInt)count);
-            }   
+            }
 
             crcRes = crcStr(crc);
             *key = QString("%1:").arg(crcRes);

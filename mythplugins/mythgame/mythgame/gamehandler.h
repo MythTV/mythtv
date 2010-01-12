@@ -6,7 +6,6 @@
 #include <QMap>
 
 #include <mythdbcon.h>
-//#include <mythdialogs.h>
 
 #include "rom_metadata.h"
 #include "rominfo.h"
@@ -62,8 +61,8 @@ class GameHandler
         m_RemoveAll(false),         m_KeepAll(false) {}
 
     static void updateSettings(GameHandler*);
-    static GameHandler* getHandler(uint i);
-    static GameHandler* newHandler(QString name);
+    static GameHandler *getHandler(uint i);
+    static GameHandler *newHandler(QString name);
     static uint count(void);
     void InitMetaDataMap(QString GameType);
     void GetMetadata(GameHandler *handler, QString rom, 
