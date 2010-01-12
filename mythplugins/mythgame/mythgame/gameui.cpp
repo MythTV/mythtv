@@ -173,6 +173,8 @@ bool GameUI::keyPressEvent(QKeyEvent *event)
 
         if (action == "MENU")
             showMenu();
+        else if (action == "EDIT")
+            edit();
         else if (action == "INFO")
             showInfo();
         else if (action == "TOGGLEFAV")
