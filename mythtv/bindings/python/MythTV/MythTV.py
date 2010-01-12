@@ -285,14 +285,14 @@ class MythTV(object):
 		"""
 		Returns a Program object for the current recorders recording.
 		"""
-		res = self.backendCommand('QUERY_RECORDER '+BACKEND_SEP.join([recorder,'GET_CURRENT_RECORDING']))
+		res = self.backendCommand('QUERY_RECORDER '+BACKEND_SEP.join([str(recorder),'GET_CURRENT_RECORDING']))
 		return Program(res.split(BACKEND_SEP))
 
 	def isRecording(self, recorder):
 		"""
 		Returns a boolean as to whether the given recorder is recording.
 		"""
-		res = self.backendCommand('QUERY_RECORDER '+BACKEND_SEP.join([recorder,'IS_RECORDING']))
+		res = self.backendCommand('QUERY_RECORDER '+BACKEND_SEP.join([str(recorder),'IS_RECORDING']))
 		if res == '1':
 			return True
 		else:
@@ -526,7 +526,8 @@ class FileTransfer(object):
 	write = False
 
 	def __init__(self, file, mode):
-		regex = re.compile('myth://((?P<group>.*)@)?(?P<host>[0-9\.]*)(:(?P<port>[0-9]*))?/(?P<file>.*)')
+		reuri = re.compile('myth://((?P<group>.*)@)?(?P<host>[a-zA-Z-_0-9\.]+)(:(?P<port>[0-9]+))?/(?P<file>.*)')
+		reip = re.compile('(?:\d{1,3}\.}{3}\d{1,3}')
 		self.db = MythDB(sys.argv[1:])
 		self.comsock = MythTV()
 		self.mode = mode
@@ -538,9 +539,8 @@ class FileTransfer(object):
 			log.Msg(CRITICAL, 'Invalid FileTransfer mode given')
 			sys.exit(1)
 		if isinstance(file, Program):
-			match = regex.match(file.filename)
+			match = reuri.match(file.filename)
 			self.host = match.group('host')
-			self.port = int(match.group('port'))
 			self.filename = match.group('file')
 			self.sgroup = file.storagegroup
 			if self.port is None:
@@ -551,25 +551,25 @@ class FileTransfer(object):
 				sys.exit(1)
 			else:
 				self.host = file[0]
-				self.port = int(self.db.getSetting('BackendServerPort',self.host))
 				self.filename = file[1]
 				self.sgroup = file[2]
 		elif isinstance(file, str):
-			match = regex.match(file)
+			match = reuri.match(file)
 			if match is None:
 				log.Msg(CRITICAL, 'Incorrect FileTransfer() input string: %s' % file)
 				sys.exit(1)
 			self.sgroup = match.group('group')
 			self.host = match.group('host')
-			self.port = int(match.group('port'))
 			self.filename = match.group('file')
 			if self.sgroup is None:
-				self.sgroup = ''
-			if self.port is None:
-				self.port = 6543
+				self.sgroup = 'Default'
 		else:
 			log.Msg(CRITICAL, 'Improper input to FileTransfer()')
 			sys.exit(1)
+
+		if reip.match(self.host):
+			self.host = socket.gethostbyaddr(self.host)
+		self.port = int(self.db.getSetting('BackendServerPort'),self.host)
 
 		try:
 			self.datsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -579,7 +579,7 @@ class FileTransfer(object):
 			if res[0] == 'REJECT':
 				log.Msg(CRITICAL, 'Backend has version %s and we speak version %s', res[1], PROTO_VERSION)
 				sys.exit(1)
-			res = self.send('ANN FileTransfer %s %d %d %s' % (socket.gethostbyname(),write, False, BACKEND_SEP.join(['-1',self.filename,self.sgroup])))
+			res = self.send('ANN FileTransfer %s %d %d %s' % (socket.gethostname(),write, False, BACKEND_SEP.join(['-1',self.filename,self.sgroup])))
 			if res.split(BACKEND_SEP)[0] != 'OK':
 				log.Msg(CRITICAL, 'Unexpected answer to ANN command: %s', res)
 			else:
