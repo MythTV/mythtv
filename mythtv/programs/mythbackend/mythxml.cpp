@@ -1197,6 +1197,8 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     QByteArray fname = pRequest->m_sFileName.toAscii();
     img.save( fname.constData(), "PNG" );
 
+    makeFileAccessible(fname.constData());
+
     delete pImage;
 }
 

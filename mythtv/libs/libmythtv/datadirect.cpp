@@ -1,9 +1,5 @@
 #include <unistd.h>
 
-// POSIX headers
-#include <sys/types.h> // for chmod
-#include <sys/stat.h>  // for chmod
-
 // Qt headers
 #include <QDir>
 #include <QFileInfo>
@@ -1710,7 +1706,7 @@ bool DataDirectProcessor::SaveLineupToCache(const QString &lineupid) const
 
     VERBOSE(VB_GENERAL, "SaveLineupToCache("<<lineupid<<") -- success");
 
-    chmod(fna.constData(), 0666); // Let anybody update it
+    makeFileAccessible(fna.constData()); // Let anybody update it
 
     return true;
 }

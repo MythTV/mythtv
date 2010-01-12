@@ -1138,6 +1138,30 @@ QString createTempFile(QString name_template, bool dir)
     return tmpFileName;
 }
 
+/** \fn makeFileAccessible(QString)
+ *  \brief Makes a file accessible to all frontends/backends.
+ *
+ *   This function abstracts the functionality of making a file accessible to
+ *   all frontends and backends.  Currently it contains a permissions hack that
+ *   makes a file accessible even on a system with an improperly configured
+ *   environment (umask/group) where the frontend and backend are being run as
+ *   different users or where a NFS share is used but UID's/GID's differ on
+ *   different hosts.
+ *
+ *   Though the function currently only changes the file mode to 0666, by
+ *   abstracting the functionality, it will be easier to make changes in the
+ *   future if a better approach is chosen.  Similarly, using this function
+ *   allows the hack to be applied only when required if code is written to
+ *   detect or allow the user to specify their system is misconfigured.
+ *
+ *  \param filename   Path of file to make accessible
+ */
+void makeFileAccessible(QString filename)
+{
+    QByteArray fname = filename.toAscii();
+    chmod(fname.constData(), 0666);
+}
+
 double MythGetPixelAspectRatio(void)
 {
     float pixelAspect = 1.0;

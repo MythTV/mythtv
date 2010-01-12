@@ -2,14 +2,8 @@
 #include <cmath>
 
 // POSIX headers
-#include <sys/types.h> // for stat
-#include <sys/stat.h>  // for stat
-#include <unistd.h>    // for stat
 #include <sys/time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 
 // Qt headers
 #include <QFileInfo>
@@ -500,7 +494,7 @@ bool PreviewGenerator::SavePreview(QString filename,
     QByteArray fname = filename.toAscii();
     if (small_img.save(fname.constData(), "PNG"))
     {
-        chmod(fname.constData(), 0666); // Let anybody update it
+        makeFileAccessible(fname.constData()); // Let anybody update it
 
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Saved preview '%0' %1x%2")
@@ -515,7 +509,7 @@ bool PreviewGenerator::SavePreview(QString filename,
     if (QFileInfo(fname.constData()).exists() &&
         small_img.save(newfilea.constData(), "PNG"))
     {
-        chmod(newfilea.constData(), 0666);
+        makeFileAccessible(newfilea.constData());
         rename(newfilea.constData(), fname.constData());
 
         VERBOSE(VB_PLAYBACK, LOC +
