@@ -3837,14 +3837,21 @@ void ProgramInfo::SubstituteMatches(QString &str)
     str.replace(QString("%RECGROUP%"), recgroup);
     str.replace(QString("%PLAYGROUP%"), playgroup);
     str.replace(QString("%CHANID%"), chanid);
-    str.replace(QString("%STARTTIME%"), recstartts.toString("yyyyMMddhhmmss"));
-    str.replace(QString("%ENDTIME%"), recendts.toString("yyyyMMddhhmmss"));
-    str.replace(QString("%STARTTIMEISO%"), recstartts.toString(Qt::ISODate));
-    str.replace(QString("%ENDTIMEISO%"), recendts.toString(Qt::ISODate));
-    str.replace(QString("%PROGSTART%"), startts.toString("yyyyMMddhhmmss"));
-    str.replace(QString("%PROGEND%"), endts.toString("yyyyMMddhhmmss"));
-    str.replace(QString("%PROGSTARTISO%"), startts.toString(Qt::ISODate));
-    str.replace(QString("%PROGENDISO%"), endts.toString(Qt::ISODate));
+    static const char *time_str[] =
+        { "STARTTIME", "ENDTIME", "PROGSTART", "PROGEND", };
+    const QDateTime *time_dtr[] =
+        { &recstartts, &recendts, &startts,    &endts,    };
+    for (uint i = 0; i < sizeof(time_str)/sizeof(char*); i++)
+    {
+        str.replace(QString("%%1%").arg(time_str[i]),
+                    time_dtr[i]->toString("yyyyMMddhhmmss"));
+        str.replace(QString("%%1ISO%").arg(time_str[i]),
+                    time_dtr[i]->toString(Qt::ISODate));
+        str.replace(QString("%%1UTC%").arg(time_str[i]),
+                    (time_dtr[i]->toUTC()).toString("yyyyMMddhhmmss"));
+        str.replace(QString("%%1ISOUTC%").arg(time_str[i]),
+                    (time_dtr[i]->toUTC()).toString(Qt::ISODate));
+    }
 }
 
 QString SkipTypeToString(int flags)
