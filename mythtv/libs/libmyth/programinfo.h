@@ -460,9 +460,9 @@ class MPUBLIC ProgramInfo
     RecordingDupInType dupin;
     RecordingDupMethodType dupmethod;
 
-    uint32_t sourceid;
-    uint32_t inputid;
-    uint32_t cardid;
+    int32_t sourceid;
+    int32_t inputid;
+    int32_t cardid;
     bool shareable;
     bool duplicate;
 
