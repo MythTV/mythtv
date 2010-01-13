@@ -412,7 +412,12 @@ void ViewScheduled::FillList()
         {
             if ((m_curcard == 0 && m_curinput == 0) ||
                 pginfo->cardid == m_curcard || pginfo->inputid == m_curinput)
-                state = "normal";
+            {
+                if (pginfo->recpriority2 < 0)
+                    state = "warning";
+                else
+                    state = "normal";
+            }
         }
         else if (pginfo->recstatus == rsRepeat ||
                     pginfo->recstatus == rsOtherShowing ||

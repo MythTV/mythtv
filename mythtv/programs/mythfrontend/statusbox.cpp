@@ -589,6 +589,7 @@ void StatusBox::doScheduleStatus()
     QString tmpstr;
     int maxSource = 0;
     int maxInput = 0;
+    int lowerpriority = 0;
     int hdflag = 0;
 
     query.prepare("SELECT MAX(sourceid) FROM videosource");
@@ -646,6 +647,8 @@ void StatusBox::doScheduleStatus()
         {
             ++sourceMatch[s->sourceid];
             ++inputMatch[s->inputid];
+            if (s->recpriority2 < 0)
+                ++lowerpriority;
             if (s->videoproperties & VID_HDTV)
                 ++hdflag;
         }
@@ -678,6 +681,12 @@ void StatusBox::doScheduleStatus()
 
     QString willrec = statusText[rsWillRecord];
 
+    if (lowerpriority > 0)
+    {
+        tmpstr = QString("%1 %2 %3").arg(lowerpriority).arg(willrec)
+                                    .arg(tr("with lower priority"));
+        AddLogLine(tmpstr, tmpstr);
+    }
     if (hdflag > 0)
     {
         tmpstr = QString("%1 %2 %3").arg(hdflag).arg(willrec)

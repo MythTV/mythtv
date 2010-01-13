@@ -3200,19 +3200,6 @@ static GlobalSpinBox *GRDefaultEndOffset()
     return bs;
 }
 
-static GlobalCheckBox *GRComplexPriority()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("ComplexPriority");
-    bc->setLabel(QObject::tr("Complex Prioritization"));
-    bc->setHelpText(QObject::tr("If set, per rule plus type priorities "
-                    "will be used for primary prioritization with all other "
-                    "priorities having a secondary effect. Unset so that all "
-                    "are treated equally in a single total priority as "
-                    "described in the HOWTO."));
-    bc->setValue(false);
-    return bc;
-}
-
 static GlobalSpinBox *GRPrefInputRecPriority()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("PrefInputPriority", 1, 99, 1);
@@ -4586,7 +4573,6 @@ GeneralRecPrioritiesSettings::GeneralRecPrioritiesSettings()
     sched->addChild(GRSchedOpenEnd());
     sched->addChild(GRDefaultStartOffset());
     sched->addChild(GRDefaultEndOffset());
-    sched->addChild(GRComplexPriority());
     sched->addChild(GRPrefInputRecPriority());
     sched->addChild(GRHDTVRecPriority());
     sched->addChild(GRWSRecPriority());

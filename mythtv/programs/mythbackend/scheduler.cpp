@@ -293,9 +293,6 @@ static bool comp_priority(RecordingInfo *a, RecordingInfo *b)
     if (a->recpriority != b->recpriority)
         return a->recpriority > b->recpriority;
 
-    if (a->recpriority2 != b->recpriority2)
-        return a->recpriority2 > b->recpriority2;
-
     int apast = (a->recstartts < schedTime.addSecs(-30) && !a->reactivate);
     int bpast = (b->recstartts < schedTime.addSecs(-30) && !b->reactivate);
 
@@ -461,7 +458,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
 
     cout << "--- print list start ---\n";
     cout << "Title - Subtitle                Ch Station "
-        "Day Start  End   S C I  T N   Pri" << endl;
+        "Day Start  End   S C I  T N Pri" << endl;
 
     RecIter i = list.begin();
     for ( ; i != list.end(); i++)
@@ -492,20 +489,21 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
         episode = QString("%1 - \"%2\"").arg(p->title).arg(p->subtitle);
     episode = episode.leftJustified(30, ' ', true);
 
-    QString outstr = QString("%1 %2 %3 %4%5 %6 %7 %8 ")
+    QString outstr = QString("%1 %2 %3 %4-%5  %6 %7 %8  ")
         .arg(episode)
         .arg(p->chanstr.rightJustified(4, ' '))
         .arg(p->chansign.leftJustified(7, ' ', true))
-        .arg(p->recstartts.toString("dd hh:mm-"))
-        .arg(p->recendts.toString("hh:mm  "))
+        .arg(p->recstartts.toString("dd hh:mm"))
+        .arg(p->recendts.toString("hh:mm"))
         .arg(p->sourceid)
         .arg(p->cardid)
         .arg(p->inputid);
-    outstr += QString("%1 %2 %3/%4")
+    outstr += QString("%1 %2 %3")
         .arg(p->RecTypeChar())
         .arg(p->RecStatusChar())
-        .arg(p->recpriority)
-        .arg((QString::number(p->recpriority2)).rightJustified(5, ' '));
+        .arg(p->recpriority);
+    if (p->recpriority2)
+        outstr += QString("/%1").arg(p->recpriority2);
 
     QByteArray out = outstr.toLocal8Bit();
 
@@ -1297,6 +1295,11 @@ void Scheduler::PruneRedundants(void)
         }
         else
         {
+            // Flag lower priority showings that will recorded so we
+            // can warn the user about them
+            if (lastp->recstatus == rsWillRecord &&
+                p->recpriority > lastp->recpriority - lastp->recpriority2)
+                lastp->recpriority2 = lastp->recpriority - p->recpriority;
             delete p;
             *(i++) = NULL;
         }
@@ -2965,7 +2968,6 @@ void Scheduler::AddNewRecords(void)
         }
     }
 
-    int complexpriority = gContext->GetNumSetting("ComplexPriority", 0);
     prefinputpri        = gContext->GetNumSetting("PrefInputPriority", 2);
     int hdtvpriority    = gContext->GetNumSetting("HDTVRecPriority", 0);
     int wspriority      = gContext->GetNumSetting("WSRecPriority", 0);
@@ -3327,18 +3329,11 @@ void Scheduler::AddNewRecords(void)
             recTypeRecPriorityMap[p->rectype] =
                 p->GetRecordingTypeRecPriority(p->rectype);
         p->recpriority += recTypeRecPriorityMap[p->rectype];
+        p->recpriority += result.value(46).toInt();
 
         if (autopriority)
             p->recpriority += autopriority -
                               (result.value(45).toInt() * autostrata / 200);
-
-        p->recpriority2 = result.value(46).toInt();
-
-        if (complexpriority == 0)
-        {
-            p->recpriority += p->recpriority2;
-            p->recpriority2 = 0;
-        }
 
         if (p->recstartts >= p->recendts)
         {
