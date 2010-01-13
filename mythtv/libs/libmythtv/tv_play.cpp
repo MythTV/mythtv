@@ -8339,7 +8339,7 @@ void TV::SleepDialogCreate(void)
     sleepTimerId = 0;
 
     QString message = QObject::tr(
-        "MythTV has was set to sleep for %1 minutes and "
+        "MythTV was set to sleep after %1 minutes and "
         "will exit in %2 seconds.\n"
         "Do you wish to continue watching?")
         .arg(sleepTimerTimeout * (1.0f/60000.0f))
