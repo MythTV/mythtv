@@ -1816,7 +1816,6 @@ bool PhrasePopup::Create()
     {
         m_titleText->SetText(tr("Phrase"));
         new MythUIButtonListItem(m_phraseList, tr("<New Phrase>"), NULL, false);
-        m_okButton->SetText(tr("Ok"));
     }
 
     for (int x = 0; x < m_list.size(); x++)
@@ -2036,8 +2035,6 @@ bool TimePopup::Create()
         if (hr.toString("hh") == m_parent->m_searchTime.toString("hh"))
             m_timeList->SetItemCurrent(x);
     }
-
-    m_okButton->SetText(tr("Ok"));
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okClicked()));
 
@@ -2315,8 +2312,6 @@ bool EditPowerSearchPopup::Create()
     m_descEdit->SetText(field[2]);
 
     initLists();
-
-    m_okButton->SetText(tr("Ok"));
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okClicked()));
 
