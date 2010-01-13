@@ -22,6 +22,7 @@ flix="yes"
 archive="yes"
 zoneminder="yes"
 movies="yes"
+netvision="yes"
 
 cc="gcc"
 qmake="qmake"
@@ -89,10 +90,12 @@ MythZoneMinder related options:
 MythMovies related options:
   --enable-mythmovies      build the mythmovies plugin [$movies]
 
+MythNetvision related options: 
+  --enable-mythnetvision      build the mythnetvision plugin (BETA) [$netvision]
+
 EOF
 exit 1
 fi
-
 if [ -e config.log ] ; then
     PCONF=`cat config.log | tail -n 1 | grep configure`
     if test x"$PCONF" != x"" ; then
@@ -173,6 +176,10 @@ for opt do
   ;;
   --disable-mythmovies) movies="no"
   ;;
+  --enable-mythnetvision) netvision="yes"
+  ;;
+  --disable-mythnetvision) netvision="no"
+  ;;
   --enable-opengl) opengl="yes"
   ;;
   --disable-opengl) opengl="no"
@@ -214,6 +221,7 @@ for opt do
                  zoneminder="yes";
                  flix="yes";
                  movies="yes";
+                 netvision="yes";
                  sdl="yes";
                  opengl="yes";
                  visual="yes";
@@ -233,6 +241,7 @@ for opt do
                  zoneminder="no";
                  flix="no";
                  movies="no";
+                 netvision="no";
                  sdl="no";
                  opengl="no";
                  visual="no";
@@ -570,6 +579,12 @@ else
   echo "        MythMovies     plugin will not be built"
 fi
 
+if test "$netvision" = "yes" ; then
+  echo "        MythNetvision  plugin will be built (BETA)"
+  echo "SUBDIRS += mythnetvision" >> ./config.pro
+else
+  echo "        MythNetvision  plugin will not be built"
+fi
 
 ###########################################################
 #                                                         #
