@@ -1,12 +1,6 @@
 #ifndef NETSEARCH_H
 #define NETSEARCH_H
 
-#include <QEventLoop>
-#include <QThread>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QNetworkAccessManager>
-
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/oldsettings.h>
@@ -124,7 +118,6 @@ class NetSearch : public MythScreenType
     GrabberScript::scriptList fillGrabberList(void);
     void fillGrabberButtonList(void);
     void slotItemChanged(void);
-    void handleNetworkReply(QNetworkReply *reply);
     void slotDoProgress(qint64 bytesReceived,
                         qint64 bytesTotal);
     void slotDownloadFinished(void);

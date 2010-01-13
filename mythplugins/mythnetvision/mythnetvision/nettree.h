@@ -1,12 +1,6 @@
 #ifndef NETTREE_H
 #define NETTREE_H
 
-#include <QEventLoop>
-#include <QThread>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QNetworkAccessManager>
-
 #include <mythtv/uitypes.h>
 #include <mythtv/xmlparse.h>
 #include <mythtv/oldsettings.h>
