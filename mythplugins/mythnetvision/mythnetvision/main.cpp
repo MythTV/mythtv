@@ -33,10 +33,10 @@ int  RunTreeEditor(void);
 
 void setupKeys(void)
 {
-    REG_JUMP("MythNetVision", QT_TRANSLATE_NOOP("MythControls",
-        "Internet Television Client"), "", runNetVision);
+    REG_JUMP("MythNetSearch", QT_TRANSLATE_NOOP("MythControls",
+        "Internet Television Client - Search"), "", runNetVision);
     REG_JUMP("MythNetTree", QT_TRANSLATE_NOOP("MythControls",
-        "Internet Television Client - Map View"), "", runNetTree);
+        "Internet Television Client - Site/Tree View"), "", runNetTree);
 }
 
 int mythplugin_init(const char *libversion)
