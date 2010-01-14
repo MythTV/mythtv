@@ -425,17 +425,6 @@ static HostCheckBox *PBBStartInTitle()
     return gc;
 }
 
-static HostCheckBox *PBBShowGroupSummary()
-{
-    HostCheckBox *gc = new HostCheckBox("ShowGroupInfo");
-    gc->setLabel(QObject::tr("Show group summary"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("While selecting a group, show a group "
-                    "summary instead of showing info about the first episode "
-                    "in that group."));
-    return gc;
-}
-
 static HostCheckBox *SmartForward()
 {
     HostCheckBox *gc = new HostCheckBox("SmartForward");
@@ -4358,7 +4347,6 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(PlaybackPreview());
     pbox->addChild(HWAccelPlaybackPreview());
     pbox->addChild(PBBStartInTitle());
-    pbox->addChild(PBBShowGroupSummary());
     addChild(pbox);
 
     VerticalConfigurationGroup* pbox2 = new VerticalConfigurationGroup(false);
