@@ -47,6 +47,10 @@
         <template>Description: %1</template>
     </textarea>
 
+    <textarea name="nosites" from="description">
+        <value>Can't find any search scripts!  This usually indicates missing search script prerequisities.  Try running a script from the command line.</value>
+    </textarea>
+
   </window>
 
   <window name="treeeditor">
@@ -222,6 +226,10 @@
           <template>Description: %1</template>
       </textarea>
 
+      <textarea name="nosites" from="description">
+          <value>You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose "Scan/Manage Subscriptions," then "Manage Site Subscriptions."</value>
+      </textarea>
+
       <imagetype name="preview">
           <area>38,330,150,240</area>
           <preserveaspect>true</preserveaspect>
@@ -311,6 +319,10 @@
             <multiline>yes</multiline>
         </textarea>
 
+        <textarea name="nosites" from="description">
+            <value>You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose "Scan/Manage Subscriptions," then "Manage Site Subscriptions."</value>
+        </textarea>
+
         <textarea name="lenlbl" from="basetextarea">
             <area>260,343,150,35</area>
             <value>Runtime</value>
@@ -354,6 +366,11 @@
             <area>550,15,220,50</area>
             <cutdown>yes</cutdown>
             <font>basemedium</font>
+        </textarea>
+
+        <textarea name="nosites" from="basetextarea">
+            <area>550,15,220,50</area>
+            <value>You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose "Scan/Manage Subscriptions," then "Manage Site Subscriptions."</value>
         </textarea>
 
         <buttonlist name="videos">

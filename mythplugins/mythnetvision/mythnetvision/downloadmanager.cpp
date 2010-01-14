@@ -1,6 +1,5 @@
 // qt
 #include <QCoreApplication>
-#include <QImage>
 #include <QFileInfo>
 #include <QDir>
 #include <QEvent>

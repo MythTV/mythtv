@@ -43,9 +43,9 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_date(NULL),                  m_time(NULL),
       m_filesize(NULL),              m_filesize_str(NULL),
       m_rating(NULL),                m_pageText(NULL),
-      m_thumbImage(NULL),            m_downloadable(NULL),
-      m_progress(NULL),              m_busyPopup(NULL),
-      m_okPopup(NULL),
+      m_noSites(NULL),               m_thumbImage(NULL),
+      m_downloadable(NULL),          m_progress(NULL),      
+      m_busyPopup(NULL),             m_okPopup(NULL),
       m_popupStack(),                m_netSearch(),
       m_currentSearch(NULL),
       m_currentGrabber(0),           m_currentCmd(NULL),
@@ -90,6 +90,7 @@ bool NetSearch::Create()
     m_filesize_str = dynamic_cast<MythUIText *> (GetChild("filesize_str"));
     m_rating = dynamic_cast<MythUIText *> (GetChild("rating"));
     m_pageText = dynamic_cast<MythUIText *> (GetChild("page"));
+    m_noSites = dynamic_cast<MythUIText *> (GetChild("nosites"));
 
     m_thumbImage = dynamic_cast<MythUIImage *> (GetChild("preview"));
 
@@ -180,6 +181,11 @@ void NetSearch::loadData(void)
         busyPopup->Close();
         busyPopup = NULL;
     }
+
+    if (m_grabberList.count() == 0 && m_noSites)
+        m_noSites->SetVisible(true);
+    else if (m_noSites)
+        m_noSites->SetVisible(false);
 }
 
 bool NetSearch::keyPressEvent(QKeyEvent *event)
