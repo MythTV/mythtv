@@ -1010,9 +1010,6 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
                 new MythUIButtonListItem(
                     m_groupList, "", qVariantFromValue(groupname.toLower()));
 
-            // The first item added to the list will trigger an update of the
-            // associated Recording List, m_needsUpdate should be false unless
-            // this is the currently selected group
             int pref = groupPreferences.indexOf(groupname.toLower());
             if ((pref >= 0) && (pref < best_pref))
             {
@@ -1033,6 +1030,11 @@ void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 
         m_needUpdate = true;
         m_groupList->SetItemCurrent(sel_idx);
+        // We need to explicitly call updateRecList in this case,
+        // since 0 is selected by default, and we need updateRecList
+        // to be called with m_needUpdate set.
+        if (!sel_idx)
+            updateRecList(m_groupList->GetItemCurrent());
     }
 }
 
@@ -1171,42 +1173,144 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     }
 }
 
+static bool save_position(
+    const MythUIButtonList *groupList, const MythUIButtonList *recordingList,
+    QStringList &groupSelPref, QStringList &itemSelPref,
+    QStringList &itemTopPref)
+{
+    MythUIButtonListItem *prefSelGroup = groupList->GetItemCurrent();
+    if (!prefSelGroup)
+        return false;
+
+    groupSelPref.push_back(prefSelGroup->GetData().toString());
+    for (int i = groupList->GetCurrentPos();
+         i < groupList->GetCount(); i++)
+    {
+        prefSelGroup = groupList->GetItemAt(i);
+        if (prefSelGroup)
+            groupSelPref.push_back(prefSelGroup->GetData().toString());
+    }
+
+    int curPos = recordingList->GetCurrentPos();
+    for (int i = curPos; (i >= 0) && (i < recordingList->GetCount()); i++)
+    {
+        MythUIButtonListItem *item = recordingList->GetItemAt(i);
+        ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+        itemSelPref.push_back(groupSelPref.front());
+        itemSelPref.push_back(pginfo->MakeUniqueKey());
+    }
+    for (int i = curPos; (i >= 0) && (i < recordingList->GetCount()); i--)
+    {
+        MythUIButtonListItem *item = recordingList->GetItemAt(i);
+        ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+        itemSelPref.push_back(groupSelPref.front());
+        itemSelPref.push_back(pginfo->MakeUniqueKey());
+    }
+
+    int topPos = recordingList->GetTopItemPos();
+    for (int i = topPos + 1; i >= topPos - 1; i--)
+    {
+        if (i >= 0 && i < recordingList->GetCount())
+        {
+            MythUIButtonListItem *item = recordingList->GetItemAt(i);
+            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+            if (i == topPos)
+            {
+                itemTopPref.push_front(pginfo->MakeUniqueKey());
+                itemTopPref.push_front(groupSelPref.front());
+            }
+            else
+            {
+                itemTopPref.push_back(groupSelPref.front());
+                itemTopPref.push_back(pginfo->MakeUniqueKey());
+            }
+        }
+    }
+
+    return true;
+}
+
+static void restore_position(
+    MythUIButtonList *groupList, MythUIButtonList *recordingList,
+    const QStringList &groupSelPref, const QStringList &itemSelPref,
+    const QStringList &itemTopPref)
+{
+    // If possible reselect the item selected before,
+    // otherwise select the nearest available item.
+    MythUIButtonListItem *prefSelGroup = groupList->GetItemCurrent();
+    if (!prefSelGroup ||
+        !groupSelPref.contains(prefSelGroup->GetData().toString()) ||
+        !itemSelPref.contains(prefSelGroup->GetData().toString()))
+    {
+        return;
+    }
+
+    // the group is selected in UpdateUIGroupList()
+    QString groupname = prefSelGroup->GetData().toString();
+
+    // find best selection
+    int sel = -1;
+    for (uint i = 0; i+1 < (uint)itemSelPref.size(); i+=2)
+    {
+        if (itemSelPref[i] != groupname)
+            continue;
+
+        const QString key = itemSelPref[i+1];
+        for (uint j = 0; j < (uint)recordingList->GetCount(); j++)
+        {
+            MythUIButtonListItem *item = recordingList->GetItemAt(j);
+            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+            if (pginfo && (pginfo->MakeUniqueKey() == key))
+            {
+                sel = j;
+                i = itemSelPref.size();
+                break;
+            }
+        }
+    }
+
+    // find best top item
+    int top = -1;
+    for (uint i = 0; i+1 < (uint)itemTopPref.size(); i+=2)
+    {
+        if (itemTopPref[i] != groupname)
+            continue;
+
+        const QString key = itemTopPref[i+1];
+        for (uint j = 0; j < (uint)recordingList->GetCount(); j++)
+        {
+            MythUIButtonListItem *item = recordingList->GetItemAt(j);
+            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
+            if (pginfo && (pginfo->MakeUniqueKey() == key))
+            {
+                top = j;
+                i = itemTopPref.size();
+                break;
+            }
+        }
+    }
+
+    if (sel >= 0)
+    {
+        //VERBOSE(VB_IMPORTANT, QString("Reselect success (%1,%2)")
+        //        .arg(sel).arg(top));
+        recordingList->SetItemCurrent(sel, top);
+    }
+    else
+    {
+        //VERBOSE(VB_GENERAL, QString("Reselect failure (%1,%2)")
+        //        .arg(sel).arg(top));
+    }
+}
+
 bool PlaybackBox::UpdateUILists(void)
 {
     m_isFilling = true;
 
     // Save selection, including next few items & groups
-    QStringList groupSelPref;
-    QStringList itemSelPref;
-    MythUIButtonListItem *prefSelGroup = m_groupList->GetItemCurrent();
-    if (prefSelGroup)
-    {
-        groupSelPref.push_back(prefSelGroup->GetData().toString());
-        for (int i = m_groupList->GetCurrentPos();
-             i < m_groupList->GetCount(); i++)
-        {
-            prefSelGroup = m_groupList->GetItemAt(i);
-            if (prefSelGroup)
-                groupSelPref.push_back(prefSelGroup->GetData().toString());
-        }
-
-        int curPos = m_recordingList->GetCurrentPos();
-        for (int i = curPos; (i >= 0) && (i < m_recordingList->GetCount()); i++)
-        {
-            MythUIButtonListItem *item = m_recordingList->GetItemAt(i);
-            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
-            itemSelPref.push_back(groupSelPref.front());
-            itemSelPref.push_back(pginfo->MakeUniqueKey());
-        }
-        for (int i = curPos; (i >= 0) && (i < m_recordingList->GetCount()); i--)
-        {
-            MythUIButtonListItem *item = m_recordingList->GetItemAt(i);
-            ProgramInfo *pginfo = qVariantValue<ProgramInfo*>(item->GetData());
-            itemSelPref.push_back(groupSelPref.front());
-            itemSelPref.push_back(pginfo->MakeUniqueKey());
-        }
-    }
-    else
+    QStringList groupSelPref, itemSelPref, itemTopPref;
+    if (!save_position(m_groupList, m_recordingList,
+                       groupSelPref, itemSelPref, itemTopPref))
     {
         // If user wants to start in watchlist and watchlist is displayed, then
         // make it the current group
@@ -1692,36 +1796,8 @@ bool PlaybackBox::UpdateUILists(void)
             item->DisplayState("yes", "playlist");
     }
 
-    // If possible reselect the item selected before,
-    // otherwise select the nearest available item.
-    prefSelGroup = m_groupList->GetItemCurrent();
-    if (prefSelGroup &&
-        groupSelPref.contains(prefSelGroup->GetData().toString()) &&
-        itemSelPref.contains(prefSelGroup->GetData().toString()))
-    {
-        // the group is selected above in UpdateUIGroupList()
-        QString groupname = prefSelGroup->GetData().toString();
-        for (uint i = 0; i+1 < (uint)itemSelPref.size(); i+=2)
-        {
-            if (itemSelPref[i] != groupname)
-                continue;
-
-            const QString key = itemSelPref[i+1];
-            for (uint j = 0; j < (uint)m_recordingList->GetCount(); j++)
-            {
-                MythUIButtonListItem *item = m_recordingList->GetItemAt(j);
-                ProgramInfo *pginfo =
-                    qVariantValue<ProgramInfo*>(item->GetData());
-                if (pginfo && (pginfo->MakeUniqueKey() == key))
-                {
-                    //VERBOSE(VB_IMPORTANT, "Reselect success");
-                    m_recordingList->SetItemCurrent(j);
-                    i = itemSelPref.size();
-                    break;
-                }
-            }
-        }
-    }
+    restore_position(m_groupList, m_recordingList,
+                     groupSelPref, itemSelPref, itemTopPref);
 
     m_isFilling = false;
 
