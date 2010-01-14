@@ -87,14 +87,18 @@ void ImportRecorder::StartRecording(void)
     while (!Open() && _request_recording && !_error)
         usleep(20000);
 
+    curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+
     // build seek table
     if (_import_fd && _request_recording && !_error)
     {
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
         NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
+        RingBuffer *rb = new RingBuffer(
+            ringBuffer->GetFilename(), false, true, 6);
+
         PlayerContext *ctx = new PlayerContext("importrecorder");
         ctx->SetPlayingInfo(curRecording);
-        ctx->SetRingBuffer(ringBuffer);
+        ctx->SetRingBuffer(rb);
         ctx->SetNVP(nvp);
         nvp->SetPlayerInfo(NULL, NULL, true, ctx);
 
