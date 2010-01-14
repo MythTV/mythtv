@@ -884,14 +884,16 @@ void NetSearch::slotItemChanged()
 
         if (!item->GetThumbnail().isEmpty() && m_thumbImage)
         {
-            MythUIButtonListItem *item = m_searchResultList->GetItemCurrent();
-            QString filename = item->GetImage();
+            MythUIButtonListItem *btn = m_searchResultList->GetItemCurrent();
+            QString filename = btn->GetImage();
             if (!filename.isEmpty())
             {
                 m_thumbImage->SetFilename(filename);
                 m_thumbImage->Load();
                 m_thumbImage->SetVisible(true);
             }
+            else
+                m_thumbImage->SetVisible(false);
         }
         else if (m_thumbImage)
             m_thumbImage->SetVisible(false);
