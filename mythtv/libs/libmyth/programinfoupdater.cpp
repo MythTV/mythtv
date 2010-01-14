@@ -1,5 +1,6 @@
 #include "programinfoupdater.h"
 #include "remoteutil.h"
+#include "compat.h"
 
 uint qHash(const PIKey &k)
 {

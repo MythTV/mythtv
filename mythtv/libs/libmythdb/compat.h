@@ -30,7 +30,11 @@
 #ifndef _MSC_VER 
  #define close wsock_close
 #endif
+
+#ifndef NOMINMAX 
 #define NOMINMAX 
+#endif
+
 #include <windows.h>
 #ifndef _MSC_VER
     #include <winsock2.h>
@@ -49,6 +53,11 @@
 #include <sys/resource.h> // for setpriority
 #include <sys/socket.h>
 #include <sys/wait.h>     // For WIFEXITED on Mac OS X
+#endif
+
+#ifdef USING_MINGW
+#include <unistd.h>       // for usleep()
+#include <sys/time.h>
 #endif
 
 #ifdef _WIN32
