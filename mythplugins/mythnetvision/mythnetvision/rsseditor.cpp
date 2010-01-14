@@ -169,20 +169,49 @@ void RSSEditPopup::parseAndSave(void)
     }
     else
     {
-        QNetworkAccessManager *manager = new QNetworkAccessManager();
+        m_manager = new QNetworkAccessManager();
         QUrl qurl(m_urlEdit->GetText());
 
-        m_reply = manager->get(QNetworkRequest(qurl));
+        m_reply = m_manager->get(QNetworkRequest(qurl));
 
-        connect(manager, SIGNAL(finished(QNetworkReply*)), this,
-                           SLOT(slotSave(QNetworkReply*)));
+        connect(m_manager, SIGNAL(finished(QNetworkReply*)), this,
+                           SLOT(slotCheckRedirect(QNetworkReply*)));
+    }
+}
+
+QUrl RSSEditPopup::redirectUrl(const QUrl& possibleRedirectUrl,
+                               const QUrl& oldRedirectUrl) const
+{
+    QUrl redirectUrl;
+    if(!possibleRedirectUrl.isEmpty() && possibleRedirectUrl != oldRedirectUrl)
+        redirectUrl = possibleRedirectUrl;
+    return redirectUrl;
+}
+
+void RSSEditPopup::slotCheckRedirect(QNetworkReply* reply)
+{
+    QVariant possibleRedirectUrl =
+         reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+
+    QUrl urlRedirectedTo = redirectUrl(possibleRedirectUrl.toUrl(),
+                                       urlRedirectedTo);
+
+    if(!urlRedirectedTo.isEmpty())
+    {
+        m_urlEdit->SetText(urlRedirectedTo.toString());
+        m_manager->get(QNetworkRequest(urlRedirectedTo));
+    }
+    else
+    {
+//        urlRedirectedTo.clear();
+        slotSave(reply);
     }
 }
 
 void RSSEditPopup::slotSave(QNetworkReply* reply)
 {
     QDomDocument *document = new QDomDocument();
-    document->setContent(m_reply->read(reply->bytesAvailable()), true);
+    document->setContent(reply->read(reply->bytesAvailable()), true);
 
     QString text = document->toString();
 
@@ -233,8 +262,6 @@ void RSSEditPopup::slotSave(QNetworkReply* reply)
                     thumbnailURL = nodes.at(0).toElement().text();
             }
         }
-
-    VERBOSE(VB_GENERAL, QString("Thumbnail: %1").arg(thumbnailURL));
 
         bool download;
         if (m_download->GetCheckState() == MythUIStateType::Full)

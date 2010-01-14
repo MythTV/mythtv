@@ -35,29 +35,34 @@ class RSSEditPopup : public MythScreenType
     bool keyPressEvent(QKeyEvent*);
 
   private:
-    mutable QMutex  m_lock;
-    RSSSite        *m_site;
-    QString         m_urlText;
-    bool            m_editing;
+    QUrl redirectUrl(const QUrl& possibleRedirectUrl,
+                     const QUrl& oldRedirectUrl) const;
 
-    MythUIImage      *m_thumbImage;
-    MythUIButton     *m_thumbButton;
-    MythUITextEdit   *m_urlEdit;
-    MythUITextEdit   *m_titleEdit;
-    MythUITextEdit   *m_descEdit;
-    MythUITextEdit   *m_authorEdit;
+    mutable QMutex          m_lock;
+    RSSSite                *m_site;
+    QString                 m_urlText;
+    bool                    m_editing;
 
-    MythUIButton   *m_okButton;
-    MythUIButton   *m_cancelButton;
+    MythUIImage            *m_thumbImage;
+    MythUIButton           *m_thumbButton;
+    MythUITextEdit         *m_urlEdit;
+    MythUITextEdit         *m_titleEdit;
+    MythUITextEdit         *m_descEdit;
+    MythUITextEdit         *m_authorEdit;
 
-    MythUICheckBox *m_download;
+    MythUIButton           *m_okButton;
+    MythUIButton           *m_cancelButton;
 
-    QNetworkReply  *m_reply;
+    MythUICheckBox         *m_download;
+
+    QNetworkAccessManager  *m_manager;
+    QNetworkReply          *m_reply;
 
   signals:
     void saving(void);
 
   private slots:
+    void slotCheckRedirect(QNetworkReply* reply);
     void parseAndSave(void);
     void slotSave(QNetworkReply *reply);
     void doFileBrowser(void);
