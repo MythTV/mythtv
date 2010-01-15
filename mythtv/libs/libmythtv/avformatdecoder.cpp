@@ -3425,14 +3425,21 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (gotvideo)
         {
-            if (lowbuffers && onlyvideo == 0 &&
-                storedPackets.count() < max_video_queue_size &&
-                lastapts < lastvpts + 100 &&
-                !ringBuffer->InDVDMenuOrStillFrame())
+            if (onlyvideo < 0)
+            {
+                // no need to buffer audio or video if we
+                // only care about building a keyframe map.
+                allowedquit = true;
+                continue;
+            }
+            else if (lowbuffers && onlyvideo == 0 &&
+                     storedPackets.count() < max_video_queue_size &&
+                     lastapts < lastvpts + 100 &&
+                     !ringBuffer->InDVDMenuOrStillFrame())
             {
                 storevideoframes = true;
             }
-            else if (onlyvideo >= 0)
+            else
             {
                 if (storedPackets.count() >= max_video_queue_size)
                     VERBOSE(VB_IMPORTANT,
@@ -4002,6 +4009,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                     if (onlyvideo < 0)
                     {
+                        // if onlyvideo < 0 we really just want
+                        // to find the keyframes, we don't care
+                        // about decoding the actual video content.
                         framesPlayed++;
                         gotvideo = 1;
                         ptr += pkt->size;
