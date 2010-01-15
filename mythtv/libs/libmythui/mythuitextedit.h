@@ -73,7 +73,7 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
     void SetInitialStates(void);
 
     bool InsertCharacter(const QString &character);
-    void RemoveCharacter(void);
+    void RemoveCharacter(int position);
 
     void CutTextToClipboard(void);
     void CopyTextToClipboard(void);

@@ -252,15 +252,16 @@ bool MythUITextEdit::InsertCharacter(const QString &character)
     return true;
 }
 
-void MythUITextEdit::RemoveCharacter()
+void MythUITextEdit::RemoveCharacter(int position)
 {
-    if (m_Message.isEmpty())
+    if (m_Message.isEmpty() || position < 0 || position >= m_Message.size())
         return;
 
     QString newmessage = m_Message;
 
-    newmessage.remove(m_Position, 1);
-    MoveCursor(MoveLeft);
+    newmessage.remove(position, 1);
+    if (position == m_Position)
+        MoveCursor(MoveLeft);
     SetText(newmessage, false);
 }
 
@@ -404,9 +405,13 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
             if (!MoveCursor(MoveRight))
                 handled = false;
         }
+        else if (action == "DELETE")
+        {
+            RemoveCharacter(m_Position+1);
+        }
         else if (action == "BACKSPACE")
         {
-            RemoveCharacter();
+            RemoveCharacter(m_Position);
         }
         else if (action == "SELECT" && e->key() != Qt::Key_Space
                  && GetMythDB()->GetNumSetting("UseVirtualKeyboard", 1) == 1)
