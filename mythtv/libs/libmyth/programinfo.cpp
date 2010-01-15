@@ -2855,8 +2855,27 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
     if (max_frame >= 0)
         query.bindValue(":MAX_FRAME", max_frame);
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
         MythDB::DBError("position map clear", query);
+
+    if (isVideo)
+    {
+        query.prepare(
+            "INSERT DELAYED INTO "
+            "filemarkup (filename, mark, type, offset) "
+            "VALUES ( :PATH , :MARK , :TYPE , :OFFSET )");
+        query.bindValue(":PATH", videoPath);
+    }
+    else
+    {
+        query.prepare(
+            "INSERT DELAYED INTO "
+            "recordedseek (chanid, starttime, mark, type, offset) "
+            " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET )");
+        query.bindValue(":CHANID",    chanid);
+        query.bindValue(":STARTTIME", recstartts);
+    }
+    query.bindValue(":TYPE", type);
 
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
@@ -2870,29 +2889,14 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
 
         long long offset = *i;
 
-        if (isVideo)
-        {
-            query.prepare("INSERT INTO filemarkup"
-                          " (filename, mark, type, offset)"
-                          " VALUES"
-                          " ( :PATH , :MARK , :TYPE , :OFFSET );");
-            query.bindValue(":PATH", videoPath);
-        }
-        else
-        {
-            query.prepare("INSERT INTO recordedseek"
-                          " (chanid, starttime, mark, type, offset)"
-                          " VALUES"
-                          " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
-            query.bindValue(":CHANID", chanid);
-            query.bindValue(":STARTTIME", recstartts);
-        }
         query.bindValue(":MARK", frame);
-        query.bindValue(":TYPE", type);
         query.bindValue(":OFFSET", offset);
 
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
+        {
             MythDB::DBError("position map insert", query);
+            break;
+        }
     }
 }
 
@@ -2921,34 +2925,38 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
     if (isVideo)
         videoPath = StorageGroup::GetRelativePathname(pathname);
 
+    if (isVideo)
+    {
+        query.prepare(
+            "INSERT DELAYED INTO "
+            "filemarkup (filename, mark, type, offset) "
+            "VALUES ( :PATH , :MARK , :TYPE , :OFFSET )");
+        query.bindValue(":PATH", videoPath);
+    }
+    else
+    {
+        query.prepare(
+            "INSERT DELAYED INTO "
+            "recordedseek (chanid, starttime, mark, type, offset) "
+            " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET )");
+        query.bindValue(":CHANID",    chanid);
+        query.bindValue(":STARTTIME", recstartts);
+    }
+    query.bindValue(":TYPE", type);
+
     for (i = posMap.begin(); i != posMap.end(); ++i)
     {
         long long frame = i.key();
         long long offset = *i;
 
-        if (isVideo)
-        {
-            query.prepare("INSERT INTO filemarkup"
-                          " (filename, mark, type, offset)"
-                          " VALUES"
-                          " ( :PATH , :MARK , :TYPE , :OFFSET );");
-            query.bindValue(":PATH", videoPath);
-        }
-        else
-        {
-            query.prepare("INSERT INTO recordedseek"
-                          " (chanid, starttime, mark, type, offset)"
-                          " VALUES"
-                          " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
-            query.bindValue(":CHANID", chanid);
-            query.bindValue(":STARTTIME", recstartts);
-        }
         query.bindValue(":MARK", frame);
-        query.bindValue(":TYPE", type);
         query.bindValue(":OFFSET", offset);
 
-        if (!query.exec() || !query.isActive())
+        if (!query.exec())
+        {
             MythDB::DBError("delta position map insert", query);
+            break;
+        }
     }
 }
 
