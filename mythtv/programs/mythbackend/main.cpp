@@ -55,6 +55,13 @@ using namespace std;
 #define LOC_WARN QString("MythBackend, Warning: ")
 #define LOC_ERR  QString("MythBackend, Error: ")
 
+#ifdef Q_OS_MACX 
+    // 10.6 uses handle 3 for its new Grand Central Dispatch thingy 
+    #define UNUSED_FILENO 4  
+#else 
+    #define UNUSED_FILENO 3 
+#endif
+
 QMap<int, EncoderLink *> tvList;
 AutoExpire  *expirer      = NULL;
 Scheduler   *sched        = NULL;
@@ -510,7 +517,7 @@ int main(int argc, char **argv)
 
     bool need_gui = false;
 #ifndef _WIN32
-    for (int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
+    for (int i = UNUSED_FILENO; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
         close(i);
 #else
     // MINGW application needs a window to receive messages
