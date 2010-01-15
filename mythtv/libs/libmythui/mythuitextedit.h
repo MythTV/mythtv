@@ -44,6 +44,7 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     void SetFilter(InputFilter filter) { m_Filter = filter; }
     void SetPassword(bool isPassword)  { m_isPassword = isPassword; }
+    void SetMaxLength(const int length);
 
     enum MoveDirection { MoveLeft, MoveRight, MoveEnd };
     bool MoveCursor(MoveDirection);
@@ -73,8 +74,6 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     bool InsertCharacter(const QString &character);
     void RemoveCharacter(void);
-
-    void SetMaxLength(const int length);
 
     void CutTextToClipboard(void);
     void CopyTextToClipboard(void);

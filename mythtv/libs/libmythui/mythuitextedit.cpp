@@ -103,11 +103,6 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
     {
         SetArea(parseRect(element));
     }
-    else if (element.tagName() == "maxlength")
-    {
-        QString maxlength = getFirstText(element);
-        SetMaxLength(maxlength.toInt());
-    }
     else if (element.tagName() == "keyboardposition")
     {
         QString pos = getFirstText(element);
