@@ -2033,8 +2033,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     {
         if (tracks[kTrackTypeAudio].size() > 1)
         {
-            sort(tracks[kTrackTypeAudio].begin(),
-                 tracks[kTrackTypeAudio].end());
+            stable_sort(tracks[kTrackTypeAudio].begin(),
+                        tracks[kTrackTypeAudio].end());
             sinfo_vec_t::iterator it = tracks[kTrackTypeAudio].begin();
             for (; it != tracks[kTrackTypeAudio].end(); ++it)
             {
