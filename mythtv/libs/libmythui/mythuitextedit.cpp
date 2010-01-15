@@ -3,11 +3,12 @@
 #include "mythuitextedit.h"
 
 // QT headers
-#include <QCoreApplication>
+#include <QApplication>
 #include <QRegExp>
 #include <QChar>
 #include <QKeyEvent>
 #include <QDomDocument>
+#include <QClipboard>
 
 // Libmythdb headers
 #include "mythverbose.h"
@@ -214,6 +215,20 @@ void MythUITextEdit::SetText(const QString &text, bool moveCursor)
     emit valueChanged();
 }
 
+void MythUITextEdit::InsertText(const QString &text)
+{
+    if (!m_Text)
+        return;
+
+    int i = 0;
+    for (; i < text.size(); ++i)
+    {
+        InsertCharacter(text.data()[i]);
+    }
+    
+    emit valueChanged();
+}
+
 bool MythUITextEdit::InsertCharacter(const QString &character)
 {
     if (m_maxLength != 0 && m_Message.length() == m_maxLength)
@@ -351,6 +366,26 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
     return true;
 }
 
+void MythUITextEdit::CutTextToClipboard()
+{
+    CopyTextToClipboard();
+    Reset();
+}
+
+void MythUITextEdit::CopyTextToClipboard()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    if (clipboard)
+        clipboard->setText(m_Message);
+}
+
+void MythUITextEdit::PasteTextFromClipboard()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    if (clipboard)
+        InsertText(clipboard->text());
+}
+
 bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
 {
     QStringList actions;
@@ -391,6 +426,18 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
             }
             else
                 delete kb;
+        }
+        else if (action == "CUT")
+        {
+            CutTextToClipboard();
+        }
+        else if (action == "COPY")
+        {
+            CopyTextToClipboard();
+        }
+        else if (action == "PASTE")
+        {
+            PasteTextFromClipboard();
         }
         else
             handled = false;

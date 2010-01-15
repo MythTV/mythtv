@@ -397,6 +397,13 @@ MythMainWindow::MythMainWindow(const bool useDB)
     RegisterKey("Global", "EJECT", QT_TRANSLATE_NOOP("MythControls"
         ,"Eject Removable Media"),   "");
 
+    RegisterKey("Global", "CUT", QT_TRANSLATE_NOOP("MythControls",
+        "Cut text from textedit"), "Ctrl+X");
+    RegisterKey("Global", "COPY", QT_TRANSLATE_NOOP("MythControls"
+        ,"Copy text from textedit"), "Ctrl+C");
+    RegisterKey("Global", "PASTE", QT_TRANSLATE_NOOP("MythControls",
+        "Paste text into textedit"), "Ctrl+V");
+
     RegisterKey("Global", "0", QT_TRANSLATE_NOOP("MythControls","0"), "0");
     RegisterKey("Global", "1", QT_TRANSLATE_NOOP("MythControls","1"), "1");
     RegisterKey("Global", "2", QT_TRANSLATE_NOOP("MythControls","2"), "2");

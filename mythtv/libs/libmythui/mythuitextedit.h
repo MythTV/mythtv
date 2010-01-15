@@ -39,6 +39,7 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
     virtual void Reset(void);
 
     void SetText(const QString &text, bool moveCursor = true);
+    void InsertText(const QString &text);
     QString GetText(void) const { return m_Message; }
 
     void SetFilter(InputFilter filter) { m_Filter = filter; }
@@ -74,6 +75,10 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
     void RemoveCharacter(void);
 
     void SetMaxLength(const int length);
+
+    void CutTextToClipboard(void);
+    void CopyTextToClipboard(void);
+    void PasteTextFromClipboard(void);
 
     bool m_initialized;
 
