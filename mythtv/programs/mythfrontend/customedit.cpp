@@ -74,8 +74,11 @@ bool CustomEdit::Create()
                 SLOT(ruleChanged(MythUIButtonListItem *)));
     connect(m_titleEdit, SIGNAL(valueChanged(void)), this,
                 SLOT(textChanged(void)));
+    m_titleEdit->SetMaxLength(128);
+    m_subtitleEdit->SetMaxLength(128);
     connect(m_descriptionEdit, SIGNAL(valueChanged(void)), this,
                 SLOT(textChanged(void)));
+    m_descriptionEdit->SetMaxLength(0);
 
     connect(m_clauseList, SIGNAL(itemSelected(MythUIButtonListItem *)),
                 SLOT(clauseChanged(MythUIButtonListItem *)));

@@ -4815,7 +4815,9 @@ bool RecMetadataEdit::Create()
     }
 
     m_titleEdit->SetText(m_progInfo->title);
+    m_titleEdit->SetMaxLength(128);
     m_subtitleEdit->SetText(m_progInfo->subtitle);
+    m_subtitleEdit->SetMaxLength(128);
 
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
 
