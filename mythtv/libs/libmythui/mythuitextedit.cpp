@@ -34,7 +34,7 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
 
     m_Position = -1;
 
-    m_maxLength = 0;
+    m_maxLength = 255;
 
     m_backgroundState = NULL;
     m_cursorImage = NULL;
