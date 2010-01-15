@@ -76,7 +76,9 @@ bool CustomPriority::Create()
                 SLOT(ruleChanged(MythUIButtonListItem *)));
 
     connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(textChanged()));
+    m_titleEdit->SetMaxLength(128);
     connect(m_descriptionEdit, SIGNAL(valueChanged()), SLOT(textChanged()));
+    m_descriptionEdit->SetMaxLength(0);
 
     connect(m_addButton, SIGNAL(Clicked()), SLOT(addClicked()));
     connect(m_testButton, SIGNAL(Clicked()), SLOT(testClicked()));

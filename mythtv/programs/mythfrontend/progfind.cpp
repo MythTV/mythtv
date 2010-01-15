@@ -15,7 +15,6 @@
 #include "recordinginfo.h"
 #include "tv.h"
 #include "mythuitext.h"
-#include "mythuitextedit.h"
 #include "mythuibuttonlist.h"
 #include "mythuibutton.h"
 #include "mythuihelper.h"

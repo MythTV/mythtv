@@ -722,7 +722,7 @@ void PlaybackBox::UpdateUIListItem(
         item->SetText(tempLongDate, "longdate");
         item->SetText(tempShortDate, "shortdate");
     }
-    
+
     item->SetFontState(state);
     item->DisplayState(state, "status");
 
@@ -4763,7 +4763,9 @@ bool PasswordChange::Create()
     }
 
     m_oldPasswordEdit->SetPassword(true);
+    m_oldPasswordEdit->SetMaxLength(10);
     m_newPasswordEdit->SetPassword(true);
+    m_newPasswordEdit->SetMaxLength(10);
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");

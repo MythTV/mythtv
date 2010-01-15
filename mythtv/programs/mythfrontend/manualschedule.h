@@ -39,14 +39,14 @@ class ManualSchedule : public MythScreenType
 
     QStringList m_chanids;
 
-    MythUITextEdit *m_title;
+    MythUITextEdit *m_titleEdit;
 
-    MythUIButtonList *m_channel;
-    MythUIButtonList *m_startdate;
+    MythUIButtonList *m_channelList;
+    MythUIButtonList *m_startdateList;
 
-    MythUISpinBox *m_starthour;
-    MythUISpinBox *m_startminute;
-    MythUISpinBox *m_duration;
+    MythUISpinBox *m_starthourSpin;
+    MythUISpinBox *m_startminuteSpin;
+    MythUISpinBox *m_durationSpin;
 
     MythUIButton *m_recordButton;
     MythUIButton *m_cancelButton;

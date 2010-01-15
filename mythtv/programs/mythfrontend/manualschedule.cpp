@@ -35,11 +35,10 @@ ManualSchedule::ManualSchedule(MythScreenStack *parent)
     m_dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     m_timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
-    m_title = NULL;
-    m_channel = NULL;
+    m_titleEdit = NULL;
+    m_channelList = m_startdateList = NULL;
     m_recordButton = m_cancelButton = NULL;
-    m_startdate = NULL;
-    m_duration = m_starthour = m_startminute = NULL;
+    m_durationSpin = m_starthourSpin = m_startminuteSpin = NULL;
 }
 
 bool ManualSchedule::Create(void)
@@ -47,20 +46,21 @@ bool ManualSchedule::Create(void)
     if (!LoadWindowFromXML("schedule-ui.xml", "manualschedule", this))
         return false;
 
-    m_channel = dynamic_cast<MythUIButtonList *>(GetChild("channel"));
-    m_startdate = dynamic_cast<MythUIButtonList *>(GetChild("startdate"));
+    m_channelList = dynamic_cast<MythUIButtonList *>(GetChild("channel"));
+    m_startdateList = dynamic_cast<MythUIButtonList *>(GetChild("startdate"));
 
-    m_starthour = dynamic_cast<MythUISpinBox *>(GetChild("starthour"));
-    m_startminute = dynamic_cast<MythUISpinBox *>(GetChild("startminute"));
-    m_duration = dynamic_cast<MythUISpinBox *>(GetChild("duration"));
+    m_starthourSpin = dynamic_cast<MythUISpinBox *>(GetChild("starthour"));
+    m_startminuteSpin = dynamic_cast<MythUISpinBox *>(GetChild("startminute"));
+    m_durationSpin = dynamic_cast<MythUISpinBox *>(GetChild("duration"));
 
-    m_title = dynamic_cast<MythUITextEdit *>(GetChild("title"));
+    m_titleEdit = dynamic_cast<MythUITextEdit *>(GetChild("title"));
 
     m_recordButton = dynamic_cast<MythUIButton *>(GetChild("next"));
     m_cancelButton = dynamic_cast<MythUIButton *>(GetChild("cancel"));
 
-    if (!m_channel || !m_startdate || !m_starthour || !m_startminute ||
-        !m_duration || !m_title || !m_recordButton || !m_cancelButton)
+    if (!m_channelList || !m_startdateList || !m_starthourSpin ||
+        !m_startminuteSpin || !m_durationSpin || !m_titleEdit ||
+        !m_recordButton || !m_cancelButton)
     {
         VERBOSE(VB_IMPORTANT, "ManualSchedule, theme is missing "
                               "required elements");
@@ -81,7 +81,7 @@ bool ManualSchedule::Create(void)
             .replace("<sign>", channels[i].callsign)
             .replace("<name>", channels[i].name);
         chantext.detach();
-        new MythUIButtonListItem(m_channel, chantext);
+        new MythUIButtonListItem(m_channelList, chantext);
         m_chanids << QString::number(channels[i].chanid);
     }
 
@@ -92,31 +92,33 @@ bool ManualSchedule::Create(void)
             dinfo += QString(" (%1)").arg(tr("5 weekdays if daily"));
         else
             dinfo += QString(" (%1)").arg(tr("7 days per week if daily"));
-        new MythUIButtonListItem(m_startdate, dinfo);
+        new MythUIButtonListItem(m_startdateList, dinfo);
         if (m_nowDateTime.addDays(index).toString("MMdd") ==
             m_startDateTime.toString("MMdd"))
-            m_startdate->SetItemCurrent(m_startdate->GetCount() - 1);
+            m_startdateList->SetItemCurrent(m_startdateList->GetCount() - 1);
     }
 
     QTime thisTime = m_nowDateTime.time();
     thisTime = thisTime.addSecs((30 - (thisTime.minute() % 30)) * 60);
 
     if (thisTime < QTime(0,30))
-        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
+        m_startdateList->SetItemCurrent(m_startdateList->GetCurrentPos() + 1);
 
-    m_starthour->SetRange(0,23,1);
-    m_starthour->SetValue(thisTime.hour());
+    m_starthourSpin->SetRange(0,23,1);
+    m_starthourSpin->SetValue(thisTime.hour());
     int minute_increment =
         gContext->GetNumSetting("ManualScheduleMinuteIncrement", 5);
-    m_startminute->SetRange(0, 60-minute_increment, minute_increment);
-    m_startminute->SetValue((thisTime.minute()/5)*5);
-    m_duration->SetRange(5,360,5);
-    m_duration->SetValue(60);
+    m_startminuteSpin->SetRange(0, 60-minute_increment, minute_increment);
+    m_startminuteSpin->SetValue((thisTime.minute()/5)*5);
+    m_durationSpin->SetRange(5,360,5);
+    m_durationSpin->SetValue(60);
 
     connectSignals();
     connect(m_recordButton, SIGNAL(Clicked()), SLOT(recordClicked()));
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
 
+    m_titleEdit->SetMaxLength(128);
+    
     BuildFocusList();
 
     return true;
@@ -124,57 +126,57 @@ bool ManualSchedule::Create(void)
 
 void ManualSchedule::connectSignals()
 {
-    connect(m_startdate, SIGNAL(itemSelected(MythUIButtonListItem*)),
+    connect(m_startdateList, SIGNAL(itemSelected(MythUIButtonListItem*)),
                          SLOT(dateChanged(void)));
-    connect(m_starthour, SIGNAL(itemSelected(MythUIButtonListItem*)),
+    connect(m_starthourSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
                          SLOT(dateChanged(void)));
-    connect(m_startminute, SIGNAL(itemSelected(MythUIButtonListItem*)),
+    connect(m_startminuteSpin, SIGNAL(itemSelected(MythUIButtonListItem*)),
                            SLOT(dateChanged(void)));
 }
 
 void ManualSchedule::disconnectSignals()
 {
-    disconnect(m_startdate, 0, this, 0);
-    disconnect(m_starthour, 0, this, 0);
-    disconnect(m_startminute, 0, this, 0);
+    disconnect(m_startdateList, 0, this, 0);
+    disconnect(m_starthourSpin, 0, this, 0);
+    disconnect(m_startminuteSpin, 0, this, 0);
 }
 
 void ManualSchedule::hourRollover(void)
 {
-    if (m_startminute->GetIntValue() == 0 )
+    if (m_startminuteSpin->GetIntValue() == 0 )
     {
-        m_startminute->SetValue(12);
-        m_starthour->SetValue(m_starthour->GetIntValue() - 1);
+        m_startminuteSpin->SetValue(12);
+        m_starthourSpin->SetValue(m_starthourSpin->GetIntValue() - 1);
     }
-    if (m_startminute->GetIntValue() == 13 )
+    if (m_startminuteSpin->GetIntValue() == 13 )
     {
-        m_starthour->SetValue(m_starthour->GetIntValue() + 1);
-        m_startminute->SetValue(1);
+        m_starthourSpin->SetValue(m_starthourSpin->GetIntValue() + 1);
+        m_startminuteSpin->SetValue(1);
     }
 }
 
 void ManualSchedule::minuteRollover(void)
 {
-    if (m_starthour->GetIntValue() == 0 )
+    if (m_starthourSpin->GetIntValue() == 0 )
     {
-        m_starthour->SetValue(24);
-        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() - 1);
+        m_starthourSpin->SetValue(24);
+        m_startdateList->SetItemCurrent(m_startdateList->GetCurrentPos() - 1);
     }
-    if (m_starthour->GetIntValue() == 25 )
+    if (m_starthourSpin->GetIntValue() == 25 )
     {
-        m_startdate->SetItemCurrent(m_startdate->GetCurrentPos() + 1);
-        m_starthour->SetValue(1);
+        m_startdateList->SetItemCurrent(m_startdateList->GetCurrentPos() + 1);
+        m_starthourSpin->SetValue(1);
     }
 }
 
 void ManualSchedule::dateChanged(void)
 {
     disconnectSignals();
-    daysahead = m_startdate->GetCurrentPos();
+    daysahead = m_startdateList->GetCurrentPos();
     m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
 
-    int hr = m_starthour->GetIntValue();
-    int min = m_startminute->GetIntValue();
+    int hr = m_starthourSpin->GetIntValue();
+    int min = m_startminuteSpin->GetIntValue();
     m_startDateTime.setTime(QTime(hr, min));
 
     VERBOSE(VB_SCHEDULE, QString("Start Date Time: %1")
@@ -188,7 +190,7 @@ void ManualSchedule::dateChanged(void)
     if (tmp < m_nowDateTime)
     {
         hr = m_nowDateTime.time().hour();
-        m_starthour->SetValue(hr);
+        m_starthourSpin->SetValue(hr);
         m_startDateTime.setDate(m_nowDateTime.date());
         m_startDateTime.setTime(QTime(hr, min));
     }
@@ -200,7 +202,7 @@ void ManualSchedule::recordClicked(void)
     ProgramInfo p;
 
     QString channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    p.chanid = m_chanids[m_channel->GetCurrentPos()];
+    p.chanid = m_chanids[m_channelList->GetCurrentPos()];
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, callsign, name "
@@ -214,7 +216,7 @@ void ManualSchedule::recordClicked(void)
         p.channame = query.value(3).toString();
     }
 
-    int addsec = m_duration->GetIntValue() * 60;
+    int addsec = m_durationSpin->GetIntValue() * 60;
 
     if (!addsec)
         addsec = 60;
@@ -222,8 +224,8 @@ void ManualSchedule::recordClicked(void)
     p.startts = m_startDateTime;
     p.endts = p.startts.addSecs(addsec);
 
-    if (!m_title->GetText().isEmpty())
-        p.title = m_title->GetText();
+    if (!m_titleEdit->GetText().isEmpty())
+        p.title = m_titleEdit->GetText();
     else
         p.title = p.ChannelText(channelFormat) + " - " +
                   p.startts.toString(m_timeformat);
