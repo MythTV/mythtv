@@ -108,18 +108,32 @@ bool EditMetadataDialog::Create()
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
 
     connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(SetTitle()));
+    m_titleEdit->SetMaxLength(128);
     connect(m_subtitleEdit, SIGNAL(valueChanged()), SLOT(SetSubtitle()));
+    m_subtitleEdit->SetMaxLength(0);
     connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(SetPlayer()));
     if (m_ratingEdit)
+    {
         connect(m_ratingEdit, SIGNAL(valueChanged()), SLOT(SetRating()));
+        m_ratingEdit->SetMaxLength(128);
+    }
     if (m_directorEdit)
+    {
         connect(m_directorEdit, SIGNAL(valueChanged()), SLOT(SetDirector()));
+        m_directorEdit->SetMaxLength(128);
+    }
     if (m_inetrefEdit)
         connect(m_inetrefEdit, SIGNAL(valueChanged()), SLOT(SetInetRef()));
     if (m_homepageEdit)
+    {
         connect(m_homepageEdit, SIGNAL(valueChanged()), SLOT(SetHomepage()));
+        m_homepageEdit->SetMaxLength(0);
+    }
     if (m_plotEdit)
+    {
         connect(m_plotEdit, SIGNAL(valueChanged()), SLOT(SetPlot()));
+        m_plotEdit->SetMaxLength(0);
+    }
 
     connect(m_seasonSpin, SIGNAL(LosingFocus()), SLOT(SetSeason()));
     connect(m_episodeSpin, SIGNAL(LosingFocus()), SLOT(SetEpisode()));

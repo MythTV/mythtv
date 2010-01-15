@@ -3956,7 +3956,7 @@ void VideoDialog::ManualVideoUID()
     QString message = tr("Enter Video Unique ID:");
 
     MythTextInputDialog *searchdialog =
-                                new MythTextInputDialog(m_popupStack,message);
+                                new MythTextInputDialog(m_popupStack, message);
 
     if (searchdialog->Create())
         m_popupStack->AddScreen(searchdialog);
@@ -3977,7 +3977,7 @@ void VideoDialog::ManualVideoTitle()
     QString message = tr("Enter Video Title:");
 
     MythTextInputDialog *searchdialog =
-                                new MythTextInputDialog(m_popupStack,message);
+                                new MythTextInputDialog(m_popupStack, message);
 
     if (searchdialog->Create())
         m_popupStack->AddScreen(searchdialog);
