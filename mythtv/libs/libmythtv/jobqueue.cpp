@@ -1623,7 +1623,7 @@ void JobQueue::ProcessJob(JobQueueEntry job)
     runningJobs[jobID] = jInfo;
 
     if (pginfo)
-        pginfo->MarkAsInUse(true, "jobqueue");
+        pginfo->MarkAsInUse(true, kJobQueueInUseID);
 
     if (pginfo && pginfo->recgroup == "Deleted")
     {

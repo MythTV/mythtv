@@ -990,7 +990,7 @@ TV::TV(void)
     gContext->addListener(this);
 
     playerLock.lockForWrite();
-    player.push_back(new PlayerContext("player"));
+    player.push_back(new PlayerContext(kPlayerInUseID));
     playerActive = 0;
     playerLock.unlock();
     VERBOSE(VB_PLAYBACK, LOC + "ctor -- end");
@@ -5052,7 +5052,7 @@ bool TV::CreatePBP(PlayerContext *ctx, const ProgramInfo *info)
     mctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     // This is safe because we are already holding lock for a ctx
-    player.push_back(new PlayerContext("pbpplayer"));
+    player.push_back(new PlayerContext(kPBPPlayerInUseID));
     PlayerContext *pbpctx = player.back();
     if (noHardwareDecoders)
         pbpctx->SetNoHardwareDecoders();
@@ -5136,7 +5136,7 @@ bool TV::CreatePIP(PlayerContext *ctx, const ProgramInfo *info)
         return false;
     }
 
-    PlayerContext *pipctx = new PlayerContext("pipplayer");
+    PlayerContext *pipctx = new PlayerContext(kPIPPlayerInUseID);
     if (noHardwareDecoders)
         pipctx->SetNoHardwareDecoders();
     pipctx->SetNullVideo(true);

@@ -1900,7 +1900,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     if (pginfo)
     {
         pginfo->pathname = filename;
-        pginfo->MarkAsInUse(true, "truncatingdelete");
+        pginfo->MarkAsInUse(true, kTruncatingDeleteInUseID);
     }
 
     int cards = 5;

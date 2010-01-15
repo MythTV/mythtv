@@ -96,13 +96,13 @@ void ImportRecorder::StartRecording(void)
         RingBuffer *rb = new RingBuffer(
             ringBuffer->GetFilename(), false, true, 6);
 
-        PlayerContext *ctx = new PlayerContext("importrecorder");
+        PlayerContext *ctx = new PlayerContext(kImportRecorderInUseID);
         ctx->SetPlayingInfo(curRecording);
         ctx->SetRingBuffer(rb);
         ctx->SetNVP(nvp);
         nvp->SetPlayerInfo(NULL, NULL, true, ctx);
 
-        nvp->RebuildSeekTable();
+        nvp->RebuildSeekTable(false);
 
         delete ctx;
     }

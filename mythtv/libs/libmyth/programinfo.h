@@ -17,7 +17,17 @@ using namespace std;
 #include "recordingtypes.h"
 #include "mythdbcon.h"
 
+MPUBLIC extern const char *kPlayerInUseID;
+MPUBLIC extern const char *kPIPPlayerInUseID;
+MPUBLIC extern const char *kPBPPlayerInUseID;
+MPUBLIC extern const char *kImportRecorderInUseID;
+MPUBLIC extern const char *kRecorderInUseID;
+MPUBLIC extern const char *kFileTransferInUseID;
+MPUBLIC extern const char *kTruncatingDeleteInUseID;
+MPUBLIC extern const char *kFlaggerInUseID;
+MPUBLIC extern const char *kTranscoderInUseID;
 MPUBLIC extern const char *kPreviewGeneratorInUseID;
+MPUBLIC extern const char *kJobQueueInUseID;
 
 typedef QHash<QString,QString> InfoMap;
 

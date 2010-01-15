@@ -22,7 +22,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote,
     if (pginfo)
     {
         pginfo->pathname = pginfo->GetPlaybackURL();
-        pginfo->MarkAsInUse(true, "filetransfer");
+        pginfo->MarkAsInUse(true, kFileTransferInUseID);
     }
 }
 
@@ -39,7 +39,7 @@ FileTransfer::FileTransfer(QString &filename, MythSocket *remote, bool write) :
     if (pginfo)
     {
         pginfo->pathname = pginfo->GetPlaybackURL();
-        pginfo->MarkAsInUse(true, "filetransfer");
+        pginfo->MarkAsInUse(true, kFileTransferInUseID);
     }
 }
 

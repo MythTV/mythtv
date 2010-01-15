@@ -432,6 +432,9 @@ void DecoderBase::SetPositionMap(void)
 
     if (m_playbackinfo && (positionMapType != MARK_UNSET)) 
     {
+        VERBOSE(VB_GENERAL, LOC + QString("SetPositionMap() %1")
+                .arg(m_positionMap.size()));
+
         QMap<long long, long long> posMap;
         for (uint i = 0; i < m_positionMap.size(); i++) 
             posMap[m_positionMap[i].index] = m_positionMap[i].pos;

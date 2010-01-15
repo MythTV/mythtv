@@ -32,7 +32,17 @@ using namespace std;
 #define LOC QString("ProgramInfo: ")
 #define LOC_ERR QString("ProgramInfo, Error: ")
 
+const char *kPlayerInUseID           = "player";
+const char *kPIPPlayerInUseID        = "pipplayer";
+const char *kPBPPlayerInUseID        = "pbpplayer";
+const char *kImportRecorderInUseID   = "import_recorder";
+const char *kRecorderInUseID         = "recorder";
+const char *kFileTransferInUseID     = "filetransfer";
+const char *kTruncatingDeleteInUseID = "truncatingdelete";
+const char *kFlaggerInUseID          = "flagger";
+const char *kTranscoderInUseID       = "transcoder";
 const char *kPreviewGeneratorInUseID = "preview_generator";
+const char *kJobQueueInUseID         = "jobqueue";
 
 // works only for integer divisors of 60
 static const uint kUnknownProgramLength = 30;
@@ -2201,26 +2211,31 @@ bool ProgramInfo::IsInUse(QString &byWho) const
     query.bindValue(":ONEHOURAGO", oneHourAgo);
 
     byWho.clear();
-    if (query.exec() && query.size() > 0)
+    if (query.exec())
     {
         QString usageStr, recusage;
-        while(query.next())
+        while (query.next())
         {
             usageStr = QObject::tr("Unknown");
             recusage = query.value(1).toString();
 
-            if (recusage == "player")
+            if (recusage == kPlayerInUseID)
                 usageStr = QObject::tr("Playing");
-            else if (recusage == "recorder")
-                usageStr = QObject::tr("Recording");
-            else if (recusage == "flagger")
-                usageStr = QObject::tr("Commercial Flagging");
-            else if (recusage == "transcoder")
-                usageStr = QObject::tr("Transcoding");
-            else if (recusage == "pipplayer")
+            else if (recusage == kPIPPlayerInUseID)
                 usageStr = QObject::tr("PIP");
-            else if (recusage == "pbpplayer")
+            else if (recusage == kPBPPlayerInUseID)
                 usageStr = QObject::tr("PBP");
+            else if ((recusage == kRecorderInUseID) ||
+                     (recusage == kImportRecorderInUseID))
+                usageStr = QObject::tr("Recording");
+            else if (recusage == kFileTransferInUseID)
+                usageStr = QObject::tr("File transfer");
+            else if (recusage == kTruncatingDeleteInUseID)
+                usageStr = QObject::tr("Delete");
+            else if (recusage == kFlaggerInUseID)
+                usageStr = QObject::tr("Commercial Flagging");
+            else if (recusage == kTranscoderInUseID)
+                usageStr = QObject::tr("Transcoding");
 
             byWho += query.value(0).toString() + " (" + usageStr + ")\n";
         }

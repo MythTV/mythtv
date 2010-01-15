@@ -3883,7 +3883,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                 {
                     int weightOffset = 0;
 
-                    if (recUsage == "recorder")
+                    if (recUsage == kRecorderInUseID)
                     {
                         if (recEnd > pginfo->recstartts.addSecs(maxOverlap))
                         {
@@ -3892,13 +3892,11 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                                            recStart.toString(Qt::ISODate);
                         }
                     }
-                    else if ((recUsage == "player") ||
-                             (recUsage == "pipplayer") ||
-                             (recUsage == "pbpplayer"))
+                    else if (recUsage.contains(kPlayerInUseID))
                         weightOffset += weightPerPlayback;
-                    else if (recUsage == "flagger")
+                    else if (recUsage == kFlaggerInUseID)
                         weightOffset += weightPerCommFlag;
-                    else if (recUsage == "transcoder")
+                    else if (recUsage == kTranscoderInUseID)
                         weightOffset += weightPerTranscode;
 
                     if (weightOffset)

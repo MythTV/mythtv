@@ -405,7 +405,7 @@ int Transcode::TranscodeFile(
     inRingBuffer = new RingBuffer(inputname, false, false);
     nvp = new NuppelVideoPlayer();
 
-    player_ctx = new PlayerContext("transcoder");
+    player_ctx = new PlayerContext(kTranscoderInUseID);
     player_ctx->SetPlayingInfo(m_proginfo);
     player_ctx->SetRingBuffer(inRingBuffer);
     player_ctx->SetNVP(nvp);

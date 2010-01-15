@@ -269,13 +269,10 @@ bool LoadFromRecorded(
             if (!inUseMap.contains(inUseKey))
                 inUseMap[inUseKey] = 0;
 
-            if ((inUseForWhat == "player") ||
-                (inUseForWhat == "preview player") ||
-                (inUseForWhat == "pipplayer") ||
-                (inUseForWhat == "pbpplayer"))
-                inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSEPLAYING;
-            else if (inUseForWhat == "recorder")
-                inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSERECORDING;
+            if (inUseForWhat.contains(kPlayerInUseID))
+                inUseMap[inUseKey] |= FL_INUSEPLAYING;
+            else if (inUseForWhat == kRecorderInUseID)
+                inUseMap[inUseKey] |= FL_INUSERECORDING;
         }
     }
 

@@ -646,7 +646,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         // Tell event loop to begin recording.
         curRecording = new RecordingInfo(*rcinfo);
-        curRecording->MarkAsInUse(true, "recorder");
+        curRecording->MarkAsInUse(true, kRecorderInUseID);
         StartedRecording(curRecording);
 
         // Make sure scheduler is allowed to end this recording
@@ -3362,7 +3362,7 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
             delete curRecording;
         }
         curRecording = new RecordingInfo(*pginfo);
-        curRecording->MarkAsInUse(true, "recorder");
+        curRecording->MarkAsInUse(true, kRecorderInUseID);
     }
 
     SetRingBuffer(rb);
@@ -4425,7 +4425,7 @@ bool TVRec::CreateLiveTVRingBuffer(void)
     }
 
     curRecording = pginfo;
-    curRecording->MarkAsInUse(true, "recorder");
+    curRecording->MarkAsInUse(true, kRecorderInUseID);
 
     return true;
 }
@@ -4455,7 +4455,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
         delete oldinfo;
     }
 
-    pginfo->MarkAsInUse(true, "recorder");
+    pginfo->MarkAsInUse(true, kRecorderInUseID);
     pginfo->SetAutoExpire(kLiveTVAutoExpire);
     pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),

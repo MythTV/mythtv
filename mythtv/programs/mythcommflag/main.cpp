@@ -722,7 +722,7 @@ int FlagCommercials(
 
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer();
 
-    PlayerContext *ctx = new PlayerContext("flagger");
+    PlayerContext *ctx = new PlayerContext(kFlaggerInUseID);
     ctx->SetPlayingInfo(program_info);
     ctx->SetRingBuffer(tmprbuf);
     ctx->SetNVP(nvp);
