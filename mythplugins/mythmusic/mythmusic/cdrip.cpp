@@ -502,6 +502,7 @@ bool Ripper::Create(void)
     connect(m_searchGenreButton, SIGNAL(Clicked()), SLOT(searchGenre()));
     connect(m_genreEdit, SIGNAL(valueChanged()), SLOT(genreChanged()));
     m_yearEdit->SetFilter((InputFilter)(FilterAlpha | FilterSymbols | FilterPunct));
+    m_yearEdit->SetMaxLength(4);
     connect(m_yearEdit, SIGNAL(valueChanged()), SLOT(yearChanged()));
     connect(m_artistEdit, SIGNAL(valueChanged()), SLOT(artistChanged()));
     connect(m_searchArtistButton, SIGNAL(Clicked()), SLOT(searchArtist()));
