@@ -1,6 +1,9 @@
 #ifndef DECODERBASE_H_
 #define DECODERBASE_H_
 
+#define __STDC_LIMIT_MACROS
+#include <stdint.h>
+
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
@@ -110,7 +113,7 @@ class DecoderBase
     virtual bool FindPosition(long long desired_value, bool search_adjusted,
                               int &lower_bound, int &upper_bound);
 
-    virtual void SetPositionMap(void);
+    uint64_t SavePositionMapDelta(uint64_t first_frame, uint64_t last_frame);
     virtual void SeekReset(long long newkey, uint skipFrames,
                            bool doFlush, bool discardFrames);
 

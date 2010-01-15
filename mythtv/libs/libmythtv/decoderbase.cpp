@@ -426,27 +426,47 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     return false;
 }
 
-void DecoderBase::SetPositionMap(void)
+uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
 {
-    m_positionMapLock.lock();
+    MythTimer ttm, ctm, stm;
+    ttm.start();
 
-    if (m_playbackinfo && (positionMapType != MARK_UNSET)) 
-    {
-        VERBOSE(VB_GENERAL, LOC + QString("SetPositionMap() %1")
-                .arg(m_positionMap.size()));
+    QMutexLocker locker(&m_positionMapLock);
+    MarkTypes type = positionMapType;
+    uint64_t saved = 0;
 
-        QMap<long long, long long> posMap;
-        for (uint i = 0; i < m_positionMap.size(); i++) 
-            posMap[m_positionMap[i].index] = m_positionMap[i].pos;
-        MarkTypes type = positionMapType;
-        m_positionMapLock.unlock();
-        
-        m_playbackinfo->SetPositionMap(posMap, type);
-    }
-    else
+    if (!m_playbackinfo || (positionMapType == MARK_UNSET)) 
+        return saved;
+
+    ctm.start();
+    QMap<long long, long long> posMap;
+    for (uint i = 0; i < m_positionMap.size(); i++) 
     {
-        m_positionMapLock.unlock();
+        if ((uint64_t)m_positionMap[i].index < first)
+            continue;
+        if ((uint64_t)m_positionMap[i].index > last)
+            break;
+
+        posMap[m_positionMap[i].index] = m_positionMap[i].pos;
+        saved++;
     }
+
+    locker.unlock();
+
+    stm.start();
+    m_playbackinfo->SetPositionMapDelta(posMap, type);
+
+#if 0
+    cout<<'\n';
+    VERBOSE(VB_IMPORTANT,
+            QString("Saving position map [%1,%2] w/%3 keyframes, "
+                    "took (%4,%5,%6) ms\n")
+            .arg(first).arg(last).arg(saved)
+            .arg(ttm.elapsed())
+            .arg(ctm.elapsed()-stm.elapsed()).arg(stm.elapsed()));
+#endif
+
+    return saved;
 }
 
 bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
