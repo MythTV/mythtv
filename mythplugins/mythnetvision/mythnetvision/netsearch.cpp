@@ -136,6 +136,7 @@ bool NetSearch::Create()
 
 void NetSearch::Load()
 {
+    m_grabberList = fillGrabberList();
 }
 
 void NetSearch::Init()
@@ -167,32 +168,7 @@ void NetSearch::loadData(void)
 {
     QMutexLocker locker(&m_lock);
 
-    QString busymessage = tr("Searching for Scripts...");
-
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
-
-    MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
-                                                       "scriptbusydialog");
-
-    if (busyPopup->Create())
-    {
-        popupStack->AddScreen(busyPopup, false);
-    }
-    else
-    {
-        delete busyPopup;
-        busyPopup = NULL;
-    }
-
-    m_grabberList = fillGrabberList();
-
     fillGrabberButtonList();
-
-    if (busyPopup)
-    {
-        busyPopup->Close();
-        busyPopup = NULL;
-    }
 
     if (m_grabberList.count() == 0 && m_noSites)
         m_noSites->SetVisible(true);
