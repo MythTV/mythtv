@@ -1008,7 +1008,12 @@ int main(int argc, char **argv)
             tempMonitorConnection->DownRef();
     }
 
-    if (!UpgradeTVDatabaseSchema(true, true))
+    // Don't allow upgrade for --printsched, --testsched, --resched,
+    // --printexpire, --generate-preview
+    bool allowUpgrade = (!(printsched || testsched || resched)) &&
+                        (printexpire.isEmpty()) &&
+                        ((previewFrameNumber < -1) && (previewSeconds < -1));
+    if (!UpgradeTVDatabaseSchema(allowUpgrade, allowUpgrade))
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
         return BACKEND_EXIT_DB_OUTOFDATE;
