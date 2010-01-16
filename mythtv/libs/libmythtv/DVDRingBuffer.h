@@ -57,6 +57,7 @@ class MPUBLIC DVDRingBufferPriv
 
     bool IgnoringStillorWait(void) { return m_skipstillorwait; }
     uint GetAudioLanguage(int id);
+    int  GetAudioTrackNum(uint key);
     uint GetSubtitleLanguage(int key);
     void SetMenuPktPts(long long pts) { m_menupktpts = pts; }
     long long GetMenuPktPts(void) { return m_menupktpts; }

@@ -1099,6 +1099,14 @@ uint DVDRingBufferPriv::GetAudioLanguage(int id)
     return ConvertLangCode(lang);
 }
 
+/** \brief get real dvd track audio number
+  * \param key stream_id
+*/
+int DVDRingBufferPriv::GetAudioTrackNum(uint stream_id)
+{
+    return dvdnav_get_audio_logical_stream(m_dvdnav, stream_id);
+}
+
 /** \brief get the subtitle language from the dvd
  */
 uint DVDRingBufferPriv::GetSubtitleLanguage(int id)
