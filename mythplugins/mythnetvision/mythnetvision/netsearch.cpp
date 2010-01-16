@@ -101,6 +101,9 @@ bool NetSearch::Create()
     if (m_progress)
         m_progress->SetVisible(false);
 
+    if (m_noSites)
+        m_noSites->SetVisible(false);
+
     m_search = dynamic_cast<MythUITextEdit *> (GetChild("search"));
 
     if (!m_siteList || !m_searchResultList || !m_search)
@@ -126,9 +129,18 @@ bool NetSearch::Create()
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
-    loadData();
+    LoadInBackground();
 
     return true;
+}
+
+void NetSearch::Load()
+{
+}
+
+void NetSearch::Init()
+{
+    loadData();
 }
 
 NetSearch::~NetSearch()

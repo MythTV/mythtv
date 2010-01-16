@@ -48,10 +48,10 @@ class NetSearch : public MythScreenType
     void createBusyDialog(QString title);
 
   private:
+    virtual void Load();
+    virtual void Init();
+
     void cleanCacheDir(void);
-    QUrl redirectUrl(const QUrl& possibleRedirectUrl,
-                         const QUrl& oldRedirectUrl) const;
-    void processAndShowRSS(RSSSite *site);
 
     MythUIButtonList   *m_searchResultList;
     MythUIButtonList   *m_siteList;
