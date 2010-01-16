@@ -1,5 +1,6 @@
 // qt
 #include <QString>
+#include <QCoreApplication>
 #include <QProcess>
 #include <QFile>
 #include <QDir>
@@ -35,50 +36,43 @@ void GrabberScript::run()
 {
     QMutexLocker locker(&m_lock);
 
-    m_getTree = new QProcess;
-
-    connect(m_getTree, SIGNAL(finished(int, QProcess::ExitStatus)),
-                      this, SLOT(updateTreeFinished()));    
-
     QString commandline = m_commandline;
-    m_getTree->setReadChannel(QProcess::StandardOutput);
+    m_getTree.setReadChannel(QProcess::StandardOutput);
+
     if (QFile(commandline).exists())
-        m_getTree->start(commandline, QStringList() << "-T");
+    {
+        m_getTree.start(commandline, QStringList() << "-T");
+        m_getTree.waitForFinished(-1);
+        QDomDocument domDoc;
+
+        if (QProcess::NormalExit != m_getTree.exitStatus())
+        {
+            VERBOSE(VB_IMPORTANT, QString("Script %1 crashed while grabbing tree.")
+                              .arg(m_title));
+            emit finished();
+            return;
+        }
+
+        VERBOSE(VB_IMPORTANT, QString("MythNetvision: Script %1 completed download.")
+                                  .arg(m_title));
+
+        QByteArray result = m_getTree.readAll();
+
+        domDoc.setContent(result, true);
+        QDomElement root = domDoc.documentElement();
+        QDomElement channel = root.firstChildElement("channel");
+
+        clearTreeItems(m_title);
+
+        while (!channel.isNull())
+        {
+            parseDBTree(m_title, QString(), QString(), channel);
+            channel = channel.nextSiblingElement("channel");
+        }
+        emit finished();
+    }
     else
         emit finished();
-}
-
-void GrabberScript::updateTreeFinished()
-{
-    QMutexLocker locker(&m_lock);
-
-    QDomDocument domDoc;
-
-    if (QProcess::NormalExit != m_getTree->exitStatus())
-    {
-        VERBOSE(VB_IMPORTANT, QString("Script %1 crashed while grabbing tree.")
-                              .arg(m_title));
-        emit finished();
-        return;
-    }
-
-    VERBOSE(VB_IMPORTANT, QString("MythNetvision: Script %1 completed download.")
-                              .arg(m_title));
-
-    QByteArray result = m_getTree->readAll();
-
-    domDoc.setContent(result, true);
-    QDomElement root = domDoc.documentElement();
-    QDomElement channel = root.firstChildElement("channel");
-
-    clearTreeItems(m_title);
-
-    while (!channel.isNull())
-    {
-        parseDBTree(m_title, QString(), QString(), channel);
-        channel = channel.nextSiblingElement("channel");
-    }
-    emit finished();
 }
 
 void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
@@ -123,7 +117,7 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
 GrabberManager::GrabberManager() :     m_lock(QMutex::Recursive)
 {
     m_updateFreq = (gContext->GetNumSetting(
-                       "mythNetvision.updateFreq", 6) * 3600 * 1000);
+                       "mythNetvision.updateFreq", 24) * 3600 * 1000);
     m_timer = new QTimer();
     m_runningCount = 0;
     connect( m_timer, SIGNAL(timeout()),
@@ -147,35 +141,50 @@ void GrabberManager::stopTimer()
 
 void GrabberManager::doUpdate()
 {
-    m_scripts = findAllDBTreeGrabbers();
-
-    GrabberScript *s;
-    for (int x = 0; x < m_scripts.count(); x++)
-    {
-        s = m_scripts.at(x);
-        VERBOSE(VB_IMPORTANT, QString("MythNetvision: Updating Script %1")
-                              .arg(s->GetTitle()));
-        connect(s, SIGNAL(finished()),
-                          this, SLOT(grabberFinished()));
-        m_runningCount++;
-        s->run();
-    }
+    GrabberDownloadThread *gdt = new GrabberDownloadThread(this);
+    gdt->start();
 
     m_timer->start(m_updateFreq);
-}
-
-void GrabberManager::grabberFinished()
-{
-    QMutexLocker locker(&m_lock);
-
-    m_runningCount--;
-    if (m_runningCount == 0)
-        emit finished();
 }
 
 void GrabberManager::timeout()
 {
     QMutexLocker locker(&m_lock);
     doUpdate();
+}
+
+GrabberDownloadThread::GrabberDownloadThread(QObject *parent)
+{
+    m_parent = parent;
+}
+
+GrabberDownloadThread::~GrabberDownloadThread()
+{
+    cancel();
+    wait();
+}
+
+void GrabberDownloadThread::cancel()
+{
+    m_mutex.lock();
+    m_scripts.clear();
+    m_mutex.unlock();
+}
+
+void GrabberDownloadThread::run()
+{
+    m_scripts = findAllDBTreeGrabbers();
+
+    while (m_scripts.count())
+    {
+        GrabberScript *script = m_scripts.takeFirst();
+        if (script)
+        {
+            VERBOSE(VB_IMPORTANT, QString("MythNetvision: Script %1 Updating...")
+                                  .arg(script->GetTitle()));
+            script->run();
+        }
+    }
+    QCoreApplication::postEvent(m_parent, new GrabberUpdateEvent());
 }
 

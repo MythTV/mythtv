@@ -57,13 +57,16 @@ int mythplugin_init(const char *libversion)
 
     setupKeys();
 
-//    grabMan = new GrabberManager();
-//    grabMan->startTimer();
-//    grabMan->doUpdate();
+    if (gContext->GetNumSetting("mythnetvision.backgroundFetch", 0))
+    {
+        grabMan = new GrabberManager();
+        grabMan->startTimer();
+        grabMan->doUpdate();
 
-//    rssMan = new RSSManager();
-//    rssMan->startTimer();
-//    rssMan->doUpdate();
+//        rssMan = new RSSManager();
+//        rssMan->startTimer();
+//        rssMan->doUpdate();
+    }
 
     return 0;
 }

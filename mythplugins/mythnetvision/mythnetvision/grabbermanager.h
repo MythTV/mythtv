@@ -2,6 +2,7 @@
 #define GRABBERMANAGER_H
 
 #include <QObject>
+#include <QEvent>
 #include <QDomElement>
 #include <QThread>
 #include <QMetaType>
@@ -55,7 +56,7 @@ class GrabberScript : public QThread
     bool      m_search;
     bool      m_tree;
     QString   m_commandline;
-    QProcess *m_getTree;
+    QProcess  m_getTree;
 };
 Q_DECLARE_METATYPE(GrabberScript *);
 
@@ -84,6 +85,37 @@ class GrabberManager : public QObject
     GrabberScript::scriptList      m_scripts;
     uint                           m_updateFreq;
     uint                           m_runningCount;
+};
+
+const int kGrabberUpdateEventType = QEvent::User + 5000;
+
+class GrabberUpdateEvent : public QEvent
+{
+  public:
+    GrabberUpdateEvent(void)
+         : QEvent((QEvent::Type)kGrabberUpdateEventType) {}
+    ~GrabberUpdateEvent() {}
+};
+
+class GrabberDownloadThread : public QThread
+{
+public:
+
+    GrabberDownloadThread(QObject *parent);
+    ~GrabberDownloadThread();
+
+    void cancel();
+
+protected:
+
+    void run();
+    
+private:
+
+    QObject               *m_parent;
+    QList<GrabberScript*>  m_scripts;
+    QMutex                 m_mutex;
+
 };
 
 #endif

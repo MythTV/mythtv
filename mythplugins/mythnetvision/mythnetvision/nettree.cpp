@@ -52,11 +52,11 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
       m_thumbImage(NULL),            m_downloadable(NULL),
       m_busyPopup(NULL),             m_menuPopup(NULL),
       m_popupStack(),                m_type(type),
-      m_lock(QMutex::Recursive),
-      m_parse(new Parse())
+      m_lock(QMutex::Recursive),     m_parse(new Parse())
 {
     m_download = new DownloadManager(this);
     m_imageDownload = new ImageDownloadManager(this);
+    m_gdt = new GrabberDownloadThread(this);
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_updateFreq = gContext->GetNumSetting(
                        "mythNetTree.updateFreq", 6);
@@ -185,6 +185,12 @@ NetTree::~NetTree()
     {
         delete m_imageDownload;
         m_imageDownload = NULL;
+    }
+
+    if (m_gdt)
+    {
+        delete m_gdt;
+        m_gdt = NULL;
     }
 
     cleanCacheDir();
@@ -1323,15 +1329,10 @@ void NetTree::updateRSS()
 
 void NetTree::updateTrees()
 {
-    QString title(tr("Updating Trees.  This could take a while..."));
+    QString title(tr("Updating Site Maps.  This could take a while..."));
     createBusyDialog(title);
 
-    GrabberManager *grabMan = new GrabberManager();
-    grabMan->startTimer();
-    grabMan->doUpdate();
-
-    connect(grabMan, SIGNAL(finished()), this,
-                   SLOT(doTreeRefresh()));
+    m_gdt->start();
 }
 
 void NetTree::customEvent(QEvent *event)
@@ -1381,5 +1382,9 @@ void NetTree::customEvent(QEvent *event)
             return;
 
         GetMythMainWindow()->HandleMedia("Internal", dl->filename);
+    }
+    else if (event->type() == kGrabberUpdateEventType)
+    {
+        doTreeRefresh();
     }
 }

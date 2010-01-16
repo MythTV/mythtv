@@ -123,6 +123,7 @@ class NetTree : public MythScreenType
 
     DownloadManager    *m_download;
     ImageDownloadManager  *m_imageDownload;
+    GrabberDownloadThread *m_gdt;
 
     QFile              *m_file;
 
