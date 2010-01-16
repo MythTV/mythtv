@@ -1,0 +1,19 @@
+<mythmenu name="NETVISION">
+
+    <button>
+        <type>NET_VIDEO_SEARCH</type>
+        <text>Search Internet Video</text>
+        <description>Search popular video sites</description>
+        <action>JUMP MythNetSearch</action>
+        <depends>mythnetvision</depends>
+    </button>
+
+    <button>
+        <type>NET_VIDEO_TREE</type>
+        <text>Browse Internet Video</text>
+        <description>Browse highlights and entire sites</description>
+        <action>JUMP MythNetTree</action>
+        <depends>mythnetvision</depends>
+    </button>
+
+</mythmenu>
