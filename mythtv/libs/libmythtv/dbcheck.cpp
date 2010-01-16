@@ -17,10 +17,10 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /* If currentDatabaseVersion gets updated, the following files need updated:
-   mythtv/bindings/python/MythTV/MythTV.py
+   mythtv/bindings/python/MythTV/MythDB.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1250";
+const QString currentDatabaseVersion = "1251";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5049,6 +5049,16 @@ NULL
             return false;
 
         dbver = "1250";
+    }
+
+    if (dbver == "1250")
+    {
+       const char *updates[] = {
+"UPDATE recorded SET bookmark = 1 WHERE bookmark != 0;",
+NULL
+};
+        if (!performActualUpdate(updates, "1251", dbver))
+            return false;
     }
 
     return true;

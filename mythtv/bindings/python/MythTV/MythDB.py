@@ -22,7 +22,7 @@ except:
 	log.Msg(CRITICAL, "MySQLdb (python-mysqldb) is required but is not found.")
 	sys.exit(1)
 
-SCHEMA_VERSION = 1250
+SCHEMA_VERSION = 1251
 
 class MythDB(object):
 	"""
