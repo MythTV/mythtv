@@ -730,6 +730,7 @@ int main(int argc, char *argv[])
         VERBOSE(VB_GENERAL, "Fudging non-unique programids "
                 "with multiple parts.");
 
+        int found = 0;
         MSqlQuery sel(MSqlQuery::InitCon());
         sel.prepare("SELECT DISTINCT programid, partnumber, parttotal "
                     "FROM program WHERE partnumber > 0 AND parttotal > 0 AND "
@@ -773,11 +774,12 @@ int main(int argc, char *argv[])
                             .arg(orig_programid)
                             .arg(new_programid));
                 }
+                else
+                    found += repl.numRowsAffected();
             }
         }
 
-        VERBOSE(VB_GENERAL,
-                QString("    Found %1").arg(sel.numRowsAffected()));
+        VERBOSE(VB_GENERAL, QString("    Found %1").arg(found));
     }
 
     if (mark_repeats)
