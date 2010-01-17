@@ -16,22 +16,4 @@ Once the make is completed, do a 'make install'.
 CONFIGURATION/USAGE:
 ---------------------------------------------------------------------
 
-Add the following to library.xml in defaultmenu:
-
-    <button>
-        <type>NET_VIDEO_SEARCH</type>
-        <text>Search Internet Video</text>
-        <description>Search popular video sites</description>
-        <action>JUMP MythNetVision</action>
-        <depends>mythnetvision</depends>
-    </button>
-        
-    <button>
-        <type>NET_VIDEO_TREE</type>
-        <text>Browse Internet Video</text>
-        <description>Browse highlights and entire sites</description>
-        <action>JUMP MythNetTree</action>
-        <depends>mythnetvision</depends>
-    </button>
-
 The items should now appear under Media Library.
