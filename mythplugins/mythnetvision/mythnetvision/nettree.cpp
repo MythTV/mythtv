@@ -976,9 +976,10 @@ QString NetTree::getDownloadFilename(ResultVideo *item)
                            .arg(QString::number(urlChecksum))
                            .arg(QString::number(titleChecksum)).arg(ext);
 
-//    QString remote = NetVision::generate_file_url("Default", gContext->GetMasterHostName(),
-//                                      basefilename);
-    return basefilename;
+
+    QString finalFilename = GetConfDir() + "/" + basefilename;
+
+    return finalFilename;
 }
 
 void NetTree::slotItemChanged()

@@ -124,6 +124,8 @@ QString DownloadManager::getDownloadFilename(ResultVideo *item)
                            .arg(QString::number(urlChecksum))
                            .arg(QString::number(titleChecksum)).arg(ext);
 
-    return basefilename;
+    QString finalFilename = GetConfDir() + "/" + basefilename;
+
+    return finalFilename;
 }
 
