@@ -3432,7 +3432,7 @@ else
     # For environments that don't have pkg-config, we do a compile test.
     qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
 
-    check_cxx ${qt_inc} <<EOF && enable qtwebkit
+    check_cxx ${qt_inc} ${qt_inc}/QtCore <<EOF && enable qtwebkit
 #include <QtWebKit/QtWebKit>
 #if QT_VERSION < 0x040400
 die
