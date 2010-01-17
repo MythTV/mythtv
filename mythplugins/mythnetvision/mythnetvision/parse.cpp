@@ -4,6 +4,7 @@
 #include <QProcess>
 #include <QDomImplementation>
 #include <QHash>
+#include <QLocale>
 #include <QUrl>
 #include <QFileInfo>
 #include <QRegExp>
