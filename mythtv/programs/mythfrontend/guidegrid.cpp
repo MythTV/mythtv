@@ -419,10 +419,11 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
     // The reason is because the number keys could be mapped to
     // other things. If this is the case, then the jump to channel
     // will not work correctly.
+    if (m_jumpToChannelEnabled)
     {
         QMutexLocker locker(&m_jumpToChannelLock);
 
-        if (!m_jumpToChannel || m_jumpToChannelEnabled)
+        if (!m_jumpToChannel)
         {
             bool isNum;
             event->text().toInt(&isNum);
