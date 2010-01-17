@@ -108,7 +108,6 @@ class NetSearch : public MythScreenType
     void doDownloadAndPlay(void);
     void doPlayVideo(void);
     void showMenu(void);
-    void showViewMenu(void);
     void getMoreResults();
     void getLastResults();
 

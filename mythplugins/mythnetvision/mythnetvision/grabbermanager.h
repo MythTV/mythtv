@@ -40,10 +40,6 @@ class GrabberScript : public QThread
 
     void finished(void);
 
-  public slots:
-
-    void updateTreeFinished(void);
-
   private:
 
     void parseDBTree(const QString &feedtitle, const QString &path,
@@ -76,7 +72,6 @@ class GrabberManager : public QObject
 
   private slots:
     void timeout(void);
-    void grabberFinished(void);
 
   private:
 

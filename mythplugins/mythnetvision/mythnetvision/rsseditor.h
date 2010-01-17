@@ -105,7 +105,6 @@ class RSSEditor : public MythScreenType
     void itemsChanged(void);
 
   public slots:
-    void toggleItem(MythUIButtonListItem *item);
     void slotItemChanged();
     void loadData(void);
 

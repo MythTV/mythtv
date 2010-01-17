@@ -151,7 +151,6 @@ class NetTree : public MythScreenType
     void runRSSEditor(void);
     void loadData(void);
     void handleSelect(MythUIButtonListItem *item);
-    void slotRSSRetrieved(RSSSite *site);
 
     void switchTreeView(void);
     void switchGalleryView(void);
