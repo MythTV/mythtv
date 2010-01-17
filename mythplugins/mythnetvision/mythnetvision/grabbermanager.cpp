@@ -42,7 +42,7 @@ void GrabberScript::run()
     if (QFile(commandline).exists())
     {
         m_getTree.start(commandline, QStringList() << "-T");
-        m_getTree.waitForFinished(-1);
+        m_getTree.waitForFinished(900000);
         QDomDocument domDoc;
 
         if (QProcess::NormalExit != m_getTree.exitStatus())
