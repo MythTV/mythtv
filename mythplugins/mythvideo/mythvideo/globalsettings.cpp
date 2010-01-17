@@ -30,7 +30,7 @@ HostComboBox *VideoDefaultParentalLevel()
 }
 
 const char *password_clue =
-    QT_TR_NOOP("Setting this value to all numbers will make your life "
+    QT_TRANSLATE_NOOP("QObject", "Setting this value to all numbers will make your life "
                 "much easier.");
 
 HostLineEdit *VideoAdminPassword()
