@@ -8,7 +8,6 @@
 #include <QChar>
 #include <QKeyEvent>
 #include <QDomDocument>
-#include <QClipboard>
 
 // Libmythdb headers
 #include "mythverbose.h"
@@ -289,7 +288,7 @@ bool MythUITextEdit::MoveCursor(MoveDirection moveDir)
         string = m_Message;
 
     QSize stringSize = fm.size(Qt::TextSingleLine, string);
-    m_Text->SetDrawRectSize(stringSize.width(), textRect.height());
+    m_Text->SetDrawRectSize(stringSize.width()+1, textRect.height());
     QSize charSize;
 
     switch (moveDir)
@@ -375,11 +374,14 @@ void MythUITextEdit::CopyTextToClipboard()
         clipboard->setText(m_Message);
 }
 
-void MythUITextEdit::PasteTextFromClipboard()
+void MythUITextEdit::PasteTextFromClipboard(QClipboard::Mode mode)
 {
     QClipboard *clipboard = QApplication::clipboard();
+    if (!clipboard->supportsSelection())
+        mode = QClipboard::Clipboard;
+        
     if (clipboard)
-        InsertText(clipboard->text());
+        InsertText(clipboard->text(mode));
 }
 
 bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
@@ -445,6 +447,25 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
 
     if (!handled && InsertCharacter(e->text()))
         handled = true;
+
+    return handled;
+}
+
+/** \brief Mouse click/movement handler, receives mouse gesture events from the
+ *         QCoreApplication event loop. Should not be used directly.
+ *
+ *  \param uitype The mythuitype receiving the event
+ *  \param event Mouse event
+ */
+bool MythUITextEdit::gestureEvent(MythGestureEvent *event)
+{
+    bool handled = false;
+
+    if (event->gesture() == MythGestureEvent::Click &&
+        event->GetButton() == MythGestureEvent::MiddleButton)
+    {
+        PasteTextFromClipboard(QClipboard::Selection);
+    }
 
     return handled;
 }

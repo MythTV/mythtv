@@ -2,6 +2,7 @@
 #define MYTHUI_TEXTEDIT_H_
 
 #include <QString>
+#include <QClipboard>
 
 #include "mythuitype.h"
 #include "mythuitext.h"
@@ -36,6 +37,7 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     virtual void Pulse(void);
     virtual bool keyPressEvent(QKeyEvent *);
+    bool gestureEvent(MythGestureEvent *);
     virtual void Reset(void);
 
     void SetText(const QString &text, bool moveCursor = true);
@@ -77,7 +79,7 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     void CutTextToClipboard(void);
     void CopyTextToClipboard(void);
-    void PasteTextFromClipboard(void);
+    void PasteTextFromClipboard(QClipboard::Mode mode = QClipboard::Clipboard);
 
     bool m_initialized;
 
