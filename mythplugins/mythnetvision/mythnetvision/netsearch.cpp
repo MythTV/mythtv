@@ -227,7 +227,7 @@ void NetSearch::showMenu(void)
     MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
                                                     "mythnetvisionmenupopup");
 
-    if (menuPopup->Create())
+    if (m_searchResultList->GetCount() > 0 && menuPopup->Create())
     {
         m_popupStack->AddScreen(menuPopup);
 
