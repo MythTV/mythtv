@@ -9,8 +9,9 @@
 
 #include <QStringList>
 #include <QObject>
+#include <QTcpSocket>
+#include <QTcpServer>
 
-#include "serversocket.h"
 #include "lcdprocclient.h"
 
 /*
@@ -29,42 +30,42 @@ class LCDServer : public QObject
     Q_OBJECT
 
   public:
-  
+
     LCDServer(int port, QString message, int messageTime);
 
     void sendKeyPress(QString key_pressed);
-     
+
   signals:
-  
+
   private slots:
-  
-    void newConnection(Q3Socket *);
-    void endConnection(Q3Socket *);
+
+    void newConnection(void);
+    void endConnection(void);
     void readSocket();
     QStringList parseCommand(QString &command);
-    void parseTokens(const QStringList &tokens, Q3Socket *socket);
+    void parseTokens(const QStringList &tokens, QTcpSocket *socket);
     void shutDown();
-    void sendMessage(Q3Socket *where, const QString &what);
-    void sendConnected(Q3Socket *socket);
-    void switchToTime(Q3Socket *socket);
-    void switchToMusic(const QStringList &tokens, Q3Socket *socket);
-    void switchToGeneric(const QStringList &tokens, Q3Socket *socket);
-    void switchToChannel(const QStringList &tokens, Q3Socket *socket);
-    void switchToVolume(const QStringList &tokens, Q3Socket *socket);
-    void switchToNothing(Q3Socket *socket);
-    void switchToMenu(const QStringList &tokens, Q3Socket *socket);
-    void setChannelProgress(const QStringList &tokens, Q3Socket *socket);
-    void setMusicProgress(const QStringList &tokens, Q3Socket *socket);
-    void setMusicProp(const QStringList &tokens, Q3Socket *socket);
-    void setGenericProgress(const QStringList &tokens, Q3Socket *socket);
-    void setVolumeLevel(const QStringList &tokens, Q3Socket *socket);
-    void updateLEDs(const QStringList &tokens, Q3Socket *socket);
-    
+    void sendMessage(QTcpSocket *where, const QString &what);
+    void sendConnected(QTcpSocket *socket);
+    void switchToTime(QTcpSocket *socket);
+    void switchToMusic(const QStringList &tokens, QTcpSocket *socket);
+    void switchToGeneric(const QStringList &tokens, QTcpSocket *socket);
+    void switchToChannel(const QStringList &tokens, QTcpSocket *socket);
+    void switchToVolume(const QStringList &tokens, QTcpSocket *socket);
+    void switchToNothing(QTcpSocket *socket);
+    void switchToMenu(const QStringList &tokens, QTcpSocket *socket);
+    void setChannelProgress(const QStringList &tokens, QTcpSocket *socket);
+    void setMusicProgress(const QStringList &tokens, QTcpSocket *socket);
+    void setMusicProp(const QStringList &tokens, QTcpSocket *socket);
+    void setGenericProgress(const QStringList &tokens, QTcpSocket *socket);
+    void setVolumeLevel(const QStringList &tokens, QTcpSocket *socket);
+    void updateLEDs(const QStringList &tokens, QTcpSocket *socket);
+
   private:
 
     LCDProcClient   *m_lcd;
-    LCDServerSocket *m_serverSocket;
-    Q3Socket         *m_lastSocket;        // last socket we received data from
+    QTcpServer      *m_serverSocket;
+    QTcpSocket      *m_lastSocket;        // last socket we received data from
 };
 
 #endif

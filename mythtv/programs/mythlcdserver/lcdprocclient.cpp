@@ -7,24 +7,27 @@
     (c) 2002, 2003 Thor Sigvaldason, Dan Morphis and Isaac Richards
 */
 
+// c/c++
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
+//qt
 #include <QCoreApplication>
 #include <QEvent>
 #include <QTimer>
 
-#include <Q3TextStream>
-
-#include "lcdprocclient.h"
+// mythtv
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "mythdbcon.h"
 #include "tv.h"
+#include "compat.h"
+
+//mythlcdserver
+#include "lcdprocclient.h"
 #include "lcdserver.h"
 #include "lcddevice.h"
-#include "compat.h"
 
 #define LCD_START_COL 3
 
@@ -37,8 +40,7 @@
 
 int lcdStartCol = LCD_START_COL;
 
-LCDProcClient::LCDProcClient(LCDServer *lparent) :
-    QObject(NULL, "LCDProcClient")
+LCDProcClient::LCDProcClient(LCDServer *lparent) : QObject(NULL)
 {
     // Constructor for LCDProcClient
     //
@@ -48,8 +50,9 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDProcClient: An LCDProcClient object now exists");
 
-    socket = new Q3Socket(this);
-    connect(socket, SIGNAL(error(int)), this, SLOT(veryBadThings(int)));
+    socket = new QTcpSocket(this);
+    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), 
+            this, SLOT(veryBadThings(QAbstractSocket::SocketError)));
     connect(socket, SIGNAL(readyRead()), this, SLOT(serverSendingData()));
 
     m_parent = lparent;
@@ -79,11 +82,8 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     volume_level = 0.0;
     connected = false;
     send_buffer = "";
-    lcdMenuItems = new Q3PtrList<LCDMenuItem>;
-    lcdMenuItems->setAutoDelete(true);
-
-    lcdTextItems = new Q3PtrList<LCDTextItem>;
-    lcdTextItems->setAutoDelete(true);
+    lcdMenuItems = new QList<LCDMenuItem>;
+    lcdTextItems = new QList<LCDTextItem>;
 
     timeTimer = new QTimer(this);
     connect(timeTimer, SIGNAL(timeout()), this, SLOT(outputTime()));
@@ -92,10 +92,12 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     connect(scrollWTimer, SIGNAL(timeout()), this, SLOT(scrollWidgets()));
 
     preScrollWTimer = new QTimer(this);
+    preScrollWTimer->setSingleShot(true);
     connect(preScrollWTimer, SIGNAL(timeout()), this, 
             SLOT(beginScrollingWidgets()));
 
     popMenuTimer = new QTimer(this);
+    popMenuTimer->setSingleShot(true);
     connect(popMenuTimer, SIGNAL(timeout()), this, SLOT(unPopMenu()));
 
     menuScrollTimer = new QTimer(this);
@@ -108,7 +110,7 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     checkConnectionsTimer = new QTimer(this);
     connect(checkConnectionsTimer, SIGNAL(timeout()), this, 
             SLOT(checkConnections()));
-    checkConnectionsTimer->start(10000, false);
+    checkConnectionsTimer->start(10000);
 
     recStatusTimer = new QTimer(this);
     connect(recStatusTimer, SIGNAL(timeout()), this, SLOT(outputRecStatus()));
@@ -117,10 +119,12 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     connect(scrollListTimer, SIGNAL(timeout()), this, SLOT(scrollList()));
 
     showMessageTimer = new QTimer(this);
+    showMessageTimer->setSingleShot(true);
     connect(showMessageTimer, SIGNAL(timeout()), this, 
             SLOT(removeStartupMessage()));
 
     updateRecInfoTimer = new QTimer(this);
+    updateRecInfoTimer->setSingleShot(true);
     connect(updateRecInfoTimer, SIGNAL(timeout()), this, 
             SLOT(updateRecordingList()));
 
@@ -161,15 +165,15 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
 
     if (!connected)
     {
-        Q3TextStream os(socket);
+        QTextStream os(socket);
         socket->connectToHost(hostname, port);
 
-        while (--timeout && socket->state() != Q3Socket::Idle)
+        while (--timeout && socket->state() != QAbstractSocket::ConnectedState)
         {
             qApp->processEvents();
             usleep(1000);
 
-            if (socket->state() == Q3Socket::Connected)
+            if (socket->state() == QAbstractSocket::ConnectedState)
             {
                 connected = true;
                 os << "hello\n";
@@ -184,7 +188,7 @@ bool LCDProcClient::connectToHost(const QString &lhostname, unsigned int lport)
 void LCDProcClient::sendToServer(const QString &someText)
 {
     // Check the socket, make sure the connection is still up
-    if (socket->state() == Q3Socket::Idle)
+    if (socket->state() != QAbstractSocket::ConnectedState)
     {
         if (!lcd_ready)
             return;
@@ -200,8 +204,8 @@ void LCDProcClient::sendToServer(const QString &someText)
         return;
     }
 
-    Q3TextStream os(socket);
-    os.setEncoding(Q3TextStream::Latin1);
+    QTextStream os(socket);
+    //os.setCodec(Q3TextStream::Latin1);
 
     last_command = someText;
 
@@ -300,7 +304,7 @@ void LCDProcClient::checkConnections()
     }
 
     //check connection to LCDProc server
-    if (socket->state() == Q3Socket::Idle)
+    if (socket->state() != QAbstractSocket::ConnectedState)
     {
         if (debug_level > 0)
            VERBOSE(VB_GENERAL, "LCDProcClient: connecting to LCDProc server");
@@ -341,7 +345,7 @@ void LCDProcClient::serverSendingData()
                 VERBOSE(VB_NETWORK, "LCDProcClient: Received from server: " 
                     << lineFromServer);
 
-        aList = QStringList::split(" ", lineFromServer);
+        aList = lineFromServer.split(" ");
         if (aList.first() == "connect")
         {
             // We got a connect, which is a response to "hello"
@@ -401,7 +405,7 @@ void LCDProcClient::serverSendingData()
         else if (aList.first() == "key")
         {
            if (m_parent)
-               m_parent->sendKeyPress(aList.last().stripWhiteSpace());
+               m_parent->sendKeyPress(aList.last().trimmed());
         }
     }
 }
@@ -596,8 +600,7 @@ void LCDProcClient::loadSettings()
 
 void LCDProcClient::showStartupMessage(void)
 {
-    Q3PtrList<LCDTextItem> textItems;
-    textItems.setAutoDelete(true);
+    QList<LCDTextItem> textItems;
 
     QStringList list = formatScrollerText(startup_message);
 
@@ -609,13 +612,13 @@ void LCDProcClient::showStartupMessage(void)
     {
         if (x == (int)lcdHeight)
             break; 
-        textItems.append(new LCDTextItem(x + startrow, ALIGN_LEFT, list[x], 
+        textItems.append(LCDTextItem(x + startrow, ALIGN_LEFT, list[x], 
                     "Generic", false));
     }
 
     switchToGeneric(&textItems);
 
-    showMessageTimer->start(startup_showtime * 1000, true);
+    showMessageTimer->start(startup_showtime * 1000);
 }
 
 void LCDProcClient::removeStartupMessage(void)
@@ -733,23 +736,11 @@ void LCDProcClient::describeServer()
     }
 }
 
-void LCDProcClient::veryBadThings(int anError)
+void LCDProcClient::veryBadThings(QAbstractSocket::SocketError error)
 {
     // Deal with failures to connect and inabilities to communicate
-
-    QString err;
-
-    if (anError == Q3Socket::ErrConnectionRefused)
-        err = "connection refused.";
-    else if (anError == Q3Socket::ErrHostNotFound)
-        err = "host not found.";
-    else if (anError == Q3Socket::ErrSocketRead)
-        err = "socket read failed.";
-    else
-        err = "unknown error.";
-
-    VERBOSE(VB_IMPORTANT, QString("Could not connect to LCDd: %1").arg(err));
-    socket->clearPendingData();
+    VERBOSE(VB_IMPORTANT, QString("Could not connect to LCDd: %1")
+            .arg(socket->errorString()));
     socket->close();
 }
 
@@ -805,21 +796,21 @@ void LCDProcClient::startTime()
     setPriority("Time", MEDIUM);
     setPriority("RecStatus", LOW);
 
-    timeTimer->start(1000, FALSE);
+    timeTimer->start(1000);
     outputTime();
     activeScreen = "Time";
     isTimeVisible = true;
 
     if (lcd_showrecstatus && isRecording)
-        recStatusTimer->start(LCD_TIME_TIME, FALSE);
+        recStatusTimer->start(LCD_TIME_TIME);
 }
 
-void LCDProcClient::outputText(Q3PtrList<LCDTextItem> *textItems)
+void LCDProcClient::outputText(QList<LCDTextItem> *textItems)
 {
     if (!lcd_ready)
         return;
 
-    Q3PtrListIterator<LCDTextItem> it( *textItems );
+    QList<LCDTextItem>::iterator it = textItems->begin();
     LCDTextItem *curItem;
     QString num;
     unsigned int counter = 1;
@@ -827,8 +818,9 @@ void LCDProcClient::outputText(Q3PtrList<LCDTextItem> *textItems)
     // Do the definable scrolling in here.
     // Use asignScrollingWidgets(curItem->getText(), "textWidget" + num);
     // When scrolling is set, alignment has no effect
-    while ((curItem = it.current()) != 0 && counter < lcdHeight)
+    while (it != textItems->end() && counter < lcdHeight)
     {
+        curItem = &(*it);
         ++it;
         num.setNum(curItem->getRow());
 
@@ -926,7 +918,7 @@ void LCDProcClient::assignScrollingList(QStringList theList, QString theScreen,
 
     scrollListItem = 0;
     scrollList();
-    scrollListTimer->start(LCD_SCROLLLIST_TIME, FALSE);
+    scrollListTimer->start(LCD_SCROLLLIST_TIME);
 }
 
 //
@@ -942,13 +934,12 @@ void LCDProcClient::assignScrollingWidgets(QString theText, QString theScreen,
     scrollScreen = theScreen;
 
     // Alignment is not used...
-    lcdTextItems->append(new LCDTextItem(theRow, ALIGN_LEFT, theText,
-                                          theScreen, true, theWidget));
+    lcdTextItems->append(LCDTextItem(theRow, ALIGN_LEFT, theText,
+                                     theScreen, true, theWidget));
 }
 
 void LCDProcClient::formatScrollingWidgets()
 {
-
     scrollWTimer->stop();
     preScrollWTimer->stop();
 
@@ -956,20 +947,22 @@ void LCDProcClient::formatScrollingWidgets()
         return; // Weird...
 
     int max_len = 0;
-    Q3PtrListIterator<LCDTextItem> it(*lcdTextItems);
+    QList<LCDTextItem>::iterator it = lcdTextItems->begin();
     LCDTextItem *curItem;
 
     // Get the length of the longest item to scroll
-    for(; (curItem = it.current()) != 0; ++it) 
+    for(; it != lcdTextItems->end(); ++it) 
     {
+        curItem = &(*it);
         if (curItem->getText().length() > max_len)
             max_len = curItem->getText().length();
     }
 
     // Make all scrollable items the same lenght and do the initial output
-    it.toFirst();
-    while ((curItem = it.current()) != 0)
+    it = lcdTextItems->begin();
+    while (it != lcdTextItems->end())
     {
+        curItem = &(*it);
         ++it;
         if (curItem->getText().length() > (int)lcdWidth)
         {
@@ -981,7 +974,7 @@ void LCDProcClient::formatScrollingWidgets()
                         curItem->getText().mid(lcdWidth, max_len),
                         curItem->getWidget(), curItem->getRow());
         }
-        else 
+        else
         {
             curItem->setScrollable(false);
             outputCenteredText(scrollScreen, curItem->getText(),
@@ -993,14 +986,14 @@ void LCDProcClient::formatScrollingWidgets()
         // We're done, no scrolling
         return;
 
-    preScrollWTimer->start(2000, TRUE);
+    preScrollWTimer->start(2000);
 }
 
 void LCDProcClient::beginScrollingWidgets()
 {
     scrollPosition = lcdWidth;
     preScrollWTimer->stop();
-    scrollWTimer->start(400, false);
+    scrollWTimer->start(400);
 }
 
 void LCDProcClient::scrollWidgets()
@@ -1011,12 +1004,13 @@ void LCDProcClient::scrollWidgets()
     if (lcdTextItems->isEmpty())
         return; // Weird...
 
-    Q3PtrListIterator<LCDTextItem> it(*lcdTextItems);
+    QList<LCDTextItem>::iterator it = lcdTextItems->begin();
     LCDTextItem *curItem;
 
     unsigned int len = 0;
-    for(; (curItem = it.current()) != 0; ++it) 
+    for(; it != lcdTextItems->end(); ++it) 
     {
+        curItem = &(*it);
         if (curItem->getScroll()) 
         {
             // Note that all scrollable items have the same lenght!
@@ -1027,11 +1021,11 @@ void LCDProcClient::scrollWidgets()
                         curItem->getWidget(), curItem->getRow());
         }
     }
+
     if (len == 0) 
     {
         // Shouldn't happen, but....
-        cerr << "LCDProcClient::scrollWidgets called without scrollable items"
-             << endl;
+        VERBOSE(VB_IMPORTANT, "LCDProcClient::scrollWidgets called without scrollable items");
         scrollWTimer->stop();
         return;
     }
@@ -1133,10 +1127,11 @@ void LCDProcClient::startChannel(QString channum, QString title, QString subtitl
     outputChannel();
 }
 
-void LCDProcClient::startGeneric(Q3PtrList<LCDTextItem> * textItems)
+void LCDProcClient::startGeneric(QList<LCDTextItem> *textItems)
 {
-    LCDTextItem *curItem;
-    Q3PtrListIterator<LCDTextItem> it( *textItems );
+    QList<LCDTextItem>::iterator it = textItems->begin();
+    LCDTextItem *curItem = &(*it);
+
     QString aString;
 
     if (lcd_showgeneric)
@@ -1161,7 +1156,7 @@ void LCDProcClient::startGeneric(Q3PtrList<LCDTextItem> * textItems)
     generic_progress = 0.0;
 
     // Return if there are no more items
-    if ((curItem = it.current()) == 0)
+    if (textItems->isEmpty())
         return;
 
     // Todo, make scrolling definable in LCDTextItem
@@ -1176,18 +1171,19 @@ void LCDProcClient::startGeneric(Q3PtrList<LCDTextItem> * textItems)
     //    just handle the whole thing and the 'pop off' stuff can go.
     //
     lcdTextItems->clear();
-    assignScrollingWidgets(curItem->getText(), "Generic", "textWidget1",
-                                                        curItem->getRow());
+    assignScrollingWidgets(curItem->getText(), "Generic",
+                           "textWidget1", curItem->getRow());
 
     outputGeneric();
 
     // Pop off the first item so item one isn't written twice
-    if (textItems->removeFirst() != 0)
+    textItems->removeFirst();
+    if (!textItems->isEmpty())
         outputText(textItems);
     formatScrollingWidgets();
 }
 
-void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
+void LCDProcClient::startMenu(QList<LCDMenuItem> *menuItems, QString app_name,
                     bool popMenu)
 {
     // Now do the menu items
@@ -1207,7 +1203,7 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
     if (lcdHeight > 1)
     outputCenteredText("Menu", app_name, "topWidget", 1);
 
-    Q3PtrListIterator<LCDMenuItem> it(*menuItems);
+    QList<LCDMenuItem>::iterator it = menuItems->begin();
     LCDMenuItem *curItem;
 
     // First loop through and figure out where the selected item is in the
@@ -1216,8 +1212,9 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
     unsigned int counter = 0;
     bool oneSelected = false;
 
-    while ((curItem = it.current()) != 0)
+    while (it != menuItems->end())
     {
+        curItem = &(*it);
         ++it;
         if (curItem->isSelected() && !oneSelected)
         {
@@ -1240,17 +1237,18 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
     popMenuTimer->stop();
     // Start the unPop timer if this is a popup menu
     if (popMenu)
-        popMenuTimer->start(lcd_popuptime, true);
+        popMenuTimer->start(lcd_popuptime);
 
     // QPtrListIterator doesn't contain a deep copy constructor. . .
     // This will contain a copy of the menuItems for scrolling purposes
-    Q3PtrListIterator<LCDMenuItem> itTemp(*menuItems);
+    QList<LCDMenuItem>::iterator itTemp = menuItems->begin();
     lcdMenuItems->clear();
     counter = 1;
-    while ((curItem = itTemp.current()) != 0)
+    while (itTemp != menuItems->end())
     {
+        curItem = &(*itTemp);
         ++itTemp;
-        lcdMenuItems->append(new LCDMenuItem(curItem->isSelected(),
+        lcdMenuItems->append(LCDMenuItem(curItem->isSelected(),
                              curItem->isChecked(), curItem->ItemName(),
                              curItem->getIndent()));
         ++counter;
@@ -1260,16 +1258,18 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
     //  item and leave
     if (lcdHeight <= 2)
     {
-        it.toFirst();
-        while ((curItem = it.current()) != 0)
+        it = menuItems->begin();
+        while (it != menuItems->end())
         {
+            curItem = &(*it);
             ++it;
             if (curItem->isSelected())
             {
                 // Set the scroll flag if necessary, otherwise set it to false
                 if (curItem->ItemName().length()  > (int)(lcdWidth - lcdStartCol))
                 {
-                    menuPreScrollTimer->start(2000, true);
+                    menuPreScrollTimer->setSingleShot(true);
+                    menuPreScrollTimer->start(2000);
                     curItem->setScroll(true);
                 }
                 else
@@ -1319,11 +1319,11 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
 
     // Reset things
     counter = 1;
-    it.toFirst();
+    it = menuItems->begin();
 
     // Move the iterator to selectedItem lcdHeight/2, if > 1, -1.
     unsigned int midPoint = (lcdHeight/2) - 1;
-    if (selectedItem > midPoint && it.count() >= lcdHeight-1)
+    if (selectedItem > midPoint && menuItems->size() >= (int)lcdHeight-1)
     {
         while (counter != selectedItem)
         {
@@ -1336,14 +1336,15 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
 
     // Back up one if we're at the end so the last item shows up at the bottom 
     // of the display
-    if (counter + midPoint > it.count() - midPoint && counter > midPoint)
+    if (counter + midPoint > menuItems->size() - midPoint && counter > midPoint)
     {
-        it -= (counter+(lcdHeight/2)- 1) - (it.count () - midPoint);
+        it -= (counter + (lcdHeight / 2) - 1) - (menuItems->size() - midPoint);
     }
 
     counter = 1;
-    while ((curItem = it.current()) != 0)
+    while (it != menuItems->end())
     {
+        curItem = &(*it);
         // Can't write more menu items then we have on the display
         if ((counter + 1) > lcdHeight)
             break;
@@ -1384,7 +1385,8 @@ void LCDProcClient::startMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_nam
         ++counter;
     }
 
-    menuPreScrollTimer->start(2000, true);
+    menuPreScrollTimer->setSingleShot(true);
+    menuPreScrollTimer->start(2000);
 }
 
 void LCDProcClient::beginScrollingMenuText()
@@ -1397,14 +1399,15 @@ void LCDProcClient::beginScrollingMenuText()
 
     menuScrollPosition = 1;
 
-    Q3PtrListIterator<LCDMenuItem> it( *lcdMenuItems );
+    QList<LCDMenuItem>::iterator it = lcdMenuItems->begin();
     LCDMenuItem *curItem;
 
     QString temp;
     // Loop through and prepend everything with enough spaces
     // for smooth scrolling, and update the position
-    while ((curItem = it.current()) != 0)
+    while (it != lcdMenuItems->end())
     {
+        curItem = &(*it);
         ++it;
         // Don't setup for smooth scrolling if the item isn't long enough
         // (It causes problems with items being scrolled when they shouldn't)
@@ -1422,7 +1425,7 @@ void LCDProcClient::beginScrollingMenuText()
 
     // Can get segfaults if we try to start a timer thats already running. . .
     menuScrollTimer->stop();
-    menuScrollTimer->start(250, FALSE);
+    menuScrollTimer->start(250);
 }
 
 void LCDProcClient::scrollMenuText()
@@ -1431,7 +1434,7 @@ void LCDProcClient::scrollMenuText()
         return;
 
     QString aString, bString;
-    Q3PtrListIterator<LCDMenuItem> it(*lcdMenuItems);
+    QList<LCDMenuItem>::iterator it = lcdMenuItems->begin();
     LCDMenuItem *curItem;
 
     ++menuScrollPosition;
@@ -1442,8 +1445,9 @@ void LCDProcClient::scrollMenuText()
     unsigned int counter = 0;
     bool oneSelected = false;
 
-    while ((curItem = it.current()) != 0)
+    while (it != lcdMenuItems->end())
     {
+        curItem = &(*it);
         ++it;
         if (curItem->isSelected() && !oneSelected)
         {
@@ -1456,11 +1460,12 @@ void LCDProcClient::scrollMenuText()
 
     // If there is only one or two lines on the display, then just write
     // the selected item and leave
-    it.toFirst();
+    it = lcdMenuItems->begin();
     if (lcdHeight <= 2)
     {
-        while ((curItem = it.current()) != 0)
+        while (it != lcdMenuItems->end())
         {
+            curItem = &(*it);
             ++it;
             if (curItem->isSelected())
             {
@@ -1469,7 +1474,7 @@ void LCDProcClient::scrollMenuText()
                 {
                     // Scroll slower second and subsequent times through
                     menuScrollTimer->stop();
-                    menuScrollTimer->start(500, FALSE);
+                    menuScrollTimer->start(500);
                     curItem->setScrollPos(curItem->getIndent());
                 }
 
@@ -1481,7 +1486,7 @@ void LCDProcClient::scrollMenuText()
 
                 if (lcdHeight == 2)
                 {
-                aString  = "widget_set Menu menuWidget1 1 2 \">";
+                    aString  = "widget_set Menu menuWidget1 1 2 \">";
                 }
                 else
                 {
@@ -1525,12 +1530,13 @@ void LCDProcClient::scrollMenuText()
 
     // Find the longest line, if menuScrollPosition is longer then this, then 
     // reset them all
-    it.toFirst();
+    it = lcdMenuItems->begin();
     int longest_line = 0;
     int max_scroll_pos = 0;
 
-    while ((curItem = it.current()) != 0)
+    while (it != lcdMenuItems->end())
     {
+        curItem = &(*it);
         ++it;
         if (curItem->ItemName().length() > longest_line)
             longest_line = curItem->ItemName().length();
@@ -1544,12 +1550,13 @@ void LCDProcClient::scrollMenuText()
     {
         // Scroll slower second and subsequent times through
         menuScrollTimer->stop();
-        menuScrollTimer->start(500, FALSE);
+        menuScrollTimer->start(500);
         menuScrollPosition = 0;
 
-        it.toFirst();
-        while ((curItem = it.current()) != 0)
+        it = lcdMenuItems->begin();
+        while (it != lcdMenuItems->end())
         {
+            curItem = &(*it);
             ++it;
             curItem->setScrollPos(curItem->getIndent());
         }
@@ -1557,10 +1564,10 @@ void LCDProcClient::scrollMenuText()
 
     // Reset things
     counter = 1;
-    it.toFirst();
+    it = lcdMenuItems->begin();
 
     // Move the iterator to selectedItem -1
-    if (selectedItem != 1 && it.count() >= lcdHeight)
+    if (selectedItem != 1 && lcdMenuItems->size() >= (int)lcdHeight)
     {
         while (counter != selectedItem)
         {
@@ -1572,14 +1579,15 @@ void LCDProcClient::scrollMenuText()
 
     // Back up one if were at the end so the last item shows up at the bottom 
     // of the display
-    if (counter == it.count())
+    if ((int)counter == lcdMenuItems->size())
         --it;
 
     bool stopTimer = true;
 
     counter = 1;
-    while ((curItem = it.current()) != 0 && counter <= lcdHeight)
+    while (it != lcdMenuItems->end() && counter <= lcdHeight)
     {
+        curItem = &(*it);
         // Can't write more menu items then we have on the display
         if ((counter + 1) > lcdHeight)
             break;
@@ -1937,10 +1945,10 @@ void LCDProcClient::outputRecStatus(void)
         setPriority("Time", MEDIUM);
         setPriority("RecStatus", LOW);
 
-        timeTimer->start(1000, FALSE);
+        timeTimer->start(1000);
         scrollWTimer->stop();
         scrollListTimer->stop();
-        recStatusTimer->start(LCD_TIME_TIME, FALSE);
+        recStatusTimer->start(LCD_TIME_TIME);
 
         outputTime();
         activeScreen = "Time";
@@ -2018,7 +2026,7 @@ void LCDProcClient::outputRecStatus(void)
     if (listTime < LCD_TIME_TIME)
         listTime = LCD_TIME_TIME;
 
-    recStatusTimer->start(listTime, FALSE);
+    recStatusTimer->start(listTime);
 
     if (lcdTunerNo < (int) tunerList.size() - 1)
         lcdTunerNo++;
@@ -2235,8 +2243,8 @@ void LCDProcClient::switchToChannel(QString channum, QString title, QString subt
     startChannel(channum, title, subtitle);
 }
 
-void LCDProcClient::switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_name,
-                       bool popMenu)
+void LCDProcClient::switchToMenu(QList<LCDMenuItem> *menuItems, QString app_name,
+                                 bool popMenu)
 {
     if (!lcd_ready)
         return;
@@ -2247,7 +2255,7 @@ void LCDProcClient::switchToMenu(Q3PtrList<LCDMenuItem> *menuItems, QString app_
     startMenu(menuItems, app_name, popMenu);
 }
 
-void LCDProcClient::switchToGeneric(Q3PtrList<LCDTextItem> *textItems)
+void LCDProcClient::switchToGeneric(QList<LCDTextItem> *textItems)
 {
     if (!lcd_ready)
         return;
@@ -2386,7 +2394,7 @@ void LCDProcClient::customEvent(QEvent *e)
 
                 // we can't query the backend from inside the customEvent
                 // so fire the recording list update from a timer 
-                updateRecInfoTimer->start(500, true);
+                updateRecInfoTimer->start(500);
             }
         }
     }

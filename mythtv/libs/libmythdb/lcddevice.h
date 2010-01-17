@@ -229,7 +229,7 @@ class MPUBLIC LCD : public QObject, public MythSocketCBs
     //
     // Note that the "channel" screen can be used for any kind of progress meter
     // just put whatever you want in the strings, and update the progress as
-    // appropriate; see the demo app mythlcd for an example)
+    // appropriate;
     void switchToChannel(QString channum = "", QString title = "",
                          QString subtitle = "");
 

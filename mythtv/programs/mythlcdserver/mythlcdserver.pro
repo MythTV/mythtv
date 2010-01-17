@@ -8,11 +8,10 @@ target.path = $${PREFIX}/bin
 
 INSTALLS += target
 
-HEADERS += lcdserver.h serversocket.h lcdprocclient.h
+HEADERS += lcdserver.h  lcdprocclient.h
 
-SOURCES += main.cpp lcdserver.cpp serversocket.cpp lcdprocclient.cpp 
+SOURCES += main.cpp lcdserver.cpp lcdprocclient.cpp 
 
-#The following line was inserted by qt3to4
-QT += network xml sql qt3support
+QT += network xml sql
 
 using_opengl:QT += opengl

@@ -13,7 +13,6 @@ using namespace std;
 
 #include <QCoreApplication>
 #include <QFile>
-#include <Q3TextStream>
 
 #include "exitcodes.h"
 #include "mythcontext.h"
