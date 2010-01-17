@@ -728,9 +728,6 @@ void NetTree::buildGenericTree(MythGenericTree *dst, QStringList paths,
         buildGenericTree(folder, paths, dirthumb, videos);
     else
     {
-        // Sort the filenames
-        qSort(videos);
-
         // File Handling
         for (QList<ResultVideo*>::iterator it = videos.begin();
                 it != videos.end(); ++it)

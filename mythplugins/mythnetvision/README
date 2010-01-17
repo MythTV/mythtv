@@ -4,6 +4,11 @@ MythNetvision
 INSTALLATION:
 ---------------------------------------------------------------------
 
+Run MythPlugins ./configure with the option --enable-mythnetvision or
+--enable-all.
+
+-- Standalone config --
+
 run (a Qt4 version of) qmake on mythnetvision.pro:
 
 qmake-qt4 mythnetvision.pro

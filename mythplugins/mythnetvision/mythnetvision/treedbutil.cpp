@@ -247,7 +247,7 @@ QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &f
                   "rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, "
                   "downloadable, path, paththumb FROM netvisiontreeitems "
-                  "WHERE feedtitle = :FEEDTITLE ORDER BY title ASC;");
+                  "WHERE feedtitle = :FEEDTITLE ORDER BY title DESC;");
     query.bindValue(":FEEDTITLE", feedtitle);
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Tree find in db", query);
