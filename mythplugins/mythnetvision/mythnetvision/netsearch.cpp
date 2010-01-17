@@ -241,6 +241,8 @@ void NetSearch::showMenu(void)
 
         if (item)
         {
+            menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
+
             filename = getDownloadFilename(item);
 
             if (filename.startsWith("myth://"))
