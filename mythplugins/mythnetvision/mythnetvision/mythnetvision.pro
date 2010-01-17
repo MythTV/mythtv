@@ -17,7 +17,7 @@ INCLUDEPATH += $${PREFIX}/include/mythtv/libmythdb
 installfiles.path = $${PREFIX}/share/mythtv/mythnetvision
 
 installscripts.path = $${PREFIX}/share/mythtv/mythnetvision/scripts
-installscripts.files = scripts/*.py scripts/*.sh
+installscripts.files = scripts/*.py scripts/*.sh scripts/*.pl
 
 installpylibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs
 installpylibs.files = scripts/nv_python_libs/*.py
