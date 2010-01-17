@@ -1399,6 +1399,7 @@ void NetTree::customEvent(QEvent *event)
             return;
 
         GetMythMainWindow()->HandleMedia("Internal", dl->filename);
+        delete dl;
     }
     else if (event->type() == kGrabberUpdateEventType)
     {

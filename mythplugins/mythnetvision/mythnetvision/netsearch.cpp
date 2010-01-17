@@ -25,10 +25,6 @@
 #include "rssdbutil.h"
 #include "rsseditor.h"
 
-class ResultVideo;
-class QMetaType;
-class GrabberScript;
-
 using namespace std;
 
 // ---------------------------------------------------
@@ -1015,6 +1011,17 @@ void NetSearch::customEvent(QEvent *event)
         }
 
         delete id;
+    }
+    else if (event->type() == kVideoDLEventType)
+    {
+        VideoDLEvent *vde = (VideoDLEvent *)event;
+
+        VideoDL *dl = vde->videoDL;
+        if (!dl)
+            return;
+
+        GetMythMainWindow()->HandleMedia("Internal", dl->filename);
+        delete dl;
     }
 }
 
