@@ -49,10 +49,12 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
       m_date(NULL),                  m_time(NULL),
       m_filesize(NULL),              m_filesize_str(NULL),
       m_rating(NULL),                m_noSites(NULL),
-      m_thumbImage(NULL),            m_downloadable(NULL),
-      m_busyPopup(NULL),             m_menuPopup(NULL),
-      m_popupStack(),                m_type(type),
-      m_lock(QMutex::Recursive),     m_parse(new Parse())
+      m_width(NULL),                 m_height(NULL),
+      m_resolution(NULL),            m_thumbImage(NULL),
+      m_downloadable(NULL),          m_busyPopup(NULL),
+      m_menuPopup(NULL),             m_popupStack(),
+      m_type(type),                  m_lock(QMutex::Recursive),
+      m_parse(new Parse())
 {
     m_download = new DownloadManager(this);
     m_imageDownload = new ImageDownloadManager(this);
@@ -105,6 +107,9 @@ bool NetTree::Create()
     UIUtilW::Assign(this, m_filesize_str, "filesize_str");
     UIUtilW::Assign(this, m_rating, "rating");
     UIUtilW::Assign(this, m_noSites, "nosites");
+    UIUtilW::Assign(this, m_width, "width");
+    UIUtilW::Assign(this, m_height, "height");
+    UIUtilW::Assign(this, m_resolution, "resolution");
 
     UIUtilW::Assign(this, m_thumbImage, "preview");
 
@@ -313,6 +318,10 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
                     GetSetting("DateFormat", "yyyy-MM-dd hh:mm")), "date");
         item->SetText(video->GetDescription(), "description");
         item->SetText(video->GetURL(), "url");
+        item->SetText(QString::number(video->GetWidth()), "width");
+        item->SetText(QString::number(video->GetHeight()), "height");
+        item->SetText(QString("%1x%2").arg(video->GetWidth())
+                      .arg(video->GetHeight()), "resolution");
 
         off_t bytes = video->GetFilesize();
         item->SetText(QString::number(bytes), "filesize");
@@ -1026,6 +1035,13 @@ void NetTree::slotItemChanged()
             m_time->SetText(item->GetTime());
         if (m_rating)
             m_rating->SetText(item->GetRating());
+        if (m_width)
+            m_width->SetText(QString::number(item->GetWidth()));
+        if (m_height)
+            m_height->SetText(QString::number(item->GetHeight()));
+        if (m_resolution)
+            m_resolution->SetText(QString("%1x%2")
+                          .arg(item->GetWidth()).arg(item->GetHeight()));
 
         if (m_filesize || m_filesize_str)
         {

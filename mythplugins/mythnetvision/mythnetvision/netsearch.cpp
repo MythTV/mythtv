@@ -43,11 +43,12 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_date(NULL),                  m_time(NULL),
       m_filesize(NULL),              m_filesize_str(NULL),
       m_rating(NULL),                m_pageText(NULL),
-      m_noSites(NULL),               m_thumbImage(NULL),
-      m_downloadable(NULL),          m_progress(NULL),
-      m_busyPopup(NULL),             m_okPopup(NULL),
-      m_popupStack(),                m_netSearch(),
-      m_currentSearch(NULL),
+      m_noSites(NULL),               m_width(NULL),
+      m_height(NULL),                m_resolution(NULL),
+      m_thumbImage(NULL),            m_downloadable(NULL),
+      m_progress(NULL),              m_busyPopup(NULL),
+      m_okPopup(NULL),               m_popupStack(),
+      m_netSearch(),                 m_currentSearch(NULL),
       m_currentGrabber(0),           m_currentCmd(NULL),
       m_currentDownload(NULL),       m_pagenum(0),
       m_lock(QMutex::Recursive)
@@ -91,6 +92,9 @@ bool NetSearch::Create()
     m_rating = dynamic_cast<MythUIText *> (GetChild("rating"));
     m_pageText = dynamic_cast<MythUIText *> (GetChild("page"));
     m_noSites = dynamic_cast<MythUIText *> (GetChild("nosites"));
+    m_width = dynamic_cast<MythUIText *> (GetChild("width"));
+    m_height = dynamic_cast<MythUIText *> (GetChild("height"));
+    m_resolution = dynamic_cast<MythUIText *> (GetChild("resolution"));
 
     m_thumbImage = dynamic_cast<MythUIImage *> (GetChild("preview"));
 
@@ -567,6 +571,10 @@ void NetSearch::populateResultList(ResultVideo::resultList list)
                "yyyy-MM-dd hh:mm")), "date");
             item->SetText((*i)->GetTime(), "time");
             item->SetText((*i)->GetRating(), "rating");
+            item->SetText(QString::number((*i)->GetWidth()), "width");
+            item->SetText(QString::number((*i)->GetHeight()), "height");
+            item->SetText(QString("%1x%2").arg((*i)->GetWidth())
+                      .arg((*i)->GetHeight()), "resolution");
 
             off_t bytes = (*i)->GetFilesize();
             if (bytes > 0)
@@ -844,6 +852,13 @@ void NetSearch::slotItemChanged()
             m_time->SetText(item->GetTime());
         if (m_rating)
             m_rating->SetText(item->GetRating());
+        if (m_width)
+            m_width->SetText(QString::number(item->GetWidth()));
+        if (m_height)
+            m_height->SetText(QString::number(item->GetHeight()));
+        if (m_resolution)
+            m_resolution->SetText(QString("%1x%2")
+                          .arg(item->GetWidth()).arg(item->GetHeight()));
 
         if (m_filesize || m_filesize_str)
         {

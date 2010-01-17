@@ -70,6 +70,10 @@ class NetSearch : public MythScreenType
     MythUIText         *m_rating;
     MythUIText         *m_pageText;
     MythUIText         *m_noSites;
+    MythUIText         *m_width;
+    MythUIText         *m_height;
+    MythUIText         *m_resolution;
+
     MythUIImage        *m_thumbImage;
     MythUIStateType    *m_downloadable;
     MythUIProgressBar  *m_progress;
