@@ -44,7 +44,7 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_filesize(NULL),              m_filesize_str(NULL),
       m_rating(NULL),                m_pageText(NULL),
       m_noSites(NULL),               m_thumbImage(NULL),
-      m_downloadable(NULL),          m_progress(NULL),      
+      m_downloadable(NULL),          m_progress(NULL),
       m_busyPopup(NULL),             m_okPopup(NULL),
       m_popupStack(),                m_netSearch(),
       m_currentSearch(NULL),
@@ -196,11 +196,11 @@ bool NetSearch::keyPressEvent(QKeyEvent *event)
         }
         else
             handled = false;
-    } 
-    
+    }
+
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
-            
+
     return handled;
 }
 
@@ -374,7 +374,7 @@ void NetSearch::fillGrabberButtonList()
         item->SetData((*i)->GetCommandline());
         item->SetImage((*i)->GetImage());
         }
-    } 
+    }
 }
 
 void NetSearch::cleanCacheDir()

@@ -27,7 +27,7 @@ RSSSite* findByURL(const QString& url)
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("RSS find in db", query);
         RSSSite *tmp = new RSSSite(QString(), QString(), QString(),
-                       QString(), QString(), false, 
+                       QString(), QString(), false,
                        QDateTime());
         return tmp;
     }

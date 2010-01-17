@@ -65,7 +65,7 @@ class NetSearch : public MythScreenType
     MythUIText         *m_author;
     MythUIText         *m_date;
     MythUIText         *m_time;
-    MythUIText         *m_filesize; 
+    MythUIText         *m_filesize;
     MythUIText         *m_filesize_str;
     MythUIText         *m_rating;
     MythUIText         *m_pageText;

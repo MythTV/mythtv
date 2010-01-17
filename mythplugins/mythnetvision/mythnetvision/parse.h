@@ -20,88 +20,88 @@ class QDomDocument;
     */
    struct Enclosure
    {
-       QString URL_;
-       QString Type_;
-       qint64 Length_;
-       QString Lang_;
+       QString URL;
+       QString Type;
+       qint64 Length;
+       QString Lang;
    };
 
    struct MRSSThumbnail
    {
-       QString URL_;
-       int Width_;
-       int Height_;
-       QString Time_;
+       QString URL;
+       int Width;
+       int Height;
+       QString Time;
    };
 
    struct MRSSCredit
    {
-       QString Role_;
-       QString Who_;
+       QString Role;
+       QString Who;
    };
 
    struct MRSSComment
    {
-       QString Type_;
-       QString Comment_;
+       QString Type;
+       QString Comment;
    };
 
    struct MRSSPeerLink
    {
-       QString Type_;
-       QString Link_;
+       QString Type;
+       QString Link;
    };
 
    struct MRSSScene
    {
-       QString Title_;
-       QString Description_;
-       QString StartTime_;
-       QString EndTime_;
+       QString Title;
+       QString Description;
+       QString StartTime;
+       QString EndTime;
    };
 
    struct MRSSEntry
    {
-       QString URL_;
-       qint64 Size_;
-       QString Type_;
-       QString Medium_;
-       bool IsDefault_;
-       QString Expression_;
-       int Bitrate_;
-       double Framerate_;
-       double SamplingRate_;
-       int Channels_;
-       int Duration_;
-       int Width_;
-       int Height_;
-       QString Lang_;
-       int Group_;
-       QString Rating_;
-       QString RatingScheme_;
-       QString Title_;
-       QString Description_;
-       QString Keywords_;
-       QString CopyrightURL_;
-       QString CopyrightText_;
-       int RatingAverage_;
-       int RatingCount_;
-       int RatingMin_;
-       int RatingMax_;
-       int Views_;
-       int Favs_;
-       QString Tags_;
-       QList<MRSSThumbnail> Thumbnails_;
-       QList<MRSSCredit> Credits_;
-       QList<MRSSComment> Comments_;
-       QList<MRSSPeerLink> PeerLinks_;
-       QList<MRSSScene> Scenes_;
+       QString URL;
+       qint64 Size;
+       QString Type;
+       QString Medium;
+       bool IsDefault;
+       QString Expression;
+       int Bitrate;
+       double Framerate;
+       double SamplingRate;
+       int Channels;
+       int Duration;
+       int Width;
+       int Height;
+       QString Lang;
+       int Group;
+       QString Rating;
+       QString RatingScheme;
+       QString Title;
+       QString Description;
+       QString Keywords;
+       QString CopyrightURL;
+       QString CopyrightText;
+       int RatingAverage;
+       int RatingCount;
+       int RatingMin;
+       int RatingMax;
+       int Views;
+       int Favs;
+       QString Tags;
+       QList<MRSSThumbnail> Thumbnails;
+       QList<MRSSCredit> Credits;
+       QList<MRSSComment> Comments;
+       QList<MRSSPeerLink> PeerLinks;
+       QList<MRSSScene> Scenes;
    };
 
 class ResultVideo
 {
 
-public:
+  public:
 
     typedef QList<ResultVideo *> resultList;
     typedef vector<ResultVideo> List;
@@ -109,7 +109,7 @@ public:
     ResultVideo(const QString& title, const QString& desc,
               const QString& URL, const QString& thumbnail,
               const QString& mediaURL, const QString& author,
-              const QDateTime& date, const QString& time, 
+              const QDateTime& date, const QString& time,
               const QString& rating, const off_t& filesize,
               const QString& player, const QStringList& playerargs,
               const QString& download, const QStringList& downloadargs,
@@ -137,7 +137,7 @@ public:
     const QString& GetLanguage() const { return m_language; }
     const bool& GetDownloadable() const { return m_downloadable; }
 
-private:
+  private:
     QString   m_title;
     QString   m_desc;
     QString   m_URL;
@@ -163,8 +163,8 @@ class Parse : public QObject
 {
     Q_OBJECT
     friend class MRSSParser;
-public:
 
+  public:
     Parse();
     virtual ~Parse();
 
@@ -185,21 +185,20 @@ public:
     QList<Enclosure> GetEnclosures(const QDomElement& entry) const;
     static QString UnescapeHTML (const QString&);
 
-private:
+  private:
+    QMap<QString, int> TimezoneOffsets;
 
-    QMap<QString, int> TimezoneOffsets_;
-
-protected:
-    static const QString DC_;
-    static const QString WFW_;
-    static const QString Atom_;
-    static const QString RDF_;
-    static const QString Slash_;
-    static const QString Enc_;
-    static const QString ITunes_;
-    static const QString GeoRSSSimple_;
-    static const QString GeoRSSW3_;
-    static const QString MediaRSS_;
+  protected:
+    static const QString DC;
+    static const QString WFW;
+    static const QString Atom;
+    static const QString RDF;
+    static const QString Slash;
+    static const QString Enc;
+    static const QString ITunes;
+    static const QString GeoRSSSimple;
+    static const QString GeoRSSW3;
+    static const QString MediaRSS;
 
 };
 

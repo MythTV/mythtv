@@ -19,39 +19,39 @@ using namespace std;
 
 class RSSSite;
 class RSSSite : public QObject, public MythHttpListener
-{                                                      
-    Q_OBJECT                                           
+{
+    Q_OBJECT
 
-public:
+  public:
 
     enum State {
         Retrieving = 0,
         RetrieveFailed,
-        WriteFailed,   
-        Success        
-    };                 
+        WriteFailed,
+        Success
+    };
 
     class List : public vector<RSSSite*>
-    {                                   
-      public:                           
-        void clear(void)                
-        {                               
-            while (size())              
-            {                           
-                RSSSite *tmp = back();  
-                pop_back();             
-                tmp->deleteLater();     
-            }                           
-        }                               
-    };                                  
+    {
+      public:
+        void clear(void)
+        {
+            while (size())
+            {
+                RSSSite *tmp = back();
+                pop_back();
+                tmp->deleteLater();
+            }
+        }
+    };
 
     RSSSite(const QString& title,
                   const QString& image,
                   const QString& description,
-                  const QString& url,        
-                  const QString& author,     
-                  const bool& download,      
-                  const QDateTime& updated); 
+                  const QString& url,
+                  const QString& author,
+                  const bool& download,
+                  const QDateTime& updated);
 
     ~RSSSite();
 
@@ -60,35 +60,35 @@ public:
     const QString& GetTitle() const { return m_title; }
     const QString& GetImage() const { return m_image; }
     const QString& GetDescription() const { return m_description; }
-    const QString& GetURL() const { return m_url; }                
-    const QString& GetAuthor() const { return m_author; }          
-    const bool& GetDownload() const { return m_download; }         
-    const QDateTime& GetUpdated() const { return m_updated; }      
+    const QString& GetURL() const { return m_url; }
+    const QString& GetAuthor() const { return m_author; }
+    const bool& GetDownload() const { return m_download; }
+    const QDateTime& GetUpdated() const { return m_updated; }
 
     virtual void deleteLater();
 
     unsigned int timeSinceLastUpdate(void) const; // in minutes
 
     void insertRSSArticle(ResultVideo *item);
-    void clearRSSArticles(void);             
+    void clearRSSArticles(void);
 
     ResultVideo::resultList GetVideoList(void) const;
 
     void retrieve(void);
-    void stop(void);    
-    void process(void); 
+    void stop(void);
+    void process(void);
 
     bool     successful(void) const;
-    QString  errorMsg(void) const;  
+    QString  errorMsg(void) const;
 
     virtual void Update(QHttp::Error      error,
                         const QString    &error_str,
-                        const QUrl       &url,      
+                        const QUrl       &url,
                         uint              http_status_id,
                         const QString    &http_status_str,
-                        const QByteArray &data);          
+                        const QByteArray &data);
 
-private:
+  private:
 
     QString    m_title;
     QString    m_image;
@@ -98,8 +98,6 @@ private:
     QString    m_author;
     bool       m_download;
     QDateTime  m_updated;
-
-//Inherited from MN
 
     mutable    QMutex m_lock;
     QString    m_destDir;
@@ -112,7 +110,7 @@ private:
 
     ResultVideo::resultList m_articleList;
 
-signals:
+  signals:
 
     void finished(RSSSite *item);
 

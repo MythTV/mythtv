@@ -3,7 +3,7 @@ include ( ../../settings.pro )
 include ( ../../programs-libs.pro )
 
 QT += network sql xml
- 
+
 TEMPLATE = lib
 CONFIG += plugin thread warn_on debug
 TARGET = mythnetvision
@@ -59,7 +59,7 @@ HEADERS += dbcheck.h grabbermanager.h rssmanager.h treedbutil.h rssdbutil.h rsse
 HEADERS += search.h netsearch.h parse.h imagedownloadmanager.h downloadmanager.h treeeditor.h nettree.h
 
 SOURCES += dbcheck.cpp grabbermanager.cpp rssmanager.cpp parse.cpp treedbutil.cpp search.cpp
-SOURCES += rssdbutil.cpp rsseditor.cpp netsearch.cpp 
+SOURCES += rssdbutil.cpp rsseditor.cpp netsearch.cpp
 SOURCES += downloadmanager.cpp imagedownloadmanager.cpp treeeditor.cpp nettree.cpp main.cpp
 
 include ( ../../libs-targetfix.pro )

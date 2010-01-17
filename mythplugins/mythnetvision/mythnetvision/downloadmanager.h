@@ -30,7 +30,7 @@ class VideoDLEvent : public QEvent
 
 class DownloadManager : public QThread
 {
-public:
+  public:
 
     DownloadManager(QObject *parent);
     ~DownloadManager();
@@ -40,11 +40,11 @@ public:
 
     QString getDownloadFilename(ResultVideo *item);
 
-protected:
+  protected:
 
     void run();
     
-private:
+  private:
 
     bool moreWork();
 

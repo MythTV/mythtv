@@ -21,7 +21,7 @@ class Search : public QObject
     friend class MRSSParser;
     Q_OBJECT
 
-public:
+  public:
 
     Search();
     ~Search();
@@ -33,11 +33,11 @@ public:
 
     uint numResults();
     uint numReturned();
-    uint numIndex(); 
+    uint numIndex();
 
     ResultVideo::resultList GetVideoList();
 
-private:
+  private:
 
     QProcess       *m_searchProcess;
 
@@ -50,12 +50,12 @@ private:
     uint parseNumReturned(QDomDocument domDoc);
     uint parseNumIndex(QDomDocument domDoc);
 
-signals:
+  signals:
 
     void finishedSearch(Search *item);
     void searchTimedOut(Search *item);
 
-private slots:
+  private slots:
 
     void slotProcessSearchExit(int exitcode,
                                QProcess::ExitStatus exitstatus);

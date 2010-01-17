@@ -66,8 +66,8 @@ class NetTree : public MythScreenType
     void createBusyDialog(QString title);
 
   private:
-    virtual void Load(); 
-    virtual void Init(); 
+    virtual void Load();
+    virtual void Init();
 
     void fillTree(void);
     void SetCurrentNode(MythGenericTree *node);
@@ -107,7 +107,7 @@ class NetTree : public MythScreenType
     MythUIText         *m_author;
     MythUIText         *m_date;
     MythUIText         *m_time;
-    MythUIText         *m_filesize; 
+    MythUIText         *m_filesize;
     MythUIText         *m_filesize_str;
     MythUIText         *m_rating;
     MythUIText         *m_noSites;

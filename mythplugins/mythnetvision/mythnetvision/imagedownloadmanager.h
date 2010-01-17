@@ -30,7 +30,7 @@ class ImageDLEvent : public QEvent
 
 class ImageDownloadManager : public QThread
 {
-public:
+  public:
 
     ImageDownloadManager(QObject *parent);
     ~ImageDownloadManager();
@@ -39,11 +39,11 @@ public:
                 const uint& pos);
     void cancel();
 
-protected:
+  protected:
 
     void run();
-    
-private:
+
+  private:
 
     bool moreWork();
 

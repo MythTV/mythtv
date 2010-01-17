@@ -502,7 +502,7 @@ void RSSEditor::fillRSSButtonList()
         item->SetData(qVariantFromValue(*i));
         item->SetImage((*i)->GetImage());
         }
-    } 
+    }
 }
 
 void RSSEditor::slotItemChanged()

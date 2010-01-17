@@ -206,7 +206,7 @@ void TreeEditor::fillGrabberButtonList()
         if (findTreeGrabberInDB((*i)->GetCommandline()))
             item->setChecked(MythUIButtonListItem::FullChecked);
         }
-    } 
+    }
 }
 
 void TreeEditor::toggleItem(MythUIButtonListItem *item)

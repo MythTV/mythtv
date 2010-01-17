@@ -68,7 +68,7 @@ bool NetTree::Create()
 
     QString windowName = "gallery";
 
-    switch (m_type) 
+    switch (m_type)
     {
         case DLG_GALLERY:
             windowName = "gallery";
@@ -76,23 +76,23 @@ bool NetTree::Create()
         case DLG_BROWSER:
             windowName = "browser";
             break;
-        case DLG_TREE: 
+        case DLG_TREE:
             windowName = "tree";
             break;
         case DLG_DEFAULT:
         default:
             break;
-    }  
+    }
 
     if (!LoadWindowFromXML("netvision-ui.xml", windowName, this))
         return false;
-                
+
     bool err = false;
     if (m_type == DLG_TREE)
         UIUtilE::Assign(this, m_siteMap, "videos", &err);
     else
         UIUtilE::Assign(this, m_siteButtonList, "videos", &err);
-                
+
     UIUtilW::Assign(this, m_title, "title");
     UIUtilW::Assign(this, m_description, "description");
     UIUtilW::Assign(this, m_url, "url");
@@ -107,12 +107,12 @@ bool NetTree::Create()
     UIUtilW::Assign(this, m_noSites, "nosites");
 
     UIUtilW::Assign(this, m_thumbImage, "preview");
-                
+
     UIUtilW::Assign(this, m_downloadable, "downloadable");
 
     m_siteGeneric = new MythGenericTree("site root", 0, false);
     m_currentNode = m_siteGeneric;
-        
+
     if (err)
     {
         VERBOSE(VB_IMPORTANT, "Cannot load screen '" + windowName + "'");
@@ -159,10 +159,10 @@ void NetTree::Load()
 }
 
 void NetTree::SetCurrentNode(MythGenericTree *node)
-{        
+{
     if (!node)
         return;
-    
+
     m_currentNode = node;
 }
 
@@ -229,12 +229,12 @@ void NetTree::loadData(void)
 
         if (!m_currentNode)
             SetCurrentNode(m_siteGeneric);
-            
+
         if (!m_currentNode)
             return;
 
         MythGenericTree *selectedNode = m_currentNode->getSelectedChild();
- 
+
         typedef QList<MythGenericTree *> MGTreeChildList;
         MGTreeChildList *lchildren = m_currentNode->getAllChildren();
 
@@ -369,7 +369,7 @@ void NetTree::handleSelect(MythUIButtonListItem *item)
         case kSubFolder:
             handleDirSelect(node);
             break;
-        case kUpFolder: 
+        case kUpFolder:
             goBack();
             break;
         default:
@@ -409,9 +409,9 @@ bool NetTree::goBack()
             handled = true;
         }
     }
-                
+
     loadData();
-             
+
     return handled;
 }
 
@@ -444,11 +444,11 @@ bool NetTree::keyPressEvent(QKeyEvent *event)
         }
         else
             handled = false;
-    } 
-    
+    }
+
     if (!handled && MythScreenType::keyPressEvent(event))
         handled = true;
-            
+
     return handled;
 }
 
@@ -593,7 +593,7 @@ void NetTree::switchView()
 
     NetTree *nettree =
             new NetTree(m_type, GetMythMainWindow()->GetMainStack(), "nettree");
-    
+
     if (nettree->Create())
     {
         gContext->SaveSetting("mythnetvision.ViewMode", m_type);
@@ -627,7 +627,7 @@ void NetTree::fillTree()
     RSSSite::rssList::iterator i = m_rssList.begin();
     for (; i != m_rssList.end(); ++i)
     {
-        ResultVideo::resultList items = 
+        ResultVideo::resultList items =
                    getRSSArticles((*i)->GetTitle());
         MythGenericTree *ret = new MythGenericTree(
                    (*i)->GetTitle(), kSubFolder, false);
@@ -716,7 +716,7 @@ void NetTree::buildGenericTree(MythGenericTree *dst, QStringList paths,
     }
 
     if (paths.size())
-        buildGenericTree(folder, paths, dirthumb, videos); 
+        buildGenericTree(folder, paths, dirthumb, videos);
     else
     {
         // Sort the filenames
@@ -761,11 +761,11 @@ void NetTree::showWebVideo()
     else
     {
         MythGenericTree *node = GetNodePtrFromButton(m_siteButtonList->GetItemCurrent());
-  
+
         if (!node)
             return;
 
-        item = qVariantValue<ResultVideo *>(node->GetData());                 
+        item = qVariantValue<ResultVideo *>(node->GetData());
     }
 
     if (!item)
@@ -1247,7 +1247,7 @@ void NetTree::slotItemChanged()
         {
             m_thumbImage->SetVisible(false);
         }
-        if (m_downloadable)   
+        if (m_downloadable)
             m_downloadable->SetVisible(false);
     }
 }

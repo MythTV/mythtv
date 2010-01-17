@@ -99,18 +99,18 @@ class GrabberUpdateEvent : public QEvent
 
 class GrabberDownloadThread : public QThread
 {
-public:
+  public:
 
     GrabberDownloadThread(QObject *parent);
     ~GrabberDownloadThread();
 
     void cancel();
 
-protected:
+  protected:
 
     void run();
-    
-private:
+
+  private:
 
     QObject               *m_parent;
     QList<GrabberScript*>  m_scripts;
