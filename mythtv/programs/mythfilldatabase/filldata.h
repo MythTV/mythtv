@@ -26,6 +26,9 @@ bool updateLastRunStatus(MSqlQuery &query, QString &status);
 
 struct Source
 {
+    Source() : id(0), name(), xmltvgrabber(), userid(), password(), lineupid(),
+        xmltvgrabber_baseline(false), xmltvgrabber_manualconfig(false),
+        xmltvgrabber_cache(false), xmltvgrabber_prefmethod() {}
     int id;
     QString name;
     QString xmltvgrabber;
