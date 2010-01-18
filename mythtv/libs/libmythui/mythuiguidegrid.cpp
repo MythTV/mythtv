@@ -179,9 +179,14 @@ bool MythUIGuideGrid::ParseElement(QDomElement &element)
     else if (element.tagName() == "font")
     {
         QString fontname = getFirstText(element);
-        m_font = GetFont(fontname);
-        if (!m_font)
-            m_font = GetGlobalFontMap()->GetFont(fontname);
+        MythFontProperties *font = GetFont(fontname);
+        if (!font)
+            font = GetGlobalFontMap()->GetFont(fontname);
+
+        if (font)
+            m_font = font;
+        else
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown font: " + fontname); 
     }
     else if (element.tagName() == "recordstatus")
     {
