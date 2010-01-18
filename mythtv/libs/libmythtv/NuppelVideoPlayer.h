@@ -16,6 +16,7 @@
 #include "cc608decoder.h"
 #include "cc708decoder.h"
 #include "cc708window.h"
+#include "decoderbase.h"
 
 #include "mythexp.h"
 
@@ -67,22 +68,6 @@ enum TCTypes
     TC_CC
 };
 #define TCTYPESMAX 4
-
-/// Track types
-enum
-{
-    kTrackTypeAudio = 0,
-    kTrackTypeSubtitle,
-    kTrackTypeCC608,
-    kTrackTypeCC708,
-    kTrackTypeTeletextCaptions,
-    kTrackTypeCount,
-
-    kTrackTypeTeletextMenu,
-    kTrackTypeTextSubtitle,
-};
-QString track_type_to_string(uint type);
-int type_string_to_track_type(const QString &str);
 
 // Caption Display modes
 enum
@@ -467,9 +452,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     bool PrebufferEnoughFrames(void);
     void CheckPrebuffering(void);
-    bool GetFrameNormal(int onlyvideo);
+    bool GetFrameNormal(DecodeType);
     bool GetFrameFFREW(void);
-    bool GetFrame(int onlyvideo, bool unsafe = false);
+    bool GetFrame(DecodeType, bool unsafe = false);
 
     // These actually execute commands requested by public members
     void DoPause(void);

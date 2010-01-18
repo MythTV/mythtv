@@ -3458,7 +3458,7 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
     }
     else if (action.left(6) == "TOGGLE")
     {
-        int type = type_string_to_track_type(action.mid(6));
+        int type = to_track_type(action.mid(6));
         if (type == kTrackTypeTeletextMenu)
         {
             handled = true;
@@ -3472,7 +3472,7 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
     }
     else if (action.left(6) == "SELECT")
     {
-        int type = type_string_to_track_type(action.mid(6));
+        int type = to_track_type(action.mid(6));
         int mid  = (kTrackTypeSubtitle == type) ? 15 : 12;
         if (type >= kTrackTypeAudio)
         {
@@ -3483,7 +3483,7 @@ bool TV::HandleTrackAction(PlayerContext *ctx, const QString &action)
     else if (action.left(4) == "NEXT" || action.left(4) == "PREV")
     {
         int dir = (action.left(4) == "NEXT") ? +1 : -1;
-        int type = type_string_to_track_type(action.mid(4));
+        int type = to_track_type(action.mid(4));
         if (type >= kTrackTypeAudio)
         {
             handled = true;

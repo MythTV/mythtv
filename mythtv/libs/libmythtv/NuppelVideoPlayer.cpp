@@ -89,48 +89,6 @@ static unsigned dbg_ident(const NuppelVideoPlayer*);
 #define LOC_WARN QString("NVP(%1), Warning: ").arg(dbg_ident(this),0,36)
 #define LOC_ERR  QString("NVP(%1), Error: ").arg(dbg_ident(this),0,36)
 
-QString track_type_to_string(uint type)
-{
-    QString str = QObject::tr("Track");
-
-    if (kTrackTypeAudio == type)
-        str = QObject::tr("Audio track");
-    else if (kTrackTypeSubtitle == type)
-        str = QObject::tr("Subtitle track");
-    else if (kTrackTypeCC608 == type)
-        str = QObject::tr("CC", "EIA-608 closed captions");
-    else if (kTrackTypeCC708 == type)
-        str = QObject::tr("ATSC CC", "EIA-708 closed captions");
-    else if (kTrackTypeTeletextCaptions == type)
-        str = QObject::tr("TT CC", "Teletext closed captions");
-    else if (kTrackTypeTeletextMenu == type)
-        str = QObject::tr("TT Menu", "Teletext Menu");
-    else if (kTrackTypeTextSubtitle == type)
-        str = QObject::tr("TXT File", "Text File");
-    return str;
-}
-
-int type_string_to_track_type(const QString &str)
-{
-    int ret = -1;
-
-    if (str.left(5) == "AUDIO")
-        ret = kTrackTypeAudio;
-    else if (str.left(8) == "SUBTITLE")
-        ret = kTrackTypeSubtitle;
-    else if (str.left(5) == "CC608")
-        ret = kTrackTypeCC608;
-    else if (str.left(5) == "CC708")
-        ret = kTrackTypeCC708;
-    else if (str.left(3) == "TTC")
-        ret = kTrackTypeTeletextCaptions;
-    else if (str.left(3) == "TTM")
-        ret = kTrackTypeTeletextMenu;
-    else if (str.left(3) == "TFL")
-        ret = kTrackTypeTextSubtitle;
-    return ret;
-}
-
 uint track_type_to_display_mode[kTrackTypeCount+2] =
 {
     kDisplayNone,
@@ -1524,9 +1482,9 @@ void NuppelVideoPlayer::CheckPrebuffering(void)
 #endif
 }
 
-bool NuppelVideoPlayer::GetFrameNormal(int onlyvideo)
+bool NuppelVideoPlayer::GetFrameNormal(DecodeType decodetype)
 {
-    if (!GetDecoder()->GetFrame(onlyvideo))
+    if (!GetDecoder()->GetFrame(decodetype))
         return false;
 
     CheckPrebuffering();
@@ -1580,12 +1538,12 @@ bool NuppelVideoPlayer::GetFrameFFREW(void)
         Play(stretch, true, true);
     }
 
-    bool ret = GetDecoder()->GetFrame(1);
+    bool ret = GetDecoder()->GetFrame(kDecodeVideo);
     CheckPrebuffering();
     return ret;
 }
 
-bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
+bool NuppelVideoPlayer::GetFrame(DecodeType decodetype, bool unsafe)
 {
     bool ret = false;
 
@@ -1612,7 +1570,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
     if (!GetDecoder())
         VERBOSE(VB_IMPORTANT, LOC + "GetFrame() called with NULL decoder.");
     else if (ffrew_skip == 1)
-        ret = GetFrameNormal(onlyvideo);
+        ret = GetFrameNormal(decodetype);
     else
         ret = GetFrameFFREW();
 
@@ -3417,7 +3375,8 @@ void NuppelVideoPlayer::JumpToProgram(void)
 
 void NuppelVideoPlayer::RefreshPauseFrame(void)
 {
-    GetFrame(audioOutput == NULL || !normal_speed);
+    DecodeType dt = (audioOutput && normal_speed) ? kDecodeAV : kDecodeVideo;
+    GetFrame(dt);
 
     resetvideo = true;
     while (resetvideo)
@@ -3533,7 +3492,9 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
 
     if (bookmarkseek > 30)
     {
-        GetFrame(audioOutput == NULL || !normal_speed);
+        DecodeType dt = (audioOutput && normal_speed) ?
+            kDecodeAV : kDecodeVideo;
+        GetFrame(dt);
 
         bool seeks = exactseeks;
 
@@ -3779,7 +3740,9 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
             continue;
         }
 
-        GetFrame(audioOutput == NULL || !normal_speed);
+        DecodeType dt = (audioOutput && normal_speed) ?
+            kDecodeAV : kDecodeVideo;
+        GetFrame(dt);
 
         if (using_null_videoout)
             GetDecoder()->UpdateFramesPlayed();
@@ -5848,7 +5811,7 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
         else if (player_ctx->buffer->DVD()->GetTotalTimeOfTitle() < 60)
         {
             GoToDVDProgram(1);
-            GetFrame(1);
+            GetFrame(kDecodeVideo);
 
             number = frameNum;
             if (number >= totalFrames)
@@ -5908,7 +5871,7 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
     // Only do seek if we have position map
     if (hasFullPositionMap && !player_ctx->buffer->isDVD())
     {
-        GetFrame(1);
+        GetFrame(kDecodeVideo);
         DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
 
         fftime = number;
@@ -5916,7 +5879,7 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
         fftime = 0;
     }
 
-    GetFrame(1);
+    GetFrame(kDecodeVideo);
 
     if (!(frame = videoOutput->GetLastDecodedFrame()))
     {
@@ -5979,7 +5942,7 @@ VideoFrame* NuppelVideoPlayer::GetRawVideoFrame(long long frameNumber)
         ClearAfterSeek();
     }
 
-    GetFrame(1,true);
+    GetFrame(kDecodeVideo,true);
 
     return videoOutput->GetLastDecodedFrame();
 }
@@ -6061,7 +6024,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
     if ((lastDecodedFrameNumber == 0) && honorCutList)
         dm_iter = deleteMap.begin();
 
-    if (!GetDecoder()->GetFrame(0))
+    if (!GetDecoder()->GetFrame(kDecodeAV))
         return false;
     if (eof)
         return false;
@@ -6088,7 +6051,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
                 GetDecoder()->DoFastForward(dm_iter.key());
                 GetDecoder()->ClearStoredData();
                 ClearAfterSeek();
-                GetDecoder()->GetFrame(0);
+                GetDecoder()->GetFrame(kDecodeAV);
                 *did_ff = 1;
             }
             while(((*dm_iter) == 0) && (dm_iter != deleteMap.end()))
@@ -6236,7 +6199,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(
     inuse_timer.start();
     save_timer.start();
 
-    GetFrame(-1,true);
+    GetFrame(kDecodeNothing,true);
     if (showPercentage)
     {
         if (totalFrames)
@@ -6306,7 +6269,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(
             }
         }
 
-        GetFrame(-1,true);
+        GetFrame(kDecodeNothing,true);
     }
 
     if (showPercentage)
@@ -6613,7 +6576,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
             UnpauseVideo(true);
         }
 
-        GetFrame(1, true);
+        GetFrame(kDecodeVideo, true);
     }
     else
     {
@@ -6982,7 +6945,7 @@ int NuppelVideoPlayer::ChangeTrack(uint type, int dir)
         {
             QString msg = "";
 
-            //msg = track_type_to_string(type);
+            //msg = toString((TrackType)type);
 
             msg = GetDecoder()->GetTrackDesc(type, GetTrack(type));
 

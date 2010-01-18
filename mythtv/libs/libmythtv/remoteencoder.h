@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QMutex>
+#include <QHash>
 #include <QMap>
 
 #include "mythexp.h"

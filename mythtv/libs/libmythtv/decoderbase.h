@@ -5,7 +5,6 @@
 #include <stdint.h>
 
 #include "RingBuffer.h"
-#include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -14,8 +13,33 @@
 
 class RingBuffer;
 class TeletextViewer;
+class NuppelVideoPlayer;
 
 const int kDecoderProbeBufferSize = 65536;
+
+/// Track types
+typedef enum TrackTypes
+{
+    kTrackTypeAudio = 0,
+    kTrackTypeSubtitle,
+    kTrackTypeCC608,
+    kTrackTypeCC708,
+    kTrackTypeTeletextCaptions,
+    kTrackTypeCount,
+
+    kTrackTypeTeletextMenu,
+    kTrackTypeTextSubtitle,
+} TrackType;
+QString toString(TrackType type);
+int to_track_type(const QString &str);
+
+typedef enum DecodeTypes
+{
+    kDecodeNothing = 0x00, // Demux and preprocess only.
+    kDecodeVideo   = 0x01,
+    kDecodeAudio   = 0x02,
+    kDecodeAV      = 0x03,
+} DecodeType;
 
 class StreamInfo
 {
@@ -75,10 +99,8 @@ class DecoderBase
     virtual void SetDisablePassThrough(bool disable) { (void)disable; }
 
     virtual void setWatchingRecording(bool mode);
-    /// Decode a frame of video/audio. If onlyvideo is +1,
-    /// decodes the video portion, if it is -1 only decodes
-    /// the audio portion, if it is 0 it decodes audio and video
-    virtual bool GetFrame(int onlyvideo) = 0;
+    /// Demux, preprocess and possibly decode a frame of video/audio.
+    virtual bool GetFrame(DecodeType) = 0;
     NuppelVideoPlayer *GetNVP() { return m_parent; }
 
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);

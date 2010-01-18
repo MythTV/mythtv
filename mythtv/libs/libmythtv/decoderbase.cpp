@@ -653,7 +653,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
         exitafterdecoded = true; // don't actualy get a frame
         while ((desiredFrame > last_frame) && !ateof)
         {
-            GetFrame(-1); // don't need to return frame...
+            GetFrame(kDecodeNothing); // don't need to return frame...
             last_frame = GetLastFrameInPosMap();
         }
         exitafterdecoded = false; // allow frames to be returned again
@@ -874,7 +874,7 @@ QString DecoderBase::GetTrackDesc(uint type, uint trackNo) const
 
     QMutexLocker locker(avcodeclock);
 
-    QString type_msg = track_type_to_string(type);
+    QString type_msg = toString((TrackType)type);
     int lang = tracks[type][trackNo].language;
     int hnum = trackNo + 1;
     if (kTrackTypeCC608 == type)
@@ -1033,6 +1033,48 @@ int DecoderBase::AutoSelectTrack(uint type)
         GetNVP()->TracksChanged(type);
 
     return selTrack;
+}
+
+QString toString(TrackType type)
+{
+    QString str = QObject::tr("Track");
+
+    if (kTrackTypeAudio == type)
+        str = QObject::tr("Audio track");
+    else if (kTrackTypeSubtitle == type)
+        str = QObject::tr("Subtitle track");
+    else if (kTrackTypeCC608 == type)
+        str = QObject::tr("CC", "EIA-608 closed captions");
+    else if (kTrackTypeCC708 == type)
+        str = QObject::tr("ATSC CC", "EIA-708 closed captions");
+    else if (kTrackTypeTeletextCaptions == type)
+        str = QObject::tr("TT CC", "Teletext closed captions");
+    else if (kTrackTypeTeletextMenu == type)
+        str = QObject::tr("TT Menu", "Teletext Menu");
+    else if (kTrackTypeTextSubtitle == type)
+        str = QObject::tr("TXT File", "Text File");
+    return str;
+}
+
+int to_track_type(const QString &str)
+{
+    int ret = -1;
+
+    if (str.left(5) == "AUDIO")
+        ret = kTrackTypeAudio;
+    else if (str.left(8) == "SUBTITLE")
+        ret = kTrackTypeSubtitle;
+    else if (str.left(5) == "CC608")
+        ret = kTrackTypeCC608;
+    else if (str.left(5) == "CC708")
+        ret = kTrackTypeCC708;
+    else if (str.left(3) == "TTC")
+        ret = kTrackTypeTeletextCaptions;
+    else if (str.left(3) == "TTM")
+        ret = kTrackTypeTeletextMenu;
+    else if (str.left(3) == "TFL")
+        ret = kTrackTypeTextSubtitle;
+    return ret;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

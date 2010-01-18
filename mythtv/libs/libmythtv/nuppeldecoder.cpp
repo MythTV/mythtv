@@ -1007,11 +1007,7 @@ void NuppelDecoder::ClearStoredData()
     }
 }
 
-// avignore = 0  : get audio and video
-//          = 1  : video only
-//          = -1 : neither, just parse
-
-bool NuppelDecoder::GetFrame(int avignore)
+bool NuppelDecoder::GetFrame(DecodeType decodetype)
 {
     bool gotvideo = false;
     bool ret = false;
@@ -1148,7 +1144,7 @@ bool NuppelDecoder::GetFrame(int avignore)
 
         if (frameheader.frametype == 'V')
         {
-            if (avignore == -1)
+            if (!(kDecodeVideo & decodetype))
             {
                 framesPlayed++;
                 gotvideo = 1;
@@ -1198,7 +1194,7 @@ bool NuppelDecoder::GetFrame(int avignore)
             continue;
         }
 
-        if (frameheader.frametype=='A' && avignore == 0)
+        if (frameheader.frametype=='A' && (kDecodeAudio & decodetype))
         {
             if ((frameheader.comptype == '3') || (frameheader.comptype == 'A'))
             {
@@ -1264,7 +1260,7 @@ bool NuppelDecoder::GetFrame(int avignore)
             }
         }
 
-        if (frameheader.frametype == 'T' && avignore >= 0)
+        if (frameheader.frametype == 'T' && (kDecodeVideo & decodetype))
         {
             if (getrawframes)
                 StoreRawData(strm);
@@ -1342,7 +1338,7 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
 
     for (;(skipFrames > 0) && !ateof; skipFrames--)
     {
-        GetFrame(0);
+        GetFrame(kDecodeAV);
         if (decoded_video_frame)
             GetNVP()->DiscardVideoFrame(decoded_video_frame);
     }

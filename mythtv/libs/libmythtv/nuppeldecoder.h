@@ -40,7 +40,8 @@ class NuppelDecoder : public DecoderBase
     int OpenFile(RingBuffer *rbuffer, bool novideo, 
                  char testbuf[kDecoderProbeBufferSize], 
                  int testbufsize = kDecoderProbeBufferSize);
-    bool GetFrame(int onlyvideo);
+
+    virtual bool GetFrame(DecodeType); // DecoderBase
 
     // lastFrame is really (framesPlayed - 1) since we increment after getting
     bool isLastFrameKey(void) { return (lastKey == framesPlayed); }

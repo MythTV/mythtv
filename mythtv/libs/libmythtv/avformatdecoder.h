@@ -96,7 +96,7 @@ class AvFormatDecoder : public DecoderBase
                  char testbuf[kDecoderProbeBufferSize],
                  int testbufsize = kDecoderProbeBufferSize);
 
-    bool GetFrame(int onlyvideo);
+    virtual bool GetFrame(DecodeType); // DecoderBase
 
     bool isLastFrameKey(void) { return false; }
 

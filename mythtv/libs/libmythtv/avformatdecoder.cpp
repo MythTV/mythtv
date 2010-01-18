@@ -775,7 +775,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     // Skip all the desired number of skipFrames
     for (;skipFrames > 0 && !ateof; skipFrames--)
     {
-        GetFrame(0);
+        GetFrame(kDecodeVideo);
         if (decoded_video_frame)
             GetNVP()->DiscardVideoFrame(decoded_video_frame);
     }
@@ -3305,7 +3305,7 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
 }
 
 // documented in decoderbase.h
-bool AvFormatDecoder::GetFrame(int onlyvideo)
+bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 {
     AVPacket *pkt = NULL;
     AC3HeaderInfo hdr;
@@ -3331,10 +3331,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
     bool has_video = HasVideo(ic);
 
-    if (!has_video && (onlyvideo >= 0))
+    if (!has_video && (decodetype & kDecodeVideo))
     {
         gotvideo = GenerateDummyVideoFrame();
-        onlyvideo = -1;
+        decodetype = (DecodeType)((int)decodetype & ~kDecodeVideo);
         skipaudio = false;
     }
 
@@ -3342,19 +3342,19 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
     if (GetNVP()->GetAudioBufferStatus(ofill, ototal))
     {
         othresh =  ((ototal>>1) + (ototal>>2));
-        allowedquit = (onlyvideo < 0) && (ofill > othresh);
+        allowedquit = (!(decodetype & kDecodeAudio)) && (ofill > othresh);
     }
 
     while (!allowedquit)
     {
-        if ((onlyvideo == 0) &&
+        if ((decodetype & kDecodeAudio) &&
             ((currentTrack[kTrackTypeAudio] < 0) ||
              (selectedTrack[kTrackTypeAudio].av_stream_index < 0)))
         {
             // disable audio request if there are no audio streams anymore
             // and we have video, otherwise allow decoding to stop
             if (has_video)
-                onlyvideo = 1;
+                decodetype = (DecodeType)((int)decodetype & ~kDecodeAudio);
             else
                 allowedquit = true;
         }
@@ -3433,21 +3433,21 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (gotvideo)
         {
-            if (onlyvideo < 0)
+            if (decodetype == kDecodeNothing)
             {
                 // no need to buffer audio or video if we
                 // only care about building a keyframe map.
                 allowedquit = true;
                 continue;
             }
-            else if (lowbuffers && onlyvideo == 0 &&
+            else if (lowbuffers && ((decodetype & kDecodeAV) == kDecodeAV) &&
                      storedPackets.count() < max_video_queue_size &&
                      lastapts < lastvpts + 100 &&
                      !ringBuffer->InDVDMenuOrStillFrame())
             {
                 storevideoframes = true;
             }
-            else
+            else if (decodetype & kDecodeVideo)
             {
                 if (storedPackets.count() >= max_video_queue_size)
                     VERBOSE(VB_IMPORTANT,
@@ -3688,7 +3688,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
             // Have to return regularly to ensure that the OSD is updated.
             // This applies both to MHEG and also channel browsing.
-            if (onlyvideo < 0)
+            if (!(decodetype & kDecodeVideo))
             {
                 allowedquit |= (itv && itv->ImageHasChanged());
                 OSD *osd = NULL;
@@ -3817,7 +3817,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                             .av_substream_index;
                     }
 
-                    if ((onlyvideo > 0) || (pkt->stream_index != audIdx))
+                    if (!(decodetype & kDecodeAudio) ||
+                        (pkt->stream_index != audIdx))
                     {
                         ptr += len;
                         len = 0;
@@ -3975,11 +3976,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     total_decoded_audio += data_size;
 
                     allowedquit |= ringBuffer->InDVDMenuOrStillFrame();
-                    allowedquit |= (onlyvideo < 0) &&
+                    allowedquit |= !(decodetype & kDecodeVideo) &&
                         (ofill + total_decoded_audio > othresh);
 
                     // top off audio buffers initially in audio only mode
-                    if (!allowedquit && (onlyvideo < 0))
+                    if (!allowedquit && !(decodetype & kDecodeVideo))
                     {
                         uint fill, total;
                         if (GetNVP()->GetAudioBufferStatus(fill, total))
@@ -4015,11 +4016,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         lastccptsu = (long long)
                             (av_q2d(curstream->time_base)*pkt->pts*1000000);
                     }
-                    if (onlyvideo < 0)
+
+                    if (!(decodetype & kDecodeVideo))
                     {
-                        // if onlyvideo < 0 we really just want
-                        // to find the keyframes, we don't care
-                        // about decoding the actual video content.
                         framesPlayed++;
                         gotvideo = 1;
                         ptr += pkt->size;
