@@ -413,14 +413,24 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                     if(channel_preset && cstr.isEmpty())
                         cstr = QString::number(chanid % 1000);
 
-                    ChannelUtil::CreateChannel(
-                        mplexid,          id,        chanid,
-                        (*i).callsign,    (*i).name, cstr,
-                        0 /*service id*/, major,     minor,
-                        false /*use on air guide*/,  false /*hidden*/,
-                        false /*hidden in guide*/,
-                        (*i).freqid,      localfile, (*i).tvformat,
-                        (*i).xmltvid);
+                    bool retval = ChannelUtil::CreateChannel(
+                                                     mplexid, id,
+                                                     chanid,
+                                                     (*i).callsign,
+                                                     (*i).name, cstr,
+                                                     0 /*service id*/,
+                                                     major, minor,
+                                                     false /*use on air guide*/,
+                                                     false /*hidden*/,
+                                                     false /*hidden in guide*/,
+                                                     (*i).freqid,
+                                                     localfile,
+                                                     (*i).tvformat, 
+                                                     (*i).xmltvid
+                                                            );
+                    if (!retval)
+                        cout << "Channel " << chanid << " creation failed"
+                             << endl;
                 }
             }
         }

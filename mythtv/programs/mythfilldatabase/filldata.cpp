@@ -810,7 +810,7 @@ bool FillData::Run(SourceList &sourcelist)
                 QString currDate(qCurrentDate.addDays(i).toString());
 
                 VERBOSE(VB_GENERAL, ""); // add a space between days
-                VERBOSE(VB_GENERAL, "Checking day @ " <<
+                VERBOSE(VB_GENERAL, "Checking day @ " +
                         QString("offset %1, date: %2").arg(i).arg(currDate));
 
                 bool download_needed = false;
