@@ -185,7 +185,7 @@ void IconData::UpdateSourceIcons(uint sourceid)
         return;
     }
 
-    bool count = 0;
+    unsigned int count = 0;
     while (query.next())
     {
         count++;
