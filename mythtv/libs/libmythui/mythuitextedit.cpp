@@ -391,6 +391,9 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
 
     handled = GetMythMainWindow()->TranslateKeyPress("Global", e, actions, false);
 
+    if (!handled && InsertCharacter(e->text()))
+        handled = true;
+    
     for (int i = 0; i < actions.size() && !handled; i++)
     {
 
@@ -444,9 +447,6 @@ bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
         else
             handled = false;
     }
-
-    if (!handled && InsertCharacter(e->text()))
-        handled = true;
 
     return handled;
 }
