@@ -2861,7 +2861,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
     if (isVideo)
     {
         query.prepare(
-            "INSERT DELAYED INTO "
+            "INSERT INTO "
             "filemarkup (filename, mark, type, offset) "
             "VALUES ( :PATH , :MARK , :TYPE , :OFFSET )");
         query.bindValue(":PATH", videoPath);
@@ -2869,7 +2869,7 @@ void ProgramInfo::SetPositionMap(frm_pos_map_t &posMap, int type,
     else
     {
         query.prepare(
-            "INSERT DELAYED INTO "
+            "INSERT INTO "
             "recordedseek (chanid, starttime, mark, type, offset) "
             " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET )");
         query.bindValue(":CHANID",    chanid);
@@ -2928,7 +2928,7 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
     if (isVideo)
     {
         query.prepare(
-            "INSERT DELAYED INTO "
+            "INSERT INTO "
             "filemarkup (filename, mark, type, offset) "
             "VALUES ( :PATH , :MARK , :TYPE , :OFFSET )");
         query.bindValue(":PATH", videoPath);
@@ -2936,7 +2936,7 @@ void ProgramInfo::SetPositionMapDelta(frm_pos_map_t &posMap,
     else
     {
         query.prepare(
-            "INSERT DELAYED INTO "
+            "INSERT INTO "
             "recordedseek (chanid, starttime, mark, type, offset) "
             " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET )");
         query.bindValue(":CHANID",    chanid);
