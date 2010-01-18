@@ -7175,11 +7175,13 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
 
                 // scale the subtitle images which are scaled and positioned for
                 // a 720x576 video resolution to fit the current OSD resolution
-                float vsize = 576.0;
-                if (player_ctx->buffer->isDVD())
-                    vsize = (float) video_disp_dim.height();
+                float vsize = (float) video_disp_dim.height();
+                float hsize = (float) video_disp_dim.width();
 
-                float hmult = osd->GetSubtitleBounds().width() / 720.0;
+                if (player_ctx->buffer->isDVD())
+                    hsize = 720.0;
+
+                float hmult = osd->GetSubtitleBounds().width() / hsize;
                 float vmult = osd->GetSubtitleBounds().height() / vsize;
 
                 rect->x = (int)(rect->x * hmult);
@@ -7187,7 +7189,7 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                 rect->w = (int)(rect->w * hmult);
                 rect->h = (int)(rect->h * vmult);
 
-                if (hmult < 0.98 || hmult > 1.02 || vmult < 0.98 || hmult > 1.02)
+                if (hmult < 0.98 || hmult > 1.02 || vmult < 0.98 || vmult > 1.02)
                     qImage = qImage.scaled(rect->w, rect->h,
                             Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
