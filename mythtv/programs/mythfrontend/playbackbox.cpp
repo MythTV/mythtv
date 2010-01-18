@@ -628,17 +628,17 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         }
     }
 
-    if (countInGroup > 1)
-        infoMap["description"] = QString(tr("There are %1 recordings in "
-                                            "this display group"))
-                                            .arg(countInGroup);
-    else if (countInGroup == 1)
-        infoMap["description"] = QString(tr("There is one recording in "
-                                                "this display group"));
-    else
-        infoMap["description"] = QString(tr("There are no recordings in "
-                                            "this display group"));
+    QString desc;
 
+    if (countInGroup > 1)
+        desc = tr("There are %1 recordings in this display group")
+               .arg(countInGroup);
+    else if (countInGroup == 1)
+        desc = tr("There is one recording in this display group");
+    else
+        desc = tr("There are no recordings in this display group");
+
+    infoMap["description"] = desc;
     infoMap["rec_count"] = QString("%1").arg(countInGroup);
 
     ResetMap(m_currentMap);
