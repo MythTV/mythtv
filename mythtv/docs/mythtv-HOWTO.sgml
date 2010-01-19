@@ -2817,9 +2817,9 @@ F8		| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off @
 CTRL-B		| Jump to the beginning of the recording / ringbuffer @
 +		| Switch between audio streams @
 Left		| skip back the configured number of seconds (default is 5)&nbsp;
-                  If a jump amount is entered, jump back that amount				@
+                  If a jump amount is entered, jump back that amount (HHMM format)		@
 Right		| skip forward the configured number of seconds (default is 30)&nbsp;
-                  If a jump amount is entered, jump ahead that amount				@
+                  If a jump amount is entered, jump ahead that amount (HHMM format)		@
 &lt;		| starts sticky rewind mode&nbsp;
                   If a jump amount is entered, jump to that position				@
 &gt;		| starts sticky fast forward mode&nbsp;

@@ -45,12 +45,11 @@ Watching TV or a recording
 - S   Toggle display of the Program Guide (EPG).
 - F6  Display the Program Finder.
 - F8  Cycle through sleep timer settings Off->30m->1hr->1hr30m->2hr->Off
-- Left arrow  Skip back
-- Right arrow Skip ahead
-  NOTE: During playback of a recording you can enter a number of minutes to
-        jump before using the Skip key. Otherwise, the configured defaults
-        will be used. Seconds can be entered by entering four digits in the
-        MMss format.
+- Left arrow  Skip back the configured number of seconds (default is 5)
+- Right arrow Skip ahead the configured number of seconds (default is 30)
+  NOTE: During playback of a recording you can enter a number of hours/minutes
+        to jump before using the Skip key. Jump amount is specified using the
+        HHMM format.
 
 - Page Up     Jump back the configured number of minutes.  (default is 10)
 - Page Down   Jump ahead the configured number of minutes. (default is 10)
@@ -61,8 +60,6 @@ Watching TV or a recording
 - [ or F10    Decrease volume
 - ] or F11    Increase volume
 - Ctrl+B      Jump to the beginning of the recording / ringbuffer.
-- Left arrow to skip back the configured number of seconds (default is 5)
-- Right arrow to skip forward the configured number of seconds (default is 30)
 - < starts sticky rewind mode
     If a jump amount is entered, jump to that position.
 - > starts sticky fast forward mode
