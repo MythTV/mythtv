@@ -40,7 +40,8 @@ OutputListeners::~OutputListeners()
 
 void OutputListeners::error(const QString &e)
 {
-    dispatch(OutputEvent(e));
+    OutputEvent event(e);
+    dispatch(event);
 }
 
 void OutputListeners::addVisual(MythTV::Visual *v)
