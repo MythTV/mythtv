@@ -1,7 +1,9 @@
 #ifndef DECODERBASE_H_
 #define DECODERBASE_H_
 
+#ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
+#endif
 #include <stdint.h>
 
 #include "RingBuffer.h"
