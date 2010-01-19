@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/MythDB.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1251";
+const QString currentDatabaseVersion = "1252";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5059,6 +5059,43 @@ NULL
 };
         if (!performActualUpdate(updates, "1251", dbver))
             return false;
+    }
+
+    if (dbver == "1251")
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SHOW INDEX FROM recgrouppassword");
+
+        if (!query.exec())
+        {
+            MythDB::DBError("Unable to retrieve current indices on "
+                            "recgrouppassword.", query);
+        }
+        else
+        {
+            while (query.next())
+            {
+                QString index_name = query.value(2).toString();
+
+                if ("recgroup" == index_name)
+                {
+                    MSqlQuery update(MSqlQuery::InitCon());
+                    update.prepare("ALTER TABLE recgrouppassword "
+                                   " DROP INDEX recgroup");
+
+                    if (!update.exec())
+                         MythDB::DBError("Unable to drop duplicate index on "
+                                         "recgrouppassword. Ignoring.",
+                                         update);
+                    break;
+                }
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1252"))
+            return false;
+
+        dbver = "1252";
     }
 
     return true;

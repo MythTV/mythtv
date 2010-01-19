@@ -88,7 +88,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1031";
+    const QString currentDatabaseVersion = "1032";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -1115,6 +1115,43 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                 return false;
 
             dbver = "1031";
+        }
+
+        if (dbver == "1031")
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SHOW INDEX FROM videometadata");
+
+            if (!query.exec())
+            {
+                MythDB::DBError("Unable to retrieve current indices on "
+                                "videometadata.", query);
+            }
+            else
+            {
+                while (query.next())
+                {
+                    QString index_name = query.value(2).toString();
+
+                    if ("title_2" == index_name)
+                    {
+                        MSqlQuery update(MSqlQuery::InitCon());
+                        update.prepare("ALTER TABLE videometadata "
+                                       " DROP INDEX title_2");
+
+                        if (!update.exec())
+                             MythDB::DBError("Unable to drop duplicate index "
+                                             "on recgrouppassword. Ignoring.",
+                                             update);
+                        break;
+                    }
+                }
+            }
+
+            if (!UpdateDBVersionNumber(MythVideoVersionName, "1032"))
+                return false;
+
+            dbver = "1032";
         }
 
         return true;
