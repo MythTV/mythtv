@@ -19,7 +19,8 @@ HEADERS += lcddevice.h mythstorage.h remotefile.h decodeencode.h
 
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp 
 SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp mythverbose.cpp
-SOURCES += mythobservable.cpp httpcomms.cpp mcodecs.cpp mythdirs.cpp
+SOURCES += mythobservable.cpp mythevent.cpp httpcomms.cpp mcodecs.cpp
+SOURCES += mythdirs.cpp
 SOURCES += lcddevice.cpp mythstorage.cpp remotefile.cpp decodeencode.cpp
 
 win32:SOURCES += msocketdevice_win.cpp

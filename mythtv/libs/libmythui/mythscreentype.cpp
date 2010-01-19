@@ -14,6 +14,9 @@
 #include "mythuihelper.h"
 #include "mythprogressdialog.h"
 
+QEvent::Type ScreenLoadCompletionEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 class ScreenLoadTask : public QRunnable
 {
   public:

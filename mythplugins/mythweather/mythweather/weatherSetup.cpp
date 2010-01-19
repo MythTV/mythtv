@@ -626,21 +626,22 @@ void ScreenSetup::deleteScreen()
 
 void ScreenSetup::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-                                dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        QString resultid= dce->GetId();
-        int buttonnum  = dce->GetResult();
+        QString resultid  = dce->GetId();
+        int     buttonnum = dce->GetResult();
 
         if (resultid == "options")
         {
             if (buttonnum > -1)
             {
-                MythUIButtonListItem *item = qVariantValue<MythUIButtonListItem *>(dce->GetData());
+                MythUIButtonListItem *item =
+                    qVariantValue<MythUIButtonListItem *>(dce->GetData());
                         
-                ScreenListInfo *si = qVariantValue<ScreenListInfo *>(item->GetData());
+                ScreenListInfo *si =
+                    qVariantValue<ScreenListInfo *>(item->GetData());
 
                 if (buttonnum == 0)
                 {
@@ -669,7 +670,8 @@ void ScreenSetup::customEvent(QEvent *event)
         {
             if (buttonnum > -1)
             {
-                ScreenListInfo *si = qVariantValue<ScreenListInfo *>(dce->GetData());
+                ScreenListInfo *si =
+                    qVariantValue<ScreenListInfo *>(dce->GetData());
                                 
                 if (buttonnum == 0)
                 {
@@ -684,7 +686,8 @@ void ScreenSetup::customEvent(QEvent *event)
         }
         else if (resultid == "location")
         {
-            ScreenListInfo *si = qVariantValue<ScreenListInfo *>(dce->GetData());
+            ScreenListInfo *si =
+                qVariantValue<ScreenListInfo *>(dce->GetData());
 
             TypeListMap::iterator it = si->types.begin();
             for (; it != si->types.end(); ++it)
@@ -695,7 +698,8 @@ void ScreenSetup::customEvent(QEvent *event)
 
             QString txt = si->title; txt.detach();
 
-            MythUIButtonListItem *item = new MythUIButtonListItem(m_activeList, txt);
+            MythUIButtonListItem *item =
+                new MythUIButtonListItem(m_activeList, txt);
             item->SetData(qVariantFromValue(si));
             if (m_activeList->GetCount())
                 m_activeList->SetEnabled(true);

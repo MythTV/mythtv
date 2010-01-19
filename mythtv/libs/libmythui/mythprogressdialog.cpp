@@ -2,6 +2,9 @@
 #include "mythprogressdialog.h"
 #include "mythverbose.h"
 
+QEvent::Type ProgressUpdateEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 MythUIBusyDialog::MythUIBusyDialog(const QString &message,
                              MythScreenStack *parent, const char *name)
          : MythScreenType(parent, name, false)
@@ -135,7 +138,7 @@ bool MythUIProgressDialog::keyPressEvent(QKeyEvent *event)
 
 void MythUIProgressDialog::customEvent(QEvent *event)
 {
-    if (event->type() == kProgressUpdateEventType)
+    if (event->type() == ProgressUpdateEvent::kEventType)
     {
         ProgressUpdateEvent *pue = dynamic_cast<ProgressUpdateEvent*>(event);
 

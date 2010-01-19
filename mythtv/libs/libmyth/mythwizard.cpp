@@ -586,8 +586,9 @@ void MythWizard::keyPressEvent(QKeyEvent* e)
             else
             {
                 back();
-                QCoreApplication::postEvent(gContext->GetMainWindow(), 
-                                            new ExitToMainMenuEvent());
+                QCoreApplication::postEvent(
+                    gContext->GetMainWindow(), 
+                    new QEvent(MythEvent::kExitToMainMenuEventType));
             }
         }
         else

@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #ifndef DECODER_H_
 #define DECODER_H_
 
@@ -26,16 +28,10 @@ class AudioOutput;
 
 class DecoderEvent : public MythEvent
 {
-public:
-    enum Type { Decoding = (QEvent::User + 100), Stopped, Finished, Error };
+  public:
+    DecoderEvent(Type t) : MythEvent(t), error_msg(NULL) { ; }
 
-    DecoderEvent(Type t)
-        : MythEvent(t), error_msg(0)
-    { ; }
-
-    DecoderEvent(QString *e)
-        : MythEvent(Error), error_msg(e)
-    { ; }
+    DecoderEvent(QString *e) : MythEvent(Error), error_msg(e) { ; }
 
     ~DecoderEvent()
     {
@@ -45,9 +41,25 @@ public:
 
     const QString *errorMessage() const { return error_msg; }
 
-    virtual DecoderEvent *clone() const;
+    virtual MythEvent *clone(void) const { return new DecoderEvent(*this); }
 
-private:
+    static Type Decoding;
+    static Type Stopped;
+    static Type Finished;
+    static Type Error;
+
+  private:
+    DecoderEvent(const DecoderEvent &o) : MythEvent(o), error_msg(NULL)
+    {
+        if (o.error_msg)
+        {
+            error_msg = new QString(*o.error_msg);
+            error_msg->detach();
+        }
+    }
+    DecoderEvent &operator=(const DecoderEvent&);
+
+  private:
     QString *error_msg;
 };
 

@@ -412,21 +412,20 @@ void ScheduleCommon::ShowNotRecordingDialog(RecordingInfo recinfo)
 
 void ScheduleCommon::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-        dynamic_cast<DialogCompletionEvent*>(event);
-        
-        QString resultid = dce->GetId();
-        QString resulttext  = dce->GetResultText();
-        
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+
+        QString resultid   = dce->GetId();
+        QString resulttext = dce->GetResultText();
+
         if (resultid == "schedulenotrecording")
         {
             if (!qVariantCanConvert<RecordingInfo>(dce->GetData()))
                 return;
-            
+
             RecordingInfo recInfo = qVariantValue<RecordingInfo>
-                                                            (dce->GetData());
+                (dce->GetData());
 
             if (resulttext == tr("Reactivate"))
                 recInfo.ReactivateRecording();

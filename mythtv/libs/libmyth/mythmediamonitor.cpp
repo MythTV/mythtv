@@ -32,6 +32,9 @@ using namespace std;
 #include "mediamonitor-unix.h" 
 #endif
 
+QEvent::Type MediaEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 MediaMonitor *MediaMonitor::c_monitor = NULL;
 
 // MonitorThread
@@ -723,7 +726,7 @@ bool MediaMonitor::shouldIgnore(const MythMediaDevice* device)
  */
 bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
 {
-    if (event->type() == kMediaEventType)
+    if (event->type() == MediaEvent::kEventType)
     {
         MythMediaDevice *pDev = ((MediaEvent*)event)->getDevice();
 

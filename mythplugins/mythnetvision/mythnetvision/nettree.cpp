@@ -1353,7 +1353,7 @@ void NetTree::customEvent(QEvent *event)
 {
     QMutexLocker locker(&m_lock);
 
-    if (event->type() == kImageDLEventType)
+    if (event->type() == ImageDLEvent::kEventType)
     {
         ImageDLEvent *ide = (ImageDLEvent *)event;
 
@@ -1387,7 +1387,7 @@ void NetTree::customEvent(QEvent *event)
 
         delete id;
     }
-    else if (event->type() == kVideoDLEventType)
+    else if (event->type() == VideoDLEvent::kEventType)
     {
         VideoDLEvent *vde = (VideoDLEvent *)event;
 

@@ -787,13 +787,9 @@ void EditMetadataDialog::SetTrailer(QString file)
 
 void EditMetadataDialog::customEvent(QEvent *levent)
 {
-    if (levent->type() == kMythDialogBoxCompletionEventType)
+    if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-                dynamic_cast<DialogCompletionEvent*>(levent);
-
-        if (!dce)
-            return;
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(levent);
 
         const QString resultid = dce->GetId();
 

@@ -36,16 +36,15 @@ typedef struct {
     QString directory;
 } ThumbData;
 
-const int kMythGalleryThumbGenEventType = QEvent::User + 4000;
-
 class ThumbGenEvent : public QEvent
 {
   public:
-    ThumbGenEvent(ThumbData *td)
-         : QEvent((QEvent::Type)kMythGalleryThumbGenEventType) { thumbData=td; }
+    ThumbGenEvent(ThumbData *td) : QEvent(kEventType), thumbData(td) {}
     ~ThumbGenEvent() {}
 
     ThumbData *thumbData;
+
+    static Type kEventType;
 };
 
 class ThumbGenerator : public QThread

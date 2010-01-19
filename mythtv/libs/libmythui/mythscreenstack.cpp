@@ -122,7 +122,10 @@ void MythScreenStack::PopScreen(MythScreenType *screen, bool allowFade,
 
         mainwindow->update();
         if (mainwindow->IsExitingToMain())
-            QCoreApplication::postEvent(mainwindow, new ExitToMainMenuEvent());
+        {
+            QCoreApplication::postEvent(
+                mainwindow, new QEvent(MythEvent::kExitToMainMenuEventType));
+        }
     }
 
     m_topScreen = NULL;

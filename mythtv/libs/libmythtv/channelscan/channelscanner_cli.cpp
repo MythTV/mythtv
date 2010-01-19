@@ -48,62 +48,47 @@ ChannelScannerCLI::~ChannelScannerCLI()
 
 void ChannelScannerCLI::HandleEvent(const ScannerEvent *scanEvent)
 {
-    switch (scanEvent->eventType())
+    if ((scanEvent->type() == ScannerEvent::ScanComplete) ||
+        (scanEvent->type() == ScannerEvent::ScanShutdown))
     {
-        case ScannerEvent::ScanComplete:
-        case ScannerEvent::ScanShutdown:
+        cout<<endl;
+
+        if (scanEvent->type() == ScannerEvent::ScanShutdown)
+            cerr<<"HandleEvent(void) -- scan shutdown"<<endl;
+        else
+            cerr<<"HandleEvent(void) -- scan complete"<<endl;
+
+        ScanDTVTransportList transports;
+        if (sigmonScanner)
         {
-            cout<<endl;
-
-            if (ScannerEvent::ScanShutdown == scanEvent->eventType())
-                cerr<<"HandleEvent(void) -- scan shutdown"<<endl;
-            else
-                cerr<<"HandleEvent(void) -- scan complete"<<endl;
-
-            ScanDTVTransportList transports;
-            if (sigmonScanner)
-            {
-                sigmonScanner->StopScanner();
-                transports = sigmonScanner->GetChannelList();
-            }
-
-            Teardown();
-
-            if (!transports.empty())
-                Process(transports);
-
-            done = true;
-            QCoreApplication::exit(0);
+            sigmonScanner->StopScanner();
+            transports = sigmonScanner->GetChannelList();
         }
-        break;
 
-        case ScannerEvent::AppendTextToLog:
-            status_last_log = scanEvent->strValue();
-            break;
-        case ScannerEvent::SetStatusText:
-            status_text = scanEvent->strValue();
-            //cout<<"."<<flush;
-            break;
-        case ScannerEvent::SetStatusTitleText:
-            //cout<<"."<<flush;
-            break;
-        case ScannerEvent::SetPercentComplete:
-            status_complete = scanEvent->intValue();
-            break;
-        case ScannerEvent::SetStatusRotorPosition:
-            break;
-        case ScannerEvent::SetStatusSignalLock:
-            status_lock = scanEvent->intValue();
-            break;
-        case ScannerEvent::SetStatusSignalToNoise:
-            status_snr = scanEvent->intValue() / 65535.0;
-            break;
-        case ScannerEvent::SetStatusSignalStrength:
-            break;
-        default:
-            break;
+        Teardown();
+
+        if (!transports.empty())
+            Process(transports);
+
+        done = true;
+        QCoreApplication::exit(0);
     }
-
+    else if (scanEvent->type() == ScannerEvent::AppendTextToLog)
+        status_last_log = scanEvent->strValue();
+    else if (scanEvent->type() == ScannerEvent::SetStatusText)
+        status_text = scanEvent->strValue();
+    else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
+        ;
+    else if (scanEvent->type() == ScannerEvent::SetPercentComplete)
+        status_complete = scanEvent->intValue();
+    else if (scanEvent->type() == ScannerEvent::SetStatusRotorPosition)
+        ;
+    else if (scanEvent->type() == ScannerEvent::SetStatusSignalLock)
+        status_lock = scanEvent->intValue();
+    else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
+        status_snr = scanEvent->intValue() / 65535.0;
+    else if (scanEvent->type() == ScannerEvent::SetStatusSignalStrength)
+        ;
 
     //cout<<"HERE<"<<print_verbose_messages<<">"<<endl;
     QString msg;

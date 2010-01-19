@@ -112,9 +112,9 @@ namespace
 
         void customEvent(QEvent *event)
         {
-            if (event->type() == kMythDialogBoxCompletionEventType)
+            if (event->type() == DialogCompletionEvent::kEventType)
             {
-                DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+                DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
                 int buttonnum = dce->GetResult();
 
                 if (dce->GetId() == "bookmarkdialog")

@@ -337,17 +337,10 @@ void RSSEditPopup::SelectImagePopup(const QString &prefix,
 
 void RSSEditPopup::customEvent(QEvent *levent)
 {
-    if (levent->type() == kMythDialogBoxCompletionEventType)
+    if (levent->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-                dynamic_cast<DialogCompletionEvent*>(levent);
-
-        if (!dce)
-            return;
-
-        const QString resultid = dce->GetId();
-
-        if (resultid == CEID_NEWIMAGE)
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(levent);
+        if (dce->GetId() == CEID_NEWIMAGE)
         {
             m_thumbImage->SetFilename(dce->GetResultText());
             m_thumbImage->Load();

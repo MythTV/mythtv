@@ -35,19 +35,40 @@
 // Qt headers
 #include <QCoreApplication>
 
+QEvent::Type ScannerEvent::ScanComplete =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::ScanShutdown =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::AppendTextToLog =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::SetStatusText =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::SetStatusTitleText =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::SetPercentComplete =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::SetStatusRotorPosition =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::SetStatusSignalToNoise =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::SetStatusSignalStrength =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ScannerEvent::SetStatusSignalLock =
+    (QEvent::Type) QEvent::registerEventType();
+
 /// Percentage to set to after the transports have been scanned
 #define TRANSPORT_PCT 6
 /// Percentage to set to after the first tune
 #define TUNED_PCT     3
 
-void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
+void post_event(QObject *dest, QEvent::Type type, int val)
 {
     ScannerEvent *e = new ScannerEvent(type);
     e->intValue(val);
     QCoreApplication::postEvent(dest, e);
 }
 
-void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val)
+void post_event(QObject *dest, QEvent::Type type, const QString &val)
 {
     ScannerEvent *e = new ScannerEvent(type);
     QString tmp = val; tmp.detach();
@@ -55,7 +76,7 @@ void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val)
     QCoreApplication::postEvent(dest, e);
 }
 
-void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
+void post_event(QObject *dest, QEvent::Type type, int val,
                 Configurable *spp)
 {
     ScannerEvent *e = new ScannerEvent(type);

@@ -748,16 +748,10 @@ void ImportMusicDialog::showImportCoverArtDialog(void)
 
 void ImportMusicDialog::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
-
-        if (!dce)
-            return;
-
-        const QString resultid = dce->GetId();
-
-        if (resultid == "locationchange")
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        if (dce->GetId() == "locationchange")
         {
             m_locationEdit->SetText(dce->GetResultText());
             startScan();

@@ -89,85 +89,62 @@ ChannelScannerGUI::~ChannelScannerGUI()
 
 void ChannelScannerGUI::HandleEvent(const ScannerEvent *scanEvent)
 {
-    switch (scanEvent->eventType())
+    if (scanEvent->type() == ScannerEvent::ScanComplete)
     {
-        case ScannerEvent::ScanComplete:
+        if (scanStage)
+            scanStage->SetScanProgress(1.0);
+        raise(doneStage);
+
+        // HACK: make channel insertion work after [21644]
+        post_event(scanMonitor, ScannerEvent::ScanShutdown,
+                   kDialogCodeAccepted);
+    }
+    else if (scanEvent->type() == ScannerEvent::ScanShutdown)
+    {
+        if (scanEvent->ConfigurableValue())
         {
-            if (scanStage)
-                scanStage->SetScanProgress(1.0);
-            raise(doneStage);
-
-            // HACK: make channel insertion work after [21644]
-            post_event(scanMonitor, ScannerEvent::ScanShutdown,
-                       kDialogCodeAccepted);
+            setLabel(scanEvent->ConfigurableValue()->getLabel());
+            raise(scanEvent->ConfigurableValue());
         }
-        break;
 
-        case ScannerEvent::ScanShutdown:
+        ScanDTVTransportList transports;
+        if (sigmonScanner)
         {
-            if (scanEvent->ConfigurableValue())
-            {
-                setLabel(scanEvent->ConfigurableValue()->getLabel());
-                raise(scanEvent->ConfigurableValue());
-            }
-
-            ScanDTVTransportList transports;
-            if (sigmonScanner)
-            {
-                sigmonScanner->StopScanner();
-                transports = sigmonScanner->GetChannelList();
-            }
-
-            Teardown();
-
-            int ret = scanEvent->intValue();
-            if (!transports.empty() || (MythDialog::Rejected != ret))
-                Process(transports);
+            sigmonScanner->StopScanner();
+            transports = sigmonScanner->GetChannelList();
         }
-        break;
 
-        case ScannerEvent::AppendTextToLog:
-        {
-            if (scanStage)
-                scanStage->AppendLine(scanEvent->strValue());
-            doneStage->AppendLine(scanEvent->strValue());
-            messageList += scanEvent->strValue();
-        }
-        break;
+        Teardown();
 
-        default:
-            break;
+        int ret = scanEvent->intValue();
+        if (!transports.empty() || (MythDialog::Rejected != ret))
+            Process(transports);
+    }
+    else if (scanEvent->type() ==  ScannerEvent::AppendTextToLog)
+    {
+        if (scanStage)
+            scanStage->AppendLine(scanEvent->strValue());
+        doneStage->AppendLine(scanEvent->strValue());
+        messageList += scanEvent->strValue();
     }
 
     if (!scanStage)
         return;
 
-    switch (scanEvent->eventType())
-    {
-        case ScannerEvent::SetStatusText:
-            scanStage->SetStatusText(scanEvent->strValue());
-            break;
-        case ScannerEvent::SetStatusTitleText:
-            scanStage->SetStatusTitleText(scanEvent->strValue());
-            break;
-        case ScannerEvent::SetPercentComplete:
-            scanStage->SetScanProgress(scanEvent->intValue() * 0.01);
-            break;
-        case ScannerEvent::SetStatusRotorPosition:
-            scanStage->SetStatusRotorPosition(scanEvent->intValue());
-            break;
-        case ScannerEvent::SetStatusSignalLock:
-            scanStage->SetStatusLock(scanEvent->intValue());
-            break;
-        case ScannerEvent::SetStatusSignalToNoise:
-            scanStage->SetStatusSignalToNoise(scanEvent->intValue());
-            break;
-        case ScannerEvent::SetStatusSignalStrength:
-            scanStage->SetStatusSignalStrength(scanEvent->intValue());
-            break;
-        default:
-            break;
-    }
+    if (scanEvent->type() == ScannerEvent::SetStatusText)
+        scanStage->SetStatusText(scanEvent->strValue());
+    else if (scanEvent->type() == ScannerEvent::SetStatusTitleText)
+        scanStage->SetStatusTitleText(scanEvent->strValue());
+    else if (scanEvent->type() == ScannerEvent::SetPercentComplete)
+        scanStage->SetScanProgress(scanEvent->intValue() * 0.01);
+    else if (scanEvent->type() == ScannerEvent::SetStatusRotorPosition)
+        scanStage->SetStatusRotorPosition(scanEvent->intValue());
+    else if (scanEvent->type() == ScannerEvent::SetStatusSignalLock)
+        scanStage->SetStatusLock(scanEvent->intValue());
+    else if (scanEvent->type() == ScannerEvent::SetStatusSignalToNoise)
+        scanStage->SetStatusSignalToNoise(scanEvent->intValue());
+    else if (scanEvent->type() == ScannerEvent::SetStatusSignalStrength)
+        scanStage->SetStatusSignalStrength(scanEvent->intValue());
 }
 
 void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports)

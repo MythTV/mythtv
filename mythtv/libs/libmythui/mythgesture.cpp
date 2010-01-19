@@ -35,6 +35,9 @@
 #include <QMutex>
 #include <QMap>
 
+QEvent::Type MythGestureEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 /**
  * @class MythGesturePrivate
  * @brief Private information used only by a stroke class.

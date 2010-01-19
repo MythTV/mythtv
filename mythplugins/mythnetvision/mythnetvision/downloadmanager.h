@@ -16,16 +16,15 @@ typedef struct {
     QStringList downloadargs;
 } VideoDL;
 
-const int kVideoDLEventType = QEvent::User + 4050;
-
 class VideoDLEvent : public QEvent
 {
   public:
-    VideoDLEvent(VideoDL *dl)
-         : QEvent((QEvent::Type)kVideoDLEventType) { videoDL=dl; }
+    VideoDLEvent(VideoDL *dl) : QEvent(kEventType), videoDL(dl) {}
     ~VideoDLEvent() {}
 
     VideoDL *videoDL;
+
+    static Type kEventType;
 };
 
 class DownloadManager : public QThread

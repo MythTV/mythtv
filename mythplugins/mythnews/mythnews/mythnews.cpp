@@ -990,16 +990,12 @@ void MythNews::playVideo(const QString &filename)
 // does not need locking
 void MythNews::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-            dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        if (!dce)
-            return;
-
-        QString resultid = dce->GetId();
-        int buttonnum    = dce->GetResult();
+        QString resultid  = dce->GetId();
+        int     buttonnum = dce->GetResult();
 
         if (resultid == "options")
         {

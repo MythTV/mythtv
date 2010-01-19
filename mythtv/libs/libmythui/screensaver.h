@@ -9,7 +9,7 @@ public:
     enum ScreenSaverEventKind {ssetDisable, ssetRestore, ssetReset};
 
     ScreenSaverEvent(ScreenSaverEventKind type) :
-        QEvent((QEvent::Type)ScreenSaverEventType), sset(type)
+        QEvent(kEventType), sset(type)
     {
     }
 
@@ -18,7 +18,7 @@ public:
         return sset;
     }
 
-    enum EventID { ScreenSaverEventType = 23425 };
+    static Type kEventType;
 
 protected:
     ScreenSaverEventKind sset;

@@ -15,8 +15,9 @@ LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION
 LIBS += -lmythswscale-$$LIBVERSION
 LIBS += -lmythupnp-$$LIBVERSION
-LIBS += -lmyth-$$LIBVERSION -lmythui-$$LIBVERSION
 LIBS += -lmythdb-$$LIBVERSION
+LIBS += -lmythui-$$LIBVERSION
+LIBS += -lmyth-$$LIBVERSION
 
 using_live:LIBS += -L../../libs/libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_mheg:LIBS += -L../../libs/libmythfreemheg -lmythfreemheg-$$LIBVERSION

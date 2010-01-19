@@ -54,6 +54,9 @@ using namespace std;
 #define LOC QString("IconView: ")
 #define LOC_ERR QString("IconView, Error: ")
 
+QEvent::Type ChildCountEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 class FileCopyThread: public QThread
 {
   public:
@@ -691,7 +694,7 @@ bool IconView::HandleEscape(void)
 
 void IconView::customEvent(QEvent *event)
 {
-    if (event->type() == kMythGalleryThumbGenEventType)
+    if (event->type() == ThumbGenEvent::kEventType)
     {
         ThumbGenEvent *tge = (ThumbGenEvent *)event;
 
@@ -722,7 +725,7 @@ void IconView::customEvent(QEvent *event)
         }
         delete td;
     }
-    else if (event->type() == kMythGalleryChildCountEventType)
+    else if (event->type() == ChildCountEvent::kEventType)
     {
         ChildCountEvent *cce = (ChildCountEvent *)event;
 
@@ -740,13 +743,12 @@ void IconView::customEvent(QEvent *event)
         }
         delete ccd;
     }
-    else if (event->type() == kMythDialogBoxCompletionEventType)
+    else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-                                dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        QString resultid= dce->GetId();
-        int buttonnum  = dce->GetResult();
+        QString resultid  = dce->GetId();
+        int     buttonnum = dce->GetResult();
 
         if (resultid == "mainmenu")
         {

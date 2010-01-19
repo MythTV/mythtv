@@ -44,6 +44,13 @@ using namespace std;
 #define LOC QString("OSDListTreeType: ")
 #define LOC_ERR QString("OSDListTreeType, Error: ")
 
+QEvent::Type OSDListTreeItemEnteredEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type OSDListTreeItemSelectedEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type OSDListBtnItemSelectedEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 OSDListTreeType::OSDListTreeType(
     const QString &name,      const QRect &area,
     const QRect   &levelsize, int          levelspacing,

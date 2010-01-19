@@ -6,6 +6,11 @@
 
 #include "mythmainwindow.h"
 
+QEvent::Type LircKeycodeEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type LircMuteEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 LircEventLock::LircEventLock(bool lock_events) 
              : events_locked(false)
 {

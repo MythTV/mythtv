@@ -51,8 +51,6 @@ static inline QRect bias(QRect rect, float wmult, float hmult)
                  (int)ceil( rect.height() * hmult));
 }
 
-const int kOSDClosedEventType = 33300;
-
 /**
  *  \class OSDClosedEvent
  *
@@ -62,11 +60,13 @@ class MPUBLIC OSDCloseEvent : public QEvent
 {
   public:
     OSDCloseEvent(const QString &name, int osdFunctionalType)
-        : QEvent((QEvent::Type)kOSDClosedEventType),
+        : QEvent(kEventType),
           m_name(name), m_osdFunctionalType(osdFunctionalType) { }
 
     QString GetName() { return m_name; }
     int GetFunctionType() { return m_osdFunctionalType; }
+
+    static Type kEventType;
 
   private:
     QString m_name;

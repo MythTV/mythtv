@@ -19,8 +19,6 @@ class QTextStream;
 // clientLock -> ncLock
 //            -> nrLock
 
-const int kNetworkControlCloseEvent = 35672;
-
 class NetworkControlClient : public QObject
 {
     Q_OBJECT
@@ -70,11 +68,12 @@ class NetworkCommand : public QObject
 class NetworkControlCloseEvent : public QEvent
 {
   public:
-    NetworkControlCloseEvent(NetworkControlClient * ncc)
-        : QEvent((QEvent::Type)kNetworkControlCloseEvent),
-          m_networkControlClient(ncc) {};
+    NetworkControlCloseEvent(NetworkControlClient *ncc) :
+        QEvent(kEventType), m_networkControlClient(ncc) {}
 
     NetworkControlClient *getClient() { return m_networkControlClient; }
+
+    static Type kEventType;
 
   private:
     NetworkControlClient * m_networkControlClient;

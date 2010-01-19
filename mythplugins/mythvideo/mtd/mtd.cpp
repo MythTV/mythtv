@@ -993,12 +993,12 @@ bool MythTranscodeDaemon::IncrConcurrentTranscodeCounter(void)
 
 void MythTranscodeDaemon::customEvent(QEvent *ce)
 {
-    if (ce->type() == (QEvent::Type) LoggingEvent::ID)
+    if (ce->type() == LoggingEvent::kEventType)
     {
         LoggingEvent *le = (LoggingEvent*)ce;
         emit writeToLog(le->getString());
     }
-    else if (ce->type() == (QEvent::Type) ErrorEvent::ID)
+    else if (ce->type() == ErrorEvent::kEventType)
     {
         ErrorEvent *ee = (ErrorEvent*)ce;
         QString error_string = "Error: " + ee->getString();

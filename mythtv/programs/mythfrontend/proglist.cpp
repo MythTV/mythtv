@@ -1622,13 +1622,13 @@ void ProgLister::customEvent(QEvent *event)
 {
     bool needUpdate = false;
 
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce = dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        QString resultid= dce->GetId();
-        QString resulttext  = dce->GetResultText();
-        int buttonnum  = dce->GetResult();
+        QString resultid   = dce->GetId();
+        QString resulttext = dce->GetResultText();
+        int     buttonnum  = dce->GetResult();
 
         if (resultid == "menu")
         {
@@ -1736,10 +1736,9 @@ void ProgLister::customEvent(QEvent *event)
         else
             ScheduleCommon::customEvent(event);
     }
-    else if (event->type() == kMythScreenLoadCompletionEventType)
+    else if (event->type() == ScreenLoadCompletionEvent::kEventType)
     {
-        ScreenLoadCompletionEvent *slce =
-            dynamic_cast<ScreenLoadCompletionEvent*>(event);
+        ScreenLoadCompletionEvent *slce = (ScreenLoadCompletionEvent*)(event);
         QString id = slce->GetId();
 
         if (id == objectName())

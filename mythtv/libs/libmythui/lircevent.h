@@ -11,7 +11,7 @@ class LircKeycodeEvent : public QEvent
   public:
      LircKeycodeEvent(Type keytype, int key, Qt::KeyboardModifiers mod,
                       const QString &text, const QString &lirc_text) :
-        QEvent((Type)kLIRCKeycodeEventType),
+        QEvent(kEventType),
         m_keytype(keytype), m_key(key), m_modifiers(mod),
         m_text(text), m_lirctext(lirc_text)
     {
@@ -25,7 +25,8 @@ class LircKeycodeEvent : public QEvent
     QString               text(void)      const { return m_text;      }
     QString               lirctext(void)  const { return m_lirctext;  }
 
-    static const int kLIRCKeycodeEventType = 23423;
+    static Type kEventType;
+
     static const int kLIRCInvalidKeyCombo  = 0xFFFFFFFF;
 
   private:
@@ -39,13 +40,13 @@ class LircKeycodeEvent : public QEvent
 class LircMuteEvent : public QEvent
 {
   public:
-    LircMuteEvent(bool mute_events) : QEvent((QEvent::Type)LircMuteEventType),
+    LircMuteEvent(bool mute_events) : QEvent(kEventType),
             m_muteLircEvents(mute_events) {}
 
     bool eventsMuted() const { return m_muteLircEvents; }
 
   public:
-    enum EventID { LircMuteEventType = 23424 };
+    static Type kEventType;
 
   private:
     bool m_muteLircEvents;

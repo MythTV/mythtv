@@ -789,13 +789,12 @@ bool ImportIconsWizard::submit()
 
 void ImportIconsWizard::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-                                dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        QString resultid= dce->GetId();
-        int buttonnum  = dce->GetResult();
+        QString resultid  = dce->GetId();
+        int     buttonnum = dce->GetResult();
 
         if (resultid == "submitresults")
         {

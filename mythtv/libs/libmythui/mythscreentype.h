@@ -10,8 +10,6 @@
 class MythScreenStack;
 class MythUIBusyDialog;
 
-const int kMythScreenLoadCompletionEventType = 34110;
-
 /**
  *  \class ScreenLoadCompletionEvent
  *
@@ -21,11 +19,12 @@ const int kMythScreenLoadCompletionEventType = 34110;
 class MPUBLIC ScreenLoadCompletionEvent : public QEvent
 {
   public:
-    ScreenLoadCompletionEvent(const QString &id)
-        : QEvent((QEvent::Type)kMythScreenLoadCompletionEventType),
-          m_id(id) { }
+    ScreenLoadCompletionEvent(const QString &id) :
+        QEvent(kEventType), m_id(id) { }
 
     QString GetId() { return m_id; }
+
+    static Type kEventType;
 
   private:
     QString m_id;

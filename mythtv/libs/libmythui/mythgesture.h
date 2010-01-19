@@ -31,8 +31,6 @@
 #include <QString>
 #include <QEvent>
 
-const int MythGestureEventType = 24427;
-
 /**
  * @class MythGestureEvent
  * @brief A custom event that represents a mouse gesture.
@@ -88,8 +86,8 @@ class MythGestureEvent : public QEvent
      * @param type The gesture type, as per the Type enumeration.
      * @sa Type
      */
-    inline MythGestureEvent(Gesture gesture, Button button = LeftButton)
-            :QEvent((QEvent::Type)MythGestureEventType)
+    MythGestureEvent(Gesture gesture, Button button = LeftButton) :
+        QEvent(kEventType)
     {
         m_position = QPoint(0,0);
         m_button = button;
@@ -114,6 +112,8 @@ class MythGestureEvent : public QEvent
 
     void SetButton(Button button) { m_button = button; }
     Button GetButton(void) const { return m_button; }
+
+    static Type kEventType;
 
   private:
     Gesture m_gesture;

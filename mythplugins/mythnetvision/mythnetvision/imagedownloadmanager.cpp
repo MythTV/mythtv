@@ -15,6 +15,9 @@
 
 #include "imagedownloadmanager.h"
 
+QEvent::Type ImageDLEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 ImageDownloadManager::ImageDownloadManager(QObject *parent)
 {
     m_parent = parent;

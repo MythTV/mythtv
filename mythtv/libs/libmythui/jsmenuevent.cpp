@@ -14,6 +14,11 @@
 // Mythui headers
 #include "mythmainwindow.h"
 
+QEvent::Type JoystickKeycodeEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type JoystickMenuMuteEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 JoystickMenuEventLock::JoystickMenuEventLock(bool lock_events)
              : m_eventsLocked(false)
 {

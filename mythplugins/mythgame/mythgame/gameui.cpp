@@ -467,12 +467,11 @@ void GameUI::toggleFavorite(void)
 
 void GameUI::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-            dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        QString resultid = dce->GetId();
+        QString resultid   = dce->GetId();
         QString resulttext = dce->GetResultText();
 
         if (resultid == "showMenuPopup")

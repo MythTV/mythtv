@@ -265,103 +265,92 @@ void MiniPlayer::customEvent(QEvent *event)
     if (!IsVisible())
         return;
 
-    switch ((int)event->type())
+    if (event->type() == OutputEvent::Playing)
     {
-        case OutputEvent::Playing:
+        if (gPlayer->getCurrentMetadata())
         {
-            if (gPlayer->getCurrentMetadata())
-            {
-                m_maxTime = gPlayer->getCurrentMetadata()->Length() / 1000;
-                updateTrackInfo(gPlayer->getCurrentMetadata());
-            }
-            break;
-        }
-
-        case OutputEvent::Buffering:
-        {
-            break;
-        }
-
-        case OutputEvent::Paused:
-        {
-            break;
-        }
-
-        case OutputEvent::Info:
-        {
-            OutputEvent *oe = (OutputEvent *) event;
-
-            int rs;
-            m_currTime = rs = oe->elapsedSeconds();
-
-            QString time_string = getTimeString(rs, m_maxTime);
-
-            QString info_string;
-
-            //  Hack around for cd bitrates
-            if (oe->bitrate() < 2000)
-            {
-                info_string.sprintf("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
-                                   oe->bitrate(), float(oe->frequency()) / 1000.0,
-                                   oe->channels() > 1 ? "2" : "1");
-            }
-            else
-            {
-                info_string.sprintf("%.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
-                                   float(oe->frequency()) / 1000.0,
-                                   oe->channels() > 1 ? "2" : "1");
-            }
-
-            if (m_timeText)
-                m_timeText->SetText(time_string);
-            if (m_infoText && !m_showingInfo)
-                m_infoText->SetText(info_string);
-
-            if (m_progressBar)
-            {
-                m_progressBar->SetTotal(m_maxTime);
-                m_progressBar->SetUsed(m_currTime);
-            }
-
-            if (gPlayer->getCurrentMetadata())
-            {
-                if (class LCD *lcd = LCD::Get())
-                {
-                    float percent_heard = m_maxTime <=0 ? 0.0 :
-                            ((float)rs / (float)gPlayer->getCurrentMetadata()->Length()) * 1000.0;
-
-                    QString lcd_time_string = time_string;
-
-                    // if the string is longer than the LCD width, remove all spaces
-                    if (time_string.length() > (int)lcd->getLCDWidth())
-                        lcd_time_string.remove(' ');
-
-                    lcd->setMusicProgress(lcd_time_string, percent_heard);
-                }
-            }
-            break;
-        }
-        case OutputEvent::Error:
-        {
-            break;
-        }
-        case DecoderEvent::Stopped:
-        {
-            break;
-        }
-        case DecoderEvent::Finished:
-        {
-            if (gPlayer->getRepeatMode() == MusicPlayer::REPEAT_TRACK)
-               gPlayer->play();
-            else
-                gPlayer->next();
-            break;
-        }
-        case DecoderEvent::Error:
-        {
-            break;
+            m_maxTime = gPlayer->getCurrentMetadata()->Length() / 1000;
+            updateTrackInfo(gPlayer->getCurrentMetadata());
         }
     }
+    else if (event->type() == OutputEvent::Buffering)
+    {
+    }
+    else if (event->type() == OutputEvent::Paused)
+    {
+    }
+    else if (event->type() == OutputEvent::Info)
+    {
+        OutputEvent *oe = (OutputEvent *) event;
+
+        int rs;
+        m_currTime = rs = oe->elapsedSeconds();
+
+        QString time_string = getTimeString(rs, m_maxTime);
+
+        QString info_string;
+
+        //  Hack around for cd bitrates
+        if (oe->bitrate() < 2000)
+        {
+            info_string.sprintf(
+                "%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
+                oe->bitrate(), float(oe->frequency()) / 1000.0,
+                oe->channels() > 1 ? "2" : "1");
+        }
+        else
+        {
+            info_string.sprintf("%.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
+                                float(oe->frequency()) / 1000.0,
+                                oe->channels() > 1 ? "2" : "1");
+        }
+
+        if (m_timeText)
+            m_timeText->SetText(time_string);
+        if (m_infoText && !m_showingInfo)
+            m_infoText->SetText(info_string);
+
+        if (m_progressBar)
+        {
+            m_progressBar->SetTotal(m_maxTime);
+            m_progressBar->SetUsed(m_currTime);
+        }
+
+        if (gPlayer->getCurrentMetadata())
+        {
+            if (class LCD *lcd = LCD::Get())
+            {
+                float percent_heard = (m_maxTime <= 0) ? 0.0 :
+                    ((float)rs /
+                     (float)gPlayer->getCurrentMetadata()->Length()) * 1000.0;
+
+                QString lcd_time_string = time_string;
+
+                // if the string is longer than the LCD width, remove all spaces
+                if (time_string.length() > (int)lcd->getLCDWidth())
+                    lcd_time_string.remove(' ');
+
+                lcd->setMusicProgress(lcd_time_string, percent_heard);
+            }
+        }
+    }
+    else if (event->type() == OutputEvent::Error)
+    {
+    }
+    else if (event->type() == DecoderEvent::Stopped)
+    {
+    }
+    else if (event->type() == DecoderEvent::Finished)
+    {
+        if (gPlayer->getRepeatMode() == MusicPlayer::REPEAT_TRACK)
+            gPlayer->play();
+        else
+            gPlayer->next();
+    }
+    else if (event->type() == DecoderEvent::Error)
+    {
+    }
+
     QObject::customEvent(event);
 }
 

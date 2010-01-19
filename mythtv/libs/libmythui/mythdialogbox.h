@@ -18,8 +18,6 @@ class MythUITextEdit;
 class MythUIImage;
 class MythUIStateType;
 
-const int kMythDialogBoxCompletionEventType = 34111;
-
 /**
  *  \class DialogCompletionEvent
  *
@@ -34,13 +32,15 @@ class MPUBLIC DialogCompletionEvent : public QEvent
   public:
     DialogCompletionEvent(const QString &id, int result, QString text,
                           QVariant data)
-        : QEvent((QEvent::Type)kMythDialogBoxCompletionEventType),
+        : QEvent(kEventType),
           m_id(id), m_result(result), m_resultText(text), m_resultData(data) { }
 
     QString GetId() { return m_id; }
     int GetResult() { return m_result; }
     QString GetResultText() { return m_resultText; }
     QVariant GetData() { return m_resultData; }
+
+    static Type kEventType;
 
   private:
     QString m_id;

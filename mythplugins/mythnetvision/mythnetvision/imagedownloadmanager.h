@@ -16,16 +16,15 @@ typedef struct {
     uint pos;
 } ImageData;
 
-const int kImageDLEventType = QEvent::User + 4000;
-
 class ImageDLEvent : public QEvent
 {
   public:
-    ImageDLEvent(ImageData *id)
-         : QEvent((QEvent::Type)kImageDLEventType) { imageData=id; }
+    ImageDLEvent(ImageData *id) : QEvent(kEventType), imageData(id) {}
     ~ImageDLEvent() {}
 
     ImageData *imageData;
+
+    static Type kEventType;
 };
 
 class ImageDownloadManager : public QThread

@@ -43,6 +43,9 @@
 #include <libexif/exif-entry.h>
 #endif
 
+QEvent::Type ThumbGenEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 ThumbGenerator::ThumbGenerator(QObject *parent, int w, int h)
 {
     m_parent = parent;

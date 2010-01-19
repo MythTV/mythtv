@@ -3363,6 +3363,12 @@ bool TV::eventFilter(QObject *o, QEvent *e)
         }
     }
 
+    if (e->type() == MythEvent::MythEventMessage)
+    {
+        customEvent(e);
+        return true;
+    }
+
     switch (e->type())
     {
         case QEvent::KeyPress:
@@ -3392,11 +3398,6 @@ bool TV::eventFilter(QObject *o, QEvent *e)
             return false;
         }
 
-        case MythEvent::MythEventMessage:
-        {
-            customEvent((QEvent *)e);
-            return true;
-        }
         default:
             return false;
     }
@@ -8485,28 +8486,28 @@ bool TV::MuteChannelChange(PlayerContext *ctx)
 
 void TV::customEvent(QEvent *e)
 {
-    if ((MythEvent::Type)(e->type()) == kOSDClosedEventType)
+    if (e->type() == OSDCloseEvent::kEventType)
     {
         OSDCloseEvent *ce = (OSDCloseEvent *)e;
         HandleOSDClosed(ce->GetFunctionType());
         return;
     }
 
-    if ((MythEvent::Type)(e->type()) == kOSDListTreeItemEnteredEventType)
+    if (e->type() == OSDListTreeItemEnteredEvent::kEventType)
     {
         OSDListTreeItemEnteredEvent *ee = (OSDListTreeItemEnteredEvent *)e;
         TreeMenuEntered(ee);
         return;
     }
 
-    if ((MythEvent::Type)(e->type()) == kOSDListTreeItemSelectedEventType)
+    if (e->type() == OSDListTreeItemSelectedEvent::kEventType)
     {
         OSDListTreeItemSelectedEvent *se = (OSDListTreeItemSelectedEvent *)e;
         TreeMenuSelected(se);
         return;
     }
 
-    if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
+    if (e->type() != MythEvent::MythEventMessage)
         return;
 
     uint cardnum   = 0;

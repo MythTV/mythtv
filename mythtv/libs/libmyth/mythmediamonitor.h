@@ -10,8 +10,6 @@
 
 #include "mythmedia.h"
 
-const int kMediaEventType = 30042;
-
 /// Stores details of media handlers
 struct MHData
 {
@@ -24,12 +22,13 @@ struct MHData
 class MPUBLIC MediaEvent : public QEvent
 {
   public:
-    MediaEvent(MediaStatus oldStatus, MythMediaDevice* pDevice) 
-         : QEvent((QEvent::Type)kMediaEventType)
-           { m_OldStatus = oldStatus; m_Device = pDevice;}
+    MediaEvent(MediaStatus oldStatus, MythMediaDevice *pDevice) :
+        QEvent(kEventType), m_OldStatus(oldStatus), m_Device(pDevice) {}
 
     MediaStatus getOldStatus(void) const { return m_OldStatus; }
     MythMediaDevice* getDevice(void) { return m_Device; }
+
+    static Type kEventType;
 
   protected:
     MediaStatus m_OldStatus;

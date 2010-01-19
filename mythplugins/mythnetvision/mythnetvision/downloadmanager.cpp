@@ -14,6 +14,9 @@
 
 #include "downloadmanager.h"
 
+QEvent::Type VideoDLEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 DownloadManager::DownloadManager(QObject *parent)
 {
     m_parent = parent;

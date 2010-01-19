@@ -17,11 +17,10 @@
 class LoggingEvent : public QEvent
 {
   public:
-    enum eventID { ID = QEvent::User + 1978 };
-
-  public:
     LoggingEvent(const QString &init_logging_string);
     const QString &getString();
+
+    static Type kEventType;
 
   private:
     QString logging_string;
@@ -30,11 +29,10 @@ class LoggingEvent : public QEvent
 class ErrorEvent : public QEvent
 {
   public:
-    enum eventID { ID = QEvent::User + 1979 };
-
-  public:
     ErrorEvent(const QString &init_error_string);
     const QString &getString();
+
+    static Type kEventType;
 
   private:
     QString error_string;

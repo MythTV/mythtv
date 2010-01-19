@@ -12,9 +12,13 @@
 
 #include "threadevents.h"
 
+QEvent::Type LoggingEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type ErrorEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 LoggingEvent::LoggingEvent(const QString &init_logging_string) :
-    QEvent(QEvent::Type(ID)),
-    logging_string(init_logging_string)
+    QEvent(kEventType), logging_string(init_logging_string)
 {
 }
 
@@ -24,8 +28,7 @@ const QString &LoggingEvent::getString()
 }
 
 ErrorEvent::ErrorEvent(const QString &init_error_string) :
-    QEvent(QEvent::Type(ID)),
-    error_string(init_error_string)
+    QEvent(kEventType), error_string(init_error_string)
 {
 }
 

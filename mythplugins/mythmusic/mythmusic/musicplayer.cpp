@@ -472,89 +472,76 @@ void MusicPlayer::customEvent(QEvent *event)
 {
     if (m_isAutoplay)
     {
-        switch ((int)event->type())
+        if (event->type() == OutputEvent::Error)
         {
-            case OutputEvent::Error:
+            OutputEvent *aoe = (OutputEvent *) event;
+
+            VERBOSE(VB_IMPORTANT, QString("Output Error - %1")
+                    .arg(*aoe->errorMessage()));
+            MythPopupBox::showOkPopup(
+                gContext->GetMainWindow(),
+                "Output Error:",
+                QString("MythMusic has encountered"
+                        " the following error:\n%1")
+                .arg(*aoe->errorMessage()));
+            stop(true);
+        }
+        else if (event->type() == DecoderEvent::Finished)
+        {
+            nextAuto();
+        }
+        else if (event->type() == DecoderEvent::Error)
+        {
+            stop(true);
+
+            QApplication::sendPostedEvents();
+
+            DecoderEvent *dxe = (DecoderEvent *) event;
+
+            VERBOSE(VB_IMPORTANT, QString("Decoder Error - %1")
+                    .arg(*dxe->errorMessage()));
+            MythPopupBox::showOkPopup(
+                gContext->GetMainWindow(), "Decoder Error",
+                QString("MythMusic has encountered the following error:\n%1")
+                .arg(*dxe->errorMessage()));
+        }
+        else if (event->type() == MythEvent::MythEventMessage)
+        {
+            MythEvent *me = (MythEvent*) event;
+            if (me->Message().left(14) == "PLAYBACK_START")
             {
-                OutputEvent *aoe = (OutputEvent *) event;
+                m_wasPlaying = m_isPlaying;
+                QString hostname = me->Message().mid(15);
 
-                VERBOSE(VB_IMPORTANT, QString("Output Error - %1")
-                        .arg(*aoe->errorMessage()));
-                MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                        "Output Error:",
-                        QString("MythMusic has encountered"
-                                " the following error:\n%1")
-                                .arg(*aoe->errorMessage()));
-                stop(true);
-
-                break;
-            }
-
-            case DecoderEvent::Finished:
-            {
-                nextAuto();
-                break;
-            }
-
-            case DecoderEvent::Error:
-            {
-                stop(true);
-
-                QApplication::sendPostedEvents();
-
-                DecoderEvent *dxe = (DecoderEvent *) event;
-
-                VERBOSE(VB_IMPORTANT, QString("Decoder Error - %1")
-                        .arg(*dxe->errorMessage()));
-                MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                        "Decoder Error",
-                                        QString("MythMusic has encountered"
-                                                " the following error:\n%1")
-                                        .arg(*dxe->errorMessage()));
-                break;
-            }
-
-            case MythEvent::MythEventMessage:
-            {
-                MythEvent *me = (MythEvent *) event;
-                if (me->Message().left(14) == "PLAYBACK_START")
+                if (hostname == gContext->GetHostName())
                 {
-                    m_wasPlaying = m_isPlaying;
-                    QString hostname = me->Message().mid(15);
+                    if (m_isPlaying)
+                        savePosition();
+                    stop(true);
+                }
+            }
 
+            if (me->Message().left(12) == "PLAYBACK_END")
+            {
+                if (m_wasPlaying)
+                {
+                    QString hostname = me->Message().mid(13);
                     if (hostname == gContext->GetHostName())
                     {
-                        if (m_isPlaying)
-                            savePosition();
-                        stop(true);
+                        play();
+                        seek(gContext->GetNumSetting(
+                                 "MusicBookmarkPosition", 0));
+                        gContext->SaveSetting("MusicBookmark", "");
+                        gContext->SaveSetting("MusicBookmarkPosition", 0);
                     }
+
+                    m_wasPlaying = false;
                 }
-
-                if (me->Message().left(12) == "PLAYBACK_END")
-                {
-                    if (m_wasPlaying)
-                    {
-                        QString hostname = me->Message().mid(13);
-                        if (hostname == gContext->GetHostName())
-                        {
-                            play();
-                            seek(gContext->GetNumSetting(
-                                "MusicBookmarkPosition", 0));
-                            gContext->SaveSetting("MusicBookmark", "");
-                            gContext->SaveSetting("MusicBookmarkPosition", 0);
-                        }
-
-                        m_wasPlaying = false;
-                    }
-                }
-
-                break;
             }
         }
     }
 
-
-    if ((int)event->type() == OutputEvent::Info)
+    if (event->type() == OutputEvent::Info)
     {
         OutputEvent *oe = (OutputEvent *) event;
         m_currentTime = oe->elapsedSeconds();
@@ -563,9 +550,12 @@ void MusicPlayer::customEvent(QEvent *event)
         {
             // we update the lastplay and playcount after playing
             // for m_lastplayDelay seconds or half the total track time
-            if ((m_currentMetadata &&  m_currentTime > (m_currentMetadata->Length() / 1000) / 2) ||
+            if ((m_currentMetadata &&  m_currentTime >
+                 (m_currentMetadata->Length() / 1000) / 2) ||
                  m_currentTime >= m_lastplayDelay)
-            updateLastplay();
+            {
+                updateLastplay();
+            }
         }
     }
 

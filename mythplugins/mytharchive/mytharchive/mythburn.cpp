@@ -1169,17 +1169,12 @@ void BurnMenu::start(void)
 
 void BurnMenu::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce
-            = dynamic_cast<DialogCompletionEvent*>(event);
-
-        QString resultid= dce->GetId();
-        int buttonnum  = dce->GetResult();
-
-        if (resultid == "action")
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
+        if (dce->GetId() == "action")
         {
-            doBurn(buttonnum);
+            doBurn(dce->GetResult());
             deleteLater();
         }
     }

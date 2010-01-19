@@ -86,23 +86,9 @@ class ScannerEvent : public QEvent
     friend class QObject; // quiet OSX gcc warning
 
   public:
-    enum TYPE 
-    {
-        ScanComplete,
-        ScanShutdown,
-        AppendTextToLog,
-        SetStatusText,
-        SetStatusTitleText,
-        SetPercentComplete,
-        SetStatusRotorPosition,
-        SetStatusSignalToNoise,
-        SetStatusSignalStrength,
-        SetStatusSignalLock,
-    };
 
-    ScannerEvent(TYPE t) :
-        QEvent((QEvent::Type)(t + QEvent::User)),
-        str(""), intvalue(0), cfg_ptr(NULL) { ; }
+    ScannerEvent(QEvent::Type t) :
+        QEvent(t), str(""), intvalue(0), cfg_ptr(NULL) { ; }
 
     QString strValue()              const { return str; }
     void    strValue(const QString& _str) { str = _str; }
@@ -114,7 +100,16 @@ class ScannerEvent : public QEvent
     void    ConfigurableValue(Configurable *_cfg_ptr)
         { cfg_ptr = _cfg_ptr; }
 
-    TYPE    eventType()       const { return (TYPE)(type()-QEvent::User); }
+    static Type ScanComplete;
+    static Type ScanShutdown;
+    static Type AppendTextToLog;
+    static Type SetStatusText;
+    static Type SetStatusTitleText;
+    static Type SetPercentComplete;
+    static Type SetStatusRotorPosition;
+    static Type SetStatusSignalToNoise;
+    static Type SetStatusSignalStrength;
+    static Type SetStatusSignalLock;
 
   private:
     ~ScannerEvent() { }
@@ -125,9 +120,9 @@ class ScannerEvent : public QEvent
     Configurable *cfg_ptr;
 };
 
-void post_event(QObject *dest, ScannerEvent::TYPE type, int val);
-void post_event(QObject *dest, ScannerEvent::TYPE type, const QString &val);
-void post_event(QObject *dest, ScannerEvent::TYPE type, int val,
+void post_event(QObject *dest, QEvent::Type type, int val);
+void post_event(QObject *dest, QEvent::Type type, const QString &val);
+void post_event(QObject *dest, QEvent::Type type, int val,
                 Configurable *cfg);
 
 #endif // _SCAN_MONITOR_H_

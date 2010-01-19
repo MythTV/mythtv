@@ -10,6 +10,8 @@
 #include "screensaver-osx.h"
 #endif
 
+QEvent::Type ScreenSaverEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
 
 ScreenSaverControl* ScreenSaverSingleton = NULL;
 

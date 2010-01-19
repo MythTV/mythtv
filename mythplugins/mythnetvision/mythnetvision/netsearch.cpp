@@ -991,7 +991,7 @@ QString NetSearch::getDownloadFilename(ResultVideo *item)
 
 void NetSearch::customEvent(QEvent *event)
 {
-    if (event->type() == kImageDLEventType)
+    if (event->type() == ImageDLEvent::kEventType)
     {
         ImageDLEvent *ide = (ImageDLEvent *)event;
 
@@ -1012,7 +1012,7 @@ void NetSearch::customEvent(QEvent *event)
 
         delete id;
     }
-    else if (event->type() == kVideoDLEventType)
+    else if (event->type() == VideoDLEvent::kEventType)
     {
         VideoDLEvent *vde = (VideoDLEvent *)event;
 

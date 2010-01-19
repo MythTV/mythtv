@@ -24,7 +24,10 @@
 #define LOC QString("NetworkControl: ")
 #define LOC_ERR QString("NetworkControl Error: ")
 
-const int kNetworkControlDataReadyEvent = 35671;
+static QEvent::Type kNetworkControlDataReadyEvent =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type NetworkControlCloseEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
 
 /** Is @p test an abbreviation of @p command ?
  * The @p test substring must be at least @p minchars long.
@@ -1038,8 +1041,8 @@ QString NetworkControl::processHelp(QStringList tokens)
 
 void NetworkControl::notifyDataAvailable(void)
 {
-    QCoreApplication::postEvent(this, new QEvent(
-        (QEvent::Type)kNetworkControlDataReadyEvent));
+    QCoreApplication::postEvent(
+        this, new QEvent(kNetworkControlDataReadyEvent));
 }
 
 void NetworkControl::sendReplyToClient(NetworkControlClient *ncc,
@@ -1135,7 +1138,7 @@ void NetworkControl::customEvent(QEvent *e)
             delete nc;
         }
     }
-    else if (e->type() == kNetworkControlCloseEvent)
+    else if (e->type() == NetworkControlCloseEvent::kEventType)
     {
         NetworkControlCloseEvent *ncce = (NetworkControlCloseEvent*)e;
         NetworkControlClient     *ncc  = ncce->getClient();

@@ -15,15 +15,14 @@
 #include <output.h>
 #include <visual.h>
 
-DecoderEvent* DecoderEvent::clone(void) const
-{
-    DecoderEvent *result = new DecoderEvent(*this);
-
-    if (error_msg)
-        result->error_msg = new QString(*error_msg);
-
-    return result;
-}
+QEvent::Type DecoderEvent::Decoding =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type DecoderEvent::Stopped =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type DecoderEvent::Finished =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type DecoderEvent::Error =
+    (QEvent::Type) QEvent::registerEventType();
 
 Decoder::Decoder(DecoderFactory *d, QIODevice *i, AudioOutput *o)
        : fctry(d), in(i), out(o), blksize(0)

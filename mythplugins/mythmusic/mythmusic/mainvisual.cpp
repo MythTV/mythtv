@@ -280,25 +280,20 @@ void MainVisual::resizeEvent( QResizeEvent *event )
 
 void MainVisual::customEvent(QEvent *event)
 {
-    switch (event->type())
+    if ((event->type() == OutputEvent::Playing)   ||
+        (event->type() == OutputEvent::Info)      ||
+        (event->type() == OutputEvent::Buffering) ||
+        (event->type() == OutputEvent::Paused))
     {
-        case OutputEvent::Playing:
-        case OutputEvent::Info:
-        case OutputEvent::Buffering:
-        case OutputEvent::Paused:
-            playing = TRUE;
+        playing = true;
 
-            if (! timer->isActive())
-                timer->start(1000 / fps);
-            break;
-
-        case OutputEvent::Stopped:
-        case OutputEvent::Error:
-            playing = FALSE;
-            break;
-
-        default:
-            ;
+        if (!timer->isActive())
+            timer->start(1000 / fps);
+    }
+    else if ((event->type() == OutputEvent::Stopped) ||
+             (event->type() == OutputEvent::Error))
+    {
+        playing = false;
     }
 }
 

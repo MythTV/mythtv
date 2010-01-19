@@ -8,18 +8,18 @@
 #include "mythuitext.h"
 #include "mythuiprogressbar.h"
 
-const int kProgressUpdateEventType = 35111;
-
 class MPUBLIC ProgressUpdateEvent : public QEvent
 {
   public:
-    ProgressUpdateEvent(uint count, uint total=0, QString message="")
-        : QEvent((QEvent::Type)kProgressUpdateEventType),
-          m_total(total), m_count(count), m_message(message) { }
+    ProgressUpdateEvent(uint count, uint total=0, QString message="") :
+        QEvent(kEventType), m_total(total), m_count(count),
+        m_message(message) { }
 
     QString GetMessage() { return m_message; }
     uint GetTotal() { return m_total; }
     uint GetCount() { return m_count; }
+
+    static Type kEventType;
 
   private:
     uint m_total;

@@ -1912,133 +1912,120 @@ void PlaybackBoxMusic::editPlaylist()
 
 void PlaybackBoxMusic::customEvent(QEvent *event)
 {
-    switch ((int)event->type())
+    if (event->type() == OutputEvent::Playing)
     {
-        case OutputEvent::Playing:
+        if (curMeta)
+            updateTrackInfo(curMeta);
+        statusString = tr("Playing stream.");
+    }
+    else if (event->type() == OutputEvent::Buffering)
+    {
+        statusString = tr("Buffering stream.");
+    }
+    else if (event->type() == OutputEvent::Paused)
+    {
+        statusString = tr("Stream paused.");
+    }
+    else if (event->type() == OutputEvent::Info)
+    {
+        OutputEvent *oe = (OutputEvent*) event;
+
+        int rs;
+        currentTime = rs = oe->elapsedSeconds();
+
+        QString time_string = getTimeString(rs, maxTime);
+
+        showProgressBar();
+
+        if (curMeta)
         {
-            if (curMeta)
-                updateTrackInfo(curMeta);
-            statusString = tr("Playing stream.");
-            break;
+            if (class LCD *lcd = LCD::Get())
+            {
+                float percent_heard = (maxTime<=0) ? 
+                    0.0:((float)rs / (float)curMeta->Length()) * 1000.0;
+
+                QString lcd_time_string = time_string;
+
+                // if the string is longer than the LCD width, remove all spaces
+                if (time_string.length() > (int)lcd->getLCDWidth())
+                    lcd_time_string.remove(' ');
+
+                lcd->setMusicProgress(lcd_time_string, percent_heard);
+            }
         }
 
-        case OutputEvent::Buffering:
+        QString info_string;
+
+        //  Hack around for cd bitrates
+        if (oe->bitrate() < 2000)
         {
-            statusString = tr("Buffering stream.");
-            break;
+            info_string.sprintf(
+                "%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
+                oe->bitrate(), float(oe->frequency()) / 1000.0,
+                oe->channels() > 1 ? "2" : "1");
+        }
+        else
+        {
+            info_string.sprintf("%.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
+                                float(oe->frequency()) / 1000.0,
+                                oe->channels() > 1 ? "2" : "1");
         }
 
-        case OutputEvent::Paused:
+        if (curMeta && visualizer_status != 2)
         {
-            statusString = tr("Stream paused.");
-            break;
+            if (time_text)
+                time_text->SetText(time_string);
+            if (info_text)
+                info_text->SetText(info_string);
+            if (current_visualization_text)
+            {
+                current_visualization_text->SetText(
+                    visual_modes[current_visual]);
+                current_visualization_text->refresh();
+            }
         }
+    }
+    else if (event->type() == OutputEvent::Error)
+    {
+        statusString = tr("Output error.");
 
-        case OutputEvent::Info:
-        {
-            OutputEvent *oe = (OutputEvent *) event;
+        OutputEvent *aoe = (OutputEvent *) event;
 
-            int rs;
-            currentTime = rs = oe->elapsedSeconds();
-
-            QString time_string = getTimeString(rs, maxTime);
-
-            showProgressBar();
-
-            if (curMeta)
-            {
-                if (class LCD *lcd = LCD::Get())
-                {
-                    float percent_heard = maxTime<=0?0.0:((float)rs /
-                                                          (float)curMeta->Length()) * 1000.0;
-
-                    QString lcd_time_string = time_string;
-
-                    // if the string is longer than the LCD width, remove all spaces
-                    if (time_string.length() > (int)lcd->getLCDWidth())
-                        lcd_time_string.remove(' ');
-
-                    lcd->setMusicProgress(lcd_time_string, percent_heard);
-                }
-            }
-
-            QString info_string;
-
-            //  Hack around for cd bitrates
-            if (oe->bitrate() < 2000)
-            {
-                info_string.sprintf("%d "+tr("kbps")+ "   %.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
-                                   oe->bitrate(), float(oe->frequency()) / 1000.0,
-                                   oe->channels() > 1 ? "2" : "1");
-            }
-            else
-            {
-                info_string.sprintf("%.1f "+ tr("kHz")+ "   %s "+ tr("ch"),
-                                   float(oe->frequency()) / 1000.0,
-                                   oe->channels() > 1 ? "2" : "1");
-            }
-
-            if (curMeta && visualizer_status != 2)
-            {
-                if (time_text)
-                    time_text->SetText(time_string);
-                if (info_text)
-                    info_text->SetText(info_string);
-                if (current_visualization_text)
-                {
-                    current_visualization_text->SetText(visual_modes[current_visual]);
-                    current_visualization_text->refresh();
-                }
-            }
-
-            break;
-        }
-        case OutputEvent::Error:
-        {
-            statusString = tr("Output error.");
-
-            OutputEvent *aoe = (OutputEvent *) event;
-
-            VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
+        VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
                 .arg(*aoe->errorMessage()));
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                      statusString,
-                                      QString("MythMusic has encountered the following error:\n%1")
-                                      .arg(*aoe->errorMessage()));
-            stopAll();
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(),
+            statusString,
+            QString("MythMusic has encountered the following error:\n%1")
+            .arg(*aoe->errorMessage()));
+        stopAll();
+    }
+    else if (event->type() == DecoderEvent::Stopped)
+    {
+        statusString = tr("Stream stopped.");
+    }
+    else if (event->type() == DecoderEvent::Finished)
+    {
+        statusString = tr("Finished playing stream.");
+        nextAuto();
+    }
+    else if (event->type() == DecoderEvent::Error)
+    {
+        stop();
 
-            break;
-        }
-        case DecoderEvent::Stopped:
-        {
-            statusString = tr("Stream stopped.");
+        QApplication::sendPostedEvents();
 
-            break;
-        }
-        case DecoderEvent::Finished:
-        {
-            statusString = tr("Finished playing stream.");
-            nextAuto();
-            break;
-        }
-        case DecoderEvent::Error:
-        {
-            stop();
+        statusString = tr("Decoder error.");
 
-            QApplication::sendPostedEvents();
+        DecoderEvent *dxe = (DecoderEvent*) event;
 
-            statusString = tr("Decoder error.");
-
-            DecoderEvent *dxe = (DecoderEvent *) event;
-
-            VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
+        VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
                 .arg(*dxe->errorMessage()));
-            MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                      statusString,
-                                      QString("MythMusic has encountered the following error:\n%1")
-                                      .arg(*dxe->errorMessage()));
-            break;
-        }
+        MythPopupBox::showOkPopup(
+            gContext->GetMainWindow(),
+            statusString,
+            QString("MythMusic has encountered the following error:\n%1")
+            .arg(*dxe->errorMessage()));
     }
 
     QWidget::customEvent(event);

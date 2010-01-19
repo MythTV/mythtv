@@ -14,6 +14,19 @@ using namespace std;
 
 class QObject;
 
+QEvent::Type OutputEvent::Playing =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type OutputEvent::Buffering =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type OutputEvent::Info =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type OutputEvent::Paused =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type OutputEvent::Stopped =
+    (QEvent::Type) QEvent::registerEventType();
+QEvent::Type OutputEvent::Error =
+    (QEvent::Type) QEvent::registerEventType();
+
 OutputListeners::OutputListeners()
 {
     bufsize=0;

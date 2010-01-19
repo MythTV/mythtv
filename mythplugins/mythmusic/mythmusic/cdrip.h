@@ -155,29 +155,26 @@ class Ripper : public MythScreenType
 class RipStatusEvent : public QEvent
 {
   public:
-    enum Type
-    {
-        ST_TRACK_TEXT = (QEvent::User + 3000),
-        ST_OVERALL_TEXT,
-        ST_STATUS_TEXT,
-        ST_TRACK_PROGRESS,
-        ST_TRACK_PERCENT,
-        ST_TRACK_START,
-        ST_OVERALL_PROGRESS,
-        ST_OVERALL_PERCENT,
-        ST_OVERALL_START,
-        ST_FINISHED,
-        ST_ENCODER_ERROR
-    };
-
-    RipStatusEvent(Type t, int val)
-        : QEvent((QEvent::Type)t), text(""), value(val) {}
-    RipStatusEvent(Type t, const QString &val)
-        : QEvent((QEvent::Type)t), text(val), value( -1) {}
+    RipStatusEvent(Type t, int val) :
+        QEvent(t), text(""), value(val) {}
+    RipStatusEvent(Type t, const QString &val) :
+        QEvent(t), text(val), value(-1) {}
     ~RipStatusEvent() {}
 
     QString text;
     int value;
+
+    static Type kTrackTextEvent;
+    static Type kOverallTextEvent;
+    static Type kStatusTextEvent;
+    static Type kTrackProgressEvent;
+    static Type kTrackPercentEvent;
+    static Type kTrackStartEvent;
+    static Type kOverallProgressEvent;
+    static Type kOverallPercentEvent;
+    static Type kOverallStartEvent;
+    static Type kFinishedEvent;
+    static Type kEncoderErrorEvent;
 };
 
 class RipStatus : public MythScreenType

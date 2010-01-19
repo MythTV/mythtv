@@ -24,6 +24,9 @@ using namespace std;
     #include <QTextCodec>
 #endif // USING_FRIBIDI
 
+QEvent::Type OSDCloseEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 /// Shared OSD image cache
 OSDImageCache OSDTypeImage::c_cache;
 

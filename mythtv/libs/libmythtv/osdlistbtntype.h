@@ -41,10 +41,6 @@ class OSDListBtnTypeItem;
 typedef vector<OSDListBtnType*> OSDListBtnList;
 typedef vector<OSDListBtnTypeItem*> OSDListBtnItemList;
 
-const int kOSDListTreeItemEnteredEventType = 33301;
-const int kOSDListTreeItemSelectedEventType = 33302;
-const int kOSDListBtnItemSelectedEventType = 33303;
-
 /**
  *  \class OSDListTreeItemEnteredEvent
  *
@@ -57,12 +53,13 @@ const int kOSDListBtnItemSelectedEventType = 33303;
 class MPUBLIC OSDListTreeItemEnteredEvent : public QEvent
 {
   public:
-    OSDListTreeItemEnteredEvent(const QString &name, const QString &action)
-        : QEvent((QEvent::Type)kOSDListTreeItemEnteredEventType),
-          m_name(name), m_action(action) { }
+    OSDListTreeItemEnteredEvent(const QString &name, const QString &action) :
+        QEvent(kEventType), m_name(name), m_action(action) { }
 
     QString GetName() { return m_name; }
     QString GetAction() { return m_action; }
+
+    static Type kEventType;
 
   private:
     QString m_name;
@@ -81,12 +78,13 @@ class MPUBLIC OSDListTreeItemEnteredEvent : public QEvent
 class MPUBLIC OSDListTreeItemSelectedEvent : public QEvent
 {
   public:
-    OSDListTreeItemSelectedEvent(const QString &name, const QString &action)
-        : QEvent((QEvent::Type)kOSDListTreeItemSelectedEventType),
-          m_name(name), m_action(action) { }
+    OSDListTreeItemSelectedEvent(const QString &name, const QString &action) :
+        QEvent(kEventType), m_name(name), m_action(action) { }
 
     QString GetName() { return m_name; }
     QString GetAction() { return m_action; }
+
+    static Type kEventType;
 
   private:
     QString m_name;
@@ -104,11 +102,12 @@ class MPUBLIC OSDListTreeItemSelectedEvent : public QEvent
 class MPUBLIC OSDListBtnItemSelectedEvent : public QEvent
 {
   public:
-    OSDListBtnItemSelectedEvent(const QString &name)
-        : QEvent((QEvent::Type)kOSDListBtnItemSelectedEventType),
-          m_name(name) { }
+    OSDListBtnItemSelectedEvent(const QString &name) :
+        QEvent(kEventType), m_name(name) { }
 
     QString GetName() { return m_name; }
+
+    static Type kEventType;
 
   private:
     QString m_name;

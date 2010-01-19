@@ -15,12 +15,10 @@
 class MPUBLIC MythEvent : public QEvent
 {
   public:
-    enum Type { MythEventMessage = (User + 1000) };
-
     MythEvent(int t) : QEvent((QEvent::Type)t)
     { }
 
-    MythEvent(const QString lmessage) : QEvent((QEvent::Type)MythEventMessage)
+    MythEvent(const QString lmessage) : QEvent(MythEventMessage)
     {
         message = lmessage;
         extradata.append( "empty" );
@@ -51,37 +49,27 @@ class MPUBLIC MythEvent : public QEvent
     virtual MythEvent *clone() const
     { return new MythEvent(message, extradata); }
 
+    static Type MythEventMessage;
+    static Type kExitToMainMenuEventType;
+    static Type kMythPostShowEventType;
+
   private:
     QString message;
     QStringList extradata;
 };
 
-const int kExternalKeycodeEventType = 33213;
-const int kExitToMainMenuEventType = 33214;
-
-class ExternalKeycodeEvent : public QEvent
+class MPUBLIC ExternalKeycodeEvent : public QEvent
 {
   public:
-    ExternalKeycodeEvent(const int key)
-           : QEvent((QEvent::Type)kExternalKeycodeEventType), keycode(key) {}
+    ExternalKeycodeEvent(const int key) :
+        QEvent(kEventType), keycode(key) {}
 
     int getKeycode() { return keycode; }
 
+    static Type kEventType;
+
   private:
     int keycode;
-};
-
-class ExitToMainMenuEvent : public QEvent
-{
-  public:
-    ExitToMainMenuEvent(void) : QEvent((QEvent::Type)kExitToMainMenuEventType) {}
-};
-
-const int kMythPostShowEventType = QEvent::User + 2000;
-class MPUBLIC MythPostShowEvent : public QEvent
-{
-  public:
-    MythPostShowEvent() : QEvent((QEvent::Type)kMythPostShowEventType) {}
 };
 
 #endif /* MYTHEVENT_H */

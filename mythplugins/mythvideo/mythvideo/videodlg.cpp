@@ -3812,7 +3812,7 @@ Metadata *VideoDialog::GetMetadata(MythUIButtonListItem *item)
 
 void VideoDialog::customEvent(QEvent *levent)
 {
-    if (levent->type() == kMythDialogBoxCompletionEventType)
+    if (levent->type() == DialogCompletionEvent::kEventType)
     {
         m_menuPopup = NULL;
     }

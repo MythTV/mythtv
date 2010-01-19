@@ -811,9 +811,12 @@ bool MythMainWindow::screenShot(void)
 bool MythMainWindow::event(QEvent *e)
 {
     if (e->type() == QEvent::Show && !e->spontaneous())
-        QCoreApplication::postEvent(this, new MythPostShowEvent());
+    {
+        QCoreApplication::postEvent(
+            this, new QEvent(MythEvent::kMythPostShowEventType));
+    }
 
-    if (e->type() == (QEvent::Type)kMythPostShowEventType)
+    if (e->type() == MythEvent::kMythPostShowEventType)
     {
         raise();
         activateWindow();
@@ -1018,7 +1021,10 @@ void MythMainWindow::detach(QWidget *child)
     }
 
     if (d->exitingtomain)
-        QCoreApplication::postEvent(this, new ExitToMainMenuEvent());
+    {
+        QCoreApplication::postEvent(
+            this, new QEvent(MythEvent::kExitToMainMenuEventType));
+    }
 }
 
 QWidget *MythMainWindow::currentWidget(void)
@@ -1159,7 +1165,8 @@ bool MythMainWindow::TranslateKeyPress(const QString &context,
     {
         d->exitingtomain = true;
         d->exitmenucallback = d->jumpMap[keynum]->callback;
-        QCoreApplication::postEvent(this, new ExitToMainMenuEvent());
+        QCoreApplication::postEvent(
+            this, new QEvent(MythEvent::kExitToMainMenuEventType));
         return true;
     }
 
@@ -1418,7 +1425,8 @@ void MythMainWindow::JumpTo(const QString& destination, bool pop)
         d->exitingtomain = true;
         d->popwindows = pop;
         d->exitmenucallback = d->destinationMap[destination].callback;
-        QCoreApplication::postEvent(this, new ExitToMainMenuEvent());
+        QCoreApplication::postEvent(
+            this, new QEvent(MythEvent::kExitToMainMenuEventType));
         return;
     }
 }
@@ -1680,7 +1688,7 @@ bool MythMainWindow::eventFilter(QObject *, QEvent *e)
 
 void MythMainWindow::customEvent(QEvent *ce)
 {
-    if (ce->type() == MythGestureEventType)
+    if (ce->type() == MythGestureEvent::kEventType)
     {
         MythGestureEvent *ge = static_cast<MythGestureEvent*>(ce);
         MythScreenStack *toplevel = GetMainStack();
@@ -1693,11 +1701,12 @@ void MythMainWindow::customEvent(QEvent *ce)
         VERBOSE(VB_IMPORTANT, QString("Gesture: %1")
                 .arg(QString(*ge).toLocal8Bit().constData()));
     }
-    else if (ce->type() == kExitToMainMenuEventType && d->exitingtomain)
+    else if (ce->type() == MythEvent::kExitToMainMenuEventType &&
+             d->exitingtomain)
     {
         ExitToMainMenu();
     }
-    else if (ce->type() == kExternalKeycodeEventType)
+    else if (ce->type() == ExternalKeycodeEvent::kEventType)
     {
         ExternalKeycodeEvent *eke = static_cast<ExternalKeycodeEvent *>(ce);
         int keycode = eke->getKeycode();
@@ -1711,8 +1720,7 @@ void MythMainWindow::customEvent(QEvent *ce)
             QCoreApplication::sendEvent(key_target, &key);
     }
 #if defined(USE_LIRC) || defined(USING_APPLEREMOTE)
-    else if (ce->type() ==
-             (QEvent::Type) LircKeycodeEvent::kLIRCKeycodeEventType &&
+    else if (ce->type() == LircKeycodeEvent::kEventType &&
              !d->ignore_lirc_keys)
     {
         LircKeycodeEvent *lke = static_cast<LircKeycodeEvent *>(ce);
@@ -1740,15 +1748,14 @@ void MythMainWindow::customEvent(QEvent *ce)
                 QCoreApplication::sendEvent(key_target, &key);
         }
     }
-    else if (ce->type() == (QEvent::Type) LircMuteEvent::LircMuteEventType)
+    else if (ce->type() == LircMuteEvent::kEventType)
     {
         LircMuteEvent *lme = static_cast<LircMuteEvent *>(ce);
         d->ignore_lirc_keys = lme->eventsMuted();
     }
 #endif
 #ifdef USE_JOYSTICK_MENU
-    else if (ce->type() ==
-             (QEvent::Type) JoystickKeycodeEvent::JoystickKeycodeEventType &&
+    else if (ce->type() == JoystickKeycodeEvent::kEventType &&
              !d->ignore_joystick_keys)
     {
         JoystickKeycodeEvent *jke = static_cast<JoystickKeycodeEvent *>(ce);
@@ -1788,15 +1795,13 @@ void MythMainWindow::customEvent(QEvent *ce)
                     .arg(jke->getJoystickMenuText().toLocal8Bit().constData()));
         }
     }
-    else if (ce->type() ==
-             (QEvent::Type) JoystickMenuMuteEvent::JoystickMuteEventType)
+    else if (ce->type() == JoystickMenuMuteEvent::kEventType)
     {
         JoystickMenuMuteEvent *jme = static_cast<JoystickMenuMuteEvent *>(ce);
         d->ignore_joystick_keys = jme->eventsMuted();
     }
 #endif
-    else if (ce->type() ==
-             (QEvent::Type) ScreenSaverEvent::ScreenSaverEventType)
+    else if (ce->type() == ScreenSaverEvent::kEventType)
     {
         ScreenSaverEvent *sse = static_cast<ScreenSaverEvent *>(ce);
         switch (sse->getSSEventType())

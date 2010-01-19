@@ -19,6 +19,9 @@
 #include "mythuibutton.h"
 #include "mythuistatetype.h"
 
+QEvent::Type DialogCompletionEvent::kEventType =
+    (QEvent::Type) QEvent::registerEventType();
+
 MythDialogBox::MythDialogBox(const QString &text,
                              MythScreenStack *parent, const char *name,
                              bool fullscreen)

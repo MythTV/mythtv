@@ -155,16 +155,16 @@ typedef struct
     int count;
 } ChildCountData;
 
-const int kMythGalleryChildCountEventType = QEvent::User + 4001;
-
 class ChildCountEvent : public QEvent
 {
   public:
-    ChildCountEvent(ChildCountData *ccd)
-         : QEvent((QEvent::Type)kMythGalleryChildCountEventType) { childCountData = ccd; }
+    ChildCountEvent(ChildCountData *ccd) :
+        QEvent(kEventType), childCountData(ccd) {}
     ~ChildCountEvent() {}
 
     ChildCountData *childCountData;
+
+    static Type kEventType;
 };
 
 class ChildCountThread : public QThread

@@ -350,13 +350,12 @@ void ScheduleEditor::ShowSchedInfo()
 
 void ScheduleEditor::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-                                dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        QString resultid = dce->GetId();
-        int buttonnum  = dce->GetResult();
+        QString resultid  = dce->GetId();
+        int     buttonnum = dce->GetResult();
 
         if (resultid == "schedinfo")
         {
@@ -897,13 +896,12 @@ void StoreOptEditor::PromptForRecgroup()
 
 void StoreOptEditor::customEvent(QEvent *event)
 {
-    if (event->type() == kMythDialogBoxCompletionEventType)
+    if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-                                dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        QString resultid= dce->GetId();
-        QString resulttext  = dce->GetResultText();
+        QString resultid   = dce->GetId();
+        QString resulttext = dce->GetResultText();
 
         if (resultid == "newrecgroup")
         {

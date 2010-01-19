@@ -268,13 +268,12 @@ void ProgFinder::customEvent(QEvent *event)
             }
         }
     }
-    else if (event->type() == kMythDialogBoxCompletionEventType)
+    else if (event->type() == DialogCompletionEvent::kEventType)
     {
-        DialogCompletionEvent *dce =
-        dynamic_cast<DialogCompletionEvent*>(event);
+        DialogCompletionEvent *dce = (DialogCompletionEvent*)(event);
 
-        QString resultid= dce->GetId();
-        QString resulttext  = dce->GetResultText();
+        QString resultid   = dce->GetId();
+        QString resulttext = dce->GetResultText();
 
         if (resultid == "menu")
         {
