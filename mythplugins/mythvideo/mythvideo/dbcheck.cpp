@@ -1141,7 +1141,7 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
 
                         if (!update.exec())
                              MythDB::DBError("Unable to drop duplicate index "
-                                             "on recgrouppassword. Ignoring.",
+                                             "on videometadata. Ignoring.",
                                              update);
                         break;
                     }
