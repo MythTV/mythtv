@@ -720,11 +720,7 @@ bool NuppelVideoPlayer::InitVideo(void)
             return false;
         }
 
-        bool db_scale = true;
-        if (player_ctx->buffer->isDVD())
-            db_scale = false;
-
-        videoOutput->SetVideoScalingAllowed(db_scale);
+        videoOutput->SetVideoScalingAllowed(true);
 
         // We need to tell it this for automatic deinterlacer settings
         videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
