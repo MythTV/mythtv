@@ -45,6 +45,7 @@ typedef enum AspectOverrideMode
     kAspect_4_3,
     kAspect_16_9,
     kAspect_14_9, // added after 16:9 so as not to upset existing setups.
+    kAspect_2_35_1,
     kAspect_END
 } AspectOverrideMode;
 
@@ -182,9 +183,10 @@ inline QString toString(AspectOverrideMode aspectmode)
     QString ret = QObject::tr("Off"); 
     switch (aspectmode)
     {
-        case kAspect_4_3:  ret = QObject::tr("4:3");  break;
-        case kAspect_14_9: ret = QObject::tr("14:9"); break; 
-        case kAspect_16_9: ret = QObject::tr("16:9"); break;
+        case kAspect_4_3:    ret = QObject::tr("4:3");    break;
+        case kAspect_14_9:   ret = QObject::tr("14:9");   break;
+        case kAspect_16_9:   ret = QObject::tr("16:9");   break;
+        case kAspect_2_35_1: ret = QObject::tr("2.35:1"); break;
         case kAspect_Toggle:
         case kAspect_Off:
         case kAspect_END: break;
@@ -229,9 +231,10 @@ inline float get_aspect_override(AspectOverrideMode aspectmode, float orig)
     float ret = orig;
     switch (aspectmode)
     {
-        case kAspect_4_3:  ret = 4.0f  / 3.0f; break;
-        case kAspect_14_9: ret = 14.0f / 9.0f; break; 
-        case kAspect_16_9: ret = 16.0f / 9.0f; break;
+        case kAspect_4_3:    ret = 4.0f  / 3.0f; break;
+        case kAspect_14_9:   ret = 14.0f / 9.0f; break;
+        case kAspect_16_9:   ret = 16.0f / 9.0f; break;
+        case kAspect_2_35_1: ret = 2.35f       ; break;
         case kAspect_Toggle:
         case kAspect_Off:
         case kAspect_END: break;
