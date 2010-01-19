@@ -1343,6 +1343,9 @@ void NetTree::updateRSS()
 
 void NetTree::updateTrees()
 {
+    if (m_grabberList.count() == 0)
+        return;
+
     QString title(tr("Updating Site Maps.  This could take a while..."));
     createBusyDialog(title);
 
