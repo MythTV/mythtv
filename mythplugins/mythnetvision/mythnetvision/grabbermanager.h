@@ -98,7 +98,8 @@ class GrabberDownloadThread : public QThread
 
     GrabberDownloadThread(QObject *parent);
     ~GrabberDownloadThread();
-
+    
+    void refreshAll();
     void cancel();
 
   protected:
@@ -110,6 +111,7 @@ class GrabberDownloadThread : public QThread
     QObject               *m_parent;
     QList<GrabberScript*>  m_scripts;
     QMutex                 m_mutex;
+    bool                   m_refreshAll;
 
 };
 

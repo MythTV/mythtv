@@ -69,6 +69,7 @@ void GrabberScript::run()
             parseDBTree(m_title, QString(), QString(), channel);
             channel = channel.nextSiblingElement("channel");
         }
+        markTreeUpdated(this, QDateTime::currentDateTime());
         emit finished();
     }
     else
@@ -156,6 +157,7 @@ void GrabberManager::timeout()
 GrabberDownloadThread::GrabberDownloadThread(QObject *parent)
 {
     m_parent = parent;
+    m_refreshAll = false;
 }
 
 GrabberDownloadThread::~GrabberDownloadThread()
@@ -171,14 +173,23 @@ void GrabberDownloadThread::cancel()
     m_mutex.unlock();
 }
 
+void GrabberDownloadThread::refreshAll()
+{
+    m_mutex.lock();
+    m_refreshAll = true;
+    m_mutex.unlock();
+}
+
 void GrabberDownloadThread::run()
 {
     m_scripts = findAllDBTreeGrabbers();
+    uint updateFreq = gContext->GetNumSetting(
+               "mythNetvision.updateFreq", 24);
 
     while (m_scripts.count())
     {
         GrabberScript *script = m_scripts.takeFirst();
-        if (script)
+        if (script && (needsUpdate(script, updateFreq) || m_refreshAll))
         {
             VERBOSE(VB_IMPORTANT, QString("MythNetvision: Script %1 Updating...")
                                   .arg(script->GetTitle()));

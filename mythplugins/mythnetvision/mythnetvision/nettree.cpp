@@ -1348,7 +1348,7 @@ void NetTree::updateTrees()
 
     QString title(tr("Updating Site Maps.  This could take a while..."));
     createBusyDialog(title);
-
+    m_gdt->refreshAll();
     m_gdt->start();
 }
 

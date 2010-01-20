@@ -155,10 +155,9 @@ QDateTime lastUpdate(GrabberScript* script)
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT updated "
                   "FROM netvisiontreegrabbers "
-                  "WHERE commandline = :COMMAND AND "
-                  "host = :HOST;");
-    query.bindValue(":COMMAND", script->GetCommandline());
-    query.bindValue(":HOST", gContext->GetHostName());
+                  "WHERE name = :NAME ORDER "
+                  "BY updated DESC LIMIT 1;");
+    query.bindValue(":NAME", script->GetTitle());
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Tree find in db", query);
     }
