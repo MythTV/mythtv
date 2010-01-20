@@ -88,6 +88,9 @@ bool MythDialogBox::Create(void)
 
 void MythDialogBox::Select(MythUIButtonListItem* item)
 {
+    if (!item)
+        return;
+
     const char *slot = qVariantValue<const char *>(item->GetData());
     if (m_useSlots && slot)
     {
@@ -160,7 +163,8 @@ bool MythDialogBox::keyPressEvent(QKeyEvent *event)
         else if (action == "RIGHT")
         {
             MythUIButtonListItem *item = m_buttonList->GetItemCurrent();
-            Select(item);
+            if (item)
+                Select(item);
         }
         else
             handled = false;
