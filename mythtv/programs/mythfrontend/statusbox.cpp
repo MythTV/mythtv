@@ -652,31 +652,23 @@ void StatusBox::doScheduleStatus()
                 ++hdflag;
         }
     }
-    QMap<int, RecStatusType> statusMap;
-    int i = 0;
-    statusMap[i++] = rsRecording;
-    statusMap[i++] = rsWillRecord;
-    statusMap[i++] = rsConflict;
-    statusMap[i++] = rsTooManyRecordings;
-    statusMap[i++] = rsLowDiskSpace;
-    statusMap[i++] = rsLaterShowing;
-    statusMap[i++] = rsNotListed;
-    int j = i;
 
-    QString fontstate;
-    for (i = 0; i < j; ++i)
-    {
-        RecStatusType type = statusMap[i];
-
-        if (statusMatch[type] > 0)
-        {
-            tmpstr = QString("%1 %2").arg(statusMatch[type])
-                                     .arg(statusText[type]);
-            if (type == rsConflict)
-                fontstate = "warning";
-            AddLogLine(tmpstr, tmpstr, fontstate);
-        }
-    }
+#define ADD_STATUS_LOG_LINE(rtype, fstate)                      \
+    do {                                                        \
+        if (statusMatch[rtype] > 0)                             \
+        {                                                       \
+            tmpstr = QString("%1 %2").arg(statusMatch[rtype])   \
+                                     .arg(statusText[rtype]);   \
+            AddLogLine(tmpstr, tmpstr, fstate);                 \
+        }                                                       \
+    } while (0)
+    ADD_STATUS_LOG_LINE(rsRecording, "");
+    ADD_STATUS_LOG_LINE(rsWillRecord, "");
+    ADD_STATUS_LOG_LINE(rsConflict, "error");
+    ADD_STATUS_LOG_LINE(rsTooManyRecordings, "warning");
+    ADD_STATUS_LOG_LINE(rsLowDiskSpace, "warning");
+    ADD_STATUS_LOG_LINE(rsLaterShowing, "warning");
+    ADD_STATUS_LOG_LINE(rsNotListed, "warning");
 
     QString willrec = statusText[rsWillRecord];
 
@@ -684,7 +676,7 @@ void StatusBox::doScheduleStatus()
     {
         tmpstr = QString("%1 %2 %3").arg(lowerpriority).arg(willrec)
                                     .arg(tr("with lower priority"));
-        AddLogLine(tmpstr, tmpstr);
+        AddLogLine(tmpstr, tmpstr, "warning");
     }
     if (hdflag > 0)
     {
@@ -692,6 +684,7 @@ void StatusBox::doScheduleStatus()
                                     .arg(tr("marked as HDTV"));
         AddLogLine(tmpstr, tmpstr);
     }
+    int i;
     for (i = 1; i <= maxSource; ++i)
     {
         if (sourceMatch[i] > 0)
