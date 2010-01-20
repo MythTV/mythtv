@@ -99,6 +99,11 @@ bool RSSEditPopup::Create(void)
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
     connect(m_thumbButton, SIGNAL(Clicked()), this, SLOT(doFileBrowser()));
 
+    m_urlEdit->SetMaxLength(0);
+    m_titleEdit->SetMaxLength(255);
+    m_descEdit->SetMaxLength(0);
+    m_authorEdit->SetMaxLength(255);
+
     if (m_editing)
     {
         m_site = findByURL(m_urlText);

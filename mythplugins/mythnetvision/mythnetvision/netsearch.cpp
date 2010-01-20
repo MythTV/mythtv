@@ -105,6 +105,7 @@ bool NetSearch::Create()
         m_noSites->SetVisible(false);
 
     m_search = dynamic_cast<MythUITextEdit *> (GetChild("search"));
+    m_search->SetMaxLength(255);
 
     if (!m_siteList || !m_searchResultList || !m_search)
     {
