@@ -21,3 +21,4 @@ SOURCES += jobthread.cpp dvdprobe.cpp fileobs.cpp threadevents.cpp
 mingw:DEFINES += USING_MINGW
 
 win32:LIBS += -lws2_32
+macx :LIBS += -framework CoreFoundation
