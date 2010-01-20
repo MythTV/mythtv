@@ -126,7 +126,8 @@ bool MythCommandLineParser::PreParse(
     }
     else if ((parseTypes & kCLPExtra) &&
              argv[argpos][0] != '-')
-        return true;
+        // Though it's allowed (err = false), we didn't handle the arg
+        return false;
 
     return false;
 }

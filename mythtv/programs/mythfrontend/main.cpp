@@ -1321,12 +1321,11 @@ int main(int argc, char **argv)
             {
                 return FRONTEND_EXIT_OK;
             }
-
-            if ((argpos + 1 == a.argc()) &&
-                (!QString(a.argv()[argpos]).startsWith("-")))
-            {
-                pluginname = a.argv()[argpos];
-            }
+        }
+        else if ((argpos + 1 == a.argc()) &&
+                 (!QString(a.argv()[argpos]).startsWith("-")))
+        {
+            pluginname = a.argv()[argpos];
         }
         else
         {
