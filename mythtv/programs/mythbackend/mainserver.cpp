@@ -2105,6 +2105,7 @@ void MainServer::HandleDeleteRecording(QString &chanid, QString &starttime,
         QStringList outputlist( QString::number(0) );
 
         SendResponse(pbssock, outputlist);
+        return;
     }
 
     RecordingInfo ri(*pginfo);
