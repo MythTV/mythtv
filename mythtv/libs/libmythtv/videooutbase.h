@@ -243,8 +243,8 @@ class VideoOutput
 
 
     QString GetFilters(void) const;
-    virtual bool MoveScaleDVDButton(QRect button, QSize &scale,
-                                    QPoint &position, QRect &crop);
+    /// \brief translates caption/dvd button rectangle into 'screen' space
+    QRect   GetImageRect(const QRect &rect);
 
   protected:
     void InitBuffers(int numdecode, bool extra_for_pause, int need_free,

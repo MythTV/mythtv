@@ -7121,6 +7121,10 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
             {
                 // AVSubtitleRect's image data's not guaranteed to be 4 byte
                 // aligned.
+
+                QRect qrect(rect->x, rect->y, rect->w, rect->h);
+                QRect scaled = videoOutput->GetImageRect(qrect);
+
                 QImage qImage(rect->w, rect->h, QImage::Format_ARGB32);
                 for (int y = 0; y < rect->h; ++y)
                 {
@@ -7132,28 +7136,15 @@ void NuppelVideoPlayer::DisplayAVSubtitles(void)
                     }
                 }
 
-                // scale the subtitle images which are scaled and positioned for
-                // a 720x576 video resolution to fit the current OSD resolution
-                float vsize = (float) video_disp_dim.height();
-                float hsize = (float) video_disp_dim.width();
 
-                if (player_ctx->buffer->isDVD())
-                    hsize = 720.0;
-
-                float hmult = osd->GetSubtitleBounds().width() / hsize;
-                float vmult = osd->GetSubtitleBounds().height() / vsize;
-
-                rect->x = (int)(rect->x * hmult);
-                rect->y = (int)(rect->y * vmult);
-                rect->w = (int)(rect->w * hmult);
-                rect->h = (int)(rect->h * vmult);
-
-                if (hmult < 0.98 || hmult > 1.02 || vmult < 0.98 || vmult > 1.02)
-                    qImage = qImage.scaled(rect->w, rect->h,
-                            Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                if (scaled.size() != qrect.size())
+                {
+                    qImage = qImage.scaled(scaled.width(), scaled.height(),
+                             Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+                }
 
                 OSDTypeImage* image = new OSDTypeImage();
-                image->SetPosition(QPoint(rect->x, rect->y), hmult, vmult);
+                image->SetPosition(scaled.topLeft(), 1.0f, 1.0f);
                 image->Load(qImage);
 
                 subtitleOSD->AddType(image);
@@ -7481,22 +7472,16 @@ void NuppelVideoPlayer::DisplayDVDButton(void)
         }
 
         // scale highlight image to match OSD size, if required
-        QSize scale;
-        QRect crop, button;
-        button = QRect(topleft, QSize(w, h));
-        if (videoOutput->MoveScaleDVDButton(button, scale,
-                                            topleft, crop))
+        QRect button(topleft, QSize(w, h));
+        QRect scaled = videoOutput->GetImageRect(button);
+        if (scaled.size() != button.size())
         {
-            hl_image = hl_image.scaled(scale);
-            if (!crop.isNull())
-            {
-                hl_image = hl_image.copy(crop.left(), crop.top(),
-                                         crop.width(), crop.height());
-            }
+            hl_image = hl_image.scaled(scaled.width(), scaled.height(),
+                       Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         }
 
         OSDTypeImage* image = new OSDTypeImage();
-        image->SetPosition(topleft, 1.0, 1.0);
+        image->SetPosition(scaled.topLeft(), 1.0f, 1.0f);
         image->Load(hl_image);
         image->SetDontRoundPosition(true);
 

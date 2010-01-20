@@ -1357,47 +1357,58 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 */
 }
 
-bool VideoOutput::MoveScaleDVDButton(QRect button, QSize &scale,
-                                     QPoint &position, QRect &crop)
+QRect VideoOutput::GetImageRect(const QRect &rect)
 {
-    // N.B. horizontal scaling/positioning may not work when the video width
-    // is not 720. I have no DVDs to test, for example, 704 x 576/480
-    float hscale, vscale, tmp = 0.0;
-    QRect vis_osd = GetVisibleOSDBounds(tmp, tmp, tmp);
-    QRect tot_osd = GetTotalOSDBounds();
-    QRect vid_rec = windows[0].GetVideoRect();
-
-    if (vid_rec.width() < 1 ||
-        vid_rec.height() < 1)
-        return false;
+    QRect result = rect;
+    float hscale, vscale, tmp;
+    tmp = 0.0;
+    QRect visible_osd  = GetVisibleOSDBounds(tmp, tmp, tmp);
+    QSize video_size   = windows[0].GetVideoDispDim();
+    int image_height   = video_size.height();
+    int image_width    = (image_height > 720) ? 1920 :
+                         (image_height > 576) ? 1280 : 720;
+    float image_aspect = (float)image_width / (float)image_height;
+    float pixel_aspect = (float)video_size.width() /
+                         (float)video_size.height();
 
     if (hasFullScreenOSD())
     {
         QRect dvr_rec = windows[0].GetDisplayVideoRect();
-        vscale = (float)dvr_rec.width() / (float)vid_rec.width();
-        hscale = (float)dvr_rec.height() / (float)vid_rec.height();
+        QRect vid_rec = windows[0].GetVideoRect();
 
-        QMatrix m;
-        m.translate(dvr_rec.left(), dvr_rec.top());
-        m.scale(vscale, hscale);
-        QRect adj_but = button;
-        adj_but.moveTopLeft(-vid_rec.topLeft());
-        crop = m.mapRect(adj_but);
-        QPoint cut = QPoint((crop.left() < 0) ? -crop.left() : 0,
-                            (crop.top() < 0) ? -crop.top() : 0);
-        scale = crop.size();
-        crop  = crop.intersected(tot_osd);
-        position = QPoint(crop.left(), crop.top());
-        crop.moveTopLeft(cut);
-        return true;
+        hscale = image_aspect / pixel_aspect;
+        if (hscale < 0.99f || hscale > 1.01f)
+        {
+            vid_rec.setLeft((int)(((float)vid_rec.left() * hscale) + 0.5f));
+            vid_rec.setWidth((int)(((float)vid_rec.width() * hscale) + 0.5f));
+        }
+
+        vscale = (float)dvr_rec.width() / (float)image_width;
+        hscale = (float)dvr_rec.height() / (float)image_height;
+        QMatrix m1;
+        m1.translate(dvr_rec.left(), dvr_rec.top());
+        m1.scale(vscale, hscale);
+
+        vscale = (float)image_width / (float)vid_rec.width();
+        hscale = (float)image_height / (float)vid_rec.height();
+        QMatrix m2;
+        m2.scale(vscale, hscale);
+        m2.translate(-vid_rec.left(), -vid_rec.top());
+
+        result = m2.mapRect(result);
+        result = m1.mapRect(result);
+        return result;
     }
 
-    crop = QRect(0,0,0,0);
-    scale = QSize(button.width(), button.height());
-    position = QPoint(button.left()- vis_osd.left(),
-                      button.top() - vis_osd.top());
+    hscale = pixel_aspect / image_aspect;
+    if (hscale < 0.99f || hscale > 1.01f)
+    {
+        result.setLeft((int)(((float)rect.left() * hscale) + 0.5f));
+        result.setWidth((int)(((float)rect.width() * hscale) + 0.5f));
+    }
 
-    return true;
+    result.translate(-visible_osd.left(), -visible_osd.top());
+    return result;
 }
 
 void VideoOutput::SetPIPState(PIPState setting)
