@@ -202,23 +202,15 @@ bool ArchiveFileSelector::Create(void)
     if (m_titleText)
         m_titleText->SetText(tr("Find File To Import"));
 
-    m_nextButton->SetText(tr("Next"));
     connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
-
-    m_prevButton->SetText(tr("Previous"));
     connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
 
     connect(m_locationEdit, SIGNAL(LosingFocus()),
             this, SLOT(locationEditLostFocus()));
     m_locationEdit->SetText(m_curDirectory);
 
-    m_backButton->SetText(tr("Back"));
     connect(m_backButton, SIGNAL(Clicked()), this, SLOT(backPressed()));
-
-    m_homeButton->SetText(tr("Home"));
     connect(m_homeButton, SIGNAL(Clicked()), this, SLOT(homePressed()));
 
     connect(m_fileButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
@@ -229,8 +221,6 @@ bool ArchiveFileSelector::Create(void)
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_fileButtonList);
 
     updateSelectedList();
     updateFileList();
@@ -347,13 +337,8 @@ bool ImportNative::Create(void)
         return false;
     }
 
-    m_finishButton->SetText(tr("Finish"));
     connect(m_finishButton, SIGNAL(Clicked()), this, SLOT(finishedPressed()));
-
-    m_prevButton->SetText(tr("Previous"));
     connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(prevPressed()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
 
     connect(m_searchChanID_button, SIGNAL(Clicked()), this, SLOT(searchChanID()));
@@ -377,8 +362,6 @@ bool ImportNative::Create(void)
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_finishButton);
 
     return true;
 }

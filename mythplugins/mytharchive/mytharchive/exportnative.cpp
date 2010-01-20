@@ -84,13 +84,8 @@ bool ExportNative::Create(void)
         return false;
     }
 
-    m_nextButton->SetText(tr("Finish"));
     connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(handleNextPage()));
-
-    m_prevButton->SetText(tr("Previous"));
     connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(handlePrevPage()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(handleCancel()));
 
 
@@ -98,16 +93,11 @@ bool ExportNative::Create(void)
     connect(m_archiveButtonList, SIGNAL(itemSelected(MythUIButtonListItem *)),
             this, SLOT(titleChanged(MythUIButtonListItem *)));
 
-    m_addrecordingButton->SetText(tr("Add Recording"));
     connect(m_addrecordingButton, SIGNAL(Clicked()), this, SLOT(handleAddRecording()));
-
-    m_addvideoButton->SetText(tr("Add Video"));
     connect(m_addvideoButton, SIGNAL(Clicked()), this, SLOT(handleAddVideo()));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_nextButton);
 
     loadConfiguration();
 

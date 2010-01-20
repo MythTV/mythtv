@@ -78,13 +78,8 @@ bool LogViewer::Create(void)
         return false;
     }
 
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelClicked()));
-
-    m_updateButton->SetText(tr("Update"));
     connect(m_updateButton, SIGNAL(Clicked()), this, SLOT(updateClicked()));
-
-    m_exitButton->SetText(tr("Exit"));
     connect(m_exitButton, SIGNAL(Clicked()), this, SLOT(Close()));
 
     connect(m_logList, SIGNAL(itemSelected(MythUIButtonListItem*)),
@@ -96,8 +91,6 @@ bool LogViewer::Create(void)
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_logList);
 
     return true;
 }

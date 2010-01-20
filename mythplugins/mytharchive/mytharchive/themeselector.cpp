@@ -70,13 +70,8 @@ bool ThemeSelector::Create(void)
         return false;
     }
 
-    m_nextButton->SetText(tr("Next"));
     connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(handleNextPage()));
-
-    m_prevButton->SetText(tr("Previous"));
     connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(handlePrevPage()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(handleCancel()));
 
     getThemeList();
@@ -85,8 +80,6 @@ bool ThemeSelector::Create(void)
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_nextButton);
 
     loadConfiguration();
 

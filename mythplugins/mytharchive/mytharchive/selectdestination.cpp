@@ -69,13 +69,8 @@ bool SelectDestination::Create(void)
         return false;
     }
 
-    m_nextButton->SetText(tr("Next"));
     connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(handleNextPage()));
-
-    m_prevButton->SetText(tr("Previous"));
     connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(handlePrevPage()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(handleCancel()));
 
     connect(m_destinationSelector, SIGNAL(itemSelected(MythUIButtonListItem*)),
@@ -87,7 +82,6 @@ bool SelectDestination::Create(void)
             MythUIButtonListItem(m_destinationSelector, tr(ArchiveDestinations[x].name));
         item->SetData(qVariantFromValue(ArchiveDestinations[x].type));
     }
-    m_findButton->SetText(tr("Find..."));
     connect(m_findButton, SIGNAL(Clicked()), this, SLOT(handleFind()));
 
     connect(m_filenameEdit, SIGNAL(LosingFocus()), this,
@@ -97,8 +91,6 @@ bool SelectDestination::Create(void)
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
     loadConfiguration();
-
-    SetFocusWidget(m_nextButton);
 
     return true;
 }

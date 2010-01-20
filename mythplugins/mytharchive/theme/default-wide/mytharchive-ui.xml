@@ -76,6 +76,7 @@ Common MythArchive window definitions
 
         <button name="find_button" from="basebutton">
             <position>750,225</position>
+            <value>Find</value>
         </button>
 
         <textarea name="freespace_label" from="basetextarea">
@@ -125,14 +126,17 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
             <position>900,650</position>
+            <value>Prev</value>
         </button>
 
         <button name="next_button" from="basebutton">
             <position>1060,650</position>
+            <value>Next</value>
         </button>
 
     </window>
@@ -242,10 +246,12 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok_button" from="basebutton">
             <position>1060,650</position>
+            <value>OK</value>
         </button>
 
     </window>
@@ -276,10 +282,12 @@ Common MythArchive window definitions
 
         <button name="back_button" from="basebutton">
             <position>625,70</position>
+            <value>Back</value>
         </button>
 
         <button name="home_button" from="basebutton">
             <position>785,70</position>
+            <value>Home</value>
         </button>
 
         <buttonlist name="filelist" from="basebuttonlist">
@@ -318,10 +326,12 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="ok_button" from="basebutton">
             <position>1060,650</position>
+            <value>OK</value>
         </button>
 
     </window>
@@ -440,10 +450,12 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position >
+            <value>Cancel</value>
         </button>
 
         <button name="ok_button" from="basebutton">
             <position>1060,650</position>
+            <value>OK</value>
         </button>
 
     </window>
@@ -508,14 +520,17 @@ Common MythArchive window definitions
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="update_button" from="basebutton">
             <position>500,650</position>
+            <value>Update</value>
         </button>
 
         <button name="exit_button" from="basebutton">
             <position>1060,650</position>
+            <value>Exit</value>
         </button>
 
     </window>

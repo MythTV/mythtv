@@ -151,18 +151,13 @@ bool ThumbFinder::Create(void)
     connect(m_imageGrid, SIGNAL(itemSelected(MythUIButtonListItem *)),
             this, SLOT(gridItemChanged(MythUIButtonListItem *)));
 
-    m_saveButton->SetText(tr("Save"));
     connect(m_saveButton, SIGNAL(Clicked()), this, SLOT(savePressed()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
 
     connect(m_frameButton, SIGNAL(Clicked()), this, SLOT(updateThumb()));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_imageGrid);
 
     return true;
 }

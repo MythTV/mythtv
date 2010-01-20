@@ -79,10 +79,12 @@ MythTV Archive GUI theme
 
         <button name="addrecording_button" from="basewidebutton">
             <position>250,300</position>
+            <value>Add Recording</value>
         </button>
 
         <button name="addvideo_button" from="basewidebutton">
             <position>800,300</position>
+            <value>Add video</value>
         </button>
 
         <shape name="bottombackground" from="basebackground">
@@ -157,14 +159,17 @@ MythTV Archive GUI theme
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
             <position>900,650</position>
+            <value>Prev</value>
         </button>
 
         <button name="next_button" from="basebutton">
             <position>1060,650</position>
+            <value>Next</value>
         </button>
 
     </window>
@@ -195,10 +200,12 @@ MythTV Archive GUI theme
 
         <button name="back_button" from="basebutton">
             <position>425,65</position>
+            <value>Back</value>
         </button>
 
         <button name="home_button" from="basebutton">
             <position>585,65</position>
+            <value>Home</value>
         </button>
 
         <buttonlist name="filelist" from="basebuttonlist">
@@ -262,14 +269,17 @@ MythTV Archive GUI theme
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
             <position>900,650</position>
+            <value>Prev</value>
         </button>
 
         <button name="next_button" from="basebutton">
             <position>1060,650</position>
+            <value>Next</value>
         </button>
 
     </window>
@@ -427,6 +437,7 @@ MythTV Archive GUI theme
 
         <button name="searchchanno_button" from="searchchanid_button">
             <position>500,580</position>
+            <value>Search Channel</value>
         </button>
 
         <textarea name="label9" from="label2">
@@ -440,6 +451,7 @@ MythTV Archive GUI theme
 
         <button name="searchcallsign_button" from="searchchanid_button">
             <position>980,540</position>
+            <value>Search Callsign</value>
         </button>
 
         <textarea name="label10" from="label2">
@@ -453,18 +465,22 @@ MythTV Archive GUI theme
 
         <button name="searchname_button" from="searchchanid_button">
             <position>980,580</position>
+            <value>Search Name</value>
         </button>
 
         <button name="cancel_button" from="basebutton">
             <position>55,650</position>
+            <value>Cancel</value>
         </button>
 
         <button name="prev_button" from="basebutton">
             <position>900,650</position>
+            <value>Prev</value>
         </button>
 
         <button name="finish_button" from="basebutton">
             <position>1060,650</position>
+            <value>Finish</value>
         </button>
 
   </window>

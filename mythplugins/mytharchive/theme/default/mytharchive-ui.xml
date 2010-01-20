@@ -68,6 +68,7 @@ Common MythArchive window definitions
 
         <button name="find_button" from="basebutton">
             <position>450,215</position>
+            <value>Find</value>
         </button>
 
         <textarea name="freespace_label" from="basetextarea">
@@ -123,10 +124,12 @@ Common MythArchive window definitions
 
         <button name="prev_button" from="basebutton">
             <position>440,550</position>
+            <value>Prev</value>
         </button>
 
         <button name="next_button" from="basebutton">
             <position>610,550</position>
+            <value>Next</value>
         </button>
 
     </window>
@@ -232,7 +235,7 @@ Common MythArchive window definitions
 
         <button name="ok_button" from="basebutton">
             <position>610,550</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
 
     </window>
@@ -255,10 +258,12 @@ Common MythArchive window definitions
 
         <button name="back_button" from="basebutton">
             <position>425,65</position>
+            <value>Back</value>
         </button>
 
         <button name="home_button" from="basebutton">
             <position>585,65</position>
+            <value>Home</value>
         </button>
 
         <buttonlist name="filelist" from="basebuttonlist">
@@ -302,7 +307,7 @@ Common MythArchive window definitions
 
         <button name="ok_button" from="basebutton">
             <position>610,550</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
 
     </window>
@@ -417,7 +422,7 @@ Common MythArchive window definitions
 
         <button name="ok_button" from="basebutton">
             <position>610,550</position>
-            <value>Ok</value>
+            <value>OK</value>
         </button>
 
     </window>
@@ -455,10 +460,12 @@ Common MythArchive window definitions
 
         <button name="update_button" from="basebutton">
             <position>320,550</position>
+            <value>Update</value>
         </button>
 
         <button name="exit_button" from="basebutton">
             <position>610,550</position>
+            <value>Exit</value>
         </button>
 
     </window>

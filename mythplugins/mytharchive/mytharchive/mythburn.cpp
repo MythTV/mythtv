@@ -108,13 +108,8 @@ bool MythBurn::Create(void)
         return false;
     }
 
-    m_nextButton->SetText(tr("Finish"));
     connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(handleNextPage()));
-
-    m_prevButton->SetText(tr("Previous"));
     connect(m_prevButton, SIGNAL(Clicked()), this, SLOT(handlePrevPage()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(handleCancel()));
 
 
@@ -123,24 +118,17 @@ bool MythBurn::Create(void)
 
     updateArchiveList();
 
-    m_addrecordingButton->SetText(tr("Add Recording"));
     connect(m_addrecordingButton, SIGNAL(Clicked()),
             this, SLOT(handleAddRecording()));
 
-    m_addvideoButton->SetText(tr("Add Video"));
     connect(m_addvideoButton, SIGNAL(Clicked()), this, SLOT(handleAddVideo()));
-
-    m_addfileButton->SetText(tr("Add File"));
     connect(m_addfileButton, SIGNAL(Clicked()), this, SLOT(handleAddFile()));
-
     connect(m_archiveButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             this, SLOT(itemClicked(MythUIButtonListItem *)));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT,
                 "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_nextButton);
 
     return true;
 }
@@ -1087,15 +1075,12 @@ bool ProfileDialog::Create()
 
     m_captionText->SetText(m_archiveItem->title);
     m_oldSizeText->SetText(formatSize(m_archiveItem->size / 1024, 2));
-    m_okButton->SetText(tr("Ok"));
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(save()));
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT,
                 "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_profile_list);
 
     return true;
 }

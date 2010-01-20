@@ -85,8 +85,6 @@ bool VideoSelector::Create(void)
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
 
-    SetFocusWidget(m_videoButtonList);
-
     updateSelectedList();
     updateVideoList();
 

@@ -82,20 +82,14 @@ bool FileSelector::Create(void)
         }
     }
 
-    m_okButton->SetText(tr("OK"));
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(OKPressed()));
-
-    m_cancelButton->SetText(tr("Cancel"));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(cancelPressed()));
 
     connect(m_locationEdit, SIGNAL(LosingFocus()),
             this, SLOT(locationEditLostFocus()));
     m_locationEdit->SetText(m_curDirectory);
 
-    m_backButton->SetText(tr("Back"));
     connect(m_backButton, SIGNAL(Clicked()), this, SLOT(backPressed()));
-
-    m_homeButton->SetText(tr("Home"));
     connect(m_homeButton, SIGNAL(Clicked()), this, SLOT(homePressed()));
 
     connect(m_fileButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
@@ -103,8 +97,6 @@ bool FileSelector::Create(void)
 
     if (!BuildFocusList())
         VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
-
-    SetFocusWidget(m_fileButtonList);
 
     updateSelectedList();
     updateFileList();
