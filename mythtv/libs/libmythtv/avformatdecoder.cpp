@@ -585,50 +585,58 @@ int AvFormatDecoder::GetNumChapters()
     return ic->nb_chapters;
 }
 
-int AvFormatDecoder::GetPrevChapter(int framesPlayed)
+void AvFormatDecoder::GetChapterTimes(QList<long long> &times)
 {
-    int framenum = 0;
-    int prevframenum = framesPlayed;
-    int prevchapter = 0;
-    for (unsigned int i=0; i < ic->nb_chapters; i++)
+    int total = GetNumChapters();
+    if (!total)
+        return;
+
+    for (int i = 0; i < total; i++)
     {
         int num = ic->chapters[i]->time_base.num;
         int den = ic->chapters[i]->time_base.den;
         int64_t start = ic->chapters[i]->start;
         long double total_secs = (long double)start * (long double)num / (long double)den;
-        framenum = (int)(total_secs * fps);
-        if (framenum > (framesPlayed - (int)(3.0f * fps)))
-        {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("GetPrevChapter(selected chapter %1 framenum %2)")
-                            .arg(prevchapter).arg(prevframenum));
-            return prevframenum;
-        }
-        prevframenum = framenum;
-        prevchapter = i;
+        times.push_back((long long)total_secs);
     }
-    return framenum;
 }
 
-int AvFormatDecoder::GetNextChapter(int framesPlayed)
+int AvFormatDecoder::GetCurrentChapter(long long framesPlayed)
 {
-    int framenum = 0;
-    for (unsigned int i=0; i < ic->nb_chapters; i++)
+    if (!GetNumChapters())
+        return 0;
+
+    for (int i = (ic->nb_chapters - 1); i > -1 ; i--)
     {
         int num = ic->chapters[i]->time_base.num;
         int den = ic->chapters[i]->time_base.den;
         int64_t start = ic->chapters[i]->start;
         long double total_secs = (long double)start * (long double)num / (long double)den;
-        framenum = (int)(total_secs * fps);
-        if (framenum > framesPlayed)
+        long long framenum = (long long)(total_secs * fps);
+        if (framesPlayed >= framenum)
         {
             VERBOSE(VB_IMPORTANT, LOC +
-                    QString("GetNextChapter(selected chapter %1 framenum %2)")
+                    QString("GetCurrentChapter(selected chapter %1 framenum %2)")
                             .arg(i).arg(framenum));
-            return framenum;
+            return i;
         }
     }
-    return framesPlayed;
+    return 0;
+}
+
+long long AvFormatDecoder::GetChapter(int chapter)
+{
+    if (chapter < 1 || chapter > GetNumChapters())
+        return -1;
+
+    int num = ic->chapters[chapter - 1]->time_base.num;
+    int den = ic->chapters[chapter - 1]->time_base.den;
+    int64_t start = ic->chapters[chapter - 1]->start;
+    long double total_secs = (long double)start * (long double)num / (long double)den;
+    long long framenum = (long long)(total_secs * fps);
+    VERBOSE(VB_PLAYBACK, LOC + QString("GetChapter %1: framenum %2")
+                               .arg(chapter).arg(framenum));
+    return framenum;
 }
 
 bool AvFormatDecoder::DoRewind(long long desiredFrame, bool discardFrames)

@@ -442,7 +442,9 @@ class MPUBLIC TV : public QThread
     float StopFFRew(PlayerContext*);
     void ChangeFFRew(PlayerContext*, int direction);
     void SetFFRew(PlayerContext*, int index);
-    int  GetNumChapters(PlayerContext*);
+    int  GetNumChapters(const PlayerContext*) const;
+    void GetChapterTimes(const PlayerContext*, QList<long long> &times) const;
+    int  GetCurrentChapter(const PlayerContext*) const;
     void DoJumpChapter(PlayerContext*, int direction);
     void DoSkipCommercials(PlayerContext*, int direction);
     void StartProgramEditMode(PlayerContext*);
@@ -538,6 +540,7 @@ class MPUBLIC TV : public QThread
 
     void FillOSDTreeMenu(       const PlayerContext*, OSDGenericTree*, QString category) const;
     void FillMenuPlaying(       const PlayerContext*, OSDGenericTree*, QString category) const;
+    void FillMenuAVChapter(     const PlayerContext*, OSDGenericTree*) const;
     void FillMenuPxP(           const PlayerContext*, OSDGenericTree*) const;
     void FillMenuInputSwitching(const PlayerContext*, OSDGenericTree*) const;
     void FillMenuVideoAspect(   const PlayerContext*, OSDGenericTree*) const;

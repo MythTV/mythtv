@@ -251,7 +251,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
                           void* cbData = NULL);
 
     // Chapter stuff
-    void JumpChapter(int direction);
+    void JumpChapter(int chapter);
 
     // Commercial stuff
     void SkipCommercials(int direction);
@@ -398,7 +398,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void FileChangedCallback();
 
     // Chapter public stuff
-    int GetNumChapters();
+    int  GetNumChapters();
+    int  GetCurrentChapter();
+    void GetChapterTimes(QList<long long> &times);
 
     // DVD public stuff
     void ChangeDVDTrack(bool ffw);
@@ -477,7 +479,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void RefreshPauseFrame(void);
 
     // Private chapter stuff
-    bool DoJumpChapter(int direction);
+    bool DoJumpChapter(int chapter);
 
     // Private commercial skipping
     void SkipCommercialsByBlanks(void);

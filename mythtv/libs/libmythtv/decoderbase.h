@@ -105,9 +105,10 @@ class DecoderBase
     virtual bool GetFrame(DecodeType) = 0;
     NuppelVideoPlayer *GetNVP() { return m_parent; }
 
-    virtual int GetNumChapters(void)             { return 0; }
-    virtual int GetNextChapter(int framesPlayed) { return framesPlayed; }
-    virtual int GetPrevChapter(int framesPlayed) { return framesPlayed; }
+    virtual int GetNumChapters(void)                      { return 0; }
+    virtual int GetCurrentChapter(long long framesPlayed) { return 0; }
+    virtual void GetChapterTimes(QList<long long> &times) { return;   }
+    virtual long long GetChapter(int chapter)             { return framesPlayed; }
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 

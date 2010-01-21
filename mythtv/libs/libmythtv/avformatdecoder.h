@@ -132,8 +132,9 @@ class AvFormatDecoder : public DecoderBase
     int ScanStreams(bool novideo);
 
     virtual int  GetNumChapters();
-    virtual int  GetPrevChapter(int framesPlayed);
-    virtual int  GetNextChapter(int framesPlayed);
+    virtual void GetChapterTimes(QList<long long> &times);
+    virtual int  GetCurrentChapter(long long framesPlayed);
+    virtual long long GetChapter(int chapter);
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 

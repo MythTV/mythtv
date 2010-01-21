@@ -4313,7 +4313,7 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         if (isDVD)
             DVDJumpForward(ctx);
         else if (GetNumChapters(ctx) > 0)
-            DoJumpChapter(ctx, 1);
+            DoJumpChapter(ctx, 9999);
         else
             DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
     }
@@ -4694,7 +4694,7 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
         else if (isDVD)
             DVDJumpForward(ctx);
         else if (GetNumChapters(ctx) > 0)
-            DoJumpChapter(ctx, 1);
+            DoJumpChapter(ctx, 9999);
         else
             DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
     }
@@ -6201,7 +6201,7 @@ void TV::DoQueueTranscode(PlayerContext *ctx, QString profile)
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 }
 
-int TV::GetNumChapters(PlayerContext *ctx)
+int TV::GetNumChapters(const PlayerContext *ctx) const
 {
     int num_chapters = 0;
     ctx->LockDeleteNVP(__FILE__, __LINE__);
@@ -6211,7 +6211,25 @@ int TV::GetNumChapters(PlayerContext *ctx)
     return num_chapters;
 }
 
-void TV::DoJumpChapter(PlayerContext *ctx, int direction)
+void TV::GetChapterTimes(const PlayerContext *ctx, QList<long long> &times) const
+{
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        ctx->nvp->GetChapterTimes(times);
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+}
+
+int TV::GetCurrentChapter(const PlayerContext *ctx) const
+{
+    int chapter = 0;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        chapter = ctx->nvp->GetCurrentChapter();
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    return chapter;
+}
+
+void TV::DoJumpChapter(PlayerContext *ctx, int chapter)
 {
     NormalSpeed(ctx);
     StopFFRew(ctx);
@@ -6229,17 +6247,14 @@ void TV::DoJumpChapter(PlayerContext *ctx, int direction)
     if (osd)
     {
         posInfo.desc = tr("Searching...");
-        if (direction < 0)
-            osd->ShowStatus(posInfo, slidertype, tr("Previous Chapter"), 3);
-        else
-            osd->ShowStatus(posInfo, slidertype, tr("Next Chapter"), 3);
+        osd->ShowStatus(posInfo, slidertype, tr("Jump Chapter"), 3);
         SetUpdateOSDPosition(true);
     }
     ReturnOSDLock(ctx, osd);
 
     ctx->LockDeleteNVP(__FILE__, __LINE__);
     if (ctx->nvp)
-        ctx->nvp->JumpChapter(direction);
+        ctx->nvp->JumpChapter(chapter);
     ctx->UnlockDeleteNVP(__FILE__, __LINE__);
 
     if (muted)
@@ -10094,6 +10109,11 @@ void TV::TreeMenuSelected(OSDListTreeItemSelectedEvent *e)
                 actx->nvp->GoToDVDMenu(menu);
             actx->UnlockDeleteNVP(__FILE__, __LINE__);
         }
+        else if (action.left(13) == "JUMPTOCHAPTER")
+        {
+            int chapter = action.right(3).toInt();
+            DoJumpChapter(actx, chapter);
+        }
         else if (action == "EDIT")
             StartProgramEditMode(actx);
         else if (action == "TOGGLEAUTOEXPIRE")
@@ -10199,6 +10219,8 @@ void TV::FillOSDTreeMenu(
         new OSDGenericTree(
             treeMenu, tr("DVD Chapter Menu"), "JUMPTODVDCHAPTERMENU");
     }
+    else if (category == "AVCHAPTER")
+        FillMenuAVChapter(ctx, treeMenu);
     else if (category == "GUIDE")
         new OSDGenericTree(treeMenu, tr("Program Guide"), "GUIDE");
     else if (category ==  "PIP")
@@ -10386,6 +10408,38 @@ void TV::FillMenuPlaying(
             sr_item, tr("Program Finder"),          "FINDER");
         new OSDGenericTree(
             sr_item, tr("Edit Recording Schedule"), "SCHEDULE");
+    }
+}
+
+/// \brief Adds AVChapter menu if chapters available
+void TV::FillMenuAVChapter(
+    const PlayerContext *ctx, OSDGenericTree *treeMenu) const
+{
+    int num_chapters = GetNumChapters(ctx);
+    if (!num_chapters)
+        return;
+
+    int current_chapter =  GetCurrentChapter(ctx);
+    QList<long long> times;
+    GetChapterTimes(ctx, times);
+    if (num_chapters != times.size())
+        return;
+
+    OSDGenericTree *item =
+        new OSDGenericTree(treeMenu, tr("Chapter"));
+
+    int size = QString::number(num_chapters).size();
+    for (int i = 0; i < num_chapters; i++)
+    {
+        int minutes = times[i] / 60;
+        int hours   = minutes / 60;
+        minutes = minutes - (hours * 60);
+        QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
+        QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
+        QString desc = chapter1 + QString(" (%1:%2)")
+            .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48));
+        new OSDGenericTree(item, desc, QString("JUMPTOCHAPTER%1").arg(chapter2),
+                           (current_chapter == i) ? 1 : 0);
     }
 }
 
