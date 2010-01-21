@@ -122,6 +122,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       transcoding(false),
       hasFullPositionMap(false),    limitKeyRepeat(false),
       errorMsg(QString::null),      errorType(kError_None),
+      // Chapter stuff
+      jumpchapter(0),
       // Bookmark stuff
       bookmarkseek(0),
       // Seek
@@ -3125,6 +3127,12 @@ bool NuppelVideoPlayer::JumpToFrame(long long frame)
 }
 
 
+void NuppelVideoPlayer::JumpChapter(int direction)
+{
+    if (jumpchapter == 0)
+        jumpchapter = direction;
+}
+
 void NuppelVideoPlayer::SkipCommercials(int direction)
 {
     if (skipcommercials == 0)
@@ -3454,6 +3462,7 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
     }
 
     rewindtime = fftime = 0;
+    jumpchapter = 0;
     skipcommercials = 0;
 
     if (bookmarkseek > 30)
@@ -3662,6 +3671,12 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
                 RefreshPauseFrame();
                 need_change_dvd_track = 0;
             }
+            else if (jumpchapter != 0)
+            {
+                DoJumpChapter(jumpchapter);
+                RefreshPauseFrame();
+                jumpchapter = 0;
+            }
             else if (player_ctx->tvchain && player_ctx->tvchain->NeedsToJump())
             {
                 JumpToProgram();
@@ -3722,6 +3737,17 @@ bool NuppelVideoPlayer::StartPlaying(bool openfile)
             UnpauseVideo(true);
 
             need_change_dvd_track = 0;
+        }
+
+        if (jumpchapter != 0)
+        {
+            QMutexLocker locker(&internalPauseLock);
+
+            PauseVideo(true);
+            DoJumpChapter(jumpchapter);
+            UnpauseVideo(true);
+
+            jumpchapter = 0;
         }
 
         if (skipcommercials != 0 && ffrew_skip == 1)
@@ -6578,6 +6604,40 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
     {
         ++commBreakIter;
     }
+}
+
+int NuppelVideoPlayer::GetNumChapters()
+{
+    return GetDecoder()->GetNumChapters();
+}
+
+bool NuppelVideoPlayer::DoJumpChapter(int direction)
+{
+  int desiredFrame = 0;
+
+  if (direction == -1)
+  {
+      desiredFrame = GetDecoder()->GetPrevChapter(framesPlayed);
+  }
+  else
+  {
+      desiredFrame = GetDecoder()->GetNextChapter(framesPlayed);
+  }
+
+  if (paused && !editmode)
+      GetDecoder()->setExactSeeks(true);
+  if (direction == -1)
+      GetDecoder()->DoRewind(desiredFrame);
+  else
+      GetDecoder()->DoFastForward(desiredFrame);
+  GetDecoder()->setExactSeeks(exactseeks);
+
+  // Note: The video output will be reset by what the the decoder
+  //       does, so we only need to reset the audio, subtitles, etc.
+  ClearAfterSeek(false);
+
+  lastSkipTime = time(NULL);
+  return true;
 }
 
 bool NuppelVideoPlayer::DoSkipCommercials(int direction)

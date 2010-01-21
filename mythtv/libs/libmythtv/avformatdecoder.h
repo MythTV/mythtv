@@ -131,6 +131,9 @@ class AvFormatDecoder : public DecoderBase
 
     int ScanStreams(bool novideo);
 
+    virtual int  GetNumChapters();
+    virtual int  GetPrevChapter(int framesPlayed);
+    virtual int  GetNextChapter(int framesPlayed);
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 

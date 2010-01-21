@@ -580,6 +580,57 @@ static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
     return  ((lsb - base_ts)&mask);
 }
 
+int AvFormatDecoder::GetNumChapters()
+{
+    return ic->nb_chapters;
+}
+
+int AvFormatDecoder::GetPrevChapter(int framesPlayed)
+{
+    int framenum = 0;
+    int prevframenum = framesPlayed;
+    int prevchapter = 0;
+    for (unsigned int i=0; i < ic->nb_chapters; i++)
+    {
+        int num = ic->chapters[i]->time_base.num;
+        int den = ic->chapters[i]->time_base.den;
+        int64_t start = ic->chapters[i]->start;
+        long double total_secs = (long double)start * (long double)num / (long double)den;
+        framenum = (int)(total_secs * fps);
+        if (framenum > (framesPlayed - (int)(3.0f * fps)))
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("GetPrevChapter(selected chapter %1 framenum %2)")
+                            .arg(prevchapter).arg(prevframenum));
+            return prevframenum;
+        }
+        prevframenum = framenum;
+        prevchapter = i;
+    }
+    return framenum;
+}
+
+int AvFormatDecoder::GetNextChapter(int framesPlayed)
+{
+    int framenum = 0;
+    for (unsigned int i=0; i < ic->nb_chapters; i++)
+    {
+        int num = ic->chapters[i]->time_base.num;
+        int den = ic->chapters[i]->time_base.den;
+        int64_t start = ic->chapters[i]->start;
+        long double total_secs = (long double)start * (long double)num / (long double)den;
+        framenum = (int)(total_secs * fps);
+        if (framenum > framesPlayed)
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    QString("GetNextChapter(selected chapter %1 framenum %2)")
+                            .arg(i).arg(framenum));
+            return framenum;
+        }
+    }
+    return framesPlayed;
+}
+
 bool AvFormatDecoder::DoRewind(long long desiredFrame, bool discardFrames)
 {
     VERBOSE(VB_PLAYBACK, LOC + "DoRewind("
@@ -1099,6 +1150,23 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Successfully opened decoder for file: "
                     "\"%1\". novideo(%2)").arg(filename).arg(novideo));
+
+    // Print AVChapter information
+    for (unsigned int i=0; i < ic->nb_chapters; i++)
+    {
+        int num = ic->chapters[i]->time_base.num;
+        int den = ic->chapters[i]->time_base.den;
+        int64_t start = ic->chapters[i]->start;
+        long double total_secs = (long double)start * (long double)num / (long double)den;
+        int hours = (int)total_secs / 60 / 60;
+        int minutes = ((int)total_secs / 60) - (hours * 60);
+        double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
+        VERBOSE(VB_PLAYBACK, LOC + QString("Chapter %1 found @ [%2:%3:%4]")
+                .arg(QString().sprintf("%02d", i))
+                .arg(QString().sprintf("%02d", hours))
+                .arg(QString().sprintf("%02d", minutes))
+                .arg(QString().sprintf("%06.3f", secs)));
+    }
 
     // Return true if recording has position map
     return recordingHasPositionMap;

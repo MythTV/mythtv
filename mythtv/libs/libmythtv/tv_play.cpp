@@ -4303,6 +4303,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     {
         if (isDVD)
             DVDJumpBack(ctx);
+        else if (GetNumChapters(ctx) > 0)
+            DoJumpChapter(ctx, -1);
         else
             DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
     }
@@ -4310,6 +4312,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
     {
         if (isDVD)
             DVDJumpForward(ctx);
+        else if (GetNumChapters(ctx) > 0)
+            DoJumpChapter(ctx, 1);
         else
             DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
     }
@@ -4673,6 +4677,8 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
         }
         else if (isDVD)
             DVDJumpBack(ctx);
+        else if (GetNumChapters(ctx) > 0)
+            DoJumpChapter(ctx, -1);
         else
             DoSeek(ctx, -ctx->jumptime * 60, tr("Jump Back"));
     }
@@ -4687,6 +4693,8 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
         }
         else if (isDVD)
             DVDJumpForward(ctx);
+        else if (GetNumChapters(ctx) > 0)
+            DoJumpChapter(ctx, 1);
         else
             DoSeek(ctx, ctx->jumptime * 60, tr("Jump Ahead"));
     }
@@ -6191,6 +6199,51 @@ void TV::DoQueueTranscode(PlayerContext *ctx, QString profile)
         }
     }
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+}
+
+int TV::GetNumChapters(PlayerContext *ctx)
+{
+    int num_chapters = 0;
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        num_chapters = ctx->nvp->GetNumChapters();
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+    return num_chapters;
+}
+
+void TV::DoJumpChapter(PlayerContext *ctx, int direction)
+{
+    NormalSpeed(ctx);
+    StopFFRew(ctx);
+
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    bool muted = MuteChannelChange(ctx);
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+    struct StatusPosInfo posInfo;
+    ctx->CalcNVPSliderPosition(posInfo);
+
+    bool slidertype = false;
+
+    OSD *osd = GetOSDLock(ctx);
+    if (osd)
+    {
+        posInfo.desc = tr("Searching...");
+        if (direction < 0)
+            osd->ShowStatus(posInfo, slidertype, tr("Previous Chapter"), 3);
+        else
+            osd->ShowStatus(posInfo, slidertype, tr("Next Chapter"), 3);
+        SetUpdateOSDPosition(true);
+    }
+    ReturnOSDLock(ctx, osd);
+
+    ctx->LockDeleteNVP(__FILE__, __LINE__);
+    if (ctx->nvp)
+        ctx->nvp->JumpChapter(direction);
+    ctx->UnlockDeleteNVP(__FILE__, __LINE__);
+
+    if (muted)
+        SetMuteTimer(ctx, kMuteTimeout);
 }
 
 void TV::DoSkipCommercials(PlayerContext *ctx, int direction)

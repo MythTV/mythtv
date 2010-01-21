@@ -250,6 +250,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
                           void* cbData = NULL);
 
+    // Chapter stuff
+    void JumpChapter(int direction);
+
     // Commercial stuff
     void SkipCommercials(int direction);
     int FlagCommercials(bool showPercentage, bool fullSpeed,
@@ -394,6 +397,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void CheckTVChain();
     void FileChangedCallback();
 
+    // Chapter public stuff
+    int GetNumChapters();
+
     // DVD public stuff
     void ChangeDVDTrack(bool ffw);
     void ActivateDVDButton(void);
@@ -469,6 +475,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool FrameIsInMap(long long frameNumber, QMap<long long, int> &breakMap);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
     void RefreshPauseFrame(void);
+
+    // Private chapter stuff
+    bool DoJumpChapter(int direction);
 
     // Private commercial skipping
     void SkipCommercialsByBlanks(void);
@@ -579,6 +588,9 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     mutable QMutex   errorLock;
     mutable QString  errorMsg;   ///< Reason why NVP exited with a error
     mutable int errorType;
+
+    // Chapter stuff
+    int jumpchapter;
 
     // Bookmark stuff
     long long bookmarkseek;

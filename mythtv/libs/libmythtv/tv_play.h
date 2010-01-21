@@ -442,6 +442,8 @@ class MPUBLIC TV : public QThread
     float StopFFRew(PlayerContext*);
     void ChangeFFRew(PlayerContext*, int direction);
     void SetFFRew(PlayerContext*, int index);
+    int  GetNumChapters(PlayerContext*);
+    void DoJumpChapter(PlayerContext*, int direction);
     void DoSkipCommercials(PlayerContext*, int direction);
     void StartProgramEditMode(PlayerContext*);
 
