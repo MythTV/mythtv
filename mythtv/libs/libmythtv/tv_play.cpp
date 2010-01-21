@@ -922,7 +922,7 @@ TV::TV(void)
     for (uint i = 0; i < sizeof(ff_rew_def)/sizeof(ff_rew_def[0]); i++)
         kv[QString("FFRewSpeed%1").arg(i)] = QString::number(ff_rew_def[i]);
 
-    bool ok = MythDB::getMythDB()->GetSettings(kv);
+    MythDB::getMythDB()->GetSettings(kv);
 
     // convert from minutes to ms.
     db_idle_timeout        = kv["LiveTVIdleTimeout"].toInt() * 60 * 1000;
