@@ -1524,7 +1524,7 @@ bool MythContext::ConnectToMasterServer(bool blockingClient)
             .arg(blockingClient ? "Playback" : "Monitor")
             .arg(d->m_localhostname).arg(false);
         d->serverSock = ConnectCommandSocket(
-            server, port, ann, &proto_mismatch);
+            server, port, ann, &proto_mismatch, d->m_gui);
     }
 
     if (!d->serverSock)
