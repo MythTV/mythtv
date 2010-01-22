@@ -13,6 +13,8 @@ isEmpty(TARGET_OS) : win32 {
     DEFINES += USING_MINGW
     # Qt4 creates separate compile directories by default. This disables:
     CONFIG -= debug_and_release debug_and_release_target
+    # Some shared libs we depend on are installed here:
+    LIBS += -L/bin
 }
 
 DEFINES += _GNU_SOURCE
