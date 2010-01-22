@@ -160,13 +160,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!UpgradeTVDatabaseSchema(false))
-    {
-        VERBOSE(VB_IMPORTANT, "Incorrect database schema.");
-        delete gContext;
-        return GENERIC_EXIT_DB_OUTOFDATE;
-    }
-
     // Create priveledged thread, then drop privs
     pthread_t priv_thread;
     bool priv_thread_created = true;
@@ -215,10 +208,17 @@ int main(int argc, char *argv[])
 
     TV::InitKeys();
 
+    if (!UpgradeTVDatabaseSchema(false))
+    {
+        VERBOSE(VB_IMPORTANT, "Fatal Error: Incorrect database schema.");
+        delete gContext;
+        return GENERIC_EXIT_DB_OUTOFDATE;
+    }
+
     TV *tv = new TV();
     if (!tv->Init())
     {
-        VERBOSE(VB_IMPORTANT, "Fatal Error: Could not initializing TV class.");
+        VERBOSE(VB_IMPORTANT, "Fatal Error: Could not initialize TV class.");
         return TV_EXIT_NO_TV;
     }
 

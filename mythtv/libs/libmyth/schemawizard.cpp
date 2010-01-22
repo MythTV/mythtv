@@ -263,7 +263,7 @@ SchemaUpgradeWizard::PromptForUpgrade(const char *name,
 
 
     connections = CountClients() > 1;
-    gui         = GetMythUI()->IsScreenSetup();
+    gui         = GetMythUI()->IsScreenSetup() && gContext->GetMainWindow();
     validDBMS   = (minDBMSmajor == 0)   // If the caller provided no version,
                   ? true                // the upgrade code can't be fussy!
                   : CompareDBMSVersion(minDBMSmajor,
