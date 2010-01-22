@@ -111,16 +111,16 @@ int main(int argc, char *argv[])
 
     while (argpos < a.argc())
     {
-        if (a.argv()[argpos][0] != '-')
-        {
-            filename = a.argv()[argpos];
-        }
         if (cmdline.Parse(a.argc(), a.argv(), argpos, cmdline_err))
         {
             if (cmdline_err)
                 return GENERIC_EXIT_INVALID_CMDLINE;
             if (cmdline.WantsToExit())
                 return GENERIC_EXIT_OK;
+        }
+        else if (a.argv()[argpos][0] != '-')
+        {
+            filename = a.argv()[argpos];
         }
         else
         {
