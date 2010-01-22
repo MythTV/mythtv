@@ -62,7 +62,7 @@ MythQtPainter::~MythQtPainter()
 {
 }
 
-void MythQtPainter::Begin(QWidget *parent)
+void MythQtPainter::Begin(QPaintDevice *parent)
 {
     if (!parent)
     {

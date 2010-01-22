@@ -26,12 +26,12 @@ class MPUBLIC MythPainter
     virtual bool SupportsAlpha(void) = 0;
     virtual bool SupportsClipping(void) = 0;
 
-    virtual void Begin(QWidget *parent) { m_Parent = parent; }
+    virtual void Begin(QPaintDevice *parent) { m_Parent = parent; }
     virtual void End() { m_Parent = NULL; }
 
     virtual void SetClipRect(const QRect &clipRect);
 
-    QWidget *GetParent(void) { return m_Parent; }
+    QPaintDevice *GetParent(void) { return m_Parent; }
 
     virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
                            int alpha) = 0;
@@ -56,7 +56,7 @@ class MPUBLIC MythPainter
     virtual void DeleteFormatImage(MythImage *im) = 0;
 
   protected:
-    QWidget *m_Parent;
+    QPaintDevice *m_Parent;
 };
 
 #endif  

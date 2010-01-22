@@ -21,7 +21,7 @@ class MythQtPainter : public MythPainter
     virtual bool SupportsAlpha(void) { return true; }
     virtual bool SupportsClipping(void) { return true; }
 
-    virtual void Begin(QWidget *parent);
+    virtual void Begin(QPaintDevice *parent);
     virtual void End();
 
     virtual void SetClipRect(const QRect &clipRect);

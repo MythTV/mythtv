@@ -79,7 +79,7 @@ MythOpenGLPainter::~MythOpenGLPainter()
     }
 }
 
-void MythOpenGLPainter::Begin(QWidget *parent)
+void MythOpenGLPainter::Begin(QPaintDevice *parent)
 {
     if (!parent)
     {

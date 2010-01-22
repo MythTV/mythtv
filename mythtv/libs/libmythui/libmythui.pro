@@ -27,6 +27,7 @@ HEADERS += screensaver.h screensaver-null.h mythsystem.h x11colors.h
 HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
+HEADERS += mythrender_base.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp
@@ -66,8 +67,8 @@ INSTALLS += inc
 
 using_vdpau {
     DEFINES += USING_VDPAU
-    HEADERS += mythpainter_vdpau.h
-    SOURCES += mythpainter_vdpau.cpp
+    HEADERS += mythpainter_vdpau.h   mythrender_vdpau.h
+    SOURCES += mythpainter_vdpau.cpp mythrender_vdpau.cpp
     LIBS += -lvdpau
 }
 

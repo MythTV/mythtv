@@ -20,7 +20,7 @@ class MythOpenGLPainter : public MythPainter
     virtual bool SupportsAlpha(void) { return true; }
     virtual bool SupportsClipping(void) { return false; }
 
-    virtual void Begin(QWidget *parent);
+    virtual void Begin(QPaintDevice *parent);
     virtual void End();
 
     virtual void DrawImage(const QRect &dest, MythImage *im, const QRect &src,
