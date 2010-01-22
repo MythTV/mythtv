@@ -6,9 +6,10 @@
 #include "mythrender_vdpau.h"
 
 // NB this may be API dependant
-#ifndef VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L9
-#define VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L9 (VdpVideoMixerFeature)19
+#ifndef VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1
+#define VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 (VdpVideoMixerFeature)11
 #endif
+#define NUM_SCALING_LEVELS 9
 
 #define LOC      QString("VDPAU: ")
 #define LOC_ERR  QString("VDPAU Error: ")
@@ -316,7 +317,7 @@ MythRenderVDPAU::MythRenderVDPAU()
     m_render_lock(QMutex::Recursive), m_decode_lock(QMutex::Recursive),
     m_display(NULL), m_window(0), m_device(0), m_surface(0),
     m_flipQueue(0),  m_flipTarget(0), m_flipReady(false), m_colorKey(0),
-    vdp_get_proc_address(NULL), vdp_get_error_string(NULL)
+    m_best_scaling(0), vdp_get_proc_address(NULL), vdp_get_error_string(NULL)
 {
     LOCK_ALL
     ResetProcs();
@@ -353,6 +354,7 @@ bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
     CREATE_CHECK(CreatePresentationSurfaces(), "No presentation surfaces")
     CREATE_CHECK(SetColorKey(colorkey), "No colorkey")
     CREATE_CHECK(RegisterCallback(), "No callback")
+    CREATE_CHECK(GetBestScaling(), "")
 
     if (ok)
     {
@@ -654,7 +656,7 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
     int count = 0;
     VdpVideoMixerFeature feat[6];
     VdpBool enable = true;
-    const VdpBool enables[5] = { enable, enable, enable, enable, enable };
+    const VdpBool enables[6] = { enable, enable, enable, enable, enable, enable };
 
     bool temporal = (features & kVDPFeatTemporal) ||
                     (features & kVDPFeatSpatial);
@@ -690,10 +692,12 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
 
     if (features & kVDPFeatHQScaling)
     {
-        if (IsFeatureAvailable(VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L9))
+        if (m_best_scaling)
         {
-            feat[count] = VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L9;
+            feat[count] = m_best_scaling;
             count++;
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Enabling high quality scaling."));
         }
         else
             VERBOSE(VB_PLAYBACK, LOC + "High quality scaling not available");
@@ -1113,16 +1117,6 @@ bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, float value)
     return SetMixerAttribute(id, &attr, &val);
 }
 
-bool MythRenderVDPAU::IsFeatureAvailable(uint feature)
-{
-    INIT_ST
-    VdpBool supported = false;
-    vdp_st = vdp_video_mixer_query_feature_support(m_device,
-                feature, &supported);
-    CHECK_ST
-    return ok && supported;
-}
-
 bool MythRenderVDPAU::UploadBitmap(uint id, void* const plane[1], uint32_t pitch[1])
 {
     LOCK_RENDER
@@ -1490,6 +1484,32 @@ bool MythRenderVDPAU::RegisterCallback(bool enable)
     return ok;
 }
 
+bool MythRenderVDPAU::GetBestScaling(void)
+{
+    for (int i = 0; i < NUM_SCALING_LEVELS; i++)
+        if (IsFeatureAvailable(VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + i))
+            m_best_scaling = VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + i;
+
+    if (m_best_scaling)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + QString("HQ scaling level %1 of %2 available.")
+            .arg(m_best_scaling - VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + 1)
+            .arg(NUM_SCALING_LEVELS));
+    }
+
+    return true;
+}
+
+bool MythRenderVDPAU::IsFeatureAvailable(uint feature)
+{
+    INIT_ST
+    VdpBool supported = false;
+    vdp_st = vdp_video_mixer_query_feature_support(m_device,
+                feature, &supported);
+    CHECK_ST
+    return ok && supported;
+}
+
 void MythRenderVDPAU::Destroy(void)
 {
     DestroyPresentationQueue();
@@ -1504,6 +1524,7 @@ void MythRenderVDPAU::Destroy(void)
     DestroyDevice();
     ResetProcs();
 
+    m_best_scaling = 0;
     m_master  = kMasterUI;
     m_size    = QSize();
     m_errored = false;

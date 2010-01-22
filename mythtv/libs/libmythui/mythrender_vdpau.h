@@ -105,7 +105,6 @@ class MythRenderVDPAU : public MythRender
     bool ChangeVideoMixerFeatures(uint id, uint features);
     bool SetMixerAttribute(uint id, uint attrib, int value);
     bool SetMixerAttribute(uint id, uint attrib, float value);
-    bool IsFeatureAvailable(uint feature);
 
     bool UploadBitmap(uint id, void* const plane[1], uint32_t pitch[1]);
     bool UploadMythImage(uint id, MythImage *image);
@@ -127,6 +126,8 @@ class MythRenderVDPAU : public MythRender
     bool CreatePresentationQueue(void);
     bool CreatePresentationSurfaces(void);
     bool RegisterCallback(bool enable = true);
+    bool GetBestScaling(void);
+    bool IsFeatureAvailable(uint feature);
 
     void Destroy(void);
     void DestroyDevice(void);
@@ -162,6 +163,7 @@ class MythRenderVDPAU : public MythRender
     VdpPresentationQueueTarget       m_flipTarget;
     bool                             m_flipReady;
     uint                             m_colorKey;
+    uint                             m_best_scaling;
 
     QVector<uint>                    m_surfaces;
     QHash<uint, VDPAUOutputSurface>  m_outputSurfaces;

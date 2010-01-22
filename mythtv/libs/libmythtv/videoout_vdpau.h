@@ -124,7 +124,6 @@ class VideoOutputVDPAU : public VideoOutput
 
     bool                 m_using_piccontrols;
     bool                 m_skip_chroma;
-    bool                 m_hq_scaling;
     float                m_denoise;
     float                m_sharpen;
     bool                 m_studio;

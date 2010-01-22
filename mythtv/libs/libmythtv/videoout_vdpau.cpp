@@ -33,8 +33,8 @@ VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
     m_osd_alpha_surface(0),  m_osd_mixer(0),   m_osd_ready(false),
     m_osd_avail(false),      m_osd_size(QSize()),
     m_using_piccontrols(false),
-    m_skip_chroma(false),    m_hq_scaling(false),
-    m_denoise(0.0f),         m_sharpen(0.0f),  m_studio(false),
+    m_skip_chroma(false),    m_denoise(0.0f),
+    m_sharpen(0.0f),         m_studio(false),
     m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
 {
     if (gContext->GetNumSetting("UseVideoModes", 0))
@@ -167,13 +167,6 @@ bool VideoOutputVDPAU::InitBuffers(void)
     }
     else
     {
-        if (m_hq_scaling && m_render->IsFeatureAvailable(kVDPFeatHQScaling))
-        {
-            VERBOSE(VB_PLAYBACK, LOC +
-                    QString("Enabling high quality scaling."));
-            m_mixer_features |= kVDPFeatHQScaling;
-        }
-
         m_video_mixer = m_render->CreateVideoMixer(video_dim, 2,
                                                    m_mixer_features);
         ok = m_video_mixer;
@@ -1102,7 +1095,6 @@ void VideoOutputVDPAU::RemovePIP(NuppelVideoPlayer *pipplayer)
 
 void VideoOutputVDPAU::ParseOptions(void)
 {
-    m_hq_scaling  = false;
     m_skip_chroma = false;
     m_denoise     = 0.0f;
     m_sharpen     = 0.0f;
@@ -1194,7 +1186,9 @@ void VideoOutputVDPAU::ParseOptions(void)
         }
         else if (name.contains("vdpauhqscaling"))
         {
-            m_hq_scaling = true;
+            m_mixer_features |= kVDPFeatHQScaling;
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Requesting high quality scaling."));
         }
     }
 }
