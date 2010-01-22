@@ -20,10 +20,6 @@ using namespace std;
 
 #include "mythdeque.h"
 
-#ifdef USING_VDPAU
-class VDPAUContext;
-#endif
-
 #ifdef USING_X11
 class MythXDisplay;
 #endif
@@ -170,10 +166,7 @@ class VideoBuffers
                        vector<void*> surfs);
 #endif
 
-#ifdef USING_VDPAU
-    bool CreateBuffers(int width, int height, VDPAUContext *ctx);
-    void Add(int width, int height, VDPAUContext *ctx, int num);
-#endif
+    bool CreateBuffer(int width, int height, uint num, void *data);
 
     QString GetStatus(int n=-1) const; // debugging method
   private:

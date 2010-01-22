@@ -1,25 +1,41 @@
 #include "mythcontext.h"
 #include "NuppelVideoPlayer.h"
 #include "videooutbase.h"
-#include "util-vdpau.h"
 #include "videoout_vdpau.h"
 #include "videodisplayprofile.h"
 #include "osd.h"
 #include "osdsurface.h"
 #include "mythxdisplay.h"
-#include "mythmainwindow.h"
-#include "mythuihelper.h"
 
 #define LOC      QString("VidOutVDPAU: ")
 #define LOC_ERR  QString("VidOutVDPAU Error: ")
 #define NUM_VDPAU_BUFFERS 17
 
+#define CHECK_ERROR(Loc) \
+  if (m_render && m_render->IsErrored()) \
+      errorState = kError_Unknown; \
+  if (IsErrored()) \
+  { \
+      VERBOSE(VB_IMPORTANT, LOC_ERR + QString("IsErrored() in %1").arg(Loc)); \
+      return; \
+  }
+
 VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
   : VideoOutput(),
-    m_codec_id(codec_id), m_win(0),
-    m_disp(NULL), m_ctx(NULL), m_colorkey(0x020202),
-    m_lock(QMutex::Recursive), m_osd_avail(false), m_pip_avail(true),
-    m_buffer_size(NUM_VDPAU_BUFFERS)
+    m_codec_id(codec_id),    m_win(0),         m_render(NULL),
+    m_buffer_size(NUM_VDPAU_BUFFERS),          m_pause_surface(0),
+    m_need_deintrefs(false), m_video_mixer(0), m_mixer_features(kVDPFeatNone),
+    m_checked_surface_ownership(false),
+    m_decoder(0),            m_pix_fmt(-1),    m_frame_delay(0),
+    m_lock(QMutex::Recursive), m_pip_layer(0), m_pip_surface(0),
+    m_pip_ready(false),
+    m_osd_layer(0),          m_osd_surface(0), m_osd_output_surface(0),
+    m_osd_alpha_surface(0),  m_osd_mixer(0),   m_osd_ready(false),
+    m_osd_avail(false),      m_osd_size(QSize()),
+    m_using_piccontrols(false),
+    m_skip_chroma(false),    m_hq_scaling(false),
+    m_denoise(0.0f),         m_sharpen(0.0f),  m_studio(false),
+    m_colorspace(VDP_COLOR_STANDARD_ITUR_BT_601)
 {
     if (gContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes(true);
@@ -34,17 +50,18 @@ VideoOutputVDPAU::~VideoOutputVDPAU()
 void VideoOutputVDPAU::TearDown(void)
 {
     QMutexLocker locker(&m_lock);
-    m_pip_avail = true;
-    m_osd_avail = false;
+    DeinitPIPS();
+    DeinitPIPLayer();
     DeleteBuffers();
-    DeleteContext();
-    DeleteXDisplay();
+    RestoreDisplay();
+    DeleteRender();
 }
 
 bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
                             int winx, int winy, int winw, int winh, WId embedid)
 {
     (void) embedid;
+    m_win = winid;
     QMutexLocker locker(&m_lock);
     windows[0].SetNeedRepaint(true);
     bool ok = VideoOutput::Init(width, height, aspect,
@@ -52,155 +69,191 @@ bool VideoOutputVDPAU::Init(int width, int height, float aspect, WId winid,
                                 embedid);
     if (db_vdisp_profile)
         db_vdisp_profile->SetVideoRenderer("vdpau");
-    ok = ok ? InitXDisplay(winid) : ok;
+
     InitDisplayMeasurements(width, height, true);
-    ok = ok ? InitContext()       : ok;
-    ok = ok ? InitBuffers()       : ok;
+    ParseOptions();
+    if (ok) ok = InitRender();
+    if (ok) ok = InitBuffers();
     if (!ok)
     {
         TearDown();
         return ok;
     }
 
-    if (db_use_picture_controls)
+    m_using_piccontrols = (db_use_picture_controls || m_studio ||
+                           m_colorspace != VDP_COLOR_STANDARD_ITUR_BT_601);
+    if (m_using_piccontrols)
         InitPictureAttributes();
     MoveResize();
     VERBOSE(VB_PLAYBACK, LOC +
             QString("Created VDPAU context (%1 decode)")
             .arg(codec_is_std(m_codec_id) ? "software" : "GPU"));
 
-    if (m_ctx->InitOSD(GetTotalOSDBounds().size()))
-        m_osd_avail = true;
-    else
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-            QString("Failed to create VDPAU osd."));
-
     return ok;
 }
 
-bool VideoOutputVDPAU::InitContext(void)
-{
-    if (m_ctx || !m_disp)
-        return false;
-
-    QMutexLocker locker(&m_lock);
-    const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-    m_ctx = new VDPAUContext();
-    bool ok = m_ctx;
-    ok = ok ? m_ctx->Init(m_disp, m_win,
-                          display_visible_rect.size(),
-                          db_use_picture_controls,
-                          m_colorkey, m_codec_id, GetFilters()): ok;
-    if (!ok)
-        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to initialise VDPAU"));
-    return ok;
-}
-
-void VideoOutputVDPAU::DeleteContext(void)
+bool VideoOutputVDPAU::InitRender(void)
 {
     QMutexLocker locker(&m_lock);
 
-    if (m_disp)
-        m_disp->Lock();
+    const QSize size = windows[0].GetDisplayVisibleRect().size();
+    const QRect rect = QRect(QPoint(0,0), size);
+    m_render = new MythRenderVDPAU();
 
-    if (m_ctx)
+    if (m_render && m_render->Create(size, m_win))
     {
-        m_ctx->Deinit();
-        delete m_ctx;
+        m_render->SetMaster(kMasterVideo);
+        InitOSD(GetTotalOSDBounds().size());
+        return true;
     }
-    m_ctx = NULL;
 
-    if (m_disp)
-        m_disp->Unlock();
+    VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Failed to initialise VDPAU"));
+
+    return false;
+}
+
+void VideoOutputVDPAU::DeleteRender(void)
+{
+    QMutexLocker locker(&m_lock);
+
+    if (m_render)
+    {
+        DeinitOSD();
+
+        if (m_decoder)
+            m_render->DestroyDecoder(m_decoder);
+
+        delete m_render;
+    }
+
+    m_decoder = 0;
+    m_render = NULL;
+    m_pix_fmt = -1;
 }
 
 bool VideoOutputVDPAU::InitBuffers(void)
 {
-    if (!m_ctx)
+    if (!m_render)
         return false;
 
     QMutexLocker locker(&m_lock);
     const QSize video_dim = windows[0].GetVideoDim();
 
-    ParseBufferSize();
-
     vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1, false);
-    bool ok = m_ctx->InitBuffers(video_dim.width(), video_dim.height(),
-                                 m_buffer_size, db_letterbox_colour);
 
-    if (codec_is_vdpau(m_codec_id) && ok)
+    bool ok = false;
+    if (codec_is_vdpau(m_codec_id))
     {
-        ok = vbuffers.CreateBuffers(video_dim.width(),
-                                    video_dim.height(), m_ctx);
+        ok = CreateVideoSurfaces(m_buffer_size);
+        if (ok)
+        {
+            for (int i = 0; i < m_video_surfaces.size(); i++)
+                ok &= vbuffers.CreateBuffer(video_dim.width(),
+                                    video_dim.height(), i,
+                                    m_render->GetRender(m_video_surfaces[i]));
+        }
     }
-    else if (codec_is_std(m_codec_id) && ok)
+    else if (codec_is_std(m_codec_id))
     {
-        ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
+        ok = CreateVideoSurfaces(NUM_REFERENCE_FRAMES);
+        if (ok)
+            ok = vbuffers.CreateBuffers(video_dim.width(), video_dim.height());
     }
 
     if (!ok)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Unable to create VDPAU buffers"));
+    }
+    else
+    {
+        if (m_hq_scaling && m_render->IsFeatureAvailable(kVDPFeatHQScaling))
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Enabling high quality scaling."));
+            m_mixer_features |= kVDPFeatHQScaling;
+        }
+
+        m_video_mixer = m_render->CreateVideoMixer(video_dim, 2,
+                                                   m_mixer_features);
+        ok = m_video_mixer;
+        m_pause_surface = m_video_surfaces[0];
+
+        if (ok && (m_mixer_features & kVDPFeatSharpness))
+            m_render->SetMixerAttribute(m_video_mixer,
+                                        kVDPAttribSharpness,
+                                        m_sharpen);
+        if (ok && (m_mixer_features & kVDPFeatDenoise))
+            m_render->SetMixerAttribute(m_video_mixer,
+                                        kVDPAttribNoiseReduction,
+                                        m_denoise);
+        if (ok && m_skip_chroma)
+            m_render->SetMixerAttribute(m_video_mixer,
+                                        kVDPAttribSkipChroma, 1);
+
+        if (ok && (db_letterbox_colour == kLetterBoxColour_Gray25))
+            m_render->SetMixerAttribute(m_video_mixer,
+                                        kVDPAttribBackground, 0x7F7F7FFF);
+    }
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unable to create VDPAU mixer"));
         DeleteBuffers();
     }
+
     return ok;
+}
+
+bool VideoOutputVDPAU::CreateVideoSurfaces(uint num)
+{
+    if (!m_render || num < 1)
+        return false;
+
+    bool ret = true;
+    QSize size = windows[0].GetVideoDim();
+    for (uint i = 0; i < num; i++)
+    {
+        uint tmp = m_render->CreateVideoSurface(size);
+        if (tmp)
+        {
+            m_video_surfaces.push_back(tmp);
+            m_render->ClearVideoSurface(tmp);
+        }
+        else
+        {
+            ret = false;
+            break;
+        }
+    }
+    return ret;
+}
+
+void VideoOutputVDPAU::DeleteVideoSurfaces(void)
+{
+    if (!m_render || !m_video_surfaces.size())
+        return;
+
+    for (int i = 0; i < m_video_surfaces.size(); i++)
+        m_render->DestroyVideoSurface(m_video_surfaces[i]);
+    m_video_surfaces.clear();
 }
 
 void VideoOutputVDPAU::DeleteBuffers(void)
 {
     QMutexLocker locker(&m_lock);
+    if (m_render && m_video_mixer)
+        m_render->DestroyVideoMixer(m_video_mixer);
+    m_video_mixer = 0;
+    m_checked_surface_ownership = false;
     DiscardFrames(true);
-    if (m_ctx)
-        m_ctx->FreeBuffers();
+    DeleteVideoSurfaces();
     vbuffers.Reset();
     vbuffers.DeleteBuffers();
 }
 
-bool VideoOutputVDPAU::InitXDisplay(WId wid)
-{
-    QMutexLocker locker(&m_lock);
-    bool ok = true;
-    if (wid <= 0)
-    {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Invalid Window ID."));
-        ok = false;
-    }
-
-    if (ok)
-    {
-        m_disp = OpenMythXDisplay();
-        if (!m_disp)
-        {
-            VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Failed to open display."));
-            ok = false;
-        }
-    }
-
-    if (ok)
-    {
-        m_win = wid;
-        // if the color depth is less than 24 just use black for colorkey
-        int depth = m_disp->GetDepth();
-        if (depth < 24)
-            m_colorkey = 0x0;
-        VERBOSE(VB_PLAYBACK, LOC + QString("VDPAU Colorkey: 0x%1 (depth %2)")
-                .arg(m_colorkey, 0, 16).arg(depth));
-
-        if (!m_disp->CreateGC(m_win))
-        {
-            VERBOSE(VB_PLAYBACK, LOC + QString("Failed to create GC."));
-            ok = false;
-        }
-    }
-
-    if (!ok)
-        DeleteXDisplay();
-
-    return ok;
-}
-
-void VideoOutputVDPAU::DeleteXDisplay(void)
+void VideoOutputVDPAU::RestoreDisplay(void)
 {
     QMutexLocker locker(&m_lock);
 
@@ -213,40 +266,75 @@ void VideoOutputVDPAU::DeleteXDisplay(void)
     }
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
 
-    if (m_disp)
+    if (m_render && m_render->GetDisplay())
     {
-        m_disp->SetForeground(m_disp->GetBlack());
-        m_disp->FillRectangle(m_win, display_visible_rect);
-        delete m_disp;
-        m_disp = NULL;
+        m_render->GetDisplay()->SetForeground(m_render->GetDisplay()->GetBlack());
+        m_render->GetDisplay()->FillRectangle(m_win, display_visible_rect);
     }
 }
 
 bool VideoOutputVDPAU::SetDeinterlacingEnabled(bool interlaced)
 {
-    if (!m_ctx)
-        return false;
+    if ((interlaced && m_deinterlacing) ||
+       (!interlaced && !m_deinterlacing))
+        return m_deinterlacing;
 
-    if (m_ctx->GetDeinterlacer() != m_deintfiltername)
-        return SetupDeinterlace(interlaced);
-
-    m_deinterlacing = m_ctx->SetDeinterlacing(interlaced);
-    return m_deinterlacing;
+    return SetupDeinterlace(interlaced);
 }
 
 bool VideoOutputVDPAU::SetupDeinterlace(bool interlaced,
                                         const QString &override)
 {
-    if (!m_ctx)
+    if (!m_render)
         return false;
 
-    m_deintfiltername = db_vdisp_profile->GetFilteredDeint(override);
-    if (!m_deintfiltername.contains("vdpau"))
-        return false;
+    m_lock.lock();
+    bool enable = interlaced;
 
-    m_ctx->SetDeinterlacer(m_deintfiltername);
-    m_deinterlacing = m_ctx->SetDeinterlacing(interlaced);
-    return m_deinterlacing;
+    if (enable)
+    {
+        m_deintfiltername = db_vdisp_profile->GetFilteredDeint(override);
+        if (m_deintfiltername.contains("vdpau"))
+        {
+            uint features = kVDPFeatNone;
+            bool spatial  = m_deintfiltername.contains("advanced");
+            bool temporal = m_deintfiltername.contains("basic") || spatial;
+            m_need_deintrefs = spatial || temporal;
+
+            if (temporal)
+                features += kVDPFeatTemporal;
+
+            if (spatial)
+                features += kVDPFeatSpatial;
+
+            enable = m_render->SetDeinterlacing(m_video_mixer, features);
+            if (enable)
+            {
+                m_deinterlacing = true;
+                VERBOSE(VB_PLAYBACK, LOC + QString("Enabled deinterlacing."));
+            }
+            else
+            {
+                enable = false;
+                VERBOSE(VB_PLAYBACK, LOC +
+                                    QString("Failed to enable deinterlacing."));
+            }
+        }
+        else
+        {
+            enable = false;
+        }
+    }
+
+    if (!enable)
+    {
+        m_render->SetDeinterlacing(m_video_mixer);
+        m_deintfiltername = QString();
+        m_deinterlacing   = false;
+        m_need_deintrefs  = false;
+    }
+    m_lock.unlock();
+    return enable;
 }
 
 bool VideoOutputVDPAU::ApproveDeintFilter(const QString &filtername) const
@@ -259,42 +347,117 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
                                     const PIPMap &pipPlayers,
                                     FrameScanType scan)
 {
-    if (m_ctx->IsErrored())
-        errorState = m_ctx->GetError();
+    CHECK_ERROR("ProcessFrame")
 
-    if (IsErrored())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in ProcessFrame()");
-        return;
-    }
+    if (!m_checked_surface_ownership && codec_is_std(m_codec_id))
+        ClaimVideoSurfaces();
 
-    if (m_osd_avail && osd)
+    m_osd_ready = false;
+    if (m_osd_avail)
         DisplayOSD(frame, osd);
+
     ShowPIPs(frame, pipPlayers);
 }
 
 void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
 {
-    if (m_ctx->IsErrored())
-        errorState = m_ctx->GetError();
+    CHECK_ERROR("PrepareFrame")
 
-    if (IsErrored())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in PrepareFrame()");
+    if (!m_render)
         return;
+
+    QMutexLocker locker(&m_lock);
+    bool new_frame = false;
+    if (frame)
+    {
+        // FIXME for 0.23. This should be triggered from AFD by a seek
+        if ((abs(frame->frameNumber - framesPlayed) > 8))
+            ClearReferenceFrames();
+        new_frame = (framesPlayed != frame->frameNumber + 1);
+        framesPlayed = frame->frameNumber + 1;
     }
 
-    if (frame)
-        framesPlayed = frame->frameNumber + 1;
+    uint video_surface = m_video_surfaces[0];
+    bool deint = (m_deinterlacing && m_need_deintrefs && frame);
 
-    if (!m_ctx)
-        return;
+    if (deint)
+    {
+        if (new_frame)
+            UpdateReferenceFrames(frame);
+        if (m_reference_frames.size() != NUM_REFERENCE_FRAMES)
+            deint = false;
+    }
 
-    m_ctx->PrepareVideo(
-        frame, windows[0].GetVideoRect(), 
-        vsz_enabled ? vsz_desired_display_rect :
-                      windows[0].GetDisplayVideoRect(),
-        windows[0].GetDisplayVisibleRect().size(), scan);
+    if (!codec_is_std(m_codec_id) && frame)
+    {
+        struct vdpau_render_state *render =
+            (struct vdpau_render_state *)frame->buf;
+        if (!render)
+            return;
+        video_surface = m_render->GetSurfaceOwner(render->surface);
+    }
+    else if (new_frame && frame)
+    {
+        // FIXME - reference frames for software decode
+        if (deint)
+            video_surface = m_video_surfaces[(framesPlayed + 1) %
+                            NUM_REFERENCE_FRAMES];
+
+        uint32_t pitches[3] = {
+            frame->pitches[0],
+            frame->pitches[2],
+            frame->pitches[1]
+        };
+        void* const planes[3] = {
+            frame->buf,
+            frame->buf + frame->offsets[2],
+            frame->buf + frame->offsets[1]
+        };
+
+        if (!m_render->UploadYUVFrame(video_surface, planes, pitches))
+            return;
+    }
+    else if (!frame)
+    {
+        deint = false;
+        video_surface = m_pause_surface;
+    }
+
+    VdpVideoMixerPictureStructure field =
+        VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
+
+    if (scan == kScan_Interlaced && m_deinterlacing)
+    {
+        field = frame->top_field_first ?
+                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD :
+                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD;
+    }
+    else if (scan == kScan_Intr2ndField && m_deinterlacing)
+    {
+        field = frame->top_field_first ?
+                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_BOTTOM_FIELD :
+                VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD;
+    }
+    else if (!frame && m_deinterlacing)
+    {
+        field = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_TOP_FIELD;
+    }
+
+    m_render->WaitForFlip();
+
+    QSize size = windows[0].GetDisplayVisibleRect().size();
+    if (size != m_render->GetSize())
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Unexpected display size."));
+
+    if (!m_render->MixAndRend(m_video_mixer, field, video_surface, 0,
+                              deint ? &m_reference_frames : NULL,
+                              scan == kScan_Interlaced,
+                              windows[0].GetVideoRect(), size,
+                              vsz_enabled ? vsz_desired_display_rect :
+                                            windows[0].GetDisplayVideoRect(),
+                              m_pip_ready ? m_pip_layer : 0,
+                              m_osd_ready ? m_osd_layer : 0))
+        VERBOSE(VB_PLAYBACK, LOC_ERR + QString("Prepare frame failed."));
 
     if (!frame)
     {
@@ -304,6 +467,18 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
     }
 }
 
+void VideoOutputVDPAU::ClaimVideoSurfaces(void)
+{
+    if (!m_render)
+        return;
+
+    QMutexLocker locker(&m_lock);
+    QVector<uint>::iterator it;
+    for (it = m_video_surfaces.begin(); it != m_video_surfaces.end(); ++it)
+        m_render->ChangeVideoSurfaceOwner(*it);
+    m_checked_surface_ownership = true;
+}
+
 void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 {
     (void)x;
@@ -311,36 +486,114 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
     (void)w;
     (void)h;
 
-    if (m_ctx->IsErrored())
-        errorState = m_ctx->GetError();
+    CHECK_ERROR("DrawSlice")
 
-    if (IsErrored())
+    if (codec_is_std(m_codec_id) || !m_render)
+        return;
+
+    if (!m_checked_surface_ownership)
+        ClaimVideoSurfaces();
+
+    struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
+    if (!render)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() is true in DrawSlice()");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("No video surface to decode to."));
+        errorState = kError_Unknown;
         return;
     }
 
-    if (m_ctx)
-        m_ctx->Decode(frame);
+    if (frame->pix_fmt != m_pix_fmt)
+    {
+        if (m_decoder)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Picture format has changed."));
+            errorState = kError_Unknown;
+            return;
+        }
+
+        uint max_refs = 2;
+        if (frame->pix_fmt == PIX_FMT_VDPAU_H264)
+        {
+            max_refs = render->info.h264.num_ref_frames;
+            if (max_refs < 1 || max_refs > 16)
+            {
+                uint32_t round_width  = (frame->width + 15) & ~15;
+                uint32_t round_height = (frame->height + 15) & ~15;
+                uint32_t surf_size    = (round_width * round_height * 3) / 2;
+                max_refs = (12 * 1024 * 1024) / surf_size;
+            }
+            if (max_refs > 16)
+                max_refs = 16;
+        }
+
+        VdpDecoderProfile vdp_decoder_profile;
+        switch (frame->pix_fmt)
+        {
+            case PIX_FMT_VDPAU_MPEG1:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG1;
+                break;
+            case PIX_FMT_VDPAU_MPEG2:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_MAIN;
+                break;
+            case PIX_FMT_VDPAU_H264:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_H264_HIGH;
+                break;
+            case PIX_FMT_VDPAU_WMV3:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_MAIN;
+                break;
+            case PIX_FMT_VDPAU_VC1:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_VC1_ADVANCED;
+                break;
+            default:
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Picture format is not supported."));
+                errorState = kError_Unknown;
+                return;
+        }
+
+        m_decoder = m_render->CreateDecoder(QSize(frame->width, frame->height),
+                                            vdp_decoder_profile, max_refs);
+        if (m_decoder)
+        {
+            m_pix_fmt = frame->pix_fmt;
+            VERBOSE(VB_PLAYBACK, LOC +
+                QString("Created VDPAU decoder (%1 ref frames)")
+                .arg(max_refs));
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to create decoder."));
+            errorState = kError_Unknown;
+            return;
+        }
+    }
+    else if (!m_decoder)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Pix format already set but no VDPAU decoder."));
+        errorState = kError_Unknown;
+        return;
+    }
+
+    m_render->Decode(m_decoder, render);
 }
 
 void VideoOutputVDPAU::Show(FrameScanType scan)
 {
-    if (!m_ctx)
-        return;
-    if (m_ctx->IsErrored())
-        errorState = m_ctx->GetError();
-    if (IsErrored())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() is true in Show()");
-        return;
-    }
+    CHECK_ERROR("Show")
 
     if (windows[0].IsRepaintNeeded())
         DrawUnusedRects(false);
 
-    m_ctx->DisplayNextFrame();
-    m_disp->Sync();
+    if (m_render)
+    {
+        m_render->Flip(m_frame_delay);
+        m_render->GetDisplay()->Sync();
+        m_frame_delay = 0;
+    }
     CheckFrameStates();
 }
 
@@ -427,22 +680,21 @@ void VideoOutputVDPAU::StopEmbedding(void)
 
 void VideoOutputVDPAU::MoveResizeWindow(QRect new_rect)
 {
-    if (m_disp)
-        m_disp->MoveResizeWin(m_win, new_rect);
+    if (m_render && m_render->GetDisplay())
+        m_render->GetDisplay()->MoveResizeWin(m_win, new_rect);
 }
 
 void VideoOutputVDPAU::DrawUnusedRects(bool sync)
 {
-    if (windows[0].IsRepaintNeeded())
+    if (windows[0].IsRepaintNeeded() && m_render && m_render->GetDisplay())
     {
         const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-        m_disp->SetForeground(m_colorkey);
-        m_disp->FillRectangle(m_win, display_visible_rect);
+        m_render->GetDisplay()->SetForeground(m_render->GetColorKey());
+        m_render->GetDisplay()->FillRectangle(m_win, display_visible_rect);
         windows[0].SetNeedRepaint(false);
+        if (sync)
+            m_render->GetDisplay()->Sync();
     }
-
-    if (sync)
-        m_disp->Sync();
 }
 
 void VideoOutputVDPAU::UpdatePauseFrame(void)
@@ -452,33 +704,100 @@ void VideoOutputVDPAU::UpdatePauseFrame(void)
     VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame() " + vbuffers.GetStatus());
 
     vbuffers.begin_lock(kVideoBuffer_used);
-    if (vbuffers.size(kVideoBuffer_used) && m_ctx)
-        m_ctx->UpdatePauseFrame(vbuffers.head(kVideoBuffer_used));
+
+    if (vbuffers.size(kVideoBuffer_used) && m_render)
+    {
+        VideoFrame *frame = vbuffers.head(kVideoBuffer_used);
+        if (codec_is_std(m_codec_id))
+        {
+            m_pause_surface = m_video_surfaces[0];
+            uint32_t pitches[3] = { frame->pitches[0],
+                                    frame->pitches[2],
+                                    frame->pitches[1] };
+            void* const planes[3] = { frame->buf,
+                                      frame->buf + frame->offsets[2],
+                                      frame->buf + frame->offsets[1] };
+            m_render->UploadYUVFrame(m_video_surfaces[0], planes, pitches);
+        }
+        else
+        {
+            struct vdpau_render_state *render =
+                    (struct vdpau_render_state *)frame->buf;
+            if (render)
+                m_pause_surface = m_render->GetSurfaceOwner(render->surface);
+        }
+    }
     else
-        VERBOSE(VB_PLAYBACK,LOC_ERR +
-            QString("Failed to update the pause frame."));
+        VERBOSE(VB_PLAYBACK,LOC +
+            QString("WARNING: Could not update pause frame - no used frames."));
+
     vbuffers.end_lock();
 }
 
 void VideoOutputVDPAU::InitPictureAttributes(void)
 {
-    if (!m_ctx)
-        return;
-
-    supported_attributes = m_ctx->GetSupportedPictureAttributes();
+    supported_attributes = (PictureAttributeSupported)
+                           (kPictureAttributeSupported_Brightness |
+                            kPictureAttributeSupported_Contrast |
+                            kPictureAttributeSupported_Colour |
+                            kPictureAttributeSupported_Hue);
     VERBOSE(VB_PLAYBACK, LOC + QString("PictureAttributes: %1")
             .arg(toString(supported_attributes)));
     VideoOutput::InitPictureAttributes();
+
+    if (m_render && m_video_mixer)
+    {
+        if (m_studio)
+            m_render->SetMixerAttribute(m_video_mixer,
+                                        kVDPAttribStudioLevels, 1);
+
+        if (m_colorspace < 0)
+        {
+            QSize size = windows[0].GetVideoDim();
+            m_colorspace = (size.width() > 720 || size.height() > 576) ?
+                            VDP_COLOR_STANDARD_ITUR_BT_709 :
+                            VDP_COLOR_STANDARD_ITUR_BT_601;
+            VERBOSE(VB_PLAYBACK, LOC + QString("Using ITU %1 colorspace")
+                        .arg((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
+                        "BT.601" : "BT.709"));
+        }
+
+        if (m_colorspace != VDP_COLOR_STANDARD_ITUR_BT_601)
+            m_render->SetMixerAttribute(m_video_mixer,
+                                        kVDPAttribColorStandard,
+                                        m_colorspace);
+    }
 }
 
 int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
                                           int newValue)
 {
-    if (!supported_attributes || !m_ctx)
+    if (!m_using_piccontrols || !m_render || !m_video_mixer)
         return -1;
-
     newValue = min(max(newValue, 0), 100);
-    newValue = m_ctx->SetPictureAttribute(attribute, newValue);
+
+    uint vdpau_attrib = kVDPAttribNone;
+    switch (attribute)
+    {
+        case kPictureAttribute_Brightness:
+            vdpau_attrib = kVDPAttribBrightness;
+            break;
+        case kPictureAttribute_Contrast:
+            vdpau_attrib = kVDPAttribContrast;
+            break;
+        case kPictureAttribute_Colour:
+            vdpau_attrib = kVDPAttribColour;
+            break;
+        case kPictureAttribute_Hue:
+            vdpau_attrib = kVDPAttribHue;
+            break;
+        default:
+            newValue = -1;
+    }
+
+    if (vdpau_attrib != kVDPAttribNone)
+        m_render->SetMixerAttribute(m_video_mixer, vdpau_attrib, newValue);
+
     if (newValue >= 0)
         SetPictureAttributeDBValue(attribute, newValue);
     return newValue;
@@ -529,19 +848,49 @@ DisplayInfo VideoOutputVDPAU::GetDisplayInfo(void)
     return ret;
 }
 
-void VideoOutputVDPAU::SetNextFrameDisplayTimeOffset(int delayus)
+void VideoOutputVDPAU::UpdateReferenceFrames(VideoFrame *frame)
 {
-    if (m_ctx)
-        m_ctx->SetNextFrameDisplayTimeOffset(delayus);
+    while (m_reference_frames.size() > (NUM_REFERENCE_FRAMES - 1))
+        m_reference_frames.pop_front();
+
+    uint ref = m_video_surfaces[(framesPlayed +1)  % NUM_REFERENCE_FRAMES];
+    if (!codec_is_std(m_codec_id))
+    {
+        struct vdpau_render_state *render =
+            (struct vdpau_render_state *)frame->buf;
+        if (render)
+            ref = m_render->GetSurfaceOwner(render->surface);
+    }
+
+    m_reference_frames.push_back(ref);
+}
+
+bool VideoOutputVDPAU::FrameIsInUse(VideoFrame *frame)
+{
+    if (!frame || codec_is_std(m_codec_id))
+        return false;
+
+    QMutexLocker locker(&m_lock);
+    uint ref = 0;
+    struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
+    if (render)
+        ref = m_render->GetSurfaceOwner(render->surface);
+    return m_reference_frames.contains(ref);
+}
+
+void VideoOutputVDPAU::ClearReferenceFrames(void)
+{
+    m_lock.lock();
+    m_reference_frames.clear();
+    m_lock.unlock();
 }
 
 void VideoOutputVDPAU::DiscardFrame(VideoFrame *frame)
 {
-    if (!frame || !m_ctx)
+    if (!frame)
         return;
 
-    bool displaying = m_ctx->IsBeingUsed(frame);
-    if (displaying)
+    if (FrameIsInUse(frame))
         vbuffers.safeEnqueue(kVideoBuffer_displayed, frame);
     else
     {
@@ -553,8 +902,7 @@ void VideoOutputVDPAU::DiscardFrames(bool next_frame_keyframe)
 {
     VERBOSE(VB_PLAYBACK, LOC + "DiscardFrames("<<next_frame_keyframe<<")");
     CheckFrameStates();
-    if (m_ctx)
-        m_ctx->ClearReferenceFrames();
+    ClearReferenceFrames();
     vbuffers.DiscardFrames(next_frame_keyframe);
     VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1 -- done()")
             .arg(vbuffers.GetStatus()));
@@ -569,15 +917,12 @@ void VideoOutputVDPAU::DoneDisplayingFrame(VideoFrame *frame)
 
 void VideoOutputVDPAU::CheckFrameStates(void)
 {
-    if (!m_ctx)
-        return;
-
     frame_queue_t::iterator it;
     it = vbuffers.begin_lock(kVideoBuffer_displayed);
     while (it != vbuffers.end(kVideoBuffer_displayed))
     {
         VideoFrame* frame = *it;
-        if (!m_ctx->IsBeingUsed(frame))
+        if (!FrameIsInUse(frame))
         {
             if (vbuffers.contains(kVideoBuffer_decode, frame))
             {
@@ -600,39 +945,56 @@ void VideoOutputVDPAU::CheckFrameStates(void)
     vbuffers.end_lock();
 }
 
-int VideoOutputVDPAU::DisplayOSD(VideoFrame *frame, OSD *osd,
-                                  int stride, int revision)
+bool VideoOutputVDPAU::InitPIPLayer(QSize size)
 {
-    if (!osd || !m_ctx)
-        return -1;
+    if (!m_render)
+        return false;
 
-    OSDSurface *surface = osd->Display();
-    if (!surface)
+    if (!m_pip_surface)
+        m_pip_surface = m_render->CreateOutputSurface(size);
+
+    if (!m_pip_layer && m_pip_surface)
+        m_pip_layer = m_render->CreateLayer(m_pip_surface);
+
+    return (m_pip_surface && m_pip_layer);
+}
+
+void VideoOutputVDPAU::DeinitPIPS(void)
+{
+    while (!m_pips.empty())
     {
-        m_ctx->DisableOSD();
-        return -1;
+        RemovePIP(m_pips.begin().key());
+        m_pips.erase(m_pips.begin());
     }
 
-    bool changed = (-1 == revision) ?
-        surface->Changed() : (surface->GetRevision()!=revision);
-    if (changed)
+    m_pip_ready = false;
+}
+
+void VideoOutputVDPAU::DeinitPIPLayer(void)
+{
+    if (m_render)
     {
-        QSize visible = GetTotalOSDBounds().size();
-        void *offsets[3], *alpha[1];
-        offsets[0] = surface->y;
-        offsets[1] = surface->u;
-        offsets[2] = surface->v;
-        alpha[0] = surface->alpha;
-        m_ctx->UpdateOSD(offsets, visible, alpha);
+        if (m_pip_surface)
+        {
+            m_render->DestroyOutputSurface(m_pip_surface);
+            m_pip_surface = 0;
+        }
+
+        if (m_pip_layer)
+        {
+            m_render->DestroyLayer(m_pip_layer);
+            m_pip_layer = 0;
+        }
     }
-    return changed;
+
+    m_pip_ready = false;
 }
 
 void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, NuppelVideoPlayer *pipplayer,
                                PIPLocation loc)
 {
     (void) frame;
-    if (!pipplayer || !m_ctx)
+    if (!pipplayer || !m_render)
         return;
 
     int pipw, piph;
@@ -649,40 +1011,279 @@ void VideoOutputVDPAU::ShowPIP(VideoFrame *frame, NuppelVideoPlayer *pipplayer,
         return;
     }
 
-    if (m_pip_avail && 
-        m_ctx->InitPIPLayer(windows[0].GetDisplayVisibleRect().size()))
+    if (InitPIPLayer(windows[0].GetDisplayVisibleRect().size()))
     {
-        m_pip_avail = m_ctx->ShowPIP(pipplayer, pipimage,
-                                     GetPIPRect(loc, pipplayer), pipActive);
+        if (m_pips.contains(pipplayer) &&
+            m_pips[pipplayer].videoSize != pipVideoDim)
+            RemovePIP(pipplayer);
+
+        if (!m_pips.contains(pipplayer))
+        {
+            uint mixer = m_render->CreateVideoMixer(pipVideoDim, 0, 0);
+            uint surf  = m_render->CreateVideoSurface(pipVideoDim);
+            vdpauPIP tmp = { pipVideoDim, surf, mixer};
+            m_pips.insert(pipplayer, tmp);
+            if (!mixer || !surf)
+                RemovePIP(pipplayer);
+            else
+                VERBOSE(VB_IMPORTANT, LOC + QString("Created pip %1x%2")
+                    .arg(pipVideoDim.width()).arg(pipVideoDim.height()));
+        }
+
+        if (m_pips.contains(pipplayer))
+        {
+            QRect rect = GetPIPRect(loc, pipplayer);
+
+            if (!m_pip_ready)
+                m_render->DrawBitmap(0, m_pip_surface, NULL, NULL, 0, 0, 0, 0);
+
+            uint32_t pitches[] = {
+                pipimage->pitches[0],
+                pipimage->pitches[2],
+                pipimage->pitches[1] };
+            void* const planes[] = {
+                pipimage->buf,
+                pipimage->buf + pipimage->offsets[2],
+                pipimage->buf + pipimage->offsets[1] };
+
+            bool ok;
+            ok = m_render->UploadYUVFrame(m_pips[pipplayer].videoSurface,
+                                          planes, pitches);
+            ok &= m_render->MixAndRend(m_pips[pipplayer].videoMixer,
+                                       VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
+                                       m_pips[pipplayer].videoSurface,
+                                       m_pip_surface, NULL, false,
+                                       QRect(QPoint(0,0), pipVideoDim),
+                                       windows[0].GetDisplayVisibleRect().size(),
+                                       rect);
+            ok &= m_render->DrawBitmap(0, m_pip_surface, NULL, &rect,
+                                       255, 0, 0, 0, true);
+
+            if (pipActive)
+            {
+                // TODO this could be one rect rendered before the video frame
+                QRect l = QRect(QPoint(rect.x() - 10, rect.y() - 10),
+                                QSize(10, rect.height() + 20));
+                QRect t = QRect(QPoint(rect.x(), rect.y() - 10),
+                                QSize(rect.width(), 10));
+                QRect b = QRect(QPoint(rect.x(), rect.y() + rect.height()),
+                                QSize(rect.width(), 10));
+                QRect r = QRect(QPoint(rect.x() + rect.width(), rect.y() -10),
+                                QSize(10, rect.height() + 20));
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &l, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &t, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &b, 255, 127);
+                m_render->DrawBitmap(0, m_pip_surface, NULL, &r, 255, 127);
+            }
+
+            m_pip_ready = ok;
+        }
     }
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
 void VideoOutputVDPAU::RemovePIP(NuppelVideoPlayer *pipplayer)
 {
-    if (m_ctx)
-        m_ctx->DeinitPIP(pipplayer);
+    if (!m_pips.contains(pipplayer))
+        return;
+
+    if (m_pips[pipplayer].videoSurface && m_render)
+        m_render->DestroyVideoSurface(m_pips[pipplayer].videoSurface);
+
+    if (m_pips[pipplayer].videoMixer)
+        m_render->DestroyVideoMixer(m_pips[pipplayer].videoMixer);
+
+    m_pips.remove(pipplayer);
+    VERBOSE(VB_PLAYBACK, LOC + "Removed 1 PIP");
+
+    if (m_pips.empty())
+        DeinitPIPLayer();
 }
 
-void VideoOutputVDPAU::ParseBufferSize(void)
+void VideoOutputVDPAU::ParseOptions(void)
 {
+    m_hq_scaling  = false;
+    m_skip_chroma = false;
+    m_denoise     = 0.0f;
+    m_sharpen     = 0.0f;
+    m_studio      = false;
+    m_colorspace  = VDP_COLOR_STANDARD_ITUR_BT_601;
+    m_buffer_size = NUM_VDPAU_BUFFERS;
+    m_mixer_features = kVDPFeatNone;
+
     QStringList list = GetFilters().split(",");
     if (list.empty())
         return;
 
     for (QStringList::Iterator i = list.begin(); i != list.end(); ++i)
     {
-        QString name = (*i).section('=', 0, 0);
-        if (!name.contains("vdpaubuffersize"))
+        QString name = (*i).section('=', 0, 0).toLower();
+        QString opts = (*i).section('=', 1).toLower();
+
+        if (!name.contains("vdpau"))
             continue;
 
-        uint num = (*i).section('=', 1).toUInt();
-        if (6 <= num && num <= 50)
+        if (name.contains("vdpaubuffersize"))
         {
-            m_buffer_size = num;
-            VERBOSE(VB_IMPORTANT, LOC +
-                        QString("VDPAU video buffer size: %1 (default %2)")
-                        .arg(m_buffer_size).arg(NUM_VDPAU_BUFFERS));
+            uint num = opts.toUInt();
+            if (6 <= num && num <= 50)
+            {
+                m_buffer_size = num;
+                VERBOSE(VB_PLAYBACK, LOC +
+                            QString("VDPAU video buffer size: %1 (default %2)")
+                            .arg(m_buffer_size).arg(NUM_VDPAU_BUFFERS));
+            }
+        }
+        else if (name.contains("vdpauivtc"))
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Enabling VDPAU inverse telecine "
+                            "(requires Basic or Advanced deinterlacer)"));
+            m_mixer_features |= kVDPFeatIVTC;
+        }
+        else if (name.contains("vdpauskipchroma"))
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Enabling SkipChromaDeinterlace."));
+            m_skip_chroma = true;
+        }
+        else if (name.contains("vdpaudenoise"))
+        {
+            float tmp = std::max(0.0f, std::min(1.0f, opts.toFloat()));
+            if (tmp != 0.0)
+            {
+                VERBOSE(VB_PLAYBACK, LOC +
+                    QString("VDPAU Denoise %1").arg(tmp,4,'f',2,'0'));
+                m_denoise = tmp;
+                m_mixer_features |= kVDPFeatDenoise;
+            }
+        }
+        else if (name.contains("vdpausharpen"))
+        {
+            float tmp = std::max(-1.0f, std::min(1.0f, opts.toFloat()));
+            if (tmp != 0.0)
+            {
+                VERBOSE(VB_PLAYBACK, LOC +
+                    QString("VDPAU Sharpen %1").arg(tmp,4,'f',2,'0'));
+                m_sharpen = tmp;
+                m_mixer_features |= kVDPFeatSharpness;
+            }
+        }
+        else if (name.contains("vdpaucolorspace"))
+        {
+            if (opts.contains("auto"))
+                m_colorspace = -1;
+            else if (opts.contains("601"))
+                m_colorspace = VDP_COLOR_STANDARD_ITUR_BT_601;
+            else if (opts.contains("709"))
+                m_colorspace = VDP_COLOR_STANDARD_ITUR_BT_709;
+
+            if (m_colorspace > -1)
+            {
+                VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Forcing ITU BT.%1 colorspace")
+                    .arg((m_colorspace == VDP_COLOR_STANDARD_ITUR_BT_601) ?
+                    "BT.601" : "BT.709"));
+            }
+        }
+        else if (name.contains("vdpaustudio"))
+        {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Enabling Studio Levels [16-235]."));
+            m_studio = true;
+        }
+        else if (name.contains("vdpauhqscaling"))
+        {
+            m_hq_scaling = true;
         }
     }
+}
+
+int VideoOutputVDPAU::DisplayOSD(VideoFrame *frame, OSD *osd,
+                                 int stride, int revision)
+{
+    if (!osd || !m_render || !m_osd_avail)
+        return -1;
+
+    OSDSurface *surface = osd->Display();
+    if (!surface)
+        return -1;
+
+    bool changed = (-1 == revision) ?
+        surface->Changed() : (surface->GetRevision()!=revision);
+    if (changed)
+    {
+        QRect osd_rect(QPoint(0,0), m_osd_size);
+        uint32_t pitches[3] = {m_osd_size.width(),
+                               m_osd_size.width()>>1,
+                               m_osd_size.width()>>1};
+        void *offsets[3], *alpha[1];
+        offsets[0] = surface->y;
+        offsets[1] = surface->v;
+        offsets[2] = surface->u;
+        alpha[0] = surface->alpha;
+        uint32_t alpha_pitch[1] = { m_osd_size.width() };
+
+        m_render->UploadYUVFrame(m_osd_surface, offsets, pitches);
+        m_render->MixAndRend(m_osd_mixer,
+                             VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME,
+                             m_osd_surface, m_osd_output_surface, NULL, false,
+                             osd_rect, m_osd_size, osd_rect, 0, 0);
+
+        m_render->UploadBitmap(m_osd_alpha_surface, alpha, alpha_pitch);
+        m_render->DrawBitmap(m_osd_alpha_surface, m_osd_output_surface, NULL,
+                             NULL, 255, 255, 255, 255, true);
+    }
+
+    m_osd_ready = true;
+    return changed;
+}
+
+void VideoOutputVDPAU::InitOSD(QSize size)
+{
+    if (!m_render)
+        return;
+
+    m_osd_output_surface = m_render->CreateOutputSurface(size);
+    m_osd_layer          = m_render->CreateLayer(m_osd_output_surface);
+    m_osd_surface        = m_render->CreateVideoSurface(size);
+    m_osd_alpha_surface  = m_render->CreateBitmapSurface(size, VDP_RGBA_FORMAT_A8);
+    m_osd_mixer          = m_render->CreateVideoMixer(size, 0, kVDPFeatNone);
+
+    if (m_osd_output_surface && m_osd_layer && m_osd_surface &&
+        m_osd_alpha_surface && m_osd_mixer)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + QString("Created VDPAU osd (%1x%2)")
+            .arg(size.width()).arg(size.height()));
+        m_osd_size  = size;
+        m_osd_avail = true;
+        m_osd_ready = false;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Failed to create VDPAU osd."));
+    }
+}
+
+void VideoOutputVDPAU::DeinitOSD(void)
+{
+    if (m_render)
+    {
+        m_render->DestroyOutputSurface(m_osd_output_surface);
+        m_render->DestroyLayer(m_osd_layer);
+        m_render->DestroyVideoSurface(m_osd_surface);
+        m_render->DestroyBitmapSurface(m_osd_alpha_surface);
+        m_render->DestroyVideoMixer(m_osd_mixer);
+    }
+
+    m_osd_output_surface = 0;
+    m_osd_layer          = 0;
+    m_osd_surface        = 0;
+    m_osd_alpha_surface  = 0;
+    m_osd_mixer          = 0;
+
+    m_osd_size  = QSize();
+    m_osd_avail = false;
+    m_osd_ready = false;
 }
