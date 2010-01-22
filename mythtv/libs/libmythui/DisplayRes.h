@@ -1,7 +1,10 @@
 #ifndef _Display_Res_H_
 #define _Display_Res_H_
 
+#include <vector>
+
 #include "DisplayResScreen.h"
+#include "mythexp.h"
 
 /** \class DisplayRes
  *  \brief The DisplayRes module allows for the display resolution
@@ -26,7 +29,8 @@ typedef enum
     MAX_MODES    = 5,
 } tmode;
 
-class MPUBLIC DisplayRes {
+class MPUBLIC DisplayRes
+{
   public:
     /** \brief Factory method that returns a DisplayRes singleton
      *
