@@ -312,8 +312,8 @@ using_frontend {
 
     using_vdpau {
         DEFINES += USING_VDPAU
-        HEADERS += util-vdpau.h   videoout_vdpau.h
-        SOURCES += util-vdpau.cpp videoout_vdpau.cpp
+        HEADERS += videoout_vdpau.h
+        SOURCES += videoout_vdpau.cpp
         LIBS += -lvdpau
     }
 

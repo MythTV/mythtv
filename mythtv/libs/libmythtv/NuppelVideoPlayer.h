@@ -188,8 +188,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     long long GetBookmark(void) const;
     QString   GetError(void) const;
     bool      IsErrorRecoverable(void) const
-        { return (errorType & kError_Preempt ||
-                  errorType & kError_Switch_Renderer); }
+        { return (errorType & kError_Switch_Renderer); }
     bool      IsDecoderErrored(void)   const
         { return (errorType & kError_Decode); }
     QString   GetEncodingType(void) const;

@@ -106,8 +106,7 @@ typedef enum VideoErrorState
     kError_None            = 0x00,
     kError_Unknown         = 0x01,
     kError_Decode          = 0x02, // VDPAU decoder error
-    kError_Preempt         = 0x04, // VDPAU display pre-empted
-    kError_Switch_Renderer = 0x08, // Current renderer is not preferred choice
+    kError_Switch_Renderer = 0x04, // Current renderer is not preferred choice
 } VideoErrorState;
 
 class DisplayInfo
