@@ -236,7 +236,7 @@ static QString sortTitle(QString title, PlaybackBox::ViewMask viewmask,
 
 static QString extract_main_state(const ProgramInfo &pginfo, const TV *player)
 {
-    QString state;
+    QString state("normal");
     if (pginfo.recstatus == rsRecording)
         state = "running";
 
@@ -723,9 +723,11 @@ void PlaybackBox::UpdateUIListItem(
         item->SetText(tempShortDate, "shortdate");
     }
 
+    // Recording and availability status
     item->SetFontState(state);
     item->DisplayState(state, "status");
 
+    // Job status (recording, transcoding, flagging)
     QString job = extract_job_state(*pginfo);
     item->DisplayState(job, "jobstate");
 
