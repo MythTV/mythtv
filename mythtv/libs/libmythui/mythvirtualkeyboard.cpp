@@ -92,7 +92,6 @@ MythUIVirtualKeyboard::MythUIVirtualKeyboard(MythScreenStack *parentStack, MythU
     m_shiftLButton = NULL;
 
     m_composing = false;
-    m_composeStr = "";
 
     if (m_parentEdit)
         m_preferredPos = m_parentEdit->GetKeyboardPosition();
@@ -450,7 +449,7 @@ void MythUIVirtualKeyboard::charClicked(void)
                 }
             }
 
-            m_composeStr = "";
+            m_composeStr.clear();
             m_composing = false;
             if (m_compButton)
                 m_compButton->SetLocked(false);
@@ -542,7 +541,7 @@ void MythUIVirtualKeyboard::altClicked(void)
 void MythUIVirtualKeyboard::compClicked(void)
 {
     m_composing = !m_composing;
-    m_composeStr = "";
+    m_composeStr.clear();
 }
 
 void MythUIVirtualKeyboard::returnClicked(void)
@@ -574,7 +573,7 @@ void MythUIVirtualKeyboard::moverightClicked(void)
 
 QString MythUIVirtualKeyboard::decodeChar(QString c)
 {
-    QString res = "";
+    QString res;
 
     while (c.length() > 0)
     {
@@ -608,28 +607,17 @@ QString MythUIVirtualKeyboard::decodeChar(QString c)
 
 QString MythUIVirtualKeyboard::getKeyText(KeyDefinition key)
 {
+
     if (m_shift)
     {
         if (m_alt)
-        {
             return key.altshift;
-        }
         else
-        {
             return key.shift;
-        }
-    }
-    else
-    {
-        if (m_alt)
-        {
-            return key.alt;
-        }
-        else
-        {
-            return key.normal;
-        }
     }
 
-    return QString("");
+    if (m_alt)
+        return key.alt;
+
+    return key.normal;
 }
