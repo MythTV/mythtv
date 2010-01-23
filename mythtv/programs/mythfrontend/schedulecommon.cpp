@@ -199,18 +199,18 @@ void ScheduleCommon::ShowRecordingDialog(RecordingInfo recinfo)
                 if (recinfo.recstatus != rsRecording &&
                     recinfo.rectype != kFindOneRecord &&
                     !((recinfo.findid == 0 || !IsFindApplicable(recinfo)) &&
-                    recinfo.catType == "series" &&
-                    recinfo.programid.contains(QRegExp("0000$"))) &&
+                      recinfo.catType == "series" &&
+                      recinfo.programid.contains(QRegExp("0000$"))) &&
                     ((!(recinfo.dupmethod & kDupCheckNone) &&
-                    !recinfo.programid.isEmpty() &&
-                    (recinfo.findid != 0 || !IsFindApplicable(recinfo))) ||
-                    ((recinfo.dupmethod & kDupCheckSub) &&
-                    !recinfo.subtitle.isEmpty()) ||
-                    ((recinfo.dupmethod & kDupCheckDesc) &&
-                    !recinfo.description.isEmpty()) ||
-                    ((recinfo.dupmethod & kDupCheckSubThenDesc) &&
-                    (!recinfo.subtitle.isEmpty() ||
-                    !recinfo.description.isEmpty())) ))
+                      !recinfo.programid.isEmpty() &&
+                      (recinfo.findid != 0 || !IsFindApplicable(recinfo))) ||
+                     ((recinfo.dupmethod & kDupCheckSub) &&
+                      !recinfo.subtitle.isEmpty()) ||
+                     ((recinfo.dupmethod & kDupCheckDesc) &&
+                      !recinfo.description.isEmpty()) ||
+                     ((recinfo.dupmethod & kDupCheckSubThenDesc) &&
+                      (!recinfo.subtitle.isEmpty() ||
+                       !recinfo.description.isEmpty())) ))
                     {
                         menuPopup->AddButton(tr("Never record"),
                                              qVariantFromValue(recinfo));
@@ -367,15 +367,18 @@ void ScheduleCommon::ShowNotRecordingDialog(RecordingInfo recinfo)
                     }
                     if (recinfo.rectype != kFindOneRecord &&
                         !((recinfo.findid == 0 || !IsFindApplicable(recinfo)) &&
-                        recinfo.catType == "series" &&
-                        recinfo.programid.contains(QRegExp("0000$"))) &&
+                          recinfo.catType == "series" &&
+                          recinfo.programid.contains(QRegExp("0000$"))) &&
                         ((!(recinfo.dupmethod & kDupCheckNone) &&
-                        !recinfo.programid.isEmpty() &&
-                        (recinfo.findid != 0 || !IsFindApplicable(recinfo))) ||
-                        ((recinfo.dupmethod & kDupCheckSub) &&
-                        !recinfo.subtitle.isEmpty()) ||
-                        ((recinfo.dupmethod & kDupCheckDesc) &&
-                        !recinfo.description.isEmpty())))
+                          !recinfo.programid.isEmpty() &&
+                          (recinfo.findid != 0 || !IsFindApplicable(recinfo))) ||
+                         ((recinfo.dupmethod & kDupCheckSub) &&
+                          !recinfo.subtitle.isEmpty()) ||
+                         ((recinfo.dupmethod & kDupCheckDesc) &&
+                          !recinfo.description.isEmpty()) ||
+                         ((recinfo.dupmethod & kDupCheckSubThenDesc) &&
+                          (!recinfo.subtitle.isEmpty() ||
+                           !recinfo.description.isEmpty())) ))
                         {
                             menuPopup->AddButton(tr("Never record"),
                                                 qVariantFromValue(recinfo));
