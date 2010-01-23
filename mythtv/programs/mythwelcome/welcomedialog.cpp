@@ -29,15 +29,14 @@
 
 WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
               :MythScreenType(parent, name),
-    m_status_text(NULL),          m_recording_text(NULL), m_scheduled_text(NULL),
-    m_warning_text(NULL),         m_time_text(NULL),      m_date_text(NULL),
-    m_startfrontend_button(NULL), m_menuPopup(NULL),
-    m_updateStatusTimer(new QTimer(this)),   m_updateScreenTimer(new QTimer(this)),
-    m_timeTimer(new QTimer(this)),                        m_isRecording(false),
-    m_hasConflicts(false),        m_bWillShutdown(false), m_secondsToShutdown(-1),
-    m_preRollSeconds(0),          m_idleWaitForRecordingTime(0),
-    m_screenTunerNo(0),           m_screenScheduledNo(0), m_statusListNo(0),
-    m_frontendIsRunning(false),   m_pendingRecListUpdate(false),
+    m_status_text(NULL),       m_recording_text(NULL), m_scheduled_text(NULL),
+    m_warning_text(NULL),      m_startfrontend_button(NULL), 
+    m_menuPopup(NULL),         m_updateStatusTimer(new QTimer(this)),
+    m_updateScreenTimer(new QTimer(this)),             m_isRecording(false),      
+    m_hasConflicts(false),     m_bWillShutdown(false),
+    m_secondsToShutdown(-1),   m_preRollSeconds(0),    m_idleWaitForRecordingTime(0),
+    m_screenTunerNo(0),        m_screenScheduledNo(0), m_statusListNo(0),
+    m_frontendIsRunning(false),m_pendingRecListUpdate(false),
     m_pendingSchedUpdate(false)
 {
     gContext->addListener(this);
@@ -60,10 +59,6 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
 
     connect(m_updateScreenTimer, SIGNAL(timeout()),
             this, SLOT(updateScreen()));
-
-    connect(m_timeTimer, SIGNAL(timeout()), 
-            this, SLOT(updateTime()));
-    m_timeTimer->start(1000);
 }
 
 bool WelcomeDialog::Create(void)
@@ -80,8 +75,6 @@ bool WelcomeDialog::Create(void)
     UIUtilE::Assign(this, m_status_text, "status_text", &err);
     UIUtilE::Assign(this, m_recording_text, "recording_text", &err);
     UIUtilE::Assign(this, m_scheduled_text, "scheduled_text", &err);
-    UIUtilE::Assign(this, m_time_text, "time_text", &err);
-    UIUtilE::Assign(this, m_date_text, "date_text", &err);
     UIUtilE::Assign(this, m_warning_text, "conflicts_text", &err);
     UIUtilE::Assign(this, m_startfrontend_button, "startfrontend_button", &err);
 
@@ -102,7 +95,6 @@ bool WelcomeDialog::Create(void)
 
     SetFocusWidget(m_startfrontend_button);
 
-    updateTime();
     checkConnectionToServer();
     checkAutoStart();
 
@@ -326,22 +318,6 @@ WelcomeDialog::~WelcomeDialog()
 
     if (m_updateScreenTimer)
         m_updateScreenTimer->disconnect();
-
-    if (m_timeTimer)
-        m_timeTimer->disconnect();
-}
-
-void WelcomeDialog::updateTime(void)
-{
-    QString s = QTime::currentTime().toString(m_timeFormat);
-
-    if (s != m_time_text->GetText())
-        m_time_text->SetText(s);
-
-    s = QDateTime::currentDateTime().toString(m_dateFormat);
-
-    if (s != m_date_text->GetText())
-        m_date_text->SetText(s);
 }
 
 void WelcomeDialog::updateStatus(void)

@@ -10,11 +10,6 @@ target.path = $${PREFIX}/bin
 
 INSTALLS = target
 
-uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = welcome-ui.xml images/*.png
-
-INSTALLS += uifiles 
-
 QMAKE_CLEAN += $(TARGET)
 
 # Input

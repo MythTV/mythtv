@@ -33,7 +33,6 @@ class WelcomeDialog : public MythScreenType
     void updateStatus(void);
     void updateScreen(void);
     void closeDialog(void);
-    void updateTime(void);
     void showMenu(void);
     void shutdownNow(void);
     void runEPGGrabber(void);
@@ -55,8 +54,6 @@ class WelcomeDialog : public MythScreenType
     MythUIText    *m_recording_text;
     MythUIText    *m_scheduled_text;
     MythUIText    *m_warning_text;
-    MythUIText    *m_time_text;
-    MythUIText    *m_date_text;
 
     MythUIButton  *m_startfrontend_button;
 
@@ -64,7 +61,6 @@ class WelcomeDialog : public MythScreenType
 
     QTimer        *m_updateStatusTimer; // audited ref #5318
     QTimer        *m_updateScreenTimer; // audited ref #5318
-    QTimer        *m_timeTimer; // audited ref #5318
 
     QString        m_installDir;
     QString        m_timeFormat;
