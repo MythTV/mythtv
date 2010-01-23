@@ -3249,6 +3249,9 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 {
     MythSocket *pbssock = pbs->getSocket();
 
+    if (commands.size() < 2 || slist.size() < 2)
+        return;
+    
     int recnum = commands[1].toInt();
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
