@@ -56,21 +56,21 @@
         </textarea>
 
         <!--
-            time
+            date & time
         -->
-        <textarea name="time_text" from="basetextarea">
-            <area>1072,24,176,36</area>
-            <font>time</font>
-            <align>right</align>
-            <value></value>
-        </textarea>
-
-        <textarea name="date_text" from="time_text">
+        <clock name="date">
             <area>32,24,304,84</area>
-            <multiline>yes</multiline>
-            <align>left</align>
-            <value></value>
-        </textarea>
+            <font>time</font>
+            <format>dddd\ndd MMMM yyyy</format>
+            <align>left,top</align>
+            <cutdown>true</cutdown>
+        </clock>
+
+        <clock name="time" from="date">
+            <area>1072,24,176,36</area>
+            <format>%TIME%</format>
+            <align>right</align>
+        </clock>
 
         <!--
             current myth status
@@ -124,35 +124,11 @@
         <!--
             start frontend button
         -->
-         <button name="startfrontend_button">
-             <area>321,642,637,34</area>
-             <statetype name="buttonstate">
-                 <state name="active">
-                    <imagetype name="background">
-                        <filename>mw_text_button_off.png</filename>
-                    </imagetype>
-                    <textarea name="text">
-                        <area>0,0,627,34</area>
-                        <align>allcenter</align>
-                        <font>buttons</font>
-                        <font state="selected">buttons</font>
-                        <font state="disabled">buttons</font>
-                    </textarea>
-                 </state>
+        <button name="startfrontend_button" from="basewidebutton">
+            <position>487,642</position>
+            <value>Start Frontend</value>
+        </button>
 
-                 <state name="selected" from="active">
-                     <imagetype name="background">
-                         <filename>mw_text_button_on.png</filename>
-                     </imagetype>
-                 </state>
-                 <state name="disabled" from="active" />
-                 <state name="pushed" from="active">
-                     <imagetype name="background">
-                         <filename>mw_text_button_pushed.png</filename>
-                     </imagetype>
-                 </state>
-             </statetype>
-         </button>
 
     </window>
 
