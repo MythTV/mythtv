@@ -1279,7 +1279,21 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
 
     if (srcfile.isEmpty() || label.isEmpty())
         return NULL;
-       
+
+    // Some screens include certain images dozens or even hundreds of
+    // times.  Even if the image is in the cache, there is still a
+    // stat system call on the original file to see if it has changed.
+    // This code relaxes the original-file check so that the check
+    // isn't repeated if it was already done within kImageCacheTimeout
+    // seconds.
+    const uint kImageCacheTimeout = 5;
+    uint now = QDateTime::currentDateTime().toTime_t();
+    if (d->imageCache.contains(label) &&
+        d->CacheTrack[label] + kImageCacheTimeout > now)
+    {
+        return d->imageCache[label];
+    }
+
     QString cachefilepath = GetThemeCacheDir() + '/' + label;
     QFileInfo fi(cachefilepath);
 
