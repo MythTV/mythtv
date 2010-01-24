@@ -494,7 +494,7 @@
         <clock name="time">
             <area>1185,688,80,30</area>
             <font>timefont</font>
-            <format>%TIME%</format>
+            <format>hh:mm</format>
             <align>left,vcenter</align>
             <cutdown>no</cutdown>
         </clock>
