@@ -392,4 +392,86 @@
   <catcolor category="תעודה, טבע ומדע, כללי" color="#33ff99"></catcolor>
   <catcolor category="תרבות ואמנות, כללי" color="goldenrod"></catcolor>
 
+  <!-- Categories introduced by Dish Network/Bell ExpressVU --> 
+  <catcolor category="(Arabic)" color="#dddd00"></catcolor> 
+  <catcolor category="(Chinese)" color="#dddd00"></catcolor> 
+  <catcolor category="(German)" color="#dddd00"></catcolor> 
+  <catcolor category="(Hebrew)" color="#dddd00"></catcolor> 
+  <catcolor category="(Hindi)" color="#dddd00"></catcolor> 
+  <catcolor category="(Hindi) R" color="#dddd00"></catcolor> 
+  <catcolor category="(Tamil)" color="#dddd00"></catcolor> 
+  <catcolor category="(Telegu)" color="#dddd00"></catcolor> 
+  <catcolor category="Adults only" color="thistle3"></catcolor> 
+  <catcolor category="Agriculture" color="#00ee00"></catcolor> 
+  <catcolor category="Anime" color="#3333aa"></catcolor> 
+  <catcolor category="Art" color="goldenrod"></catcolor> 
+  <catcolor category="Arts/crafts" color="goldenrod"></catcolor> 
+  <catcolor category="Auction" color="#333300"></catcolor> 
+  <catcolor category="Auto" color="#33ffff"></catcolor> 
+  <catcolor category="Auto racing" color="DarkCyan"></catcolor> 
+  <catcolor category="Aviation" color="#33ffff"></catcolor> 
+  <catcolor category="Awards" color="#ee4400"></catcolor> 
+  <catcolor category="Biography" color="goldenrod"></catcolor> 
+  <catcolor category="Boat" color="#33ffff"></catcolor> 
+  <catcolor category="Boxing" color="DarkCyan"></catcolor> 
+  <catcolor category="Children-special" color="MediumSlateBlue"></catcolor> 
+  <catcolor category="Children-talk" color="MediumSlateBlue"></catcolor> 
+  <catcolor category="Collectibles" color="Red"></catcolor> 
+  <catcolor category="Community" color="DarkOrange2"></catcolor> 
+  <catcolor category="Computers" color="#0000dd"></catcolor> 
+  <catcolor category="Dance" color="DarkRed"></catcolor> 
+  <catcolor category="Debate" color="MediumTurquoise"></catcolor> 
+  <catcolor category="Dog show" color="#00ff44"></catcolor> 
+  <catcolor category="Education" color="CornflowerBlue"></catcolor> 
+  <catcolor category="Enfants" color="MediumSlateBlue"></catcolor> 
+  <catcolor category="Equestrian" color="goldenrod"></catcolor> 
+  <catcolor category="Extreme" color="DarkCyan"></catcolor> 
+  <catcolor category="Fashion" color="#333311"></catcolor> 
+  <catcolor category="Fishing" color="DarkCyan"></catcolor> 
+  <catcolor category="Fundraiser" color="DarkOrange2"></catcolor> 
+  <catcolor category="Gay/lesbian" color="goldenrod"></catcolor> 
+  <catcolor category="Golf" color="DarkCyan"></catcolor> 
+  <catcolor category="Health" color="#00ffaa"></catcolor> 
+  <catcolor category="Historical drama" color="DarkOrange1"></catcolor> 
+  <catcolor category="History" color="DarkOrange1"></catcolor> 
+  <catcolor category="Holiday" color="#ee2200"></catcolor> 
+  <catcolor category="Holiday music special" color="#ee2200"></catcolor> 
+  <catcolor category="Holiday special" color="#ee2200"></catcolor> 
+  <catcolor category="Holiday-children" color="#ee2200"></catcolor> 
+  <catcolor category="Holiday-children special" color="#ee2200"></catcolor> 
+  <catcolor category="Interview" color="MediumTurquoise"></catcolor> 
+  <catcolor category="Law" color="CornflowerBlue"></catcolor> 
+  <catcolor category="Martial arts" color="#00ffaa"></catcolor> 
+  <catcolor category="Medical" color="CornflowerBlue"></catcolor> 
+  <catcolor category="Miniseries" color="DarkOrchid"></catcolor> 
+  <catcolor category="Motorcycle" color="#33ffff"></catcolor> 
+  <catcolor category="Music talk" color="#aa0000"></catcolor> 
+  <catcolor category="Music/Art" color="goldenrod"></catcolor> 
+  <catcolor category="Musical comedy" color="turquoise2"></catcolor> 
+  <catcolor category="Musique" color="DarkRed"></catcolor> 
+  <catcolor category="Nouvelles" color="#dddd00"></catcolor> 
+  <catcolor category="OffAir" color="Black"></catcolor> 
+  <catcolor category="Opera" color="turquoise3"></catcolor> 
+  <catcolor category="Outdoors" color="#33ff99"></catcolor> 
+  <catcolor category="Paranormal" color="#DD00DD"></catcolor> 
+  <catcolor category="Parenting" color="DarkOrange3"></catcolor> 
+  <catcolor category="Performing arts" color="DarkRed"></catcolor> 
+  <catcolor category="Poker" color="orchid"></catcolor> 
+  <catcolor category="Politics" color="DarkOrange2"></catcolor> 
+  <catcolor category="PPV Events" color="DarkCyan"></catcolor> 
+  <catcolor category="Pro wrestling" color="DarkCyan"></catcolor> 
+  <catcolor category="Public affairs" color="DarkOrange2"></catcolor> 
+  <catcolor category="Religion" color="CornflowerBlue"></catcolor> 
+  <catcolor category="Rodeo" color="DarkCyan"></catcolor> 
+  <catcolor category="Series/Sp" color="DarkOrchid"></catcolor> 
+  <catcolor category="Snowboarding" color="DarkCyan"></catcolor> 
+  <catcolor category="Soccer" color="DarkCyan"></catcolor> 
+  <catcolor category="Spanish" color="#dddd00"></catcolor> 
+  <catcolor category="Standup" color="#8800aa"></catcolor> 
+  <catcolor category="Surfing" color="DarkCyan"></catcolor> 
+  <catcolor category="Theater" color="Blue"></catcolor> 
+  <catcolor category="Variety" color="Red"></catcolor> 
+  <catcolor category="Weather" color="DarkOrange3"></catcolor> 
+  <catcolor category="Wrestling" color="DarkCyan"></catcolor>
+
 </categorycolors>
