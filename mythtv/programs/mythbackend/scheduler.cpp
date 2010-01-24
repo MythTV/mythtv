@@ -4091,27 +4091,27 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                     else // recording is remote
                     {
                         QString backuppath = (*it)->pathname;
-                        ProgramInfo *pginfo = *it;
+                        ProgramInfo *programinfo = *it;
                         bool foundSlave = false;
 
                         QMap<int, EncoderLink *>::Iterator enciter =
                             m_tvList->begin();
                         for (; enciter != m_tvList->end(); ++enciter)
                         {
-                            if ((*enciter)->GetHostName() == pginfo->hostname)
+                            if ((*enciter)->GetHostName() == programinfo->hostname)
                             {
-                                (*enciter)->CheckFile(pginfo);
+                                (*enciter)->CheckFile(programinfo);
                                 foundSlave = true;
                                 break;
                             }
                         }
-                        if (foundSlave && pginfo->pathname == filename)
+                        if (foundSlave && programinfo->pathname == filename)
                         {
                             fs = *fslistit;
-                            pginfo->pathname = backuppath;
+                            programinfo->pathname = backuppath;
                             break;
                         }
-                        pginfo->pathname = backuppath;
+                        programinfo->pathname = backuppath;
                     }
                 }   
 
