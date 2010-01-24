@@ -156,7 +156,7 @@ void ScheduleCommon::MakeOverride(RecordingInfo *recinfo, bool startActive)
 *  \brief Creates a dialog displaying current recording status and options
 *         available
 */
-void ScheduleCommon::ShowRecordingDialog(RecordingInfo recinfo)
+void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
 {
     QString message = recinfo.title;
     
@@ -267,7 +267,7 @@ void ScheduleCommon::ShowRecordingDialog(RecordingInfo recinfo)
 *  \brief Creates a dialog displaying current recording status and options
 *         available
 */
-void ScheduleCommon::ShowNotRecordingDialog(RecordingInfo recinfo)
+void ScheduleCommon::ShowNotRecordingDialog(const RecordingInfo& recinfo)
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
@@ -519,7 +519,7 @@ void ScheduleCommon::customEvent(QEvent *event)
 *  \brief Returns true if a search should be employed to find a matching
 *         program.
 */
-bool ScheduleCommon::IsFindApplicable(RecordingInfo recInfo) const
+bool ScheduleCommon::IsFindApplicable(const RecordingInfo& recInfo) const
 {
     return recInfo.rectype == kFindDailyRecord ||
            recInfo.rectype == kFindWeeklyRecord;
