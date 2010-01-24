@@ -72,8 +72,7 @@ bool MythBrowser::Create(void)
     if (m_progressBar)
         m_progressBar->SetTotal(100);
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(browser);
 

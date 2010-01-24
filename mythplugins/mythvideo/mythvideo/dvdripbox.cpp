@@ -181,8 +181,7 @@ bool DVDRipBox::Create()
     m_overallText->SetVisible(false);
     m_jobText->SetVisible(false);
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     Init();
 

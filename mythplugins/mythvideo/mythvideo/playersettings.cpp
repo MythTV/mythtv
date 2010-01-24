@@ -90,8 +90,7 @@ bool PlayerSettings::Create()
     connect(m_okButton,     SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_cancelButton, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_defaultPlayerEdit);
 

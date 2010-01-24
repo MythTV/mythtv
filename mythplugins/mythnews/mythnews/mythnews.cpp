@@ -126,11 +126,7 @@ bool MythNews::Create(void)
         m_nositesText->Hide();
     }
 
-    if (!BuildFocusList())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to build a focuslist. Something is wrong");
-    }
+    BuildFocusList();
 
     SetFocusWidget(m_sitesList);
 

@@ -68,8 +68,7 @@ bool BrowserConfig::Create()
     connect(m_okButton,     SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
     connect(m_cancelButton, SIGNAL(TakingFocus()), SLOT(slotFocusChanged()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_commandEdit);
 
@@ -171,8 +170,7 @@ bool BookmarkManager::Create(void)
     connect(m_bookmarkList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(slotBookmarkClicked(MythUIButtonListItem*)));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_groupList);
 

@@ -49,8 +49,7 @@ bool EditMetadataDialog::Create(void)
     m_startdateEdit->SetText(m_sourceMetadata->startDate);
     m_starttimeEdit->SetText(m_sourceMetadata->startTime);
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_titleEdit);
 

@@ -738,8 +738,7 @@ namespace
             connect(m_resultsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
                     SLOT(sendResult(MythUIButtonListItem *)));
 
-            if (!BuildFocusList())
-                VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+            BuildFocusList();
 
             return true;
         }
@@ -1705,8 +1704,7 @@ bool VideoDialog::Create()
     CheckedSet(m_parentalLevelState, "None");
     CheckedSet(m_watchedState, "None");
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     CheckedSet(m_novideoText, tr("Video dialog loading, or no videos available..."));
 

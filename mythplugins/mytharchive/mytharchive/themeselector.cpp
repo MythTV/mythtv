@@ -78,8 +78,7 @@ bool ThemeSelector::Create(void)
     connect(theme_selector, SIGNAL(itemSelected(MythUIButtonListItem*)),
             this, SLOT(themeChanged(MythUIButtonListItem*)));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     loadConfiguration();
 

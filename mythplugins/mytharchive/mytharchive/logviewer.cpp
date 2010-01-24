@@ -89,8 +89,7 @@ bool LogViewer::Create(void)
     m_updateTimer = new QTimer(this);
     connect(m_updateTimer, SIGNAL(timeout()), SLOT(updateTimerTimeout()) );
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     return true;
 }

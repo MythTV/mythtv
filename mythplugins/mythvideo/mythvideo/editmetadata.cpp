@@ -104,8 +104,7 @@ bool EditMetadataDialog::Create()
 
     fillWidgets();
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     connect(m_titleEdit, SIGNAL(valueChanged()), SLOT(SetTitle()));
     m_titleEdit->SetMaxLength(128);

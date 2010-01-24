@@ -105,11 +105,7 @@ bool MythNewsEditor::Create(void)
            m_podcastCheck->SetCheckState(MythUIStateType::Full);
     }
 
-    if (!BuildFocusList())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to build a focuslist. Something is wrong");
-    }
+    BuildFocusList();
 
     SetFocusWidget(m_nameEdit);
 

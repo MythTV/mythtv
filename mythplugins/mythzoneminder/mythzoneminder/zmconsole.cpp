@@ -73,8 +73,7 @@ bool FunctionDialog::Create()
     else
         m_enabledCheck->SetCheckState(MythUIStateType::Off);
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_functionList);
 
@@ -163,8 +162,7 @@ bool ZMConsole::Create(void)
         return false;
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_monitor_list);
 

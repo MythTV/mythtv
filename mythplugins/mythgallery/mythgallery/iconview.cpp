@@ -188,8 +188,7 @@ bool IconView::Create(void)
         m_noImagesText->SetVisible(false);
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     // TODO Not accurate, the image may be smaller than the button
     uint buttonwidth = m_imageList->ItemWidth();

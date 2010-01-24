@@ -85,8 +85,7 @@ bool BookmarkEditor::Create()
         m_urlEdit->SetText(m_site->url);
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_categoryEdit);
 

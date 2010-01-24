@@ -82,8 +82,7 @@ bool VideoSelector::Create(void)
     connect(m_videoButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(toggleSelected(MythUIButtonListItem *)));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     updateSelectedList();
     updateVideoList();

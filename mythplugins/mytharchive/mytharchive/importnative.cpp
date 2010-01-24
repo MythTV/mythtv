@@ -219,8 +219,7 @@ bool ArchiveFileSelector::Create(void)
     connect(m_fileButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             this, SLOT(itemClicked(MythUIButtonListItem *)));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     updateSelectedList();
     updateFileList();
@@ -360,8 +359,7 @@ bool ImportNative::Create(void)
     findChannelMatch(m_details.chanID, m_details.chanNo,
                      m_details.chanName, m_details.callsign);
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     return true;
 }

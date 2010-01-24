@@ -127,8 +127,7 @@ bool NetSearch::Create()
     connect(m_searchResultList, SIGNAL(itemSelected(MythUIButtonListItem *)),
                        SLOT(slotItemChanged()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     LoadInBackground();
 

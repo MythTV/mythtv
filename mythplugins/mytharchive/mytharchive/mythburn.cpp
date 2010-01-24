@@ -126,9 +126,7 @@ bool MythBurn::Create(void)
     connect(m_archiveButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             this, SLOT(itemClicked(MythUIButtonListItem *)));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT,
-                "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     return true;
 }
@@ -1078,9 +1076,7 @@ bool ProfileDialog::Create()
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(save()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT,
-                "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     return true;
 }

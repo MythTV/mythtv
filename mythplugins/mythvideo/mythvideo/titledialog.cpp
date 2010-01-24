@@ -101,8 +101,7 @@ bool TitleDialog::Create()
 
     m_ripawayButton->SetText(tr("Begin Ripping"));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     showCurrentTitle();
 

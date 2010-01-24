@@ -142,11 +142,7 @@ bool MythNewsConfig::Create(void)
     connect(m_siteList, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(toggleItem(MythUIButtonListItem*)));
 
-    if (!BuildFocusList())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to build a focuslist. Something is wrong");
-    }
+    BuildFocusList();
 
     SetFocusWidget(m_categoriesList);
 

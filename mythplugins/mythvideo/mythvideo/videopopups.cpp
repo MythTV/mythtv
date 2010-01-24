@@ -44,8 +44,7 @@ bool CastDialog::Create()
         new MythUIButtonListItem(castList, castIterator.next());
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     return true;
 }
@@ -81,8 +80,7 @@ bool PlotDialog::Create()
     if (okButton)
         connect(okButton, SIGNAL(Clicked()), SLOT(Close()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     return true;
 }

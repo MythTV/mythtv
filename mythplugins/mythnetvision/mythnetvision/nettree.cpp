@@ -124,8 +124,7 @@ bool NetTree::Create()
         return false;
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     LoadInBackground();
 

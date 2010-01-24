@@ -156,8 +156,7 @@ bool ThumbFinder::Create(void)
 
     connect(m_frameButton, SIGNAL(Clicked()), this, SLOT(updateThumb()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     return true;
 }

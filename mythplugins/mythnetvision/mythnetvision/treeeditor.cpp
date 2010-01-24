@@ -70,11 +70,7 @@ bool TreeEditor::Create(void)
     connect(m_grabbers, SIGNAL(itemClicked(MythUIButtonListItem*)),
             this, SLOT(toggleItem(MythUIButtonListItem*)));
 
-    if (!BuildFocusList())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to build a focuslist. Something is wrong");
-    }
+    BuildFocusList();
 
     loadData();
 

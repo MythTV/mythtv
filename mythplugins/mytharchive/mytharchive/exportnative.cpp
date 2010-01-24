@@ -96,8 +96,7 @@ bool ExportNative::Create(void)
     connect(m_addrecordingButton, SIGNAL(Clicked()), this, SLOT(handleAddRecording()));
     connect(m_addvideoButton, SIGNAL(Clicked()), this, SLOT(handleAddVideo()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     loadConfiguration();
 

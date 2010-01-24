@@ -124,11 +124,7 @@ bool RSSEditPopup::Create(void)
            m_download->SetCheckState(MythUIStateType::Full);
     }
 
-    if (!BuildFocusList())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to build a focuslist. Something is wrong");
-    }
+    BuildFocusList();
 
     return true;
 }
@@ -413,11 +409,7 @@ bool RSSEditor::Create(void)
     connect(m_sites, SIGNAL(itemSelected(MythUIButtonListItem *)),
             SLOT(slotItemChanged(void)));
 
-    if (!BuildFocusList())
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "Failed to build a focuslist. Something is wrong");
-    }
+    BuildFocusList();
 
     loadData();
 

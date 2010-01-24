@@ -582,8 +582,7 @@ bool VideoFilterDialog::Create()
         return false;
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     fillWidgets();
     update_numvideo();

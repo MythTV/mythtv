@@ -63,8 +63,7 @@ bool EditRomInfoDialog::Create()
 
     fillWidgets();
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     connect(m_gamenameEdit, SIGNAL(valueChanged()), SLOT(SetGamename()));
     connect(m_genreEdit, SIGNAL(valueChanged()), SLOT(SetGenre()));

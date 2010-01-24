@@ -125,8 +125,7 @@ bool ZMPlayer::Create(void)
         connect(m_nextButton, SIGNAL(Clicked()), this, SLOT(nextPressed()));
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_playButton);
 

@@ -95,8 +95,7 @@ bool FileSelector::Create(void)
     connect(m_fileButtonList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             this, SLOT(itemClicked(MythUIButtonListItem *)));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     updateSelectedList();
     updateFileList();

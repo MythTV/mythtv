@@ -372,8 +372,7 @@ bool FileAssocDialog::Create()
 
     UpdateScreen();
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist.");
+    BuildFocusList();
 
     return true;
 }

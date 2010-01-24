@@ -87,8 +87,7 @@ bool SelectDestination::Create(void)
     connect(m_filenameEdit, SIGNAL(LosingFocus()), this,
             SLOT(filenameEditLostFocus()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     loadConfiguration();
 
