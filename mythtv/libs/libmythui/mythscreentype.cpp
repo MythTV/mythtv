@@ -187,7 +187,7 @@ bool MythScreenType::NextPrevWidgetFocus(bool up)
     return false;
 }
 
-bool MythScreenType::BuildFocusList(void)
+void MythScreenType::BuildFocusList(void)
 {
     m_FocusWidgetList.clear();
     m_CurrentFocusWidget = NULL;
@@ -195,12 +195,7 @@ bool MythScreenType::BuildFocusList(void)
     AddFocusableChildrenToList(m_FocusWidgetList);
 
     if (m_FocusWidgetList.size() > 0)
-    {
         SetFocusWidget();
-        return true;
-    }
-
-    return false;
 }
 
 MythScreenStack *MythScreenType::GetScreenStack(void) const

@@ -57,7 +57,7 @@ class MPUBLIC MythScreenType : public MythUIType
     MythUIType *GetFocusWidget(void) const;
     bool SetFocusWidget(MythUIType *widget = NULL);
     virtual bool NextPrevWidgetFocus(bool up_or_down);
-    bool BuildFocusList(void);
+    void BuildFocusList(void);
 
     MythScreenStack *GetScreenStack() const;
 
