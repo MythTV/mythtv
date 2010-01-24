@@ -731,6 +731,10 @@ void PlaybackBox::UpdateUIListItem(
     QString job = extract_job_state(*pginfo);
     item->DisplayState(job, "jobstate");
 
+    // Watched status
+//     QString watched =
+//     item->DisplayState(, "watched");
+
     QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
 
     item->DisplayState(rating, "ratingstate");
@@ -4619,8 +4623,7 @@ bool GroupSelector::Create()
     // Set the current position in the list
     groupList->SetValueByData(qVariantFromValue(m_selected));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
+    BuildFocusList();
 
     connect(groupList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(AcceptItem(MythUIButtonListItem *)));
@@ -4726,8 +4729,7 @@ bool ChangeView::Create()
     MythUIButton *savebutton = dynamic_cast<MythUIButton*>(GetChild("save"));
     connect(savebutton, SIGNAL(Clicked()), SLOT(SaveChanges()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
+    BuildFocusList();
 
     return true;
 }
@@ -4769,8 +4771,7 @@ bool PasswordChange::Create()
     m_newPasswordEdit->SetPassword(true);
     m_newPasswordEdit->SetMaxLength(10);
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
+    BuildFocusList();
 
     connect(m_oldPasswordEdit, SIGNAL(valueChanged()),
                                SLOT(OldPasswordChanged()));
@@ -4825,8 +4826,7 @@ bool RecMetadataEdit::Create()
 
     connect(okButton, SIGNAL(Clicked()), SLOT(SaveChanges()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
+    BuildFocusList();
 
     return true;
 }
@@ -4867,8 +4867,7 @@ bool HelpPopup::Create()
         return false;
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to build a focuslist.");
+    BuildFocusList();
 
     addItem("commflagged", tr("Commercials are flagged"));
     addItem("cutlist",     tr("An editing cutlist is present"));

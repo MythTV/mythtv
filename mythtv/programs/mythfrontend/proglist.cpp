@@ -1839,8 +1839,7 @@ bool PhrasePopup::Create()
 
     connect(m_phraseEdit, SIGNAL(valueChanged()), this, SLOT(editChanged()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_phraseList);
 
@@ -2037,8 +2036,7 @@ bool TimePopup::Create()
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okClicked()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_dateList);
 
@@ -2118,8 +2116,7 @@ bool PowerSearchPopup::Create()
     connect(m_deleteButton, SIGNAL(Clicked()), this, SLOT(deleteClicked()));
     connect(m_recordButton, SIGNAL(Clicked()), this, SLOT(recordClicked()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_phraseList);
 
@@ -2314,8 +2311,7 @@ bool EditPowerSearchPopup::Create()
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(okClicked()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_titleEdit);
 

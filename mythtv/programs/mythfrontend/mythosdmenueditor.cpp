@@ -104,8 +104,7 @@ bool MythOSDMenuEditor::Create()
 
     updateCategoryList(false);
 
-    if (!BuildFocusList())
-      VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     return true;
 }

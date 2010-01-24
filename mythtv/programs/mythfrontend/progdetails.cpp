@@ -45,11 +45,7 @@ bool ProgDetails::Create(void)
         return false;
     }
 
-    if (!BuildFocusList())
-    {
-        VERBOSE(VB_IMPORTANT,
-                "Failed to build a focuslist. Something is wrong");
-    }
+    BuildFocusList();
 
     SetFocusWidget(m_browser);
 

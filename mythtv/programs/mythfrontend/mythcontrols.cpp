@@ -141,8 +141,7 @@ bool MythControls::Create(void)
         m_actionButtons.append(button);
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     LoadData(gContext->GetHostName());
 
