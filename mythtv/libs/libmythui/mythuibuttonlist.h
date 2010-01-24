@@ -9,6 +9,7 @@
 #include "mythuitype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
+#include "mythuigroup.h"
 
 class MythUIButtonList;
 class MythFontProperties;
@@ -109,6 +110,9 @@ class MPUBLIC MythUIButtonList : public MythUIType
     virtual bool keyPressEvent(QKeyEvent *);
     virtual bool gestureEvent(MythGestureEvent *event);
 
+    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
+                        MoveMid, MoveByAmount };
+    
     void SetDrawFromBottom(bool draw);
 
     void Reset();
@@ -143,12 +147,6 @@ class MPUBLIC MythUIButtonList : public MythUIType
     uint GetVisibleCount() const { return m_itemsVisible; }
     bool IsEmpty() const;
 
-    enum ScrollStyle  { ScrollFree, ScrollCenter };
-    enum LayoutType   { LayoutVertical, LayoutHorizontal, LayoutGrid };
-    enum MovementUnit { MoveItem, MoveColumn, MoveRow, MovePage, MoveMax,
-                        MoveMid, MoveByAmount };
-    enum WrapStyle    { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems };
-
     virtual bool MoveDown(MovementUnit unit = MoveItem, uint amount = 0);
     virtual bool MoveUp(MovementUnit unit = MoveItem, uint amount = 0);
     bool MoveToNamedPosition(const QString &position_name);
@@ -166,6 +164,11 @@ class MPUBLIC MythUIButtonList : public MythUIType
     void itemClicked(MythUIButtonListItem* item);
 
   protected:
+    enum ScrollStyle  { ScrollFree, ScrollCenter, ScrollGroupCenter };
+    enum LayoutType   { LayoutVertical, LayoutHorizontal, LayoutGrid };
+    enum ArrangeType  { ArrangeFixed, ArrangeFill, ArrangeSpread, ArrangeStack };
+    enum WrapStyle    { WrapCaptive = -1, WrapNone = 0, WrapSelect, WrapItems };
+      
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect);
     void Const();
@@ -173,12 +176,36 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     void InsertItem(MythUIButtonListItem *item);
 
+    int minButtonWidth(const MythRect & area);
+    int minButtonHeight(const MythRect & area);
+    void InitButton(int itemIdx, MythUIStateType* & realButton,
+                    MythUIButtonListItem* & buttonItem);
+    MythUIGroup *PrepareButton(int buttonIdx, int itemIdx,
+                               int & selectedIdx, int & button_shift);
+    bool DistributeRow(int & first_button, int & last_button,
+                       int & first_item, int & last_item,
+                       int & selected_column,
+                       bool grow_left, bool grow_right,
+                       int ** col_widths, int & row_height,
+                       int total_height, int split_height,
+                       int & col_cnt, bool & wrapped);
+    bool DistributeCols(int & first_button, int & last_button,
+                        int & first_item, int & last_item,
+                        int & selected_column, int & selected_row,
+                        int ** col_widths, QList<int> & row_heights,
+                        int & top_height, int & bottom_height,
+                        bool & wrapped);
+    bool DistributeButtons(void);
+    void SetPosition(void);
     void SetPositionArrowStates(void);
 
     void updateLCD(void);
 
     void SetActive(bool active);
 
+    int PageUp(void);
+    int PageDown(void);
+    
     /* methods for subclasses to override */
     virtual void CalculateVisibleItems(void);
     virtual QPoint GetButtonPosition(int column, int row) const;
@@ -192,9 +219,11 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     /**/
 
-    LayoutType m_layout;
+    LayoutType  m_layout;
+    ArrangeType m_arrange;
     ScrollStyle m_scrollStyle;
-    WrapStyle m_wrapStyle;
+    WrapStyle   m_wrapStyle;
+    int         m_alignment;
 
     MythRect m_contentsRect;
 
@@ -203,14 +232,19 @@ class MPUBLIC MythUIButtonList : public MythUIType
     int m_itemHorizSpacing;
     int m_itemVertSpacing;
     uint m_itemsVisible;
+    int m_maxVisible;
     int m_rows;
     int m_columns;
+    int m_leftColumns, m_rightColumns;
+    int m_topRows, m_bottomRows;
 
     bool m_active;
     bool m_showArrow;
 
     MythUIStateType *m_upArrow;
     MythUIStateType *m_downArrow;
+
+    MythUIStateType *m_buttontemplate;
 
     QVector<MythUIStateType *> m_ButtonList;
     QMap<int, MythUIButtonListItem *> m_ButtonToItem;
