@@ -617,7 +617,7 @@ int AvFormatDecoder::GetCurrentChapter(long long framesPlayed)
         {
             VERBOSE(VB_IMPORTANT, LOC +
                     QString("GetCurrentChapter(selected chapter %1 framenum %2)")
-                            .arg(i).arg(framenum));
+                            .arg(i + 1).arg(framenum));
             return i;
         }
     }
@@ -1169,11 +1169,13 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         int hours = (int)total_secs / 60 / 60;
         int minutes = ((int)total_secs / 60) - (hours * 60);
         double secs = (double)total_secs - (double)(hours * 60 * 60 + minutes * 60);
-        VERBOSE(VB_PLAYBACK, LOC + QString("Chapter %1 found @ [%2:%3:%4]")
-                .arg(QString().sprintf("%02d", i))
+        long long framenum = (long long)(total_secs * fps);
+        VERBOSE(VB_PLAYBACK, LOC + QString("Chapter %1 found @ [%2:%3:%4]->%5")
+                .arg(QString().sprintf("%02d", i + 1))
                 .arg(QString().sprintf("%02d", hours))
                 .arg(QString().sprintf("%02d", minutes))
-                .arg(QString().sprintf("%06.3f", secs)));
+                .arg(QString().sprintf("%06.3f", secs))
+                .arg(framenum));
     }
 
     // Return true if recording has position map
