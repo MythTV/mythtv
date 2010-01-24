@@ -93,7 +93,9 @@ class IconView : public MythScreenType
     void HandleDelete(void);
     void HandleDeleteMarked(void);
     void HandleClearMarked(void);
+    void HandleClearOneMarked(void);
     void HandleSelectAll(void);
+    void HandleSelectOne(void);
     void HandleMkDir(void);
     void HandleRename(void);
 

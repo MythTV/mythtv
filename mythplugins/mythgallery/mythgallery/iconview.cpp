@@ -791,10 +791,16 @@ void IconView::customEvent(QEvent *event)
             switch (buttonnum)
             {
                 case 0:
-                    HandleClearMarked();
+                    HandleSelectOne();
                     break;
                 case 1:
+                    HandleClearOneMarked();
+                    break;
+                case 2:
                     HandleSelectAll();
+                    break;
+                case 3:
+                    HandleClearMarked();
                     break;
             }
         }
@@ -895,8 +901,10 @@ void IconView::HandleSubMenuMark(void)
 
     m_menuPopup->SetReturnEvent(this, "markingmenu");
 
-    m_menuPopup->AddButton(tr("Clear Marked"));
+    m_menuPopup->AddButton(tr("Select One"));
+    m_menuPopup->AddButton(tr("Clear One Marked"));
     m_menuPopup->AddButton(tr("Select All"));
+    m_menuPopup->AddButton(tr("Clear Marked"));
 }
 
 void IconView::HandleSubMenuFile(void)
@@ -1189,6 +1197,22 @@ void IconView::DoDeleteMarked(bool doDelete)
 
         LoadDirectory(m_currDir);
     }
+}
+
+void IconView::HandleClearOneMarked(void)
+{
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    if (!item)
+        return;
+    item->setChecked(MythUIButtonListItem::NotChecked);
+}
+
+void IconView::HandleSelectOne(void)
+{
+    MythUIButtonListItem *item = m_imageList->GetItemCurrent();
+    if (!item)
+        return;
+    item->setChecked(MythUIButtonListItem::FullChecked);
 }
 
 void IconView::HandleClearMarked(void)
