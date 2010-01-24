@@ -53,6 +53,19 @@
                         <font>basesmallbrown</font>
                         <align>hcenter</align>
                     </textarea>
+                    <statetype name="buttoncheck">
+                        <position>10,105</position>
+                        <showempty>yes</showempty>
+                        <state type="full">
+                            <imagetype name="overlay">
+                                <filename>recordings/statusoverlay.png</filename>
+                            </imagetype>
+                            <imagetype name="watchedimage">
+                                <position>4,4</position>
+                                <filename>shared/playlist.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
                 </state>
                 <state name="selected" from="active">
                     <imagetype name="buttonbackground">
