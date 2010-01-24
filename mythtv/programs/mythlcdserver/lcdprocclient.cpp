@@ -1875,18 +1875,19 @@ void LCDProcClient::outputTime()
     if (lcd_bigclock)
         dobigclock(0);
     else
-    {
-        if (lcd_showrecstatus && isRecording)
-            outputCenteredText("Time", tr("RECORDING"), "topWidget", 1);
-        else
-            outputCenteredText("Time", QDate::currentDate().toString(dateformat), "topWidget", 1);
-
         dostdclock();
-    }
 }
 
 void LCDProcClient::dostdclock()
 {
+    if (!lcd_showtime)
+        return;
+
+    if (lcd_showrecstatus && isRecording)
+         outputCenteredText("Time", tr("RECORDING"), "topWidget", 1);
+    else
+        outputCenteredText("Time", QDate::currentDate().toString(dateformat), "topWidget", 1);
+
     QString aString;
     int x, y;
 
@@ -1926,7 +1927,7 @@ void LCDProcClient::outputRecStatus(void)
 
     int listTime;
 
-    if (isTimeVisible)
+    if (isTimeVisible || !lcd_showtime)
     {
         // switch to the rec status screen
         setPriority("RecStatus", MEDIUM);

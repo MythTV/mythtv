@@ -586,7 +586,7 @@ void LCD::outputLEDs()
 
 void LCD::switchToTime()
 {
-    if (!lcd_ready || !lcd_showtime)
+    if (!lcd_ready)
         return;
 
     VERBOSE(VB_IMPORTANT|VB_EXTRA, LOC + "switchToTime");
