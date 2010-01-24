@@ -501,6 +501,161 @@
         </button>
     </window>
 
+    <window name="iconhelp">
+        <area>0,42,1280,515</area>
+        <shape name="fade" from="basefadebackground" />
+
+        <imagetype name="backimg">
+            <position>877,78</position>
+            <filename>popups/alt_menu_background.png</filename>
+        </imagetype>
+
+        <imagetype name="listback">
+            <position>896,238</position>
+            <filename>recordings/filterlist_background.png</filename>
+        </imagetype>
+
+        <textarea name="title" from="basetextarea">
+            <area>889,93,378,125</area>
+            <font>basemedium</font>
+            <align>allcenter</align>
+            <value>Status Icons</value>
+            <multiline>yes</multiline>
+        </textarea>
+
+        <buttonlist name="iconlist">
+            <area>900,248,364,307</area>
+            <buttonarea>0,0,364,305</buttonarea>
+            <spacing>2</spacing>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <imagetype name="buttonbackground">
+                        <filename>popups/menu_button.png</filename>
+                        <area>0,0,364,60</area>
+                    </imagetype>
+                    <textarea name="buttontext">
+                        <area>110,-3,240,60</area>
+                        <align>allcenter</align>
+                        <font>basesmall</font>
+                        <multiline>yes</multiline>
+                    </textarea>
+                    <statetype name="icons">
+                        <position>19,13</position>
+                        <state name="commflagged">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/adflagged.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="cutlist">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/cutlist.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="autoexpire">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/autoexpire.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="processing">
+                            <imagetype name="statusimage">
+                                <filepattern low="1" high="8">recordings/flagging_%1.png</filepattern>
+                                <delay>160</delay>
+                                <position>0,2</position>
+                            </imagetype>
+                        </state>
+                        <state name="bookmark">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/bookmark.png</filename>
+                                <position>0,2</position>
+                            </imagetype>
+                        </state>
+                        <state name="mono">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/audio_mono.png</filename>
+                                <position>0,5</position>
+                            </imagetype>
+                        </state>
+                        <state name="stereo">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/audio_stereo.png</filename>
+                                <position>0,5</position>
+                            </imagetype>
+                        </state>
+                        <state name="surround">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/audio_surround.png</filename>
+                                <position>0,5</position>
+                            </imagetype>
+                        </state>
+                        <!--
+                        <state name="dolby">
+                            <imagetype name="statusimage">
+                                <filename></filename>
+                            </imagetype>
+                        </state>
+                        <state name="cc">
+                            <imagetype name="statusimage">
+                                <filename></filename>
+                            </imagetype>
+                        </state>
+                        <state name="subtitles">
+                            <imagetype name="statusimage">
+                                <filename></filename>
+                            </imagetype>
+                        </state>
+                        <state name="onscreensub">
+                            <imagetype name="statusimage">
+                                <filename></filename>
+                            </imagetype>
+                        </state>
+                        -->
+                        <state name="hdtv">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/hdtv.png</filename>
+                                <position>0,6</position>
+                            </imagetype>
+                        </state>
+                        <state name="hd720">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/hd_720.png</filename>
+                                <position>0,6</position>
+                            </imagetype>
+                        </state>
+                        <state name="hd1080">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/hd_1080.png</filename>
+                                <position>0,6</position>
+                            </imagetype>
+                        </state>
+                        <state name="widescreen">
+                            <imagetype name="statusimage">
+                                <filename>shared/icons/16_9.png</filename>
+                                <position>0,6</position>
+                            </imagetype>
+                        </state>
+                        <state name="watched">
+                            <imagetype name="statusimage">
+                                <filename>shared/watched.png</filename>
+                                <position>0,5</position>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                </state>
+                <state name="inactive" from="active">
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="selecteditemarrow">
+                        <position>3,18</position>
+                        <filename>popups/selected_item_arrow.png</filename>
+                    </imagetype>
+                    <textarea name="buttontext">
+                         <font>basesmallbrown</font>
+                    </textarea>
+                </state>
+            </statetype>
+        </buttonlist>
+    </window>
+
     <window name="editmetadata">
         <area>0,42,1280,515</area>
         <shape name="fade" from="basefadebackground" />
