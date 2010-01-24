@@ -90,8 +90,7 @@ bool WelcomeDialog::Create(void)
     connect(m_startfrontend_button, SIGNAL(Clicked()),
             this, SLOT(startFrontendClick()));
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     SetFocusWidget(m_startfrontend_button);
 

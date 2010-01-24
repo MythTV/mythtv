@@ -56,8 +56,7 @@ bool RawSettingsEditor::Create(void)
         return false;
     }
 
-    if (!BuildFocusList())
-        VERBOSE(VB_IMPORTANT, "Failed to build a focuslist. Something is wrong");
+    BuildFocusList();
 
     MythUIText *text = dynamic_cast<MythUIText *> (GetChild("heading"));
     if (text)
