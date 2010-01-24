@@ -90,11 +90,11 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
             m_lines.push_back(line);
     }
 
-    if (m_lines.size() < 3)
+    if (m_lines.size() < 6)
     {
         DialogBox *dlg = new DialogBox(
             gContext->GetMainWindow(),
-            tr("The theme you are using does not contain any info "
+            tr("The theme you are using does not contain enough info "
                "lines in the music element. Please contact the theme "
                "creator and ask if they could please update it."));
 
