@@ -224,6 +224,7 @@ class AvFormatDecoder : public DecoderBase
     bool drawband;
 
     bool no_dts_hack;
+    bool dorewind;
 
     bool gopset;
     /// A flag to indicate that we've seen a GOP frame.  Used in junction with seq_count.

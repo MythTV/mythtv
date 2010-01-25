@@ -599,6 +599,9 @@ int RingBuffer::safe_read(int fd, void *data, uint sz)
             tot += ret;
         }
 
+        if (oldfile)
+            break;
+
         if (ret == 0) // EOF returns 0
         {
             if (tot > 0)
@@ -606,9 +609,9 @@ int RingBuffer::safe_read(int fd, void *data, uint sz)
 
             zerocnt++;
 
-            // 3 second timeout with usleep(60000), 
-            // or 0.12 seconds if it's an old, unmodified file.
-            if (zerocnt >= ((oldfile) ? 2 : (livetvchain) ? 6 : 40))
+            // 0.36 second timeout for livetvchain with usleep(60000), 
+            // or 2.4 seconds if it's a new file less than 30 minutes old.
+            if (zerocnt >= (livetvchain ? 6 : 40))
             {
                 break;
             }
@@ -943,6 +946,7 @@ void RingBuffer::ReadAheadThread(void)
             readaheadpaused = false;
         }
 
+        totfree = ReadBufFree();
         if (totfree < GetReadBlockSize())
         {
             usleep(50000);

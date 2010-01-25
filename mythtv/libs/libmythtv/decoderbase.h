@@ -91,7 +91,8 @@ class DecoderBase
                          int testbufsize = kDecoderProbeBufferSize) = 0;
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
-    void setLiveTVMode(bool live) { livetv = live; }
+    bool getExactSeeks(void)       { return exactseeks;  }
+    void setLiveTVMode(bool live)  { livetv = live;      }
 
     // Must be done while player is paused.
     void SetProgramInfo(const ProgramInfo &pginfo);

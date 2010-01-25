@@ -648,6 +648,8 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame, bool discardFrames)
     if (recordingHasPositionMap || livetv)
         return DecoderBase::DoRewind(desiredFrame, discardFrames);
 
+    dorewind = true;
+
     // avformat-based seeking
     return DoFastForward(desiredFrame, discardFrames);
 }
@@ -678,6 +680,18 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     if (!st)
         return false;
 
+    int seekDelta = desiredFrame - framesPlayed;
+
+    // avoid using av_frame_seek if we want to advance forward < 1 second
+    if (seekDelta >= 0 && seekDelta < (int)(fps + 1.0f) && !dorewind)
+    {
+        SeekReset(framesPlayed, seekDelta, false, true);
+        GetNVP()->SetFramesPlayed(framesPlayed + 1);
+        GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
+
+        return true;
+    }
+
     int64_t frameseekadjust = 0;
     AVCodecContext *context = st->codec;
 
@@ -692,7 +706,13 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
     long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE / fps;
     ts += (long long)diff;
 
-    if (av_seek_frame(ic, -1, ts, AVSEEK_FLAG_BACKWARD) < 0)
+    bool exactseeks = DecoderBase::getExactSeeks();
+
+    int flags = 0;
+    if (dorewind || exactseeks)
+        flags |= AVSEEK_FLAG_BACKWARD;
+
+    if (av_seek_frame(ic, -1, ts, flags) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR
                 <<"av_seek_frame(ic, -1, "<<ts<<", 0) -- error");
@@ -731,7 +751,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         framesPlayed = lastKey;
         framesRead = lastKey;
 
-        normalframes = desiredFrame - framesPlayed;
+        normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
         normalframes = max(normalframes, 0);
         no_dts_hack = false;
     }
@@ -744,13 +764,15 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         normalframes = 0;
     }
 
-    SeekReset(lastKey, normalframes, discardFrames, discardFrames);
+    SeekReset(lastKey, normalframes, true, discardFrames);
 
     if (discardFrames)
     {
         GetNVP()->SetFramesPlayed(framesPlayed + 1);
         GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
     }
+
+    dorewind = false;
 
     getrawframes = oldrawstate;
 
