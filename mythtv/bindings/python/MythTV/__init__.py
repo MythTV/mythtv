@@ -1,6 +1,43 @@
-__all__ = ['MythTV', 'MythLog', 'MythDB', 'MythVideo']
+#!/usr/bin/env python
 
-from MythLog import *
-from MythDB import *
-from MythTV import *
-from MythVideo import *
+__all__ = ['MythStatic', \
+            \
+           'DictData', 'DBData', 'DBDataWrite', 'DBDataCRef', 'MythDBConn', \
+           'MythBEConn', 'MythXMLConn', 'MythLog', 'MythError', \
+           'StorageGroup', 'Grabber', \
+            \
+           'ftopen', 'FileTransfer', 'FreeSpace', 'Program', \
+           'Recorded', 'RecordedProgram', 'OldRecorded', 'Job', 'Channel', \
+           'Guide', 'Video', 'VideoGrabber', 'NetVisionRSSItems', \
+           'NetVisionTreeItems', 'NetVisionSites', 'NetVisionGrabber', \
+            \
+           'MythBE', 'Frontend', 'MythDB', 'MythVideo']
+
+from sys import version_info
+if (version_info[0]>2) | (version_info[1]>5): # 2.6 or newer
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        from MythStatic import *
+        from MythBase import *
+        from MythData import *
+        from MythFunc import *
+else:
+    from MythStatic import *
+    from MythBase import *
+    from MythData import *
+    from MythFunc import *
+
+if __name__ == '__main__':
+    banner = 'MythTV Python interactive shell.'
+    import code
+    try:
+        import readline, rlcompleter
+    except:
+        pass
+    else:
+        readline.parse_and_bind("tab: complete")
+        banner += ' TAB completion available.'
+    namespace = globals().copy()
+    namespace.update(locals())
+    code.InteractiveConsole(namespace).interact(banner)
