@@ -60,6 +60,12 @@ openbsd {
     setting.extra += -ldconfig -R
 }
 
+win32 : !debug {
+    # To hide the window that contains logging output:
+    CONFIG -= console
+    DEFINES += WINDOWS_CLOSE_CONSOLE
+}
+
 using_x11:DEFINES += USING_X11
 using_xv:DEFINES += USING_XV
 using_xvmc:DEFINES += USING_XVMC

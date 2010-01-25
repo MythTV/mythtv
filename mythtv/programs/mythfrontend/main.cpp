@@ -1109,9 +1109,17 @@ int log_rotate(int report_error)
         }
     }
 
+#ifdef WINDOWS_CLOSE_CONSOLE
+    // pure Win32 GUI app does not have standard IO streams 
+    // simply assign the file descriptors to the logfile 
+    *stdout = *(_fdopen(new_logfd, "w")); 
+    *stderr = *stdout; 
+    setvbuf(stdout, NULL, _IOLBF, 256);
+#else
     while (dup2(new_logfd, 1) < 0 && errno == EINTR);
     while (dup2(new_logfd, 2) < 0 && errno == EINTR);
     while (close(new_logfd) < 0   && errno == EINTR);
+#endif
 
     return 0;
 }
