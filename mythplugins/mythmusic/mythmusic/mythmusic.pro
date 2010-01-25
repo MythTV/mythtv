@@ -74,6 +74,9 @@ mingw {
     SOURCES += cddecoder-windows.cpp
 
     LIBS += -logg
+
+    # libcdaudio needs ...
+    LIBS += -lwsock32
 }
 
 include ( ../../libs-targetfix.pro )
