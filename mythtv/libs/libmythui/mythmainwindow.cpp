@@ -855,7 +855,12 @@ void MythMainWindow::Init(void)
     Qt::WindowFlags flags = Qt::Window;
 
     if (d->does_fill_screen)
-        flags |= Qt::FramelessWindowHint;
+    {
+        if (GetMythUI()->IsGeometryOverridden())
+            flags |= Qt::FramelessWindowHint;
+        else
+            setWindowState(Qt::WindowFullScreen);
+    }
 
     // Workarounds for Qt/Mac bugs
 #ifdef Q_WS_MACX
