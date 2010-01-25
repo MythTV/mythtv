@@ -601,7 +601,7 @@ void VideoOutput::VideoAspectRatioChanged(float aspect)
 }
 
 /**
- * \fn VideoOutput::InputChanged(const QSize&, float, MythCodecID, void*)
+ * \fn VideoOutput::InputChanged(const QSize&, float, MythCodecID, void*, bool)
  * \brief Tells video output to discard decoded frames and wait for new ones.
  * \bug We set the new width height and aspect ratio here, but we should
  *      do this based on the new video frames in Show().
@@ -609,8 +609,11 @@ void VideoOutput::VideoAspectRatioChanged(float aspect)
 bool VideoOutput::InputChanged(const QSize &input_size,
                                float        aspect,
                                MythCodecID  myth_codec_id,
-                               void        *codec_private)
+                               void        *codec_private,
+                               bool         force_change)
 {
+    (void) force_change;
+
     vector<VideoOutWindow>::iterator it = windows.begin();
     for (; it != windows.end(); ++it)
         (*it).InputChanged(input_size, aspect, myth_codec_id, codec_private);

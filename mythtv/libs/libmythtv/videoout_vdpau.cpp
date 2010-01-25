@@ -360,7 +360,7 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
     if (!m_render)
         return;
 
-    if (!m_checked_output_surfaces && m_decoder)
+    if (!m_checked_output_surfaces && !(!codec_is_std(m_codec_id) && !m_decoder))
     {
         m_render->SetMaster(kMasterVideo);
         m_render->CheckOutputSurfaces();
@@ -607,7 +607,8 @@ void VideoOutputVDPAU::ClearAfterSeek(void)
 bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
                                     float        aspect,
                                     MythCodecID  av_codec_id,
-                                    void        *codec_private)
+                                    void        *codec_private,
+                                    bool         force_change)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'->'%5'")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
@@ -618,7 +619,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     bool res_changed = input_size  != windows[0].GetVideoDispDim();
     bool asp_changed = aspect      != windows[0].GetVideoAspect();
 
-    if (!res_changed && !cid_changed)
+    if (!res_changed && !cid_changed && !force_change)
     {
         if (asp_changed)
         {

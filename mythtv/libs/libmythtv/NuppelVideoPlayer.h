@@ -293,7 +293,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
 
     // Reinit
     void    ReinitOSD(void);
-    void    ReinitVideo(void);
+    void    ReinitVideo(bool force_reinit = false);
     QString ReinitAudio(void);
 
     // Add data
