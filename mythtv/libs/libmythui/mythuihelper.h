@@ -72,6 +72,7 @@ class MPUBLIC MythUIHelper
 
     // Parse an X11 style command line (-geometry) string
     static void ParseGeometryOverride(const QString &geometry);
+    bool IsGeometryOverridden(void);
 
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true);
     QImage *LoadScaleImage(QString filename, bool fromcache = true);

@@ -887,6 +887,14 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     }
 }
 
+bool MythUIHelper::IsGeometryOverridden(void)
+{
+    return (MythUIHelperPrivate::x_override >= 0 ||
+            MythUIHelperPrivate::y_override >= 0 ||
+            MythUIHelperPrivate::w_override >= 0 ||
+            MythUIHelperPrivate::h_override >= 0);
+}
+
 /**
  *  \brief Returns the full path to the theme denoted by themename
  *
