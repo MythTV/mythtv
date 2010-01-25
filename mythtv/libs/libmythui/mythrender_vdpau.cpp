@@ -452,6 +452,35 @@ void MythRenderVDPAU::Flip(int delay)
         m_surface = 0;
 }
 
+void MythRenderVDPAU::CheckOutputSurfaces(void)
+{
+    LOCK_RENDER
+    CHECK_STATUS()
+
+    int need = (m_master == kMasterUI) ?
+                MIN_OUTPUT_SURFACES : MAX_OUTPUT_SURFACES;
+    int have = m_surfaces.size();
+    int created = 0;
+
+    // TODO reduce number of surfaces
+    if (have >= need)
+        return;
+
+    for (; have < need; have++)
+    {
+        uint id = CreateOutputSurface(m_size);
+        if (id)
+        {
+            m_surfaces.push_back(id);
+            created++;
+        }
+    }
+
+    VERBOSE(VB_GENERAL, LOC +
+        QString("Added %1 output surfaces (total %2, max %3)")
+            .arg(created).arg(m_surfaces.size()).arg(need));
+}
+
 uint MythRenderVDPAU::CreateOutputSurface(const QSize &size, VdpRGBAFormat fmt,
                                           uint existing)
 {

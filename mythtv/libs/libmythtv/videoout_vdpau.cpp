@@ -26,6 +26,7 @@ VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
     m_buffer_size(NUM_VDPAU_BUFFERS),          m_pause_surface(0),
     m_need_deintrefs(false), m_video_mixer(0), m_mixer_features(kVDPFeatNone),
     m_checked_surface_ownership(false),
+    m_checked_output_surfaces(false),
     m_decoder(0),            m_pix_fmt(-1),    m_frame_delay(0),
     m_lock(QMutex::Recursive), m_pip_layer(0), m_pip_surface(0),
     m_pip_ready(false),
@@ -102,7 +103,6 @@ bool VideoOutputVDPAU::InitRender(void)
 
     if (m_render && m_render->Create(size, m_win))
     {
-        m_render->SetMaster(kMasterVideo);
         InitOSD(GetTotalOSDBounds().size());
         return true;
     }
@@ -126,6 +126,7 @@ void VideoOutputVDPAU::DeleteRender(void)
         delete m_render;
     }
 
+    m_checked_output_surfaces = false;
     m_decoder = 0;
     m_render = NULL;
     m_pix_fmt = -1;
@@ -358,6 +359,13 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
 
     if (!m_render)
         return;
+
+    if (!m_checked_output_surfaces && m_decoder)
+    {
+        m_render->SetMaster(kMasterVideo);
+        m_render->CheckOutputSurfaces();
+        m_checked_output_surfaces = true;
+    }
 
     QMutexLocker locker(&m_lock);
     bool new_frame = false;

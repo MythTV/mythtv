@@ -71,6 +71,7 @@ class MPUBLIC MythRenderVDPAU : public MythRender
     bool SetColorKey(uint color);
     void WaitForFlip(void);
     void Flip(int delay = 0);
+    void CheckOutputSurfaces(void);
 
     uint CreateOutputSurface(const QSize &size,
                              VdpRGBAFormat fmt = VDP_RGBA_FORMAT_B8G8R8A8,

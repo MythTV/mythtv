@@ -101,6 +101,7 @@ class VideoOutputVDPAU : public VideoOutput
     uint                 m_video_mixer;
     uint                 m_mixer_features;
     bool                 m_checked_surface_ownership;
+    bool                 m_checked_output_surfaces;
 
     uint                 m_decoder;
     int                  m_pix_fmt;
