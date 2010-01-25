@@ -692,11 +692,15 @@ QString HDHRStreamHandler::TunerSet(
         return QString::null;
     }
 
-    if (error && name == QString("channel"))
+    // Database modulation strings and HDHR use different syntax.
+    // HACK!! Caller should be doing this. (e.g. auto in HDHRChannel::Tune())
+    //
+    if (error && name == QString("channel") && val.contains("qam_"))
     {
         QString newval = val;
         newval.replace("qam_256", "qam");
         newval.replace("qam_64", "qam");
+        VERBOSE(VB_CHANNEL, "HDHRSH::TunerSet() Failed. Trying " + newval);
         return TunerSet(name, newval, report_error_return, print_error);
     }
 
