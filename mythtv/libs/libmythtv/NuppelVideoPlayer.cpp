@@ -3131,6 +3131,9 @@ void NuppelVideoPlayer::JumpChapter(int chapter)
 {
     if (jumpchapter == 0)
         jumpchapter = chapter;
+
+    if (osdHasSubtitles || !nonDisplayedAVSubtitles.empty())
+       ClearSubtitles();
 }
 
 void NuppelVideoPlayer::SkipCommercials(int direction)
