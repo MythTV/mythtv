@@ -1,6 +1,10 @@
 #ifndef _GOOMTOOLS_H
 #define _GOOMTOOLS_H
 
+#if !defined( M_PI ) 
+ #define M_PI 3.14159265358979323846 
+#endif
+
 #define NB_RAND 0x10000
 
 /* in graphic.c */
