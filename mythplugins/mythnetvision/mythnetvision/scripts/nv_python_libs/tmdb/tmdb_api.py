@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.5"
+__version__="v0.1.6"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -28,6 +28,8 @@ __version__="v0.1.5"
 # 0.1.4 More data validation added (e.g. valid image file extentions)
 #       More data massaging added.
 # 0.1.5 Added a superclass to perform TMDB Trailer searches for the Mythnetvison grabber tmdb_nv.py
+# 0.1.6 Add sme common routines to clean up description text and convert any '&' to '&amp;'\
+#       Fixed the Trailer URLs with clean up of the '&'
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -286,6 +288,7 @@ class MovieDb(object):
 
         self.config['debug_enabled'] = debug # show debugging messages
 
+        self.log_name = "tmdb_nv"
         self.log = self._initLogger() # Setups the logger (self.log.debug() etc)
 
         self.config['custom_ui'] = custom_ui
@@ -340,10 +343,50 @@ class MovieDb(object):
     # end __init__()
 
 
+###########################################################################################################
+#
+# Start - Utility functions
+#
+###########################################################################################################
+
+    def massageDescription(self, text):
+        '''Removes HTML markup from a text string.
+        @param text The HTML source.
+        @return The plain text.  If the HTML source contains non-ASCII
+        entities or character references, this is a Unicode string.
+        '''
+        def fixup(m):
+            text = m.group(0)
+            if text[:1] == "<":
+                return "" # ignore tags
+            if text[:2] == "&#":
+                try:
+                    if text[:3] == "&#x":
+                        return unichr(int(text[3:-1], 16))
+                    else:
+                        return unichr(int(text[2:-1]))
+                except ValueError:
+                    pass
+            elif text[:1] == "&":
+                import htmlentitydefs
+                entity = htmlentitydefs.entitydefs.get(text[1:-1])
+                if entity:
+                    if entity[:2] == "&#":
+                        try:
+                            return unichr(int(entity[2:-1]))
+                        except ValueError:
+                            pass
+                    else:
+                        return unicode(entity, "iso-8859-1")
+            return text # leave as is
+        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
+    # end massageDescription()
+
+
     def _initLogger(self):
         """Setups a logger using the logging module, returns a log object
         """
-        logger = logging.getLogger("tmdb")
+        logger = logging.getLogger(self.log_name)
         formatter = logging.Formatter('%(asctime)s) %(levelname)s %(message)s')
 
         hdlr = logging.StreamHandler(sys.stdout)
@@ -364,9 +407,46 @@ class MovieDb(object):
             return text
         try:
             return unicode(text, 'utf8')
+        except UnicodeDecodeError:
+            return u''
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
+
+
+    def ampReplace(self, text):
+        '''Replace all "&" characters with "&amp;"
+        '''
+        text = self.textUtf8(text)
+        return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
+    # end ampReplace()
+
+    def setTreeViewIcon(self, dir_icon=None):
+        '''Check if there is a specific generic tree view icon. If not default to the channel icon.
+        return self.tree_dir_icon
+        '''
+        self.tree_dir_icon = self.channel_icon
+        if not dir_icon:
+            if not self.icon_dir:
+                return self.tree_dir_icon
+            if not self.feed_icons.has_key(self.tree_key):
+                return self.tree_dir_icon
+            if not self.feed_icons[self.tree_key].has_key(self.feed):
+                return self.tree_dir_icon
+            dir_icon = self.feed_icons[self.tree_key][self.feed]
+        for ext in self.config[u'image_extentions']:
+            icon = u'%s%s.%s' % (self.icon_dir, dir_icon, ext)
+            if os.path.isfile(icon):
+                self.tree_dir_icon = icon
+                break
+        return self.tree_dir_icon
+    # end setTreeViewIcon()
+
+###########################################################################################################
+#
+# End of Utility functions
+#
+###########################################################################################################
 
 
     def getCategories(self, categories_et):
@@ -884,11 +964,11 @@ class Videos(MovieDb):
                         trailer_data[self.key_translation[1][key]] = thumbnail[0]
                         continue
                     if key == 'url':    # themoviedb.org always uses Youtube for trailers
-                        trailer_data[self.key_translation[1][key]] = data['trailer']
+                        trailer_data[self.key_translation[1][key]] = self.ampReplace(data['trailer'])
                         continue
                     if key == 'releasedate':
                         c = time.strptime(data[key],"%Y-%m-%d")
-                        trailer_data[self.key_translation[1][key]] = time.strftime("%a, %d %b %Y 00:%M:%S GMT",c) # <pubDate>Tue, 14 Jul 2009 17:05:00 GMT</pubDate> <pubdate>Wed, 24 Jun 2009 03:53:00 GMT</pubdate>
+                        trailer_data[self.key_translation[1][key]] = time.strftime("%a, %d %b %Y 00:%M:%S GMT",c)
                         continue
                     trailer_data[self.key_translation[1][key]] = data[key]
                 else:
