@@ -7,7 +7,7 @@ using namespace std;
 
 #include <QIODevice>
 #include <QObject>
-#include <QDile>
+#include <QFile>
 #include <QDir>
 
 #include <mythconfig.h>
