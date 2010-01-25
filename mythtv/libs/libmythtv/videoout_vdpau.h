@@ -33,8 +33,7 @@ class VideoOutputVDPAU : public VideoOutput
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,
-                      void        *codec_private,
-                      bool         force_change = false);
+                      void        *codec_private);
     void Zoom(ZoomDirection direction);
     void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(int x, int y, int w, int h);

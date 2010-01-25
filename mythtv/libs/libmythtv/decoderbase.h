@@ -214,7 +214,6 @@ class DecoderBase
     float current_aspect;
     double fps;
     uint bitrate;
-    long long stream_hash;
 
     long long framesPlayed;
     long long framesRead;

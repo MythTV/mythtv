@@ -607,8 +607,7 @@ void VideoOutputVDPAU::ClearAfterSeek(void)
 bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
                                     float        aspect,
                                     MythCodecID  av_codec_id,
-                                    void        *codec_private,
-                                    bool         force_change)
+                                    void        *codec_private)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'->'%5'")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
@@ -619,7 +618,7 @@ bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
     bool res_changed = input_size  != windows[0].GetVideoDispDim();
     bool asp_changed = aspect      != windows[0].GetVideoAspect();
 
-    if (!res_changed && !cid_changed && !force_change)
+    if (!res_changed && !cid_changed)
     {
         if (asp_changed)
         {

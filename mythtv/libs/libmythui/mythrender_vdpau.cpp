@@ -520,7 +520,7 @@ uint MythRenderVDPAU::CreateOutputSurface(const QSize &size, VdpRGBAFormat fmt,
     uint id = next_id;
     m_outputSurfaces.insert(id, VDPAUOutputSurface(tmp, size, fmt));
     id_lock.unlock();
-VERBOSE(VB_PLAYBACK, QString("Created output surface %1 (actual %2) - %3x%4").arg(id).arg(tmp).arg(size.width()).arg(size.height()));
+
     DrawBitmap(0, id, NULL, NULL);
     return id;
 }
@@ -566,7 +566,7 @@ uint MythRenderVDPAU::CreateVideoSurface(const QSize &size, VdpChromaType type,
     m_videoSurfaces.insert(id, VDPAUVideoSurface(tmp, size, type));
     m_videoSurfaceHash[tmp] = id;
     id_lock.unlock();
-VERBOSE(VB_PLAYBACK, QString("Created video surface %1 (actual %2) - %3x%4").arg(id).arg(tmp).arg(size.width()).arg(size.height()));
+
     return id;
 }
 
@@ -609,7 +609,7 @@ uint MythRenderVDPAU::CreateBitmapSurface(const QSize &size, VdpRGBAFormat fmt,
     uint id = next_id;
     m_bitmapSurfaces.insert(id, VDPAUBitmapSurface(tmp, size, fmt));
     id_lock.unlock();
-VERBOSE(VB_PLAYBACK, QString("Created bitmap surface %1 (actual %2) - %3x%4").arg(id).arg(tmp).arg(size.width()).arg(size.height()));
+
     return id;
 }
 
@@ -654,7 +654,7 @@ uint MythRenderVDPAU::CreateDecoder(const QSize &size,
     uint id = next_id;
     m_decoders.insert(id, VDPAUDecoder(tmp, size, profile, references));
     id_lock.unlock();
-VERBOSE(VB_PLAYBACK, QString("Created decoder %1 (actual %2) - %3x%4").arg(id).arg(tmp).arg(size.width()).arg(size.height()));
+
     return id;
 }
 
@@ -742,7 +742,7 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
             QString("Failed to create video mixer."));
         return 0;
     }
-VERBOSE(VB_PLAYBACK, QString("Feature count %1").arg(count));
+
     vdp_st = vdp_video_mixer_set_feature_enables(
         tmp, count, count ? feat : NULL, count ? enables : NULL);
     CHECK_ST
@@ -788,7 +788,7 @@ VERBOSE(VB_PLAYBACK, QString("Feature count %1").arg(count));
     m_videoMixers.insert(id,
         VDPAUVideoMixer(tmp, size, layers, features, type));
     id_lock.unlock();
-VERBOSE(VB_PLAYBACK, QString("Created mixer %1 (actual %2) - %3x%4").arg(id).arg(tmp).arg(size.width()).arg(size.height()));
+
     return id;
 }
 
@@ -827,8 +827,6 @@ void MythRenderVDPAU::DestroyOutputSurface(uint id)
 
     if (!m_outputSurfaces.contains(id))
         return;
-VERBOSE(VB_PLAYBACK, QString("Destroyed output surface %1 (actual %2)")
-        .arg(id).arg(m_outputSurfaces[id].m_id));
 
     vdp_st = vdp_output_surface_destroy(m_outputSurfaces[id].m_id);
     CHECK_ST
@@ -843,8 +841,6 @@ void MythRenderVDPAU::DestroyVideoSurface(uint id)
 
     if (!m_videoSurfaces.contains(id))
         return;
-VERBOSE(VB_PLAYBACK, QString("Destroyed video surface %1 (actual %2)")
-        .arg(id).arg(m_videoSurfaces[id].m_id));
 
     vdp_st = vdp_video_surface_destroy(m_videoSurfaces[id].m_id);
     CHECK_ST
@@ -860,8 +856,6 @@ void MythRenderVDPAU::DestroyBitmapSurface(uint id)
 
     if (!m_bitmapSurfaces.contains(id))
         return;
-VERBOSE(VB_PLAYBACK, QString("Destroyed bitmap surface %1 (actual %2)")
-        .arg(id).arg(m_bitmapSurfaces[id].m_id));
 
     vdp_st = vdp_bitmap_surface_destroy(m_bitmapSurfaces[id].m_id);
     CHECK_ST
@@ -876,8 +870,6 @@ void MythRenderVDPAU::DestroyDecoder(uint id)
 
     if (!m_decoders.contains(id))
         return;
-VERBOSE(VB_PLAYBACK, QString("Destroyed decoders %1 (actual %2)")
-        .arg(id).arg(m_decoders[id].m_id));
 
     vdp_st = vdp_decoder_destroy(m_decoders[id].m_id);
     CHECK_ST
@@ -892,8 +884,6 @@ void MythRenderVDPAU::DestroyVideoMixer(uint id)
 
     if (!m_videoMixers.contains(id))
         return;
-VERBOSE(VB_PLAYBACK, QString("Destroyed mixer %1 (actual %2)")
-        .arg(id).arg(m_videoMixers[id].m_id));
 
     vdp_st = vdp_video_mixer_destroy(m_videoMixers[id].m_id);
     CHECK_ST
@@ -1377,7 +1367,7 @@ bool MythRenderVDPAU::CreateDevice(void)
         vdp_get_error_string = &dummy_get_error_string;
         ok = true;
     }
-VERBOSE(VB_PLAYBACK, QString("Created device %1").arg(m_device));
+
     return ok;
 }
 
@@ -1471,11 +1461,10 @@ bool MythRenderVDPAU::CreatePresentationQueue(void)
     CHECK_ST
     if (!ok)
         return false;
-VERBOSE(VB_PLAYBACK, QString("Created flip target %1").arg(m_flipTarget));
+
     vdp_st = vdp_presentation_queue_create(m_device, m_flipTarget,
                                           &m_flipQueue);
     CHECK_ST
-VERBOSE(VB_PLAYBACK, QString("Created flipqueue %1").arg(m_flipQueue));
     return ok;
 }
 
@@ -1580,9 +1569,6 @@ void MythRenderVDPAU::Destroy(void)
 
 void MythRenderVDPAU::DestroyDevice(void)
 {
-VERBOSE(VB_PLAYBACK, QString("Destroyed device %1")
-        .arg(m_device));
-
     vdp_get_error_string = NULL;
     vdp_get_proc_address = NULL;
     if (vdp_device_destroy && m_device)
@@ -1628,11 +1614,6 @@ void MythRenderVDPAU::ResetProcs(void)
 
 void MythRenderVDPAU::DestroyPresentationQueue(void)
 {
-VERBOSE(VB_PLAYBACK, QString("Destroyed flipqueue %1")
-        .arg(m_flipQueue));
-VERBOSE(VB_PLAYBACK, QString("Destroyed fliptarget %1")
-        .arg(m_flipTarget));
-
     MythXLocker locker(m_display);
     if (vdp_presentation_queue_destroy && m_flipQueue)
     {

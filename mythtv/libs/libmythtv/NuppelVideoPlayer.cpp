@@ -783,7 +783,7 @@ void NuppelVideoPlayer::ReinitOSD(void)
     }
 }
 
-void NuppelVideoPlayer::ReinitVideo(bool force_reinit)
+void NuppelVideoPlayer::ReinitVideo(void)
 {
     vidExitLock.lock();
     videofiltersLock.lock();
@@ -796,8 +796,7 @@ void NuppelVideoPlayer::ReinitVideo(bool force_reinit)
     {
         if (!videoOutput->InputChanged(video_disp_dim, aspect,
                                        GetDecoder()->GetVideoCodecID(),
-                                       GetDecoder()->GetVideoCodecPrivate()),
-                                       force_reinit)
+                                       GetDecoder()->GetVideoCodecPrivate()))
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Failed to Reinitialize Video. Exiting..");
