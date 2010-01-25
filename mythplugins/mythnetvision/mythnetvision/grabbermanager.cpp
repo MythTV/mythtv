@@ -143,7 +143,7 @@ void GrabberManager::stopTimer()
 void GrabberManager::doUpdate()
 {
     GrabberDownloadThread *gdt = new GrabberDownloadThread(this);
-    gdt->start();
+    gdt->start(QThread::LowPriority);
 
     m_timer->start(m_updateFreq);
 }
