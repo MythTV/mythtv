@@ -335,20 +335,16 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		(None, None, 0, None, None, None, None,
 		0.0, None, 0, None, None, child, "")
 
-	intid = mythvideo.getMetadataId(videopath)
-	has_metadata = mythvideo.hasMetadata(videopath)
-	if intid is not None :
-		if not overwrite and has_metadata:
+	video = mythvideo.getVideo(exactfile=videopath)
+	if video is not None:
+		if not overwrite and video.inetref != 0:
 			print_verbose("Metadata already exist in MythDB, not overwriting it.")
 			return None
 		else:
 			print_verbose("Entry exists in MythDB with default metadata.  Updating.")
-			mythvideo.setMetadata({'filename': videopath}, id=intid)
+			#video.filename = videopath #why are you setting the file to the path it already is?
 	else:
-		print_verbose("No metadata in MythDB, creating a new one.")
-		# Create a new empty entry at this point so we can use the common UPDATE code
-		# to actually insert the data.
-		intid = mythvideo.setMetadata({'filename': videopath})
+		video = Video().create({'filename':videopath})
 
 	def parse_metadata(variable, oldvalue, emptyvalue="", meta=metadata):
 		return parse_meta(variable, oldvalue, emptyvalue, meta)
@@ -451,15 +447,14 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		genres = genrestring.split(",")
 
 	#Always set category to "Unknown", until we can identify what it really is
-	category = mythvideo.getGenreId("Unknown")
 	if len(genres) < 1:
 		print_verbose("No genres.")
 	else:
 		#Remove previous genres
-		mythvideo.cleanGenres(intid)
+		video.genre.clean()
 		#Set all the genres
 		for genre in genres:
-			mythvideo.setGenres(genre.strip(), intid)
+			video.genre.add(genre.strip())
 
 	## Process countries
 	countrystring = parse_metadata('Countries', "", "")
@@ -471,10 +466,10 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		print_verbose("No countries.")
 	else:
 		#Remove previous countries
-		mythvideo.cleanCountry(intid)
+		video.country.clean()
 		#Set all the countries
 		for country in countries:
-			mythvideo.setCountry(country.strip(), intid)
+			video.country.add(country.strip())
 
 	## Process cast
 	caststring = parse_metadata('Cast', "", "")
@@ -486,21 +481,32 @@ def save_video_metadata_to_mythdb(videopath, metadata, child=-1, disc=None):
 		print_verbose("No cast.")
 	else:
 		#Remove previous cast
-		mythvideo.cleanCast(intid)
+		video.cast.clean()
 		#Set all the cast
 		for actor in cast:
-			mythvideo.setCast(actor.strip(), intid)
+			video.cast.add(actor.strip())
 
 	if coverfile == None:
 		coverfile = "No cover"
 
-	mythvideo.setMetadata({'showlevel': 1, 'browse': 1, 'childid': childid,
-					'playcommand': playcommand, 'title': title.encode('utf8'),
-					'director': director.encode('utf8'), 'plot': plot.encode('utf8'),
-					'rating': rating, 'inetref': inetref, 'category': category,
-					'year': year, 'userrating': userrating, 'length': length,
-					'filename': filename, 'coverfile': coverfile}, intid)
-	return intid
+	video.showlevel = 1
+	video.browse = 1
+	video.childid = 1
+	video.playcommand = playcommand
+	video.title = title.encode('utf8')
+	video.director = directory.encode('utf8')
+	video.plot = plot.encode('utf8')
+	video.rating = rating
+	vidoe.inetref = inetref
+	video.category = 'Unknown'
+	video.year = year
+	video.userrating = userrating
+	video.length = length
+	video.filename = filename
+	video.coverfile = coverfile
+
+	video.update()
+	return video.intid
 
 def find_poster_image(title, imdb_id):
 	"""
@@ -867,7 +873,12 @@ def should_be_skipped(path, meta_file = None):
 	# Check if we are not in overwrite mode and there is existing data
 	# for the wanted targets (metadata files and/or MythDB).
 	if not overwrite:
-		need_mythdb_data = dbimport and not mythvideo.hasMetadata(path)
+		has_metadata = False
+		video = mythvideo.getVideo(exactfile=path)
+		if video:
+			if video.inetref:
+				has_metadata = True
+		need_mythdb_data = dbimport and not has_metadata
 		need_metadata_file = metafiles
 		if metafiles and meta_file is not None:
 			need_metadata_file = not os.path.exists(meta_file)
@@ -983,13 +994,13 @@ def main():
 		if not mythdb:
 			print "You must have the MythTV module to make direct DB importing to work"
 			sys.exit(1)
-		poster_dir = mythdb.getSetting("VideoArtworkDir", socket.gethostname())
+		poster_dir = mythdb.settings[socket.gethostname()].VideoArtworkDir
 		if not mythdb:
 			print "Could not get VideoArtworkDir setting for the current host."
 			sys.exit(1)
 
 	if prune:
-		mythvideo.pruneMetadata()
+		mythvideo.scanStorageGroups(returnnew=False)
 
 	for path in paths:
 

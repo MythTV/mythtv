@@ -24,8 +24,9 @@ except ImportError:
 	sys.exit(1)
 
 try:
-	from MythTV import MythTV
-	mythtv = MythTV()
+	from MythTV import MythDB, MythLog
+	MythLog._setlevel('none')
+	mythtv = MythDB()
 except:
 	mythtv = None
 
@@ -208,8 +209,7 @@ class VideoMetadata:
 	def __init__(self):
 		self.episode_title_format = None
 		if mythtv != None:
-			self.episode_title_format = mythtv.db.getSetting(
-					'VideoEpisodeTitleFormat', socket.gethostname())
+			self.episode_title_format = mythtv.settings[socket.gethostname()].VideoEpisodeTitleFormat
 		if self.episode_title_format == None:
 			self.episode_title_format = '%(series_title)s S%(season)02d E%(episode)02d %(episode_title)s'
 
