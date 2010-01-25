@@ -472,12 +472,8 @@ PlaybackBox::~PlaybackBox(void)
 
 bool PlaybackBox::Create()
 {
-    if (m_type == Delete && LoadWindowFromXML("recordings-ui.xml",
-                                              "deleterecordings", this))
-        VERBOSE(VB_EXTRA, "Found a customised delete recording screen");
-    else
-        if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
-            return false;
+    if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
+        return false;
 
     m_groupList     = dynamic_cast<MythUIButtonList *> (GetChild("groups"));
     m_recordingList = dynamic_cast<MythUIButtonList *> (GetChild("recordings"));
@@ -641,23 +637,6 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         desc = tr("There is one recording in this display group");
     else
         desc = tr("There are no recordings in this display group");
-
-    if (m_type == Delete && countInGroup > 1)
-    {
-        ProgramList  group     = m_progLists[groupname];
-        float        groupSize = 0.0;
-
-        for (ProgramList::iterator it = group.begin(); it != group.end(); ++it)
-        {
-            ProgramInfo *info = FindProgramInUILists(*it);
-            if (info)
-                groupSize += info->GetFilesize();
-        }
-
-        desc += tr(", which consume %1")
-                .arg(groupSize / 1024.0 / 1024.0 / 1024.0, 0, 'f', 2);
-        desc += QObject::tr("GB", "GigaBytes");
-    }
 
     infoMap["description"] = desc;
     infoMap["rec_count"] = QString("%1").arg(countInGroup);
