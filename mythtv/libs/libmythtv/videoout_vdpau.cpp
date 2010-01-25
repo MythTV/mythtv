@@ -322,6 +322,7 @@ bool VideoOutputVDPAU::SetupDeinterlace(bool interlaced,
 
     if (!enable)
     {
+        ClearReferenceFrames();
         m_render->SetDeinterlacing(m_video_mixer);
         m_deintfiltername = QString();
         m_deinterlacing   = false;
