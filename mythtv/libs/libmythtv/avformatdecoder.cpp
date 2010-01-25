@@ -719,14 +719,6 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         return false;
     }
 
-    // If seeking to start of stream force a DTS and start_time of zero as
-    // libav sometimes returns the end of the stream instead.
-    if (desiredFrame <= 1)
-    {
-        av_update_cur_dts(ic, st, 0);
-        ic->start_time = 0;
-    }
-
     int normalframes = 0;
 
     if (st->cur_dts != (int64_t)AV_NOPTS_VALUE)
@@ -739,8 +731,13 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
             int64_t st1 = av_rescale(ic->start_time,
                                     st->time_base.den,
                                     AV_TIME_BASE * (int64_t)st->time_base.num);
-            adj_cur_dts = lsb3full(adj_cur_dts, st1, st->pts_wrap_bits);
-
+            // If seeking near the start of stream sometimes the adjusted current dts time 
+            // is less than the start time (possibly due to the AVSEEK_FLAG_BACKWARD flag ?).
+            // If so, set adjusted current dts to zero.
+            if (adj_cur_dts < st1)
+                adj_cur_dts = 0;
+            else
+                adj_cur_dts = lsb3full(adj_cur_dts, st1, st->pts_wrap_bits);
         }
 
         long long newts = av_rescale(adj_cur_dts,
