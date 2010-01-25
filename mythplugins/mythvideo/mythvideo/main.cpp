@@ -177,6 +177,9 @@ namespace
         if (dvd_device.isEmpty())
             dvd_device = MediaMonitor::defaultDVDdevice();
 
+        if (dvd_device.isEmpty())
+            return;  // User cancelled in the Popup
+
         GetMythUI()->AddCurrentLocation("playdvd");
 
         if ((command_string.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
