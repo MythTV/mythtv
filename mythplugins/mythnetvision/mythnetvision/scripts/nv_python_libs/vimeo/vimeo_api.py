@@ -36,12 +36,15 @@ metadata and video/image URLs from vimeo. These routines are based on the v2 api
 for this api are published at http://vimeo.com/api/docs/advanced-api
 '''
 
-__version__="v0.2.1"
+__version__="v0.2.2"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree view processing
 # 0.1.2 Documentation review
 # 0.2.0 Public release
 # 0.2.1 Fixed bug where some videos cannot be embedded (played fullscreen automatically)
+# 0.2.2 New python bindings conversion
+#       Better exception error reporting
+#       Better handling of invalid unicode data from source
 
 """
 Python module to interact with Vimeo through its API (version 2)
@@ -615,23 +618,24 @@ sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 try:
 	'''If the MythTV python interface is found, required to access Netvision icon directory settings
 	'''
-	from MythTV import MythDB
+	from MythTV import MythDBConn, MythLog
 	mythdb = None
 	try:
 		'''Create an instance of each: MythDB
 		'''
-		mythdb = MythDB()
+		MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
+		mythdb = MythDBConn()
 	except MythError, e:
-		sys.stderr(u'\n! Warning - %s\n' % e.message)
+		sys.stderr(u'\n! Warning - %s\n' % e.args[0])
 		filename = os.path.expanduser("~")+'/.mythtv/config.xml'
 		if not os.path.isfile(filename):
 			sys.stderr(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
 		else:
 			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
-	except Exception:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB\n")
-except Exception:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported\n")
+	except Exception, e:
+		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+except Exception, e:
+	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
 	mythdb = None
 
 from socket import gethostname, gethostbyname
@@ -780,7 +784,7 @@ class Videos(object):
         self.channel_icon = u'http://vimeo.com/assets/images/vimeo_logo/vimeo_logo.png'
 
         if mythdb:
-            self.icon_dir = mythdb.getSetting('mythnetvision.iconDir', hostname=gethostname())
+            self.icon_dir = mythdb.settings[gethostname()]['mythnetvision.iconDir']
             if self.icon_dir:
                 self.icon_dir = self.icon_dir.replace(u'//', u'/')
                 self.setTreeViewIcon(dir_icon='vimeo')
@@ -823,7 +827,7 @@ class Videos(object):
                     else:
                         return unicode(entity, "iso-8859-1")
             return text # leave as is
-        return self.ampReplace(re.sub("(?s)<[^>]*>|&#?\w+;", fixup, text)).replace(u'\n',u' ')
+        return self.ampReplace(re.sub(u"(?s)<[^>]*>|&#?\w+;", fixup, self.textUtf8(text))).replace(u'\n',u' ')
     # end massageDescription()
 
 
@@ -851,6 +855,8 @@ class Videos(object):
             return text
         try:
             return unicode(text, 'utf8')
+        except UnicodeDecodeError:
+            return u''
         except (UnicodeEncodeError, TypeError):
             return text
     # end textUtf8()
@@ -859,6 +865,7 @@ class Videos(object):
     def ampReplace(self, text):
         '''Replace all "&" characters with "&amp;"
         '''
+        text = self.textUtf8(text)
         return text.replace(u'&amp;',u'~~~~~').replace(u'&',u'&amp;').replace(u'~~~~~', u'&amp;')
     # end ampReplace()
 
