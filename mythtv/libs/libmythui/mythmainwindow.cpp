@@ -494,6 +494,8 @@ MythMainWindow::MythMainWindow(const bool useDB)
 
 MythMainWindow::~MythMainWindow()
 {
+    d->drawTimer->stop();
+
     while (!d->stackList.isEmpty())
     {
         delete d->stackList.back();
