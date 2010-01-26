@@ -142,6 +142,7 @@ class FileTransfer( MythBEConn ):
         self.type = type
 
         self.tsize = 2**15
+        self.tmax = 2**17
         self.count = 0
         self.step = 2**12
 
@@ -224,7 +225,7 @@ class FileTransfer( MythBEConn ):
                                             str(size)]))
             #print '%s - %s' % (int(res), size)
             if int(res) == size:
-                if (self.count == 10) and (self.tsize < 2**17) :
+                if (self.count == 10) and (self.tsize < self.tmax) :
                     self.count = 0
                     self.tsize += self.step
             else:
@@ -582,12 +583,12 @@ class Recorded( DBDataWrite ):
         Recorded.formatPath(path, replace=None) -> formatted path string
                 'path' string is formatted as per mythrename.pl
         """
-        for (tag, data, format) in (('T','title','%s'),('S','subtitle','%s'),
-                             ('R','description','%s'), ('C','category','%s'),
-                             ('U','recgroup','%s'),    ('hn','hostname','%s'),
-                             ('c','chanid','%d') ):
-            tmp = self[data].replace('/','-')
-            path = path.replace('%'+tag, format % self[data])
+        for (tag, data) in (('T','title'), ('S','subtitle'),
+                            ('R','description'), ('C','category'),
+                            ('U','recgroup'), ('hn','hostname'),
+                            ('c','chanid') ):
+            tmp = str(self[data]).replace('/','-')
+            path = path.replace('%'+tag, tmp)
         for (data, pre) in (   ('starttime','%'), ('endtime','%e'),
                                ('progstart','%p'),('progend','%pe') ):
             for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
@@ -1082,7 +1083,6 @@ class Video( DBDataWrite ):
             return None
         be = FileOps(self.host)
         hash = be.getHash(self.filename, 'Videos')
-        be.close()
         return hash
 
 class VideoGrabber( Grabber ):
@@ -1171,7 +1171,7 @@ class VideoGrabber( Grabber ):
         cast = ()
         genre = ()
         country = ()
-        additional = {}
+        adddict = {}
         for point in res.split('\n')[:-1]:
             if point.find(':') == -1:
                 continue
@@ -1185,12 +1185,12 @@ class VideoGrabber( Grabber ):
             elif key == 'Countries':
                 country = typle(val.split(', '))
             else:
-                additional[key] = val
+                adddict[key] = val
         if 'releasedate' in dat:
             dat['releasedate'] = datetime.strptime(dat['releasedate'],\
                                                 '%Y-%m-%d').date()
         if additional:
-            return (dat, cast, genre, country, additional)
+            return (dat, cast, genre, country, adddict)
         return (dat, cast, genre, country)
 
 #### MYTHNETVISION ####

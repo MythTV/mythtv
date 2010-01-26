@@ -24,8 +24,9 @@ class databaseSearch( object ):
         res = list(self.func(self, True))
         self.table = res[0]
         self.dbclass = res[1]
-        if len(res) > 2:
-            self.joins = res[2:]
+        self.require = res[2]
+        if len(res) > 3:
+            self.joins = res[3:]
         else:
             self.joins = ()
 
@@ -58,6 +59,14 @@ class databaseSearch( object ):
             where.append(res[0])
             fields.append(res[1])
             joinbit = joinbit|res[2]
+        for key in self.require:
+            if key not in kwargs:
+                res = self.func(self.inst, key=key)
+                if res is None:
+                    continue
+                where.append(res[0])
+                fields.append(res[1])
+                joinbit = joinbit|res[2]
 
         # build joins
         joins = []
@@ -589,7 +598,7 @@ class MythDB( MythDBConn ):
 
         if init:
             # table and join descriptor
-            return ('recorded', Recorded,
+            return ('recorded', Recorded, ('livetv',),
                     ('recordedprogram','recorded',('chanid','starttime')),
                     ('recordedcredits','recorded',('chanid','starttime')),
                     ('people','recordedcredits',('person',)))
@@ -610,6 +619,10 @@ class MythDB( MythDBConn ):
         if key == 'cast':
             return ('people.name=%s', value, 2|4)
 
+        if key == 'livetv':
+            if value is None:
+                return ('recorded.recgroup!=%s', 'LiveTV', 0)
+
         return None
 
     @databaseSearch
@@ -620,7 +633,7 @@ class MythDB( MythDBConn ):
         """
 
         if init:
-            return ('oldrecorded', OldRecorded)
+            return ('oldrecorded', OldRecorded, ())
         if key in ('title','subtitle','chanid','starttime','endtime',
                         'category','seriesid','programid','station',
                         'duplicate','generic'):
@@ -634,7 +647,7 @@ class MythDB( MythDBConn ):
         Returns a tuple of Job objects.
         """
         if init:
-            return ('jobqueue', Job,
+            return ('jobqueue', Job, (),
                     ('recorded','jobqueue',('chanid','starttime')))
         if key in ('chanid','starttime','type','status','hostname'):
             return ('jobqueue.%s=%%s' % key, value, 0)
@@ -655,7 +668,7 @@ class MythDB( MythDBConn ):
         Returns a tuple of Guide objects.
         """
         if init:
-            return ('program', Guide)
+            return ('program', Guide, ())
         if key in ('chanid','starttime','endtime','title','subtitle',
                         'category','airdate','stars','previouslyshown','stereo',
                         'subtitled','hdtv','closecaptioned','partnumber',
@@ -866,7 +879,7 @@ class MythVideo( MythDBConn ):
         """
 
         if init:
-            return ('videometadata', Video,
+            return ('videometadata', Video, (),
                     ('videometadatacast','videometadata',
                                             ('idvideo',),('intid',)),   #1
                     ('videocast','videometadatacast',
