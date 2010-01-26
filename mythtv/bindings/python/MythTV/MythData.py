@@ -310,7 +310,7 @@ class FileOps( MythBEConn ):
         if res[0] == 'ERROR':
             return None
         else:
-            return Program(res[1:], db=cls.db)
+            return Program(res[1:], db=self.db)
     
     def deleteRecording(self, program, force=False):
         """
