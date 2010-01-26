@@ -126,7 +126,7 @@ inline int random(void)
 #if defined(__cplusplus) && defined(_MSC_VER)
 inline unsigned int usleep( unsigned int us ) 
 { 
-    Sleep( us / 1000 ); 
+    Sleep( (us + 999) / 1000 );
     return 0;
 }
 
