@@ -18,7 +18,6 @@
  */
 
 #include "mythsignalingtimer.h"
-#include "mythverbose.h"
 
 MythSignalingTimer::MythSignalingTimer(
     QObject *parent, const char *slot) :
@@ -35,7 +34,6 @@ MythSignalingTimer::~MythSignalingTimer()
 
 void MythSignalingTimer::start(int msec)
 {
-    VERBOSE(VB_IMPORTANT, QString("start(%1) -- begin").arg(msec));
     if (msec <= 0)
         return;
 
@@ -49,24 +47,20 @@ void MythSignalingTimer::start(int msec)
         while (!running)
             usleep(10 * 1000);
     }
-    VERBOSE(VB_IMPORTANT, QString("start(%1) -- end").arg(msec));
 }
 
 void MythSignalingTimer::stop(void)
 {
-    VERBOSE(VB_IMPORTANT, "stop() -- begin");
     QMutexLocker locker(&startStopLock);
     if (running)
     {
         dorun = false;
         QThread::wait();
     }
-    VERBOSE(VB_IMPORTANT, "stop() -- end");
 }
 
 void MythSignalingTimer::run(void)
 {
-    VERBOSE(VB_IMPORTANT, "run() -- begin");
     running = true;
     while (true)
     {
@@ -76,5 +70,4 @@ void MythSignalingTimer::run(void)
         emit timeout();
     }
     running = false;
-    VERBOSE(VB_IMPORTANT, "run() -- end");
 }

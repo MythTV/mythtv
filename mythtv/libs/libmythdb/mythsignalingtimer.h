@@ -21,7 +21,7 @@ class MPUBLIC MythSignalingTimer : private QThread
     Q_OBJECT
 
   public:
-    MythSignalingTimer(QObject *parent, const char *slot);\
+    MythSignalingTimer(QObject *parent, const char *slot);
     ~MythSignalingTimer();
 
     virtual void stop(void);
@@ -33,10 +33,10 @@ class MPUBLIC MythSignalingTimer : private QThread
   private:
     virtual void run(void);
 
-    QMutex         startStopLock;
-    bool           dorun;
-    bool           running;
-    uint64_t       microsec;
+    QMutex            startStopLock;
+    volatile bool     dorun;
+    volatile bool     running;
+    volatile uint64_t microsec;
 };
 
 #endif // _MYTH_SIGNALING_TIMER_H_
