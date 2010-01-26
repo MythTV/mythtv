@@ -182,11 +182,13 @@ inline int statfs(const char* path, struct statfs* buffer)
 #ifdef USING_MINGW
 #define lstat stat
 #define bzero(x, y) memset((x), 0, (y))
-#define nice(x) ((int)!::SetThreadPriority(\
-                    ::GetCurrentThread(), ((x) < -10) ? \
-                        2 : (((x) < 0) ? \
-                        1 : (((x) > 10) ? \
-                        2 : (((x) > 0) ? 1 : 0)))))
+#define nice(x) ((int)!::SetPriorityClass(\
+                    ::GetCurrentProcess(), ((x) < -10) ? \
+                        HIGH_PRIORITY_CLASS : (((x) < 0) ? \
+                        ABOVE_NORMAL_PRIORITY_CLASS : (((x) > 10) ? \
+                        IDLE_PRIORITY_CLASS : (((x) > 0) ? \
+                        BELOW_NORMAL_PRIORITY_CLASS : \
+                        NORMAL_PRIORITY_CLASS)))))
 #define PRIO_PROCESS 0
 #define setpriority(x, y, z) ((x) == PRIO_PROCESS && y == 0 ? nice(z) : -1)
 #endif // USING_MINGW
