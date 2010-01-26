@@ -376,7 +376,7 @@ void MoviesUI::nodeChanged(MythGenericTree* node)
     }
     else
     {
-        if (m_currentMode == "By Theater")
+        if (m_currentMode == QObject::tr("By Theater"))
         {
             if (nodeInt < 0)
             {
@@ -410,7 +410,7 @@ void MoviesUI::nodeChanged(MythGenericTree* node)
                 m_movieShowTimes->SetText(buf);
             }
         }
-        else if (m_currentMode == "By Movie")
+        else if (m_currentMode == QObject::tr("By Movie"))
         {
             if (nodeInt < 0)
             {
@@ -455,7 +455,7 @@ MythGenericTree* MoviesUI::getDisplayTreeByTheater()
     TheaterVector *theaters;
     theaters = &m_dataTreeByTheater;
     int tbase = 0;
-    MythGenericTree *parent = new MythGenericTree("By Theater", 0, false);
+    MythGenericTree *parent = new MythGenericTree(QObject::tr("By Theater"), 0, false);
     for (int i = 0; i < theaters->size(); i++)
     {
         int mbase = 0;
@@ -476,7 +476,7 @@ MythGenericTree* MoviesUI::getDisplayTreeByMovie()
     MovieVector *movies;
     movies = &m_dataTreeByMovie;
     int mbase = 0;
-    MythGenericTree *parent = new MythGenericTree("By Movie", 0, false);
+    MythGenericTree *parent = new MythGenericTree(QObject::tr("By Movie"), 0, false);
     for (int i = 0; i < movies->size(); i++)
     {
         int tbase = 0;
@@ -500,7 +500,7 @@ void MoviesUI::updateDataTrees()
 
 void MoviesUI::drawDisplayTree()
 {
-    m_movieTree = new MythGenericTree("Theaters", 0, false);
+    m_movieTree = new MythGenericTree(QObject::tr("Theaters"), 0, false);
     m_movieTree->addNode(getDisplayTreeByTheater());
     m_movieTree->addNode(getDisplayTreeByMovie());
     m_movieTreeUI->AssignTree(m_movieTree);
