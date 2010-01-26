@@ -14,13 +14,13 @@ HEADERS += mythsocket.h mythsocket_cb.h mythsocketthread.h msocketdevice.h
 HEADERS += mythexp.h mythdbcon.h mythdb.h mythdbparams.h oldsettings.h
 HEADERS += mythverbose.h mythversion.h compat.h mythconfig.h
 HEADERS += mythobservable.h mythevent.h httpcomms.h mcodecs.h
-HEADERS += mythtimer.h mythdirs.h exitcodes.h
+HEADERS += mythtimer.h mythsignalingtimer.h mythdirs.h exitcodes.h
 HEADERS += lcddevice.h mythstorage.h remotefile.h decodeencode.h
 
 SOURCES += mythsocket.cpp mythsocketthread.cpp msocketdevice.cpp 
 SOURCES += mythdbcon.cpp mythdb.cpp oldsettings.cpp mythverbose.cpp
 SOURCES += mythobservable.cpp mythevent.cpp httpcomms.cpp mcodecs.cpp
-SOURCES += mythdirs.cpp
+SOURCES += mythdirs.cpp mythsignalingtimer.cpp
 SOURCES += lcddevice.cpp mythstorage.cpp remotefile.cpp decodeencode.cpp
 
 win32:SOURCES += msocketdevice_win.cpp

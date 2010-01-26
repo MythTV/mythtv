@@ -1,11 +1,14 @@
 #include "mythmainwindow.h"
 #include "mythmainwindow_internal.h"
 
-// C++ headers
-#include <math.h>
+// C headers
+#include <cmath>
 #include <pthread.h>
+
+// C++ headers
 #include <algorithm>
 #include <vector>
+using namespace std;
 
 // QT headers
 #ifdef USE_OPENGL_PAINTER
@@ -22,6 +25,7 @@
 #include <QKeyEvent>
 
 // Platform headers
+#include "unistd.h"
 #ifdef QWS
 #include <qwindowsystem_qws.h>
 #endif
@@ -35,7 +39,7 @@
 #include "mythevent.h"
 #include "mythdirs.h"
 #include "compat.h"
-#include "unistd.h"
+#include "mythsignalingtimer.h"
 
 // Libmythui headers
 #include "screensaver.h"
@@ -149,7 +153,7 @@ class MythMainWindowPrivate
 
     QObject *sysEventHandler;
 
-    QTimer *drawTimer;
+    MythSignalingTimer *drawTimer;
     QVector<MythScreenStack *> stackList;
     MythScreenStack *mainStack;
 
@@ -478,8 +482,7 @@ MythMainWindow::MythMainWindow(const bool useDB)
     d->gestureTimer = new QTimer(this);
     connect(d->gestureTimer, SIGNAL(timeout()), this, SLOT(mouseTimeout()));
 
-    d->drawTimer = new QTimer(this);
-    connect(d->drawTimer, SIGNAL(timeout()), this, SLOT(animate()));
+    d->drawTimer = new MythSignalingTimer(this, SLOT(animate()));
     d->drawTimer->start(1000 / 70);
 
     d->AllowInput = true;
