@@ -19,6 +19,9 @@
 #include "mythfontproperties.h"
 #include "mythuihelper.h"
 
+#define LOC      QString("MythUITextEdit: ")
+#define LOC_ERR  QString("MythUITextEdit, Error: ")
+#define LOC_WARN QString("MythUITextEdit, Warning: ")
 
 MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
            : MythUIType(parent, name)
@@ -148,14 +151,23 @@ void MythUITextEdit::SetInitialStates()
 
     m_initialized = true;
 
-    m_backgroundState = dynamic_cast<MythUIStateType *>
-                                                    (GetChild("background"));
-    m_cursorImage = dynamic_cast<MythUIImage *> (GetChild("cursor"));
-    m_Text = dynamic_cast<MythUIText *> (GetChild("text"));
+    m_Text        = dynamic_cast<MythUIText*>(GetChild("text"));
+    m_cursorImage = dynamic_cast<MythUIImage*>(GetChild("cursor"));
+    m_backgroundState =
+        dynamic_cast<MythUIStateType*>(GetChild("background"));
 
-    if (!m_Text || !m_cursorImage || !m_backgroundState)
+    if (!m_Text)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Missing text element.");
+    if (!m_cursorImage)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Missing cursor element.");
+    if (!m_backgroundState)
+        VERBOSE(VB_IMPORTANT, LOC_WARN + "Missing background element.");
+
+    if (!m_Text || !m_cursorImage)
     {
-        VERBOSE(VB_IMPORTANT, "MythUITextEdit: Missing required element.");
+        m_Text = NULL;
+        m_cursorImage = NULL;
+        m_backgroundState = NULL;
         return;
     }
 
