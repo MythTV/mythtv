@@ -479,6 +479,7 @@ bool PlaybackBox::Create()
         if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
             return false;
 
+    m_recgroupList  = dynamic_cast<MythUIButtonList *> (GetChild("recgroups"));
     m_groupList     = dynamic_cast<MythUIButtonList *> (GetChild("groups"));
     m_recordingList = dynamic_cast<MythUIButtonList *> (GetChild("recordings"));
 
@@ -495,6 +496,9 @@ bool PlaybackBox::Create()
                 "Theme is missing critical theme elements.");
         return false;
     }
+
+    if (m_recgroupList)
+        m_recgroupList->SetCanTakeFocus(false);
 
     connect(m_groupList, SIGNAL(itemSelected(MythUIButtonListItem*)),
             SLOT(updateRecList(MythUIButtonListItem*)));
@@ -1022,6 +1026,35 @@ void PlaybackBox::UpdateUsageUI(void)
     }
 }
 
+/*
+ * \fn PlaybackBox::updateUIRecGroupList(void)
+ * \brief called when the list of recording groups may have changed
+ */
+void PlaybackBox::UpdateUIRecGroupList(void)
+{
+    if (m_recGroupIdx < 0 || !m_recgroupList || m_recGroups.size() < 2)
+        return;
+
+    m_recgroupList->Reset();
+
+    int idx = 0;
+    QStringList::iterator it = m_recGroups.begin();
+    for (; it != m_recGroups.end(); (++it), (++idx))
+    {
+        QString key = (*it);
+        QString tmp = (key == "All Programs") ? "All" : key;
+        QString name = ProgramInfo::i18n(tmp);
+
+        MythUIButtonListItem *item = new MythUIButtonListItem(
+            m_recgroupList, name, qVariantFromValue(key));
+
+        if (idx == m_recGroupIdx)
+            m_recgroupList->SetItemCurrent(item);
+
+        item->SetText(name);
+    }
+}
+
 void PlaybackBox::UpdateUIGroupList(const QStringList &groupPreferences)
 {
     m_groupList->Reset();
@@ -1366,6 +1399,8 @@ bool PlaybackBox::UpdateUILists(void)
     m_progLists.clear();
     m_recordingList->Reset();
     m_groupList->Reset();
+    if (m_recgroupList)
+        m_recgroupList->Reset();
     // Clear autoDelete for the "all" list since it will share the
     // objects with the title lists.
     m_progLists[""] = ProgramList(false);
@@ -1809,6 +1844,7 @@ bool PlaybackBox::UpdateUILists(void)
         }
     }
 
+    UpdateUIRecGroupList();
     UpdateUIGroupList(groupSelPref);
     UpdateUsageUI();
 

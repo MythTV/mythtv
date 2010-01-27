@@ -3804,6 +3804,7 @@ static int init_tr(void)
 
     QString display_rec_groups =
         QObject::tr("All Programs",   "Recording Group All Programs") +
+        QObject::tr("All", "Recording Group All Programs -- short form") +
         QObject::tr("LiveTV",         "Recording Group LiveTV") +
         QObject::tr("Default",        "Recording Group Default") +
         QObject::tr("Deleted",        "Recording Group Deleted");

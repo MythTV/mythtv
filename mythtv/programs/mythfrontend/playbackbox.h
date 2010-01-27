@@ -263,6 +263,7 @@ class PlaybackBox : public ScheduleCommon
   private:
     bool UpdateUILists(void);
     void UpdateUIGroupList(const QStringList &groupPreferences);
+    void UpdateUIRecGroupList(void);
 
     void UpdateProgressBar(void);
 
@@ -325,6 +326,7 @@ class PlaybackBox : public ScheduleCommon
     QString CreateProgramInfoString(const ProgramInfo &program) const;
 
   private:
+    MythUIButtonList *m_recgroupList;
     MythUIButtonList *m_groupList;
     MythUIButtonList *m_recordingList;
 
