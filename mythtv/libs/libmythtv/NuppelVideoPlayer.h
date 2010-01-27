@@ -803,6 +803,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     bool       decode_extra_audio;
     float      m_stored_audio_stretchfactor;
     bool       audio_paused;
+    int        repeat_delay;
 
     // Audio warping stuff
     bool       usevideotimebase;
@@ -814,6 +815,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
  
     // Time Code stuff
     int        prevtc;        ///< 32 bit timecode if last VideoFrame shown
+    int        prevrp;        ///< repeat_pict of last frame
     int        tc_avcheck_framecounter;
     long long  tc_wrap[TCTYPESMAX];
     long long  tc_lastval[TCTYPESMAX];
