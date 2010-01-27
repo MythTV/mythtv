@@ -765,7 +765,7 @@ static HostCheckBox *LogCleanEnabled()
     gc->setValue(false);
     gc->setHelpText(QObject::tr("This enables the periodic cleanup of the "
                     "events stored in the Myth database (see \"Log MythTV "
-                    "events to database\" on the previous page)."));
+                    "events to database\")."));
     return gc;
 }
 
