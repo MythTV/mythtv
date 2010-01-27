@@ -1065,7 +1065,7 @@ bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
         *(m_videoMixers[id].m_skip_chroma) = value;
         VdpVideoMixerAttribute attr =
             { VDP_VIDEO_MIXER_ATTRIBUTE_SKIP_CHROMA_DEINTERLACE };
-        void const * val = { &(m_videoMixers[id].m_skip_chroma) };
+        void const * val = { &value };
         return SetMixerAttribute(id, &attr, &val);
     }
 
