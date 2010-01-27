@@ -4,6 +4,7 @@
 #include <QString>
 #include <QClipboard>
 
+#include "mythtimer.h"
 #include "mythuitype.h"
 #include "mythuitext.h"
 #include "mythuistatetype.h"
@@ -85,6 +86,7 @@ class MPUBLIC MythUITextEdit : public MythUIType, public StorageUser
 
     int m_blinkInterval;
     int m_cursorBlinkRate;
+    MythTimer m_lastKeyPress;
 
     int m_maxLength;
 

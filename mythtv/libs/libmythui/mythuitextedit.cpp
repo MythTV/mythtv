@@ -47,6 +47,8 @@ MythUITextEdit::MythUITextEdit(MythUIType *parent, const QString &name)
     m_CanHaveFocus = true;
 
     m_initialized = false;
+
+    m_lastKeyPress.start();
 }
 
 MythUITextEdit::~MythUITextEdit()
@@ -77,7 +79,12 @@ void MythUITextEdit::Pulse(void)
 
     if (m_HasFocus)
     {
-        if (m_blinkInterval > m_cursorBlinkRate)
+        if (m_lastKeyPress.elapsed() < 500)
+        {
+            m_cursorImage->SetVisible(true);
+            m_blinkInterval = 0;
+        }
+        else if (m_blinkInterval > m_cursorBlinkRate)
         {
             m_blinkInterval = 0;
             if (m_cursorImage->IsVisible())
@@ -386,6 +393,8 @@ void MythUITextEdit::PasteTextFromClipboard(QClipboard::Mode mode)
 
 bool MythUITextEdit::keyPressEvent(QKeyEvent *e)
 {
+    m_lastKeyPress.restart();
+
     QStringList actions;
     bool handled = false;
 
