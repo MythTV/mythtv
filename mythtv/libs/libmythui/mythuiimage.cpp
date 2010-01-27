@@ -347,7 +347,7 @@ void MythUIImage::SetImages(QVector<MythImage *> &images)
     d->m_UpdateLock.unlock();
 
     QWriteLocker updateLocker(&d->m_UpdateLock);
-    QSize aSize = m_Area.size();
+    QSize aSize = GetArea().size();
 
     QVector<MythImage *>::iterator it;
     for (it = images.begin(); it != images.end(); ++it)
@@ -538,8 +538,8 @@ bool MythUIImage::Load(bool allowLoadInBackground)
 
         if (!m_Area.isEmpty())
         {
-            gradWidth = m_Area.size().width();
-            gradHeight = m_Area.size().height();
+            gradWidth  = GetArea().size().width();
+            gradHeight = GetArea().size().height();
         }
         else if ((w > 0) && (h > 0))
         {
@@ -705,7 +705,7 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
                                      .arg(filename));
             QSize gradsize;
             if (!m_Area.isEmpty())
-                gradsize = m_Area.size();
+                gradsize = GetArea().size();
             else
                 gradsize = QSize(10, 10);
 
@@ -865,7 +865,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             }
         }
 
-        QRect area = m_Area.toQRect();
+        QRect area = GetArea().toQRect();
         area.translate(xoffset, yoffset);
 
         int alpha = CalcAlpha(alphaMod);
@@ -898,7 +898,7 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
             area.translate(x,y);
 
         QRect srcRect;
-        m_cropRect.CalculateArea(m_Area);
+        m_cropRect.CalculateArea(GetArea());
         if (!m_cropRect.isEmpty())
             srcRect = m_cropRect.toQRect();
         else

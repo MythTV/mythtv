@@ -239,7 +239,7 @@ void MythUIText::MoveDrawRect(const int x, const int y)
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
-    QRect area = m_Area.toQRect();
+    QRect area = GetArea().toQRect();
     area.translate(xoffset, yoffset);
     QRect drawrect = m_drawRect.toQRect();
     drawrect.translate(xoffset, yoffset);
@@ -247,6 +247,93 @@ void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset,
     int alpha = CalcAlpha(alphaMod);
 
     p->DrawText(drawrect, m_CutMessage, m_Justification, *m_Font, alpha, area);
+}
+
+/*
+ * If minsize and multiline are defined, minimize the width by using
+ * as many lines as possible.
+ */
+bool MythUIText::MakeNarrow(QRect &min_rect)
+{
+    QFontMetrics fm(GetFontProperties()->face());
+
+    if (m_scrolling || !m_MultiLine)
+    {
+        min_rect = fm.boundingRect(m_Area, m_Justification, m_CutMessage);
+        return false;
+    }
+
+    /*
+     * Shrinkage is desired, and multiline is allowed
+     * If more than one line will fit, squeeze to the left
+     */
+    if ((m_Area.height() + fm.leading()) / fm.lineSpacing() < 2)
+    {
+        min_rect = fm.boundingRect(m_Area, m_Justification, m_CutMessage);
+        return false;
+    }
+
+    // Give plenty of vertical space, to prevent clipping from coloring results
+    min_rect = m_Area;
+    min_rect.setHeight(m_Area.height() * 2);
+
+    QRect rect;
+    int   first = 1;
+    int   last  = m_CutMessage.size() - 2;
+    int   min_width = INT_MAX;
+
+    /*
+     * Test from each end to find the best width to use.
+     * An interior line may actually represent the best width, but it
+     * is not worth the extra complexity to test interior lines.
+     */
+    while (first < last && min_width > m_MinSize.x())
+    {
+        if ((first = m_CutMessage.indexOf(' ', first)) < 1)
+            break;
+
+        min_rect.setWidth(fm.width(m_CutMessage.left(first)));
+
+        if (min_rect.width() < m_Area.width())
+        {
+            rect = fm.boundingRect(min_rect, m_Justification, m_CutMessage);
+            if (rect.height() <= m_Area.height() && rect.width() < min_width)
+                min_width = rect.width();
+        }
+
+        if ((last = m_CutMessage.lastIndexOf(' ', last)) < 0)
+            break;
+
+        min_rect.setWidth(fm.width(m_CutMessage.mid(last)));
+
+        if (min_rect.width() < m_Area.width())
+        {
+            rect = fm.boundingRect(min_rect, m_Justification, m_CutMessage);
+            if (rect.height() <= m_Area.height() && rect.width() < min_width)
+                min_width = rect.width();
+        }
+
+        ++first;
+        --last;
+    }
+
+    if (min_width == INT_MAX)
+    {
+        // won't fit, even when the ara is the maxium size
+        min_rect = fm.boundingRect(m_Area, m_Justification, m_CutMessage);
+        return false;
+    }
+    else
+    {
+        if (min_width < m_MinSize.x() - m_Area.x())
+            min_width = m_MinSize.x() - m_Area.x();
+
+        // Found the minimal width which will accommodate the whole message.
+        min_rect.setHeight(m_Area.height());
+        min_rect.setWidth(min_width);
+        min_rect = fm.boundingRect(min_rect, m_Justification, m_CutMessage);
+        return true;
+    }
 }
 
 void MythUIText::FillCutMessage()
@@ -273,37 +360,47 @@ void MythUIText::FillCutMessage()
     
     if (m_CutMessage.isEmpty())
         m_CutMessage = m_Message;
+    if (m_CutMessage.isEmpty())
+	return;
 
-    if (!m_CutMessage.isEmpty())
+    QStringList templist;
+    QStringList::iterator it;
+    switch (m_textCase)
     {
-        QStringList templist;
-        QStringList::iterator it;
-        switch (m_textCase)
-        {
-            case CaseUpper :
-                m_CutMessage = m_CutMessage.toUpper();
-            break;
-            case CaseLower :
-                m_CutMessage = m_CutMessage.toLower();
-            break;
-            case CaseCapitaliseFirst :
-                //m_CutMessage = m_CutMessage.toLower();
-                templist = m_CutMessage.split(". ");
-                for (it = templist.begin(); it != templist.end(); ++it)
-                    (*it).replace(0,1,(*it).left(1).toUpper());
-                m_CutMessage = templist.join(". ");
-                break;
-            case CaseCapitaliseAll :
-                //m_CutMessage = m_CutMessage.toLower();
-                templist = m_CutMessage.split(" ");
-                for (it = templist.begin(); it != templist.end(); ++it)
-                    (*it).replace(0,1,(*it).left(1).toUpper());
-                m_CutMessage = templist.join(" ");
-            break;
-        }
+      case CaseUpper :
+	m_CutMessage = m_CutMessage.toUpper();
+	break;
+      case CaseLower :
+	m_CutMessage = m_CutMessage.toLower();
+	break;
+      case CaseCapitaliseFirst :
+	//m_CutMessage = m_CutMessage.toLower();
+	templist = m_CutMessage.split(". ");
+	for (it = templist.begin(); it != templist.end(); ++it)
+	    (*it).replace(0,1,(*it).left(1).toUpper());
+	m_CutMessage = templist.join(". ");
+	break;
+      case CaseCapitaliseAll :
+	//m_CutMessage = m_CutMessage.toLower();
+	templist = m_CutMessage.split(" ");
+	for (it = templist.begin(); it != templist.end(); ++it)
+	    (*it).replace(0,1,(*it).left(1).toUpper());
+	m_CutMessage = templist.join(" ");
+	break;
     }
     
-    if (m_Cutdown & !m_CutMessage.isEmpty())
+    if (m_MinSize.x() > 0)
+    {
+        QRect rect;
+        MakeNarrow(rect);
+
+        // Record the minimal area needed for the message.
+        SetMinArea(rect.size());
+        if (m_MinArea.width() > 0)
+            SetDrawRectSize(m_MinArea.width(), m_MinArea.height());
+    }
+
+    if (m_Cutdown)
         m_CutMessage = cutDown(m_CutMessage, m_Font, m_MultiLine);
 }
 
@@ -346,22 +443,22 @@ void MythUIText::Pulse(void)
             case ScrollLeft :
                 MoveDrawRect(-1, 0);
                 if ((m_drawRect.x() + m_drawRect.width()) < 0)
-                    SetDrawRectPosition(m_Area.width(),0);
+                    SetDrawRectPosition(GetArea().width(),0);
                 break;
             case ScrollRight :
                 MoveDrawRect(1, 0);
                 if (m_drawRect.x() > m_Area.width())
-                    SetDrawRectPosition(-m_Area.width(),0);
+                    SetDrawRectPosition(-GetArea().width(),0);
                 break;
             case ScrollUp :
                 MoveDrawRect(0, -1);
                 if (m_drawRect.y() > m_Area.height())
-                    SetDrawRectPosition(0,-(m_Area.height()));
+                    SetDrawRectPosition(0,-(GetArea().height()));
                 break;
             case ScrollDown :
                 MoveDrawRect(0, 1);
                 if ((m_drawRect.y() + m_Area.height()) < 0)
-                    SetDrawRectPosition(0,m_Area.height()-1);
+                    SetDrawRectPosition(0,GetArea().height()-1);
                 break;
         }
     }
@@ -405,8 +502,8 @@ QString MythUIText::cutDown(const QString &data, MythFontProperties *font,
     if (length == 0)
         return data;
 
-    int maxwidth = m_Area.width();
-    int maxheight = m_Area.height();
+    int maxwidth = GetArea().width();
+    int maxheight = GetArea().height();
     int justification = Qt::AlignLeft | Qt::TextWordWrap;
     QFontMetrics fm(font->face());
 

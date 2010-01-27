@@ -78,6 +78,7 @@ class MPUBLIC MythUIText : public MythUIType, public StorageUser
     void SetDrawRectPosition(const int x, const int y);
     void MoveDrawRect(const int x, const int y);
 
+    bool MakeNarrow(QRect &min_rect);
     void FillCutMessage(void);
     QString cutDown(const QString &data, MythFontProperties *font,
                     bool multiline = false);

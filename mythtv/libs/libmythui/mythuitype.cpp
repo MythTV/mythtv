@@ -35,6 +35,7 @@ MythUIType::MythUIType(QObject *parent, const QString &name)
     m_Enabled = true;
     m_CanHaveFocus = m_HasFocus = false;
     m_Area = MythRect(0, 0, 0, 0);
+    m_MinArea = MythRect(0, 0, 0, 0);
     m_NeedsRedraw = false;
     m_Alpha = 255;
     m_AlphaChangeMode = m_AlphaChange = m_AlphaMin = 0;
@@ -465,6 +466,29 @@ void MythUIType::SetSize(const QSize &size)
     SetRedraw();
 }
 
+/*
+ * Use MythPoint to represent size, so percentages can be used
+ */
+void MythUIType::SetMinSize(const MythPoint &minsize)
+{
+    MythPoint point(minsize);
+
+    if (m_Parent)
+    {
+        point.CalculatePoint(m_Parent->GetArea());
+        m_Parent->m_MinSize = point;
+    }
+    m_MinSize = point;
+}
+
+QSize MythUIType::GetMinSize(void) const
+{
+    if (m_MinSize.x() > 0)
+        return QSize(m_MinSize.x(), m_MinSize.y());
+
+    return m_Area.size();
+}
+
 void MythUIType::SetArea(const MythRect &rect)
 {
     if (rect == m_Area)
@@ -481,6 +505,77 @@ void MythUIType::SetArea(const MythRect &rect)
     SetRedraw();
 }
 
+/**
+ * Adjust the size of a sibling.
+ */
+void MythUIType::AdjustMinArea(int delta_x, int delta_y)
+{
+    // If a minsize is not set, don't use MinArea
+    if (m_MinSize.x() < 1)
+        return;
+
+    QSize size(m_Area.size());
+
+    size.setWidth( size.width()  + delta_x);
+    size.setHeight(size.height() + delta_y);
+    m_MinArea.setSize(size);
+    m_MinArea.setX(m_Area.x());
+    m_MinArea.setY(m_Area.y());
+}
+
+/**
+ * Adjust the size of sibling objects within the button.
+ */
+void MythUIType::SetMinAreaSiblings(const QSize &size,
+                                    int delta_x, int delta_y)
+{
+    // If a minsize is not set, don't use MinArea
+    if (m_MinSize.x() > 0)
+    {
+        m_MinArea.setSize(size);
+        m_MinArea.setX(m_Area.x());
+        m_MinArea.setY(m_Area.y());
+    }
+
+    QList<MythUIType*>::iterator it;
+    for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
+    {
+        (*it)->AdjustMinArea(delta_x, delta_y);
+    }
+}
+
+/**
+ * Set the minimum area based on the given size
+ */
+void MythUIType::SetMinArea(const QSize &size)
+{
+    // If a minsize is not set, don't use MinArea
+    if (m_MinSize.x() < 1)
+        return;
+
+    /*
+     * The MinArea will have the same origin as the normal Area,
+     * but can have a smaller size.
+     */
+    QSize minsize = QSize(m_MinSize.x(), m_MinSize.y());
+    QSize bounded(size);
+
+    bounded = bounded.expandedTo(minsize);
+    bounded = bounded.boundedTo(m_Area.size());
+
+    if (bounded == m_MinArea.size())
+        return;
+
+    m_MinArea.setSize(bounded);
+    m_MinArea.setX(m_Area.x());
+    m_MinArea.setY(m_Area.y());
+
+    if (m_Parent)
+        m_Parent->SetMinAreaSiblings(bounded,
+                                     bounded.width()  - m_Area.width(),
+                                     bounded.height() - m_Area.height());
+}
+
 void MythUIType::ExpandArea(const MythRect &rect)
 {
     QSize childSize = rect.size();
@@ -493,8 +588,14 @@ void MythUIType::ExpandArea(const MythRect &rect)
     SetRedraw();
 }
 
+/*
+ * If the object has a minimum area defined, return it, other wise
+ * return the default area.
+ */
 MythRect MythUIType::GetArea(void) const
 {
+    if (m_MinArea.width() > 0)
+        return m_MinArea;
     return m_Area;
 }
 
@@ -666,6 +767,8 @@ void MythUIType::CopyFrom(MythUIType *base)
     m_focusOrder = base->m_focusOrder;
 
     SetArea(base->m_Area);
+    m_MinArea = base->m_MinArea;
+    m_MinSize = base->m_MinSize;
     m_Alpha = base->m_Alpha;
     m_AlphaChangeMode = base->m_AlphaChangeMode;
     m_AlphaChange = base->m_AlphaChange;
@@ -701,6 +804,11 @@ bool MythUIType::ParseElement(QDomElement &element)
         SetPosition(parsePoint(element));
     else if (element.tagName() == "area")
         SetArea(parseRect(element));
+    else if (element.tagName() == "minsize")
+    {
+        // Use parsePoint so percentages can be used
+        SetMinSize(parsePoint(element));
+    }
     else if (element.tagName() == "alpha")
     {
         m_Alpha = getFirstText(element).toInt();

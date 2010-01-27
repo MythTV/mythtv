@@ -83,7 +83,13 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     virtual void SetPosition(const MythPoint &pos);
     virtual MythPoint GetPosition(void) const;
     virtual void SetSize(const QSize &size);
+    virtual void SetMinSize(const MythPoint &size);
+    virtual QSize GetMinSize(void) const;
     virtual void SetArea(const MythRect &rect);
+    virtual void AdjustMinArea(int delta_x, int delta_y);
+    virtual void SetMinAreaSiblings(const QSize &size,
+                                    int delta_x, int delta_y);
+    virtual void SetMinArea(const QSize &size);
     virtual MythRect GetArea(void) const;
     virtual void RecalculateArea(bool recurse = true);
     void ExpandArea(const MythRect &rect);
@@ -167,6 +173,8 @@ class MPUBLIC MythUIType : public QObject, public XMLParseBase
     int m_focusOrder;
 
     MythRect m_Area;
+    MythRect m_MinArea;
+    MythPoint m_MinSize;
 
     QRegion m_DirtyRegion;
     bool m_NeedsRedraw;

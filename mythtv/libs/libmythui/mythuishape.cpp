@@ -47,7 +47,7 @@ void MythUIShape::Reset()
 void MythUIShape::DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRect)
 {
-    QRect area = m_Area;
+    QRect area = GetArea();
     area.translate(xoffset, yoffset);
 
     if (!m_image || m_image->isNull())
