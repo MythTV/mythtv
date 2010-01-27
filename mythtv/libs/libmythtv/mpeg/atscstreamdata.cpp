@@ -355,6 +355,17 @@ bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
             // All DVB specific tables, not handled here
             return false;
         }
+        case TableID::PIM:
+        case TableID::PNM:
+        case TableID::NIM:
+        case TableID::NTM:
+        case TableID::VCM:
+        case TableID::STM:
+        case TableID::SM:
+        {
+            // SCTE Specific tables, not handled here
+            return false;
+        }
         default:
         {
             VERBOSE(VB_RECORD,
