@@ -111,7 +111,7 @@ class DictData( object ):
         return self
 
     def next(self):
-        res = self.iterdata[self.field-1]
+        res = self.iterdata[self.field]
         self.field += 1
         if self.field == len(self.iterdata):
             del self.field

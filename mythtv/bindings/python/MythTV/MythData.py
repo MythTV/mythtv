@@ -421,7 +421,7 @@ class Program( DictData ):
                     3,      0,      0,
                     0,      0]
     def __str__(self):
-        return u"<Program '%s','%s' at %s" % (self.title,
+        return u"<Program '%s','%s' at %s>" % (self.title,
                  self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
 
     def __repr__(self):

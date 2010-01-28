@@ -689,7 +689,7 @@ class MythDB( MythDBConn ):
         """
         Returns a list of Frontend objects for accessible frontends
         """
-        cursor = self.db.cursor(self.log)
+        cursor = self.cursor(self.log)
         cursor.execute("""SELECT DISTINCT hostname
                           FROM settings
                           WHERE hostname IS NOT NULL
@@ -731,7 +731,7 @@ class MythDB( MythDBConn ):
         Returns a tuple of channel object defined in the database
         """
         channels = []
-        c = self.db.cursor(self.log)
+        c = self.cursor(self.log)
         c.execute("""SELECT * FROM channel""")
         for row in c.fetchall():
             channels.append(Channel(db=self, raw=row))
