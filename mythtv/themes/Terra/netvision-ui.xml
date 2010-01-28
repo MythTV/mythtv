@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mythuitheme>
+
+    <window name="browser">
+
+        <imagetype name="fanart" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Internet Video Browser</value>
+        </textarea>
+
+        <imagetype name="browserbackground">
+            <position>0,345</position>
+            <filename>video/browserlistbackground.png</filename>
+        </imagetype>
+
+        <buttonlist name="videos">
+            <area>0,345,1280,299</area>
+            <layout>horizontal</layout>
+            <scrollstyle>center</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <buttonarea>0,0,1282,299</buttonarea>
+            <spacing>0</spacing>
+            <statetype name="buttonitem">
+                <state name="selected">
+                    <area>-13,0,209,332</area>
+                    <imagetype name="buttonimage">
+                        <area>1,3,209,325</area>
+                        <preserveaspect>true</preserveaspect>
+                        <mask>video/postermask.png</mask>
+                    </imagetype>
+
+                    <shape name="titlebackground" />
+                    <textarea name="buttontext" />
+
+                    <statetype name="nodetype">
+                        <position>134,255</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <filename>shared/directory.png</filename>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder" from="subfolder">
+                            <imagetype name="arrow">
+                                <position>38,33</position>
+                                <filename>shared/updirectory.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+
+                    <textarea name="childcount" from="basetextarea">
+                        <area>160,290,35,20</area>
+                        <font>basesmallbrown</font>
+                        <align>hcenter</align>
+                    </textarea>
+
+                </state>
+                <state name="active" from="selected">
+                    <area>0,0,183,332</area>
+                    <imagetype name="buttonimage">
+                        <area>0,25,183,275</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+
+                    <shape name="titlebackground">
+                        <area>0,0,183,25</area>
+                        <fill color="#767662" alpha="180" />
+                    </shape>
+
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>5,2,173,20</area>
+                        <align>hcenter</align>
+                    </textarea>
+
+                    <statetype name="nodetype">
+                        <position>108,230</position>
+                    </statetype>
+
+                    <textarea name="childcount">
+                        <position>135,265</position>
+                    </textarea>
+                    
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <imagetype name="posterframe">
+            <position>0,340</position>
+            <filename>video/browserlistframe.png</filename>
+        </imagetype>
+
+        <shape name="textbackground" from="basetextbackground">
+            <position>30,70</position>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>48,75,590,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>48,124,1182,145</area>
+            <multiline>yes</multiline>
+            <align>vcenter</align>
+        </textarea>
+
+        <textarea name="nosites" from="description">
+            <align>allcenter</align>
+            <value>No sites configured!</value>
+        </textarea>  
+
+        <textarea name="year" from="basetextarea">
+            <area>48,284,290,30</area>
+        </textarea>
+
+        <textarea name="author" from="basetextarea">
+            <area>430,284,800,30</area>
+            <align>right</align>
+        </textarea>
+
+    </window>
+
+    <window name="gallery">
+
+        <imagetype name="fanart" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Videos - Gallery</value>
+        </textarea>
+
+        <buttonlist name="videos">
+            <area>17,55,1250,520</area>
+            <layout>grid</layout>
+            <spacing>10</spacing>
+            <buttonarea>0,0,1250,450</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,200,209</area>
+                    <imagetype name="buttonbackground">
+                        <filename>video/video_gallery_background.png</filename>
+                    </imagetype>
+
+                    <imagetype name="buttonimage">
+                        <area>6,5,187,145</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    
+                    <statetype name="nodetype">
+                        <position>118,83</position>
+                        <state name="subfolder">
+                            <imagetype name="icon">
+                                <filename>shared/directory.png</filename>
+                                <preserveaspect>yes</preserveaspect>
+                            </imagetype>
+                        </state>
+                        <state name="upfolder" from="subfolder">
+                            <imagetype name="upnode">
+                                <position>37,34</position>
+                                <filename>shared/updirectory.png</filename>
+                            </imagetype>
+                        </state>
+                    </statetype>
+                    <textarea name="buttontext" from="basetextarea">
+                        <area>8,155,183,50</area>
+                        <align>hcenter,vcenter</align>
+                        <multiline>true</multiline>
+                    </textarea>
+                    <textarea name="childcount" from="basetextarea">
+                        <area>144,118,35,20</area>
+                        <font>basesmallbrown</font>
+                        <align>hcenter</align>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="buttonbackground">
+                        <filename>video/video_gallery_background_selected.png</filename>
+                    </imagetype>
+                </state>
+            </statetype>
+        </buttonlist>
+
+        <textarea name="nosites" from="basetextarea">
+            <area>50,50,700,50</area>
+            <multiline>yes</multiline>
+            <align>hcenter,vcenter</align>
+            <value>No sites configured!</value>
+        </textarea>
+
+        <shape name="textbackground" from="basetextbackground">
+            <area>30,490,1222,188</area>
+            <shape name="hline2" from="hline">
+                <position>15,152</position>
+            </shape>
+        </shape>
+
+        <textarea name="title" from="basetextarea">
+            <area>48,497,590,35</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>48,535,1182,110</area>
+            <multiline>yes</multiline>
+            <align>vcenter</align>
+        </textarea>
+
+        <textarea name="year" from="basetextarea">
+            <area>48,650,290,30</area>
+        </textarea>
+
+        <textarea name="author" from="basetextarea">
+            <area>430,650,800,30</area>
+            <align>right</align>
+        </textarea>
+
+    </window>
+
+    <window name="tree">
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="heading" from="baseheading">
+            <value>Videos - Tree</value>
+        </textarea>
+
+        <textarea name="breadcrumbs" from="basetextarea">
+            <area>50,20,700,40</area>
+            <font>basemedium</font>
+        </textarea>
+
+        <buttontree name="videos">
+            <area>40,50,720,260</area>
+            <numlists>3</numlists>
+            <spacing>10</spacing>
+            <buttonlist name="listtemplate" from="basebuttonlist" />
+        </buttontree>
+
+        <textarea name="title" from="basetextarea">
+            <area>40,330,530,40</area>
+            <font>baselarge</font>
+        </textarea>
+
+        <textarea name="author" from="basetextarea">
+            <area>50,367,450,30</area>
+        </textarea>
+
+        <textarea name="date" from="basetextarea">
+            <area>500,367,80,30</area>
+            <align>right</align>
+        </textarea>
+
+        <textarea name="description" from="basetextarea">
+            <area>40,395,530,80</area>
+            <align>left,top</align>
+            <multiline>yes</multiline>
+            <cutdown>yes</cutdown>
+        </textarea>
+
+        <textarea name="nosites" from="description">
+            <align>allcenter</align>
+            <value>No sites configured!</value>
+        </textarea>  
+
+        <imagetype name="preview">
+            <area>624,335,140,212</area>
+            <preserveaspect>yes</preserveaspect>
+        </imagetype>
+
+    </window>
+
+</mythuitheme>
+<!-- vim: set expandtab ts=4 sw=4 : -->
