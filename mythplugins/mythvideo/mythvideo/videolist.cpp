@@ -514,7 +514,7 @@ namespace fake_unnamed
         QString ret;
         int slashLoc = path.lastIndexOf('/', -2) + 1;
         if (path.right(1) == "/")
-            ret = path.mid(slashLoc, path.length() - slashLoc - 2);
+            ret = path.mid(slashLoc, path.length() - slashLoc - 1);
         else
             ret = path.mid(slashLoc);
 
