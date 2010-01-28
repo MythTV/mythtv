@@ -89,6 +89,8 @@ QString LookupUDN( QString sDeviceType )
 
 long GetIPAddressList(QStringList &sStrList)
 {
+    QString LOC = "GetIPAddressList() - ";
+
     struct ifaddrs *list, *ifa;
 
 
@@ -96,7 +98,7 @@ long GetIPAddressList(QStringList &sStrList)
 
     if (getifaddrs(&list) == -1)
     {
-        VERBOSE(VB_UPNP, QString("GetIPAddressList() - getifaddrs failed: %s").arg(strerror(errno)));
+        VERBOSE(VB_UPNP, (LOC + "getifaddrs failed: %1").arg(strerror(errno)));
         return 0;
     }
 
@@ -118,13 +120,14 @@ long GetIPAddressList(QStringList &sStrList)
                       &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
                       address, sizeof(address)) == NULL)
         {
-            VERBOSE(VB_UPNP, QString("GetIPAddressList() - inet_ntop failed: %s").arg(strerror(errno)));
+            VERBOSE(VB_UPNP, (LOC + "inet_ntop failed: %1")
+                             .arg(strerror(errno)));
             continue;
         }
 
         sStrList.append(address);
-        //VERBOSE(VB_UPNP, QString("GetIPAddressList() - Added %1 as %2")
-        //                 .arg(ifa->ifa_name).arg(address));
+        VERBOSE(VB_UPNP+VB_EXTRA, (LOC + "Added %1 as %2")
+                                  .arg(ifa->ifa_name).arg(address));
     }
 
     freeifaddrs(list);
