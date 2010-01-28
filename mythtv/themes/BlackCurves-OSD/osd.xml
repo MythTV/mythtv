@@ -177,15 +177,19 @@
             <area>1001,395,140,60</area>
             <font>timefont</font>
         </textarea>
-	<textarea name="channum" align="center">
+        <textarea name="channum" align="center">
             <area>130,474,138,40</area>
             <font>channelfont</font>
             <value>%CHANNUM%</value>
         </textarea>
-	<image name="channelicon">
-	    <position>147,516</position>
-	    <staticsize>100,75</staticsize>
-	</image>
+        <image name="channelicon">
+            <position>147,516</position>
+            <staticsize>100,75</staticsize>
+        </image>
+        <image name="coverart">
+            <position>140,480</position>
+            <staticsize>110,165</staticsize>
+        </image>
         <textarea name="callsign" align="center">
             <multiline>no</multiline>
             <area>130,607,135,40</area>
@@ -229,7 +233,7 @@
         </textarea>
         <textarea name="callsign" align="center">
             <multiline>no</multiline>
-            <area>134,603,115,40</area>
+            <area>134,620,115,40</area>
             <font>callsignfontsmall</font>
             <value>%CALLSIGN%</value>
         </textarea> 
