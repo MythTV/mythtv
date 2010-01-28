@@ -304,7 +304,7 @@ void HDHRStreamHandler::RunTS(void)
         _listener_lock.unlock();
         if (remainder != 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC +
+            VERBOSE(VB_RECORD, LOC +
                     QString("RunTS(): data_length = %1 remainder = %2")
                     .arg(data_length).arg(remainder));
         }
