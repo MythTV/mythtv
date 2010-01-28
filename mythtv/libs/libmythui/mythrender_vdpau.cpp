@@ -10,6 +10,9 @@
 #define VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 (VdpVideoMixerFeature)11
 #endif
 #define NUM_SCALING_LEVELS 9
+#ifndef VDP_DECODER_PROFILE_MPEG4_PART2_ASP
+#define VDP_DECODER_PROFILE_MPEG4_PART2_ASP             (VdpDecoderProfile)13
+#endif
 
 #define LOC      QString("VDPAU: ")
 #define LOC_ERR  QString("VDPAU Error: ")
@@ -311,13 +314,17 @@ static void vdpau_preemption_callback(VdpDevice device, void *myth_render)
         render->SetPreempted();
 }
 
+bool MythRenderVDPAU::gVDPAUSupportChecked = false;
+bool MythRenderVDPAU::gVDPAUMPEG4Accel     = false;
+uint MythRenderVDPAU::gVDPAUBestScaling    = 0;
+
 MythRenderVDPAU::MythRenderVDPAU()
   : m_preempted(false), m_recreating(false),
     m_recreated(false), m_reset_video_surfaces(false),
     m_render_lock(QMutex::Recursive), m_decode_lock(QMutex::Recursive),
     m_display(NULL), m_window(0), m_device(0), m_surface(0),
     m_flipQueue(0),  m_flipTarget(0), m_flipReady(false), m_colorKey(0),
-    m_best_scaling(0), vdp_get_proc_address(NULL), vdp_get_error_string(NULL)
+    vdp_get_proc_address(NULL), vdp_get_error_string(NULL)
 {
     LOCK_ALL
     ResetProcs();
@@ -328,6 +335,40 @@ MythRenderVDPAU::~MythRenderVDPAU(void)
 {
     LOCK_ALL
     Destroy();
+}
+
+bool MythRenderVDPAU::IsMPEG4Available(void)
+{
+    if (gVDPAUSupportChecked)
+        return gVDPAUMPEG4Accel;
+
+    VERBOSE(VB_PLAYBACK, LOC + QString("Checking VDPAU capabilities."));
+    MythRenderVDPAU *dummy = new MythRenderVDPAU();
+    if (dummy)
+    {
+        if (dummy->CreateDummy())
+            return gVDPAUMPEG4Accel;
+        delete dummy;
+    }
+
+    return false;
+}
+
+bool MythRenderVDPAU::CreateDummy(void)
+{
+    LOCK_ALL
+
+    bool ok = true;
+    m_display = OpenMythXDisplay();
+    CREATE_CHECK(m_display != NULL, "Invalid display")
+    CREATE_CHECK(CreateDevice(),    "No VDPAU device")
+    CREATE_CHECK(GetProcs(),        "No VDPAU procedures")
+    CREATE_CHECK(CheckHardwareSupport(), "")
+
+    if (!ok)
+        VERBOSE(VB_IMPORTANT, LOC + QString("Failed to create dummy device."));
+
+    return ok;
 }
 
 bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
@@ -354,7 +395,7 @@ bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
     CREATE_CHECK(CreatePresentationSurfaces(), "No presentation surfaces")
     CREATE_CHECK(SetColorKey(colorkey), "No colorkey")
     CREATE_CHECK(RegisterCallback(), "No callback")
-    CREATE_CHECK(GetBestScaling(), "")
+    CREATE_CHECK(CheckHardwareSupport(), "")
 
     if (ok)
     {
@@ -721,9 +762,9 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
 
     if (features & kVDPFeatHQScaling)
     {
-        if (m_best_scaling)
+        if (gVDPAUBestScaling)
         {
-            feat[count] = m_best_scaling;
+            feat[count] = gVDPAUBestScaling;
             count++;
             VERBOSE(VB_PLAYBACK, LOC +
                     QString("Enabling high quality scaling."));
@@ -1412,6 +1453,8 @@ bool MythRenderVDPAU::GetProcs(void)
     GET_PROC(VDP_FUNC_ID_DECODER_CREATE,  vdp_decoder_create);
     GET_PROC(VDP_FUNC_ID_DECODER_DESTROY, vdp_decoder_destroy);
     GET_PROC(VDP_FUNC_ID_DECODER_RENDER,  vdp_decoder_render);
+    GET_PROC(VDP_FUNC_ID_DECODER_QUERY_CAPABILITIES,
+        vdp_decoder_query_capabilities);
     GET_PROC(VDP_FUNC_ID_BITMAP_SURFACE_CREATE, vdp_bitmap_surface_create);
     GET_PROC(VDP_FUNC_ID_BITMAP_SURFACE_DESTROY,vdp_bitmap_surface_destroy);
     GET_PROC(VDP_FUNC_ID_BITMAP_SURFACE_PUT_BITS_NATIVE,
@@ -1513,17 +1556,40 @@ bool MythRenderVDPAU::RegisterCallback(bool enable)
     return ok;
 }
 
-bool MythRenderVDPAU::GetBestScaling(void)
+bool MythRenderVDPAU::CheckHardwareSupport(void)
 {
-    for (int i = 0; i < NUM_SCALING_LEVELS; i++)
-        if (IsFeatureAvailable(VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + i))
-            m_best_scaling = VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + i;
+    if (!m_device || !vdp_decoder_query_capabilities)
+        return false;
 
-    if (m_best_scaling)
+    if (!gVDPAUSupportChecked)
     {
-        VERBOSE(VB_PLAYBACK, LOC + QString("HQ scaling level %1 of %2 available.")
-            .arg(m_best_scaling - VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + 1)
-            .arg(NUM_SCALING_LEVELS));
+        gVDPAUSupportChecked = true;
+
+        for (int i = 0; i < NUM_SCALING_LEVELS; i++)
+            if (IsFeatureAvailable(VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + i))
+                gVDPAUBestScaling = VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + i;
+
+        if (gVDPAUBestScaling)
+        {
+            VERBOSE(VB_PLAYBACK, LOC + QString("HQ scaling level %1 of %2 available.")
+                .arg(gVDPAUBestScaling - VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + 1)
+                .arg(NUM_SCALING_LEVELS));
+        }
+        else
+            VERBOSE(VB_PLAYBACK, LOC + QString("HQ Scaling not supported."));
+
+        INIT_ST
+        VdpBool supported = false;
+        uint32_t tmp1, tmp2, tmp3, tmp4;
+        vdp_st = vdp_decoder_query_capabilities(m_device,
+                    VDP_DECODER_PROFILE_MPEG4_PART2_ASP, &supported,
+                    &tmp1, &tmp2, &tmp3, &tmp4);
+        CHECK_ST
+        gVDPAUMPEG4Accel = (bool)supported;
+
+        VERBOSE(VB_PLAYBACK, LOC +
+                    QString("MPEG4 hardware acceleration %1supported.")
+                    .arg(gVDPAUMPEG4Accel ? "" : "not "));
     }
 
     return true;
@@ -1553,7 +1619,6 @@ void MythRenderVDPAU::Destroy(void)
     DestroyDevice();
     ResetProcs();
 
-    m_best_scaling = 0;
     m_master  = kMasterUI;
     m_size    = QSize();
     m_errored = false;
@@ -1606,6 +1671,7 @@ void MythRenderVDPAU::ResetProcs(void)
     vdp_decoder_create = NULL;
     vdp_decoder_destroy = NULL;
     vdp_decoder_render = NULL;
+    vdp_decoder_query_capabilities = NULL;
     vdp_bitmap_surface_create = NULL;
     vdp_bitmap_surface_destroy = NULL;
     vdp_bitmap_surface_put_bits_native = NULL;

@@ -57,6 +57,12 @@ class VDPAULayer;
 class MPUBLIC MythRenderVDPAU : public MythRender
 {
   public:
+    static bool gVDPAUSupportChecked;
+    static uint gVDPAUBestScaling;
+    static bool gVDPAUMPEG4Accel;
+    static bool IsMPEG4Available(void);
+    bool        CreateDummy(void);
+
     MythRenderVDPAU();
    ~MythRenderVDPAU();
 
@@ -128,7 +134,7 @@ class MPUBLIC MythRenderVDPAU : public MythRender
     bool CreatePresentationQueue(void);
     bool CreatePresentationSurfaces(void);
     bool RegisterCallback(bool enable = true);
-    bool GetBestScaling(void);
+    bool CheckHardwareSupport(void);
     bool IsFeatureAvailable(uint feature);
 
     void Destroy(void);
@@ -165,7 +171,6 @@ class MPUBLIC MythRenderVDPAU : public MythRender
     VdpPresentationQueueTarget       m_flipTarget;
     bool                             m_flipReady;
     uint                             m_colorKey;
-    uint                             m_best_scaling;
 
     QVector<uint>                    m_surfaces;
     QHash<uint, VDPAUOutputSurface>  m_outputSurfaces;
@@ -209,6 +214,7 @@ class MPUBLIC MythRenderVDPAU : public MythRender
     VdpDecoderCreate                *vdp_decoder_create;
     VdpDecoderDestroy               *vdp_decoder_destroy;
     VdpDecoderRender                *vdp_decoder_render;
+    VdpDecoderQueryCapabilities     *vdp_decoder_query_capabilities;
     VdpBitmapSurfaceCreate          *vdp_bitmap_surface_create;
     VdpBitmapSurfaceDestroy         *vdp_bitmap_surface_destroy;
     VdpBitmapSurfacePutBitsNative   *vdp_bitmap_surface_put_bits_native;
