@@ -126,4 +126,25 @@
 
     </window>
 
+    <window name="browser">
+
+        <imagetype name="backdrop" from="basebackdrop" />
+
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="title" from="baseheading">
+            <value>Web Page</value>
+        </textarea>
+
+        <webbrowser name="webbrowser">
+            <area>20,55,1240,620</area>
+            <zoom>1.4</zoom>
+        </webbrowser>
+
+        <buttonlist name="pagelist" from="baseselector">
+            <position>20,685</position>
+        </buttonlist>
+
+    </window>
+
 </mythuitheme>
