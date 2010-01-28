@@ -600,6 +600,8 @@ void MythMainWindow::animate(void)
     if (!d->paintwin)
         return;
 
+    d->drawTimer->blockSignals(true);
+
     bool redraw = false;
 
     if (!d->repaintRegion.isEmpty())
@@ -632,6 +634,8 @@ void MythMainWindow::animate(void)
 
     for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
         (*it)->ScheduleInitIfNeeded();
+
+    d->drawTimer->blockSignals(false);
 }
 
 void MythMainWindow::drawScreen(void)

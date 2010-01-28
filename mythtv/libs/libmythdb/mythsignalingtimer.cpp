@@ -24,7 +24,7 @@ MythSignalingTimer::MythSignalingTimer(
     QThread(parent), dorun(false), running(false), microsec(0)
 {
     connect(this, SIGNAL(timeout()), parent, slot,
-            Qt::BlockingQueuedConnection);
+            Qt::QueuedConnection);
 }
 
 MythSignalingTimer::~MythSignalingTimer()
@@ -44,30 +44,35 @@ void MythSignalingTimer::start(int msec)
     {
         dorun = true;
         QThread::start();
-        while (!running)
+        while (dorun && !running)
             usleep(10 * 1000);
     }
 }
 
 void MythSignalingTimer::stop(void)
 {
+    if (thread() == this)
+    {
+        dorun = false;
+        return;
+    }
+
     QMutexLocker locker(&startStopLock);
     if (running)
     {
         dorun = false;
-        QThread::wait();
+        wait();
     }
 }
 
 void MythSignalingTimer::run(void)
 {
     running = true;
-    while (true)
+    while (dorun)
     {
         usleep(microsec);
-        if (!dorun)
-            break;
-        emit timeout();
+        if (dorun)
+            emit timeout();
     }
     running = false;
 }

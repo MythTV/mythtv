@@ -27,6 +27,9 @@ class MPUBLIC MythSignalingTimer : private QThread
     virtual void stop(void);
     virtual void start(int msec);
 
+    virtual bool blockSignals(bool block)
+        { return QObject::blockSignals(block); }
+
   signals:
     void timeout(void);
 
