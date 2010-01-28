@@ -292,7 +292,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
         DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
         DTVTransmitMode::kTransmissionModeAuto,
-        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyAuto,
+        DTVGuardInterval::kGuardInterval_1_32, DTVHierarchy::kHierarchyNone,
         DTVModulation::kModulationQAMAuto, 166670, -166670);
 
     // Finland
