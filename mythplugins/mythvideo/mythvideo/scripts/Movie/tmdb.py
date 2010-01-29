@@ -30,7 +30,7 @@
 #-------------------------------------
 __title__ ="TheMovieDB APIv2 Query";
 __author__="R.D.Vaughan"
-__version__="v0.1.6"
+__version__="v0.1.7"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 New movie data fields now have proper key names
@@ -45,6 +45,7 @@ __version__="v0.1.6"
 #       Changed the formatting of person information for AlsoKnownAs and Filmography
 # 0.1.6 Stopped stderr output when any TMDB meta data search or access does not find anything.
 #       This was causing issues for MythVideo.
+# 0.1.7 Change over to the installed TMDB api library
 
 
 __usage_examples__='''
@@ -197,15 +198,14 @@ sys.stderr = OutStreamEncoder(sys.stderr)
 
 
 try:
-    import tmdb.tmdb_api as tmdb_api
-    from tmdb.tmdb_exceptions import (TmdBaseError, TmdHttpError, TmdXmlError, TmdbUiAbort, TmdbMovieOrPersonNotFound,)
-except Exception:
+    import MythTV.tmdb.tmdb_api as tmdb_api
+    from MythTV.tmdb.tmdb_exceptions import (TmdBaseError, TmdHttpError, TmdXmlError, TmdbUiAbort, TmdbMovieOrPersonNotFound,)
+except Exception, e:
     sys.stderr.write('''
-The subdirectory "tmdb" containing the modules tmdb_api.py (v0.1.1 or greater), tmdb_ui.py,
-tmdb_exceptions.py must be in the same directory as tmdb.py.
-They should have been included with the distribution of tmdb.py.
-
-''')
+The subdirectory "tmdb" containing the modules tmdb_api.py (v0.1.3 or greater), tmdb_ui.py,
+tmdb_exceptions.py must have been installed with the MythTV python bindings.
+Error:(%s)
+''' %  u''.join([u'%s ' % x for x in e.args]))
     sys.exit(1)
 
 if tmdb_api.__version__ < '0.1.3':

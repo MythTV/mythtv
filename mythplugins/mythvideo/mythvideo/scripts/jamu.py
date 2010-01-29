@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.3"
+__version__=u"v0.6.4"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -248,11 +248,44 @@ __version__=u"v0.6.3"
  #       Properly initalize the homepage, hash, releasedate fields when adding a new videometadata record.
  # 0.6.3 Convert to new python bindings and replace all direct mysql data base calls. See ticket #7264
  #       Remove the requirement for the MySQLdb python library.
- #       Removed the folder icon symlink code as it is redundant with MythVideo internal functionality. The 'folderart'
- #       option is no longer support on a jamu.conf file and will be ignored if present.
- #       Fixed a bug where a FE video directory was set but there were no FE image directories. If there were local
- #       SG images directories set they were being used. This is an invalid configuration that should have caused an
- #       error.
+ #       Removed the folder icon symlink code as it is redundant with MythVideo internal functionality.
+ #       The 'folderart' option is no longer support on a jamu.conf file and will be ignored if present.
+ #       Fixed a bug where a FE video directory was set but there were no FE image directories.
+ #       If there were local SG images directories set they were being used. This is an invalid
+ #       configuration that should have caused an error.
+ # 0.6.4 Added a new option (-R) to allow just interactively populate the video reference numbers from
+ #       TVDB and TMDB without any meta data downloads. After that the user runs Jamu with the -M option
+ #       and the meta data and images are downloaded.
+ #       Added to the interactive interface the ability to select a reference number of '99999999'
+ #       which effectively tells jamu to ignore the specific video from all further processing.
+ #       Changed the return code from 1 to 0 when Jamu exits without processing if there is already an
+ #       instance of Jamu running. This was causing issues for Mythbuntu when TVDB or TMDB was down for an
+ #       extended period.
+ #       Added a new jamu.conf section [ignore-directory] to list Video sub-directories that Jamu should
+ #       ignore.
+ #       Change Jamu's import of tvdb and tmdb api libraries to use the installed versions found with the
+ #       MythTV python bindings.
+ #       Changed Jamu to use the tmdb API v2.0 python library
+ #       Jamu will always use the TMDB reference number over the IMDB number but still supports IMDB#s
+ #       Jamu interactive sessions for movies now lists the TMDB#s instead of IMDB#s
+ #       Jamu will convert any IMDB#s to TMDB#s when themoviedb.org includes that movie. This is in line
+ #       with MythVideo changes. Graphics for the movie will also be renamed so they do not need to be
+ #       re-downloaded.
+ #       Add the production countries for movies when TMDB provides that information.
+ #       Adjusted the -MW option to add a " Season 1" to any downloaded image filename for TV shows.
+ #       This must be done to make sure that TV shows like "24" do not clash with a movie's TMDB# like
+ #       (Kill Bill Vol.1) which is "24".
+ #       Added message display for exceptions where the message may enhance problem analysis.
+ #       Removed logic which checked that a TV episode was using Season graphics rather than Series graphics.
+ #       Unfortunately there was a chance that the a Series's graphics could clobber a movie with the same TMDB#
+ #       as the series title (e.g. the movie Kill Bill Vol.1 and the TV series 24). A positive is that a number
+ #       of redundant TV Series images can be removed through the jamu -MJ option.
+ #       Improved the -MW options detection of TV series when the EPG data does not include a subtitle. Users
+ #       can add the specific TVDB numbers to the 'series_name_override' section of the jamu.conf file.
+ #       Australian users had mentioned this as an issue, previously the TV series was always being mistaken
+ #       for a movie.
+ #       Jamu will now download the top rated TV Series season coverart and banner images. This enhancement
+ #       matches MythVideo processing.
 
 
 usage_txt=u'''
@@ -477,11 +510,11 @@ except Exception, e:
 
 # Verify that tvdb_api.py, tvdb_ui.py and tvdb_exceptions.py are available
 try:
-    import ttvdb.tvdb_ui as tvdb_ui
     # thetvdb.com specific modules
-    from ttvdb.tvdb_api import (tvdb_error, tvdb_shownotfound, tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_episodenotfound, tvdb_attributenotfound, tvdb_userabort)
-# from tvdb_api import Tvdb
-    import ttvdb.tvdb_api as tvdb_api
+    import MythTV.ttvdb.tvdb_ui as tvdb_ui
+    # from tvdb_api import Tvdb
+    import MythTV.ttvdb.tvdb_api as tvdb_api
+    from MythTV.ttvdb.tvdb_exceptions import (tvdb_error, tvdb_shownotfound, tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_episodenotfound, tvdb_attributenotfound, tvdb_userabort)
 
     # verify version of tvdbapi to make sure it is at least 1.0
     if tvdb_api.__version__ < '1.0':
@@ -489,19 +522,36 @@ try:
         raise
 except Exception, e:
     print '''
-The modules tvdb_api.py (v1.0.0 or greater), tvdb_ui.py, tvdb_exceptions.py and cache.py must be
-in the same directory as ttvdb.py. They should have been included with the distribution of ttvdb.py.
-error(%s)
+The modules tvdb_api.py (v1.0.0 or greater), tvdb_ui.py, tvdb_exceptions.py and cache.py.
+They should have been installed along with the MythTV python bindings.
+Error(%s)
 ''' % u''.join([u'%s ' % x for x in e.args])
     sys.exit(1)
+
+
+try:
+    import MythTV.tmdb.tmdb_api as tmdb_api
+    from MythTV.tmdb.tmdb_exceptions import (TmdBaseError, TmdHttpError, TmdXmlError, TmdbUiAbort, TmdbMovieOrPersonNotFound,)
+except Exception, e:
+    sys.stderr.write('''
+The subdirectory "tmdb" containing the modules tmdb_api.py (v0.1.3 or greater), tmdb_ui.py,
+tmdb_exceptions.py must have been installed with the MythTV python bindings.
+Error:(%s)
+''' %  u''.join([u'%s ' % x for x in e.args]))
+    sys.exit(1)
+
+if tmdb_api.__version__ < '0.1.3':
+    sys.stderr.write("\n! Error: Your current installed tmdb_api.py version is (%s)\nYou must at least have version (0.1.3) or higher.\n" % tmdb_api.__version__)
+    sys.exit(1)
+
 
 imdb_lib = True
 try:            # Check if the installation is equiped to directly search IMDB for movies
     import imdb
-except ImportError:
+except ImportError, e:
     sys.stderr.write("\n! Error: To search for movies movies the IMDbPy library must be installed."\
         "Check your installation's repository or check the following link."\
-        "from (http://imdbpy.sourceforge.net/?page=download)\n")
+        "from (http://imdbpy.sourceforge.net/?page=download)\nError:(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
     sys.exit(1)
 
 if imdb_lib:
@@ -604,8 +654,8 @@ def _getFileList(dst):
                 pass
             for filename in os.listdir(directory):
                 names.append(os.path.join(directory, filename))
-    except OSError:
-        sys.stderr.write(u"\n! Error: Getting a list of files for directory (%s)\nThis is most likely a 'Permission denied' error\n\n" % (dst))
+    except OSError, e:
+        sys.stderr.write(u"\n! Error: Getting a list of files for directory (%s)\nThis is most likely a 'Permission denied' error\nError:(%s)\n\n" % (dst, u''.join([u'%s ' % x for x in e.args])))
         return file_list
 
     for video_file in names:
@@ -729,339 +779,6 @@ def getStorageGroups():
 # end getStorageGroups
 
 
-# Start of code used to access themoviedb.com api
-class TmdBaseError(Exception):
-    pass
-
-class TmdHttpError(TmdBaseError):
-    def __repr__(self):    # Display the type of error
-        print u"TMDB Http Error"
-        return None
-    # end __repr__
-
-class TmdXmlError(TmdBaseError):
-    def __repr__(self):    # Display the type of error
-        print u"TMDB XML Error"
-        return None
-    # end __repr__
-
-class XmlHandler:
-    """Deals with retrieval of XML files from API
-    """
-    def __init__(self, url):
-        self.url = url
-
-    def _grabUrl(self, url):
-        try:
-            urlhandle = urllib.urlopen(url)
-        except IOError:
-            raise TmdHttpError(errormsg)
-        return urlhandle.read()
-
-    def getEt(self):
-        xml = self._grabUrl(self.url)
-        try:
-            et = ElementTree.fromstring(xml)
-        except SyntaxError, errormsg:
-            raise TmdXmlError(errormsg)
-        return et
-
-
-class SearchResults(list):
-    """Stores a list of Movie's that matched the search
-    """
-    def __repr__(self):
-        return u"<Search results: %s>" % (list.__repr__(self))
-
-
-class Movie(dict):
-    """A dict containing the information about the film
-    """
-    def __repr__(self):
-        return u"<Movie: %s>" % self.get(u"title")
-
-
-class MovieAttribute(dict):
-    """Base class for more complex attributes (like Poster,
-    which has multiple resolutions)
-    """
-    pass
-
-
-class Poster(MovieAttribute):
-    """Stores poster image URLs, each size is under the appropriate dict key.
-    Common sizes are: cover, mid, original, thumb
-    """
-    def __repr__(self):
-        return u"<%s with sizes %s>" % (
-            self.__class__.__name__,
-            u", ".join(
-                [u"'%s'" % x for x in sorted(self.keys())]
-            )
-        )
-
-    def set(self, poster_et):
-        """Takes an elementtree Element ('poster') and stores the poster,
-        using the size as the dict key.
-
-        For example:
-        <backdrop size="original">
-            http://example.com/poster_original.jpg
-        </backdrop>
-
-        ..becomes:
-        poster['original'] = 'http://example.com/poster_original.jpg'
-        """
-        size = poster_et.get(u"size")
-        value = poster_et.text
-        self[size] = value
-
-    def largest(self):
-        """Attempts to return largest image.
-        """
-        for cur_size in [u"original", u"mid", u"cover", u"thumb"]:
-            if cur_size in self:
-                return self[cur_size]
-
-class Backdrop(Poster):
-    """Stores backdrop image URLs, each size under the appropriate dict key.
-    Common sizes are: mid, original, thumb
-    """
-    pass
-
-class People(MovieAttribute):
-    """Stores people in a dictionary of roles in the movie.
-    """
-    def __repr__(self):
-        return u"<%s with jobs %s>" % (
-            self.__class__.__name__,
-            u", ".join(
-                [u"'%s'" % x for x in sorted(self.keys())]
-            )
-        )
-
-    def set(self, people_et):
-        """Takes an element tree Element ('people') and stores a dictionary of roles,
-        for each person.
-
-        For example:
-        <person job="director">
-            <name>Robert Rodriguez</name>
-            <role/>
-            <url>http://www.themoviedb.org/person/2294</url>
-        </person>
-
-        ..becomes:
-        self['people']['director'] = 'Robert Rodriguez'
-        """
-        self[u'people']={}
-        people = self[u'people']
-        for node in people_et:
-            if node.find(u'name') != None:
-                try:
-                    key = unicode(node.get(u"job").lower(), 'utf8')
-                except (UnicodeEncodeError, TypeError):
-                    key = node.get(u"job").lower()
-                try:
-                    data = unicode(node.find(u'name').text, 'utf8')
-                except (UnicodeEncodeError, TypeError):
-                    data = node.find(u'name').text
-                if people.has_key(key):
-                    people[key]=u"%s, %s" % (people[key], data)
-                else:
-                    people[key]=data
-
-class MovieDb:
-    """Main interface to www.themoviedb.com
-
-    The search() method searches for the film by title.
-    """
-    # Local Variables
-    tmdb_config = {}
-
-    # themoviedb.org api key given by Travis Bell for Mythtv
-    tmdb_config[u'apikey'] = "c27cb71cff5bd76e1a7a009380562c62"
-
-    tmdb_config[u'urls'] = {}
-
-# v2.0 api calls
-    tmdb_config[u'urls'][u'movie.search'] = u"http://api.themoviedb.org/2.0/Movie.search?title=%%s&api_key=%(apikey)s" % (tmdb_config)
-    tmdb_config[u'urls'][u'tmdbid.search'] = u"http://api.themoviedb.org/2.0/Movie.getInfo?id=%%s&api_key=%(apikey)s"  % (tmdb_config)
-
-# v2.1 api calls
-#    tmdb_config[u'urls'][u'movie.search'] = u'http://api.themoviedb.org/2.1/Movie.search/%%s/xml/%(apikey)s/%%s' % (tmdb_config)
-#    tmdb_config[u'urls'][u'tmdbid.search'] = u'http://api.themoviedb.org/2.1/Movie.getInfo/%%s/xml/%(apikey)s/%%s' % (tmdb_config)
-
-
-    tmdb_config[u'urls'][u'imdb.search'] = u"http://api.themoviedb.org/2.0/Movie.imdbLookup?imdb_id=tt%%s&api_key=%(apikey)s"  % (tmdb_config)
-    tmdb_config[u'translation'] = {u'actor': u'cast', u'alternative_title': u'alternative_title', u'backdrop': u'fanart', u'budget': u'budget',  u'categories': u'genres', u'director': u'director',  u'homepage': 'homepage', u'id': u'inetref', u'imdb': u'imdb', u'popularity': u'popularity', u'poster': u'coverimage', u'production_countries': u'production_countries', u'rating': u'userrating', u'release': u'releasedate', u'revenue': u'revenue', u'runtime': u'runtime', u'score': u'score', u'screenplay': u'writers', u'short_overview': u'plot', u'title': u'title', u'trailer': u'trailer', u'type': u'type', u'url': u'tmdb_url'}
-
-    def getCategories(self, categories_et):
-        """Takes an element tree Element ('categories') and create a string of comma seperated film
-        categories
-        return comma seperated sting of film category names
-
-        For example:
-        <category>
-            <name>Literary Fiction</name>
-            <url>
-                http://www.themoviedb.org/encyclopedia/category/6033
-            </url>
-        </category>
-
-        ..becomes:
-        'Literary Fiction'
-        """
-        cat = u''
-        for category in categories_et:
-            if category.find(u'name') != None:
-                try:
-                    data = unicode((category.find(u'name')).text, 'utf8')
-                except (UnicodeEncodeError, TypeError):
-                    data = (category.find(u'name')).text
-                if len(cat):
-                    cat+=u", %s" % (data)
-                else:
-                    cat=data
-        return cat
-
-    def getProductionCountries(self, countries_et):
-        """Takes an element tree Element ('categories') and create a string of comma seperated film
-        categories
-        return comma seperated sting of film category names
-
-        For example:
-        <production_countries>
-            <country>
-                <name>United States of America</name>
-                <url>http://www.../country/223</url>
-            </country>
-        </production_countries>
-        ..becomes:
-        'United States of America'
-        """
-        countries = u''
-        for country in countries_et:
-            if country.find(u'name') != None:
-                try:
-                    data = unicode((country.find(u'name')).text, 'utf8')
-                except (UnicodeEncodeError, TypeError):
-                    data = (country.find(u'name')).text
-
-                if len(countries):
-                    countries+=u", %s" % data
-                else:
-                    countries=data
-        return countries
-
-    def _parseMovie(self, movie_element, graphics=False):
-        cur_movie = Movie()
-        cur_poster = Poster()
-        cur_backdrop = Backdrop()
-        cur_people = People()
-
-        for item in movie_element.getchildren():
-            if item.tag.lower() == u"poster":
-                if graphics == True:
-                    cur_poster.set(item)
-                else:
-                    cur_poster = None
-            elif item.tag.lower() == u"backdrop":
-                if graphics == True:
-                    cur_backdrop.set(item)
-                else:
-                    cur_backdrop = None
-            elif item.tag.lower() == u"categories":
-                cur_movie[u'categories'] = self.getCategories(item)
-            elif item.tag.lower() == u"production_countries":
-                cur_movie[u'production_countries'] = self.getProductionCountries(item)
-            elif item.tag.lower() == u"people":
-                cur_people.set(item)
-            else:
-                if item.text != None:
-                    try:
-                        tag = unicode(item.tag, 'utf8')
-                    except (UnicodeEncodeError, TypeError):
-                        tag = item.tag
-                    try:
-                        cur_movie[tag] = unicode(item.text, 'utf8')
-                    except (UnicodeEncodeError, TypeError):
-                        cur_movie[tag] = item.text
-
-        if cur_poster != None:
-            cur_movie[u'poster'] = cur_poster.largest()
-        if cur_backdrop != None:
-            cur_movie[u'backdrop'] = cur_backdrop.largest()
-        if cur_people.has_key(u'people'):
-            if cur_people[u'people'] != None:
-                for key in cur_people[u'people']:
-                    cur_movie[key] = cur_people[u'people'][key]
-
-        translated={}
-        for key in cur_movie:
-            if cur_movie[key] == None or cur_movie[key] == u'None' or cur_movie[key] == u'':
-                continue
-            if key in [u'score', u'userrating']:
-                if cur_movie[key] == 0.0 or cur_movie[key] == u'0.0':
-                    continue
-            if key in [u'popularity', u'budget', u'runtime', u'revenue']:
-                if cur_movie[key] == 0 or cur_movie[key] == u'0':
-                    continue
-            if key == u'imdb':
-                translated[key] = cur_movie[key][2:]
-                continue
-            if key == u'release':
-                translated[u'year'] = cur_movie[key][:4]
-            if self.tmdb_config[u'translation'].has_key(key):
-                translated[self.tmdb_config[u'translation'][key]] = cur_movie[key]
-            else:
-                translated[key] = cur_movie[key]
-        return translated
-
-    def searchTitle(self, title, lang=u'en'):
-        """Searches for a film by its title.
-        Returns SearchResults (a list) containing all matches (Movie instances)
-        """
-        title = urllib.quote(title.encode("utf-8"))
-        url = self.tmdb_config[u'urls'][u'movie.search'] % (title)
-#        url = self.tmdb_config[u'urls'][u'movie.search'] % (lang, title)
-        etree = XmlHandler(url).getEt()
-        search_results = SearchResults()
-        for cur_result in etree.find(u"moviematches").findall(u"movie"):
-#        for cur_result in etree.find(u"movies").findall(u"movie"):
-            cur_movie = self._parseMovie(cur_result)
-            search_results.append(cur_movie)
-        return search_results
-
-    def searchTMDB(self, by_id, graphics=False, lang=u'en'):
-        """Searches for a film by its TMDB id number.
-        Returns a movie data dictionary
-        """
-        id_url = urllib.quote(by_id.encode("utf-8"))
-        url = self.tmdb_config[u'urls'][u'tmdbid.search'] % (id_url)
-#        url = self.tmdb_config[u'urls'][u'tmdbid.search'] % (lang, id_url)
-        etree = XmlHandler(url).getEt()
-
-        if etree.find(u"moviematches").find(u"movie"):
-            return self._parseMovie(etree.find(u"moviematches").find(u"movie"), graphics=graphics)
-#        if etree.find(u"movies").find(u"movie"):
-#            return self._parseMovie(etree.find(u"movies").find(u"movie"), graphics=graphics)
-        else:
-            return None
-
-    def searchIMDB(self, by_id, graphics=False, lang=u'en'):
-        """Searches for a film by its IMDB number.
-        Returns a movie data dictionary
-        """
-        id_url = urllib.quote(by_id.encode("utf-8"))
-        url = self.tmdb_config[u'urls'][u'imdb.search'] % (id_url)
-        etree = XmlHandler(url).getEt()
-        if self._parseMovie(etree.find(u"moviematches").find(u"movie")).has_key(u'inetref'):
-            return self.searchTMDB(self._parseMovie(etree.find(u"moviematches").find(u"movie"))[u'inetref'], graphics=graphics)
-        else:
-            return None
-# end MovieDb
-
 def _can_int(x):
     """Takes a string, checks if it is numeric.
     >>> _can_int("2")
@@ -1086,6 +803,9 @@ class BaseUI:
 
     def selectSeries(self, allSeries):
         return allSeries[0]
+
+    def selectMovieOrPerson(self, allElements):
+        return makeDict([allElements[0]])
 
 # Local variable
 video_type = u''
@@ -1160,9 +880,19 @@ class jamu_ConsoleUI(BaseUI):
             if filter(is_not_punct_char, allSeries_array[0]['name'].lower()) == filter(is_not_punct_char, UI_title.lower()):
                 return new_array
 
+        # Add the ability to select the skip inetref of '99999999'
+        new_array.append( {'sid': '99999999', 'name': u'User choses to ignore video'} )
+        names.append(u'User choses to ignore video')
+
         i_show=0
         for key in names: # list all search results
             i_show+=1 # Start at more human readable number 1 (not 0)
+            if key == u'User choses to ignore video':
+                print u"% 2s -> %s # %s" % (
+                    i_show,
+                    '99999999', "Set this video to be ignored by Jamu with a reference number of '99999999'"
+                )
+                continue
             if video_type != u'IMDB' and video_type != u'TMDB':
                 tmp_URL = URL % (allSeries[key]['sid'], UI_langid_dict[UI_search_language])
                 print u"% 2s -> %s # %s" % (
@@ -1187,10 +917,11 @@ class jamu_ConsoleUI(BaseUI):
         allSeries = self._displaySeries(allSeries)
 
         # Check for an automatic choice
-        if len(allSeries) == 1:
-            if filter(is_not_punct_char, allSeries[0]['name'].lower()) == filter(is_not_punct_char, UI_title.lower()):
-                UI_selectedtitle = allSeries[0]['name']
-                return allSeries[ 0 ]
+        if len(allSeries) <= 2:
+            for series in allSeries:
+                if filter(is_not_punct_char, series['name'].lower()) == filter(is_not_punct_char, UI_title.lower()):
+                    UI_selectedtitle = series['name']
+                    return series
 
         display_total = len(allSeries)
 
@@ -1368,6 +1099,7 @@ class Configuration(object):
         self.config['folderart'] = False
         self.config['metadata_exclude_as_update_trigger'] = ['intid', 'season', 'episode', 'showlevel', 'filename', 'coverfile', 'childid', 'browse', 'playcommand', 'trailer', 'host', 'screenshot', 'banner', 'fanart']
         self.config['filename_char_filter'] = u"/%\000"
+        self.config['ignore-directory'] = []
 
 
         # Dictionaries for Miro Bridge metadata downlods
@@ -1538,6 +1270,11 @@ class Configuration(object):
                 for option in cfg.options(section):
                     self.config['name_parse'].append(re.compile(unicode(cfg.get(section, option), 'utf8'), re.UNICODE))
                 continue
+            if section == 'ignore-directory':
+                # Video directories to be excluded from Jamu processing
+                for option in cfg.options(section):
+                    self.config['ignore-directory'].append(unicode(cfg.get(section, option), 'utf8'))
+                continue
             if section =='series_name_override':
                 overrides = {}
                 for option in cfg.options(section):
@@ -1662,8 +1399,8 @@ class Configuration(object):
         global localhostname, graphicsDirectories
         try:
             localip = gethostbyname(localhostname) # Get the local hosts IP address
-        except:
-            sys.stderr.write("\n! Error: There is no valid address-to-host mapping for the host (%s)\nThe Jamu Janitor (-MJ) option cannot be used while this issue remains un-resolved.\n" % localhostname)
+        except Exception, e:
+            sys.stderr.write("\n! Error: There is no valid address-to-host mapping for the host (%s)\nThe Jamu Janitor (-MJ) option cannot be used while this issue remains un-resolved.\nError:(%s)\n" % (localhostname, u''.join([u'%s ' % x for x in e.args])))
             sys.exit(1)
 
         # Get all curently mounted NFS shares
@@ -1946,12 +1683,12 @@ class Configuration(object):
             try:
                 import Image
                 self.config['image_library'] = Image
-            except:
+            except Exception, e:
                 sys.stderr.write(u"""\n! Error: Python Imaging Library is required for figuring out the sizes of
 the fetched poster images.
 
 In Debian/Ubuntu it is packaged as 'python-imaging'.
-http://www.pythonware.com/products/pil/\n""")
+http://www.pythonware.com/products/pil/\nError:(%s)\n""" % u''.join([u'%s ' % x for x in e.args]))
                 sys.exit(1)
 
         if not _can_int(self.config['min_poster_size']):
@@ -2191,6 +1928,9 @@ class Tvdatabase(object):
                     seriesfound=self._searchforSeries(series_name).search(episode_name)
                 if len(seriesfound) != 0:
                     for ep in seriesfound:
+                        if ep['seriesid'] == '999999999':
+                            self.config['sid'] = ep['seriesid']
+                            return(ep)
                         if (ep['episodename'].lower()).startswith(episode_name.lower()):
                             if len(ep['episodename']) > (len(episode_name)+1):
                                 # Skip episodes the are not part of a set of (1), (2) ... etc
@@ -2212,6 +1952,8 @@ class Tvdatabase(object):
             elif season:
                 if episode:     # series & season & episode
                     seriesfound=self._searchforSeries(series_name)[int(season)][int(episode)]
+                    if seriesfound['seriesid'] == '999999999':
+                        return(seriesfound)
                     self.config['sid'] = seriesfound['seriesid']
                     self.config['episode_name'] = seriesfound['episodename']
                 else:                            # series & season
@@ -2221,9 +1963,14 @@ class Tvdatabase(object):
         except tvdb_shownotfound:
             # No such show found.
             # Use the show-name from the files name, and None as the ep name
-            sys.stderr.write(u"\n! Warning: Series (%s) not found\n" % (
-                series_name )
-            )
+            if series_name:
+                sys.stderr.write(u"\n! Warning: Series (%s) not found\n" % (
+                    series_name )
+                )
+            else:
+                sys.stderr.write(u"\n! Warning: Series TVDB number (%s) not found\n" % (
+                    sid )
+                )
             return(False)
         except (tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_attributenotfound):
             # The season, episode or name wasn't found, but the show was.
@@ -2300,21 +2047,24 @@ class Tvdatabase(object):
 
         try:
             dat = urllib.urlopen(url).read()
-        except IOError:
-            sys.stderr.write( u"\n! Warning: Download IOError on URL for Filename(%s)\nOrginal URL(%s)\nIOError urllib.quote URL(%s)\n" % (OutputFileName, org_url, url))
+        except IOError, e:
+            sys.stderr.write( u"\n! Warning: Download IOError on URL for Filename(%s)\nOrginal URL(%s)\nIOError urllib.quote URL(%s)\nError:(%s)\n" % (OutputFileName, org_url, url, u''.join([u'%s ' % x for x in e.args])))
             return False
 
         try:
             target_socket = open(OutputFileName, "wb")
             target_socket.write(dat)
             target_socket.close()
-        except IOError:
-            sys.stderr.write( u"\n! Warning: Download IOError for Filename(%s), may be the directory is invalid\n" % (OutputFileName, ))
+        except IOError, e:
+            sys.stderr.write( u"\n! Warning: Download IOError for Filename(%s), may be the directory is invalid\nError:(%s)\n" % (OutputFileName, u''.join([u'%s ' % x for x in e.args])))
             return False
 
         # Verify that the downloaded file was NOT HTML instead of the intended file
         try:
             p = subprocess.Popen(u'file "%s"' % OutputFileName, shell=True, bufsize=4096, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
+        except Exception, e:
+            sys.stderr.write( u"\n! Warning: Download Exception for Filename(%s)\nError:(%s)\n" % (OutputFileName, u''.join([u'%s ' % x for x in e.args])))
+            return False
         except:
             return False
         data = p.stdout.readline()
@@ -2507,68 +2257,47 @@ class Tvdatabase(object):
         lang=self.config['local_language']
         graphics=[]
 
-        if graphics_type == self.fanart_type:        # Series fanart graphics
-            lowres_items=[]
-            hires_items=[]
-            lowres_flag=True
-            highres_flag=True
-            try:
-                self.config['log'].debug(u'Checking for fanart low resolution graphics')
-                lowres_items=self._searchforSeries(series_name).data[banners][self.fanart_key][self.fanart_lowres_key].values()
-            except:
-                lowres_flag=False
-            try:
-                self.config['log'].debug(u'Checking for fanart high resolution graphics')
-                hires_items=self._searchforSeries(series_name).data[banners][self.fanart_key][self.fanart_hires_key].values()
-            except:
-                highres_flag=False
-            if highres_flag==False and lowres_flag==False:
+        try:
+            if self.config['sid']:
+                URLs = self.config['tvdb_api'].ttvdb_parseBanners(self.config['sid'])
+            else:
+                URLs = self.config['tvdb_api'].ttvdb_parseBanners(self.config['tvdb_api']._nameToSid(series_name))
+        except Exception, e:
+            return None
+
+        if graphics_type == self.fanart_type: # Series fanart graphics
+            if not len(URLs[u'fanart']):
                 return None
-            for item in lowres_items:
-                graphics.append(item)
-            for item in hires_items:
-                graphics.append(item)
-        elif season == None and episode == None and episode_name == None :
-            if graphics_type == self.banner_type:         # Series Banners
-                try:
-                    self.config['log'].debug(u'Checking for Series Banner graphics')
-                    graphics=[b for b in
-                            self._searchforSeries(series_name).data[banners][self.banner_key][self.banner_series_key].values()]
-                except:
-                    return None
-            elif graphics_type == self.poster_type:        # Series Posters
-                try:
-                    self.config['log'].debug(u'Checking for Series Poster graphics')
-                    graphics=[b for b in
-                            self._searchforSeries(series_name).data[banners][self.poster_key][self.poster_series_key].values()]
-                except:
-                    return None
+            for url in URLs[u'fanart']:
+                graphics.append(url)
+        elif season == None and episode == None and episode_name == None:
+            if not len(URLs[u'series']):
+                return None
+            if graphics_type == self.banner_type: # Series Banners
+                for url in URLs[u'series']:
+                    graphics.append(url)
+            else: # Series Posters
+                for url in URLs[u'poster']:
+                    graphics.append(url)
         else:
-            if graphics_type == self.banner_type:         # Season Banners
-                try:
-                    self.config['log'].debug(u'Checking for Season Banner graphics')
-                    graphics=[b for b in
-                            self._searchforSeries(series_name).data[banners][self.season_key][self.banner_season_key].values()
-                            if b[self.season_key] == season]
-                except:
+            if not len(URLs[u'season']):
+                return None
+            if graphics_type == self.banner_type: # Season Banners
+                season_banners=[]
+                for url in URLs[u'season']:
+                    if url[u'bannertype2'] == u'seasonwide' and url[u'season'] == season:
+                        season_banners.append(url)
+                if not len(season_banners):
                     return None
-            elif graphics_type == self.poster_type:            # Season Posters
-                try:
-                    self.config['log'].debug(u'Checking for Season Poster graphics')
-                    graphics=[b for b in
-                            self._searchforSeries(series_name).data[banners][self.season_key][self.poster_season_key].values()
-                            if b[self.season_key] == season]
-                except:
+                graphics = season_banners
+            else: # Season Posters
+                season_posters=[]
+                for url in URLs[u'season']:
+                    if url[u'bannertype2'] == u'season' and url[u'season'] == season:
+                        season_posters.append(url)
+                if not len(season_posters):
                     return None
-            elif graphics_type == self.ep_image_type:        # Episode Image
-                try:
-                    self.config['log'].debug(u'Checking for Episode Image graphics')
-                    if episode_name:        # Find an exact match for the series and episode name
-                        graphics=self._searchforSeries(series_name).search(episode_name)
-                    else:
-                        graphics= self._searchforSeries(series_name)[int(season)][int(episode)]
-                except:
-                    return None
+                graphics = season_posters
 
         graphicsURLs=u''
         if self.config['nokeys'] and not self.config['download']:
@@ -2929,7 +2658,7 @@ class Tvdatabase(object):
 
         sid=self.config['sid']
 
-        if UI_selectedtitle and self.config['mythtv_inetref']:
+        if UI_selectedtitle and (self.config['mythtv_inetref'] or self.config['mythtv_ref_num']):
             self.config['series_name'] = UI_selectedtitle
 
         series_name=self.config['series_name']
@@ -3044,6 +2773,14 @@ class VideoFiles(Tvdatabase):
         for cfile in args: # Directories must exist and be both readable and writable
             if os.path.isdir(cfile) and not os.access(cfile, os.F_OK | os.R_OK):
                 sys.stderr.write(u"\n! Error: Video directory (%s) does not exist or the permissions are not at least readable. Skipping this directory.\n" % (cfile))
+                continue
+            ignore = False
+            if os.path.isdir(cfile):
+                for directory in self.config['ignore-directory']: # ignore directory list
+                    if not cfile.startswith(directory):
+                        continue
+                    ignore = True
+            if ignore: # Skip this directory
                 continue
             if os.path.isdir(cfile):
                 index = cfile.find(u'VIDEO_TS')
@@ -3430,12 +3167,13 @@ class MythTvMetaData(VideoFiles):
         TMDB_movies=[]
         IMDB_movies=[]
 
-        mdb = MovieDb()
         try:
             if IMDB:
-                results = mdb.searchTMDB(IMDB)
+                results = self.config['tmdb_api'].searchTMDB(IMDB)
             else:
-                results = mdb.searchTitle(tmp_title)
+                results = self.config['tmdb_api'].searchTitle(tmp_title)
+        except TmdbMovieOrPersonNotFound, e:
+            results = [[]]
         except Exception, errormsg:
             self._displayMessage(u"themoviedb.com error for Movie(%s) invalid data error (%s)" % (title, errormsg))
             return False
@@ -3444,13 +3182,18 @@ class MythTvMetaData(VideoFiles):
             return False
 
         if IMDB: # This is required to allow graphic file searching both by a TMDB and IMDB numbers
-            if results:
-                if results.has_key('imdb'):
-                    return results['imdb']
+            if len(results[0]):
+                if results.has_key('imdb_id'):
+                    return results['imdb_id'][2:]
                 else:
                     return False
             else:
                 return False
+
+        # Check if the user wants to skip this video
+        if len(results[0]) and self.config['interactive']:
+            if results[0]['id'] == '99999999':
+                return results[0]['id']
 
         if UI_title[-1:] == ')':
             name = UI_title[:-7].lower() # Just the movie title
@@ -3461,46 +3204,42 @@ class MythTvMetaData(VideoFiles):
 
         if len(results[0]):
             for movie in results:
-                if not movie.has_key(u'imdb'):
-                    continue
-                if not _can_int(movie[u'imdb']): # Make sure the IMDB is numeric
-                    continue
-                if filter(is_not_punct_char, movie['title']).lower() == filter(is_not_punct_char, name):
+                if filter(is_not_punct_char, movie['name']).lower() == filter(is_not_punct_char, name):
                     if not year:
-                        if movie.has_key('year'):
-                            TMDB_movies.append({'name': "%s (%s)" % (movie['title'], movie['year']), u'sid': movie[u'imdb']})
+                        if movie.has_key('released'):
+                            TMDB_movies.append({'name': "%s (%s)" % (movie['name'], movie['released'][:4]), u'sid': movie[u'id']})
                         else:
-                            TMDB_movies.append({'name': "%s" % (movie['title'], ), u'sid': movie[u'imdb']})
+                            TMDB_movies.append({'name': "%s" % (movie['name'], ), u'sid': movie[u'id']})
                         continue
-                    if movie.has_key(u'year'):
-                        if movie['year'] == year:
+                    if movie.has_key(u'released'):
+                        if movie['released'][:4] == year:
                             if rtnyear:
-                                return {'name': "%s (%s)" % (movie['title'], movie['year']), u'sid': movie[u'imdb']}
+                                return {'name': "%s (%s)" % (movie['name'], movie['released'][:4]), u'sid': movie[u'id']}
                             else:
-                                return u"%07d" % int(movie[u'imdb'])
-                        TMDB_movies.append({'name': "%s (%s)" % (movie['title'], movie['year']), u'sid': movie[u'imdb']})
+                                return movie[u'id']
+                        TMDB_movies.append({'name': "%s (%s)" % (movie['name'], movie['released'][:4]), u'sid': movie[u'id']})
                         continue
                     else:
-                        TMDB_movies.append({'name': "%s" % (movie['title'], ), u'sid': movie[u'imdb']})
+                        TMDB_movies.append({'name': "%s" % (movie['name'], ), u'sid': movie[u'id']})
                         continue
-                elif movie.has_key('alternative_title'):
-                    if filter(is_not_punct_char, movie['alternative_title']).lower() == filter(is_not_punct_char, name):
+                elif movie.has_key('alternative_name'):
+                    if filter(is_not_punct_char, movie['alternative_name']).lower() == filter(is_not_punct_char, name):
                         if not year:
-                            if movie.has_key('year'):
-                                TMDB_movies.append({'name': "%s (%s)" % (movie['alternative_title'], movie['year']), u'sid': movie[u'imdb']})
+                            if movie.has_key('released'):
+                                TMDB_movies.append({'name': "%s (%s)" % (movie['alternative_name'], movie['released'][:4]), u'sid': movie[u'id']})
                             else:
-                                TMDB_movies.append({'name': "%s" % (movie['alternative_title'], ), u'sid': movie[u'imdb']})
+                                TMDB_movies.append({'name': "%s" % (movie['alternative_name'], ), u'sid': movie[u'id']})
                             continue
-                        if movie.has_key(u'year'):
-                            if movie['year'] == year:
+                        if movie.has_key(u'released'):
+                            if movie['released'][:4] == year:
                                 if rtnyear:
-                                    return {'name': "%s (%s)" % (movie['alternative_title'], movie['year']), u'sid': movie[u'imdb']}
+                                    return {'name': "%s (%s)" % (movie['alternative_name'], movie['released'][:4]), u'sid': movie[u'id']}
                                 else:
-                                    return u"%07d" % int(movie['imdb'])
-                            TMDB_movies.append({'name': "%s (%s)" % (movie['alternative_title'], movie['year']), u'sid': movie[u'imdb']})
+                                    return movie['id']
+                            TMDB_movies.append({'name': "%s (%s)" % (movie['alternative_name'], movie['released'][:4]), u'sid': movie[u'imdb']})
                             continue
                         else:
-                            TMDB_movies.append({'name': "%s" % (movie['alternative_title'], ), u'sid': movie[u'imdb']})
+                            TMDB_movies.append({'name': "%s" % (movie['alternative_name'], ), u'sid': movie[u'id']})
                             continue
 
         # When there is only one match but NO year to confirm then it is OK to assume an exact match
@@ -3508,7 +3247,7 @@ class MythTvMetaData(VideoFiles):
             if rtnyear:
                 return TMDB_movies[0]
             else:
-                return u"%07d" % int(TMDB_movies[0][u'sid'])
+                return TMDB_movies[0][u'sid']
 
         if imdb_lib:    # Can a imdb.com search be done?
             imdb_access = imdb.IMDb()
@@ -3574,6 +3313,8 @@ class MythTvMetaData(VideoFiles):
 
         if inetref.has_key('sid'):
             if _can_int(inetref['sid']):
+                if inetref['sid'] == '99999999':
+                    return inetref['sid']
                 if rtnyear:
                     if inetref['name'] == u'User selected':
                         try:
@@ -3603,7 +3344,7 @@ class MythTvMetaData(VideoFiles):
         '''
         if graphic_type == u'-P':
             graphic_name = u'poster'
-            key_type = u'coverimage'
+            key_type = u'coverart'
             rel_type = u'coverfile'
         else:
             graphic_name = u'fanart'
@@ -3611,14 +3352,16 @@ class MythTvMetaData(VideoFiles):
             rel_type = key_type
 
         self.config['series_name']=cfile['file_seriesname']
-        mdb = MovieDb()
         try:
             if len(cfile['inetref']) == 7: # IMDB number
-                results = mdb.searchIMDB(cfile['inetref'], graphics=True)
+                results = self.config['tmdb_api'].searchIMDB(cfile['inetref'])
             else:
-                results = mdb.searchTMDB(cfile['inetref'], graphics=True)
-        except:
-            self._displayMessage(u"themoviedb.com error for Movie(%s) graphics(%s)" % (cfile['file_seriesname'], graphic_name))
+                results = self.config['tmdb_api'].searchTMDB(cfile['inetref'])
+        except TmdbMovieOrPersonNotFound, e:
+            self._displayMessage(u"0-tmdb %s for Movie not found(%s)(%s)" % (graphic_name, cfile['filename'], cfile['inetref']))
+            return None
+        except Exception, e:
+            self._displayMessage(u"themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_name, u''.join([u'%s ' % x for x in e.args])))
             return None
 
         if results != None:
@@ -3629,7 +3372,7 @@ class MythTvMetaData(VideoFiles):
             self._displayMessage(u"1b-tmdb %s for Movie not found(%s)(%s)" % (graphic_name, cfile['filename'], cfile['inetref']))
             return None
 
-        graphic_file = results[key_type]
+        graphic_file = (results[key_type].split(u','))[0].strip() # Only want the first image URL
 
         self.config['g_defaultname']=False
         self.config['toprated'] = True
@@ -3638,7 +3381,7 @@ class MythTvMetaData(VideoFiles):
         self.config['sid']=None
         if watched:
             if self.program_seriesid == None:
-                self.config['g_series'] = self.sanitiseFileName(cfile['file_seriesname'])+self.graphic_suffix[rel_type]+u'.%(ext)s'
+                self.config['g_series'] = self.sanitiseFileName(cfile['file_seriesname'])+u' Season 1'+self.graphic_suffix[rel_type]+u'.%(ext)s'
             else:
                 self.config['g_series'] = self.sanitiseFileName(self.program_seriesid)+self.graphic_suffix[rel_type]+u'.%(ext)s'
         else:
@@ -3684,11 +3427,13 @@ class MythTvMetaData(VideoFiles):
                 source = self.config['myth_secondary_sources']['movies'][graphic_type]
                 if source.find(u'%(imdb)s') != -1:
                     if len(cfile['inetref']) != 7:
-                        mdb = MovieDb()
                         try:
-                            results = mdb.searchTMDB(cfile['inetref'])
-                        except:
-                            self._displayMessage(u"\n! Warning: Secondary themoviedb.com error for Movie(%s) graphics(%s)" % (cfile['file_seriesname'], graphic_type))
+                            results = self.config['tmdb_api'].searchTMDB(cfile['inetref'])
+                        except TmdbMovieOrPersonNotFound, e:
+                            self._displayMessage(u"\n! Warning: Secondary themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_type, u''.join([u'%s ' % x for x in e.args])))
+                            return None
+                        except Exception, e:
+                            self._displayMessage(u"\n! Warning: Secondary themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_type, u''.join([u'%s ' % x for x in e.args])))
                             return None
                         if results == None:
                             return None
@@ -3848,7 +3593,7 @@ class MythTvMetaData(VideoFiles):
                         if len(available_metadata[key].split(' ')) < 10 and len(meta_dict[key].split(' ')) > 10:
                             available_metadata[key] = meta_dict[key]
                             continue
-                if not available_metadata.has_key(key): # Mainly for Genre and Cast
+                if not available_metadata.has_key(key): # Mainly for Genre, Cast and Countries
                     available_metadata[key] = meta_dict[key]
                     continue
                 if available_metadata[key] == None or available_metadata[key] == '' or available_metadata[key] == 'None' or available_metadata[key] == 'Unknown':
@@ -3874,11 +3619,13 @@ class MythTvMetaData(VideoFiles):
                 source = self.config['myth_secondary_sources']['movies']['metadata']
                 if source.find(u'%(imdb)s') != -1:
                     if len(cfile['inetref']) != 7:
-                        mdb = MovieDb()
                         try:
-                            results = mdb.searchTMDB(cfile['inetref'])
-                        except:
-                            self._displayMessage(u"Secondary metadata themoviedb.com error for Movie(%s)" % (cfile['file_seriesname']))
+                            results = self.config['tmdb_api'].searchTMDB(cfile['inetref'])
+                        except TmdbMovieOrPersonNotFound, e:
+                            self._displayMessage(u"Secondary metadata themoviedb.com error for Movie(%s), error(%s)" % (cfile['file_seriesname'], u''.join([u'%s ' % x for x in e.args])))
+                            return available_metadata
+                        except Exception, e:
+                            self._displayMessage(u"Secondary metadata themoviedb.com error for Movie(%s), error(%s)" % (cfile['file_seriesname'], u''.join([u'%s ' % x for x in e.args])))
                             return available_metadata
                         if results == None:
                             return available_metadata
@@ -3984,14 +3731,16 @@ class MythTvMetaData(VideoFiles):
         return results for secondary sources when no primary source meta data
         return dictionary of metadata combined with data from a secondary source
         '''
-        mdb = MovieDb()
         try:
             if len(cfile['inetref']) == 7: # IMDB number
-                meta_dict = mdb.searchIMDB(cfile['inetref'])
+                meta_dict = self.config['tmdb_api'].searchIMDB(cfile['inetref'])
             else:
-                meta_dict = mdb.searchTMDB(cfile['inetref'])
-        except:
-            self._displayMessage(u"themoviedb.com error for Movie(%s)(%s) meta data dictionary cannot be returned" % (cfile['filename'], cfile['inetref']))
+                meta_dict = self.config['tmdb_api'].searchTMDB(cfile['inetref'])
+        except TmdbMovieOrPersonNotFound, e:
+            self._displayMessage(u"0-tmdb Movie not found(%s)(%s) meta data dictionary cannot be returned" % (cfile['filename'], cfile['inetref']))
+            return self._getSecondarySourceMetadata(cfile, available_metadata)
+        except Exception, e:
+            self._displayMessage(u"themoviedb.com error for Movie(%s)(%s) meta data dictionary cannot be returned, error(%s)" % (cfile['filename'], cfile['inetref'], u''.join([u'%s ' % x for x in e.args])))
             return self._getSecondarySourceMetadata(cfile, available_metadata)
 
         if meta_dict == None:
@@ -4001,11 +3750,10 @@ class MythTvMetaData(VideoFiles):
         keys = meta_dict.keys()
 
         for key in keys:
-            if key == u'inetref' and len(cfile['inetref']) == 7: # IMDB number
-                meta_dict[key] = cfile['inetref']
-                continue
             data = meta_dict[key]
             if not data:
+                continue
+            if key == 'homepage':
                 continue
             data = self._changeAmp(data)
             data = self._changeToCommas(data)
@@ -4035,7 +3783,7 @@ class MythTvMetaData(VideoFiles):
                 except:
                     pass
                 continue
-            if key == 'tmdb_url':
+            if key == 'url':
                 meta_dict['homepage'] = data
                 continue
             if key == 'releasedate':
@@ -4095,8 +3843,8 @@ class MythTvMetaData(VideoFiles):
         if not self.config['sid'] and self.config['mythtv_guess']:
             try:
                 allmatchingseries = self.config['tvdb_api']._getSeries(self.config['series_name'])
-            except Exception:
-                self._displayMessage(u"tvdb Series not found(%s) or connection issues with thetvdb.com web site.\n" % cfile['filename'])
+            except Exception, e:
+                self._displayMessage(u"tvdb Series not found(%s) or connection issues with thetvdb.com web site.\nError:(%s)\n" % (cfile['filename'], u''.join([u'%s ' % x for x in e.args])))
                 return None
             if filter(is_not_punct_char, allmatchingseries['name'].lower()) == filter(is_not_punct_char,cfile['file_seriesname'].lower()):
                 self.config['sid'] = allmatchingseries['sid']
@@ -4112,13 +3860,15 @@ class MythTvMetaData(VideoFiles):
 
         if watched:
             if self.program_seriesid == None:
-                self.config['g_series'] = self.sanitiseFileName(cfile['file_seriesname'])+self.graphic_suffix[rel_type]+u'.%(ext)s'
+                self.config['g_series'] = self.sanitiseFileName(cfile['file_seriesname'])+u' Season 1'+self.graphic_suffix[rel_type]+u'.%(ext)s'
                 self.config['g_season'] = self.sanitiseFileName(cfile['file_seriesname'])+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
             else:
                 self.config['g_series'] = self.sanitiseFileName(self.program_seriesid)+self.graphic_suffix[rel_type]+u'.%(ext)s'
                 self.config['g_season'] = self.sanitiseFileName(self.program_seriesid)+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
         else:
-            self.config['g_series'] = self.sanitiseFileName(self.config['series_name'])+self.graphic_suffix[rel_type]+u'.%(ext)s'
+        # TV Series ALWAYS need the ' Season' in the file name incase the show name could clobber a Movie image
+        # Season X is used so that a real season image is not overritten. It will be renamed later.
+            self.config['g_series'] = self.sanitiseFileName(self.config['series_name'])+u' Season X'+self.graphic_suffix[rel_type]+u'.%(ext)s'
             self.config['g_season'] = self.sanitiseFileName(self.config['series_name'])+u' Season %(seasonnumber)d'+self.graphic_suffix[rel_type]+u'.%(ext)s'
         if toprated:
             typegetGraphics=self.getTopRatedGraphics
@@ -4159,8 +3909,8 @@ class MythTvMetaData(VideoFiles):
         if not self.config['sid'] and self.config['mythtv_guess']:
             try:
                 allmatchingseries = self.config['tvdb_api']._getSeries(self.config['series_name'])
-            except Exception:
-                self._displayMessage(u"tvdb Series not found(%s) or there are connection problems with thetvdb.com" % cfile['filename'])
+            except Exception, e:
+                self._displayMessage(u"tvdb Series not found(%s) or there are connection problems with thetvdb.com\nError(%s)" % (cfile['filename'], u''.join([u'%s ' % x for x in e.args])))
                 return None
             if filter(is_not_punct_char, allmatchingseries['name'].lower()) == filter(is_not_punct_char,cfile['file_seriesname'].lower()):
                 self.config['sid'] = allmatchingseries['sid']
@@ -4173,6 +3923,12 @@ class MythTvMetaData(VideoFiles):
             if not self.verifySeriesExists():
                 self._displayMessage(u"tvdb Series not found(%s) meta data dictionary cannot be returned" % cfile['filename'])
                 return self._getSecondarySourceMetadata(cfile, available_metadata)
+
+        if self.config['sid'] == '99999999':
+            if not self.config['interactive']:
+                return self._getSecondarySourceMetadata(cfile, available_metadata)
+            else:
+                return {'sid': self.config['sid'], 'title': cfile['file_seriesname']}
 
         meta_dict={}
         tmp_array=(self.getSeriesEpisodeData()).split('\n')
@@ -4287,8 +4043,8 @@ class MythTvMetaData(VideoFiles):
         return text
     # end make_db_ready
 
-    def _addCastGenre(self, data_string, vim, cast_genres_type):
-        '''From a comma delimited string of cast members or genres add the ones
+    def _addCastGenreCountry(self, data_string, vim, cast_genres_type):
+        '''From a comma delimited string of cast members, genres or countries add the ones
         not already in the myth db and update the video's meta data
         return True when successfull
         return False if failed
@@ -4306,12 +4062,15 @@ class MythTvMetaData(VideoFiles):
         if cast_genres_type == 'genres':
             for item in data:
                 vim.genre.add(item)
-        else:
+        elif cast_genres_type == 'cast':
             for item in data:
                 vim.cast.add(item)
+        elif cast_genres_type == 'countries':
+            for item in data:
+                vim.country.add(item)
 
         return True
-    # end _addCastGenre
+    # end _addCastGenreCountry()
 
     # Local variables
     errors = []
@@ -4506,13 +4265,13 @@ class MythTvMetaData(VideoFiles):
                         tmp_path = src+cfile['filepath'].replace(dst, u'')
                         video_file = self.rtnRelativePath(self.movie_file_format % (tmp_path, cfile['filename'], cfile['ext']), 'mythvideo')
                         tmp_filename = self.rtnRelativePath(self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext']), 'mythvideo')
-                        result = mythvideo.getVideo(file=video_file, exactfile=True)
+                        result = mythvideo.getVideo(exactfile=video_file)
                         if result == None:
                             intid = result
                         else:
                             intid = result.intid
                         if not intid:
-                            result = mythvideo.getVideo(file=self.movie_file_format % (tmp_path, cfile['filename'], cfile['ext']), host=localhostname.lower(), exactfile=True)
+                            result = mythvideo.getVideo(exactfile=self.movie_file_format % (tmp_path, cfile['filename'], cfile['ext']), host=localhostname.lower())
                             if result == None:
                                 intid = result
                             else:
@@ -4542,7 +4301,7 @@ class MythTvMetaData(VideoFiles):
         if self.config['ret_filename']:
             for index in range(len(cfile_array)):
                 cfile = cfile_array[index]
-                if self.config['mythtv_inetref']:
+                if self.config['mythtv_inetref'] or self.config['mythtv_ref_num']:
                     sys.stdout.write(u"\nAttempting to rename video filename (%s)\n" % cfile['file_seriesname'])
                 if  cfile['seasno'] == 0 and cfile['epno'] == 0: # File rename for a movie
                     sid = None
@@ -4554,6 +4313,8 @@ class MythTvMetaData(VideoFiles):
                         data = self._getTmdbIMDB(cfile['file_seriesname'], rtnyear=True)
                         if data:
                             sid = data[u'sid']
+                            if data[u'sid'] == '99999999': # The user chose to ignore this video
+                                continue
                             new_filename = self.sanitiseFileName(data[u'name'])
                         else:
                             continue
@@ -4591,6 +4352,8 @@ class MythTvMetaData(VideoFiles):
                     self.config['episode_name'] = None
                     new_filename = self.returnFilename()
                     inetref = self.config['sid']
+                    if inetref == '99999999': # User chose to ignore this video
+                        continue
 
                 if new_filename:
                     if new_filename == cfile['filename']: # The file was already named to standard format
@@ -4609,13 +4372,13 @@ class MythTvMetaData(VideoFiles):
                     num_renamed_files+=1
                     video_file = self.rtnRelativePath(self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext']), 'mythvideo')
                     tmp_filename = self.rtnRelativePath(self.movie_file_format % (cfile['filepath'], new_filename, cfile['ext']), 'mythvideo')
-                    result = mythvideo.getVideo(file=video_file, exactfile=True)
+                    result = mythvideo.getVideo(exactfile=video_file)
                     if result == None:
                         intid = result
                     else:
                         intid = result.intid
                     if not intid:
-                        result = mythvideo.getVideo(file=self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext']), host=localhostname.lower(), exactfile=True)
+                        result = mythvideo.getVideo(exactfile=self.movie_file_format % (cfile['filepath'], cfile['filename'], cfile['ext']), host=localhostname.lower())
                         if result == None:
                             intid = result
                         else:
@@ -4688,13 +4451,13 @@ class MythTvMetaData(VideoFiles):
                 videopath = os.path.join(unicode(cfile['filepath'],'utf8'), unicode(cfile['filename'],'utf8')+u'.'+cfile['ext'])
 
             # Find the MythTV meta data
-            result = mythvideo.getVideo(file=videopath, exactfile=True)
+            result = mythvideo.getVideo(exactfile=videopath)
             if result == None:
                 intid = result
             else:
                 intid = result.intid
             if not intid:
-                result = mythvideo.getVideo(file=self.rtnRelativePath(videopath, 'mythvideo'), host=localhostname.lower(), exactfile=True)
+                result = mythvideo.getVideo(exactfile=self.rtnRelativePath(videopath, 'mythvideo'), host=localhostname.lower())
                 if result == None:
                     intid = result
                 else:
@@ -4704,7 +4467,7 @@ class MythTvMetaData(VideoFiles):
             else:
                 meta_dict = Video(id=intid, db=mythvideo)
                 if self.config['video_dir']:
-                    if not mythvideo.getVideo(file=meta_dict[u'filename'], host=meta_dict[u'host'], exactfile=True):
+                    if not mythvideo.getVideo(exactfile=meta_dict[u'filename'], host=meta_dict[u'host']):
                         missing_list.append(cfile)
                         continue
                 # There must be an Internet reference number. Get one for new records.
@@ -4806,12 +4569,14 @@ class MythTvMetaData(VideoFiles):
         if records:
             for record in records:
                 atleast_one_video_file = True
-                meta_dict = {'host': record.host, 'coverfile': record.coverfile, 'banner': record.banner, 'fanart': record.fanart, 'filename': record.filename, 'intid': record.intid, }
-                if meta_dict['host'] != u'' and meta_dict['host'] != None:    # Skip any videometadata record that is not for this host
+                meta_dict = {'host': record.host, 'coverfile': record.coverfile, 'banner': record.banner, 'fanart': record.fanart, 'filename': record.filename, 'intid': record.intid, 'inetref': record.inetref, }
+                # Skip any videometadata record that is not for this host
+                if meta_dict['host'] != u'' and meta_dict['host'] != None:
                     if meta_dict['host'].lower() != localhostname.lower():
                         continue
-                for key in meta_dict.keys(): # Start removing any graphics in this videometadata record
-                    if key in ['host','filename','intid']:
+                # Start removing any graphics in this videometadata record
+                for key in meta_dict.keys():
+                    if key in ['host','filename','intid', 'inetref']:
                         continue
                     if meta_dict[key] in [None, u'', u'None', u'No Cover', u'Unknown']:
                         continue
@@ -4832,27 +4597,18 @@ class MythTvMetaData(VideoFiles):
                     (fileBaseName, fileExtension)=os.path.splitext(fileName)
                     index = fileBaseName.find(u' Season ')
                     intid = meta_dict['intid']
-                    if index != -1: # Was a season string found?
-                        filename = os.path.join(dirName, u'%s%s' % (fileBaseName[:index], fileExtension))
-                        if filename in graphics_file_dict[key]: # No suffix
-                            if self._checkValidGraphicFile(filename, graphicstype=key, vidintid=intid) == True:
-                                graphics_file_dict[key].remove(filename)
-                                all_graphics_file_list.remove(filename)
-                        filename = os.path.join(dirName, u'%s%s%s' % (fileBaseName[:index], self.graphic_suffix[key], fileExtension))
-                        if filename in graphics_file_dict[key]: # With suffix
-                            if self._checkValidGraphicFile(filename, graphicstype=key, vidintid=intid) == True:
-                                graphics_file_dict[key].remove(filename)
-                                all_graphics_file_list.remove(filename)
 
-                    if meta_dict[key] in graphics_file_dict[key]: # No suffix
-                        if self._checkValidGraphicFile(meta_dict[key], graphicstype=key, vidintid=intid) == True:
-                            graphics_file_dict[key].remove(meta_dict[key])
-                            all_graphics_file_list.remove(meta_dict[key])
-                    filename = os.path.join(dirName, u'%s%s%s' % (fileBaseName, self.graphic_suffix[key], fileExtension))
-                    if filename in graphics_file_dict[key]: # With suffix
-                        if self._checkValidGraphicFile(filename, graphicstype=key, vidintid=intid) == True:
-                            graphics_file_dict[key].remove(filename)
-                            all_graphics_file_list.remove(filename)
+                    if index != -1: # Is this a TV Series episode?
+                        if meta_dict[key] in graphics_file_dict[key]:
+                            if self._checkValidGraphicFile(meta_dict[key], graphicstype=key, vidintid=intid) == True:
+                                graphics_file_dict[key].remove(meta_dict[key])
+                                all_graphics_file_list.remove(meta_dict[key])
+                    # This logic is specific to Movies and videos with a '99999999' inetref numbers
+                    elif fileName.startswith(meta_dict['inetref']+u'_') or fileName.startswith(meta_dict['inetref']+u'.') or meta_dict['inetref'] == '99999999':
+                        if meta_dict[key] in graphics_file_dict[key]:
+                            if self._checkValidGraphicFile(meta_dict[key], graphicstype=key, vidintid=intid) == True:
+                                graphics_file_dict[key].remove(meta_dict[key])
+                                all_graphics_file_list.remove(meta_dict[key])
 
         if not atleast_one_video_file:
             sys.stderr.write(u"\n! Error: Janitor - did not find any video files to process so skipping\nimage clean up to protect your image files, in case this is a configuration or NFS error.\nIf you do not use MythVideo then the Janitor option (-MJ) is not of value to you on this MythTV back end.\n")
@@ -4872,20 +4628,19 @@ class MythTvMetaData(VideoFiles):
                     (dirName, fileName) = os.path.split(graphic)
                     (fileBaseName, fileExtension)=os.path.splitext(fileName)
                     for program in programs:
-                        if fileBaseName.lower().startswith(program['title'].lower()):
+                        if fileBaseName.lower().startswith(program['title'].lower()+u' '):
                             remove.append(graphic)
                             break
                         if not isValidPosixFilename(program['title']) and program['seriesid'] != u'':
                             if fileBaseName.lower().startswith(program['seriesid'].lower()):
                                 remove.append(graphic)
                                 break
-
                 for rem in remove:
                     if self._checkValidGraphicFile(rem, graphicstype=u'', vidintid=False) == True:
                         graphics_file_dict[field].remove(rem)
                         try:
                             all_graphics_file_list.remove(rem)
-                        except ValueError:
+                        except ValueError, e:
                             pass
 
         for key in graphicsDirectories.keys():    # Set deleted files totals
@@ -5350,6 +5105,7 @@ class MythTvMetaData(VideoFiles):
         self.config['series_name'] = program['title']
         self.config['season_num'] = None
         self.config['episode_num'] = None
+
         series_graphics = self.getGraphics(graphics_type)
 
         if series_graphics != None:
@@ -5415,11 +5171,24 @@ class MythTvMetaData(VideoFiles):
         for program in programs:
             program['need'] = False    # Initalize that this program does not need graphic(s) downloaded
             mirodetails = None
+            program_override_tv = False
+            # Check if a subtitle-less program is really a TV show with an override. This compensates for
+            # poor EPG data sources (as has been reported from at least Australia)
+            if not program['subtitle'] and program['title'].lower() in self.config['series_name_override']:
+                try:
+                    result = self._searchforSeries(program['title'])
+                    program_override_tv = True
+                except Exception, e:
+                    pass
+
+            # Even movies get the ' Season' added to the image names so that movie such as '1408' do not clash
+            # with TMDB#ed image names
+            pattern = u'%s Season*.*'
             if not program.has_key(u'miro'):
-                if program['subtitle']:
+                if program['subtitle'] or program_override_tv:
                     graphics_name = program['title']
                 else:
-                    if program['originalairdate'] == u'0000':
+                    if not int(program['originalairdate']):
                         graphics_name = program['title']
                     else:
                         graphics_name = "%s (%s)" % (program['title'], program['originalairdate'])
@@ -5464,7 +5233,7 @@ class MythTvMetaData(VideoFiles):
                     except (UnicodeEncodeError, TypeError):
                         dir_list = os.listdir(dirct)
                     for flenme in dir_list:
-                        if fnmatch.fnmatch(flenme.lower(), u'%s*.*' % filename.lower()):
+                        if fnmatch.fnmatch(flenme.lower(), (pattern % filename).lower()):
                             program[directory] = True
                             if directory == 'coverfile':
                                 total_posters_found +=1
@@ -5496,12 +5265,13 @@ class MythTvMetaData(VideoFiles):
                 continue
 
             if not mirodetails:
-                if not program['subtitle']: # It is more efficient to find inetref of movie once
+                # It is more efficient to find inetref of movie once
+                if not program['subtitle'] and not program_override_tv:
                     if not program.has_key('inetref'): # Was the inetref number already found?
                         inetref = self._getTmdbIMDB(graphics_name, watched=True)
                         if not inetref:
                             self._displayMessage("No movie inetref [%s]" % graphics_name)
-                            # Fake subtitle as this may be a TV series without subtitles
+                            # Fake subtitle as this may be a TV series without a subtitle
                             program['subtitle']=' '
                         else:
                             self._displayMessage("Found movie inetref (%s),[%s]" % (inetref, graphics_name))
@@ -5517,7 +5287,8 @@ class MythTvMetaData(VideoFiles):
                 if mirodetails:
                     if not mirodetails[u'tv']:
                         miromovieflag = True
-                if program['subtitle'] and not miromovieflag:    # This is a TV episode or Miro TV show
+                # This is a TV episode or Miro TV show
+                if (program['subtitle'] or program_override_tv) and not miromovieflag:
                     results = self._getScheduledRecordedTVGraphics(program, key)
                     if results:
                         if not mirodetails:
@@ -5561,8 +5332,6 @@ class MythTvMetaData(VideoFiles):
                     if results:
                         if key == 'coverfile':
                             total_posters_downloaded +=1
-                        elif key == 'banner':
-                            total_banners_downloaded +=1
                         elif key == 'fanart':
                             total_fanart_downloaded +=1
                         if mirodetails:    # Save the filename for storing later
@@ -5593,7 +5362,10 @@ class MythTvMetaData(VideoFiles):
                         if program['subtitle']:
                             sys.stdout.write(u'%s\n' % (program['title'], ))
                         else:
-                            sys.stdout.write(u'%s\n' % ("%s (%s)" % (program['title'], program['originalairdate'])))
+                            if program['originalairdate'] != u'0000':
+                                sys.stdout.write(u'%s\n' % ("%s (%s)" % (program['title'], program['originalairdate'])))
+                            else:
+                                sys.stdout.write(u'%s\n' % (program['title'], ))
                 elif program[u'miro'][u'tv']:
                     sys.stdout.write(u'Miro TV Show: %s\n' % (program['title'], ))
                 else:
@@ -5679,6 +5451,27 @@ class MythTvMetaData(VideoFiles):
                 sys.stderr.write(u"\n! Error: Your MythTv data base scheme version (%s) does not have the necessary fields at least (%s) is missing\n\n" % (db_version, field))
                 sys.exit(1)
 
+        # Initailize and instance to the TMDB api
+        apikey = "c27cb71cff5bd76e1a7a009380562c62"
+        if self.config['interactive']:
+            # themoviedb.org api key given by Travis Bell for Mythtv
+            self.config['tmdb_api'] = tmdb_api.MovieDb(apikey,
+                mythtv = True,
+                interactive = True,
+                select_first = False,
+                debug = self.config['debug_enabled'],
+                custom_ui = None,
+                language = self.config['local_language'],
+                search_all_languages = True,)
+        else:
+            self.config['tmdb_api'] = tmdb_api.MovieDb(apikey,
+                mythtv = True,
+                interactive = False,
+                select_first = False,
+                debug = self.config['debug_enabled'],
+                language = self.config['local_language'],
+                search_all_languages = True,)
+
         # If there were directories specified move them and update the MythTV db meta data accordingly
         if self.config['video_dir']:
             if len(self.config['video_dir']) % 2 == 0:
@@ -5689,7 +5482,7 @@ class MythTvMetaData(VideoFiles):
                 sys.exit(1)
 
         # Check if only missing inetref video's should be processed
-        if self.config['mythtv_inetref']:
+        if self.config['mythtv_inetref'] or self.config['mythtv_ref_num']:
             validFiles = self._findMissingInetref()
             if validFiles == None:
                 sys.stderr.write(u"\n! Warning: There were no missing interef video files found.\n\n")
@@ -5720,22 +5513,22 @@ class MythTvMetaData(VideoFiles):
         num_posters_downloads=0
         num_banners_downloads=0
         num_episode_metadata_downloads=0
-        #num_movies_using_imdb_numbers=0
+        num_movies_using_imdb_numbers=0
         num_symlinks_created=0
         num_mythdb_updates=0
         num_posters_below_min_size=0
         videos_with_small_posters=[]
-        #videos_using_imdb_numbers=[]
+        videos_using_imdb_numbers=[]
         videos_updated_metadata=[]
         missing_inetref=[]
 
         sys.stdout.write(u'Mythtv video database maintenance start: %s\n' % (datetime.datetime.now()).strftime("%Y-%m-%d %H:%M"))
 
-        if not self.config['video_dir'] and not self.config['mythtv_inetref']:
+        if not self.config['video_dir'] and not self.config['mythtv_inetref'] and not self.config['mythtv_ref_num']:
             allFiles = self._findFiles(directories, self.config['recursive'] , verbose = self.config['debug_enabled'])
             validFiles = self._processNames(allFiles, verbose = self.config['debug_enabled'], movies=True)
 
-        if len(validFiles) == 0:
+        if not len(validFiles):
             sys.stderr.write(u"\n! Error: No valid video files found\n")
             sys.exit(1)
 
@@ -5822,13 +5615,20 @@ class MythTvMetaData(VideoFiles):
             else:
                 if movie:
                     if not self.config['interactive'] and not self.config['mythtv_guess']:
-                        sys.stderr.write(u'\n! Warning: Skipping "%s" as there is no IMDB number for this movie.\nUse interactive option (-i) or (-I) to select the IMDB number.\n\n' % (cfile['file_seriesname']))
+                        sys.stderr.write(u'\n! Warning: Skipping "%s" as there is no TMDB or IMDB number for this movie.\nUse interactive option (-I) or (-R) to select the TMDB or IMDB number.\n\n' % (cfile['file_seriesname']))
                         continue
                     inetref = self._getTmdbIMDB(available_metadata['title'])
                     cfile['inetref'] = inetref
                     if not inetref:
                         self._displayMessage(u"themoviedb.com does not recognize the movie (%s) - Cannot update metadata - skipping\n" % available_metadata['title'])
                         missing_inetref.append(available_metadata['title'])
+                        continue
+                    # Only update the reference number
+                    if self.config['mythtv_ref_num'] or inetref == '99999999':
+                        Video(id=intid, db=mythvideo).update({'inetref': inetref})
+                        num_mythdb_updates+=1
+                        videos_updated_metadata.append(cfile['filename'])
+                        self._displayMessage(u"\nReference number (%s) added for (%s) \n" % (inetref, cfile['filename']))
                         continue
                 else:
                     copy = {}
@@ -5842,6 +5642,16 @@ class MythTvMetaData(VideoFiles):
                     inetref = tmp_dict['inetref']
                     available_metadata['title'] = tmp_dict['title']
                     cfile['file_seriesname'] = tmp_dict['title']
+                    # Only update the reference number and title
+                    if self.config['mythtv_ref_num'] or inetref == '99999999':
+                        if inetref == u'99999999':
+                            Video(id=intid, db=mythvideo).update({'inetref': inetref})
+                        else:
+                            Video(id=intid, db=mythvideo).update({'inetref': inetref, 'title': tmp_dict['title']})
+                        num_mythdb_updates+=1
+                        videos_updated_metadata.append(cfile['filename'])
+                        self._displayMessage(u"\nReference number (%s) added for (%s) \n" % (inetref, cfile['filename']))
+                        continue
                 cfile['inetref'] = inetref
                 available_metadata['inetref'] = inetref
 
@@ -5855,17 +5665,14 @@ class MythTvMetaData(VideoFiles):
                     available_metadata['title'] = self.config['series_name']
                     cfile['file_seriesname'] = self.config['series_name']
 
-            '''# Check if current inetref is a IMDB#
-            # If so then check it could be changed to tmdb#
+            # Check if current inetref is a IMDB#
+            # If so then check it can be changed to tmdb#
             # If it can be changed then rename any graphics and update meta data
             if movie and len(inetref) == 7:
                 self._displayMessage(u"%s has IMDB# (%s)" % (available_metadata['title'], inetref))
                 num_movies_using_imdb_numbers+=1
                 videos_using_imdb_numbers.append(u"%s has IMDB# (%s)" % (available_metadata['title'], inetref))
-                copy = {}
-                for key in available_metadata:
-                    copy[key] = available_metadata[key]
-                movie_data = self._getTmdbMetadata(cfile, copy)
+                movie_data = self._getTmdbMetadata(cfile, dict(available_metadata))
                 if movie_data.has_key('inetref'):
                     if available_metadata['inetref'] != movie_data['inetref']:
                         available_metadata['inetref'] = movie_data['inetref']
@@ -5881,13 +5688,19 @@ class MythTvMetaData(VideoFiles):
                                 ext = ext[1:]
                                 if self.config['simulation']:
                                     sys.stdout.write(
-                                        u"Simulation renaming (%s) to (%s)\n" % (graphic_file, tv_series_format % (filepath, inetref, ext))
+                                        u"Simulation renaming (%s) to (%s)\n" % (graphic_file, tv_series_format % (filepath, inetref+self.graphic_suffix[graphic_type], ext))
                                     )
                                 else:
-                                    dest = tv_series_format % (filepath, inetref, ext)
-                                    os.rename(graphic_file, dest)
-                                    self._displayMessage(u"Renamed (%s) to (%s)\n" % (graphic_file, tv_series_format % (filepath, inetref, ext)))
-                                available_metadata[graphic_type]= self.rtnRelativePath(dest,  graphicsDirectories[graphic_type])'''
+                                    dest = tv_series_format % (filepath, inetref+self.graphic_suffix[graphic_type], ext)
+                                    try:
+                                        if not os.path.isfile(dest):
+                                            os.rename(graphic_file, dest)
+                                    except IOError, e:
+                                        sys.stderr.write(
+                                            u"Renaming image file (%s) to (%s) failed, error(%s)\n" % (graphic_file, dest, u''.join([u'%s ' % x for x in e.args])))
+
+                                    self._displayMessage(u"Renamed (%s) to (%s)\n" % (graphic_file, tv_series_format % (filepath, inetref+self.graphic_suffix[graphic_type], ext)))
+                                available_metadata[graphic_type]= self.rtnRelativePath(dest,  graphicsDirectories[graphic_type])
 
             ###############################################################################
             # START of metadata Graphics logic - Checking, downloading, renaming
@@ -6013,7 +5826,7 @@ class MythTvMetaData(VideoFiles):
                                         newFilename = u"%s/%s%s%s" % (filepath, baseFilename, self.graphic_suffix[graphic_type], ext)
                                     elif season_missing:
                                         baseFilename = baseFilename.replace(self.graphic_suffix[graphic_type], u'')
-                                        newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename, available_metadata['season'], self.graphic_suffix[graphic_type], ext)
+                                        newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename.replace(u' Season X', u''), available_metadata['season'], self.graphic_suffix[graphic_type], ext)
                                     if self.config['simulation']:
                                         sys.stdout.write(
                                             u"Simulation renaming (%s) to (%s)\n" % (graphic_file, newFilename)
@@ -6034,21 +5847,25 @@ class MythTvMetaData(VideoFiles):
                                             baseFilename, ext = os.path.splitext( filename )
                                             baseFilename = self.sanitiseFileName(baseFilename)
                                             baseFilename = baseFilename.replace(self.graphic_suffix[graphic_type], u'')
-                                            newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename, available_metadata['season'], self.graphic_suffix[graphic_type], ext)
+                                            newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename.replace(u' Season X', u''), available_metadata['season'], self.graphic_suffix[graphic_type], ext)
                                             if self.config['simulation']:
                                                 sys.stdout.write(
-                                                    u"Simulation copy (%s) to (%s)\n" % (tmp_fullfilename,newFilename)
+                                                    u"Simulation rename (%s) to (%s)\n" % (tmp_fullfilename,newFilename)
                                                 )
                                             else:
-                                                self._displayMessage(u"Coping existing graphic %s for  series (%s)" % (graphic_type, available_metadata['title']))
-                                                shutil.copy2(tmp_fullfilename, newFilename)
-                                            if graphic_type == 'coverfile':
-                                                self._displayMessage("1-Added a poster for(%s)" % cfile['filename'])
-                                                num_posters_downloads+=1
-                                            else:
-                                                self._displayMessage("1-Added a banner for(%s)" % cfile['filename'])
-                                                num_banners_downloads+=1
-                                            available_metadata[graphic_type] = self.rtnRelativePath(newFilename,  graphicsDirectories[graphic_type])
+                                                self._displayMessage(u"Rename existing graphic %s for series (%s)" % (graphic_type, available_metadata['title']))
+                                                try:
+                                                    os.rename(tmp_fullfilename, newFilename)
+                                                    if graphic_type == 'coverfile':
+                                                        self._displayMessage("1-Added a poster for(%s)" % cfile['filename'])
+                                                        num_posters_downloads+=1
+                                                    else:
+                                                        self._displayMessage("1-Added a banner for(%s)" % cfile['filename'])
+                                                        num_banners_downloads+=1
+                                                    available_metadata[graphic_type] = self.rtnRelativePath(newFilename,  graphicsDirectories[graphic_type])
+                                                except IOError, e:
+                                                    sys.stderr.write(
+                                                        u"IOError coping (%s) to (%s)\nError:(%s)\n" % (tmp_fullfilename, newFilename, u''.join([u'%s ' % x for x in e.args])))
                                         else: # Try a secondary source
                                             dummy = self._getSecondarySourceGraphics(cfile, graphic_type)
                                             if dummy:
@@ -6066,78 +5883,24 @@ class MythTvMetaData(VideoFiles):
                                         baseFilename, ext = os.path.splitext( filename )
                                         baseFilename = self.sanitiseFileName(baseFilename)
                                         baseFilename = baseFilename.replace(self.graphic_suffix[graphic_type], u'')
-                                        newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename, available_metadata['season'], self.graphic_suffix[graphic_type], ext)
+                                        newFilename = u"%s/%s Season %d%s%s" % (filepath, baseFilename.replace(u' Season X', u''), available_metadata['season'], self.graphic_suffix[graphic_type], ext)
                                         if self.config['simulation']:
                                             sys.stdout.write(
-                                                u"Simulation fanart copy (%s) to (%s)\n" % (tmp, newFilename)
+                                                u"Simulation fanart rename (%s) to (%s)\n" % (tmp, newFilename)
                                             )
                                         else:
-                                            shutil.copy2(self.rtnAbsolutePath(tmp, graphicsDirectories[graphic_type]), newFilename)
-                                        available_metadata['fanart'] = self.rtnRelativePath(newFilename,  graphicsDirectories['fanart'])
-                                        num_fanart_downloads+=1
+                                            try:
+                                                os.rename(self.rtnAbsolutePath(tmp, graphicsDirectories[graphic_type]), newFilename)
+                                                available_metadata['fanart'] = self.rtnRelativePath(newFilename,  graphicsDirectories['fanart'])
+                                                num_fanart_downloads+=1
+                                            except IOError, e:
+                                                sys.stderr.write(
+                                                    u"IOError coping (%s) to (%s)\nError:(%s)\n" % (self.rtnAbsolutePath(tmp, graphicsDirectories[graphic_type]), newFilename, u''.join([u'%s ' % x for x in e.args])))
                                     else: # Try a secondary source
                                         dummy = self._getSecondarySourceGraphics(cfile, graphic_type)
                                         if dummy:
                                             available_metadata['fanart'] = self.rtnRelativePath(dummy,  graphicsDirectories['fanart'])
                                             num_fanart_downloads+=1
-                    else:
-                        if graphic_type == 'coverfile' or graphic_type == 'banner':
-                            for ext in self.image_extensions:
-                                filename = self.findFileInDir(u"%s.%s" % (self.sanitiseFileName(available_metadata['title']), ext), graphicsdirs, suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
-                                if filename:
-                                    size = self.findFileInDir(u"%s Season %d.%s" % (self.sanitiseFileName(available_metadata['title']), available_metadata['season'], ext), graphicsdirs, suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
-                                    if not size:
-                                        continue
-                                    if os.path.getsize(size) == os.path.getsize(filename):
-                                        # Find out if there are any season level graphics available
-                                        self.config['toprated'] = False
-                                        self.config['sid'] = None
-                                        self.config['episode_name'] = None
-                                        self.config['series_name'] = cfile['file_seriesname']
-                                        self.config['season_num'] = u"%d" % cfile['seasno']
-                                        self.config['episode_num'] = u"%d" % cfile['epno']
-                                        if graphic_type == 'coverfile':
-                                            graphics_type = 'poster'
-                                        else:
-                                            graphics_type = graphic_type
-                                        season_graphics = self.getGraphics(graphics_type)
-                                        # Find out if there are any Series level graphics available
-                                        self.config['toprated'] = True
-                                        self.config['sid'] = None
-                                        self.config['episode_name'] = None
-                                        self.config['series_name'] = cfile['file_seriesname']
-                                        self.config['season_num'] = None
-                                        self.config['episode_num'] = None
-                                        series_graphics = self.getGraphics(graphics_type)
-                                        # Sometimes there is only a season level Graphic
-                                        if season_graphics != None and series_graphics != None:
-                                            if season_graphics != series_graphics:
-                                                tmp_graphics = self._getTvdbGraphics(cfile, graphic_type)
-                                                if tmp_graphics != None:
-                                                    if os.path.getsize(size) != os.path.getsize(filename):
-                                                        if graphic_type == 'coverfile':
-                                                            self._displayMessage(u"2-Added a poster for(%s)" % cfile['filename'])
-                                                            num_posters_downloads+=1
-                                                        else:
-                                                            self._displayMessage(u"2-Added a banner for(%s)" % cfile['filename'])
-                                                            num_banners_downloads+=1
-                                    break
-                    for ext in self.image_extensions:
-                        dest = self.findFileInDir(u"%s.%s" % (self.sanitiseFileName(available_metadata['title']), ext), graphicsdirs, suffix=self.graphic_suffix[graphic_type], fuzzy_match=True)
-                        if dest:
-                            break
-                    else:
-                        tmp_graphics = self._getTvdbGraphics(cfile, graphic_type, toprated=True)
-                        if tmp_graphics != None:
-                            if graphic_type == 'coverfile':
-                                self._displayMessage(u"3-Added a poster for(%s)" % cfile['filename'])
-                                num_posters_downloads+=1
-                            elif graphic_type == 'banner':
-                                self._displayMessage(u"3-Added a banner for(%s)" % cfile['filename'])
-                                num_banners_downloads+=1
-                            else:
-                                self._displayMessage(u"3-Added fanart for(%s)" % cfile['filename'])
-                                num_fanart_downloads+=1
                     # END of TV Series graphics updating
             ###############################################################################
             # END of metadata Graphics logic - Checking, downloading, renaming
@@ -6225,7 +5988,7 @@ class MythTvMetaData(VideoFiles):
                 num_episode_metadata_downloads+=1
                 # Update meta data
                 if tmp_dict:
-                    for key in ['genres', 'cast']:
+                    for key in ['genres', 'cast', 'countries']:
                         if tmp_dict.has_key(key):
                             genres_cast[key] = tmp_dict[key]
                     for key in available_metadata.keys():
@@ -6296,6 +6059,8 @@ class MythTvMetaData(VideoFiles):
                     if available_metadata[key] != meta_dict[key]:
                         if available_metadata[key] == u'' and meta_dict[key] == None:
                             continue
+                        if available_metadata[key] == u'' and meta_dict[key] == u'Unknown':
+                            continue
                         try:
                             self._displayMessage(
                             u"1-At least (%s)'s value(%s) has changed new(%s)(%s) old(%s)(%s)\n" % (cfile['filename'], key, available_metadata[key], type(available_metadata[key]), meta_dict[key], type(meta_dict[key])))
@@ -6326,11 +6091,11 @@ class MythTvMetaData(VideoFiles):
                 Video(id=intid, db=mythvideo).update(available_metadata)
                 num_mythdb_updates+=1
                 videos_updated_metadata.append(cfile['filename'])
-                for key in ['cast', 'genres']:
+                for key in ['genres', 'cast', 'countries']:
                     if key == 'genres' and len(cfile['categories']):
                         genres_cast[key]+=cfile['categories']
                     if genres_cast.has_key(key):
-                        self._addCastGenre( genres_cast[key], Video(id=intid, db=mythvideo), key)
+                        self._addCastGenreCountry( genres_cast[key], Video(id=intid, db=mythvideo), key)
                 self._displayMessage(
                     u"Updated Mythdb for video file(%s)\n" % cfile['filename']
                 )
@@ -6341,7 +6106,7 @@ class MythTvMetaData(VideoFiles):
         sys.stdout.write(u"\nMythtv video database maintenance ends at  : %s\n" % (datetime.datetime.now()).strftime("%Y-%m-%d %H:%M"))
 
         # Print statistics
-        sys.stdout.write(u'\n------------------Statistics---------------\nNumber of video files processed .....(% 5d)\nNumber of Fanart graphics downloaded (% 5d)\nNumber of Poster graphics downloaded (% 5d)\nNumber of Banner graphics downloaded (% 5d)\nNumber of 2nd source graphics downld (% 5d)\nNumber of metadata downloads.........(% 5d)\nNumber of 2nd source metadata found .(% 5d)\nNumber of symbolic links created.....(% 5d)\nNumber of Myth database updates......(% 5d)\nNumber of undersized posters ........(% 5d)\n' % (num_processed, num_fanart_downloads, num_posters_downloads, num_banners_downloads, self.num_secondary_source_graphics_downloaded, num_episode_metadata_downloads, self.num_secondary_source_metadata_downloaded, num_symlinks_created, num_mythdb_updates, num_posters_below_min_size))
+        sys.stdout.write(u'\n------------------Statistics---------------\nNumber of video files processed .....(% 5d)\nNumber of Fanart graphics downloaded (% 5d)\nNumber of Poster graphics downloaded (% 5d)\nNumber of Banner graphics downloaded (% 5d)\nNumber of 2nd source graphics downld (% 5d)\nNumber of metadata downloads.........(% 5d)\nNumber of 2nd source metadata found .(% 5d)\nNumber of symbolic links created.....(% 5d)\nNumber of Myth database updates......(% 5d)\nNumber of undersized posters ........(% 5d)\nNumber of Movies using IMDB numbers .(% 5d)\n' % (num_processed, num_fanart_downloads, num_posters_downloads, num_banners_downloads, self.num_secondary_source_graphics_downloaded, num_episode_metadata_downloads, self.num_secondary_source_metadata_downloaded, num_symlinks_created, num_mythdb_updates, num_posters_below_min_size, num_movies_using_imdb_numbers))
 
         if len(videos_updated_metadata):
             sys.stdout.write(u'\n--------------Updated Video Files----------\n' )
@@ -6355,7 +6120,10 @@ class MythTvMetaData(VideoFiles):
             sys.stdout.write(u'\n---------------Under sized Poster----------\n' )
             for videofile in videos_with_small_posters:
                 sys.stdout.write(u'%s\n' % videofile)
-
+        if len(videos_using_imdb_numbers):
+            sys.stdout.write(u'\n---------------Movies with IMDB#s----------\n' )
+            for videofile in videos_using_imdb_numbers:
+                sys.stdout.write(u'%s\n' % videofile)
         return None
     # end processMythTvMetaData
 
@@ -6448,6 +6216,8 @@ def main():
                         help=u"Guess at the inetref for a video. This option is ONLY active if the -M option is also selected.")
     parser.add_option(  "-S", "--selected_data", metavar="TYPES", default=None, dest="selected_data",
                         help=u"Select one of more data types to display or download, P-poster, B-Banner, F-Fanart, E-Episode data, I-Episode Image. e.g. --selected_data=PBFEI gets all types of data")
+    parser.add_option(  "-R", "--mythtv_ref_num", action="store_true", default=False, dest="mythtv_ref_num",
+                        help=u"Start an interactive session that ONLY adds the TVDB/TMDB reference numbers to when missing. No meta data or images will be concurrently downloaded.")
 
     opts, series_season_ep = parser.parse_args()
 
@@ -6456,7 +6226,7 @@ def main():
         print "\nargs", series_season_ep
 
     # Set the default configuration values
-    if opts.mythtv_inetref:
+    if opts.mythtv_inetref or opts.mythtv_ref_num:
         opts.interactive = True
     configuration = Configuration(interactive = opts.interactive, debug = opts.debug)
 
@@ -6495,11 +6265,16 @@ def main():
         #
         if jamu_instance.alreadyrunning():
             print u'\n! Error: An instance of Jamu (-%s) is already running only one instance can run at a time.\nOne of the meta data sources may be off-line or very slow.\n' % options
-            sys.exit(1)
+            sys.exit(0)
 
     # Message the user that they are using incompatible options with the -MW option
     if opts.mythtvmeta and opts.mythtv_watched and (opts.mythtv_inetref or opts.interactive):
         print u'\n! Error: There us no Interactive mode (-I or -i) for the Jamu (-MW) option.\nPlease change your options and try again.\n'
+        sys.exit(1)
+
+    # Message the user that they are using incompatible options -R and -I or -i
+    if opts.mythtvmeta and opts.mythtv_ref_num and opts.mythtv_inetref:
+        print u'\n! Error: The (-R) and (-I) options are mutually exclusive.\nPlease change your options and try again.\n'
         sys.exit(1)
 
     # Apply any command line switches
@@ -6515,6 +6290,7 @@ def main():
     configuration.changeVariable('mythtvdir', opts.mythtvdir)
     configuration.changeVariable('mythtvmeta', opts.mythtvmeta)
     configuration.changeVariable('mythtv_inetref', opts.mythtv_inetref)
+    configuration.changeVariable('mythtv_ref_num', opts.mythtv_ref_num)
     configuration.changeVariable('mythtv_watched', opts.mythtv_watched)
     configuration.changeVariable('mythtv_guess', opts.mythtv_guess)
     configuration.changeVariable('mythtv_verbose', opts.mythtv_verbose)
