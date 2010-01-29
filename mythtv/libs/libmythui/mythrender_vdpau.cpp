@@ -515,6 +515,8 @@ void MythRenderVDPAU::CheckOutputSurfaces(void)
             m_surfaces.push_back(id);
             created++;
         }
+        else
+            break;
     }
 
     VERBOSE(VB_GENERAL, LOC +
