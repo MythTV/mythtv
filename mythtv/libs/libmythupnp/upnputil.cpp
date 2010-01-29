@@ -114,7 +114,7 @@ long GetIPAddressList(QStringList &sStrList)
             continue;
 
 
-        char  address[15];
+        char  address[16];
 
         if (inet_ntop(ifa->ifa_addr->sa_family,
                       &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
