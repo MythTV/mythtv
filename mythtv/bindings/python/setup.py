@@ -6,6 +6,6 @@ setup(
         name='MythTV',
         version='0.23.0',
         description='MythTV Python bindings.',
-        packages=['MythTV'],
+        packages=['MythTV', 'MythTV/tmdb', 'MythTV/ttvdb'],
         url=['http://www.mythtv.org/'],
         )
