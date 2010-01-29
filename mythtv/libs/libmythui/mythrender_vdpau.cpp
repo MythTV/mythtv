@@ -1472,25 +1472,6 @@ bool MythRenderVDPAU::GetProcs(void)
         (void **)&vdp_get_information_string
     );
 
-    static bool debugged = false;
-
-    if (!debugged)
-    {
-        debugged = true;
-        if (vdp_get_api_version)
-        {
-            uint version;
-            vdp_get_api_version(&version);
-            VERBOSE(VB_GENERAL, LOC + QString("Version %1").arg(version));
-        }
-        if (vdp_get_information_string)
-        {
-            const char * info;
-            vdp_get_information_string(&info);
-            VERBOSE(VB_GENERAL, LOC + QString("Information %2").arg(info));
-        }
-    }
-
     return ok;
 }
 
@@ -1564,6 +1545,19 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
     if (!gVDPAUSupportChecked)
     {
         gVDPAUSupportChecked = true;
+
+        if (vdp_get_api_version)
+        {
+            uint version;
+            vdp_get_api_version(&version);
+            VERBOSE(VB_GENERAL, LOC + QString("Version %1").arg(version));
+        }
+        if (vdp_get_information_string)
+        {
+            const char * info;
+            vdp_get_information_string(&info);
+            VERBOSE(VB_GENERAL, LOC + QString("Information %2").arg(info));
+        }
 
         for (int i = 0; i < NUM_SCALING_LEVELS; i++)
             if (IsFeatureAvailable(VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 + i))
@@ -1681,15 +1675,18 @@ void MythRenderVDPAU::ResetProcs(void)
 void MythRenderVDPAU::DestroyPresentationQueue(void)
 {
     MythXLocker locker(m_display);
+    INIT_ST
     if (vdp_presentation_queue_destroy && m_flipQueue)
     {
-        vdp_presentation_queue_destroy(m_flipQueue);
+        vdp_st = vdp_presentation_queue_destroy(m_flipQueue);
+        CHECK_ST
         m_flipQueue = 0;
     }
 
     if (vdp_presentation_queue_target_destroy && m_flipTarget)
     {
-        vdp_presentation_queue_target_destroy(m_flipTarget);
+        vdp_st = vdp_presentation_queue_target_destroy(m_flipTarget);
+        CHECK_ST
         m_flipTarget = 0;
     }
     m_flipReady = false;
