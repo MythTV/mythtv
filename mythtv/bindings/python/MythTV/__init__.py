@@ -31,7 +31,7 @@ from MythFunc import *
 """
 
 from sys import version_info
-if version_info > (2, 5): # 2.6 or newer
+if version_info >= (2, 6): # 2.6 or newer
     exec(import26)
 else:
     exec(import25)
