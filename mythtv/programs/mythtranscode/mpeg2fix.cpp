@@ -746,6 +746,8 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
         return 0;
     }
 
+    mkvfile = !strcmp(inputFC->iformat->name, "mkv") ? 1 : 0;
+
     if (offset)
         av_seek_frame(inputFC, vid_id, offset, AVSEEK_FLAG_BYTE);
 
@@ -2575,6 +2577,12 @@ int MPEG2fixup::BuildKeyframeIndex(QString &file,
     QByteArray fname = file.toLocal8Bit();
     if (!InitAV(fname.constData(), NULL, 0))
         return TRANSCODE_EXIT_UNKNOWN_ERROR;
+
+    if (mkvfile)
+    {
+        VERBOSE(MPF_IMPORTANT, "Seek tables are not required for MKV");
+        return TRANSCODE_EXIT_UNKNOWN_ERROR;
+    }
 
     av_init_packet(&pkt);
 

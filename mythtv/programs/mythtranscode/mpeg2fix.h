@@ -244,6 +244,7 @@ class MPEG2fixup
     int aud_stream_count;
     int64_t ptsIncrement;
     int64_t ptsOffset;  //was initPTS
+    bool mkvfile;
 
     int discard;
     //control options

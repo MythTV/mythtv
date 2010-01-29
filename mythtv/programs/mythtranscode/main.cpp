@@ -568,7 +568,7 @@ int main(int argc, char *argv[])
         return TRANSCODE_EXIT_REMOTE_FILE;
     }
 
-    if (outfile.isNull())
+    if (outfile.isNull() && !build_index)
         outfile = infile + ".tmp";
 
     if (jobID >= 0)
@@ -576,15 +576,16 @@ int main(int argc, char *argv[])
 
     Transcode *transcode = new Transcode(pginfo);
 
-    VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
-                        .arg(infile).arg(outfile));
+    if (!build_index)
+        VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
+                            .arg(infile).arg(outfile));
 
     if (showprogress)
         transcode->ShowProgress(true);
     if (!recorderOptions.isEmpty())
         transcode->SetRecorderOptions(recorderOptions);
     int result = 0;
-    if (!mpeg2)
+    if (!mpeg2 && !build_index)
     {
         result = transcode->TranscodeFile(infile, outfile,
                                           profilename, useCutlist,
@@ -595,7 +596,7 @@ int main(int argc, char *argv[])
     }
 
     int exitcode = TRANSCODE_EXIT_OK;
-    if ((result == REENCODE_MPEG2TRANS) || mpeg2)
+    if ((result == REENCODE_MPEG2TRANS) || mpeg2 || build_index)
     {
         void (*update_func)(float) = NULL;
         int (*check_func)() = NULL;
@@ -647,7 +648,9 @@ int main(int argc, char *argv[])
     {
         if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_STOPPING);
-        VERBOSE(VB_GENERAL, QString("Transcoding %1 done").arg(infile));
+        VERBOSE(VB_GENERAL, QString("%1 %2 done")
+                .arg(build_index ? "Building Index for" : "Transcoding")
+                .arg(infile));
     }
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
