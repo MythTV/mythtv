@@ -13,20 +13,28 @@ __all__ = ['MythStatic', \
             \
            'MythBE', 'Frontend', 'MythDB', 'MythVideo']
 
-from sys import version_info
-if (version_info[0]>2) | (version_info[1]>5): # 2.6 or newer
-    import warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        from MythStatic import *
-        from MythBase import *
-        from MythData import *
-        from MythFunc import *
-else:
+import26 = """
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter('ignore')
     from MythStatic import *
     from MythBase import *
     from MythData import *
     from MythFunc import *
+"""
+
+import25 = """
+from MythStatic import *
+from MythBase import *
+from MythData import *
+from MythFunc import *
+"""
+
+from sys import version_info
+if version_info > (2, 5): # 2.6 or newer
+    exec(import26)
+else:
+    exec(import25)
 
 if __name__ == '__main__':
     banner = 'MythTV Python interactive shell.'
