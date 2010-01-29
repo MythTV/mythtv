@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.4"
+__version__=u"v0.6.5"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -286,6 +286,7 @@ __version__=u"v0.6.4"
  #       for a movie.
  #       Jamu will now download the top rated TV Series season coverart and banner images. This enhancement
  #       matches MythVideo processing.
+ # 0.6.5 Small fix related to the bindings changes
 
 
 usage_txt=u'''
@@ -4943,12 +4944,12 @@ class MythTvMetaData(VideoFiles):
             record['subtitle'] = prog.subtitle
             record['seriesid'] = prog.seriesid
 
-            if record['subtitle']:
+            if record['subtitle'] and prog.airdate != None:
                 record['originalairdate'] = prog.airdate[:4]
             else:
                 if prog.year != '0':
                     record['originalairdate'] = prog.year
-                else:
+                elif prog.airdate != None:
                     record['originalairdate'] = prog.airdate[:4]
             for program in programs:    # Skip duplicates
                 if program['title'] == record['title']:
