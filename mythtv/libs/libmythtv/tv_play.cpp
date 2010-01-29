@@ -4242,62 +4242,8 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             }
         }
     }
-    else if (has_action("SEEKFFWD",actions) && !isDVDStill)
+    else if (!isDVDStill && SeekHandleAction(ctx, actions, isDVD))
     {
-        if (HasQueuedInput())
-            DoArbSeek(ctx, ARBSEEK_FORWARD);
-        else if (ctx->paused)
-        {
-            if (!isDVD)
-                DoSeek(ctx, 1.001 / ctx->last_framerate, tr("Forward"));
-        }
-        else
-        {
-            if (smartForward && doSmartForward)
-                DoSeek(ctx, ctx->rewtime, tr("Skip Ahead"));
-            else
-                DoSeek(ctx, ctx->fftime, tr("Skip Ahead"));
-        }
-    }
-    else if (has_action("FFWDSTICKY", actions) && !isDVDStill)
-    {
-        if (HasQueuedInput())
-            DoArbSeek(ctx, ARBSEEK_END);
-        else if (ctx->paused)
-        {
-            if (!isDVD)
-                DoSeek(ctx, 1.0, tr("Forward"));
-        }
-        else
-            ChangeFFRew(ctx, 1);
-    }
-    else if (has_action("SEEKRWND", actions) && !isDVDStill)
-    {
-        if (HasQueuedInput())
-            DoArbSeek(ctx, ARBSEEK_REWIND);
-        else if (ctx->paused)
-        {
-            if (!isDVD)
-                DoSeek(ctx, -1.001 / ctx->last_framerate, tr("Rewind"));
-        }
-        else
-        {
-            if (smartForward)
-                doSmartForward = true;
-            DoSeek(ctx, -ctx->rewtime, tr("Skip Back"));
-        }
-    }
-    else if (has_action("RWNDSTICKY", actions) && !isDVDStill)
-    {
-        if (HasQueuedInput())
-            DoArbSeek(ctx, ARBSEEK_SET);
-        else if (ctx->paused)
-        {
-            if (!isDVD)
-                DoSeek(ctx, -1.0, tr("Rewind"));
-        }
-        else
-            ChangeFFRew(ctx, -1);
     }
     else if (has_action("JUMPRWND", actions))
     {
@@ -5932,6 +5878,63 @@ bool TV::DoNVPSeek(PlayerContext *ctx, float time)
     VERBOSE(VB_PLAYBACK, LOC + "DoNVPSeek() -- end");
 
     return res;
+}
+
+bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
+                          const bool isDVD)
+{
+    int REWIND = 4, FORWARD = 8, STICKY = 16, SLIPPERY = 32,
+        INCREMENTAL = 64, ABSOLUTE = 128, WHENCE = 3;
+    int flags = 0;
+    if (has_action("SEEKFFWD", actions))
+        flags = ARBSEEK_FORWARD | FORWARD | SLIPPERY | INCREMENTAL;
+    else if (has_action("FFWDSTICKY", actions))
+        flags = ARBSEEK_END     | FORWARD | STICKY   | ABSOLUTE;
+    else if (has_action("RIGHT", actions))
+        flags = ARBSEEK_FORWARD | FORWARD | STICKY   | INCREMENTAL;
+    else if (has_action("SEEKRWND", actions))
+        flags = ARBSEEK_REWIND  | REWIND  | SLIPPERY | INCREMENTAL;
+    else if (has_action("RWNDSTICKY", actions))
+        flags = ARBSEEK_SET     | REWIND  | STICKY   | ABSOLUTE;
+    else if (has_action("LEFT", actions))
+        flags = ARBSEEK_REWIND  | REWIND  | STICKY   | INCREMENTAL;
+    else
+        return false;
+
+    int direction = (flags & REWIND) ? -1 : 1;
+    if (HasQueuedInput())
+    {
+        DoArbSeek(actx, (ArbSeekWhence)(flags & WHENCE));
+    }
+    else if (actx->paused)
+    {
+        if (!isDVD)
+        {
+            float time = (flags & ABSOLUTE) ?  direction :
+                             direction * (1.001 / actx->last_framerate);
+            QString message = (flags & REWIND) ? QString(tr("Rewind")) :
+                                                 QString(tr("Forward"));
+            DoSeek(actx, time, message);
+        }
+    }
+    else if (flags & STICKY)
+    {
+        ChangeFFRew(actx, direction);
+    }
+    else if (flags & REWIND)
+    {
+            if (smartForward)
+                doSmartForward = true;
+            DoSeek(actx, -actx->rewtime, tr("Skip Back"));
+    }
+    else
+    {
+        if (smartForward & doSmartForward)
+            DoSeek(actx, actx->rewtime, tr("Skip Ahead"));
+        else
+            DoSeek(actx, actx->fftime, tr("Skip Ahead"));
+    }
+    return true;
 }
 
 void TV::DoSeek(PlayerContext *ctx, float time, const QString &mesg)

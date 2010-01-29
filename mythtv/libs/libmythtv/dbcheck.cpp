@@ -17,10 +17,10 @@ using namespace std;
 #define MINIMUM_DBMS_VERSION 5,0,15
 
 /* If currentDatabaseVersion gets updated, the following files need updated:
-   mythtv/bindings/python/MythTV/MythDB.py
+   mythtv/bindings/python/MythTV/MythStatic.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1252";
+const QString currentDatabaseVersion = "1253";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5096,6 +5096,67 @@ NULL
             return false;
 
         dbver = "1252";
+    }
+
+    if (dbver == "1252")
+    {
+        MSqlQuery select(MSqlQuery::InitCon());
+        select.prepare("SELECT hostname, data FROM settings "
+                       " WHERE value = 'StickyKeys'");
+
+        if (!select.exec())
+        {
+            MythDB::DBError("Unable to retrieve StickyKeys values.", select);
+        }
+        else
+        {
+            MSqlQuery update(MSqlQuery::InitCon());
+            while (select.next())
+            {
+                QString hostname = select.value(0).toString();
+                QString sticky_keys = select.value(1).toString();
+
+                if ("1" == sticky_keys)
+                {
+                    // Only remap the keys if they're currently set to defaults
+                    update.prepare("UPDATE keybindings "
+                                   "   SET keylist  = :KEYS "
+                                   " WHERE context  = 'TV Playback' AND "
+                                   "       action   = :ACTION AND "
+                                   "       hostname = :HOSTNAME AND "
+                                   "       keylist  = :DEFAULT_KEYS");
+
+                    QString keylist = ">,.";
+                    QString action = "FFWDSTICKY";
+                    QString default_keys = ">,.,Right";
+
+                    update.bindValue(":KEYS", keylist);
+                    update.bindValue(":ACTION", action);
+                    update.bindValue(":HOSTNAME", hostname);
+                    update.bindValue(":DEFAULT_KEYS", default_keys);
+                    if (!update.exec())
+                         MythDB::DBError("Unable to update keybindings",
+                                         update);
+
+                    keylist = ",,<";
+                    action = "RWNDSTICKY";
+                    default_keys = ",,<,Left";
+
+                    update.bindValue(":KEYS", keylist);
+                    update.bindValue(":ACTION", action);
+                    update.bindValue(":HOSTNAME", hostname);
+                    update.bindValue(":DEFAULT_KEYS", default_keys);
+                    if (!update.exec())
+                         MythDB::DBError("Unable to update keybindings",
+                                         update);
+                }
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1253"))
+            return false;
+
+        dbver = "1253";
     }
 
     return true;

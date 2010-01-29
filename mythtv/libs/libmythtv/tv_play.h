@@ -419,6 +419,8 @@ class MPUBLIC TV : public QThread
     void DoTogglePause(PlayerContext*, bool showOSD);
     vector<bool> DoSetPauseState(PlayerContext *lctx, const vector<bool>&);
 
+    bool SeekHandleAction(PlayerContext *actx, const QStringList &actions,
+                          const bool isDVD);
     void DoSeek(PlayerContext*, float time, const QString &mesg);
     bool DoNVPSeek(PlayerContext*, float time);
     enum ArbSeekWhence {
