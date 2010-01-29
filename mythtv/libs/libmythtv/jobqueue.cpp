@@ -933,11 +933,12 @@ bool JobQueue::ChangeJobStatus(int jobID, int newStatus, QString comment)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("UPDATE jobqueue SET status = :STATUS, comment = :COMMENT "
-                  "WHERE id = :ID;");
+                  "WHERE id = :ID AND status <> :NEWSTATUS;");
 
     query.bindValue(":STATUS", newStatus);
     query.bindValue(":COMMENT", comment);
     query.bindValue(":ID", jobID);
+    query.bindValue(":NEWSTATUS", newStatus);
 
     if (!query.exec())
     {
