@@ -836,144 +836,17 @@ bool hasUtf8(const char *str)
     return false;
 }
 
-#ifdef USING_MINGW
-u_short in_cksum(u_short *addr, int len)
-{
-    register int nleft = len;
-    register u_short *w = addr;
-    register u_short answer;
-    register int sum = 0;
-
-    /*
-     *  Our algorithm is simple, using a 32 bit accumulator (sum),
-     *  we add sequential 16 bit words to it, and at the end, fold
-     *  back all the carry bits from the top 16 bits into the lower
-     *  16 bits.
-     */
-    while (nleft > 1)
-    {
-        sum += *w++;
-        nleft -= 2;
-    }
-
-    /* mop up an odd byte, if necessary */
-    if (nleft == 1)
-    {
-        u_short u = 0;
-
-        *(u_char *)(&u) = *(u_char *)w ;
-        sum += u;
-    }
-
-    /*
-     * add back carry outs from top 16 bits to low 16 bits
-     */
-    sum = (sum >> 16) + (sum & 0xffff);  /* add hi 16 to low 16 */
-    sum += (sum >> 16);                  /* add carry */
-    answer = ~sum;                       /* truncate to 16 bits */
-    return (answer);
-}
-#endif
-
 /**
  * \brief Can we ping host within timeout seconds?
  */
 bool ping(const QString &host, int timeout)
 {
 #ifdef USING_MINGW
-    VERBOSE(VB_SOCKET, QString("Ping: pinging %1 (%2 seconds max)")
-                       .arg(host).arg(timeout));
-    SOCKET    rawSocket;
-    LPHOSTENT lpHost;
-    struct    sockaddr_in saDest;
+    QString cmd = QString("%systemroot%\\system32\\ping.exe -i %1 -n 1 %2>NUL")
+                  .arg(timeout).arg(host);
 
-    #define ICMP_ECHOREPLY 0
-    #define ICMP_ECHOREQ   8
-    struct IPHDR {
-        u_char         VIHL;     // Version and IHL
-        u_char         TOS;      // Type Of Service
-        short          TotLen;   // Total Length
-        short          ID;       // Identification
-        short          FlagOff;  // Flags and Fragment Offset
-        u_char         TTL;      // Time To Live
-        u_char         Protocol; // Protocol
-        u_short        Checksum; // Checksum
-        struct in_addr iaSrc;    // Internet Address - Source
-        struct in_addr iaDst;    // Internet Address - Destination
-    };
-    struct ICMPHDR {
-        u_char  Type;            // Type
-        u_char  Code;            // Code
-        u_short Checksum;        // Checksum
-        u_short ID;              // Identification
-        u_short Seq;             // Sequence
-        char    Data;            // Data
-    };
-
-    struct Request {
-        ICMPHDR icmpHdr;
-        DWORD   dwTime;
-        char    cData[32];
-    };
-    struct Reply {
-        IPHDR   ipHdr;
-        Request echoRequest;
-        char    cFiller[256];
-    };
-
-    if (INVALID_SOCKET == (rawSocket = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)))
-    {
-        VERBOSE(VB_SOCKET, "Ping: can't create socket");
+    if (myth_system(cmd))
         return false;
-    }
-
-    lpHost = gethostbyname(host.toLocal8Bit().constData());
-    if (!lpHost)
-    {
-        VERBOSE(VB_SOCKET, "Ping: gethostbyname failed");
-        closesocket(rawSocket);
-        return false;
-    }
-
-    saDest.sin_addr.s_addr = *((u_long FAR *) (lpHost->h_addr));
-    saDest.sin_family      = AF_INET;
-    saDest.sin_port        = 0;
-
-    Request echoReq;
-    echoReq.icmpHdr.Type = ICMP_ECHOREQ;
-    echoReq.icmpHdr.Code = 0;
-    echoReq.icmpHdr.ID   = 123;
-    echoReq.icmpHdr.Seq  = 456;
-    for (unsigned i = 0; i < sizeof(echoReq.cData); i++)
-        echoReq.cData[i] = ' ' + i;
-    echoReq.dwTime = GetTickCount();
-    echoReq.icmpHdr.Checksum = in_cksum((u_short *)&echoReq, sizeof(Request));
-
-    if (SOCKET_ERROR == sendto(rawSocket, (LPSTR)&echoReq, sizeof(Request),
-                               0, (LPSOCKADDR)&saDest, sizeof(SOCKADDR_IN)))
-    {
-        VERBOSE(VB_SOCKET, "Ping: send failed");
-        closesocket(rawSocket);
-        return false;
-    }
-
-    struct timeval Timeout;
-    fd_set readfds;
-    readfds.fd_count = 1;
-    readfds.fd_array[0] = rawSocket;
-    Timeout.tv_sec  = timeout;
-    Timeout.tv_usec = 0;
-
-    if (SOCKET_ERROR == select(1, &readfds, NULL, NULL, &Timeout))
-    {
-        VERBOSE(VB_SOCKET, "Ping: timeout expired or select failed");
-        closesocket(rawSocket);
-        return false;
-    }
-
-    closesocket(rawSocket);
-    VERBOSE(VB_SOCKET, "Ping: done");
-    return true;
 #else
     QString cmd = QString("ping -t %1 -c 1  %2  >/dev/null 2>&1")
                   .arg(timeout).arg(host);
@@ -987,9 +860,9 @@ bool ping(const QString &host, int timeout)
         if (myth_system(cmd))
             return false;
     }
+#endif
 
     return true;
-#endif
 }
 
 /**
