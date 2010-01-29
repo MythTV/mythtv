@@ -129,14 +129,13 @@ sys.stderr = OutStreamEncoder(sys.stderr)
 
 # Verify that the tmdb_api modules are installed and accessable
 try:
-    import nv_python_libs.tmdb.tmdb_api as target
-except Exception:
+    import MythTV.tmdb.tmdb_api as target
+except Exception, e:
     sys.stderr.write('''
-The subdirectory "nv_python_libs/tmdb" containing the modules tmdb_api.py (v0.1.3 or greater), tmdb_ui.py,
-tmdb_exceptions.py must be in the same directory as tmdb_nv.py.
-They should have been included with the distribution of tmdb_nv.py.
-
-''')
+The subdirectory "tmdb" containing the modules tmdb_api.py (v0.1.1 or greater), tmdb_ui.py,
+tmdb_exceptions.py must have been installed with the MythTV python bindings.
+Error:(%s)
+''' %  u''.join([u'%s ' % x for x in e.args]))
     sys.exit(1)
 
 if target.__version__ < '0.1.3':
@@ -146,11 +145,11 @@ if target.__version__ < '0.1.3':
 # Verify that the common process modules are installed and accessable
 try:
     import nv_python_libs.mainProcess as process
-except Exception:
+except Exception, e:
     sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
-
-''')
+Error:(%s)
+''' %  u''.join([u'%s ' % x for x in e.args]))
     sys.exit(1)
 
 if process.__version__ < '0.2.0':
