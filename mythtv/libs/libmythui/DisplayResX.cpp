@@ -26,7 +26,7 @@ DisplayResX::~DisplayResX(void)
 }
 
 bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
-                                 int &h_mm, double &rate) const
+                                 int &h_mm, double &rate, double &par) const
 {
     bool success = false;
     MythXDisplay *d = OpenMythXDisplay();
@@ -45,6 +45,7 @@ bool DisplayResX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
         h_mm = mm.height();
         w_pix = pix.width();
         h_pix = pix.height();
+        par = d->GetPixelAspectRatio();
         success = true;
     }
 

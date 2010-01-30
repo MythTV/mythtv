@@ -129,6 +129,8 @@ class MPUBLIC MythUIHelper
 
     QThreadPool *GetImageThreadPool(void);
 
+    double GetPixelAspectRatio(void);
+
   protected:
     MythUIHelper();
    ~MythUIHelper();

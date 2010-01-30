@@ -75,6 +75,8 @@ class MythUIHelperPrivate
     void GetScreenBounds(void);
     void StoreGUIsettings(void);
 
+    double GetPixelAspectRatio(void);
+
     Settings *m_qtThemeSettings;   ///< Text/button/background colours, etc
 
     bool      m_themeloaded;       ///< Do we have a palette and pixmap to use?
@@ -85,6 +87,7 @@ class MythUIHelperPrivate
     QString language;
 
     float m_wmult, m_hmult;
+    float m_pixelAspectRatio;
 
     // Drawable area of the full screen. May cover several screens,
     // or exclude windowing system fixtures (like Mac menu bar)
@@ -140,7 +143,7 @@ MythUIHelperPrivate::MythUIHelperPrivate(MythUIHelper *p)
     : m_qtThemeSettings(new Settings()),
       m_themeloaded(false),
       language(""),
-      m_wmult(1.0), m_hmult(1.0),
+      m_wmult(1.0), m_hmult(1.0), m_pixelAspectRatio(-1.0),
       m_xbase(0), m_ybase(0), m_height(0), m_width(0),
       m_baseWidth(800), m_baseHeight(600), m_isWide(false),
       m_cacheLock(new QMutex(QMutex::Recursive)), m_cacheSize(0),
@@ -327,8 +330,28 @@ void MythUIHelperPrivate::StoreGUIsettings()
         font = QFont();
     font.setStyleHint(QFont::SansSerif, QFont::PreferAntialias);
     font.setPointSize((int)floor(14 * m_hmult));
+    font.setStretch((int)(100 / GetPixelAspectRatio()));
 
     QApplication::setFont(font);
+}
+
+double MythUIHelperPrivate::GetPixelAspectRatio(void)
+{
+    if (m_pixelAspectRatio < 0)
+    {
+        if (!display_res)
+        {
+            DisplayRes *dispRes = DisplayRes::GetDisplayRes(); // create singleton
+            if (dispRes)
+                m_pixelAspectRatio = dispRes->GetPixelAspectRatio();
+            else
+                m_pixelAspectRatio = 1.0;
+        }
+        else
+            m_pixelAspectRatio = display_res->GetPixelAspectRatio();
+    }
+
+    return m_pixelAspectRatio;
 }
 
 MythUIHelper::MythUIHelper()
@@ -1561,4 +1584,9 @@ QString MythUIHelper::GetCurrentLocation(bool fullPath, bool mainStackOnly)
 QThreadPool *MythUIHelper::GetImageThreadPool(void)
 {
     return d->m_imageThreadPool;
+}
+
+double MythUIHelper::GetPixelAspectRatio(void)
+{
+    return d->GetPixelAspectRatio();
 }

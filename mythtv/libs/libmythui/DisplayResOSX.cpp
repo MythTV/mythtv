@@ -21,7 +21,7 @@ DisplayResOSX::~DisplayResOSX(void)
 }
 
 bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
-                                   int &h_mm, double &rate) const
+                                   int &h_mm, double &rate, double &par) const
 {
     CGDirectDisplayID d = mythtv_display();
 
@@ -39,6 +39,7 @@ bool DisplayResOSX::GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
     w_pix  = get_int_CF(mode_dict, kCGDisplayWidth);
     h_pix  = get_int_CF(mode_dict, kCGDisplayHeight);
     rate   = (double) get_int_CF(mode_dict, kCGDisplayRefreshRate);
+    par    = 1.0;
 
     //CFRelease(dict); // this release causes a segfault
     

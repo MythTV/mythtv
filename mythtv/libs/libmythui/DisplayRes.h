@@ -128,6 +128,8 @@ class MPUBLIC DisplayRes
     int GetMaxWidth(void)    const { return max_width; }
     /// \brief Returns maximum height in pixels supported by display.
     int GetMaxHeight(void)   const { return max_height; }
+    /// \brief Returns the pixel aspect ratio of the display.
+    double GetPixelAspectRatio(void) const { return pixelAspectRatio; }
     /// \brief Returns all video modes supported by the display.
     virtual const std::vector<DisplayResScreen>& GetVideoModes() const = 0;
     /// \brief Returns refresh rates available at a specific screen resolution.
@@ -141,7 +143,7 @@ class MPUBLIC DisplayRes
     
     // These methods are implemented by the subclasses
     virtual bool GetDisplayInfo(int &w_pix, int &h_pix, int &w_mm,
-                                int &h_mm, double &rate) const = 0;
+                                int &h_mm, double &rate, double &par) const = 0;
     virtual bool SwitchToVideoMode(int width, int height, double framerate) = 0;
 
   private:
@@ -155,6 +157,8 @@ class MPUBLIC DisplayRes
     DisplayResMap in_size_to_output_mode;
 
     int max_width, max_height;
+
+    double pixelAspectRatio;
 
     static DisplayRes *instance;
     static bool        locked;
