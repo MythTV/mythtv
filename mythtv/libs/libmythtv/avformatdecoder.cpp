@@ -2981,17 +2981,22 @@ void AvFormatDecoder::ProcessDVBDataPacket(
     while (buf < buf_end)
     {
         if (*buf == 0x10)
-            buf++; // skip
-
-        if (*buf == 0x02)
         {
-            buf += 3;
-            ttd->Decode(buf+1, VBI_DVB);
+            buf++; // skip
+        }
+        else if (*buf == 0x02)
+        {
+            buf += 4;
+            if ((buf_end - buf) >= 42)
+                ttd->Decode(buf, VBI_DVB);
+            buf += 42;
         }
         else if (*buf == 0x03)
         {
-            buf += 3;
-            ttd->Decode(buf+1, VBI_DVB_SUBTITLE);
+            buf += 4;
+            if ((buf_end - buf) >= 42)
+                ttd->Decode(buf, VBI_DVB_SUBTITLE);
+            buf += 42;
         }
         else if (*buf == 0xff)
         {
@@ -3000,9 +3005,8 @@ void AvFormatDecoder::ProcessDVBDataPacket(
         else
         {
             VERBOSE(VB_VBI, QString("VBI: Unknown descriptor: %1").arg(*buf));
+            buf += 46;
         }
-
-        buf += 43;
     }
 }
 
