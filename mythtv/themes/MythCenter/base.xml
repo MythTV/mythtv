@@ -2,8 +2,8 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="Arial">
-        <pixelsize>22</pixelsize>
+    <font name="basesmall" face="Thorndale">
+        <pixelsize>19</pixelsize>
         <color>#EEEEEE</color>
         <bold>yes</bold>
     </font>
@@ -31,11 +31,11 @@
     </font>
 
     <font name="basemedium" from="basesmall">
-        <pixelsize>24</pixelsize>
+        <pixelsize>22</pixelsize>
     </font>
 
     <font name="baselarge" from="basesmall">
-        <pixelsize>26</pixelsize>
+        <pixelsize>24</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -47,7 +47,7 @@
     </font>
 
     <font name="baseextralarge" from="basesmall">
-        <pixelsize>31</pixelsize>
+        <pixelsize>29</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -55,6 +55,14 @@
     </font>
 
     <!-- Colour variations on base fonts -->
+    <font name="basesmallwhite" from="basesmall">
+        <color>#FFFFFF</color>
+    </font>
+
+    <font name="basesmalllightgrey" from="basesmall">
+        <color>#CCCCCC</color>
+    </font>
+
     <font name="basesmallgrey" from="basesmall">
         <color>#666666</color>
     </font>
@@ -81,6 +89,14 @@
 
     <font name="basesmallred" from="basesmall">
         <color>#800900</color>
+    </font>
+
+    <font name="basemediumwhite" from="basemedium">
+        <color>#FFFFFF</color>
+    </font>
+
+    <font name="basemediumlightgrey" from="basemedium">
+        <color>#CCCCCC</color>
     </font>
 
     <font name="basemediumgrey" from="basemedium">
@@ -203,10 +219,12 @@
         </statetype>
     </buttonlist>
 
+
+    <!-- Base definition of a buttonlist in wide configuration -->
     <buttonlist name="basebuttonlist2">
         <area>0,0,760,305</area>
         <layout>vertical</layout>
-        <spacing>12</spacing>
+        <spacing>5</spacing>
         <wrapstyle>selection</wrapstyle>
         <buttonarea>0,0,760,260</buttonarea>
         <statetype name="buttonitem">
@@ -225,7 +243,7 @@
             </state>
             <state name="selected" from="active">
                 <shape name="selectbar">
-                    <area>5,0,750,25</area>
+                    <area>5,-4,750,29</area>
                     <type>roundbox</type>
                     <line color="#00FF00" alpha="255" width="1" />
                     <fill color="#43b038" alpha="128" />
@@ -273,9 +291,9 @@
                 <textarea name="text">
                     <area>5,6,140,30</area>
                     <align>allcenter</align>
-                    <font>basemedium</font>
-                    <font state="selected">basemedium</font>
-                    <font state="disabled">basemediumgrey</font>
+                    <font>basemediumwhite</font>
+                    <font state="selected">basemediumwhite</font>
+                    <font state="disabled">basemediumlightgray</font>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -295,7 +313,7 @@
         </statetype>
     </button>
 
-    <!-- Base definition of a button -->
+    <!-- Base definition of a wide button -->
     <button name="basewidebutton">
         <position>0,0</position>
         <statetype name="buttonstate">
@@ -306,9 +324,9 @@
                 <textarea name="text">
                     <area>5,6,173,30</area>
                     <align>allcenter</align>
-                    <font>basemedium</font>
-                    <font state="selected">basemedium</font>
-                    <font state="disabled">basemediumgrey</font>
+                    <font>basemediumwhite</font>
+                    <font state="selected">basemediumwhite</font>
+                    <font state="disabled">basemediumlightgrey</font>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -320,6 +338,39 @@
             <state name="pushed" from="active">
                 <imagetype name="background">
                     <filename>wide_button_pushed_background.png</filename>
+                </imagetype>
+                <textarea name="text">
+                    <position>8,8</position>
+                </textarea>
+            </state>
+        </statetype>
+    </button>
+
+    <!-- Base definition of a very wide button -->
+    <button name="baseverywidebutton">
+        <position>0,0</position>
+        <statetype name="buttonstate">
+            <state name="active">
+                <imagetype name="background">
+                    <filename>very_wide_button_background.png</filename>
+                </imagetype>
+                <textarea name="text">
+                    <area>5,6,395,30</area>
+                    <align>allcenter</align>
+                    <font>basemediumwhite</font>
+                    <font state="selected">basemediumwhite</font>
+                    <font state="disabled">basemediumlightgrey</font>
+                </textarea>
+            </state>
+            <state name="selected" from="active">
+                <imagetype name="background">
+                    <filename>very_wide_button_selected_background.png</filename>
+                </imagetype>
+            </state>
+            <state name="disabled" from="active" />
+            <state name="pushed" from="active">
+                <imagetype name="background">
+                    <filename>very_wide_button_pushed_background.png</filename>
                 </imagetype>
                 <textarea name="text">
                     <position>8,8</position>
@@ -583,6 +634,15 @@
             <filename>progressbar_fill.png</filename>
         </imagetype>
     </progressbar>
+
+    <!-- Base definition of a shape used as a background on many screens -->
+    <shape name="basebackground">
+        <area>0,0,10,10</area>
+        <type>roundbox</type>
+        <fill color="#0c58a7" alpha="120" />
+        <line color="#FFFFFF" alpha="255" width="2" />
+        <cornerradius>12</cornerradius>
+    </shape>
 
     <!-- Popup Dialogue Box -->
     <window name="MythPopupBox">
@@ -915,6 +975,36 @@
             <value>Please Wait....</value>
         </textarea>
 
+    </window>
+
+    <window name="backgroundwindow">
+        <imagetype name="backimg">
+          <filename>ui/background.png</filename>
+        </imagetype>
+                                   
+        <font name="small" face="Thorndale">
+          <color>#FFFFFF</color>
+          <pixelsize>19</pixelsize>
+          <bold>yes</bold>
+        </font>
+    
+        <font name="medium" face="Thorndale">
+          <color>#FFFFFF</color>
+          <pixelsize>22</pixelsize>
+          <bold>yes</bold>
+        </font>
+    
+        <font name="large" face="Thorndale">
+          <color>#FFFFFF</color>
+          <pixelsize>28</pixelsize>
+          <bold>yes</bold>
+        </font>
+    
+        <font name="clock" face="Thorndale">
+             <color>#FFFFFF</color>
+             <pixelsize>25</pixelsize>
+             <bold>yes</bold>
+        </font>
     </window>
 
 </mythuitheme>
