@@ -391,7 +391,7 @@
                                 <filename>hd1080.png</filename>
                             </imagetype>
                         </state>
-                         <state name="avchd">
+                        <state name="avchd">
                             <imagetype name="statusimage">
                                 <filename>avchd.png</filename>
                             </imagetype>
