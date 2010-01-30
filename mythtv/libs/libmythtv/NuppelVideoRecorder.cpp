@@ -1389,11 +1389,9 @@ void NuppelVideoRecorder::DoV4L2(void)
         return;
     }
 
-    if (vrbuf.count < 5)
+    if (vrbuf.count < numbuffers)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Not enough buffer memory, exiting");
-        errored = true;
-        return;
+        VERBOSE(VB_IMPORTANT, LOC + QString("Requested %1 buffers, but only %2 are available. Proceeding anyway").arg(numbuffers).arg(vrbuf.count));
     }
 
     numbuffers = vrbuf.count;
