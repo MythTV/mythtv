@@ -1069,10 +1069,19 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
     else
         progMap["stars"] = "";
 
-    if (stars)
+    if (stars && (year != "0"))
     {
         QString str = QObject::tr("%n star(s)", "", (int)(stars * 4));
         progMap["yearstars"] = QString("(%1, %2)").arg(year).arg(str);
+    }
+    else if (stars)
+    {
+        QString str = QObject::tr("%n star(s)", "", (int)(stars * 4));
+        progMap["yearstars"] = QString("(%1)").arg(str);
+    }
+    else if (year != "0")
+    {
+        progMap["yearstars"] = QString("(%1)").arg(year);
     }
     else
         progMap["yearstars"] = "";
