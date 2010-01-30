@@ -292,28 +292,27 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
 {
     QMutexLocker locker(&clientLock);
     QString result;
-    QStringList tokens = nc->getCommand().simplified().split(" ");
 
     int clientID = clients.indexOf(nc->getClient());
 
-    if (is_abbrev("jump", tokens[0]))
-        result = processJump(tokens);
-    else if (is_abbrev("key", tokens[0]))
-        result = processKey(tokens);
-    else if (is_abbrev("play", tokens[0]))
-        result = processPlay(tokens, clientID);
-    else if (is_abbrev("query", tokens[0]))
-        result = processQuery(tokens);
-    else if (is_abbrev("set", tokens[0]))
-        result = processSet(tokens);
-    else if (is_abbrev("help", tokens[0]))
-        result = processHelp(tokens);
-    else if ((tokens[0].toLower() == "exit") || (tokens[0].toLower() == "quit"))
+    if (is_abbrev("jump", nc->getArg(0)))
+        result = processJump(nc);
+    else if (is_abbrev("key", nc->getArg(0)))
+        result = processKey(nc);
+    else if (is_abbrev("play", nc->getArg(0)))
+        result = processPlay(nc, clientID);
+    else if (is_abbrev("query", nc->getArg(0)))
+        result = processQuery(nc);
+    else if (is_abbrev("set", nc->getArg(0)))
+        result = processSet(nc);
+    else if (is_abbrev("help", nc->getArg(0)))
+        result = processHelp(nc);
+    else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
         QCoreApplication::postEvent(this, 
                                 new NetworkControlCloseEvent(nc->getClient()));
-    else if (! tokens[0].isEmpty())
+    else if (! nc->getArg(0).isEmpty())
         result = QString("INVALID command '%1', try 'help' for more info")
-                         .arg(tokens[0]);
+                         .arg(nc->getArg(0));
 
     if (!result.isEmpty())
     {
@@ -443,35 +442,35 @@ void NetworkControl::receiveCommand(QString &command)
     ncLock.unlock();
 }
 
-QString NetworkControl::processJump(QStringList tokens)
+QString NetworkControl::processJump(NetworkCommand *nc)
 {
     QString result = "OK";
 
-    if ((tokens.size() < 2) || (!jumpMap.contains(tokens[1])))
+    if ((nc->getArgCount() < 2) || (!jumpMap.contains(nc->getArg(1))))
         return QString("ERROR: See 'help %1' for usage information")
-                       .arg(tokens[0]);
+                       .arg(nc->getArg(0));
 
-    gContext->GetMainWindow()->JumpTo(jumpMap[tokens[1]]);
+    gContext->GetMainWindow()->JumpTo(jumpMap[nc->getArg(1)]);
 
     // Fixme, should do some better checking here, but that would
     // depend on all Locations matching their jumppoints
     QTime timer;
     timer.start();
     while ((timer.elapsed() < 2000) &&
-           (GetMythUI()->GetCurrentLocation().toLower() != tokens[1]))
+           (GetMythUI()->GetCurrentLocation().toLower() != nc->getArg(1)))
         usleep(10000);
 
     return result;
 }
 
-QString NetworkControl::processKey(QStringList tokens)
+QString NetworkControl::processKey(NetworkCommand *nc)
 {
     QString result = "OK";
     QKeyEvent *event = NULL;
 
-    if (tokens.size() < 2)
+    if (nc->getArgCount() < 2)
         return QString("ERROR: See 'help %1' for usage information")
-                       .arg(tokens[0]);
+                       .arg(nc->getArg(0));
 
     QObject *keyDest = NULL;
 
@@ -488,17 +487,17 @@ QString NetworkControl::processKey(QStringList tokens)
 
     int curToken = 1;
     int tokenLen = 0;
-    while (curToken < tokens.size())
+    while (curToken < nc->getArgCount())
     {
-        tokenLen = tokens[curToken].length();
+        tokenLen = nc->getArg(curToken).length();
 
-        if (tokens[curToken] == "sleep")
+        if (nc->getArg(curToken) == "sleep")
         {
             sleep(1);
         }
-        else if (keyMap.contains(tokens[curToken]))
+        else if (keyMap.contains(nc->getArg(curToken)))
         {
-            int keyCode = keyMap[tokens[curToken]];
+            int keyCode = keyMap[nc->getArg(curToken)];
             QString keyText;
 
             if (keyTextMap.contains(keyCode))
@@ -515,17 +514,17 @@ QString NetworkControl::processKey(QStringList tokens)
             QCoreApplication::postEvent(keyDest, event);
         }
         else if (((tokenLen == 1) &&
-                  (tokens[curToken][0].isLetterOrNumber())) ||
+                  (nc->getArg(curToken)[0].isLetterOrNumber())) ||
                  ((tokenLen >= 1) &&
-                  (tokens[curToken].contains("+"))))
+                  (nc->getArg(curToken).contains("+"))))
         {
-            QKeySequence a(tokens[curToken]);
+            QKeySequence a(nc->getArg(curToken));
             int keyCode = a[0];
             Qt::KeyboardModifiers modifiers = Qt::NoModifier;
 
             if (tokenLen > 1)
             {
-                QStringList tokenParts = tokens[curToken].split('+');
+                QStringList tokenParts = nc->getArg(curToken).split('+');
 
                 int partNum = 0;
                 while (partNum < (tokenParts.size() - 1))
@@ -544,24 +543,24 @@ QString NetworkControl::processKey(QStringList tokens)
             }
             else
             {
-                if (tokens[curToken] == tokens[curToken].toUpper())
+                if (nc->getArg(curToken) == nc->getArg(curToken).toUpper())
                     modifiers = Qt::ShiftModifier;
             }
 
             GetMythUI()->ResetScreensaver();
 
             event = new QKeyEvent(QEvent::KeyPress, keyCode, modifiers,
-                                  tokens[curToken]);
+                                  nc->getArg(curToken));
             QCoreApplication::postEvent(keyDest, event);
 
             event = new QKeyEvent(QEvent::KeyRelease, keyCode, modifiers,
-                                  tokens[curToken]);
+                                  nc->getArg(curToken));
             QCoreApplication::postEvent(keyDest, event);
         }
         else
             return QString("ERROR: Invalid syntax at '%1', see 'help %2' for "
                            "usage information")
-                           .arg(tokens[curToken]).arg(tokens[0]);
+                           .arg(nc->getArg(curToken)).arg(nc->getArg(0));
 
         curToken++;
     }
@@ -569,17 +568,17 @@ QString NetworkControl::processKey(QStringList tokens)
     return result;
 }
 
-QString NetworkControl::processPlay(QStringList tokens, int clientID)
+QString NetworkControl::processPlay(NetworkCommand *nc, int clientID)
 {
     QString result = "OK";
     QString message;
 
-    if (tokens.size() < 2)
+    if (nc->getArgCount() < 2)
         return QString("ERROR: See 'help %1' for usage information")
-                       .arg(tokens[0]);
+                       .arg(nc->getArg(0));
 
-    if ((tokens.size() >= 3) &&
-        (is_abbrev("file", tokens[1])))
+    if ((nc->getArgCount() >= 3) &&
+        (is_abbrev("file", nc->getArg(1))))
     {
         if (GetMythUI()->GetCurrentLocation().toLower() != "mainmenu")
         {
@@ -594,17 +593,17 @@ QString NetworkControl::processPlay(QStringList tokens, int clientID)
 
         if (GetMythUI()->GetCurrentLocation().toLower() == "mainmenu")
         {
-            QString msg = QString("HANDLE_MEDIA Internal %1").arg(tokens[2]);
+            QString msg = QString("HANDLE_MEDIA Internal %1").arg(nc->getFrom(2));
             MythEvent me(msg);
             QCoreApplication::postEvent(gContext->GetMainWindow(), me.clone());
         }
         else
             return QString("Unable to change to main menu to start playback!");
     }
-    else if ((tokens.size() >= 4) &&
-             (is_abbrev("program", tokens[1])) &&
-             (tokens[2].contains(QRegExp("^\\d+$"))) &&
-             (tokens[3].contains(QRegExp(
+    else if ((nc->getArgCount() >= 4) &&
+             (is_abbrev("program", nc->getArg(1))) &&
+             (nc->getArg(2).contains(QRegExp("^\\d+$"))) &&
+             (nc->getArg(3).contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
     {
         if (GetMythUI()->GetCurrentLocation().toLower() == "playback")
@@ -629,17 +628,22 @@ QString NetworkControl::processPlay(QStringList tokens, int clientID)
             while ((timer.elapsed() < 10000) &&
                    (GetMythUI()->GetCurrentLocation().toLower() != "playbackbox"))
                 usleep(10000);
+
+            timer.start();
+            while ((timer.elapsed() < 10000) &&
+                   (!GetMythUI()->IsTopScreenInitialized()))
+                usleep(10000);
         }
 
         if (GetMythUI()->GetCurrentLocation().toLower() == "playbackbox")
         {
             QString action = "PLAY";
-            if (tokens.size() == 5 && tokens[4] == "resume")
+            if (nc->getArgCount() == 5 && nc->getArg(4) == "resume")
                 action = "RESUME";
 
             QString message = QString("NETWORK_CONTROL %1 PROGRAM %2 %3 %4")
-                                      .arg(action).arg(tokens[2])
-                                      .arg(tokens[3].toUpper()).arg(clientID);
+                                      .arg(action).arg(nc->getArg(2))
+                                      .arg(nc->getArg(3).toUpper()).arg(clientID);
             MythEvent me(message);
             gContext->dispatch(me);
 
@@ -660,83 +664,83 @@ QString NetworkControl::processPlay(QStringList tokens, int clientID)
                        "for playback mode")
                        .arg(GetMythUI()->GetCurrentLocation());
     }
-    else if (is_abbrev("chanid", tokens[1], 5))
+    else if (is_abbrev("chanid", nc->getArg(1), 5))
     {
-        if (tokens[2].contains(QRegExp("^\\d+$")))
-            message = QString("NETWORK_CONTROL CHANID %1").arg(tokens[2]);
+        if (nc->getArg(2).contains(QRegExp("^\\d+$")))
+            message = QString("NETWORK_CONTROL CHANID %1").arg(nc->getArg(2));
         else
             return QString("ERROR: See 'help %1' for usage information")
-                           .arg(tokens[0]);
+                           .arg(nc->getArg(0));
     }
-    else if (is_abbrev("channel", tokens[1], 5))
+    else if (is_abbrev("channel", nc->getArg(1), 5))
     {
-        if (tokens.size() < 3)
+        if (nc->getArgCount() < 3)
             return "ERROR: See 'help play' for usage information";
 
-        if (is_abbrev("up", tokens[2]))
+        if (is_abbrev("up", nc->getArg(2)))
             message = "NETWORK_CONTROL CHANNEL UP";
-        else if (is_abbrev("down", tokens[2]))
+        else if (is_abbrev("down", nc->getArg(2)))
             message = "NETWORK_CONTROL CHANNEL DOWN";
-        else if (tokens[2].contains(QRegExp("^[-\\.\\d_#]+$")))
-            message = QString("NETWORK_CONTROL CHANNEL %1").arg(tokens[2]);
+        else if (nc->getArg(2).contains(QRegExp("^[-\\.\\d_#]+$")))
+            message = QString("NETWORK_CONTROL CHANNEL %1").arg(nc->getArg(2));
         else
             return QString("ERROR: See 'help %1' for usage information")
-                           .arg(tokens[0]);
+                           .arg(nc->getArg(0));
     }
-    else if (is_abbrev("seek", tokens[1], 2))
+    else if (is_abbrev("seek", nc->getArg(1), 2))
     {
-        if (tokens.size() < 3)
+        if (nc->getArgCount() < 3)
             return QString("ERROR: See 'help %1' for usage information")
-                           .arg(tokens[0]);
+                           .arg(nc->getArg(0));
 
-        if (is_abbrev("beginning", tokens[2]))
+        if (is_abbrev("beginning", nc->getArg(2)))
             message = "NETWORK_CONTROL SEEK BEGINNING";
-        else if (is_abbrev("forward", tokens[2]))
+        else if (is_abbrev("forward", nc->getArg(2)))
             message = "NETWORK_CONTROL SEEK FORWARD";
-        else if (is_abbrev("rewind",   tokens[2]) ||
-                 is_abbrev("backward", tokens[2]))
+        else if (is_abbrev("rewind",   nc->getArg(2)) ||
+                 is_abbrev("backward", nc->getArg(2)))
             message = "NETWORK_CONTROL SEEK BACKWARD";
-        else if (tokens[2].contains(QRegExp("^\\d\\d:\\d\\d:\\d\\d$")))
+        else if (nc->getArg(2).contains(QRegExp("^\\d\\d:\\d\\d:\\d\\d$")))
         {
-            int hours   = tokens[2].mid(0, 2).toInt();
-            int minutes = tokens[2].mid(3, 2).toInt();
-            int seconds = tokens[2].mid(6, 2).toInt();
+            int hours   = nc->getArg(2).mid(0, 2).toInt();
+            int minutes = nc->getArg(2).mid(3, 2).toInt();
+            int seconds = nc->getArg(2).mid(6, 2).toInt();
             message = QString("NETWORK_CONTROL SEEK POSITION %1")
                               .arg((hours * 3600) + (minutes * 60) + seconds);
         }
         else
             return QString("ERROR: See 'help %1' for usage information")
-                           .arg(tokens[0]);
+                           .arg(nc->getArg(0));
     }
-    else if (is_abbrev("speed", tokens[1], 2))
+    else if (is_abbrev("speed", nc->getArg(1), 2))
     {
-        if (tokens.size() < 3)
+        if (nc->getArgCount() < 3)
             return QString("ERROR: See 'help %1' for usage information")
-                           .arg(tokens[0]);
+                           .arg(nc->getArg(0));
 
-        tokens[2] = tokens[2].toLower();
-        if ((tokens[2].contains(QRegExp("^\\-*\\d+x$"))) ||
-            (tokens[2].contains(QRegExp("^\\-*\\d+\\/\\d+x$"))) ||
-            (tokens[2].contains(QRegExp("^\\d*\\.\\d+x$"))))
-            message = QString("NETWORK_CONTROL SPEED %1").arg(tokens[2]);
-        else if (is_abbrev("normal", tokens[2]))
+        QString token2 = nc->getArg(2).toLower();
+        if ((token2.contains(QRegExp("^\\-*\\d+x$"))) ||
+            (token2.contains(QRegExp("^\\-*\\d+\\/\\d+x$"))) ||
+            (token2.contains(QRegExp("^\\d*\\.\\d+x$"))))
+            message = QString("NETWORK_CONTROL SPEED %1").arg(token2);
+        else if (is_abbrev("normal", token2))
             message = QString("NETWORK_CONTROL SPEED 1x");
-        else if (is_abbrev("pause", tokens[2]))
+        else if (is_abbrev("pause", token2))
             message = QString("NETWORK_CONTROL SPEED 0x");
         else
             return QString("ERROR: See 'help %1' for usage information")
-                           .arg(tokens[0]);
+                           .arg(nc->getArg(0));
     }
-    else if (is_abbrev("save", tokens[1], 2))
+    else if (is_abbrev("save", nc->getArg(1), 2))
     {
-        if (is_abbrev("screenshot", tokens[2], 2))
-            return saveScreenshot(tokens);
+        if (is_abbrev("screenshot", nc->getArg(2), 2))
+            return saveScreenshot(nc);
     }
-    else if (is_abbrev("stop", tokens[1], 2))
+    else if (is_abbrev("stop", nc->getArg(1), 2))
         message = QString("NETWORK_CONTROL STOP");
     else
         return QString("ERROR: See 'help %1' for usage information")
-                       .arg(tokens[0]);
+                       .arg(nc->getArg(0));
 
     if (!message.isEmpty())
     {
@@ -747,23 +751,23 @@ QString NetworkControl::processPlay(QStringList tokens, int clientID)
     return result;
 }
 
-QString NetworkControl::processQuery(QStringList tokens)
+QString NetworkControl::processQuery(NetworkCommand *nc)
 {
     QString result = "OK";
 
-    if (tokens.size() < 2)
+    if (nc->getArgCount() < 2)
         return QString("ERROR: See 'help %1' for usage information")
-                       .arg(tokens[0]);
+                       .arg(nc->getArg(0));
 
-    if (is_abbrev("location", tokens[1]))
+    if (is_abbrev("location", nc->getArg(1)))
     {
         bool fullPath = false;
         bool mainStackOnly = true;
 
-        if (tokens.size() > 2)
-            fullPath = (tokens[2].toLower() == "true" || tokens[2] == "1");
-        if (tokens.size() > 3)
-            mainStackOnly = (tokens[3].toLower() == "true" || tokens[3] == "1");
+        if (nc->getArgCount() > 2)
+            fullPath = (nc->getArg(2).toLower() == "true" || nc->getArg(2) == "1");
+        if (nc->getArgCount() > 3)
+            mainStackOnly = (nc->getArg(3).toLower() == "true" || nc->getArg(3) == "1");
 
         QString location = GetMythUI()->GetCurrentLocation(fullPath, mainStackOnly);
         result = location;
@@ -788,18 +792,18 @@ QString NetworkControl::processQuery(QStringList tokens)
                 result = "ERROR: Timed out waiting for reply from player";
         }
     }
-    else if (is_abbrev("verbose", tokens[1]))
+    else if (is_abbrev("verbose", nc->getArg(1)))
     {
         return verboseString;
     }
-    else if (is_abbrev("liveTV", tokens[1]))
+    else if (is_abbrev("liveTV", nc->getArg(1)))
     {
-        if(tokens.size() == 3) // has a channel ID
-            return listSchedule(tokens[2]);
+        if(nc->getArgCount() == 3) // has a channel ID
+            return listSchedule(nc->getArg(2));
         else
             return listSchedule();
     }
-    else if (is_abbrev("version", tokens[1]))
+    else if (is_abbrev("version", nc->getArg(1)))
     {
         extern const char *myth_source_version;
         extern const char *myth_source_path;
@@ -815,9 +819,9 @@ QString NetworkControl::processQuery(QStringList tokens)
                        .arg(dbSchema);
 
     }
-    else if(is_abbrev("time", tokens[1]))
+    else if(is_abbrev("time", nc->getArg(1)))
         return QDateTime::currentDateTime().toString(Qt::ISODate);
-    else if (is_abbrev("uptime", tokens[1]))
+    else if (is_abbrev("uptime", nc->getArg(1)))
     {
         QString str;
         time_t  uptime;
@@ -828,7 +832,7 @@ QString NetworkControl::processQuery(QStringList tokens)
             str = QString("Could not determine uptime.");
         return str;
     }
-    else if (is_abbrev("load", tokens[1]))
+    else if (is_abbrev("load", nc->getArg(1)))
     {
         QString str;
         double  loads[3];
@@ -839,7 +843,7 @@ QString NetworkControl::processQuery(QStringList tokens)
             str = QString("%1 %2 %3").arg(loads[0]).arg(loads[1]).arg(loads[2]);
         return str;
     }
-    else if (is_abbrev("memstats",tokens[1]))
+    else if (is_abbrev("memstats", nc->getArg(1)))
     {
         QString str;
         int     totalMB, freeMB, totalVM, freeVM;
@@ -851,38 +855,38 @@ QString NetworkControl::processQuery(QStringList tokens)
             str = QString("Could not determine memory stats.");
         return str;
     }
-    else if ((tokens.size() == 4) &&
-             is_abbrev("recording", tokens[1]) &&
-             (tokens[2].contains(QRegExp("^\\d+$"))) &&
-             (tokens[3].contains(QRegExp(
+    else if ((nc->getArgCount() == 4) &&
+             is_abbrev("recording", nc->getArg(1)) &&
+             (nc->getArg(2).contains(QRegExp("^\\d+$"))) &&
+             (nc->getArg(3).contains(QRegExp(
                          "^\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\d$"))))
-        return listRecordings(tokens[2], tokens[3].toUpper());
-    else if (is_abbrev("recordings", tokens[1]))
+        return listRecordings(nc->getArg(2), nc->getArg(3).toUpper());
+    else if (is_abbrev("recordings", nc->getArg(1)))
         return listRecordings();
     else
         return QString("ERROR: See 'help %1' for usage information")
-                       .arg(tokens[0]);
+                       .arg(nc->getArg(0));
 
     return result;
 }
 
-QString NetworkControl::processSet(QStringList tokens)
+QString NetworkControl::processSet(NetworkCommand *nc)
 {
-    if (tokens.size() == 1)
+    if (nc->getArgCount() == 1)
         return QString("ERROR: See 'help %1' for usage information")
-                       .arg(tokens[0]);
+                       .arg(nc->getArg(0));
 
-    if (tokens[1] == "verbose")
+    if (nc->getArg(1) == "verbose")
     {
-        if (tokens.size() > 3)
+        if (nc->getArgCount() > 3)
             return QString("ERROR: Separate filters with commas with no "
                            "space: playback,audio\r\n See 'help %1' for usage "
-                           "information").arg(tokens[0]);
+                           "information").arg(nc->getArg(0));
 
         QString oldVerboseString = verboseString;
         QString result = "OK";
 
-        int pva_result = parse_verbose_arg(tokens[2]);
+        int pva_result = parse_verbose_arg(nc->getArg(2));
 
         if (pva_result != 0 /*GENERIC_EXIT_OK */)
             result = "Failed";
@@ -899,25 +903,25 @@ QString NetworkControl::processSet(QStringList tokens)
     }
 
     return QString("ERROR: See 'help %1' for usage information")
-                   .arg(tokens[0]);
+                   .arg(nc->getArg(0));
 }
 
-QString NetworkControl::processHelp(QStringList tokens)
+QString NetworkControl::processHelp(NetworkCommand *nc)
 {
     QString command, helpText;
 
-    if (tokens.size() >= 1)
+    if (nc->getArgCount() >= 1)
     {
-        if (is_abbrev("help", tokens[0]))
+        if (is_abbrev("help", nc->getArg(0)))
         {
-            if (tokens.size() >= 2)
-                command = tokens[1];
+            if (nc->getArgCount() >= 2)
+                command = nc->getArg(1);
             else
                 command.clear();
         }
         else
         {
-            command = tokens[0];
+            command = nc->getArg(0);
         }
     }
 
@@ -1249,7 +1253,7 @@ QString NetworkControl::listRecordings(QString chanid, QString starttime)
     return result;
 }
 
-QString NetworkControl::saveScreenshot(QStringList tokens)
+QString NetworkControl::saveScreenshot(NetworkCommand *nc)
 {
     QString result;
     long long frameNumber = 150;
@@ -1283,12 +1287,12 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
 
         QString outFile = QDir::homePath() + "/.mythtv/screenshot.png";
 
-        if (tokens.size() >= 4)
-            outFile = tokens[3];
+        if (nc->getArgCount() >= 4)
+            outFile = nc->getArg(3);
 
-        if (tokens.size() >= 5)
+        if (nc->getArgCount() >= 5)
         {
-            QStringList size = tokens[4].split('x');
+            QStringList size = nc->getArg(4).split('x');
             width  = size[0].toInt();
             height = size[1].toInt();
         }
@@ -1317,6 +1321,16 @@ QString NetworkControl::saveScreenshot(QStringList tokens)
         return "ERROR: Timed out waiting for reply from player";
 
     return "ERROR: Unknown reason";
+}
+
+QString NetworkCommand::getFrom(int arg)
+{
+    QString c = m_command;
+    for(int i=0 ; i<arg ; i++) {
+        QString arg = c.simplified().split(" ")[0];
+        c = c.mid(arg.length()).trimmed();
+    }
+    return c;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

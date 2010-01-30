@@ -11,6 +11,7 @@ using namespace std;
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QMutex>
+#include <QStringList>
 
 class MainServer;
 class QTextStream;
@@ -46,23 +47,29 @@ class NetworkCommand : public QObject
   public:
     NetworkCommand(NetworkControlClient *cli, QString c)
     {
-        m_command = c;
+        m_command = c.trimmed();
         m_client = cli;
+        m_args = m_command.simplified().split(" ");
     }
-    
+
     NetworkCommand &operator=(NetworkCommand const &nc)
     {
         m_command = nc.m_command;
         m_client = nc.m_client;
+        m_args = m_command.simplified().split(" ");
         return *this;
     }
 
-    QString               getCommand() { return m_command; }
-    NetworkControlClient *getClient()  { return m_client; }
+    QString               getCommand()    { return m_command; }
+    NetworkControlClient *getClient()     { return m_client; }
+    QString               getArg(int arg) { return m_args[arg]; }
+    int                   getArgCount()   { return m_args.size(); }
+    QString               getFrom(int arg);
 
   private:
     QString               m_command;
     NetworkControlClient *m_client;
+    QStringList           m_args;
 };
 
 class NetworkControlCloseEvent : public QEvent
@@ -100,13 +107,13 @@ class NetworkControl : public QTcpServer
     void RunCommandThread(void);
 
   private:
-    QString processJump(QStringList tokens);
-    QString processKey(QStringList tokens);
-    QString processLiveTV(QStringList tokens);
-    QString processPlay(QStringList tokens, int clientID);
-    QString processQuery(QStringList tokens);
-    QString processSet(QStringList tokens);
-    QString processHelp(QStringList tokens);
+    QString processJump(NetworkCommand *nc);
+    QString processKey(NetworkCommand *nc);
+    QString processLiveTV(NetworkCommand *nc);
+    QString processPlay(NetworkCommand *nc, int clientID);
+    QString processQuery(NetworkCommand *nc);
+    QString processSet(NetworkCommand *nc);
+    QString processHelp(NetworkCommand *nc);
 
     void notifyDataAvailable(void);
     void sendReplyToClient(NetworkControlClient *ncc, QString &reply);
@@ -114,7 +121,7 @@ class NetworkControl : public QTcpServer
 
     QString listRecordings(QString chanid = "", QString starttime = "");
     QString listSchedule(const QString& chanID = "") const;
-    QString saveScreenshot(QStringList tokens);
+    QString saveScreenshot(NetworkCommand *nc);
 
     void processNetworkControlCommand(NetworkCommand *nc);
 
