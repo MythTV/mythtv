@@ -1376,7 +1376,7 @@ void NuppelVideoRecorder::DoV4L2(void)
         hardware_encode = true;
     }
 
-    int numbuffers = 5;
+    uint numbuffers = 5;
 
     vrbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     vrbuf.memory = V4L2_MEMORY_MMAP;
@@ -1399,7 +1399,7 @@ void NuppelVideoRecorder::DoV4L2(void)
     unsigned char *buffers[numbuffers];
     int bufferlen[numbuffers];
 
-    for (int i = 0; i < numbuffers; i++)
+    for (uint i = 0; i < numbuffers; i++)
     {
         vbuf.type = vrbuf.type;
         vbuf.index = i;
@@ -1425,7 +1425,7 @@ void NuppelVideoRecorder::DoV4L2(void)
         bufferlen[i] = vbuf.length;
     }
 
-    for (int i = 0; i < numbuffers; i++)
+    for (uint i = 0; i < numbuffers; i++)
     {
         memset(buffers[i], 0, bufferlen[i]);
         vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -1472,7 +1472,7 @@ again:
             turnon = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             ioctl(fd, VIDIOC_STREAMOFF, &turnon);
 
-            for (int i = 0; i < numbuffers; i++)
+            for (uint i = 0; i < numbuffers; i++)
             {
                 memset(buffers[i], 0, bufferlen[i]);
                 vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -1579,7 +1579,7 @@ again:
 
     ioctl(fd, VIDIOC_STREAMOFF, &turnon);
 
-    for (int i = 0; i < numbuffers; i++)
+    for (uint i = 0; i < numbuffers; i++)
     {
         munmap(buffers[i], bufferlen[i]);
     }
