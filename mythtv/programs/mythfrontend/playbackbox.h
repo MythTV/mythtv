@@ -134,6 +134,7 @@ class PlaybackBox : public ScheduleCommon
         { UpdateUIListItem(item, true); }
     void selected(MythUIButtonListItem *item);
     void playSelected(MythUIButtonListItem *item = NULL);
+    void playProgramInfo(ProgramInfo *pginfo = NULL);
     void deleteSelected(MythUIButtonListItem *item);
 
     void SwitchList(void);

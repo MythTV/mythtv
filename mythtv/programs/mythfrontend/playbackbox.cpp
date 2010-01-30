@@ -1900,6 +1900,11 @@ void PlaybackBox::playSelected(MythUIButtonListItem *item)
 
     ProgramInfo *pginfo = qVariantValue<ProgramInfo *>(item->GetData());
 
+    playProgramInfo(pginfo);
+}
+
+void PlaybackBox::playProgramInfo(ProgramInfo *pginfo)
+{
     if (!pginfo)
         return;
 
@@ -3580,8 +3585,10 @@ void PlaybackBox::processNetworkControlCommand(const QString &command)
                 if (tokens[1] == "PLAY")
                     tmpItem->setIgnoreBookmark(true);
 
+                tmpItem->pathname = tmpItem->GetPlaybackURL();
+
                 m_underNetworkControl = true;
-                playSelected(m_recordingList->GetItemCurrent());
+                playProgramInfo(tmpItem);
                 m_underNetworkControl = false;
             }
             else
