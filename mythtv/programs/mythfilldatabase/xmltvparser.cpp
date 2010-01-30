@@ -401,8 +401,7 @@ ProgInfo *XMLTVParser::parseProgram(
                 ProgRating rating;
                 rating.system = info.attribute("system", "");
                 rating.rating = getFirstText(item);
-                if (rating.system.isEmpty())
-                    pginfo->ratings.append(rating);
+                pginfo->ratings.append(rating);
             }
             else if (info.tagName() == "previously-shown")
             {
