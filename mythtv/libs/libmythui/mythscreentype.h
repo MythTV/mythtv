@@ -49,6 +49,7 @@ class MPUBLIC MythScreenType : public MythUIType
 
     void doInit(void);
     void LoadInForeground(void);
+    bool IsInitialized(void) const;
 
     // if the widget is full screen and obscures widgets below it
     bool IsFullscreen(void) const;
@@ -100,6 +101,7 @@ class MPUBLIC MythScreenType : public MythUIType
     bool m_IsDeleting;
     bool m_IsLoading;
     bool m_IsLoaded;
+    bool m_IsInitialized;
 
     MythUIType *m_CurrentFocusWidget;
     //TODO We are currently dependant on the internal sorting of QMap for

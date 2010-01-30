@@ -59,6 +59,7 @@ class MPUBLIC MythUIHelper
     Settings *qtconfig(void);
 
     bool IsScreenSetup(void);
+    bool IsTopScreenInitialized(void);
 
     // which the user may have set to be different from the raw screen size
     void GetScreenSettings(float &wmult, float &hmult);

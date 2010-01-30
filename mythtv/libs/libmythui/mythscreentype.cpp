@@ -45,6 +45,7 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const QString &name,
     m_IsDeleting = false;
     m_IsLoading = false;
     m_IsLoaded = false;
+    m_IsInitialized = false;
 
     // Can be overridden, of course, but default to full sized.
     m_Area = GetMythMainWindow()->GetUIScreenRect();
@@ -58,7 +59,11 @@ MythScreenType::MythScreenType(MythUIType *parent, const QString &name,
     m_CurrentFocusWidget = NULL;
 
     m_ScreenStack = NULL;
+    m_BusyPopup = NULL;
     m_IsDeleting = false;
+    m_IsLoading = false;
+    m_IsLoaded = false;
+    m_IsInitialized = false;
 
     m_Area = GetMythMainWindow()->GetUIScreenRect();
 }
@@ -297,10 +302,16 @@ void MythScreenType::CloseBusyPopup(void)
     m_BusyPopup = NULL;
 }
 
+bool MythScreenType::IsInitialized(void) const
+{
+    return m_IsInitialized;
+}
+
 void MythScreenType::doInit(void)
 {
     CloseBusyPopup();
     Init();
+    m_IsInitialized = true;
 }
 
 void MythScreenType::Init(void)
