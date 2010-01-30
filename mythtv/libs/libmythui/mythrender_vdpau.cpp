@@ -454,13 +454,16 @@ void MythRenderVDPAU::WaitForFlip(void)
     if (!m_flipReady)
         return;
 
-    LOCK_RENDER
-    CHECK_STATUS()
-    INIT_ST
+    VdpOutputSurface surface = 0;
+    {
+        LOCK_RENDER
+        CHECK_STATUS()
+        surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
+    }
 
+    INIT_ST
     VdpTime dummy = 0;
     usleep(2000);
-    VdpOutputSurface surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
     vdp_st = vdp_presentation_queue_block_until_surface_idle(
                 m_flipQueue, surface, &dummy);
     CHECK_ST
@@ -471,12 +474,18 @@ void MythRenderVDPAU::Flip(int delay)
     if (!m_flipReady)
         return;
 
-    LOCK_RENDER
-    CHECK_STATUS()
+    VdpOutputSurface surface = 0;
+    {
+        LOCK_RENDER
+        CHECK_STATUS()
+        surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
+        m_surface++;
+        if (m_surface >= (uint)m_surfaces.size())
+            m_surface = 0;
+    }
+
     INIT_ST
-
     VdpTime now = 0;
-
     if (delay > 0 && vdp_presentation_queue_get_time)
     {
         vdp_st = vdp_presentation_queue_get_time(m_flipQueue, &now);
@@ -484,13 +493,8 @@ void MythRenderVDPAU::Flip(int delay)
         now += delay * 1000;
     }
 
-    VdpOutputSurface surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
     vdp_st = vdp_presentation_queue_display(m_flipQueue, surface, m_rect.x1, m_rect.y1, now);
     CHECK_ST
-
-    m_surface++;
-    if (m_surface >= (uint)m_surfaces.size())
-        m_surface = 0;
 }
 
 void MythRenderVDPAU::CheckOutputSurfaces(void)
@@ -951,17 +955,76 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
                                  QRect dst_vid, uint layer1, uint layer2)
 {
     CHECK_VIDEO_SURFACES(true)
-    LOCK_RENDER
-    CHECK_STATUS(false)
     INIT_ST
 
-    if (!out_surface)
-        out_surface = m_surfaces[m_surface];
+    VdpVideoSurface past_surfaces[2]   = { VDP_INVALID_HANDLE,
+                                           VDP_INVALID_HANDLE };
+    VdpVideoSurface future_surfaces[1] = { VDP_INVALID_HANDLE };
+    VdpVideoSurface vid_surf = 0;
+    bool deint = false;
+    uint num_layers = 0;
+    VdpLayer layers[2];
+    VdpOutputSurface surf = 0;
+    VdpVideoMixer   mixer = 0;
 
-    if (!m_videoMixers.contains(id) ||
-        !m_videoSurfaces.contains(vid_surface)||
-        !m_outputSurfaces.contains(out_surface))
-        return false;
+    {
+        LOCK_RENDER
+        CHECK_STATUS(false)
+
+        if (!out_surface)
+            out_surface = m_surfaces[m_surface];
+
+        if (!m_videoMixers.contains(id) ||
+            !m_videoSurfaces.contains(vid_surface)||
+            !m_outputSurfaces.contains(out_surface))
+            return false;
+
+        vid_surf = m_videoSurfaces[vid_surface].m_id;
+
+        if (refs && refs->size() == NUM_REFERENCE_FRAMES)
+        {
+            deint = true;
+            VdpVideoSurface act_refs[NUM_REFERENCE_FRAMES];
+            for (int i = 0; i < NUM_REFERENCE_FRAMES; i++)
+            {
+                if (m_videoSurfaces.contains(refs->value(i)))
+                    act_refs[i] = m_videoSurfaces[refs->value(i)].m_id;
+                else
+                    act_refs[i] = VDP_INVALID_HANDLE;
+            }
+
+            vid_surf = act_refs[1];
+
+            if (top)
+            {
+                future_surfaces[0] = act_refs[1];
+                past_surfaces[0]   = act_refs[0];
+                past_surfaces[1]   = act_refs[0];
+            }
+            else
+            {
+                future_surfaces[0] = act_refs[2];
+                past_surfaces[0]   = act_refs[1];
+                past_surfaces[1]   = act_refs[0];
+            }
+        }
+
+        if (m_layers.contains(layer1))
+        {
+            memcpy(&(layers[num_layers]), &(m_layers[layer1].m_layer),
+                   sizeof(VdpLayer));
+            num_layers++;
+        }
+        if (m_layers.contains(layer2))
+        {
+            memcpy(&(layers[num_layers]), &(m_layers[layer2].m_layer),
+                   sizeof(VdpLayer));
+            num_layers++;
+        }
+
+        surf  = m_outputSurfaces[out_surface].m_id;
+        mixer = m_videoMixers[id].m_id;
+    }
 
     if (dst_vid.top() < 0 && dst_vid.height() > 0)
     {
@@ -998,55 +1061,8 @@ bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
     outRectVid.x1 = dst_vid.left() + dst_vid.width();
     outRectVid.y1 = dst_vid.top() +  dst_vid.height();
 
-    VdpVideoSurface past_surfaces[2]   = { VDP_INVALID_HANDLE,
-                                           VDP_INVALID_HANDLE };
-    VdpVideoSurface future_surfaces[1] = { VDP_INVALID_HANDLE };
-    VdpVideoSurface vid_surf = m_videoSurfaces[vid_surface].m_id;
-    bool deint = false;
 
-    if (refs && refs->size() == NUM_REFERENCE_FRAMES)
-    {
-        deint = true;
-        VdpVideoSurface act_refs[NUM_REFERENCE_FRAMES];
-        for (int i = 0; i < NUM_REFERENCE_FRAMES; i++)
-        {
-            if (m_videoSurfaces.contains(refs->value(i)))
-                act_refs[i] = m_videoSurfaces[refs->value(i)].m_id;
-            else
-                act_refs[i] = VDP_INVALID_HANDLE;
-        }
-
-        vid_surf = act_refs[1];
-
-        if (top)
-        {
-            future_surfaces[0] = act_refs[1];
-            past_surfaces[0]   = act_refs[0];
-            past_surfaces[1]   = act_refs[0];
-        }
-        else
-        {
-            future_surfaces[0] = act_refs[2];
-            past_surfaces[0]   = act_refs[1];
-            past_surfaces[1]   = act_refs[0];
-        } 
-    }
-
-    uint num_layers = 0;
-    VdpLayer layers[2];
-    if (m_layers.contains(layer1))
-    {
-        memcpy(&(layers[num_layers]), &(m_layers[layer1].m_layer), sizeof(VdpLayer));
-        num_layers++;
-    }
-    if (m_layers.contains(layer2))
-    {
-        memcpy(&(layers[num_layers]), &(m_layers[layer2].m_layer), sizeof(VdpLayer));
-        num_layers++;
-    }
-
-    VdpOutputSurface surf = m_outputSurfaces[out_surface].m_id;
-    vdp_st = vdp_video_mixer_render(m_videoMixers[id].m_id, VDP_INVALID_HANDLE,
+    vdp_st = vdp_video_mixer_render(mixer, VDP_INVALID_HANDLE,
                                     NULL, field, deint ? 2 : 0,
                                     deint ? past_surfaces : NULL,
                                     vid_surf, deint ? 1 : 0,
@@ -1191,12 +1207,17 @@ bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, float value)
 
 bool MythRenderVDPAU::UploadBitmap(uint id, void* const plane[1], uint32_t pitch[1])
 {
-    LOCK_RENDER
-    CHECK_STATUS(false)
-    INIT_ST
+    VdpBitmapSurface bitmap = 0;
+    {
+        LOCK_RENDER
+        CHECK_STATUS(false)
+        if (!m_bitmapSurfaces.contains(id))
+            return false;
+        bitmap = m_bitmapSurfaces[id].m_id;
+    }
 
-    vdp_st = vdp_bitmap_surface_put_bits_native(
-                m_bitmapSurfaces[id].m_id, plane, pitch, NULL);
+    INIT_ST
+    vdp_st = vdp_bitmap_surface_put_bits_native(bitmap, plane, pitch, NULL);
     CHECK_ST
 
     return ok;
@@ -1216,14 +1237,18 @@ bool MythRenderVDPAU::UploadYUVFrame(uint id, void* const planes[3],
                                      uint32_t pitches[3])
 {
     CHECK_VIDEO_SURFACES(false)
-    LOCK_RENDER
-    CHECK_STATUS(false)
+
+    VdpVideoSurface surface = 0;
+    {
+        LOCK_RENDER
+        CHECK_STATUS(false)
+        if (!m_videoSurfaces.contains(id))
+            return false;
+        surface = m_videoSurfaces[id].m_id;
+    }
+
     INIT_ST
-
-    if (!m_videoSurfaces.contains(id))
-        return false;
-
-    vdp_st = vdp_video_surface_put_bits_y_cb_cr(m_videoSurfaces[id].m_id,
+    vdp_st = vdp_video_surface_put_bits_y_cb_cr(surface,
                                                 VDP_YCBCR_FORMAT_YV12,
                                                 planes, pitches);
     CHECK_ST;
@@ -1235,15 +1260,20 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
                                  int alpha, int red, int green, int blue,
                                  bool blend)
 {
-    LOCK_RENDER
-    CHECK_STATUS(false)
-    INIT_ST
+    uint bitmap = VDP_INVALID_HANDLE;
+    VdpOutputSurface surface = VDP_INVALID_HANDLE;
+    {
+        LOCK_RENDER
+        CHECK_STATUS(false)
 
-    if (!target)
-        target = m_surfaces[m_surface];
-
-    if (!m_outputSurfaces.contains(target))
-        return false;
+        if (!target)
+            target = m_surfaces[m_surface];
+        if (!m_outputSurfaces.contains(target))
+            return false;
+        surface = m_outputSurfaces[target].m_id;
+        if (id && m_bitmapSurfaces.contains(id))
+            bitmap = m_bitmapSurfaces[id].m_id;
+    }
 
     VdpRect vdest, vsrc;
     if (dst)
@@ -1289,12 +1319,9 @@ bool MythRenderVDPAU::DrawBitmap(uint id, uint target,
     const VdpOutputSurfaceRenderBlendState *bs =
         nullblend ? NULL :(blend ? &pipblend : &vdpblend);
 
-    uint bitmap = VDP_INVALID_HANDLE;
-    if (id && m_bitmapSurfaces.contains(id))
-        bitmap = m_bitmapSurfaces[id].m_id;
-
+    INIT_ST
     vdp_st = vdp_output_surface_render_bitmap_surface(
-                m_outputSurfaces[target].m_id,
+                surface,
                 dst ? &vdest : NULL, bitmap, src ? &vsrc  : NULL,
                 alpha >= 0 ? &color : NULL, bs,
                 VDP_OUTPUT_SURFACE_RENDER_ROTATE_0);
@@ -1364,13 +1391,17 @@ void MythRenderVDPAU::ChangeVideoSurfaceOwner(uint id)
 void MythRenderVDPAU::Decode(uint id, struct vdpau_render_state *render)
 {
     CHECK_VIDEO_SURFACES()
-    LOCK_DECODE
-    CHECK_STATUS()
+    VdpDecoder decoder = 0;
+
+    {
+        LOCK_DECODE
+        CHECK_STATUS()
+        if (!m_decoders.contains(id))
+            return;
+        decoder = m_decoders[id].m_id;
+    }
+
     INIT_ST
-
-    if (!m_decoders.contains(id))
-        return;
-
     vdp_st = vdp_decoder_render(m_decoders[id].m_id, render->surface,
                                (VdpPictureInfo const *)&(render->info),
                                 render->bitstream_buffers_used,
