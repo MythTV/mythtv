@@ -47,19 +47,30 @@ void ScheduleCommon::ShowDetails(ProgramInfo *pginfo) const
 /**
 *  \brief Show the upcoming recordings for this title
 */
-void ScheduleCommon::ShowUpcoming(ProgramInfo *pginfo) const
+void ScheduleCommon::ShowUpcoming(const QString &title) const
 {
-    if (!pginfo)
+    if (title.isEmpty())
         return;
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ProgLister *pl = new ProgLister(mainStack, plTitle, pginfo->title, "");
+    ProgLister *pl = new ProgLister(mainStack, plTitle, title, "");
     if (pl->Create())
     {
         mainStack->AddScreen(pl);
     }
     else
         delete pl;
+}
+
+/**
+*  \brief Show the upcoming recordings for this title
+*/
+void ScheduleCommon::ShowUpcoming(ProgramInfo *pginfo) const
+{
+    if (!pginfo)
+        return;
+
+    ShowUpcoming(pginfo->title);
 }
 
 /**
