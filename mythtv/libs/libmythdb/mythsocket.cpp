@@ -45,7 +45,7 @@ MythSocket::MythSocket(int socket, MythSocketCBs *cb)
         // Windows sockets' default buffersize is too small for streaming
         // Could this apply to other platforms, too?
         setSendBufferSize(kSocketBufferSize);
-#endif	
+#endif
     }
 
     if (m_cb)
@@ -313,6 +313,7 @@ bool MythSocket::writeStringList(QStringList &list)
         {
             written += temp;
             size -= temp;
+            timer.restart();
         }
         else if (temp < 0 && error() != MSocketDevice::NoError)
         {
