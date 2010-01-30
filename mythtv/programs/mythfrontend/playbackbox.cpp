@@ -3653,6 +3653,8 @@ bool PlaybackBox::keyPressEvent(QKeyEvent *event)
                          ShowActionPopup(*pginfo);
                      }
                  }
+                 else
+                     ShowGroupPopup();
              }
         }
         else if (action == "NEXTFAV")
