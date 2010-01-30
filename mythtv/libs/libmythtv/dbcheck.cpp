@@ -20,7 +20,7 @@ using namespace std;
    mythtv/bindings/python/MythTV/MythStatic.py
 */
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1253";
+const QString currentDatabaseVersion = "1254";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(
@@ -5157,6 +5157,26 @@ NULL
             return false;
 
         dbver = "1253";
+    }
+    
+    if (dbver == "1253")
+    {
+        if (gContext->GetNumSetting("have-nit-fix") == 1)
+        {
+            // User has previously applied patch from ticket #7486.
+            VERBOSE (VB_IMPORTANT, "Sneaky schema change detected");
+            if (!UpdateDBVersionNumber("1254"))
+                return false;
+        }
+        else
+        {
+            const char *updates[] = {
+                "ALTER TABLE videosource ADD dvb_nit_id INT(6) DEFAULT -1;",
+                NULL
+            };
+            if (!performActualUpdate(updates, "1254", dbver))
+                return false;
+        }
     }
 
     return true;
