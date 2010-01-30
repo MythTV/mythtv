@@ -756,6 +756,7 @@ class MythDBConn( object ):
         information.
     """
     logmodule = 'Python Database Connection'
+    cursorclass = MythDBCursor
     shared = {}
 
     def __repr__(self):
@@ -1114,7 +1115,7 @@ class MythDBConn( object ):
 
     def cursor(self, log=None):
         self.db.ping(True)
-        c = self.db.cursor(MythDBCursor)
+        c = self.db.cursor(self.cursorclass)
         if log:
             c.log = log
         else:
@@ -1208,6 +1209,7 @@ class MythBEConn( object ):
             self.socket.connect((self.host, self.port))
             self.check_version()
             self.announce(type)
+            self.hostname = self.backendCommand('QUERY_HOSTNAME')
             self.connected = True
         except socket.error, e:
             self.log(MythLog.IMPORTANT|MythLog.SOCKET,
@@ -1259,7 +1261,6 @@ class MythBEConn( object ):
         else:
             self.log(MythLog.SOCKET,"Successfully connected to backend",
                                         "%s:%d" % (self.host, self.port))
-        self.hostname = self.backendCommand('QUERY_HOSTNAME')
 
     def backendCommand(self, data):
         """
