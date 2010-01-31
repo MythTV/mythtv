@@ -2019,8 +2019,7 @@ void PlaybackBox::popupClosed(QString which, int result)
             {
                 m_helper.CheckAvailability(*pginfo, kCheckForMenuAction);
 
-                if ((asPendingDelete == pginfo->availableStatus) ||
-                    (asPendingDelete == pginfo->availableStatus))
+                if (asPendingDelete == pginfo->availableStatus)
                 {
                     ShowAvailabilityPopup(*pginfo);
                 }
@@ -2157,6 +2156,12 @@ void PlaybackBox::RemoveProgram(
     delItem->availableStatus = asPendingDelete;
     m_helper.DeleteRecording(
         delItem->chanid.toUInt(), delItem->recstartts, forceMetadataDelete);
+
+    // if the item is in the current recording list UI then delete it.
+    MythUIButtonListItem *uiItem =
+        m_recordingList->GetItemByData(qVariantFromValue(delItem));
+    if (uiItem)
+        m_recordingList->RemoveItem(uiItem);
 
     if (forgetHistory)
     {
@@ -2520,6 +2525,10 @@ void PlaybackBox::ShowAvailabilityPopup(const ProgramInfo &pginfo)
         case asPendingDelete:
             ShowOkPopup(tr("Recording Unavailable\n") + msg +
                         tr("This recording is currently being "
+                           "deleted and is unavailable"));
+        case asDeleted:
+            ShowOkPopup(tr("Recording Unavailable\n") + msg +
+                        tr("This recording has been "
                            "deleted and is unavailable"));
             break;
         case asFileNotFound:
@@ -3238,6 +3247,12 @@ void PlaybackBox::PlaylistDelete(bool forgetHistory)
                 RecordingInfo recInfo(*tmpItem);
                 recInfo.ForgetHistory();
             }
+
+            // if the item is in the current recording list UI then delete it.
+            MythUIButtonListItem *uiItem =
+                m_recordingList->GetItemByData(qVariantFromValue(tmpItem));
+            if (uiItem)
+                m_recordingList->RemoveItem(uiItem);
         }
     }
     m_playList.clear();
@@ -3847,33 +3862,41 @@ void PlaybackBox::customEvent(QEvent *event)
         }
         else if (message == "DELETE_FAILURES")
         {
-            if (m_popupMenu)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_WARN +
-                        "Delete failures not handled due to "
-                        "pre-existing popup.");
-                return;
-            }
-
             if (me->ExtraDataList().size() < 3)
                 return;
 
-            m_delList = me->ExtraDataList();
             for (uint i = 0; i+2 < (uint)m_delList.size(); i+=3)
             {
-                const ProgramInfo *pginfo =
-                    FindProgramInUILists(
+                ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
                         m_delList[i+0].toUInt(),
                         QDateTime::fromString(m_delList[i+1], Qt::ISODate));
                 if (pginfo)
+                {
+                    pginfo->availableStatus = asAvailable;
                     m_helper.CheckAvailability(*pginfo, kCheckForCache);
+                }
             }
 
-            bool forceDelete = m_delList[2].toUInt();
+            bool forceDelete = me->ExtraDataList()[2].toUInt();
             if (!forceDelete)
-                ShowDeletePopup(kForceDeleteRecording);
-            else
-                m_delList.clear();
+            {
+                m_delList = me->ExtraDataList();
+                if (!m_popupMenu)
+                {
+                    ShowDeletePopup(kForceDeleteRecording);
+                    return;
+                }
+                else
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            "Delete failures not handled due to "
+                            "pre-existing popup.");
+                }
+            }
+
+            // Since we deleted items from the UI after we set
+            // asPendingDelete, we need to put them back now..
+            ScheduleUpdateUIList();
         }
         else if (message == "PREVIEW_READY" && me->ExtraDataCount() == 2)
         {

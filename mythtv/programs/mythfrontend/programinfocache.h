@@ -42,6 +42,7 @@ class ProgramInfoCache
     void GetOrdered(vector<ProgramInfo*> &list, bool newest_first = false);
     /// \note This must only be called from the UI thread.
     bool empty(void) const { return m_cache.empty(); }
+    ProgramInfo *GetProgramInfo(uint chanid, const QDateTime &recstartts) const;
 
   private:
     void Load(void);

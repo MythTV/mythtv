@@ -244,6 +244,17 @@ void ProgramInfoCache::GetOrdered(vector<ProgramInfo*> &list, bool newest_first)
     }
 }
 
+ProgramInfo *ProgramInfoCache::GetProgramInfo(
+    uint chanid, const QDateTime &recstartts) const
+{
+    Cache::const_iterator it = m_cache.find(PICKey(chanid,recstartts));
+    
+    if (it != m_cache.end())
+        return it->second;
+
+    return NULL;
+}
+
 /// Clears the cache, m_lock must be held when this is called.
 void ProgramInfoCache::Clear(void)
 {
