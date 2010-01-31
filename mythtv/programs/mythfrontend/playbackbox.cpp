@@ -2111,16 +2111,14 @@ bool PlaybackBox::Play(const ProgramInfo &rec, bool inPlaylist)
         return false;
     }
 
-    ProgramInfo *tvrec = new ProgramInfo(rec);
+    ProgramInfo tvrec(rec);
 
     m_playingSomething = true;
 
     playCompleted = TV::StartTV(
-        tvrec, false, inPlaylist, m_underNetworkControl);
+        &tvrec, false, inPlaylist, m_underNetworkControl);
 
     m_playingSomething = false;
-
-    delete tvrec;
 
     if (inPlaylist && !m_playListPlay.empty())
     {
@@ -3856,6 +3854,42 @@ void PlaybackBox::customEvent(QEvent *event)
         {
             m_programInfoCache.ScheduleLoad();
         }
+        else if (message == "LOCAL_PBB_DELETE_RECORDINGS")
+        {
+            QStringList list;
+            for (uint i = 0; i+3 < (uint)me->ExtraDataList().size(); i+=4)
+            {
+                ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
+                        me->ExtraDataList()[i+0].toUInt(),
+                        QDateTime::fromString(
+                            me->ExtraDataList()[i+1], Qt::ISODate));
+
+                if (!pginfo)
+                    continue;
+
+                QString forceDeleteStr = me->ExtraDataList()[i+2];
+                bool    forgetHistory  = me->ExtraDataList()[i+3].toInt();
+
+                list.push_back(pginfo->chanid);
+                list.push_back(pginfo->recstartts.toString(Qt::ISODate));
+                list.push_back(forceDeleteStr);
+                pginfo->availableStatus = asPendingDelete;
+                if (forgetHistory)
+                {
+                    RecordingInfo recInfo(*pginfo);
+                    recInfo.ForgetHistory();
+                }
+
+                // if the item is in the current recording list UI
+                // then delete it.
+                MythUIButtonListItem *uiItem =
+                    m_recordingList->GetItemByData(qVariantFromValue(pginfo));
+                if (uiItem)
+                    m_recordingList->RemoveItem(uiItem);
+            }            
+            if (!list.empty())
+                m_helper.DeleteRecordings(list);
+        }
         else if (message == "DELETE_SUCCESSES")
         {
             m_helper.ForceFreeSpaceUpdate();
@@ -3865,11 +3899,12 @@ void PlaybackBox::customEvent(QEvent *event)
             if (me->ExtraDataList().size() < 3)
                 return;
 
-            for (uint i = 0; i+2 < (uint)m_delList.size(); i+=3)
+            for (uint i = 0; i+2 < (uint)me->ExtraDataList().size(); i+=3)
             {
                 ProgramInfo *pginfo = m_programInfoCache.GetProgramInfo(
-                        m_delList[i+0].toUInt(),
-                        QDateTime::fromString(m_delList[i+1], Qt::ISODate));
+                        me->ExtraDataList()[i+0].toUInt(),
+                        QDateTime::fromString(
+                            me->ExtraDataList()[i+1], Qt::ISODate));
                 if (pginfo)
                 {
                     pginfo->availableStatus = asAvailable;

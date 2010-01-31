@@ -232,9 +232,6 @@ class MPUBLIC TV : public QThread
     /// Returns true if the TV event thread is running. Should always be true
     /// between the end of the constructor and the beginning of the destructor.
     bool IsRunning(void)         const { return isRunning(); }
-    /// Returns true if the user told MythTV to delete the recording
-    /// we were most recently playing.
-    bool getRequestDelete(void)  const { return requestDelete; }
     /// Returns true if the user told Mythtv to allow re-recording of the show
     bool getAllowRerecord(void) const { return allowRerecord;  }
     /// This is set to true if the player reaches the end of the

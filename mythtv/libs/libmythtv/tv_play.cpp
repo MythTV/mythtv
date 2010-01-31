@@ -381,8 +381,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
         playCompleted = true;
 
     bool allowrerecord = tv->getAllowRerecord();
-    bool deleterecording = tv->getRequestDelete();
-    bool force = false;
+    bool deleterecording = tv->requestDelete;
 
     tv->SaveChannelGroup();
 
@@ -394,14 +393,13 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
 
         if (deleterecording)
         {
-            curProgram->UpdateLastDelete(true);
-            if (allowrerecord)
-            {
-                RecordingInfo recInfo(*curProgram);
-                recInfo.ForgetHistory();
-            }
-            RemoteDeleteRecording(
-                curProgram->chanid.toUInt(), curProgram->recstartts, force);
+            QStringList list;
+            list.push_back(curProgram->chanid);
+            list.push_back(curProgram->recstartts.toString(Qt::ISODate));
+            list.push_back("0"); // do not force delete
+            list.push_back(allowrerecord ? "1" : "0");
+            MythEvent me("LOCAL_PBB_DELETE_RECORDINGS", list);
+            gContext->dispatch(me);
         }
         else if (!curProgram->isVideo)
         {
