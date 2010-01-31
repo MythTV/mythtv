@@ -433,12 +433,12 @@ ProgramInfo *EncoderLink::GetRecording(void)
     return info;
 }
 
-/** \fn EncoderLink::StopRecording()
+/** \fn EncoderLink::StopRecording(bool killFile)
  *  \brief Tells TVRec to stop recording immediately.
  *         <b>This only works on local recorders.</b>
  *  \sa StartRecording(const ProgramInfo *rec), FinishRecording()
  */
-void EncoderLink::StopRecording(void)
+void EncoderLink::StopRecording(bool killFile)
 {
     endRecordingTime = QDateTime::currentDateTime().addDays(-2);
     startRecordingTime = endRecordingTime;
@@ -446,7 +446,7 @@ void EncoderLink::StopRecording(void)
 
     if (local)
     {
-        tv->StopRecording();
+        tv->StopRecording(killFile);
         return;
     }
 }

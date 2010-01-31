@@ -713,19 +713,20 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     return retval;
 }
 
-/** \fn TVRec::StopRecording(void)
+/** \fn TVRec::StopRecording(bool killFile)
  *  \brief Changes from a recording state to kState_None.
  *  \sa StartRecording(const ProgramInfo *rec), FinishRecording()
  */
-void TVRec::StopRecording(void)
+void TVRec::StopRecording(bool killFile)
 {
     if (StateIsRecording(GetState()))
     {
         QMutexLocker lock(&stateChangeLock);
+        SetFlags(kFlagKillRec);
         ChangeState(RemoveRecording(GetState()));
         // wait for state change to take effect
         WaitForEventThreadSleep();
-        ClearFlags(kFlagCancelNextRecording);
+        ClearFlags(kFlagCancelNextRecording|kFlagKillRec);
     }
 }
 
@@ -924,7 +925,8 @@ void TVRec::HandleStateChange(void)
     else if (TRANSITION(kState_RecordingOnly, kState_None))
     {
         tuningRequests.enqueue(
-            TuningRequest(kFlagCloseRec|kFlagKillRingBuffer));
+            TuningRequest(kFlagCloseRec|kFlagKillRingBuffer|
+                          (GetFlags()&kFlagKillRec)));
         SET_NEXT();
     }
 

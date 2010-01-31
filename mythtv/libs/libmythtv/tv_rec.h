@@ -160,7 +160,7 @@ class MPUBLIC TVRec : public SignalMonitorListener
     void RecordPending(const ProgramInfo *rcinfo, int secsleft, bool hasLater);
     RecStatusType StartRecording(const ProgramInfo *rcinfo);
 
-    void StopRecording(void);
+    void StopRecording(bool killFile = false);
     /// \brief Tells TVRec to finish the current recording as soon as possible.
     void FinishRecording(void)  { SetFlags(kFlagFinishRecording); }
     /// \brief Tells TVRec that the frontend's TV class is ready for messages.

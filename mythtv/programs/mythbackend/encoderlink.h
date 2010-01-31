@@ -90,7 +90,7 @@ class EncoderLink
     bool MatchesRecording(const ProgramInfo *rec);
     void RecordPending(const ProgramInfo *rec, int secsleft, bool hasLater);
     RecStatusType StartRecording(const ProgramInfo *rec);
-    void StopRecording(void);
+    void StopRecording(bool killFile = false);
     void FinishRecording(void);
     void FrontendReady(void);
     void CancelNextRecording(bool);

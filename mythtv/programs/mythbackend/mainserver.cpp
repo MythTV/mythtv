@@ -2209,7 +2209,7 @@ void MainServer::DoHandleDeleteRecording(
         {
             resultCode = iter.key();
 
-            elink->StopRecording();
+            elink->StopRecording(true);
 
             while (elink->IsBusyRecording() ||
                    elink->GetState() == kState_ChangingState)
