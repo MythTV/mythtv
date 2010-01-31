@@ -99,16 +99,24 @@ OSD::~OSD(void)
 {
     QMutexLocker locker(&osdlock);
 
-    QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
-    for (; fonts != fontMap.end(); ++fonts)
     {
-        if (*fonts)
+        QMutexLocker locker(&loadFontLock);
+        QHash<QString, TTFFont*>::iterator it = loadFontHash.begin();
+        for (; it != loadFontHash.end(); ++it)
         {
-            delete *fonts;
-            *fonts = NULL;
+            if (*it)
+                delete *it;
         }
+
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("dtor, loaded fonts #%1, fontMap #%2")
+                .arg(loadFontHash.size())
+                .arg(fontMap.size()));
+
+        loadFontHash.clear();
+        reinitFontHash.clear();
+        fontMap.clear();
     }
-    fontMap.clear();
 
     QMap<QString, OSDSet *>::iterator sets = setMap.begin();
     for (; sets != setMap.end(); ++sets)
@@ -612,13 +620,7 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
     // adjust for wscale font size scaling
     fscale *= (float) sqrt(2.0/(sq(wscale) + 1.0));
 
-    QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
-    for (; fonts != fontMap.end(); ++fonts)
-    {
-        TTFFont *font = (*fonts);
-        if (font)
-            font->Reinit(wscale, hmult * fscale);
-    }
+    ReinitFonts();
 
     QMap<QString, OSDSet *>::iterator sets = setMap.begin();
     for (; sets != setMap.end(); ++sets)
@@ -691,47 +693,150 @@ QString OSD::FindTheme(QString name)
     return "";
 }
 
-TTFFont *OSD::LoadFont(QString name, int size)
+TTFFont *OSD::LoadFont(const QString &name, int size)
 {
     QString fullname = GetConfDir() + "/" + name;
+    QString stdFontKey = QString("%1_%2###%3_%4")
+        .arg(fullname).arg(size)
+        .arg(wscale,8,'g').arg(hmult*fscale,8,'g');
+
+    QMutexLocker locker(&loadFontLock);
+    QHash<QString, TTFFont*>::iterator it =
+        loadFontHash.find(stdFontKey);
+    if (it != loadFontHash.end())
+        return *it;
+
+    QString sharedFontKey = QString("%1_%2###%3_%4")
+        .arg(GetShareDir() + name).arg(size)
+        .arg(wscale,8,'g').arg(hmult*fscale,8,'g');
+
+    it = loadFontHash.find(sharedFontKey);
+    if (it != loadFontHash.end())
+        return *it;
+
+    QString themeFontKey = QString("%1_%2###%3_%4")
+        .arg(themepath + "/" + name).arg(size)
+        .arg(wscale,8,'g').arg(hmult*fscale,8,'g');
+
+    if (!themepath.isEmpty())
+    {
+        it = loadFontHash.find(themeFontKey);
+        if (it != loadFontHash.end())
+            return *it;
+    }
+
+    QString simpleFontKey = QString("%1_%2###%3_%4")
+        .arg(name).arg(size)
+        .arg(wscale,8,'g').arg(hmult*fscale,8,'g');
+    it = loadFontHash.find(simpleFontKey);
+    if (it != loadFontHash.end())
+    {
+        if (!*it)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Unable to find font: %1\n\t\t\t"
+                            "No OSD will be displayed.").arg(name));
+        }
+        return *it;
+    }
+
+    //
+    // Loading from cache failed, attempt to load the font.
+    //
+
     TTFFont *font = new TTFFont(fullname, size, wscale, hmult * fscale);
-
     if (font->isValid())
+    {
+        loadFontHash[stdFontKey] = font;
+        reinitFontHash[font] = stdFontKey;
         return font;
-
+    }
     delete font;
+
     fullname = GetShareDir() + name;
-
     font = new TTFFont(fullname, size, wscale, hmult*fscale);
-
     if (font->isValid())
+    {
+        loadFontHash[sharedFontKey] = font;
+        reinitFontHash[font] = sharedFontKey;
         return font;
-
+    }
     delete font;
-    if (themepath != "")
+
+    if (!themepath.isEmpty())
     {
         fullname = themepath + "/" + name;
         font = new TTFFont(fullname, size, wscale, hmult * fscale);
         if (font->isValid())
+        {
+            loadFontHash[themeFontKey] = font;
+            reinitFontHash[font] = themeFontKey;
             return font;
-
+        }
         delete font;
     }
 
-    fullname = name;
-    font = new TTFFont(fullname, size, wscale, hmult * fscale);
-
+    font = new TTFFont(name, size, wscale, hmult * fscale);
     if (font->isValid())
+    {
+        loadFontHash[simpleFontKey] = font;
+        reinitFontHash[font] = simpleFontKey;
         return font;
-   
-    VERBOSE(VB_IMPORTANT, QString("Unable to find font: %1\n\t\t\t"
-                                  "No OSD will be displayed.").arg(name));
-
+    }
     delete font;
-    font = NULL;
 
-    return font;
+    loadFontHash[simpleFontKey] = NULL;
+
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Unable to find font: %1\n\t\t\t"
+                    "No OSD will be displayed.").arg(name));
+
+    return NULL;
 }
+
+void OSD::ReinitFonts(void)
+{
+    QMutexLocker locker(&loadFontLock);
+
+    QSet<TTFFont*> done;
+
+    QString key_tail =
+        QString("###%1_%2").arg(wscale,8,'g').arg(hmult*fscale,8,'g');
+    float hscale = hmult*fscale;
+    uint key_tail_len = key_tail.length();
+
+    QMap<QString, TTFFont*>::iterator it = fontMap.begin();
+    for (; it != fontMap.end(); ++it)
+    {
+        if (!*it)
+            continue;
+        if (done.contains(*it))
+            continue;
+
+        QHash<TTFFont*, QString>::iterator kit = reinitFontHash.find(*it);
+        if (kit == reinitFontHash.end())
+            continue;
+
+        QString key = *kit;
+        if (key.right(key_tail_len) == key_tail)
+        {
+            done.insert(*it);
+            continue;
+        }
+
+        QHash<QString, TTFFont*>::iterator lit = loadFontHash.find(key);
+        if (lit != loadFontHash.end() && (*lit == *it))
+        {
+            loadFontHash.erase(lit);
+            (*it)->Reinit(wscale, hscale);
+            QString new_key = key.left(key.length() - key_tail_len) + key_tail;
+            reinitFontHash[*it] = new_key;
+            loadFontHash[new_key] = *it;
+            done.insert(*it);
+        }
+    }
+}
+
 
 QString OSD::getFirstText(QDomElement &element)
 {
@@ -2830,11 +2935,8 @@ OSDSet *OSD::GetSet(const QString &text)
 
 TTFFont *OSD::GetFont(const QString &text)
 {
-    TTFFont *ret = NULL;
-    if (fontMap.contains(text))
-        ret = fontMap[text];
-
-    return ret;
+    QMap<QString,TTFFont*>::iterator it = fontMap.find(text);
+    return (it != fontMap.end()) ? *it : NULL;
 }
 
 class comp

@@ -17,6 +17,7 @@ using namespace std;
 #include <QMutex>
 #include <QPoint>
 #include <QRect>
+#include <QHash>
 #include <QMap>
 
 // MythTV Headers
@@ -204,7 +205,8 @@ class OSD : public QObject
     bool InitMenu(void);
     bool InitInteractiveTV(void);
 
-    TTFFont *LoadFont(QString name, int size); 
+    TTFFont *LoadFont(const QString &name, int size);
+    void ReinitFonts(void);
     QString FindTheme(QString name);
 
     void HighlightDialogSelection(OSDSet *container, int num);  
@@ -258,6 +260,10 @@ class OSD : public QObject
     vector<OSDSet *> *setList;
 
     QMap<QString, TTFFont *> fontMap;
+
+    QMutex loadFontLock;
+    QHash<QString, TTFFont*> loadFontHash;
+    QHash<TTFFont*, QString> reinitFontHash;
 
     QMap<QString, int> dialogResponseList;
     deque<QString> dialogs;
