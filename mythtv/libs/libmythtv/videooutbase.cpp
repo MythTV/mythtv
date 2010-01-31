@@ -394,7 +394,7 @@ QString VideoOutput::GetFilters(void) const
 
 bool VideoOutput::IsPreferredRenderer(QSize video_size)
 {
-    if (!db_vdisp_profile)
+    if (!db_vdisp_profile || (video_size == windows[0].GetVideoDispDim()))
         return true;
 
     VideoDisplayProfile vdisp;
