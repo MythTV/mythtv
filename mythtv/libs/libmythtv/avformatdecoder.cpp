@@ -497,6 +497,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
 
     cc608_build_parity_table(cc608_parity_table);
 
+    if (gContext->GetNumSetting("CCBackground", 0))
+        CC708Window::forceWhiteOnBlackText = true;
+
     no_dts_hack = false;
 }
 

@@ -180,6 +180,8 @@ class CC708Window
     /// set to false when DeleteWindow is called on the window.
     bool            exists;
 
+    static bool     forceWhiteOnBlackText;
+
     mutable QMutex  lock;
 };
 

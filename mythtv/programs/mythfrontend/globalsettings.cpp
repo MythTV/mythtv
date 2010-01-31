@@ -1926,12 +1926,12 @@ static HostCheckBox *UseVideoTimebase()
 static HostCheckBox *CCBackground()
 {
     HostCheckBox *gc = new HostCheckBox("CCBackground");
-    gc->setLabel(QObject::tr("Black background for analog closed captioning"));
+    gc->setLabel(QObject::tr("Black background for closed captioning"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
-                        "If enabled, analog captions will be displayed "
-                        "over a black space for maximum contrast. Otherwise, "
-                        "captions will use outlined text over the picture."));
+                        "If enabled, captions will be displayed "
+                        "as white text over a black background "
+                        "for better contrast."));
     return gc;
 }
 
@@ -1956,10 +1956,7 @@ static HostCheckBox *PreferCC708()
     gc->setHelpText(
         QObject::tr(
             "When enabled the new EIA-708 captions will be preferred over "
-            "the old EIA-608 captions in ATSC streams.") + ' ' +
-        QObject::tr(
-            "This is the default, but as of early 2008 most stations are "
-            "not broadcasting useable EIA-708 captions."));
+            "the old EIA-608 captions in ATSC streams."));
 
     return gc;
 }
