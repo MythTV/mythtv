@@ -18,7 +18,6 @@
             <arrange>stack</arrange>
             <area>365,37,820,30</area>
             <align>center</align>
-            <spacing>20</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>
@@ -27,47 +26,33 @@
                 <state name="active">
                     <area>0,0,300,30</area>
                     <shape name="recActiveGroupShape">
-                        <area>0, 0, 100%, 100%</area>
-                        <minsize>150,100%</minsize>
-                        <type>roundbox</type>
-                        <fill color="#000000" alpha="0" />
-                        <line color="#FFFFFF" alpha="255" width="1" />
-                        <cornerradius>15</cornerradius>
+                        <area>0,0,0,0</area>
                     </shape>
                     <textarea name="buttontext">
-                        <area>3%,0,96%,100%</area>
-                        <minsize>10%,100%</minsize>
-                        <align>allcenter</align>
-                        <cutdown>yes</cutdown>
-                        <font>basesmall</font>
-                        <alpha>255</alpha>
+                        <area>0,0,0,0</area>
+                        <alpha>0</alpha>
                     </textarea>
                 </state>
                 <state name="selected">
                     <area>0,0,300,30</area>
                     <shape name="recSelectedGroupShape">
-                        <area>0, 0, 100%, 100%</area>
-                        <minsize>150,100%</minsize>
-                        <type>roundbox</type>
-                        <fill color="#FFFFFF" alpha="192" />
-                        <line color="#000000" alpha="255" width="1" />
-                        <cornerradius>15</cornerradius>
+                        <area>0,0,0,0</area>
                     </shape>
                     <textarea name="buttontext">
-                        <area>3%,0,96%,95%</area>
+                        <area>3%,-5,96%,95%</area>
                         <minsize>10%,100%</minsize>
                         <align>allcenter</align>
-                        <font>basesmallblue</font>
-                        <alpha>255</alpha>
+                        <font>basemedium</font>
+                        <alpha>200</alpha>
                     </textarea>
                 </state>
                 <state name="inactive" from="selected" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>132,247</position>
+                <area>0,0,0,0</area>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>160,247</position>
+                <area>0,0,0,0</area>
             </statetype>
         </buttonlist>
 
@@ -80,7 +65,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="name">
-                        <area>5,2,300,30</area>
+                        <area>5,1,300,30</area>
                         <font>basesmallboldblue</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -88,7 +73,7 @@
                 </state>
                 <state name="inactive" from="active">
                     <textarea name="name">
-                        <area>5,2,300,30</area>
+                        <area>5,1,300,30</area>
                         <font>basesmallboldblue</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -96,7 +81,7 @@
                 </state>
                 <state name="selected" from="active">
                     <textarea name="name">
-                        <area>5,2,300,30</area>
+                        <area>5,1,300,30</area>
                         <font>basesmallbold</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -144,11 +129,11 @@
                         <area>32,5,655,28</area>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>638,5,120,28</area>
+                        <area>635,5,120,28</area>
                         <align>right</align>
                     </textarea>
                     <textarea name="starttime" from="shortdate">
-                        <area>764,5,111,28</area>
+                        <area>761,5,114,28</area>
                         <align>right</align>
                     </textarea>
                     <statetype name="watched">

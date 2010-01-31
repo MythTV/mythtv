@@ -14,6 +14,48 @@
             <position>0,40</position>
         </imagetype>
 
+        <buttonlist name="recgroups">
+            <arrange>stack</arrange>
+            <area>225,17,500,30</area>
+            <align>center</align>
+            <scrollstyle>center</scrollstyle>
+            <wrapstyle>items</wrapstyle>
+            <layout>horizontal</layout>
+            <buttonarea>0,0,100%,100%</buttonarea>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <area>0,0,300,30</area>
+                    <shape name="recActiveGroupShape">
+                        <area>0,0,0,0</area>
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>0,0,0,0</area>
+                        <alpha>0</alpha>
+                    </textarea>
+                </state>
+                <state name="selected">
+                    <area>0,0,300,30</area>
+                    <shape name="recSelectedGroupShape">
+                        <area>0,0,0,0</area>
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>3%,-2,96%,95%</area>
+                        <minsize>10%,100%</minsize>
+                        <align>allcenter</align>
+                        <font>basesmallbold</font>
+                        <alpha>230</alpha>
+                    </textarea>
+                </state>
+                <state name="inactive" from="selected" />
+            </statetype>
+            <statetype name="upscrollarrow">
+                <area>0,0,0,0</area>
+            </statetype>
+            <statetype name="downscrollarrow">
+                <area>0,0,0,0</area>
+            </statetype>
+        </buttonlist>
+
         <buttonlist name="groups">
             <area>30,70,188,300</area>
             <buttonarea>0,0,188,250</buttonarea>
