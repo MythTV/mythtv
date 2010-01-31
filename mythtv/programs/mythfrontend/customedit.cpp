@@ -315,12 +315,6 @@ void CustomEdit::loadClauses()
     new MythUIButtonListItem(m_clauseList, rule.title,
                              qVariantFromValue(rule));
 
-    rule.title = tr("Only on channels marked as favorites");
-    rule.subtitle = ", favorites";
-    rule.description = "program.chanid = favorites.chanid ";
-    new MythUIButtonListItem(m_clauseList, rule.title,
-                             qVariantFromValue(rule));
-
     rule.title = tr("Only channels from a specific video source");
     rule.subtitle.clear();
     rule.description = "channel.sourceid = 2 ";
