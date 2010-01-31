@@ -113,11 +113,11 @@
                             <filename>schedule_other.png</filename>
                         </imagetype>
                     </state>
-                    <state name="normal">
+<!--                <state name="normal">
                         <imagetype name="statusimage">
                             <filename>schedule_record.png</filename>
                         </imagetype>
-                    </state>
+                    </state> -->
                     <state name="running">
                         <imagetype name="statusimage">
                             <filename>schedule_recording.png</filename>
