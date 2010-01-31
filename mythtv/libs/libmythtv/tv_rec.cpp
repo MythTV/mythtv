@@ -722,7 +722,8 @@ void TVRec::StopRecording(bool killFile)
     if (StateIsRecording(GetState()))
     {
         QMutexLocker lock(&stateChangeLock);
-        SetFlags(kFlagKillRec);
+        if (killFile)
+            SetFlags(kFlagKillRec);
         ChangeState(RemoveRecording(GetState()));
         // wait for state change to take effect
         WaitForEventThreadSleep();
