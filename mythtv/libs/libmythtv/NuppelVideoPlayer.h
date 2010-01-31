@@ -689,6 +689,7 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     TextSubtitles textSubtitles;
 
     CC708Service CC708services[64];
+    int        CC708DelayedDeletes[64];
     QString    osdfontname;
     QString    osdccfontname;
     QString    osd708fontnames[20];

@@ -256,6 +256,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
     for (int i = 0; i < MAXTBUFFER; i++)
         txtbuffers[i].buffer = new unsigned char[text_size + 1];
+
+    memset(&CC708DelayedDeletes, 0, sizeof(CC708DelayedDeletes));
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -7808,6 +7810,40 @@ void NuppelVideoPlayer::DefineWindow(
     if (!(textDisplayMode & kDisplayCC708))
         return;
 
+    {
+        int i = window_id;
+        {
+            CC708Window &win = GetCCWin(service_num, i);
+
+#if 0
+            if ((1<<i) & CC708DelayedDeletes[service_num&63])
+            {
+                QString txt;
+                vector<CC708String*> list = win.GetStrings();
+                for (uint j = 0; j < list.size(); j++)
+                {
+                    txt = list[j]->str + ((j+1!=list.size()) ? "\n" : "");
+                    delete list[j];
+                }
+                VERBOSE(VB_VBI, LOC +
+                        QString("DeleteWindow(%1, %2) text: '%3'")
+                        .arg(service_num).arg(i).arg(txt));
+            }
+#endif
+
+            win.exists = false;
+            if (win.text)
+            {
+                delete [] win.text;
+                win.text = NULL;
+            }
+
+            CC708DelayedDeletes[service_num&63] &= ~(1<<i);
+            if (GetOSD())
+                GetOSD()->CC708Updated();
+        }
+    }
+
     VERBOSE(VB_VBI, LOC + QString("DefineWindow(%1, %2,\n\t\t\t\t\t")
             .arg(service_num).arg(window_id) +
             QString("  prio %1, vis %2, ap %3, rp %4, av %5, ah %6")
@@ -7836,19 +7872,7 @@ void NuppelVideoPlayer::DeleteWindows(uint service_num, int window_map)
     VERBOSE(VB_VBI, LOC + QString("DeleteWindows(%1, 0x%2)")
             .arg(service_num).arg(window_map,0,16));
 
-    for (uint i=0; i<8; i++)
-    {
-        if ((1<<i) & window_map)
-        {
-            CC708Window &win = GetCCWin(service_num, i);
-            win.exists = false;
-            if (win.text)
-            {
-                delete [] win.text;
-                win.text = NULL;
-            }
-        }
-    }
+    CC708DelayedDeletes[service_num&63] |= window_map;
 }
 
 void NuppelVideoPlayer::DisplayWindows(uint service_num, int window_map)
@@ -7861,8 +7885,53 @@ void NuppelVideoPlayer::DisplayWindows(uint service_num, int window_map)
 
     for (uint i=0; i<8; i++)
     {
+        if ((1<<i) & CC708DelayedDeletes[service_num&63])
+        {
+            CC708Window &win = GetCCWin(service_num, i);
+
+            if (0)
+            {
+                QString txt;
+                vector<CC708String*> list = win.GetStrings();
+                for (uint j = 0; j < list.size(); j++)
+                {
+                    txt = list[j]->str + ((j+1!=list.size()) ? "\n" : "");
+                    delete list[j];
+                }
+                VERBOSE(VB_VBI, LOC +
+                        QString("DeleteWindow(%1, %2) text: '%3'")
+                        .arg(service_num).arg(i).arg(txt));
+            }
+
+            win.exists = false;
+            if (win.text)
+            {
+                delete [] win.text;
+                win.text = NULL;
+            }
+        }
+        CC708DelayedDeletes[service_num&63] = 0;
+    }
+
+    for (uint i=0; i<8; i++)
+    {
         if ((1<<i) & window_map)
+        {
             GetCCWin(service_num, i).visible = true;
+            {
+                CC708Window &win = GetCCWin(service_num, i);
+                QString txt;
+                vector<CC708String*> list = win.GetStrings();
+                for (uint j = 0; j < list.size(); j++)
+                {
+                    txt = list[j]->str + ((j+1!=list.size()) ? "\n" : "");
+                    delete list[j];
+                }
+                VERBOSE(VB_VBI, LOC +
+                        QString("DisplayedWindow(%1, %2) text: '%3'")
+                        .arg(service_num).arg(i).arg(txt));
+            }
+        }
     }
 
     if (GetOSD())
