@@ -108,11 +108,6 @@ OSD::~OSD(void)
                 delete *it;
         }
 
-        VERBOSE(VB_IMPORTANT, LOC +
-                QString("dtor, loaded fonts #%1, fontMap #%2")
-                .arg(loadFontHash.size())
-                .arg(fontMap.size()));
-
         loadFontHash.clear();
         reinitFontHash.clear();
         fontMap.clear();
