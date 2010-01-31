@@ -2771,8 +2771,25 @@ void OSDType708CC::Draw(OSDSurface *surface,
                 font->setShadow(+2, +2);
             }
 
+            if (list[i]->attr.GetBGAlpha())
+            {
+                uint max_height = max(max_height, (uint)font->Size() * 3 / 2);
+                float wmult = 1.0f, hmult = 1.0f;
+                QRect rect(0,0, text_length, max_height);
+                OSDTypeBox box(QString("cc708_char_background_%1_%2")
+                               .arg((uint64_t)&win).arg(i),
+                               rect, wmult, hmult);
+                box.SetColor(list[i]->attr.GetBGColor());
+                box.SetRect(rect, wmult, hmult);
+                box.Draw(surface, 0/*fade*/, 0/*maxfade*/,
+                         ul.x() + tot_width + 1,
+                         ul.y() + total_height + 2,
+                         list[i]->attr.GetBGAlpha());
+            }
+
             font->DrawString(surface,
-                             ul.x() + tot_width, ul.y() + total_height + 2,
+                             ul.x() + tot_width,
+                             ul.y() + total_height + 2,
                              list[i]->str, maxx, maxy,
                              list[i]->attr.GetFGAlpha());
 
@@ -2801,7 +2818,7 @@ void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
 
         QMutexLocker locker(&win.lock);
 
-        //VERBOSE(VB_VBI, "Window #"<<i);
+        VERBOSE(VB_VBI, "Window #"<<i);
         vector<CC708String*> list = win.GetStrings();
         uint box_xoffset = 0;
         QRect bounds = CalcBounds(surface, win, list, box_xoffset);
@@ -2810,6 +2827,8 @@ void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
         {
             if (list.size() && win.GetFillAlpha())
             {
+                VERBOSE(VB_VBI, QString("drawing rect %1x%2")
+                        .arg(bounds.width()).arg(bounds.height()));
                 QRect rect(0,0, bounds.width(), bounds.height());
                 OSDTypeBox box(QString("cc708_background%1").arg(i),
                                rect, wmult, hmult);
@@ -2817,6 +2836,11 @@ void OSDType708CC::Draw(OSDSurface *surface, int /*fade*/, int /*maxfade*/,
                 box.Draw(surface, 0/*fade*/, 0/*maxfade*/,
                          bounds.left() + box_xoffset/*xoff*/,
                          bounds.top()/*yoff*/, win.GetFillAlpha());
+            }
+            else
+            {
+                VERBOSE(VB_VBI, QString("list size: %1 alpha %2")
+                        .arg(list.size()).arg(win.GetFillAlpha()));
             }
             Draw(surface, bounds.topLeft(), win, list);
         }
