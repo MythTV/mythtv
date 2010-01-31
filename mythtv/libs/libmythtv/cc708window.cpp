@@ -170,7 +170,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
         for (uint i = old_row * old_col; i < num; i++)
         {
             new_text[i].attr = pen.attr;
-            if (forceWhiteOnBlackText)
+            //if (forceWhiteOnBlackText)
             {
                 new_text[i].attr.fg_opacity = k708AttrOpacityTransparent;
                 new_text[i].attr.bg_opacity = k708AttrOpacityTransparent;
@@ -195,7 +195,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
         for (uint i = 0; i < num; i++)
         {
             text[i].attr = pen.attr;
-            if (forceWhiteOnBlackText)
+            //if (forceWhiteOnBlackText)
             {
                 text[i].attr.fg_opacity = k708AttrOpacityTransparent;
                 text[i].attr.bg_opacity = k708AttrOpacityTransparent;
@@ -233,7 +233,7 @@ void CC708Window::Clear(void)
     {
         text[i].character = QChar(' ');
         text[i].attr = pen.attr;
-        if (forceWhiteOnBlackText)
+        //if (forceWhiteOnBlackText)
         {
             text[i].attr.fg_opacity = k708AttrOpacityTransparent;
             text[i].attr.bg_opacity = k708AttrOpacityTransparent;
@@ -318,6 +318,11 @@ void CC708Window::SetWindowStyle(uint style)
     effect_speed   = 0;
     justify        = style2justify[style];
     word_wrap      = (style > 3) && (style < 7) ? 1 : 0;
+
+    /// HACK -- begin
+    // It appears that ths is missused by broadcasters (FOX -- Dollhouse)
+    fill_opacity   = k708AttrOpacityTransparent;
+    /// HACK -- end
 }
 
 void CC708Window::AddChar(QChar ch)
@@ -527,7 +532,7 @@ void CC708Pen::SetPenStyle(uint style)
 CC708Character::CC708Character(const CC708Window &win)
 {
     attr = win.pen.attr;
-    if (CC708Window::forceWhiteOnBlackText)
+    //if (CC708Window::forceWhiteOnBlackText)
     {
         attr.fg_opacity = k708AttrOpacityTransparent;
         attr.bg_opacity = k708AttrOpacityTransparent;
