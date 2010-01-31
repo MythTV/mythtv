@@ -229,7 +229,7 @@ class DBData( DictData ):
         for row in c.fetchall():
             objs.append(self.__class__(db=self.db, raw=row))
         c.close()
-        return tuple(objs)
+        return objs
 
     def _setDefs(self):
         self.__dict__['field_order'] = self.db.tablefields[self.table]
@@ -862,6 +862,7 @@ class MythDBConn( object ):
             return self.__Settings(self._parent, key, self._shared[key])
 
     def __init__(self, db=None, args=None, **dbconn):
+        self.db = None
         self.log = MythLog(self.logmodule)
         self.settings = None
         if db is not None:
@@ -1111,7 +1112,7 @@ class MythDBConn( object ):
         ret = []
         for row in c.fetchall():
             ret.append(StorageGroup(raw=row,db=self))
-        return tuple(ret)
+        return ret
 
     def cursor(self, log=None):
         self.db.ping(True)
@@ -1126,14 +1127,15 @@ class MythDBConn( object ):
 
     def __del__(self):
         if self.db is not None:
-            # decrement use count
-            self.shared[self.ident][1] -= 1
-            self.db = None
+            if self.ident in self.shared:
+                # decrement use count
+                self.shared[self.ident][1] -= 1
+                self.db = None
 
-            if not self.shared[self.ident][1]:
-                # database connection no longer in use, close and delete it
-                self.shared[self.ident][0].close()
-                del self.shared[self.ident]
+                if not self.shared[self.ident][1]:
+                    # database connection no longer in use, close and delete it
+                    self.shared[self.ident][0].close()
+                    del self.shared[self.ident]
 
 class MythBEConn( object ):
     """
@@ -1231,6 +1233,8 @@ class MythBEConn( object ):
             self.socket.close()
             self.connected = False
 
+        if not 'connected' in self.__dict__:
+            return
         if self.connected:
             if self.single:
                 disconnect(self)

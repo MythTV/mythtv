@@ -55,7 +55,8 @@ class databaseSearch( object ):
             # let function process remaining queries
             res = self.func(self.inst, key=key, value=val)
             if res is None:
-                continue
+                raise TypeError("%s got an unexpected keyword arguemnt '%s'" \
+                                    % (self.__name__, key))  
             where.append(res[0])
             fields.append(res[1])
             joinbit = joinbit|res[2]
@@ -109,7 +110,7 @@ class databaseSearch( object ):
         for row in rows:
             records.append(self.dbclass(db=self.inst, raw=row))
         if len(records):
-            return tuple(records)
+            return records
         else:
             return None
 
@@ -136,7 +137,7 @@ class MythBE( FileOps ):
         for i in range(num_progs):
             programs.append(Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS)
                 + PROGRAM_FIELDS], db=self.db))
-        return tuple(programs)
+        return programs
 
     def getScheduledRecordings(self):
         """
@@ -148,7 +149,7 @@ class MythBE( FileOps ):
         for i in range(num_progs):
             programs.append(Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS)
                 + PROGRAM_FIELDS], db=self.db))
-        return tuple(programs)
+        return programs
 
     def getUpcomingRecordings(self):
         """
@@ -170,7 +171,7 @@ class MythBE( FileOps ):
             if p.recstatus == p.WILLRECORD:
                 programs.append(p)
         programs.sort(sort_programs_by_starttime)
-        return tuple(programs)
+        return programs
 
     def getRecorderList(self):
         """
@@ -219,7 +220,8 @@ class MythBE( FileOps ):
         res[0] = int(res[0])
         if res[0] > 0:
             self.locked_tuners.append(res[0])
-        return tuple(res)
+            return tuple(res[1:])
+        return res[0]
 
 
     def freeTuner(self,id=None):
@@ -297,7 +299,7 @@ class MythBE( FileOps ):
         for i in range(num_progs):
             programs.append(Program(res[i * PROGRAM_FIELDS:(i*PROGRAM_FIELDS)
                 + PROGRAM_FIELDS], db=self.db))
-        return tuple(programs)
+        return programs
 
     def getExpiring(self):
         """
@@ -309,7 +311,7 @@ class MythBE( FileOps ):
         for i in range(num_progs):
             programs.append(Program(res[i * PROGRAM_FIELDS:(i*PROGRAM_FIELDS)
                 + PROGRAM_FIELDS], db=self.db))
-        return tuple(programs)
+        return programs
 
     def getCheckfile(self,program):
         """
@@ -333,8 +335,8 @@ class MythBE( FileOps ):
         res = self.backendCommand(command).split(BACKEND_SEP)
         dirs = []
         for i in range(0,len(res)/10):
-            dirs.append(res[i*10:i*10+18])
-        return tuple(dirs)
+            dirs.append(FreeSpace(res[i*10:i*10+10]))
+        return dirs
 
     def getFreeSpaceSummary(self):
         """
@@ -427,11 +429,11 @@ class MythBE( FileOps ):
                 if type == 'dir':
                     dirs.append(name)
         if filenamesonly:
-            return tuple(files)
+            return files
         elif path == '':
-            return tuple(dirs)
+            return dirs
         else:
-            return (tuple(dirs),tuple(files),tuple(sizes))
+            return (dirs, files, sizes)
 
     def getSGFile(self,host,sg,path):
         """
@@ -532,7 +534,7 @@ class Frontend(object):
         Returns a tuple containing available jumppoints
         """
         self.send("help jump")
-        return tuple(re.findall('(\w+)[ ]+- ([\w /,]+)',self.recv()))
+        return re.findall('(\w+)[ ]+- ([\w /,]+)',self.recv())
 
     def sendKey(self,key):
         """
@@ -549,7 +551,7 @@ class Frontend(object):
         Returns a tuple containing available special keys
         """
         self.send("help key")
-        return tuple(self.recv().split('\r\n')[4].split(', '))
+        return self.recv().split('\r\n')[4].split(', ')
 
     def sendQuery(self,query):
         """
@@ -563,8 +565,7 @@ class Frontend(object):
         Returns a tuple containing available queries
         """
         self.send("help query")
-        return tuple(re.findall('query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)',
-                        self.recv()))
+        return re.findall('query ([\w ]*\w+)[ \r\n]+- ([\w /,]+)', self.recv())
 
     def sendPlay(self,play):
         """
@@ -581,8 +582,8 @@ class Frontend(object):
         Returns a tuple containing available playback commands
         """
         self.send("help play")
-        return tuple(re.findall('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)',
-                        self.recv()))
+        return re.findall('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)',
+                        self.recv())
 
 class MythDB( MythDBConn ):
     """
@@ -736,7 +737,7 @@ class MythDB( MythDBConn ):
         for row in c.fetchall():
             channels.append(Channel(db=self, raw=row))
         c.close()
-        return tuple(channels)
+        return channels
 
 # wrappers for backwards compatibility of old functions
 
@@ -854,7 +855,7 @@ class MythVideo( MythDBConn ):
 
         curvids = curvids.values()
         if returnnew:
-            res = tuple(newvidlist)
+            res = newvidlist
         else:
             res = None
         if deleteold:
@@ -863,7 +864,7 @@ class MythVideo( MythDBConn ):
                 vid.delete()
         else:
             if res:
-                res = (res, tuple(curvids))
+                res = (res, curvids)
             else:
                 res = curvids
         return res
@@ -933,7 +934,7 @@ class MythVideo( MythDBConn ):
                 res = []
                 for vid in videos:
                     res.append(vid.intid)
-                return tuple(res)
+                return res
             else:
                 return videos[0].intid
         else:

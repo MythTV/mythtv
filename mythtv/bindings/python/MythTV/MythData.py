@@ -348,8 +348,8 @@ class FreeSpace( DictData ):
                     'us_low']
     field_type = [3, 3, 2, 0, 0, 0, 0, 0, 0, 0]
     def __str__(self):
-        return "FreeSpace %d (%s@%s)"\
-                    % (self.sgroupid, self.path, self.host)
+        return "<FreeSpace '%s@%s' at %s>"\
+                    % (self.path, self.host, hex(id(self)))
 
     def __repr__(self):
         return str(self).encode('utf-8')
@@ -1127,7 +1127,7 @@ class VideoGrabber( Grabber ):
                 if m[2] != int(year):
                     continue
             ret.append(tuple(m))
-        return tuple(ret)
+        return ret
 
     def searchEpisode(self, title, subtitle):
         """
@@ -1179,11 +1179,11 @@ class VideoGrabber( Grabber ):
             if key in trans:
                 dat[trans[key]] = val
             elif key == 'Cast':
-                cast = tuple(val.split(', '))
+                cast = val.split(', ')
             elif key == 'Genres':
-                genre = tuple(val.split(', '))
+                genre = val.split(', ')
             elif key == 'Countries':
-                country = typle(val.split(', '))
+                country = val.split(', ')
             else:
                 adddict[key] = val
         if 'releasedate' in dat:
@@ -1274,7 +1274,7 @@ class NetVisionGrabber( Grabber ):
             for name,commandline in c.fetchall():
                 glist.append(NetVisionGrabber(name, t, db, commandline))
         c.close()
-        return tuple(glist)
+        return glist
 
     def __init__(self, name, type, db=None, commandline=None):
         if type not in ('search','tree'):
