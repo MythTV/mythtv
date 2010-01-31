@@ -259,6 +259,9 @@ vector<CC708String*> CC708Window::GetStrings(void) const
 
     CC708String *cur = NULL;
 
+    if (!text)
+        return list;
+
     for (uint j = 0; j < true_row_count; j++)
     {
         for (uint i = 0; i < true_column_count; i++)
