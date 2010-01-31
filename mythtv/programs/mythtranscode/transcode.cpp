@@ -1148,7 +1148,7 @@ int Transcode::TranscodeFile(
                 if (elapsed)
                     flagFPS = curFrameNum / elapsed;
 
-                int percentage = curFrameNum * 100 / new_frame_count;
+                int percentage = curFrameNum * 100 / total_frame_count;
 
                 if (jobID >= 0)
                     JobQueue::ChangeJobComment(jobID,
