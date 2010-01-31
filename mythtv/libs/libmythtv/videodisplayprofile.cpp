@@ -602,7 +602,6 @@ QStringList VideoDisplayProfile::GetDecoders(void)
     list += "xvmc";
     list += "xvmc-vld";
     list += "macaccel";
-    list += "ivtv";
     list += "vdpau";
 
     return list;
@@ -633,7 +632,6 @@ QString VideoDisplayProfile::GetDecoderName(const QString &decoder)
         dec_name["xvmc"]     = QObject::tr("Standard XvMC");
         dec_name["xvmc-vld"] = QObject::tr("VIA XvMC");
         dec_name["macaccel"] = QObject::tr("Mac hardware acceleration");
-        dec_name["ivtv"]     = QObject::tr("PVR-350 decoder");
         dec_name["vdpau"]    = QObject::tr("NVidia VDPAU acceleration");
     }
 
@@ -678,12 +676,6 @@ QString VideoDisplayProfile::GetDecoderHelp(QString decoder)
         msg += QObject::tr(
             "Mac hardware will try to use the graphics "
             "processor - this may hang or crash your Mac!");
-
-    if (decoder == "ivtv")
-        msg += QObject::tr(
-            "MythTV can use the PVR-350's TV out and MPEG decoder for "
-            "high quality playback.  This requires that the ivtv-fb "
-            "kernel module is also loaded and configured properly.");
 
     if (decoder == "vdpau")
         msg += QObject::tr(
@@ -1046,18 +1038,15 @@ void VideoDisplayProfile::CreateOldProfiles(const QString &hostname)
     DeleteProfileGroup("CPU--", hostname);
     groupid = CreateProfileGroup("CPU--", hostname);
     CreateProfile(groupid, 1, "<=", 720, 576, ">", 0, 0,
-                  "ivtv", 1, "ivtv", "ivtv", true,
-                  "none", "none", "");
-    CreateProfile(groupid, 2, "<=", 720, 576, ">", 0, 0,
                   "xvmc", 1, "xvmc-blit", "ia44blend", false,
                   "bobdeint", "onefield", "");
-    CreateProfile(groupid, 3, "<=", 1280, 720, ">", 720, 576,
+    CreateProfile(groupid, 2, "<=", 1280, 720, ">", 720, 576,
+                  "xvmc", 1, "xvmc-blit", "ia44blend", false,
+                  "bobdeint", "onefield", "");
+    CreateProfile(groupid, 3, ">", 0, 0, "", 0, 0,
                   "xvmc", 1, "xvmc-blit", "ia44blend", false,
                   "bobdeint", "onefield", "");
     CreateProfile(groupid, 4, ">", 0, 0, "", 0, 0,
-                  "xvmc", 1, "xvmc-blit", "ia44blend", false,
-                  "bobdeint", "onefield", "");
-    CreateProfile(groupid, 5, ">", 0, 0, "", 0, 0,
                   "libmpeg2", 1, "xv-blit", "chromakey", false,
                   "none", "none", "");
 }
@@ -1219,10 +1208,6 @@ QString VideoDisplayProfile::GetVideoRendererHelp(const QString &renderer)
     if (renderer == "quartz-accel")
         msg = QObject::tr(
             "This is the only video renderer for the MacAccel decoder.");
-
-    if (renderer == "ivtv")
-        msg = QObject::tr(
-            "This is only video renderer for the PVR-350 decoder.");
 
     if (renderer == "opengl")
     {
@@ -1428,12 +1413,6 @@ QString VideoDisplayProfile::GetOSDHelp(const QString &osd)
                 "removes two of the limited XvMC buffers from decoding duty.");
     }
 
-    if (osd == "ivtv")
-    {
-        msg = QObject::tr(
-            "Renders the OSD using the PVR-350 chromakey feature.");
-    }
-
     if (osd.contains("opengl"))
     {
         msg = QObject::tr(
@@ -1511,7 +1490,6 @@ QString VideoDisplayProfile::toString(void) const
 "xvmc"
 "xvmc-vld"
 "macaccel"
-"ivtv"
 "vdpau"
 
 // Video Renderers
@@ -1523,7 +1501,6 @@ QString VideoDisplayProfile::toString(void) const
 "directfb"
 "quartz-blit"
 "quartz-accel"
-"ivtv"
 "opengl"
 "vdpau"
 
@@ -1531,8 +1508,6 @@ QString VideoDisplayProfile::toString(void) const
 "chromakey"
 "softblend"
 "ia44blend"
-"ivtv"
-"opengl"
 "opengl2"
 "opengl3"
 "vdpau"
@@ -1630,7 +1605,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_osd["xv-blit"]     += "softblend";
     safe_osd["xvmc-blit"]   += "chromakey";
     safe_osd["xvmc-blit"]   += "ia44blend";
-    safe_osd["ivtv"]        += "ivtv";
     safe_osd["opengl"]      += "opengl2";
     safe_osd["quartz-accel"]+= "opengl3";
     safe_osd["vdpau"]       += "vdpau";
@@ -1638,7 +1612,6 @@ void VideoDisplayProfile::init_statics(void)
 
     // These video renderers do not support deinterlacing in MythTV
     safe_deint["quartz-accel"] += "none";
-    safe_deint["ivtv"]         += "none";
 
     QStringList tmp;
     tmp += "dummy";
@@ -1665,7 +1638,6 @@ void VideoDisplayProfile::init_statics(void)
 
     safe_renderer["dummy"]    += "quartz-accel";
     safe_renderer["macaccel"] += "quartz-accel";
-    safe_renderer["ivtv"]     += "ivtv";
     safe_renderer["vdpau"]    += "vdpau";
 
     safe_renderer_priority["null"]         =  10;
@@ -1678,7 +1650,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_renderer_priority["direct3d"]     =  55;
     safe_renderer_priority["quartz-blit"]  =  70;
     safe_renderer_priority["quartz-accel"] =  80;
-    safe_renderer_priority["ivtv"]         =  40;
 
     safe_equiv_dec["ffmpeg"]   += "nuppel";
     safe_equiv_dec["libmpeg2"] += "nuppel";
@@ -1689,7 +1660,6 @@ void VideoDisplayProfile::init_statics(void)
     safe_equiv_dec["xvmc"]     += "dummy";
     safe_equiv_dec["xvmc-vld"] += "dummy";
     safe_equiv_dec["macaccel"] += "dummy";
-    safe_equiv_dec["ivtv"]     += "dummy";
     safe_equiv_dec["vdpau"]    += "dummy";
 
     safe_renderer_group["x11"] += "xlib";
