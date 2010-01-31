@@ -406,7 +406,7 @@ void ChannelEditor::del()
     if (!item)
         return;
     
-    QString message = tr("Delete channel '%1'?").arg(item->GetText());
+    QString message = tr("Delete channel '%1'?").arg(item->GetText("name"));
     
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
     MythConfirmationDialog *dialog = new MythConfirmationDialog(popupStack, message, true);
