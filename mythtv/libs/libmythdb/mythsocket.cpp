@@ -186,6 +186,7 @@ void MythSocket::setSocket(int socket, Type type)
     MSocketDevice::setSocket(socket, type);
     setBlocking(false);
     setState(Connected);
+    setKeepalive(true);
 }
 
 void MythSocket::close(void)
@@ -697,6 +698,7 @@ bool MythSocket::connect(const QHostAddress &addr, quint16 port)
 
     setReceiveBufferSize(kSocketBufferSize);
     setAddressReusable(true);
+    setKeepalive(true);
     if (state() == Connecting)
     {
         setState(Connected);

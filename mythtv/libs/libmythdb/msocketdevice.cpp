@@ -446,6 +446,27 @@ void MSocketDevice::setAddressReusable( bool enable )
 
 
 /*!
+    Returns true if this socket has the keepalive option set.
+
+    \sa setKeepalive()
+*/
+bool MSocketDevice::keepalive() const
+{
+	return option( Keepalive );
+}
+
+/*!
+    Sets the keepalive option for this socket.
+
+    \sa keepalive()
+*/
+void MSocketDevice::setKeepalive( bool enable )
+{
+    setOption( Keepalive, enable );
+}
+
+
+/*!
     Returns the size of the operating system receive buffer.
 
     \sa setReceiveBufferSize()

@@ -303,6 +303,9 @@ int MSocketDevice::option( Option opt ) const
     case SendBuffer:
 	n = SO_SNDBUF;
 	break;
+    case Keepalive:
+	n = SO_KEEPALIVE;
+	break;
     }
     if ( n != -1 ) {
 	QT_SOCKOPTLEN_T len;
@@ -351,6 +354,9 @@ void MSocketDevice::setOption( Option opt, int v )
 	break;
     case SendBuffer:
 	n = SO_SNDBUF;
+	break;
+    case Keepalive:
+	n = SO_KEEPALIVE;
 	break;
     default:
 	return;

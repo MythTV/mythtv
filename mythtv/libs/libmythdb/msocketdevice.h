@@ -94,6 +94,9 @@ public:
     int		 sendBufferSize() const;
     virtual void setSendBufferSize( uint );
 
+    bool	 keepalive() const;
+    virtual void setKeepalive( bool );
+
     virtual bool connect( const QHostAddress &, quint16 );
 
     virtual bool bind( const QHostAddress &, quint16 );
@@ -146,7 +149,7 @@ private:
     MSocketDevice::Error e;
     MSocketDevicePrivate * d;
 
-    enum Option { Broadcast, ReceiveBuffer, ReuseAddress, SendBuffer };
+    enum Option { Broadcast, ReceiveBuffer, ReuseAddress, SendBuffer, Keepalive };
 
     int		 option( Option ) const;
     virtual void setOption( Option, int );

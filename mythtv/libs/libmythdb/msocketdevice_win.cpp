@@ -306,6 +306,9 @@ int MSocketDevice::option( Option opt ) const
 	case SendBuffer:
 	    n = SO_SNDBUF;
 	    break;
+	case Keepalive:
+	    n = SO_KEEPALIVE;
+	    break;
     }
     if ( n != -1 ) {
 	SOCKLEN_T len = sizeof(v);
@@ -360,6 +363,9 @@ void MSocketDevice::setOption( Option opt, int v )
 	    break;
 	case SendBuffer:
 	    n = SO_SNDBUF;
+	    break;
+	case Keepalive:
+	    n = SO_KEEPALIVE;
 	    break;
 	default:
 	    return;
