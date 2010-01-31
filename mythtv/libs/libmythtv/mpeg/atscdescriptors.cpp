@@ -167,7 +167,7 @@ void MultipleStringStructure::Parse(void) const
         _ptrs[Index(i,0)] = Offset(i,-1) + 4;
         uint j = 0;
         for (; j < SegmentCount(i); j++)
-            _ptrs[Index(i,j+1)] = Offset(i,j) + Bytes(i,j);
+            _ptrs[Index(i,j+1)] = Offset(i,j) + Bytes(i,j) + 3;
         _ptrs[Index(i+1,-1)] = Offset(i,j);
     }
 }
