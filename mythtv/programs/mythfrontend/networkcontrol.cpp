@@ -1171,7 +1171,10 @@ QString NetworkControl::listSchedule(const QString& chanID) const
     query.prepare(queryStr);
     query.bindValue(":START", QDateTime::currentDateTime());
     query.bindValue(":END", QDateTime::currentDateTime());
-    query.bindValue(":CHANID", chanID);
+    if (!chanID.isEmpty())
+    {
+        query.bindValue(":CHANID", chanID);
+    }
 
     if (query.exec())
     {
