@@ -193,4 +193,50 @@ class CC708Service
     CC708Window windows[8];
 };
 
+extern const uint k708JustifyLeft;
+extern const uint k708JustifyRight;
+extern const uint k708JustifyCenter;
+extern const uint k708JustifyFull;
+
+extern const uint k708EffectSnap;
+extern const uint k708EffectFade;
+extern const uint k708EffectWipe;
+
+extern const uint k708BorderNone;
+extern const uint k708BorderRaised;
+extern const uint k708BorderDepressed;
+extern const uint k708BorderUniform;
+extern const uint k708BorderShadowLeft;
+extern const uint k708BorderShadowRight;
+
+extern const uint k708DirLeftToRight;
+extern const uint k708DirRightToLeft;
+extern const uint k708DirTopToBottom;
+extern const uint k708DirBottomToTop;
+
+extern const uint k708AttrSizeSmall;
+extern const uint k708AttrSizeStandard;
+extern const uint k708AttrSizeLarge;
+
+extern const uint k708AttrOffsetSubscript;
+extern const uint k708AttrOffsetNormal;
+extern const uint k708AttrOffsetSuperscript;
+
+extern const uint k708AttrFontDefault;
+extern const uint k708AttrFontMonospacedSerif;
+extern const uint k708AttrFontProportionalSerif;
+extern const uint k708AttrFontMonospacedSansSerif;
+extern const uint k708AttrFontProportionalSansSerif;
+extern const uint k708AttrFontCasual;
+extern const uint k708AttrFontCursive;
+extern const uint k708AttrFontSmallCaps;
+
+extern const uint k708AttrColorBlack;
+extern const uint k708AttrColorWhite;
+
+extern const uint k708AttrOpacitySolid;
+extern const uint k708AttrOpacityFlash;
+extern const uint k708AttrOpacityTranslucent;
+extern const uint k708AttrOpacityTransparent;
+
 #endif // _CC708_WINDOW_
