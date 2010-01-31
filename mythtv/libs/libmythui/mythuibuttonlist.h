@@ -42,7 +42,7 @@ class MPUBLIC MythUIButtonListItem
     void SetText(const QString &text, const QString &name="",
                  const QString &state="");
     void SetTextFromMap(QHash<QString, QString> &infoMap, const QString &state="");
-    QString GetText(void) const;
+    QString GetText(const QString &name="") const;
 
     void SetFontState(const QString &state, const QString &name="");
 

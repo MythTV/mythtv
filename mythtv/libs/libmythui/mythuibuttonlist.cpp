@@ -2569,9 +2569,14 @@ void MythUIButtonListItem::SetTextFromMap(QHash<QString, QString> &infoMap,
         m_parent->Update();
 }
 
-QString MythUIButtonListItem::GetText() const
+QString MythUIButtonListItem::GetText(const QString &name) const
 {
-    return m_text;
+    if (name.isEmpty())
+        return m_text;
+    else if (m_strings.contains(name))
+        return m_strings[name].text;
+    else
+        return QString();
 }
 
 void MythUIButtonListItem::SetFontState(const QString &state,
