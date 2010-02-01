@@ -75,13 +75,13 @@ sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 try:
 	'''If the MythTV python interface is found, required to access Netvision icon directory settings
 	'''
-	from MythTV import MythDBConn, MythLog
+	from MythTV import MythDB, MythLog
 	mythdb = None
 	try:
 		'''Create an instance of each: MythDB
 		'''
 		MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
-		mythdb = MythDBConn()
+		mythdb = MythDB()
 	except MythError, e:
 		sys.stderr(u'\n! Warning - %s\n' % e.args[0])
 		filename = os.path.expanduser("~")+'/.mythtv/config.xml'
