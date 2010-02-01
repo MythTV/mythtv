@@ -1936,7 +1936,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)
         {
-            int lang = get_canonical_lang(ic->streams[i]->language);
+            int lang;
+            if (ringBuffer && ringBuffer->isDVD())
+                lang = ringBuffer->DVD()->GetAudioLanguage(
+                    ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id));
+            else
+                lang = get_canonical_lang(ic->streams[i]->language);
+
             int lang_indx = lang_aud_cnt[lang];
             lang_aud_cnt[lang]++;
 
@@ -3151,10 +3157,12 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
         for (uint i = 0; i < numStreams; i++)
         {
             if (wlang == atracks[i].language)
+            {
                 selTrack = i;
 
-            if (windx == atracks[i].language_index)
-                break;
+                if (windx == atracks[i].language_index)
+                    break;
+            }
         }
     }
 
