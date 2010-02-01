@@ -473,16 +473,16 @@ try:
     '''If the MythTV python interface is found, we can insert data directly to MythDB or
     get the directories to store poster, fanart, banner and episode graphics.
     '''
-    from MythTV import MythDBConn, DBData, Video, MythVideo, MythBEConn, MythBE, FileOps, MythError, MythLog
+    from MythTV import MythDB, DBData, Video, MythVideo, MythBE, FileOps, MythError, MythLog
     mythdb = None
     mythvideo = None
     mythbeconn = None
     localhostname = gethostname()
     try:
-        '''Create an instance of each: MythDBConn, MythVideo
+        '''Create an instance of each: MythDB, MythVideo
         '''
         MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
-        mythdb = MythDBConn()
+        mythdb = MythDB()
         mythvideo = MythVideo(mythdb)
         MythLog._setlevel('important,general')
     except MythError, e:
@@ -493,10 +493,10 @@ try:
         else:
             print u'\n! Warning - Check that (%s) is correctly configured\n' % filename
     except Exception, e:
-        print u"\n! Warning - Creating an instance caused an error for one of: MythDBConn or MythVideo, error(%s)\n" % u''.join([u'%s ' % x for x in e.args])
+        print u"\n! Warning - Creating an instance caused an error for one of: MythDB or MythVideo, error(%s)\n" % u''.join([u'%s ' % x for x in e.args])
     try:
         MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
-        mythbeconn = MythBEConn(backend=localhostname)
+        mythbeconn = MythBE(backend=localhostname, db=mythdb)
         MythLog._setlevel('important,general')
     except MythError, e:
         print u'\nWith any -M option Jamu must be run on a MythTV backend'
@@ -569,7 +569,7 @@ class VideoTypes( DBData ):
     logmodule = 'Python VideoType'
     @staticmethod
     def getAll(db=None):
-        db = MythDBConn(db)
+        db = MythDB(db)
         c = db.cursor()
         c.execute("""SELECT * FROM videotypes""")
         types = []
