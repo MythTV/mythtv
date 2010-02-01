@@ -611,9 +611,10 @@ class MythDB( MythDBBase ):
             return ('recorded.%s=%%s' % key, value, 0)
 
         # recordedprogram matches
-        if key in ('airdate','stereo','subtitled','hdtv','closecaptioned',
-                    'partnumber','parttotal','seriesid','showtype',
-                    'syndicatedepisodenumber','programid','manualid','generic'):
+        if key in ('category_type','airdate','stereo','subtitled','hdtv',
+                    'closecaptioned','partnumber','parttotal','seriesid',
+                    'showtype','syndicatedepisodenumber','programid',
+                    'manualid','generic'):
             return ('recordedprogram.%s=%%s' % key, value, 1)
 
         if key == 'cast':
@@ -683,6 +684,20 @@ class MythDB( MythDBBase ):
             return ('endtime<%s', value, 0)
         if key == 'endafter':
             return ('endtime>%s', value, 0)
+        return None
+
+    @databaseSearch
+    def searchRecord(self, init=False, key=None, value=None):
+        """
+        Tries to find recording rules matching the given information.
+        Returns a tuple of Record objects.
+        """
+        if init:
+            return ('record', Record, ())
+        if key in ('type','chanid','starttime','startdate','endtime','enddate',
+                        'title','subtitle','category','profile','recgroup',
+                        'station','seriesid','programid','playgroup'):
+            return ('%s=%%s' % key, value, 0)
         return None
 
     def getFrontends(self):

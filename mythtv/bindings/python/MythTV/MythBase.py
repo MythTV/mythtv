@@ -352,6 +352,9 @@ class DBDataWrite( DBData ):
             data = self._sanitize(data, False)
             self.data.update(data)
         data = self._sanitize(self.data)
+        for key in data.keys():
+            if data[key] is None:
+                del data[key]
         c = self.db.cursor(self.log)
         fields = ', '.join(data.keys())
         format_string = ', '.join(['%s' for d in data.values()])
@@ -1272,7 +1275,7 @@ class MythBEBase( object ):
     def __repr__(self):
         return "<%s 'myth://%s:%d/' at %s>" % \
                 (str(self.__class__).split("'")[1].split(".")[-1], 
-                 self.be.host, self.be.port, hex(id(self)))
+                 self.hostname, self.port, hex(id(self)))
 
     def __init__(self, backend=None, type='Monitor', db=None):
         self.db = MythDBBase(db)
@@ -1283,6 +1286,8 @@ class MythBEBase( object ):
         else:
             self.be = MythBEConn(backend, type, db)
             self.shared[self._ident] = self.be
+        self.hostname = self.be.hostname
+        self.port = self.be.port
 
     def backendCommand(self, data):
         """

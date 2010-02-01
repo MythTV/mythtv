@@ -481,6 +481,48 @@ class Program( DictData ):
                             'Program () objects cannot be opened for writing')
         return ftopen(self.filename, 'r')
 
+class Record( DBDataWrite ):
+    """
+    Record(id=None, db=None, raw=None) -> Record object
+    """
+
+    kNotRecording       = 0
+    kSingleRecord       = 1
+    kTimeslotRecord     = 2
+    kChannelRecord      = 3
+    kAllRecord          = 4
+    kWeekslotRecord     = 5
+    kFindOneRecord      = 6
+    kOverrideRecord     = 7
+    kDontRecord         = 8
+    kFindDailyRecord    = 9
+    kFindWeeklyRecord   = 10
+
+    table = 'record'
+    where = 'recordid=%s'
+    setwheredat = 'self.recordid,'
+    defaults = {'recordid':None,    'type':kAllRecord,      'title':u'Unknown',
+                'subtitle':'',      'description':'',       'category':'',
+                'station':'',       'seriesid':'',          'search':''}
+    logmodule = 'Python Record'
+
+    def __str__(self):
+        if self.wheredat is None:
+            return u"<Uninitialized Record Rule at %s>" % hex(id(self))
+        return u"<Record Rule '%s', Type %d at %s>" \
+                                    % (self.title, self.type, hex(id(self)))
+
+    def __repr__(self):
+        return str(self).encode('utf-8')
+
+    def __init__(self, id=None, db=None, raw=None):
+        DBDataWrite.__init__(self, (id,), db, raw)
+
+    def create(self, data=None):
+        """Record.create(data=None) -> Record object"""
+        self.wheredat = (DBDataWrite.create(self, data),)
+        self._pull()
+        return self
 
 class Recorded( DBDataWrite ):
     """
@@ -551,6 +593,8 @@ class Recorded( DBDataWrite ):
         self.wheredat = (self.chanid,self.starttime)
         self._pull()
         self.cast = self._Cast(self.wheredat, self.db)
+        self.seek = self._Seek(self.wheredat, self.db)
+        self.markup = self._Markup(self.wheredat, self.db)
         return self
 
     def delete(self, force=False, rerecord=False):
