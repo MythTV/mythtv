@@ -19,7 +19,7 @@ meta data, video and image URLs from youtube. These routines are based on the ap
 for this api are published at http://developer.youtubenservices.com/docs
 '''
 
-__version__="v0.2.1"
+__version__="v0.2.2"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree view display option
 # 0.1.2 Modified Tree view internals to be consistent in approach and structure.
@@ -29,10 +29,11 @@ __version__="v0.2.1"
 # 0.2.1 New python bindings conversion
 #       Better exception error reporting
 #       Better handling of invalid unicode data from source
+# 0.2.2 Completed exception error reporting improvements
+#       Removed the use of the feedparser library
 
 import os, struct, sys, re, time
 import urllib, urllib2
-import feedparser
 import logging
 
 try:
@@ -112,9 +113,9 @@ try:
 		else:
 			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
 	except Exception, e:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
 except Exception, e:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
 	mythdb = None
 
 from socket import gethostname, gethostbyname
@@ -488,58 +489,111 @@ class Videos(object):
             print
 
         try:
-            data = feedparser.parse(url)
-        except ValueError, errormsg:
+            etree = XmlHandler(url).getEt()
+        except Exception, errormsg:
             raise YouTubeUrlError(self.error_messages['YouTubeUrlError'] % (url, errormsg))
 
-        if data.has_key('bozo'):
-            if data['bozo'] != 0:
-                raise YouTubeRssError(data['bozo_exception'])
-
-        if not len(data['entries']):
+        if etree is None:
             raise YouTubeVideoNotFound(u"No YouTube Video matches found for search value (%s)" % title)
 
-        if data.has_key('feed'):
-            if data['feed'].has_key('opensearch_totalresults'):
-                self.channel['channel_numresults'] = int(data['feed']['opensearch_totalresults'])
+        data = []
+        for entry in etree:
+            if entry.tag.endswith('totalResults'):
+                if entry.text:
+                    self.channel['channel_numresults'] = int(entry.text)
+                else:
+                    self.channel['channel_numresults'] = 0
+                continue
+            if not entry.tag.endswith('entry'):
+                continue
+            item = {}
+            cur_size = True
+            flash = False
+            for parts in entry:
+                if parts.tag.endswith('id'):
+                    item['id'] = parts.text
+                    continue
+                if parts.tag.endswith('title'):
+                    item['title'] = parts.text
+                    continue
+                if parts.tag.endswith('author'):
+                    for e in parts:
+                        if e.tag.endswith('name'):
+                            item['author'] = e.text
+                            break
+                    continue
+                if parts.tag.endswith('published'):
+                    item['published_parsed'] = parts.text
+                    continue
+                if parts.tag.endswith('content'):
+                    item['media_description'] = parts.text
+                    continue
+                if parts.tag.endswith(u'rating'):
+                    item['rating'] = parts.get('average')
+                    continue
+                if not parts.tag.endswith(u'group'):
+                    continue
+                for elem in parts:
+                    if elem.tag.endswith(u'duration'):
+                        item['duration'] =  elem.get('seconds')
+                        continue
+                    if elem.tag.endswith(u'thumbnail'):
+                        if cur_size == False:
+                            continue
+                        height = elem.get('height')
+                        width = elem.get('width')
+                        if int(width) > cur_size:
+                            item['thumbnail'] = self.ampReplace(elem.get('url'))
+                            cur_size = int(width)
+                        if int(width) >= 200:
+                            cur_size = False
+                        continue
+                    if elem.tag.endswith(u'player'):
+                        item['link'] = self.ampReplace(elem.get('url'))
+                        continue
+                    if elem.tag.endswith(u'content') and flash == False:
+                        for key in elem.keys():
+                            if not key.endswith(u'format'):
+                                continue
+                            if not elem.get(key) == '5':
+                                continue
+                            item['video'] = self.ampReplace((elem.get('url')+'&autoplay=1'))
+                            flash = True
+                        continue
+            if not item.has_key('video'):
+                item['video'] =  item['link']
+                item['duration'] =  u''
+            else:
+                item['link'] =  item['video']
+            data.append(item)
+
+        # Make sure there are no item elements that are None
+        for item in data:
+            for key in item.keys():
+                if item[key] == None:
+                    item[key] = u''
 
         # Massage each field and eliminate any item without a URL
         elements_final = []
-        for item in data['entries']:
+        for item in data:
             if not 'id' in item.keys():
                 continue
-
-            video_details = None
-
-            # For debugging
-            #print self.videoDetails(item['id'])
-            #sys.exit()
-
-            try:
-                video_details = self.videoDetails(item['id'])
-            except YouTubeUrlError, msg:
-                sys.stderr.write(self.error_messages['YouTubeUrlError'] % msg)
-            except YouTubeVideoDetailError, msg:
-                sys.stderr.write(self.error_messages['YouTubeVideoDetailError'] % msg)
-            except:
-                sys.stderr.write(u"! Error: Unknown error during retrieving a Video's meta data. Skipping video details.' (%s)\n" % title)
-
-            if video_details:
-                for key in video_details.keys():
-                    item[key] = video_details[key]
-
             item['language'] = self.config['language']
-            for key in item.keys():
+            for key in item.keys(): # 2010-01-23T08:38:39.000Z
                 if key == 'published_parsed':
-                    item[key] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', item[key])
+                    if item[key]:
+                        pub_time = time.strptime(item[key].strip(), "%Y-%m-%dT%H:%M:%S.%fZ")
+                        item[key] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
                     continue
                 if key == 'media_description' or key == 'title':
                     # Strip the HTML tags
-                    item[key] = self.massageDescription(item[key].strip())
-                    item[key] = item[key].replace(u'|', u'-')
+                    if item[key]:
+                        item[key] = self.massageDescription(item[key].strip())
+                        item[key] = item[key].replace(u'|', u'-')
                     continue
                 if type(item[key]) == type(u''):
-                    item[key] = self.ampReplace(item[key].replace('"\n',' ').strip())
+                    if item[key]:
+                        item[key] = self.ampReplace(item[key].replace('"\n',' ').strip())
             elements_final.append(item)
 
         if not len(elements_final):
@@ -547,76 +601,6 @@ class Videos(object):
 
         return elements_final
         # end searchTitle()
-
-
-    def videoDetails(self, url):
-        '''Using the passed URL retrieve the video meta data details
-        return a dictionary of video metadata details
-        return
-        '''
-        if self.config['debug_enabled']:
-            print url
-            print
-
-        try:
-            etree = XmlHandler(url).getEt()
-        except Exception, errormsg:
-            raise YouTubeUrlError(self.error_messages['YouTubeUrlError'] % (url, errormsg))
-
-        if etree is None:
-            raise YouTubeVideoDetailError(u'1-No Video meta data for (%s)' % url)
-
-        metadata = {}
-        cur_size = True
-        flash = False
-        for e in etree:
-            if e.tag.endswith(u'title'):
-                metadata['title'] = e.text
-                continue
-            if e.tag.endswith(u'rating'):
-                metadata['rating'] = e.get('average')
-                continue
-            if not e.tag.endswith(u'group'):
-                continue
-            for elem in e:
-                if elem.tag.endswith(u'duration'):
-                    metadata['duration'] =  elem.get('seconds')
-                    continue
-                if elem.tag.endswith(u'thumbnail'):
-                    if cur_size == False:
-                        continue
-                    height = elem.get('height')
-                    width = elem.get('width')
-                    if int(width) > cur_size:
-                        metadata['thumbnail'] = self.ampReplace(elem.get('url'))
-                        cur_size = int(width)
-                    if int(width) >= 200:
-                        cur_size = False
-                    continue
-                if elem.tag.endswith(u'player'):
-                    metadata['link'] = self.ampReplace(elem.get('url'))
-                    continue
-                if elem.tag.endswith(u'content') and flash == False:
-                    for key in elem.keys():
-                        if not key.endswith(u'format'):
-                            continue
-                        if not elem.get(key) == '5':
-                            continue
-                        metadata['video'] = self.ampReplace((elem.get('url')+'&autoplay=1'))
-                        flash = True
-                    continue
-
-        if not len(metadata):
-            raise YouTubeVideoDetailError(u'2-No Video meta data for (%s)' % url)
-
-        if not metadata.has_key('video'):
-            metadata['video'] =  metadata['link']
-            metadata['duration'] =  u''
-        else:
-            metadata['link'] =  metadata['video']
-
-        return metadata
-        # end videoDetails()
 
 
     def searchForVideos(self, title, pagenumber):
@@ -645,8 +629,8 @@ class Videos(object):
         except YouTubeRssError, msg:
             sys.stderr.write(self.error_messages['YouTubeRssError'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\n" % title)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data == None:
@@ -695,22 +679,27 @@ class Videos(object):
             print self.config[u'urls']
             print
 
+        if self.config['debug_enabled']:
+            print self.config[u'urls'][u'categories_list']
+            print
+
         try:
-            cats = feedparser.parse(self.config[u'urls'][u'categories_list'])
-        except ValueError, errormsg:
+            etree = XmlHandler(self.config[u'urls'][u'categories_list']).getEt()
+        except Exception, errormsg:
             raise YouTubeUrlError(self.error_messages['YouTubeUrlError'] % (url, errormsg))
 
-        if cats.has_key('bozo'):
-            if cats['bozo'] != 0:
-                raise YouTubeRssError(cats['bozo_exception'])
-
-        if not len(cats['feed']):
+        if etree is None:
             raise YouTubeCategoryNotFound(u"No YouTube Categories found for Tree view")
-        if not cats['feed'].has_key('tags'):
+
+        cats = []
+        for category in etree:
+            if category.tag.endswith('category'):
+                cats.append({'term': category.get('term'), 'label': category.get('label')})
+        if not len(cats):
             raise YouTubeCategoryNotFound(u"No YouTube Category tags found for Tree view")
 
         self.feed_names['category'] = {}
-        for category in cats['feed']['tags']:
+        for category in cats:
             self.feed_names['category'][category['term']] = self.ampReplace(category['label'])
 
         # Verify all categories are already in site tree map add any new ones to 'Other'

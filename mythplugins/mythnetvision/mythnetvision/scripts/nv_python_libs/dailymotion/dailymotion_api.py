@@ -20,7 +20,7 @@ meta data, video and image URLs from dailymotion. These routines are based on th
 for this api are published at http://www.dailymotion.com/ca-en/doc/api/player
 '''
 
-__version__="v0.2.1"
+__version__="v0.2.2"
 # 0.1.0 Initial development
 # 0.1.1 Added getting local directory images
 # 0.1.2 Documentation update
@@ -28,11 +28,12 @@ __version__="v0.2.1"
 # 0.2.1 New python bindings conversion
 #       Better exception error reporting
 #       Better handling of invalid unicode data from source
+# 0.2.2 Completed abort exception display message improvements
+#       Removed unused import of the feedparser library
 
 
 import os, struct, sys, re, time
 import urllib, urllib2
-import feedparser
 import logging
 
 try:
@@ -112,9 +113,9 @@ try:
 		else:
 			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
 	except Exception, e:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
 except Exception, e:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
 	mythdb = None
 
 from socket import gethostname, gethostbyname
@@ -771,8 +772,8 @@ class Videos(object):
         except DailymotionRssError, msg:
             sys.stderr.write(self.error_messages['DailymotionRssError'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\n" % title)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data == None:

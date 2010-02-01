@@ -36,7 +36,7 @@ metadata and video/image URLs from vimeo. These routines are based on the v2 api
 for this api are published at http://vimeo.com/api/docs/advanced-api
 '''
 
-__version__="v0.2.2"
+__version__="v0.2.3"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree view processing
 # 0.1.2 Documentation review
@@ -45,6 +45,9 @@ __version__="v0.2.2"
 # 0.2.2 New python bindings conversion
 #       Better exception error reporting
 #       Better handling of invalid unicode data from source
+# 0.2.3 Completed the exception error reporting improvements
+#       Fixed an exception message error when vimeo returns poorly formed XML.
+#       For example search term "flute" returns bad XML while "Flute music" returns proper XML
 
 """
 Python module to interact with Vimeo through its API (version 2)
@@ -124,8 +127,7 @@ class CurlyRequest:
                 raise Exception(err_code, err_msg, ET.tostring(t))
             return t
         except Exception,e:
-            code, msg, xml = e
-            raise Exception(u'%s - %s' % (code, __errmsgs__[code]))
+            raise Exception(u'%s' % (e))
 
     def _body_callback(self, buf):
         self.buf += buf
@@ -633,9 +635,9 @@ try:
 		else:
 			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
 	except Exception, e:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
 except Exception, e:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
 	mythdb = None
 
 from socket import gethostname, gethostbyname
@@ -1085,8 +1087,8 @@ class Videos(object):
         except VimeoException, msg:
             sys.stderr.write(self.error_messages['VimeoException'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\n" % title)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data == None:
@@ -1311,8 +1313,8 @@ class Videos(object):
             except VimeoException, msg:
                 sys.stderr.write(self.error_messages['VimeoException'] % msg)
                 sys.exit(1)
-            except:
-                sys.stderr.write(u"! Error: Unknown error during while getting all Channels (%s)\n" % self.dir_name)
+            except Exception, e:
+                sys.stderr.write(u"! Error: Unknown error during while getting all Channels (%s)\nError(%s)\n" % (self.dir_name, e))
                 sys.exit(1)
 
         if len(tmp_dictionary):

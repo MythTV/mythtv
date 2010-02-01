@@ -20,7 +20,7 @@ meta data, video and image URLs from blip.tv. These routines are based on the v2
 for this api are published at  http://blip.tv/about/api/
 '''
 
-__version__="v0.2.1"
+__version__="v0.2.2"
 # 0.1.0 Initial development
 # 0.1.1 Changed to use bliptv's rss data rather than JSON as JSON ad a number of error
 # 0.1.2 Changes Search to parse XML and added Tree view
@@ -30,10 +30,11 @@ __version__="v0.2.1"
 # 0.2.1 New python bindings conversion
 #       Better exception error reporting
 #       Better handling of invalid unicode data from source
+# 0.2.2 Completed exception message improvements
+#       Removed the unused import of the feedparser library
 
 import os, struct, sys, re, time
 import urllib, urllib2
-import feedparser
 import logging
 
 try:
@@ -90,9 +91,9 @@ try:
 		else:
 			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
 	except Exception, e:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
 except Exception, e:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
 	mythdb = None
 
 from socket import gethostname, gethostbyname
@@ -554,8 +555,8 @@ class Videos(object):
         except BliptvRssError, msg:
             sys.stderr.write(self.error_messages['BliptvRssError'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\n" % title)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data == None:

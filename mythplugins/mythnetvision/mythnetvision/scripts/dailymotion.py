@@ -27,10 +27,12 @@
 #-------------------------------------
 __title__ ="Dailymotion|ST";
 __author__="R.D.Vaughan"
-__version__="v0.2.0"
+__version__="v0.2.1"
 # 0.1.0 Initial development
 # 0.1.1 Update documentation
 # 0.2.0 Public release
+# 0.2.1 Improved the diplayed messages when exception occur
+
 
 __usage_examples__ ='''
 (Option Help)
@@ -195,12 +197,12 @@ sys.stderr = OutStreamEncoder(sys.stderr)
 # Verify that the tmdb_api modules are installed and accessable
 try:
     import nv_python_libs.dailymotion.dailymotion_api as target
-except Exception:
+except Exception, e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/dailymotion" containing the modules dailymotion_api.py (v0.2.0 or greater),
 They should have been included with the distribution of dailymotion.py.
-
-''')
+Error(%s)
+''' % e)
     sys.exit(1)
 
 if target.__version__ < '0.2.0':
@@ -211,11 +213,11 @@ if target.__version__ < '0.2.0':
 # Verify that the common process modules are installed and accessable
 try:
     import nv_python_libs.mainProcess as process
-except Exception:
+except Exception, e:
     sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
-
-''')
+Error(%s)
+''' % e)
     sys.exit(1)
 
 if process.__version__ < '0.2.0':

@@ -19,7 +19,7 @@ metadata, video and image URLs from Joost. These routines are based on the api. 
 for this api are published at http://www.joost.com/test/doc/api/
 '''
 
-__version__="v0.2.1"
+__version__="v0.2.2"
 # 0.1.0 Initial development - Tree View Processing
 # 0.1.1 Updated code and data structures to conform to the standard Tree view
 # 0.1.2 Documentation updates
@@ -27,11 +27,11 @@ __version__="v0.2.1"
 # 0.2.1 New python bindings conversion
 #       Better exception error reporting
 #       Better handling of invalid unicode data from source
+# 0.2.1 Removed and unused import of the feedparser library
 
 import os, struct, sys, re, time
 from datetime import datetime, timedelta
 import urllib, urllib2
-import feedparser
 import logging
 
 try:
@@ -111,9 +111,9 @@ try:
 		else:
 			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
 	except Exception, e:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
 except Exception, e:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
 	mythdb = None
 
 from socket import gethostname, gethostbyname

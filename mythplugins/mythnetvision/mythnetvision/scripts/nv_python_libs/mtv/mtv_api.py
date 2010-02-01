@@ -19,7 +19,7 @@ metadata, video and image URLs from MTV. These routines are based on the api. Sp
 for this api are published at http://developer.mtvnservices.com/docs
 '''
 
-__version__="v0.2.1"
+__version__="v0.2.2"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree View Processing
 # 0.1.2 Modified Reee view code and structure to be standandized across all grabbers
@@ -29,11 +29,12 @@ __version__="v0.2.1"
 # 0.2.1 New python bindings conversion
 #       Better exception error reporting
 #       Better handling of invalid unicode data from source
+# 0.2.2 Complete abort error message display improvements
+#       Removed the import and use of the feedparser library
 
 import os, struct, sys, re, time
 from datetime import datetime, timedelta
 import urllib, urllib2
-import feedparser
 import logging
 
 try:
@@ -91,9 +92,9 @@ try:
 		else:
 			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
 	except Exception, e:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
 except Exception, e:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
 	mythdb = None
 
 from socket import gethostname, gethostbyname
@@ -393,20 +394,43 @@ class Videos(object):
             print
 
         try:
-            data = feedparser.parse(url)
-        except ValueError, errormsg:
+            etree = XmlHandler(url).getEt()
+        except Exception, errormsg:
             raise MtvUrlError(self.error_messages['MtvUrlError'] % (url, errormsg))
 
-        if data.has_key('bozo'):
-            if data['bozo'] != 0:
-                raise MtvRssError(data['bozo_exception'])
-
-        if not len(data['entries']):
+        if etree is None:
             raise MtvVideoNotFound(u"No MTV Video matches found for search value (%s)" % title)
+
+        data = []
+        for entry in etree:
+            if not entry.tag.endswith('entry'):
+                continue
+            item = {}
+            for parts in entry:
+                if parts.tag.endswith('id'):
+                    item['id'] = parts.text
+                if parts.tag.endswith('title'):
+                    item['title'] = parts.text
+                if parts.tag.endswith('author'):
+                    for e in parts:
+                        if e.tag.endswith('name'):
+                            item['media_credit'] = e.text
+                            break
+                if parts.tag.endswith('published'):
+                    item['published_parsed'] = parts.text
+                if parts.tag.endswith('description'):
+                    item['media_description'] = parts.text
+            data.append(item)
+
+        # Make sure there are no item elements that are None
+        for item in data:
+            for key in item.keys():
+                if item[key] == None:
+                    item[key] = u''
 
         # Massage each field and eliminate any item without a URL
         elements_final = []
-        for item in data['entries']:
+        for item in data:
             if not 'id' in item.keys():
                 continue
 
@@ -417,8 +441,8 @@ class Videos(object):
                 sys.stderr.write(self.error_messages['MtvUrlError'] % msg)
             except MtvVideoDetailError, msg:
                 sys.stderr.write(self.error_messages['MtvVideoDetailError'] % msg)
-            except:
-                sys.stderr.write(u"! Error: Unknown error while retrieving a Video's meta data. Skipping video.' (%s)\n" % title)
+            except Exception, e:
+                sys.stderr.write(u"! Error: Unknown error while retrieving a Video's meta data. Skipping video.' (%s)\nError(%s)\n" % (title, e))
 
             if video_details:
                 for key in video_details.keys():
@@ -431,16 +455,20 @@ class Videos(object):
                         if item[key][0].has_key('language'):
                             if item[key][0]['language'] != None:
                                 item['language'] = item[key][0]['language']
-                if key == 'published_parsed':
-                    item[key] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', item[key])
+                if key == 'published_parsed': # '2009-12-21T00:00:00Z'
+                    if item[key]:
+                        pub_time = time.strptime(item[key].strip(), "%Y-%m-%dT%H:%M:%SZ")
+                        item[key] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
                     continue
                 if key == 'media_description' or key == 'title':
                     # Strip the HTML tags
-                    item[key] = self.massageDescription(item[key].strip())
-                    item[key] = item[key].replace(u'|', u'-')
+                    if item[key]:
+                        item[key] = self.massageDescription(item[key].strip())
+                        item[key] = item[key].replace(u'|', u'-')
                     continue
                 if type(item[key]) == type(u''):
-                    item[key] = item[key].replace('"\n',' ').strip()
+                    if item[key]:
+                        item[key] = item[key].replace('"\n',' ').strip()
             elements_final.append(item)
 
         if not len(elements_final):
@@ -534,8 +562,8 @@ class Videos(object):
         except MtvRssError, msg:
             sys.stderr.write(self.error_messages['MtvRssError'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\n" % title)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Video search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data == None:
@@ -698,7 +726,10 @@ class Videos(object):
             metadata['language'] = self.config['language']
             for e in elements:
                 if e.tag.endswith(u'title'):
-                    metadata['title'] = self.massageDescription(e.text.strip())
+                    if e.text != None:
+                        metadata['title'] = self.massageDescription(e.text.strip())
+                    else:
+                        metadata['title'] = u''
                     continue
                 if e.tag == u'content':
                     if e.text != None:
@@ -707,8 +738,11 @@ class Videos(object):
                         metadata['media_description'] = u''
                     continue
                 if e.tag.endswith(u'published'): # '2007-03-06T00:00:00Z'
-                    pub_time = time.strptime(e.text.strip(), "%Y-%m-%dT%H:%M:%SZ")
-                    metadata['published_parsed'] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
+                    if e.text != None:
+                        pub_time = time.strptime(e.text.strip(), "%Y-%m-%dT%H:%M:%SZ")
+                        metadata['published_parsed'] = time.strftime('%a, %d %b %Y %H:%M:%S GMT', pub_time)
+                    else:
+                        metadata['published_parsed'] = u''
                     continue
                 if e.tag.endswith(u'content') and e.text == None:
                     metadata['video'] =  self.ampReplace(e.get('url'))
@@ -731,7 +765,10 @@ class Videos(object):
                 if e.tag.endswith(u'author'):
                     for a in e:
                         if a.tag.endswith(u'name'):
-                            metadata['media_credit'] = self.massageDescription(a.text.strip())
+                            if a.text:
+                                metadata['media_credit'] = self.massageDescription(a.text.strip())
+                            else:
+                                metadata['media_credit'] = u''
                             break
                     continue
 

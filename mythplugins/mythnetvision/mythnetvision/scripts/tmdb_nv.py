@@ -135,7 +135,7 @@ except Exception, e:
 The subdirectory "tmdb" containing the modules tmdb_api.py (v0.1.1 or greater), tmdb_ui.py,
 tmdb_exceptions.py must have been installed with the MythTV python bindings.
 Error:(%s)
-''' %  u''.join([u'%s ' % x for x in e.args]))
+''' %  e)
     sys.exit(1)
 
 if target.__version__ < '0.1.3':
@@ -149,7 +149,7 @@ except Exception, e:
     sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
 Error:(%s)
-''' %  u''.join([u'%s ' % x for x in e.args]))
+''' %  e)
     sys.exit(1)
 
 if process.__version__ < '0.2.0':

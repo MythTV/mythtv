@@ -28,11 +28,12 @@
 #-------------------------------------
 __title__ ="Vimeo|ST";
 __author__="R.D.Vaughan"
-__version__="v0.2.0"
+__version__="v0.2.1"
 # 0.1.0 Initial development
 # 0.1.1 Added the Tree view option
 # 0.1.2 Documentation review
 # 0.2.0 Public release
+# 0.2.1 Improved error display messages on an exception abort
 
 __usage_examples__ ='''
 > ./vimeo.py -h
@@ -195,12 +196,12 @@ sys.stderr = OutStreamEncoder(sys.stderr)
 # Verify that the tmdb_api modules are installed and accessable
 try:
     import nv_python_libs.vimeo.vimeo_api as target
-except Exception:
+except Exception,e:
     sys.stderr.write('''
 The subdirectory "nv_python_libs/vimeo" containing the modules vimeo_api.py (v0.2.0 or greater),
 They should have been included with the distribution of vimeo.py.
-
-''')
+Error(%s)
+''' % e)
     sys.exit(1)
 
 if target.__version__ < '0.2.0':
@@ -215,11 +216,11 @@ import nv_python_libs.mainProcess as process
 # Verify that the common process modules are installed and accessable
 try:
     import nv_python_libs.mainProcess as process
-except Exception:
+except Exception, e:
     sys.stderr.write('''
 The python script "nv_python_libs/mainProcess.py" must be present.
-
-''')
+Error(%s)
+''' % e)
     sys.exit(1)
 
 if process.__version__ < '0.2.0':
