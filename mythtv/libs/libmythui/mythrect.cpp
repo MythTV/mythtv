@@ -63,8 +63,12 @@ void MythRect::CalculateArea(MythRect parentArea)
         Y = (int) (m_percentY * (float)m_parentArea.height());
     if (m_percentWidth > 0.0)
         w = (int) (m_percentWidth * (float)(m_parentArea.width() - X));
+    else if (w < 0)
+        w += m_parentArea.width() - X + 1;
     if (m_percentHeight > 0.0)
         h = (int) (m_percentHeight * (float)(m_parentArea.height() - Y));
+    else if (h < 0)
+        h += m_parentArea.height() - Y + 1;
 
     QRect::setRect(X,Y,w,h);
 
