@@ -124,7 +124,6 @@ class MythBE( FileOps ):
 
     def __del__(self):
         self.freeTuner()
-        MythBEConn.__del__(self)
 
     def getPendingRecordings(self):
         """
@@ -585,7 +584,7 @@ class Frontend(object):
         return re.findall('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)',
                         self.recv())
 
-class MythDB( MythDBConn ):
+class MythDB( MythDBBase ):
     """
     Several canned queries for general purpose access to the database
     """
@@ -758,7 +757,7 @@ class MythDB( MythDBConn ):
             hostname = 'NULL'
         self.settings[hostname][value] = data
 
-class MythVideo( MythDBConn ):
+class MythVideo( MythDBBase ):
     """
     Provides convenient methods to access the MythTV MythVideo database.
     """
@@ -766,7 +765,7 @@ class MythVideo( MythDBConn ):
         """
         Initialise the MythDB connection.
         """
-        MythDBConn.__init__(self,db)
+        MythDBBase.__init__(self,db)
 
         # check schema version
         self._check_schema('mythvideo.DBSchemaVer', 

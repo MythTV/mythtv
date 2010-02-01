@@ -28,7 +28,7 @@ def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
     'type' takes a 'r' or 'w'
     'nooverwrite' will refuse to open a file writable, if a local file is found.
     """
-    db = MythDBConn(db)
+    db = MythDBBase(db)
     log = MythLog('Python File Transfer', db=db)
     reuri = re.compile(\
         'myth://((?P<group>.*)@)?(?P<host>[a-zA-Z0-9\.]*)(:[0-9]*)?/(?P<file>.*)')
@@ -148,10 +148,10 @@ class FileTransfer( MythBEConn ):
 
         self.open = False
         # create control socket
-        self.control = MythBEConn(host, 'Playback', db=db)
+        self.control = MythBEBase(host, 'Playback', db=db)
         self.control.log.module = 'Python FileTransfer Control'
         # continue normal Backend initialization
-        MythBEConn.__init__(self, host, type, db=db, single=True)
+        MythBEConn.__init__(self, host, type, db=db)
         self.open = True
 
     def announce(self, type):
@@ -297,8 +297,8 @@ class FileTransfer( MythBEConn ):
                     ).split(BACKEND_SEP)
         self.pos = self.joinInt(int(res[0]),int(res[1]))
 
-class FileOps( MythBEConn ):
-    __doc__ = MythBEConn.__doc__+"""
+class FileOps( MythBEBase ):
+    __doc__ = MythBEBase.__doc__+"""
     Includes several canned file management tasks.
     """
     logmodule = 'Python Backend FileOps'
@@ -428,7 +428,7 @@ class Program( DictData ):
         return str(self).encode('utf-8')
 
     def __init__(self, raw, db=None):
-        self.db = MythDBConn(db)
+        self.db = MythDBBase(db)
         DictData.__init__(self, raw)
         self.filesize = self.joinInt(self.fs_high,self.fs_low)
 
@@ -1260,7 +1260,7 @@ class NetVisionGrabber( Grabber ):
 
     @staticmethod
     def grabberList(types='search,tree', db=None):
-        db = MythDBConn(db)
+        db = MythDBBase(db)
         db._check_schema('NetvisionDBSchemaVer',
                                 NVSCHEMA_VERSION, 'NetVision')
         c = db.cursor(self.log)
@@ -1284,7 +1284,7 @@ class NetVisionGrabber( Grabber ):
         if commandline:
             Grabber.__init__(path=commandline, db=db)
         else:
-            db = MythDBConn(db)
+            db = MythDBBase(db)
             self.log = MythLog(self.logmodule, db=self)
             if c.execute("""SELECT commandline
                             FROM netvision%sgrabbers

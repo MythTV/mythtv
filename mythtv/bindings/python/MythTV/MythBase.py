@@ -6,7 +6,7 @@ Provides base classes for accessing MythTV
 
 from MythStatic import *
 
-import os, re, socket, MySQLdb, MySQLdb.cursors, sys, locale
+import os, re, socket, MySQLdb, MySQLdb.cursors, sys, locale, weakref
 import xml.etree.cElementTree as etree
 from datetime import datetime
 from time import sleep, time
@@ -239,7 +239,7 @@ class DBData( DictData ):
         self.log = MythLog(self.logmodule, db=self.db)
 
     def __init__(self, data=None, db=None, raw=None):
-        self.__dict__['db'] = MythDBConn(db)
+        self.__dict__['db'] = MythDBBase(db)
         self.db._check_schema(self.schema_value, 
                                 self.schema_local, self.schema_name)
         self._setDefs()
@@ -471,7 +471,7 @@ class DBDataRef( object ):
         return self[self.field-1]
 
     def __init__(self,where,db=None):
-        self.db = MythDBConn(db)
+        self.db = MythDBBase(db)
         self._setDefs()
         self.where = tuple(where)
         self.dfield = list(self.db.tablefields[self.table])
@@ -599,7 +599,7 @@ class DBDataCRef( object ):
         return self[self.field-1]
 
     def __init__(self,where,db=None):
-        self.db = MythDBConn(db)
+        self.db = MythDBBase(db)
         self._setDefs()
         self.w_dat = tuple(where)
 
@@ -733,12 +733,44 @@ class MythDBCursor( MySQLdb.cursors.Cursor ):
 
 class MythDBConn( object ):
     """
-    MythDBConn(db=None, args=None, **kwargs) -> database connection object
+    This is the basic database connection object.
+    You dont want to use this directly.
+    """
+
+    def __init__(self, dbconn):
+        self.log = MythLog('Python Database Connection')
+        self.tablefields = {}
+        self.settings = {}
+        try:
+            self.log(MythLog.DATABASE, "Attempting connection", 
+                                                str(dbconn))
+            self.db = MySQLdb.connect(  user=   dbconn['DBUserName'],
+                                        host=   dbconn['DBHostName'],
+                                        passwd= dbconn['DBPassword'],
+                                        db=     dbconn['DBName'],
+                                        port=   dbconn['DBPort'],
+                                        use_unicode=True,
+                                        charset='utf8')
+        except:
+            raise MythDBError(MythError.DB_CONNECTION, dbconn)
+
+    def cursor(self, log=None, type=MythDBCursor):
+        self.db.ping(True)
+        c = self.db.cursor(type)
+        if log:
+            c.log = log
+        else:
+            c.log = self.log
+        return c
+
+class MythDBBase( object ):
+    """
+    MythDBBase(db=None, args=None, **kwargs) -> database connection object
 
     Basic connection to the mythtv database
     Offers connection caching to prevent multiple connections
 
-    'db' will accept an existing MythDBConn object, or any subclass there of
+    'db' will accept an existing MythDBBase object, or any subclass there of
     'args' will accept a tuple of 2-tuples for connection settings
     'kwargs' will accept a series of keyword arguments for connection settings
         'args' and 'kwargs' accept the following values:
@@ -757,7 +789,7 @@ class MythDBConn( object ):
     """
     logmodule = 'Python Database Connection'
     cursorclass = MythDBCursor
-    shared = {}
+    shared = weakref.WeakValueDictionary()
 
     def __repr__(self):
         return "<%s '%s' at %s>" % \
@@ -766,20 +798,19 @@ class MythDBConn( object ):
 
     class _TableFields(object):
         """Provides a dictionary-like list of table fieldnames"""
-        def __init__(self, parent, shared):
-            self._db = parent
-            self._log = parent.log
-            self._shared = shared
+        def __init__(self, db, log):
+            self._db = db
+            self._log = log
         def __getattr__(self,key):
             if key in self.__dict__:
                 return self.__dict__[key]
-            elif key in self._shared:
-                return self._shared[key]
+            elif key in self._db.tablefields:
+                return self._db.tablefields[key]
             else:
                 return self.__getitem__(key)
         def __getitem__(self,key):
-            if key in self._shared:
-                return self._shared[key]
+            if key in self._db.tablefields:
+                return self._db.tablefields[key]
             table_names = []
             c = self._db.cursor(self._log)
             try:
@@ -790,7 +821,7 @@ class MythDBConn( object ):
             for name in c.fetchall():
                 table_names.append(name[0])
             c.close()
-            self._shared[key] = tuple(table_names)
+            self._db.tablefields[key] = tuple(table_names)
             return table_names
 
     class _Settings(object):
@@ -799,24 +830,23 @@ class MythDBConn( object ):
             """Provides dictionary-like list of settings"""
             def __repr__(self):
                 return str(self._shared.keys())
-            def __init__(self, parent, host, shared):
-                self._db = parent
-                self._log = parent.log
+            def __init__(self, db, log, host):
+                self._db = db
+                self._log = log
                 self._host = host
-                self._shared = shared
             def __getattr__(self,name):
                 if name in self.__dict__:
                     return self.__dict__[name]
                 else:
                     return self.__getitem__(name)
             def __setattr__(self,name,value):
-                if name in ('_db','_host','_shared','_log'):
+                if name in ('_db','_host','_log'):
                     self.__dict__[name] = value
                 else:
                     self.__setitem__(name,value)
             def __getitem__(self,key):
-                if key in self._shared:
-                    return self._shared[key]
+                if key in self._db.settings[self._host]:
+                    return self._db.settings[self._host][key]
                 if self._host == 'NULL':
                     where = 'IS NULL'
                     wheredat = (key,)
@@ -830,36 +860,36 @@ class MythDBConn( object ):
                 row = c.fetchone()
                 c.close()
                 if row:
-                    self._shared[key] = row[0]
+                    self._db.settings[self._host][key] = row[0]
                     return row[0]
                 else:
                     return None
             def __setitem__(self, key, value):
-                if key not in self._shared:
+                if key not in self._db.settings[self._host]:
                     self.__getitem__(key)
                 c = self._db.cursor(self._log)
-                if key not in self._shared:
+                if key not in self._db.settings[self._host]:
                     c.execute("""INSERT INTO settings (value,data,hostname)
                                     (%s,%s,%s)""", (key, value, self._host))
                 else:
                     c.execute("""UPDATE settings SET data=%s
                                         WHERE value=%s AND hostname=%s""",
                                         (value, key, self._host))
-                self._shared[key] = value
+                self._db.settings[self._host][key] = value
         def __repr__(self):
-            return str(self._shared.keys())
-        def __init__(self, parent, shared):
-            self._parent = parent
-            self._shared = shared
+            return str(self._db.settings.keys())
+        def __init__(self, db, log):
+            self._db = db
+            self._log = log
         def __getattr__(self,key):
             if key in self.__dict__:
                 return self.__dict__[key]
             else:
                 return self.__getitem__(key)
         def __getitem__(self,key):
-            if key not in self._shared:
-                self._shared[key] = {}
-            return self.__Settings(self._parent, key, self._shared[key])
+            if key not in self._db.settings:
+                self._db.settings[key] = {}
+            return self.__Settings(self._db, self._log, key)
 
     def __init__(self, db=None, args=None, **dbconn):
         self.db = None
@@ -943,35 +973,20 @@ class MythDBConn( object ):
                 (dbconn['DBName'],dbconn['DBHostName'],dbconn['DBPort'])
         if self.ident in self.shared:
             # reuse existing database connection and update count
-            self.db = self.shared[self.ident][0]
-            self.shared[self.ident][1] += 1
+            self.db = self.shared[self.ident]
         else:
             # attempt new connection
-            self.connect()
+            self.db = MythDBConn(dbconn)
 
             # check schema version
             self._check_schema('DBSchemaVer',SCHEMA_VERSION)
 
             # add connection to cache
-            self.shared[self.ident] = [self.db, 1, {}, {}]
+            self.shared[self.ident] = self.db
 
         # connect to table name cache
-        self.tablefields = self._TableFields(self, self.shared[self.ident][2])
-        self.settings = self._Settings(self, self.shared[self.ident][3])
-
-    def connect(self):
-        try:
-            self.log(MythLog.DATABASE, "Attempting connection", 
-                                                str(self.dbconn))
-            self.db = MySQLdb.connect(  user=   self.dbconn['DBUserName'],
-                                        host=   self.dbconn['DBHostName'],
-                                        passwd= self.dbconn['DBPassword'],
-                                        db=     self.dbconn['DBName'],
-                                        port=   self.dbconn['DBPort'],
-                                        use_unicode=True,
-                                        charset='utf8')
-        except:
-            raise MythDBError(MythError.DB_CONNECTION, self.dbconn)
+        self.tablefields = self._TableFields(self.shared[self.ident], self.log)
+        self.settings = self._Settings(self.shared[self.ident], self.log)
 
     def _listenUPNP(self, pin, timeout):
         # open outbound socket
@@ -1115,58 +1130,21 @@ class MythDBConn( object ):
         return ret
 
     def cursor(self, log=None):
-        self.db.ping(True)
-        c = self.db.cursor(self.cursorclass)
-        if log:
-            c.log = log
-        else:
-            c.log = self.log
-        return c
-
-    def close(self): self.__del__()
-
-    def __del__(self):
-        if self.db is not None:
-            if self.ident in self.shared:
-                # decrement use count
-                self.shared[self.ident][1] -= 1
-                self.db = None
-
-                if not self.shared[self.ident][1]:
-                    # database connection no longer in use, close and delete it
-                    self.shared[self.ident][0].close()
-                    del self.shared[self.ident]
+        if not log:
+            log = self.log
+        return self.db.cursor(log, self.cursorclass)
 
 class MythBEConn( object ):
     """
-    MythBEConn(backend=None, type='Monitor', db=None, single=False)
-                                            -> MythBackend connection object
-
-    Basic class for mythbackend socket connections.
-    Offers connection caching to prevent multiple connections.
-
-    'backend' allows a hostname or IP address to connect to. If not provided,
-                connect will be made to the master backend. Port is always
-                taken from the database.
-    'db' allows an existing database object to be supplied.
-    'type' specifies the type of connection to declare to the backend. Accepts
-                'Monitor' or 'Playback'.
-    'single' allows one to force a new connection, rather than using the cache.
+    This is the basic backend connection object.
+    You probably dont want to use this directly.
     """
     logmodule = 'Python Backend Connection'
-    MYTHBECONN = {}
 
-    def __repr__(self):
-        return "<%s 'myth://%s:%d/' at %s>" % \
-                (str(self.__class__).split("'")[1].split(".")[-1], 
-                 self.host, self.port, hex(id(self)))
-
-    def __init__(self, backend=None, type='Monitor', db=None, single=False):
+    def __init__(self, backend, type, db=None):
         self.connected = False
-        self.db = MythDBConn(db)
+        self.db = MythDBBase(db)
         self.log = MythLog(self.logmodule, db=self.db)
-        self.single = single
-        self._ident = None
         if backend is None:
             # use master backend, no sanity checks, these should always be set
             self.host = self.db.settings.NULL.MasterServerIP
@@ -1193,16 +1171,6 @@ class MythBEConn( object ):
                                         'BackendServerPort', backend)
         self.port = int(self.port)
 
-        if not self.single:
-            self._ident = '%s@%s:%d' % (type, self.host, self.port)
-            if self._ident in self.MYTHBECONN:
-                self.socket = self.MYTHBECONN[self._ident][1]
-                self.MYTHBECONN[self._ident][0] += 1
-                self.log(MythLog.SOCKET, "Loading existing connection"\
-                        "%s:%d" % (self.host, self.port))
-                self.connected = True
-                return
-
         try:
             self.log(MythLog.SOCKET|MythLog.NETWORK,
                     "Connecting to backend %s:%d" % (self.host, self.port))
@@ -1211,7 +1179,6 @@ class MythBEConn( object ):
             self.socket.connect((self.host, self.port))
             self.check_version()
             self.announce(type)
-            self.hostname = self.backendCommand('QUERY_HOSTNAME')
             self.connected = True
         except socket.error, e:
             self.log(MythLog.IMPORTANT|MythLog.SOCKET,
@@ -1220,40 +1187,6 @@ class MythBEConn( object ):
             raise MythBEError(MythError.PROTO_CONNECTION, self.host, self.port)
         except:
             raise
-
-        if not self.single:
-            self.MYTHBECONN[self._ident] = [1, self.socket]
-
-    def __del__(self):
-        def disconnect(self):
-            self.log(MythLog.SOCKET|MythLog.NETWORK,
-                    "Terminating connection to %s:%d" % (self.host, self.port))
-            self.backendCommand('DONE')
-            self.socket.shutdown(1)
-            self.socket.close()
-            self.connected = False
-
-        if not 'connected' in self.__dict__:
-            return
-        if self.connected:
-            if self.single:
-                disconnect(self)
-            elif self.MYTHBECONN[self._ident][0] == 1:
-                disconnect(self)
-                del self.MYTHBECONN[self._ident]
-            else:
-                self.MYTHBECONN[self._ident][0] += -1
-                self.connected = False
-
-    def check_version(self):
-        res = self.backendCommand('MYTH_PROTO_VERSION %s' \
-                    % PROTO_VERSION).split(BACKEND_SEP)
-        if res[0] == 'REJECT':
-            self.log(MythLog.IMPORTANT|MythLog.NETWORK, 
-                            "Backend has version %s, and we speak %d" %\
-                            (res[1], PROTO_VERSION))
-            raise MythBEError(MythError.PROTO_MISMATCH,
-                                                int(res[1]), PROTO_VERSION)
 
     def announce(self,type):
         res = self.backendCommand('ANN %s %s 0' % (type, socket.gethostname()))
@@ -1265,6 +1198,17 @@ class MythBEConn( object ):
         else:
             self.log(MythLog.SOCKET,"Successfully connected to backend",
                                         "%s:%d" % (self.host, self.port))
+        self.hostname = self.backendCommand('QUERY_HOSTNAME')
+
+    def check_version(self):
+        res = self.backendCommand('MYTH_PROTO_VERSION %s' \
+                    % PROTO_VERSION).split(BACKEND_SEP)
+        if res[0] == 'REJECT':
+            self.log(MythLog.IMPORTANT|MythLog.NETWORK, 
+                            "Backend has version %s, and we speak %d" %\
+                            (res[1], PROTO_VERSION))
+            raise MythBEError(MythError.PROTO_MISMATCH,
+                                                int(res[1]), PROTO_VERSION)
 
     def backendCommand(self, data):
         """
@@ -1298,6 +1242,56 @@ class MythBEConn( object ):
         self.socket.send(command)
         return recv()
 
+    def __del__(self):
+        if self.connected:
+            self.log(MythLog.SOCKET|MythLog.NETWORK,
+                    "Terminating connection to %s:%d" % (self.host, self.port))
+            self.backendCommand('DONE')
+            self.socket.shutdown(1)
+            self.socket.close()
+            self.connected = False
+
+class MythBEBase( object ):
+    """
+    MythBEBase(backend=None, type='Monitor', db=None, single=False)
+                                            -> MythBackend connection object
+
+    Basic class for mythbackend socket connections.
+    Offers connection caching to prevent multiple connections.
+
+    'backend' allows a hostname or IP address to connect to. If not provided,
+                connect will be made to the master backend. Port is always
+                taken from the database.
+    'db' allows an existing database object to be supplied.
+    'type' specifies the type of connection to declare to the backend. Accepts
+                'Monitor' or 'Playback'.
+    """
+    logmodule = 'Python Backend Connection'
+    shared = weakref.WeakValueDictionary()
+
+    def __repr__(self):
+        return "<%s 'myth://%s:%d/' at %s>" % \
+                (str(self.__class__).split("'")[1].split(".")[-1], 
+                 self.be.host, self.be.port, hex(id(self)))
+
+    def __init__(self, backend=None, type='Monitor', db=None):
+        self.db = MythDBBase(db)
+        self.log = MythLog(self.logmodule, db=self.db)
+        self._ident = '%s@%s' % (type, backend)
+        if self._ident in self.shared:
+            self.be = self.shared[self._ident]
+        else:
+            self.be = MythBEConn(backend, type, db)
+            self.shared[self._ident] = self.be
+
+    def backendCommand(self, data):
+        """
+        obj.backendCommand(data) -> response string
+
+        Sends a formatted command via a socket to the mythbackend.
+        """
+        return self.be.backendCommand(data)
+
     def joinInt(self,high,low):
         """obj.joinInt(high, low) -> 64-bit int, from two signed ints"""
         return (high + (low<0))*2**32 + low
@@ -1323,7 +1317,7 @@ class MythXMLConn( object ):
                  self.host, self.port, hex(id(self)))
 
     def __init__(self, backend=None, db=None):
-        db = MythDBConn(db)
+        db = MythDBBase(db)
         self.log = MythLog('Python XML Connection', db=db)
         if backend is None:
             # use master backend
@@ -1503,7 +1497,7 @@ class MythLog( object ):
         self.module = module
         self.db = db
         if self.db:
-            self.db = MythDBConn(self.db)
+            self.db = MythDBBase(self.db)
         if (logfile is not None) and (self.LOGFILE is None):
             self.LOGFILE = open(logfile,'w')
 
@@ -1566,7 +1560,7 @@ class MythLog( object ):
 
         if dblevel is not None:
             if self.db is None:
-                self.db = MythDBConn()
+                self.db = MythDBBase()
             c = self.db.cursor(self.log)
             c.execute("""INSERT INTO mythlog (module,   priority,   logdate,
                                               host,     message,    details)
@@ -1708,7 +1702,7 @@ class StorageGroup( DBData ):
         else:
             self.local = False
 
-class Grabber( MythDBConn ):
+class Grabber( MythDBBase ):
     """
     Grabber(path=None, setting=None, db=None) -> Grabber object
 
@@ -1718,7 +1712,7 @@ class Grabber( MythDBConn ):
     logmodule = 'Python Metadata Grabber'
 
     def __init__(self, path=None, setting=None, db=None):
-        MythDBConn.__init__(self, db=db)
+        MythDBBase.__init__(self, db=db)
         self.log = MythLog(self.logmodule, db=self)
         self.path = ''
         if path:
