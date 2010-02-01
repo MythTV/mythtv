@@ -92,6 +92,7 @@ class D3D9Video
 class VideoOutputD3D : public VideoOutput
 {
   public:
+    static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
     VideoOutputD3D();
    ~VideoOutputD3D();
 

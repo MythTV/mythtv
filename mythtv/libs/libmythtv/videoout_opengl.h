@@ -9,6 +9,7 @@
 class VideoOutputOpenGL : public VideoOutput
 {
   public:
+    static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
     VideoOutputOpenGL();
    ~VideoOutputOpenGL();
 

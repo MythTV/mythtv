@@ -55,6 +55,47 @@ extern "C" {
 
 static QString to_comma_list(const QStringList &list);
 
+void VideoOutput::GetRenderOptions(render_opts &opts)
+{
+    QStringList cpudeints;
+    cpudeints += "onefield";
+    cpudeints += "linearblend";
+    cpudeints += "kerneldeint";
+    cpudeints += "kerneldoubleprocessdeint";
+    cpudeints += "greedyhdeint";
+    cpudeints += "greedyhdoubleprocessdeint";
+    cpudeints += "yadifdeint";
+    cpudeints += "yadifdoubleprocessdeint";
+    cpudeints += "fieldorderdoubleprocessdeint";
+    cpudeints += "none";
+
+    VideoOutputNull::GetRenderOptions(opts, cpudeints);
+
+#ifdef USING_DIRECTFB
+    VideoOutputDirectfb::GetRenderOptions(opts, cpudeints);
+#endif // USING_DIRECTFB
+
+#ifdef USING_MINGW
+    VideoOutputD3D::GetRenderOptions(opts, cpudeints);
+#endif
+
+#ifdef USING_XV
+    VideoOutputXv::GetRenderOptions(opts, cpudeints);
+#endif // USING_XV
+
+#ifdef Q_OS_MACX
+    VideoOutputQuartz::GetRenderOptions(opts, cpudeints);
+#endif // Q_OS_MACX
+
+#ifdef USING_OPENGL_VIDEO
+    VideoOutputOpenGL::GetRenderOptions(opts, cpudeints);
+#endif // USING_OPENGL_VIDEO
+
+#ifdef USING_VDPAU
+    VideoOutputVDPAU::GetRenderOptions(opts);
+#endif // USING_VDPAU
+}
+
 /**
  * \brief  Depending on compile-time configure settings and run-time
  *         renderer settings, create a relevant VideoOutput subclass.

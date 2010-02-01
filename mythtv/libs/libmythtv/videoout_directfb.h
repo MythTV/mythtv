@@ -11,6 +11,7 @@ class QSize;
 class VideoOutputDirectfb: public VideoOutput
 {
   public:
+    static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
     VideoOutputDirectfb();
     ~VideoOutputDirectfb();
 

@@ -12,6 +12,21 @@ const int kPrebufferFramesNormal = 12;
 const int kPrebufferFramesSmall = 4;
 const int kKeepPrebuffer = 2;
 
+void VideoOutputNull::GetRenderOptions(render_opts &opts,
+                                       QStringList &cpudeints)
+{
+    opts.renderers->append("null");
+    opts.deints->insert("null", cpudeints);
+    (*opts.osds)["null"].append("softblend");
+    (*opts.safe_renderers)["dummy"].append("null");
+    (*opts.safe_renderers)["nuppel"].append("null");
+    if (opts.decoders->contains("ffmpeg"))
+        (*opts.safe_renderers)["ffmpeg"].append("null");
+    if (opts.decoders->contains("libmpeg2"))
+        (*opts.safe_renderers)["libmpeg2"].append("null");
+    opts.priorities->insert("null", 10);
+}
+
 VideoOutputNull::VideoOutputNull(void) :
     VideoOutput(), global_lock(QMutex::Recursive)
 {

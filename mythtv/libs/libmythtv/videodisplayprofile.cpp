@@ -6,6 +6,8 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdb.h"
 #include "mythverbose.h"
+#include "videooutbase.h"
+#include "avformatdecoder.h"
 
 bool ProfileItem::IsMatch(const QSize &size, float rate) const
 {
@@ -207,6 +209,7 @@ safe_map_t  VideoDisplayProfile::safe_equiv_dec;
 safe_list_t VideoDisplayProfile::safe_custom;
 priority_map_t VideoDisplayProfile::safe_renderer_priority;
 pref_map_t  VideoDisplayProfile::dec_name;
+safe_list_t VideoDisplayProfile::safe_decoders;
 
 VideoDisplayProfile::VideoDisplayProfile()
     : lock(QMutex::Recursive), last_size(0,0), last_rate(0.0f),
@@ -436,7 +439,13 @@ item_list_t VideoDisplayProfile::LoadDB(uint groupid)
             if (profileid)
             {
                 tmp.SetProfileID(profileid);
-                list.push_back(tmp);
+                QString error;
+                bool valid = tmp.IsValid(&error);
+                if (valid)
+                    list.push_back(tmp);
+                else
+                    VERBOSE(VB_PLAYBACK, LOC + QString("Ignoring profile item %1 (%2)")
+                        .arg(profileid).arg(error));
             }
             tmp.Clear();
             profileid = query.value(0).toUInt();
@@ -446,7 +455,13 @@ item_list_t VideoDisplayProfile::LoadDB(uint groupid)
     if (profileid)
     {
         tmp.SetProfileID(profileid);
-        list.push_back(tmp);
+        QString error;
+        bool valid = tmp.IsValid(&error);
+        if (valid)
+            list.push_back(tmp);
+        else
+            VERBOSE(VB_PLAYBACK, LOC + QString("Ignoring profile item %1 (%2)")
+                .arg(profileid).arg(error));
     }
 
     sort(list.begin(), list.end());
@@ -595,20 +610,13 @@ bool VideoDisplayProfile::SaveDB(uint groupid, item_list_t &items)
 
 QStringList VideoDisplayProfile::GetDecoders(void)
 {
-    QStringList list;
-
-    list += "ffmpeg";
-    list += "libmpeg2";
-    list += "xvmc";
-    list += "xvmc-vld";
-    list += "macaccel";
-    list += "vdpau";
-
-    return list;
+    init_statics();
+    return safe_decoders;
 }
 
 QStringList VideoDisplayProfile::GetDecoderNames(void)
 {
+    init_statics();
     QStringList list;
 
     const QStringList decs = GetDecoders();
@@ -745,6 +753,7 @@ QString VideoDisplayProfile::GetDeinterlacerName(const QString short_name)
 
 QStringList VideoDisplayProfile::GetProfiles(const QString &hostname)
 {
+    init_statics();
     QStringList list;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -1481,66 +1490,6 @@ QString VideoDisplayProfile::toString(void) const
         .arg(renderer).arg(osd).arg(deint0).arg(deint1).arg(filter);
 }
 
-/*
-// Decoders
-"dummy"
-"nuppel"
-"ffmpeg"
-"libmpeg2"
-"xvmc"
-"xvmc-vld"
-"macaccel"
-"vdpau"
-
-// Video Renderers
-"null"
-"xlib"
-"xshm"
-"xv-blit"
-"xvmc-blit"
-"directfb"
-"quartz-blit"
-"quartz-accel"
-"opengl"
-"vdpau"
-
-// OSD Renderers
-"chromakey"
-"softblend"
-"ia44blend"
-"opengl2"
-"opengl3"
-"vdpau"
-
-// deinterlacers
-"none"
-"onefield"
-"bobdeint"
-"linearblend"
-"kerneldeint"
-"kerneldoubleprocessdeint"
-"greedyhdeint"
-"greedyhdoubleprocessdeint"
-"yadifdeint"
-"yadifdoubleprocessdeint"
-"fieldorderdoubleprocessdeint"
-"opengllinearblend"
-"openglkerneldeint"
-"openglonefield"
-"openglbobdeint"
-"openglyadif"
-"opengldoubleratelinearblend"
-"opengldoubleratekerneldeint"
-"opengldoubleratefieldorder"
-"opengldoublerateyadif"
-"vdpauonefield"
-"vdpaubobdeint"
-"vdpaubasic"
-"vdpauadvanced"
-"vdpaubasicdoublerate"
-"vdpauadvanceddoublerate"
-*/
-
 void VideoDisplayProfile::init_statics(void)
 {
     if (safe_initialized)
@@ -1548,124 +1497,21 @@ void VideoDisplayProfile::init_statics(void)
 
     safe_initialized = true;
 
-    safe_custom += "null";
-    safe_custom += "xlib";
-    safe_custom += "xshm";
-    safe_custom += "directfb";
-    safe_custom += "direct3d";
-    safe_custom += "quartz-blit";
-    safe_custom += "xv-blit";
-    safe_custom += "opengl";
+    render_opts options;
+    options.renderers      = &safe_custom;
+    options.safe_renderers = &safe_renderer;
+    options.deints         = &safe_deint;
+    options.osds           = &safe_osd;
+    options.render_group   = &safe_renderer_group;
+    options.priorities     = &safe_renderer_priority;
+    options.decoders       = &safe_decoders;
+    options.equiv_decoders = &safe_equiv_dec;
 
-    safe_list_t::const_iterator it;
-    for (it = safe_custom.begin(); it != safe_custom.end(); ++it)
-    {
-        safe_deint[*it] += "onefield";
-        safe_deint[*it] += "linearblend";
-        safe_deint[*it] += "kerneldeint";
-        safe_deint[*it] += "kerneldoubleprocessdeint";
-        safe_deint[*it] += "greedyhdeint";
-        safe_deint[*it] += "greedyhdoubleprocessdeint";
-        safe_deint[*it] += "yadifdeint";
-        safe_deint[*it] += "yadifdoubleprocessdeint";
-        safe_deint[*it] += "fieldorderdoubleprocessdeint";
-        safe_deint[*it] += "none";
-        safe_osd[*it]   += "softblend";
-    }
+    // N.B. assumes NuppelDecoder and DummyDecoder always present
+    AvFormatDecoder::GetDecoders(options);
+    VideoOutput::GetRenderOptions(options);
 
-    // allow vdpau filters
-    safe_custom += "vdpau";
-
-    safe_deint["xv-blit"]   += "bobdeint";
-    safe_deint["xvmc-blit"] += "bobdeint";
-    safe_deint["xvmc-blit"] += "onefield";
-    safe_deint["xvmc-blit"] += "none";
-    safe_osd["xv-blit"]     += "chromakey";
-    safe_osd["xvmc-blit"]   += "chromakey";
-
-    safe_deint["opengl"] += "opengllinearblend";
-    safe_deint["opengl"] += "openglonefield";
-    safe_deint["opengl"] += "openglkerneldeint";
-    safe_deint["opengl"] += "bobdeint";
-    safe_deint["opengl"] += "openglbobdeint";
-    safe_deint["opengl"] += "opengldoubleratelinearblend";
-    safe_deint["opengl"] += "opengldoubleratekerneldeint";
-    safe_deint["opengl"] += "opengldoubleratefieldorder";
-    safe_deint["opengl"] += "opengldoublerateyadif";
-    safe_deint["opengl"] += "openglyadif";
-
-    safe_deint["vdpau"] += "none";
-    safe_deint["vdpau"] += "vdpauonefield";
-    safe_deint["vdpau"] += "vdpaubobdeint";
-    safe_deint["vdpau"] += "vdpaubasic";
-    safe_deint["vdpau"] += "vdpauadvanced";
-    safe_deint["vdpau"] += "vdpaubasicdoublerate";
-    safe_deint["vdpau"] += "vdpauadvanceddoublerate";
-
-    safe_osd["xv-blit"]     += "softblend";
-    safe_osd["xvmc-blit"]   += "chromakey";
-    safe_osd["xvmc-blit"]   += "ia44blend";
-    safe_osd["opengl"]      += "opengl2";
-    safe_osd["quartz-accel"]+= "opengl3";
-    safe_osd["vdpau"]       += "vdpau";
-    safe_osd["direct3d"]    += "direct3d";
-
-    // These video renderers do not support deinterlacing in MythTV
-    safe_deint["quartz-accel"] += "none";
-
-    QStringList tmp;
-    tmp += "dummy";
-    tmp += "nuppel";
-    tmp += "ffmpeg";
-    tmp += "libmpeg2";
-    QStringList::const_iterator it2;
-    for (it2 = tmp.begin(); it2 != tmp.end(); ++it2)
-    {
-        safe_renderer[*it2] += "null";
-        safe_renderer[*it2] += "xlib";
-        safe_renderer[*it2] += "xshm";
-        safe_renderer[*it2] += "directfb";
-        safe_renderer[*it2] += "direct3d";
-        safe_renderer[*it2] += "quartz-blit";
-        safe_renderer[*it2] += "xv-blit";
-        safe_renderer[*it2] += "opengl";
-        safe_renderer[*it2] += "vdpau";
-    }
-
-    safe_renderer["dummy"]    += "xvmc-blit";
-    safe_renderer["xvmc"]     += "xvmc-blit";
-    safe_renderer["xvmc-vld"] += "xvmc-blit";
-
-    safe_renderer["dummy"]    += "quartz-accel";
-    safe_renderer["macaccel"] += "quartz-accel";
-    safe_renderer["vdpau"]    += "vdpau";
-
-    safe_renderer_priority["null"]         =  10;
-    safe_renderer_priority["xlib"]         =  20;
-    safe_renderer_priority["xshm"]         =  30;
-    safe_renderer_priority["xv-blit"]      =  90;
-    safe_renderer_priority["xvmc-blit"]    = 110;
-    safe_renderer_priority["vdpau"]        = 120;
-    safe_renderer_priority["directfb"]     =  60;
-    safe_renderer_priority["direct3d"]     =  55;
-    safe_renderer_priority["quartz-blit"]  =  70;
-    safe_renderer_priority["quartz-accel"] =  80;
-
-    safe_equiv_dec["ffmpeg"]   += "nuppel";
-    safe_equiv_dec["libmpeg2"] += "nuppel";
-    safe_equiv_dec["libmpeg2"] += "ffmpeg";
-
-    safe_equiv_dec["ffmpeg"]   += "dummy";
-    safe_equiv_dec["libmpeg2"] += "dummy";
-    safe_equiv_dec["xvmc"]     += "dummy";
-    safe_equiv_dec["xvmc-vld"] += "dummy";
-    safe_equiv_dec["macaccel"] += "dummy";
-    safe_equiv_dec["vdpau"]    += "dummy";
-
-    safe_renderer_group["x11"] += "xlib";
-    safe_renderer_group["x11"] += "xshm";
-    safe_renderer_group["x11"] += "xv-blit";
-    safe_renderer_group["x11"] += "xvmc-blit";
-    safe_renderer_group["quartz"] += "quartz-blit";
-    safe_renderer_group["quartz"] += "quartz-accel";
+    foreach(QString decoder, safe_decoders)
+        VERBOSE(VB_PLAYBACK, LOC + QString("decoder<->render support: %1%2")
+            .arg(decoder, -12).arg(GetVideoRenderers(decoder).join(" ")));
 }

@@ -20,7 +20,7 @@ extern "C" {
 #include "videoouttypes.h"
 #include "videooutwindow.h"
 #include "DisplayRes.h"
-
+#include "videodisplayprofile.h"
 using namespace std;
 
 class NuppelVideoPlayer;
@@ -28,7 +28,6 @@ class OSD;
 class OSDSurface;
 class FilterChain;
 class FilterManager;
-class VideoDisplayProfile;
 class OpenGLContextGLX;
 
 typedef QMap<NuppelVideoPlayer*,PIPLocation> PIPMap;
@@ -43,6 +42,7 @@ class VideoOutput
     friend class OpenGLVideoSync;
 
   public:
+    static void GetRenderOptions(render_opts &opts);
     static VideoOutput *Create(
         const QString &decoder,   MythCodecID  codec_id,
         void          *codec_priv,
@@ -240,7 +240,6 @@ class VideoOutput
     virtual void SetPIPState(PIPState setting);
 
     virtual QString GetOSDRenderer(void) const;
-
 
     QString GetFilters(void) const;
     /// \brief translates caption/dvd button rectangle into 'screen' space

@@ -88,6 +88,70 @@ const char *vr_str[] =
     "xvmc",
 };
 
+void VideoOutputXv::GetRenderOptions(render_opts &opts,
+                                     QStringList &cpudeints)
+{
+    opts.renderers->append("xlib");
+    opts.renderers->append("xshm");
+    opts.renderers->append("xv-blit");
+
+    opts.deints->insert("xlib", cpudeints);
+    opts.deints->insert("xshm", cpudeints);
+    opts.deints->insert("xv-blit", cpudeints);
+    (*opts.deints)["xv-blit"].append("bobdeint");
+
+    (*opts.osds)["xlib"].append("softblend");
+    (*opts.osds)["xshm"].append("softblend");
+    (*opts.osds)["xv-blit"].append("softblend");
+    (*opts.osds)["xv-blit"].append("chromakey");
+
+    (*opts.safe_renderers)["dummy"].append("xlib");
+    (*opts.safe_renderers)["dummy"].append("xshm");
+    (*opts.safe_renderers)["dummy"].append("xv-blit");
+    (*opts.safe_renderers)["nuppel"].append("xlib");
+    (*opts.safe_renderers)["nuppel"].append("xshm");
+    (*opts.safe_renderers)["nuppel"].append("xv-blit");
+
+    (*opts.render_group)["x11"].append("xlib");
+    (*opts.render_group)["x11"].append("xshm");
+    (*opts.render_group)["x11"].append("xv-blit");
+
+    opts.priorities->insert("xlib", 20);
+    opts.priorities->insert("xshm", 30);
+    opts.priorities->insert("xv-blit", 90);
+
+    if (opts.decoders->contains("ffmpeg"))
+    {
+        (*opts.safe_renderers)["ffmpeg"].append("xlib");
+        (*opts.safe_renderers)["ffmpeg"].append("xshm");
+        (*opts.safe_renderers)["ffmpeg"].append("xv-blit");
+    }
+    if (opts.decoders->contains("libmpeg2"))
+    {
+        (*opts.safe_renderers)["libmpeg2"].append("xlib");
+        (*opts.safe_renderers)["libmpeg2"].append("xshm");
+        (*opts.safe_renderers)["libmpeg2"].append("xv-blit");
+    }
+
+#ifdef USING_XVMC
+    if (opts.decoders->contains("xvmc"))
+    {
+        (*opts.deints)["xvmc-blit"].append("bobdeint");
+        (*opts.deints)["xvmc-blit"].append("onefield");
+        (*opts.deints)["xvmc-blit"].append("none");
+        (*opts.osds)["xvmc-blit"].append("chromakey");
+        (*opts.osds)["xvmc-blit"].append("ia44blend");
+        (*opts.safe_renderers)["dummy"].append("xvmc-blit");
+        (*opts.safe_renderers)["xvmc"].append("xvmc-blit");
+        (*opts.render_group)["x11"].append("xvmc-blit");
+        opts.priorities->insert("xvmc-blit", 110);
+    }
+    if (opts.decoders->contains("xvmc-vld"))
+        (*opts.safe_renderers)["xvmc-vld"].append("xvmc-blit");
+#endif
+
+}
+
 /** \class  VideoOutputXv
  *  \brief Supports common video output methods used with %X11 Servers.
  *

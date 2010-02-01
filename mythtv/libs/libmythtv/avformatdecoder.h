@@ -9,6 +9,7 @@
 #include "decoderbase.h"
 #include "vbilut.h"
 #include "H264Parser.h"
+#include "videodisplayprofile.h"
 
 extern "C" {
 #include "frame.h"
@@ -70,11 +71,11 @@ class AudioInfo
 
 /// The AvFormatDecoder is used to decode non-NuppleVideo files.
 /// It's used as a decoder of last resort after trying the NuppelDecoder
-/// and IvtvDecoder (if "USING_IVTV" is defined).
 class AvFormatDecoder : public DecoderBase
 {
     friend void HandleStreamChange(void*);
   public:
+    static void GetDecoders(render_opts &opts);
     AvFormatDecoder(NuppelVideoPlayer *parent, const ProgramInfo &pginfo,
                     bool use_null_video_out, bool allow_libmpeg2 = true,
                     bool no_hardware_decode = false);

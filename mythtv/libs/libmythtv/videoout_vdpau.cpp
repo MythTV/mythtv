@@ -20,6 +20,32 @@
       return; \
   }
 
+void VideoOutputVDPAU::GetRenderOptions(render_opts &opts)
+{
+    opts.renderers->append("vdpau");
+    (*opts.osds)["vdpau"].append("vdpau");
+    if (opts.decoders->contains("vdpau"))
+        (*opts.safe_renderers)["vdpau"].append("vdpau");
+    if (opts.decoders->contains("ffmpeg"))
+        (*opts.safe_renderers)["ffmpeg"].append("vdpau");
+    if (opts.decoders->contains("libmpeg2"))
+        (*opts.safe_renderers)["libmpeg2"].append("vdpau");
+
+    (*opts.safe_renderers)["dummy"].append("vdpau");
+    (*opts.safe_renderers)["nuppel"].append("vdpau");
+
+    opts.priorities->insert("vdpau", 120);
+    QStringList deints;
+    deints += "none";
+    deints += "vdpauonefield";
+    deints += "vdpaubobdeint";
+    deints += "vdpaubasic";
+    deints += "vdpauadvanced";
+    deints += "vdpaubasicdoublerate";
+    deints += "vdpauadvanceddoublerate";
+    opts.deints->insert("vdpau", deints);
+}
+
 VideoOutputVDPAU::VideoOutputVDPAU(MythCodecID codec_id)
   : VideoOutput(),
     m_codec_id(codec_id),    m_win(0),         m_render(NULL),

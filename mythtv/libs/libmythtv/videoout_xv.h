@@ -50,6 +50,7 @@ class VideoOutputXv : public VideoOutput
     friend class ChromaKeyOSD;
     friend class XvMCOSD;
   public:
+    static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
     VideoOutputXv(MythCodecID av_codec_id);
    ~VideoOutputXv();
 

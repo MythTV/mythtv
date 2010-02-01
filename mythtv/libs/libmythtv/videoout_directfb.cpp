@@ -259,6 +259,21 @@ void DirectfbData::DeleteBuffers(VideoBuffers &vbuffers)
     buffers.clear();
 }
 
+void VideoOutputDirectfb::GetRenderOptions(render_opts &opts,
+                                           QStringList &cpudeints)
+{
+    opts.renderers->append("directfb");
+    opts.deints->insert("directfb", cpudeints);
+    (*opts.osds)["directfb"].append("softblend");
+    (*opts.safe_renderers)["dummy"].append("directfb");
+    (*opts.safe_renderers)["nuppel"].append("directfb");
+    if (opts.decoders->contains("ffmpeg"))
+        (*opts.safe_renderers)["ffmpeg"].append("directfb");
+    if (opts.decoders->contains("libmpeg2"))
+        (*opts.safe_renderers)["libmpeg2"].append("directfb");
+    opts.priorities->insert("directfb", 60);
+}
+
 VideoOutputDirectfb::VideoOutputDirectfb(void)
     : VideoOutput(), XJ_started(false), widget(NULL),
       data(new DirectfbData())

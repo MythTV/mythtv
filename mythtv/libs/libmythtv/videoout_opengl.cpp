@@ -12,6 +12,32 @@
 #define LOC      QString("VidOutOGL: ")
 #define LOC_ERR  QString("VidOutOGL: ")
 
+void VideoOutputOpenGL::GetRenderOptions(render_opts &opts,
+                                         QStringList &cpudeints)
+{
+    opts.renderers->append("opengl");
+    opts.deints->insert("opengl", cpudeints);
+    (*opts.deints)["opengl"].append("opengllinearblend");
+    (*opts.deints)["opengl"].append("openglonefield");
+    (*opts.deints)["opengl"].append("openglkerneldeint");
+    (*opts.deints)["opengl"].append("bobdeint");
+    (*opts.deints)["opengl"].append("openglbobdeint");
+    (*opts.deints)["opengl"].append("opengldoubleratelinearblend");
+    (*opts.deints)["opengl"].append("opengldoubleratekerneldeint");
+    (*opts.deints)["opengl"].append("opengldoubleratefieldorder");
+    (*opts.deints)["opengl"].append("opengldoublerateyadif");
+    (*opts.deints)["opengl"].append("openglyadif");
+    (*opts.osds)["opengl"].append("softblend");
+    (*opts.osds)["opengl"].append("opengl2");
+    (*opts.safe_renderers)["dummy"].append("opengl");
+    (*opts.safe_renderers)["nuppel"].append("opengl");
+    if (opts.decoders->contains("ffmpeg"))
+        (*opts.safe_renderers)["ffmpeg"].append("opengl");
+    if (opts.decoders->contains("libmpeg2"))
+        (*opts.safe_renderers)["libmpeg2"].append("opengl");
+    opts.priorities->insert("opengl", 65);
+}
+
 VideoOutputOpenGL::VideoOutputOpenGL(void)
     : VideoOutput(),
     gl_context_lock(QMutex::Recursive),

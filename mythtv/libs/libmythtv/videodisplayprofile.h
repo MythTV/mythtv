@@ -18,6 +18,18 @@ typedef QMap<QString,QStringList> safe_map_t;
 typedef QStringList               safe_list_t;
 typedef QMap<QString,uint>        priority_map_t;
 
+struct render_opts
+{
+    safe_list_t    *renderers;
+    safe_map_t     *safe_renderers;
+    safe_map_t     *deints;
+    safe_map_t     *osds;
+    safe_map_t     *render_group;
+    priority_map_t *priorities;
+    safe_list_t    *decoders;
+    safe_map_t     *equiv_decoders;
+};
+
 class ProfileItem
 {
   public:
@@ -183,6 +195,7 @@ class MPUBLIC VideoDisplayProfile
     static safe_list_t  safe_custom;
     static priority_map_t safe_renderer_priority;
     static pref_map_t   dec_name;
+    static safe_list_t  safe_decoders;
 };
 
 #endif // _VIDEO_DISPLAY_PROFILE_H_

@@ -932,6 +932,22 @@ const int kKeepPrebuffer = 2;
 #define LOC_WARN QString("VideoOutputD3D Warning: ")
 #define LOC_ERR  QString("VideoOutputD3D Error: ")
 
+void VideoOutputD3D::GetRenderOptions(render_opts &opts,
+                                      QStringList &cpudeints)
+{
+    opts.renderers->append("direct3d");
+    opts.deints->insert("direct3d", cpudeints);
+    (*opts.osds)["direct3d"].append("softblend");
+    (*opts.osds)["direct3d"].append("direct3d");
+    (*opts.safe_renderers)["dummy"].append("direct3d");
+    (*opts.safe_renderers)["nuppel"].append("direct3d");
+    if (opts.decoders->contains("ffmpeg"))
+        (*opts.safe_renderers)["ffmpeg"].append("direct3d");
+    if (opts.decoders->contains("libmpeg2"))
+        (*opts.safe_renderers)["libmpeg2"].append("direct3d");
+    opts.priorities->insert("direct3d", 55);
+}
+
 VideoOutputD3D::VideoOutputD3D(void)
   : VideoOutput(),         m_lock(QMutex::Recursive),
     m_hWnd(NULL),          m_ctx(NULL),

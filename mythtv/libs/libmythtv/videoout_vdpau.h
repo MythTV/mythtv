@@ -15,6 +15,7 @@ struct vdpauPIP
 class VideoOutputVDPAU : public VideoOutput
 {
   public:
+    static void GetRenderOptions(render_opts &opts);
     VideoOutputVDPAU(MythCodecID codec_id);
     ~VideoOutputVDPAU();
     bool Init(int width, int height, float aspect, WId winid,

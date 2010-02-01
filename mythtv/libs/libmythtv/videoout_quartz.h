@@ -9,6 +9,7 @@ struct QuartzData;
 class VideoOutputQuartz : public VideoOutput
 {
   public:
+    static void GetRenderOptions(render_opts &opts, QStringList &cpudeints);
     VideoOutputQuartz(MythCodecID av_codec_id, void *codec_priv);
    ~VideoOutputQuartz();
 

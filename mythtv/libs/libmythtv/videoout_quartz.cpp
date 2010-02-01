@@ -1077,6 +1077,34 @@ class VoqvDesktop : public VideoOutputQuartzView
     };
 };
 
+void VideoOutputQuartz::GetRenderOptions(render_opts &opts,
+                                         QStringList &cpudeints)
+{
+    opts.renderers->append("quartz-blit");
+    opts.deints->insert("quartz-blit", cpudeints);
+    (*opts.osds)["quartz-blit"].append("softblend");
+    (*opts.safe_renderers)["dummy"].append("quartz-blit");
+    (*opts.safe_renderers)["nuppel"].append("quartz-blit");
+    if (opts.decoders->contains("ffmpeg"))
+        (*opts.safe_renderers)["ffmpeg"].append("quartz-blit");
+    if (opts.decoders->contains("libmpeg2"))
+        (*opts.safe_renderers)["libmpeg2"].append("quartz-blit");
+    (*opts.render_group)["quartz"].append("quartz-blit");
+    opts.priorities->insert("quartz-blit", 70);
+
+#ifdef USING_DVDV
+    if (opts.decoders->contains("macaccel"))
+    {
+        opts.deints->insert("quartz-accel", "none");
+        (*opts.osds)["quartz-accel"].append("opengl3");
+        opts.priorities->insert("quartz-accel", 80);
+        (*opts.safe_renderers)["macaccel"].append("quartz-accel");
+        (*opts.safe_renderers)["dummy"].append("quartz-accel");
+        (*opts.render_group)["quartz"].append("quartz-accel");
+    }
+#endif
+}
+
 /** \class VideoOutputQuartz
  *  \brief Implementation of Quartz (Mac OS X windowing system) video output
  */

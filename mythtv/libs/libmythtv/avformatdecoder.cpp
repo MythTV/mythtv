@@ -433,6 +433,34 @@ bool AvFormatDecoderPrivate::SetVideoSize(const QSize &video_dim)
     return true;
 }
 
+void AvFormatDecoder::GetDecoders(render_opts &opts)
+{
+    opts.decoders->append("ffmpeg");
+    opts.decoders->append("libmpeg2");
+    (*opts.equiv_decoders)["ffmpeg"].append("nuppel");
+    (*opts.equiv_decoders)["libmpeg2"].append("nuppel");
+    (*opts.equiv_decoders)["libmpeg2"].append("ffmpeg");
+    (*opts.equiv_decoders)["ffmpeg"].append("dummy");
+    (*opts.equiv_decoders)["libmpeg2"].append("dummy");
+
+#ifdef USING_XVMC
+    opts.decoders->append("xvmc");
+    opts.decoders->append("xvmc-vld");
+    (*opts.equiv_decoders)["xvmc"].append("dummy");
+    (*opts.equiv_decoders)["xvmc-vld"].append("dummy");
+#endif
+
+#ifdef USING_DVDV
+    opts.decoders->append("macaccel");
+    (*opts.equiv_decoders)["macaccel"].append("dummy");
+#endif
+
+#ifdef USING_VDPAU
+    opts.decoders->append("vdpau");
+    (*opts.equiv_decoders)["vdpau"].append("dummy");
+#endif
+}
+
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                                  const ProgramInfo &pginfo,
                                  bool use_null_videoout,
