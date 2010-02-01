@@ -95,14 +95,17 @@ void JobQueue::customEvent(QEvent *e)
                 jobID = GetJobID(tokens[2].toInt(), tokens[3],
                                  QDateTime::fromString(tokens[4], Qt::ISODate));
 
+            runningJobsLock->lock();
             if (!runningJobs.contains(jobID))
             {
                 msg = QString("Unable to determine jobID for message: "
                               "%1.  Program will not be flagged.")
                               .arg(message);
                 VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+                runningJobsLock->unlock();
                 return;
             }
+            runningJobsLock->unlock();
 
             msg = QString("Received message '%1'").arg(message);
             VERBOSE(VB_JOBQUEUE, LOC + msg);
@@ -271,17 +274,23 @@ void JobQueue::ProcessQueue(void)
                 }
 
                 // Check to see if there was a previous job that is not done
-                if ((inTimeWindow) &&
-                    (jobStatus.contains(jobID)) &&
-                    (!(jobStatus[jobID] & JOB_DONE)))
+                if (inTimeWindow)
                 {
-                    message = QString("Skipping '%1' job for %2, "
-                                      "there is another job for "
-                                      "this recording with a status of '%3'")
-                                      .arg(JobText(jobs[x].type)).arg(logInfo)
-                                      .arg(StatusText(jobStatus[jobID]));
-                    VERBOSE(VB_JOBQUEUE, LOC + message);
-                    continue;
+                    int otherJobID = GetRunningJobID(jobs[x].chanid,
+                                                     jobs[x].starttime);
+                    if (otherJobID && (jobStatus.contains(otherJobID)) &&
+                        (!(jobStatus[otherJobID] & JOB_DONE)))
+                    {
+                        message =
+                            QString("Skipping '%1' job for %2, "
+                                    "Job ID %3 is already running for "
+                                    "this recording with a status of '%4'")
+                                    .arg(JobText(jobs[x].type)).arg(logInfo)
+                                    .arg(otherJobID)
+                                    .arg(StatusText(jobStatus[otherJobID]));
+                        VERBOSE(VB_JOBQUEUE, LOC + message);
+                        continue;
+                    }
                 }
 
                 jobStatus[jobID] = status;
@@ -994,6 +1003,27 @@ bool JobQueue::ChangeJobArgs(int jobID, QString args)
     }
 
     return true;
+}
+
+int JobQueue::GetRunningJobID(const QString &chanid, const QDateTime &starttime)
+{
+    runningJobsLock->lock();
+    QMap<int, RunningJobInfo>::iterator it = runningJobs.begin();
+    for (; it != runningJobs.end(); ++it)
+    {
+        RunningJobInfo jInfo = *it;
+
+        if ((jInfo.pginfo->chanid == chanid) &&
+            (jInfo.pginfo->recstartts == starttime))
+        {
+            runningJobsLock->unlock();
+
+            return jInfo.id;
+        }
+    }
+    runningJobsLock->unlock();
+
+    return 0;
 }
 
 bool JobQueue::IsJobRunning(int jobType, QString chanid, QDateTime starttime)
@@ -1804,6 +1834,7 @@ void *JobQueue::TranscodeThread(void *param)
 void JobQueue::DoTranscodeThread(int jobID)
 {
     // We can't currently transcode non-recording files w/o a ProgramInfo
+    runningJobsLock->lock();
     if (!runningJobs[jobID].pginfo)
     {
         VERBOSE(VB_JOBQUEUE, LOC_ERR +
@@ -1811,10 +1842,13 @@ void JobQueue::DoTranscodeThread(int jobID)
                 "have a chanid/starttime in the recorded table.");
         ChangeJobStatus(jobID, JOB_ERRORED, "ProgramInfo data not found");
         RemoveRunningJob(jobID);
+        runningJobsLock->unlock();
         return;
     }
 
     ProgramInfo *program_info = runningJobs[jobID].pginfo;
+    runningJobsLock->unlock();
+
     QString subtitle;
     
     if (!program_info->subtitle.isEmpty())
@@ -1837,6 +1871,7 @@ void JobQueue::DoTranscodeThread(int jobID)
     QString path;
     QString command;
 
+    runningJobsLock->lock();
     if (runningJobs[jobID].command == "mythtranscode")
     {
         path = GetInstallPrefix() + "/bin/mythtranscode";
@@ -1853,6 +1888,7 @@ void JobQueue::DoTranscodeThread(int jobID)
         if (!tokens.empty())
             path = tokens[0];
     }
+    runningJobsLock->unlock();
 
     if (jobQueueCPU < 2)
         myth_nice(17);
@@ -2034,6 +2070,7 @@ void *JobQueue::FlagCommercialsThread(void *param)
 void JobQueue::DoFlagCommercialsThread(int jobID)
 {
     // We can't currently commflag non-recording files w/o a ProgramInfo
+    runningJobsLock->lock();
     if (!runningJobs[jobID].pginfo)
     {
         VERBOSE(VB_JOBQUEUE, LOC_ERR +
@@ -2041,10 +2078,13 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
                 "have a chanid/starttime in the recorded table.");
         ChangeJobStatus(jobID, JOB_ERRORED, "ProgramInfo data not found");
         RemoveRunningJob(jobID);
+        runningJobsLock->unlock();
         return;
     }
 
     ProgramInfo *program_info = runningJobs[jobID].pginfo;
+    runningJobsLock->unlock();
+
     QString subtitle;
     
     if (!program_info->subtitle.isEmpty())
@@ -2081,6 +2121,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     QString path;
     QString command;
 
+    runningJobsLock->lock();
     if (runningJobs[jobID].command == "mythcommflag")
     {
         path = GetInstallPrefix() + "/bin/mythcommflag";
@@ -2094,6 +2135,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
         if (!tokens.empty())
             path = tokens[0];
     }
+    runningJobsLock->unlock();
 
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'").arg(command));
 
@@ -2171,8 +2213,11 @@ void *JobQueue::UserJobThread(void *param)
 
 void JobQueue::DoUserJobThread(int jobID)
 {
+    runningJobsLock->lock();
     ProgramInfo *pginfo = runningJobs[jobID].pginfo;
     QString jobDesc = runningJobs[jobID].desc;
+    QString command = runningJobs[jobID].command;
+    runningJobsLock->unlock();
 
     ChangeJobStatus(jobID, JOB_RUNNING);
 
@@ -2202,16 +2247,15 @@ void JobQueue::DoUserJobThread(int jobID)
     }
 
     VERBOSE(VB_JOBQUEUE, LOC + QString("Running command: '%1'")
-                                       .arg(runningJobs[jobID].command));
-
-    int result = myth_system(runningJobs[jobID].command);
+                                       .arg(command));
+    int result = myth_system(command);
 
     if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
         msg = QString("User Job '%1' failed, unable to find "
                       "executable, check your PATH and backend logs.")
-                      .arg(runningJobs[jobID].command);
+                      .arg(command);
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
         VERBOSE(VB_IMPORTANT, LOC + QString("Current PATH: '%1'")
                                             .arg(getenv("PATH")));
@@ -2224,7 +2268,7 @@ void JobQueue::DoUserJobThread(int jobID)
     }
     else if (result != 0)
     {
-        msg = QString("User Job '%1' failed.").arg(runningJobs[jobID].command);
+        msg = QString("User Job '%1' failed.").arg(command);
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
 
         gContext->LogEntry("jobqueue", LP_WARNING, "User Job Errored", msg);

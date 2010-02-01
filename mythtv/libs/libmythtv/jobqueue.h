@@ -142,6 +142,7 @@ class MPUBLIC JobQueue : public QObject
                               QString args = "");
     static bool IsJobQueuedOrRunning(int jobType, QString chanid,
                                      QDateTime starttime);
+    int GetRunningJobID(const QString &chanid, const QDateTime &starttime);
     static bool IsJobRunning(int jobType, QString chanid,
                              QDateTime starttime);
     static bool IsJobRunning(int jobType, const ProgramInfo *pginfo);
