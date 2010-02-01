@@ -545,6 +545,7 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     audio_lock.lock();
     if (audioOutput && unpauseaudio)
         audio_paused = false;
+    
     audio_lock.unlock();
     if (player_ctx->buffer)
         player_ctx->buffer->Unpause();
@@ -578,9 +579,11 @@ bool NuppelVideoPlayer::IsPaused(bool *is_pause_still_possible)
 void NuppelVideoPlayer::PauseVideo(bool wait)
 {
     QMutexLocker locker(&pauseUnpauseLock);
+    
     if (wait)
-      video_actually_paused = false;
+        video_actually_paused = false;
     pausevideo = true;
+    
     for (uint i = 0; wait && !video_actually_paused; i++)
     {
         videoThreadPaused.wait(&pauseUnpauseLock, 250);
@@ -2594,9 +2597,11 @@ void NuppelVideoPlayer::AVSync(void)
                         "\t\t\tdoubling video frame interval to slow down.").arg(diverge));
     }
 
+    audio_lock.lock();
     if (audioOutput && normal_speed)
     {
         long long currentaudiotime = audioOutput->GetAudiotime();
+        audio_lock.unlock();
 #if 0
         VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, QString(
                     "A/V timecodes audio %1 video %2 frameinterval %3 "
@@ -2659,7 +2664,9 @@ void NuppelVideoPlayer::AVSync(void)
             avsync_avg = 0;
             avsync_oldavg = 0;
         }
-    }
+    } 
+    else
+        audio_lock.unlock();
 }
 
 void NuppelVideoPlayer::ShutdownAVSync(void)
