@@ -217,8 +217,9 @@ VideoOutputXv::~VideoOutputXv()
     DeleteBuffers(VideoOutputSubType(), true);
 
     // ungrab port...
-    if (xv_port >= 0)
+    if (xv_port >= 0 && XJ_started)
     {
+        XLOCK(disp, XvStopVideo(disp->GetDisplay(), xv_port, XJ_curwin));
         UngrabXvPort(disp, xv_port);
         xv_port = -1;
     }
