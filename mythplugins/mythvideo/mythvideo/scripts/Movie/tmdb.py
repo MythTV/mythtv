@@ -30,7 +30,7 @@
 #-------------------------------------
 __title__ ="TheMovieDB APIv2 Query";
 __author__="R.D.Vaughan"
-__version__="v0.1.7"
+__version__="v0.1.8"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 New movie data fields now have proper key names
@@ -46,6 +46,7 @@ __version__="v0.1.7"
 # 0.1.6 Stopped stderr output when any TMDB meta data search or access does not find anything.
 #       This was causing issues for MythVideo.
 # 0.1.7 Change over to the installed TMDB api library
+# 0.1.8 Improved displayed messages on an exception abort
 
 
 __usage_examples__='''
@@ -205,7 +206,7 @@ except Exception, e:
 The subdirectory "tmdb" containing the modules tmdb_api.py (v0.1.3 or greater), tmdb_ui.py,
 tmdb_exceptions.py must have been installed with the MythTV python bindings.
 Error:(%s)
-''' %  u''.join([u'%s ' % x for x in e.args]))
+''' %  e)
     sys.exit(1)
 
 if tmdb_api.__version__ < '0.1.3':
@@ -297,8 +298,8 @@ class moviedbQueries():
         except TmdbUiAbort, msg:
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Title search (%s)\n" % title)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Title search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data != None:
@@ -333,8 +334,8 @@ class moviedbQueries():
         except TmdbUiAbort, msg:
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a People search\n")
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a People search for (%s)\nError(%s)\n" % (persons_name, e))
             sys.exit(1)
     # end moviePeople()
 
@@ -394,8 +395,8 @@ class moviedbQueries():
         except TmdbUiAbort, msg:
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Movie (%s) information display\n" % tmdb_id)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Movie (%s) information display\nError(%s)\n" % (tmdb_id, e))
             sys.exit(1)
     # end movieData()
 
@@ -419,8 +420,8 @@ class moviedbQueries():
         except TmdbUiAbort, msg:
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Person (%s) information display\n" % person_id)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Person (%s) information display\n" % (person_id, e))
             sys.exit(1)
 
         if data == None:
@@ -479,8 +480,8 @@ class moviedbQueries():
         except TmdbUiAbort, msg:
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Hash value Movie information display\n")
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Hash value Movie information display for (%s)\nError(%s)\n" % (hash_value, e))
             sys.exit(1)
     # end hashData()
 

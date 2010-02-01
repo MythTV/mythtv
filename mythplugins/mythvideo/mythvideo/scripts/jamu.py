@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.5"
+__version__=u"v0.6.6"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -286,7 +286,9 @@ __version__=u"v0.6.5"
  #       for a movie.
  #       Jamu will now download the top rated TV Series season coverart and banner images. This enhancement
  #       matches MythVideo processing.
- # 0.6.5 Small fix related to the bindings changes
+ # 0.6.5 Small fix related to the bindings changes.
+ # 0.6.6 Fixed Exception messages
+ #       Change all occurances of 'mythbeconn.host' to 'mythbeconn.hostname' to be consistent with bindings
 
 
 usage_txt=u'''
@@ -460,7 +462,7 @@ sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 try:
     import xml
 except Exception, e:
-    print '''The python module xml must be installed. error(%s)''' % u''.join([u'%s ' % x for x in e.args])
+    print '''The python module xml must be installed. error(%s)''' % e
     sys.exit(1)
 if xml.__version__ < u'41660':
     print '''
@@ -493,7 +495,7 @@ try:
         else:
             print u'\n! Warning - Check that (%s) is correctly configured\n' % filename
     except Exception, e:
-        print u"\n! Warning - Creating an instance caused an error for one of: MythDB or MythVideo, error(%s)\n" % u''.join([u'%s ' % x for x in e.args])
+        print u"\n! Warning - Creating an instance caused an error for one of: MythDBConn or MythVideo, error(%s)\n" % e
     try:
         MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
         mythbeconn = MythBE(backend=localhostname, db=mythdb)
@@ -503,7 +505,7 @@ try:
         print u'! Warning - %s' % e.args[0]
         mythbeconn = None
 except Exception, e:
-    print u"\n! Warning - MythTV python bindings could not be imported, error(%s)\n" % u''.join([u'%s ' % x for x in e.args])
+    print u"\n! Warning - MythTV python bindings could not be imported, error(%s)\n" % e
     mythdb = None
     mythvideo = None
     mythbeconn = None
@@ -526,7 +528,7 @@ except Exception, e:
 The modules tvdb_api.py (v1.0.0 or greater), tvdb_ui.py, tvdb_exceptions.py and cache.py.
 They should have been installed along with the MythTV python bindings.
 Error(%s)
-''' % u''.join([u'%s ' % x for x in e.args])
+''' % e
     sys.exit(1)
 
 
@@ -538,7 +540,7 @@ except Exception, e:
 The subdirectory "tmdb" containing the modules tmdb_api.py (v0.1.3 or greater), tmdb_ui.py,
 tmdb_exceptions.py must have been installed with the MythTV python bindings.
 Error:(%s)
-''' %  u''.join([u'%s ' % x for x in e.args]))
+''' %  e)
     sys.exit(1)
 
 if tmdb_api.__version__ < '0.1.3':
@@ -552,7 +554,7 @@ try:            # Check if the installation is equiped to directly search IMDB f
 except ImportError, e:
     sys.stderr.write("\n! Error: To search for movies movies the IMDbPy library must be installed."\
         "Check your installation's repository or check the following link."\
-        "from (http://imdbpy.sourceforge.net/?page=download)\nError:(%s)\n" % u''.join([u'%s ' % x for x in e.args]))
+        "from (http://imdbpy.sourceforge.net/?page=download)\nError:(%s)\n" % e)
     sys.exit(1)
 
 if imdb_lib:
@@ -656,7 +658,7 @@ def _getFileList(dst):
             for filename in os.listdir(directory):
                 names.append(os.path.join(directory, filename))
     except OSError, e:
-        sys.stderr.write(u"\n! Error: Getting a list of files for directory (%s)\nThis is most likely a 'Permission denied' error\nError:(%s)\n\n" % (dst, u''.join([u'%s ' % x for x in e.args])))
+        sys.stderr.write(u"\n! Error: Getting a list of files for directory (%s)\nThis is most likely a 'Permission denied' error\nError:(%s)\n\n" % (dst, e))
         return file_list
 
     for video_file in names:
@@ -1401,7 +1403,7 @@ class Configuration(object):
         try:
             localip = gethostbyname(localhostname) # Get the local hosts IP address
         except Exception, e:
-            sys.stderr.write("\n! Error: There is no valid address-to-host mapping for the host (%s)\nThe Jamu Janitor (-MJ) option cannot be used while this issue remains un-resolved.\nError:(%s)\n" % (localhostname, u''.join([u'%s ' % x for x in e.args])))
+            sys.stderr.write("\n! Error: There is no valid address-to-host mapping for the host (%s)\nThe Jamu Janitor (-MJ) option cannot be used while this issue remains un-resolved.\nError:(%s)\n" % (localhostname, e))
             sys.exit(1)
 
         # Get all curently mounted NFS shares
@@ -1689,7 +1691,7 @@ class Configuration(object):
 the fetched poster images.
 
 In Debian/Ubuntu it is packaged as 'python-imaging'.
-http://www.pythonware.com/products/pil/\nError:(%s)\n""" % u''.join([u'%s ' % x for x in e.args]))
+http://www.pythonware.com/products/pil/\nError:(%s)\n""" % e)
                 sys.exit(1)
 
         if not _can_int(self.config['min_poster_size']):
@@ -2049,7 +2051,7 @@ class Tvdatabase(object):
         try:
             dat = urllib.urlopen(url).read()
         except IOError, e:
-            sys.stderr.write( u"\n! Warning: Download IOError on URL for Filename(%s)\nOrginal URL(%s)\nIOError urllib.quote URL(%s)\nError:(%s)\n" % (OutputFileName, org_url, url, u''.join([u'%s ' % x for x in e.args])))
+            sys.stderr.write( u"\n! Warning: Download IOError on URL for Filename(%s)\nOrginal URL(%s)\nIOError urllib.quote URL(%s)\nError:(%s)\n" % (OutputFileName, org_url, url, e))
             return False
 
         try:
@@ -2057,14 +2059,14 @@ class Tvdatabase(object):
             target_socket.write(dat)
             target_socket.close()
         except IOError, e:
-            sys.stderr.write( u"\n! Warning: Download IOError for Filename(%s), may be the directory is invalid\nError:(%s)\n" % (OutputFileName, u''.join([u'%s ' % x for x in e.args])))
+            sys.stderr.write( u"\n! Warning: Download IOError for Filename(%s), may be the directory is invalid\nError:(%s)\n" % (OutputFileName, e))
             return False
 
         # Verify that the downloaded file was NOT HTML instead of the intended file
         try:
             p = subprocess.Popen(u'file "%s"' % OutputFileName, shell=True, bufsize=4096, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True)
         except Exception, e:
-            sys.stderr.write( u"\n! Warning: Download Exception for Filename(%s)\nError:(%s)\n" % (OutputFileName, u''.join([u'%s ' % x for x in e.args])))
+            sys.stderr.write( u"\n! Warning: Download Exception for Filename(%s)\nError:(%s)\n" % (OutputFileName, e))
             return False
         except:
             return False
@@ -2640,7 +2642,7 @@ class Tvdatabase(object):
             try:
                 allmatchingseries = self.config['tvdb_api']._getSeries(self.config['series_name'])
             except Exception, e:
-                sys.stderr.write(u"\nErrors while trying to contact thetvbd.com for Series (%s)\ntherefore a file rename is not possible. error(%s)\n\n" % (self.config['series_name'], u''.join([u'%s ' % x for x in e.args])))
+                sys.stderr.write(u"\nErrors while trying to contact thetvbd.com for Series (%s)\ntherefore a file rename is not possible. error(%s)\n\n" % (self.config['series_name'], e))
                 return False
             if filter(is_not_punct_char, allmatchingseries['name'].lower()) == filter(is_not_punct_char, self.config['series_name'].lower()):
                 self.config['sid'] = allmatchingseries['sid']
@@ -3362,7 +3364,7 @@ class MythTvMetaData(VideoFiles):
             self._displayMessage(u"0-tmdb %s for Movie not found(%s)(%s)" % (graphic_name, cfile['filename'], cfile['inetref']))
             return None
         except Exception, e:
-            self._displayMessage(u"themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_name, u''.join([u'%s ' % x for x in e.args])))
+            self._displayMessage(u"themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_name, e))
             return None
 
         if results != None:
@@ -3431,10 +3433,10 @@ class MythTvMetaData(VideoFiles):
                         try:
                             results = self.config['tmdb_api'].searchTMDB(cfile['inetref'])
                         except TmdbMovieOrPersonNotFound, e:
-                            self._displayMessage(u"\n! Warning: Secondary themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_type, u''.join([u'%s ' % x for x in e.args])))
+                            self._displayMessage(u"\n! Warning: Secondary themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_type, e))
                             return None
                         except Exception, e:
-                            self._displayMessage(u"\n! Warning: Secondary themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_type, u''.join([u'%s ' % x for x in e.args])))
+                            self._displayMessage(u"\n! Warning: Secondary themoviedb.com error for Movie(%s) graphics(%s), error(%s)" % (cfile['file_seriesname'], graphic_type, e))
                             return None
                         if results == None:
                             return None
@@ -3623,10 +3625,10 @@ class MythTvMetaData(VideoFiles):
                         try:
                             results = self.config['tmdb_api'].searchTMDB(cfile['inetref'])
                         except TmdbMovieOrPersonNotFound, e:
-                            self._displayMessage(u"Secondary metadata themoviedb.com error for Movie(%s), error(%s)" % (cfile['file_seriesname'], u''.join([u'%s ' % x for x in e.args])))
+                            self._displayMessage(u"Secondary metadata themoviedb.com error for Movie(%s), error(%s)" % (cfile['file_seriesname'], e))
                             return available_metadata
                         except Exception, e:
-                            self._displayMessage(u"Secondary metadata themoviedb.com error for Movie(%s), error(%s)" % (cfile['file_seriesname'], u''.join([u'%s ' % x for x in e.args])))
+                            self._displayMessage(u"Secondary metadata themoviedb.com error for Movie(%s), error(%s)" % (cfile['file_seriesname'], e))
                             return available_metadata
                         if results == None:
                             return available_metadata
@@ -3741,7 +3743,7 @@ class MythTvMetaData(VideoFiles):
             self._displayMessage(u"0-tmdb Movie not found(%s)(%s) meta data dictionary cannot be returned" % (cfile['filename'], cfile['inetref']))
             return self._getSecondarySourceMetadata(cfile, available_metadata)
         except Exception, e:
-            self._displayMessage(u"themoviedb.com error for Movie(%s)(%s) meta data dictionary cannot be returned, error(%s)" % (cfile['filename'], cfile['inetref'], u''.join([u'%s ' % x for x in e.args])))
+            self._displayMessage(u"themoviedb.com error for Movie(%s)(%s) meta data dictionary cannot be returned, error(%s)" % (cfile['filename'], cfile['inetref'], e))
             return self._getSecondarySourceMetadata(cfile, available_metadata)
 
         if meta_dict == None:
@@ -3845,7 +3847,7 @@ class MythTvMetaData(VideoFiles):
             try:
                 allmatchingseries = self.config['tvdb_api']._getSeries(self.config['series_name'])
             except Exception, e:
-                self._displayMessage(u"tvdb Series not found(%s) or connection issues with thetvdb.com web site.\nError:(%s)\n" % (cfile['filename'], u''.join([u'%s ' % x for x in e.args])))
+                self._displayMessage(u"tvdb Series not found(%s) or connection issues with thetvdb.com web site.\nError:(%s)\n" % (cfile['filename'], e))
                 return None
             if filter(is_not_punct_char, allmatchingseries['name'].lower()) == filter(is_not_punct_char,cfile['file_seriesname'].lower()):
                 self.config['sid'] = allmatchingseries['sid']
@@ -3911,7 +3913,7 @@ class MythTvMetaData(VideoFiles):
             try:
                 allmatchingseries = self.config['tvdb_api']._getSeries(self.config['series_name'])
             except Exception, e:
-                self._displayMessage(u"tvdb Series not found(%s) or there are connection problems with thetvdb.com\nError(%s)" % (cfile['filename'], u''.join([u'%s ' % x for x in e.args])))
+                self._displayMessage(u"tvdb Series not found(%s) or there are connection problems with thetvdb.com\nError(%s)" % (cfile['filename'], e))
                 return None
             if filter(is_not_punct_char, allmatchingseries['name'].lower()) == filter(is_not_punct_char,cfile['file_seriesname'].lower()):
                 self.config['sid'] = allmatchingseries['sid']
@@ -4933,7 +4935,7 @@ class MythTvMetaData(VideoFiles):
 
         # Get pending recordings
         try:
-            progs = MythBE(backend=mythbeconn.host, db=mythbeconn.db).getUpcomingRecordings()
+            progs = MythBE(backend=mythbeconn.hostname, db=mythbeconn.db).getUpcomingRecordings()
         except MythError, e:
             sys.stderr.write(u"\n! Error: Getting Upcoming Recordings list: %s\n" % e.args[0])
             return programs
@@ -4959,7 +4961,7 @@ class MythTvMetaData(VideoFiles):
 
         # Get recorded table field names:
         try:
-            recordedlist = MythBE(backend=mythbeconn.host, db=mythbeconn.db).getRecordings()
+            recordedlist = MythBE(backend=mythbeconn.hostname, db=mythbeconn.db).getRecordings()
         except MythError, e:
             sys.stderr.write(u"\n! Error: Getting recorded programs list: %s\n" % e.args[0])
             return programs
@@ -5698,7 +5700,7 @@ class MythTvMetaData(VideoFiles):
                                             os.rename(graphic_file, dest)
                                     except IOError, e:
                                         sys.stderr.write(
-                                            u"Renaming image file (%s) to (%s) failed, error(%s)\n" % (graphic_file, dest, u''.join([u'%s ' % x for x in e.args])))
+                                            u"Renaming image file (%s) to (%s) failed, error(%s)\n" % (graphic_file, dest, e))
 
                                     self._displayMessage(u"Renamed (%s) to (%s)\n" % (graphic_file, tv_series_format % (filepath, inetref+self.graphic_suffix[graphic_type], ext)))
                                 available_metadata[graphic_type]= self.rtnRelativePath(dest,  graphicsDirectories[graphic_type])
@@ -5866,7 +5868,7 @@ class MythTvMetaData(VideoFiles):
                                                     available_metadata[graphic_type] = self.rtnRelativePath(newFilename,  graphicsDirectories[graphic_type])
                                                 except IOError, e:
                                                     sys.stderr.write(
-                                                        u"IOError coping (%s) to (%s)\nError:(%s)\n" % (tmp_fullfilename, newFilename, u''.join([u'%s ' % x for x in e.args])))
+                                                        u"IOError coping (%s) to (%s)\nError:(%s)\n" % (tmp_fullfilename, newFilename, e))
                                         else: # Try a secondary source
                                             dummy = self._getSecondarySourceGraphics(cfile, graphic_type)
                                             if dummy:
@@ -5896,7 +5898,7 @@ class MythTvMetaData(VideoFiles):
                                                 num_fanart_downloads+=1
                                             except IOError, e:
                                                 sys.stderr.write(
-                                                    u"IOError coping (%s) to (%s)\nError:(%s)\n" % (self.rtnAbsolutePath(tmp, graphicsDirectories[graphic_type]), newFilename, u''.join([u'%s ' % x for x in e.args])))
+                                                    u"IOError coping (%s) to (%s)\nError:(%s)\n" % (self.rtnAbsolutePath(tmp, graphicsDirectories[graphic_type]), newFilename, e))
                                     else: # Try a secondary source
                                         dummy = self._getSecondarySourceGraphics(cfile, graphic_type)
                                         if dummy:

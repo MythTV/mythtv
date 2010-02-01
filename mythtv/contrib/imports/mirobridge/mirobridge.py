@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.5.2"
+__version__=u"v0.5.3"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -170,6 +170,7 @@ __version__=u"v0.5.2"
 #       Remove all seek table processing as it is not used due to issues with some video file types. This code had been
 #       previously disable but the code and related mythcommflag related code has been removed entirely.
 #       Initialized new videometadata fields 'releasedate' and 'hash'.
+# 0.5.3 Fixed Exception messages
 
 
 
@@ -270,7 +271,7 @@ try:
         logger.critical(u"The python library 'pyparsing' must be at version 1.5.0 or higher. Your version is v%s" % pyparsing.__version__)
         sys.exit(1)
 except Exception, e:
-    logger.critical(u"The python library 'pyparsing' must be installed and be version 1.5.0 or higher, error(%s)" % u''.join([u'%s ' % x for x in e.args]))
+    logger.critical(u"The python library 'pyparsing' must be installed and be version 1.5.0 or higher, error(%s)" % e)
     sys.exit(1)
 logger.info(u"Using python library 'pyparsing' version %s" % pyparsing.__version__)
 
@@ -282,7 +283,6 @@ try:
     '''
     from MythTV import OldRecorded, Recorded, RecordedProgram, Channel, \
                         MythDB, Video, MythVideo, MythBE, FileOps, MythError, MythLog
-    MythLog._setlevel('database')
     mythdb = None
     mythvideo = None
     mythbeconn = None
@@ -301,8 +301,8 @@ try:
             logger.critical(u'Check that (%s) is correctly configured\n' % filename)
         sys.exit(1)
     except Exception, e:
-        logger.critical(u'''Creating an instance caused an error for one of: MythDB or MythVideo, error(%s)
-''' % u''.join([u'%s ' % x for x in e.args]))
+        logger.critical(u'''Creating an instance caused an error for one of: MythDBConn or MythVideo, error(%s)
+''' % e)
         sys.exit(1)
     try:
         mythbeconn = MythBE(backend=localhostname, db=mythdb)
@@ -310,7 +310,7 @@ try:
         logger.critical(u'MiroBridge must be run on a MythTV backend, error(%s)' % e.args[0])
         sys.exit(1)
 except Exception, e:
-    logger.critical(u"MythTV python bindings could not be imported, error(%s)" % u''.join([u'%s ' % x for x in e.args]))
+    logger.critical(u"MythTV python bindings could not be imported, error(%s)" % e)
     sys.exit(1)
 
 # Find out if the Miro python bindings can be accessed and instances can be created
@@ -334,7 +334,7 @@ try:
     from miro import app
     from miro.frontends.cli.events import EventHandler
 except Exception, e:
-    logger.critical(u"Importing Miro functions has an issue. Miro must be installed and functional, error(%s)", u''.join([u'%s ' % x for x in e.args]))
+    logger.critical(u"Importing Miro functions has an issue. Miro must be installed and functional, error(%s)", e)
     sys.exit(1)
 
 logger.info(u"Miro Bridge version %s with Miro version %s" % (__version__, config.get(prefs.APP_VERSION)))
@@ -350,7 +350,7 @@ try:
         logger.info("Using mirobridge_interpreter_2_5_2")
         from mirobridge.mirobridge_interpreter_2_5_2 import MiroInterpreter
 except Exception, e:
-    logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py', error(%s)" % u''.join([u'%s ' % x for x in e.args]))
+    logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py', error(%s)" % e)
     sys.exit(1)
 
 
@@ -540,7 +540,7 @@ class delOldRecorded( OldRecorded ):
         try:
             c.execute(query, self.wheredat)
         except Exception, e:
-            logger.warning(u"Oldrecorded record delete failed (%s)" % (u''.join([u'%s ' % x for x in e.args]), ))
+            logger.warning(u"Oldrecorded record delete failed (%s)" % (e, ))
             pass
         c.close()
 # end delOldRecorded()
@@ -611,7 +611,7 @@ class delRecordedProgram( RecordedProgram ):
         try:
             c.execute(query, self.wheredat)
         except Exception, e:
-            logger.warning(u"Recordedprogram record delete failed (%s)" % (u''.join([u'%s ' % x for x in e.args]), ))
+            logger.warning(u"Recordedprogram record delete failed (%s)" % (e, ))
             pass
         c.close()
 # end delRecordedProgram()
@@ -2432,7 +2432,7 @@ def main():
                     try:    # Miro Channel icon copy for the new subdirectory
                         useImageMagick(u'convert "%s" "%s"' % (video[u'channel_icon'], dirpath))
                     except Exception, e:
-                        logger.critical(u"Copy a Channel Icon (%s) for directory (%s) failed, error(%s)." % (video[u'channel_icon'], dirpath, u''.join([u'%s ' % x for x in e.args])))
+                        logger.critical(u"Copy a Channel Icon (%s) for directory (%s) failed, error(%s)." % (video[u'channel_icon'], dirpath, e))
                         # Gracefully close the Miro database and shutdown the Miro Front and Back ends
                         app.controller.shutdown()
                         time.sleep(5) # Let the shutdown processing complete
@@ -2455,7 +2455,7 @@ def main():
                 else:
                     video[u'videoFilename'] = filepath
             except Exception, e:
-                logger.critical(u"Copying the Miro video (%s) to the MythVideo directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'videoFilename'], filepath, u''.join([u'%s ' % x for x in e.args])))
+                logger.critical(u"Copying the Miro video (%s) to the MythVideo directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'videoFilename'], filepath, e))
                 # Gracefully close the Miro database and shutdown the Miro Front and Back ends
                 app.controller.shutdown()
                 time.sleep(5) # Let the shutdown processing complete
@@ -2489,7 +2489,7 @@ def main():
                         else:
                             video[u'channel_icon'] = filepath
                     except Exception, e:
-                        logger.critical(u"Copying the Channel Icon (%s) to the poster directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'channel_icon'], filepath, u''.join([u'%s ' % x for x in e.args])))
+                        logger.critical(u"Copying the Channel Icon (%s) to the poster directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'channel_icon'], filepath, e))
                         # Gracefully close the Miro database and shutdown the Miro Front and Back ends
                         app.controller.shutdown()
                         time.sleep(5) # Let the shutdown processing complete
@@ -2524,7 +2524,7 @@ def main():
                         else:
                             video[u'screenshot'] = filepath
                     except Exception, e:
-                        logger.critical(u"Copying the Screenshot (%s) to the Screenshot directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'screenshot'], filepath, u''.join([u'%s ' % x for x in e.args])))
+                        logger.critical(u"Copying the Screenshot (%s) to the Screenshot directory (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory), error(%s)" % (video[u'screenshot'], filepath, e))
                         # Gracefully close the Miro database and shutdown the Miro Front and Back ends
                         app.controller.shutdown()
                         time.sleep(5) # Let the shutdown processing complete

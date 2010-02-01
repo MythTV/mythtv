@@ -316,7 +316,7 @@ except Exception, e:
 The modules tvdb_api.py (v1.0.0 or greater), tvdb_ui.py, tvdb_exceptions.py and cache.py.
 They should have been installed along with the MythTV python bindings.
 Error:(%s)
-''' %  u''.join([u'%s ' % x for x in e.args])
+''' %  e
     sys.exit(1)
 
 # Global variables
@@ -1033,7 +1033,7 @@ def main():
         except tvdb_shownotfound:
             sys.exit(0) # No matching series
         except Exception, e:
-            sys.stderr.write("! Error: %s\n" % (u''.join([u'%s ' % x for x in e.args])))
+            sys.stderr.write("! Error: %s\n" % (e))
             sys.exit(1) # Most likely a communications error
         match_list = []
         for series_name_sid in allSeries: # list search results
