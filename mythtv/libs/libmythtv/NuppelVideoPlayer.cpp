@@ -578,9 +578,9 @@ bool NuppelVideoPlayer::IsPaused(bool *is_pause_still_possible)
 void NuppelVideoPlayer::PauseVideo(bool wait)
 {
     QMutexLocker locker(&pauseUnpauseLock);
-    video_actually_paused = false;
+    if (wait)
+      video_actually_paused = false;
     pausevideo = true;
-
     for (uint i = 0; wait && !video_actually_paused; i++)
     {
         videoThreadPaused.wait(&pauseUnpauseLock, 250);
@@ -3080,7 +3080,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                         continue;
                     }
 
-                    if (!pausevideo && nbframes == 1)
+                    if (!video_actually_paused && nbframes == 1)
                     {
                         dvd_stillframe_showing = true;
                         PauseVideo(false);
