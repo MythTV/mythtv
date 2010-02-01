@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.5"
+__version__="v0.1.6"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -28,6 +28,7 @@ __version__="v0.1.5"
 # 0.1.4 More data validation added (e.g. valid image file extentions)
 #       More data massaging added.
 # 0.1.5 Added a superclass to perform TMDB Trailer searches for the Mythnetvison grabber tmdb_nv.py
+# 0.1.6 Improved displayed error messages on an exception abort
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -918,8 +919,8 @@ class Videos(MovieDb):
             except TmdbUiAbort, msg:
                 sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
                 sys.exit(1)
-            except:
-                sys.stderr.write(u"! Error: Unknown error during a Movie (%s) information lookup\n" % tmdb_id)
+            except Exception, e:
+                sys.stderr.write(u"! Error: Unknown error during a Movie (%s) information lookup\nError(%s)\n" % (tmdb_id, e))
                 sys.exit(1)
         # end movieData()
 
@@ -940,8 +941,8 @@ class Videos(MovieDb):
         except TmdbUiAbort, msg:
             sys.stderr.write(self.error_messages['TmdbUiAbort'] % msg)
             sys.exit(1)
-        except:
-            sys.stderr.write(u"! Error: Unknown error during a Movie Trailer search (%s)\n" % title)
+        except Exception, e:
+            sys.stderr.write(u"! Error: Unknown error during a Movie Trailer search (%s)\nError(%s)\n" % (title, e))
             sys.exit(1)
 
         if data == None:
