@@ -280,17 +280,18 @@ try:
     '''If the MythTV python interface is found, we can insert data directly to MythDB or
     get the directories to store poster, fanart, banner and episode graphics.
     '''
-    from MythTV import MythDBConn, OldRecorded, Recorded, RecordedProgram, Channel, \
-                        MythDB, Video, MythVideo, MythBEConn, FileOps, MythError
+    from MythTV import OldRecorded, Recorded, RecordedProgram, Channel, \
+                        MythDB, Video, MythVideo, MythBE, FileOps, MythError, MythLog
+    MythLog._setlevel('database')
     mythdb = None
     mythvideo = None
     mythbeconn = None
     localhostname = gethostname()
     try:
-        '''Create an instance of each: MythDBConn, MythVideo
+        '''Create an instance of each: MythDB, MythVideo
         '''
-        mythdb = MythDBConn()
-        mythvideo = MythVideo(mythdb)
+        mythdb = MythDB()
+        mythvideo = MythVideo(db=mythdb)
     except MythError, e:
         print u'\n! Warning - %s' % e.args[0]
         filename = os.path.expanduser("~")+'/.mythtv/config.xml'
@@ -300,11 +301,11 @@ try:
             logger.critical(u'Check that (%s) is correctly configured\n' % filename)
         sys.exit(1)
     except Exception, e:
-        logger.critical(u'''Creating an instance caused an error for one of: MythDBConn or MythVideo, error(%s)
+        logger.critical(u'''Creating an instance caused an error for one of: MythDB or MythVideo, error(%s)
 ''' % u''.join([u'%s ' % x for x in e.args]))
         sys.exit(1)
     try:
-        mythbeconn = MythBEConn(backend=localhostname)
+        mythbeconn = MythBE(backend=localhostname, db=mythdb)
     except MythError, e:
         logger.critical(u'MiroBridge must be run on a MythTV backend, error(%s)' % e.args[0])
         sys.exit(1)

@@ -432,7 +432,7 @@ def main():
         export = VIDEO(opts,int(args[0]))
     else:
         if opts.tformat or opts.mformat or opts.gformat:
-            db = MythDBConn()
+            db = MythDB()
             host = gethostname()
             if opts.tformat:
                 print "Changing TV format to: "+opts.tformat
