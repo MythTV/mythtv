@@ -113,7 +113,7 @@ QStringList TV::lastProgramStringList = QStringList();
 /**
  * \brief function pointer for RunPlaybackBox in playbackbox.cpp
  */
-EMBEDRETURNPROGRAM TV::RunPlaybackBoxPtr = NULL;
+EMBEDRETURNVOID TV::RunPlaybackBoxPtr = NULL;
 
 /**
  * \brief function pointer for RunViewScheduled in viewscheduled.cpp
@@ -438,7 +438,7 @@ void TV::SetFuncPtr(const char *string, void *lptr)
 {
     QString name(string);
     if (name == "playbackbox")
-        RunPlaybackBoxPtr = (EMBEDRETURNPROGRAM)lptr;
+        RunPlaybackBoxPtr = (EMBEDRETURNVOID)lptr;
     else if (name == "viewscheduled")
         RunViewScheduledPtr = (EMBEDRETURNVOID)lptr;
     else if (name == "programguide")
@@ -3083,6 +3083,18 @@ void TV::SetErrored(PlayerContext *ctx)
     ctx->errored = true;
     KillTimer(errorRecoveryTimerId);
     errorRecoveryTimerId = StartTimer(1, __LINE__);
+}
+
+void TV::PrepToSwitchToRecordedProgram(PlayerContext *ctx,
+                                        ProgramInfo *p)
+{
+    VERBOSE(VB_GENERAL, LOC +
+                    QString("Switchin to program: %1: %2")
+                            .arg(p->title).arg(p->subtitle));
+    SetLastProgram(p);
+    PrepareToExitPlayer(ctx,__LINE__);
+    jumpToProgram = true;
+    SetExitPlayer(true, true);
 }
 
 void TV::PrepareToExitPlayer(PlayerContext *ctx, int line, bool bookmark) const
@@ -8114,7 +8126,6 @@ void TV::DoEditSchedule(int editType)
     }
 
     // Actually show the pop-up UI
-    ProgramInfo *nextProgram = NULL;
     switch (editType)
     {
         case kScheduleProgramGuide:
@@ -8145,7 +8156,7 @@ void TV::DoEditSchedule(int editType)
         }
         case kPlaybackBox:
         {
-            nextProgram = RunPlaybackBoxPtr((void *)this, !pause_active);
+            RunPlaybackBoxPtr((void *)this, !pause_active);
             ignoreKeyPresses = true;
             break;
         }
@@ -8856,6 +8867,7 @@ void TV::customEvent(QEvent *e)
     if (message.left(11) == "EPG_EXITING" || 
         message.left(18) == "PROGFINDER_EXITING" || 
         message.left(21) == "VIEWSCHEDULED_EXITING" || 
+        message.left(19)   == "PLAYBACKBOX_EXITING" ||
         message.left(22) == "SCHEDULEEDITOR_EXITING")
     {
         GetMythMainWindow()->SetDrawEnabled(false);
@@ -8889,10 +8901,24 @@ void TV::customEvent(QEvent *e)
         qApp->processEvents();
         DrawUnusedRects();
 
-        ReturnPlayerLock(actx);
-
         isEmbedded = false;
         ignoreKeyPresses = false;
+
+        if (message.left(19)   == "PLAYBACKBOX_EXITING")
+        {
+            ProgramInfo *p = new ProgramInfo;
+            QStringList nextProgStringList = me->ExtraDataList();
+            if (!nextProgStringList.isEmpty() && 
+                p->FromStringList(nextProgStringList, 0))
+            {
+                PrepToSwitchToRecordedProgram(actx, p);
+            }
+            else
+               delete p;
+        }
+        
+        ReturnPlayerLock(actx);
+
     }
 
     if (message.left(14) == "COMMFLAG_START")
@@ -10998,14 +11024,7 @@ bool TV::HandleJumpToProgramAction(
         {
             if (mctx == ctx)
             {
-                VERBOSE(VB_GENERAL, LOC +
-                        QString("Switching to program: %1: %2")
-                        .arg(p->title).arg(p->subtitle));
-
-                SetLastProgram(p);
-                PrepareToExitPlayer(ctx, __LINE__);
-                jumpToProgram = true;
-                SetExitPlayer(true, true);
+                PrepToSwitchToRecordedProgram(ctx, p);
             }
             else
             {
@@ -11043,7 +11062,8 @@ bool TV::HandleJumpToProgramAction(
             (wants_pbp ? kPBPLeft : kPIPOff);
     }
 
-    if (db_jump_prefer_osd && (StateIsPlaying(s) || StateIsLiveTV(s)))
+    if ((wants_pbp || wants_pip || db_jump_prefer_osd) && 
+        (StateIsPlaying(s) || StateIsLiveTV(s)))
     {
         QMutexLocker locker(&timerIdLock);
         if (jumpMenuTimerId)

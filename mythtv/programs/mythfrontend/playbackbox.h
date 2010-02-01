@@ -123,7 +123,7 @@ class PlaybackBox : public ScheduleCommon
     void customEvent(QEvent *event);
 
     void setInitialRecGroup(QString initialGroup) { m_recGroup = initialGroup; }
-    static ProgramInfo *RunPlaybackBox(void *player, bool);
+    static void * RunPlaybackBox(void *player, bool);
 
   public slots:
     void displayRecGroup(const QString &newRecGroup = "");
@@ -175,9 +175,6 @@ class PlaybackBox : public ScheduleCommon
 
     void doPlayFromBeg();
     void doPlayListRandom();
-    void doPIPPlay(void);
-    void doPIPPlay(PIPState state);
-    void doPBPPlay(void);
 
     void askStop();
 
@@ -433,6 +430,7 @@ class PlaybackBox : public ScheduleCommon
 
     // Other
     TV                 *m_player;
+    bool                m_player_selected_new_show;
     /// Main helper thread
     PlaybackBoxHelper   m_helper;
 };

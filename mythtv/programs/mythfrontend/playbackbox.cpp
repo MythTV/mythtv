@@ -319,7 +319,7 @@ static bool extract_one_del(
     return chanid && recstartts.isValid();
 }
 
-ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
+void * PlaybackBox::RunPlaybackBox(void * player, bool showTV)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -331,11 +331,7 @@ ProgramInfo *PlaybackBox::RunPlaybackBox(void * player, bool showTV)
     else
         delete pbb;
 
-    ProgramInfo *nextProgram = NULL;
-    if (pbb->CurrentItem())
-        nextProgram = new ProgramInfo(*pbb->CurrentItem());
-
-    return nextProgram;
+    return NULL;
 }
 
 PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
@@ -373,6 +369,7 @@ PlaybackBox::PlaybackBox(MythScreenStack *parent, QString name, BoxType ltype,
       m_underNetworkControl(false),
       // Other
       m_player(NULL),
+      m_player_selected_new_show(false),
       m_helper(this)
 {
     m_formatShortDate    = gContext->GetSetting("ShortDateFormat", "M/d");
@@ -467,6 +464,18 @@ PlaybackBox::~PlaybackBox(void)
     {
         m_coverartTimer->disconnect(this);
         m_coverartTimer = NULL;
+    }
+
+    if (m_player)
+    {
+        QStringList nextProgram;
+        ProgramInfo *pginfo = CurrentItem();
+
+        if (pginfo && m_player_selected_new_show)
+            pginfo->ToStringList(nextProgram);
+
+        QString message = QString("PLAYBACKBOX_EXITING");
+        qApp->postEvent(m_player, new MythEvent(message, nextProgram));
     }
 }
 
@@ -764,7 +773,7 @@ void PlaybackBox::UpdateUIListItem(
     QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
 
     item->DisplayState(rating, "ratingstate");
-    
+
     QString oldimgfile = item->GetImage("preview");
     if (oldimgfile.isEmpty() || force_preview_reload)
         m_helper.GetPreviewImage(*pginfo);
@@ -1151,7 +1160,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
     subtitleFlags[SUB_ONSCREEN] = "onscreensub";
     subtitleFlags[SUB_NORMAL] = "subtitles";
     subtitleFlags[SUB_HARDHEAR] = "cc";
-    
+
     ProgramList::iterator it = progList.begin();
     for (; it != progList.end(); ++it)
     {
@@ -1193,10 +1202,10 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         disp_flag_stat[7] = (*it)->programflags & FL_INUSEPLAYING;
         disp_flag_stat[8] = (*it)->programflags & FL_COMMFLAG;
         disp_flag_stat[9] = (*it)->programflags & FL_TRANSCODED;
-        
+
         for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
             item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
-        
+
         QMap<AudioProps, QString>::iterator ait;
         for (ait = audioFlags.begin(); ait != audioFlags.end(); ++ait)
         {
@@ -1210,7 +1219,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
             if ((*it)->videoproperties & vit.key())
                 item->DisplayState(vit.value(), "videoprops");
         }
-          
+
         QMap<SubtitleTypes, QString>::iterator sit;
         for (sit = subtitleFlags.begin(); sit != subtitleFlags.end(); ++sit)
         {
@@ -1908,8 +1917,10 @@ void PlaybackBox::playProgramInfo(ProgramInfo *pginfo)
     if (!pginfo)
         return;
 
-    if (m_player && m_player->IsSameProgram(0, pginfo))
+    if (m_player)
     {
+        if (!m_player->IsSameProgram(0, pginfo))
+            m_player_selected_new_show = true;
         Close();
         return;
     }
@@ -2282,7 +2293,7 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
     QStringList sgEntries;
 
     // TODO do this in another thread
-    RemoteGetFileList(host, "", &sgEntries, sgroup, true); 
+    RemoteGetFileList(host, "", &sgEntries, sgroup, true);
 
     int regIndex = 0;
     titleIn.replace(' ', "(?:\\s|-|_|\\.)?");
@@ -2354,28 +2365,6 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
     }
     else
         return QString();
-}
-
-void PlaybackBox::doPIPPlay(void)
-{
-    doPIPPlay(kPIPonTV);
-}
-
-void PlaybackBox::doPBPPlay(void)
-{
-    doPIPPlay(kPBPLeft);
-}
-
-void PlaybackBox::doPIPPlay(PIPState state)
-{
-    if (m_player)
-    {
-        ProgramInfo *pginfo = CurrentItem();
-        m_player->SetNextProgPIPState(state);
-        if (pginfo)
-            pginfo->setIgnoreBookmark(true);
-        Close();
-    }
 }
 
 void PlaybackBox::ShowDeletePopup(DeletePopupType type)
@@ -2956,23 +2945,18 @@ void PlaybackBox::ShowActionPopup(const ProgramInfo &pginfo)
         sameProgram = m_player->IsSameProgram(0, &pginfo);
 
     TVState tvstate = kState_None;
-    if (m_player)
-    {
-        if (!sameProgram && m_player->IsPIPSupported())
-            m_popupMenu->AddButton(tr("Start As PIP"), SLOT(doPIPPlay()));
-        if (!sameProgram && m_player->IsPBPSupported())
-            m_popupMenu->AddButton(tr("Start As PBP"), SLOT(doPBPPlay()));
 
-        tvstate = m_player->GetState(0);
-    }
-    else
+    if (!sameProgram)
     {
         if (pginfo.programflags & FL_BOOKMARK)
             m_popupMenu->AddButton(tr("Play from..."),
                                         SLOT(showPlayFromPopup()), true);
         else
             m_popupMenu->AddButton(tr("Play"), SLOT(playSelected()));
+    }
 
+    if (!m_player)
+    {
         if (m_playList.filter(pginfo.MakeUniqueKey()).size())
             m_popupMenu->AddButton(tr("Remove from Playlist"),
                                         SLOT(togglePlayListItem()));
@@ -4495,9 +4479,9 @@ void PlaybackBox::doPlaylistWatchedSetting(bool turnOn)
             tmpItem->SetWatchedFlag(turnOn);
         }
     }
-    
+
     doClearPlaylist();
-    UpdateUILists();    
+    UpdateUILists();
 }
 
 void PlaybackBox::showMetadataEditor()

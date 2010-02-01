@@ -59,7 +59,6 @@ class OSDListTreeItemSelectedEvent;
 
 typedef QMap<QString,InfoMap>    DDValueMap;
 typedef QMap<QString,DDValueMap> DDKeyMap;
-typedef ProgramInfo * (*EMBEDRETURNPROGRAM)(void *, bool);
 typedef void (*EMBEDRETURNVOID) (void *, bool);
 typedef void (*EMBEDRETURNVOIDEPG) (uint, const QString &, TV *, bool, bool, int);
 typedef void (*EMBEDRETURNVOIDFINDER) (TV *, bool, bool);
@@ -308,7 +307,7 @@ class MPUBLIC TV : public QThread
 
     bool eventFilter(QObject *o, QEvent *e);
     static QStringList lastProgramStringList;
-    static EMBEDRETURNPROGRAM RunPlaybackBoxPtr;
+    static EMBEDRETURNVOID RunPlaybackBoxPtr;
     static EMBEDRETURNVOID RunViewScheduledPtr;
     static EMBEDRETURNVOIDEPG RunProgramGuidePtr;
     static EMBEDRETURNVOIDFINDER RunProgramFinderPtr;
@@ -339,6 +338,8 @@ class MPUBLIC TV : public QThread
     void ForceNextStateNone(PlayerContext*);
     void ScheduleStateChange(PlayerContext*);
     void SetErrored(PlayerContext*);
+    void PrepToSwitchToRecordedProgram(PlayerContext*,
+                                        ProgramInfo*);
     void PrepareToExitPlayer(PlayerContext*, int line,
                              bool bookmark = true) const;
     void SetExitPlayer(bool set_it, bool wants_to) const;
