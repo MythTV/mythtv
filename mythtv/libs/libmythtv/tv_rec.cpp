@@ -2628,7 +2628,7 @@ long long TVRec::GetMaxBitrate(void) const
     if (genOpt.cardtype == "HDPVR")
         bitrate = 20200000LL; // Peek bit rate for HD-PVR
     else if (!CardUtil::IsEncoder(genOpt.cardtype))
-        bitrate = 19400000LL; // 1080i
+        bitrate = 22200000LL; // 1080i
     else // frame grabber
         bitrate = 10080000LL; // use DVD max bit rate, probably too big
 
