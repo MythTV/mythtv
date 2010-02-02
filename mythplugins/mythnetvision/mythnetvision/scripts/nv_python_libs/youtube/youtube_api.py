@@ -205,7 +205,7 @@ class Videos(object):
         self.config[u'urls'] = {}
 
         # v2 api calls - An example that must be customized for each target site
-        self.config[u'urls'][u'video.search'] = 'http://gdata.youtube.com/feeds/api/videos?vq="%s"&max-results=%s&start-index=%s&orderby=rating&Ir=%s'
+        self.config[u'urls'][u'video.search'] = 'http://gdata.youtube.com/feeds/api/videos?vq=%s&max-results=%s&start-index=%s&orderby=rating&Ir=%s'
 
 
         # Functions that parse video data from RSS data
@@ -483,7 +483,7 @@ class Videos(object):
         return an array of matching item dictionaries
         return
         '''
-        url = self.config[u'urls'][u'video.search'] % (title.replace(u' ', u'+'), pagelen, pagenumber, self.config['language'], )
+        url = self.config[u'urls'][u'video.search'] % (urllib.quote_plus(title.encode("utf-8")), pagelen, pagenumber, self.config['language'], )
         if self.config['debug_enabled']:
             print url
             print

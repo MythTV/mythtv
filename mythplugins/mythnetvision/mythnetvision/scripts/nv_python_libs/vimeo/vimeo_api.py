@@ -937,7 +937,8 @@ class Videos(object):
 #        print xml_data
 
         try:
-            xml_data = self.client.vimeo_videos_search(title, sort='most_liked',
+            xml_data = self.client.vimeo_videos_search(urllib.quote_plus(title.encode("utf-8")),
+                             sort='most_liked',
                              per_page=pagelen,
                              page=pagenumber)
         except Exception, msg:

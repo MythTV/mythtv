@@ -447,7 +447,7 @@ class Videos(object):
         return an array of matching item dictionaries
         return
         '''
-        url = self.config[u'urls'][u'video.search'] % (title.replace(u' ', u'+'), pagenumber, pagelen, self.config['language'])
+        url = self.config[u'urls'][u'video.search'] % (urllib.quote_plus(title.encode("utf-8")), pagenumber, pagelen, self.config['language'])
 
         if self.config['debug_enabled']:
             print "Search URL:"
