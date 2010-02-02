@@ -43,7 +43,7 @@
                         <alpha>255</alpha>
                     </textarea>
                 </state>
-                <state name="selected">
+                <state name="selectedactive">
                     <area>0,0,300,30</area>
                     <shape name="recSelectedGroupShape">
                         <area>0, 0, 100%, 100%</area>
@@ -61,7 +61,7 @@
                         <alpha>255</alpha>
                     </textarea>
                 </state>
-                <state name="inactive" from="selected" />
+                <state name="selectedinactive" from="selectedactive" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>132,247</position>
@@ -86,8 +86,8 @@
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
-                <state name="inactive" from="active" />
-                <state name="selected" from="active" />
+                <state name="selectedinactive" from="active" />
+                <state name="selectedactive" from="active" />
             </statetype>
         </buttonlist>
 
@@ -127,8 +127,8 @@
                         <state name="no" />
                     </statetype>
                 </state>
-                <state name="inactive" from="active" />
-                <state name="selected" from="active">
+                <state name="selectedinactive" from="active" />
+                <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>25,0,527,25</area>
                     </shape>
@@ -599,7 +599,7 @@
                         <align>vcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>0,0,650,40</area>
                         <type>roundbox</type>
@@ -607,7 +607,7 @@
                         <cornerradius>13</cornerradius>
                     </shape>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>590,395</position>

@@ -177,12 +177,12 @@
                     <filename>lb-arrow.png</filename>
                 </imagetype>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <imagetype name="buttonbackground">
                     <gradient start="#52CA38" end="#349838" alpha="255" />
                 </imagetype>
             </state>
-            <state name="inactive" from="active">
+            <state name="selectedinactive" from="active">
                 <imagetype name="buttonbackground">
                     <gradient start="#52CA38" end="#349838" alpha="100" />
                 </imagetype>
@@ -241,7 +241,7 @@
                     <align>vcenter</align>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="selectbar">
                     <area>5,-4,750,29</area>
                     <type>roundbox</type>
@@ -250,7 +250,7 @@
                     <cornerradius>4</cornerradius>
                 </shape>
             </state>
-            <state name="inactive" from="active" /> 
+            <state name="selectedinactive" from="active" /> 
         </statetype>
         <statetype name="upscrollarrow">
             <position>710,268</position>
@@ -450,10 +450,10 @@
                     <align>left,vcenter</align>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="background" from="baseselectedwidgetshape" />
             </state>
-            <state name="inactive" from="active" />
+            <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>75,2</position>
@@ -495,10 +495,10 @@
                     <area>5,5,365,30</area>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="background" from="baseselectedwidgetshape" />
             </state>
-            <state name="inactive" from="active" />
+            <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>380,2</position>
@@ -524,10 +524,10 @@
                     <align>left,vcenter</align>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="background" from="baseselectedwidgetshape" />
             </state>
-            <state name="inactive" from="active" />
+            <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>205,2</position>
@@ -568,10 +568,10 @@
                     <area>5,5,365,30</area>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="background" from="baseselectedwidgetshape" />
             </state>
-            <state name="inactive" from="active" />
+            <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>380,2</position>
@@ -669,13 +669,13 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="inactive">
+                <state name="selectedinactive">
                     <textarea name="buttontext">
                         <area>0,0,100%,30</area>
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selected">
+                <state name="selectedactive">
                     <textarea name="buttontext">
                         <area>0,0,100%,30</area>
                         <align>allcenter</align>
@@ -718,13 +718,13 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="inactive">
+                <state name="selectedinactive">
                     <textarea name="buttontext">
                         <area>0,0,100%,30</area>
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selected">
+                <state name="selectedactive">
                     <textarea name="buttontext">
                         <area>0,0,100%,30</area>
                         <align>allcenter</align>
@@ -842,12 +842,12 @@
                         <area>4,0,460,30</area>
                     </textarea>
                 </state>
-                <state name="inactive">
+                <state name="selectedinactive">
                     <textarea name="buttontext">
                         <area>5,0,460,30</area>
                     </textarea>
                 </state>
-                <state name="selected">
+                <state name="selectedactive">
                     <textarea name="buttontext">
                         <area>5,0,460,30</area>
                     </textarea>
@@ -918,8 +918,8 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="inactive" from="active" />
-                <state name="selected" from="active">
+                <state name="selectedinactive" from="active" />
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <area>0,0,165,105</area>
                         <gradient start="#999999" end="#666666" alpha="220" />

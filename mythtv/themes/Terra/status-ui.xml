@@ -32,7 +32,7 @@
                         <align>vcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="frame">
                         <position>-19,0</position>
                         <filename>recordings/generallistselectedframe.png</filename>
@@ -46,7 +46,7 @@
                         <area>37,10,555,42</area>
                     </textarea>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                 </state>
             </statetype>
             <statetype name="upscrollarrow">

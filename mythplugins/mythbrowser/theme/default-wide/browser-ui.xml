@@ -73,12 +73,12 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>horiz_selector_selected.png</filename>
                     </imagetype>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>horiz_selector_inactive.png</filename>
                     </imagetype>
@@ -174,12 +174,12 @@
                         <font>basesmall</font>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>30,0,1130,30</area>
                     </shape>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                     <textarea name="name">
                         <font>basesmallpurple</font>
                     </textarea>

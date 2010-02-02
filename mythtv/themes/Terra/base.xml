@@ -272,12 +272,12 @@
                     <align>allcenter</align>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="buttonbackground">
                     <fill color="#8a916f" />
                 </shape>
             </state>
-            <state name="inactive" from="active" />
+            <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="upscrollarrow">
             <position>0,0</position>
@@ -309,12 +309,12 @@
                     <align>allcenter</align>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="buttonbackground">
                     <fill color="#8a916f" />
                 </shape>
             </state>
-            <state name="inactive" from="active" />
+            <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>492,0</position>
@@ -347,12 +347,12 @@
                     <align>allcenter</align>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="buttonbackground">
                     <fill color="#8a916f" />
                 </shape>
             </state>
-            <state name="inactive" from="active" />
+            <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="upscrollarrow">
             <position>0,0</position>
@@ -384,12 +384,12 @@
                     <align>allcenter</align>
                 </textarea>
             </state>
-            <state name="selected" from="active">
+            <state name="selectedactive" from="active">
                 <shape name="buttonbackground">
                     <fill color="#8a916f" />
                 </shape>
             </state>
-            <state name="inactive" from="active" />
+            <state name="selectedinactive" from="active" />
         </statetype>
         <statetype name="downscrollarrow">
             <position>492,0</position>
@@ -540,9 +540,9 @@
                         <filename>popups/submenu_arrow.png</filename>
                     </imagetype>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="selecteditemarrow">
                         <position>5,16</position>
                         <filename>popups/selected_item_arrow.png</filename>
@@ -593,8 +593,8 @@
                         <filename>popups/submenu_arrow.png</filename>
                     </imagetype>
                 </state>
-                <state name="inactive" from="active" />
-                <state name="selected" from="active">
+                <state name="selectedinactive" from="active" />
+                <state name="selectedactive" from="active">
                     <imagetype name="selecteditemarrow">
                         <position>5,16</position>
                         <filename>popups/selected_item_arrow.png</filename>
@@ -782,8 +782,8 @@
                         <multiline>yes</multiline>
                     </textarea>
                 </state>
-                <state name="inactive" from="active" />
-                <state name="selected" from="active">
+                <state name="selectedinactive" from="active" />
+                <state name="selectedactive" from="active">
                     <shape name="buttonbackground">
                         <area>0,0,100%,100%</area>
                         <type>roundbox</type>

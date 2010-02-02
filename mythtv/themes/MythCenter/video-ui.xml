@@ -372,7 +372,7 @@
                         <area>670,4,50,25</area>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <textarea name="buttontext">
                         <font>basesmall</font>
                     </textarea>
@@ -464,7 +464,7 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <area>0,0,50,255</area>
                     <imagetype name="buttonimage">
                         <alpha>255</alpha>
@@ -676,7 +676,7 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>shared/grid_back_sel.png</filename>
                     </imagetype>

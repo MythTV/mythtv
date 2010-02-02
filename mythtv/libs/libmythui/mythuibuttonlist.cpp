@@ -2755,20 +2755,20 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
     if (!m_parent)
         return;
 
-    QString state = "active";
+    QString state;
     if (selected)
     {
         button->MoveToTop();
-
-        if (m_parent->m_active)
-        {
-            state = "selected";
-        }
-        else
-            state = "inactive";
+        state = m_parent->m_active ? "selectedactive" : "selectedinactive";
     }
+    else
+        state = m_parent->m_active ? "active" : "inactive";
 
-    button->DisplayState(state);
+    if (!button->DisplayState(state) && state == "inactive")
+    {
+        state = "active";
+        button->DisplayState(state);
+    }
 
     MythUIGroup *buttonstate = dynamic_cast<MythUIGroup *>
                                             (button->GetCurrentState());

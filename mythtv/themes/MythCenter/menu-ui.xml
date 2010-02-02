@@ -144,7 +144,7 @@
                         <cutdown>yes</cutdown>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="background">
                         <filename>ui/button_on.png</filename>
                     </imagetype>

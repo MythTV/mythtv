@@ -34,13 +34,13 @@
                         <alpha>220</alpha>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <textarea name="name">
                         <area>4,1,232,36</area>
                         <font>baselargebrown</font>
                     </textarea>
                 </state>
-                <state name="inactive" from="selected">
+                <state name="selectedinactive" from="selectedactive">
                     <textarea name="name">
                         <font>baselarge</font>
                         <alpha>220</alpha>
@@ -153,7 +153,7 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <area>-17,0,291,307</area>
                     <imagetype name="frame">
                         <filename>recordings/selected_recording_background.png</filename>
@@ -188,7 +188,7 @@
                         <position>240,12</position>
                     </statetype>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>0,289</position>
@@ -358,9 +358,9 @@
                         <font>basesmall</font>
                     </textarea>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="selecteditemarrow">
                         <position>3,6</position>
                         <filename>popups/selected_item_arrow.png</filename>
@@ -641,9 +641,9 @@
                         </state>
                     </statetype>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="selecteditemarrow">
                         <position>3,18</position>
                         <filename>popups/selected_item_arrow.png</filename>

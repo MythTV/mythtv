@@ -268,7 +268,7 @@ MythArchive GUI theme
                     </statetype>
 
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
@@ -277,7 +277,7 @@ MythArchive GUI theme
                         <font>basesmallyellow</font>
                     </textarea>
                 </state>
-               <state name="inactive" from="active">
+               <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>
@@ -581,7 +581,7 @@ MythArchive GUI theme
                         <filename>mv_browse_nocover.png</filename>
                     </imagetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
@@ -589,7 +589,7 @@ MythArchive GUI theme
                         <font>basesmall</font>
                     </textarea>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>

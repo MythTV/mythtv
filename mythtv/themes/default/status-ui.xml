@@ -29,10 +29,10 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <shape name="background" from="baseselectedwidgetshape" />
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                     <textarea name="buttontext">
                         <font>basesmallgrey</font>
                     </textarea>

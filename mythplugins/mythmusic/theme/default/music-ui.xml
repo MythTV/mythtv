@@ -875,12 +875,12 @@
                         <filename>mm_nothumb.png</filename>
                     </imagetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>mm_browser_back_sel.png</filename>
                     </imagetype>
                 </state>
-                <state name="inactive" from="selected" />
+                <state name="selectedinactive" from="selectedactive" />
             </statetype>
         </buttonlist>
 
@@ -1024,12 +1024,12 @@
                         <align>center</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
         </buttonlist>
 

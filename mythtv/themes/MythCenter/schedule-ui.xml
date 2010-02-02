@@ -86,8 +86,8 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active"/>
-                <state name="inactive" from="active"/>
+                <state name="selectedactive" from="active"/>
+                <state name="selectedinactive" from="active"/>
             </statetype>
         </buttonlist>
 
@@ -114,8 +114,8 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active"/>
-                <state name="inactive" from="active"/>
+                <state name="selectedactive" from="active"/>
+                <state name="selectedinactive" from="active"/>
             </statetype>
         </buttonlist>
 
@@ -253,8 +253,8 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active"/>
-                <state name="inactive" from="active"/>
+                <state name="selectedactive" from="active"/>
+                <state name="selectedinactive" from="active"/>
             </statetype>
             <statetype name="downscrollarrow">
                 <state type="off">
@@ -307,8 +307,8 @@
                         <align>allcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active"/>
-                <state name="inactive" from="active"/>
+                <state name="selectedactive" from="active"/>
+                <state name="selectedinactive" from="active"/>
             </statetype>
             <statetype name="downscrollarrow">
                 <state type="off">
@@ -503,7 +503,7 @@
                         <area>730,1,30,24</area>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <textarea name="shortstarttimedate" from="buttontext">
                         <area>15,1,155,24</area>
                         <font state="disabled">basesmallboldgreyhighlight</font>
@@ -522,7 +522,7 @@
                         <font>basesmallbold</font>
                     </shape>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
         </buttonlist>
 
@@ -606,8 +606,8 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active" />
-                <state name="inactive" from="active" />
+                <state name="selectedactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>710,340</position>
@@ -716,13 +716,13 @@
                         <position>710,1</position>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>3,-2,755,30</area>
                         <font>basesmallbold</font>
                     </shape>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>710,355</position>
@@ -838,12 +838,12 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>5,-4,750,28</area>
                     </shape>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>710,340</position>
@@ -1047,12 +1047,12 @@
                         <area>5,0,450,30</area>
                     </textarea>
                 </state>
-                <state name="inactive">
+                <state name="selectedinactive">
                     <textarea name="buttontext">
                         <area>5,0,450,30</area>
                     </textarea>
                 </state>
-                <state name="selected">
+                <state name="selectedactive">
                     <textarea name="buttontext">
                         <area>5,0,450,30</area>
                     </textarea>
@@ -1128,12 +1128,12 @@
                         <area>5,0,450,30</area>
                     </textarea>
                 </state>
-                <state name="inactive">
+                <state name="selectedinactive">
                     <textarea name="buttontext">
                         <area>5,0,450,30</area>
                     </textarea>
                 </state>
-                <state name="selected">
+                <state name="selectedactive">
                     <textarea name="buttontext">
                         <area>5,0,450,30</area>
                     </textarea>
@@ -1261,13 +1261,13 @@
                         <font>basesmallboldblue</font>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>5,-1,751,27</area>
                         <font>basesmallbold</font>
                     </shape>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>700,330</position>
@@ -1391,7 +1391,7 @@
                         <font>basesmallboldblue</font>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <textarea name="buttontext">
                         <font>basesmallwhite</font>
                     </textarea>
@@ -1399,7 +1399,7 @@
                         <area>0,0,0,0</area>
                     </shape>
                 </state>
-                <state name="inactive" from="active"/>
+                <state name="selectedinactive" from="active"/>
             </statetype>
             <statetype name="upscrollarrow">
                 <state type="off">
@@ -1439,12 +1439,12 @@
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <textarea name="buttontext">
                         <font>basesmallwhite</font>
                     </textarea>
                 </state>
-                <state name="inactive" from="active"/>
+                <state name="selectedinactive" from="active"/>
             </statetype>
         </buttonlist>
 
@@ -1465,12 +1465,12 @@
                     <font state="running">basesmallgreen</font>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <textarea name="buttontext">
                         <font state="disabled">basesmallboldgreyhighlight</font>
                     </textarea>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
         </buttonlist>
 

@@ -29,12 +29,12 @@
                         <multiline>yes</multiline>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#669966" end="#339933" alpha="200" />
                     </imagetype>
                 </state>
-                <state name="inactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
                 <position>700,425</position>
@@ -131,8 +131,8 @@
                         <area>500,1,200,24</area>
                     </textarea>
                 </state>
-                <state name="selected" from="active" />
-                <state name="inactive" from="active" />
+                <state name="selectedactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
         </buttonlist>
 

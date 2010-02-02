@@ -531,7 +531,7 @@
                         </state>
                     </statetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <area>-11,0,277,330</area>
 
                     <textarea name="buttontext">
@@ -942,7 +942,7 @@
                         </state>
                     </statetype>
                 </state>
-                <state name="inactive" from="selected" />
+                <state name="selectedinactive" from="selectedactive" />
             </statetype>
             <statetype name="downscrollarrow">
                 <position>700,400</position>

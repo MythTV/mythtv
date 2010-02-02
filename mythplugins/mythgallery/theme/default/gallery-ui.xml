@@ -70,7 +70,7 @@
                         </state>
                     </statetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>shared/grid_back_sel.png</filename>
                     </imagetype>

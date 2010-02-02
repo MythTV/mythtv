@@ -171,12 +171,12 @@ Common MythArchive window definitions
                         <position>670,5</position>
                     </statetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>
@@ -284,12 +284,12 @@ Common MythArchive window definitions
                         <position>715,5</position>
                     </statetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>
@@ -349,12 +349,12 @@ Common MythArchive window definitions
                         <position>670,5</position>
                     </statetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>

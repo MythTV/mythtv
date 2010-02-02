@@ -846,12 +846,12 @@
                         <filename>mm_nothumb.png</filename>
                     </imagetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>mm_browser_back_sel.png</filename>
                     </imagetype>
                 </state>
-                <state name="inactive" from="selected" />
+                <state name="selectedinactive" from="selectedactive" />
             </statetype>
         </buttonlist>
 

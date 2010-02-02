@@ -205,7 +205,7 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
@@ -419,7 +419,7 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
@@ -437,7 +437,7 @@
                         <font>basesmall</font>
                     </textarea>
                 </state>
-               <state name="inactive" from="active">
+               <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>
@@ -532,7 +532,7 @@
                     </textarea>
 
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
@@ -541,7 +541,7 @@
                         <font>basesmall</font>
                     </textarea>
                 </state>
-               <state name="inactive" from="active">
+               <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>
@@ -598,7 +598,7 @@
                         <font>basesmallgrey</font>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
@@ -607,7 +607,7 @@
                         <font>basesmall</font>
                     </textarea>
                 </state>
-               <state name="inactive" from="active">
+               <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>

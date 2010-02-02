@@ -277,7 +277,7 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <position>5,7</position>
                         <filename>mv_browse_selector.png</filename>
@@ -417,7 +417,7 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>shared/grid_back_sel.png</filename>
                     </imagetype>

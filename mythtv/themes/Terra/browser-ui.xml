@@ -34,7 +34,7 @@
                         <align>vcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="frame">
                         <position>-19,0</position>
                         <filename>recordings/generallistselectedframe.png</filename>
@@ -46,7 +46,7 @@
                         <position>37,58</position>
                     </textarea>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
@@ -90,14 +90,14 @@
                         <alpha>220</alpha>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <textarea name="buttontext">
                         <area>4,1,232,36</area>
                         <font>basemediumbrown</font>
                         <alpha>255</alpha>
                     </textarea>
                 </state>
-                <state name="inactive" from="selected" />
+                <state name="selectedinactive" from="selectedactive" />
             </statetype>
             <statetype name="downscrollarrow">
                 <position>1264,0</position>

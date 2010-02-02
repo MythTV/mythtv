@@ -41,8 +41,8 @@
                         <area>860,1,275,24</area>
                     </textarea>
                 </state>
-                <state name="selected" from="active" />
-                <state name="inactive" from="active" />
+                <state name="selectedactive" from="active" />
+                <state name="selectedinactive" from="active" />
             </statetype>
         </buttonlist>
 

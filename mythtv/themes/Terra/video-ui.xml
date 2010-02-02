@@ -70,9 +70,9 @@
                         <filename>popups/submenu_arrow.png</filename>
                     </imagetype>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="selecteditemarrow">
                         <position>5,16</position>
                         <filename>popups/selected_item_arrow.png</filename>
@@ -324,7 +324,7 @@
                         <align>right</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <area>0,-24,92,137</area>
                     <imagetype name="buttonimage">
                         <area>0,0,92,137</area>
@@ -565,7 +565,7 @@
             <buttonarea>0,0,1282,299</buttonarea>
             <spacing>0</spacing>
             <statetype name="buttonitem">
-                <state name="selected">
+                <state name="selectedactive">
                     <area>-13,0,209,332</area>
                     <imagetype name="coverart">
                         <area>1,3,209,325</area>
@@ -598,7 +598,7 @@
                     </textarea>
 
                 </state>
-                <state name="active" from="selected">
+                <state name="active" from="selectedactive">
                     <area>0,0,183,332</area>
                     <imagetype name="coverart">
                         <area>0,25,183,275</area>
@@ -730,7 +730,7 @@
                         <align>hcenter</align>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>video/video_gallery_background_selected.png</filename>
                     </imagetype>

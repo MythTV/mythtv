@@ -219,12 +219,12 @@ MythTV Archive GUI theme
                         <area>35,0,1190,30</area>
                     </textarea>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
                 </state>
-                <state name="inactive" from="active">
+                <state name="selectedinactive" from="active">
                     <imagetype name="buttonbackground">
                         <gradient start="#52CA38" end="#349838" alpha="100" />
                     </imagetype>

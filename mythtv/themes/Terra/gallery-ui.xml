@@ -67,7 +67,7 @@
                         </state>
                     </statetype>
                 </state>
-                <state name="selected" from="active">
+                <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
                         <filename>video/video_gallery_background_selected.png</filename>
                     </imagetype>
