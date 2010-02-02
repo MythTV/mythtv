@@ -2,8 +2,8 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="Thorndale">
-        <pixelsize>19</pixelsize>
+    <font name="basesmall" face="Arial">
+        <pixelsize>22</pixelsize>
         <color>#EEEEEE</color>
         <bold>yes</bold>
     </font>
@@ -31,11 +31,11 @@
     </font>
 
     <font name="basemedium" from="basesmall">
-        <pixelsize>22</pixelsize>
+        <pixelsize>24</pixelsize>
     </font>
 
     <font name="baselarge" from="basesmall">
-        <pixelsize>24</pixelsize>
+        <pixelsize>26</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -47,7 +47,7 @@
     </font>
 
     <font name="baseextralarge" from="basesmall">
-        <pixelsize>29</pixelsize>
+        <pixelsize>31</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
