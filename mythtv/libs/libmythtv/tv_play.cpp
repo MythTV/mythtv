@@ -5893,45 +5893,45 @@ bool TV::DoNVPSeek(PlayerContext *ctx, float time)
 bool TV::SeekHandleAction(PlayerContext *actx, const QStringList &actions,
                           const bool isDVD)
 {
-    const int kREWIND = 4, kFORWARD = 8, kSTICKY = 16, kSLIPPERY = 32,
-              kRELATIVE = 64, kABSOLUTE = 128, kWHENCE_MASK = 3;
+    const int kRewind = 4, kForward = 8, kSticky = 16, kSlippery = 32,
+              kRelative = 64, kAbsolute = 128, kWhenceMask = 3;
     int flags = 0;
     if (has_action("SEEKFFWD", actions))
-        flags = ARBSEEK_FORWARD | kFORWARD | kSLIPPERY | kRELATIVE;
+        flags = ARBSEEK_FORWARD | kForward | kSlippery | kRelative;
     else if (has_action("FFWDSTICKY", actions))
-        flags = ARBSEEK_END     | kFORWARD | kSTICKY   | kABSOLUTE;
+        flags = ARBSEEK_END     | kForward | kSticky   | kAbsolute;
     else if (has_action("RIGHT", actions))
-        flags = ARBSEEK_FORWARD | kFORWARD | kSTICKY   | kRELATIVE;
+        flags = ARBSEEK_FORWARD | kForward | kSticky   | kRelative;
     else if (has_action("SEEKRWND", actions))
-        flags = ARBSEEK_REWIND  | kREWIND  | kSLIPPERY | kRELATIVE;
+        flags = ARBSEEK_REWIND  | kRewind  | kSlippery | kRelative;
     else if (has_action("RWNDSTICKY", actions))
-        flags = ARBSEEK_SET     | kREWIND  | kSTICKY   | kABSOLUTE;
+        flags = ARBSEEK_SET     | kRewind  | kSticky   | kAbsolute;
     else if (has_action("LEFT", actions))
-        flags = ARBSEEK_REWIND  | kREWIND  | kSTICKY   | kRELATIVE;
+        flags = ARBSEEK_REWIND  | kRewind  | kSticky   | kRelative;
     else
         return false;
 
-    int direction = (flags & kREWIND) ? -1 : 1;
+    int direction = (flags & kRewind) ? -1 : 1;
     if (HasQueuedInput())
     {
-        DoArbSeek(actx, (ArbSeekWhence)(flags & kWHENCE_MASK));
+        DoArbSeek(actx, static_cast<ArbSeekWhence>(flags & kWhenceMask));
     }
     else if (actx->paused)
     {
         if (!isDVD)
         {
-            float time = (flags & kABSOLUTE) ?  direction :
+            float time = (flags & kAbsolute) ?  direction :
                              direction * (1.001 / actx->last_framerate);
-            QString message = (flags & kREWIND) ? QString(tr("Rewind")) :
+            QString message = (flags & kRewind) ? QString(tr("Rewind")) :
                                                  QString(tr("Forward"));
             DoSeek(actx, time, message);
         }
     }
-    else if (flags & kSTICKY)
+    else if (flags & kSticky)
     {
         ChangeFFRew(actx, direction);
     }
-    else if (flags & kREWIND)
+    else if (flags & kRewind)
     {
             if (smartForward)
                 doSmartForward = true;
