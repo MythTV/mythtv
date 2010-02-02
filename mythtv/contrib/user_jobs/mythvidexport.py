@@ -429,7 +429,12 @@ def main():
     if opts.chanid and opts.starttime:
         export = VIDEO(opts)
     elif len(args) == 1:
-        export = VIDEO(opts,int(args[0]))
+        try:
+            export = VIDEO(opts,int(args[0]))
+        except Exception, e:
+            Job(int(args[0])).update({'status':304,
+                                      'comment':'ERROR: '+e.args[0]})
+            sys.exit(1)
     else:
         if opts.tformat or opts.mformat or opts.gformat:
             db = MythDB()
