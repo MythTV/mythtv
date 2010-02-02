@@ -126,11 +126,32 @@ VideoSync::VideoSync(VideoOutput *video_output,
     m_delay(-1)
 {
     bzero(&m_nexttrigger, sizeof(m_nexttrigger));
+
+    int tolerance = m_refresh_interval / 200;
+    if (m_interlaced && m_refresh_interval > ((m_frame_interval/2) + tolerance))
+        m_interlaced = false; // can't display both fields at 2x rate
+
+    //cout << "Frame interval: " << m_frame_interval << endl;
 }
 
 void VideoSync::Start(void)
 {
     gettimeofday(&m_nexttrigger, NULL); // now
+}
+
+/** \fn VideoSync::SetFrameInterval(int fr, bool intr)
+ *  \brief Change frame interval and interlacing attributes
+ */
+void VideoSync::SetFrameInterval(int fr, bool intr)
+{
+    m_frame_interval = fr;
+    m_interlaced = intr;
+    int tolerance = m_refresh_interval / 200;
+    if (m_interlaced && m_refresh_interval > ((m_frame_interval/2) + tolerance))
+        m_interlaced = false; // can't display both fields at 2x rate
+
+    VERBOSE(VB_PLAYBACK, QString("Set video sync frame interval to %1")
+                                 .arg(m_frame_interval));
 }
 
 void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
@@ -210,6 +231,23 @@ int VideoSync::CalcDelay()
     }
 
     return ret_val;
+}
+
+/** \fn VideoSync::KeepPhase()
+ *  \brief Keep our nexttrigger from drifting too close to the exact retrace.
+ *
+ *   If delay is near zero, some frames will be delay < 0 and others
+ *   delay > 0 which would cause continous rapid fire stuttering.
+ *   This method is only useful for those sync methods where WaitForFrame
+ *   targets hardware retrace rather than targeting nexttrigger.
+ */
+void VideoSync::KeepPhase()
+{
+    // cerr << m_delay << endl;
+    if (m_delay < -(m_refresh_interval/2))
+        OffsetTimeval(m_nexttrigger, 200);
+    else if (m_delay > -500)
+        OffsetTimeval(m_nexttrigger, -2000);
 }
 
 #ifndef _WIN32
@@ -332,6 +370,12 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
         //cerr << "Wait " << n << " intervals. Count " << blank.request.sequence;
         //cerr  << " Delay " << m_delay << endl;
     }
+}
+
+void DRMVideoSync::AdvanceTrigger(void)
+{
+    KeepPhase();
+    UpdateNexttrigger();
 }
 #endif /* !_WIN32 */
 
@@ -497,6 +541,15 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     
 #endif /* USING_OPENGL_VSYNC */
 }
+
+void OpenGLVideoSync::AdvanceTrigger(void)
+{
+#ifdef USING_OPENGL_VSYNC
+
+    KeepPhase();
+    UpdateNexttrigger();
+#endif /* USING_OPENGL_VSYNC */
+}
 #endif /* !_WIN32 */
 
 #ifdef __linux__
@@ -557,6 +610,11 @@ void RTCVideoSync::WaitForFrame(int sync_delay)
             usleep(m_delay);
     }
 }
+
+void RTCVideoSync::AdvanceTrigger(void)
+{
+    UpdateNexttrigger();
+}
 #endif /* __linux__ */
 
 #ifdef USING_VDPAU
@@ -590,6 +648,11 @@ void VDPAUVideoSync::WaitForFrame(int sync_delay)
 
     VideoOutputVDPAU *vo = (VideoOutputVDPAU *)(m_video_output);
     vo->SetNextFrameDisplayTimeOffset(m_delay);
+}
+
+void VDPAUVideoSync::AdvanceTrigger(void)
+{
+    UpdateNexttrigger();
 }
 
 #endif
@@ -642,6 +705,11 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
     }
 }
 
+void BusyWaitVideoSync::AdvanceTrigger(void)
+{
+    UpdateNexttrigger();
+}
+
 USleepVideoSync::USleepVideoSync(VideoOutput *vo,
                                  int fr, int ri, bool intl) : 
     VideoSync(vo, fr, ri, intl)
@@ -665,4 +733,9 @@ void USleepVideoSync::WaitForFrame(int sync_delay)
     m_delay = CalcDelay();
     if (m_delay > 0)
         usleep(m_delay);
+}
+
+void USleepVideoSync::AdvanceTrigger(void)
+{
+    UpdateNexttrigger();
 }
