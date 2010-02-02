@@ -3,6 +3,7 @@
 
 #include <QCoreApplication>
 #include <QDomDocument>
+#include <QFontInfo>
 
 #include "mythverbose.h"
 #include "mythdb.h"
@@ -10,6 +11,10 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "xmlparsebase.h"
+
+#define LOC      QString("MythFontProperties: ")
+#define LOC_WARN QString("MythFontProperties, Warning: ")
+#define LOC_ERR  QString("MythFontProperties, Error: ")
 
 MythFontProperties::MythFontProperties() :
     m_color(QColor(Qt::white)), m_hasShadow(false), m_shadowAlpha(255),
@@ -135,13 +140,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     if (name.isEmpty())
     {
         XML_ERROR(element, "Font needs a name");
-        return NULL;
-    }
-
-    if (addToGlobal && GetGlobalFontMap()->Contains(name))
-    {
-        VERBOSE(VB_FILE, QString("Warning, already have a global font "
-                                 "called: %1").arg(name));
+        delete newFont;
         return NULL;
     }
 
@@ -161,6 +160,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         {
             XML_ERROR(element, QString("Specified base font '%1' does not "
                                        "exist for font %2").arg(base).arg(name));
+            delete newFont;
             return NULL;
         }
 
@@ -184,12 +184,19 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     else
     {
         newFont->m_face.setFamily(face);
-        // NOTE: exactMatch() is broken and always returns false
-//         if (!newFont->m_face.exactMatch())
-//         {
-//             QFont tmp = QCoreApplication::font();
-//             newFont->m_face.setFamily(tmp.family());
-//         }
+    }
+
+    if (addToGlobal && GetGlobalFontMap()->Contains(name))
+    {
+        MythFontProperties *tmp = GetGlobalFontMap()->GetFont(name);
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                QString("Attempting to define %1\n\t\t\t"
+                        "with face '%2', but it already exists with face '%3'")
+                .arg(name)
+                .arg(QFontInfo(newFont->m_face).family())
+                .arg((tmp) ? QFontInfo(tmp->m_face).family() : "ERROR"));
+        delete newFont;
+        return NULL;
     }
 
     QString hint = element.attribute("stylehint", "");
@@ -346,6 +353,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             else
             {
                 XML_ERROR(info, QString("Unknown tag in font %1").arg(name));
+                delete newFont;
                 return NULL;
             }
         }
@@ -354,6 +362,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     if (size <= 0 && pixelsize <= 0 && !fromBase)
     {
         XML_ERROR(element, "Error, font size must be > 0");
+        delete newFont;
         return NULL;
     }
     else if (pixelsize > 0)
@@ -362,6 +371,18 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
         newFont->m_face.setPointSize(GetMythMainWindow()->NormalizeFontSize(size));
 
     newFont->Unfreeze();
+
+    QFontInfo fi(newFont->m_face);
+    if (newFont->m_face.family() != fi.family())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to load '%1', got '%2' instead")
+                .arg(newFont->m_face.family()).arg(fi.family()));
+    }
+    else
+    {
+        VERBOSE(VB_OSD, LOC + QString("loaded '%1'").arg(fi.family()));
+    }
 
     if (addToGlobal)
         GetGlobalFontMap()->AddFont(name, newFont);
