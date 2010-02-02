@@ -1,7 +1,0 @@
-This module provides a number of old themes for MythTV that used to be
-distributed in the main download.
-
-To install:
-
-$ ./configure
-$ sudo make install
