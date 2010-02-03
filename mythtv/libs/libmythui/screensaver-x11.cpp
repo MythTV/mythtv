@@ -38,10 +38,14 @@ class ScreenSaverX11Private
         m_timeoutInterval(-1),        m_resetTimer(NULL),
         m_display(NULL)
     {
+        const int flags = MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                          MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU;
         m_xscreensaverRunning =
-                myth_system("xscreensaver-command -version >&- 2>&-") == 0;
+                myth_system("xscreensaver-command -version >&- 2>&-",
+                            flags) == 0;
         m_gscreensaverRunning =
-                myth_system("gnome-screensaver-command --help >&- 2>&-") == 0;
+                myth_system("gnome-screensaver-command --help >&- 2>&-",
+                            flags) == 0;
 
         if (IsScreenSaverRunning())
         {
@@ -200,12 +204,18 @@ class ScreenSaverX11Private
             if (m_xscreensaverRunning)
             {
                 VERBOSE(VB_PLAYBACK, LOC + "Calling xscreensaver-command -deactivate");
-                myth_system("xscreensaver-command -deactivate >&- 2>&- &");
+                myth_system("xscreensaver-command -deactivate >&- 2>&- &",
+                            MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                            MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU |
+                            MYTH_SYSTEM_DONT_BLOCK_PARENT);
             }
             if (m_gscreensaverRunning)
             {
                 VERBOSE(VB_PLAYBACK, LOC + "Calling gnome-screensaver-command --poke");
-                myth_system("gnome-screensaver-command --poke >&- 2>&- &");
+                myth_system("gnome-screensaver-command --poke >&- 2>&- &",
+                            MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                            MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU |
+                            MYTH_SYSTEM_DONT_BLOCK_PARENT);
             }
             m_last_deactivated = current_time;
         }
