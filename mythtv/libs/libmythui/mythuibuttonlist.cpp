@@ -2035,14 +2035,7 @@ void MythUIButtonList::Init()
                 row++;
             }
 
-            if ((m_FixedButtonPosition.contains(col)) &&
-                (m_FixedButtonPosition[col].contains(row)))
-                button->SetPosition(m_FixedButtonPosition[col][row]);
-
-            if ((m_FixedButtonSize.contains(col)) &&
-                (m_FixedButtonSize[col].contains(row)))
-                button->SetSize(m_FixedButtonSize[col][row]);
-
+            button->SetPosition(GetButtonPosition(col, row));
             col++;
 
             m_ButtonList.push_back(button);
@@ -2226,6 +2219,16 @@ bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
     return handled;
 }
 
+QPoint MythUIButtonList::GetButtonPosition(int column, int row) const
+{
+    int x = m_contentsRect.x() +
+                            ((column - 1) * (m_itemWidth + m_itemHorizSpacing));
+    int y = m_contentsRect.y() +
+                            ((row - 1) * (m_itemHeight + m_itemVertSpacing));
+
+    return QPoint(x,y);
+}
+
 void MythUIButtonList::CalculateVisibleItems(void)
 {
     int y = 0;
@@ -2241,7 +2244,6 @@ void MythUIButtonList::CalculateVisibleItems(void)
             x += m_itemWidth + m_itemHorizSpacing;
             m_columns++;
         }
-        x -= m_itemHorizSpacing;
     }
 
     if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
@@ -2251,7 +2253,6 @@ void MythUIButtonList::CalculateVisibleItems(void)
             y += m_itemHeight + m_itemVertSpacing;
             m_rows++;
         }
-        y -= m_itemVertSpacing;
     }
 
     if (m_rows <= 0)
@@ -2261,64 +2262,6 @@ void MythUIButtonList::CalculateVisibleItems(void)
         m_columns = 1;
 
     m_itemsVisible = m_columns * m_rows;
-
-    // scale up button sizes to fill in gaps
-    int largecount = 0;
-    int small      = 0;
-    QMap <int, int> rowSizes;
-    QMap <int, int> colSizes;
-
-    // horizontal row of buttons
-    if (x && x < m_contentsRect.width())
-    {
-        int diff = m_contentsRect.width() - x;
-        small = diff / m_columns;
-        largecount = diff % m_columns;
-    }
-
-    x = 0;
-    for (int btn = 1; btn <= m_columns; btn++ )
-    {
-        if (btn < largecount)
-            colSizes[btn] = m_itemWidth + small + 1;
-        else
-            colSizes[btn] = m_itemWidth + small;
-    }
-
-    m_itemWidth += small + 1;
-
-    // vertical column of buttons
-    if (y && y < m_contentsRect.height())
-    {
-        int diff  = m_contentsRect.height() - y;
-        small = diff / m_rows;
-        largecount = diff % m_rows;
-    }
-
-    y = 0;
-    for (int btn = 1; btn <= m_rows; btn++ )
-    {
-        if (btn < largecount)
-            rowSizes[btn] = m_itemHeight + small + 1;
-        else
-            rowSizes[btn] = m_itemHeight + small;
-    }
-
-    m_itemHeight += small + 1;
-
-    x = 0;
-    y = 0;
-    for (int r = 1; r <= m_rows; r++)
-    {
-        x = 0;
-        for (int c = 1; c <= m_columns; c++)
-        {
-            m_FixedButtonSize[c][r] = QSize(colSizes[c], rowSizes[r]);
-            m_FixedButtonPosition[c][r] = QPoint(x, y);
-            x += colSizes[c] + m_itemHorizSpacing;
-        }
-        y += rowSizes[r] + m_itemVertSpacing;
-    }
 }
 
 bool MythUIButtonList::ParseElement(QDomElement &element)
@@ -2383,27 +2326,8 @@ bool MythUIButtonList::ParseElement(QDomElement &element)
         m_showArrow = parseBool(element);
     else if (element.tagName() == "spacing")
     {
-        int val  = 0;
-
-        // If the theme wants 1-pixel separation, don't let scaling
-        // convert this down to 0-pixels of separation
-        val  = getFirstText(element).toInt();
-        if (val == 1)
-        {
-            int nval = NormX(val);
-            m_itemHorizSpacing = nval != 0 ? nval : 1;
-        }
-        else
-            m_itemHorizSpacing = NormX(val);
-
-        val  = getFirstText(element).toInt();
-        if (val == 1)
-        {
-            int nval = NormY(val);
-            m_itemVertSpacing = nval != 0 ? nval : 1;
-        }
-        else
-            m_itemVertSpacing = NormY(val);
+        m_itemHorizSpacing = NormX(getFirstText(element).toInt());
+        m_itemVertSpacing = NormY(getFirstText(element).toInt());
     }
     else if (element.tagName() == "drawfrombottom")
     {
@@ -2991,5 +2915,3 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
 
 
 }
-
-/* vim: set expandtab tabstop=4 shiftwidth=4: */

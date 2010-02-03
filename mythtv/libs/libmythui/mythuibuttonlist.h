@@ -208,6 +208,7 @@ class MPUBLIC MythUIButtonList : public MythUIType
     
     /* methods for subclasses to override */
     virtual void CalculateVisibleItems(void);
+    virtual QPoint GetButtonPosition(int column, int row) const;
 
     virtual bool ParseElement(QDomElement &element);
     virtual void CopyFrom(MythUIType *base);
@@ -247,8 +248,6 @@ class MPUBLIC MythUIButtonList : public MythUIType
 
     QVector<MythUIStateType *> m_ButtonList;
     QMap<int, MythUIButtonListItem *> m_ButtonToItem;
-    QMap<int, QMap<int, QSize> > m_FixedButtonSize;
-    QMap<int, QMap<int, QPoint> > m_FixedButtonPosition;
 
     bool m_initialized;
     bool m_needsUpdate;
