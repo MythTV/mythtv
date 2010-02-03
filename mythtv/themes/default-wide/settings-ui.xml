@@ -13,7 +13,7 @@
             <spacing>5</spacing>
             <scrollstyle>free</scrollstyle>
             <wrapstyle>none</wrapstyle>
-            <buttonarea>0,0,400,97%</buttonarea>
+            <buttonarea>0,0,400,380</buttonarea>
         </buttonlist>
 
         <shape name="label-shape">
