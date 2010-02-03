@@ -953,7 +953,8 @@ bool VideoOutputDirectfb::InputChanged(const QSize &input_size,
                                        void        *codec_private,
                                        bool        &aspect_only)
 {
-    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,
+                              aspect_only);
 
     DFBSurfaceDescription desc;
     bzero(&desc, sizeof(DFBSurfaceDescription));
