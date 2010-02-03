@@ -1549,7 +1549,6 @@ void MythUIButtonList::InitButton(int itemIdx, MythUIStateType* & realButton,
 int MythUIButtonList::PageUp(void)
 {
     int pos        = m_selPosition;
-    int num_items  = m_itemList.size();
     int total      = 0;
     MythUIGroup*     buttonstate;
     MythUIStateType* realButton;
