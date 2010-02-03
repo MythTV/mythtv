@@ -101,8 +101,8 @@ OSD::~OSD(void)
 
     {
         QMutexLocker locker(&loadFontLock);
-        QHash<QString, TTFFont*>::iterator it = loadFontHash.begin();
-        for (; it != loadFontHash.end(); ++it)
+        QMap<QString, TTFFont *>::iterator it = fontMap.begin();
+        for (; it != fontMap.end(); ++it)
         {
             if (*it)
                 delete *it;
@@ -699,7 +699,7 @@ TTFFont *OSD::LoadFont(const QString &name, int size)
     QHash<QString, TTFFont*>::iterator it =
         loadFontHash.find(stdFontKey);
     if (it != loadFontHash.end())
-        return *it;
+        return (*it) ? new TTFFont(**it) : NULL;
 
     QString sharedFontKey = QString("%1_%2###%3_%4")
         .arg(GetShareDir() + name).arg(size)
@@ -707,7 +707,7 @@ TTFFont *OSD::LoadFont(const QString &name, int size)
 
     it = loadFontHash.find(sharedFontKey);
     if (it != loadFontHash.end())
-        return *it;
+        return (*it) ? new TTFFont(**it) : NULL;
 
     QString themeFontKey = QString("%1_%2###%3_%4")
         .arg(themepath + "/" + name).arg(size)
@@ -717,7 +717,7 @@ TTFFont *OSD::LoadFont(const QString &name, int size)
     {
         it = loadFontHash.find(themeFontKey);
         if (it != loadFontHash.end())
-            return *it;
+            return (*it) ? new TTFFont(**it) : NULL;
     }
 
     QString simpleFontKey = QString("%1_%2###%3_%4")
@@ -732,7 +732,7 @@ TTFFont *OSD::LoadFont(const QString &name, int size)
                     QString("Unable to find font: %1\n\t\t\t"
                             "No OSD will be displayed.").arg(name));
         }
-        return *it;
+        return (*it) ? new TTFFont(**it) : NULL;
     }
 
     //

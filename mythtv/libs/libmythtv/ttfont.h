@@ -1,14 +1,6 @@
 #ifndef INCLUDED_TTFONT__H_
 #define INCLUDED_TTFONT__H_
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_GLYPH_H
-
-#include <QString>
-#include <QColor>
-#include <QMap>
-
 #include "mythconfig.h"
 
 #if HAVE_STDINT_H
@@ -24,62 +16,39 @@ enum kTTF_Color {
     kTTF_Shadow,
 };
 
+class TTFFontPrivate;
 class TTFFont
 {
   public:
      TTFFont(const QString &file, int size, float wscale, float hmult);
+     TTFFont(const TTFFont&);
     ~TTFFont();
 
      // Actually greyscale, keep for compat.
      void setColor(int color);
-     void setColor(QColor c, kTTF_Color k = kTTF_Normal);
+     void setColor(const QColor &c, kTTF_Color k = kTTF_Normal);
 
      void setOutline(bool outline) { m_outline = outline; }
      void setShadow(int xoff, int yoff) { m_shadowxoff = xoff; 
                                           m_shadowyoff = yoff; }
 
-     bool isValid(void) { return valid; }
-
      void DrawString(OSDSurface *surface, int x, int y, const QString &text,
                      int maxx, int maxy, int alphamod = 255,
-                     bool double_size = false); 
-     void CalcWidth(const QString &text, int *width_return);
+                     bool double_size = false) const; 
+     void CalcWidth(const QString &text, int *width_return) const;
 
-     int SpaceWidth() { return spacewidth; }
-     int Size() { return loadedfontsize; }
+     bool isValid(void)    const;
+     int  SpaceWidth(void) const;
+     int  Size(void)       const;
 
-     void Reinit(float wscale, float hmult);
+     bool Reinit(float wscale, float hmult);
 
   private:
-     void KillFace(void);
-     void Init(void);
+     void MergeText(OSDSurface *surface, Raster_Map *rmap, int offset_x, 
+                    int offset_y, int xstart, int ystart, int width, 
+                    int height, int alphamod, kTTF_Color k = kTTF_Normal) const;
 
-     Raster_Map *create_font_raster(int width, int height);
-     Raster_Map *duplicate_raster(FT_BitmapGlyph bmap);
-     void clear_raster(Raster_Map *rmap);
-     void destroy_font_raster(Raster_Map *rmap);
-     Raster_Map *calc_size(int *width, int *height, const QString &text,
-                           bool double_size = false);
-     void render_text(Raster_Map *rmap, Raster_Map *rchr, const QString &text, 
-                      int *xorblah, int *yor, bool double_size = false);
-     void merge_text(OSDSurface *surface, Raster_Map *rmap, int offset_x, 
-                     int offset_y, int xstart, int ystart, int width, 
-                     int height, int alphamod, kTTF_Color k = kTTF_Normal);
-     bool cache_glyph(unsigned short c);
-
-     bool         valid;
-     FT_Face      face;
-     QMap<unsigned short, FT_Glyph> glyphs;
-     QMap<unsigned short, Raster_Map *> glyphs_cached;
-     int          max_descent;
-     int          max_ascent;
-     int          fontsize;
-     int          vid_width;
-     int          vid_height;
-     bool         use_kerning;
-
-     int spacewidth;
-     int m_size;
+     TTFFontPrivate *m_priv;
 
      bool m_outline;
      int m_shadowxoff;
@@ -96,15 +65,6 @@ class TTFFont
      uint8_t m_color_shadow_y;
      uint8_t m_color_shadow_u;
      uint8_t m_color_shadow_v;
-
-     QString m_file;
-
-     int loadedfontsize;
-     float m_wscale;
-     float m_hmult;
-
-     static bool have_library;
-     static FT_Library the_library;
 };
 
 #endif
