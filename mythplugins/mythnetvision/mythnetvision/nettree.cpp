@@ -62,6 +62,10 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
     m_updateFreq = gContext->GetNumSetting(
                        "mythNetTree.updateFreq", 6);
+    m_rssAutoUpdate = gContext->GetNumSetting(
+                       "mythnetvision.rssBackgroundFetch", 0);
+    m_treeAutoUpdate = gContext->GetNumSetting(
+                       "mythnetvision.backgroundFetch", 0);
 }
 
 bool NetTree::Create()
@@ -564,6 +568,14 @@ void NetTree::showManageMenu()
         menuPopup->AddButton(tr("Update RSS"), SLOT(updateRSS()));
         menuPopup->AddButton(tr("Manage Site Subscriptions"), SLOT(runTreeEditor()));
         menuPopup->AddButton(tr("Manage RSS Subscriptions"), SLOT(runRSSEditor()));
+        if (!m_treeAutoUpdate)
+            menuPopup->AddButton(tr("Enable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
+        else 
+            menuPopup->AddButton(tr("Disable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
+        if (!m_rssAutoUpdate) 
+            menuPopup->AddButton(tr("Enable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
+        else
+            menuPopup->AddButton(tr("Disable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
     }
     else
     {
@@ -1349,6 +1361,20 @@ void NetTree::updateTrees()
     createBusyDialog(title);
     m_gdt->refreshAll();
     m_gdt->start();
+}
+
+void NetTree::toggleRSSUpdates()
+{
+    m_rssAutoUpdate = !m_rssAutoUpdate;
+    gContext->SaveSetting("mythnetvision.rssBackgroundFetch",
+                         m_rssAutoUpdate);
+}
+
+void NetTree::toggleTreeUpdates()
+{
+    m_treeAutoUpdate = !m_treeAutoUpdate;
+    gContext->SaveSetting("mythnetvision.backgroundFetch",
+                         m_treeAutoUpdate);
 }
 
 void NetTree::customEvent(QEvent *event)

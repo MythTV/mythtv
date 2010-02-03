@@ -142,6 +142,8 @@ class NetTree : public MythScreenType
     Parse              *m_parse;
 
     uint                m_updateFreq;
+    bool                m_rssAutoUpdate;
+    bool                m_treeAutoUpdate;
 
   private slots:
     void showWebVideo(void);
@@ -161,6 +163,8 @@ class NetTree : public MythScreenType
 
     void updateRSS();
     void updateTrees();
+    void toggleRSSUpdates();
+    void toggleTreeUpdates();
 
     void slotDeleteVideo(void);
     void doDeleteVideo(bool remove);
