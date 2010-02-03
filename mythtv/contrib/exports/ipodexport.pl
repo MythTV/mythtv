@@ -36,7 +36,7 @@ $debug = 0;
 $usage = "\nHow to use ipodexport.pl : \n"
         ."ipodexport.pl exportdir=/foo/bar starttime=%STARTTIME% chanid=%CHANID bitrate=x size=320x240 aspect=4:3 debug\n"
         ."\n%CHANID% = channel ID associated with the recording to export\n"
-        ."%STARTTIME% = recording start time in either 'yyyy-mm-dd hh:mm:ss' or 'yyyymmddhhmmss' format\n"
+        ."%STARTTIME% = recording start time in either 'yyyy-MM-dd hh:mm:ss' or 'yyyyMMddhhmmss' format\n"
         ."exportdir = dir to export completed MP4 files to (note the user the script runs as must have write permission on that dir\n"
         ."size = frame size of output file.  320x240 is the default value \n"
         ."aspect = aspect ratio of output file.  Valid values are 4:3 (default) and 16:9 \n"

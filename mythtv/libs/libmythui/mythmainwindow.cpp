@@ -793,7 +793,7 @@ bool MythMainWindow::screenShot(int x, int y, int x2, int y2)
     QString fName = QString("/%1/myth-screenshot-%2.png")
                     .arg(fPath)
                     .arg(QDateTime::currentDateTime()
-                         .toString("yyyy-mm-ddThh-mm-ss.zzz"));
+                         .toString("yyyy-MM-ddThh-mm-ss.zzz"));
 
     return screenShot(fName, x, y, x2, y2, 0, 0);
 }
