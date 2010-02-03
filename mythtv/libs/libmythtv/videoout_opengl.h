@@ -24,7 +24,8 @@ class VideoOutputOpenGL : public VideoOutput
                       FrameScanType scan);
     void Show(FrameScanType );
     bool InputChanged(const QSize &input_size, float aspect,
-                      MythCodecID  av_codec_id, void *codec_private);
+                      MythCodecID  av_codec_id, void *codec_private,
+                      bool &aspect_only);
     DisplayInfo GetDisplayInfo(void);
     void UpdatePauseFrame(void);
     void DrawUnusedRects(bool) { }

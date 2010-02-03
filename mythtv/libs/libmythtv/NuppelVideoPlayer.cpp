@@ -788,57 +788,48 @@ void NuppelVideoPlayer::ReinitOSD(void)
 
 void NuppelVideoPlayer::ReinitVideo(void)
 {
-    vidExitLock.lock();
-    videofiltersLock.lock();
-
-    float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
-                                               video_aspect;
-
-    bool ok = true;
-    if (videoOutput->IsPreferredRenderer(video_disp_dim))
-    {
-        if (!videoOutput->InputChanged(video_disp_dim, aspect,
-                                       GetDecoder()->GetVideoCodecID(),
-                                       GetDecoder()->GetVideoCodecPrivate()))
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Failed to Reinitialize Video. Exiting..");
-            SetErrored(QObject::tr("Failed to reinitialize video output"));
-            ok = false;
-        }
-    }
-    else
+    if (!videoOutput->IsPreferredRenderer(video_disp_dim))
     {
         VERBOSE(VB_PLAYBACK, LOC + QString("Need to switch video renderer."));
         SetErrored(QObject::tr("Need to switch video renderer."));
         errorType |= kError_Switch_Renderer;
-        ok = false;
+        return;
     }
 
-    ok &= !videoOutput->IsErrored();
-    if (ok)
+    bool aspect_only = false;
     {
+        QMutexLocker locker1(&vidExitLock);
+        QMutexLocker locker2(&videofiltersLock);
+        float aspect = (forced_video_aspect > 0) ? forced_video_aspect :
+                                               video_aspect;
+        if (!videoOutput->InputChanged(video_disp_dim, aspect,
+                                       GetDecoder()->GetVideoCodecID(),
+                                       GetDecoder()->GetVideoCodecPrivate(),
+                                       aspect_only))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to Reinitialize Video. Exiting..");
+            SetErrored(QObject::tr("Failed to reinitialize video output"));
+            return;
+        }
+
         // We need to tell it this for automatic deinterlacer settings
         videoOutput->SetVideoFrameRate(video_frame_rate * play_speed);
-        CheckExtraAudioDecode();
         ReinitOSD();
     }
 
-    videofiltersLock.unlock();
-    vidExitLock.unlock();
-
-    if (!ok)
-        return;
-
-    ClearAfterSeek();
+    if (!aspect_only)
+    {
+        CheckExtraAudioDecode();
+        ClearAfterSeek();
+        InitFilters();
+    }
 
     if (textDisplayMode)
     {
         DisableCaptions(textDisplayMode, false);
         SetCaptionsEnabled(true, false);
     }
-
-    InitFilters();
 
     if (player_ctx->buffer->InDVDMenuOrStillFrame())
         player_ctx->buffer->DVD()->SetRunSeekCellStart(true);

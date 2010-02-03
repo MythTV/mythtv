@@ -1176,7 +1176,8 @@ void VideoOutputQuartz::MoveResize(void)
 bool VideoOutputQuartz::InputChanged(const QSize &input_size,
                                      float        aspect,
                                      MythCodecID  av_codec_id,
-                                     void        *codec_private)
+                                     void        *codec_private,
+                                     bool        &aspect_only)
 {
     VERBOSE(VB_PLAYBACK, LOC +
             QString("InputChanged(WxH = %1x%2, aspect=%3")
@@ -1193,7 +1194,10 @@ bool VideoOutputQuartz::InputChanged(const QSize &input_size,
     {
         // TODO we should clear our buffers to black here..
         if (asp_changed)
+        {
+            aspect_only = true;
             MoveResize();
+        }
         return true;
     }
 

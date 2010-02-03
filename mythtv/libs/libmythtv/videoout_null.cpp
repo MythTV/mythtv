@@ -85,7 +85,8 @@ void VideoOutputNull::CreatePauseFrame(void)
 bool VideoOutputNull::InputChanged(const QSize &input_size,
                                    float        aspect,
                                    MythCodecID  av_codec_id,
-                                   void        *codec_private)
+                                   void        *codec_private,
+                                   bool        &aspect_only)
 {
     VERBOSE(VB_PLAYBACK,
             QString("InputChanged(WxH = %1x%2, aspect = %3)")
@@ -104,7 +105,8 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     bool res_changed = input_size != windows[0].GetVideoDispDim();
 
-    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,
+                              aspect_only);
 
     if (!res_changed)
     {

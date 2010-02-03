@@ -950,7 +950,8 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
 bool VideoOutputDirectfb::InputChanged(const QSize &input_size,
                                        float        aspect,
                                        MythCodecID  av_codec_id,
-                                       void        *codec_private)
+                                       void        *codec_private,
+                                       bool        &aspect_only)
 {
     VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
 

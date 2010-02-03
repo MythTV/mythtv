@@ -276,7 +276,8 @@ void VideoOutputXv::WindowResized(const QSize &new_size)
 bool VideoOutputXv::InputChanged(const QSize &input_size,
                                  float        aspect,
                                  MythCodecID  av_codec_id,
-                                 void        *codec_private)
+                                 void        *codec_private,
+                                 bool        &aspect_only)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) '%4'->'%5'")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
@@ -288,16 +289,19 @@ bool VideoOutputXv::InputChanged(const QSize &input_size,
     bool res_changed = input_size     != windows[0].GetVideoDispDim();
     bool asp_changed = aspect         != windows[0].GetVideoAspect();
 
-    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private);
-
     if (!res_changed && !cid_changed)
     {
-        if (VideoOutputSubType() == XVideo)
-            vbuffers.Clear(xv_chroma);
         if (asp_changed)
+        {
+            aspect_only = true;
+            VideoAspectRatioChanged(aspect);
             MoveResize();
+        }
         return true;
     }
+
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,
+                              aspect_only);
 
     bool delete_pause_frame = cid_changed;
     DeleteBuffers(VideoOutputSubType(), delete_pause_frame);

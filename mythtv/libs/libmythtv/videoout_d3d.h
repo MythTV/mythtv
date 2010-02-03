@@ -108,7 +108,8 @@ class VideoOutputD3D : public VideoOutput
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,
-                      void        *codec_private);
+                      void        *codec_private,
+                      bool        &aspect_only);
     DisplayInfo GetDisplayInfo(void);
     void MoveResizeWindow(QRect new_rect) {;}
     void UpdatePauseFrame(void);

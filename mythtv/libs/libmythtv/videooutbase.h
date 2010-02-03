@@ -77,7 +77,8 @@ class VideoOutput
     virtual bool InputChanged(const QSize &input_size,
                               float        aspect,
                               MythCodecID  myth_codec_id,
-                              void        *codec_private);
+                              void        *codec_private,
+                              bool        &aspect_changed);
     virtual void VideoAspectRatioChanged(float aspect);
 
     virtual void ResizeDisplayWindow(const QRect&, bool);

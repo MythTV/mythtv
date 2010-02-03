@@ -27,7 +27,8 @@ class VideoOutputQuartz : public VideoOutput
     bool InputChanged(const QSize &input_size,
                       float        aspect,
                       MythCodecID  av_codec_id,
-                      void        *codec_private);
+                      void        *codec_private,
+                      bool        &aspect_only);
     void VideoAspectRatioChanged(float aspect);
     void MoveResize(void);
     void Zoom(ZoomDirection direction);

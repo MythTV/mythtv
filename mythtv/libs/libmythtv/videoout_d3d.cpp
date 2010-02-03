@@ -1024,7 +1024,8 @@ void VideoOutputD3D::WindowResized(const QSize &new_size)
 bool VideoOutputD3D::InputChanged(const QSize &input_size,
                                   float        aspect,
                                   MythCodecID  av_codec_id,
-                                  void        *codec_private)
+                                  void        *codec_private,
+                                  bool        &aspect_only)
 {
     VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3) %4")
             .arg(input_size.width()).arg(input_size.height()).arg(aspect)
@@ -1044,6 +1045,7 @@ bool VideoOutputD3D::InputChanged(const QSize &input_size,
     {
         if (windows[0].GetVideoAspect() != aspect)
         {
+            aspect_only = true;
             VideoAspectRatioChanged(aspect);
             MoveResize();
         }
