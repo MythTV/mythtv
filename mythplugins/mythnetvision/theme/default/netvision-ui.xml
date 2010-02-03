@@ -48,7 +48,7 @@
     </textarea>
 
     <textarea name="nosites" from="description">
-        <value>Can't find any search scripts!  This usually indicates missing search script prerequisities.  Try running a script from the command line.</value>
+        <value>Can't find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.</value>
     </textarea>
 
   </window>
