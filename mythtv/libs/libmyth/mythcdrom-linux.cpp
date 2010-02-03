@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/ioctl.h>       // ioctls
 #include <linux/cdrom.h>     // old ioctls for cdrom
 #include <scsi/sg.h>
