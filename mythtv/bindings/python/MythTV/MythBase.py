@@ -1042,36 +1042,16 @@ class MythDBBase( object ):
                         'urn:schemas-upnp-org:device:MediaServer:1'):
                 continue
             ip, port = reLOC.match(sdict['location']).group(1,2)
-            try:
-                dbconn = self._processPage(ip, port, pin)
+            xml = MythXMLConn(backend=ip, port=port)
+            dbconn = xml.getConnectionInfo(pin)
+            if self._check_dbconn(dbconn):
                 break
-            except:
-                continue
             
         else:
             sock.close()
             raise MythDBError(MythError.DB_CREDENTIALS)
 
         sock.close()
-        return dbconn
-
-    def _processPage(self, ip, port, pin):
-        dbconn = {'SecurityPin':pin}
-        # try opening settings page with SecurityPin
-        up = urlopen('http://%s:%s/Myth/GetConnectionInfo?Pin=%s' \
-                            % (ip, port, pin))
-        config = etree.fromstring(up.read())
-        up.close()
-
-        # load data from webpage
-        conv = {'Host':'DBHostName',    'Port':'DBPort',
-                'UserName':'DBUserName','Password':'DBPassword',
-                'Name':'DBName'}
-        for child in config.find('Info').find('Database').getchildren():
-            if child.tag in conv:
-                dbconn[conv[child.tag]] = child.text
-        if not self._check_dbconn(dbconn):
-            raise MythDBError(MythError.DB_CREDENTIALS)
         return dbconn
 
     def _check_dbconn(self,dbconn):
@@ -1321,7 +1301,10 @@ class MythXMLConn( object ):
                 (str(self.__class__).split("'")[1].split(".")[-1], 
                  self.host, self.port, hex(id(self)))
 
-    def __init__(self, backend=None, db=None):
+    def __init__(self, backend=None, db=None, port=None):
+        if backend and port:
+            self.host, self.port = backend, int(port)
+            return
         db = MythDBBase(db)
         self.log = MythLog('Python XML Connection', db=db)
         if backend is None:
@@ -1332,20 +1315,20 @@ class MythXMLConn( object ):
             c = db.cursor(self.log)
             if c.execute("""SELECT hostname FROM settings
                             WHERE value='BackendServerIP'
-                            AND data=%s""", self.host) == 0:
+                            AND data=%s""", backend) == 0:
                 raise MythDBError(MythError.DB_SETTING, 
                                         backend+': BackendServerIP')
             self.host = c.fetchone()[0]
-            self.port = self.db.settings[self.host].BackendStatusPort
+            self.port = int(db.settings[self.host].BackendStatusPort)
             c.close()
         else:
             # assume given a hostname
             self.host = backend
-            self.port = db.settings[self.host].BackendStatusPort
+            self.port = int(db.settings[self.host].BackendStatusPort)
             if not self.port:
                 # try a truncated hostname
                 self.host = backend.split('.')[0]
-                self.port = db.setting[self.host].BackendStatusPort
+                self.port = int(db.setting[self.host].BackendStatusPort)
                 if not self.port:
                     raise MythDBError(MythError.DB_SETTING, 
                                         backend+': BackendStatusPort')
@@ -1365,7 +1348,6 @@ class MythXMLConn( object ):
             for key in keyvars:
                 fields.append('%s=%s' % (key, keyvars[key]))
             url += '?'+'&'.join(fields)
-        print 'opening %s' % url
         ufd = urlopen(url)
         res = ufd.read()
         ufd.close()
@@ -1373,7 +1355,27 @@ class MythXMLConn( object ):
 
     def _queryTree(self, path=None, **keyvars):
         """obj._queryTree(path=None, **keyvars) -> xml element tree"""
-        return etree.fromstring(self._query(path, **keyvars)).getroot()
+        xmlstr = self._query(path, **keyvars)
+        if xmlstr.find('xmlns') >= 0:
+            ind1 = xmlstr.find('xmlns')
+            ind2 = xmlstr.find('"', ind1+7) + 1
+            xmlstr = xmlstr[:ind1] + xmlstr[ind2:]
+        return etree.fromstring(xmlstr)
+
+    def getConnectionInfo(self, pin=0):
+        """Return dbconn dict from backend connection info."""
+        dbconn = {'SecurityPin':pin}
+        conv = {'Host':'DBHostName',    'Port':'DBPort',
+                'UserName':'DBUserName','Password':'DBPassword',
+                'Name':'DBName'}
+        tree = self._queryTree('GetConnectionInfo', Pin=pin)
+        if tree.tag == 'GetConnectionInfoResponse':
+            for child in tree.find('Info').find('Database'):
+                if child.tag in conv:
+                    dbconn[conv[child.tag]] = child.text
+            if 'DBPort' in dbconn:
+                dbconn['DBPort'] = int(dbconn['DBPort'])
+        return dbconn
     
 
 class MythLog( object ):
