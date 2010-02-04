@@ -407,16 +407,6 @@ bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
     VERBOSE(VB_IMPORTANT, "Failed to create VDPAU render device.");
     return ok;
 }
-
-void MythRenderVDPAU::RenderLock(bool lock)
-{
-    lock ? m_render_lock.lock() : m_render_lock.unlock();
-}
-
-void MythRenderVDPAU::DecodeLock(bool lock)
-{
-    lock ? m_decode_lock.lock() : m_decode_lock.unlock();
-}
     
 bool MythRenderVDPAU::WasPreempted(void)
 {
@@ -473,7 +463,7 @@ void MythRenderVDPAU::WaitForFlip(void)
 
 void MythRenderVDPAU::Flip(int delay)
 {
-    if (!m_flipReady)
+    if (!m_flipReady || !m_display)
         return;
 
     VdpOutputSurface surface = 0;
@@ -499,6 +489,32 @@ void MythRenderVDPAU::Flip(int delay)
 
     vdp_st = vdp_presentation_queue_display(m_flipQueue, surface, m_rect.x1, m_rect.y1, now);
     CHECK_ST
+    SyncDisplay();
+}
+
+void MythRenderVDPAU::SyncDisplay(void)
+{
+    LOCK_RENDER
+    if (m_display)
+        m_display->Sync();
+}
+
+void MythRenderVDPAU::DrawDisplayRect(const QRect &rect, bool use_colorkey)
+{
+    LOCK_RENDER
+    if (!m_display)
+        return;
+
+    uint color = use_colorkey ? m_colorKey : m_display->GetBlack();
+    m_display->SetForeground(color);
+    m_display->FillRectangle(m_window, rect);
+}
+
+void MythRenderVDPAU::MoveResizeWin(QRect &rect)
+{
+    LOCK_RENDER
+    if (m_display)
+        m_display->MoveResizeWin(m_window, rect);
 }
 
 void MythRenderVDPAU::CheckOutputSurfaces(void)

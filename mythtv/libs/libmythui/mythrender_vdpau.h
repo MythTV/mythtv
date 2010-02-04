@@ -68,15 +68,15 @@ class MPUBLIC MythRenderVDPAU : public MythRender
 
     uint GetColorKey(void)         { return m_colorKey;  }
     void SetPreempted(void)        { m_preempted = true; }
-    MythXDisplay* GetDisplay(void) { return m_display;   }
 
     bool Create(const QSize &size, WId window, uint colorkey = VDPAU_COLORKEY);
-    void RenderLock(bool lock);
-    void DecodeLock(bool lock);
     bool WasPreempted(void);
     bool SetColorKey(uint color);
     void WaitForFlip(void);
     void Flip(int delay = 0);
+    void SyncDisplay(void);
+    void DrawDisplayRect(const QRect &rect, bool use_colorkey = false);
+    void MoveResizeWin(QRect &rect);
     void CheckOutputSurfaces(void);
 
     uint CreateOutputSurface(const QSize &size,

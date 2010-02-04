@@ -160,10 +160,9 @@ void VideoOutputVDPAU::DeleteRender(void)
 
 bool VideoOutputVDPAU::InitBuffers(void)
 {
+    QMutexLocker locker(&m_lock);
     if (!m_render)
         return false;
-
-    QMutexLocker locker(&m_lock);
     const QSize video_dim = windows[0].GetVideoDim();
 
     vbuffers.Init(m_buffer_size, false, 2, 1, 4, 1, false);
@@ -286,11 +285,8 @@ void VideoOutputVDPAU::RestoreDisplay(void)
     }
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
 
-    if (m_render && m_render->GetDisplay())
-    {
-        m_render->GetDisplay()->SetForeground(m_render->GetDisplay()->GetBlack());
-        m_render->GetDisplay()->FillRectangle(m_win, display_visible_rect);
-    }
+    if (m_render)
+        m_render->DrawDisplayRect(display_visible_rect);
 }
 
 bool VideoOutputVDPAU::SetDeinterlacingEnabled(bool interlaced)
@@ -305,12 +301,11 @@ bool VideoOutputVDPAU::SetDeinterlacingEnabled(bool interlaced)
 bool VideoOutputVDPAU::SetupDeinterlace(bool interlaced,
                                         const QString &override)
 {
+    m_lock.lock();
     if (!m_render)
         return false;
 
-    m_lock.lock();
     bool enable = interlaced;
-
     if (enable)
     {
         m_deintfiltername = db_vdisp_profile->GetFilteredDeint(override);
@@ -368,6 +363,7 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
                                     const PIPMap &pipPlayers,
                                     FrameScanType scan)
 {
+    QMutexLocker locker(&m_lock);
     CHECK_ERROR("ProcessFrame")
 
     if (!m_checked_surface_ownership && codec_is_std(m_codec_id))
@@ -382,6 +378,7 @@ void VideoOutputVDPAU::ProcessFrame(VideoFrame *frame, OSD *osd,
 
 void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
 {
+    QMutexLocker locker(&m_lock);
     CHECK_ERROR("PrepareFrame")
 
     if (!m_render)
@@ -394,7 +391,6 @@ void VideoOutputVDPAU::PrepareFrame(VideoFrame *frame, FrameScanType scan)
         m_checked_output_surfaces = true;
     }
 
-    QMutexLocker locker(&m_lock);
     bool new_frame = false;
     if (frame)
     {
@@ -500,7 +496,6 @@ void VideoOutputVDPAU::ClaimVideoSurfaces(void)
     if (!m_render)
         return;
 
-    QMutexLocker locker(&m_lock);
     QVector<uint>::iterator it;
     for (it = m_video_surfaces.begin(); it != m_video_surfaces.end(); ++it)
         m_render->ChangeVideoSurfaceOwner(*it);
@@ -611,6 +606,7 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 
 void VideoOutputVDPAU::Show(FrameScanType scan)
 {
+    QMutexLocker locker(&m_lock);
     CHECK_ERROR("Show")
 
     if (windows[0].IsRepaintNeeded())
@@ -619,7 +615,6 @@ void VideoOutputVDPAU::Show(FrameScanType scan)
     if (m_render)
     {
         m_render->Flip(m_frame_delay);
-        m_render->GetDisplay()->Sync();
         m_frame_delay = 0;
     }
     CheckFrameStates();
@@ -627,8 +622,10 @@ void VideoOutputVDPAU::Show(FrameScanType scan)
 
 void VideoOutputVDPAU::ClearAfterSeek(void)
 {
+    m_lock.lock();
     VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
     DiscardFrames(false);
+    m_lock.unlock();
 }
 
 bool VideoOutputVDPAU::InputChanged(const QSize &input_size,
@@ -710,21 +707,24 @@ void VideoOutputVDPAU::StopEmbedding(void)
 
 void VideoOutputVDPAU::MoveResizeWindow(QRect new_rect)
 {
-    if (m_render && m_render->GetDisplay())
-        m_render->GetDisplay()->MoveResizeWin(m_win, new_rect);
+    m_lock.lock();
+    if (m_render)
+        m_render->MoveResizeWin(new_rect);
+    m_lock.unlock();
 }
 
 void VideoOutputVDPAU::DrawUnusedRects(bool sync)
 {
-    if (windows[0].IsRepaintNeeded() && m_render && m_render->GetDisplay())
+    m_lock.lock();
+    if (windows[0].IsRepaintNeeded() && m_render)
     {
-        const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-        m_render->GetDisplay()->SetForeground(m_render->GetColorKey());
-        m_render->GetDisplay()->FillRectangle(m_win, display_visible_rect);
+        const QRect dvr = windows[0].GetDisplayVisibleRect();
+        m_render->DrawDisplayRect(dvr, true);
         windows[0].SetNeedRepaint(false);
         if (sync)
-            m_render->GetDisplay()->Sync();
+            m_render->SyncDisplay();
     }
+    m_lock.unlock();
 }
 
 void VideoOutputVDPAU::UpdatePauseFrame(void)
@@ -775,6 +775,7 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
             .arg(toString(supported_attributes)));
     VideoOutput::InitPictureAttributes();
 
+    m_lock.lock();
     if (m_render && m_video_mixer)
     {
         if (m_studio)
@@ -797,6 +798,7 @@ void VideoOutputVDPAU::InitPictureAttributes(void)
                                         kVDPAttribColorStandard,
                                         m_colorspace);
     }
+    m_lock.unlock();
 }
 
 int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
@@ -804,6 +806,8 @@ int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
 {
     if (!m_using_piccontrols || !m_render || !m_video_mixer)
         return -1;
+
+    m_lock.lock();
     newValue = min(max(newValue, 0), 100);
 
     uint vdpau_attrib = kVDPAttribNone;
@@ -830,6 +834,7 @@ int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
 
     if (newValue >= 0)
         SetPictureAttributeDBValue(attribute, newValue);
+    m_lock.unlock();
     return newValue;
 }
 
@@ -900,7 +905,6 @@ bool VideoOutputVDPAU::FrameIsInUse(VideoFrame *frame)
     if (!frame || codec_is_std(m_codec_id))
         return false;
 
-    QMutexLocker locker(&m_lock);
     uint ref = 0;
     struct vdpau_render_state *render = (struct vdpau_render_state *)frame->buf;
     if (render)
@@ -920,33 +924,40 @@ void VideoOutputVDPAU::DiscardFrame(VideoFrame *frame)
     if (!frame)
         return;
 
+    m_lock.lock();
     if (FrameIsInUse(frame))
         vbuffers.safeEnqueue(kVideoBuffer_displayed, frame);
     else
     {
         vbuffers.DiscardFrame(frame);
     }
+    m_lock.unlock();
 }
 
 void VideoOutputVDPAU::DiscardFrames(bool next_frame_keyframe)
 {
+    m_lock.lock();
     VERBOSE(VB_PLAYBACK, LOC + "DiscardFrames("<<next_frame_keyframe<<")");
     CheckFrameStates();
     ClearReferenceFrames();
     vbuffers.DiscardFrames(next_frame_keyframe);
     VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1 -- done()")
             .arg(vbuffers.GetStatus()));
+    m_lock.unlock();
 }
 
 void VideoOutputVDPAU::DoneDisplayingFrame(VideoFrame *frame)
 {
+    m_lock.lock();
     if (vbuffers.contains(kVideoBuffer_used, frame))
         DiscardFrame(frame);
     CheckFrameStates();
+    m_lock.unlock();
 }
 
 void VideoOutputVDPAU::CheckFrameStates(void)
 {
+    m_lock.lock();
     frame_queue_t::iterator it;
     it = vbuffers.begin_lock(kVideoBuffer_displayed);
     while (it != vbuffers.end(kVideoBuffer_displayed))
@@ -973,6 +984,7 @@ void VideoOutputVDPAU::CheckFrameStates(void)
         ++it;
     }
     vbuffers.end_lock();
+    m_lock.unlock();
 }
 
 bool VideoOutputVDPAU::InitPIPLayer(QSize size)
