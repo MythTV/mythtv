@@ -6221,7 +6221,7 @@ class MythTvMetaData(VideoFiles):
 						continue
 					posterdirs = self.config['localpaths']['posters']
 				else:
-					posterdirs = self.config['posters']
+					posterdirs = self.config['posterdir']
 
 				# There must be an Internet reference number. Get one for new records.
 				if _can_int(meta_dict['inetref']) and not meta_dict['inetref'] == u'00000000' and not meta_dict['inetref'] == u'':
