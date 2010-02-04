@@ -69,9 +69,9 @@ class VIDEO:
         self.get_format()
 
         # process file
-        self.cast = ()
-        self.genre = ()
-        self.country = ()
+        self.cast = []
+        self.genre = []
+        self.country = []
         self.rec = self.db.getRecorded(chanid=self.chanid,\
                                     starttime=self.starttime)
         self.vid = Video()
@@ -281,10 +281,10 @@ class VIDEO:
                 tsize = srcsize - dstfp.tell()
             dstfp.write(srcfp.read(tsize))
             htime.append(time.time())
-            rate = float(tsize*4)/(time.time()-htime.pop())
+            rate = float(tsize*4)/(time.time()-htime.pop(0))
             remt = (srcsize-dstfp.tell())/rate
             if self.job:
-                self.job.setComment("%02d%% complete - %s seconds remaining" %\
+                self.job.setComment("%02d%% complete - %d seconds remaining" %\
                             (dstfp.tell()*100/srcsize, remt))
         srcfp.close()
         dstfp.close()
