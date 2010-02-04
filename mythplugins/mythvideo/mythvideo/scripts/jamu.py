@@ -5209,7 +5209,7 @@ class MythTvMetaData(VideoFiles):
                 if directory == 'screenshot':    # There is no downloading of screenshots required
                     program[directory] = True
                     continue
-                if directory == 'banner' and program['subtitle'] == '': # No banners for movies
+                if directory == 'banner' and not program['subtitle']: # No banners for movies
                     program[directory] = True
                     continue
                 elif mirodetails:
