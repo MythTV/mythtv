@@ -458,6 +458,8 @@ void MythRenderVDPAU::WaitForFlip(void)
     {
         LOCK_RENDER
         CHECK_STATUS()
+        if (m_surface >= (uint)m_surfaces.size())
+            return;
         surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
     }
 
@@ -478,6 +480,8 @@ void MythRenderVDPAU::Flip(int delay)
     {
         LOCK_RENDER
         CHECK_STATUS()
+        if (m_surface >= (uint)m_surfaces.size())
+            return;
         surface = m_outputSurfaces[m_surfaces[m_surface]].m_id;
         m_surface++;
         if (m_surface >= (uint)m_surfaces.size())
@@ -1645,7 +1649,6 @@ void MythRenderVDPAU::Destroy(void)
     RegisterCallback(false);
     DestroyDevice();
     ResetProcs();
-
     m_master  = kMasterUI;
     m_size    = QSize();
     m_errored = false;
@@ -1730,6 +1733,7 @@ void MythRenderVDPAU::DestroyPresentationSurfaces(void)
     for (int i = 0; i < m_surfaces.size(); i++)
         DestroyOutputSurface(m_surfaces[i]);
     m_surfaces.clear();
+    m_surface = 0;
     m_flipReady = false;
 }
 
