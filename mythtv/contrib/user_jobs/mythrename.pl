@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Renames mythtv recordings to more human-readable filenames.
+# Creates symlinks to mythtv recordings using more-human-readable filenames.
 # See --help for instructions.
 #
 # Automatically detects database settings from mysql.txt, and loads
@@ -22,7 +22,7 @@
     use MythTV;
 
 # Some variables we'll use here
-    our ($dest, $format, $usage, $underscores, $live);
+    our ($dest, $format, $usage, $underscores, $live, $rename);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir, $verbose);
     our ($hostname, $dbh, $sh, $q, $count, $base_dir);
@@ -45,6 +45,7 @@
                'live'                         => \$live,
                'separator=s'                  => \$separator,
                'replacement=s'                => \$replacement,
+               'rename'                       => \$rename,
                'usage|help|h'                 => \$usage,
                'underscores'                  => \$underscores,
                'verbose'                      => \$verbose
@@ -57,23 +58,22 @@ $0 usage:
 
 options:
 
---link [destination directory]
+--dest [destination directory]
 
-    If you would like mythrename.pl to work like the old mythlink.pl, specify
-    --link and an optional pathname. If no pathname is given, links will be
-    created in the show_names directory inside of the current mythtv data
+    Specify the directory for the links.  If no pathname is given, links will
+    be created in the show_names directory inside of the current mythtv data
     directory on this machine.  eg:
 
     /var/video/show_names/
 
     WARNING: ALL symlinks within the destination directory and its
-    subdirectories (recursive) will be removed when using the --link option.
+    subdirectories (recursive) will be removed.
 
 --live
 
-    Include live tv recordings, affects both linking and renaming.
+    Include live tv recordings.
 
-    default: do not link/rename live tv recordings
+    default: do not link live tv recordings
 
 --format
 
@@ -164,8 +164,7 @@ options:
       between the appropriate fields.  For example, "\%T/\%S" would create
       a directory for each title containing links for each recording named
       by subtitle.  You may use any number of subdirectories in your format
-      specifier.  If used without the --link option, "/" will be replaced
-      with the "\%-" separator character.
+      specifier.
 
 --separator
 
@@ -191,6 +190,18 @@ options:
     Replace whitespace in filenames with underscore characters.
 
     default:  No underscores
+
+--rename
+
+    Rename the recording files back to their default names.  If you had
+    previously used mythrename.pl to rename files (rather than creating links
+    to the files), use this option to restore the file names to their default
+    format.
+
+    Renaming the recording files is no longer supported.  Instead, use
+    contrib/exports/mythfs.py to create a FUSE file system that represents
+    recordings using human-readable file names or use mythlink.pl to create
+    links with human-readable names to the recording files.
 
 --verbose
 
@@ -235,6 +246,11 @@ EOF
 
     my $sgroup = new MythTV::StorageGroup();
 
+# Only if we're renaming files back to "default" names
+    if ($rename) {
+        do_rename();
+    }
+
 # Get our base location
     $base_dir = $sgroup->FindRecordingDir('show_names');
     if ($base_dir eq '') {
@@ -242,32 +258,24 @@ EOF
     }
 
 # Link destination
-    if (defined($dest)) {
-    # Double-check the destination
-        $dest ||= "$base_dir/show_names";
-    # Alert the user
-        vprint("Link destination directory:  $dest");
-    # Create nonexistent paths
-        unless (-e $dest) {
-            mkpath($dest, 0, 0755) or die "Failed to create $dest:  $!\n";
-        }
-    # Bad path
-        die "$dest is not a directory.\n" unless (-d $dest);
-    # Delete any old links
-        find sub { if (-l $_) {
-                       unlink $_ or die "Couldn't remove old symlink $_: $!\n";
-                   }
-                 }, $dest;
-    # Delete empty directories (should this be an option?)
-    # Let this fail silently for non-empty directories
-        finddepth sub { rmdir $_; }, $dest;
+# Double-check the destination
+    $dest ||= "$base_dir/show_names";
+# Alert the user
+    vprint("Link destination directory:  $dest");
+# Create nonexistent paths
+    unless (-e $dest) {
+        mkpath($dest, 0, 0755) or die "Failed to create $dest:  $!\n";
     }
-
-# Only if we're renaming files
-    unless ($dest) {
-        $q  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=FROM_UNIXTIME(?)';
-        $sh = $dbh->prepare($q);
-    }
+# Bad path
+    die "$dest is not a directory.\n" unless (-d $dest);
+# Delete any old links
+    find sub { if (-l $_) {
+                   unlink $_ or die "Couldn't remove old symlink $_: $!\n";
+               }
+             }, $dest;
+# Delete empty directories (should this be an option?)
+# Let this fail silently for non-empty directories
+    finddepth sub { rmdir $_; }, $dest;
 
 # Create symlinks for the files on this machine
     my %rows = $Myth->backend_rows('QUERY_RECORDINGS Delete');
@@ -286,28 +294,50 @@ EOF
     # Figure out the suffix
         my ($suffix) = ($show->{'basename'} =~ /(\.\w+)$/);
     # Link destination
-        if ($dest) {
-        # Check for duplicates
-            if (-e "$dest/$name$suffix") {
-                $count = 2;
-                while (-e "$dest/$name.$count$suffix") {
-                    $count++;
-                }
-                $name .= ".$count";
+    # Check for duplicates
+        if (-e "$dest/$name$suffix") {
+            $count = 2;
+            while (-e "$dest/$name.$count$suffix") {
+                $count++;
             }
-            $name .= $suffix;
-        # Create the link
-            my $directory = dirname("$dest/$name");
-            unless (-e $directory) {
-                mkpath($directory, 0, 0755)
-                    or die "Failed to create $directory:  $!\n";
-            }
-            symlink $show->{'local_path'}, "$dest/$name"
-                or die "Can't create symlink $dest/$name:  $!\n";
-            vprint("$dest/$name");
+            $name .= ".$count";
         }
-    # Rename the file, but only if it's a real file
-        elsif (-f $show->{'local_path'}) {
+        $name .= $suffix;
+    # Create the link
+        my $directory = dirname("$dest/$name");
+        unless (-e $directory) {
+            mkpath($directory, 0, 0755)
+                or die "Failed to create $directory:  $!\n";
+        }
+        symlink $show->{'local_path'}, "$dest/$name"
+            or die "Can't create symlink $dest/$name:  $!\n";
+        vprint("$dest/$name");
+    }
+
+# Print the message, but only if verbosity is enabled
+    sub vprint {
+        return unless (defined($verbose));
+        print join("\n", @_), "\n";
+    }
+
+# Rename the file back to default format
+    sub do_rename {
+        $q  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=FROM_UNIXTIME(?)';
+        $sh = $dbh->prepare($q);
+        my %rows = $Myth->backend_rows('QUERY_RECORDINGS Delete');
+        foreach my $row (@{$rows{'rows'}}) {
+            my $show = new MythTV::Recording(@$row);
+        # File doesn't exist locally
+            next unless (-e $show->{'local_path'});
+        # Format the name
+            my $name = $show->format_name('%c_%Y%m%d%H%i%s');
+        # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
+            my $safe_file = $show->{'local_path'};
+            $safe_file =~ s/'/'\\''/sg;
+            $safe_file = "'$safe_file'";
+        # Figure out the suffix
+            my ($suffix) = ($show->{'basename'} =~ /(\.\w+)$/);
+        # Rename the file, but only if it's a real file
             if ($show->{'basename'} ne $name.$suffix) {
             # Check for duplicates
                 $video_dir = $sgroup->FindRecordingDir($show->{'basename'});
@@ -332,7 +362,7 @@ EOF
             # Rename previews
                 opendir DIR, $video_dir;
                 foreach my $thumb (grep /\.png$/, readdir DIR) {
-                    next unless ($thumb =~ /^$show->{'basename'}((?:\.\d+)?(?:\.\d+x\d+(?:x\d+)?)?\.png)$/);
+                    next unless ($thumb =~ /^$show->{'basename'}((?:\.\d+)?(?:\.\d+x\d+(?:x\d+)?)?)\.png$/);
                     my $dim = $1;
                     $ret = rename "$video_dir/$thumb", "$video_dir/$name$dim.png";
                 # If the rename fails, try to delete the preview from the
@@ -346,13 +376,5 @@ EOF
                 closedir DIR;
             }
         }
+        exit 0;
     }
-
-    $sh->finish if ($sh);
-
-# Print the message, but only if verbosity is enabled
-    sub vprint {
-        return unless (defined($verbose));
-        print join("\n", @_), "\n";
-    }
-
