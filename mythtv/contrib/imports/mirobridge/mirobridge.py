@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.5.3"
+__version__=u"v0.5.4"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -171,7 +171,9 @@ __version__=u"v0.5.3"
 #       previously disable but the code and related mythcommflag related code has been removed entirely.
 #       Initialized new videometadata fields 'releasedate' and 'hash'.
 # 0.5.3 Fixed Exception messages
-
+# 0.5.4 Add the command line option (-i) to import an OPML file that was exported from Miro on a different PC.
+#       This new option allows configuring Miro channels on a separate PC then importing those channels on
+#       a Myth backend without a keyboard. No Miro GUI needs to run on the MythTV backend.
 
 
 examples_txt=u'''
@@ -2048,8 +2050,8 @@ def main():
                         help=u"Organise MythVideo's Miro directory WITHOUT Miro channel subdirectories. The default is to have Channel subdirectories.")
     parser.add_option(  "-c", "--channel", metavar="CHANNEL_ID:CHANNEL_NUM", default="", dest="channel",
                         help=u'Specifies the channel id that is used for Miros unplayed recordings. Enter as "xxxx:yyy". Default is 9999:999. Be warned that once you change the default channel_id "9999" you must always use this option!')
-    #parser.add_option(  "-i", "--import", metavar="CONFIGFILE", default="", dest="import",
-    #                    help=u'Import Miro exported configuration file and or channel changes.')
+    parser.add_option(  "-i", "--import_opml", metavar="CONFIGFILEPATH", default="", dest="import_opml",
+                        help=u'Import Miro exported OPML file containing Channel configurations. File name must be a fully qualified path. This option is exclusive to Miro v2.5.x and higher.')
     parser.add_option(  "-V", "--verbose", action="store_true", default=False, dest="verbose",
                         help=u"Display verbose messages when processing")
     parser.add_option(  "-H", "--hostname", metavar="HOSTNAME", default="", dest="hostname",
@@ -2091,8 +2093,9 @@ def main():
     if opts.new_watch_copy: x+=1
     if opts.watch_only: x+=1
     if opts.mythvideo_only: x+=1
+    if opts.import_opml: x+=1
     if x > 1:
-        logger.critical(u"The (-W), (-M) and (-N) options are mutually exclusive, so only one can be specified at a time.")
+        logger.critical(u"The (-W), (-M), (-N) and (-i) options are mutually exclusive, so only one can be specified at a time.")
         sys.exit(1)
 
     # Set option related global variables
@@ -2125,6 +2128,34 @@ def main():
             requirements_are_met = False
         else:
             sys.exit(1)
+
+    # Verify that the import opml option can be used
+    if opts.import_opml:
+        if config.get(prefs.APP_VERSION) < u"2.5.2":
+            logger.critical(u"The OPML import option requires Miro v2.5.2 or higher your Miro (%s) is too old." % config.get(prefs.APP_VERSION))
+            if test_environment:
+                requirements_are_met = False
+            else:
+                sys.exit(1)
+        if not os.path.isfile(opts.import_opml):
+            logger.critical(u"The OPML import file (%s) does not exist" % opts.import_opml)
+            if test_environment:
+                requirements_are_met = False
+            else:
+                sys.exit(1)
+        if len(opts.import_opml) > 5:
+            if not opts.import_opml[:-4] != '.opml':
+                logger.critical(u"The OPML import file (%s) must had a file extention of '.opml'" % opts.import_opml)
+                if test_environment:
+                    requirements_are_met = False
+                else:
+                    sys.exit(1)
+        else:
+            logger.critical(u"The OPML import file (%s) must had a file extention of '.opml'" % opts.import_opml)
+            if test_environment:
+                requirements_are_met = False
+            else:
+                sys.exit(1)
 
     # Get storage groups
     if getStorageGroups() == False:
@@ -2254,6 +2285,23 @@ def main():
         app.renderer = app.cli_interpreter
     else:
         app.movie_data_program_info = app.cli_interpreter.movie_data_program_info
+
+
+    #
+    # Attempt to import an opml file
+    #
+    if opts.import_opml:
+        results = 0
+        try:
+            app.cli_interpreter.do_mythtv_import_opml(opts.import_opml)
+            time.sleep(30) # Let the Miro backend process the OPML file before shutting down
+        except Exception, e:
+            logger.critical(u"Import of OPML file (%s) failed, error(%s)." % (opts.import_opml, e))
+            results = 1
+        # Gracefully close the Miro database and shutdown the Miro Front and Back ends
+        app.controller.shutdown()
+        time.sleep(5) # Let the shutdown processing complete
+        sys.exit(results)
 
     #
     # Optionally Update Miro feeds and

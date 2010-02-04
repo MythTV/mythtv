@@ -26,8 +26,8 @@
 # this exception statement from your version. If you delete this exception
 # statement from all source files in the program, then also delete it here.
 ###########################################################################
-# The original source "...miro/frontends/cli/interpreter.py" 
-# was modified for the purposes of the MythTV script mirobridge.py 
+# The original source "...miro/frontends/cli/interpreter.py"
+# was modified for the purposes of the MythTV script mirobridge.py
 ###########################################################################
 
 import cmd
@@ -45,7 +45,7 @@ from miro import tabs
 from miro.frontends.cli import clidialog
 from miro.plat import resources
 
-## mirobridge.py import additions - All to get feed updates and auto downloads working
+## mirobridge.py import additions - All to get feed updates, auto downloads and OPML import working
 import os, sys, subprocess, re, fnmatch, string
 import logging
 from miro import moviedata
@@ -59,7 +59,7 @@ from miro import fileutil
 from miro import autoupdate
 from miro import startup
 from miro import filetypes
-
+from miro import messages
 
 def run_in_event_loop(func):
     def decorated(*args, **kwargs):
@@ -254,6 +254,15 @@ class MiroInterpreter(cmd.Cmd):
             self.downloading = True
 
     @run_in_event_loop
+    def do_mythtv_import_opml(self, filename):
+        """Import an OPML file"""
+        try:
+            messages.ImportFeeds(filename).send_to_backend()
+            logging.info(u"Import of OPML file (%s) sent to Miro" % (filename))
+        except Exception, e:
+            logging.info(u"Import of OPML file (%s) failed, error (%s)" % (filename, e))
+
+    @run_in_event_loop
     def do_mythtv_updatewatched(self, line):
         """Process MythTV update watched videos"""
         #items = views.watchableItems
@@ -378,7 +387,7 @@ class MiroInterpreter(cmd.Cmd):
             """ Using ImageMagick's utility 'identify'. Decide whether the screen shot is worth using.
             >>> useImageMagick('identify screenshot.jpg')
             >>> Example returned information "rose.jpg JPEG 640x480 DirectClass 87kb 0.050u 0:01"
-            >>> u'' if the screenshot quality is too low 
+            >>> u'' if the screenshot quality is too low
             >>> screenshot if the quality is good enough to use
             """
             if not self.imagemagick: # If imagemagick is not installed do not bother checking
@@ -698,4 +707,3 @@ class MiroInterpreter(cmd.Cmd):
         print "Dumping database...."
         database.defaultDatabase.liveStorage.dumpDatabase(database.defaultDatabase)
         print "Done."
-
