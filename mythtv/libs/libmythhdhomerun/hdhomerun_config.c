@@ -286,7 +286,7 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		}
 
 		cmd_scan_printf(fp, "SCANNING: %lu (%s)\n",
-			result.frequency, result.channel_str
+			(unsigned long)result.frequency, result.channel_str
 		);
 
 		ret = hdhomerun_device_channelscan_detect(hd, &result);
@@ -364,7 +364,7 @@ static int cmd_save(const char *tuner_str, const char *filename)
 		size_t actual_size;
 		uint8_t *ptr = hdhomerun_device_stream_recv(hd, VIDEO_DATA_BUFFER_SIZE_1S, &actual_size);
 		if (!ptr) {
-			msleep(64);
+			msleep_approx(64);
 			continue;
 		}
 
@@ -381,6 +381,12 @@ static int cmd_save(const char *tuner_str, const char *filename)
 				next_progress = loop_start_time + 1000;
 			}
 
+			/* Windows - indicate activity to suppress auto sleep mode. */
+			#if defined(__WINDOWS__)
+			SetThreadExecutionState(ES_SYSTEM_REQUIRED);
+			#endif
+
+			/* Video stats. */
 			hdhomerun_device_get_video_stats(hd, &stats_cur);
 
 			if (stats_cur.overflow_error_count > stats_old.overflow_error_count) {
@@ -404,7 +410,7 @@ static int cmd_save(const char *tuner_str, const char *filename)
 			continue;
 		}
 
-		msleep(delay);
+		msleep_approx(delay);
 	}
 
 	if (fp) {
@@ -440,10 +446,10 @@ static int cmd_upgrade(const char *filename)
 		fclose(fp);
 		return -1;
 	}
-	sleep(2);
+	msleep_minimum(2000);
 
 	printf("upgrading firmware...\n");
-	sleep(8);
+	msleep_minimum(8000);
 
 	printf("rebooting...\n");
 	int count = 0;
@@ -460,7 +466,7 @@ static int cmd_upgrade(const char *filename)
 			return -1;
 		}
 
-		sleep(1);
+		msleep_minimum(1000);
 	}
 
 	printf("upgrade complete - now running firmware %s\n", version_str);

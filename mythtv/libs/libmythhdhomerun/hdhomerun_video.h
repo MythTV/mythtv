@@ -71,6 +71,12 @@ extern LIBTYPE void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs);
 extern LIBTYPE uint16_t hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs);
 
 /*
+ * Join/leave multicast group.
+ */
+extern LIBTYPE int hdhomerun_video_join_multicast_group(struct hdhomerun_video_sock_t *vs, uint32_t multicast_ip, uint32_t local_ip);
+extern LIBTYPE int hdhomerun_video_leave_multicast_group(struct hdhomerun_video_sock_t *vs);
+
+/*
  * Read data from buffer.
  *
  * size_t max_size: The maximum amount of data to be returned.
