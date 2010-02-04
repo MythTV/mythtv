@@ -166,7 +166,8 @@
             <multiline>yes</multiline>
             <area>272,474,874,178</area>
             <font>descriptionfont</font>
-            <value>%SUBTITLE|"|" %%DESCRIPTION%</value>
+            <value>%SUBTITLE|"|" %%ORIGINALAIRDATE|(|)
+%%YEARSTARS|| %%DESCRIPTION%</value>
         </textarea>
         <textarea name="starttime">
             <area>139,426,842,30</area>
@@ -211,7 +212,8 @@
             <multiline>yes</multiline>
             <area>253,567,888,78</area>
             <font>descriptionfontsmall</font>
-            <value>%SUBTITLE|"|" %%DESCRIPTION%</value>
+            <value>%SUBTITLE|"|" %%ORIGINALAIRDATE|(|)
+%%YEARSTARS|| %%DESCRIPTION%</value>
         </textarea>
         <textarea name="starttime">
             <area>263,527,716,30</area>
@@ -219,7 +221,7 @@
             <value>%STARTDATE%  (%STARTTIME% - %ENDTIME%)  %LENMINS%</value>
         </textarea> 
         <image name="channelicon">
-            <position>159,560</position>
+            <position>159,550</position>
             <staticsize>62,46</staticsize>
         </image>
         <textarea name="time" align="right">
