@@ -2598,7 +2598,7 @@ if __name__ == "__main__":
     #
     if myapp.alreadyrunning():
         print u'\nMiro Bridge is already running only one instance can run at a time\n\n'
-        sys.exit(1)
+        sys.exit(0)
 
     main()
     displayMessage(u"Miro Bridge Processing completed")
