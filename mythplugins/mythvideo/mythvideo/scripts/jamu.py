@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.6"
+__version__=u"v0.6.7"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -289,6 +289,7 @@ __version__=u"v0.6.6"
  # 0.6.5 Small fix related to the bindings changes.
  # 0.6.6 Fixed Exception messages
  #       Change all occurances of 'mythbeconn.host' to 'mythbeconn.hostname' to be consistent with bindings
+ # 0.6.7 Fixed the (-J) janitor option from removing the Mirobridge default images when they are not being used
 
 
 usage_txt=u'''
@@ -4662,6 +4663,13 @@ class MythTvMetaData(VideoFiles):
                     u"Simulation deleting (%s)\n" % (filel)
                 )
             else:
+                # Do not remove the MiroBridge default image files even if they are not currently being used
+                if filel.endswith('mirobridge_coverart.jpg'):
+                    continue
+                if filel.endswith('mirobridge_banner.jpg'):
+                    continue
+                if filel.endswith('mirobridge_fanart.jpg'):
+                    continue
                 try:
                     os.remove(filel)
                 except OSError:
