@@ -103,19 +103,15 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 
     QMutexLocker locker(&global_lock);
 
-    bool res_changed = input_size != windows[0].GetVideoDispDim();
-
-    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,
-                              aspect_only);
-
-    if (!res_changed)
+    if (input_size == windows[0].GetVideoDispDim())
     {
         vbuffers.Clear(GUID_I420_PLANAR);
         MoveResize();
         return true;
     }
 
-    vbuffers.DiscardFrames(true);
+    VideoOutput::InputChanged(input_size, aspect, av_codec_id, codec_private,
+                              aspect_only);
     vbuffers.DeleteBuffers();
 
     MoveResize();
