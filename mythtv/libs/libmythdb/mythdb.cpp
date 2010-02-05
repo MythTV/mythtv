@@ -738,6 +738,12 @@ void MythDB::OverrideSettingForSession(
     const QString &key, const QString &value)
 {
     QString mk = key.toLower(), mk2 = d->m_localhostname + ' ' + mk, mv = value;
+    if ("dbschemaver" == mk)
+    {
+        VERBOSE(VB_IMPORTANT, QString("ERROR: Refusing to allow override "
+                                      "for '%1'.").arg(key));
+        return;
+    }
     mk.squeeze();
     mk2.squeeze();
     mv.squeeze();
