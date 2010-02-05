@@ -6497,8 +6497,8 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
     if (!hascommbreaktable)
         return;
 
-    if (((time(NULL) - lastSkipTime) <= 2) ||
-        ((time(NULL) - lastCommSkipTime) <= 2))
+    if (((time(NULL) - lastSkipTime) <= 3) ||
+        ((time(NULL) - lastCommSkipTime) <= 3))
     {
         SetCommBreakIter();
         return;
