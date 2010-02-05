@@ -286,7 +286,11 @@ QStringList DBUtil::GetTables(void)
     if (!query.isConnected())
         return result;
 
-    if (!query.exec("SHOW FULL TABLES"))
+    QString sql = "SELECT INFORMATION_SCHEMA.TABLES.TABLE_NAME "
+                  "  FROM INFORMATION_SCHEMA.TABLES "
+                  " WHERE INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA = DATABASE() "
+                  "   AND INFORMATION_SCHEMA.TABLES.TABLE_TYPE = 'BASE TABLE';";
+    if (!query.exec(sql))
     {
         MythDB::DBError("DBUtil Finding Tables", query);
         return result;
@@ -294,8 +298,7 @@ QStringList DBUtil::GetTables(void)
 
     while (query.next())
     {
-        if (query.value(1).toString() != "VIEW")
-            result.append(query.value(0).toString());
+        result.append(query.value(0).toString());
     }
 
     return result;
