@@ -23,6 +23,7 @@
 
 # Some variables we'll use here
     our ($dest, $format, $usage, $underscores, $live, $rename);
+    our ($chanid, $starttime, $filename);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir, $verbose);
     our ($hostname, $dbh, $sh, $q, $count, $base_dir);
@@ -41,6 +42,9 @@
 
 # Load the cli options
     GetOptions('link|dest|destination|path:s' => \$dest,
+               'chanid=s'                     => \$chanid,
+               'starttime=s'                  => \$starttime,
+               'filename=s'                   => \$filename,
                'format=s'                     => \$format,
                'live'                         => \$live,
                'separator=s'                  => \$separator,
@@ -68,6 +72,26 @@ options:
 
     WARNING: ALL symlinks within the destination directory and its
     subdirectories (recursive) will be removed.
+
+--chanid chanid
+
+    Create a link only for the specified recording file. Use with --starttime
+    to specify a recording. This argument may be used with the event-driven
+    notification system's "Recording started" event or in a post-recording
+    user job.
+
+--starttime starttime
+
+    Create a link only for the specified recording file. Use with --chanid
+    to specify a recording. This argument may be used with the event-driven
+    notification system's "Recording started" event or in a post-recording
+    user job.
+
+--filename absolute_filename
+
+    Create a link only for the specified recording file. This argument may be
+    used with the event-driven notification system's "Recording started" event
+    or in a post-recording user job.
 
 --live
 
@@ -217,6 +241,12 @@ EOF
         exit;
     }
 
+# Ensure --chanid and --starttime were specified together, if at all
+    if ((defined($chanid) or defined($starttime)) and
+        !(defined($chanid) and defined($starttime))) {
+        die "The arguments --chanid and --starttime must be used together.\n";
+    }
+
 # Check the separator and replacement characters for illegal characters
     if ($separator =~ /(?:[\/\\:*?<>|"])/) {
         die "The separator cannot contain any of the following characters:  /\\:*?<>|\"\n";
@@ -268,14 +298,17 @@ EOF
     }
 # Bad path
     die "$dest is not a directory.\n" unless (-d $dest);
-# Delete any old links
-    find sub { if (-l $_) {
-                   unlink $_ or die "Couldn't remove old symlink $_: $!\n";
-               }
-             }, $dest;
-# Delete empty directories (should this be an option?)
-# Let this fail silently for non-empty directories
-    finddepth sub { rmdir $_; }, $dest;
+# Delete old links/directories unless linking only one recording
+    if (!defined($filename) and !defined($chanid)) {
+    # Delete any old links
+        find sub { if (-l $_) {
+                       unlink $_ or die "Couldn't remove old symlink $_: $!\n";
+                   }
+                 }, $dest;
+    # Delete empty directories (should this be an option?)
+    # Let this fail silently for non-empty directories
+        finddepth sub { rmdir $_; }, $dest;
+    }
 
 # Create symlinks for the files on this machine
     my %rows = $Myth->backend_rows('QUERY_RECORDINGS Delete');
@@ -285,6 +318,25 @@ EOF
         next unless (defined($live) || $show->{'recgroup'} ne 'LiveTV');
     # File doesn't exist locally
         next unless (-e $show->{'local_path'});
+    # Check if this is the file to link if only linking one file
+        if (defined($filename)) {
+            next unless (($show->{'basename'} eq $filename) or
+                         ($show->{'local_path'} eq $filename));
+        }
+        elsif (defined($chanid)) {
+            next unless ($show->{'chanid'} eq $chanid);
+            my $recstartts = unix_to_myth_time($show->{'recstartts'});
+        # Check starttime in MythTV time format (yyyy-MM-ddThh:mm:ss)
+            if ($recstartts ne $starttime) {
+            # Check starttime in ISO time format (yyyy-MM-dd hh:mm:ss)
+                $recstartts =~ tr/T/ /;
+                if ($recstartts ne $starttime) {
+                # Check starttime in job queue time format (yyyyMMddhhmmss)
+                    $recstartts =~ s/[\- :]//g;
+                    next unless ($recstartts eq $starttime);
+                }
+            }
+        }
     # Format the name
         my $name = $show->format_name($format,$separator,$replacement,$dest,$underscores);
     # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
@@ -296,11 +348,17 @@ EOF
     # Link destination
     # Check for duplicates
         if (-e "$dest/$name$suffix") {
-            $count = 2;
-            while (-e "$dest/$name.$count$suffix") {
-                $count++;
+            if ((!defined($filename) and !defined($chanid)) or
+                (! -l "$dest/$name$suffix")) {
+                $count = 2;
+                while (-e "$dest/$name.$count$suffix") {
+                    $count++;
+                }
+                $name .= ".$count";
+            } else {
+                unlink "$dest/$name$suffix" or die "Couldn't remove ".
+                       "old symlink $dest/$name$suffix: $!\n";
             }
-            $name .= ".$count";
         }
         $name .= $suffix;
     # Create the link
