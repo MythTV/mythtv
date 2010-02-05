@@ -966,6 +966,8 @@ VideoOutputD3D::~VideoOutputD3D()
 void VideoOutputD3D::TearDown(void)
 {
     QMutexLocker locker(&m_lock);
+    vbuffers.DiscardFrames(true);
+    vbuffers.Reset();
     vbuffers.DeleteBuffers();
     if (m_pauseFrame.buf)
     {
