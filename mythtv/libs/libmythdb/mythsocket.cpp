@@ -275,6 +275,7 @@ bool MythSocket::writeStringList(QStringList &list)
     QByteArray utf8 = str.toUtf8();
     int size = utf8.length();
     int written = 0;
+    int written_since_timer_restart = 0;
 
     QByteArray payload;
     payload = payload.setNum(size);
@@ -313,8 +314,13 @@ bool MythSocket::writeStringList(QStringList &list)
         if (temp > 0)
         {
             written += temp;
+            written_since_timer_restart += temp;
             size -= temp;
-            timer.restart();
+            if ((timer.elapsed() > 500) && written_since_timer_restart != 0)
+            {
+                timer.restart();
+                written_since_timer_restart = 0;
+            }
         }
         else if (temp < 0 && error() != MSocketDevice::NoError)
         {
