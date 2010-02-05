@@ -831,19 +831,19 @@ void H264Parser::decode_SEI(GetBitContext *gb)
     bool  broken_link_flag = false;
     int   changing_group_slice_idc = -1;
 
-        int type = 0, size = 0;
+    int type = 0, size = 0;
 
-        do {
-            type += show_bits(gb, 8);
-        } while (get_bits(gb, 8) == 255);
+    do {
+        type += show_bits(gb, 8);
+    } while (get_bits(gb, 8) == 255);
 
-        do {
-            size += show_bits(gb, 8);
-        } while (get_bits(gb, 8) == 255);
+    do {
+        size += show_bits(gb, 8);
+    } while (get_bits(gb, 8) == 255);
 
-        switch (type)
-        {
-          case SEI_TYPE_RECOVERY_POINT:
+    switch (type)
+    {
+        case SEI_TYPE_RECOVERY_POINT:
             recovery_frame_cnt = get_ue_golomb(gb);
             exact_match_flag = get_bits1(gb);
             broken_link_flag = get_bits1(gb);
@@ -851,12 +851,12 @@ void H264Parser::decode_SEI(GetBitContext *gb)
             is_keyframe |= (recovery_frame_cnt >= 0);
             return;
 
-          default:
+        default:
             skip_bits(gb, size * 8);
             break;
-        }
+    }
 
-        align_get_bits(gb);
+    align_get_bits(gb);
 }
 
 void H264Parser::vui_parameters(GetBitContext * gb)
