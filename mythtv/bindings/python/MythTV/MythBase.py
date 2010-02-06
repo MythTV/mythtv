@@ -177,9 +177,15 @@ class DictData( object ):
                 data[i] = datetime.fromtimestamp(int(data[i]))
         return dict(zip(self.field_order,data))
 
-    def joinInt(self,high,low):
+    @staticmethod
+    def joinInt(high,low):
         """obj.joinInt(high, low) -> 64-bit int, from two signed ints"""
         return (high + (low<0))*2**32 + low
+
+    @staticmethod
+    def splitInt(integer):
+        """obj.joinInt(64-bit int) -> (high, low)"""
+        return integer/(2**32),integer%2**32 - (integer%2**32 > 2**31)*2**32
 
 class DBData( DictData ):
     """
@@ -1303,32 +1309,33 @@ class MythXMLConn( object ):
 
     def __init__(self, backend=None, db=None, port=None):
         if backend and port:
+            self.db = None
             self.host, self.port = backend, int(port)
             return
-        db = MythDBBase(db)
-        self.log = MythLog('Python XML Connection', db=db)
+        self.db = MythDBBase(db)
+        self.log = MythLog('Python XML Connection', db=self.db)
         if backend is None:
             # use master backend
-            backend = db.settings.NULL.MasterServerIP
+            backend = self.db.settings.NULL.MasterServerIP
         if re.match('(?:\d{1,3}\.){3}\d{1,3}',backend):
             # process ip address
-            c = db.cursor(self.log)
+            c = self.db.cursor(self.log)
             if c.execute("""SELECT hostname FROM settings
                             WHERE value='BackendServerIP'
                             AND data=%s""", backend) == 0:
                 raise MythDBError(MythError.DB_SETTING, 
                                         backend+': BackendServerIP')
             self.host = c.fetchone()[0]
-            self.port = int(db.settings[self.host].BackendStatusPort)
+            self.port = int(self.db.settings[self.host].BackendStatusPort)
             c.close()
         else:
             # assume given a hostname
             self.host = backend
-            self.port = int(db.settings[self.host].BackendStatusPort)
+            self.port = int(self.db.settings[self.host].BackendStatusPort)
             if not self.port:
                 # try a truncated hostname
                 self.host = backend.split('.')[0]
-                self.port = int(db.setting[self.host].BackendStatusPort)
+                self.port = int(self.db.setting[self.host].BackendStatusPort)
                 if not self.port:
                     raise MythDBError(MythError.DB_SETTING, 
                                         backend+': BackendStatusPort')
@@ -1341,7 +1348,9 @@ class MythXMLConn( object ):
         'keyvars' are a series of optional variables to specify on the URL.
         """
         url = 'http://%s:%d/' % (self.host, self.port)
-        if path is not None:
+        if path == 'xml':
+            url += 'xml'
+        elif path is not None:
             url += 'Myth/%s' % path
         if len(keyvars) > 0:
             fields = []
