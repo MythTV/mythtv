@@ -1419,6 +1419,7 @@
             <value>Channel</value>
             <align>right</align>
         </textarea>
+
         <textarea name="lastrecordedlabel" from="basetextarea">
             <area>790,15,290,40</area>
             <value>Last Recorded</value>
@@ -1949,7 +1950,7 @@
 
         <textarea name="userjob2label" from="basetextarea">
             <area>500,493,300,30</area>
-            <value>Run User job #2</value>
+            <value>Run User Job #2</value>
         </textarea>
 
         <checkbox name="userjob3" from="basecheckbox">

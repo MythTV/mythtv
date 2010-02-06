@@ -49,7 +49,7 @@
             <channels>5</channels>
             <timeslots>4</timeslots>
             <solidcolor>#003256</solidcolor>
-            <selector type="roundbox" linecolor="#ffff33"></selector>
+            <selector type="roundbox" linecolor="#ffff33" />
             <showcategories>yes</showcategories>
             <categoryalpha>60</categoryalpha>
             <recordingcolor>#00aa00</recordingcolor>
@@ -57,15 +57,15 @@
             <cutdown>no</cutdown>
             <multiline>yes</multiline>
             <textoffset>6,2</textoffset>
-            <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
-            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
-            <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
-            <recordstatus type="AllRecord" image="gg-rs-all.png"></recordstatus>
-            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png"></recordstatus>
-            <recordstatus type="FindOneRecord" image="gg-rs-findone.png"></recordstatus>
-            <recordstatus type="OverrideRecord" image="gg-rs-override.png"></recordstatus>
-            <arrow direction="left" image="gg-arrow-left.png"></arrow>
-            <arrow direction="right" image="gg-arrow-right.png"></arrow>
+            <recordstatus type="SingleRecord" image="gg-rs-single.png" />
+            <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png" />
+            <recordstatus type="ChannelRecord" image="gg-rs-channel.png" />
+            <recordstatus type="AllRecord" image="gg-rs-all.png" />
+            <recordstatus type="WeekslotRecord" image="gg-rs-weekslot.png" />
+            <recordstatus type="FindOneRecord" image="gg-rs-findone.png" />
+            <recordstatus type="OverrideRecord" image="gg-rs-override.png" />
+            <arrow direction="left" image="gg-arrow-left.png" />
+            <arrow direction="right" image="gg-arrow-right.png" />
             <font>basesmall</font>
         </guidegrid>
 
@@ -145,7 +145,7 @@
         <textarea name="description"  from="basetextarea">
             <area>30,110,740,60</area>
             <multiline>yes</multiline>
-            <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
+            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -362,7 +362,7 @@
         <textarea name="description"  from="basetextarea">
             <area>30,140,520,80</area>
             <multiline>yes</multiline>
-            <value>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</value>
+            <template>%LONGREPEAT%%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -543,7 +543,7 @@
             <area>20,430,720,140</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
-            <value>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</value>
+            <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
 
         <textarea name="rectypestatus" from="basetextarea">
@@ -1388,7 +1388,7 @@
                     <textarea name="buttontext" from="basetextarea">
                         <area>0,4,50,25</area>
                         <align>allcenter</align>
-                        <font>basesmallboldblue</font>
+                        <font>basesmallgray</font>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
@@ -1507,7 +1507,7 @@
             <area>25,250,190,30</area>
             <font>basesmallyellow</font>
             <align>right</align>
-            <value>Search For: </value>
+            <value>Search For</value>
         </textarea>
         <textarea name="search" from="basetextarea">
             <area>230,250,300,30</area>
@@ -1555,7 +1555,7 @@
             <align>left,vcenter</align>
             <cutdown>yes</cutdown>
         </textarea>
-        
+
         <textedit name="description">
             <area>54,290,692,130</area>
             <statetype name="background">
@@ -1734,6 +1734,7 @@
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
         </textarea>
+
         <spinbox name="priority" from="basewidespinbox">
             <position>215,210</position>
             <template type="negative">Reduce priority by %n</template>
@@ -1916,7 +1917,7 @@
 
         <textarea name="userjob1label" from="basetextarea">
             <area>260,352,300,30</area>
-            <value>Transcode new recordings</value>
+            <value>Run User Job #1</value>
         </textarea>
 
         <checkbox name="userjob2" from="basecheckbox">
@@ -1925,7 +1926,7 @@
 
         <textarea name="userjob2label" from="basetextarea">
             <area>260,397,300,30</area>
-            <value>Transcode new recordings</value>
+            <value>Run User Job #2</value>
         </textarea>
 
         <checkbox name="userjob3" from="basecheckbox">
@@ -1934,7 +1935,7 @@
 
         <textarea name="userjob3label" from="basetextarea">
             <area>260,447,300,30</area>
-            <value>Transcode new recordings</value>
+            <value>Run User Job #3</value>
         </textarea>
 
         <checkbox name="userjob4" from="basecheckbox">
@@ -1943,7 +1944,7 @@
 
         <textarea name="userjob4label" from="basetextarea">
             <area>260,487,300,30</area>
-            <value>Transcode new recordings</value>
+            <value>Run User Job #4</value>
         </textarea>
 
         <button name="back" from="basebutton">
