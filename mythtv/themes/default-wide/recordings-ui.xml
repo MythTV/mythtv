@@ -93,6 +93,7 @@
         <buttonlist name="recordings" from="basebuttonlist2">
             <area>365,44,880,350</area>
             <buttonarea>0,33,880,290</buttonarea>
+            <spacing>4</spacing>
             <wrapstyle>captive</wrapstyle>
             <statetype name="buttonitem">
                 <state name="active">
