@@ -79,7 +79,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="name">
-                        <area>5,0,300,30</area>
+                        <area>5,-2,300,30</area>
                         <font>basesmall</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -92,19 +92,19 @@
 
         <buttonlist name="recordings" from="basebuttonlist2">
             <area>365,44,880,350</area>
-            <buttonarea>0,30,880,290</buttonarea>
+            <buttonarea>0,33,880,290</buttonarea>
             <wrapstyle>captive</wrapstyle>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,1,600,28</area>
+                        <area>35,-2,652,28</area>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>640,1,120,28</area>
+                        <area>635,-2,120,28</area>
                         <align>right</align>
                     </textarea>
                     <textarea name="starttime" from="shortdate">
-                        <area>770,1,105,28</area>
+                        <area>761,-2,114,28</area>
                         <align>right</align>
                     </textarea>
                     <statetype name="watched">
@@ -119,7 +119,7 @@
                     <statetype name="playlist">
                         <state name="yes">
                             <imagetype name="playlistyes">
-                                <position>15,0</position>
+                                <position>0,0</position>
                                 <filename>playlist_yes.png</filename>
                             </imagetype>
                         </state>
@@ -129,7 +129,7 @@
                 <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
-                        <area>25,0,857,30</area>
+                        <area>26,-4,853,32</area>
                     </shape>
                 </state>
             </statetype>

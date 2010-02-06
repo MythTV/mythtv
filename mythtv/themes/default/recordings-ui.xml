@@ -80,7 +80,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="name">
-                        <area>5,0,180,30</area>
+                        <area>5,-4,180,30</area>
                         <font>basesmall</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -93,7 +93,8 @@
 
         <buttonlist name="recordings" from="basebuttonlist2">
             <area>225,26,550,330</area>
-            <buttonarea>0,30,550,270</buttonarea>
+            <buttonarea>0,27,550,270</buttonarea>
+            <spacing>5</spacing>
             <wrapstyle>captive</wrapstyle>
             <statetype name="buttonitem">
                 <state name="active">
@@ -120,7 +121,7 @@
                     <statetype name="playlist">
                         <state name="yes">
                             <imagetype name="playlistyes">
-                                <position>15,0</position>
+                                <position>0,0</position>
                                 <filename>playlist_yes.png</filename>
                             </imagetype>
                         </state>
