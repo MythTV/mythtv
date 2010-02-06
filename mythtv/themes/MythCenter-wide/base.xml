@@ -219,7 +219,7 @@
             <state name="active">
                 <textarea name="buttontext">
                     <area>33,1,1155,24</area>
-                    <font>basesmall</font>
+                    <font>basesmall_normal</font>
                     <font state="disabled">basesmall_disabled</font>
                     <font state="error">basesmall_error</font>
                     <font state="warning">basesmall_warning</font>
@@ -238,7 +238,7 @@
                 </shape>
                 <textarea name="buttontext">
                     <area>33,1,1155,24</area>
-                    <font>basesmall</font>
+                    <font>base_normal_selected</font>
                     <font state="disabled">basesmall_disabled_selected</font>
                     <font state="error">basesmall_error_selected</font>
                     <font state="warning">basesmall_warning_selected</font>

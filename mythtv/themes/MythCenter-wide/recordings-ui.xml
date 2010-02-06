@@ -65,26 +65,16 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="name">
-                        <area>5,1,300,30</area>
+                        <area>10,0,300,30</area>
                         <font>basesmall_normal</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
                     </textarea>
                 </state>
-                <state name="selectedinactive" from="active">
-                    <textarea name="name">
-                        <area>5,1,300,30</area>
-                        <font>basesmall_normal</font>
-                        <cutdown>yes</cutdown>
-                        <align>left,vcenter</align>
-                    </textarea>
-                </state>
+                <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
                     <textarea name="name">
-                        <area>5,1,300,30</area>
                         <font>basesmall_normal_selected</font>
-                        <cutdown>yes</cutdown>
-                        <align>left,vcenter</align>
                     </textarea>
                 </state>
             </statetype>
@@ -92,8 +82,9 @@
 
         <buttonlist name="recordings" from="basebuttonlist2">
             <area>365,44,880,350</area>
-            <buttonarea>0,35,880,290</buttonarea>
+            <buttonarea>0,30,880,284</buttonarea>
             <wrapstyle>captive</wrapstyle>
+            <spacing>3</spacing>
             <statetype name="buttonitem">
                 <state name="active">
                 <statetype name="status">
@@ -158,8 +149,26 @@
                 <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
-                        <area>26,2,855,34</area>
+                        <area>26,3,855,31</area>
                     </shape>
+                    <textarea name="titlesubtitle" from="buttontext">
+                        <area>32,5,655,28</area>
+                        <font>basesmall_normal_selected</font>
+                        <font state="disabled">basesmall_disabled_selected</font>
+                        <font state="error">basesmall_error_selected</font>
+                        <font state="warning">basesmall_warning_selected</font>
+                        <font state="normal">basesmall_normal_selected</font>
+                        <font state="running">basesmall_running_selected</font>
+                        <align>vcenter</align>
+                    </textarea>
+                    <textarea name="shortdate" from="titlesubtitle">
+                        <area>635,5,120,28</area>
+                        <align>right</align>
+                    </textarea>
+                    <textarea name="starttime" from="shortdate">
+                        <area>761,5,114,28</area>
+                        <align>right</align>
+                    </textarea>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
