@@ -2,8 +2,8 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="Thorndale">
-        <pixelsize>22</pixelsize>
+    <font name="basesmall" face="Droid Sans">
+        <pixelsize>23</pixelsize>
         <color>#EEEEEE</color>
         <bold>yes</bold>
     </font>
@@ -12,30 +12,18 @@
         <bold>yes</bold>
     </font>
 
-    <font name="basesmallboldblue" from="basesmallbold">
-        <color>#9999cc</color>
-    </font>
-
-    <font name="basesmallboldgrey" from="basesmallbold">
-        <color>#555555</color>
-    </font>
-
-    <font name="basesmallboldgreyhighlight" from="basesmallbold">
-        <color>#888888</color>
-    </font>
-
     <font name="small" from="basesmall">
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>2,2</shadowoffset>
         <shadowalpha>0</shadowalpha>
     </font>
 
-    <font name="basemedium" from="basesmall">
-        <pixelsize>24</pixelsize>
+    <font name="basemedium" from="basesmall" face="Liberation Sans">
+        <pixelsize>26</pixelsize>
     </font>
 
-    <font name="baselarge" from="basesmall">
-        <pixelsize>26</pixelsize>
+    <font name="baselarge" from="basemedium">
+        <pixelsize>28</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
@@ -46,72 +34,71 @@
         <bold>no</bold>
     </font>
 
-    <font name="baseextralarge" from="basesmall">
-        <pixelsize>31</pixelsize>
+    <font name="baseextralarge" from="baselarge">
+        <pixelsize>33</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
     </font>
 
-    <!-- Colour variations on base fonts -->
-    <font name="basesmallwhite" from="basesmall">
+    <!-- State variations on small font -->
+    <font name="basesmall_normal_selected" from="basesmallbold">
         <color>#FFFFFF</color>
     </font>
-
-    <font name="basesmalllightgrey" from="basesmall">
-        <color>#CCCCCC</color>
-    </font>
-
-    <font name="basesmallgrey" from="basesmall">
-        <color>#666666</color>
-    </font>
-
-    <font name="basesmallpurple" from="basesmall">
+    <font name="basesmall_normal" from="basesmall">
         <color>#9999cc</color>
     </font>
-
-    <font name="basesmallblack" from="basesmall">
-        <color>#000000</color>
-    </font>
-
-    <font name="basesmallyellow" from="basesmall">
-        <color>#BBBB33</color>
-    </font>
-
-    <font name="basesmallgreen" from="basesmall">
-        <color>#00FF00</color>
-    </font>
-
-    <font name="basesmallblue" from="basesmall">
-        <color>#0492A7</color>
-    </font>
-
-    <font name="basesmallred" from="basesmall">
-        <color>#800900</color>
-    </font>
-
-    <font name="basemediumwhite" from="basemedium">
-        <color>#FFFFFF</color>
-    </font>
-
-    <font name="basemediumlightgrey" from="basemedium">
-        <color>#CCCCCC</color>
-    </font>
-
-    <font name="basemediumgrey" from="basemedium">
+    <font name="basesmall_normal_inactive" from="basesmall">
         <color>#666666</color>
     </font>
-
-    <font name="basemediumgreen" from="basemedium">
-        <color>#80d400</color>
+    <font name="basesmall_warning_selected" from="basesmallbold">
+        <color>#dddd44</color>
     </font>
-
-    <font name="basemediumred" from="basemedium">
-        <color>#800900</color>
+    <font name="basesmall_warning" from="basesmall">
+        <color>#bbbb33</color>
     </font>
-
-    <font name="basemediumyellow" from="basemedium">
+    <font name="basesmall_favourite_selected" from="basesmallbold">
+        <color>#dddd44</color>
+    </font>
+    <font name="basesmall_favourite" from="basesmall">
+        <color>#bbbb33</color>
+    </font>
+    <font name="basesmall_favourite_unavailable" from="basesmall"> 
+        <color>#9999cc</color>
+    </font>
+    <font name="basesmall_error_selected" from="basesmallbold">
+        <color>#900800</color>
+    </font>
+    <font name="basesmall_error" from="basesmall">
+        <color>#700700</color>
+    </font>
+    <font name="basesmall_disabled_selected" from="basesmallbold">
+        <color>#888888</color>
+    </font>
+    <font name="basesmall_disabled" from="basesmall">
+        <color>#666666</color>
+    </font>
+    <font name="basesmall_running_selected" from="basesmallbold">
+        <color>#00FF00</color>
+    </font>
+    <font name="basesmall_running" from="basesmall">
+        <color>#11DD11</color>
+    </font>
+    <font name="basesmall_textedit" from="basesmall">
+        <color>#000000</color>
+    </font>
+    <!-- State variations on medium font -->
+    <font name="basemedium_normal_selected" from="basemediumbold">
+        <color>#FFFFFF</color>
+    </font>
+    <font name="basemedium_normal" from="basemedium">
+        <color>#9999cc</color>
+    </font>
+    <font name="basemedium_disabled" from="basemedium">
+        <color>#666666</color>
+    </font>
+    <font name="basemedium_highlight" from="basemediumbold">
         <color>#FFFF33</color>
     </font>
 
@@ -187,7 +174,7 @@
                     <gradient start="#52CA38" end="#349838" alpha="100" />
                 </imagetype>
                 <textarea name="buttontext">
-                    <font>basesmallpurple</font>
+                    <font>basesmall_normal_inactive</font>
                 </textarea>
             </state>
         </statetype>
@@ -233,22 +220,32 @@
                 <textarea name="buttontext">
                     <area>33,1,1155,24</area>
                     <font>basesmall</font>
-                    <font state="disabled">basesmallgrey</font>
-                    <font state="error">basesmallyellow</font>
-                    <font state="warning">basesmallbold</font>
-                    <font state="normal">basesmallboldblue</font>
-                    <font state="running">basesmallgreen</font>
+                    <font state="disabled">basesmall_disabled</font>
+                    <font state="error">basesmall_error</font>
+                    <font state="warning">basesmall_warning</font>
+                    <font state="normal">basesmall_normal</font>
+                    <font state="running">basesmall_running</font>
                     <align>vcenter</align>
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
                 <shape name="selectbar">
-                    <area>25,0,1162,25</area>
+                    <area>27,-2,1130,29</area>
                     <type>roundbox</type>
                     <line color="#00FF00" alpha="255" width="1" />
                     <fill color="#43b038" alpha="128" />
                     <cornerradius>4</cornerradius>
                 </shape>
+                <textarea name="buttontext">
+                    <area>33,1,1155,24</area>
+                    <font>basesmall</font>
+                    <font state="disabled">basesmall_disabled_selected</font>
+                    <font state="error">basesmall_error_selected</font>
+                    <font state="warning">basesmall_warning_selected</font>
+                    <font state="normal">basesmall_normal_selected</font>
+                    <font state="running">basesmall_running_selected</font>
+                    <align>vcenter</align>
+                </textarea>
             </state>
             <state name="selectedinactive" from="active" />
         </statetype>
@@ -291,9 +288,9 @@
                 <textarea name="text">
                     <area>5,6,140,30</area>
                     <align>allcenter</align>
-                    <font>basemediumwhite</font>
-                    <font state="selected">basemediumwhite</font>
-                    <font state="disabled">basemediumgrey</font>
+                    <font>basemedium_normal</font>
+                    <font state="selected">basemedium_normal_selected</font>
+                    <font state="disabled">basemedium_disabled</font>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -324,9 +321,9 @@
                 <textarea name="text">
                     <area>5,5,290,30</area>
                     <align>allcenter</align>
-                    <font>basemediumwhite</font>
-                    <font state="selected">basemediumwhite</font>
-                    <font state="disabled">basemediumgrey</font>
+                    <font>basemedium_normal</font>
+                    <font state="selected">basemedium_normal_selected</font>
+                    <font state="disabled">basemedium_disabled</font>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -358,9 +355,9 @@
                 <textarea name="text">
                     <area>5,5,490,30</area>
                     <align>allcenter</align>
-                    <font>basemediumwhite</font>
-                    <font state="selected">basemediumwhite</font>
-                    <font state="disabled">basemediumgrey</font>
+                    <font>basemedium_normal</font>
+                    <font state="selected">basemedium_normal_selected</font>
+                    <font state="disabled">basemedium_disabled</font>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -619,7 +616,7 @@
         </imagetype>
         <textarea name="text">
             <area>13,13,351,25</area>
-            <font>basesmallblack</font>
+            <font>basesmall_textedit</font>
         </textarea>
     </textedit>
 
@@ -985,27 +982,27 @@
           <filename>ui/background.png</filename>
         </imagetype>
                                    
-        <font name="small" face="Thorndale">
+        <font name="small" face="Liberation Sans">
           <color>#FFFFFF</color>
           <pixelsize>19</pixelsize>
           <bold>yes</bold>
         </font>
     
-        <font name="medium" face="Thorndale">
+        <font name="medium" face="Droid Sans">
           <color>#FFFFFF</color>
-          <pixelsize>22</pixelsize>
+          <pixelsize>26</pixelsize>
           <bold>yes</bold>
         </font>
     
-        <font name="large" face="Thorndale">
+        <font name="large" face="Liberation Sans">
           <color>#FFFFFF</color>
           <pixelsize>28</pixelsize>
           <bold>yes</bold>
         </font>
     
-        <font name="clock" face="Thorndale">
+        <font name="clock" face="Liberation Sans">
              <color>#FFFFFF</color>
-             <pixelsize>25</pixelsize>
+             <pixelsize>26</pixelsize>
              <bold>yes</bold>
         </font>
     </window>

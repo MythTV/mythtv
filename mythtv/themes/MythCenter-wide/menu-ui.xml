@@ -2,7 +2,7 @@
 <mythuitheme>
     <window name="mainmenu">
 
-        <font name="menufont" face="Trebuchet MS">
+        <font name="menufont" face="Liberation Sans">
             <color>#FFFFFF</color>
             <size>22</size>
             <bold>yes</bold>

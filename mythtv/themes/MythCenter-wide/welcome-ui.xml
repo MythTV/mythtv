@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mythuitheme>
+
+    <window name="welcome_screen">
+
+        <!--
+            First, define all the fonts we need on this screen
+        -->
+        <font name="title" from="baselarge">>
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <font name="time" from="basesmall">
+            <color>#9999cc</color>
+            <size>14</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="label" from="basesmall">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>18</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <font name="info" from="basesmall">
+            <color>#ffffff</color>
+            <size>16</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="warning" from="basesmall">
+            <color>#ff0000</color>
+            <dropcolor>#000000</dropcolor>
+            <size>16</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <font name="buttons" from="basesmall">
+            <color>#ffff00</color>
+            <size>14</size>
+            <bold>yes</bold>
+        </font>
+
+
+        <textarea name="title" from="basetextarea">
+            <area>80,12,1120,48</area>
+            <font>title</font>
+            <align>allcenter</align>
+            <value>Welcome to MythTV</value>
+        </textarea>
+
+        <!--
+            date & time
+        -->
+        <clock name="date">
+            <area>32,24,304,84</area>
+            <font>time</font>
+            <format>dddd\ndd MMMM yyyy</format>
+            <align>left,top</align>
+            <cutdown>true</cutdown>
+        </clock>
+
+        <clock name="time" from="date">
+            <area>1072,24,176,36</area>
+            <format>%TIME%</format>
+            <align>right</align>
+        </clock>
+
+        <!--
+            current myth status
+        -->
+        <textarea name="status_text" from="basetextarea">
+            <area>32,84,1216,72</area>
+            <multiline>yes</multiline>
+            <font>info</font>
+            <align>hcenter</align>
+            <value>MythTV is idle and will shutdown shortly.</value>
+        </textarea>
+
+        <!--
+            current recordings status
+        -->
+        <textarea name="recording_label" from="basetextarea">
+            <area>32,156,1216,36</area>
+            <font>label</font>
+            <align>hcenter</align>
+            <value>Current Recording(s)</value>
+        </textarea>
+
+        <textarea name="recording_text" from="status_text">
+            <area>32,198,1216,180</area>
+            <value>Retrieving Recording Status ...</value>
+        </textarea>
+
+        <!--
+            next scheduled recording status
+        -->
+        <textarea name="scheduled_label" from="recording_label">
+            <area>32,384,1216,36</area>
+            <value>Next Scheduled Recording(s)</value>
+        </textarea>
+
+        <textarea name="scheduled_text" from="recording_text">
+            <area>32,426,1216,144</area>
+            <value>Retrieving Scheduled Recordings ...</value>
+        </textarea>
+
+        <!--
+            scheduled recordings conflict warning
+        -->
+        <textarea name="conflicts_text" from="basetextarea">
+            <area>32,588,1216,36</area>
+            <font>warning</font>
+            <align>hcenter</align>
+            <value>WARNING: There are conflicting scheduled recordings!</value>
+        </textarea>
+
+        <!--
+            start frontend button
+        -->
+        <button name="startfrontend_button" from="basewidebutton">
+            <position>487,642</position>
+            <value>Start Frontend</value>
+        </button>
+
+
+    </window>
+
+</mythuitheme>

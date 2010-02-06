@@ -1,0 +1,122 @@
+<mythuitheme>
+
+    <window name="channeloverview">
+
+        <textarea name="pagetitle">
+            <area>20,5,570,40</area>
+            <font>baselarge</font>
+            <value>Channel Editor</value>
+        </textarea>
+
+        <shape name="list_background" from="basebackground">
+            <area>15,40,1190,360</area>
+        </shape>
+
+        <shape name="channum_column">
+            <area>51,42,80,356</area>
+            <fill color="#333333" alpha="180" />
+        </shape>
+
+        <shape name="sourcename_background">
+            <area>855,42,290,356</area>
+            <fill color="#333333" alpha="180" />
+        </shape>
+
+        <buttonlist name="channels" from="basebuttonlist2">
+            <position>19,50</position>
+            <statetype name="buttonitem">
+                <state name="active">
+                    <imagetype name="icon">
+                        <area>1125,0,60,25</area>
+                        <preserveaspect>true</preserveaspect>
+                    </imagetype>
+                    <textarea name="channum" from="buttontext">
+                        <area>32,1,80,24</area>
+                        <align>center</align>
+                    </textarea>
+                    <textarea name="name" from="buttontext">
+                        <area>120,1,740,24</area>
+                    </textarea>
+                    <textarea name="sourcename" from="name">
+                        <area>860,1,275,24</area>
+                    </textarea>
+                </state>
+                <state name="selectedactive" from="active" />
+                <state name="selectedinactive" from="active" />
+            </statetype>
+        </buttonlist>
+
+        <textarea name="sortlabel" from="basetextarea">
+            <area>30,420,220,30</area>
+            <value>Sort Mode:</value>
+            <font>basemedium</font>
+        </textarea>
+
+        <buttonlist name="sorting" from="basewideselector">
+            <position>260,415</position>
+        </buttonlist>
+
+        <textarea name="sourcelabel" from="sortlabel">
+            <position>30,480</position>
+            <value>Video Source:</value>
+        </textarea>
+
+        <buttonlist name="source" from="basewideselector">
+            <position>260,475</position>
+        </buttonlist>
+
+        <button name="delete" from="basebutton">
+            <position>760,475</position>
+            <value>Delete</value>
+        </button>
+
+        <textarea name="nochannumlabel" from="basetextarea">
+            <area>70,537,500,60</area>
+            <value>Hide Channels without channel number.</value>
+        </textarea>
+
+        <checkbox name="nochannum" from="basecheckbox">
+            <position>30,535</position>
+        </checkbox>
+
+        <button name="scan" from="basewidebutton">
+            <position>90,605</position>
+            <value>Channel Scan</value>
+        </button>
+
+        <button name="importicons" from="basewidebutton">
+            <position>490,605</position>
+            <value>Icon Download</value>
+        </button>
+
+        <button name="edittransport" from="basewidebutton">
+            <position>890,605</position>
+            <value>Edit Transports</value>
+        </button>
+
+    </window>
+
+    <window name="osdmenueditor">
+
+        <textarea name="title" from="basetextarea">
+            <font>baselarge</font>
+            <area>0,20,1000,40</area>
+            <value>OSD Menu Editor</value>
+            <align>center</align>
+        </textarea>
+
+        <buttonlist name="states" from="basebuttonlist">
+            <area>60,100,300,300</area>
+            <showarrow>no</showarrow>
+        </buttonlist>
+
+        <buttonlist name="categories" from="basebuttonlist">
+            <area>402,100,500,500</area>
+        </buttonlist>
+
+        <button name="done" from="basebutton">
+            <position>500,620</position>
+            <value>Done</value>
+        </button>
+    </window>
+</mythuitheme>
