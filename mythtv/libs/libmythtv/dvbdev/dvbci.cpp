@@ -1135,6 +1135,11 @@ bool cCiDateTime::Process(int Length, const uint8_t *Data)
 
 // --- cCiMMI ----------------------------------------------------------------
 
+// Close MMI Commands:
+
+#define CLOSE_MMI_IMMEDIATE                0x00
+#define CLOSE_MMI_DELAY                    0x01
+
 // Display Control Commands:
 
 #define DCC_SET_MMI_MODE                          0x01
@@ -1284,6 +1289,25 @@ bool cCiMMI::Process(int Length, const uint8_t *Data)
                }
             }
             break;
+       case AOT_CLOSE_MMI: {
+            int l = 0;
+            const uint8_t *d = GetData(Data, l);
+
+            if(l > 0){
+                switch(*d){
+                case CLOSE_MMI_IMMEDIATE:
+                    dbgprotocol("%d <== Menu Close: immediate\n", SessionId());
+                    break;
+                case CLOSE_MMI_DELAY:
+                    dbgprotocol("%d <== Menu Close: delay\n", SessionId());
+                    break;
+                default: esyslog("ERROR: CI MMI: unknown close_mmi_cmd_id %02X", *d);
+                    return false;
+                }
+            }
+
+            break;
+       }
        default: esyslog("ERROR: CI MMI: unknown tag %06X", Tag);
                 return false;
        }
