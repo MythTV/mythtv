@@ -6,7 +6,7 @@ Provides base classes for accessing MythTV
 
 from MythStatic import *
 
-import os, re, socket, MySQLdb, MySQLdb.cursors, sys, locale, weakref
+import os, re, socket, sys, locale, weakref
 import xml.etree.cElementTree as etree
 from datetime import datetime
 from time import sleep, time
@@ -14,6 +14,8 @@ from urllib import urlopen
 from subprocess import Popen
 from sys import version_info
 
+import MySQLdb, MySQLdb.cursors
+MySQLdb.__version__ = tuple([int(v) for v in MySQLdb.__version__.split('.')])
 
 class DictData( object ):
     """
@@ -764,7 +766,10 @@ class MythDBConn( object ):
             raise MythDBError(MythError.DB_CONNECTION, dbconn)
 
     def cursor(self, log=None, type=MythDBCursor):
-        self.db.ping(True)
+        if MySQLdb.__version__ >= (1,2,2):
+            self.db.ping(True)
+        else:
+            self.db.ping()
         c = self.db.cursor(type)
         if log:
             c.log = log
