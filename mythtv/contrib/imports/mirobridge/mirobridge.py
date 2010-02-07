@@ -2050,7 +2050,7 @@ def main():
                         help=u"Organise MythVideo's Miro directory WITHOUT Miro channel subdirectories. The default is to have Channel subdirectories.")
     parser.add_option(  "-c", "--channel", metavar="CHANNEL_ID:CHANNEL_NUM", default="", dest="channel",
                         help=u'Specifies the channel id that is used for Miros unplayed recordings. Enter as "xxxx:yyy". Default is 9999:999. Be warned that once you change the default channel_id "9999" you must always use this option!')
-    parser.add_option(  "-i", "--import_opml", metavar="CONFIGFILEPATH", default="", dest="import_opml",
+    parser.add_option(  "-i", "--import_opml", metavar="OPMLFILEPATH", default="", dest="import_opml",
                         help=u'Import Miro exported OPML file containing Channel configurations. File name must be a fully qualified path. This option is exclusive to Miro v2.5.x and higher.')
     parser.add_option(  "-V", "--verbose", action="store_true", default=False, dest="verbose",
                         help=u"Display verbose messages when processing")
