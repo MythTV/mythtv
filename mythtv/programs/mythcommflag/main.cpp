@@ -444,7 +444,10 @@ void commDetectorBreathe()
 void commDetectorStatusUpdate(const QString& status)
 {
     if (jobID != -1)
+    {
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING,  status);
+        JobQueue::ChangeJobComment(jobID,  status);
+    }
 }
 
 void commDetectorGotNewCommercialBreakList(void)
