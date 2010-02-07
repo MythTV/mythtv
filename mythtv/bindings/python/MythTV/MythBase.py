@@ -719,7 +719,10 @@ class MythDBCursor( MySQLdb.cursors.Cursor ):
         MySQLdb.cursors.Cursor.__init__(self, connection)
 
     def execute(self, query, args=None):
-        self.connection.ping(True)
+        if MySQLdb.__version__ >= (1,2,2):
+            self.connection.ping(True)
+        else:
+            self.connection.ping()
         if self.log == None:
             self.log = MythLog('Python Database Connection')
         if args:
@@ -732,7 +735,10 @@ class MythDBCursor( MySQLdb.cursors.Cursor ):
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
     def executemany(self, query, args):
-        self.connection.ping(True)
+        if MySQLdb.__version__ >= (1,2,2):
+            self.connection.ping(True)
+        else:
+            self.connection.ping()
         if self.log == None:
             self.log = MythLog('Python Database Connection')
         for arg in args:
