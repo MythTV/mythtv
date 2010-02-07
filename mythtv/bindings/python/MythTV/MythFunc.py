@@ -9,6 +9,7 @@ from MythBase import *
 from MythData import *
 
 import os, re, socket
+from datetime import datetime
 
 
 class databaseSearch( object ):
@@ -771,6 +772,99 @@ class MythDB( MythDBBase ):
         if not hostname:
             hostname = 'NULL'
         self.settings[hostname][value] = data
+
+class MythXML( MythXMLConn ):
+    """
+    Provides convenient methods to access the backend XML server.
+    """
+    def getServDesc(self):
+        """
+        Returns a dictionary of valid pages, as well as input and output
+        arguments.
+        """
+        tree = self._queryTree('GetServDesc')
+        acts = {}
+        for act in tree.find('actionList').getchildren():
+            actname = act.find('name').text
+            acts[actname] = {'in':[], 'out':[]}
+            for arg in act.find('argumentList').getchildren():
+                argname = arg.find('name').text
+                argdirec = arg.find('direction').text
+                acts[actname][argdirec].append(argname)
+        return acts
+
+    def getHosts(self):
+        """Returns a list of unique hostnames found in the settings table."""
+        tree = self._queryTree('GetHosts')
+        return [child.text for child in tree.find('Hosts').getchildren()]
+
+    def getKeys(self):
+        """Returns a list of unique keys found in the settings table."""
+        tree = self._queryTree('GetKeys')
+        return [child.text for child in tree.find('Keys').getchildren()]
+
+    def getSetting(self, key, hostname=None, default=None):
+        """Retrieves a setting from the backend."""
+        args = {'Key':key}
+        if hostname:
+            args['HostName'] = hostname
+        if default:
+            args['Default'] = default
+        tree = self._queryTree('GetSetting', **args)
+        return tree.find('Values').find('Value').text
+
+    def getProgramGuide(self, starttime, endtime, startchan=None, numchan=None):
+        """
+        Returns a list of Guide objects corresponding to the given time period.
+        """
+        args = {'StartTime':starttime, 'EndTime':endtime, 'Details':1}
+        if startchan:
+            args['StartChanId'] = startchan
+            if numchan:
+                args['NumOfChannels'] = numchan
+            else:
+                args['NumOfChannels'] = 1
+
+        progs = []
+        tree = self._queryTree('GetProgramGuide', **args)
+        for chan in tree.find('ProgramGuide').find('Channels').getchildren():
+            chanid = int(chan.attrib['chanId'])
+            for guide in chan.getchildren():
+                progs.append(Guide(db=self.db, etree=(chanid, guide)))
+        return progs
+
+    def getProgramDetails(self, chanid, starttime):
+        """
+        Returns a Program object for the matching show.
+        """
+        args = {'ChanId': chanid, 'StartTime':starttime}
+        tree = self._queryTree('GetProgramDetails', **args)
+        prog = tree.find('ProgramDetails').find('Program')
+        return Program(db=self.db, etree=prog)
+
+    def getChannelIcon(self, chanid):
+        """Returns channel icon as a data string"""
+        return self._query('GetChannelIcon', ChanId=chanid)
+
+    def getRecorded(self, descending=True):
+        """
+        Returns a list of Program objects for recorded shows on the backend.
+        """
+        tree = self._queryTree('GetRecorded', Descending=descending)
+        progs = []
+        for prog in tree.find('Recorded').find('Programs').getchildren():
+            progs.append(Program(db=self.db, etree=prog))
+        return progs
+
+    def getExpiring(self):
+        """
+        Returns a list of Program objects for expiring shows on the backend.
+        """
+        tree = self._queryTree('GetExpiring')
+        progs = []
+        for prog in tree.find('Expiring').find('Programs').getchildren():
+            progs.append(Program(db=self.db, etree=prog))
+        return progs
 
 class MythVideo( MythDBBase ):
     """

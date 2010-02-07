@@ -9,7 +9,7 @@ from MythBase import *
 
 import re, sys, socket, os
 import xml.etree.cElementTree as etree
-from time import mktime, strftime
+from time import mktime, strftime, strptime
 from datetime import date, datetime
 from socket import gethostbyaddr, gethostname
 
@@ -427,9 +427,44 @@ class Program( DictData ):
     def __repr__(self):
         return str(self).encode('utf-8')
 
-    def __init__(self, raw, db=None):
+    def __init__(self, raw=None, db=None, etree=None):
+        if raw:
+            DictData.__init__(self, raw)
+        elif etree:
+            xmldat = etree.attrib
+            xmldat.update(etree.find('Channel').attrib)
+            if etree.find('Recording'):
+                xmldat.update(etree.find('Recording').attrib)
+
+            dat = {}
+            if etree.text:
+                dat['description'] = etree.text.strip()
+            for key in ('title','subTitle','seriesId','programId','airdate',
+                    'category','hostname','chanNum','callSign','playGroup',
+                    'recGroup','rectype','programFlags','chanId','recStatus',
+                    'commFree','stars'):
+                if key in xmldat:
+                    dat[key.lower()] = xmldat[key]
+            for key in ('startTime','endTime','lastModified',
+                                    'recStartTs','recEndTs'):
+                if key in xmldat:
+                    dat[key.lower()] = str(int(mktime(strptime(
+                                        xmldat[key], '%Y-%m-%dT%H:%M:%S'))))
+            if 'fileSize' in xmldat:
+                dat['fs_high'],dat['fs_low'] = \
+                                    self.splitInt(int(xmldat['fileSize']))
+
+            raw = []
+            defs = (0,0,0,'',0)
+            for i in range(len(self.field_order)):
+                if self.field_order[i] in dat:
+                    raw.append(dat[self.field_order[i]])
+                else:
+                    raw.append(defs[self.field_type[i]])
+            DictData.__init__(self, raw)
+        else:
+            raise InputError("Either 'raw' or 'etree' must be provided")
         self.db = MythDBBase(db)
-        DictData.__init__(self, raw)
         self.filesize = self.joinInt(self.fs_high,self.fs_low)
 
     def toString(self):
@@ -876,6 +911,34 @@ class Guide( DBData ):
 
     def __repr__(self):
         return str(self).encode('utf-8')
+
+    def __init__(self, data=None, db=None, raw=None, etree=None):
+        if etree:
+            db = MythDBBase(db)
+            dat = {'chanid':etree[0]}
+            attrib = etree[1].attrib
+            for key in ('title','subTitle','category','seriesId',
+                        'hostname','programId','airdate'):
+                if key in attrib:
+                    dat[key.lower()] = attrib[key]
+            if 'stars' in attrib:
+                dat['stars'] = locale.atof(attrib['stars'])
+            if etree[1].text:
+                dat['description'] = etree[1].text.strip()
+            for key in ('startTime','endTime','lastModified'):
+                if key in attrib:
+                    dat[key.lower()] = datetime.strptime(
+                                    attrib[key],'%Y-%m-%dT%H:%M:%S')
+
+            raw = []
+            for key in db.tablefields.program:
+                if key in dat:
+                    raw.append(dat[key])
+                else:
+                    raw.append(None)
+            DBData.__init__(self, db=db, raw=raw)
+        else:
+            DBData.__init__(self, data=data, db=db, raw=raw)
 
 
 #### MYTHVIDEO ####

@@ -6,12 +6,12 @@ __all__ = ['MythStatic', \
            'MythBEConn', 'MythXMLConn', 'MythLog', 'MythError', \
            'StorageGroup', 'Grabber', \
             \
-           'ftopen', 'FileTransfer', 'FreeSpace', 'Program', \
+           'ftopen', 'FileTransfer', 'FreeSpace', 'Program', 'Record', \
            'Recorded', 'RecordedProgram', 'OldRecorded', 'Job', 'Channel', \
            'Guide', 'Video', 'VideoGrabber', 'NetVisionRSSItems', \
            'NetVisionTreeItems', 'NetVisionSites', 'NetVisionGrabber', \
             \
-           'MythBE', 'Frontend', 'MythDB', 'MythVideo']
+           'MythBE', 'Frontend', 'MythDB', 'MythVideo', 'MythXML']
 
 import26 = """
 import warnings
