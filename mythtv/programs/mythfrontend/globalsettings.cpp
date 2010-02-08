@@ -80,7 +80,7 @@ static HostComboBox *AudioOutputDevice()
 #endif
 #ifdef USING_MINGW
     gc->addSelection("Windows:");
-    gc->addSelection("DirectX:");
+    gc->addSelection("DirectX:Primary Sound Driver");
 #endif
 
     gc->addSelection("NULL", "NULL");
@@ -164,7 +164,9 @@ static HostComboBox *PassThroughOutputDevice()
 
     gc->setLabel(QObject::tr("Digital output device"));
     gc->addSelection(QObject::tr("Default"), "Default");
-#ifndef USING_MINGW
+#ifdef USING_MINGW
+    gc->addSelection("DirectX:Primary Sound Driver");
+#else
     gc->addSelection("ALSA:iec958:{ AES0 0x02 }", "ALSA:iec958:{ AES0 0x02 }");
     gc->addSelection("ALSA:hdmi", "ALSA:hdmi");
     gc->addSelection("ALSA:plughw:0,3", "ALSA:plughw:0,3");
@@ -175,7 +177,7 @@ static HostComboBox *PassThroughOutputDevice()
 
     gc->setHelpText(QObject::tr("Audio output device to use for digital audio. Default is the same as Audio output "
                     "device. This value is currently only used with ALSA "
-                    "sound output."));
+                    "and DirectX sound output."));
     return gc;
 }
 

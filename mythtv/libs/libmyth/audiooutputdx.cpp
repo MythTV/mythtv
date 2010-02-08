@@ -57,9 +57,11 @@ class AudioOutputDXPrivate
             dsbuffer(NULL),
             playStarted(false),
             writeCursor(0),
-            lastValidTime(0)
+            lastValidTime(0),
+            chosenGUID(NULL),
+            device_count(0),
+            device_num(0)
         {
-            InitDirectSound();
         }
 
         ~AudioOutputDXPrivate()
@@ -74,10 +76,13 @@ class AudioOutputDXPrivate
         }
 
         int InitDirectSound(void);
+        void ResetDirectSound(void);        
         void DestroyDSBuffer(void);
         void FillBuffer(unsigned char *buffer, int size);
         bool StartPlayback(void);
         void StopPlayback(bool reset);
+        static int CALLBACK DSEnumCallback(LPGUID lpGuid,
+                LPCSTR lpcstrDesc, LPCSTR lpcstrModule, LPVOID lpContext);
 
     public:
         AudioOutputDX *parent;
@@ -87,6 +92,9 @@ class AudioOutputDXPrivate
         bool playStarted;        
         DWORD writeCursor;        
         DWORD lastValidTime;        
+        GUID deviceGUID, *chosenGUID;
+        int device_count, device_num;
+        QString device_name;        
 };
 
 
@@ -112,17 +120,97 @@ AudioOutputDX::~AudioOutputDX()
 }
 
 typedef HRESULT (WINAPI *LPFNDSC) (LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
+typedef HRESULT (WINAPI *LPFNDSE) (LPDSENUMCALLBACK, LPVOID);
+
+int CALLBACK AudioOutputDXPrivate::DSEnumCallback(LPGUID lpGuid, 
+        LPCSTR lpcstrDesc, LPCSTR lpcstrModule, LPVOID lpContext)
+{
+    const QString enum_desc = lpcstrDesc,
+                  cfg_desc = ((AudioOutputDXPrivate*)lpContext)->device_name;
+    const int device_num = ((AudioOutputDXPrivate*)lpContext)->device_num,
+              device_count = ((AudioOutputDXPrivate*)lpContext)->device_count;
+
+    VERBOSE(VB_AUDIO, QString(LOC + "Device %1:" + enum_desc)
+            .arg(device_count));
+
+    if ((device_num == device_count) ||
+        (device_num == 0 && !cfg_desc.isEmpty() &&
+        enum_desc.startsWith(cfg_desc, Qt::CaseInsensitive)))
+    {
+        if (lpGuid)
+        {
+            ((AudioOutputDXPrivate*)lpContext)->deviceGUID = *lpGuid;
+            ((AudioOutputDXPrivate*)lpContext)->chosenGUID =
+                &(((AudioOutputDXPrivate*)lpContext)->deviceGUID);
+            ((AudioOutputDXPrivate*)lpContext)->device_name = enum_desc;
+            ((AudioOutputDXPrivate*)lpContext)->device_num = device_count;
+        }
+    }
+
+    ((AudioOutputDXPrivate*)lpContext)->device_count++;
+    return 1;
+}
+
+void AudioOutputDXPrivate::ResetDirectSound(void)
+{
+    DestroyDSBuffer();
+
+    if (dsobject)
+    {
+        IDirectSound_Release(dsobject);
+        dsobject = NULL;
+    }
+ 
+    if (dsound_dll)
+    {
+       FreeLibrary(dsound_dll);
+       dsound_dll = NULL;
+    }
+
+    chosenGUID   = NULL;
+    device_count = 0;
+    device_num   = 0;
+}
 
 int AudioOutputDXPrivate::InitDirectSound(void)
 {
     LPFNDSC OurDirectSoundCreate;
-   
+    LPFNDSE OurDirectSoundEnumerate;
+    bool ok;
+
+    ResetDirectSound();
+
     dsound_dll = LoadLibrary("DSOUND.DLL");
     if (dsound_dll == NULL )
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot open DSOUND.DLL" );
         goto error;
     }
+
+    device_name = (parent->m_UseSPDIF) ?
+        parent->audio_passthru_device : parent->audio_main_device;
+    device_name = device_name.section(':', 1);
+    device_num = device_name.toInt(&ok, 10);
+    VERBOSE(VB_AUDIO, LOC + QString("Looking for device num:%1 or name:%2")
+            .arg(device_num).arg(device_name));
+
+    OurDirectSoundEnumerate =
+        (LPFNDSE)GetProcAddress(dsound_dll, "DirectSoundEnumerateA" );
+    if(OurDirectSoundEnumerate)
+    {
+        if(FAILED(OurDirectSoundEnumerate(DSEnumCallback, this)))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "DirectSoundEnumerate FAILED" );
+        }
+    }
+
+    if (!chosenGUID)
+    {
+        device_num = 0;
+        device_name = "Primary Sound Driver";
+    }
+    VERBOSE(VB_AUDIO, LOC + QString("Using device %1:%2")
+            .arg(device_num).arg(device_name));
 
     OurDirectSoundCreate = 
         (LPFNDSC)GetProcAddress(dsound_dll, "DirectSoundCreate");
@@ -132,7 +220,7 @@ int AudioOutputDXPrivate::InitDirectSound(void)
         goto error;
     }
 
-    if (FAILED(OurDirectSoundCreate(NULL, &dsobject, NULL)))
+    if (FAILED(OurDirectSoundCreate(chosenGUID, &dsobject, NULL)))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "cannot create a direct sound device" );
         goto error;
@@ -174,12 +262,10 @@ void AudioOutputDXPrivate::DestroyDSBuffer(void)
     if (dsbuffer)
     {
         VERBOSE(VB_AUDIO, LOC + "Destroying DirectSound buffer");
-        IDirectSoundBuffer_Stop(dsbuffer);
+        StopPlayback(true);
         IDirectSoundBuffer_Release(dsbuffer);
         dsbuffer = NULL;
     }
-    writeCursor = 0;
-    playStarted = false;        
 }
 
 void AudioOutputDXPrivate::FillBuffer(unsigned char *buffer, int size)
@@ -284,9 +370,17 @@ vector<int> AudioOutputDX::GetSupportedRates(void)
 {
     const int srates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000 };
     vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
+    m_UseSPDIF = audio_passthru || audio_enc;
+    if (m_UseSPDIF)
+    {
+        rates.clear();
+        rates.push_back(48000);
+    }
+
     DSCAPS devcaps;
     devcaps.dwSize = sizeof(DSCAPS);
 
+    m_priv->InitDirectSound();
     if ((!m_priv->dsobject || !m_priv->dsound_dll) ||
         FAILED(IDirectSound_GetCaps(m_priv->dsobject, &devcaps)) )
     {
@@ -316,13 +410,15 @@ bool AudioOutputDX::OpenDevice(void)
     WAVEFORMATEXTENSIBLE wf;
     DSBUFFERDESC         dsbdesc;
 
+    CloseDevice();
+
+    m_UseSPDIF = audio_passthru || audio_enc;
+    m_priv->InitDirectSound();
     if (!m_priv->dsobject || !m_priv->dsound_dll)
     {
         Error("DirectSound initialization failed");
         return false;
     }
-
-    CloseDevice();
 
     SetBlocking(true);
     fragment_size = (source == AUDIOOUTPUT_TELEPHONY) ? 320 : 6144;
@@ -330,7 +426,6 @@ bool AudioOutputDX::OpenDevice(void)
         fragment_size *= 2;
     soundcard_buffer_size = kFramesNum * fragment_size;
     audio_bytes_per_sample = audio_bits / 8 * audio_channels;
-    m_UseSPDIF = audio_passthru || audio_enc;
     if (m_UseSPDIF && (audio_channels != 2))
     {
         Error("SPDIF passthru requires 2 channel data");
@@ -349,8 +444,9 @@ bool AudioOutputDX::OpenDevice(void)
     wf.SubFormat = (m_UseSPDIF) ? _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF 
                                 : _KSDATAFORMAT_SUBTYPE_PCM;
  
-    VERBOSE(VB_AUDIO, LOC + QString("New format: %1bits %2ch %3Hz")
-            .arg(audio_bits).arg(audio_channels).arg(audio_samplerate));
+    VERBOSE(VB_AUDIO, LOC + QString("New format: %1bits %2ch %3Hz %4")
+            .arg(audio_bits).arg(audio_channels).arg(audio_samplerate)
+            .arg((m_UseSPDIF) ? "data" : "PCM"));
 
     if (audio_channels <= 2)
     {
@@ -384,8 +480,13 @@ bool AudioOutputDX::OpenDevice(void)
                 m_priv->dsobject, &dsbdesc, &m_priv->dsbuffer, NULL);
         if FAILED(dsresult)
         {
-           Error(QString("Failed to create DS buffer %1").arg((DWORD)dsresult));
-           return false;
+            if (dsresult == DSERR_UNSUPPORTED)
+                Error(QString("Unsupported format for device %1:%2")
+                        .arg(m_priv->device_num).arg(m_priv->device_name));
+            else
+                Error(QString("Failed to create DS buffer 0x%1")
+                        .arg((DWORD)dsresult, 0, 16));
+            return false;
         }
         VERBOSE(VB_AUDIO, LOC + "Using software mixer" );
     }
@@ -428,7 +529,10 @@ void AudioOutputDX::WriteAudio(unsigned char * buffer, int size)
     }
 
     m_priv->FillBuffer(buffer, size);
-    m_priv->StartPlayback();
+    if (!pauseaudio)
+        m_priv->StartPlayback();
+    else
+        m_priv->playStarted = true;
 }
 
 void AudioOutputDX::Pause(bool pause)
@@ -482,7 +586,8 @@ int AudioOutputDX::GetSpaceOnSoundcard(void) const
                     .arg(play_pos).arg(write_pos).arg(m_priv->writeCursor));
         // WriteCursor is in unsafe zone - stop playback for now
         // Next call to WriteAudio will restart the buffer
-        m_priv->StopPlayback(false);
+        m_priv->StopPlayback(true);
+        buffer_free = soundcard_buffer_size;
     }
     else if (m_priv->lastValidTime && (currentTime > m_priv->lastValidTime))
     {
@@ -490,6 +595,7 @@ int AudioOutputDX::GetSpaceOnSoundcard(void) const
                     .arg(play_pos).arg(write_pos).arg(m_priv->writeCursor)
                     .arg(currentTime - m_priv->lastValidTime));
         m_priv->StopPlayback(true);
+        buffer_free = soundcard_buffer_size;
     }
 
     return buffer_free;
