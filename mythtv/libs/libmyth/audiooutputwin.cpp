@@ -144,6 +144,11 @@ vector<int> AudioOutputWin::GetSupportedRates(void)
     // so just return a set of standard rates
     const int srates[] = { 11025, 22050, 44100, 48000 };
     vector<int> rates(srates, srates + sizeof(srates) / sizeof(int) );
+    if (audio_passthru || audio_enc)
+    {
+        rates.clear();
+        rates.push_back(48000);
+    }
     return rates;
 }
 
