@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.5.4"
+__version__=u"v0.5.5"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -174,6 +174,8 @@ __version__=u"v0.5.4"
 # 0.5.4 Add the command line option (-i) to import an OPML file that was exported from Miro on a different PC.
 #       This new option allows configuring Miro channels on a separate PC then importing those channels on
 #       a Myth backend without a keyboard. No Miro GUI needs to run on the MythTV backend.
+# 0.5.5 Fixed bug #8051 - creating hash value for non-SG Miro video files had an incorrect variable and missing
+#       library import.
 
 
 examples_txt=u'''
@@ -181,7 +183,7 @@ For examples, please see the Mirobridge's wiki page at http://www.mythtv.org/wik
 '''
 
 # Common function imports
-import sys, os, re, locale, subprocess, locale, ConfigParser, codecs, shutil
+import sys, os, re, locale, subprocess, locale, ConfigParser, codecs, shutil, struct
 import datetime, fnmatch, string, time, logging, traceback, platform, fnmatch, ConfigParser
 from datetime import date
 from optparse import OptionParser
@@ -566,7 +568,7 @@ def hashFile(filename):
     try:
         longlongformat = 'q'  # long long
         bytesize = struct.calcsize(longlongformat)
-        f = open(name, "rb")
+        f = open(filename, "rb")
         filesize = os.path.getsize(filename)
         hash = filesize
         if filesize < 65536 * 2:    # Video file is too small
