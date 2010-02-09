@@ -360,7 +360,7 @@ class MythBE( FileOps ):
         """
         return self.backendCommand('QUERY_UPTIME')
 
-    def walkSG(self, host, sg, top):
+    def walkSG(self, host, sg, top=None):
         """
         Performs similar to os.walk(), returning a tuple of tuples containing
             (dirpath, dirnames, filenames).
@@ -379,7 +379,7 @@ class MythBE( FileOps ):
             return res
 
         bases = self.getSGList(host, sg, '')
-        if top == '/': top = ''
+        if (top == '/') or (top is None): top = ''
         walked = {}
         for base in bases:
             res = walk(self, host, sg, base, top)
@@ -880,7 +880,7 @@ class MythVideo( MythDBBase ):
         self._check_schema('mythvideo.DBSchemaVer', 
                                 MVSCHEMA_VERSION, 'MythVideo')
         
-    def scanStorageGroups(self, returnnew=True, deleteold=True):
+    def scanStorageGroups(self, deleteold=True):
         """
         Removes metadata from the database for files that no longer exist.
         Respects 'Videos' storage groups and relative paths.
@@ -959,23 +959,16 @@ class MythVideo( MythDBBase ):
                     curvids[thash].update({'filename':tpath})
                     del curvids[thash]
                 else:
-                    newvidlist.append((hostname, tpath, thash))
+                    vid = Video(db=self).fromFilename(tpath)
+                    vid.host = hostname
+                    vid.hash = thash
+                    newvidlist.append(vid)
 
-        curvids = curvids.values()
-        if returnnew:
-            res = newvidlist
-        else:
-            res = None
         if deleteold:
             for vid in curvids:
-                #print 'deleting '+str(vid)
                 vid.delete()
-        else:
-            if res:
-                res = (res, curvids)
-            else:
-                res = curvids
-        return res
+
+        return (newvidlist, curvids.values())
 
     @databaseSearch
     def searchVideos(self, init=False, key=None, value=None):

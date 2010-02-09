@@ -15,7 +15,7 @@ from subprocess import Popen
 from sys import version_info
 
 import MySQLdb, MySQLdb.cursors
-MySQLdb.__version__ = tuple([int(v) for v in MySQLdb.__version__.split('.')])
+MySQLdb.__version__ = tuple([v for v in MySQLdb.__version__.split('.')])
 
 class DictData( object ):
     """
@@ -719,7 +719,7 @@ class MythDBCursor( MySQLdb.cursors.Cursor ):
         MySQLdb.cursors.Cursor.__init__(self, connection)
 
     def execute(self, query, args=None):
-        if MySQLdb.__version__ >= (1,2,2):
+        if MySQLdb.__version__ >= ('1','2','2'):
             self.connection.ping(True)
         else:
             self.connection.ping()
@@ -735,7 +735,7 @@ class MythDBCursor( MySQLdb.cursors.Cursor ):
             raise MythDBError(MythDBError.DB_RAW, e.args)
 
     def executemany(self, query, args):
-        if MySQLdb.__version__ >= (1,2,2):
+        if MySQLdb.__version__ >= ('1','2','2'):
             self.connection.ping(True)
         else:
             self.connection.ping()
@@ -772,7 +772,7 @@ class MythDBConn( object ):
             raise MythDBError(MythError.DB_CONNECTION, dbconn)
 
     def cursor(self, log=None, type=MythDBCursor):
-        if MySQLdb.__version__ >= (1,2,2):
+        if MySQLdb.__version__ >= ('1','2','2'):
             self.db.ping(True)
         else:
             self.db.ping()

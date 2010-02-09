@@ -1192,6 +1192,48 @@ class Video( DBDataWrite ):
         hash = be.getHash(self.filename, 'Videos')
         return hash
 
+    def fromFilename(self, filename):
+        if self.wheredat is not None:
+            return self
+        self.filename = filename
+        filename = filename[:filename.rindex('.')]
+        for old in ('%20','_','.'):
+            filename = filename.replace(old, ' ')
+
+        sep = '(?:\s?(?:-|/)?\s?)?'
+        regex1 = re.compile('^(.*[^s0-9])'+sep \
+                           +'(?:s|(?:Season))?'+sep \
+                           +'(\d{1,3})'+sep \
+                           +'(?:[ex/]|Episode)'+sep \
+                           +'(\d{1,3})'+sep \
+                           +'(.*)$', re.I)
+
+        regex2 = re.compile('(%s(?:Season%s\d*%s)*%s)$' \
+                            % (sep, sep, sep, sep), re.I)
+
+        match1 = regex1.search(filename)
+        if match1:
+            self.season = int(match1.group(2))
+            self.episode = int(match1.group(3))
+            self.subtitle = match1.group(4)
+
+            title = match1.group(1)
+            match2 = regex2.search(title)
+            if match2:
+                title = title[:match2.start()]
+            self.title = title[title.rindex('/')+1:]
+        else:
+            title = filename[filename.rindex('/')+1:]
+            for left,right in (('(',')'), ('[',']'), ('{','}')):
+                while left in title:
+                    lin = title.index(left)
+                    rin = title.index(right,lin)
+                    title = title[:lin]+title[rin+1:]
+            self.title = title
+
+        return self
+        
+
 class VideoGrabber( Grabber ):
     """
     VideoGrabber(mode, lang='en', db=None) -> VideoGrabber object
