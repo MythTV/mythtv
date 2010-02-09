@@ -155,7 +155,7 @@ class H264Parser {
     bool decode_Header(GetBitContext *gb);
     void decode_SPS(GetBitContext *gb);
     void decode_PPS(GetBitContext * gb);
-    void decode_SEI(GetBitContext * gb, int len);
+    void decode_SEI(GetBitContext * gb);
     void vui_parameters(GetBitContext * gb);
 
     bool       AU_pending;

@@ -264,7 +264,6 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
 {
     const uint8_t *byteP = bytes;
     const uint8_t *endP = bytes + byte_count;
-    const uint8_t *nalP;
     uint8_t        first_byte;
 
     state_changed = is_keyframe = false;
@@ -312,10 +311,7 @@ uint32_t H264Parser::addBytes(const uint8_t  *bytes,
 
                     if (nal_unit_type == SEI)
                     {
-                        nalP = ff_find_start_code(byteP+1, endP,
-                                                  &sync_accumulator) - 8;
-                        // Subtract 4, so we don't consume the next start code
-                        decode_SEI(&gb, (nalP - byteP - 4) * 8);
+                        decode_SEI(&gb);
                         set_AU_pending(stream_offset);
                     }
                     else if (nal_unit_type == SPS)
@@ -828,28 +824,26 @@ void H264Parser::decode_PPS(GetBitContext * gb)
 #endif
 }
 
-void H264Parser::decode_SEI(GetBitContext * gb, int bitlen)
+void H264Parser::decode_SEI(GetBitContext *gb)
 {
     int   recovery_frame_cnt = -1;
     bool  exact_match_flag = false;
     bool  broken_link_flag = false;
     int   changing_group_slice_idc = -1;
 
-    while (get_bits_count(gb) < bitlen)
+    int type = 0, size = 0;
+
+    do {
+        type += show_bits(gb, 8);
+    } while (get_bits(gb, 8) == 255);
+
+    do {
+        size += show_bits(gb, 8);
+    } while (get_bits(gb, 8) == 255);
+
+    switch (type)
     {
-        int type = 0, size = 0;
-
-        do {
-            type += show_bits(gb, 8);
-        } while (get_bits(gb, 8) == 255);
-
-        do {
-            size += show_bits(gb, 8);
-        } while (get_bits(gb, 8) == 255);
-
-        switch (type)
-        {
-          case SEI_TYPE_RECOVERY_POINT:
+        case SEI_TYPE_RECOVERY_POINT:
             recovery_frame_cnt = get_ue_golomb(gb);
             exact_match_flag = get_bits1(gb);
             broken_link_flag = get_bits1(gb);
@@ -857,13 +851,12 @@ void H264Parser::decode_SEI(GetBitContext * gb, int bitlen)
             is_keyframe |= (recovery_frame_cnt >= 0);
             return;
 
-          default:
+        default:
             skip_bits(gb, size * 8);
             break;
-        }
-
-        align_get_bits(gb);
     }
+
+    align_get_bits(gb);
 }
 
 void H264Parser::vui_parameters(GetBitContext * gb)
