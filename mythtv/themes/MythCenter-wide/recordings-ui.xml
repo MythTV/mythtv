@@ -82,13 +82,14 @@
 
         <buttonlist name="recordings" from="basebuttonlist2">
             <area>365,44,880,350</area>
-            <buttonarea>0,30,880,284</buttonarea>
+            <buttonarea>0,35,880,273</buttonarea>
             <wrapstyle>captive</wrapstyle>
-            <spacing>3</spacing>
+            <spacing>7</spacing>
             <statetype name="buttonitem">
                 <state name="active">
+                <area>0,0,100%,28</area>
                 <statetype name="status">
-                    <position>0,5</position>
+                    <position>0,3</position>
                     <state name="disabled">
                         <imagetype name="statusimage">
                             <filename>schedule_disabled.png</filename>
@@ -117,20 +118,20 @@
                     <state name="marked"></state>
                 </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,5,655,28</area>
+                        <area>32,3,655,28</area>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>635,5,120,28</area>
+                        <area>635,3,120,28</area>
                         <align>right</align>
                     </textarea>
                     <textarea name="starttime" from="shortdate">
-                        <area>761,5,114,28</area>
+                        <area>761,3,114,28</area>
                         <align>right</align>
                     </textarea>
                     <statetype name="watched">
                         <state name="yes">
                             <imagetype name="yes">
-                                <position>5,5</position>
+                                <position>5,3</position>
                                 <filename>small_watched.png</filename>
                             </imagetype>
                         </state>
@@ -149,10 +150,10 @@
                 <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
-                        <area>26,3,855,31</area>
+                        <area>26,1,853,31</area>
                     </shape>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,5,655,28</area>
+                        <area>32,3,655,28</area>
                         <font>basesmall_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -162,11 +163,11 @@
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>635,5,120,28</area>
+                        <area>635,3,120,28</area>
                         <align>right</align>
                     </textarea>
                     <textarea name="starttime" from="shortdate">
-                        <area>761,5,114,28</area>
+                        <area>761,3,114,28</area>
                         <align>right</align>
                     </textarea>
                 </state>
