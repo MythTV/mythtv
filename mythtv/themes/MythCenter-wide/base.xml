@@ -102,6 +102,13 @@
         <color>#FFFF33</color>
     </font>
 
+    <!-- Fonts for specific screens -->
+    <font name="deleterecordings_filesize_font" from="basemedium">
+        <pixelsize>40</pixelsize>
+        <color>#bbbb33</color>
+        <bold>yes</bold>
+    </font>
+
     <!-- Base definition of a shape used as a background on many screens -->
     <shape name="basebackground">
         <area>0,0,10,10</area>
