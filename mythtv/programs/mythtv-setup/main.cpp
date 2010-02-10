@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
         else if (QString(argv[argpos]).left(6) == "--scan")
         {
             use_display = false;
-            print_verbose_messages = 0;
+            print_verbose_messages = VB_NONE;
             verboseString = "";
         }
     }

@@ -348,7 +348,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
         }
     }
 
-    if (print_verbose_messages & (VB_FILE|VB_SCHEDULE))
+    if (VERBOSE_LEVEL_CHECK(VB_FILE|VB_SCHEDULE))
     {
         cout << "--- GetFilesystemInfos directory list start ---" << endl;
         for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)

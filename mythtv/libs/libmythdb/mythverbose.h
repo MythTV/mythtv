@@ -115,6 +115,10 @@ extern MPUBLIC unsigned int print_verbose_messages;
   extern MPUBLIC QMutex verbose_mutex;
 #endif
 
+// Helper for checking verbose flags outside of VERBOSE macro
+#define VERBOSE_LEVEL_NONE        (print_verbose_messages == 0)
+#define VERBOSE_LEVEL_CHECK(mask) ((print_verbose_messages & (mask)) == (mask))
+
 // 1. A non-locking one, used in C or Objective C src, or standalone libraries,
 // 2. A mutex-locked one, which may deadlock, and
 // 3. A mutex-locked one, which should be deadlock safe.
@@ -127,7 +131,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
         #ifdef WIN32
             #define VERBOSE(mask, ...)                        \
                 do {                                                 \
-                    if ((print_verbose_messages & (mask)) == (mask)) \
+                    if (VERBOSE_LEVEL_CHECK(mask))                   \
                     {                                                \
                         QDateTime dtmp = QDateTime::currentDateTime(); \
                         QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
@@ -141,7 +145,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
         #else
                 #define VERBOSE(mask,args...)                        \
                 do {                                                 \
-                    if ((print_verbose_messages & (mask)) == (mask)) \
+                    if (VERBOSE_LEVEL_CHECK(mask))                   \
                     {                                                \
                         QDateTime dtmp = QDateTime::currentDateTime(); \
                         QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
@@ -170,7 +174,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
         #endif
         #define VERBOSE(mask,args...)                        \
         do { \
-            if ((print_verbose_messages & (mask)) == (mask)) \
+            if (VERBOSE_LEVEL_CHECK(mask))                   \
             {                                                \
                 VERBOSEDATE                                  \
                 printf(args);                                \
@@ -189,7 +193,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
     #define VERBOSE(mask,args...) \
         do { \
-            if ((print_verbose_messages & (mask)) == (mask)) \
+            if (VERBOSE_LEVEL_CHECK(mask))                   \
             { \
                 QDateTime dtmp = QDateTime::currentDateTime(); \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \
@@ -206,7 +210,7 @@ extern MPUBLIC unsigned int print_verbose_messages;
 
     #define VERBOSE(mask,args...) \
         do { \
-            if ((print_verbose_messages & (mask)) == (mask)) \
+            if (VERBOSE_LEVEL_CHECK(mask))                   \
             { \
                 QDateTime dtmp = QDateTime::currentDateTime(); \
                 QString dtime = dtmp.toString("yyyy-MM-dd hh:mm:ss.zzz"); \

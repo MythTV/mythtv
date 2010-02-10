@@ -390,14 +390,14 @@ bool MythMediaDevice::findMountPath()
             return true;
         }
 
-        if (print_verbose_messages & VB_MEDIA)
+        if (VERBOSE_LEVEL_CHECK(VB_MEDIA))
             debug += QString("                 %1 | %2\n")
                      .arg(deviceName, 16).arg(mountPoint);
     }
 
     mountFile.close();
 
-    if (print_verbose_messages & VB_MEDIA)
+    if (VERBOSE_LEVEL_CHECK(VB_MEDIA))
     {
         debug = LOC + ":findMountPath() - mount of '"
                 + m_DevicePath + "' not found.\n"

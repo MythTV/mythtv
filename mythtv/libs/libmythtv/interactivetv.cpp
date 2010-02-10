@@ -20,7 +20,7 @@ InteractiveTV::InteractiveTV(NuppelVideoPlayer *nvp)
 {
     Restart(0, 0, false);
 
-    if (print_verbose_messages & VB_MHEG)
+    if (VERBOSE_LEVEL_CHECK(VB_MHEG))
     {
         MHSetLogging(stdout, MHLogAll);
     }

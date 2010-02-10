@@ -584,7 +584,7 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
             .arg((*it)->chanid).arg((*it)->startts.toString())
             .arg(titlestr);
 
-        if (print_verbose_messages & VB_IMPORTANT)
+        if (VERBOSE_LEVEL_CHECK(VB_IMPORTANT))
             VERBOSE(VB_IMPORTANT, msg);
         else
             VERBOSE(VB_FILE, QString("    ") +  msg);
@@ -699,7 +699,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
                             .arg(chanid).arg(startts.toString())
                             .arg(title).arg(*maxIter);
 
-                    if (print_verbose_messages & VB_IMPORTANT)
+                    if (VERBOSE_LEVEL_CHECK(VB_IMPORTANT))
                         VERBOSE(VB_IMPORTANT, msg);
                     else
                         VERBOSE(VB_FILE, QString("    ") +  msg);

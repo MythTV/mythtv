@@ -135,7 +135,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             return;
     }
 
-    if ((print_verbose_messages & verbose_level) != verbose_level)
+    if (VERBOSE_LEVEL_CHECK(verbose_level))
         return;
 
     string_lock.lock();
@@ -511,7 +511,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                                            sizeof(*audioSamples));
     ccd608->SetIgnoreTimecode(true);
 
-    bool debug = (bool)(print_verbose_messages & VB_LIBAV);
+    bool debug = VERBOSE_LEVEL_CHECK(VB_LIBAV);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
     av_log_set_callback(myth_av_log);
 
@@ -2049,7 +2049,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             // Nigel's bogus codec-debug. Dump the list of codecs & decoders,
             // and have one last attempt to find a decoder. This is usually
             // only caused by build problems, where libavcodec needs a rebuild
-            if (print_verbose_messages & VB_LIBAV)
+            if (VERBOSE_LEVEL_CHECK(VB_LIBAV))
             {
                 AVCodec *p = av_codec_next(NULL);
                 int      i = 1;

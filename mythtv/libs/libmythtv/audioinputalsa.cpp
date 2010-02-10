@@ -156,7 +156,7 @@ bool AudioInputALSA::PrepHwParams(void)
                 QString("failed to set sample format %1")
                         .arg(snd_pcm_format_description(format))))
         return false;
-    if ((print_verbose_messages & VB_AUDIO) && (print_verbose_messages & VB_EXTRA))
+    if (VERBOSE_LEVEL_CHECK(VB_AUDIO|VB_EXTRA))
     {
         uint min_chans, max_chans;
         if(AlsaBad(snd_pcm_hw_params_get_channels_min(hwparams, &min_chans),

@@ -635,8 +635,7 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
                            .arg(row[mode], 2).arg(rowcount[mode])
                            .arg(style[mode]).arg(f, 2, 16)
                            .arg(clr).arg(len, 3));
-    if ((print_verbose_messages & VB_VBI) != 0
-        && len)
+    if (len && VERBOSE_LEVEL_CHECK(VB_VBI))
     {
         QString dispbuf = QString::fromUtf8(tmpbuf.constData(), len);
         VERBOSE(VB_VBI, QString("%1 '").arg(timecode[mode], 10));

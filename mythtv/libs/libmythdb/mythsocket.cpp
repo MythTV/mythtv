@@ -284,12 +284,12 @@ bool MythSocket::writeStringList(QStringList &list)
     payload += utf8;
     size = payload.length();
 
-    if ((print_verbose_messages & VB_NETWORK) != 0)
+    if (VERBOSE_LEVEL_CHECK(VB_NETWORK))
     {
         QString msg = QString("write -> %1 %2")
             .arg(socket(), 2).arg(payload.data());
 
-        if (((print_verbose_messages & VB_EXTRA) == 0) && msg.length() > 88)
+        if (!VERBOSE_LEVEL_CHECK(VB_EXTRA) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
@@ -609,12 +609,12 @@ bool MythSocket::readStringList(QStringList &list, uint timeoutMS)
     payload.truncate(8);
     payload += str;
 
-    if ((print_verbose_messages & VB_NETWORK) != 0)
+    if (VERBOSE_LEVEL_CHECK(VB_NETWORK))
     {
         QString msg = QString("read  <- %1 %2").arg(socket(), 2)
             .arg(payload.data());
 
-        if (((print_verbose_messages & VB_EXTRA) == 0) && msg.length() > 88)
+        if (!VERBOSE_LEVEL_CHECK(VB_EXTRA) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";

@@ -1130,7 +1130,7 @@ int Transcode::TranscodeFile(
                 return REENCODE_CUTLIST_CHANGE;
             }
 
-            if ((jobID >= 0) || (print_verbose_messages & VB_IMPORTANT))
+            if ((jobID >= 0) || (VERBOSE_LEVEL_CHECK(VB_IMPORTANT)))
             {
                 if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {

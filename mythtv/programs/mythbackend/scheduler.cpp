@@ -451,7 +451,7 @@ void Scheduler::FillRecordListFromMaster(void)
 
 void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
 {
-    if ((print_verbose_messages & VB_SCHEDULE) == 0)
+    if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
         return;
 
     QDateTime now = QDateTime::currentDateTime();
@@ -478,7 +478,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
 
 void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
 {
-    if ((print_verbose_messages & VB_SCHEDULE) == 0)
+    if (!VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
         return;
 
     if (prefix)
@@ -2803,7 +2803,7 @@ void Scheduler::UpdateMatches(int recordid) {
 
     BuildNewRecordsQueries(recordid, fromclauses, whereclauses, bindings);
 
-    if (print_verbose_messages & VB_SCHEDULE)
+    if (VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
     {
         for (clause = 0; clause < fromclauses.count(); clause++)
         {
@@ -3993,7 +3993,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
     else // default to using original method
         fsInfoList.sort(comp_storage_combination);
 
-    if (print_verbose_messages & (VB_FILE|VB_SCHEDULE))
+    if (VERBOSE_LEVEL_CHECK(VB_FILE|VB_SCHEDULE))
     {
         cout << "--- FillRecordingDir Sorted fsInfoList start ---\n";
         for (fslistit = fsInfoList.begin();fslistit != fsInfoList.end();

@@ -1050,7 +1050,7 @@ int main(int argc, char *argv[])
         {
             quiet = true;
             showPercentage = false;
-            print_verbose_messages = 0;
+            print_verbose_messages = VB_NONE;
             verboseString = "";
         }
         else if (!strcmp(a.argv()[argpos], "--queue"))

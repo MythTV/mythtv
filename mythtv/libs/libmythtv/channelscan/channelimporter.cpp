@@ -54,7 +54,7 @@ void ChannelImporter::Process(const ScanDTVTransportList &_transports)
     ScanDTVTransportList transports = _transports;
 
     // Print out each channel
-    if (print_verbose_messages | VB_CHANSCAN)
+    if (VERBOSE_LEVEL_CHECK(VB_CHANSCAN))
     {
         cout << "Before processing: " << endl;
         ChannelImporterBasicStats infoA = CollectStats(transports);

@@ -2922,7 +2922,7 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 
     usevideotimebase = gContext->GetNumSetting("UseVideoTimebase", 0);
 
-    if ((print_verbose_messages & VB_PLAYBACK) != 0)
+    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK))
         output_jmeter = new Jitterometer("video_output", 100);
     else
         output_jmeter = NULL;

@@ -146,7 +146,7 @@ bool ImportRecorder::Open(void)
 
         // Slow down StartRecording open loop when debugging -v record.
         // This is just to make the debugging output less spammy.
-        if (print_verbose_messages & VB_RECORD)
+        if (VERBOSE_LEVEL_CHECK(VB_RECORD))
             usleep(250 * 1000);
 
         return false;

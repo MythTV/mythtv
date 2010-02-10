@@ -466,7 +466,7 @@ bool MSqlQuery::exec()
 {
     bool result = QSqlQuery::exec();
 
-    if (print_verbose_messages & VB_DATABASE)
+    if (VERBOSE_LEVEL_CHECK(VB_DATABASE))
     {
         QString str = lastQuery();
 

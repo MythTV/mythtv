@@ -430,7 +430,7 @@ bool FillData::GrabData(Source source, int offset, QDate *qCurrentDate)
         command += QString(" --days 1 --offset %1").arg(offset);
     }
 
-    if (! (print_verbose_messages & VB_XMLTV))
+    if (!VERBOSE_LEVEL_CHECK(VB_XMLTV))
         command += " --quiet";
 
     // Append additional arguments passed to mythfilldatabase

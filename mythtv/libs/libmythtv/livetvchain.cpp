@@ -467,7 +467,7 @@ void LiveTVChain::SwitchTo(int num)
     else
         VERBOSE(VB_IMPORTANT, LOC + "SwitchTo() not switching to current");   
 
-    if (print_verbose_messages & VB_PLAYBACK)
+    if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK))
     {
         LiveTVChainEntry e;
         GetEntryAt(num, e);

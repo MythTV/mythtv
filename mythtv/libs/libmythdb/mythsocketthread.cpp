@@ -355,8 +355,7 @@ void MythSocketThread::run(void)
             (*it)->Unlock(false);
         }
 
-        if ((print_verbose_messages & (VB_SOCKET|VB_EXTRA)) ==
-            (VB_SOCKET|VB_EXTRA))
+        if (VERBOSE_LEVEL_CHECK(VB_SOCKET|VB_EXTRA))
         {
             QString rep = QString("Total read time: %1ms, on sockets")
                 .arg(tm.elapsed());

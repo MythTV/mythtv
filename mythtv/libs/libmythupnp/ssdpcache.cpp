@@ -472,7 +472,7 @@ void SSDPCache::Dump()
 {
     int nCount = 0;
 
-    if ( print_verbose_messages & VB_UPNP)
+    if (VERBOSE_LEVEL_CHECK(VB_UPNP))
     {
 
         Lock();

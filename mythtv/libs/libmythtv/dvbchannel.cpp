@@ -849,7 +849,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
                 return false;
             }
 
-            if ((print_verbose_messages & (VB_CHANNEL | VB_EXTRA)) == (VB_CHANNEL | VB_EXTRA))
+            if (VERBOSE_LEVEL_CHECK(VB_CHANNEL|VB_EXTRA))
             {
                 for (uint i = 0; i < cmds->num; i++)
                 {

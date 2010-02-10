@@ -90,7 +90,7 @@ void BackendSelect::AddItem(DeviceLocation *dev)
         ListBoxDevice *item;
         QString        name;
 
-        if (print_verbose_messages & VB_UPNP)
+        if (VERBOSE_LEVEL_CHECK(VB_UPNP))
             name = dev->GetNameAndDetails(true);
         else
             name = dev->GetFriendlyName(true);
