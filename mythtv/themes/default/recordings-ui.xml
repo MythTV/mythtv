@@ -387,7 +387,7 @@
                         <area>365,1,100,24</area>
                         <align>right</align>
                     </textarea>
-                    <textarea name="starttime" from="shortdate">
+                    <textarea name="filesize_str" from="shortdate">
                         <area>465,1,80,24</area>
                         <align>right</align>
                     </textarea>
