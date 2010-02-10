@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "avcodec.h"
 #include "bytestream.h"
@@ -52,6 +51,16 @@ static av_cold int ulti_decode_init(AVCodecContext *avctx)
     avctx->pix_fmt = PIX_FMT_YUV410P;
     avctx->coded_frame = (AVFrame*) &s->frame;
     s->ulti_codebook = ulti_codebook;
+
+    return 0;
+}
+
+static av_cold int ulti_decode_end(AVCodecContext *avctx){
+    UltimotionDecodeContext *s = avctx->priv_data;
+    AVFrame *pic = &s->frame;
+
+    if (pic->data[0])
+        avctx->release_buffer(avctx, pic);
 
     return 0;
 }
@@ -393,13 +402,6 @@ static int ulti_decode_frame(AVCodecContext *avctx,
     *(AVFrame*)data= s->frame;
 
     return buf_size;
-}
-
-static av_cold int ulti_decode_end(AVCodecContext *avctx)
-{
-/*    UltimotionDecodeContext *s = avctx->priv_data;*/
-
-    return 0;
 }
 
 AVCodec ulti_decoder = {

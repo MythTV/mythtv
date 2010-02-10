@@ -128,7 +128,9 @@ static int find_image_range(int *pfirst_index, int *plast_index,
         if (av_get_frame_filename(buf, sizeof(buf), path, first_index) < 0){
             *pfirst_index =
             *plast_index = 1;
-            return 0;
+            if(url_exist(buf))
+                return 0;
+            return -1;
         }
         if (url_exist(buf))
             break;
@@ -221,7 +223,7 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
 
     if (!s->is_pipe) {
         if (find_image_range(&first_index, &last_index, s->path) < 0)
-            return AVERROR(EIO);
+            return AVERROR(ENOENT);
         s->img_first = first_index;
         s->img_last = last_index;
         s->img_number = first_index;
@@ -230,12 +232,12 @@ static int img_read_header(AVFormatContext *s1, AVFormatParameters *ap)
         st->duration = last_index - first_index + 1;
     }
 
-    if(ap->video_codec_id){
+    if(s1->video_codec_id){
         st->codec->codec_type = CODEC_TYPE_VIDEO;
-        st->codec->codec_id = ap->video_codec_id;
-    }else if(ap->audio_codec_id){
+        st->codec->codec_id = s1->video_codec_id;
+    }else if(s1->audio_codec_id){
         st->codec->codec_type = CODEC_TYPE_AUDIO;
-        st->codec->codec_id = ap->audio_codec_id;
+        st->codec->codec_id = s1->audio_codec_id;
     }else{
         st->codec->codec_type = CODEC_TYPE_VIDEO;
         st->codec->codec_id = av_str2id(img_tags, s->path);
@@ -260,6 +262,8 @@ static int img_read_packet(AVFormatContext *s1, AVPacket *pkt)
         if (s1->loop_input && s->img_number > s->img_last) {
             s->img_number = s->img_first;
         }
+        if (s->img_number > s->img_last)
+            return AVERROR_EOF;
         if (av_get_frame_filename(filename, sizeof(filename),
                                   s->path, s->img_number)<0 && s->img_number > 1)
             return AVERROR(EIO);
@@ -339,8 +343,10 @@ static int img_write_packet(AVFormatContext *s, AVPacket *pkt)
 
     if (!img->is_pipe) {
         if (av_get_frame_filename(filename, sizeof(filename),
-                                  img->path, img->img_number) < 0 && img->img_number>1)
+                                  img->path, img->img_number) < 0 && img->img_number>1) {
+            av_log(s, AV_LOG_ERROR, "Could not get frame filename from pattern\n");
             return AVERROR(EIO);
+        }
         for(i=0; i<3; i++){
             if (url_fopen(&pb[i], filename, URL_WRONLY) < 0) {
                 av_log(s, AV_LOG_ERROR, "Could not open file : %s\n",filename);

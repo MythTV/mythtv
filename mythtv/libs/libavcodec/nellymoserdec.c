@@ -43,15 +43,15 @@
 
 typedef struct NellyMoserDecodeContext {
     AVCodecContext* avctx;
-    DECLARE_ALIGNED_16(float,float_buf[NELLY_SAMPLES]);
+    DECLARE_ALIGNED_16(float,float_buf)[NELLY_SAMPLES];
     float           state[128];
     AVLFG           random_state;
     GetBitContext   gb;
     int             add_bias;
     float           scale_bias;
     DSPContext      dsp;
-    MDCTContext     imdct_ctx;
-    DECLARE_ALIGNED_16(float,imdct_out[NELLY_BUF_LEN * 2]);
+    FFTContext      imdct_ctx;
+    DECLARE_ALIGNED_16(float,imdct_out)[NELLY_BUF_LEN * 2];
 } NellyMoserDecodeContext;
 
 static void overlap_and_window(NellyMoserDecodeContext *s, float *state, float *audio, float *a_in)
@@ -129,7 +129,7 @@ static av_cold int decode_init(AVCodecContext * avctx) {
     NellyMoserDecodeContext *s = avctx->priv_data;
 
     s->avctx = avctx;
-    av_lfg_init(&s->random_state, ff_random_get_seed());
+    av_lfg_init(&s->random_state, 0);
     ff_mdct_init(&s->imdct_ctx, 8, 1, 1.0);
 
     dsputil_init(&s->dsp, avctx);
@@ -144,7 +144,7 @@ static av_cold int decode_init(AVCodecContext * avctx) {
 
     /* Generate overlap window */
     if (!ff_sine_128[127])
-        ff_sine_window_init(ff_sine_128, 128);
+        ff_init_ff_sine_windows(7);
 
     avctx->sample_fmt = SAMPLE_FMT_S16;
     avctx->channel_layout = CH_LAYOUT_MONO;

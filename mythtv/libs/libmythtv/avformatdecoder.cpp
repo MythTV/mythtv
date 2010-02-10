@@ -125,6 +125,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
         case AV_LOG_ERROR:
             verbose_level = VB_GENERAL;
             break;
+        case AV_LOG_DEBUG:
         case AV_LOG_VERBOSE:
         case AV_LOG_INFO:
             verbose_level = VB_EXTRA;
@@ -2038,6 +2039,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         VERBOSE(VB_PLAYBACK, LOC + QString("Looking for decoder for %1")
                 .arg(codec_id_string(enc->codec_id)));
+
+        if (enc->codec_id == CODEC_ID_PROBE)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Probing of stream #%1 unsuccesful, "
+                            "ignoring.").arg(i));
+            continue;
+        }
+
         AVCodec *codec = avcodec_find_decoder(enc->codec_id);
         if (!codec)
         {
@@ -2062,7 +2072,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     if (p->id == enc->codec_id)
                     {   codec = p; break;    }
 
-                    printf("Codec %d != %d\n", p->id, enc->codec_id);
+                    printf("Codec 0x%x != 0x%x\n", p->id, enc->codec_id);
                     p = av_codec_next(p);
                     ++i;
                 }
@@ -2104,7 +2114,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_SUBTITLE)
         {
-            int lang = get_canonical_lang(ic->streams[i]->language);
+            AVMetadataTag *metatag = av_metadata_get(ic->streams[i]->metadata,
+                                                     "language", NULL, 0);
+            int lang = metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
             int lang_indx = lang_aud_cnt[lang];
             lang_indx = lang_sub_cnt[lang];
             lang_sub_cnt[lang]++;
@@ -2126,7 +2138,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 lang = ringBuffer->DVD()->GetAudioLanguage(
                     ringBuffer->DVD()->GetAudioTrackNum(ic->streams[i]->id));
             else
-                lang = get_canonical_lang(ic->streams[i]->language);
+            {
+                AVMetadataTag *metatag = av_metadata_get(ic->streams[i]->metadata,
+                                                         "language", NULL, 0);
+                lang = metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
+            }
 
             int lang_indx = lang_aud_cnt[lang];
             lang_aud_cnt[lang]++;
@@ -3804,7 +3820,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         if (len > 0 &&
             curstream->codec->codec_type == CODEC_TYPE_DATA &&
-            curstream->codec->codec_id   == CODEC_ID_DVB_VBI)
+            (curstream->codec->codec_id  == CODEC_ID_DVB_VBI ||
+             curstream->codec->codec_id  == CODEC_ID_DVB_TELETEXT))
         {
             ProcessDVBDataPacket(curstream, pkt);
 

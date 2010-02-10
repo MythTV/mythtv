@@ -39,6 +39,18 @@
  * correctly decodes this file:
  *  http://samples.mplayerhq.hu/V-codecs/SVQ3/Vertical400kbit.sorenson3.mov
  */
+#include "internal.h"
+#include "dsputil.h"
+#include "avcodec.h"
+#include "mpegvideo.h"
+#include "h264.h"
+
+#include "h264data.h" //FIXME FIXME FIXME
+
+#include "h264_mvpred.h"
+#include "golomb.h"
+#include "rectangle.h"
+#include "vdpau_internal.h"
 
 #if CONFIG_ZLIB
 #include <zlib.h>
@@ -114,7 +126,7 @@ static const uint32_t svq3_dequant_coeff[32] = {
 };
 
 
-static void svq3_luma_dc_dequant_idct_c(DCTELEM *block, int qp)
+void ff_svq3_luma_dc_dequant_idct_c(DCTELEM *block, int qp)
 {
     const int qmul = svq3_dequant_coeff[qp];
 #define stride 16
@@ -151,7 +163,7 @@ static void svq3_luma_dc_dequant_idct_c(DCTELEM *block, int qp)
 }
 #undef stride
 
-static void svq3_add_idct_c(uint8_t *dst, DCTELEM *block, int stride, int qp,
+void ff_svq3_add_idct_c(uint8_t *dst, DCTELEM *block, int stride, int qp,
                             int dc)
 {
     const int qmul = svq3_dequant_coeff[qp];
@@ -571,10 +583,10 @@ static int svq3_decode_mb(H264Context *h, unsigned int mb_type)
             }
         }
 
-        write_back_intra_pred_mode(h);
+        ff_h264_write_back_intra_pred_mode(h);
 
         if (mb_type == 8) {
-            check_intra4x4_pred_mode(h);
+            ff_h264_check_intra4x4_pred_mode(h);
 
             h->top_samples_available  = (s->mb_y == 0) ? 0x33FF : 0xFFFF;
             h->left_samples_available = (s->mb_x == 0) ? 0x5F5F : 0xFFFF;
@@ -592,7 +604,7 @@ static int svq3_decode_mb(H264Context *h, unsigned int mb_type)
         dir = i_mb_type_info[mb_type - 8].pred_mode;
         dir = (dir >> 1) ^ 3*(dir & 1) ^ 1;
 
-        if ((h->intra16x16_pred_mode = check_intra_pred_mode(h, dir)) == -1){
+        if ((h->intra16x16_pred_mode = ff_h264_check_intra_pred_mode(h, dir)) == -1){
             av_log(h->s.avctx, AV_LOG_ERROR, "check_intra_pred_mode = -1\n");
             return -1;
         }
@@ -685,7 +697,7 @@ static int svq3_decode_mb(H264Context *h, unsigned int mb_type)
     s->current_picture.mb_type[mb_xy] = mb_type;
 
     if (IS_INTRA(mb_type)) {
-        h->chroma_pred_mode = check_intra_pred_mode(h, DC_PRED8x8);
+        h->chroma_pred_mode = ff_h264_check_intra_pred_mode(h, DC_PRED8x8);
     }
 
     return 0;
@@ -784,13 +796,19 @@ static av_cold int svq3_decode_init(AVCodecContext *avctx)
     unsigned char *extradata;
     unsigned int size;
 
-    if (decode_init(avctx) < 0)
+    if(avctx->thread_count > 1){
+        av_log(avctx, AV_LOG_ERROR, "SVQ3 does not support multithreaded decoding, patch welcome! (check latest SVN too)\n");
+        return -1;
+    }
+
+    if (ff_h264_decode_init(avctx) < 0)
         return -1;
 
     s->flags  = avctx->flags;
     s->flags2 = avctx->flags2;
     s->unrestricted_mv = 1;
     h->is_complex=1;
+    avctx->pix_fmt = avctx->codec->pix_fmts[0];
 
     if (!s->context_initialized) {
         s->width  = avctx->width;
@@ -805,7 +823,7 @@ static av_cold int svq3_decode_init(AVCodecContext *avctx)
 
         h->b_stride = 4*s->mb_width;
 
-        alloc_tables(h);
+        ff_h264_alloc_tables(h);
 
         /* prowl for the "SEQH" marker in the extradata */
         extradata = (unsigned char *)avctx->extradata;
@@ -819,14 +837,25 @@ static av_cold int svq3_decode_init(AVCodecContext *avctx)
         if (extradata && !memcmp(extradata, "SEQH", 4)) {
 
             GetBitContext gb;
+            int frame_size_code;
 
             size = AV_RB32(&extradata[4]);
             init_get_bits(&gb, extradata + 8, size*8);
 
             /* 'frame size code' and optional 'width, height' */
-            if (get_bits(&gb, 3) == 7) {
-                skip_bits(&gb, 12);
-                skip_bits(&gb, 12);
+            frame_size_code = get_bits(&gb, 3);
+            switch (frame_size_code) {
+                case 0: avctx->width = 160; avctx->height = 120; break;
+                case 1: avctx->width = 128; avctx->height =  96; break;
+                case 2: avctx->width = 176; avctx->height = 144; break;
+                case 3: avctx->width = 352; avctx->height = 288; break;
+                case 4: avctx->width = 704; avctx->height = 576; break;
+                case 5: avctx->width = 240; avctx->height = 180; break;
+                case 6: avctx->width = 320; avctx->height = 240; break;
+                case 7:
+                    avctx->width  = get_bits(&gb, 12);
+                    avctx->height = get_bits(&gb, 12);
+                    break;
             }
 
             h->halfpel_flag  = get_bits1(&gb);
@@ -948,7 +977,7 @@ static int svq3_decode_frame(AVCodecContext *avctx,
             s->next_p_frame_damaged = 0;
     }
 
-    if (frame_start(h) < 0)
+    if (ff_h264_frame_start(h) < 0)
         return -1;
 
     if (s->pict_type == FF_B_TYPE) {
@@ -1011,7 +1040,7 @@ static int svq3_decode_frame(AVCodecContext *avctx,
             }
 
             if (mb_type != 0) {
-                hl_decode_mb (h);
+                ff_h264_hl_decode_mb (h);
             }
 
             if (s->pict_type != FF_B_TYPE && !s->low_delay) {
@@ -1047,9 +1076,9 @@ AVCodec svq3_decoder = {
     sizeof(H264Context),
     svq3_decode_init,
     NULL,
-    decode_end,
+    ff_h264_decode_end,
     svq3_decode_frame,
     CODEC_CAP_DRAW_HORIZ_BAND | CODEC_CAP_DR1 | CODEC_CAP_DELAY,
-    .long_name = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 3"),
-    .pix_fmts= (enum PixelFormat[]){PIX_FMT_YUVJ420P, PIX_FMT_NONE},
+    .long_name = NULL_IF_CONFIG_SMALL("Sorenson Vector Quantizer 3 / Sorenson Video 3 / SVQ3"),
+    .pix_fmts= (const enum PixelFormat[]){PIX_FMT_YUVJ420P, PIX_FMT_NONE},
 };

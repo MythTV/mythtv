@@ -37,7 +37,7 @@
 #include <stdint.h>
 
 #define AAC_INIT_VLC_STATIC(num, size) \
-    INIT_VLC_STATIC(&vlc_spectral[num], 6, ff_aac_spectral_sizes[num], \
+    INIT_VLC_STATIC(&vlc_spectral[num], 8, ff_aac_spectral_sizes[num], \
          ff_aac_spectral_bits[num], sizeof( ff_aac_spectral_bits[num][0]), sizeof( ff_aac_spectral_bits[num][0]), \
         ff_aac_spectral_codes[num], sizeof(ff_aac_spectral_codes[num][0]), sizeof(ff_aac_spectral_codes[num][0]), \
         size);
@@ -103,6 +103,17 @@ enum CouplingPoint {
 };
 
 /**
+ * Output configuration status
+ */
+enum OCStatus {
+    OC_NONE,        //< Output unconfigured
+    OC_TRIAL_PCE,   //< Output configuration under trial specified by an inband PCE
+    OC_TRIAL_FRAME, //< Output configuration under trial specified by a frame header
+    OC_GLOBAL_HDR,  //< Output configuration set in a global header but not yet locked
+    OC_LOCKED,      //< Output configuration locked in place
+};
+
+/**
  * Predictor State
  */
 typedef struct {
@@ -116,6 +127,12 @@ typedef struct {
 
 #define MAX_PREDICTORS 672
 
+#define SCALE_DIV_512    36    ///< scalefactor difference that corresponds to scale difference in 512 times
+#define SCALE_ONE_POS   140    ///< scalefactor index that corresponds to scale=1.0
+#define SCALE_MAX_POS   255    ///< scalefactor index maximum value
+#define SCALE_MAX_DIFF   60    ///< maximum scalefactor difference allowed by standard
+#define SCALE_DIFF_ZERO  60    ///< codebook index corresponding to zero scalefactor indices difference
+
 /**
  * Individual Channel Stream
  */
@@ -126,6 +143,7 @@ typedef struct {
     int num_window_groups;
     uint8_t group_len[8];
     const uint16_t *swb_offset; ///< table of offsets to the lowest spectral coefficient of a scalefactor band, sfb, for a particular window
+    const uint8_t *swb_sizes;   ///< table of scalefactor band sizes for a particular window
     int num_swb;                ///< number of scalefactor window bands
     int num_windows;
     int tns_max_bands;
@@ -165,6 +183,7 @@ typedef struct {
 
 typedef struct {
     int num_pulse;
+    int start;
     int pos[4];
     int amp[4];
 } Pulse;
@@ -189,12 +208,15 @@ typedef struct {
 typedef struct {
     IndividualChannelStream ics;
     TemporalNoiseShaping tns;
-    enum BandType band_type[120];             ///< band types
+    Pulse pulse;
+    enum BandType band_type[128];             ///< band types
     int band_type_run_end[120];               ///< band type run end points
     float sf[120];                            ///< scalefactors
-    DECLARE_ALIGNED_16(float, coeffs[1024]);  ///< coefficients for IMDCT
-    DECLARE_ALIGNED_16(float, saved[512]);    ///< overlap
-    DECLARE_ALIGNED_16(float, ret[1024]);     ///< PCM output
+    int sf_idx[128];                          ///< scalefactor indices (used by encoder)
+    uint8_t zeroes[128];                      ///< band is not coded (used by encoder)
+    DECLARE_ALIGNED_16(float, coeffs)[1024];  ///< coefficients for IMDCT
+    DECLARE_ALIGNED_16(float, saved)[1024];   ///< overlap
+    DECLARE_ALIGNED_16(float, ret)[1024];     ///< PCM output
     PredictorState predictor_state[MAX_PREDICTORS];
 } SingleChannelElement;
 
@@ -203,7 +225,9 @@ typedef struct {
  */
 typedef struct {
     // CPE specific
-    uint8_t ms_mask[120];     ///< Set if mid/side stereo is used for each scalefactor window band
+    int common_window;        ///< Set if channels share a common 'IndividualChannelStream' in bitstream.
+    int     ms_mode;          ///< Signals mid/side stereo flags coding mode (used by encoder)
+    uint8_t ms_mask[128];     ///< Set if mid/side stereo is used for each scalefactor window band
     // shared
     SingleChannelElement ch[2];
     // CCE specific
@@ -237,15 +261,15 @@ typedef struct {
      * @defgroup temporary aligned temporary buffers (We do not want to have these on the stack.)
      * @{
      */
-    DECLARE_ALIGNED_16(float, buf_mdct[1024]);
+    DECLARE_ALIGNED_16(float, buf_mdct)[1024];
     /** @} */
 
     /**
      * @defgroup tables   Computed / set up during initialization.
      * @{
      */
-    MDCTContext mdct;
-    MDCTContext mdct_small;
+    FFTContext mdct;
+    FFTContext mdct_small;
     DSPContext dsp;
     int random_state;
     /** @} */
@@ -260,7 +284,9 @@ typedef struct {
     int sf_offset;                                    ///< offset into pow2sf_tab as appropriate for dsp.float_to_int16
     /** @} */
 
-    DECLARE_ALIGNED(16, float, temp[128]);
+    DECLARE_ALIGNED(16, float, temp)[128];
+
+    enum OCStatus output_configured;
 } AACContext;
 
 #endif /* AVCODEC_AAC_H */

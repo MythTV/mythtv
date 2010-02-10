@@ -2,6 +2,8 @@
 
 #include <QPainter>
 
+#include "mythconfig.h"
+
 #include "playercontext.h"
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"

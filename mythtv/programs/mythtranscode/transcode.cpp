@@ -7,6 +7,8 @@ using namespace std;
 #include <QMap>
 #include <QRegExp>
 
+#include "mythconfig.h"
+
 #include "transcode.h"
 #include "audiooutput.h"
 #include "recordingprofile.h"

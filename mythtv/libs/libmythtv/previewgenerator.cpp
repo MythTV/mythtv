@@ -13,6 +13,8 @@
 #include <QDir>
 
 // MythTV headers
+#include "mythconfig.h"
+
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
 #include "previewgenerator.h"

@@ -24,7 +24,6 @@
 
 #include "libavutil/x86_cpu.h"
 #include "libavcodec/dsputil.h"
-#include "libavcodec/h263.h"
 #include "libavcodec/mpegvideo.h"
 #include "libavcodec/simple_idct.h"
 #include "dsputil_mmx.h"
@@ -43,7 +42,7 @@ int mm_flags; /* multimedia extension flags */
 DECLARE_ALIGNED_8 (const uint64_t, ff_bone) = 0x0101010101010101ULL;
 DECLARE_ALIGNED_8 (const uint64_t, ff_wtwo) = 0x0002000200020002ULL;
 
-DECLARE_ALIGNED_16(const uint64_t, ff_pdw_80000000[2]) =
+DECLARE_ALIGNED_16(const uint64_t, ff_pdw_80000000)[2] =
 {0x8000000080000000ULL, 0x8000000080000000ULL};
 
 DECLARE_ALIGNED_8 (const uint64_t, ff_pw_3  ) = 0x0003000300030003ULL;
@@ -70,8 +69,8 @@ DECLARE_ALIGNED_8 (const uint64_t, ff_pb_81 ) = 0x8181818181818181ULL;
 DECLARE_ALIGNED_8 (const uint64_t, ff_pb_A1 ) = 0xA1A1A1A1A1A1A1A1ULL;
 DECLARE_ALIGNED_8 (const uint64_t, ff_pb_FC ) = 0xFCFCFCFCFCFCFCFCULL;
 
-DECLARE_ALIGNED_16(const double, ff_pd_1[2]) = { 1.0, 1.0 };
-DECLARE_ALIGNED_16(const double, ff_pd_2[2]) = { 2.0, 2.0 };
+DECLARE_ALIGNED_16(const double, ff_pd_1)[2] = { 1.0, 1.0 };
+DECLARE_ALIGNED_16(const double, ff_pd_2)[2] = { 2.0, 2.0 };
 
 #define JUMPALIGN() __asm__ volatile (ASMALIGN(3)::)
 #define MOVQ_ZERO(regd)  __asm__ volatile ("pxor %%" #regd ", %%" #regd ::)
@@ -278,7 +277,7 @@ void put_pixels_clamped_mmx(const DCTELEM *block, uint8_t *pixels, int line_size
             :"memory");
 }
 
-DECLARE_ASM_CONST(8, uint8_t, ff_vector128[8]) =
+DECLARE_ASM_CONST(8, uint8_t, ff_vector128)[8] =
   { 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 };
 
 #define put_signed_pixels_clamped_mmx_half(off) \
@@ -597,7 +596,7 @@ static void add_bytes_l2_mmx(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w){
 }
 
 #if HAVE_7REGS && HAVE_TEN_OPERANDS
-static void add_hfyu_median_prediction_cmov(uint8_t *dst, uint8_t *top, uint8_t *diff, int w, int *left, int *left_top) {
+static void add_hfyu_median_prediction_cmov(uint8_t *dst, const uint8_t *top, const uint8_t *diff, int w, int *left, int *left_top) {
     x86_reg w2 = -w;
     x86_reg x;
     int l = *left & 0xff;
@@ -703,7 +702,7 @@ static void add_hfyu_median_prediction_cmov(uint8_t *dst, uint8_t *top, uint8_t 
         "paddb %%mm1, %%mm6             \n\t"
 
 static void h263_v_loop_filter_mmx(uint8_t *src, int stride, int qscale){
-    if(CONFIG_ANY_H263) {
+    if(CONFIG_H263_DECODER || CONFIG_H263_ENCODER) {
     const int strength= ff_h263_loop_filter_strength[qscale];
 
     __asm__ volatile(
@@ -758,9 +757,9 @@ static inline void transpose4x4(uint8_t *dst, uint8_t *src, int dst_stride, int 
 }
 
 static void h263_h_loop_filter_mmx(uint8_t *src, int stride, int qscale){
-    if(CONFIG_ANY_H263) {
+    if(CONFIG_H263_DECODER || CONFIG_H263_ENCODER) {
     const int strength= ff_h263_loop_filter_strength[qscale];
-    DECLARE_ALIGNED(8, uint64_t, temp[4]);
+    DECLARE_ALIGNED(8, uint64_t, temp)[4];
     uint8_t *btemp= (uint8_t*)temp;
 
     src -= 2;
@@ -2036,7 +2035,7 @@ static void ac3_downmix_sse(float (*samples)[256], float (*matrix)[2], int out_c
     } else if(in_ch == 5 && out_ch == 1 && matrix_cmp[0][0]==matrix_cmp[2][0] && matrix_cmp[3][0]==matrix_cmp[4][0]) {
         MIX5(IF1,IF0);
     } else {
-        DECLARE_ALIGNED_16(float, matrix_simd[in_ch][2][4]);
+        DECLARE_ALIGNED_16(float, matrix_simd)[in_ch][2][4];
         j = 2*in_ch*sizeof(float);
         __asm__ volatile(
             "1: \n"
@@ -2134,110 +2133,46 @@ static void vector_fmul_reverse_sse(float *dst, const float *src0, const float *
     );
 }
 
-static void vector_fmul_add_add_3dnow(float *dst, const float *src0, const float *src1,
-                                      const float *src2, int src3, int len, int step){
+static void vector_fmul_add_3dnow(float *dst, const float *src0, const float *src1,
+                                  const float *src2, int len){
     x86_reg i = (len-4)*4;
-    if(step == 2 && src3 == 0){
-        dst += (len-4)*2;
-        __asm__ volatile(
-            "1: \n\t"
-            "movq   (%2,%0),  %%mm0 \n\t"
-            "movq  8(%2,%0),  %%mm1 \n\t"
-            "pfmul  (%3,%0),  %%mm0 \n\t"
-            "pfmul 8(%3,%0),  %%mm1 \n\t"
-            "pfadd  (%4,%0),  %%mm0 \n\t"
-            "pfadd 8(%4,%0),  %%mm1 \n\t"
-            "movd     %%mm0,   (%1) \n\t"
-            "movd     %%mm1, 16(%1) \n\t"
-            "psrlq      $32,  %%mm0 \n\t"
-            "psrlq      $32,  %%mm1 \n\t"
-            "movd     %%mm0,  8(%1) \n\t"
-            "movd     %%mm1, 24(%1) \n\t"
-            "sub  $32, %1 \n\t"
-            "sub  $16, %0 \n\t"
-            "jge  1b \n\t"
-            :"+r"(i), "+r"(dst)
-            :"r"(src0), "r"(src1), "r"(src2)
-            :"memory"
-        );
-    }
-    else if(step == 1 && src3 == 0){
-        __asm__ volatile(
-            "1: \n\t"
-            "movq    (%2,%0), %%mm0 \n\t"
-            "movq   8(%2,%0), %%mm1 \n\t"
-            "pfmul   (%3,%0), %%mm0 \n\t"
-            "pfmul  8(%3,%0), %%mm1 \n\t"
-            "pfadd   (%4,%0), %%mm0 \n\t"
-            "pfadd  8(%4,%0), %%mm1 \n\t"
-            "movq  %%mm0,   (%1,%0) \n\t"
-            "movq  %%mm1,  8(%1,%0) \n\t"
-            "sub  $16, %0 \n\t"
-            "jge  1b \n\t"
-            :"+r"(i)
-            :"r"(dst), "r"(src0), "r"(src1), "r"(src2)
-            :"memory"
-        );
-    }
-    else
-        ff_vector_fmul_add_add_c(dst, src0, src1, src2, src3, len, step);
+    __asm__ volatile(
+        "1: \n\t"
+        "movq    (%2,%0), %%mm0 \n\t"
+        "movq   8(%2,%0), %%mm1 \n\t"
+        "pfmul   (%3,%0), %%mm0 \n\t"
+        "pfmul  8(%3,%0), %%mm1 \n\t"
+        "pfadd   (%4,%0), %%mm0 \n\t"
+        "pfadd  8(%4,%0), %%mm1 \n\t"
+        "movq  %%mm0,   (%1,%0) \n\t"
+        "movq  %%mm1,  8(%1,%0) \n\t"
+        "sub  $16, %0 \n\t"
+        "jge  1b \n\t"
+        :"+r"(i)
+        :"r"(dst), "r"(src0), "r"(src1), "r"(src2)
+        :"memory"
+    );
     __asm__ volatile("femms");
 }
-static void vector_fmul_add_add_sse(float *dst, const float *src0, const float *src1,
-                                    const float *src2, int src3, int len, int step){
+static void vector_fmul_add_sse(float *dst, const float *src0, const float *src1,
+                                const float *src2, int len){
     x86_reg i = (len-8)*4;
-    if(step == 2 && src3 == 0){
-        dst += (len-8)*2;
-        __asm__ volatile(
-            "1: \n\t"
-            "movaps   (%2,%0), %%xmm0 \n\t"
-            "movaps 16(%2,%0), %%xmm1 \n\t"
-            "mulps    (%3,%0), %%xmm0 \n\t"
-            "mulps  16(%3,%0), %%xmm1 \n\t"
-            "addps    (%4,%0), %%xmm0 \n\t"
-            "addps  16(%4,%0), %%xmm1 \n\t"
-            "movss     %%xmm0,   (%1) \n\t"
-            "movss     %%xmm1, 32(%1) \n\t"
-            "movhlps   %%xmm0, %%xmm2 \n\t"
-            "movhlps   %%xmm1, %%xmm3 \n\t"
-            "movss     %%xmm2, 16(%1) \n\t"
-            "movss     %%xmm3, 48(%1) \n\t"
-            "shufps $0xb1, %%xmm0, %%xmm0 \n\t"
-            "shufps $0xb1, %%xmm1, %%xmm1 \n\t"
-            "movss     %%xmm0,  8(%1) \n\t"
-            "movss     %%xmm1, 40(%1) \n\t"
-            "movhlps   %%xmm0, %%xmm2 \n\t"
-            "movhlps   %%xmm1, %%xmm3 \n\t"
-            "movss     %%xmm2, 24(%1) \n\t"
-            "movss     %%xmm3, 56(%1) \n\t"
-            "sub  $64, %1 \n\t"
-            "sub  $32, %0 \n\t"
-            "jge  1b \n\t"
-            :"+r"(i), "+r"(dst)
-            :"r"(src0), "r"(src1), "r"(src2)
-            :"memory"
-        );
-    }
-    else if(step == 1 && src3 == 0){
-        __asm__ volatile(
-            "1: \n\t"
-            "movaps   (%2,%0), %%xmm0 \n\t"
-            "movaps 16(%2,%0), %%xmm1 \n\t"
-            "mulps    (%3,%0), %%xmm0 \n\t"
-            "mulps  16(%3,%0), %%xmm1 \n\t"
-            "addps    (%4,%0), %%xmm0 \n\t"
-            "addps  16(%4,%0), %%xmm1 \n\t"
-            "movaps %%xmm0,   (%1,%0) \n\t"
-            "movaps %%xmm1, 16(%1,%0) \n\t"
-            "sub  $32, %0 \n\t"
-            "jge  1b \n\t"
-            :"+r"(i)
-            :"r"(dst), "r"(src0), "r"(src1), "r"(src2)
-            :"memory"
-        );
-    }
-    else
-        ff_vector_fmul_add_add_c(dst, src0, src1, src2, src3, len, step);
+    __asm__ volatile(
+        "1: \n\t"
+        "movaps   (%2,%0), %%xmm0 \n\t"
+        "movaps 16(%2,%0), %%xmm1 \n\t"
+        "mulps    (%3,%0), %%xmm0 \n\t"
+        "mulps  16(%3,%0), %%xmm1 \n\t"
+        "addps    (%4,%0), %%xmm0 \n\t"
+        "addps  16(%4,%0), %%xmm1 \n\t"
+        "movaps %%xmm0,   (%1,%0) \n\t"
+        "movaps %%xmm1, 16(%1,%0) \n\t"
+        "sub  $32, %0 \n\t"
+        "jge  1b \n\t"
+        :"+r"(i)
+        :"r"(dst), "r"(src0), "r"(src1), "r"(src2)
+        :"memory"
+    );
 }
 
 static void vector_fmul_window_3dnow2(float *dst, const float *src0, const float *src1,
@@ -2355,6 +2290,40 @@ static void int32_to_float_fmul_scalar_sse2(float *dst, const int *src, float mu
     );
 }
 
+static void vector_clipf_sse(float *dst, const float *src, float min, float max,
+                             int len)
+{
+    x86_reg i = (len-16)*4;
+    __asm__ volatile(
+        "movss  %3, %%xmm4 \n"
+        "movss  %4, %%xmm5 \n"
+        "shufps $0, %%xmm4, %%xmm4 \n"
+        "shufps $0, %%xmm5, %%xmm5 \n"
+        "1: \n\t"
+        "movaps    (%2,%0), %%xmm0 \n\t" // 3/1 on intel
+        "movaps  16(%2,%0), %%xmm1 \n\t"
+        "movaps  32(%2,%0), %%xmm2 \n\t"
+        "movaps  48(%2,%0), %%xmm3 \n\t"
+        "maxps      %%xmm4, %%xmm0 \n\t"
+        "maxps      %%xmm4, %%xmm1 \n\t"
+        "maxps      %%xmm4, %%xmm2 \n\t"
+        "maxps      %%xmm4, %%xmm3 \n\t"
+        "minps      %%xmm5, %%xmm0 \n\t"
+        "minps      %%xmm5, %%xmm1 \n\t"
+        "minps      %%xmm5, %%xmm2 \n\t"
+        "minps      %%xmm5, %%xmm3 \n\t"
+        "movaps  %%xmm0,   (%1,%0) \n\t"
+        "movaps  %%xmm1, 16(%1,%0) \n\t"
+        "movaps  %%xmm2, 32(%1,%0) \n\t"
+        "movaps  %%xmm3, 48(%1,%0) \n\t"
+        "sub  $64, %0 \n\t"
+        "jge 1b \n\t"
+        :"+&r"(i)
+        :"r"(dst), "r"(src), "m"(min), "m"(max)
+        :"memory"
+    );
+}
+
 static void float_to_int16_3dnow(int16_t *dst, const float *src, long len){
     x86_reg reglen = len;
     // not bit-exact: pf2id uses different rounding than C and SSE
@@ -2419,25 +2388,31 @@ static void float_to_int16_sse2(int16_t *dst, const float *src, long len){
     );
 }
 
-#if HAVE_YASM
 void ff_float_to_int16_interleave6_sse(int16_t *dst, const float **src, int len);
 void ff_float_to_int16_interleave6_3dnow(int16_t *dst, const float **src, int len);
 void ff_float_to_int16_interleave6_3dn2(int16_t *dst, const float **src, int len);
-void ff_add_hfyu_median_prediction_mmx2(uint8_t *dst, uint8_t *top, uint8_t *diff, int w, int *left, int *left_top);
+int32_t ff_scalarproduct_int16_mmx2(int16_t *v1, int16_t *v2, int order, int shift);
+int32_t ff_scalarproduct_int16_sse2(int16_t *v1, int16_t *v2, int order, int shift);
+int32_t ff_scalarproduct_and_madd_int16_mmx2(int16_t *v1, int16_t *v2, int16_t *v3, int order, int mul);
+int32_t ff_scalarproduct_and_madd_int16_sse2(int16_t *v1, int16_t *v2, int16_t *v3, int order, int mul);
+int32_t ff_scalarproduct_and_madd_int16_ssse3(int16_t *v1, int16_t *v2, int16_t *v3, int order, int mul);
+void ff_add_hfyu_median_prediction_mmx2(uint8_t *dst, const uint8_t *top, const uint8_t *diff, int w, int *left, int *left_top);
+int  ff_add_hfyu_left_prediction_ssse3(uint8_t *dst, const uint8_t *src, int w, int left);
+int  ff_add_hfyu_left_prediction_sse4(uint8_t *dst, const uint8_t *src, int w, int left);
 void ff_x264_deblock_v_luma_sse2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0);
 void ff_x264_deblock_h_luma_sse2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0);
-void ff_x264_deblock_v8_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta);
 void ff_x264_deblock_h_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta);
-#if ARCH_X86_32
+void ff_x264_deblock_v_luma_intra_sse2(uint8_t *pix, int stride, int alpha, int beta);
+void ff_x264_deblock_h_luma_intra_sse2(uint8_t *pix, int stride, int alpha, int beta);
+
+#if HAVE_YASM && ARCH_X86_32
+void ff_x264_deblock_v8_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta);
 static void ff_x264_deblock_v_luma_intra_mmxext(uint8_t *pix, int stride, int alpha, int beta)
 {
     ff_x264_deblock_v8_luma_intra_mmxext(pix+0, stride, alpha, beta);
     ff_x264_deblock_v8_luma_intra_mmxext(pix+8, stride, alpha, beta);
 }
-#endif
-void ff_x264_deblock_v_luma_intra_sse2(uint8_t *pix, int stride, int alpha, int beta);
-void ff_x264_deblock_h_luma_intra_sse2(uint8_t *pix, int stride, int alpha, int beta);
-#else
+#elif !HAVE_YASM
 #define ff_float_to_int16_interleave6_sse(a,b,c)   float_to_int16_interleave_misc_sse(a,b,c,6)
 #define ff_float_to_int16_interleave6_3dnow(a,b,c) float_to_int16_interleave_misc_3dnow(a,b,c,6)
 #define ff_float_to_int16_interleave6_3dn2(a,b,c)  float_to_int16_interleave_misc_3dnow(a,b,c,6)
@@ -2447,7 +2422,7 @@ void ff_x264_deblock_h_luma_intra_sse2(uint8_t *pix, int stride, int alpha, int 
 #define FLOAT_TO_INT16_INTERLEAVE(cpu, body) \
 /* gcc pessimizes register allocation if this is in the same function as float_to_int16_interleave_sse2*/\
 static av_noinline void float_to_int16_interleave_misc_##cpu(int16_t *dst, const float **src, long len, int channels){\
-    DECLARE_ALIGNED_16(int16_t, tmp[len]);\
+    DECLARE_ALIGNED_16(int16_t, tmp)[len];\
     int i,j,c;\
     for(c=0; c<channels; c++){\
         float_to_int16_##cpu(tmp, src[c], len);\
@@ -2544,77 +2519,7 @@ void ff_snow_inner_add_yblock_mmx(const uint8_t *obmc, const int obmc_stride, ui
                                   int src_x, int src_y, int src_stride, slice_buffer * sb, int add, uint8_t * dst8);
 
 
-static void add_int16_sse2(int16_t * v1, int16_t * v2, int order)
-{
-    x86_reg o = -(order << 1);
-    v1 += order;
-    v2 += order;
-    __asm__ volatile(
-        "1:                          \n\t"
-        "movdqu   (%1,%2),   %%xmm0  \n\t"
-        "movdqu 16(%1,%2),   %%xmm1  \n\t"
-        "paddw    (%0,%2),   %%xmm0  \n\t"
-        "paddw  16(%0,%2),   %%xmm1  \n\t"
-        "movdqa   %%xmm0,    (%0,%2) \n\t"
-        "movdqa   %%xmm1,  16(%0,%2) \n\t"
-        "add      $32,       %2      \n\t"
-        "js       1b                 \n\t"
-        : "+r"(v1), "+r"(v2), "+r"(o)
-    );
-}
-
-static void sub_int16_sse2(int16_t * v1, int16_t * v2, int order)
-{
-    x86_reg o = -(order << 1);
-    v1 += order;
-    v2 += order;
-    __asm__ volatile(
-        "1:                           \n\t"
-        "movdqa    (%0,%2),   %%xmm0  \n\t"
-        "movdqa  16(%0,%2),   %%xmm2  \n\t"
-        "movdqu    (%1,%2),   %%xmm1  \n\t"
-        "movdqu  16(%1,%2),   %%xmm3  \n\t"
-        "psubw     %%xmm1,    %%xmm0  \n\t"
-        "psubw     %%xmm3,    %%xmm2  \n\t"
-        "movdqa    %%xmm0,    (%0,%2) \n\t"
-        "movdqa    %%xmm2,  16(%0,%2) \n\t"
-        "add       $32,       %2      \n\t"
-        "js        1b                 \n\t"
-        : "+r"(v1), "+r"(v2), "+r"(o)
-    );
-}
-
-static int32_t scalarproduct_int16_sse2(int16_t * v1, int16_t * v2, int order, int shift)
-{
-    int res = 0;
-    DECLARE_ALIGNED_16(xmm_reg, sh);
-    x86_reg o = -(order << 1);
-
-    v1 += order;
-    v2 += order;
-    sh.a = shift;
-    __asm__ volatile(
-        "pxor      %%xmm7,  %%xmm7        \n\t"
-        "1:                               \n\t"
-        "movdqu    (%0,%3), %%xmm0        \n\t"
-        "movdqu  16(%0,%3), %%xmm1        \n\t"
-        "pmaddwd   (%1,%3), %%xmm0        \n\t"
-        "pmaddwd 16(%1,%3), %%xmm1        \n\t"
-        "paddd     %%xmm0,  %%xmm7        \n\t"
-        "paddd     %%xmm1,  %%xmm7        \n\t"
-        "add       $32,     %3            \n\t"
-        "js        1b                     \n\t"
-        "movhlps   %%xmm7,  %%xmm2        \n\t"
-        "paddd     %%xmm2,  %%xmm7        \n\t"
-        "psrad     %4,      %%xmm7        \n\t"
-        "pshuflw   $0x4E,   %%xmm7,%%xmm2 \n\t"
-        "paddd     %%xmm2,  %%xmm7        \n\t"
-        "movd      %%xmm7,  %2            \n\t"
-        : "+r"(v1), "+r"(v2), "=r"(res), "+r"(o)
-        : "m"(sh)
-    );
-    return res;
-}
+float ff_scalarproduct_float_sse(const float *v1, const float *v2, int order);
 
 void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
 {
@@ -2664,7 +2569,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
                 }
                 c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
 #endif
-            }else if((CONFIG_VP3_DECODER || CONFIG_VP5_DECODER || CONFIG_VP6_DECODER || CONFIG_THEORA_DECODER) &&
+            }else if((CONFIG_VP3_DECODER || CONFIG_VP5_DECODER || CONFIG_VP6_DECODER) &&
                      idct_algo==FF_IDCT_VP3){
                 if(mm_flags & FF_MM_SSE2){
                     c->idct_put= ff_vp3_idct_put_sse2;
@@ -2702,10 +2607,9 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
         c->add_pixels_clamped = add_pixels_clamped_mmx;
         c->clear_block  = clear_block_mmx;
         c->clear_blocks = clear_blocks_mmx;
-        /* disable clear_blocks_sse on x86_32 since XvMC has block only 8 byte
-         * aligned instead of the required 16
-         * (might be a problem of the XvMC implementation) */
-        if ((ARCH_X86_64 || !CONFIG_XVMC) && mm_flags & FF_MM_SSE){
+        if ((mm_flags & FF_MM_SSE) &&
+            !(CONFIG_MPEG_XVMC_DECODER && avctx->xvmc_acceleration > 1)){
+            /* XvMCCreateBlocks() may not allocate 16-byte aligned blocks */
             c->clear_block  = clear_block_sse;
             c->clear_blocks = clear_blocks_sse;
         }
@@ -2732,7 +2636,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
 
         c->draw_edges = draw_edges_mmx;
 
-        if (CONFIG_ANY_H263) {
+        if (CONFIG_H263_DECODER || CONFIG_H263_ENCODER) {
             c->h263_v_loop_filter= h263_v_loop_filter_mmx;
             c->h263_h_loop_filter= h263_h_loop_filter_mmx;
         }
@@ -2789,7 +2693,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
                 c->avg_pixels_tab[0][3] = avg_pixels16_xy2_mmx2;
                 c->avg_pixels_tab[1][3] = avg_pixels8_xy2_mmx2;
 
-                if (CONFIG_VP3_DECODER || CONFIG_THEORA_DECODER) {
+                if (CONFIG_VP3_DECODER) {
                     c->vp3_v_loop_filter= ff_vp3_v_loop_filter_mmx2;
                     c->vp3_h_loop_filter= ff_vp3_h_loop_filter_mmx2;
                 }
@@ -2878,7 +2782,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             if (CONFIG_CAVS_DECODER)
                 ff_cavsdsp_init_mmx2(c, avctx);
 
-            if (CONFIG_VC1_DECODER || CONFIG_WMV3_DECODER)
+            if (CONFIG_VC1_DECODER)
                 ff_vc1dsp_init_mmx(c, avctx);
 
             c->add_png_paeth_prediction= add_png_paeth_prediction_mmx2;
@@ -2993,6 +2897,11 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->put_h264_chroma_pixels_tab[1]= put_h264_chroma_mc4_ssse3;
             c->avg_h264_chroma_pixels_tab[1]= avg_h264_chroma_mc4_ssse3;
             c->add_png_paeth_prediction= add_png_paeth_prediction_ssse3;
+#if HAVE_YASM
+            c->add_hfyu_left_prediction = ff_add_hfyu_left_prediction_ssse3;
+            if (mm_flags & FF_MM_SSE4) // not really sse4, just slow on Conroe
+                c->add_hfyu_left_prediction = ff_add_hfyu_left_prediction_sse4;
+#endif
         }
 #endif
 
@@ -3003,7 +2912,7 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
             c->h264_h_loop_filter_luma_intra = ff_x264_deblock_h_luma_intra_mmxext;
 #endif
             if( mm_flags&FF_MM_SSE2 ){
-#if ARCH_X86_64 || !defined(__ICC) || __ICC > 1100
+#if ARCH_X86_64 || !defined(__ICC) || __ICC > 1110
                 c->h264_v_loop_filter_luma = ff_x264_deblock_v_luma_sse2;
                 c->h264_h_loop_filter_luma = ff_x264_deblock_h_luma_sse2;
                 c->h264_v_loop_filter_luma_intra = ff_x264_deblock_v_luma_intra_sse2;
@@ -3050,27 +2959,40 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
                 c->float_to_int16_interleave = float_to_int16_interleave_3dn2;
             }
         }
+        if(mm_flags & FF_MM_MMX2){
+#if HAVE_YASM
+            c->scalarproduct_int16 = ff_scalarproduct_int16_mmx2;
+            c->scalarproduct_and_madd_int16 = ff_scalarproduct_and_madd_int16_mmx2;
+#endif
+        }
         if(mm_flags & FF_MM_SSE){
             c->vorbis_inverse_coupling = vorbis_inverse_coupling_sse;
             c->ac3_downmix = ac3_downmix_sse;
             c->vector_fmul = vector_fmul_sse;
             c->vector_fmul_reverse = vector_fmul_reverse_sse;
-            c->vector_fmul_add_add = vector_fmul_add_add_sse;
+            c->vector_fmul_add = vector_fmul_add_sse;
             c->vector_fmul_window = vector_fmul_window_sse;
             c->int32_to_float_fmul_scalar = int32_to_float_fmul_scalar_sse;
+            c->vector_clipf = vector_clipf_sse;
             c->float_to_int16 = float_to_int16_sse;
             c->float_to_int16_interleave = float_to_int16_interleave_sse;
+#if HAVE_YASM
+            c->scalarproduct_float = ff_scalarproduct_float_sse;
+#endif
         }
         if(mm_flags & FF_MM_3DNOW)
-            c->vector_fmul_add_add = vector_fmul_add_add_3dnow; // faster than sse
+            c->vector_fmul_add = vector_fmul_add_3dnow; // faster than sse
         if(mm_flags & FF_MM_SSE2){
             c->int32_to_float_fmul_scalar = int32_to_float_fmul_scalar_sse2;
             c->float_to_int16 = float_to_int16_sse2;
             c->float_to_int16_interleave = float_to_int16_interleave_sse2;
-            c->add_int16 = add_int16_sse2;
-            c->sub_int16 = sub_int16_sse2;
-            c->scalarproduct_int16 = scalarproduct_int16_sse2;
+#if HAVE_YASM
+            c->scalarproduct_int16 = ff_scalarproduct_int16_sse2;
+            c->scalarproduct_and_madd_int16 = ff_scalarproduct_and_madd_int16_sse2;
+#endif
         }
+        if((mm_flags & FF_MM_SSSE3) && !(mm_flags & (FF_MM_SSE42|FF_MM_3DNOW)) && HAVE_YASM) // cachesplit
+            c->scalarproduct_and_madd_int16 = ff_scalarproduct_and_madd_int16_ssse3;
     }
 
     if (CONFIG_ENCODERS)

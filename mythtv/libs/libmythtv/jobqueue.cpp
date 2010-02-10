@@ -12,6 +12,8 @@ using namespace std;
 #include <QRegExp>
 #include <QEvent>
 
+#include "mythconfig.h"
+
 #include "exitcodes.h"
 #include "jobqueue.h"
 #include "programinfo.h"

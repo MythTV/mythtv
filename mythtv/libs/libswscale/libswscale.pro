@@ -23,7 +23,7 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input
-SOURCES += options.c rgb2rgb.c swscale.c yuv2rgb.c
+SOURCES += options.c rgb2rgb.c swscale.c utils.c yuv2rgb.c
 
 contains( ARCH_BFIN, yes ) {
         SOURCES += bfin/internal_bfin.S

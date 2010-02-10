@@ -21,6 +21,8 @@ using namespace std;
 #include <sys/time.h>
 #include <sys/poll.h>
 
+#include "mythconfig.h"
+
 // avlib headers
 extern "C" {
 #include "avcodec.h"

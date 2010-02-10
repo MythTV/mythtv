@@ -24,7 +24,8 @@
 #define vzero vec_splat_s32(0)
 
 static inline void
-altivec_packIntArrayToCharArray(int *val, uint8_t* dest, int dstW) {
+altivec_packIntArrayToCharArray(int *val, uint8_t* dest, int dstW)
+{
     register int i;
     vector unsigned int altivec_vectorShiftInt19 =
         vec_add(vec_splat_u32(10), vec_splat_u32(9));
@@ -92,7 +93,7 @@ yuv2yuvX_altivec_real(const int16_t *lumFilter, int16_t **lumSrc, int lumFilterS
     const vector signed int vini = {(1 << 18), (1 << 18), (1 << 18), (1 << 18)};
     register int i, j;
     {
-        DECLARE_ALIGNED(16, int, val[dstW]);
+        DECLARE_ALIGNED(16, int, val)[dstW];
 
         for (i = 0; i < (dstW -7); i+=4) {
             vec_st(vini, i << 2, val);
@@ -140,8 +141,8 @@ yuv2yuvX_altivec_real(const int16_t *lumFilter, int16_t **lumSrc, int lumFilterS
         altivec_packIntArrayToCharArray(val, dest, dstW);
     }
     if (uDest != 0) {
-        DECLARE_ALIGNED(16, int, u[chrDstW]);
-        DECLARE_ALIGNED(16, int, v[chrDstW]);
+        DECLARE_ALIGNED(16, int, u)[chrDstW];
+        DECLARE_ALIGNED(16, int, v)[chrDstW];
 
         for (i = 0; i < (chrDstW -7); i+=4) {
             vec_st(vini, i << 2, u);
@@ -214,7 +215,7 @@ static inline void hScale_altivec_real(int16_t *dst, int dstW,
                                        const int16_t *filterPos, int filterSize)
 {
     register int i;
-    DECLARE_ALIGNED(16, int, tempo[4]);
+    DECLARE_ALIGNED(16, int, tempo)[4];
 
     if (filterSize % 4) {
         for (i=0; i<dstW; i++) {
@@ -389,7 +390,8 @@ static inline void hScale_altivec_real(int16_t *dst, int dstW,
 }
 
 static inline int yv12toyuy2_unscaled_altivec(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
-                                              int srcSliceH, uint8_t* dstParam[], int dstStride_a[]) {
+                                              int srcSliceH, uint8_t* dstParam[], int dstStride_a[])
+{
     uint8_t *dst=dstParam[0] + dstStride_a[0]*srcSliceY;
     // yv12toyuy2(src[0], src[1], src[2], dst, c->srcW, srcSliceH, srcStride[0], srcStride[1], dstStride[0]);
     uint8_t *ysrc = src[0];
@@ -466,7 +468,8 @@ static inline int yv12toyuy2_unscaled_altivec(SwsContext *c, uint8_t* src[], int
 }
 
 static inline int yv12touyvy_unscaled_altivec(SwsContext *c, uint8_t* src[], int srcStride[], int srcSliceY,
-                                              int srcSliceH, uint8_t* dstParam[], int dstStride_a[]) {
+                                              int srcSliceH, uint8_t* dstParam[], int dstStride_a[])
+{
     uint8_t *dst=dstParam[0] + dstStride_a[0]*srcSliceY;
     // yv12toyuy2(src[0], src[1], src[2], dst, c->srcW, srcSliceH, srcStride[0], srcStride[1], dstStride[0]);
     uint8_t *ysrc = src[0];

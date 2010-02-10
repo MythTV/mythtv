@@ -136,7 +136,7 @@ typedef struct cook {
     AVLFG               random_state;
 
     /* transform data */
-    MDCTContext         mdct_ctx;
+    FFTContext          mdct_ctx;
     float*              mlt_window;
 
     /* VLC data */
@@ -150,7 +150,7 @@ typedef struct cook {
     /* data buffers */
 
     uint8_t*            decoded_bytes_buffer;
-    DECLARE_ALIGNED_16(float,mono_mdct_output[2048]);
+    DECLARE_ALIGNED_16(float,mono_mdct_output)[2048];
     float               decode_buffer_1[1024];
     float               decode_buffer_2[1024];
     float               decode_buffer_0[1060]; /* static allocation for joint decode */
@@ -1101,7 +1101,7 @@ static av_cold int cook_decode_init(AVCodecContext *avctx)
     q->bit_rate = avctx->bit_rate;
 
     /* Initialize RNG. */
-    av_lfg_init(&q->random_state, ff_random_get_seed());
+    av_lfg_init(&q->random_state, 0);
 
     while(edata_ptr < edata_ptr_end){
         /* 8 for mono, 16 for stereo, ? for multichannel

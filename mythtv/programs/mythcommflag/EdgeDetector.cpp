@@ -5,6 +5,8 @@
 #include <algorithm>
 using namespace std;
 
+#include "mythconfig.h"
+
 // avlib/ffmpeg headers
 extern "C" {
 #include "avcodec.h"        // AVPicture

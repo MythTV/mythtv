@@ -37,6 +37,7 @@
 #include "dcadata.h"
 #include "dcahuff.h"
 #include "dca.h"
+#include "synth_filter.h"
 
 //#define TRACE
 
@@ -227,15 +228,16 @@ typedef struct {
 
     /* Subband samples history (for ADPCM) */
     float subband_samples_hist[DCA_PRIM_CHANNELS_MAX][DCA_SUBBANDS][4];
-    DECLARE_ALIGNED_16(float, subband_fir_hist[DCA_PRIM_CHANNELS_MAX][512]);
+    DECLARE_ALIGNED_16(float, subband_fir_hist)[DCA_PRIM_CHANNELS_MAX][512];
     float subband_fir_noidea[DCA_PRIM_CHANNELS_MAX][32];
     int hist_index[DCA_PRIM_CHANNELS_MAX];
+    DECLARE_ALIGNED_16(float, raXin)[32];
 
     int output;                 ///< type of output
     float add_bias;             ///< output bias
     float scale_bias;           ///< output scale
 
-    DECLARE_ALIGNED_16(float, samples[1536]);  /* 6 * 256 = 1536, might only need 5 */
+    DECLARE_ALIGNED_16(float, samples)[1536];  /* 6 * 256 = 1536, might only need 5 */
     const float *samples_chanptr[6];
 
     uint8_t dca_buffer[DCA_MAX_FRAME_SIZE];
@@ -249,7 +251,7 @@ typedef struct {
 
     int debug_flag;             ///< used for suppressing repeated error messages output
     DSPContext dsp;
-    MDCTContext imdct;
+    FFTContext imdct;
 } DCAContext;
 
 static const uint16_t dca_vlc_offs[] = {
@@ -608,7 +610,7 @@ static int dca_subframe_header(DCAContext * s)
                 s->joint_scale_factor[j][k] = scale;    /*joint_scale_table[scale]; */
             }
 
-            if (!s->debug_flag & 0x02) {
+            if (!(s->debug_flag & 0x02)) {
                 av_log(s->avctx, AV_LOG_DEBUG,
                        "Joint stereo coding not supported\n");
                 s->debug_flag |= 0x02;
@@ -750,11 +752,7 @@ static void qmf_32_subbands(DCAContext * s, int chans,
                             float scale, float bias)
 {
     const float *prCoeff;
-    int i, j;
-    DECLARE_ALIGNED_16(float, raXin[32]);
-
-    int hist_index= s->hist_index[chans];
-    float *subband_fir_hist2 = s->subband_fir_noidea[chans];
+    int i;
 
     int subindex;
 
@@ -768,45 +766,21 @@ static void qmf_32_subbands(DCAContext * s, int chans,
 
     /* Reconstructed channel sample index */
     for (subindex = 0; subindex < 8; subindex++) {
-        float *subband_fir_hist = s->subband_fir_hist[chans] + hist_index;
         /* Load in one sample from each subband and clear inactive subbands */
         for (i = 0; i < s->subband_activity[chans]; i++){
-            if((i-1)&2) raXin[i] = -samples_in[i][subindex];
-            else        raXin[i] =  samples_in[i][subindex];
+            if((i-1)&2) s->raXin[i] = -samples_in[i][subindex];
+            else        s->raXin[i] =  samples_in[i][subindex];
         }
         for (; i < 32; i++)
-            raXin[i] = 0.0;
+            s->raXin[i] = 0.0;
 
-        ff_imdct_half(&s->imdct, subband_fir_hist, raXin);
-
-        /* Multiply by filter coefficients */
-        for (i = 0; i < 16; i++){
-            float a= subband_fir_hist2[i   ];
-            float b= subband_fir_hist2[i+16];
-            float c= 0;
-            float d= 0;
-            for (j = 0; j < 512-hist_index; j += 64){
-                a += prCoeff[i+j   ]*(-subband_fir_hist[15-i+j]);
-                b += prCoeff[i+j+16]*( subband_fir_hist[   i+j]);
-                c += prCoeff[i+j+32]*( subband_fir_hist[16+i+j]);
-                d += prCoeff[i+j+48]*( subband_fir_hist[31-i+j]);
-            }
-            for (     ; j < 512; j += 64){
-                a += prCoeff[i+j   ]*(-subband_fir_hist[15-i+j-512]);
-                b += prCoeff[i+j+16]*( subband_fir_hist[   i+j-512]);
-                c += prCoeff[i+j+32]*( subband_fir_hist[16+i+j-512]);
-                d += prCoeff[i+j+48]*( subband_fir_hist[31-i+j-512]);
-            }
-            samples_out[i   ] = a * scale + bias;
-            samples_out[i+16] = b * scale + bias;
-            subband_fir_hist2[i   ] = c;
-            subband_fir_hist2[i+16] = d;
-        }
+        ff_synth_filter_float(&s->imdct,
+                              s->subband_fir_hist[chans], &s->hist_index[chans],
+                              s->subband_fir_noidea[chans], prCoeff,
+                              samples_out, s->raXin, scale, bias);
         samples_out+= 32;
 
-        hist_index = (hist_index-32)&511;
     }
-    s->hist_index[chans]= hist_index;
 }
 
 static void lfe_interpolation_fir(int decimation_select,
@@ -1324,7 +1298,7 @@ static av_cold int dca_decode_init(AVCodecContext * avctx)
         s->samples_chanptr[i] = s->samples + i * 256;
     avctx->sample_fmt = SAMPLE_FMT_S16;
 
-    if(s->dsp.float_to_int16 == ff_float_to_int16_c) {
+    if(s->dsp.float_to_int16_interleave == ff_float_to_int16_interleave_c) {
         s->add_bias = 385.0f;
         s->scale_bias = 1.0 / 32768.0;
     } else {

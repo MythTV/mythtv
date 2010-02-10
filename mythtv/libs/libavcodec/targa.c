@@ -189,7 +189,6 @@ static int decode_frame(AVCodecContext *avctx,
                 *pal++ = (b << 16) | (g << 8) | r;
             }
             p->palette_has_changed = 1;
-            avctx->palctrl->palette_changed = 0;
         }
     }
     if((compr & (~TGA_RLE)) == TGA_NODATA)
@@ -199,7 +198,7 @@ static int decode_frame(AVCodecContext *avctx,
             targa_decode_rle(avctx, s, buf, dst, avctx->width, avctx->height, stride, bpp);
         else{
             for(y = 0; y < s->height; y++){
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
                 if((s->bpp + 1) >> 3 == 2){
                     uint16_t *dst16 = (uint16_t*)dst;
                     for(x = 0; x < s->width; x++)

@@ -202,6 +202,7 @@ const char *codec_id_string(enum CodecID codec_id)
             /* subtitle codecs */
         case CODEC_ID_DVD_SUBTITLE:     return "DVD_SUBTITLE";
         case CODEC_ID_DVB_SUBTITLE:     return "DVB_SUBTITLE";
+        case CODEC_ID_DVB_TELETEXT:     return "DVB_TELETEXT";
 
         case CODEC_ID_MPEG2VBI:         return "MPEG2VBI";
         case CODEC_ID_DVB_VBI:          return "DVB_VBI";
@@ -209,6 +210,8 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_DSMCC_B:          return "DSMCC_B";
 
         case CODEC_ID_MPEG2TS:          return "MPEG2TS";
+
+        case CODEC_ID_PROBE:            return "PROBE";
     }
     return "Unknown Codec ID";
 }

@@ -59,7 +59,7 @@ typedef struct MpegAudioContext {
 } MpegAudioContext;
 
 /* define it to use floats in quantization (I don't like floats !) */
-//#define USE_FLOATS
+#define USE_FLOATS
 
 #include "mpegaudiodata.h"
 #include "mpegaudiotab.h"
@@ -126,10 +126,8 @@ static av_cold int MPA_encode_init(AVCodecContext *avctx)
     s->sblimit = ff_mpa_sblimit_table[table];
     s->alloc_table = ff_mpa_alloc_tables[table];
 
-#ifdef DEBUG
-    av_log(avctx, AV_LOG_DEBUG, "%d kb/s, %d Hz, frame_size=%d bits, table=%d, padincr=%x\n",
-           bitrate, freq, s->frame_size, table, s->frame_frac_incr);
-#endif
+    dprintf(avctx, "%d kb/s, %d Hz, frame_size=%d bits, table=%d, padincr=%x\n",
+            bitrate, freq, s->frame_size, table, s->frame_frac_incr);
 
     for(i=0;i<s->nb_channels;i++)
         s->samples_offset[i] = 0;
@@ -799,7 +797,7 @@ AVCodec mp2_encoder = {
     MPA_encode_frame,
     MPA_encode_close,
     NULL,
-    .sample_fmts = (enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
+    .sample_fmts = (const enum SampleFormat[]){SAMPLE_FMT_S16,SAMPLE_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("MP2 (MPEG audio layer 2)"),
 };
 

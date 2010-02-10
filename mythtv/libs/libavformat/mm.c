@@ -22,7 +22,7 @@
 /**
  * @file libavformat/mm.c
  * American Laser Games MM Format Demuxer
- * by Peter Ross (suxen_drol at hotmail dot com)
+ * by Peter Ross (pross@xvid.org)
  *
  * The MM format was used by IBM-PC ports of ALG's "arcade shooter" games,
  * including Mad Dog McCree and Crime Patrol.
@@ -58,10 +58,22 @@ typedef struct {
 
 static int mm_probe(AVProbeData *p)
 {
+    int len, type, fps, w, h;
+    if (p->buf_size < MM_HEADER_LEN_AV + MM_PREAMBLE_SIZE)
+        return 0;
     /* the first chunk is always the header */
     if (AV_RL16(&p->buf[0]) != MM_TYPE_HEADER)
         return 0;
-    if (AV_RL32(&p->buf[2]) != MM_HEADER_LEN_V && AV_RL32(&p->buf[2]) != MM_HEADER_LEN_AV)
+    len = AV_RL32(&p->buf[2]);
+    if (len != MM_HEADER_LEN_V && len != MM_HEADER_LEN_AV)
+        return 0;
+    fps = AV_RL16(&p->buf[8]);
+    w = AV_RL16(&p->buf[12]);
+    h = AV_RL16(&p->buf[14]);
+    if (!fps || fps > 60 || !w || w > 2048 || !h || h > 2048)
+        return 0;
+    type = AV_RL16(&p->buf[len]);
+    if (!type || type > 0x31)
         return 0;
 
     /* only return half certainty since this check is a bit sketchy */

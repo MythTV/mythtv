@@ -192,6 +192,7 @@ static int process_audio_header_elements(AVFormatContext *s)
         case 16: ea->audio_codec = CODEC_ID_MP3; break;
         case -1: break;
         default:
+            ea->audio_codec = CODEC_ID_NONE;
             av_log(s, AV_LOG_ERROR, "unsupported stream type; revision2=%i\n", revision2);
             return 0;
         }
@@ -389,9 +390,13 @@ static int ea_probe(AVProbeData *p)
     case MPCh_TAG:
     case MVhd_TAG:
     case MVIh_TAG:
-        return AVPROBE_SCORE_MAX;
+        break;
+    default:
+        return 0;
     }
-    return 0;
+    if (AV_RL32(&p->buf[4]) > 0xfffff && AV_RB32(&p->buf[4]) > 0xfffff)
+        return 0;
+    return AVPROBE_SCORE_MAX;
 }
 
 static int ea_read_header(AVFormatContext *s,

@@ -3,6 +3,8 @@
 
 #include <unistd.h>
 
+#include "mythconfig.h"
+
 #include "mythcontext.h"
 #include "videobuffers.h"
 extern "C" {

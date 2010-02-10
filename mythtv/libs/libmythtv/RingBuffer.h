@@ -9,6 +9,8 @@
 #include <QString>
 #include <QMutex>
 
+#include "mythconfig.h"
+
 extern "C" {
 #include "avcodec.h"
 }

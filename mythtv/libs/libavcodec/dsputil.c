@@ -33,8 +33,9 @@
 #include "faandct.h"
 #include "faanidct.h"
 #include "mathops.h"
-#include "h263.h"
 #include "snow.h"
+#include "mpegvideo.h"
+#include "config.h"
 
 /* snow.c */
 void ff_spatial_dwt(int *buffer, int width, int height, int stride, int type, int decomposition_count);
@@ -45,8 +46,8 @@ void vorbis_inverse_coupling(float *mag, float *ang, int blocksize);
 /* ac3dec.c */
 void ff_ac3_downmix_c(float (*samples)[256], float (*matrix)[2], int out_ch, int in_ch, int len);
 
-/* flacenc.c */
-void ff_flac_compute_autocorr(const int32_t *data, int len, int lag, double *autoc);
+/* lpc.c */
+void ff_lpc_compute_autocorr(const int32_t *data, int len, int lag, double *autoc);
 
 /* pngdec.c */
 void ff_add_png_paeth_prediction(uint8_t *dst, uint8_t *src, uint8_t *top, int w, int bpp);
@@ -86,7 +87,7 @@ const uint8_t ff_zigzag248_direct[64] = {
 };
 
 /* not permutated inverse zigzag_direct + 1 for MMX quantizer */
-DECLARE_ALIGNED_8(uint16_t, inv_zigzag_direct16[64]) = {0, };
+DECLARE_ALIGNED_16(uint16_t, inv_zigzag_direct16)[64];
 
 const uint8_t ff_alternate_horizontal_scan[64] = {
     0,  1,   2,  3,  8,  9, 16, 17,
@@ -110,8 +111,9 @@ const uint8_t ff_alternate_vertical_scan[64] = {
     38, 46, 54, 62, 39, 47, 55, 63,
 };
 
-/* a*inverse[b]>>32 == a/b for all 0<=a<=65536 && 2<=b<=255 */
-const uint32_t ff_inverse[256]={
+/* a*inverse[b]>>32 == a/b for all 0<=a<=16909558 && 2<=b<=256
+ * for a>16909558, is an overestimate by less than 1 part in 1<<24 */
+const uint32_t ff_inverse[257]={
          0, 4294967295U,2147483648U,1431655766, 1073741824,  858993460,  715827883,  613566757,
  536870912,  477218589,  429496730,  390451573,  357913942,  330382100,  306783379,  286331154,
  268435456,  252645136,  238609295,  226050911,  214748365,  204522253,  195225787,  186737709,
@@ -144,6 +146,7 @@ const uint32_t ff_inverse[256]={
   18512791,   18433337,   18354562,   18276457,   18199014,   18122225,   18046082,   17970575,
   17895698,   17821442,   17747799,   17674763,   17602325,   17530479,   17459217,   17388532,
   17318417,   17248865,   17179870,   17111424,   17043522,   16976156,   16909321,   16843010,
+  16777216
 };
 
 /* Input permutation for the simple_idct_mmx */
@@ -2756,7 +2759,7 @@ void ff_avg_cavs_qpel16_mc00_c(uint8_t *dst, uint8_t *src, int stride) {
 
 void ff_mlp_init(DSPContext* c, AVCodecContext *avctx);
 
-#if CONFIG_VC1_DECODER || CONFIG_WMV3_DECODER
+#if CONFIG_VC1_DECODER
 /* VC-1 specific */
 void ff_vc1dsp_init(DSPContext* c, AVCodecContext *avctx);
 
@@ -2766,7 +2769,7 @@ void ff_put_vc1_mspel_mc00_c(uint8_t *dst, uint8_t *src, int stride, int rnd) {
 void ff_avg_vc1_mspel_mc00_c(uint8_t *dst, uint8_t *src, int stride, int rnd) {
     avg_pixels8_c(dst, src, stride, 8);
 }
-#endif /* CONFIG_VC1_DECODER||CONFIG_WMV3_DECODER */
+#endif /* CONFIG_VC1_DECODER */
 
 void ff_intrax8dsp_init(DSPContext* c, AVCodecContext *avctx);
 
@@ -2872,7 +2875,7 @@ static void put_mspel8_mc22_c(uint8_t *dst, uint8_t *src, int stride){
 }
 
 static void h263_v_loop_filter_c(uint8_t *src, int stride, int qscale){
-    if(CONFIG_ANY_H263) {
+    if(CONFIG_H263_DECODER || CONFIG_H263_ENCODER) {
     int x;
     const int strength= ff_h263_loop_filter_strength[qscale];
 
@@ -2909,7 +2912,7 @@ static void h263_v_loop_filter_c(uint8_t *src, int stride, int qscale){
 }
 
 static void h263_h_loop_filter_c(uint8_t *src, int stride, int qscale){
-    if(CONFIG_ANY_H263) {
+    if(CONFIG_H263_DECODER || CONFIG_H263_ENCODER) {
     int y;
     const int strength= ff_h263_loop_filter_strength[qscale];
 
@@ -2972,7 +2975,7 @@ static void h261_loop_filter_c(uint8_t *src, int stride){
     }
 }
 
-static inline void h264_loop_filter_luma_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta, int8_t *tc0)
+static av_always_inline av_flatten void h264_loop_filter_luma_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta, int8_t *tc0)
 {
     int i, d;
     for( i = 0; i < 4; i++ ) {
@@ -2996,10 +2999,12 @@ static inline void h264_loop_filter_luma_c(uint8_t *pix, int xstride, int ystrid
                 int i_delta;
 
                 if( FFABS( p2 - p0 ) < beta ) {
+                    if(tc0[i])
                     pix[-2*xstride] = p1 + av_clip( (( p2 + ( ( p0 + q0 + 1 ) >> 1 ) ) >> 1) - p1, -tc0[i], tc0[i] );
                     tc++;
                 }
                 if( FFABS( q2 - q0 ) < beta ) {
+                    if(tc0[i])
                     pix[   xstride] = q1 + av_clip( (( q2 + ( ( p0 + q0 + 1 ) >> 1 ) ) >> 1) - q1, -tc0[i], tc0[i] );
                     tc++;
                 }
@@ -3021,7 +3026,7 @@ static void h264_h_loop_filter_luma_c(uint8_t *pix, int stride, int alpha, int b
     h264_loop_filter_luma_c(pix, 1, stride, alpha, beta, tc0);
 }
 
-static inline void h264_loop_filter_luma_intra_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta)
+static av_always_inline av_flatten void h264_loop_filter_luma_intra_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta)
 {
     int d;
     for( d = 0; d < 16; d++ ) {
@@ -3078,7 +3083,7 @@ static void h264_h_loop_filter_luma_intra_c(uint8_t *pix, int stride, int alpha,
     h264_loop_filter_luma_intra_c(pix, 1, stride, alpha, beta);
 }
 
-static inline void h264_loop_filter_chroma_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta, int8_t *tc0)
+static av_always_inline av_flatten void h264_loop_filter_chroma_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta, int8_t *tc0)
 {
     int i, d;
     for( i = 0; i < 4; i++ ) {
@@ -3115,7 +3120,7 @@ static void h264_h_loop_filter_chroma_c(uint8_t *pix, int stride, int alpha, int
     h264_loop_filter_chroma_c(pix, 1, stride, alpha, beta, tc0);
 }
 
-static inline void h264_loop_filter_chroma_intra_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta)
+static av_always_inline av_flatten void h264_loop_filter_chroma_intra_c(uint8_t *pix, int xstride, int ystride, int alpha, int beta)
 {
     int d;
     for( d = 0; d < 8; d++ ) {
@@ -3571,7 +3576,7 @@ static void diff_bytes_c(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w){
         dst[i+0] = src1[i+0]-src2[i+0];
 }
 
-static void add_hfyu_median_prediction_c(uint8_t *dst, uint8_t *src1, uint8_t *diff, int w, int *left, int *left_top){
+static void add_hfyu_median_prediction_c(uint8_t *dst, const uint8_t *src1, const uint8_t *diff, int w, int *left, int *left_top){
     int i;
     uint8_t l, lt;
 
@@ -3588,7 +3593,7 @@ static void add_hfyu_median_prediction_c(uint8_t *dst, uint8_t *src1, uint8_t *d
     *left_top= lt;
 }
 
-static void sub_hfyu_median_prediction_c(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w, int *left, int *left_top){
+static void sub_hfyu_median_prediction_c(uint8_t *dst, const uint8_t *src1, const uint8_t *src2, int w, int *left, int *left_top){
     int i;
     uint8_t l, lt;
 
@@ -3605,6 +3610,66 @@ static void sub_hfyu_median_prediction_c(uint8_t *dst, uint8_t *src1, uint8_t *s
     *left= l;
     *left_top= lt;
 }
+
+static int add_hfyu_left_prediction_c(uint8_t *dst, const uint8_t *src, int w, int acc){
+    int i;
+
+    for(i=0; i<w-1; i++){
+        acc+= src[i];
+        dst[i]= acc;
+        i++;
+        acc+= src[i];
+        dst[i]= acc;
+    }
+
+    for(; i<w; i++){
+        acc+= src[i];
+        dst[i]= acc;
+    }
+
+    return acc;
+}
+
+#if HAVE_BIGENDIAN
+#define B 3
+#define G 2
+#define R 1
+#define A 0
+#else
+#define B 0
+#define G 1
+#define R 2
+#define A 3
+#endif
+static void add_hfyu_left_prediction_bgr32_c(uint8_t *dst, const uint8_t *src, int w, int *red, int *green, int *blue, int *alpha){
+    int i;
+    int r,g,b,a;
+    r= *red;
+    g= *green;
+    b= *blue;
+    a= *alpha;
+
+    for(i=0; i<w; i++){
+        b+= src[4*i+B];
+        g+= src[4*i+G];
+        r+= src[4*i+R];
+        a+= src[4*i+A];
+
+        dst[4*i+B]= b;
+        dst[4*i+G]= g;
+        dst[4*i+R]= r;
+        dst[4*i+A]= a;
+    }
+
+    *red= r;
+    *green= g;
+    *blue= b;
+    *alpha= a;
+}
+#undef B
+#undef G
+#undef R
+#undef A
 
 #define BUTTERFLY2(o1,o2,i1,i2) \
 o1= (i1)+(i2);\
@@ -3723,7 +3788,7 @@ static int hadamard8_intra8x8_c(/*MpegEncContext*/ void *s, uint8_t *src, uint8_
 
 static int dct_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
-    DECLARE_ALIGNED_16(uint64_t, aligned_temp[sizeof(DCTELEM)*64/8]);
+    DECLARE_ALIGNED_16(uint64_t, aligned_temp)[sizeof(DCTELEM)*64/8];
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
 
     assert(h==8);
@@ -3788,7 +3853,7 @@ static int dct264_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *s
 
 static int dct_max8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
-    DECLARE_ALIGNED_8(uint64_t, aligned_temp[sizeof(DCTELEM)*64/8]);
+    DECLARE_ALIGNED_16(uint64_t, aligned_temp)[sizeof(DCTELEM)*64/8];
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     int sum=0, i;
 
@@ -3805,7 +3870,7 @@ static int dct_max8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2
 
 static int quant_psnr8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
-    DECLARE_ALIGNED_8 (uint64_t, aligned_temp[sizeof(DCTELEM)*64*2/8]);
+    DECLARE_ALIGNED_16(uint64_t, aligned_temp)[sizeof(DCTELEM)*64*2/8];
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     DCTELEM * const bak = ((DCTELEM*)aligned_temp)+64;
     int sum=0, i;
@@ -3830,10 +3895,12 @@ static int quant_psnr8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *s
 static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
     const uint8_t *scantable= s->intra_scantable.permutated;
-    DECLARE_ALIGNED_8 (uint64_t, aligned_temp[sizeof(DCTELEM)*64/8]);
-    DECLARE_ALIGNED_8 (uint64_t, aligned_bak[stride]);
+    DECLARE_ALIGNED_16(uint64_t, aligned_temp)[sizeof(DCTELEM)*64/8];
+    DECLARE_ALIGNED_16(uint64_t, aligned_src1)[8];
+    DECLARE_ALIGNED_16(uint64_t, aligned_src2)[8];
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
-    uint8_t * const bak= (uint8_t*)aligned_bak;
+    uint8_t * const lsrc1 = (uint8_t*)aligned_src1;
+    uint8_t * const lsrc2 = (uint8_t*)aligned_src2;
     int i, last, run, bits, level, distortion, start_i;
     const int esc_length= s->ac_esc_length;
     uint8_t * length;
@@ -3841,12 +3908,10 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
 
     assert(h==8);
 
-    for(i=0; i<8; i++){
-        ((uint32_t*)(bak + i*stride))[0]= ((uint32_t*)(src2 + i*stride))[0];
-        ((uint32_t*)(bak + i*stride))[1]= ((uint32_t*)(src2 + i*stride))[1];
-    }
+    copy_block8(lsrc1, src1, 8, stride, 8);
+    copy_block8(lsrc2, src2, 8, stride, 8);
 
-    s->dsp.diff_pixels(temp, src1, src2, stride);
+    s->dsp.diff_pixels(temp, lsrc1, lsrc2, 8);
 
     s->block_last_index[0/*FIXME*/]= last= s->fast_dct_quantize(s, temp, 0/*FIXME*/, s->qscale, &i);
 
@@ -3899,9 +3964,9 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
             s->dct_unquantize_inter(s, temp, 0, s->qscale);
     }
 
-    s->dsp.idct_add(bak, stride, temp);
+    s->dsp.idct_add(lsrc2, 8, temp);
 
-    distortion= s->dsp.sse[1](NULL, bak, src1, stride, 8);
+    distortion= s->dsp.sse[1](NULL, lsrc2, lsrc1, 8, 8);
 
     return distortion + ((bits*s->qscale*s->qscale*109 + 64)>>7);
 }
@@ -3909,7 +3974,7 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
 static int bit8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
     const uint8_t *scantable= s->intra_scantable.permutated;
-    DECLARE_ALIGNED_8 (uint64_t, aligned_temp[sizeof(DCTELEM)*64/8]);
+    DECLARE_ALIGNED_16(uint64_t, aligned_temp)[sizeof(DCTELEM)*64/8];
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     int i, last, run, bits, level, start_i;
     const int esc_length= s->ac_esc_length;
@@ -4066,10 +4131,10 @@ static void vector_fmul_reverse_c(float *dst, const float *src0, const float *sr
         dst[i] = src0[i] * src1[-i];
 }
 
-void ff_vector_fmul_add_add_c(float *dst, const float *src0, const float *src1, const float *src2, int src3, int len, int step){
+static void vector_fmul_add_c(float *dst, const float *src0, const float *src1, const float *src2, int len){
     int i;
     for(i=0; i<len; i++)
-        dst[i*step] = src0[i] * src1[i] + src2[i] + src3;
+        dst[i] = src0[i] * src1[i] + src2[i];
 }
 
 void ff_vector_fmul_window_c(float *dst, const float *src0, const float *src1, const float *win, float add_bias, int len){
@@ -4087,10 +4152,129 @@ void ff_vector_fmul_window_c(float *dst, const float *src0, const float *src1, c
     }
 }
 
+static void vector_fmul_scalar_c(float *dst, const float *src, float mul,
+                                 int len)
+{
+    int i;
+    for (i = 0; i < len; i++)
+        dst[i] = src[i] * mul;
+}
+
+static void vector_fmul_sv_scalar_2_c(float *dst, const float *src,
+                                      const float **sv, float mul, int len)
+{
+    int i;
+    for (i = 0; i < len; i += 2, sv++) {
+        dst[i  ] = src[i  ] * sv[0][0] * mul;
+        dst[i+1] = src[i+1] * sv[0][1] * mul;
+    }
+}
+
+static void vector_fmul_sv_scalar_4_c(float *dst, const float *src,
+                                      const float **sv, float mul, int len)
+{
+    int i;
+    for (i = 0; i < len; i += 4, sv++) {
+        dst[i  ] = src[i  ] * sv[0][0] * mul;
+        dst[i+1] = src[i+1] * sv[0][1] * mul;
+        dst[i+2] = src[i+2] * sv[0][2] * mul;
+        dst[i+3] = src[i+3] * sv[0][3] * mul;
+    }
+}
+
+static void sv_fmul_scalar_2_c(float *dst, const float **sv, float mul,
+                               int len)
+{
+    int i;
+    for (i = 0; i < len; i += 2, sv++) {
+        dst[i  ] = sv[0][0] * mul;
+        dst[i+1] = sv[0][1] * mul;
+    }
+}
+
+static void sv_fmul_scalar_4_c(float *dst, const float **sv, float mul,
+                               int len)
+{
+    int i;
+    for (i = 0; i < len; i += 4, sv++) {
+        dst[i  ] = sv[0][0] * mul;
+        dst[i+1] = sv[0][1] * mul;
+        dst[i+2] = sv[0][2] * mul;
+        dst[i+3] = sv[0][3] * mul;
+    }
+}
+
+static void butterflies_float_c(float *restrict v1, float *restrict v2,
+                                int len)
+{
+    int i;
+    for (i = 0; i < len; i++) {
+        float t = v1[i] - v2[i];
+        v1[i] += v2[i];
+        v2[i] = t;
+    }
+}
+
+static float scalarproduct_float_c(const float *v1, const float *v2, int len)
+{
+    float p = 0.0;
+    int i;
+
+    for (i = 0; i < len; i++)
+        p += v1[i] * v2[i];
+
+    return p;
+}
+
 static void int32_to_float_fmul_scalar_c(float *dst, const int *src, float mul, int len){
     int i;
     for(i=0; i<len; i++)
         dst[i] = src[i] * mul;
+}
+
+static inline uint32_t clipf_c_one(uint32_t a, uint32_t mini,
+                   uint32_t maxi, uint32_t maxisign)
+{
+
+    if(a > mini) return mini;
+    else if((a^(1<<31)) > maxisign) return maxi;
+    else return a;
+}
+
+static void vector_clipf_c_opposite_sign(float *dst, const float *src, float *min, float *max, int len){
+    int i;
+    uint32_t mini = *(uint32_t*)min;
+    uint32_t maxi = *(uint32_t*)max;
+    uint32_t maxisign = maxi ^ (1<<31);
+    uint32_t *dsti = (uint32_t*)dst;
+    const uint32_t *srci = (const uint32_t*)src;
+    for(i=0; i<len; i+=8) {
+        dsti[i + 0] = clipf_c_one(srci[i + 0], mini, maxi, maxisign);
+        dsti[i + 1] = clipf_c_one(srci[i + 1], mini, maxi, maxisign);
+        dsti[i + 2] = clipf_c_one(srci[i + 2], mini, maxi, maxisign);
+        dsti[i + 3] = clipf_c_one(srci[i + 3], mini, maxi, maxisign);
+        dsti[i + 4] = clipf_c_one(srci[i + 4], mini, maxi, maxisign);
+        dsti[i + 5] = clipf_c_one(srci[i + 5], mini, maxi, maxisign);
+        dsti[i + 6] = clipf_c_one(srci[i + 6], mini, maxi, maxisign);
+        dsti[i + 7] = clipf_c_one(srci[i + 7], mini, maxi, maxisign);
+    }
+}
+static void vector_clipf_c(float *dst, const float *src, float min, float max, int len){
+    int i;
+    if(min < 0 && max > 0) {
+        vector_clipf_c_opposite_sign(dst, src, &min, &max, len);
+    } else {
+        for(i=0; i < len; i+=8) {
+            dst[i    ] = av_clipf(src[i    ], min, max);
+            dst[i + 1] = av_clipf(src[i + 1], min, max);
+            dst[i + 2] = av_clipf(src[i + 2], min, max);
+            dst[i + 3] = av_clipf(src[i + 3], min, max);
+            dst[i + 4] = av_clipf(src[i + 4], min, max);
+            dst[i + 5] = av_clipf(src[i + 5], min, max);
+            dst[i + 6] = av_clipf(src[i + 6], min, max);
+            dst[i + 7] = av_clipf(src[i + 7], min, max);
+        }
+    }
 }
 
 static av_always_inline int float_to_int16_one(const float *src){
@@ -4124,18 +4308,6 @@ void ff_float_to_int16_interleave_c(int16_t *dst, const float **src, long len, i
     }
 }
 
-static void add_int16_c(int16_t * v1, int16_t * v2, int order)
-{
-    while (order--)
-       *v1++ += *v2++;
-}
-
-static void sub_int16_c(int16_t * v1, int16_t * v2, int order)
-{
-    while (order--)
-        *v1++ -= *v2++;
-}
-
 static int32_t scalarproduct_int16_c(int16_t * v1, int16_t * v2, int order, int shift)
 {
     int res = 0;
@@ -4143,6 +4315,16 @@ static int32_t scalarproduct_int16_c(int16_t * v1, int16_t * v2, int order, int 
     while (order--)
         res += (*v1++ * *v2++) >> shift;
 
+    return res;
+}
+
+static int32_t scalarproduct_and_madd_int16_c(int16_t *v1, int16_t *v2, int16_t *v3, int order, int mul)
+{
+    int res = 0;
+    while (order--) {
+        res   += *v1 * *v2++;
+        *v1++ += mul * *v3++;
+    }
     return res;
 }
 
@@ -4279,7 +4461,7 @@ static void ff_jref_idct1_add(uint8_t *dest, int line_size, DCTELEM *block)
 static void just_return(void *mem av_unused, int stride av_unused, int h av_unused) { return; }
 
 /* init static data */
-void dsputil_static_init(void)
+av_cold void dsputil_static_init(void)
 {
     int i;
 
@@ -4316,7 +4498,7 @@ int ff_check_alignment(void){
     return 0;
 }
 
-void dsputil_init(DSPContext* c, AVCodecContext *avctx)
+av_cold void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 {
     int i;
 
@@ -4363,7 +4545,7 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
             c->idct_add= ff_jref_idct_add;
             c->idct    = j_rev_dct;
             c->idct_permutation_type= FF_LIBMPEG2_IDCT_PERM;
-        }else if((CONFIG_VP3_DECODER || CONFIG_VP5_DECODER || CONFIG_VP6_DECODER || CONFIG_THEORA_DECODER ) &&
+        }else if((CONFIG_VP3_DECODER || CONFIG_VP5_DECODER || CONFIG_VP6_DECODER ) &&
                 avctx->idct_algo==FF_IDCT_VP3){
             c->idct_put= ff_vp3_idct_put_c;
             c->idct_add= ff_vp3_idct_add_c;
@@ -4548,10 +4730,10 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #if CONFIG_MLP_DECODER || CONFIG_TRUEHD_DECODER
     ff_mlp_init(c, avctx);
 #endif
-#if CONFIG_VC1_DECODER || CONFIG_WMV3_DECODER
+#if CONFIG_VC1_DECODER
     ff_vc1dsp_init(c,avctx);
 #endif
-#if CONFIG_WMV2_DECODER || CONFIG_VC1_DECODER || CONFIG_WMV3_DECODER
+#if CONFIG_WMV2_DECODER || CONFIG_VC1_DECODER
     ff_intrax8dsp_init(c,avctx);
 #endif
 #if CONFIG_RV30_DECODER
@@ -4616,6 +4798,8 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->diff_bytes= diff_bytes_c;
     c->add_hfyu_median_prediction= add_hfyu_median_prediction_c;
     c->sub_hfyu_median_prediction= sub_hfyu_median_prediction_c;
+    c->add_hfyu_left_prediction  = add_hfyu_left_prediction_c;
+    c->add_hfyu_left_prediction_bgr32 = add_hfyu_left_prediction_bgr32_c;
     c->bswap_buf= bswap_buf;
 #if CONFIG_PNG_DECODER
     c->add_png_paeth_prediction= ff_add_png_paeth_prediction;
@@ -4631,12 +4815,12 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->h264_h_loop_filter_chroma_intra= h264_h_loop_filter_chroma_intra_c;
     c->h264_loop_filter_strength= NULL;
 
-    if (CONFIG_ANY_H263) {
+    if (CONFIG_H263_DECODER || CONFIG_H263_ENCODER) {
         c->h263_h_loop_filter= h263_h_loop_filter_c;
         c->h263_v_loop_filter= h263_v_loop_filter_c;
     }
 
-    if (CONFIG_VP3_DECODER || CONFIG_THEORA_DECODER) {
+    if (CONFIG_VP3_DECODER) {
         c->vp3_h_loop_filter= ff_vp3_h_loop_filter_c;
         c->vp3_v_loop_filter= ff_vp3_v_loop_filter_c;
     }
@@ -4661,19 +4845,28 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
 #if CONFIG_AC3_DECODER
     c->ac3_downmix = ff_ac3_downmix_c;
 #endif
-#if CONFIG_FLAC_ENCODER
-    c->flac_compute_autocorr = ff_flac_compute_autocorr;
+#if CONFIG_LPC
+    c->lpc_compute_autocorr = ff_lpc_compute_autocorr;
 #endif
     c->vector_fmul = vector_fmul_c;
     c->vector_fmul_reverse = vector_fmul_reverse_c;
-    c->vector_fmul_add_add = ff_vector_fmul_add_add_c;
+    c->vector_fmul_add = vector_fmul_add_c;
     c->vector_fmul_window = ff_vector_fmul_window_c;
     c->int32_to_float_fmul_scalar = int32_to_float_fmul_scalar_c;
+    c->vector_clipf = vector_clipf_c;
     c->float_to_int16 = ff_float_to_int16_c;
     c->float_to_int16_interleave = ff_float_to_int16_interleave_c;
-    c->add_int16 = add_int16_c;
-    c->sub_int16 = sub_int16_c;
     c->scalarproduct_int16 = scalarproduct_int16_c;
+    c->scalarproduct_and_madd_int16 = scalarproduct_and_madd_int16_c;
+    c->scalarproduct_float = scalarproduct_float_c;
+    c->butterflies_float = butterflies_float_c;
+    c->vector_fmul_scalar = vector_fmul_scalar_c;
+
+    c->vector_fmul_sv_scalar[0] = vector_fmul_sv_scalar_2_c;
+    c->vector_fmul_sv_scalar[1] = vector_fmul_sv_scalar_4_c;
+
+    c->sv_fmul_scalar[0] = sv_fmul_scalar_2_c;
+    c->sv_fmul_scalar[1] = sv_fmul_scalar_4_c;
 
     c->shrink[0]= ff_img_copy_plane;
     c->shrink[1]= ff_shrink22;

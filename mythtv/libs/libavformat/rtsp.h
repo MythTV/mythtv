@@ -18,8 +18,8 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
-#ifndef FFMPEG_RTSP_H
-#define FFMPEG_RTSP_H
+#ifndef AVFORMAT_RTSP_H
+#define AVFORMAT_RTSP_H
 
 #include <stdint.h>
 #include "avformat.h"
@@ -121,6 +121,10 @@ typedef struct RTSPMessageHeader {
      * should be re-transmitted by the client in every RTSP command. */
     char session_id[512];
 
+    /** the "Location:" field. This value is used to handle redirection.
+     */
+    char location[4096];
+
     /** the "RealChallenge1:" field from the server */
     char real_challenge[64];
 
@@ -140,6 +144,11 @@ typedef struct RTSPMessageHeader {
      * this, sent dummy requests (e.g. OPTIONS) with intervals smaller
      * than this value. */
     int timeout;
+
+    /** The "Notice" or "X-Notice" field value. See
+     * http://tools.ietf.org/html/draft-stiemerling-rtsp-announce-00
+     * for a complete list of supported values. */
+    int notice;
 } RTSPMessageHeader;
 
 /**
@@ -223,6 +232,9 @@ typedef struct RTSPState {
      * of RTSPMessageHeader->real_challenge */
     enum RTSPServerType server_type;
 
+    /** base64-encoded authorization lines (username:password) */
+    char *auth_b64;
+
     /** The last reply of the server to a RTSP command */
     char last_reply[2048]; /* XXX: allocate ? */
 
@@ -249,7 +261,16 @@ typedef struct RTSPState {
     //@{
     /** ASF demuxer context for the embedded ASF stream from WMS servers */
     AVFormatContext *asf_ctx;
+
+    /** cache for position of the asf demuxer, since we load a new
+     * data packet in the bytecontext for each incoming RTSP packet. */
+    uint64_t asf_pb_pos;
     //@}
+
+    /** some MS RTSP streams contain a URL in the SDP that we need to use
+     * for all subsequent RTSP requests, rather than the input URI; in
+     * other cases, this is a copy of AVFormatContext->filename. */
+    char control_uri[1024];
 } RTSPState;
 
 /**
@@ -306,4 +327,4 @@ extern int rtsp_rtp_port_max;
 int rtsp_pause(AVFormatContext *s);
 int rtsp_resume(AVFormatContext *s);
 
-#endif /* FFMPEG_RTSP_H */
+#endif /* AVFORMAT_RTSP_H */

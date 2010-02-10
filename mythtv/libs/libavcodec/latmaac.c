@@ -346,12 +346,13 @@ static int latm_decode_frame(AVCodecContext *avctx, void *out, int *out_size, AV
     return avpkt->size;
 }
 
-static int latm_decode_init(AVCodecContext *avctx)
+static av_cold int latm_decode_init(AVCodecContext *avctx)
 {
     AACDecoder *decoder = avctx->priv_data;
     NeAACDecConfigurationPtr faac_cfg;
 
     avctx->bit_rate = 0;
+    avctx->sample_fmt = SAMPLE_FMT_S16;
     decoder->aac_decoder = NeAACDecOpen();
     if (!decoder->aac_decoder) {
         return -1;
@@ -369,7 +370,7 @@ static int latm_decode_init(AVCodecContext *avctx)
     return 0;
 }
 
-static int latm_decode_end(AVCodecContext *avctx)
+static av_cold int latm_decode_end(AVCodecContext *avctx)
 {
     AACDecoder *decoder = avctx->priv_data;
     NeAACDecClose(decoder->aac_decoder);
@@ -385,4 +386,7 @@ AVCodec libfaad_latm_decoder = {
     .close = latm_decode_end,
     .decode = latm_decode_frame,
     .long_name = NULL_IF_CONFIG_SMALL("libfaad AAC LATM (Advanced Audio Codec)"),
+    .sample_fmts = (const enum SampleFormat[]) {
+        SAMPLE_FMT_S16,SAMPLE_FMT_NONE
+    },
 };

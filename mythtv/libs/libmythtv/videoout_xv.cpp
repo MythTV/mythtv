@@ -23,6 +23,8 @@
 #include <iostream>
 using namespace std;
 
+#include "mythconfig.h"
+
 // MythTV OSD headers
 #include "yuv2rgb.h"
 #include "osd.h"

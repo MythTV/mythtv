@@ -32,7 +32,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "avcodec.h"
 #include "dsputil.h"
@@ -42,6 +41,8 @@
 #include "xiph.h"
 
 #define FRAGMENT_PIXELS 8
+
+static av_cold int vp3_decode_end(AVCodecContext *avctx);
 
 typedef struct Coeff {
     struct Coeff *next;
@@ -178,6 +179,14 @@ typedef struct Vp3DecodeContext {
     int coded_fragment_list_index;
     int pixel_addresses_initialized;
 
+    /* track which fragments have already been decoded; called 'fast'
+     * because this data structure avoids having to iterate through every
+     * fragment in coded_fragment_list; once a fragment has been fully
+     * decoded, it is removed from this list */
+    int *fast_fragment_list;
+    int fragment_list_y_head;
+    int fragment_list_c_head;
+
     VLC dc_vlc[16];
     VLC ac_vlc_1[16];
     VLC ac_vlc_2[16];
@@ -191,7 +200,7 @@ typedef struct Vp3DecodeContext {
 
     /* these arrays need to be on 16-byte boundaries since SSE2 operations
      * index into them */
-    DECLARE_ALIGNED_16(int16_t, qmat[3][2][3][64]);     //<qmat[qpi][is_inter][plane]
+    DECLARE_ALIGNED_16(int16_t, qmat)[3][2][3][64];     //<qmat[qpi][is_inter][plane]
 
     /* This table contains superblock_count * 16 entries. Each set of 16
      * numbers corresponds to the fragment indexes 0..15 of the superblock.
@@ -229,7 +238,7 @@ typedef struct Vp3DecodeContext {
     uint16_t huffman_table[80][32][2];
 
     uint8_t filter_limit_values[64];
-    DECLARE_ALIGNED_8(int, bounding_values_array[256+2]);
+    DECLARE_ALIGNED_8(int, bounding_values_array)[256+2];
 } Vp3DecodeContext;
 
 /************************************************************************
@@ -259,25 +268,25 @@ static int init_block_mapping(Vp3DecodeContext *s)
     int current_macroblock;
     int c_fragment;
 
-    signed char travel_width[16] = {
+    static const signed char travel_width[16] = {
          1,  1,  0, -1,
          0,  0,  1,  0,
          1,  0,  1,  0,
          0, -1,  0,  1
     };
 
-    signed char travel_height[16] = {
+    static const signed char travel_height[16] = {
          0,  0,  1,  0,
          1,  1,  0, -1,
          0,  1,  0, -1,
         -1,  0, -1,  0
     };
 
-    signed char travel_width_mb[4] = {
+    static const signed char travel_width_mb[4] = {
          1,  0,  1,  0
     };
 
-    signed char travel_height_mb[4] = {
+    static const signed char travel_height_mb[4] = {
          0,  1,  0, -1
     };
 
@@ -722,6 +731,25 @@ static int unpack_superblocks(Vp3DecodeContext *s, GetBitContext *gb)
         /* end the list of coded C fragments */
         s->last_coded_c_fragment = s->coded_fragment_list_index - 1;
 
+    for (i = 0; i < s->fragment_count - 1; i++) {
+        s->fast_fragment_list[i] = i + 1;
+    }
+    s->fast_fragment_list[s->fragment_count - 1] = -1;
+
+    if (s->last_coded_y_fragment == -1)
+        s->fragment_list_y_head = -1;
+    else {
+        s->fragment_list_y_head = s->first_coded_y_fragment;
+        s->fast_fragment_list[s->last_coded_y_fragment] = -1;
+    }
+
+    if (s->last_coded_c_fragment == -1)
+        s->fragment_list_c_head = -1;
+    else {
+        s->fragment_list_c_head = s->first_coded_c_fragment;
+        s->fast_fragment_list[s->last_coded_c_fragment] = -1;
+    }
+
     return 0;
 }
 
@@ -863,11 +891,6 @@ static int unpack_vectors(Vp3DecodeContext *s, GetBitContext *gb)
                     motion_y[0] = fixed_motion_vector_table[get_bits(gb, 6)];
                 }
 
-                for (k = 1; k < 6; k++) {
-                    motion_x[k] = motion_x[0];
-                    motion_y[k] = motion_y[0];
-                }
-
                 /* vector maintenance, only on MODE_INTER_PLUS_MV */
                 if (s->macroblock_coding[current_macroblock] ==
                     MODE_INTER_PLUS_MV) {
@@ -918,10 +941,6 @@ static int unpack_vectors(Vp3DecodeContext *s, GetBitContext *gb)
                 /* all 6 fragments use the last motion vector */
                 motion_x[0] = last_motion_x;
                 motion_y[0] = last_motion_y;
-                for (k = 1; k < 6; k++) {
-                    motion_x[k] = motion_x[0];
-                    motion_y[k] = motion_y[0];
-                }
 
                 /* no vector maintenance (last vector remains the
                  * last vector) */
@@ -932,10 +951,6 @@ static int unpack_vectors(Vp3DecodeContext *s, GetBitContext *gb)
                  * last motion vector */
                 motion_x[0] = prior_last_motion_x;
                 motion_y[0] = prior_last_motion_y;
-                for (k = 1; k < 6; k++) {
-                    motion_x[k] = motion_x[0];
-                    motion_y[k] = motion_y[0];
-                }
 
                 /* vector maintenance */
                 prior_last_motion_x = last_motion_x;
@@ -946,8 +961,8 @@ static int unpack_vectors(Vp3DecodeContext *s, GetBitContext *gb)
 
             default:
                 /* covers intra, inter without MV, golden without MV */
-                memset(motion_x, 0, 6 * sizeof(int));
-                memset(motion_y, 0, 6 * sizeof(int));
+                motion_x[0] = 0;
+                motion_y[0] = 0;
 
                 /* no vector maintenance */
                 break;
@@ -964,8 +979,13 @@ static int unpack_vectors(Vp3DecodeContext *s, GetBitContext *gb)
                         current_fragment, s->fragment_count);
                     return 1;
                 }
-                s->all_fragments[current_fragment].motion_x = motion_x[k];
-                s->all_fragments[current_fragment].motion_y = motion_y[k];
+                if (s->macroblock_coding[current_macroblock] == MODE_INTER_FOURMV) {
+                    s->all_fragments[current_fragment].motion_x = motion_x[k];
+                    s->all_fragments[current_fragment].motion_y = motion_y[k];
+                } else {
+                    s->all_fragments[current_fragment].motion_x = motion_x[0];
+                    s->all_fragments[current_fragment].motion_y = motion_y[0];
+                }
             }
         }
     }
@@ -993,7 +1013,7 @@ static int unpack_block_qpis(Vp3DecodeContext *s, GetBitContext *gb)
                 num_blocks_at_qpi += run_length;
 
             for (j = 0; j < run_length; i++) {
-                if (i > s->coded_fragment_list_index)
+                if (i >= s->coded_fragment_list_index)
                     return -1;
 
                 if (s->all_fragments[s->coded_fragment_list[i]].qpi == qpi) {
@@ -1028,7 +1048,7 @@ static int unpack_block_qpis(Vp3DecodeContext *s, GetBitContext *gb)
  */
 static int unpack_vlcs(Vp3DecodeContext *s, GetBitContext *gb,
                         VLC *table, int coeff_index,
-                        int first_fragment, int last_fragment,
+                        int y_plane,
                         int eob_run)
 {
     int i;
@@ -1036,27 +1056,43 @@ static int unpack_vlcs(Vp3DecodeContext *s, GetBitContext *gb,
     int zero_run = 0;
     DCTELEM coeff = 0;
     Vp3Fragment *fragment;
-    uint8_t *perm= s->scantable.permutated;
     int bits_to_get;
+    int next_fragment;
+    int previous_fragment;
+    int fragment_num;
+    int *list_head;
 
-    if ((first_fragment >= s->fragment_count) ||
-        (last_fragment >= s->fragment_count)) {
+    /* local references to structure members to avoid repeated deferences */
+    uint8_t *perm= s->scantable.permutated;
+    int *coded_fragment_list = s->coded_fragment_list;
+    Vp3Fragment *all_fragments = s->all_fragments;
+    uint8_t *coeff_counts = s->coeff_counts;
+    VLC_TYPE (*vlc_table)[2] = table->table;
+    int *fast_fragment_list = s->fast_fragment_list;
 
-        av_log(s->avctx, AV_LOG_ERROR, "  vp3:unpack_vlcs(): bad fragment number (%d -> %d ?)\n",
-            first_fragment, last_fragment);
-        return 0;
+    if (y_plane) {
+        next_fragment = s->fragment_list_y_head;
+        list_head = &s->fragment_list_y_head;
+    } else {
+        next_fragment = s->fragment_list_c_head;
+        list_head = &s->fragment_list_c_head;
     }
 
-    for (i = first_fragment; i <= last_fragment; i++) {
-        int fragment_num = s->coded_fragment_list[i];
+    i = next_fragment;
+    previous_fragment = -1;  /* this indicates that the previous fragment is actually the list head */
+    while (i != -1) {
+        fragment_num = coded_fragment_list[i];
 
-        if (s->coeff_counts[fragment_num] > coeff_index)
+        if (coeff_counts[fragment_num] > coeff_index) {
+            previous_fragment = i;
+            i = fast_fragment_list[i];
             continue;
-        fragment = &s->all_fragments[fragment_num];
+        }
+        fragment = &all_fragments[fragment_num];
 
         if (!eob_run) {
             /* decode a VLC into a token */
-            token = get_vlc2(gb, table->table, 5, 3);
+            token = get_vlc2(gb, vlc_table, 5, 3);
             /* use the token to get a zero run, a coefficient, and an eob run */
             if (token <= 6) {
                 eob_run = eob_run_base[token];
@@ -1065,10 +1101,9 @@ static int unpack_vlcs(Vp3DecodeContext *s, GetBitContext *gb,
                 coeff = zero_run = 0;
             } else {
                 bits_to_get = coeff_get_bits[token];
-                if (!bits_to_get)
-                    coeff = coeff_tables[token][0];
-                else
-                    coeff = coeff_tables[token][get_bits(gb, bits_to_get)];
+                if (bits_to_get)
+                    bits_to_get = get_bits(gb, bits_to_get);
+                coeff = coeff_tables[token][bits_to_get];
 
                 zero_run = zero_run_base[token];
                 if (zero_run_get_bits[token])
@@ -1077,23 +1112,37 @@ static int unpack_vlcs(Vp3DecodeContext *s, GetBitContext *gb,
         }
 
         if (!eob_run) {
-            s->coeff_counts[fragment_num] += zero_run;
-            if (s->coeff_counts[fragment_num] < 64){
+            coeff_counts[fragment_num] += zero_run;
+            if (coeff_counts[fragment_num] < 64){
                 fragment->next_coeff->coeff= coeff;
-                fragment->next_coeff->index= perm[s->coeff_counts[fragment_num]++]; //FIXME perm here already?
+                fragment->next_coeff->index= perm[coeff_counts[fragment_num]++]; //FIXME perm here already?
                 fragment->next_coeff->next= s->next_coeff;
                 s->next_coeff->next=NULL;
                 fragment->next_coeff= s->next_coeff++;
             }
+            /* previous fragment is now this fragment */
+            previous_fragment = i;
         } else {
-            s->coeff_counts[fragment_num] |= 128;
+            coeff_counts[fragment_num] |= 128;
             eob_run--;
+            /* remove this fragment from the list */
+            if (previous_fragment != -1)
+                fast_fragment_list[previous_fragment] = fast_fragment_list[i];
+            else
+                *list_head = fast_fragment_list[i];
+            /* previous fragment remains unchanged */
         }
+
+        i = fast_fragment_list[i];
     }
 
     return eob_run;
 }
 
+static void reverse_dc_prediction(Vp3DecodeContext *s,
+                                  int first_fragment,
+                                  int fragment_width,
+                                  int fragment_height);
 /*
  * This function unpacks all of the DCT coefficient data from the
  * bitstream.
@@ -1106,6 +1155,8 @@ static int unpack_dct_coeffs(Vp3DecodeContext *s, GetBitContext *gb)
     int ac_y_table;
     int ac_c_table;
     int residual_eob_run = 0;
+    VLC *y_tables[64];
+    VLC *c_tables[64];
 
     /* fetch the DC table indexes */
     dc_y_table = get_bits(gb, 4);
@@ -1113,50 +1164,55 @@ static int unpack_dct_coeffs(Vp3DecodeContext *s, GetBitContext *gb)
 
     /* unpack the Y plane DC coefficients */
     residual_eob_run = unpack_vlcs(s, gb, &s->dc_vlc[dc_y_table], 0,
-        s->first_coded_y_fragment, s->last_coded_y_fragment, residual_eob_run);
+        1, residual_eob_run);
+
+    /* reverse prediction of the Y-plane DC coefficients */
+    reverse_dc_prediction(s, 0, s->fragment_width, s->fragment_height);
 
     /* unpack the C plane DC coefficients */
     residual_eob_run = unpack_vlcs(s, gb, &s->dc_vlc[dc_c_table], 0,
-        s->first_coded_c_fragment, s->last_coded_c_fragment, residual_eob_run);
+        0, residual_eob_run);
+
+    /* reverse prediction of the C-plane DC coefficients */
+    if (!(s->avctx->flags & CODEC_FLAG_GRAY))
+    {
+        reverse_dc_prediction(s, s->fragment_start[1],
+            s->fragment_width / 2, s->fragment_height / 2);
+        reverse_dc_prediction(s, s->fragment_start[2],
+            s->fragment_width / 2, s->fragment_height / 2);
+    }
 
     /* fetch the AC table indexes */
     ac_y_table = get_bits(gb, 4);
     ac_c_table = get_bits(gb, 4);
 
-    /* unpack the group 1 AC coefficients (coeffs 1-5) */
+    /* build tables of AC VLC tables */
     for (i = 1; i <= 5; i++) {
-        residual_eob_run = unpack_vlcs(s, gb, &s->ac_vlc_1[ac_y_table], i,
-            s->first_coded_y_fragment, s->last_coded_y_fragment, residual_eob_run);
-
-        residual_eob_run = unpack_vlcs(s, gb, &s->ac_vlc_1[ac_c_table], i,
-            s->first_coded_c_fragment, s->last_coded_c_fragment, residual_eob_run);
+        y_tables[i] = &s->ac_vlc_1[ac_y_table];
+        c_tables[i] = &s->ac_vlc_1[ac_c_table];
     }
-
-    /* unpack the group 2 AC coefficients (coeffs 6-14) */
     for (i = 6; i <= 14; i++) {
-        residual_eob_run = unpack_vlcs(s, gb, &s->ac_vlc_2[ac_y_table], i,
-            s->first_coded_y_fragment, s->last_coded_y_fragment, residual_eob_run);
-
-        residual_eob_run = unpack_vlcs(s, gb, &s->ac_vlc_2[ac_c_table], i,
-            s->first_coded_c_fragment, s->last_coded_c_fragment, residual_eob_run);
+        y_tables[i] = &s->ac_vlc_2[ac_y_table];
+        c_tables[i] = &s->ac_vlc_2[ac_c_table];
     }
-
-    /* unpack the group 3 AC coefficients (coeffs 15-27) */
     for (i = 15; i <= 27; i++) {
-        residual_eob_run = unpack_vlcs(s, gb, &s->ac_vlc_3[ac_y_table], i,
-            s->first_coded_y_fragment, s->last_coded_y_fragment, residual_eob_run);
-
-        residual_eob_run = unpack_vlcs(s, gb, &s->ac_vlc_3[ac_c_table], i,
-            s->first_coded_c_fragment, s->last_coded_c_fragment, residual_eob_run);
+        y_tables[i] = &s->ac_vlc_3[ac_y_table];
+        c_tables[i] = &s->ac_vlc_3[ac_c_table];
+    }
+    for (i = 28; i <= 63; i++) {
+        y_tables[i] = &s->ac_vlc_4[ac_y_table];
+        c_tables[i] = &s->ac_vlc_4[ac_c_table];
     }
 
-    /* unpack the group 4 AC coefficients (coeffs 28-63) */
-    for (i = 28; i <= 63; i++) {
-        residual_eob_run = unpack_vlcs(s, gb, &s->ac_vlc_4[ac_y_table], i,
-            s->first_coded_y_fragment, s->last_coded_y_fragment, residual_eob_run);
+    /* decode all AC coefficents */
+    for (i = 1; i <= 63; i++) {
+        if (s->fragment_list_y_head != -1)
+            residual_eob_run = unpack_vlcs(s, gb, y_tables[i], i,
+                1, residual_eob_run);
 
-        residual_eob_run = unpack_vlcs(s, gb, &s->ac_vlc_4[ac_c_table], i,
-            s->first_coded_c_fragment, s->last_coded_c_fragment, residual_eob_run);
+        if (s->fragment_list_c_head != -1)
+            residual_eob_run = unpack_vlcs(s, gb, c_tables[i], i,
+                0, residual_eob_run);
     }
 
     return 0;
@@ -1169,7 +1225,6 @@ static int unpack_dct_coeffs(Vp3DecodeContext *s, GetBitContext *gb)
  */
 #define COMPATIBLE_FRAME(x) \
   (compatible_frame[s->all_fragments[x].coding_method] == current_frame_type)
-#define FRAME_CODED(x) (s->all_fragments[x].coding_method != MODE_COPY)
 #define DC_COEFF(u) (s->coeffs[u].index ? 0 : s->coeffs[u].coeff) //FIXME do somethin to simplify this
 
 static void reverse_dc_prediction(Vp3DecodeContext *s,
@@ -1201,7 +1256,7 @@ static void reverse_dc_prediction(Vp3DecodeContext *s,
      *   2: up-right multiplier
      *   3: left multiplier
      */
-    int predictor_transform[16][4] = {
+    static const int predictor_transform[16][4] = {
         {  0,  0,  0,  0},
         {  0,  0,  0,128},        // PL
         {  0,  0,128,  0},        // PUR
@@ -1226,7 +1281,7 @@ static void reverse_dc_prediction(Vp3DecodeContext *s,
      * from other INTRA blocks. There are 2 golden frame coding types;
      * blocks encoding in these modes can only predict from other blocks
      * that were encoded with these 1 of these 2 modes. */
-    unsigned char compatible_frame[8] = {
+    static const unsigned char compatible_frame[9] = {
         1,    /* MODE_INTER_NO_MV */
         0,    /* MODE_INTRA */
         1,    /* MODE_INTER_PLUS_MV */
@@ -1234,7 +1289,8 @@ static void reverse_dc_prediction(Vp3DecodeContext *s,
         1,    /* MODE_INTER_PRIOR_MV */
         2,    /* MODE_USING_GOLDEN */
         2,    /* MODE_GOLDEN_MV */
-        1     /* MODE_INTER_FOUR_MV */
+        1,    /* MODE_INTER_FOUR_MV */
+        3     /* MODE_COPY */
     };
     int current_frame_type;
 
@@ -1262,24 +1318,24 @@ static void reverse_dc_prediction(Vp3DecodeContext *s,
                 if(x){
                     l= i-1;
                     vl = DC_COEFF(l);
-                    if(FRAME_CODED(l) && COMPATIBLE_FRAME(l))
+                    if(COMPATIBLE_FRAME(l))
                         transform |= PL;
                 }
                 if(y){
                     u= i-fragment_width;
                     vu = DC_COEFF(u);
-                    if(FRAME_CODED(u) && COMPATIBLE_FRAME(u))
+                    if(COMPATIBLE_FRAME(u))
                         transform |= PU;
                     if(x){
                         ul= i-fragment_width-1;
                         vul = DC_COEFF(ul);
-                        if(FRAME_CODED(ul) && COMPATIBLE_FRAME(ul))
+                        if(COMPATIBLE_FRAME(ul))
                             transform |= PUL;
                     }
                     if(x + 1 < fragment_width){
                         ur= i-fragment_width+1;
                         vur = DC_COEFF(ur);
-                        if(FRAME_CODED(ur) && COMPATIBLE_FRAME(ur))
+                        if(COMPATIBLE_FRAME(ur))
                             transform |= PUR;
                     }
                 }
@@ -1302,7 +1358,7 @@ static void reverse_dc_prediction(Vp3DecodeContext *s,
 
                     /* check for outranging on the [ul u l] and
                      * [ul u ur l] predictors */
-                    if ((transform == 13) || (transform == 15)) {
+                    if ((transform == 15) || (transform == 13)) {
                         if (FFABS(predicted_dc - vu) > 128)
                             predicted_dc = vu;
                         else if (FFABS(predicted_dc - vl) > 128)
@@ -1341,7 +1397,7 @@ static void render_slice(Vp3DecodeContext *s, int slice)
 {
     int x;
     int16_t *dequantizer;
-    DECLARE_ALIGNED_16(DCTELEM, block[64]);
+    DECLARE_ALIGNED_16(DCTELEM, block)[64];
     int motion_x = 0xdeadbeef, motion_y = 0xdeadbeef;
     int motion_halfpel_index;
     uint8_t *motion_source;
@@ -1577,42 +1633,45 @@ static void apply_loop_filter(Vp3DecodeContext *s)
         for (y = 0; y < height; y++) {
 
             for (x = 0; x < width; x++) {
-                /* do not perform left edge filter for left columns frags */
-                if ((x > 0) &&
-                    (s->all_fragments[fragment].coding_method != MODE_COPY)) {
-                    s->dsp.vp3_h_loop_filter(
-                        plane_data + s->all_fragments[fragment].first_pixel,
-                        stride, bounding_values);
-                }
+                /* This code basically just deblocks on the edges of coded blocks.
+                 * However, it has to be much more complicated because of the
+                 * braindamaged deblock ordering used in VP3/Theora. Order matters
+                 * because some pixels get filtered twice. */
+                if( s->all_fragments[fragment].coding_method != MODE_COPY )
+                {
+                    /* do not perform left edge filter for left columns frags */
+                    if (x > 0) {
+                        s->dsp.vp3_h_loop_filter(
+                            plane_data + s->all_fragments[fragment].first_pixel,
+                            stride, bounding_values);
+                    }
 
-                /* do not perform top edge filter for top row fragments */
-                if ((y > 0) &&
-                    (s->all_fragments[fragment].coding_method != MODE_COPY)) {
-                    s->dsp.vp3_v_loop_filter(
-                        plane_data + s->all_fragments[fragment].first_pixel,
-                        stride, bounding_values);
-                }
+                    /* do not perform top edge filter for top row fragments */
+                    if (y > 0) {
+                        s->dsp.vp3_v_loop_filter(
+                            plane_data + s->all_fragments[fragment].first_pixel,
+                            stride, bounding_values);
+                    }
 
-                /* do not perform right edge filter for right column
-                 * fragments or if right fragment neighbor is also coded
-                 * in this frame (it will be filtered in next iteration) */
-                if ((x < width - 1) &&
-                    (s->all_fragments[fragment].coding_method != MODE_COPY) &&
-                    (s->all_fragments[fragment + 1].coding_method == MODE_COPY)) {
-                    s->dsp.vp3_h_loop_filter(
-                        plane_data + s->all_fragments[fragment + 1].first_pixel,
-                        stride, bounding_values);
-                }
+                    /* do not perform right edge filter for right column
+                     * fragments or if right fragment neighbor is also coded
+                     * in this frame (it will be filtered in next iteration) */
+                    if ((x < width - 1) &&
+                        (s->all_fragments[fragment + 1].coding_method == MODE_COPY)) {
+                        s->dsp.vp3_h_loop_filter(
+                            plane_data + s->all_fragments[fragment + 1].first_pixel,
+                            stride, bounding_values);
+                    }
 
-                /* do not perform bottom edge filter for bottom row
-                 * fragments or if bottom fragment neighbor is also coded
-                 * in this frame (it will be filtered in the next row) */
-                if ((y < height - 1) &&
-                    (s->all_fragments[fragment].coding_method != MODE_COPY) &&
-                    (s->all_fragments[fragment + width].coding_method == MODE_COPY)) {
-                    s->dsp.vp3_v_loop_filter(
-                        plane_data + s->all_fragments[fragment + width].first_pixel,
-                        stride, bounding_values);
+                    /* do not perform bottom edge filter for bottom row
+                     * fragments or if bottom fragment neighbor is also coded
+                     * in this frame (it will be filtered in the next row) */
+                    if ((y < height - 1) &&
+                        (s->all_fragments[fragment + width].coding_method == MODE_COPY)) {
+                        s->dsp.vp3_v_loop_filter(
+                            plane_data + s->all_fragments[fragment + width].first_pixel,
+                            stride, bounding_values);
+                    }
                 }
 
                 fragment++;
@@ -1734,7 +1793,13 @@ static av_cold int vp3_decode_init(AVCodecContext *avctx)
     s->coeff_counts = av_malloc(s->fragment_count * sizeof(*s->coeff_counts));
     s->coeffs = av_malloc(s->fragment_count * sizeof(Coeff) * 65);
     s->coded_fragment_list = av_malloc(s->fragment_count * sizeof(int));
+    s->fast_fragment_list = av_malloc(s->fragment_count * sizeof(int));
     s->pixel_addresses_initialized = 0;
+    if (!s->superblock_coding || !s->all_fragments || !s->coeff_counts ||
+        !s->coeffs || !s->coded_fragment_list || !s->fast_fragment_list) {
+        vp3_decode_end(avctx);
+        return -1;
+    }
 
     if (!s->theora_tables)
     {
@@ -1788,29 +1853,34 @@ static av_cold int vp3_decode_init(AVCodecContext *avctx)
         for (i = 0; i < 16; i++) {
 
             /* DC histograms */
-            init_vlc(&s->dc_vlc[i], 5, 32,
+            if (init_vlc(&s->dc_vlc[i], 5, 32,
                 &s->huffman_table[i][0][1], 4, 2,
-                &s->huffman_table[i][0][0], 4, 2, 0);
+                &s->huffman_table[i][0][0], 4, 2, 0) < 0)
+                goto vlc_fail;
 
             /* group 1 AC histograms */
-            init_vlc(&s->ac_vlc_1[i], 5, 32,
+            if (init_vlc(&s->ac_vlc_1[i], 5, 32,
                 &s->huffman_table[i+16][0][1], 4, 2,
-                &s->huffman_table[i+16][0][0], 4, 2, 0);
+                &s->huffman_table[i+16][0][0], 4, 2, 0) < 0)
+                goto vlc_fail;
 
             /* group 2 AC histograms */
-            init_vlc(&s->ac_vlc_2[i], 5, 32,
+            if (init_vlc(&s->ac_vlc_2[i], 5, 32,
                 &s->huffman_table[i+16*2][0][1], 4, 2,
-                &s->huffman_table[i+16*2][0][0], 4, 2, 0);
+                &s->huffman_table[i+16*2][0][0], 4, 2, 0) < 0)
+                goto vlc_fail;
 
             /* group 3 AC histograms */
-            init_vlc(&s->ac_vlc_3[i], 5, 32,
+            if (init_vlc(&s->ac_vlc_3[i], 5, 32,
                 &s->huffman_table[i+16*3][0][1], 4, 2,
-                &s->huffman_table[i+16*3][0][0], 4, 2, 0);
+                &s->huffman_table[i+16*3][0][0], 4, 2, 0) < 0)
+                goto vlc_fail;
 
             /* group 4 AC histograms */
-            init_vlc(&s->ac_vlc_4[i], 5, 32,
+            if (init_vlc(&s->ac_vlc_4[i], 5, 32,
                 &s->huffman_table[i+16*4][0][1], 4, 2,
-                &s->huffman_table[i+16*4][0][0], 4, 2, 0);
+                &s->huffman_table[i+16*4][0][0], 4, 2, 0) < 0)
+                goto vlc_fail;
         }
     }
 
@@ -1835,6 +1905,11 @@ static av_cold int vp3_decode_init(AVCodecContext *avctx)
     s->superblock_macroblocks = av_malloc(s->superblock_count * 4 * sizeof(int));
     s->macroblock_fragments = av_malloc(s->macroblock_count * 6 * sizeof(int));
     s->macroblock_coding = av_malloc(s->macroblock_count + 1);
+    if (!s->superblock_fragments || !s->superblock_macroblocks ||
+        !s->macroblock_fragments || !s->macroblock_coding) {
+        vp3_decode_end(avctx);
+        return -1;
+    }
     init_block_mapping(s);
 
     for (i = 0; i < 3; i++) {
@@ -1844,6 +1919,10 @@ static av_cold int vp3_decode_init(AVCodecContext *avctx)
     }
 
     return 0;
+
+vlc_fail:
+    av_log(avctx, AV_LOG_FATAL, "Invalid huffman table\n");
+    return -1;
 }
 
 /*
@@ -1982,14 +2061,6 @@ static int vp3_decode_frame(AVCodecContext *avctx,
         return -1;
     }
 
-    reverse_dc_prediction(s, 0, s->fragment_width, s->fragment_height);
-    if ((avctx->flags & CODEC_FLAG_GRAY) == 0) {
-        reverse_dc_prediction(s, s->fragment_start[1],
-            s->fragment_width / 2, s->fragment_height / 2);
-        reverse_dc_prediction(s, s->fragment_start[2],
-            s->fragment_width / 2, s->fragment_height / 2);
-    }
-
     for (i = 0; i < s->macroblock_height; i++)
         render_slice(s, i);
 
@@ -2024,6 +2095,7 @@ static av_cold int vp3_decode_end(AVCodecContext *avctx)
     av_free(s->coeff_counts);
     av_free(s->coeffs);
     av_free(s->coded_fragment_list);
+    av_free(s->fast_fragment_list);
     av_free(s->superblock_fragments);
     av_free(s->superblock_macroblocks);
     av_free(s->macroblock_fragments);
@@ -2298,7 +2370,7 @@ static av_cold int theora_decode_init(AVCodecContext *avctx)
     }
 
   for(i=0;i<3;i++) {
-    init_get_bits(&gb, header_start[i], header_len[i]);
+    init_get_bits(&gb, header_start[i], header_len[i] * 8);
 
     ptype = get_bits(&gb, 8);
 
@@ -2334,8 +2406,7 @@ static av_cold int theora_decode_init(AVCodecContext *avctx)
         break;
   }
 
-    vp3_decode_init(avctx);
-    return 0;
+    return vp3_decode_init(avctx);
 }
 
 AVCodec theora_decoder = {

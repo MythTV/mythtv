@@ -4,6 +4,8 @@
 #include <algorithm>
 using namespace std;
 
+#include "mythconfig.h"
+
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
 #include "mythcontext.h"

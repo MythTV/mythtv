@@ -108,10 +108,6 @@ static av_cold int flashsv_encode_init(AVCodecContext *avctx)
         return -1;
     }
 
-    if (avcodec_check_dimensions(avctx, avctx->width, avctx->height) < 0) {
-        return -1;
-    }
-
     // Needed if zlib unused or init aborted before deflateInit
     memset(&(s->zstream), 0, sizeof(z_stream));
 
@@ -292,7 +288,7 @@ AVCodec flashsv_encoder = {
     flashsv_encode_init,
     flashsv_encode_frame,
     flashsv_encode_end,
-    .pix_fmts = (enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_NONE},
+    .pix_fmts = (const enum PixelFormat[]){PIX_FMT_BGR24, PIX_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("Flash Screen Video"),
 };
 

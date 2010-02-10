@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include "mythconfig.h"
+
 #include "DVDRingBuffer.h"
 #include "mythcontext.h"
 #include "mythmediamonitor.h"

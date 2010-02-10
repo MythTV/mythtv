@@ -33,6 +33,7 @@
 #include "rtp_asf.h"
 #include "rtp_h264.h"
 #include "rtp_vorbis.h"
+#include "rtpdec_h263.h"
 
 //#define DEBUG
 
@@ -61,6 +62,8 @@ void av_register_rtp_dynamic_payload_handlers(void)
 {
     ff_register_dynamic_payload_handler(&mp4v_es_handler);
     ff_register_dynamic_payload_handler(&mpeg4_generic_handler);
+    ff_register_dynamic_payload_handler(&ff_h263_1998_dynamic_handler);
+    ff_register_dynamic_payload_handler(&ff_h263_2000_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_h264_dynamic_handler);
     ff_register_dynamic_payload_handler(&ff_vorbis_dynamic_handler);
 
@@ -288,7 +291,7 @@ RTPDemuxContext *rtp_parse_open(AVFormatContext *s1, AVStream *st, URLContext *r
     s->rtp_payload_data = rtp_payload_data;
     rtp_init_statistics(&s->statistics, 0); // do we know the initial sequence from sdp?
     if (!strcmp(ff_rtp_enc_name(payload_type), "MP2T")) {
-        s->ts = mpegts_parse_open(s->ic);
+        s->ts = ff_mpegts_parse_open(s->ic);
         if (s->ts == NULL) {
             av_free(s);
             return NULL;
@@ -301,6 +304,7 @@ RTPDemuxContext *rtp_parse_open(AVFormatContext *s1, AVStream *st, URLContext *r
         case CODEC_ID_MP2:
         case CODEC_ID_MP3:
         case CODEC_ID_MPEG4:
+        case CODEC_ID_H263:
         case CODEC_ID_H264:
             st->need_parsing = AVSTREAM_PARSE_FULL;
             break;
@@ -420,7 +424,7 @@ int rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
             // TODO: Move to a dynamic packet handler (like above)
             if (s->read_buf_index >= s->read_buf_size)
                 return -1;
-            ret = mpegts_parse_packet(s->ts, pkt, s->buf + s->read_buf_index,
+            ret = ff_mpegts_parse_packet(s->ts, pkt, s->buf + s->read_buf_index,
                                       s->read_buf_size - s->read_buf_index);
             if (ret < 0)
                 return -1;
@@ -469,7 +473,7 @@ int rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
 
     if (!st) {
         /* specific MPEG2TS demux support */
-        ret = mpegts_parse_packet(s->ts, pkt, buf, len);
+        ret = ff_mpegts_parse_packet(s->ts, pkt, buf, len);
         if (ret < 0)
             return -1;
         if (ret < len) {
@@ -486,6 +490,7 @@ int rtp_parse_packet(RTPDemuxContext *s, AVPacket *pkt,
         // at this point, the RTP header has been stripped;  This is ASSUMING that there is only 1 CSRC, which in't wise.
         switch(st->codec->codec_id) {
         case CODEC_ID_MP2:
+        case CODEC_ID_MP3:
             /* better than nothing: skip mpeg audio RTP header */
             if (len <= 4)
                 return -1;
@@ -555,7 +560,7 @@ void rtp_parse_close(RTPDemuxContext *s)
 {
     // TODO: fold this into the protocol specific data fields.
     if (!strcmp(ff_rtp_enc_name(s->payload_type), "MP2T")) {
-        mpegts_parse_close(s->ts);
+        ff_mpegts_parse_close(s->ts);
     }
     av_free(s);
 }

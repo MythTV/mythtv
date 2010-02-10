@@ -124,6 +124,7 @@ static const AVOption options[]={
 {"b_qfactor", "qp factor between p and b frames", OFFSET(b_quant_factor), FF_OPT_TYPE_FLOAT, 1.25, -FLT_MAX, FLT_MAX, V|E},
 {"rc_strategy", "ratecontrol method", OFFSET(rc_strategy), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"b_strategy", "strategy to choose between I/P/B-frames", OFFSET(b_frame_strategy), FF_OPT_TYPE_INT, 0, INT_MIN, INT_MAX, V|E},
+{"wpredp", "weighted prediction analysis method", OFFSET(weighted_p_pred), FF_OPT_TYPE_INT, 0, INT_MIN, INT_MAX, V|E},
 {"hurry_up", NULL, OFFSET(hurry_up), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|D},
 {"ps", "rtp payload size in bytes", OFFSET(rtp_payload_size), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX, V|E},
 {"mv_bits", NULL, OFFSET(mv_bits), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
@@ -158,7 +159,7 @@ static const AVOption options[]={
 {"very", "strictly conform to a older more strict version of the spec or reference software", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_VERY_STRICT, INT_MIN, INT_MAX, V|D|E, "strict"},
 {"strict", "strictly conform to all the things in the spec no matter what consequences", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_STRICT, INT_MIN, INT_MAX, V|D|E, "strict"},
 {"normal", NULL, 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_NORMAL, INT_MIN, INT_MAX, V|D|E, "strict"},
-{"inofficial", "allow inofficial extensions", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_INOFFICIAL, INT_MIN, INT_MAX, V|D|E, "strict"},
+{"inofficial", "allow unofficial extensions", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_INOFFICIAL, INT_MIN, INT_MAX, V|D|E, "strict"},
 {"experimental", "allow non standardized experimental things", 0, FF_OPT_TYPE_CONST, FF_COMPLIANCE_EXPERIMENTAL, INT_MIN, INT_MAX, V|D|E, "strict"},
 {"b_qoffset", "qp offset between P and B frames", OFFSET(b_quant_offset), FF_OPT_TYPE_FLOAT, 1.25, -FLT_MAX, FLT_MAX, V|E},
 {"er", "set error detection aggressivity", OFFSET(error_recognition), FF_OPT_TYPE_INT, FF_ER_CAREFUL, INT_MIN, INT_MAX, A|V|D, "er"},
@@ -390,6 +391,7 @@ static const AVOption options[]={
 {"request_channels", "set desired number of audio channels", OFFSET(request_channels), FF_OPT_TYPE_INT, DEFAULT, 0, INT_MAX, A|D},
 {"drc_scale", "percentage of dynamic range compression to apply", OFFSET(drc_scale), FF_OPT_TYPE_FLOAT, 1.0, 0.0, 1.0, A|D},
 {"reservoir", "use bit reservoir", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_BIT_RESERVOIR, INT_MIN, INT_MAX, A|E, "flags2"},
+{"mbtree", "use macroblock tree ratecontrol (x264 only)", 0, FF_OPT_TYPE_CONST, CODEC_FLAG2_MBTREE, INT_MIN, INT_MAX, V|E, "flags2"},
 {"bits_per_raw_sample", NULL, OFFSET(bits_per_raw_sample), FF_OPT_TYPE_INT, DEFAULT, INT_MIN, INT_MAX},
 {"channel_layout", NULL, OFFSET(channel_layout), FF_OPT_TYPE_INT64, DEFAULT, 0, INT64_MAX, A|E|D, "channel_layout"},
 {"request_channel_layout", NULL, OFFSET(request_channel_layout), FF_OPT_TYPE_INT64, DEFAULT, 0, INT64_MAX, A|D, "request_channel_layout"},
@@ -433,12 +435,14 @@ void avcodec_get_context_defaults2(AVCodecContext *s, enum CodecType codec_type)
     s->release_buffer= avcodec_default_release_buffer;
     s->get_format= avcodec_default_get_format;
     s->execute= avcodec_default_execute;
+    s->execute2= avcodec_default_execute2;
     s->sample_aspect_ratio= (AVRational){0,1};
     s->pix_fmt= PIX_FMT_NONE;
-    s->sample_fmt= SAMPLE_FMT_S16; // FIXME: set to NONE
+    s->sample_fmt= SAMPLE_FMT_NONE;
 
     s->palctrl = NULL;
     s->reget_buffer= avcodec_default_reget_buffer;
+    s->reordered_opaque= AV_NOPTS_VALUE;
 }
 
 AVCodecContext *avcodec_alloc_context2(enum CodecType codec_type){

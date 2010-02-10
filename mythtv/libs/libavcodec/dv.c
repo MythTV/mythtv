@@ -398,6 +398,17 @@ static av_cold int dvvideo_init(AVCodecContext *avctx)
     return 0;
 }
 
+static av_cold int dvvideo_init_encoder(AVCodecContext *avctx)
+{
+    if (!ff_dv_codec_profile(avctx)) {
+        av_log(avctx, AV_LOG_ERROR, "Found no DV profile for %ix%i %s video\n",
+               avctx->width, avctx->height, avcodec_get_pix_fmt_name(avctx->pix_fmt));
+        return -1;
+    }
+
+    return dvvideo_init(avctx);
+}
+
 // #define VLC_DEBUG
 // #define printf(...) av_log(NULL, AV_LOG_ERROR, __VA_ARGS__)
 
@@ -415,11 +426,6 @@ typedef struct BlockInfo {
 static const int vs_total_ac_bits = (100 * 4 + 68*2) * 5;
 /* see dv_88_areas and dv_248_areas for details */
 static const int mb_area_start[5] = { 1, 6, 21, 43, 64 };
-
-static inline int get_bits_left(GetBitContext *s)
-{
-    return s->size_in_bits - get_bits_count(s);
-}
 
 static inline int put_bits_left(PutBitContext* s)
 {
@@ -526,9 +532,9 @@ static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
     PutBitContext pb, vs_pb;
     GetBitContext gb;
     BlockInfo mb_data[5 * DV_MAX_BPM], *mb, *mb1;
-    DECLARE_ALIGNED_16(DCTELEM, sblock[5*DV_MAX_BPM][64]);
-    DECLARE_ALIGNED_8(uint8_t, mb_bit_buffer[80 + 4]); /* allow some slack */
-    DECLARE_ALIGNED_8(uint8_t, vs_bit_buffer[5 * 80 + 4]); /* allow some slack */
+    DECLARE_ALIGNED_16(DCTELEM, sblock)[5*DV_MAX_BPM][64];
+    DECLARE_ALIGNED_16(uint8_t, mb_bit_buffer)[80 + 4]; /* allow some slack */
+    DECLARE_ALIGNED_16(uint8_t, vs_bit_buffer)[5 * 80 + 4]; /* allow some slack */
     const int log2_blocksize = 3-s->avctx->lowres;
     int is_field_mode[5];
 
@@ -631,7 +637,7 @@ static int dv_decode_video_segment(AVCodecContext *avctx, void *arg)
                 dv_decode_ac(&gb, mb, block);
             }
             if (mb->pos >= 64 && mb->pos < 127)
-                av_log(NULL, AV_LOG_ERROR, "AC EOB marker is absent pos=%d\n", mb->pos);
+                av_log(avctx, AV_LOG_ERROR, "AC EOB marker is absent pos=%d\n", mb->pos);
             block += 64;
             mb++;
         }
@@ -827,7 +833,7 @@ static av_always_inline int dv_init_enc_block(EncBlockInfo* bi, uint8_t *data, i
 {
     const int *weight;
     const uint8_t* zigzag_scan;
-    DECLARE_ALIGNED_16(DCTELEM, blk[64]);
+    DECLARE_ALIGNED_16(DCTELEM, blk)[64];
     int i, area;
     /* We offer two different methods for class number assignment: the
        method suggested in SMPTE 314M Table 22, and an improved
@@ -1099,11 +1105,20 @@ static int dv_encode_video_segment(AVCodecContext *avctx, void *arg)
        if (enc_blks[j].partial_bit_count)
            pb = dv_encode_ac(&enc_blks[j], pb, &pbs[s->sys->bpm*5]);
        if (enc_blks[j].partial_bit_count)
-            av_log(NULL, AV_LOG_ERROR, "ac bitstream overflow\n");
+            av_log(avctx, AV_LOG_ERROR, "ac bitstream overflow\n");
     }
 
-    for (j=0; j<5*s->sys->bpm; j++)
+    for (j=0; j<5*s->sys->bpm; j++) {
+       int pos;
+       int size = pbs[j].size_in_bits >> 3;
        flush_put_bits(&pbs[j]);
+       pos = put_bits_count(&pbs[j]) >> 3;
+       if (pos > size) {
+           av_log(avctx, AV_LOG_ERROR, "bitstream written beyond buffer size\n");
+           return -1;
+       }
+       memset(pbs[j].buf + pos, 0xff, size - pos);
+    }
 
     return 0;
 }
@@ -1119,7 +1134,7 @@ static int dvvideo_decode_frame(AVCodecContext *avctx,
     int buf_size = avpkt->size;
     DVVideoContext *s = avctx->priv_data;
 
-    s->sys = dv_frame_profile(s->sys, buf, buf_size);
+    s->sys = ff_dv_frame_profile(s->sys, buf, buf_size);
     if (!s->sys || buf_size < s->sys->frame_size || dv_init_dynamic_tables(s->sys)) {
         av_log(avctx, AV_LOG_ERROR, "could not find dv frame profile\n");
         return -1; /* NOTE: we only accept several full frames */
@@ -1284,7 +1299,7 @@ static int dvvideo_encode_frame(AVCodecContext *c, uint8_t *buf, int buf_size,
 {
     DVVideoContext *s = c->priv_data;
 
-    s->sys = dv_codec_profile(c);
+    s->sys = ff_dv_codec_profile(c);
     if (!s->sys || buf_size < s->sys->frame_size || dv_init_dynamic_tables(s->sys))
         return -1;
 
@@ -1322,9 +1337,9 @@ AVCodec dvvideo_encoder = {
     CODEC_TYPE_VIDEO,
     CODEC_ID_DVVIDEO,
     sizeof(DVVideoContext),
-    dvvideo_init,
+    dvvideo_init_encoder,
     dvvideo_encode_frame,
-    .pix_fmts  = (enum PixelFormat[]) {PIX_FMT_YUV411P, PIX_FMT_YUV422P, PIX_FMT_YUV420P, PIX_FMT_NONE},
+    .pix_fmts  = (const enum PixelFormat[]) {PIX_FMT_YUV411P, PIX_FMT_YUV422P, PIX_FMT_YUV420P, PIX_FMT_NONE},
     .long_name = NULL_IF_CONFIG_SMALL("DV (Digital Video)"),
 };
 #endif // CONFIG_DVVIDEO_ENCODER

@@ -1,6 +1,6 @@
 /* mm_arch.h - Multi-media CPU acceleration for several architectures */
 
-#include "libavutil/declare_aligned.h"
+#include "libavutil/mem.h"
 #include "dsputil.h"
 
 /* That has "extern int mm_flags;", or "#define mm_flags 0" as a fallthru.  */

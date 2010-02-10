@@ -36,6 +36,7 @@ typedef struct {
     int64_t last_kf_pts;
     int vrev;
     int eos;
+    unsigned packet_count; ///< number of packet buffered
 } OGGStreamContext;
 
 static void ogg_update_checksum(AVFormatContext *s, int64_t crc_offset)
@@ -83,10 +84,31 @@ static int ogg_write_page(AVFormatContext *s, const uint8_t *data, int size,
     return size;
 }
 
+static uint8_t *ogg_write_vorbiscomment(int offset, int bitexact,
+                                        int *header_len)
+{
+    const char *vendor = bitexact ? "ffmpeg" : LIBAVFORMAT_IDENT;
+    int size;
+    uint8_t *p, *p0;
+
+    size = offset + 4 + strlen(vendor) + 4;
+    p = av_mallocz(size);
+    if (!p)
+        return NULL;
+    p0 = p;
+
+    p += offset;
+    bytestream_put_le32(&p, strlen(vendor));
+    bytestream_put_buffer(&p, vendor, strlen(vendor));
+    bytestream_put_le32(&p, 0); // user comment list length
+
+    *header_len = size;
+    return p0;
+}
+
 static int ogg_build_flac_headers(AVCodecContext *avctx,
                                   OGGStreamContext *oggstream, int bitexact)
 {
-    const char *vendor = bitexact ? "ffmpeg" : LIBAVFORMAT_IDENT;
     enum FLACExtradataFormat format;
     uint8_t *streaminfo;
     uint8_t *p;
@@ -111,16 +133,40 @@ static int ogg_build_flac_headers(AVCodecContext *avctx,
     bytestream_put_buffer(&p, streaminfo, FLAC_STREAMINFO_SIZE);
 
     // second packet: VorbisComment
-    oggstream->header_len[1] = 1+3+4+strlen(vendor)+4;
-    oggstream->header[1] = av_mallocz(oggstream->header_len[1]);
-    p = oggstream->header[1];
+    p = ogg_write_vorbiscomment(4, bitexact, &oggstream->header_len[1]);
     if (!p)
         return AVERROR_NOMEM;
+    oggstream->header[1] = p;
     bytestream_put_byte(&p, 0x84); // last metadata block and vorbis comment
     bytestream_put_be24(&p, oggstream->header_len[1] - 4);
-    bytestream_put_le32(&p, strlen(vendor));
-    bytestream_put_buffer(&p, vendor, strlen(vendor));
-    bytestream_put_le32(&p, 0); // user comment list length
+
+    return 0;
+}
+
+#define SPEEX_HEADER_SIZE 80
+
+static int ogg_build_speex_headers(AVCodecContext *avctx,
+                                   OGGStreamContext *oggstream, int bitexact)
+{
+    uint8_t *p;
+
+    if (avctx->extradata_size < SPEEX_HEADER_SIZE)
+        return -1;
+
+    // first packet: Speex header
+    p = av_mallocz(SPEEX_HEADER_SIZE);
+    if (!p)
+        return AVERROR_NOMEM;
+    oggstream->header[0] = p;
+    oggstream->header_len[0] = SPEEX_HEADER_SIZE;
+    bytestream_put_buffer(&p, avctx->extradata, SPEEX_HEADER_SIZE);
+    AV_WL32(&oggstream->header[0][68], 0);  // set extra_headers to 0
+
+    // second packet: VorbisComment
+    p = ogg_write_vorbiscomment(0, bitexact, &oggstream->header_len[1]);
+    if (!p)
+        return AVERROR_NOMEM;
+    oggstream->header[1] = p;
 
     return 0;
 }
@@ -137,6 +183,7 @@ static int ogg_write_header(AVFormatContext *s)
             av_set_pts_info(st, 64, st->codec->time_base.num, st->codec->time_base.den);
         if (st->codec->codec_id != CODEC_ID_VORBIS &&
             st->codec->codec_id != CODEC_ID_THEORA &&
+            st->codec->codec_id != CODEC_ID_SPEEX  &&
             st->codec->codec_id != CODEC_ID_FLAC) {
             av_log(s, AV_LOG_ERROR, "Unsupported codec id in stream %d\n", i);
             return -1;
@@ -153,6 +200,14 @@ static int ogg_write_header(AVFormatContext *s)
                                              st->codec->flags & CODEC_FLAG_BITEXACT);
             if (err) {
                 av_log(s, AV_LOG_ERROR, "Error writing FLAC headers\n");
+                av_freep(&st->priv_data);
+                return err;
+            }
+        } else if (st->codec->codec_id == CODEC_ID_SPEEX) {
+            int err = ogg_build_speex_headers(st->codec, oggstream,
+                                              st->codec->flags & CODEC_FLAG_BITEXACT);
+            if (err) {
+                av_log(s, AV_LOG_ERROR, "Error writing Speex headers\n");
                 av_freep(&st->priv_data);
                 return err;
             }
@@ -232,35 +287,39 @@ static int ogg_compare_granule(AVFormatContext *s, AVPacket *next, AVPacket *pkt
 
 static int ogg_interleave_per_granule(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush)
 {
-    AVPacketList *pktl;
-    int stream_count = 0;
-    int streams[MAX_STREAMS] = {0};
+    OGGStreamContext *ogg;
+    int i, stream_count = 0;
     int interleaved = 0;
 
     if (pkt) {
         ff_interleave_add_packet(s, pkt, ogg_compare_granule);
+        ogg = s->streams[pkt->stream_index]->priv_data;
+        ogg->packet_count++;
     }
 
-    pktl = s->packet_buffer;
-    while (pktl) {
-        if (streams[pktl->pkt.stream_index] == 0)
-            stream_count++;
-        streams[pktl->pkt.stream_index]++;
-        // need to buffer at least one packet to set eos flag
-        if (streams[pktl->pkt.stream_index] == 2)
-            interleaved++;
-        pktl = pktl->next;
+    for (i = 0; i < s->nb_streams; i++) {
+        ogg = s->streams[i]->priv_data;
+        stream_count += !!ogg->packet_count;
+        interleaved += ogg->packet_count > 1;
     }
 
     if ((s->nb_streams == stream_count && interleaved == stream_count) ||
         (flush && stream_count)) {
-        pktl= s->packet_buffer;
+        AVPacketList *pktl= s->packet_buffer;
         *out= pktl->pkt;
         s->packet_buffer = pktl->next;
-        if (flush && streams[out->stream_index] == 1) {
-            OGGStreamContext *ogg = s->streams[out->stream_index]->priv_data;
+
+        ogg = s->streams[out->stream_index]->priv_data;
+        if (flush && ogg->packet_count == 1)
             ogg->eos = 1;
-        }
+        ogg->packet_count--;
+
+        if(!s->packet_buffer)
+            s->packet_buffer_end= NULL;
+
+        if(s->streams[out->stream_index]->last_in_packet_buffer == pktl)
+            s->streams[out->stream_index]->last_in_packet_buffer= NULL;
+
         av_freep(&pktl);
         return 1;
     } else {
@@ -275,7 +334,8 @@ static int ogg_write_trailer(AVFormatContext *s)
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st = s->streams[i];
         OGGStreamContext *oggstream = st->priv_data;
-        if (st->codec->codec_id == CODEC_ID_FLAC) {
+        if (st->codec->codec_id == CODEC_ID_FLAC ||
+            st->codec->codec_id == CODEC_ID_SPEEX) {
             av_free(oggstream->header[0]);
             av_free(oggstream->header[1]);
         }
@@ -288,7 +348,7 @@ AVOutputFormat ogg_muxer = {
     "ogg",
     NULL_IF_CONFIG_SMALL("Ogg"),
     "application/ogg",
-    "ogg,ogv",
+    "ogg,ogv,spx",
     0,
     CODEC_ID_FLAC,
     CODEC_ID_THEORA,

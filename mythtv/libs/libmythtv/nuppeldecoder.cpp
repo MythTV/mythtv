@@ -668,6 +668,7 @@ bool NuppelDecoder::InitAVCodecVideo(int codec)
     mpa_vidctx = avcodec_alloc_context();
 
     mpa_vidctx->codec_id = (enum CodecID)codec;
+    mpa_vidctx->codec_type = CODEC_TYPE_VIDEO;
     mpa_vidctx->width = video_width;
     mpa_vidctx->height = video_height;
     mpa_vidctx->error_recognition = 2;
@@ -746,6 +747,7 @@ bool NuppelDecoder::InitAVCodecAudio(int codec)
     mpa_audctx = avcodec_alloc_context();
 
     mpa_audctx->codec_id = (enum CodecID)codec;
+    mpa_audctx->codec_type = CODEC_TYPE_AUDIO;
 
     QMutexLocker locker(avcodeclock);
     if (avcodec_open(mpa_audctx, mpa_audcodec) < 0)

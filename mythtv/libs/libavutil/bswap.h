@@ -32,6 +32,8 @@
 
 #if   ARCH_ARM
 #   include "arm/bswap.h"
+#elif ARCH_AVR32
+#   include "avr32/bswap.h"
 #elif ARCH_BFIN
 #   include "bfin/bswap.h"
 #elif ARCH_SH4
@@ -93,7 +95,7 @@ static inline double bswap_dbl(double x)
 // be2me ... big-endian to machine-endian
 // le2me ... little-endian to machine-endian
 
-#ifdef WORDS_BIGENDIAN
+#if HAVE_BIGENDIAN
 #define be2me_16(x) (x)
 #define be2me_32(x) (x)
 #define be2me_64(x) (x)

@@ -22,7 +22,7 @@
 
 #include "filter.h"
 #include "frame.h"
-#include "libavutil/declare_aligned.h"
+#include "libavutil/mem.h"
 #include "dsputil.h"
 
 #ifdef MMX

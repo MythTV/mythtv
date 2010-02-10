@@ -125,6 +125,10 @@ static av_cold int flac_decode_init(AVCodecContext *avctx)
 
     /* initialize based on the demuxer-supplied streamdata header */
     ff_flac_parse_streaminfo(avctx, (FLACStreaminfo *)s, streaminfo);
+    if (s->bps > 16)
+        avctx->sample_fmt = SAMPLE_FMT_S32;
+    else
+        avctx->sample_fmt = SAMPLE_FMT_S16;
     allocate_buffers(s);
     s->got_streaminfo = 1;
 
@@ -186,10 +190,6 @@ void ff_flac_parse_streaminfo(AVCodecContext *avctx, struct FLACStreaminfo *s,
     avctx->channels = s->channels;
     avctx->sample_rate = s->samplerate;
     avctx->bits_per_raw_sample = s->bps;
-    if (s->bps > 16)
-        avctx->sample_fmt = SAMPLE_FMT_S32;
-    else
-        avctx->sample_fmt = SAMPLE_FMT_S16;
 
     s->samples  = get_bits_long(&gb, 32) << 4;
     s->samples |= get_bits(&gb, 4);
@@ -358,7 +358,7 @@ static int decode_subframe_lpc(FLACContext *s, int channel, int pred_order)
 {
     int i, j;
     int coeff_prec, qlevel;
-    int coeffs[pred_order];
+    int coeffs[32];
     int32_t *decoded = s->decoded[channel];
 
     /* warm up samples */
@@ -806,7 +806,9 @@ AVCodec flac_decoder = {
     NULL,
     flac_decode_close,
     flac_decode_frame,
-    CODEC_CAP_DELAY,
+    CODEC_CAP_DELAY | CODEC_CAP_SUBFRAMES, /* FIXME: add a FLAC parser so that
+                                              we will not need to use either
+                                              of these capabilities */
     .flush= flac_flush,
     .long_name= NULL_IF_CONFIG_SMALL("FLAC (Free Lossless Audio Codec)"),
 };

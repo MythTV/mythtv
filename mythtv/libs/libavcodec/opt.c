@@ -112,10 +112,8 @@ int av_set_string3(void *obj, const char *name, const char *val, int alloc, cons
     const AVOption *o= av_find_opt(obj, name, NULL, 0, 0);
     if (o_out)
         *o_out = o;
-    if(!o) {
-        av_log(obj, AV_LOG_ERROR, "Unknown option '%s'\n", name);
+    if(!o)
         return AVERROR(ENOENT);
-    }
     if(!val || o->offset<=0)
         return AVERROR(EINVAL);
 
@@ -426,7 +424,7 @@ void av_opt_set_defaults2(void *s, int mask, int flags)
             break;
             case FF_OPT_TYPE_INT64:
                 if((double)(opt->default_val+0.6) == opt->default_val)
-                    av_log(s, AV_LOG_DEBUG, "loss of precission in default of %s\n", opt->name);
+                    av_log(s, AV_LOG_DEBUG, "loss of precision in default of %s\n", opt->name);
                 av_set_int(s, opt->name, opt->default_val);
             break;
             case FF_OPT_TYPE_FLOAT: {

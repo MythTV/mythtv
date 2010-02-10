@@ -93,42 +93,45 @@ static int sox_read_header(AVFormatContext *s,
         return -1;
     }
 
-    if (comment_size &&
-        comment_size + FF_INPUT_BUFFER_PADDING_SIZE >= comment_size) {
-        char *comment = av_mallocz(comment_size + FF_INPUT_BUFFER_PADDING_SIZE);
+    if (comment_size && comment_size < UINT_MAX) {
+        char *comment = av_malloc(comment_size+1);
         if (get_buffer(pb, comment, comment_size) != comment_size) {
             av_freep(&comment);
             return AVERROR_IO;
         }
-        av_metadata_set(&s->metadata, "comment", comment);
-        av_freep(&comment);
+        comment[comment_size] = 0;
+
+        av_metadata_set2(&s->metadata, "comment", comment,
+                               AV_METADATA_DONT_STRDUP_VAL);
     }
 
     url_fskip(pb, header_size - SOX_FIXED_HDR - comment_size);
 
     st->codec->sample_rate           = sample_rate;
-    st->codec->sample_fmt            = SAMPLE_FMT_S32;
     st->codec->bits_per_coded_sample = 32;
     st->codec->bit_rate              = st->codec->sample_rate *
                                        st->codec->bits_per_coded_sample *
                                        st->codec->channels;
+    st->codec->block_align           = st->codec->bits_per_coded_sample *
+                                       st->codec->channels / 8;
 
     av_set_pts_info(st, 64, 1, st->codec->sample_rate);
 
     return 0;
 }
 
-#define MAX_SIZE 4096
+#define SOX_SAMPLES 1024
 
 static int sox_read_packet(AVFormatContext *s,
                            AVPacket *pkt)
 {
-    int ret;
+    int ret, size;
 
     if (url_feof(s->pb))
         return AVERROR_EOF;
 
-    ret = av_get_packet(s->pb, pkt, MAX_SIZE);
+    size = SOX_SAMPLES*s->streams[0]->codec->block_align;
+    ret = av_get_packet(s->pb, pkt, size);
     if (ret < 0)
         return AVERROR(EIO);
     pkt->stream_index = 0;

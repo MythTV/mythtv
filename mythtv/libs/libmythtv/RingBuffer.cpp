@@ -19,6 +19,8 @@
 
 using namespace std;
 
+#include "mythconfig.h"
+
 #include "exitcodes.h"
 #include "RingBuffer.h"
 #include "remotefile.h"

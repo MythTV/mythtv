@@ -41,6 +41,12 @@
 #ifndef M_SQRT1_2
 #define M_SQRT1_2      0.70710678118654752440  /* 1/sqrt(2) */
 #endif
+#ifndef NAN
+#define NAN            (0.0/0.0)
+#endif
+#ifndef INFINITY
+#define INFINITY       (1.0/0.0)
+#endif
 
 enum AVRounding {
     AV_ROUND_ZERO     = 0, ///< Round toward zero.
@@ -50,6 +56,11 @@ enum AVRounding {
     AV_ROUND_NEAR_INF = 5, ///< Round to nearest and halfway cases away from zero.
 };
 
+/**
+ * Returns the greatest common divisor of a and b.
+ * If both a and b are 0 or either or both are <0 then behavior is
+ * undefined.
+ */
 int64_t av_const av_gcd(int64_t a, int64_t b);
 
 /**

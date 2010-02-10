@@ -25,6 +25,8 @@
 #include <QDesktopWidget>
 #include <QApplication>
 
+#include "mythconfig.h"
+
 #include "videooutwindow.h"
 #include "osd.h"
 #include "osdsurface.h"
@@ -35,8 +37,7 @@
 #include "mythcontext.h"
 #include "dithertable.h"
 
-extern "C"
-{
+extern "C" {
 #include "avcodec.h"
 }
 
