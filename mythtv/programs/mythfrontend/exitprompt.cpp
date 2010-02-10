@@ -1,5 +1,7 @@
 
 #include <QCoreApplication>
+#include <QtDBus>
+#include <QDBusInterface>
 
 #include "exitprompt.h"
 #include "mythcontext.h"
@@ -15,26 +17,94 @@ void ExitPrompter::quit()
 
 void ExitPrompter::halt()
 {
-    QString halt_cmd = gContext->GetSetting("HaltCommand",
-                                            "sudo /sbin/halt -p");
-    if (!halt_cmd.isEmpty())
+    QDBusInterface kde("org.kde.ksmserver",
+                       "/KSMServer",
+                       "org.kde.KSMServerInterface");
+    QDBusInterface gnome("org.gnome.SessionManager",
+                         "/org/gnome/SessionManager",
+                         "org.gnome.SessionManager");
+    QDBusInterface consolekit("org.freedesktop.ConsoleKit",
+                              "/org/freedesktop/ConsoleKit/Manager",
+                              "org.freedesktop.ConsoleKit.Manager",
+                              QDBusConnection::systemBus());
+    QDBusInterface hal("org.freedesktop.Hal",
+                       "/org/freedesktop/Hal/devices/computer",
+                       "org.freedesktop.Hal.Device.SystemPowerManagement",
+                       QDBusConnection::systemBus());
+
+    QDBusReply<void> void_reply = kde.call("logout", 0, 2, 2);
+    QDBusReply<bool> bool_reply;
+    QDBusReply<int>  int_reply;
+
+    if (!void_reply.isValid())
     {
-        myth_system(halt_cmd);
+        bool_reply = gnome.call("CanShutdown");
+        if (bool_reply.isValid() && bool_reply.value() == 1)
+            void_reply = gnome.call("RequestShutdown");
     }
-    else
-        VERBOSE(VB_IMPORTANT, "Cannot halt - null command!");
+    if (!void_reply.isValid())
+    {
+        bool_reply = consolekit.call("CanStop");
+        if (bool_reply.isValid() && bool_reply.value() == 1)
+            void_reply = consolekit.call("Stop");
+    }
+    if (!void_reply.isValid())
+        int_reply = hal.call("Shutdown");
+    if (!void_reply.isValid() && !int_reply.isValid())
+    {
+        QString halt_cmd = gContext->GetSetting("HaltCommand",
+                                            "sudo /sbin/halt -p");
+        if (!halt_cmd.isEmpty())
+            myth_system(halt_cmd);
+        else
+            VERBOSE(VB_IMPORTANT, "Cannot halt - null command!");
+    }
 }
 
 void ExitPrompter::reboot()
 {
-    QString reboot_cmd = gContext->GetSetting("RebootCommand",
-                                              "sudo /sbin/reboot");
-    if (!reboot_cmd.isEmpty())
+    QDBusInterface kde("org.kde.ksmserver",
+                       "/KSMServer",
+                       "org.kde.KSMServerInterface");
+    QDBusInterface gnome("org.gnome.SessionManager",
+                         "/org/gnome/SessionManager",
+                         "org.gnome.SessionManager");
+    QDBusInterface consolekit("org.freedesktop.ConsoleKit",
+                              "/org/freedesktop/ConsoleKit/Manager",
+                              "org.freedesktop.ConsoleKit.Manager",
+                              QDBusConnection::systemBus());
+    QDBusInterface hal("org.freedesktop.Hal",
+                       "/org/freedesktop/Hal/devices/computer",
+                       "org.freedesktop.Hal.Device.SystemPowerManagement",
+                       QDBusConnection::systemBus());
+
+    QDBusReply<void> void_reply = kde.call("logout", 0, 1, 2);
+    QDBusReply<bool> bool_reply;
+    QDBusReply<int>  int_reply;
+
+    if (!void_reply.isValid())
     {
-        myth_system(reboot_cmd);
+        bool_reply = gnome.call("CanShutdown");
+        if (bool_reply.isValid() && bool_reply.value() == 1)
+            void_reply=gnome.call("RequestReboot");
     }
-    else
-        VERBOSE(VB_IMPORTANT, "Cannot reboot - null command!");
+    if (!void_reply.isValid())
+    {
+        bool_reply = consolekit.call("CanRestart");
+        if (bool_reply.isValid() && bool_reply.value() == 1)
+            void_reply = consolekit.call("Restart");
+    }
+    if (!void_reply.isValid())
+        int_reply = hal.call("Reboot");
+    if (!void_reply.isValid() && !int_reply.isValid())
+    {
+        QString reboot_cmd = gContext->GetSetting("RebootCommand",
+                                              "sudo /sbin/reboot");
+        if (!reboot_cmd.isEmpty())
+            myth_system(reboot_cmd);
+        else
+            VERBOSE(VB_IMPORTANT, "Cannot reboot - null command!");
+    }
 }
 
 void ExitPrompter::handleExit()
