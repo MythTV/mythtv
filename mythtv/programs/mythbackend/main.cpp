@@ -1,22 +1,25 @@
 // POSIX headers
 #include <sys/time.h>     // for setpriority
-
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <libgen.h>
 #include <signal.h>
+#include <pwd.h>
 
 #include "mythconfig.h"
 #if CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
 #endif
 
-#include <iostream>
-#include <fstream>
+// C headers
 #include <cstdlib>
 #include <cerrno>
+
+// C++ headers
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 #ifndef _WIN32
@@ -479,6 +482,7 @@ void showUsage(const MythCommandLineParser &cmdlineparser, const QString &versio
     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
     "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
     "--setverbose debug-level       Change debug level of running master backend" << endl <<
+    "--user username                Drop permissions to username after starting"  << endl <<
 
     "--printexpire                  List of auto-expire programs" << endl <<
     "--printsched                   Upcoming scheduled programs" << endl <<
@@ -554,6 +558,7 @@ int main(int argc, char **argv)
     bool testsched = false;
     bool setverbose = false;
     QString newverbose = "";
+    QString username = "";
     bool resched = false;
     bool nosched = false;
     bool noupnp = false;
@@ -637,7 +642,20 @@ int main(int argc, char **argv)
                 cerr << "Missing argument to --setverbose option\n";
                 return BACKEND_EXIT_INVALID_CMDLINE;
             }
-        } 
+        }
+        else if (!strcmp(a.argv()[argpos],"--user"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                username = a.argv()[argpos+1];
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to --user option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            }
+        }
         else if (!strcmp(a.argv()[argpos],"--printsched"))
         {
             printsched = true;
@@ -842,6 +860,48 @@ int main(int argc, char **argv)
         return BACKEND_EXIT_DAEMONIZING_ERROR;
     }
 
+    if (!username.isEmpty())
+    {
+        struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
+        const uid_t user_id = geteuid();
+
+        if (user_id && (!user_info || user_id != user_info->pw_uid))
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "You must be running as root to use the --user switch.");
+            return BACKEND_EXIT_PERMISSIONS_ERROR;
+        }
+        else if (user_info && user_id == user_info->pw_uid)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Already running as '%1'").arg(username));
+        }
+        else if (!user_id && user_info)
+        {
+            if (setenv("HOME", user_info->pw_dir,1) == -1)
+            {
+                VERBOSE(VB_IMPORTANT, "Error setting home directory.");
+                return BACKEND_EXIT_PERMISSIONS_ERROR;
+            }
+            if (setgid(user_info->pw_gid) == -1)
+            {
+                VERBOSE(VB_IMPORTANT, "Error setting effective group.");
+                return BACKEND_EXIT_PERMISSIONS_ERROR;
+            }
+            if (setuid(user_info->pw_uid) == -1)
+            {
+                VERBOSE(VB_IMPORTANT, "Error setting effective user.");
+                return BACKEND_EXIT_PERMISSIONS_ERROR;
+            }
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Invalid user '%1' specified with --user")
+                    .arg(username));
+            return BACKEND_EXIT_PERMISSIONS_ERROR;
+        }
+    }
 
     if (pidfs)
     {

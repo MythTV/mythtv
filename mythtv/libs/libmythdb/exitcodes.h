@@ -60,6 +60,7 @@
 #define BACKEND_EXIT_NO_CAP_CARD                  GENERIC_EXIT_START-11
 #define BACKEND_EXIT_NO_CHAN_DATA                 GENERIC_EXIT_START-12
 #define BACKEND_EXIT_START                        GENERIC_EXIT_START-12
+#define BACKEND_EXIT_PERMISSIONS_ERROR            GENERIC_EXIT_START-13
 
 // mythtranscode
 #define TRANSCODE_EXIT_OK                         GENERIC_EXIT_OK
