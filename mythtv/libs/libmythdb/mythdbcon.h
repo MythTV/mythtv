@@ -26,6 +26,7 @@ class MPUBLIC MSqlDatabase
     bool isOpen(void);
     bool OpenDatabase(void);
     bool KickDatabase(void);
+    QString GetConnectionName(void) { return m_name; }
     QSqlDatabase db(void) { return m_db; }
 
   private:
@@ -112,6 +113,9 @@ class MPUBLIC MSqlQuery : public QSqlQuery
 
     /// \brief Wrap QSqlQuery::exec() so we can display SQL
     bool exec(void);
+
+    /// \brief Wrap QSqlQuery::next() so we can display the query results
+    bool next(void);
 
     /// \brief Wrap QSqlQuery::exec(const QString &query) so we can display SQL
     bool exec(const QString &query);

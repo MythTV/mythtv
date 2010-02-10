@@ -7,6 +7,7 @@
 #include <QSemaphore>
 #include <QSqlError>
 #include <QSqlField>
+#include <QSqlRecord>
 
 // MythTV
 #include "compat.h"
@@ -481,7 +482,12 @@ bool MSqlQuery::exec()
             str.replace(b.key(), '\'' + b.value().toString() + '\'');
         }
 
-        VERBOSE(VB_DATABASE, "MSqlQuery::exec() \"" + str + '"');
+        VERBOSE(VB_DATABASE,
+                QString("MSqlQuery::exec(%1) %2%3")
+                        .arg(m_db->MSqlDatabase::GetConnectionName()).arg(str)
+                            .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
+                                                      .arg(size())
+                                            : QString()));
     }
 
     return result;
@@ -489,9 +495,42 @@ bool MSqlQuery::exec()
 
 bool MSqlQuery::exec(const QString &query)
 {
-    VERBOSE(VB_DATABASE, "MSqlQuery::exec(\"" + query + "\")");
+    bool result = QSqlQuery::exec(query);
 
-    return QSqlQuery::exec(query);
+    VERBOSE(VB_DATABASE, 
+            QString("MSqlQuery::exec(%1) %2%3")
+                    .arg(m_db->MSqlDatabase::GetConnectionName()).arg(query)
+                    .arg(isSelect() ? QString(" <<<< Returns %1 row(s)")
+                                              .arg(size())
+                                    : QString()));
+
+    return result;
+}
+
+bool MSqlQuery::next()
+{
+    bool result = QSqlQuery::next();    
+
+    if (result && VERBOSE_LEVEL_CHECK(VB_DATABASE|VB_EXTRA))
+    {
+        QString str;
+        QSqlRecord record=QSqlQuery::record();
+
+        for ( long int i = 0; i<record.count(); i++ )
+        {
+            if (!str.isEmpty())
+                str.append(", ");
+
+            str.append(record.fieldName(i) + " = " + value(i).toString());
+        }
+
+        VERBOSE(VB_DATABASE+VB_EXTRA,
+                QString("MSqlQuery::next(%1) Result: \"%2\"")
+                        .arg(m_db->MSqlDatabase::GetConnectionName())
+                        .arg(str));
+    }
+
+    return result;
 }
 
 bool MSqlQuery::prepare(const QString& query)
