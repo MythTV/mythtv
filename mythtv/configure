@@ -140,6 +140,7 @@ Advanced options (experts only):
                            comma-separated list
                            Supported bindings: perl, python
                            comma-separated list
+  --python=PATH            Force a specific python executable to use [$python_default]
 EOF
 
 #following is ffmpeg's configure help text
@@ -1390,6 +1391,7 @@ CMDLINE_SET="
     malloc_prefix
     nm
     qmake
+    python
     source_path
     sysinclude
     sysroot
@@ -1709,6 +1711,7 @@ nm_default="nm"
 objformat="elf"
 ranlib="ranlib"
 qmake_default="qmake"
+python_default="python"
 strip="strip"
 yasmexe="yasm"
 
@@ -2096,7 +2099,7 @@ strip="${cross_prefix}${strip}"
 sysinclude_default="${sysroot}/usr/include"
 
 set_default cc nm sysinclude
-set_default cxx qmake
+set_default cxx qmake python
 enabled cross_compile || host_cc_default=$cc
 set_default host_cc
 
@@ -4256,6 +4259,7 @@ AS=$as
 QMAKE_CC=$cc
 QMAKE_CXX=$cxx
 QMAKE_LINK=$cxx
+PYTHON=$python
 LD=$ld
 DEPCC=$dep_cc
 YASM=$yasmexe

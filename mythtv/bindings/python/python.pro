@@ -2,11 +2,11 @@ include ( ../../config.mak )
 
 python_build.target = python_build
 python_build.depends = setup.py FORCE
-python_build.commands = python setup.py build
+python_build.commands = $$PYTHON setup.py build
 
 python_install.target = python_install
 python_install.CONFIG = no_path
-python_install.commands = python setup.py install --skip-build --root=\"$(if $(INSTALL_ROOT),$(INSTALL_ROOT),/)\"
+python_install.commands = $$PYTHON setup.py install --skip-build --root=\"$(if $(INSTALL_ROOT),$(INSTALL_ROOT),/)\"
 
 # This is done so the default /usr/local prefix installs to the "normal"
 # /usr/lib/python{VER}/site-packages directory.
@@ -14,7 +14,7 @@ python_install.commands = python setup.py install --skip-build --root=\"$(if $(I
 	python_install.commands += --prefix=\"$${PREFIX}\"
 }
 
-QMAKE_CLEAN += dummy_file; python setup.py clean --all
+QMAKE_CLEAN += dummy_file; $$PYTHON setup.py clean --all
 
 PRE_TARGETDEPS += python_build
 QMAKE_LINK=@-echo
