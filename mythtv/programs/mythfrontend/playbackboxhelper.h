@@ -88,7 +88,6 @@ class PlaybackBoxHelper : public QThread
     mutable QMutex      m_lock;
 
     // Free disk space tracking
-    int                 m_freeSpaceTimerId;
     uint64_t            m_freeSpaceTotalMB;
     uint64_t            m_freeSpaceUsedMB;
 
@@ -101,8 +100,6 @@ class PlaybackBoxHelper : public QThread
     QStringList         m_previewGeneratorQueue;
     uint                m_previewGeneratorRunning;
     uint                m_previewGeneratorMaxThreads;
-
-    static const uint kUpdateFreeSpaceInterval;
 };
 
 #endif // _FREE_SPACE_H_

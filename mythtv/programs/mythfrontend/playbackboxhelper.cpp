@@ -22,10 +22,16 @@ using namespace std;
 class PBHEventHandler : public QObject
 {
   public:
-    PBHEventHandler(PlaybackBoxHelper &pbh) : m_pbh(pbh) { }
+    PBHEventHandler(PlaybackBoxHelper &pbh) :
+        m_pbh(pbh), m_freeSpaceTimerId(0) { }
     virtual bool event(QEvent*); // QObject
+    void UpdateFreeSpaceEvent(void);
     PlaybackBoxHelper &m_pbh;
+    int m_freeSpaceTimerId;
+    static const uint kUpdateFreeSpaceInterval;
 };
+
+const uint PBHEventHandler::kUpdateFreeSpaceInterval = 15000; // 15 seconds
 
 bool PBHEventHandler::event(QEvent *e)
 {
@@ -33,15 +39,15 @@ bool PBHEventHandler::event(QEvent *e)
     {
         QTimerEvent *te = (QTimerEvent*)e;
         const int timer_id = te->timerId();
-        if (timer_id == m_pbh.m_freeSpaceTimerId)
-            m_pbh.UpdateFreeSpace();
+        if (timer_id == m_freeSpaceTimerId)
+            UpdateFreeSpaceEvent();
     }
     else if (e->type() == (QEvent::Type) MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent*)e;
         if (me->Message() == "UPDATE_FREE_SPACE")
         {
-            m_pbh.UpdateFreeSpace();
+            UpdateFreeSpaceEvent();
             return true;
         }
         else if (me->Message() == "STOP_RECORDING")
@@ -186,9 +192,15 @@ bool PBHEventHandler::event(QEvent *e)
     return QObject::event(e);
 }
 
-//////////////////////////////////////////////////////////////////////
+void PBHEventHandler::UpdateFreeSpaceEvent(void)
+{
+    if (m_freeSpaceTimerId)
+        killTimer(m_freeSpaceTimerId);
+    m_pbh.UpdateFreeSpace();
+    m_freeSpaceTimerId = startTimer(kUpdateFreeSpaceInterval);
+}
 
-const uint PlaybackBoxHelper::kUpdateFreeSpaceInterval = 15000; // 15 seconds
+//////////////////////////////////////////////////////////////////////
 
 const uint PreviewGenState::maxAttempts     = 5;
 const uint PreviewGenState::minBlockSeconds = 60;
@@ -196,7 +208,7 @@ const uint PreviewGenState::minBlockSeconds = 60;
 PlaybackBoxHelper::PlaybackBoxHelper(QObject *listener) :
     m_listener(listener), m_eventHandler(NULL),
     // Free Space Tracking Variables
-    m_freeSpaceTimerId(0), m_freeSpaceTotalMB(0ULL), m_freeSpaceUsedMB(0ULL),
+    m_freeSpaceTotalMB(0ULL), m_freeSpaceUsedMB(0ULL),
     // Preview Image Variables
     m_previewGeneratorRunning(0), m_previewGeneratorMaxThreads(2)
 {
@@ -278,9 +290,6 @@ void PlaybackBoxHelper::run(void)
 
 void PlaybackBoxHelper::UpdateFreeSpace(void)
 {
-    if (m_freeSpaceTimerId)
-        killTimer(m_freeSpaceTimerId);
-
     vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
 
     QMutexLocker locker(&m_lock);
@@ -292,8 +301,6 @@ void PlaybackBoxHelper::UpdateFreeSpace(void)
             m_freeSpaceUsedMB  = (uint64_t) (fsInfos[i].usedSpaceKB  >> 10);
         }
     }
-
-    m_freeSpaceTimerId = startTimer(kUpdateFreeSpaceInterval);
 }
 
 uint64_t PlaybackBoxHelper::GetFreeSpaceTotalMB(void) const
