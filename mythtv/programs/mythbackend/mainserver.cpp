@@ -557,7 +557,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     }
     else if (command == "MESSAGE")
     {
-        if (listline[1].left(11) == "SET_VERBOSE")
+        if ((listline.size() >= 2) && (listline[1].left(11) == "SET_VERBOSE"))
             HandleSetVerbose(listline, pbs);
         else
             HandleMessage(listline, pbs);
@@ -651,7 +651,10 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
             VERBOSE(VB_IMPORTANT, "Bad SHUTDOWN_NOW query");
         else if (!ismaster)
         {
-            QString halt_cmd = listline[1];
+            QString halt_cmd;
+            if (listline.size() >= 2)
+                halt_cmd = listline[1];
+
             if (!halt_cmd.isEmpty())
             {
                 VERBOSE(VB_IMPORTANT,
@@ -1456,6 +1459,12 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
  */
 void MainServer::HandleQueryRecording(QStringList &slist, PlaybackSock *pbs)
 {
+    if (slist.size() < 3)
+    {
+        VERBOSE(VB_IMPORTANT, "Bad QUERY_RECORDING query");
+        return;
+    }
+
     MythSocket *pbssock = pbs->getSocket();
     QString command = slist[1].toUpper();
     ProgramInfo *pginfo = NULL;
@@ -1466,6 +1475,12 @@ void MainServer::HandleQueryRecording(QStringList &slist, PlaybackSock *pbs)
     }
     else if (command == "TIMESLOT")
     {
+        if (slist.size() < 4)
+        {
+            VERBOSE(VB_IMPORTANT, "Bad QUERY_RECORDING query");
+            return;
+        }
+
         pginfo = ProgramInfo::GetProgramFromRecorded(slist[2], slist[3]);
     }
 
