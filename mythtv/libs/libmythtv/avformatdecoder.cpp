@@ -107,7 +107,7 @@ static AVCodec *find_vdpau_decoder(AVCodec *c, enum CodecID id)
 
 static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
 {
-    if (!print_verbose_messages)
+    if (VERBOSE_LEVEL_NONE)
         return;
 
     static QString full_line("");
@@ -136,7 +136,7 @@ static void myth_av_log(void *ptr, int level, const char* fmt, va_list vl)
             return;
     }
 
-    if (VERBOSE_LEVEL_CHECK(verbose_level))
+    if (!VERBOSE_LEVEL_CHECK(verbose_level))
         return;
 
     string_lock.lock();
