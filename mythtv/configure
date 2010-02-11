@@ -2388,7 +2388,7 @@ case "$arch" in
     ;;
 esac
 
-is_in $arch $ARCH_LIST || echo "WARNING: unknown arch $arch"
+is_in $arch $ARCH_LIST || die "ERROR: unknown arch $arch"
 enable $arch
 
 
