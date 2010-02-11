@@ -542,7 +542,8 @@ QString MythUIText::cutDown(const QString &data, MythFontProperties *font,
 
 }
 
-bool MythUIText::ParseElement(QDomElement &element)
+bool MythUIText::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "area")
     {
@@ -671,7 +672,9 @@ bool MythUIText::ParseElement(QDomElement &element)
         FillCutMessage();
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

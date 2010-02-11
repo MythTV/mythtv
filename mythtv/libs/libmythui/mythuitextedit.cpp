@@ -104,7 +104,8 @@ void MythUITextEdit::Pulse(void)
     MythUIType::Pulse();
 }
 
-bool MythUITextEdit::ParseElement(QDomElement &element)
+bool MythUITextEdit::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     bool parsed = true;
 
@@ -127,14 +128,15 @@ bool MythUITextEdit::ParseElement(QDomElement &element)
             m_keyboardPosition = VK_POSCENTERDIALOG;
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("MythUITextEdit: Unknown popup position '%1'")
-                            .arg(pos));
+            VERBOSE_XML(VB_IMPORTANT, filename, element, LOC_ERR +
+                        QString("Unknown popup position '%1'").arg(pos));
             m_keyboardPosition = VK_POSBELOWEDIT;
         }
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return parsed;
 }

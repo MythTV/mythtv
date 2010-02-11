@@ -66,7 +66,8 @@ void MythUIClock::Pulse(void)
     MythUIText::Pulse();
 }
 
-bool MythUIClock::ParseElement(QDomElement &element)
+bool MythUIClock::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "format" ||
         element.tagName() == "template")
@@ -82,7 +83,9 @@ bool MythUIClock::ParseElement(QDomElement &element)
         m_SecsFlash = parseBool(element);
     }
     else
-        return MythUIText::ParseElement(element);
+    {
+        return MythUIText::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

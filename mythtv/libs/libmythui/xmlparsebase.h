@@ -9,16 +9,9 @@ class MythUIType;
 class MythScreenType;
 class QDomElement;
 
-#define XML_ERROR(element, error) \
-            QString tagName = element.tagName(); \
-            int lineNum = element.lineNumber(); \
-            QString name    = element.attribute("name", ""); \
-            VERBOSE(VB_IMPORTANT, QString("Theme error: %1\nType: '%2'\n" \
-                                            "Name: '%3'\nLine: %4") \
-                                            .arg(error) \
-                                            .arg(tagName) \
-                                            .arg(name) \
-                                            .arg(lineNum));
+void VERBOSE_XML(
+    unsigned int verbose_type,
+    const QString &filename, const QDomElement &element, QString msg);
 
 class MPUBLIC XMLParseBase
 {
@@ -38,12 +31,16 @@ class MPUBLIC XMLParseBase
     static MythUIType *GetGlobalObjectStore(void);
     static void ClearGlobalObjectStore(void);
 
-    static void ParseChildren(QDomElement &element, MythUIType *parent);
+    static void ParseChildren(
+        const QString &filename, QDomElement &element,
+        MythUIType *parent, bool showWarnings);
 
     // parse one and return it.
-    static MythUIType *ParseUIType(QDomElement &element, const QString &type,
-                                   MythUIType *parent,
-                                   MythScreenType *screen = NULL);
+    static MythUIType *ParseUIType(
+        const QString &filename,
+        QDomElement &element, const QString &type,
+        MythUIType *parent, MythScreenType *screen,
+        bool showWarnings);
 
     static bool LoadWindowFromXML(const QString &xmlfile,
                                   const QString &windowname,
@@ -56,7 +53,8 @@ class MPUBLIC XMLParseBase
 
   private:
     static bool doLoad(const QString &windowname, MythUIType *parent,
-                       const QString &filename, bool onlywindows = true);
+                       const QString &filename,
+                       bool onlyLoadWindows, bool showWarnings);
 };
 
 #endif

@@ -2264,7 +2264,8 @@ void MythUIButtonList::CalculateVisibleItems(void)
     m_itemsVisible = m_columns * m_rows;
 }
 
-bool MythUIButtonList::ParseElement(QDomElement &element)
+bool MythUIButtonList::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "buttonarea")
         m_contentsRect = parseRect(element);
@@ -2335,7 +2336,9 @@ bool MythUIButtonList::ParseElement(QDomElement &element)
         m_alignment |= Qt::AlignBottom;
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

@@ -915,7 +915,8 @@ void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset,
 /**
  *  \copydoc MythUIType::ParseElement()
  */
-bool MythUIImage::ParseElement(QDomElement &element)
+bool MythUIImage::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     QWriteLocker updateLocker(&d->m_UpdateLock);
     if (element.tagName() == "filename")
@@ -1033,7 +1034,9 @@ bool MythUIImage::ParseElement(QDomElement &element)
         m_isGreyscale = parseBool(element);
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     m_NeedLoad = true;
 

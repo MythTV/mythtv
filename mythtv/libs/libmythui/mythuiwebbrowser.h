@@ -94,7 +94,8 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
                           int alphaMod, QRect clipRegion);
 
-    virtual bool ParseElement(QDomElement &element);
+    virtual bool ParseElement(
+        const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 

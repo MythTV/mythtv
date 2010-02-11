@@ -27,7 +27,8 @@ class MPUBLIC MythUISpinBox : public MythUIButtonList
     int GetIntValue(void) const { return GetDataValue().toInt(); }
 
   protected:
-    virtual bool ParseElement(QDomElement &element);
+    virtual bool ParseElement(
+        const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 

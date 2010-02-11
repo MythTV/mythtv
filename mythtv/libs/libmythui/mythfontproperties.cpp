@@ -11,6 +11,7 @@
 #include "mythuihelper.h"
 #include "mythmainwindow.h"
 #include "xmlparsebase.h"
+#include "mythverbose.h"
 
 #define LOC      QString("MythFontProperties: ")
 #define LOC_WARN QString("MythFontProperties, Warning: ")
@@ -125,9 +126,12 @@ void MythFontProperties::Unfreeze(void)
     CalcHash();
 }
 
-MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
-                                                     MythUIType *parent,
-                                                     bool addToGlobal)
+MythFontProperties *MythFontProperties::ParseFromXml(
+    const QString &filename,
+    const QDomElement &element,
+    MythUIType *parent,
+    bool addToGlobal,
+    bool showWarnings)
 {
     // Crappy, but cached.  Move to GlobalFontMap?
     QString fontSizeType = GetMythDB()->GetSetting("ThemeFontSizeType", "default");
@@ -139,7 +143,8 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     QString name = element.attribute("name", "");
     if (name.isEmpty())
     {
-        XML_ERROR(element, "Font needs a name");
+        VERBOSE_XML(VB_IMPORTANT,
+                    filename, element, LOC_ERR + "Font requires a name");
         delete newFont;
         return NULL;
     }
@@ -158,8 +163,10 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 
         if (!tmp)
         {
-            XML_ERROR(element, QString("Specified base font '%1' does not "
-                                       "exist for font %2").arg(base).arg(name));
+            VERBOSE_XML(
+                VB_IMPORTANT, filename, element, LOC_ERR +
+                QString("Specified base font '%1' does not exist.").arg(base));
+
             delete newFont;
             return NULL;
         }
@@ -176,7 +183,8 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     {
         if (!fromBase)
         {
-            XML_ERROR(element, "Font needs a face");
+            VERBOSE_XML(VB_IMPORTANT, filename, element,
+                        LOC_ERR + "Font needs a face");
             delete newFont;
             return NULL;
         }
@@ -189,12 +197,17 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
     if (addToGlobal && GetGlobalFontMap()->Contains(name))
     {
         MythFontProperties *tmp = GetGlobalFontMap()->GetFont(name);
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("Attempting to define %1\n\t\t\t"
-                        "with face '%2', but it already exists with face '%3'")
-                .arg(name)
-                .arg(QFontInfo(newFont->m_face).family())
+        if (showWarnings)
+        {
+            VERBOSE_XML(
+                VB_GENERAL, filename, element,
+                LOC_WARN +
+                QString("Attempting to define '%1'\n\t\t\t"
+                        "with face '%2', but it already "
+                        "exists with face '%3'")
+                .arg(name).arg(QFontInfo(newFont->m_face).family())
                 .arg((tmp) ? QFontInfo(tmp->m_face).family() : "ERROR"));
+        }
         delete newFont;
         return NULL;
     }
@@ -352,7 +365,9 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
             }
             else
             {
-                XML_ERROR(info, QString("Unknown tag in font %1").arg(name));
+                VERBOSE_XML(VB_IMPORTANT, filename, info,
+                            LOC_ERR +
+                            QString("Unknown tag in font '%1'").arg(name));
                 delete newFont;
                 return NULL;
             }
@@ -361,27 +376,35 @@ MythFontProperties *MythFontProperties::ParseFromXml(QDomElement &element,
 
     if (size <= 0 && pixelsize <= 0 && !fromBase)
     {
-        XML_ERROR(element, "Error, font size must be > 0");
+        VERBOSE_XML(VB_IMPORTANT, filename, element,
+                    LOC_ERR + "Font size must be greater than 0.");
         delete newFont;
         return NULL;
     }
     else if (pixelsize > 0)
+    {
         newFont->m_face.setPixelSize(GetMythMainWindow()->NormY(pixelsize));
+    }
     else if (size > 0)
-        newFont->m_face.setPointSize(GetMythMainWindow()->NormalizeFontSize(size));
+    {
+        newFont->m_face.setPointSize(
+            GetMythMainWindow()->NormalizeFontSize(size));
+    }
 
     newFont->Unfreeze();
 
     QFontInfo fi(newFont->m_face);
     if (newFont->m_face.family() != fi.family())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to load '%1', got '%2' instead")
-                .arg(newFont->m_face.family()).arg(fi.family()));
+        VERBOSE_XML(
+            VB_IMPORTANT, filename, element,
+            LOC_ERR + QString("Failed to load '%1', got '%2' instead")
+            .arg(newFont->m_face.family()).arg(fi.family()));
     }
     else
     {
-        VERBOSE(VB_OSD, LOC + QString("loaded '%1'").arg(fi.family()));
+        VERBOSE_XML(VB_GENERAL|VB_EXTRA, filename, element,
+                    LOC + QString("loaded '%1'").arg(fi.family()));
     }
 
     if (addToGlobal)

@@ -128,7 +128,8 @@ void MythUIShape::DrawRoundRect(const QRect &area, int radius,
     m_image->Assign(image);
 }
 
-bool MythUIShape::ParseElement(QDomElement &element)
+bool MythUIShape::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "type")
     {
@@ -188,7 +189,9 @@ bool MythUIShape::ParseElement(QDomElement &element)
         m_cornerRadius = getFirstText(element).toInt();
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

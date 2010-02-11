@@ -35,6 +35,22 @@
 #include "mythuibuttontree.h"
 #include "mythfontproperties.h"
 
+#define LOC      QString("XMLParseBase: ")
+#define LOC_WARN QString("XMLParseBase, Warning: ")
+#define LOC_ERR  QString("XMLParseBase, Error: ")
+
+void VERBOSE_XML(
+    unsigned int verbose_type,
+    const QString &filename, const QDomElement &element, QString msg)
+{
+    VERBOSE(verbose_type,
+            QString("%1\n\t\t\t"
+                    "Location: %2 @ %3\n\t\t\t"
+                    "Name: '%4'\tType: '%5'")
+            .arg(msg).arg(filename).arg(element.lineNumber())
+            .arg(element.attribute("name", "")).arg(element.tagName()));
+}
+
 QString XMLParseBase::getFirstText(QDomElement &element)
 {
     for (QDomNode dname = element.firstChild(); !dname.isNull();
@@ -182,8 +198,10 @@ void XMLParseBase::ClearGlobalObjectStore(void)
     GetGlobalObjectStore();
 }
 
-void XMLParseBase::ParseChildren(QDomElement &element,
-                                        MythUIType *parent)
+void XMLParseBase::ParseChildren(const QString &filename,
+                                 QDomElement &element,
+                                 MythUIType *parent,
+                                 bool showWarnings)
 {
     if (!parent)
     {
@@ -198,14 +216,15 @@ void XMLParseBase::ParseChildren(QDomElement &element,
         if (!info.isNull())
         {
             QString type = info.tagName();
-            if (parent->ParseElement(info))
+            if (parent->ParseElement(filename, info, showWarnings))
             {
             }
             else if (type == "font")
             {
                 bool global = (GetGlobalObjectStore() == parent);
-                MythFontProperties *font =
-                        MythFontProperties::ParseFromXml(info, parent, global);
+                MythFontProperties *font = MythFontProperties::ParseFromXml(
+                    filename, info, parent, global, showWarnings);
+
                 if (!global && font)
                 {
                     QString name = info.attribute("name");
@@ -231,24 +250,29 @@ void XMLParseBase::ParseChildren(QDomElement &element,
                      type == "guidegrid" ||
                      type == "shape")
             {
-                ParseUIType(info, type, parent);
+                ParseUIType(filename, info, type, parent, NULL, showWarnings);
             }
             else
             {
-                XML_ERROR(info, QString("Unknown widget type"));
+                VERBOSE_XML(VB_IMPORTANT, filename, info,
+                            LOC_ERR + "Unknown widget type");
             }
         }
     }
 }
 
-MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
-                                      MythUIType *parent,
-                                      MythScreenType *screen)
+MythUIType *XMLParseBase::ParseUIType(
+    const QString &filename,
+    QDomElement &element, const QString &type,
+    MythUIType *parent,
+    MythScreenType *screen,
+    bool showWarnings)
 {
     QString name = element.attribute("name", "");
     if (name.isEmpty())
     {
-        XML_ERROR(element, "No name");
+        VERBOSE_XML(VB_IMPORTANT, filename, element,
+                    LOC_ERR + "This element requires a name");
         return NULL;
     }
 
@@ -285,9 +309,10 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
 
         if (!base)
         {
-            XML_ERROR(element, QString("Couldn't find object '%1' to "
-                                       "inherit '%2' from")
-                                       .arg(inherits).arg(name));
+            VERBOSE_XML(VB_IMPORTANT, filename, element,
+                        LOC_ERR + QString(
+                            "Couldn't find object '%1' to inherit '%2' from")
+                        .arg(inherits).arg(name));
             return NULL;
         }
 
@@ -328,14 +353,15 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         uitype = new MythScreenType(parent, name);
     else
     {
-        XML_ERROR(element, QString("Unknown widget type: %1").arg(type));
+        VERBOSE_XML(VB_IMPORTANT, filename, element,
+                    LOC_ERR + "Unknown widget type.");
         return NULL;
     }
 
     if (!uitype)
     {
-        VERBOSE(VB_IMPORTANT, QString("Failed to instanciate widget type: %1")
-                .arg(type));
+        VERBOSE_XML(VB_IMPORTANT, filename, element,
+                    LOC_ERR + "Failed to instantiate widget type.");
         return NULL;
     }
 
@@ -343,8 +369,9 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     {
         if (typeid(*olduitype) != typeid(*uitype))
         {
-            XML_ERROR(element, QString("Duplicate name: %1 in parent %2")
-                                        .arg(name).arg(parent->objectName()));
+            VERBOSE_XML(VB_IMPORTANT, filename, element, LOC_ERR +
+                        QString("Duplicate name: '%1' in parent '%2'")
+                        .arg(name).arg(parent->objectName()));
             parent->DeleteChild(olduitype);
         }
         else
@@ -358,9 +385,10 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
     {
         if (typeid(*base) != typeid(*uitype))
         {
-            XML_ERROR(element, QString("Type of new widget '%1' doesn't "
-                                          "match old '%2'")
-                                         .arg(name).arg(inherits));
+            VERBOSE_XML(VB_IMPORTANT, filename, element, LOC_ERR +
+                        QString("Type of new widget '%1' doesn't "
+                                "match old '%2'")
+                        .arg(name).arg(inherits));
             parent->DeleteChild(uitype);
             return NULL;
         }
@@ -374,14 +402,15 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
         QDomElement info = child.toElement();
         if (!info.isNull())
         {
-            if (uitype->ParseElement(info))
+            if (uitype->ParseElement(filename, info, showWarnings))
             {
             }
             else if (info.tagName() == "font")
             {
                 bool global = (GetGlobalObjectStore() == parent);
-                MythFontProperties *font =
-                        MythFontProperties::ParseFromXml(info, parent, global);
+                MythFontProperties *font = MythFontProperties::ParseFromXml(
+                    filename, info, parent, global, showWarnings);
+
                 if (!global && font)
                 {
                     QString name = info.attribute("name");
@@ -407,11 +436,13 @@ MythUIType *XMLParseBase::ParseUIType(QDomElement &element, const QString &type,
                      info.tagName() == "guidegrid" ||
                      info.tagName() == "shape")
             {
-                ParseUIType(info, info.tagName(), uitype, screen);
+                ParseUIType(filename, info, info.tagName(),
+                            uitype, screen, showWarnings);
             }
             else
             {
-                XML_ERROR(info, QString("Unknown widget type"));
+                VERBOSE_XML(VB_IMPORTANT, filename, info,
+                            LOC_ERR + "Unknown widget type.");
             }
         }
     }
@@ -424,22 +455,29 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
                                      const QString &windowname,
                                      MythUIType *parent)
 {
-    QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
-    QList<QString>::iterator i;
-    for (i = searchpath.begin(); i != searchpath.end(); ++i)
+    bool onlyLoadWindows = true;
+    bool showWarnings = true;
+
+    const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+    QStringList::const_iterator it = searchpath.begin();
+    for (; it != searchpath.end(); ++it)
     {
-        QString themefile = *i + xmlfile;
-        VERBOSE(VB_GENERAL, "Loading window theme from " + themefile);
-        if (doLoad(windowname, parent, themefile))
+        QString themefile = *it + xmlfile;
+        VERBOSE(VB_GENERAL, LOC + "Loading window theme from " + themefile);
+        if (doLoad(windowname, parent, themefile,
+                   onlyLoadWindows, showWarnings))
         {
             return true;
         }
         else
-            VERBOSE(VB_FILE+VB_EXTRA, "No theme file " + themefile);
+        {
+            VERBOSE(VB_FILE+VB_EXTRA, LOC_ERR + "No theme file " + themefile);
+        }
     }
 
-    VERBOSE(VB_IMPORTANT, QString("Unable to load window '%1' from "
-                              "%2").arg(windowname).arg(xmlfile));
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Unable to load window '%1' from '%2'")
+            .arg(windowname).arg(xmlfile));
 
     return false;
 }
@@ -447,16 +485,14 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
 bool XMLParseBase::doLoad(const QString &windowname,
                           MythUIType *parent,
                           const QString &filename,
-                          bool onlywindows)
+                          bool onlywindows,
+                          bool showWarnings)
 {
     QDomDocument doc;
     QFile f(filename);
 
     if (!f.open(QIODevice::ReadOnly))
-    {
-        //cerr << "XMLParse::LoadTheme(): Can't open: " << themeFile << endl;
         return false;
-    }
 
     QString errorMsg;
     int errorLine = 0;
@@ -464,8 +500,9 @@ bool XMLParseBase::doLoad(const QString &windowname,
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Error parsing: %1\nat line: %2 column: %3\n%4")
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Location: '%1' @ %2 column: %3"
+                        "\n\t\t\tError: %4")
                 .arg(qPrintable(filename)).arg(errorLine).arg(errorColumn)
                 .arg(qPrintable(errorMsg)));
         f.close();
@@ -486,13 +523,14 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 QString name = e.attribute("name", "");
                 if (name.isEmpty())
                 {
-                    XML_ERROR(e, "Window needs a name");
+                    VERBOSE_XML(VB_IMPORTANT, filename, e,
+                                LOC_ERR + "Window needs a name");
                     return false;
                 }
 
                 if (name == windowname)
                 {
-                    ParseChildren(e, parent);
+                    ParseChildren(filename, e, parent, showWarnings);
                     return true;
                 }
             }
@@ -503,8 +541,9 @@ bool XMLParseBase::doLoad(const QString &windowname,
                 if (type == "font")
                 {
                     bool global = (GetGlobalObjectStore() == parent);
-                    MythFontProperties *font =
-                            MythFontProperties::ParseFromXml(e, parent, global);
+                    MythFontProperties *font = MythFontProperties::ParseFromXml(
+                        filename, e, parent, global, showWarnings);
+
                     if (!global && font)
                     {
                         QString name = e.attribute("name");
@@ -530,11 +569,12 @@ bool XMLParseBase::doLoad(const QString &windowname,
                          type == "guidegrid" ||
                          type == "shape")
                 {
-                    ParseUIType(e, type, parent);
+                    ParseUIType(filename, e, type, parent, NULL, showWarnings);
                 }
                 else
                 {
-                    XML_ERROR(e, QString("Unknown widget type"));
+                    VERBOSE_XML(VB_IMPORTANT, filename, e,
+                                LOC_ERR + "Unknown widget type");
                 }
             }
         }
@@ -549,18 +589,30 @@ bool XMLParseBase::doLoad(const QString &windowname,
 bool XMLParseBase::LoadBaseTheme(void)
 {
     bool ok = false;
-    QList<QString> searchpath = GetMythUI()->GetThemeSearchPath();
-    QList<QString>::iterator i;
-    for (i = searchpath.begin(); i != searchpath.end(); ++i)
+    bool loadOnlyWindows = false;
+    bool showWarnings = true;
+
+    const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+
+    QStringList::const_iterator it = searchpath.begin();
+    for (; it != searchpath.end(); ++it)
     {
-        QString themefile = *i + "base.xml";
-        if (doLoad(QString(), GetGlobalObjectStore(), themefile, false))
+        QString themefile = *it + "base.xml";
+        if (doLoad(QString(), GetGlobalObjectStore(), themefile,
+                   loadOnlyWindows, showWarnings))
         {
-            VERBOSE(VB_GENERAL, "Loaded base theme from " + themefile);
+            VERBOSE(VB_GENERAL, LOC +
+                    QString("Loaded base theme from '%1'").arg(themefile));
+            // Don't complain about duplicate definitions after first
+            // successful load (set showWarnings to false).
+            showWarnings = false;
             ok = true;
         }
         else
-            VERBOSE(VB_FILE+VB_EXTRA, "No theme file " + themefile);
+        {
+            VERBOSE(VB_FILE|VB_EXTRA, LOC_WARN +
+                    QString("No theme file '%1'").arg(themefile));
+        }
     }
     
     return ok;
@@ -572,16 +624,18 @@ bool XMLParseBase::CopyWindowFromBase(const QString &windowname,
     MythUIType *ui = GetGlobalObjectStore()->GetChild(windowname);
     if (!ui)
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to load window '%1' from base")
-                                      .arg(windowname));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unable to load window '%1' from base")
+                .arg(windowname));
         return false;
     }
 
     MythScreenType *st = dynamic_cast<MythScreenType *>(ui);
     if (!st)
     {
-        VERBOSE(VB_IMPORTANT, QString("UI Object '%1' is not a ScreenType")
-                                      .arg(windowname));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("UI Object '%1' is not a ScreenType")
+                .arg(windowname));
         return false;
     }
 

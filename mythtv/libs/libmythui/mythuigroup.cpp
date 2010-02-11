@@ -15,11 +15,6 @@ void MythUIGroup::Reset()
     MythUIType::Reset();
 }
 
-bool MythUIGroup::ParseElement(QDomElement &element)
-{
-    return MythUIType::ParseElement(element);
-}
-
 void MythUIGroup::CopyFrom(MythUIType *base)
 {
     MythUIGroup *group = dynamic_cast<MythUIGroup *>(base);

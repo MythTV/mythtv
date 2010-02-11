@@ -210,7 +210,8 @@ void MythUIStateType::Reset()
     MythUIType::Reset();
 }
 
-bool MythUIStateType::ParseElement(QDomElement &element)
+bool MythUIStateType::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "showempty")
         m_ShowEmpty = parseBool(element);
@@ -229,7 +230,7 @@ bool MythUIStateType::ParseElement(QDomElement &element)
         element.setAttribute("name",statename);
 
         MythUIGroup *uitype = dynamic_cast<MythUIGroup *>
-                                (ParseUIType(element, "group", this));
+            (ParseUIType(filename, element, "group", this, NULL, showWarnings));
 
         if (!type.isEmpty())
         {
@@ -251,7 +252,9 @@ bool MythUIStateType::ParseElement(QDomElement &element)
         }
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

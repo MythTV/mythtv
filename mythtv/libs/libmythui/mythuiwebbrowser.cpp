@@ -798,7 +798,8 @@ void MythUIWebBrowser::HandleMouseAction(const QString &action)
     }
 }
 
-bool MythUIWebBrowser::ParseElement(QDomElement &element)
+bool MythUIWebBrowser::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "zoom")
     {
@@ -821,7 +822,9 @@ bool MythUIWebBrowser::ParseElement(QDomElement &element)
         m_bgColor.setAlpha(alpha);
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

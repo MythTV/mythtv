@@ -466,7 +466,8 @@ bool MythScreenType::gestureEvent(MythGestureEvent *event)
     return handled;
 }
 
-bool MythScreenType::ParseElement(QDomElement &element)
+bool MythScreenType::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "area")
     {
@@ -493,7 +494,9 @@ bool MythScreenType::ParseElement(QDomElement &element)
         }
     }
     else
+    {
         return false;
+    }
 
     return true;
 }

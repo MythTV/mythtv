@@ -1035,9 +1035,9 @@ QString MythUIHelper::GetThemeDir(void)
     return d->m_themepathname;
 }
 
-QList<QString> MythUIHelper::GetThemeSearchPath(void)
+QStringList MythUIHelper::GetThemeSearchPath(void)
 {
-    QList<QString> searchpath;
+    QStringList searchpath;
 
     searchpath.append(GetThemeDir());
     if (d->m_isWide)
@@ -1149,8 +1149,8 @@ bool MythUIHelper::FindThemeFile(QString &path)
 
     QString file;
     bool foundit = false;
-    QList<QString> searchpath = GetThemeSearchPath();
-    for (QList<QString>::const_iterator ii = searchpath.begin();
+    const QStringList searchpath = GetThemeSearchPath();
+    for (QStringList::const_iterator ii = searchpath.begin();
         ii != searchpath.end(); ++ii)
     {
         if (fi.isRelative())

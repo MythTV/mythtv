@@ -541,7 +541,8 @@ bool MythUIButtonTree::keyPressEvent(QKeyEvent *event)
 /*!
  * \copydoc MythUIType::ParseElement()
  */
-bool MythUIButtonTree::ParseElement(QDomElement &element)
+bool MythUIButtonTree::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "spacing")
     {
@@ -552,7 +553,9 @@ bool MythUIButtonTree::ParseElement(QDomElement &element)
         m_numLists = getFirstText(element).toInt();
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

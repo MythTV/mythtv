@@ -87,7 +87,8 @@ class MPUBLIC MythScreenType : public MythUIType
 
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
-    virtual bool ParseElement(QDomElement &element);
+    virtual bool ParseElement(
+        const QString &filename, QDomElement &element, bool showWarnings);
 
     virtual void Load(void);   // ONLY to be used for loading data, NO UI WORK
     virtual void Init(void);   // UI work to draw data loaded

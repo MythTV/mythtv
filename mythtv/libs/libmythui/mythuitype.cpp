@@ -798,7 +798,8 @@ void MythUIType::CreateCopy(MythUIType *)
 }
 
 //FIXME add alpha/movement/etc.
-bool MythUIType::ParseElement(QDomElement &element)
+bool MythUIType::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "position")
         SetPosition(parsePoint(element));

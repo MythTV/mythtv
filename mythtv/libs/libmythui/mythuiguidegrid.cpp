@@ -94,7 +94,8 @@ MythUIGuideGrid::~MythUIGuideGrid()
     }
 }
 
-bool MythUIGuideGrid::ParseElement(QDomElement &element)
+bool MythUIGuideGrid::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "layout")
     {
@@ -226,7 +227,9 @@ bool MythUIGuideGrid::ParseElement(QDomElement &element)
             SetArrow(3, image);
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

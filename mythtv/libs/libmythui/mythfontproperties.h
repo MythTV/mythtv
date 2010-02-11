@@ -29,9 +29,10 @@ class MPUBLIC MythFontProperties: public XMLParseBase
 
     QString GetHash(void) const { return m_hash; }
 
-    static MythFontProperties *ParseFromXml(QDomElement &element,
-                                            MythUIType *parent = NULL,
-                                            bool addToGlobal = false);
+    static MythFontProperties *ParseFromXml(
+        const QString &filename, const QDomElement &element,
+        MythUIType *parent = NULL, bool addToGlobal = false,
+        bool showWarnings = true);
 
     void GetOffset(QPoint &offset) const;
 

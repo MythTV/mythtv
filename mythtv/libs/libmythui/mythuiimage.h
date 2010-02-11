@@ -68,7 +68,8 @@ class MPUBLIC MythUIImage : public MythUIType
                          QSize bForceSize);
     void customEvent(QEvent *event);
 
-    virtual bool ParseElement(QDomElement &element);
+    virtual bool ParseElement(
+        const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
     virtual void Finalize(void);

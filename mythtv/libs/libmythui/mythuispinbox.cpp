@@ -62,7 +62,8 @@ void MythUISpinBox::SetRange(int low, int high, int step, uint pageMultiple)
     SetPositionArrowStates();
 }
 
-bool MythUISpinBox::ParseElement(QDomElement &element)
+bool MythUISpinBox::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)    
 {
     if (element.tagName() == "template")
     {
@@ -77,7 +78,9 @@ bool MythUISpinBox::ParseElement(QDomElement &element)
         m_hasTemplate = true;
     }
     else
-        return MythUIButtonList::ParseElement(element);
+    {
+        return MythUIButtonList::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

@@ -245,7 +245,8 @@ QString MythUIButton::GetDefaultText() const
     return m_Text->GetDefaultText();
 }
 
-bool MythUIButton::ParseElement(QDomElement &element)
+bool MythUIButton::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "value")
     {
@@ -253,7 +254,9 @@ bool MythUIButton::ParseElement(QDomElement &element)
             "ThemeUI", getFirstText(element).toLatin1().constData());
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

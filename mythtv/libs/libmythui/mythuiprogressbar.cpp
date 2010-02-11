@@ -27,7 +27,8 @@ void MythUIProgressBar::Reset()
     MythUIType::Reset();
 }
 
-bool MythUIProgressBar::ParseElement(QDomElement &element)
+bool MythUIProgressBar::ParseElement(
+    const QString &filename, QDomElement &element, bool showWarnings)
 {
     if (element.tagName() == "layout")
     {
@@ -48,7 +49,9 @@ bool MythUIProgressBar::ParseElement(QDomElement &element)
             m_effect = EffectReveal;
     }
     else
-        return MythUIType::ParseElement(element);
+    {
+        return MythUIType::ParseElement(filename, element, showWarnings);
+    }
 
     return true;
 }

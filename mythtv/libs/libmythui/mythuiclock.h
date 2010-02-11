@@ -32,7 +32,8 @@ class MPUBLIC MythUIClock : public MythUIText
     virtual void Pulse(void);
 
   protected:
-    virtual bool ParseElement(QDomElement &element);
+    virtual bool ParseElement(
+        const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 

@@ -44,7 +44,8 @@ class MPUBLIC MythUIGuideGrid : public MythUIType
 
   protected:
     virtual void Finalize(void);
-    virtual bool ParseElement(QDomElement &element);
+    virtual bool ParseElement(
+        const QString &filename, QDomElement &element, bool showWarnings);
     virtual void CopyFrom(MythUIType *base);
     virtual void CreateCopy(MythUIType *parent);
 
