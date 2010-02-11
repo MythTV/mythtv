@@ -2487,6 +2487,8 @@ if ! enabled_any cpu_override cross_compile && enabled proc_opt; then
 # Athlon 64
    elif expr "$processor" : ".*AMD Athlon(tm) 64" > /dev/null ; then
        cpu="k8"
+   elif expr "$processor" : ".*AMD Athlon(tm) Dual Core" > /dev/null ; then
+       cpu="k8"
    elif expr "$processor" : ".*Athlon LE-16" > /dev/null ; then
        cpu="k8"
 # AMD Phenom
