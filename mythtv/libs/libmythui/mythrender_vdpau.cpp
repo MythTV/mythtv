@@ -1101,7 +1101,7 @@ bool MythRenderVDPAU::SetDeinterlacing(uint id, uint deinterlacers)
     if (!m_videoMixers.contains(id))
         return false;
 
-    static const uint all_deints = kVDPFeatTemporal & kVDPFeatSpatial;
+    static const uint all_deints = kVDPFeatTemporal | kVDPFeatSpatial;
     uint current = m_videoMixers[id].m_features;
     uint deints  = current & all_deints;
 
