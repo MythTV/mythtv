@@ -721,7 +721,7 @@ static const StreamType DESC_types[] = {
     { 0x13, CODEC_TYPE_DATA,          CODEC_ID_DSMCC_B }, /* DVB_CAROUSEL_ID */
     { 0x45, CODEC_TYPE_DATA,          CODEC_ID_DVB_VBI }, /* DVB_VBI_DATA_ID */
     { 0x46, CODEC_TYPE_DATA,          CODEC_ID_DVB_VBI }, /* DVB_VBI_TELETEXT_ID */ //FixMe type subtilte
-    { 0x56, CODEC_TYPE_DATA,     CODEC_ID_DVB_TELETEXT },
+    { 0x56, CODEC_TYPE_SUBTITLE, CODEC_ID_DVB_TELETEXT },
     { 0x59, CODEC_TYPE_SUBTITLE, CODEC_ID_DVB_SUBTITLE }, /* subtitling descriptor */
     { 0 },
 };
@@ -1076,7 +1076,6 @@ static int is_desired_stream(pmt_entry_t *item)
             switch (item->codec_id)
             {
                 case CODEC_ID_DSMCC_B:
-                case CODEC_ID_DVB_TELETEXT:
                 case CODEC_ID_DVB_VBI:
                     val = 1;
                     break;

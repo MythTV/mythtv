@@ -3820,9 +3820,10 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         }
 
         if (len > 0 &&
-            curstream->codec->codec_type == CODEC_TYPE_DATA &&
-            (curstream->codec->codec_id  == CODEC_ID_DVB_VBI ||
-             curstream->codec->codec_id  == CODEC_ID_DVB_TELETEXT))
+            ((curstream->codec->codec_type == CODEC_TYPE_DATA &&
+              curstream->codec->codec_id   == CODEC_ID_DVB_VBI) ||
+             (curstream->codec->codec_type == CODEC_TYPE_SUBTITLE &&
+              curstream->codec->codec_id   == CODEC_ID_DVB_TELETEXT)))
         {
             ProcessDVBDataPacket(curstream, pkt);
 
