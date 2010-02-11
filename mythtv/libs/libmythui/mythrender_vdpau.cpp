@@ -2030,6 +2030,7 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
                 it.value().m_render.info.h264.referenceFrames[i].surface =
                     old_surfaces[ref];
         }
+
         // VC1
         fwd  = it.value().m_render.info.vc1.forward_reference;
         back = it.value().m_render.info.vc1.backward_reference;
@@ -2037,6 +2038,14 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
             it.value().m_render.info.vc1.forward_reference = old_surfaces[fwd];
         if (back != VDP_INVALID_HANDLE && old_surfaces.contains(back))
             it.value().m_render.info.vc1.backward_reference = old_surfaces[back];
+
+        // MPEG4
+        fwd  = it.value().m_render.info.mpeg4.forward_reference;
+        back = it.value().m_render.info.mpeg4.backward_reference;
+        if (fwd != VDP_INVALID_HANDLE && old_surfaces.contains(fwd))
+            it.value().m_render.info.mpeg4.forward_reference = old_surfaces[fwd];
+        if (back != VDP_INVALID_HANDLE && old_surfaces.contains(back))
+            it.value().m_render.info.mpeg4.backward_reference = old_surfaces[back];
     }
 
     if (ok)

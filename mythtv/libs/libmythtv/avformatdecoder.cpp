@@ -1280,6 +1280,7 @@ static bool IS_VDPAU_PIX_FMT(enum PixelFormat fmt)
         fmt == PIX_FMT_VDPAU_H264  ||
         fmt == PIX_FMT_VDPAU_MPEG1 ||
         fmt == PIX_FMT_VDPAU_MPEG2 ||
+        fmt == PIX_FMT_VDPAU_MPEG4 ||
         fmt == PIX_FMT_VDPAU_WMV3  ||
         fmt == PIX_FMT_VDPAU_VC1;
 }

@@ -212,7 +212,7 @@ int myth2av_codecid(MythCodecID codec_id,
             VERBOSE(VB_IMPORTANT, "Error: VDPAU H.263 not supported by ffmpeg");
             break;
         case kCodec_MPEG4_VDPAU:
-            VERBOSE(VB_IMPORTANT, "Error: VDPAU MPEG4 not supported by ffmpeg");
+            ret = CODEC_ID_MPEG4;
             break;
 
         case kCodec_H264_VDPAU:

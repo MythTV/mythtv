@@ -560,6 +560,9 @@ void VideoOutputVDPAU::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
             case PIX_FMT_VDPAU_MPEG2:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG2_MAIN;
                 break;
+            case PIX_FMT_VDPAU_MPEG4:
+                vdp_decoder_profile = VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
+                break;
             case PIX_FMT_VDPAU_H264:
                 vdp_decoder_profile = VDP_DECODER_PROFILE_H264_HIGH;
                 break;
@@ -863,6 +866,7 @@ MythCodecID VideoOutputVDPAU::GetBestSupportedCodec(
 
     MythCodecID test_cid = (MythCodecID)(kCodec_MPEG1_VDPAU + (stream_type-1));
     use_cpu |= !codec_is_vdpau_hw(test_cid);
+    use_cpu |= !MythRenderVDPAU::IsMPEG4Available();
     if ((dec != "vdpau") || getenv("NO_VDPAU") || use_cpu)
         return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
 

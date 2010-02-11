@@ -92,8 +92,7 @@ typedef enum
 #define codec_is_vdpau(id)    (id > kCodec_VDPAU_BEGIN) &&\
                               (id < kCodec_VDPAU_END)
 #define codec_is_vdpau_hw(id) (codec_is_vdpau(id) &&\
-                              (id != kCodec_H263_VDPAU) &&\
-                              (id != kCodec_MPEG4_VDPAU))
+                              (id != kCodec_H263_VDPAU))
 
 QString get_encoding_type(MythCodecID codecid);
 QString get_decoder_name(MythCodecID codec_id, bool libmpeg2);
