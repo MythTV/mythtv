@@ -1610,7 +1610,7 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
             if (item->dvbci.language[0])
                 av_metadata_set(&st->metadata, "language", item->dvbci.language);
 
-            if (item->dvbci.sub_id && (item->type == STREAM_TYPE_SUBTITLE_DVB))
+            if (item->dvbci.sub_id && (item->codec_id == CODEC_ID_DVB_SUBTITLE))
                 st->codec->sub_id = item->dvbci.sub_id;
 
             st->component_tag = item->dvbci.component_tag;
