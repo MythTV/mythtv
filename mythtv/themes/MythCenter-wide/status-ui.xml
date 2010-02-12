@@ -14,17 +14,17 @@
         </shape>
 
         <buttonlist name="category">
-            <area>70,50,1250,30</area>
+            <area>70,45,1250,44</area>
             <layout>horizontal</layout>
             <spacing>6</spacing>
-            <buttonarea>15,0,1220,40</buttonarea>
+            <buttonarea>25,0,1220,44</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
-                    <area>0,0,180,40</area>
+                    <area>0,0,215,44</area>
                     <shape name="background" from="basewidgetshape" />
                     <textarea name="buttontext" from="basetextarea">
-                        <area>0,0,180,40</area>
-                        <font>basesmall_normal</font>
+                        <area>5,4,205,38</area>
+                        <font>basesmall</font>
                         <align>allcenter</align>
                     </textarea>
                 </state>
@@ -33,12 +33,12 @@
                 </state>
                 <state name="selectedinactive" from="active">
                     <textarea name="buttontext">
-                        <font>basesmall_normal_inactive</font>
+                        <font>basesmall</font>
                     </textarea>
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>1130,10</position>
+                <position>1135,12</position>
                 <state type="off">
                     <imagetype name="dnon">
                         <filename>lb-rtarrow-reg.png</filename>
@@ -51,7 +51,7 @@
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
-                <position>0,10</position>
+                <position>-2,12</position>
                 <state type="off">
                     <imagetype name="upon">
                         <filename>lb-ltarrow-reg.png</filename>
