@@ -1538,7 +1538,7 @@ void TVRec::RunTV(void)
 
             {
                 QMutexLocker locker(&triggerEventLoopLock);
-                // We check tELSignal because it is possible
+                // We check triggerEventLoopSignal because it is possible
                 // that WakeEventLoop() was called since we
                 // unlocked the stateChangeLock
                 if (!triggerEventLoopSignal)
