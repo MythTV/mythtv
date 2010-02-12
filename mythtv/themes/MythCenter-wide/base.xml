@@ -22,6 +22,11 @@
         <pixelsize>26</pixelsize>
     </font>
 
+    <font name="basemediumbold" from="basemedium">
+        <pixelsize>26</pixelsize>
+        <bold>yes</bold>
+    </font>
+
     <font name="baselarge" from="basemedium">
         <pixelsize>28</pixelsize>
         <shadowcolor>#000000</shadowcolor>
@@ -89,11 +94,11 @@
         <color>#000000</color>
     </font>
     <!-- State variations on medium font -->
-    <font name="basemedium_normal_selected" from="basemediumbold">
-        <color>#FFFFFF</color>
-    </font>
-    <font name="basemedium_normal" from="basemedium">
+    <font name="basemedium_normal" from="basemediumbold">
         <color>#9999cc</color>
+    </font>
+    <font name="basemedium_normal_selected" from="basemedium">
+        <color>#FFFFFF</color>
     </font>
     <font name="basemedium_disabled" from="basemedium">
         <color>#666666</color>
@@ -988,23 +993,17 @@
         <imagetype name="backimg">
           <filename>ui/background.png</filename>
         </imagetype>
-                                   
-        <font name="small" face="Liberation Sans">
-          <color>#FFFFFF</color>
-          <pixelsize>19</pixelsize>
-          <bold>yes</bold>
-        </font>
     
         <font name="medium" face="Droid Sans">
-          <color>#FFFFFF</color>
-          <pixelsize>26</pixelsize>
-          <bold>yes</bold>
+            <color>#FFFFFF</color>
+            <pixelsize>26</pixelsize>
+            <bold>yes</bold>
         </font>
     
         <font name="large" face="Liberation Sans">
-          <color>#FFFFFF</color>
-          <pixelsize>28</pixelsize>
-          <bold>yes</bold>
+             <color>#FFFFFF</color>
+             <pixelsize>28</pixelsize>
+             <bold>yes</bold>
         </font>
     
         <font name="clock" face="Liberation Sans">
