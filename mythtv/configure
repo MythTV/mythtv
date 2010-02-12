@@ -2580,6 +2580,19 @@ if enabled proc_error_msg; then
     echo ""
 fi
 
+if test $target_os = "darwin"; then
+     # Apple GCC doesn't support march=core2 yet:
+    if test $cpu = "core2"; then
+        cpu="nocona"
+    fi
+    # Core Duo might be identified as march=pentium3, which errors:
+    # ...MachineExceptions.h:... error: '__m128i' does not name a type
+    # ...MachineExceptions.h:... error: '__m128i' does not name a type
+    if test $cpu = "pentium3"; then
+        cpu=prescott
+    fi
+fi
+
 # Add processor-specific flags
 if test "$cpu" = generic; then
     : do nothing
@@ -3093,16 +3106,6 @@ if test $cpu = "generic"; then
     fi
 fi
 
-    # Apple GCC doesn't support march=core2 yet:
-    if test $cpu == "core2"; then
-        cpu="nocona"
-    fi
-    # Core Duo might be identified as march=pentium3, which errors:
-    # ...MachineExceptions.h:... error: '__m128i' does not name a type
-    # ...MachineExceptions.h:... error: '__m128i' does not name a type
-    if test $cpu == "pentium3"; then
-        cpu=prescott
-    fi
 check_optflags -fomit-frame-pointer
 
 
