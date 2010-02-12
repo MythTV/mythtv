@@ -322,6 +322,7 @@ class DBDataWrite( DBData ):
 
     def _sanitize(self, data, fill=True):
         """Remove fields from dictionary that are not in database table."""
+        data = data.copy()
         for key in data.keys():
             if key not in self.field_order:
                 del data[key]
@@ -372,11 +373,19 @@ class DBDataWrite( DBData ):
         c.close()
         return intid
 
+    def _pull(self):
+        DBData._pull(self)
+        self.origdata = self.data.copy()
+
     def _push(self):
         if (self.where is None) or (self.wheredat is None):
             return
         c = self.db.cursor(self.log)
         data = self._sanitize(self.data)
+        for key, value in data.items():
+            if value == self.origdata[key]:
+            # filter unchanged data
+                del data[key]
         format_string = ', '.join(['%s = %%s' % d for d in data])
         sql_values = data.values()
         sql_values.extend(self.wheredat)
@@ -1695,7 +1704,7 @@ class MythError( Exception ):
             self.ename = 'GENERIC'
             self.ecode = self.GENERIC
             self.args = args
-        self.message = str(self.args)
+        self.message = str(self.args[0])
 
 class MythDBError( MythError ): pass
 class MythBEError( MythError ): pass

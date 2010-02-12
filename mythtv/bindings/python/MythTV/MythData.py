@@ -10,7 +10,7 @@ from MythBase import *
 import re, sys, socket, os
 import xml.etree.cElementTree as etree
 from time import mktime, strftime, strptime
-from datetime import date, datetime
+from datetime import date, time, datetime
 from socket import gethostbyaddr, gethostname
 
 #### FILE ACCESS ####
@@ -339,6 +339,10 @@ class FileOps( MythBEBase ):
         return self.backendCommand(BACKEND_SEP.join((\
                     'QUERY_FILE_HASH',file, sgroup)))
 
+    def reschedule(self, recordid=-1):
+        """FileOps.getHash() -> None"""
+        self.backendCommand('RESCHEDULE_RECORDINGS '+str(recordid))
+
 
 class FreeSpace( DictData ):
     """Represents a FreeSpace entry."""
@@ -538,7 +542,10 @@ class Record( DBDataWrite ):
     setwheredat = 'self.recordid,'
     defaults = {'recordid':None,    'type':kAllRecord,      'title':u'Unknown',
                 'subtitle':'',      'description':'',       'category':'',
-                'station':'',       'seriesid':'',          'search':''}
+                'station':'',       'seriesid':'',          'search':0,
+                'last_record':datetime(1900,1,1),
+                'next_record':datetime(1900,1,1),
+                'last_delete':datetime(1900,1,1)}
     logmodule = 'Python Record'
 
     def __str__(self):
@@ -557,7 +564,12 @@ class Record( DBDataWrite ):
         """Record.create(data=None) -> Record object"""
         self.wheredat = (DBDataWrite.create(self, data),)
         self._pull()
+        FileOps(db=self.db).reschedule(self.recordid)
         return self
+
+    def update(self, *args, **keywords):
+        DBDataWrite.update(*args, **keywords)
+        FileOps(db=self.db).reschedule(self.recordid)
 
 class Recorded( DBDataWrite ):
     """
@@ -766,6 +778,7 @@ class OldRecorded( DBDataWrite ):
         c.execute("""UPDATE oldrecorded SET duplicate=%%s
                      WHERE %s""" % self.where, \
                 tuple([record]+list(self.wheredat)))
+        FileOps(db=self.db).reschedule(0)
 
     def update(self, *args, **keywords):
         """OldRecorded entries can not be altered"""
@@ -939,6 +952,21 @@ class Guide( DBData ):
             DBData.__init__(self, db=db, raw=raw)
         else:
             DBData.__init__(self, data=data, db=db, raw=raw)
+
+    def record(self, type=Record.kAllRecord):
+        rec = Record(db=self.db)
+        for key in ('chanid','title','subtitle','description', 'category',
+                    'seriesid','programid'):
+            rec[key] = self[key]
+
+        rec.startdate = self.starttime.date()
+        rec.starttime = self.starttime-datetime.combine(rec.startdate, time())
+        rec.enddate = self.endtime.date()
+        rec.endtime = self.endtime-datetime.combine(rec.enddate, time())
+
+        rec.station = Channel(self.chanid, db=self.db).callsign
+        rec.type = type
+        return rec.create()
 
 
 #### MYTHVIDEO ####
