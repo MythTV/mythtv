@@ -3647,21 +3647,21 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     if (!inuse && inUseForWhat.length() < 2)
         return; // can't delete if we don't have a key
 
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("DELETE FROM inuseprograms WHERE "
-                  "chanid = :CHANID AND starttime = :STARTTIME AND "
-                  "hostname = :HOSTNAME AND recusage = :RECUSAGE ;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-    query.bindValue(":RECUSAGE", inUseForWhat);
-
-    if (!query.exec())
-        MythDB::DBError("MarkAsInUse -- delete", query);
-
     if (!inuse)
     {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "DELETE FROM inuseprograms "
+            "WHERE chanid   = :CHANID   AND starttime = :STARTTIME AND "
+            "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
+        query.bindValue(":CHANID",    chanid);
+        query.bindValue(":STARTTIME", recstartts);
+        query.bindValue(":HOSTNAME",  gContext->GetHostName());
+        query.bindValue(":RECUSAGE",  inUseForWhat);
+
+        if (!query.exec())
+            MythDB::DBError("MarkAsInUse -- delete", query);
+
         inUseForWhat.clear();
         SendUpdateEvent();
         return;
@@ -3712,22 +3712,61 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     lastInUseTime = mythCurrentDateTime();
 
-    query.prepare("INSERT INTO inuseprograms "
-                  " (chanid, starttime, recusage, hostname, lastupdatetime, "
-                      " rechost, recdir ) "
-                  " VALUES "
-                  " (:CHANID, :STARTTIME, :RECUSAGE, :HOSTNAME, :UPDATETIME, "
-                      " :RECHOST, :RECDIR);");
-    query.bindValue(":CHANID", chanid);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT count(*) "
+        "FROM inuseprograms "
+        "WHERE chanid   = :CHANID   AND starttime = :STARTTIME AND "
+        "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
+    query.bindValue(":CHANID",    chanid);
     query.bindValue(":STARTTIME", recstartts);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-    query.bindValue(":RECUSAGE", inUseForWhat);
-    query.bindValue(":UPDATETIME", lastInUseTime);
-    query.bindValue(":RECHOST", hostname);
-    query.bindValue(":RECDIR", recDir);
+    query.bindValue(":HOSTNAME",  gContext->GetHostName());
+    query.bindValue(":RECUSAGE",  inUseForWhat);
 
     if (!query.exec())
-        MythDB::DBError("SetInUse", query);
+    {
+        MythDB::DBError("MarkAsInUse -- select", query);
+    }
+    else if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "MarkAsInUse -- select query failed");
+    }
+    else if (query.value(0).toUInt())
+    {
+        query.prepare(
+            "UPDATE inuseprograms "
+            "SET lastupdatetime = :UPDATETIME "
+            "WHERE chanid   = :CHANID   AND starttime = :STARTTIME AND "
+            "      hostname = :HOSTNAME AND recusage  = :RECUSAGE");
+        query.bindValue(":CHANID",     chanid);
+        query.bindValue(":STARTTIME",  recstartts);
+        query.bindValue(":HOSTNAME",   gContext->GetHostName());
+        query.bindValue(":RECUSAGE",   inUseForWhat);
+        query.bindValue(":UPDATETIME", lastInUseTime);
+        
+        if (!query.exec())
+            MythDB::DBError("MarkAsInUse -- update failed", query);
+    }
+    else // if (!query.value(0).toUInt())
+    {
+        query.prepare(
+            "INSERT INTO inuseprograms "
+            " (chanid,         starttime,  recusage,  hostname, "
+            "  lastupdatetime, rechost,    recdir) "
+            "VALUES "
+            " (:CHANID,       :STARTTIME, :RECUSAGE, :HOSTNAME, "
+            "  :UPDATETIME,   :RECHOST,   :RECDIR)");
+        query.bindValue(":CHANID",     chanid);
+        query.bindValue(":STARTTIME",  recstartts);
+        query.bindValue(":HOSTNAME",   gContext->GetHostName());
+        query.bindValue(":RECUSAGE",   inUseForWhat);
+        query.bindValue(":UPDATETIME", lastInUseTime);
+        query.bindValue(":RECHOST",    hostname);
+        query.bindValue(":RECDIR",     recDir);
+        
+        if (!query.exec())
+            MythDB::DBError("MarkAsInUse -- insert failed", query);
+    }
 
     // Let others know we changed status
     if (notifyOfChange)
