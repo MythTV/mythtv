@@ -283,7 +283,6 @@ class MPUBLIC ProgramInfo
     virtual ~ProgramInfo();
 
     // Serializers
-    void Save() const;
     void ToStringList(QStringList &list) const;
     virtual void ToMap(QHash<QString, QString> &progMap,
                        bool showrerecord = false) const;

@@ -3511,42 +3511,6 @@ bool ProgramInfo::FillInRecordInfo(const vector<ProgramInfo *> &reclist)
     return found;
 }
 
-/** \fn ProgramInfo::Save(void) const
- *  \brief Saves this ProgramInfo to the database, replacing any existing
- *         program in the same timeslot on the same channel.
- */
-void ProgramInfo::Save(void) const
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    // This used to be REPLACE INTO...
-    // primary key of table program is chanid,starttime
-    query.prepare("DELETE FROM program"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid.toInt());
-    query.bindValue(":STARTTIME", startts);
-    if (!query.exec())
-        MythDB::DBError("Saving program", query);
-
-    query.prepare("INSERT INTO program (chanid,starttime,endtime,"
-                  " title,subtitle,description,category,airdate,"
-                  " stars) VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
-                  " :SUBTITLE,:DESCRIPTION,:CATEGORY,:AIRDATE,:STARS);");
-    query.bindValue(":CHANID", chanid.toInt());
-    query.bindValue(":STARTTIME", startts);
-    query.bindValue(":ENDTIME", endts);
-    query.bindValue(":TITLE", title);
-    query.bindValue(":SUBTITLE", subtitle);
-    query.bindValue(":DESCRIPTION", description);
-    query.bindValue(":CATEGORY", category);
-    query.bindValue(":AIRDATE", "0");
-    query.bindValue(":STARS", "0");
-
-    if (!query.exec())
-        MythDB::DBError("Saving program", query);
-}
-
 void ProgramInfo::UpdateInUseMark(bool force)
 {
     if (isVideo)
