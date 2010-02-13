@@ -3417,6 +3417,10 @@ check_func_headers sys/timeb.h ftime
 check_func_headers sys/time.h gettimeofday
 check_func_headers "sys/types.h sys/socket.h ifaddrs.h" getifaddrs
 
+# libmythhdhomerun now uses clock_gettime, which some Unixes need -lrt for:
+check_func clock_gettime || \
+    { check_func clock_gettime -lrt && add_extralibs -lrt; }
+
 if ! enabled_any memalign memalign_hack posix_memalign malloc_aligned &&
      enabled_any $need_memalign ; then
     die "Error, no aligned memory allocator but SSE enabled, disable it or use --enable-memalign-hack."
