@@ -93,6 +93,15 @@
     <font name="basesmall_textedit" from="basesmall">
         <color>#000000</color>
     </font>
+    <font name="basesmall_normal_button" from="basesmallbold">
+        <color>#FFFFFF</color>
+    </font>
+    <font name="basesmall_selected_button" from="basesmallbold">
+        <color>#FFFFFF</color>
+    </font>
+    <font name="basesmall_disabled_button" from="basesmallbold">
+        <color>#9999cc</color>
+    </font>
     <!-- State variations on medium font -->
     <font name="basemedium_normal" from="basemediumbold">
         <color>#9999cc</color>
@@ -105,6 +114,15 @@
     </font>
     <font name="basemedium_highlight" from="basemediumbold">
         <color>#FFFF33</color>
+    </font>
+    <font name="basemedium_normal_button" from="basemediumbold">
+        <color>#FFFFFF</color>
+    </font>
+    <font name="basemedium_selected_button" from="basemediumbold">
+        <color>#FFFFFF</color>
+    </font>
+    <font name="basemedium_disabled_button" from="basemediumbold">
+        <color>#9999cc</color>
     </font>
 
     <!-- Fonts for specific screens -->
@@ -298,11 +316,11 @@
                     <filename>button_background.png</filename>
                 </imagetype>
                 <textarea name="text">
-                    <area>5,6,140,30</area>
+                    <area>0,1,146,38</area>
                     <align>allcenter</align>
-                    <font>basemedium_normal</font>
-                    <font state="selected">basemedium_normal_selected</font>
-                    <font state="disabled">basemedium_disabled</font>
+                    <font>basemedium_normal_button</font>
+                    <font state="selected">basemedium_selected_button</font>
+                    <font state="disabled">basemedium_disabled_button</font>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -316,7 +334,7 @@
                     <filename>button_pushed_background.png</filename>
                 </imagetype>
                 <textarea name="text">
-                    <position>8,8</position>
+                    <position>4,4</position>
                 </textarea>
             </state>
         </statetype>
@@ -333,9 +351,9 @@
                 <textarea name="text">
                     <area>5,5,290,30</area>
                     <align>allcenter</align>
-                    <font>basemedium_normal</font>
-                    <font state="selected">basemedium_normal_selected</font>
-                    <font state="disabled">basemedium_disabled</font>
+                    <font>basemedium_normal_button</font>
+                    <font state="selected">basemedium_selected_button</font>
+                    <font state="disabled">basemedium_disabled_button</font>
                 </textarea>
             </state>
             <state name="selected" from="active">
@@ -349,43 +367,43 @@
                     <filename>wide_button_pushed_background.png</filename>
                 </imagetype>
                 <textarea name="text">
-                    <position>8,8</position>
+                    <position>4,4</position>
                 </textarea>
             </state>
         </statetype>
     </button>
 
-    <!-- Base definition of a wide button -->
-    <button name="basewidebutton">
-        <area>0,0,300,40</area>
+    <!-- Base definition of a very wide button -->
+    <button name="baseverywidebutton">
+        <area>0,0,495,40</area>
         <statetype name="buttonstate">
             <state name="active">
                 <imagetype name="background">
                     <area>0,0,495,40</area>
-                    <filename>button_wide_background.png</filename>
+                    <filename>very_wide_button_background.png</filename>
                 </imagetype>
                 <textarea name="text">
-                    <area>5,5,490,30</area>
+                    <area>0,-2,495,40</area>
                     <align>allcenter</align>
-                    <font>basemedium_normal</font>
-                    <font state="selected">basemedium_normal_selected</font>
-                    <font state="disabled">basemedium_disabled</font>
+                    <font>basesmall_normal_button</font>
+                    <font state="selected">basesmall_selected_button</font>
+                    <font state="disabled">basesmall_disabled_button</font>
                 </textarea>
             </state>
             <state name="selected" from="active">
                 <imagetype name="background">
                     <area>0,0,495,40</area>
-                    <filename>button_wide_selected_background.png</filename>
+                    <filename>very_wide_button_selected_background.png</filename>
                 </imagetype>
             </state>
             <state name="disabled" from="active" />
             <state name="pushed" from="active">
                 <imagetype name="background">
                     <area>0,0,495,40</area>
-                    <filename>button_wide_pushed_background.png</filename>
+                    <filename>very_wide_button_pushed_background.png</filename>
                 </imagetype>
                 <textarea name="text">
-                    <position>8,8</position>
+                    <position>4,4</position>
                 </textarea>
             </state>
         </statetype>
@@ -459,7 +477,7 @@
                     <area>5,5,55,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
-                    <align>left,vcenter</align>
+                    <align>right,vcenter</align>
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
@@ -492,6 +510,28 @@
                     <filename>lb-ltarrow-sel.png</filename>
                 </imagetype>
             </state>
+        </statetype>
+    </spinbox>
+
+    <!-- Base definition of a spinbox with centered strings -->
+    <spinbox name="base_centered_spinbox" from="basespinbox">
+        <area>0,0,90,40</area>
+        <layout>horizontal</layout>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,70,40</area>
+                <shape name="background" from="basewidgetshape" />
+                <textarea name="buttontext">
+                    <area>5,5,55,30</area>
+                    <font>basesmall</font>
+                    <cutdown>no</cutdown>
+                    <align>allcenter</align>
+                </textarea>
+            </state>
+            <state name="selectedactive" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+            </state>
+            <state name="selectedinactive" from="active" />
         </statetype>
     </spinbox>
 
@@ -530,7 +570,7 @@
                 <area>0,0,200,40</area>
                 <shape name="background" from="basewidgetshape" />
                 <textarea name="buttontext">
-                    <area>5,5,190,30</area>
+                    <area>15,5,180,30</area>
                     <font>basesmall</font>
                     <cutdown>yes</cutdown>
                     <align>left,vcenter</align>
@@ -577,7 +617,7 @@
             <state name="active">
                 <area>0,0,475,40</area>
                 <textarea name="buttontext">
-                    <area>5,5,465,30</area>
+                    <area>15,5,455,30</area>
                 </textarea>
             </state>
             <state name="selectedactive" from="active">
@@ -590,6 +630,30 @@
         </statetype>
         <statetype name="upscrollarrow">
             <position>480,21</position>
+        </statetype>
+    </buttonlist>
+
+    <buttonlist name="baseverywideselector" from="baseselector">
+        <area>0,0,505,43</area>
+        <buttonarea>0,0,495,43</buttonarea>
+        <statetype name="buttonitem">
+            <state name="active">
+                <area>0,0,495,43</area>
+                <textarea name="buttontext">
+                    <area>0,0,495,43</area>
+                    <align>allcenter</align>
+                </textarea>
+            </state>
+            <state name="selectedactive" from="active">
+                <shape name="background" from="baseselectedwidgetshape" />
+            </state>
+            <state name="selectedinactive" from="active" />
+        </statetype>
+        <statetype name="downscrollarrow">
+            <position>500,3</position>
+        </statetype>
+        <statetype name="upscrollarrow">
+            <position>500,23</position>
         </statetype>
     </buttonlist>
 

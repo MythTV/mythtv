@@ -410,7 +410,7 @@
         </textarea>
 
         <buttonlist name="channel" from="basewideselector">
-            <position>480,200</position>
+            <position>480,204</position>
         </buttonlist>
 
         <textarea name="datelabel" from="titlelabel">
@@ -419,7 +419,7 @@
         </textarea>
 
         <buttonlist name="startdate" from="basewideselector">
-            <position>480,280</position>
+            <position>480,284</position>
         </buttonlist>
 
         <textarea name="timelabel" from="titlelabel">
@@ -433,8 +433,8 @@
             <align>right</align>
         </textarea>
 
-        <spinbox name="starthour" from="basespinbox">
-            <position>550,360</position>
+        <spinbox name="starthour" from="base_centered_spinbox">
+            <position>550,364</position>
         </spinbox>
 
         <textarea name="minutelabel" from="hourlabel">
@@ -442,8 +442,8 @@
             <value>Minute</value>
         </textarea>
 
-        <spinbox name="startminute" from="basespinbox">
-            <position>785,360</position>
+        <spinbox name="startminute" from="base_centered_spinbox">
+            <position>785,364</position>
         </spinbox>
 
         <textarea name="durationlabel" from="titlelabel">
@@ -451,8 +451,8 @@
             <value>Duration:</value>
         </textarea>
 
-        <spinbox name="duration" from="basespinbox">
-            <position>480,450</position>
+        <spinbox name="duration" from="base_centered_spinbox">
+            <position>480,454</position>
         </spinbox>
 
         <button name="cancel" from="basebutton">
@@ -476,7 +476,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,49,1240,360</area>
+            <area>20,49,1240,370</area>
         </shape>
 
         <textarea name="status" from="basetextarea">
@@ -1490,7 +1490,7 @@
                         <align>vcenter,right</align>
                     </textarea>
                     <textarea name="dummy" from="buttontext">
-                        <text></text>
+                        <value></value>
                         <area>1170,2,40,24</area>
                     </textarea>
                 </state>
@@ -1719,11 +1719,11 @@
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>50,270,440,27</area>
+            <area>50,260,440,27</area>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>1025,270,200,35</area>
+            <area>1025,260,200,35</area>
             <align>right</align>
         </textarea>
 
@@ -1733,37 +1733,37 @@
             <template>%|"SUBTITLE|"% %LONGREPEAT%%STARS| %%DESCRIPTION%</template>
         </textarea>
     
-        <buttonlist name="rules" from="basewideselector">
-            <position>455,310</position>
+        <buttonlist name="rules" from="baseverywideselector">
             <helptext>Select the recording rule</helptext>
+            <position>410,305</position>
         </buttonlist>
 
         <button name="schedoptions" from="baseverywidebutton">
-            <position>455,355</position>
+            <position>410,355</position>
             <value>Schedule Options</value>
             <helptext></helptext>
         </button>
 
         <button name="storeoptions" from="baseverywidebutton">
-            <position>455,400</position>
+            <position>410,400</position>
             <value>Storage Options</value>
             <helptext></helptext>
         </button>
 
         <button name="postprocessing" from="baseverywidebutton">
-            <position>455,445</position>
+            <position>410,445</position>
             <value>Post Processing</value>
             <helptext></helptext>
         </button>
 
         <button name="schedinfo" from="baseverywidebutton">
-            <position>455,490</position>
+            <position>410,490</position>
             <value>Schedule Info</value>
             <helptext></helptext>
         </button>        
 
         <button name="preview" from="baseverywidebutton">
-            <position>455,535</position>
+            <position>410,535</position>
             <value>Preview</value>
             <helptext></helptext>
         </button>
