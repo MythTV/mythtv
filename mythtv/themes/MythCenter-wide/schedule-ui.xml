@@ -46,14 +46,14 @@
         <textarea name="channelgroup" from="basetextarea">
             <area>25,270,190,25</area>
             <align>bottom,hcenter</align>
-            <font>basesmall_normal</font>
+            <font>basesmall</font>
         </textarea>
 
         <guidegrid name="guidegrid">
-            <area>220,295,1032,390</area>
+            <area>220,295,1035,390</area>
             <layout>horizontal</layout>
             <channels>5</channels>
-            <timeslots>4</timeslots>
+            <timeslots>5</timeslots>
             <solidcolor>#003256</solidcolor>
             <selector type="roundbox" linecolor="#ffff33" />
             <showcategories>yes</showcategories>
@@ -72,22 +72,23 @@
             <recordstatus type="OverrideRecord" image="gg-rs-override.png" />
             <arrow direction="left" image="gg-arrow-left.png" />
             <arrow direction="right" image="gg-arrow-right.png" />
-            <font>basesmall</font>
+            <font>baseguide</font>
         </guidegrid>
 
         <buttonlist name="timelist">
-            <area>220,250,1036,36</area>
+            <spacing>0</spacing>
+            <area>220,250,1025,36</area>
             <layout>horizontal</layout>
-            <buttonarea>0,0,1036,36</buttonarea>
+            <buttonarea>0,0,1025,36</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,258,36</area>
+                <area>0,0,20%,36</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
-                        <area>0,0,258,36</area>
+                        <area>0,0,205,36</area>
                         <filename>gg-times.png</filename>
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>0,0,258,36</area>
+                        <area>1,4,203,32</area>
                         <font>basesmall</font>
                         <align>allcenter</align>
                     </textarea>
@@ -129,7 +130,8 @@
             <area>1090,30,150,32</area>
             <align>right,vcenter</align>
             <format>%TIME%</format>
-            <secondflash>yes</secondflash>
+            <font>clock</font>
+            <secondflash>no</secondflash>
         </clock>
 
         <imagetype name="channelicon">
@@ -137,7 +139,7 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>100,22,1000,50</area>
+            <area>40,22,1000,50</area>
             <align>left,vcenter</align>
             <font>baselarge</font>
         </textarea>
@@ -145,7 +147,7 @@
         <textarea name="subtitle" from="basetextarea">
             <area>40,80,376,30</area>
             <align>left,vcenter</align>
-            <font>basesmall_normal</font>
+            <font>basesmall</font>
         </textarea>
 
         <textarea name="description"  from="basetextarea">
@@ -218,7 +220,7 @@
         <textarea name="channelgroup" from="basetextarea">
             <area>25,270,190,25</area>
             <align>bottom,hcenter</align>
-            <font>basesmall_normal</font>
+            <font>basesmall</font>
         </textarea>
 
         <guidegrid name="guidegrid">

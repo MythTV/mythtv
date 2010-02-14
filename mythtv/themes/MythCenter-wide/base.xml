@@ -131,6 +131,10 @@
         <color>#bbbb33</color>
         <bold>yes</bold>
     </font>
+    <font name="baseguide" from="basesmall">
+        <pixelsize>21</pixelsize>
+        <bold>no</bold>
+    </font>
 
     <!-- Base definition of a shape used as a background on many screens -->
     <shape name="basebackground">
