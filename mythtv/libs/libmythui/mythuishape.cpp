@@ -173,7 +173,7 @@ bool MythUIShape::ParseElement(
 
         if (style == "solid" && !color.isEmpty())
         {
-            int width = element.attribute("width", "1").toInt();
+            int width = NormX(element.attribute("width", "1").toInt());
             int alpha = element.attribute("alpha", "255").toInt();
             QColor lineColor = QColor(color);
             lineColor.setAlpha(alpha);
@@ -186,7 +186,7 @@ bool MythUIShape::ParseElement(
     }
     else if (element.tagName() == "cornerradius")
     {
-        m_cornerRadius = getFirstText(element).toInt();
+        m_cornerRadius = NormX(getFirstText(element).toInt());
     }
     else
     {
