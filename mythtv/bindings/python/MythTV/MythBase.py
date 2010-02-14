@@ -901,9 +901,15 @@ class MythDBBase( object ):
                     c.execute("""INSERT INTO settings (value,data,hostname)
                                     (%s,%s,%s)""", (key, value, self._host))
                 else:
-                    c.execute("""UPDATE settings SET data=%s
-                                        WHERE value=%s AND hostname=%s""",
-                                        (value, key, self._host))
+                    query = """UPDATE settings SET data=%s
+                                WHERE value=%s AND"""
+                    dat = [value, key]
+                    if self._host == 'NULL':
+                        query += ' hostname IS NULL'
+                    else:
+                        query += ' hostname=%s'
+                        dat.append(self._host)
+                    c.execute(query, dat)
                 self._db.settings[self._host][key] = value
         def __repr__(self):
             return str(self._db.settings.keys())
