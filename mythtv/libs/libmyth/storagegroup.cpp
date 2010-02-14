@@ -434,7 +434,7 @@ QString StorageGroup::FindRecordingFile(QString filename)
 QString StorageGroup::FindRecordingDir(QString filename)
 {
     QString result = "";
-    QFile checkFile("");
+    QFileInfo checkFile("");
 
     int curDir = 0;
     while (curDir < m_dirlist.size())
@@ -442,8 +442,8 @@ QString StorageGroup::FindRecordingDir(QString filename)
         QString testFile = m_dirlist[curDir] + "/" + filename;
         VERBOSE(VB_FILE, LOC + QString("FindRecordingDir: Checking '%1' for '%2'")
                 .arg(m_dirlist[curDir]).arg(testFile));
-        checkFile.setFileName(testFile);
-        if (checkFile.exists())
+        checkFile.setFile(testFile);
+        if (checkFile.exists() || checkFile.isSymLink())
         {
             QString tmp = m_dirlist[curDir];
             tmp.detach();
@@ -458,8 +458,8 @@ QString StorageGroup::FindRecordingDir(QString filename)
         // Not found in any dir, so try RecordFilePrefix if it exists
         QString tmpFile =
             gContext->GetSetting("RecordFilePrefix") + "/" + filename;
-        checkFile.setFileName(tmpFile);
-        if (checkFile.exists())
+        checkFile.setFile(tmpFile);
+        if (checkFile.exists() || checkFile.isSymLink())
             result = tmpFile;
     }
     else if (m_groupname != "Default")
