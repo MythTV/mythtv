@@ -1628,7 +1628,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         // get the filesize first
         const QFileInfo info(ds->filename);
         size = info.size();
-        fd = DeleteFile(ds->filename, followLinks);
+        fd = DeleteFile(ds->filename, followLinks, ds->forceMetadataDelete);
 
         if ((fd < 0) && checkFile.exists())
             errmsg = true;
@@ -1827,7 +1827,8 @@ void MainServer::DoDeleteInDB(const DeleteStruct *ds)
  *
  *  \return fd for success, -1 for error, -2 for only a symlink deleted.
  */
-int MainServer::DeleteFile(const QString &filename, bool followLinks)
+int MainServer::DeleteFile(const QString &filename, bool followLinks,
+                           bool deleteBrokenSymlinks)
 {
     QFileInfo finfo(filename);
     int fd = -1, err = 0;
@@ -1847,9 +1848,14 @@ int MainServer::DeleteFile(const QString &filename, bool followLinks)
 
     if (followLinks && finfo.isSymLink())
     {
-        fd = OpenAndUnlink(linktext);
-        if (fd >= 0)
+        if (!finfo.exists() && deleteBrokenSymlinks)
             err = unlink(fname.constData());
+        else
+        {
+            fd = OpenAndUnlink(linktext);
+            if (fd >= 0)
+                err = unlink(fname.constData());
+        }
     }
     else if (!finfo.isSymLink())
     {

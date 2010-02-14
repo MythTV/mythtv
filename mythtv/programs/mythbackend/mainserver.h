@@ -184,7 +184,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     void SetExitCode(int exitCode, bool closeApplication);
 
-    static int  DeleteFile(const QString &filename, bool followLinks);
+    static int  DeleteFile(const QString &filename, bool followLinks,
+                           bool deleteBrokenSymlinks = false);
     static int  OpenAndUnlink(const QString &filename);
     static bool TruncateAndClose(ProgramInfo *pginfo,
                                  int fd, const QString &filename,
