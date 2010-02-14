@@ -1154,7 +1154,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             EncoderLink *elink = *iter;
             if (elink->GetHostName() == commands[2])
             {
-                if (!elink->IsWaking())
+                if (! (elink->IsWaking() || elink->IsAsleep()))
                     wasAsleep = false;
                 elink->SetSocket(pbs);
             }
