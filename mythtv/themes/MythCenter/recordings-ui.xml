@@ -16,16 +16,28 @@
 
         <buttonlist name="recgroups">
             <arrange>stack</arrange>
-            <area>225,17,500,30</area>
-            <align>center</align>
+            <area>225,17,500,55</area>
+            <align>hcenter</align>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>
             <buttonarea>0,0,100%,100%</buttonarea>
             <statetype name="buttonitem">
-                <state name="active">
-                    <area>0,0,300,30</area>
-                    <shape name="recActiveGroupShape">
+                <state name="selectedinactive">
+                    <area>0,0,300,55</area>
+                    <shape name="recSelectedGroupShape">
+                        <area>0,0,0,0</area>
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>10,2,-10,-5</area>
+                        <minsize>10%,50%</minsize>
+                        <align>allcenter</align>
+                        <font>basemedium</font>
+                        <alpha>230</alpha>
+                    </textarea>
+                </state>
+                <state name="inactive" from="selectedinactive">
+                    <shape name="recGroupShape">
                         <area>0,0,0,0</area>
                     </shape>
                     <textarea name="buttontext">
@@ -33,20 +45,6 @@
                         <alpha>0</alpha>
                     </textarea>
                 </state>
-                <state name="selectedactive">
-                    <area>0,0,300,30</area>
-                    <shape name="recSelectedGroupShape">
-                        <area>0,0,0,0</area>
-                    </shape>
-                    <textarea name="buttontext">
-                        <area>3%,-2,96%,95%</area>
-                        <minsize>10%,100%</minsize>
-                        <align>allcenter</align>
-                        <font>basesmallbold</font>
-                        <alpha>230</alpha>
-                    </textarea>
-                </state>
-                <state name="selectedinactive" from="selectedactive" />
             </statetype>
             <statetype name="upscrollarrow">
                 <area>0,0,0,0</area>
