@@ -5,7 +5,8 @@ include ( ../programs-libs.pro )
 QT += network xml sql webkit
 
 TEMPLATE = app
-CONFIG += thread qdbus
+CONFIG += thread
+using_qtdbus: CONFIG += qdbus
 TARGET = mythfrontend
 target.path = $${PREFIX}/bin
 INSTALLS = target

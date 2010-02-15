@@ -1,7 +1,10 @@
+#include "config.h"
 
 #include <QCoreApplication>
+#if CONFIG_QTDBUS
 #include <QtDBus>
 #include <QDBusInterface>
+#endif
 
 #include "exitprompt.h"
 #include "mythcontext.h"
@@ -15,8 +18,9 @@ void ExitPrompter::quit()
     qApp->exit();
 }
 
-void ExitPrompter::halt()
+bool DBusHalt(void)
 {
+#if CONFIG_QTDBUS
     QDBusInterface kde("org.kde.ksmserver",
                        "/KSMServer",
                        "org.kde.KSMServerInterface");
@@ -50,7 +54,15 @@ void ExitPrompter::halt()
     }
     if (!void_reply.isValid())
         int_reply = hal.call("Shutdown");
-    if (!void_reply.isValid() && !int_reply.isValid())
+
+    return void_reply.isValid() || int_reply.isValid();
+#endif
+    return false;
+}
+
+void ExitPrompter::halt()
+{
+    if (!DBusHalt())
     {
         QString halt_cmd = gContext->GetSetting("HaltCommand",
                                             "sudo /sbin/halt -p");
@@ -61,8 +73,9 @@ void ExitPrompter::halt()
     }
 }
 
-void ExitPrompter::reboot()
+bool DBusReboot(void)
 {
+#if CONFIG_QTDBUS
     QDBusInterface kde("org.kde.ksmserver",
                        "/KSMServer",
                        "org.kde.KSMServerInterface");
@@ -96,7 +109,15 @@ void ExitPrompter::reboot()
     }
     if (!void_reply.isValid())
         int_reply = hal.call("Reboot");
-    if (!void_reply.isValid() && !int_reply.isValid())
+
+    return void_reply.isValid() || int_reply.isValid();
+#endif
+    return false;
+}
+
+void ExitPrompter::reboot()
+{
+    if (!DBusReboot())
     {
         QString reboot_cmd = gContext->GetSetting("RebootCommand",
                                               "sudo /sbin/reboot");
