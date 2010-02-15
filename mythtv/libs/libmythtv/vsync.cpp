@@ -187,11 +187,13 @@ void VideoSync::UpdateNexttrigger()
 /** \fn VideoSync::CalcDelay()
  *  \brief Calculates the delay to the next frame.
  *
- *   Regardless of the timing method, if delay is greater than two full
+ *   Regardless of the timing method, if delay is greater than four full
  *   frames (could be greater than 20 or greater than 200), we don't want
  *   to freeze while waiting for a huge delay. Instead, contine playing 
  *   video at half speed and continue to read new audio and video frames
  *   from the file until the sync is 'in the ballpark'.
+ *   Also prevent the nexttrigger from falling too far in the past in case
+ *   we are trying to speed up video output faster than possible.
  */
 int VideoSync::CalcDelay()
 {
@@ -205,12 +207,22 @@ int VideoSync::CalcDelay()
 
     //cout << "delay " << ret_val << endl;
 
-    if (ret_val > m_frame_interval * 2)
+    if (ret_val > m_frame_interval * 4)
     {
         if (m_interlaced)
-            ret_val = m_frame_interval; // same as / 2 * 2.
+            ret_val = (m_frame_interval / 2) * 4;
         else
-            ret_val = m_frame_interval * 2;
+            ret_val = m_frame_interval * 4;
+
+        // set nexttrigger to our new target time
+        m_nexttrigger.tv_sec = now.tv_sec;
+        m_nexttrigger.tv_usec = now.tv_usec;
+        OffsetTimeval(m_nexttrigger, ret_val);
+    }
+
+    if (ret_val < -m_frame_interval)
+    {
+        ret_val = -m_frame_interval;
 
         // set nexttrigger to our new target time
         m_nexttrigger.tv_sec = now.tv_sec;
@@ -681,6 +693,7 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
         // If late, draw the frame ASAP.  If early, hold the CPU until
         // half as late as the previous frame (fudge).
         m_delay = CalcDelay();
+        m_fudge = min(m_fudge, m_frame_interval);
         while (m_delay + m_fudge > 0)
         {
             m_delay = CalcDelay();

@@ -254,13 +254,14 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       lastsync(false),              m_playing_slower(false),
       m_stored_audio_stretchfactor(1.0),
       audio_paused(false),
+      repeat_delay(0),
       // Audio warping stuff
       usevideotimebase(false),
       warpfactor(1.0f),             warpfactor_avg(1.0f),
       warplbuff(NULL),              warprbuff(NULL),
       warpbuffsize(0),
       // Time Code stuff
-      prevtc(0),
+      prevtc(0),                    prevrp(0),
       tc_avcheck_framecounter(0),   tc_diff_estimate(0),
       savedAudioTimecodeOffset(0),
       // LiveTVChain stuff
@@ -2395,6 +2396,8 @@ void NuppelVideoPlayer::InitAVSync(void)
 
     avsync_adjustment = 0;
 
+    repeat_delay = 0;
+
     if (usevideotimebase)
     {
         warpfactor_avg = gContext->GetNumSetting("WarpFactor", 0);
@@ -2477,8 +2480,10 @@ void NuppelVideoPlayer::AVSync(void)
     if (kScan_Detect == m_scan || kScan_Ignore == m_scan)
         ps = kScan_Progressive;
 
+    bool dropframe = false;
     if (diverge < -MAXDIVERGE)
     {
+        dropframe = true;
         // If video is way behind of audio, adjust for it...
         QString dbg = QString("Video is %1 frames behind audio (too slow), ")
             .arg(-diverge);
@@ -2512,7 +2517,7 @@ void NuppelVideoPlayer::AVSync(void)
 
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, QString("AVSync waitforframe %1 %2")
                 .arg(avsync_adjustment).arg(m_double_framerate));
-        videosync->WaitForFrame(avsync_adjustment);
+        videosync->WaitForFrame(avsync_adjustment + repeat_delay);
         VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, "AVSync show");
         if (!resetvideo)
             videoOutput->Show(ps);
@@ -2564,6 +2569,12 @@ void NuppelVideoPlayer::AVSync(void)
                 videoOutput->Show(ps);
             }
         }
+
+        repeat_delay = frame_interval * buffer->repeat_pict * 0.5;
+
+        if (repeat_delay)
+            VERBOSE(VB_TIMESTAMP, QString("A/V repeat_pict, adding %1 repeat "
+                    "delay").arg(repeat_delay));
     }
     else
     {
@@ -2578,7 +2589,8 @@ void NuppelVideoPlayer::AVSync(void)
                 .arg(warpfactor).arg(warpfactor_avg));
     }
 
-    videosync->AdvanceTrigger();
+    if (!dropframe)
+        videosync->AdvanceTrigger();
     avsync_adjustment = 0;
 
     if (diverge > MAXDIVERGE)
@@ -2624,13 +2636,15 @@ void NuppelVideoPlayer::AVSync(void)
 
             // If the timecode is off by a frame (dropped frame) wait to sync
             if (delta > (int) frame_interval / 1200 &&
-                delta < (int) frame_interval / 1000 * 3)
+                delta < (int) frame_interval / 1000 * 3 &&
+                prevrp == 0)
             {
                 //cerr << "+ ";
                 videosync->AdvanceTrigger();
                 if (m_double_framerate)
                     videosync->AdvanceTrigger();
             }
+            prevrp = buffer->repeat_pict;
 
             avsync_delay = (buffer->timecode - currentaudiotime) * 1000;//usec
             // prevents major jitter when pts resets during dvd title
