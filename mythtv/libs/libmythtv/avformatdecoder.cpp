@@ -3673,6 +3673,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         while (!have_err && len > 0)
         {
             int ret = 0;
+            bool dts = false;
             switch (ctype)
             {
                 case CODEC_TYPE_AUDIO:
@@ -3784,7 +3785,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     if (audioOut.do_passthru)
                     {
                         data_size = pkt->size;
-                        bool dts = CODEC_ID_DTS == curstream->codec->codec_id;
+                        dts = CODEC_ID_DTS == curstream->codec->codec_id;
                         ret = encode_frame(dts, ptr, len,
                                            audioSamples, data_size);
                     }
@@ -3825,8 +3826,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (ret < 0)
                     {
-                        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                                "Unknown audio decoding error");
+                        if (!dts)
+                        {
+                            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                                    "Unknown audio decoding error");
+                        }
                         have_err = true;
                         continue;
                     }
@@ -4381,6 +4385,8 @@ static int encode_frame(bool dts, unsigned char *data, int len,
     if (dts)
     {
         enc_len = dts_syncinfo(data, &flags, &sample_rate, &bit_rate);
+        if (enc_len < 0)
+            return enc_len;
         int rate, sfreq, nblks;
         dts_decode_header(data, &rate, &nblks, &sfreq);
         nr_samples = nblks * 32;
@@ -4490,14 +4496,36 @@ static int dts_syncinfo(uint8_t *indata_ptr, int */*flags*/,
     return fsize;
 }
 
+// defines from libavcodec/dca.h
+#define DCA_MARKER_RAW_BE 0x7FFE8001
+#define DCA_MARKER_RAW_LE 0xFE7F0180
+#define DCA_MARKER_14B_BE 0x1FFFE800
+#define DCA_MARKER_14B_LE 0xFF1F00E8
+#define DCA_HD_MARKER     0x64582025
+
 static int dts_decode_header(uint8_t *indata_ptr, int *rate,
                              int *nblks, int *sfreq)
 {
     uint id = ((indata_ptr[0] << 24) | (indata_ptr[1] << 16) |
                (indata_ptr[2] << 8)  | (indata_ptr[3]));
 
-    if (id != 0x7ffe8001)
-        return -1;
+    switch (id)
+    {
+        case DCA_MARKER_RAW_BE:
+            break;
+        case DCA_MARKER_RAW_LE:
+        case DCA_MARKER_14B_BE:
+        case DCA_MARKER_14B_LE:
+        case DCA_HD_MARKER:
+            VERBOSE(VB_AUDIO+VB_EXTRA, LOC +
+                    QString("DTS: Unsupported frame (id 0x%1)").arg(id, 8, 16));
+            return -1;
+            break;
+        default:
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("DTS: Unknown frame (id 0x%1)").arg(id, 8, 16));
+            return -1;
+    }
 
     int ftype = indata_ptr[4] >> 7;
 
