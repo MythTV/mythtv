@@ -4095,8 +4095,11 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
                     if (ret < 0)
                     {
-                        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                                "Unknown audio decoding error");
+                        if (!dts)
+                        {
+                            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                                    "Unknown audio decoding error");
+                        }
                         have_err = true;
                         continue;
                     }
@@ -4842,11 +4845,13 @@ static int dts_decode_header(uint8_t *indata_ptr, int *rate,
         case DCA_MARKER_14B_BE:
         case DCA_MARKER_14B_LE:
         case DCA_HD_MARKER:
-            VERBOSE(VB_AUDIO+VB_EXTRA, LOC + "Unsupported DTS frame");
+            VERBOSE(VB_AUDIO+VB_EXTRA, LOC +
+                    QString("DTS: Unsupported frame (id 0x%1)").arg(id, 8, 16));
             return -1;
             break;
         default:
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown DTS frame");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("DTS: Unknown frame (id 0x%1)").arg(id, 8, 16));
             return -1;
     }
 
