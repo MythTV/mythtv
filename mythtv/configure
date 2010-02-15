@@ -1304,6 +1304,7 @@ MYTHTV_CONFIG_LIST='
     mheg
     opengl_video
     opengl_vsync
+    qtdbus
     qtwebkit
     v4l
     valgrind
@@ -3784,6 +3785,12 @@ EOF
 fi
 
 enabled qtwebkit || die "Error! QtWebkit headers not found"
+
+# Check if Qt was built with DBus support:
+qt_inc="-I${sysroot}/$(${qmake} -query QT_INSTALL_HEADERS)"
+check_cxx ${qt_inc} ${qt_inc}/QtDBus <<EOF && enable qtdbus
+#include <QtDBus>
+EOF
 
 if enabled firewire; then
     firewire="no"
