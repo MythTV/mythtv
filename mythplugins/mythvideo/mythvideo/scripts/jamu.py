@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.7"
+__version__=u"v0.6.8"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -290,6 +290,7 @@ __version__=u"v0.6.7"
  # 0.6.6 Fixed Exception messages
  #       Change all occurances of 'mythbeconn.host' to 'mythbeconn.hostname' to be consistent with bindings
  # 0.6.7 Fixed the (-J) janitor option from removing the Mirobridge default images when they are not being used
+ # 0.6.8 Fixed a (-J) janitor option statistics error due to skipping Mirbridge default images
 
 
 usage_txt=u'''
@@ -4647,6 +4648,18 @@ class MythTvMetaData(VideoFiles):
                         except ValueError, e:
                             pass
 
+        # Do not remove the MiroBridge default image files even if they are not currently being used
+        for filel in list(all_graphics_file_list):
+            if filel.endswith('mirobridge_coverart.jpg'):
+                all_graphics_file_list.remove(filel)
+                continue
+            if filel.endswith('mirobridge_banner.jpg'):
+                all_graphics_file_list.remove(filel)
+                continue
+            if filel.endswith('mirobridge_fanart.jpg'):
+                all_graphics_file_list.remove(filel)
+                continue
+
         for key in graphicsDirectories.keys():    # Set deleted files totals
             if key == 'screenshot':
                 continue
@@ -4663,13 +4676,6 @@ class MythTvMetaData(VideoFiles):
                     u"Simulation deleting (%s)\n" % (filel)
                 )
             else:
-                # Do not remove the MiroBridge default image files even if they are not currently being used
-                if filel.endswith('mirobridge_coverart.jpg'):
-                    continue
-                if filel.endswith('mirobridge_banner.jpg'):
-                    continue
-                if filel.endswith('mirobridge_fanart.jpg'):
-                    continue
                 try:
                     os.remove(filel)
                 except OSError:
