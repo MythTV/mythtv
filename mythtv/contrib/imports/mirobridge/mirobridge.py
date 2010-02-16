@@ -2526,8 +2526,7 @@ def main():
 	startup.startup()
 	app.cli_events.startup_event.wait()
 	if app.cli_events.startup_failure:
-		logger.critical(u"Starting Miro Frontend and Backend failed: (%s)" % app.cli_events.startup_failure[0])
-		print_text(app.cli_events.startup_failure[1])
+		logger.critical(u"Starting Miro Frontend and Backend failed: (%s)\n(%s)" % (app.cli_events.startup_failure[0], app.cli_events.startup_failure[1]))
 		app.controller.shutdown()
 		time.sleep(5) # Let the shutdown processing complete
 		sys.exit(1)
