@@ -61,6 +61,16 @@ int mythplugin_init(const char *libversion)
 
     UpgradeBrowserDatabaseSchema();
 
+    gContext->ActivateSettingsCache(false);
+
+    if (gContext->GetSetting("WebBrowserCommand").isEmpty())
+        gContext->SaveSetting("WebBrowserCommand", "Internal");
+
+    if (gContext->GetSetting("WebBrowserZoomLevel").isEmpty())
+        gContext->SaveSetting("WebBrowserZoomLevel", "1.4");
+
+    gContext->ActivateSettingsCache(true);
+
     setupKeys();
 
     return 0;
