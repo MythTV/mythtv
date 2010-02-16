@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.5.5"
+__version__=u"v0.5.7"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -176,6 +176,10 @@ __version__=u"v0.5.5"
 #       a Myth backend without a keyboard. No Miro GUI needs to run on the MythTV backend.
 # 0.5.5 Fixed bug #8051 - creating hash value for non-SG Miro video files had an incorrect variable and missing
 #       library import.
+# 0.5.6 Fixed an abort and subsequent process hang when displaying a critical Miro start-up error
+# 0.5.7 The "DeletesFollowLinks" setting is incompatible with MiroBridge processings. A check
+#       and termination of MiroBridge with an appropriate error message has been added.
+#       Added better system error messages when an IOError exception occurs
 
 
 examples_txt=u'''
@@ -1308,11 +1312,11 @@ def setSymbolic(filename, storagegroupkey, symbolic_name, allow_symlink=False):
                 else:
                     shutil.copy2(filename, sym_filepath)
                     displayMessage(u"Copied Miro file (%s) to file (%s)" % (filename, sym_filepath))
-            except OSError:
-                logger.critical(u"Trying to copy the Miro file (%s) to the file (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory)." % (filename ,sym_filepath))
+            except OSError, e:
+                logger.critical(u"Trying to copy the Miro file (%s) to the file (%s).\nError(%s)\nThis maybe a permissions error (mirobridge.py does not have permission to write to the directory)." % (filename ,sym_filepath, e))
                 sys.exit(1)
-    except OSError:
-        logger.critical(u"Trying to create the Miro file (%s) symlink (%s).\n         This maybe a permissions error (mirobridge.py does not have permission to write to the directory)." % sym_filepath)
+    except OSError, e:
+        logger.critical(u"Trying to create the Miro file (%s) symlink (%s).\nError(%s)\nThis maybe a permissions error (mirobridge.py does not have permission to write to the directory)." % (sym_filepath, e))
         sys.exit(1)
 
     return sym_filename
@@ -1619,8 +1623,8 @@ def createMiroMythVideoDirectory():
             else:
                 try:
                     os.mkdir(miro_path)
-                except OSError:
-                    logger.critical(u"Create Miro Mythvideo directory (%s).\nThis may be due to a permissions error." % (miro_path))
+                except OSError, e:
+                    logger.critical(u"Create Miro Mythvideo directory (%s).\nError(%s)\nThis may be due to a permissions error." % (miro_path, e))
                     sys.exit(1)
             if os.path.isfile(miro_cover):
                 if simulation:
@@ -1629,11 +1633,11 @@ def createMiroMythVideoDirectory():
                     try:
                         if not os.path.isfile(os.path.realpath(miro_cover)):
                             useImageMagick(u'convert "%s" "%s"' % (miro_cover, miro_icon_filename))
-                    except OSError:
-                        logger.critical(u"File (%s) copy to (%s) failed.\nThis may be due to a permissions error." % (miro_cover, miro_icon_filename))
+                    except OSError, e:
+                        logger.critical(u"File (%s) copy to (%s) failed.\nError(%s)\nThis may be due to a permissions error." % (miro_cover, miro_icon_filename, e))
                         sys.exit(1)
-        except OSError:
-            logger.critical(u"Creation of MythVideo 'Miro' directory (%s) failed.\nThis may be due to a permissions error." % (miro_path))
+        except OSError, e:
+            logger.critical(u"Creation of MythVideo 'Miro' directory (%s) failed.\nError(%s)\nThis may be due to a permissions error." % (miro_path, e))
             sys.exit(1)
     # end createMiroMythVideoDirectory()
 
@@ -1668,8 +1672,8 @@ def createMiroChannelSubdirectory(item):
         if not os.path.isdir(path):
             try:
                 os.mkdir(path)
-            except OSError:
-                logger.critical(u"Creation of MythVideo 'Miro' subdirectory path (%s) failed.\nThis may be due to a permissions error." % (path))
+            except OSError, e:
+                logger.critical(u"Creation of MythVideo 'Miro' subdirectory path (%s) failed.\nError(%s)\nThis may be due to a permissions error." % (path, e))
                 sys.exit(1)
     if item[u'channel_icon']:
         if simulation:
@@ -1678,8 +1682,8 @@ def createMiroChannelSubdirectory(item):
             try:
                 if not os.path.isfile(os.path.realpath(cover_filename_path)):
                     useImageMagick(u'convert "%s" "%s"' % (item[u'channel_icon'], cover_filename_path))
-            except OSError:
-                logger.critical(u"Copying subdirectory cache icon(%s) cover file(%s) failed.\nThis may be due to a permissions error." % (item[u'channel_icon'], cover_filename_path))
+            except OSError, e:
+                logger.critical(u"Copying subdirectory cache icon(%s) cover file(%s) failed.\nError(%s)\nThis may be due to a permissions error." % (item[u'channel_icon'], cover_filename_path, e))
                 sys.exit(1)
     # end createMiroChannelSubdirectory()
 
@@ -1702,8 +1706,8 @@ def getPlayedMiroVideos():
         try:
             filenames.append(os.path.realpath(storagegroups[u'default']+record[u'basename']))
             statistics[u'WR_watched']+=1
-        except OSError:
-            logger.info(u"Miro video file has been removed (%s) outside of mirobridge" % (storagegroups[u'default']+record[u'basename'],))
+        except OSError, e:
+            logger.info(u"Miro video file has been removed (%s) outside of mirobridge\nError(%s)" % (storagegroups[u'default']+record[u'basename'], e))
             continue
         displayMessage(u"Miro video (%s) (%s) has been marked as watched in MythTV." % (record[u'title'], record[u'subtitle']))
 
@@ -1801,8 +1805,8 @@ def updateMythRecorded(items):
                     try:
                         shutil.copy2(item[u'channel_icon'], coverart_filename)
                         displayMessage(u"Copied a Miro Channel Icon file (%s) to MythTV as file (%s)." % (item[u'channel_icon'], coverart_filename))
-                    except OSError:
-                        logger.critical(u"Copying an icon file(%s) to coverart file(%s) failed.\nThis may be due to a permissions error." (item[u'channel_icon'], coverart_filename))
+                    except OSError, e:
+                        logger.critical(u"Copying an icon file(%s) to coverart file(%s) failed.\nError(%s)\nThis may be due to a permissions error." (item[u'channel_icon'], coverart_filename, e))
                         sys.exit(1)
 
         if item[u'screenshot'] and imagemagick: # Add Miro screen shot to 'Default' recordings directory
@@ -1821,8 +1825,8 @@ def updateMythRecorded(items):
                             demensions = u"-size %s" % demensions
                         useImageMagick(u'convert "%s" %s "%s"' % (item[u'screenshot'], demensions, screenshot_recorded))
                         displayMessage(u"Used a Miro Channel screenshot file (%s) to\ncreate using ImageMagick the MythTV Watch Recordings screen shot file\n(%s)." % (item[u'screenshot'], screenshot_recorded))
-                    except OSError:
-                        logger.critical(u"Creating screenshot file(%s) as(%s) failed.\nThis may be due to a permissions error." (item[u'screenshot'], screenshot_recorded))
+                    except OSError, e:
+                        logger.critical(u"Creating screenshot file(%s) as(%s) failed.\nError(%s)\nThis may be due to a permissions error." (item[u'screenshot'], screenshot_recorded, e))
                         sys.exit(1)
         else:
             screenshot_recorded = u"%s%s.png" % (vid_graphics_dirs[u'default'], records[0][u'basename'])
@@ -2238,6 +2242,14 @@ def main():
         else:
             sys.exit(1)
 
+    # Verify that the "DeletesFollowLinks" setting is not set to the character '1'
+    if mythdb.settings.NULL.DeletesFollowLinks == '1':
+        logger.critical(u'The MythTV back end setting "Follow symbolic links when deleting files" is checked and it is incompatible with MiroBridge processing. It must be unchecked it to use MiroBridge.\nTo uncheck this setting start "mythtv-setup" or with Mythbuntu start "MythTV Backend Setup" and then General->Miscellaneous Settings and uncheck the "Follow symbolic links when deleting files" setting')
+        if test_environment:
+            requirements_are_met = False
+        else:
+            sys.exit(1)
+
     if opts.testenv:        # All tests passed
         getVideoDetails(u"") # Test that ffmpeg is available
         if ffmpeg and requirements_are_met:
@@ -2267,8 +2279,7 @@ def main():
     startup.startup()
     app.cli_events.startup_event.wait()
     if app.cli_events.startup_failure:
-        logger.critical(u"Starting Miro Frontend and Backend failed: (%s)" % app.cli_events.startup_failure[0])
-        print_text(app.cli_events.startup_failure[1])
+        logger.critical(u"Starting Miro Frontend and Backend failed: (%s)\n(%s)" % (app.cli_events.startup_failure[0], app.cli_events.startup_failure[1]))
         app.controller.shutdown()
         time.sleep(5) # Let the shutdown processing complete
         sys.exit(1)
