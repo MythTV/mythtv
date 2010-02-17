@@ -723,6 +723,7 @@ bool MythUIButtonList::DistributeButtons(void)
     selected_column = selected_row = -1;
     top_height = bottom_height = 0;
     col_widths = 0;
+    first_button = last_button = start_button = 0;
 
     VERBOSE(VB_GENERAL|VB_EXTRA, QString("DistributeButtons: "
                                          "selected item %1 total items %2")
@@ -2231,14 +2232,13 @@ QPoint MythUIButtonList::GetButtonPosition(int column, int row) const
 
 void MythUIButtonList::CalculateVisibleItems(void)
 {
-    int y = 0;
-    int x = 0;
     m_itemsVisible = 0;
     m_rows = 0;
     m_columns = 0;
 
     if ((m_layout == LayoutHorizontal) || (m_layout == LayoutGrid))
     {
+        int x = 0;
         while (x <= m_contentsRect.width() - m_itemWidth)
         {
             x += m_itemWidth + m_itemHorizSpacing;
@@ -2248,6 +2248,7 @@ void MythUIButtonList::CalculateVisibleItems(void)
 
     if ((m_layout == LayoutVertical) || (m_layout == LayoutGrid))
     {
+        int y = 0;
         while (y <= m_contentsRect.height() - m_itemHeight)
         {
             y += m_itemHeight + m_itemVertSpacing;
