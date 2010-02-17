@@ -49,6 +49,7 @@
                         <line color="#00FF00" alpha="255" width="3" />
                     </shape>
                 </state>
+            </statetype>
         </buttonlist>
 
         <buttonlist name="groups">
