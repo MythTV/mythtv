@@ -2773,7 +2773,7 @@ void OSDType708CC::Draw(OSDSurface *surface,
 
             if (list[i]->attr.GetBGAlpha())
             {
-                uint max_height = max(max_height, (uint)font->Size() * 3 / 2);
+                max_height = max(max_height, (uint)font->Size() * 3 / 2);
                 float wmult = 1.0f, hmult = 1.0f;
                 QRect rect(0,0, text_length, max_height);
                 OSDTypeBox box(QString("cc708_char_background_%1_%2")
