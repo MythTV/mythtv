@@ -41,6 +41,26 @@ class DictData( object ):
             -- or --
         obj['field_name']
     """
+
+    class DictIterator( object ):
+        def __init__(self, mode, parent):
+            # modes = 1:keys, 2:values, 3:items
+            self.index = 0
+            self.mode = mode
+            self.data = parent
+        def __iter__(self): return self
+        def next(self):
+            self.index += 1
+            if self.index > len(self.data.field_order):
+                raise StopIteration
+            key = self.data.field_order[self.index-1]
+            if self.mode == 1:
+                return key
+            elif self.mode == 2:
+                return self.data[key]
+            elif self.mode == 3:
+                return (key, self.data[key])
+
     logmodule = 'Python DictData'
     # class emulation functions
     def __getattr__(self,name):
@@ -83,54 +103,39 @@ class DictData( object ):
         return bool(item in self.data.keys())
 
     def __iter__(self):
-        return self.itervalues()
+        return self.DictIterator(2,self)
         
     def iterkeys(self):
         """
         obj.iterkeys() -> an iterator over the keys of obj
                                                 ordered by self.field_order
         """
-        self.field = 0
-        self.iterdata = self.keys()
-        return self
+        return self.DictIterator(1,self)
         
     def itervalues(self):
         """
         obj.itervalues() -> an iterator over the values of obj
                                                 ordered by self.field_order
         """
-        self.field = 0
-        self.iterdata = self.values()
-        return self
+        return self.DictIterator(2,self)
     
     def iteritems(self):
         """
         obj.iteritems() -> an iterator of over the (key,value) pairs of obj
                                                 ordered by self.field_order
         """
-        self.field = 0
-        self.iterdata = self.items()
-        return self
+        return self.DictIterator(3,self)
 
-    def next(self):
-        res = self.iterdata[self.field]
-        self.field += 1
-        if self.field == len(self.iterdata):
-            del self.field
-            del self.iterdata
-            raise StopIteration
-        return res
- 
     def keys(self):
         """obj.keys() -> list of self.field_order"""
-        return list(self.field_order)
+        return list(self.iterkeys())
         
     def has_key(self,item):
         return self.__contains__(item)
         
     def values(self):
         """obj.values() -> list of values, ordered by self.field_order"""
-        return [self.data[key] for key in self.field_order]
+        return list(self.itervalues())
         
     def get(self,key):
         return self.data[key]
@@ -139,7 +144,7 @@ class DictData( object ):
         """
         obj.items() -> list of (key,value) pairs, ordered by self.field_order
         """
-        return [(key, self.data[key]) for key in self.field_order]
+        return list(self.iteritems())
         
     def pop(self,key):
         raise NotImplementedError
@@ -343,6 +348,11 @@ class DBDataWrite( DBData ):
     def _fillDefs(self):
         self._fillNone()
         self.data.update(self.defaults)
+
+    def __init__(self, data=None, db=None, raw=None):
+        DBData.__init__(self, data, db, raw)
+        if raw is not None:
+            self.origdata = self.data.copy()
 
     def create(self,data=None):
         """
@@ -1757,10 +1767,15 @@ class Grabber( MythDBBase ):
         MythDBBase.__init__(self, db=db)
         self.log = MythLog(self.logmodule, db=self)
         self.path = ''
-        if path:
+        if path is not None:
             self.path = path
-        elif setting:
-            self.path = self.settings[socket.gethostname()][setting]
+        elif setting is not None:
+            host = socket.gethostname()
+            self.path = self.settings[host][setting]
+            if self.path is None:
+                raise MythDBError(MythError.DB_SETTING, setting, host)
+        else:
+            raise MythError('Invalid input to Grabber()')
         self.returncode = 0
         self.stderr = ''
 
