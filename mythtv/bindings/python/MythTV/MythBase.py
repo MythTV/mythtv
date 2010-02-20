@@ -1002,7 +1002,10 @@ class MythDBBase( object ):
   </UPnP>
 </Configuration>
 """ % tuple(settings)
-                fp = open(os.path.expanduser('~/.mythtv/config.xml'), 'w')
+                mythdir = os.path.expanduser('~/.mythtv')
+                if not os.access(mythdir, os.F_OK):
+                    os.mkdir(mythdir,0755)
+                fp = open(mythdir+'/config.xml', 'w')
                 fp.write(config)
                 fp.close()
                 
