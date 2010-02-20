@@ -4,7 +4,7 @@
     <window name ="watchrecordings">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,5,570,40</area>
+            <area>20,4,570,40</area>
             <font>baselarge</font>
             <value>Watch Recordings</value>
         </textarea>
@@ -16,7 +16,7 @@
 
         <buttonlist name="recgroups">
             <arrange>stack</arrange>
-            <area>365,30,820,55</area>
+            <area>364,36,820,54</area>
             <align>hcenter</align>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
@@ -24,7 +24,7 @@
             <buttonarea>0,0,100%,100%</buttonarea>
             <statetype name="buttonitem">
                 <state name="selectedinactive">
-                    <area>0,0,300,55</area>
+                    <area>0,0,300,56</area>
                     <shape name="recSelectedGroupShape">
                         <area>0,0,0,0</area>
                     </shape>
@@ -55,9 +55,9 @@
         </buttonlist>
 
         <buttonlist name="groups">
-            <area>45,98,300,300</area>
+            <area>46,100,300,300</area>
             <buttonarea>0,0,250,250</buttonarea>
-            <spacing>5</spacing>
+            <spacing>4</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <statetype name="buttonitem">
@@ -79,15 +79,15 @@
         </buttonlist>
 
         <buttonlist name="recordings" from="basebuttonlist2">
-            <area>365,44,880,350</area>
-            <buttonarea>0,35,880,273</buttonarea>
+            <area>364,44,880,350</area>
+            <buttonarea>0,36,880,270</buttonarea>
             <wrapstyle>captive</wrapstyle>
-            <spacing>7</spacing>
+            <spacing>0</spacing>
             <statetype name="buttonitem">
                 <state name="active">
-                <area>0,0,100%,28</area>
+                <area>0,0,100%,30</area>
                 <statetype name="status">
-                    <position>0,3</position>
+                    <position>0,2</position>
                     <state name="disabled">
                         <imagetype name="statusimage">
                             <filename>schedule_disabled.png</filename>
@@ -116,20 +116,21 @@
                     <state name="marked"></state>
                 </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,3,655,28</area>
+                        <area>32,2,656,28</area>
+                        <align>vcenter</align>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>635,3,120,28</area>
-                        <align>right</align>
+                        <area>634,2,120,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="shortdate">
-                        <area>761,3,114,28</area>
-                        <align>right</align>
+                        <area>760,2,114,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <statetype name="watched">
                         <state name="yes">
                             <imagetype name="yes">
-                                <position>5,3</position>
+                                <position>4,2</position>
                                 <filename>small_watched.png</filename>
                             </imagetype>
                         </state>
@@ -138,7 +139,7 @@
                     <statetype name="playlist">
                         <state name="yes">
                             <imagetype name="playlistyes">
-                                <position>7,0</position>
+                                <position>6,0</position>
                                 <filename>playlist_yes.png</filename>
                             </imagetype>
                         </state>
@@ -148,10 +149,10 @@
                 <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
-                        <area>26,1,853,31</area>
+                        <area>26,0,854,30</area>
                     </shape>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,3,655,28</area>
+                        <area>32,2,656,28</area>
                         <font>basesmall_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -161,12 +162,12 @@
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>635,3,120,28</area>
-                        <align>right</align>
+                        <area>634,2,120,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <textarea name="starttime" from="shortdate">
-                        <area>761,3,114,28</area>
-                        <align>right</align>
+                        <area>760,2,114,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                 </state>
             </statetype>
@@ -279,22 +280,22 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>25,400,700,40</area>
+            <area>24,400,700,40</area>
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>25,445,160,30</area>
+            <area>24,444,160,30</area>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>195,445,480,30</area>
+            <area>194,444,480,30</area>
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>25,485,890,220</area>
+            <area>24,484,890,220</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
             <template>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</template>
@@ -306,7 +307,7 @@
         </imagetype>
 
         <textarea name="norecordings">
-            <area>20,75,760,300</area>
+            <area>20,74,760,300</area>
             <font>basemedium</font>
             <value>
             </value>
@@ -318,7 +319,7 @@
     <window name="deleterecordings">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,5,570,40</area>
+            <area>20,4,570,40</area>
             <font>baselarge</font>
             <value>Delete Recordings</value>
         </textarea>
@@ -330,16 +331,28 @@
 
         <buttonlist name="recgroups">
             <arrange>stack</arrange>
-            <area>365,37,820,30</area>
-            <align>center</align>
+            <area>364,36,820,54</area>
+            <align>hcenter</align>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <layout>horizontal</layout>
             <buttonarea>0,0,100%,100%</buttonarea>
             <statetype name="buttonitem">
-                <state name="active">
-                    <area>0,0,300,30</area>
-                    <shape name="recActiveGroupShape">
+                <state name="selectedinactive">
+                    <area>0,0,300,56</area>
+                    <shape name="recSelectedGroupShape">
+                        <area>0,0,0,0</area>
+                    </shape>
+                    <textarea name="buttontext">
+                        <area>10,2,-10,-5</area>
+                        <minsize>10%,50%</minsize>
+                        <align>allcenter</align>
+                        <font>basemedium</font>
+                        <alpha>200</alpha>
+                    </textarea>
+                </state>
+                <state name="inactive" from="selectedinactive">
+                    <shape name="recGroupShape">
                         <area>0,0,0,0</area>
                     </shape>
                     <textarea name="buttontext">
@@ -347,20 +360,6 @@
                         <alpha>0</alpha>
                     </textarea>
                 </state>
-                <state name="selectedactive">
-                    <area>0,0,300,30</area>
-                    <shape name="recSelectedGroupShape">
-                        <area>0,0,0,0</area>
-                    </shape>
-                    <textarea name="buttontext">
-                        <area>3%,-5,96%,95%</area>
-                        <minsize>10%,100%</minsize>
-                        <align>allcenter</align>
-                        <font>basemedium</font>
-                        <alpha>200</alpha>
-                    </textarea>
-                </state>
-                <state name="selectedinactive" from="selectedactive" />
             </statetype>
             <statetype name="upscrollarrow">
                 <area>0,0,0,0</area>
@@ -371,9 +370,9 @@
         </buttonlist>
 
         <buttonlist name="groups">
-            <area>45,98,300,300</area>
+            <area>46,100,300,300</area>
             <buttonarea>0,0,250,250</buttonarea>
-            <spacing>5</spacing>
+            <spacing>4</spacing>
             <scrollstyle>center</scrollstyle>
             <wrapstyle>items</wrapstyle>
             <statetype name="buttonitem">
@@ -395,15 +394,15 @@
         </buttonlist>
 
         <buttonlist name="recordings" from="basebuttonlist2">
-            <area>365,44,880,350</area>
-            <buttonarea>0,35,880,273</buttonarea>
+            <area>364,44,880,350</area>
+            <buttonarea>0,36,880,270</buttonarea>
             <wrapstyle>captive</wrapstyle>
-            <spacing>7</spacing>
+            <spacing>0</spacing>
             <statetype name="buttonitem">
                 <state name="active">
-                <area>0,0,100%,28</area>
+                <area>0,0,100%,30</area>
                 <statetype name="status">
-                    <position>0,3</position>
+                    <position>0,2</position>
                     <state name="disabled">
                         <imagetype name="statusimage">
                             <filename>schedule_disabled.png</filename>
@@ -432,20 +431,21 @@
                     <state name="marked"></state>
                 </statetype>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,3,655,28</area>
+                        <area>32,2,656,28</area>
+                        <align>vcenter</align>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>635,3,120,28</area>
-                        <align>right</align>
+                        <area>634,2,120,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <textarea name="filesize_str" from="shortdate">
-                        <area>761,3,114,28</area>
-                        <align>right</align>
+                        <area>760,2,114,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <statetype name="watched">
                         <state name="yes">
                             <imagetype name="yes">
-                                <position>5,3</position>
+                                <position>4,2</position>
                                 <filename>small_watched.png</filename>
                             </imagetype>
                         </state>
@@ -454,7 +454,7 @@
                     <statetype name="playlist">
                         <state name="yes">
                             <imagetype name="playlistyes">
-                                <position>7,0</position>
+                                <position>6,0</position>
                                 <filename>playlist_yes.png</filename>
                             </imagetype>
                         </state>
@@ -464,10 +464,10 @@
                 <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
-                        <area>26,1,853,31</area>
+                        <area>26,0,854,30</area>
                     </shape>
                     <textarea name="titlesubtitle" from="buttontext">
-                        <area>32,3,655,28</area>
+                        <area>32,2,656,28</area>
                         <font>basesmall_normal_selected</font>
                         <font state="disabled">basesmall_disabled_selected</font>
                         <font state="error">basesmall_error_selected</font>
@@ -477,12 +477,12 @@
                         <align>vcenter</align>
                     </textarea>
                     <textarea name="shortdate" from="titlesubtitle">
-                        <area>635,3,120,28</area>
-                        <align>right</align>
+                        <area>634,2,120,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                     <textarea name="filesize_str" from="shortdate">
-                        <area>761,3,114,28</area>
-                        <align>right</align>
+                        <area>760,2,114,28</area>
+                        <align>right,vcenter</align>
                     </textarea>
                 </state>
             </statetype>
@@ -595,18 +595,18 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>25,400,700,40</area>
+            <area>24,400,700,40</area>
             <font>baselarge</font>
             <cutdown>yes</cutdown>
             <align>vcenter</align>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>25,445,160,30</area>
+            <area>24,444,160,30</area>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>195,445,480,30</area>
+            <area>194,444,480,30</area>
         </textarea>
 
         <textarea name="filesize_str" from="basetextarea">
@@ -616,7 +616,7 @@
         </textarea>
 
         <textarea name="description" from="basetextarea">
-            <area>25,485,890,220</area>
+            <area>24,484,890,220</area>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
             <template>%|"SUBTITLE|"% %STARS% %DESCRIPTION%</template>
@@ -628,7 +628,7 @@
         </imagetype>
 
         <textarea name="norecordings">
-            <area>20,75,760,300</area>
+            <area>20,74,760,300</area>
             <font>basemedium</font>
             <value>
             </value>
@@ -637,7 +637,7 @@
         </textarea>
 
         <progressbar name="usedbar">
-            <area>15,665,536,38</area>
+            <area>14,664,536,38</area>
             <layout>horizontal</layout>
             <style>reveal</style>
             <imagetype name="background">
@@ -650,7 +650,7 @@
         </progressbar>
 
         <textarea name="freereport">
-            <area>25,667,526,34</area>
+            <area>24,666,526,34</area>
             <font>baselarge</font>
         </textarea>
 
@@ -663,7 +663,7 @@
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,5,470,90</area>
+            <area>12,4,470,90</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <font>basesmall</font>
@@ -682,7 +682,7 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>12,35,470,30</area>
+            <area>12,34,470,30</area>
             <align>allcenter</align>
             <font>basemedium</font>
             <value>Change View</value>
@@ -752,7 +752,7 @@
         </textarea>
 
         <button name="save" from="basebutton">
-            <position>315,435</position>
+            <position>314,434</position>
             <value>Save</value>
         </button>
     </window>
@@ -765,7 +765,7 @@
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,15,470,160</area>
+            <area>12,14,470,160</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <value>Change Recording Group Password</value>
@@ -790,7 +790,7 @@
         </textedit>
 
         <button name="ok" from="basebutton">
-            <position>175,435</position>
+            <position>174,434</position>
             <value>OK</value>
         </button>
     </window>
@@ -803,7 +803,7 @@
         </imagetype>
 
         <textarea name="label" from="basetextarea">
-            <area>12,15,470,160</area>
+            <area>12,14,470,160</area>
             <multiline>yes</multiline>
             <align>allcenter</align>
             <value>Edit Recording Metadata</value>
@@ -828,7 +828,7 @@
         </textedit>
 
         <button name="ok" from="basebutton">
-            <position>175,435</position>
+            <position>174,434</position>
             <value>OK</value>
         </button>
     </window>
@@ -858,7 +858,7 @@
                 <area>0,0,660,40</area>
                 <state name="active">
                     <statetype name="icons">
-                        <position>5,5</position>
+                        <position>4,4</position>
                         <state name="commflagged">
                             <imagetype name="statusimage">
                                 <filename>commflagged.png</filename>
@@ -970,7 +970,7 @@
                         -->
                     </statetype>
                     <textarea name="buttontext">
-                        <area>53,1,600,40</area>
+                        <area>52,0,600,40</area>
                         <multiline>yes</multiline>
                         <font>basesmall</font>
                         <align>vcenter</align>
@@ -981,7 +981,7 @@
                         <area>0,0,650,40</area>
                         <type>roundbox</type>
                         <line color="#999999" alpha="255" width="2" />
-                        <cornerradius>13</cornerradius>
+                        <cornerradius>12</cornerradius>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />

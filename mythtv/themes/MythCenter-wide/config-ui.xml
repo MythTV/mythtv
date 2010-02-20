@@ -3,13 +3,13 @@
     <window name="channeloverview">
 
         <textarea name="pagetitle">
-            <area>20,5,570,40</area>
+            <area>20,4,570,40</area>
             <font>baselarge</font>
             <value>Channel Editor</value>
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>15,40,1190,360</area>
+            <area>14,40,1190,360</area>
         </shape>
 
         <shape name="channum_column">
@@ -18,27 +18,29 @@
         </shape>
 
         <shape name="sourcename_background">
-            <area>855,42,290,356</area>
+            <area>854,42,290,356</area>
             <fill color="#333333" alpha="180" />
         </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">
-            <position>19,50</position>
+            <position>18,50</position>
             <statetype name="buttonitem">
+                <area>0,0,1200,26</area>
                 <state name="active">
                     <imagetype name="icon">
-                        <area>1125,0,60,25</area>
+                        <area>1124,0,60,24</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <textarea name="channum" from="buttontext">
-                        <area>32,1,80,24</area>
+                        <area>32,2,80,22</area>
                         <align>center</align>
                     </textarea>
                     <textarea name="name" from="buttontext">
-                        <area>120,1,740,24</area>
+                        <area>120,0,740,26</area>
+                        <align>left,vcenter</align>
                     </textarea>
                     <textarea name="sourcename" from="name">
-                        <area>860,1,275,24</area>
+                        <area>860,0,276,26</area>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active" />
@@ -53,7 +55,7 @@
         </textarea>
 
         <buttonlist name="sorting" from="basewideselector">
-            <position>260,415</position>
+            <position>260,414</position>
         </buttonlist>
 
         <textarea name="sourcelabel" from="sortlabel">
@@ -62,35 +64,35 @@
         </textarea>
 
         <buttonlist name="source" from="basewideselector">
-            <position>260,475</position>
+            <position>260,474</position>
         </buttonlist>
 
         <button name="delete" from="basebutton">
-            <position>760,475</position>
+            <position>760,474</position>
             <value>Delete</value>
         </button>
 
         <textarea name="nochannumlabel" from="basetextarea">
-            <area>70,537,500,60</area>
+            <area>70,536,500,60</area>
             <value>Hide Channels without channel number.</value>
         </textarea>
 
         <checkbox name="nochannum" from="basecheckbox">
-            <position>30,535</position>
+            <position>30,534</position>
         </checkbox>
 
         <button name="scan" from="basewidebutton">
-            <position>90,605</position>
+            <position>90,604</position>
             <value>Channel Scan</value>
         </button>
 
         <button name="importicons" from="basewidebutton">
-            <position>490,605</position>
+            <position>490,604</position>
             <value>Icon Download</value>
         </button>
 
         <button name="edittransport" from="basewidebutton">
-            <position>890,605</position>
+            <position>890,604</position>
             <value>Edit Transports</value>
         </button>
 

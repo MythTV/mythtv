@@ -11,46 +11,46 @@
         </shape>
 
         <shape name="shape2">
-            <area>30,125,1220,100</area>
+            <area>30,126,1220,100</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape3">
-            <area>30,75,660,40</area>
+            <area>30,74,660,40</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape4">
-            <area>700,75,550,40</area>
+            <area>700,74,550,40</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape5">
-            <area>20,240,1240,455</area>
+            <area>20,240,1240,456</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>10</cornerradius>
         </shape>
 
         <textarea name="datetext" from="basetextarea">
-            <area>25,245,190,25</area>
+            <area>26,244,190,26</area>
             <align>top,hcenter</align>
         </textarea>
 
         <textarea name="channelgroup" from="basetextarea">
-            <area>25,270,190,25</area>
+            <area>26,270,190,26</area>
             <align>bottom,hcenter</align>
             <font>basesmall</font>
         </textarea>
 
         <guidegrid name="guidegrid">
-            <area>220,295,1035,390</area>
+            <area>226,294,1020,390</area>
             <layout>horizontal</layout>
             <channels>5</channels>
             <timeslots>5</timeslots>
@@ -62,7 +62,7 @@
             <conflictingcolor>#ff6600</conflictingcolor>
             <cutdown>no</cutdown>
             <multiline>yes</multiline>
-            <textoffset>9,6</textoffset>
+            <textoffset>8,6</textoffset>
             <recordstatus type="SingleRecord" image="gg-rs-single.png" />
             <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png" />
             <recordstatus type="ChannelRecord" image="gg-rs-channel.png" />
@@ -77,18 +77,18 @@
 
         <buttonlist name="timelist">
             <spacing>0</spacing>
-            <area>220,250,1025,36</area>
+            <area>226,250,1020,36</area>
             <layout>horizontal</layout>
-            <buttonarea>0,0,1025,36</buttonarea>
+            <buttonarea>0,0,1020,36</buttonarea>
             <statetype name="buttonitem">
                 <area>0,0,20%,36</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
-                        <area>0,0,205,36</area>
+                        <area>0,0,204,36</area>
                         <filename>gg-times.png</filename>
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>1,4,203,32</area>
+                        <area>2,4,200,32</area>
                         <font>basesmall</font>
                         <align>allcenter</align>
                     </textarea>
@@ -99,20 +99,20 @@
         </buttonlist>
 
         <buttonlist name="channellist">
-            <area>25,295,190,395</area>
-            <buttonarea>0,0,190,395</buttonarea>
+            <area>24,294,194,396</area>
+            <buttonarea>0,0,194,396</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,190,74</area>
+                <area>0,0,194,74</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
-                        <area>0,0,190,78</area>
+                        <area>0,0,194,78</area>
                         <filename>gg-chans.png</filename>
                     </imagetype>
                     <imagetype name="channelicon">
-                        <area>10,15,40,40</area>
+                        <area>10,14,40,40</area>
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>55,0,130,78</area>
+                        <area>54,0,138,78</area>
                         <font>basesmall</font>
                         <font state="favourite">basesmall_favorite</font>
                         <font state="unavailable">basesmall_normal</font>
@@ -174,35 +174,35 @@
         </shape>
 
         <shape name="shape2">
-            <area>30,125,890,100</area>
+            <area>30,124,890,100</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape3">
-            <area>30,75,500,40</area>
+            <area>30,74,500,40</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape4">
-            <area>540,75,380,40</area>
+            <area>540,74,380,40</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape5">
-            <area>20,240,1240,455</area>
+            <area>20,240,1240,456</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="30"></fill>
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape6">
-            <area>935,45,310,180</area>
+            <area>934,44,310,180</area>
             <type>roundbox</type>
             <fill color="#000000" alpha="255"></fill>
             <cornerradius>6</cornerradius>
@@ -213,18 +213,18 @@
         </imagetype>
 
         <textarea name="datetext" from="basetextarea">
-            <area>25,245,190,25</area>
+            <area>24,244,190,26</area>
             <align>top,hcenter</align>
         </textarea>
 
         <textarea name="channelgroup" from="basetextarea">
-            <area>25,270,190,25</area>
+            <area>24,270,190,26</area>
             <align>bottom,hcenter</align>
             <font>basesmall</font>
         </textarea>
 
         <guidegrid name="guidegrid">
-            <area>220,295,1032,390</area>
+            <area>220,294,1032,390</area>
             <layout>horizontal</layout>
             <channels>5</channels>
             <timeslots>4</timeslots>
@@ -236,7 +236,7 @@
             <conflictingcolor>#ff6600</conflictingcolor>
             <cutdown>no</cutdown>
             <multiline>yes</multiline>
-            <textoffset>9,6</textoffset>
+            <textoffset>8,6</textoffset>
             <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
             <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
             <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -297,22 +297,22 @@
         </buttonlist>
 
         <buttonlist name="channellist">
-            <area>25,295,190,395</area>
+            <area>24,294,190,396</area>
             <layout>vertical</layout>
             <spacing>0</spacing>
-            <buttonarea>0,0,190,395</buttonarea>
+            <buttonarea>0,0,190,396</buttonarea>
             <statetype name="buttonitem">
-                <area>0,0,195,74</area>
+                <area>0,0,196,74</area>
                 <state name="active">
                     <imagetype name="buttonbackground">
                         <area>0,0,190,78</area>
                         <filename>gg-chans.png</filename>
                     </imagetype>
                     <imagetype name="channelicon">
-                        <area>10,15,40,40</area>
+                        <area>10,14,40,40</area>
                     </imagetype>
                     <textarea name="buttontext" from="basetextarea">
-                        <area>55,0,130,78</area>
+                        <area>54,0,130,78</area>
                         <font>basesmall</font>
                         <font state="favourite">basesmall_favorite</font>
                         <font state="unavailable">basesmall_normal</font>
@@ -351,7 +351,7 @@
         </buttonlist>
 
         <clock name="time">
-            <area>1090,15,150,32</area>
+            <area>1090,14,150,32</area>
             <align>right,vcenter</align>
             <format>%TIME%</format>
             <secondflash>yes</secondflash>
@@ -445,7 +445,7 @@
         </textarea>
 
         <spinbox name="startminute" from="base_centered_spinbox">
-            <position>785,364</position>
+            <position>784,364</position>
         </spinbox>
 
         <textarea name="durationlabel" from="titlelabel">
@@ -472,13 +472,13 @@
     <window name="viewscheduled">
 
         <textarea name="pagetitle">
-            <area>20,5,570,40</area>
+            <area>20,4,570,40</area>
             <font>baselarge</font>
             <value>Scheduled Recordings</value>
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,49,1240,370</area>
+            <area>20,48,1240,370</area>
         </shape>
 
         <textarea name="status" from="basetextarea">
@@ -490,7 +490,7 @@
         </textarea>
 
         <textarea name="filterlabel" from="basetextarea">
-            <area>20,430,125,30</area>
+            <area>20,430,126,30</area>
             <value>Showing:</value>
         </textarea>
 
@@ -499,9 +499,9 @@
         </textarea>
 
         <buttonlist name="schedules" from="basebuttonlist2">
-            <position>25,58</position>
+            <position>24,58</position>
             <statetype name="buttonitem">
-                <area>0,0,1200,25</area>
+                <area>0,0,1200,24</area>
                 <state name="active">
                     <textarea name="shortstarttimedate" from="buttontext">
                         <area>32,2,190,24</area>
@@ -513,7 +513,7 @@
                         <area>440,2,690,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1145,2,35,24</area>
+                        <area>1144,2,36,24</area>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
@@ -533,10 +533,10 @@
                         <area>440,2,690,24</area>
                     </textarea>
                     <textarea name="card" from="shortstarttimedate">
-                        <area>1145,2,35,24</area>
+                        <area>1144,2,36,24</area>
                     </textarea>
                     <shape name="selectbar">
-                        <area>10,0,1175,28</area>
+                        <area>10,0,1176,28</area>
                         <!--<font>basesmallbold</font>-->
                     </shape>
                 </state>
@@ -589,13 +589,13 @@
     <window name="channelrecpriority">
 
         <textarea name="pagetitle">
-            <area>20,5,570,40</area>
+            <area>20,4,570,40</area>
             <font>baselarge</font>
             <value>Channel Recording Priorities</value>
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,45,1240,390</area>
+            <area>20,44,1240,390</area>
         </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">
@@ -604,23 +604,23 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="icon">
-                        <area>0,0,25,25</area>
+                        <area>0,0,26,26</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="status">
                         <position>30,0</position>
                     </statetype>
                     <textarea name="channum" from="buttontext">
-                        <area>60,1,150,24</area>
+                        <area>60,2,150,24</area>
                     </textarea>
                     <textarea name="callsign" from="channum">
-                        <area>220,1,250,24</area>
+                        <area>220,2,250,24</area>
                     </textarea>
                     <textarea name="name" from="channum">
-                        <area>570,1,500,24</area>
+                        <area>570,2,500,24</area>
                     </textarea>
                     <textarea name="priority" from="channum">
-                        <area>1140,1,30,24</area>
+                        <area>1140,2,30,24</area>
                         <align>right</align>
                     </textarea>
                 </state>
@@ -628,7 +628,7 @@
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>1190,5</position>
+                <position>1190,4</position>
             </statetype>
             <statetype name="downscrollarrow">
                 <position>1190,350</position>
@@ -636,7 +636,7 @@
         </buttonlist>
 
         <imagetype name="icon">
-            <area>330,475,200,150</area>
+            <area>330,474,200,150</area>
             <preserveaspect>true</preserveaspect>
         </imagetype>
 
@@ -646,12 +646,12 @@
         </textarea>
 
         <textarea name="sourcelabel" from="basetextarea">
-            <area>540,515,100,30</area>
+            <area>540,514,100,30</area>
             <value>Source:</value>
         </textarea>
 
         <textarea name="sourcename" from="basetextarea">
-            <area>660,515,400,30</area>
+            <area>660,514,400,30</area>
         </textarea>
 
         <textarea name="callsignlabel" from="basetextarea">
@@ -664,12 +664,12 @@
         </textarea>
 
         <textarea name="recprioritylabel" from="basetextarea">
-            <area>540,585,100,30</area>
+            <area>540,584,100,30</area>
             <value>Priority:</value>
         </textarea>
 
         <textarea name="priority" from="basetextarea">
-            <area>660,585,400,30</area>
+            <area>660,584,400,30</area>
         </textarea>
 
         <textarea name="norecordings_info">
@@ -693,50 +693,50 @@
     <window name="programrecpriority">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,5,570,40</area>
+            <area>20,4,570,40</area>
             <font>baselarge</font>
             <value>Schedule Priorities</value>
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,49,1240,360</area>
+            <area>20,48,1240,360</area>
         </shape>
 
         <textarea name="prioritylabel" from="basetextarea">
-            <area>945,15,95,40</area>
+            <area>944,14,94,40</area>
             <value>Priority</value>
             <align>allcenter</align>
         </textarea>
 
         <textarea name="finalrecprioritylabel" from="basetextarea">
-            <area>1140,15,95,40</area>
+            <area>1140,14,94,40</area>
             <value>Final</value>
             <align>allcenter</align>
         </textarea>
 
         <buttonlist name="programs" from="basebuttonlist2">
-            <position>25,61</position>
+            <position>24,60</position>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="rectypechar" from="buttontext">
-                        <area>25,1,20,24</area>
+                        <area>24,2,20,24</area>
                         <align>allcenter</align>
                     </textarea>
                     <textarea name="titlesubtitle" from="rectypechar">
-                        <area>60,1,850,24</area>
+                        <area>60,2,850,24</area>
                         <align>left,vcenter</align>
                     </textarea>
                     <textarea name="progpriority" from="rectypechar">
-                        <area>935,1,40,24</area>
+                        <area>934,2,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="finalpriority" from="progpriority">
-                        <position>1130,1</position>
+                        <position>1130,2</position>
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="rectypechar" from="buttontext">
-                        <area>25,1,20,24</area>
+                        <area>24,2,20,24</area>
                         <align>allcenter</align>
                         <font>base_normal_selected</font>
                         <font state="disabled">basesmall_normal_selected</font>
@@ -746,27 +746,27 @@
                         <font state="running">basesmall_normal_selected</font>
                     </textarea>
                     <textarea name="titlesubtitle" from="rectypechar">
-                        <area>60,1,850,24</area>
+                        <area>60,2,850,24</area>
                         <align>left,vcenter</align>
                     </textarea>
                     <textarea name="progpriority" from="rectypechar">
-                        <area>935,1,40,24</area>
+                        <area>934,2,40,24</area>
                         <align>right,vcenter</align>
                     </textarea>
                     <textarea name="finalpriority" from="progpriority">
-                        <position>1130,1</position>
+                        <position>1130,2</position>
                     </textarea>
                     <shape name="selectbar">
-                        <area>6,0,1220,27</area>
+                        <area>6,0,1220,28</area>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>1215,-36</position>
+                <position>1214,-36</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>1210,355</position>
+                <position>1210,356</position>
             </statetype>
         </buttonlist>
 
@@ -848,7 +848,7 @@
         </textarea>
 
         <textedit name="title" from="basetextedit">
-            <position>540,155</position>
+            <position>540,156</position>
         </textedit>
 
         <textarea name="prioritylabel" from="ruleslabel">
@@ -895,7 +895,7 @@
                 <filename>cursor.png</filename>
             </imagetype>
             <textarea name="text">
-                <area>12,13,575,75</area>
+                <area>12,12,576,76</area>
                 <font>basesmall_textedit</font>
                 <multiline>yes</multiline>
             </textarea>
@@ -917,7 +917,7 @@
         </button>
 
         <button name="install" from="basebutton">
-            <position>1027,630</position>
+            <position>1026,630</position>
             <value>Install</value>
         </button>
 
@@ -942,17 +942,17 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
-                        <area>5,0,450,30</area>
+                        <area>4,0,450,30</area>
                     </textarea>
                 </state>
                 <state name="selectedinactive">
                     <textarea name="buttontext">
-                        <area>5,0,450,30</area>
+                        <area>4,0,450,30</area>
                     </textarea>
                 </state>
                 <state name="selectedactive">
                     <textarea name="buttontext">
-                        <area>5,0,450,30</area>
+                        <area>4,0,450,30</area>
                     </textarea>
                 </state>
             </statetype>
@@ -967,17 +967,17 @@
         </button>
 
         <button name="delete_button" from="basebutton">
-            <position>173,440</position>
+            <position>172,440</position>
         </button>
 
         <button name="record_button" from="basebutton">
-            <position>333,440</position>
+            <position>332,440</position>
         </button>
 
     </window>
 
     <window name="timepopup">
-        <area>-1,-1,580,165</area>
+        <area>-1,-1,580,166</area>
 
         <imagetype name="box">
             <filename>mythprogressdialog-background.png</filename>
@@ -999,7 +999,7 @@
         </buttonlist>
 
         <button name="ok_button" from="basebutton">
-            <position>220,115</position>
+            <position>220,114</position>
         </button>
 
     </window>
@@ -1023,17 +1023,17 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext">
-                        <area>5,0,450,30</area>
+                        <area>4,0,450,30</area>
                     </textarea>
                 </state>
                 <state name="selectedinactive">
                     <textarea name="buttontext">
-                        <area>5,0,450,30</area>
+                        <area>4,0,450,30</area>
                     </textarea>
                 </state>
                 <state name="selectedactive">
                     <textarea name="buttontext">
-                        <area>5,0,450,30</area>
+                        <area>4,0,450,30</area>
                     </textarea>
                 </state>
             </statetype>
@@ -1044,11 +1044,11 @@
         </button>
 
         <button name="delete_button" from="basebutton">
-            <position>173,440</position>
+            <position>172,440</position>
         </button>
 
         <button name="record_button" from="basebutton">
-            <position>333,440</position>
+            <position>332,440</position>
         </button>
 
     </window>
@@ -1119,23 +1119,23 @@
     <window name="programlist">
 
         <textarea name="sched" from="basetextarea">
-            <area>20,5,400,40</area>
+            <area>20,4,400,40</area>
             <font>baselarge</font>
             <align>left,bottom</align>
             <value>Program Listings</value>
         </textarea>
         <textarea name="keyinstr" from="basetextarea">
-            <area>500,5,200,40</area>
+            <area>500,4,200,40</area>
             <align>hcenter,bottom</align>
             <value>(1) Time (2) Title</value>
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,49,1240,390</area>
+            <area>20,48,1240,390</area>
         </shape>
 
         <textarea name="curview" from="basetextarea">
-            <area>800,5,440,40</area>
+            <area>800,4,440,40</area>
             <align>right,bottom</align>
         </textarea>
 
@@ -1144,7 +1144,7 @@
             <buttonarea>0,0,1200,374</buttonarea>
             <spacing>4</spacing>
             <statetype name="buttonitem">
-                <area>0,0,1200,25</area>
+                <area>0,0,1200,24</area>
                 <state name="active">
                     <textarea name="shortstarttimedate" from="buttontext">
                         <area>32,2,190,24</area>
@@ -1179,13 +1179,13 @@
                         <area>1160,2,30,24</area>
                     </textarea>
                     <shape name="selectbar">
-                        <area>20,0,1167,27</area>
+                        <area>20,0,1168,28</area>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>1190,5</position>
+                <position>1190,4</position>
             </statetype>
             <statetype name="downscrollarrow">
                 <position>1190,350</position>
@@ -1193,17 +1193,17 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>30,455,1200,50</area>
+            <area>30,454,1200,50</area>
             <font>baselarge</font>
         </textarea>
         <textarea name="channel" from="basetextarea">
-            <area>30,495,360,30</area>
+            <area>30,494,360,30</area>
         </textarea>
         <textarea name="timedate" from="basetextarea">
-            <area>410,495,520,30</area>
+            <area>410,494,520,30</area>
         </textarea>
         <textarea name="description" from="basetextarea">
-            <area>30,525,1200,150</area>
+            <area>30,524,1200,150</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"%\n%YEARSTARS%%DESCRIPTION%</template>
         </textarea>
@@ -1244,14 +1244,14 @@
     </window>
 
     <window name="searchpopup" from="MythTextInputDialog">
-        <area>-1,10,580,165</area>
+        <area>-1,10,580,166</area>
 
         <imagetype name="backimg">
             <filename>mythprogressdialog-background.png</filename>
         </imagetype>
 
         <textarea name="message" from="basetextarea">
-            <area>20,15,540,30</area>
+            <area>20,14,540,30</area>
             <align>allcenter</align>
             <value>Enter Search Text</value>
         </textarea>
@@ -1261,7 +1261,7 @@
         </textedit>
 
         <button name="ok" from="basebutton">
-            <position>209,110</position>
+            <position>208,110</position>
             <value>Close</value>
         </button>
 
@@ -1278,7 +1278,7 @@
         </shape>
 
         <shape name="shows_background" from="basebackground">
-            <area>165,386,620,300</area>
+            <area>164,386,620,300</area>
         </shape>
 
         <shape name="times_background" from="basebackground">
@@ -1286,7 +1286,7 @@
         </shape>
 
         <shape name="select_background">
-            <area>70,519,1120,34</area>
+            <area>70,520,1120,32</area>
             <type>roundbox</type>
             <fill color="#00FF00" alpha="48" />
             <line color="#FFFFFF" alpha="128" width="2"/>
@@ -1294,14 +1294,14 @@
         </shape>
 
         <buttonlist name="alphabet" from="basebuttonlist2">
-            <area>70,400,80,288</area>
+            <area>72,394,76,286</area>
             <scrollstyle>center</scrollstyle>
-            <spacing>6</spacing>
-            <buttonarea>0,0,80,288</buttonarea>
+            <spacing>0</spacing>
+            <buttonarea>0,0,76,286</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="buttontext" from="basetextarea">
-                        <area>0,5,80,25</area>
+                        <area>0,0,76,26</area>
                         <align>allcenter</align>
                         <font>basesmall_normal</font>
                     </textarea>
@@ -1343,12 +1343,12 @@
         </buttonlist>
 
         <buttonlist name="shows" from="alphabet">
-            <area>175,400,590,280</area>
+            <area>176,394,590,284</area>
             <statetype name="buttonitem">
-                <area>0,0,580,24</area>
+                <area>0,0,580,26</area>
                 <state name="active">
                     <textarea name="buttontext">
-                        <area>5,5,365,25</area>
+                        <area>4,0,572,26</area>
                         <font>basesmall_normal</font>
                         <cutdown>yes</cutdown>
                         <align>left,vcenter</align>
@@ -1364,12 +1364,12 @@
         </buttonlist>
 
         <buttonlist name="times" from="alphabet">
-            <area>810,400,350,295</area>
+            <area>810,394,350,284</area>
             <statetype name="buttonitem">
-                <area>0,0,30,25</area>
+                <area>0,0,30,26</area>
                 <state name="active">
                     <textarea name="buttontext">
-                        <area>35,5,330,25</area>
+                        <area>34,0,330,26</area>
                         <font>basesmall_normal_selected</font>
                         <cutdown>no</cutdown>
                         <align>left,vcenter</align>
@@ -1382,7 +1382,7 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="buttontext">
-                        <area>35,5,330,25</area>
+                        <area>34,0,330,26</area>
                         <font>basesmall_normal_selected</font>
                         <cutdown>no</cutdown>
                         <align>left,vcenter</align>
@@ -1399,22 +1399,22 @@
         </buttonlist>
 
         <textarea name="title" from="basetextarea">
-            <area>90,50,1040,45</area>
+            <area>90,50,1040,46</area>
             <font>baselarge</font>
         </textarea>
         <textarea name="timedate" from="basetextarea">
-            <area>90,250,540,27</area>
+            <area>90,250,540,28</area>
         </textarea>
         <textarea name="channel" from="basetextarea">
-            <area>880,250,280,35</area>
+            <area>880,250,280,36</area>
             <align>right</align>
         </textarea>
         <textarea name="rectypestatus" from="basetextarea">
-            <area>50,215,600,35</area>
+            <area>90,214,600,36</area>
             <font>basesmallyellow</font>
         </textarea>
         <textarea name="description" from="basetextarea">
-            <area>90,90,1040,155</area>
+            <area>90,90,1040,156</area>
             <multiline>yes</multiline>
             <template>%|"SUBTITLE|"%\n%LONGREPEAT%%STARS| %%DESCRIPTION%</template>
         </textarea>
@@ -1443,35 +1443,35 @@
     <window name="managerecrules">
 
         <textarea name="pagetitle" from="basetextarea">
-            <area>20,5,650,40</area>
+            <area>20,4,650,40</area>
             <font>baselarge</font>
             <value>Manage Recording Rules</value>
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,49,1240,360</area>
+            <area>20,48,1240,360</area>
         </shape>
 
         <textarea name="callsignlabel" from="basetextarea">
-            <area>660,15,100,40</area>
+            <area>660,14,100,40</area>
             <value>Channel</value>
             <align>right</align>
         </textarea>
 
         <textarea name="lastrecordedlabel" from="basetextarea">
-            <area>790,15,290,40</area>
+            <area>790,14,290,40</area>
             <value>Last Recorded</value>
             <align>right</align>
         </textarea>
 
         <textarea name="prioritylabel" from="basetextarea">
-            <area>1140,15,95,40</area>
+            <area>1140,14,96,40</area>
             <value>Priority</value>
         </textarea>
 
         <buttonlist name="programs" from="basebuttonlist2">
-            <area>20,61,1234,370</area>
-            <buttonarea>0,0,1234,340</buttonarea>
+            <area>20,26,1280,420</area>
+            <buttonarea>0,34,1234,340</buttonarea>
             <statetype name="buttonitem">
                 <state name="active">
                     <textarea name="rectype" from="buttontext">
@@ -1498,16 +1498,16 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
-                        <area>10,0,1220,27</area>
+                        <area>10,0,1220,26</area>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>1215,-32</position>
+                <position>1212,0</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>1210,355</position>
+                <position>1212,386</position>
             </statetype>
         </buttonlist>
 
@@ -1623,7 +1623,7 @@
         </buttonlist>
 
         <textarea name="clausetext" from="ruleslabel">
-            <area>300,275,900,80</area>
+            <area>300,274,900,80</area>
             <align>left,top</align>
             <multiline>yes</multiline>
             <cutdown>yes</cutdown>
@@ -1656,17 +1656,17 @@
         </textedit>
 
         <textarea name="subtitlelabel" from="ruleslabel">
-            <area>50,520,250,85</area>
+            <area>50,520,250,86</area>
             <value>Additional Tables:</value>
             <align>left</align>
         </textarea>
 
         <textedit name="subtitle">
-            <area>300,520,880,85</area>
+            <area>300,520,880,86</area>
             <statetype name="background">
                 <state name="active">
                     <imagetype name="background">
-                        <area>0,0,880,85</area>
+                        <area>0,0,880,86</area>
                         <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
                     </imagetype>
                 </state>
@@ -1681,7 +1681,7 @@
                 <filename>cursor.png</filename>
             </imagetype>
             <textarea name="text">
-                <area>10,10,860,75</area>
+                <area>10,10,860,76</area>
                 <font>basesmall_textedit</font>
                 <multiline>yes</multiline>
             </textarea>
@@ -1693,7 +1693,7 @@
         </button>
 
         <button name="record" from="basebutton">
-            <position>387,650</position>
+            <position>386,650</position>
             <value>Record</value>
         </button>
 
@@ -1712,20 +1712,20 @@
     <window name="scheduleeditor">
 
         <shape name="details_background" from="basebackground">
-            <area>25,25,1230,275</area>
+            <area>24,24,1230,276</area>
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>50,35,1180,45</area>
+            <area>50,34,1180,46</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>50,260,440,27</area>
+            <area>50,260,440,28</area>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>1025,260,200,35</area>
+            <area>1024,260,200,36</area>
             <align>right</align>
         </textarea>
 
@@ -1737,11 +1737,11 @@
     
         <buttonlist name="rules" from="baseverywideselector">
             <helptext>Select the recording rule</helptext>
-            <position>410,305</position>
+            <position>410,304</position>
         </buttonlist>
 
         <button name="schedoptions" from="baseverywidebutton">
-            <position>410,355</position>
+            <position>410,354</position>
             <value>Schedule Options</value>
             <helptext></helptext>
         </button>
@@ -1753,7 +1753,7 @@
         </button>
 
         <button name="postprocessing" from="baseverywidebutton">
-            <position>410,445</position>
+            <position>410,444</position>
             <value>Post Processing</value>
             <helptext></helptext>
         </button>
@@ -1765,18 +1765,18 @@
         </button>        
 
         <button name="preview" from="baseverywidebutton">
-            <position>410,535</position>
+            <position>410,534</position>
             <value>Preview</value>
             <helptext></helptext>
         </button>
 
         <button name="cancel" from="basebutton">
-            <position>330,645</position>
+            <position>330,644</position>
             <value>Cancel</value>
         </button>
 
         <button name="save" from="basebutton">
-            <position>830,645</position>
+            <position>830,644</position>
             <value>Save</value>
         </button>
     </window>
@@ -1784,20 +1784,20 @@
     <window name="scheduleoptionseditor">
 
         <shape name="details_background" from="basebackground">
-            <area>25,25,1230,275</area>
+            <area>24,24,1230,276</area>
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>50,35,1180,45</area>
+            <area>50,34,1180,46</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>50,270,440,27</area>
+            <area>50,270,440,28</area>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>1025,270,200,35</area>
+            <area>1024,270,200,36</area>
             <align>right</align>
         </textarea>
 
@@ -1808,7 +1808,7 @@
         </textarea>
 
         <spinbox name="priority" from="basewidespinbox">
-            <position>455,310</position>
+            <position>454,310</position>
             <template type="negative">Reduce priority by %n</template>
             <template type="zero">Normal recording priority</template>
             <template type="positive">Raise priority by %n</template>
@@ -1816,12 +1816,12 @@
         </spinbox>
 
         <buttonlist name="input" from="basewideselector">
-            <position>455,355</position>
+            <position>454,354</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="startoffset" from="basewidespinbox">
-            <position>455,400</position>
+            <position>454,400</position>
             <template type="negative">Start recording %n minute(s) late</template>
             <template type="zero">Start recording on time</template>
             <template type="positive">Start recording %n minute(s) early</template>
@@ -1829,7 +1829,7 @@
         </spinbox>
 
         <spinbox name="endoffset" from="basewidespinbox">
-            <position>455,445</position>
+            <position>454,444</position>
             <template type="negative">End recording %n minute(s) early</template>
             <template type="zero">End recording on time</template>
             <template type="positive">End recording %n minute(s) late</template>
@@ -1837,26 +1837,26 @@
         </spinbox>
 
         <buttonlist name="dupmethod" from="basewideselector">
-            <position>455,490</position>
+            <position>454,490</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="dupscope" from="basewideselector">
-            <position>455,535</position>
+            <position>454,534</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="ruleactive" from="basecheckbox">
-            <position>455,580</position>
+            <position>454,580</position>
         </checkbox>
 
         <textarea name="ruleactivelabel" from="basetextarea">
-            <area>500,583,300,30</area>
+            <area>500,582,300,30</area>
             <value>Recording Rule Active</value>
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>590,645</position>
+            <position>590,644</position>
             <value>Back</value>
         </button>
     </window>
@@ -1864,20 +1864,20 @@
     <window name="storageoptionseditor">
 
         <shape name="details_background" from="basebackground">
-            <area>25,25,1230,275</area>
+            <area>24,24,1230,276</area>
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>50,35,1180,45</area>
+            <area>50,34,1180,46</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>50,270,440,27</area>
+            <area>50,270,440,28</area>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>1025,270,200,35</area>
+            <area>1024,270,200,36</area>
             <align>right</align>
         </textarea>
 
@@ -1888,48 +1888,48 @@
         </textarea>
 
         <buttonlist name="recprofile" from="basewideselector">
-            <position>455,310</position>
+            <position>454,310</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="recgroup" from="basewideselector">
-            <position>455,355</position>
+            <position>454,354</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="storagegroup" from="basewideselector">
-            <position>455,400</position>
+            <position>454,400</position>
             <helptext></helptext>
         </buttonlist>
 
         <buttonlist name="playgroup" from="basewideselector">
-            <position>455,445</position>
+            <position>454,444</position>
             <helptext></helptext>
         </buttonlist>
 
         <spinbox name="maxepisodes" from="basewidespinbox">
-            <position>455,490</position>
+            <position>454,490</position>
             <template type="zero">No episode limit</template>
             <template type="positive">Keep at most %n episode(s)</template>
             <helptext></helptext>
         </spinbox>
 
         <buttonlist name="maxnewest" from="basewideselector">
-            <position>455,535</position>
+            <position>454,534</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="autoexpire" from="basecheckbox">
-            <position>455,580</position>
+            <position>454,580</position>
         </checkbox>
 
         <textarea name="autoexpirelabel" from="basetextarea">
-            <area>500,583,450,30</area>
+            <area>500,582,450,30</area>
             <value>Allow recordings to expire?</value>
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>590,645</position>
+            <position>590,646</position>
             <value>Back</value>
         </button>
     </window>
@@ -1937,20 +1937,20 @@
     <window name="postproceditor">
 
         <shape name="details_background" from="basebackground">
-            <area>25,25,1230,275</area>
+            <area>24,24,1230,276</area>
         </shape>
 
         <textarea name="title" from="basetextarea">
-            <area>50,35,1180,45</area>
+            <area>50,34,1180,46</area>
             <font>baselarge</font>
         </textarea>
 
         <textarea name="timedate" from="basetextarea">
-            <area>50,270,440,27</area>
+            <area>50,270,440,28</area>
         </textarea>
 
         <textarea name="channel" from="basetextarea">
-            <area>1025,270,200,35</area>
+            <area>1024,270,200,36</area>
             <align>right</align>
         </textarea>
 
@@ -1961,16 +1961,16 @@
         </textarea>
 
         <checkbox name="autocommflag" from="basecheckbox">
-            <position>455,310</position>
+            <position>454,310</position>
         </checkbox>
 
         <textarea name="autocommflaglabel" from="basetextarea">
-            <area>500,313,450,30</area>
+            <area>500,312,450,30</area>
             <value>Commercial Flag new recordings</value>
         </textarea>
 
         <checkbox name="autotranscode" from="basecheckbox">
-            <position>455,355</position>
+            <position>454,354</position>
         </checkbox>
 
         <textarea name="autotranscodelabel" from="basetextarea">
@@ -1979,12 +1979,12 @@
         </textarea>
 
         <buttonlist name="transcodeprofile" from="basewideselector">
-            <position>455,397</position>
+            <position>454,396</position>
             <helptext></helptext>
         </buttonlist>
 
         <checkbox name="userjob1" from="basecheckbox">
-            <position>455,445</position>
+            <position>454,444</position>
         </checkbox>
 
         <textarea name="userjob1label" from="basetextarea">
@@ -1993,16 +1993,16 @@
         </textarea>
 
         <checkbox name="userjob2" from="basecheckbox">
-            <position>455,490</position>
+            <position>454,490</position>
         </checkbox>
 
         <textarea name="userjob2label" from="basetextarea">
-            <area>500,493,300,30</area>
+            <area>500,492,300,30</area>
             <value>Run User Job #2</value>
         </textarea>
 
         <checkbox name="userjob3" from="basecheckbox">
-            <position>455,535</position>
+            <position>454,534</position>
         </checkbox>
 
         <textarea name="userjob3label" from="basetextarea">
@@ -2011,16 +2011,16 @@
         </textarea>
 
         <checkbox name="userjob4" from="basecheckbox">
-            <position>455,580</position>
+            <position>454,580</position>
         </checkbox>
 
         <textarea name="userjob4label" from="basetextarea">
-            <area>500,583,300,30</area>
+            <area>500,582,300,30</area>
             <value>Run User Job #4</value>
         </textarea>
 
         <button name="back" from="basebutton">
-            <position>590,645</position>
+            <position>590,644</position>
             <value>Back</value>
         </button>
     </window>

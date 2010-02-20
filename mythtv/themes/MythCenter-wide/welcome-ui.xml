@@ -9,42 +9,42 @@
         <font name="title" from="baselarge">>
             <color>#ffff00</color>
             <dropcolor>#000000</dropcolor>
-            <size>24</size>
-            <shadow>3,3</shadow>
+            <pixelsize>34</pixelsize>
+            <shadow>2,2</shadow>
             <bold>yes</bold>
         </font>
 
         <font name="time" from="basesmall">
             <color>#9999cc</color>
-            <size>14</size>
+            <pixelsize>20</pixelsize>
             <bold>yes</bold>
         </font>
 
         <font name="label" from="basesmall">
             <color>#ffff00</color>
             <dropcolor>#000000</dropcolor>
-            <size>18</size>
-            <shadow>3,3</shadow>
+            <pixelsize>26</pixelsize>
+            <shadow>2,2</shadow>
             <bold>yes</bold>
         </font>
 
         <font name="info" from="basesmall">
             <color>#ffffff</color>
-            <size>16</size>
+            <pixelsize>22</pixelsize>
             <bold>yes</bold>
         </font>
 
         <font name="warning" from="basesmall">
             <color>#ff0000</color>
             <dropcolor>#000000</dropcolor>
-            <size>16</size>
+            <pixelsize>22</pixelsize>
             <shadow>2,2</shadow>
             <bold>yes</bold>
         </font>
 
         <font name="buttons" from="basesmall">
             <color>#ffff00</color>
-            <size>14</size>
+            <pixelsize>20</pixelsize>
             <bold>yes</bold>
         </font>
 
@@ -126,7 +126,7 @@
             start frontend button
         -->
         <button name="startfrontend_button" from="basewidebutton">
-            <position>487,642</position>
+            <position>486,642</position>
             <value>Start Frontend</value>
         </button>
 

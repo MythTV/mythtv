@@ -11,7 +11,7 @@
         <buttonlist name="settings" from="basebuttonlist">
             <area>20,80,400,400</area>
             <layout>vertical</layout>
-            <spacing>5</spacing>
+            <spacing>4</spacing>
             <scrollstyle>free</scrollstyle>
             <wrapstyle>none</wrapstyle>
             <buttonarea>0,0,400,380</buttonarea>
@@ -43,7 +43,7 @@
                 <filename>cursor.png</filename>
             </imagetype>
             <textarea name="text">
-                <area>5,0,820,30</area>
+                <area>4,0,820,30</area>
                 <font>basesmall_textedit</font>
             </textarea>
         </textedit>

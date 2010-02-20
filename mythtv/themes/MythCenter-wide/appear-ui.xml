@@ -4,7 +4,7 @@
 
         <font name="title" face="Droid Sans">
             <color>#ffffff</color>
-            <size>18</size>
+            <pixelsize>26</pixelsize>
             <bold>yes</bold>
         </font>
 

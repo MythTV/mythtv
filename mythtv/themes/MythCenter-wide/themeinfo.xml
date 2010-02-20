@@ -1,6 +1,6 @@
 <themeinfo>
     <!-- The Theme Name (Required) -->
-    <name>MythCenter</name>
+    <name>MythCenter-wide</name>
 
     <!-- The Theme Types (Required) -->
     <types>
@@ -20,10 +20,10 @@
     <!-- Theme Author Details (Optional)-->
     <author>
         <!-- Your name -->
-        <name></name>
+        <name>Jeroen Brosens</name>
 
         <!-- Your Email Address -->
-        <email></email>
+        <email>jeroen@fotoniq.nl</email>
     </author>
 
     <!-- The Versioning Info (Required) -->
@@ -47,7 +47,13 @@
         <!-- A description of the theme, including general colours and
              style. The description should include any details that
              may help to locate your theme in a search. -->
-        <description></description>
+        <description>
+          This was adapted from the Jeroen Brosens' MythCenter theme.
+          The fonts have been changed to freely redistributable ones
+          and layout changes have been made to make this theme look
+          good on 1280x720 and 1920x1080 screens with a 1:1 pixel
+          aspect ratio.
+        </description>
 
         <!-- Errata. A list of known faults, missing elements or unfinished
              areas. e.g. "mythgallery not themed" -->
