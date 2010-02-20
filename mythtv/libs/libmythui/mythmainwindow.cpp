@@ -860,7 +860,10 @@ void MythMainWindow::Init(void)
     QWSServer::setCursorVisible(!hideCursor);
 #endif
 
-    if (GetMythDB()->GetNumSetting("RunFrontendInWindow", 0))
+    GetMythUI()->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
+                                   d->ybase, d->screenheight, d->hmult);
+
+    if (d->xbase > 0 || d->screenwidth > 0 || d->ybase > 0 || d->screenheight > 0)
         d->does_fill_screen = false;
     else
         d->does_fill_screen = true;
@@ -868,13 +871,11 @@ void MythMainWindow::Init(void)
     // Set window border based on fullscreen attribute
     Qt::WindowFlags flags = Qt::Window;
 
-    if (d->does_fill_screen)
-    {
-        if (GetMythUI()->IsGeometryOverridden())
-            flags |= Qt::FramelessWindowHint;
-        else
+    if (!GetMythDB()->GetNumSetting("RunFrontendInWindow", 0))
+        flags |= Qt::FramelessWindowHint;
+   
+    if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
             setWindowState(Qt::WindowFullScreen);
-    }
 
     // Workarounds for Qt/Mac bugs
 #ifdef Q_WS_MACX
@@ -889,9 +890,6 @@ void MythMainWindow::Init(void)
 #endif
 
     setWindowFlags(flags);
-
-    GetMythUI()->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
-                                   d->ybase, d->screenheight, d->hmult);
 
     d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
