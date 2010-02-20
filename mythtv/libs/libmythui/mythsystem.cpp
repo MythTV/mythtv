@@ -58,6 +58,9 @@ uint myth_system(const QString &command, int flags)
     bool ready_to_lock = HasMythMainWindow();
 
     (void)ready_to_lock; /* Kill warning */
+
+    uint result = GENERIC_EXIT_NOT_OK;
+
 #ifdef USE_LIRC
     bool lirc_lock_flag = !(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC);
     LircEventLock lirc_lock(lirc_lock_flag && ready_to_lock);
@@ -75,6 +78,9 @@ uint myth_system(const QString &command, int flags)
     flags |= MYTH_SYSTEM_DONT_BLOCK_PARENT;
 #endif
 
+    if (ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
+        GetMythMainWindow()->SetDrawEnabled(false);
+
     QString LOC_ERR = QString("myth_system('%1'): Error: ").arg(command);
 
 #ifndef USING_MINGW
@@ -85,7 +91,7 @@ uint myth_system(const QString &command, int flags)
         /* Fork failed */
         VERBOSE(VB_IMPORTANT, (LOC_ERR + "fork() failed because %1")
                 .arg(strerror(errno)));
-        return GENERIC_EXIT_NOT_OK;
+        result = GENERIC_EXIT_NOT_OK;
     }
     else if (child == 0)
     {
@@ -141,14 +147,18 @@ uint myth_system(const QString &command, int flags)
                     VERBOSE(VB_IMPORTANT,
                             (LOC_ERR + "waitpid() failed because %1")
                             .arg(strerror(errno)));
-                    return GENERIC_EXIT_NOT_OK;
+                    result = GENERIC_EXIT_NOT_OK;
+                    break;
                 }
 
                 qApp->processEvents();
 
 
                 if (res > 0)
-                    return WEXITSTATUS(status);
+                {
+                    result = WEXITSTATUS(status);
+                    break;
+                }
 
                 usleep(100000);
             }
@@ -159,9 +169,10 @@ uint myth_system(const QString &command, int flags)
             {
                 VERBOSE(VB_IMPORTANT, (LOC_ERR + "waitpid() failed because %1")
                         .arg(strerror(errno)));
-                return GENERIC_EXIT_NOT_OK;
+                result = GENERIC_EXIT_NOT_OK;
             }
-            return WEXITSTATUS(status);
+            else
+                result = WEXITSTATUS(status);
         }
     }
 
@@ -196,6 +207,10 @@ uint myth_system(const QString &command, int flags)
         return exitcode;
     }
 #endif
-    return GENERIC_EXIT_NOT_OK;
+
+    if (ready_to_lock && !(flags & MYTH_SYSTEM_DONT_BLOCK_PARENT))
+        GetMythMainWindow()->SetDrawEnabled(true);
+
+    return result;
 }
 
