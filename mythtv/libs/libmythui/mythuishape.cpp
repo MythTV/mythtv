@@ -2,6 +2,10 @@
 // Own header
 #include "mythuishape.h"
 
+// C++
+#include <algorithm>
+using namespace std;
+
 // qt
 #include <QDomDocument>
 #include <QPainter>
@@ -173,7 +177,8 @@ bool MythUIShape::ParseElement(
 
         if (style == "solid" && !color.isEmpty())
         {
-            int width = NormX(element.attribute("width", "1").toInt());
+            int orig_width = element.attribute("width", "1").toInt();
+            int width = (orig_width) ? max(NormX(orig_width),1) : 0;
             int alpha = element.attribute("alpha", "255").toInt();
             QColor lineColor = QColor(color);
             lineColor.setAlpha(alpha);
