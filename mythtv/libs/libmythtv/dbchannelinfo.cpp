@@ -76,6 +76,9 @@ QString ChannelInfo::GetFormatted(const QString &format) const
 
 bool PixmapChannel::CacheChannelIcon(void)
 {
+    if (icon.isEmpty())
+        return false;
+
     m_localIcon = icon;
 
     // Is icon local?
@@ -89,6 +92,7 @@ bool PixmapChannel::CacheChannelIcon(void)
     {
         VERBOSE(VB_IMPORTANT, QString("Icons directory is missing and could "
                                       "not be created: %1").arg(localDirStr));
+        icon.clear();
         return false;
     }
 
@@ -101,13 +105,19 @@ bool PixmapChannel::CacheChannelIcon(void)
     // Get address of master backed
     QString url = gContext->GetMasterHostPrefix();
     if (url.length() < 1)
+    {
+        icon.clear();
         return false;
+    }
 
     url.append(icon);
 
     QUrl qurl = url;
     if (qurl.host().isEmpty())
+    {
+        icon.clear();
         return false;
+    }
 
     RemoteFile *rf = new RemoteFile(url, false, false, 0);
 
@@ -116,7 +126,7 @@ bool PixmapChannel::CacheChannelIcon(void)
 
     delete rf;
 
-    if (ret)
+    if (ret && data.size())
     {
         QImage image;
 
@@ -132,6 +142,10 @@ bool PixmapChannel::CacheChannelIcon(void)
         else
             VERBOSE(VB_GENERAL, QString("Failed to save to %1").arg(m_localIcon));
     }
+
+    // if we get here then the icon is set in the db but couldn't be found
+    // anywhere so maybe we should remove it from the DB?
+    icon.clear();
 
     return false;
 }
