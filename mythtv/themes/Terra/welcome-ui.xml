@@ -1,0 +1,70 @@
+<mythuitheme>
+
+    <window name="welcome_screen">
+
+        <imagetype name="backdrop" from="basebackdrop" />
+        <imagetype name="topbar" from="basetopbar" />
+
+        <textarea name="title" from="baseheading">
+            <value>Welcome to MythTV</value>
+        </textarea>	
+
+        <!--
+            current myth status
+        -->
+        <textarea name="status_text" from="basetextarea">
+            <area>32,64,1216,72</area>
+            <multiline>yes</multiline>
+            <font>basemedium</font>
+            <align>hcenter</align>
+            <value>MythTV is idle and will shutdown shortly.</value>
+        </textarea>
+
+        <!--
+            current recordings status
+        -->
+        <textarea name="recording_label" from="basetextarea">
+            <area>32,136,1216,36</area>
+            <font>baseextralarge</font>
+            <align>hcenter</align>
+            <value>Current Recording(s)</value>
+        </textarea>
+
+        <textarea name="recording_text" from="status_text">
+            <area>32,178,1216,180</area>
+            <value>Retrieving Recording Status ...</value>
+        </textarea>
+
+        <!--
+            next scheduled recording status
+        -->
+        <textarea name="scheduled_label" from="recording_label">
+            <area>32,364,1216,36</area>
+            <value>Next Scheduled Recording(s)</value>
+        </textarea>
+
+        <textarea name="scheduled_text" from="recording_text">
+            <area>32,406,1216,144</area>
+            <value>Retrieving Scheduled Recordings ...</value>
+        </textarea>
+
+        <!--
+            scheduled recordings conflict warning
+        -->
+        <textarea name="conflicts_text" from="basetextarea">
+            <area>32,568,1216,36</area>
+            <font>basesmallyellow</font>
+            <pixelsize>22</pixelsize>
+            <value>WARNING: There are conflicting scheduled recordings!</value>
+        </textarea>
+
+        <!--
+            start frontend button
+        -->
+        <button name="startfrontend_button" from="basewidebutton">
+            <position>457,615</position>
+            <value>Start Frontend</value>
+        </button>
+
+    </window>
+</mythuitheme>
