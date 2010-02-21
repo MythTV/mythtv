@@ -30,7 +30,7 @@ rrecorded = re.compile('Playback ([a-zA-Z]+) ([\d:]+) of ([\d:]+) ([-0-9\.]+x) (
 rlivetv   = rrecorded
 rvideo    = re.compile('Playback [a-zA-Z]+ ([\d:]+) ([-0-9\.]+x) .*/(.*) \d+ [\.\d]+')
 rrname    = re.compile('\d+ [0-9-T:]+ (.*)')
-rlname    = re.compile(' \d+ [0-9-T: ]+ (.*)')
+rlname    = re.compile('\d+ [0-9-T: ]+ (.*)')
 
 def align(side, window, y, string, flush=0):
     w = window.getmaxyx()[1]-1
