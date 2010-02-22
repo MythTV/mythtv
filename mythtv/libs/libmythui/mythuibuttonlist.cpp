@@ -1419,8 +1419,6 @@ void MythUIButtonList::SetItemCurrent(int current, int topPosition)
         m_topPosition -= (topPosition % m_columns);
 
     m_selPosition = current;
-    if (m_itemsVisible == 0)
-        return;
 
     Update();
 
