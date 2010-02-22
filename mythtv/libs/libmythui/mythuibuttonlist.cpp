@@ -2175,12 +2175,12 @@ bool MythUIButtonList::keyPressEvent(QKeyEvent *e)
 bool MythUIButtonList::gestureEvent(MythGestureEvent *event)
 {
     bool handled = false;
-
+    
     if (event->gesture() == MythGestureEvent::Click)
     {
         // We want the relative position of the click
         QPoint position = event->GetPosition() - m_Parent->GetArea().topLeft();
-
+        
         MythUIType *type = GetChildAt(position,false,false);
 
         if (!type)
@@ -2843,7 +2843,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
         if (text)
         {
             TextProperties textprop = string_it.value();
-
+            
             QString newText = text->GetTemplateText();
             if (newText.isEmpty())
                 newText = text->GetDefaultText();
@@ -2872,7 +2872,7 @@ void MythUIButtonListItem::SetToRealButton(MythUIStateType *button, bool selecte
             }
             else
                 newText = textprop.text;
-
+                
             text->SetText(newText);
             text->SetFontState(textprop.state.isEmpty() ? m_fontState : textprop.state);
         }
