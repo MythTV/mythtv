@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-from MythTV import MythDB, MythError
+from MythTV import MythDB, MythError, MythLog
 from curses import wrapper, ascii
 from time   import sleep
 import sys, socket, curses, re
 
 #note for ticket, on-screen-keyboard remotely does not have focus
 
+MythLog._setlevel('none')
 myth = MythDB()
 frontend = None
 
@@ -147,6 +148,8 @@ def main(w):
             frontend.sendKey(s)
         except KeyboardInterrupt:
             break
+        except EOFError:
+            break
         except MythError:
             print "Remote side closed connection..."
             break
@@ -174,10 +177,14 @@ if __name__ == '__main__':
             sys.exit()
         except:
             raise
+    if frontend is None:
+        print "Please choose from the following available frontends:"
     while frontend is None:
         if frontends is None:
             frontends = myth.getFrontends()
-        print "Please choose from the following available frontends:"
+            if len(frontends) == 0:
+                print "No frontends detected"
+                sys.exit()
         for i in range(0,len(frontends)):
             print "%d. %s" % (i+1, frontends[i])
         try:
@@ -186,6 +193,8 @@ if __name__ == '__main__':
                 frontend = frontends[i]
         except KeyboardInterrupt:
             sys.exit()
+        except EOFError:
+            sys.exit()
         except:
-            raise
+            print "This input will only accept a number. Use Crtl-C to exit"
     wrapper(main)
