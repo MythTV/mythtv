@@ -2000,14 +2000,7 @@ void Scheduler::RunScheduler(void)
             gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
             if (is_rec)
-            {
                 UpdateNextRecord();
-                SendMythSystemEvent(QString("REC_STARTED CARDID %1 CHANID %2 "
-                                    "STARTTIME %3").arg(nextRecording->cardid)
-                                    .arg(nextRecording->chanid)
-                                    .arg(nextRecording->recstartts
-                                                      .toString(Qt::ISODate)));
-            }
 
             if (nextRecording->recstatus == rsFailed)
             {

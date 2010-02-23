@@ -338,7 +338,7 @@ void SendMythSystemRecEvent(const QString msg, const RecordingInfo *pginfo)
                             .arg(pginfo->recstartts.toString(Qt::ISODate)));
     else
         VERBOSE(VB_IMPORTANT, LOC_ERR + "SendMythSystemRecEvent() called with "
-                "empty ProgramInfo");
+                "empty RecordingInfo");
 }
 
 /** \fn SendMythSystemPlayEvent(const QString msg, const ProgramInfo *pginfo)
