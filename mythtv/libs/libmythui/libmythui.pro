@@ -27,7 +27,7 @@ HEADERS += screensaver.h screensaver-null.h mythsystem.h x11colors.h
 HEADERS += themeinfo.h mythxdisplay.h DisplayRes.h DisplayResScreen.h
 HEADERS += mythgenerictree.h mythuibuttontree.h mythuiutils.h
 HEADERS += mythvirtualkeyboard.h mythuishape.h mythuiguidegrid.h
-HEADERS += mythrender_base.h
+HEADERS += mythrender_base.h mythfontmanager.h
 
 SOURCES  = mythmainwindow.cpp mythpainter.cpp mythimage.cpp mythrect.cpp
 SOURCES += myththemebase.cpp
@@ -43,6 +43,7 @@ SOURCES += screensaver.cpp screensaver-null.cpp mythsystem.cpp x11colors.cpp
 SOURCES += themeinfo.cpp mythxdisplay.cpp DisplayRes.cpp DisplayResScreen.cpp
 SOURCES += mythgenerictree.cpp mythuibuttontree.cpp mythuiutils.cpp
 SOURCES += mythvirtualkeyboard.cpp mythuishape.cpp mythuiguidegrid.cpp
+SOURCES += mythfontmanager.cpp
 
 inc.path = $${PREFIX}/include/mythtv/libmythui/
 

@@ -4,6 +4,7 @@
 #include "mythscreentype.h"
 #include "xmlparsebase.h"
 #include "mythfontproperties.h"
+#include "mythfontmanager.h"
 
 #include "oldsettings.h"
 #include "mythuihelper.h"
@@ -27,6 +28,7 @@ MythThemeBase::MythThemeBase()
 
 MythThemeBase::~MythThemeBase()
 {
+    GetGlobalFontManager()->ReleaseFonts("UI");
     delete d;
 }
 
@@ -37,6 +39,8 @@ void MythThemeBase::Reload(void)
 
     GetGlobalFontMap()->Clear();
     XMLParseBase::ClearGlobalObjectStore();
+    GetGlobalFontManager()->ReleaseFonts("UI");
+    GetGlobalFontManager()->LoadFonts(GetMythUI()->GetThemeDir(), "UI");
     XMLParseBase::LoadBaseTheme();
 
     d->background->PopScreen(false, true);
@@ -68,6 +72,7 @@ void MythThemeBase::Init(void)
     d->background = new MythScreenStack(mainWindow, "background");
     d->background->DisableEffects();
 
+    GetGlobalFontManager()->LoadFonts(GetMythUI()->GetThemeDir(), "UI");
     XMLParseBase::LoadBaseTheme();
     d->backgroundscreen = new MythScreenType(d->background, "backgroundscreen");
 
