@@ -361,6 +361,24 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
         DTVModulation::kModulationQAM64, 0, 0); // UHF 21-69
 
+    // Greece (Hellas)
+    fmap["dvbt_ofdm_gr0"] = new FrequencyTable(
+        174000000, 230000000, 7000000, "Channel %1", 5,
+        DTVInversion::kInversionAuto,
+        DTVBandwidth::kBandwidth7MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionModeAuto,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyAuto,
+        DTVModulation::kModulationQAMAuto, 0, 0); // VHF 5-12, deprecated
+    fmap["dvbt_ofdm_gr1"] = new FrequencyTable(
+        474000000, 866000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionAuto,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFECAuto,
+        DTVCodeRate::kFECAuto, DTVModulation::kModulationQAMAuto,
+        DTVTransmitMode::kTransmissionModeAuto,
+        DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAMAuto, 0, 0); // UHF 21-65
+
     // Spain
     fmap["dvbt_ofdm_es0"] = new FrequencyTable(
         474000000, 858000000, 8000000, "Channel %1", 21,
