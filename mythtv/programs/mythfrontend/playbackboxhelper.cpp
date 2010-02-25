@@ -124,8 +124,18 @@ bool PBHEventHandler::event(QEvent *e)
         else if (me->Message() == "GET_PREVIEW")
         {
             ProgramInfo evinfo;
-            if (evinfo.FromStringList(me->ExtraDataList(), 0))
+            if (evinfo.FromStringList(me->ExtraDataList(), 0) &&
+                evinfo.IsFileReadable())
             {
+                // Note: IsFileReadable() implicitly calls GetPlaybackURL()
+                // when necessary, so we might as well update the pathname
+                // in the PBB cache to avoid calling this again...
+                QStringList list;
+                list.push_back(evinfo.MakeUniqueKey());
+                list.push_back(evinfo.pathname);            
+                MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
+                QCoreApplication::postEvent(m_pbh.m_listener, e0);
+
                 QString fn = m_pbh.GeneratePreviewImage(evinfo);
                 if (!fn.isEmpty())
                 {
@@ -176,6 +186,12 @@ bool PBHEventHandler::event(QEvent *e)
             }
 
             QStringList list;
+            list.push_back(evinfo.MakeUniqueKey());
+            list.push_back(evinfo.pathname);            
+            MythEvent *e0 = new MythEvent("SET_PLAYBACK_URL", list);
+            QCoreApplication::postEvent(m_pbh.m_listener, e0);
+
+            list.clear();
             list.push_back(evinfo.MakeUniqueKey());
             list.push_back(QString::number((int)cat));
             list.push_back(QString::number((int)availableStatus));
@@ -342,7 +358,7 @@ QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
     if (pginfo.availableStatus == asPendingDelete)
         return QString();
 
-    QString filename = pginfo.GetPlaybackURL() + ".png";
+    QString filename = pginfo.pathname + ".png";
 
     // If someone is asking for this preview it must be on screen
     // and hence higher priority than anything else we may have
@@ -429,9 +445,16 @@ QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
         uint attempts = IncPreviewGeneratorAttempts(filename);
         if (attempts < PreviewGenState::maxAttempts)
         {
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Requesting preview for '%1'")
+                    .arg(filename));
             PreviewGenerator::Mode mode =
                 (PreviewGenerator::Mode) m_previewGeneratorMode;
-            SetPreviewGenerator(filename, new PreviewGenerator(&pginfo, mode));
+            PreviewGenerator *pg = new PreviewGenerator(&pginfo, mode);
+            while (!SetPreviewGenerator(filename, pg)) usleep(50000);
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Requested preview for '%1'")
+                    .arg(filename));
         }
         else if (attempts == PreviewGenState::maxAttempts)
         {
@@ -440,6 +463,12 @@ QString PlaybackBoxHelper::GeneratePreviewImage(ProgramInfo &pginfo)
                             "%2 times, giving up.")
                     .arg(filename).arg(PreviewGenState::maxAttempts));
         }
+    }
+    else if (bookmark_updated || !preview_exists)
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+                "Not requesting preview as it "
+                "is already being generated");
     }
 
     UpdatePreviewGeneratorThreads();
@@ -492,14 +521,19 @@ void PlaybackBoxHelper::UpdatePreviewGeneratorThreads(void)
 bool PlaybackBoxHelper::SetPreviewGenerator(const QString &xfn, PreviewGenerator *g)
 {
     QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
-    QMutexLocker locker(&m_previewGeneratorLock);
+
+    if (!m_previewGeneratorLock.tryLock())
+        return false;
 
     if (!g)
     {
         m_previewGeneratorRunning = max(0, (int)m_previewGeneratorRunning - 1);
         PreviewMap::iterator it = m_previewGenerator.find(fn);
         if (it == m_previewGenerator.end())
+        {
+            m_previewGeneratorLock.unlock();
             return false;
+        }
 
         (*it).gen        = NULL;
         (*it).genStarted = false;
@@ -509,6 +543,7 @@ bool PlaybackBoxHelper::SetPreviewGenerator(const QString &xfn, PreviewGenerator
         (*it).blockRetryUntil =
             QDateTime::currentDateTime().addSecs((*it).lastBlockTime);
 
+        m_previewGeneratorLock.unlock();
         return true;
     }
 
@@ -519,7 +554,6 @@ bool PlaybackBoxHelper::SetPreviewGenerator(const QString &xfn, PreviewGenerator
 
     m_previewGeneratorLock.unlock();
     IncPreviewGeneratorPriority(xfn);
-    m_previewGeneratorLock.lock();
 
     return true;
 }
@@ -573,6 +607,7 @@ void PlaybackBoxHelper::ClearPreviewGeneratorAttempts(const QString &xfn)
 
 void PlaybackBoxHelper::previewThreadDone(const QString &fn, bool &success)
 {
+    VERBOSE(VB_PLAYBACK, LOC + QString("Preview for '%1' done").arg(fn));
     success = SetPreviewGenerator(fn, NULL);
     UpdatePreviewGeneratorThreads();
 }
@@ -590,6 +625,9 @@ void PlaybackBoxHelper::previewReady(const ProgramInfo *pginfo)
     QString xfn = pginfo->pathname + ".png";
     QString fn = xfn.mid(max(xfn.lastIndexOf('/') + 1,0));
 
+    VERBOSE(VB_PLAYBACK, LOC + QString("Preview for '%1' ready")
+            .arg(pginfo->pathname));
+
     m_previewGeneratorLock.lock();
     PreviewMap::iterator it = m_previewGenerator.find(fn);
     if (it != m_previewGenerator.end())
@@ -602,9 +640,10 @@ void PlaybackBoxHelper::previewReady(const ProgramInfo *pginfo)
 
     if (pginfo)
     {
-        QStringList extra;
-        pginfo->ToStringList(extra);
-        MythEvent *e = new MythEvent("GET_PREVIEW", extra);
-        QCoreApplication::postEvent(m_eventHandler, e);        
+        QStringList list;
+        list.push_back(pginfo->MakeUniqueKey());
+        list.push_back(xfn);
+        MythEvent *e = new MythEvent("PREVIEW_READY", list);
+        QCoreApplication::postEvent(m_listener, e);        
     }
 }

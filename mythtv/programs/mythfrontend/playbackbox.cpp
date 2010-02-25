@@ -847,13 +847,19 @@ void PlaybackBox::UpdateUIListItem(
     }
 }
 
+/** \brief Updates the UI properties for a new preview file.
+ *  This first update the image property of the MythUIButtonListItem
+ *  with the new preview file, then if it is selected and there is
+ *  a preview image UI item in the theme that it's filename property
+ *  gets updated as well.
+ */
 void PlaybackBox::HandlePreviewEvent(
     const QString &piKey, const QString &previewFile)
 {
     if (previewFile.isEmpty())
         return;
 
-    ProgramInfo          *info = FindProgramInUILists(piKey);
+    ProgramInfo *info = m_programInfoCache.GetProgramInfo(piKey);
     MythUIButtonListItem *item = NULL;
 
     if (info)
@@ -3288,14 +3294,10 @@ ProgramInfo *PlaybackBox::FindProgramInUILists(const ProgramInfo &pginfo)
 /// from the UI program info lists.
 ProgramInfo *PlaybackBox::FindProgramInUILists(const QString &key)
 {
-    QStringList keyParts = key.split('_');
-    if (keyParts.size() == 2)
-    {
-        uint      chanid     = keyParts[0].toUInt();
-        QDateTime recstartts = QDateTime::fromString(keyParts[1], Qt::ISODate);
-        if (chanid && recstartts.isValid())
-            return FindProgramInUILists(chanid, recstartts);
-    }
+    uint chanid;
+    QDateTime recstartts;
+    if (ProgramInfo::ExtractKey(key, chanid, recstartts))
+        return FindProgramInUILists(chanid, recstartts);
 
     VERBOSE(VB_IMPORTANT, LOC_ERR +
             QString("FindProgramInUILists(%1) "
@@ -3998,6 +4000,13 @@ void PlaybackBox::customEvent(QEvent *event)
             ProgramInfo *pginfo = FindProgramInUILists(key);
             if (pginfo)
                 Play(*pginfo, true);
+        }
+        else if ((message == "SET_PLAYBACK_URL") && (me->ExtraDataCount() == 2))
+        {
+            QString piKey = me->ExtraData(0);
+            ProgramInfo *info = m_programInfoCache.GetProgramInfo(piKey);
+            if (info)
+                info->pathname = me->ExtraData(1);
         }
     }
     else

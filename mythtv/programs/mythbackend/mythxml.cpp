@@ -1128,8 +1128,16 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         // ------------------------------------------------------------------
         // Must generate Preview Image, Generate Image and save.
         // ------------------------------------------------------------------
+        if (pInfo->pathname.left(1) != "/" && sFileName.left(1) == "/")
+            pInfo->pathname = sFileName;
+        if (pInfo->pathname.left(1) != "/")
+        {
+            delete pInfo;
+            return;
+        }
 
-        PreviewGenerator *previewgen = new PreviewGenerator(pInfo, PreviewGenerator::kLocal);
+        PreviewGenerator *previewgen = new PreviewGenerator(
+            pInfo, PreviewGenerator::kLocal);
         previewgen->SetPreviewTimeAsSeconds(nSecsIn);
         previewgen->SetOutputFilename(sFileName + ".png");
         bool ok = previewgen->Run();

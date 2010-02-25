@@ -43,6 +43,7 @@ class ProgramInfoCache
     /// \note This must only be called from the UI thread.
     bool empty(void) const { return m_cache.empty(); }
     ProgramInfo *GetProgramInfo(uint chanid, const QDateTime &recstartts) const;
+    ProgramInfo *GetProgramInfo(const QString &piKey) const;
 
   private:
     void Load(void);

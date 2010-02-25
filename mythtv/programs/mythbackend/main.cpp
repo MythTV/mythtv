@@ -332,6 +332,7 @@ int preview_helper(const QString &chanid, const QString &starttime,
                     .arg(chanid).arg(starttime));
             return GENERIC_EXIT_NOT_OK;
         }
+        pginfo->pathname = pginfo->GetPlaybackURL(false, true);
     }
     else if (!infile.isEmpty())
     {
@@ -357,11 +358,16 @@ int preview_helper(const QString &chanid, const QString &starttime,
                     pginfo->pathname = QString("dvd:%1").arg(infile);
                 }
                 else
-                    pginfo->pathname = infile;
+                {
+                    pginfo->pathname = QFileInfo(infile).absoluteFilePath();
+                }
             }
 
         }
-
+        else
+        {
+            pginfo->pathname = pginfo->GetPlaybackURL(false, true);
+        }
     }
     else
     {
@@ -369,7 +375,8 @@ int preview_helper(const QString &chanid, const QString &starttime,
         return GENERIC_EXIT_NOT_OK;
     }
 
-    PreviewGenerator *previewgen = new PreviewGenerator(pginfo, PreviewGenerator::kLocal);
+    PreviewGenerator *previewgen = new PreviewGenerator(
+        pginfo, PreviewGenerator::kLocal);
 
     if (previewFrameNumber >= 0)
         previewgen->SetPreviewTimeAsFrameNumber(previewFrameNumber);
@@ -379,12 +386,12 @@ int preview_helper(const QString &chanid, const QString &starttime,
 
     previewgen->SetOutputSize(previewSize);
     previewgen->SetOutputFilename(outfile);
-    previewgen->RunReal();
+    bool ok = previewgen->RunReal();
     previewgen->deleteLater();
 
     delete pginfo;
 
-    return GENERIC_EXIT_OK;
+    return (ok) ? GENERIC_EXIT_OK : GENERIC_EXIT_NOT_OK;
 }
 
 // [WxH] | [WxH@]seconds[S] | [WxH@]frame_numF

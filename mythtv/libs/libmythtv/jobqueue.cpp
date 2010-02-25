@@ -2179,8 +2179,15 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
 
         program_info->SendUpdateEvent();
 
-        program_info->pathname = program_info->GetPlaybackURL();
-        (new PreviewGenerator(program_info, PreviewGenerator::kLocal))->Run();
+        if (program_info->pathname.left(1) != "/")
+            program_info->pathname = program_info->GetPlaybackURL(false,true);
+        if (program_info->pathname.left(1) == "/")
+        {
+            PreviewGenerator *pg = new PreviewGenerator(
+                program_info, PreviewGenerator::kLocal);
+            pg->Run();
+            pg->deleteLater();
+        }
     }
 
     msg = tr("Commercial Flagging %1", "Job ID")

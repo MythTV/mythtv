@@ -255,6 +255,15 @@ ProgramInfo *ProgramInfoCache::GetProgramInfo(
     return NULL;
 }
 
+ProgramInfo *ProgramInfoCache::GetProgramInfo(const QString &piKey) const
+{
+    uint      chanid;
+    QDateTime recstartts;
+    if (ProgramInfo::ExtractKey(piKey, chanid, recstartts))
+        return GetProgramInfo(chanid, recstartts);
+    return NULL;
+}
+
 /// Clears the cache, m_lock must be held when this is called.
 void ProgramInfoCache::Clear(void)
 {

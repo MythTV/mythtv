@@ -70,32 +70,6 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
       timeInSeconds(true),  captureTime(-1),       outFileName(QString::null),
       outSize(0,0)
 {
-    if (!pathname.contains("/"))
-        pathname = programInfo.GetPlaybackURL(false, true);
-
-    if (IsLocal() && !(mode & kRemote))
-        return;
-
-     if (!programInfo.isVideo)
-     {
-         // Try to find a local means to access file...
-         QString localFN  = programInfo.GetPlaybackURL(false, true);
-         QString localFNdir = QFileInfo(localFN).path();
-         if (!(localFN.left(1) == "/" &&
-             QFileInfo(localFN).exists() &&
-             QFileInfo(localFNdir).isWritable()))
-             return; // didn't find file locally, must use remote backend
-
-         // Found file locally, so set the new pathname..
-         QString msg = QString(
-             "'%1' is not local, \n\t\t\treplacing with '%2', which is local.")
-             .arg(pathname).arg(localFN);
-         VERBOSE(VB_RECORD, LOC + msg);
-
-         pathname = localFN;
-     }
-     else
-         pathname = programInfo.pathname;
 }
 
 PreviewGenerator::~PreviewGenerator()
@@ -270,6 +244,9 @@ bool PreviewGenerator::Run(void)
                         <<" exists: "<<fi.exists()
                         <<" readable: "<<fi.isReadable()
                         <<" size: "<<fi.size());
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        QString("Despite command '%1' returning success")
+                        .arg(command));
             }
         }
     }

@@ -1120,7 +1120,11 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         if (!killFile)
         {
-            (new PreviewGenerator(curRecording, PreviewGenerator::kLocal))->Start();
+            if (curRecording->pathname.left(1) == "/")
+            {
+                (new PreviewGenerator(
+                    curRecording, PreviewGenerator::kLocal))->Start();
+            }
 
             if (!tvchain)
             {
@@ -4454,7 +4458,15 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
         delete pi;
         FinishedRecording(oldinfo);
         if (tvchain->GetCardType(-1) != "DUMMY")
-            (new PreviewGenerator(oldinfo, PreviewGenerator::kLocal))->Start();
+        {
+            if (oldinfo->pathname.left(1) != "/")
+                oldinfo->pathname = oldinfo->GetPlaybackURL(false,true);
+            if (oldinfo->pathname.left(1) == "/")
+            {
+                (new PreviewGenerator(
+                    oldinfo, PreviewGenerator::kLocal))->Start();
+            }
+        }
         delete oldinfo;
     }
 
