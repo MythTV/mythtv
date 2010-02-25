@@ -397,6 +397,8 @@ class MPUBLIC ProgramInfo
     static QString i18n(const QString&);
 
     static QString MakeUniqueKey(uint chanid, const QDateTime &recstartts);
+    static bool ExtractKey(const QString &uniquekey,
+                           uint &chanid, QDateTime &recstartts);
 
     /// Sends event out that the ProgramInfo should be reloaded.
     void SendUpdateEvent(void);
