@@ -4302,17 +4302,16 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     long long temppts = pts;
 
                     // Validate the video pts against the last pts. If it's
-                    // a little bit smaller or equal, compute it from the last.
-                    // Otherwise assume a wraparound.
+                    // a little bit smaller, equal or not available, compute
+                    // it from the last. Otherwise assume a wraparound.
                     if (!ringBuffer->isDVD() &&
                         temppts <= lastvpts &&
-                        (temppts + 10000 > lastvpts || temppts < 0))
+                        (temppts + 10000 > lastvpts || temppts <= 0))
                     {
                         temppts = lastvpts;
-                        temppts += (long long)(1000 * av_q2d(context->time_base));
-                        // MPEG2 frames can be repeated, update pts accordingly
-                        temppts += (long long)(mpa_pic.repeat_pict * 500
-                                      * av_q2d(curstream->codec->time_base));
+                        temppts += (long long)(1000 / fps);
+                        // MPEG2/H264 frames can be repeated, update pts accordingly
+                        temppts += (long long)(mpa_pic.repeat_pict * 500 / fps);
                     }
 
                     VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
