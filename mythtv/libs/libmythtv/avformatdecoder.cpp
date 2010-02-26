@@ -498,7 +498,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       allow_ac3_passthru(false),    allow_dts_passthru(false),
       internal_vol(false),
       disable_passthru(false),      max_channels(2),
-      last_ac3_channels(0),         dummy_frame(NULL),
+      last_ac3_channels(0),         last_framesRead(0),
+      dummy_frame(NULL),
       // DVD
       lastdvdtitle(-1),
       decodeStillFrame(false),
@@ -3951,7 +3952,13 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         {
                             if (hdr.channels != last_ac3_channels) 
                             {
-                                last_ac3_channels = curstream->codec->channels = hdr.channels;
+                                VERBOSE(VB_AUDIO, LOC + QString("AC3 changed from %1 to %2 channels (frame %3)")
+                                        .arg(last_ac3_channels).arg(hdr.channels).arg(framesRead));
+                                if ((framesRead - last_framesRead) > AUDIOMAXFRAMES ||
+                                    hdr.channels < last_ac3_channels)
+                                    curstream->codec->channels = hdr.channels;
+                                last_ac3_channels = hdr.channels;
+                                last_framesRead = framesRead;
                                 SetupAudioStream();
                             }
                         }

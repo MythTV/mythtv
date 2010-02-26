@@ -27,6 +27,8 @@ class InteractiveTV;
 class ProgramInfo;
 class MythSqlDatabase;
 
+#define AUDIOMAXFRAMES       30
+
 extern "C" void HandleStreamChange(void*);
 
 class AudioInfo
@@ -273,6 +275,7 @@ class AvFormatDecoder : public DecoderBase
     bool              disable_passthru;
     uint              max_channels;
     uint              last_ac3_channels;
+    long long         last_framesRead;
 
     VideoFrame       *dummy_frame;
 
