@@ -498,7 +498,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       allow_ac3_passthru(false),    allow_dts_passthru(false),
       internal_vol(false),
       disable_passthru(false),      max_channels(2),
-      last_ac3_channels(0),	    dummy_frame(NULL),
+      last_ac3_channels(0),         dummy_frame(NULL),
       // DVD
       lastdvdtitle(-1),
       decodeStillFrame(false),
