@@ -1671,7 +1671,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
     sleep(3);
     usleep(rand()%2000);
 
-    QMutexLocker dl(&deletelock);
+    deletelock.lock();
 
     QString logInfo = QString("chanid %1 at %2")
                               .arg(ds->chanid).arg(ds->recstartts.toString());
@@ -1691,6 +1691,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                                    "Program will NOT be deleted.")
                                    .arg(logInfo));
 
+        deletelock.unlock();
         return;
     }
 
@@ -1708,6 +1709,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
                                    "Program will NOT be deleted.")
                                    .arg(logInfo));
 
+        deletelock.unlock();
         return;
     }
 
@@ -1729,6 +1731,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
 
+        deletelock.unlock();
         return;
     }
 
@@ -1778,6 +1781,7 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
 
+        deletelock.unlock();
         return;
     }
 
@@ -1806,6 +1810,8 @@ void MainServer::DoDeleteThread(const DeleteStruct *ds)
 
     if (pginfo->recgroup != "LiveTV")
         ScheduledRecording::signalChange(0);
+
+    deletelock.unlock();
 
     if (slowDeletes && fd >= 0)
         TruncateAndClose(pginfo.get(), fd, ds->filename, size);
@@ -3920,12 +3926,13 @@ void *MainServer::SpawnTruncateThread(void *param)
 
 void MainServer::DoTruncateThread(const DeleteStruct *ds)
 {
-    QMutexLocker dl(&deletelock);
-
     if (gContext->GetNumSetting("TruncateDeletesSlowly", 0))
         TruncateAndClose(NULL, ds->fd, ds->filename, ds->size);
     else
+    {
+        QMutexLocker dl(&deletelock);
         close(ds->fd);
+    }
 }
 
 bool MainServer::HandleDeleteFile(QStringList &slist, PlaybackSock *pbs)
