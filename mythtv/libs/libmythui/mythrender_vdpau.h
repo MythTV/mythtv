@@ -111,7 +111,7 @@ class MPUBLIC MythRenderVDPAU : public MythRender
                     uint layer1 = 0, uint layer2 = 0);
     bool SetDeinterlacing(uint id, uint deinterlacers = kVDPFeatNone);
     bool ChangeVideoMixerFeatures(uint id, uint features);
-    bool SetMixerAttribute(uint id, uint attrib, int value);
+    int  SetMixerAttribute(uint id, uint attrib, int value);
     bool SetMixerAttribute(uint id, uint attrib, float value);
 
     bool UploadBitmap(uint id, void* const plane[1], uint32_t pitch[1]);

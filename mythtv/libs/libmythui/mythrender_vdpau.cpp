@@ -827,7 +827,7 @@ uint MythRenderVDPAU::CreateVideoMixer(const QSize &size, uint layers,
 
         if (m_videoMixers[existing].m_csc)
             SetMixerAttribute(existing, kVDPAttribColour,
-                              m_videoMixers[existing].m_csc->m_procamp.saturation);
+                (int)(m_videoMixers[existing].m_csc->m_procamp.saturation / 0.02f));
         if (m_videoMixers[existing].m_noise_reduction)
             SetMixerAttribute(existing, kVDPAttribNoiseReduction,
                             *(m_videoMixers[existing].m_noise_reduction));
@@ -1128,14 +1128,14 @@ bool MythRenderVDPAU::ChangeVideoMixerFeatures(uint id, uint features)
                                    m_videoMixers[id].m_type, id));
 }
 
-bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
+int MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
 {
     LOCK_RENDER
     CHECK_STATUS(false);
     INIT_ST
 
     if (!m_videoMixers.contains(id) || attrib > kVDPAttribCSCEnd)
-        return false;
+        return -1;
 
     if (attrib == kVDPAttribSkipChroma)
     {
@@ -1163,7 +1163,7 @@ bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
     {
         m_videoMixers[id].m_csc = new VDPAUCSCMatrix();
         if (!m_videoMixers[id].m_csc)
-            return false;
+            return -1;
     }
 
     if (attrib == kVDPAttribColorStandard)
@@ -1179,7 +1179,7 @@ bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
     else if (attrib == kVDPAttribBrightness)
         m_videoMixers[id].m_csc->SetBrightness(value);
     else
-        return false;
+        return -1;
 
     if (!m_videoMixers[id].m_csc->ManualUpdate())
     {
@@ -1191,7 +1191,9 @@ bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, int value)
 
     VdpVideoMixerAttribute attr = { VDP_VIDEO_MIXER_ATTRIBUTE_CSC_MATRIX };
     void const * val = { &(m_videoMixers[id].m_csc->m_csc) };
-    return SetMixerAttribute(id, &attr, &val);
+    if (SetMixerAttribute(id, &attr, &val))
+        return value;
+    return -1;
 }
 
 bool MythRenderVDPAU::SetMixerAttribute(uint id, uint attrib, float value)

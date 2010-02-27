@@ -833,7 +833,8 @@ int VideoOutputVDPAU::SetPictureAttribute(PictureAttribute attribute,
     }
 
     if (vdpau_attrib != kVDPAttribNone)
-        m_render->SetMixerAttribute(m_video_mixer, vdpau_attrib, newValue);
+        newValue = m_render->SetMixerAttribute(m_video_mixer,
+                                               vdpau_attrib, newValue);
 
     if (newValue >= 0)
         SetPictureAttributeDBValue(attribute, newValue);
