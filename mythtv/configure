@@ -3650,60 +3650,11 @@ fi
 # ALSA probe
 ! disabled audio_alsa &&
     check_lib alsa/asoundlib.h snd_asoundlib_version $audio_alsa_libs &&
+    check_cpp_condition alsa/asoundlib.h "(defined(SND_PCM_NO_AUTO_RESAMPLE))" &&
     enable  audio_alsa ||
-    disable audio_alsa
+    { { ! enabled audio_alsa || die "ERROR: Alsa >= 1.0.16 required"; } &&
+    disable audio_alsa; }
 
-if enabled audio_alsa; then
-    disable audio_alsa
-    min_alsa_version=1.0.16
-        alsa_min_major_version=`echo $min_alsa_version | \
-               sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-        alsa_min_minor_version=`echo $min_alsa_version | \
-               sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-        alsa_min_micro_version=`echo $min_alsa_version | \
-               sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-    check_cc <<EOF
-    #include <alsa/asoundlib.h>
-    int main (void) {
-    /* ensure backward compatibility */
-    #if !defined(SND_LIB_MAJOR) && defined(SOUNDLIB_VERSION_MAJOR)
-    #define SND_LIB_MAJOR SOUNDLIB_VERSION_MAJOR
-    #endif
-    #if !defined(SND_LIB_MINOR) && defined(SOUNDLIB_VERSION_MINOR)
-    #define SND_LIB_MINOR SOUNDLIB_VERSION_MINOR
-    #endif
-    #if !defined(SND_LIB_SUBMINOR) && defined(SOUNDLIB_VERSION_SUBMINOR)
-    #define SND_LIB_SUBMINOR SOUNDLIB_VERSION_SUBMINOR
-    #endif
-
-    #  if(SND_LIB_MAJOR > $alsa_min_major_version)
-      exit(0);
-    #  else
-    #    if(SND_LIB_MAJOR < $alsa_min_major_version)
-    #       error not present
-    #    endif
-
-    #   if(SND_LIB_MINOR > $alsa_min_minor_version)
-      exit(0);
-    #   else
-    #     if(SND_LIB_MINOR < $alsa_min_minor_version)
-    #          error not present
-    #      endif
-
-    #      if(SND_LIB_SUBMINOR < $alsa_min_micro_version)
-    #        error not present
-    #      endif
-    #    endif
-    #  endif
-    exit(0);
-
-      ;
-      return 0;
-    }
-EOF
-    test $? = 0 && enable audio_alsa ||
-    echolog "Please upgrade to ALSA >= $min_alsa_version if would like ALSA support." 
-fi
 
 # JACK probe
 ! disabled audio_jack &&
