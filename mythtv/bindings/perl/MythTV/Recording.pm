@@ -307,9 +307,10 @@ package MythTV::Recording;
     # Set the is_mpeg flag
         $info{'is_mpeg'} = 1;
     # Grab the info we want from mplayer (go uber-verbose to override --really-quiet)
-        my $data = `$program -v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 1 -identify '$file' 2>/dev/null`;
+        my $idargs = "-v -v -v -v -nolirc -nojoystick -vo null -ao null -frames 1 -identify";
+        my $data = `$program $idargs '$file' 2>/dev/null`;
         study $data;
-        ($info{'video_type'})            = $data =~ m/^VIDEO:\s*(MPEG[12])/m;
+        ($info{'video_type'})            = $data =~ m/^VIDEO:?\s*(MPEG[12]|H264)/m;
         ($info{'width'})                 = $data =~ m/^ID_VIDEO_WIDTH=0*([1-9]\d*)/m;
         ($info{'height'})                = $data =~ m/^ID_VIDEO_HEIGHT=0*([1-9]\d*)/m;
         ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=0*([1-9]\d*(?:\.\d+)?)/m;
@@ -317,10 +318,23 @@ package MythTV::Recording;
         ($info{'audio_bitrate'})         = $data =~ m/^ID_AUDIO_BITRATE=0*([1-9]\d*)/m;
         ($info{'audio_bits_per_sample'}) = $data =~ m/^AUDIO:.+?ch,\s*[su](8|16)/mi;
         ($info{'audio_channels'})        = $data =~ m/^ID_AUDIO_NCH=0*([1-9]\d*)/m;
-        ($info{'fps'})                   = $data =~ m/^ID_VIDEO_FPS=0*([1-9]\d*(?:\.\d+)?)/m;
         ($info{'aspect'})                = $data =~ m/^ID_VIDEO_ASPECT=0*([1-9]\d*(?:[\.\,]\d+)?)/m;
         ($info{'audio_type'})            = $data =~ m/^ID_AUDIO_CODEC=0*([1-9]\d*(?:\.\d+)?)/m;
         ($info{'mpeg_stream_type'})      = $data =~ m/^ID_DEMUXER=(\w+)/mi;
+
+    # Mplayer can't find the needed details.  Let's try again, forcing the use
+    # of the ffmpeg lavf demuxer
+        if (!defined($info{'width'})) {
+            my $altdata = `$program $idargs -demuxer lavf '$file' 2>/dev/null`;
+            study $altdata;
+            ($info{'width'})              = $altdata =~ m/^ID_VIDEO_WIDTH=0*([1-9]\d*)/m;
+            ($info{'height'})             = $altdata =~ m/^ID_VIDEO_HEIGHT=0*([1-9]\d*)/m;
+            ($info{'audio_bitrate'})      = $altdata =~ m/^ID_AUDIO_BITRATE=0*([1-9]\d*)/m;
+            ($info{'audio_sample_rate'})  = $altdata =~ m/^ID_AUDIO_RATE=0*([1-9]\d*)/m;
+            ($info{'audio_channels'})     = $altdata =~ m/^ID_AUDIO_NCH=0*([1-9]\d*)/m;
+            ($info{'aspect'})             = $altdata =~ m/^ID_VIDEO_ASPECT=0*([1-9]\d*(?:[\.\,]\d+)?)/m;
+        } 
+
     # Stream type
         $info{'mpeg_stream_type'} = lc($info{'mpeg_stream_type'});
         if ($info{'mpeg_stream_type'} && $info{'mpeg_stream_type'} !~ /^mpeg/) {
