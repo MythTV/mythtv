@@ -94,7 +94,7 @@ void MythUIText::SetText(const QString &text)
     m_Message = newtext;
     m_CutMessage.clear();
     FillCutMessage();
-    
+
     if (m_scrolling)
     {
         QFontMetrics fm(GetFontProperties()->face());
@@ -339,7 +339,7 @@ bool MythUIText::MakeNarrow(QRect &min_rect)
 void MythUIText::FillCutMessage()
 {
     m_CutMessage.clear();
-    
+
     if (m_Message != m_DefaultMessage)
     {
         bool isNumber;
@@ -357,38 +357,38 @@ void MythUIText::FillCutMessage()
             m_CutMessage = tmp.arg(m_Message);
         }
     }
-    
+
     if (m_CutMessage.isEmpty())
         m_CutMessage = m_Message;
     if (m_CutMessage.isEmpty())
-	return;
+        return;
 
     QStringList templist;
     QStringList::iterator it;
     switch (m_textCase)
     {
       case CaseUpper :
-	m_CutMessage = m_CutMessage.toUpper();
-	break;
+        m_CutMessage = m_CutMessage.toUpper();
+        break;
       case CaseLower :
-	m_CutMessage = m_CutMessage.toLower();
-	break;
+        m_CutMessage = m_CutMessage.toLower();
+        break;
       case CaseCapitaliseFirst :
-	//m_CutMessage = m_CutMessage.toLower();
-	templist = m_CutMessage.split(". ");
-	for (it = templist.begin(); it != templist.end(); ++it)
-	    (*it).replace(0,1,(*it).left(1).toUpper());
-	m_CutMessage = templist.join(". ");
-	break;
+        //m_CutMessage = m_CutMessage.toLower();
+        templist = m_CutMessage.split(". ");
+        for (it = templist.begin(); it != templist.end(); ++it)
+            (*it).replace(0,1,(*it).left(1).toUpper());
+        m_CutMessage = templist.join(". ");
+        break;
       case CaseCapitaliseAll :
-	//m_CutMessage = m_CutMessage.toLower();
-	templist = m_CutMessage.split(" ");
-	for (it = templist.begin(); it != templist.end(); ++it)
-	    (*it).replace(0,1,(*it).left(1).toUpper());
-	m_CutMessage = templist.join(" ");
-	break;
+        //m_CutMessage = m_CutMessage.toLower();
+        templist = m_CutMessage.split(" ");
+        for (it = templist.begin(); it != templist.end(); ++it)
+            (*it).replace(0,1,(*it).left(1).toUpper());
+        m_CutMessage = templist.join(" ");
+        break;
     }
-    
+
     if (m_MinSize.x() > 0)
     {
         QRect rect;
