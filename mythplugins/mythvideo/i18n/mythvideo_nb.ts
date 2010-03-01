@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation>Å velge alle tall her vil gjøre livet ditt mye enklere.</translation>
+        <translation type="obsolete">Å velge alle tall her vil gjøre livet ditt mye enklere.</translation>
     </message>
     <message>
         <source>Error writing image to file %1.</source>
@@ -114,19 +114,58 @@
     <name>FileAssocDialog</name>
     <message>
         <source>Done</source>
-        <translation>Ferdig</translation>
+        <translation type="obsolete">Ferdig</translation>
     </message>
     <message>
         <source>New</source>
-        <translation>Ny</translation>
+        <translation type="obsolete">Ny</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Slett</translation>
+        <translation type="obsolete">Slett</translation>
     </message>
     <message>
         <source>Enter the new extension:</source>
         <translation>Skriv inn det nye filetternavnet:</translation>
+    </message>
+</context>
+<context>
+    <name>MetadataSettings</name>
+    <message>
+        <source>Searching for Grabbers...</source>
+        <translation>Søker etter grabbere...</translation>
+    </message>
+    <message>
+        <source>This is the script used to search for and download Movie Metadata.</source>
+        <translation>Dette skriptet brukes for å søke etter og laste ned metadata for filmer.</translation>
+    </message>
+    <message>
+        <source>This is the script used to search for and download Television Metadata.</source>
+        <translation>Dette skriptet brukes for å søke etter og laste ned metadata for tv-programmer.</translation>
+    </message>
+    <message>
+        <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
+        <translation>Hvis satt slår dette på en knapp kalt &quot;Se med trailere&quot;. Det vil da bli vist et brukerbestemt antall trailere før filmen.</translation>
+    </message>
+    <message>
+        <source>Number of trailers to play before a film.</source>
+        <translation>Antall trailere som skal spilles før filmen.</translation>
+    </message>
+    <message>
+        <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored.</source>
+        <translation>Hvis satt, vil alle alle filer i MythVideo-katalogen bli vist, unntatt de filetternavnene som du har valgt å ignorere.</translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
+        <translation>Hvis dette og bla i filer er på, laster videolisten all kjent videodata fra databasen. Å slå dette på kan gjøre det mye raskere å laste inn videoliste-treet.</translation>
+    </message>
+    <message>
+        <source>Exit without saving settings</source>
+        <translation>Avslutt uten å lagre innstillingene</translation>
+    </message>
+    <message>
+        <source>Save settings and Exit</source>
+        <translation>Lagre innstillingene og avslutt</translation>
     </message>
 </context>
 <context>
@@ -213,6 +252,41 @@
     </message>
 </context>
 <context>
+    <name>PlayerSettings</name>
+    <message>
+        <source>This is the command used for any file whose extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
+        <translation>Denne kommandoen brukes for å spille av filer som ikke har en spesiell spiller angitt for sitt filformat. Det går òg an å bruke navnet på en av tilleggsmodulene for avspilling, f.eks. &apos;Internal&apos;.</translation>
+    </message>
+    <message>
+        <source>This can be any command to launch a DVD  player. Internal is the default.  For other players, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
+        <translation>Dette kan være en hvilken som helst kommando som starter en DVD-spiller. Internal er standard. %d vil bli erstattet av DVD enheten (f.eks /dev/dvd).</translation>
+    </message>
+    <message>
+        <source>This device must exist, and the user playing the DVD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
+        <translation>Denne enheten må eksistere, og brukeren som skal spille av en DVD må ha leserettingheter til enheten. &apos;default&apos; vil la MediaMonitor funksjonen velge en enhet.</translation>
+    </message>
+    <message>
+        <source>This can be any command to launch a VCD player. The Internal player will not play VCDs. %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
+        <translation>Dette kan være en hvilken som helst kommando som starter en VCD-spiller. Den interne avspilleren (Internal) kan ikke spille av VCDer. %d vil bli erstattet av VCD enheten (f.eks /dev/cdrom).</translation>
+    </message>
+    <message>
+        <source>This device must exist, and the user playing the VCD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
+        <translation>Denne enheten må eksistere, og brukeren som skal spille av en VCD må ha leserettingheter til enheten. &apos;default&apos; vil la MediaMonitor funksjonen velge en enhet.</translation>
+    </message>
+    <message>
+        <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
+        <translation>Hvis standardavspilleren ikke kan spille en gitt video, så kan du spille den av med den alternative avspilleren ved å velge &apos;Spill av i alternativ avspiller.&apos;</translation>
+    </message>
+    <message>
+        <source>Exit without saving settings</source>
+        <translation>Avslutt uten å lagre innstillingene</translation>
+    </message>
+    <message>
+        <source>Save settings and Exit</source>
+        <translation>Lagre innstillingene og avslutt</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Starting Parental Level</source>
@@ -232,23 +306,23 @@
     </message>
     <message>
         <source>Default View</source>
-        <translation>Standardvisning</translation>
+        <translation type="obsolete">Standardvisning</translation>
     </message>
     <message>
         <source>Gallery</source>
-        <translation>Galleri</translation>
+        <translation type="obsolete">Galleri</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation>Bla</translation>
+        <translation type="obsolete">Bla</translation>
     </message>
     <message>
         <source>Listings</source>
-        <translation>Liste</translation>
+        <translation type="obsolete">Liste</translation>
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation>MythVideos standardvisning. Andre visninger kan nås via menyen som vises når meny-knappen trykkes.</translation>
+        <translation type="obsolete">MythVideos standardvisning. Andre visninger kan nås via menyen som vises når meny-knappen trykkes.</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
@@ -260,35 +334,35 @@
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation>Vis ukjente filtyper</translation>
+        <translation type="obsolete">Vis ukjente filtyper</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation>Dette viser alle filer i MythVideo-katalogen untatt de filetternavnene som du har valgt å ignorere.</translation>
+        <translation type="obsolete">Dette viser alle filer i MythVideo-katalogen untatt de filetternavnene som du har valgt å ignorere.</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation>Nye indekserte filer er visbare som standard</translation>
+        <translation type="obsolete">Nye indekserte filer er visbare som standard</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation>Nylig indekserte filer i videobehandleren blir markert som visbare og vises i bla-menyen.</translation>
+        <translation type="obsolete">Nylig indekserte filer i videobehandleren blir markert som visbare og vises i bla-menyen.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
-        <translation>Kommando for å søke etter filmdetaljer</translation>
+        <translation type="obsolete">Kommando for å søke etter filmdetaljer</translation>
     </message>
     <message>
         <source>This command must be executable by the user running MythVideo.</source>
-        <translation>Denne kommandoen må kunne kjøres av brukeren som kjører MythVideo.</translation>
+        <translation type="obsolete">Denne kommandoen må kunne kjøres av brukeren som kjører MythVideo.</translation>
     </message>
     <message>
         <source>Command to search for movie posters</source>
-        <translation>Kommando for å søke etter filmplakater</translation>
+        <translation type="obsolete">Kommando for å søke etter filmplakater</translation>
     </message>
     <message>
         <source>Command to extract data for movies</source>
-        <translation>Kommando for å hente filmdata</translation>
+        <translation type="obsolete">Kommando for å hente filmdata</translation>
     </message>
     <message>
         <source>Directory that holds movie posters</source>
@@ -300,15 +374,15 @@
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation>Denne kommandoen brukes for å spille av filer som ikke har en spesiell spiller angitt for sitt filformat. Det går òg an å bruke navnet på en av tilleggsmodulene for avspilling, f.eks. &apos;internal&apos;.</translation>
+        <translation type="obsolete">Denne kommandoen brukes for å spille av filer som ikke har en spesiell spiller angitt for sitt filformat. Det går òg an å bruke navnet på en av tilleggsmodulene for avspilling, f.eks. &apos;internal&apos;.</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation>Videobehandler</translation>
+        <translation type="obsolete">Videobehandler</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation>Innstillinger for avspiller</translation>
+        <translation type="obsolete">Innstillinger for avspiller</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -324,15 +398,15 @@
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
-        <translation>Videolisten laster videodata</translation>
+        <translation type="obsolete">Videolisten laster videodata</translation>
     </message>
     <message>
         <source>Sorting ignores case</source>
-        <translation>Sorterer ikke store/små bokstaver</translation>
+        <translation type="obsolete">Sorterer ikke store/små bokstaver</translation>
     </message>
     <message>
         <source>If set, case is ignored when sorting entries in a view.</source>
-        <translation>Gjør at det ikke skilles mellom store og små bokstaver når oppføringer sorteres.</translation>
+        <translation type="obsolete">Gjør at det ikke skilles mellom store og små bokstaver når oppføringer sorteres.</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
@@ -380,15 +454,15 @@
     </message>
     <message>
         <source>Location of VCD device</source>
-        <translation>Sti til VCD-enhet</translation>
+        <translation type="obsolete">Sti til VCD-enhet</translation>
     </message>
     <message>
         <source>This device must exist, and the user running MythDVD needs to have read permission on the device.</source>
-        <translation>Enheten må finnes, og brukeren som kjører MythDVD må ha lesetilgang til den.</translation>
+        <translation type="obsolete">Enheten må finnes, og brukeren som kjører MythDVD må ha lesetilgang til den.</translation>
     </message>
     <message>
         <source>Location of DVD device</source>
-        <translation>Sti til DVD-enhet</translation>
+        <translation type="obsolete">Sti til DVD-enhet</translation>
     </message>
     <message>
         <source>On DVD insertion</source>
@@ -412,20 +486,20 @@
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation>Dette krever at medieovervåking er aktivert 
+        <translation type="obsolete">Dette krever at medieovervåking er aktivert 
 (Innstillinger -&gt; Generelt -&gt; Overvåk CD/DVD)</translation>
     </message>
     <message>
         <source>DVD Player Command</source>
-        <translation>Kommando for DVD-avspiller</translation>
+        <translation type="obsolete">Kommando for DVD-avspiller</translation>
     </message>
     <message>
         <source>VCD Player Command</source>
-        <translation>Kommando for VCD-avspiller</translation>
+        <translation type="obsolete">Kommando for VCD-avspiller</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player (e.g. MPlayer, xine, etc.). If present, %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation>En kommando som starter en VCD-avspiller (MPlayer, xine etc.). &apos;%d&apos; erstattes med VCD-enheten (f.eks. &apos;/dev/cdrom&apos;).</translation>
+        <translation type="obsolete">En kommando som starter en VCD-avspiller (MPlayer, xine etc.). &apos;%d&apos; erstattes med VCD-enheten (f.eks. &apos;/dev/cdrom&apos;).</translation>
     </message>
     <message>
         <source>Directory to hold temporary files</source>
@@ -565,7 +639,7 @@
     </message>
     <message>
         <source>Default Video Player</source>
-        <translation>Standard videospiller</translation>
+        <translation type="obsolete">Standard videospiller</translation>
     </message>
     <message>
         <source>Enable DVD Bookmark Support</source>
@@ -577,11 +651,11 @@
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark</source>
-        <translation>Spør om DVD&apos;en skal spilles fra begynnelsen av eller starte fra et bokmerke</translation>
+        <translation type="obsolete">Spør om DVD&apos;en skal spilles fra begynnelsen av eller starte fra et bokmerke</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD  player (e.g. MPlayer, ogle, etc.). If present, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation>Dette kan være en hvilken som helst kommando som starter en DVD-spiller (MPlayer, ogle etc.). Hvis den finnes, erstattes %d med DVD-enheten (f.eks. /dev/dvd).</translation>
+        <translation type="obsolete">Dette kan være en hvilken som helst kommando som starter en DVD-spiller (MPlayer, ogle etc.). Hvis den finnes, erstattes %d med DVD-enheten (f.eks. /dev/dvd).</translation>
     </message>
     <message>
         <source>General Settings (%1/%2)</source>
@@ -633,11 +707,11 @@
     </message>
     <message>
         <source>Video Tree remembers last selected position</source>
-        <translation>Videoviseren husker forrige valgte posisjon</translation>
+        <translation type="obsolete">Videoviseren husker forrige valgte posisjon</translation>
     </message>
     <message>
         <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation>Behold gjeldende posisjon i videoviseren etter at den lukkes.</translation>
+        <translation type="obsolete">Behold gjeldende posisjon i videoviseren etter at den lukkes.</translation>
     </message>
     <message>
         <source>Directories that hold videos</source>
@@ -686,87 +760,87 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
     </message>
     <message>
         <source>Manager</source>
-        <translation>Behandler</translation>
+        <translation type="obsolete">Behandler</translation>
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree</source>
-        <translation>Hvis dette og bla i filer er på, laster videolisten all kjent videodata fra databasen. Å slå dette på kan gjøre det mye raskere å laste inn videoliste-treet</translation>
+        <translation type="obsolete">Hvis dette og bla i filer er på, laster videolisten all kjent videodata fra databasen. Å slå dette på kan gjøre det mye raskere å laste inn videoliste-treet</translation>
     </message>
     <message>
         <source>Enable Metadata Browse Modes</source>
-        <translation>Slå på Metadata bla-modus</translation>
+        <translation type="obsolete">Slå på Metadata bla-modus</translation>
     </message>
     <message>
         <source>If set, metadata groupings of your video directory will be shown in supported views.  Default group is set below.</source>
-        <translation>Hvis aktivert viser dette metadata gruppering av din videomappe i visninger som støtter dette. Standardgruppe settes under.</translation>
+        <translation type="obsolete">Hvis aktivert viser dette metadata gruppering av din videomappe i visninger som støtter dette. Standardgruppe settes under.</translation>
     </message>
     <message>
         <source>Group based on</source>
-        <translation>Grupper basert på</translation>
+        <translation type="obsolete">Grupper basert på</translation>
     </message>
     <message>
         <source>Folder</source>
-        <translation>Mappe</translation>
+        <translation type="obsolete">Mappe</translation>
     </message>
     <message>
         <source>Genres</source>
-        <translation>Sjangrer</translation>
+        <translation type="obsolete">Sjangrer</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation>Kategori</translation>
+        <translation type="obsolete">Kategori</translation>
     </message>
     <message>
         <source>Director</source>
-        <translation>Regissør</translation>
+        <translation type="obsolete">Regissør</translation>
     </message>
     <message>
         <source>Cast</source>
-        <translation>Skuespillere</translation>
+        <translation type="obsolete">Skuespillere</translation>
     </message>
     <message>
         <source>Date Added</source>
-        <translation>Dato lagt til</translation>
+        <translation type="obsolete">Dato lagt til</translation>
     </message>
     <message>
         <source>TV/Movies</source>
-        <translation>TV/Filmer</translation>
+        <translation type="obsolete">TV/Filmer</translation>
     </message>
     <message>
         <source>Group videos in the tree</source>
-        <translation>Grupper videoer i treet</translation>
+        <translation type="obsolete">Grupper videoer i treet</translation>
     </message>
     <message>
         <source>Command to search for movie fanart</source>
-        <translation>Kommando for å søke etter Fanart for film</translation>
+        <translation type="obsolete">Kommando for å søke etter Fanart for film</translation>
     </message>
     <message>
         <source>Command to search for TV shows in MythVideo</source>
-        <translation>Kommando for å søke etter TV serier i MythVideo</translation>
+        <translation type="obsolete">Kommando for å søke etter TV serier i MythVideo</translation>
     </message>
     <message>
         <source>Command to search for TV Season posters</source>
-        <translation>Kommando for å søke etter Sesongplakater for TV serier</translation>
+        <translation type="obsolete">Kommando for å søke etter Sesongplakater for TV serier</translation>
     </message>
     <message>
         <source>Command to search for TV fanart</source>
-        <translation>Kommando for å søke etter Fanart for TV programmer</translation>
+        <translation type="obsolete">Kommando for å søke etter Fanart for TV programmer</translation>
     </message>
     <message>
         <source>Command to search for TV banners</source>
-        <translation>Kommando for å søke etter Bannere for TV programmer</translation>
+        <translation type="obsolete">Kommando for å søke etter Bannere for TV programmer</translation>
     </message>
     <message>
         <source>Command to search for TV Screenshots</source>
-        <translation>Kommando for å søke etter Screenshots for TV programmer</translation>
+        <translation type="obsolete">Kommando for å søke etter Screenshots for TV programmer</translation>
     </message>
     <message>
         <source>Command to extract data for TV Episodes</source>
-        <translation>Kommando for å hente data for episoder fra TV serier</translation>
+        <translation type="obsolete">Kommando for å hente data for episoder fra TV serier</translation>
     </message>
     <message>
         <source>Command to search for TV by Title/Subtitle</source>
-        <translation>Kommando for å søke etter TV etter tittel og undertittel</translation>
+        <translation type="obsolete">Kommando for å søke etter TV etter tittel og undertittel</translation>
     </message>
     <message>
         <source>Directory that holds movie screenshots</source>
@@ -786,23 +860,23 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
     </message>
     <message>
         <source>Enable Alternate Video Player</source>
-        <translation>Aktiver alternativ videoavspiller</translation>
+        <translation type="obsolete">Aktiver alternativ videoavspiller</translation>
     </message>
     <message>
         <source>If checked, you can select an alternate player command for videos when the default choice fails.</source>
-        <translation>Hvis valgt kan du velge en alternativ videoavspillekommando hvis standardverdien feiler.</translation>
+        <translation type="obsolete">Hvis valgt kan du velge en alternativ videoavspillekommando hvis standardverdien feiler.</translation>
     </message>
     <message>
         <source>Alternate Player</source>
-        <translation>Alternativ avspiller</translation>
+        <translation type="obsolete">Alternativ avspiller</translation>
     </message>
     <message>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
-        <translation>Hvis standardavspilleren ikke kan spille en gitt video, så kan du spille den av med den alternative avspilleren ved å velge &apos;Spill av i alternativ avspiller.&apos;</translation>
+        <translation type="obsolete">Hvis standardavspilleren ikke kan spille en gitt video, så kan du spille den av med den alternative avspilleren ved å velge &apos;Spill av i alternativ avspiller.&apos;</translation>
     </message>
     <message>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation> &apos;standard&apos; vil la MediaMonitor velge en enhet.</translation>
+        <translation type="obsolete"> &apos;standard&apos; vil la MediaMonitor velge en enhet.</translation>
     </message>
     <message>
         <source>Remove DVD Bookmarks Older than (days)</source>
@@ -810,7 +884,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older than the Number of days specified</source>
-        <translation>Fjern DVD-bokmerker som er eldre enn det oppgitte antall dager</translation>
+        <translation type="obsolete">Fjern DVD-bokmerker som er eldre enn det oppgitte antall dager</translation>
     </message>
     <message>
         <source>Set DVD Drive Speed during DVD Playback. Speed is in multiples of 177KB/s. Slower speeds may reduce drive noise but in some cases it causes playback to stutter.</source>
@@ -818,23 +892,23 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
     </message>
     <message>
         <source>Enable random trailers before videos</source>
-        <translation>Slå på tilfeldige trailere før videoavspilling</translation>
+        <translation type="obsolete">Slå på tilfeldige trailere før videoavspilling</translation>
     </message>
     <message>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
-        <translation>Hvis satt slår dette på en knapp kalt &quot;Se med trailere&quot;. Denne knappen vil spille et brukerbestemt antall trailere før filmen.</translation>
+        <translation type="obsolete">Hvis satt slår dette på en knapp kalt &quot;Se med trailere&quot;. Denne knappen vil spille et brukerbestemt antall trailere før filmen.</translation>
     </message>
     <message>
         <source>Number of trailers to play</source>
-        <translation>Antall trailere som skal spilles</translation>
+        <translation type="obsolete">Antall trailere som skal spilles</translation>
     </message>
     <message>
         <source>The number of trailers to play before playing the film itself </source>
-        <translation>Antall tailere som skal spilles før filmen blir startet</translation>
+        <translation type="obsolete">Antall tailere som skal spilles før filmen blir startet</translation>
     </message>
     <message>
         <source>Television in MythVideo</source>
-        <translation>TV i MythVideo</translation>
+        <translation type="obsolete">TV i MythVideo</translation>
     </message>
     <message>
         <source>Loading videos ...</source>
@@ -902,6 +976,38 @@ Undersøk instillingene for videobehandleren</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
+        <translation type="obsolete">Foreldrekontroll pin-kode:</translation>
+    </message>
+    <message>
+        <source>Error: failed to hash file &apos;%1&apos;</source>
+        <translation>Error: kunne ikke beregne hast av filen &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Setting this value to all numbers will make your life much easier.</source>
+        <translation>Å velge alle tall her vil gjøre livet ditt mye enklere.</translation>
+    </message>
+    <message>
+        <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor).</source>
+        <translation>Dette krever at medieovervåking er aktivert (Innstillinger -&gt; Generelt -&gt; Overvåk CD/DVD).</translation>
+    </message>
+    <message>
+        <source>Delete DVD Bookmarks that are older than the number of days specified.</source>
+        <translation>Fjern DVD-bokmerker som er eldre enn det oppgitte antall dager.</translation>
+    </message>
+    <message>
+        <source>Enable the setting and skipping to of a bookmark in DVD playback.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark.</source>
+        <translation>Spør om DVD&apos;en skal spilles fra begynnelsen av eller starte fra et bokmerke.</translation>
+    </message>
+    <message>
+        <source>Parental Control Settings</source>
+        <translation>Innstillinger for Forelderkontroll</translation>
+    </message>
+    <message>
+        <source>Parental PIN:</source>
         <translation>Foreldrekontroll pin-kode:</translation>
     </message>
 </context>
@@ -1307,7 +1413,7 @@ Undersøk instillingene for videobehandleren</translation>
     </message>
     <message>
         <source>No Videos Available</source>
-        <translation>Ingen videoer er tilgjengelig</translation>
+        <translation type="obsolete">Ingen videoer er tilgjengelig</translation>
     </message>
     <message>
         <source>Season</source>
@@ -1503,7 +1609,7 @@ Undersøk instillingene for videobehandleren</translation>
     </message>
     <message>
         <source>Download Images Only</source>
-        <translation>Last ned kun bildene</translation>
+        <translation type="obsolete">Last ned kun bildene</translation>
     </message>
     <message>
         <source>Search TV by Title/Subtitle</source>
@@ -1555,6 +1661,38 @@ Undersøk instillingene for videobehandleren</translation>
         <source>%1 exists for this item but could not be retrieved within the timeout period.
 </source>
         <translation>%1 eksisterer for dette elementet men kunne ikke hentes innenfor tidsgrensen.</translation>
+    </message>
+    <message>
+        <source>Video dialog loading, or no videos available...</source>
+        <translation>Video dialog lastes, eller ingen videoer tilgjengelig...</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Innstillinger</translation>
+    </message>
+    <message>
+        <source>Video Settings</source>
+        <translation>Videoinnstillinger</translation>
+    </message>
+    <message>
+        <source>Player Settings</source>
+        <translation>Innstillinger for avspiller</translation>
+    </message>
+    <message>
+        <source>Metadata Settings</source>
+        <translation>Innstillinger for Metadata</translation>
+    </message>
+    <message>
+        <source>File Type Settings</source>
+        <translation>Innstillinger for filtype</translation>
+    </message>
+    <message>
+        <source>View Homepage</source>
+        <translation>Se hjemmeside</translation>
+    </message>
+    <message>
+        <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
+        <translation>Ingen webleser-kommando er satt! MythVideo er avhengig av at MythBrowser er installert for å vise hjemmesiden.</translation>
     </message>
 </context>
 <context>
