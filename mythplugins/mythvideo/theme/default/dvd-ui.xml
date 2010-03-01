@@ -232,12 +232,14 @@
             <position>255,435</position>
             <regular-background filename="left_arrow.png" />
             <selected-background filename="left_arrow_selected.png" />
+            <value>Previous</value>
         </button>
 
         <button name="next_title" from="basebutton">
             <position>485,435</position>
             <regular-background filename="right_arrow.png" />
             <selected-background filename="right_arrow_selected.png.png" />
+            <value>Next</value>
         </button>
 
         <button name="ripaway" from="basebutton">
