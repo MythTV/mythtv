@@ -16,11 +16,18 @@ class MythSocket;
 class MainServer;
 class ProgramInfo;
 
+typedef enum {
+    kPBSEvents_None       = 0,
+    kPBSEvents_Normal     = 1,
+    kPBSEvents_NonSystem  = 2,
+    kPBSEvents_SystemOnly = 3
+} PlaybackSockEventsMode;
+
 class PlaybackSock
 {
   public:
     PlaybackSock(MainServer *parent, MythSocket *lsock, 
-                 QString lhostname, bool wantevents);
+                 QString lhostname, PlaybackSockEventsMode eventsMode);
     virtual ~PlaybackSock();
 
     void UpRef(void);
@@ -33,7 +40,11 @@ class PlaybackSock
     QString getHostname(void) { return hostname; }
 
     bool isLocal(void) { return local; }
-    bool wantsEvents(void) { return events; }
+    bool wantsEvents(void);
+    bool wantsNonSystemEvents(void);
+    bool wantsSystemEvents(void);
+    bool wantsOnlySystemEvents(void);
+    PlaybackSockEventsMode eventsMode(void);
 
     bool getBlockShutdown(void) { return blockshutdown; }
     void setBlockShutdown(bool value) { blockshutdown = value; }
@@ -95,7 +106,7 @@ class PlaybackSock
     QString ip;
 
     bool local;
-    bool events;
+    PlaybackSockEventsMode m_eventsMode;
     bool blockshutdown;
     bool backend;
 

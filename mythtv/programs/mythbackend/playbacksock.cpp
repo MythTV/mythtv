@@ -15,7 +15,7 @@ using namespace std;
 #define LOC_ERR QString("PlaybackSock, Error: ")
 
 PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock,
-                           QString lhostname, bool wantevents)
+                           QString lhostname, PlaybackSockEventsMode eventsMode)
 {
     m_parent = parent;
     QString localhostname = gContext->GetHostName();
@@ -24,7 +24,7 @@ PlaybackSock::PlaybackSock(MainServer *parent, MythSocket *lsock,
 
     sock = lsock;
     hostname = lhostname;
-    events = wantevents;
+    m_eventsMode = eventsMode;
     ip = "";
     backend = false;
     expectingreply = false;
@@ -60,6 +60,33 @@ bool PlaybackSock::DownRef(void)
         return true;
     }
     return false;
+}
+
+bool PlaybackSock::wantsEvents(void)
+{
+    return (m_eventsMode != kPBSEvents_None);
+}
+
+bool PlaybackSock::wantsNonSystemEvents(void)
+{
+    return ((m_eventsMode == kPBSEvents_Normal) ||
+            (m_eventsMode == kPBSEvents_NonSystem));
+}
+
+bool PlaybackSock::wantsSystemEvents(void)
+{
+    return ((m_eventsMode == kPBSEvents_Normal) ||
+            (m_eventsMode == kPBSEvents_SystemOnly));
+}
+
+bool PlaybackSock::wantsOnlySystemEvents(void)
+{
+    return (m_eventsMode == kPBSEvents_SystemOnly);
+}
+
+PlaybackSockEventsMode PlaybackSock::eventsMode(void)
+{
+    return m_eventsMode;
 }
 
 bool PlaybackSock::SendReceiveStringList(

@@ -980,12 +980,24 @@ void MainServer::customEvent(QEvent *e)
                 reallysendit = true;
             }
 
-            if (reallysendit && isSystemEvent)
+            if (reallysendit)
             {
-                if (sentSetSystemEvent.contains(pbs->getHostname()))
-                    continue;
+                if (isSystemEvent)
+                {
+                    if (!pbs->wantsSystemEvents())
+                    {
+                        continue;
+                    }
+                    else if (!pbs->wantsOnlySystemEvents())
+                    {
+                        if (sentSetSystemEvent.contains(pbs->getHostname()))
+                            continue;
 
-                sentSetSystemEvent << pbs->getHostname();
+                        sentSetSystemEvent << pbs->getHostname();
+                    }
+                }
+                else if (pbs->wantsOnlySystemEvents())
+                    continue;
             }
 
             MythSocket *sock = pbs->getSocket();
@@ -1100,19 +1112,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         // Monitor connections are same as Playback but they don't
         // block shutdowns. See the Scheduler event loop for more.
 
-        bool wantevents = commands[3].toInt();
+        PlaybackSockEventsMode eventsMode =
+            (PlaybackSockEventsMode)commands[3].toInt();
         VERBOSE(VB_GENERAL, QString("MainServer::ANN %1")
                                     .arg(commands[1]));
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a client (events: %2)")
-                               .arg(commands[2]).arg(wantevents));
-        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], wantevents);
+                               .arg(commands[2]).arg(eventsMode));
+        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], eventsMode);
         pbs->setBlockShutdown(commands[1] == "Playback");
 
         sockListLock.lockForWrite();
         playbackList.push_back(pbs);
         sockListLock.unlock();
 
-        if (wantevents && commands[2] != "tzcheck")
+        if (eventsMode != kPBSEvents_None && commands[2] != "tzcheck")
             SendMythSystemEvent(QString("CLIENT_CONNECTED HOSTNAME %1")
                                         .arg(commands[2]));
     }
@@ -1129,7 +1142,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         VERBOSE(VB_IMPORTANT, QString("adding: %1 as a slave backend server")
                                .arg(commands[2]));
-        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], false);
+        PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2],
+                                             kPBSEvents_None);
         pbs->setAsSlaveBackend();
         pbs->setIP(commands[3]);
 
@@ -5226,7 +5240,8 @@ void MainServer::reconnectTimeout(void)
 
     masterServerSock->setCallbacks(this);
 
-    masterServer = new PlaybackSock(this, masterServerSock, server, true);
+    masterServer = new PlaybackSock(this, masterServerSock, server,
+                                    kPBSEvents_Normal);
     sockListLock.lockForWrite();
     playbackList.push_back(masterServer);
     sockListLock.unlock();

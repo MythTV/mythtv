@@ -372,7 +372,9 @@ EOF
 # Connect to the running backend
     sub connect {
         my $self = shift;
-        if ($self->backend_command('ANN Monitor '.$self->{'hostname'}.' 0') ne 'OK') {
+        my $wantsEvents = shift;
+        $wantsEvents = 0 if (!defined($wantsEvents));
+        if ($self->backend_command('ANN Monitor '.$self->{'hostname'}." $wantsEvents") ne 'OK') {
             die "Unable to connect to mythbackend, is it running?\n";
         }
     }
