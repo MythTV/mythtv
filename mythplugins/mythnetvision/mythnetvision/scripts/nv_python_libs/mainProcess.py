@@ -35,8 +35,7 @@ from string import capitalize
 
 
 class OutStreamEncoder(object):
-    """Wraps a stream with an encoder
-    """
+    """Wraps a stream with an encoder"""
     def __init__(self, outstream, encoding=None):
         self.out = outstream
         if not encoding:
@@ -47,16 +46,21 @@ class OutStreamEncoder(object):
     def write(self, obj):
         """Wraps the output stream, encoding Unicode strings with the specified encoding"""
         if isinstance(obj, unicode):
-            self.out.write(obj.encode(self.encoding))
+            try:
+                self.out.write(obj.encode(self.encoding))
+            except IOError:
+                pass
         else:
-            self.out.write(obj)
+            try:
+                self.out.write(obj)
+            except IOError:
+                pass
 
     def __getattr__(self, attr):
         """Delegate everything but write to the stream"""
         return getattr(self.out, attr)
-# Sub class sys.stdout and sys.stderr as a utf8 stream. Deals with print and stdout unicode issues
-sys.stdout = OutStreamEncoder(sys.stdout)
-sys.stderr = OutStreamEncoder(sys.stderr)
+sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
+sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
 class siteQueries():
     '''Methods that quering video Web sites for metadata and outputs the results to stdout any errors are output
