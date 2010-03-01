@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.8"
+__version__=u"v0.6.9"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -291,7 +291,9 @@ __version__=u"v0.6.8"
  #       Change all occurances of 'mythbeconn.host' to 'mythbeconn.hostname' to be consistent with bindings
  # 0.6.7 Fixed the (-J) janitor option from removing the Mirobridge default images when they are not being used
  # 0.6.8 Fixed a (-J) janitor option statistics error due to skipping Mirbridge default images
-
+ # 0.6.9 Fixed an abort when IMDBpy returns movie matches with incomplete data
+ #       Fixed an abort where an IMDB# was being used instead of a TMDB#
+ #       Fixed an abort when a storage directory name caused an UnicodeEncodeError or TypeError exception
 
 usage_txt=u'''
 JAMU - Just.Another.Metadata.Utility is a versatile utility for downloading graphics and meta data
@@ -750,6 +752,7 @@ def getStorageGroups():
         for record in records:
             # Only include Video, coverfile, banner, fanart, screenshot and trailers storage groups
             if record.groupname in storagegroupnames.keys():
+                dirname = record.dirname
                 try:
                     dirname = unicode(record.dirname, 'utf8')
                 except (UnicodeDecodeError):
@@ -3241,7 +3244,7 @@ class MythTvMetaData(VideoFiles):
                                     return {'name': "%s (%s)" % (movie['alternative_name'], movie['released'][:4]), u'sid': movie[u'id']}
                                 else:
                                     return movie['id']
-                            TMDB_movies.append({'name': "%s (%s)" % (movie['alternative_name'], movie['released'][:4]), u'sid': movie[u'imdb']})
+                            TMDB_movies.append({'name': "%s (%s)" % (movie['alternative_name'], movie['released'][:4]), u'sid': movie[u'id']})
                             continue
                         else:
                             TMDB_movies.append({'name': "%s" % (movie['alternative_name'], ), u'sid': movie[u'id']})
@@ -3265,10 +3268,13 @@ class MythTvMetaData(VideoFiles):
                 return False
             tmp_movies={}
             for movie in movies_found: # Get rid of duplicates
-                if movie.has_key('year'):
-                    temp =  {imdb_access.get_imdbID(movie): u"%s (%s)" % (movie['title'], movie['year'])}
-                else:
-                    temp =  {imdb_access.get_imdbID(movie): movie['title']}
+                try: # Protect against bad data from IMDBpy
+                    if movie.has_key('year'):
+                        temp =  {imdb_access.get_imdbID(movie): u"%s (%s)" % (movie['title'], movie['year'])}
+                    else:
+                        temp =  {imdb_access.get_imdbID(movie): movie['title']}
+                except Exception:
+                    return False
                 if tmp_movies.has_key(temp.keys()[0]):
                     continue
                 tmp_movies[temp.keys()[0]] = temp[temp.keys()[0]]
