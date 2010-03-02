@@ -545,6 +545,15 @@ void MythThemedMenu::parseThemeButton(QDomElement &element)
                 addit = GetMythMainWindow()->DestinationExists(
                             getFirstText(info));
             }
+            else if (info.tagName() == "dependswindow")
+            {
+                QString xmlFile = info.attribute("xmlfile", "");
+                QString windowName = getFirstText(info);
+                if (xmlFile.isEmpty() || windowName.isEmpty())
+                    addit = false;
+                else
+                    addit = XMLParseBase::WindowExists(xmlFile, windowName);
+            }
             else if (info.tagName() == "description")
             {
                 if (description.isEmpty() &&

@@ -451,6 +451,58 @@ MythUIType *XMLParseBase::ParseUIType(
     return uitype;
 }
 
+bool XMLParseBase::WindowExists(const QString &xmlfile,
+                                const QString &windowname)
+{
+    const QStringList searchpath = GetMythUI()->GetThemeSearchPath();
+    QStringList::const_iterator it = searchpath.begin();
+    for (; it != searchpath.end(); ++it)
+    {
+        QString themefile = *it + xmlfile;
+        QFile f(themefile);
+
+        if (!f.open(QIODevice::ReadOnly))
+            continue;
+
+        QDomDocument doc;
+        QString errorMsg;
+        int errorLine = 0;
+        int errorColumn = 0;
+
+        if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Location: '%1' @ %2 column: %3"
+                            "\n\t\t\tError: %4")
+                    .arg(qPrintable(themefile)).arg(errorLine).arg(errorColumn)
+                    .arg(qPrintable(errorMsg)));
+            f.close();
+            continue;
+        }
+
+        f.close();
+
+        QDomElement docElem = doc.documentElement();
+        QDomNode n = docElem.firstChild();
+        while (!n.isNull())
+        {
+            QDomElement e = n.toElement();
+            if (!e.isNull())
+            {
+                if (e.tagName() == "window")
+                {
+                    QString name = e.attribute("name", "");
+                    if (name == windowname)
+                        return true;
+                }
+            }
+            n = n.nextSibling();
+        }
+    }
+
+    return false;
+}
+
 bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
                                      const QString &windowname,
                                      MythUIType *parent)

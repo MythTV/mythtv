@@ -42,6 +42,7 @@ class MPUBLIC XMLParseBase
         MythUIType *parent, MythScreenType *screen,
         bool showWarnings);
 
+    static bool WindowExists(const QString &xmlfile, const QString &windowname);
     static bool LoadWindowFromXML(const QString &xmlfile,
                                   const QString &windowname,
                                   MythUIType *parent);
