@@ -45,8 +45,11 @@ void strings_null() {
     ThemeUI::tr("Copy");
     ThemeUI::tr("Please Wait ...");
     ThemeUI::tr("General Settings");
+    ThemeUI::tr("Music folders and general options");
     ThemeUI::tr("Player Settings");
+    ThemeUI::tr("Music playback options");
     ThemeUI::tr("Ripper Settings");
+    ThemeUI::tr("CD copying options");
     ThemeUI::tr("Play Music");
     ThemeUI::tr("Select Music");
     ThemeUI::tr("Import CD");

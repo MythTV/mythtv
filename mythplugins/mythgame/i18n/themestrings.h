@@ -26,7 +26,11 @@ void strings_null() {
     ThemeUI::tr("Play");
     ThemeUI::tr("Game Information");
     ThemeUI::tr("General Settings");
+    ThemeUI::tr("Game folders and general options");
     ThemeUI::tr("Game Players");
+    ThemeUI::tr("Configure an emulator");
     ThemeUI::tr("Scan for Games");
+    ThemeUI::tr("Add games to your library");
     ThemeUI::tr("Clear Game Data");
+    ThemeUI::tr("Empty your game library");
 }
