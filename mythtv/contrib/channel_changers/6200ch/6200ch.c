@@ -41,6 +41,9 @@
 #define DCX3200_MODEL_ID1  0x0000f740
 #define DCX3200_MODEL_ID2  0x0000fa07
 
+#define DCX3432_VENDOR_ID1 0x000024a0
+#define DCX3432_MODEL_ID1  0x0000ea05
+
 #define DCH3416_VENDOR_ID1 0x00001e46
 #define DCH3416_MODEL_ID1  0x0000b630
 
@@ -89,6 +92,9 @@
 #define QIP7100_MODEL_ID1  0x00008100
 #define QIP7100_MODEL_ID2  0x00000001
 
+#define QIP6200_VENDOR_ID1 0x0000211e
+#define QIP6200_MODEL_ID1  0x00007100
+
 #define MOT_UNKNOWN_VENDOR_ID1 0x04db
 #define MOT_UNKNOWN_VENDOR_ID2 0x0406
 #define MOT_UNKNOWN_VENDOR_ID3 0x0ce5
@@ -100,17 +106,16 @@
 #define MOT_UNKNOWN_VENDOR_ID9 0x1ade
 #define MOT_UNKNOWN_VENDOR_ID10 0x1cfb
 #define MOT_UNKNOWN_VENDOR_ID11 0x2040
-#define MOT_UNKNOWN_VENDOR_ID12 0x211e
-#define MOT_UNKNOWN_VENDOR_ID13 0x2180
-#define MOT_UNKNOWN_VENDOR_ID14 0x2210
-#define MOT_UNKNOWN_VENDOR_ID15 0x230b
-#define MOT_UNKNOWN_VENDOR_ID16 0x2375
-#define MOT_UNKNOWN_VENDOR_ID17 0x2395
-#define MOT_UNKNOWN_VENDOR_ID18 0x23a2
-#define MOT_UNKNOWN_VENDOR_ID19 0x23ed
-#define MOT_UNKNOWN_VENDOR_ID20 0x23ee
-#define MOT_UNKNOWN_VENDOR_ID21 0x23a0
-#define MOT_UNKNOWN_VENDOR_ID22 0x23a1
+#define MOT_UNKNOWN_VENDOR_ID12 0x2180
+#define MOT_UNKNOWN_VENDOR_ID13 0x2210
+#define MOT_UNKNOWN_VENDOR_ID14 0x230b
+#define MOT_UNKNOWN_VENDOR_ID15 0x2375
+#define MOT_UNKNOWN_VENDOR_ID16 0x2395
+#define MOT_UNKNOWN_VENDOR_ID17 0x23a2
+#define MOT_UNKNOWN_VENDOR_ID18 0x23ed
+#define MOT_UNKNOWN_VENDOR_ID19 0x23ee
+#define MOT_UNKNOWN_VENDOR_ID20 0x23a0
+#define MOT_UNKNOWN_VENDOR_ID21 0x23a1
 
 #define PACE_VENDOR_ID1    0x00005094 /* 550 & 779 */
 #define PACE_VENDOR_ID2    0x00005094 /* unknown */
@@ -129,21 +134,23 @@
 #define RETRY_COUNT_FAST 0
 
 void set_chan_slow(raw1394handle_t handle, int device, int verbose, int chn);
+void set_chan_slow_four_digit(raw1394handle_t handle, int device, int verbose, int chn);
 void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn);
 void set_power_fast(raw1394handle_t handle, int device, int verbose);
 
 void usage()
 {
    fprintf(stderr, "Usage: 6200ch [-v] [-s] [-n NODE] [-g GUID] [-p PORT] "
-           "<channel_num>\n");
+           "[-4] <channel_num>\n");
    fprintf(stderr, "-v        print additional verbose output\n");
-   fprintf(stderr, "-s        use single packet method\n");
+   fprintf(stderr, "-s        use single packet method. Cannot be used with -4.\n");
    fprintf(stderr, "-w        toggle power state\n");
    fprintf(stderr, "-n NODE   node to start device scanning on (default:%i)\n",
            STARTING_NODE);
    fprintf(stderr, "-p PORT   port/adapter to use              (default:%i)\n",
            STARTING_PORT);
    fprintf(stderr, "-g GUID   GUID to use, -n switch, if present, will be ignored.\n");
+   fprintf(stderr, "-4        Enable 4 digit channel number support. Cannot be used with -s.\n");
    exit(1);
 }
 
@@ -159,6 +166,7 @@ int main (int argc, char *argv[])
    octlet_t cli_GUID=0LL;
    octlet_t node_GUID=0LL;
    int chn = 0;
+   int use_four_digit = 0;
 
    /* some people experience crashes when starting on node 1 */
    int starting_node = STARTING_NODE;
@@ -169,7 +177,7 @@ int main (int argc, char *argv[])
       usage();
 
    opterr = 0;
-   while ((c = getopt(argc, argv, "vswg:n:p:")) != -1)
+   while ((c = getopt(argc, argv, "vswg:n:p:4")) != -1)
    {
        switch (c) {
        case 'v':
@@ -192,16 +200,24 @@ int main (int argc, char *argv[])
        case 'p':
            starting_port = atoi(optarg);
            break;
+       case '4':
+           use_four_digit = 1;
+           break;
        default:
            fprintf(stderr, "incorrect command line arguments\n");
            usage();
        }
    }
 
+   {
+   /* We cannot use single packet with 4 digits */
+       if (single_packet && use_four_digit)
+           usage();
+   }
    /* print out usage message if not enough arguments */
    if (optind == argc-1)
    {
-       /* the last argument is the channel number */
+   /* the last argument is the channel number */
        chn = atoi(argv[optind]);
    }
    else if (!toggle_power)
@@ -292,7 +308,9 @@ int main (int argc, char *argv[])
             (dir.vendor_id == DCT6412_VENDOR_ID2) ||
             (dir.vendor_id == DCT6416_VENDOR_ID1) ||
             (dir.vendor_id == DCT6416_VENDOR_ID2) ||
+            (dir.vendor_id == DCX3432_VENDOR_ID1) ||
             (dir.vendor_id == QIP7100_VENDOR_ID1) ||
+            (dir.vendor_id == QIP6200_VENDOR_ID1) ||
             (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID1) ||
             (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID2) ||
             (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID3) ||
@@ -314,12 +332,12 @@ int main (int argc, char *argv[])
             (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID19) ||
             (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID20) ||
             (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID21) ||
-            (dir.vendor_id == MOT_UNKNOWN_VENDOR_ID22) ||
             (dir.vendor_id == PACE_VENDOR_ID1) ||
             (dir.vendor_id == PACE_VENDOR_ID2)) &&
            ((dir.model_id == DCH3200_MODEL_ID1) ||
             (dir.model_id == DCX3200_MODEL_ID1) ||
             (dir.model_id == DCX3200_MODEL_ID2) ||
+            (dir.model_id == DCX3432_MODEL_ID1) ||
             (dir.model_id == DCH3416_MODEL_ID1) ||
             (dir.model_id == DCT3412_MODEL_ID1) ||
             (dir.model_id == DCT3416_MODEL_ID1) ||
@@ -332,6 +350,7 @@ int main (int argc, char *argv[])
             (dir.model_id == DCT6416_MODEL_ID1) ||
             (dir.model_id == QIP7100_MODEL_ID1) ||
             (dir.model_id == QIP7100_MODEL_ID2) ||
+            (dir.model_id == QIP6200_MODEL_ID1) ||
             (dir.model_id == PACE550_MODEL_ID1) ||
             (dir.model_id == PACE779_MODEL_ID1)) )
       {
@@ -357,6 +376,9 @@ int main (int argc, char *argv[])
    {
        if (single_packet)
            set_chan_fast(handle, device, verbose, chn);
+       else
+       if (use_four_digit)
+           set_chan_slow_four_digit(handle, device, verbose, chn); 
        else
            set_chan_slow(handle, device, verbose, chn);
    }
@@ -388,6 +410,37 @@ void set_chan_slow(raw1394handle_t handle, int device, int verbose, int chn)
       usleep(500000);  // small delay for button to register
    }
 }
+
+// Same as set_chan_slow(), but sends 4 digits instead of 3 (for quicker channel changes on QIP6200-2 / QIP7100-1)
+void set_chan_slow_four_digit(raw1394handle_t handle, int device, int verbose, int chn)
+{
+   int i;
+   int dig[4];
+   quadlet_t cmd[2];
+
+   if (verbose)
+       printf("chn: %d\n", chn);
+
+   dig[3] = (chn % 10);
+   dig[2] = (chn % 100) / 10;
+   dig[1] = (chn % 1000) / 100;
+   dig[0] = (chn % 10000) / 1000;
+
+   if (verbose)
+      printf("AV/C Command: %d%d%d%d = Op1=0x%08X Op2=0x%08X Op3=0x%08X Op4=0x%08X\n",
+            dig[0], dig[1], dig[2], dig[3],
+            CTL_CMD0 | dig[0], CTL_CMD0 | dig[1], CTL_CMD0 | dig[2], CTL_CMD0 | dig[3]);
+
+   for (i=0; i<4; i++) {
+      if (verbose)
+          printf("Sending digit %d\n", dig[i]);
+      cmd[0] = CTL_CMD0 | dig[i];
+      cmd[1] = 0x0;
+    
+      avc1394_transaction_block(handle, device, cmd, 2, RETRY_COUNT_SLOW);
+      usleep(500000); // small delay for button to register
+   }
+} 
 
 void set_chan_fast(raw1394handle_t handle, int device, int verbose, int chn)
 {
