@@ -3854,7 +3854,7 @@ if test x"$xvmc_lib" != x""; then
     VENDOR_XVMC_LIBS="-l"$xvmc_lib
     disable xvmcw
 elif enabled xvmcw; then
-    VENDOR_XVMC_LIBS="-lXvMCW"
+    VENDOR_XVMC_LIBS="-lXvMCW -ldl"
 elif enabled xvmc_pro; then
     if has_library libviaXvMCPro ; then
         VENDOR_XVMC_LIBS="-lviaXvMCPro"
