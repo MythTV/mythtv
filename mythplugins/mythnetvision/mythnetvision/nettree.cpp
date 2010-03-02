@@ -572,10 +572,10 @@ void NetTree::showManageMenu()
             menuPopup->AddButton(tr("Enable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
         else 
             menuPopup->AddButton(tr("Disable Automatic Site Updates"), SLOT(toggleTreeUpdates()));
-        if (!m_rssAutoUpdate) 
-            menuPopup->AddButton(tr("Enable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
-        else
-            menuPopup->AddButton(tr("Disable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
+//        if (!m_rssAutoUpdate) 
+//            menuPopup->AddButton(tr("Enable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
+//        else
+//            menuPopup->AddButton(tr("Disable Automatic RSS Updates"), SLOT(toggleRSSUpdates()));
     }
     else
     {
