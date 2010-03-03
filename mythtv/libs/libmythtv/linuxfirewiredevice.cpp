@@ -121,8 +121,6 @@ static bool has_data(int fd, uint msec);
 static QString speed_to_string(uint speed);
 static int linux_firewire_device_bus_reset_handler(
     raw1394handle_t handle, uint generation);
-static bool get_guid(raw1394handle_t handle, nodeid_t node,
-                     uint64_t &guid, bool &temp_unavailable);
 
 LinuxFirewireDevice::LinuxFirewireDevice(
     uint64_t guid, uint subunitid,
@@ -896,27 +894,15 @@ bool LinuxFirewireDevice::UpdateDeviceList(void)
             continue;
         }
 
-        MythTimer guid_timer;
-        guid_timer.start();
         for (int node = 0; node < raw1394_get_nodecount(item.handle); node++)
         {
-            bool tmp;
             uint64_t guid;
-            if (!get_guid(item.handle, 0xffc0 | node, guid, tmp))
-            {
-                if (tmp && (guid_timer.elapsed() < 200))
-                { // device has gone off-line temporarily
-                    usleep(10 * 1000);
-                    node--;
-                }
-                continue; // device has gone off-line
-            }
 
+            guid = rom1394_get_guid(item.handle, node);
             item.port = port;
             item.node = node;
             UpdateDeviceListItem(guid, &item);
             guid_online[guid] = true;
-            guid_timer.start();
         }
 
         raw1394_destroy_handle(item.handle);
@@ -1045,37 +1031,4 @@ static int linux_firewire_device_bus_reset_handler(
         (*it)->SignalReset(generation);
 
     return 0;
-}
-
-// get_guid copied from plugreport, Copyright 2002-2004 Dan Dennedy GPL v2+
-#define PLUGREPORT_GUID_HI 0x0C
-#define PLUGREPORT_GUID_LO 0x10
-static bool get_guid(raw1394handle_t handle, nodeid_t node, uint64_t &guid,
-                     bool &temp_unavailable)
-{
-    uint64_t offset = CSR_REGISTER_BASE + CSR_CONFIG_ROM + PLUGREPORT_GUID_HI;
-    uint32_t quadlet;
-    int err = raw1394_read(handle, node, offset, sizeof(uint32_t), &quadlet);
-    if (-1 == err)
-    {
-        temp_unavailable = (errno == 11);
-        if (!temp_unavailable)
-            VERBOSE(VB_IMPORTANT, "get_guid 1, Error: " + ENO);
-        return false;
-    }
-    guid = htonl(quadlet);
-    guid <<= 32;
-
-    offset = CSR_REGISTER_BASE + CSR_CONFIG_ROM + PLUGREPORT_GUID_LO;
-    err = raw1394_read(handle, node, offset, sizeof(uint32_t), &quadlet);
-    if (-1 == err)
-    {
-        temp_unavailable = (errno == 11);
-        if (!temp_unavailable)
-            VERBOSE(VB_IMPORTANT, "get_guid 2, Error: " + ENO);
-        return false;
-    }
-    guid += htonl(quadlet);
-
-    return true;
 }
