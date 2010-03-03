@@ -1,8 +1,16 @@
 #!/bin/bash
 TS=`pwd`/themestrings
 
+pushd ..
+    chmod a-x mythplugins
+popd > /dev/null
+
 pushd ../mythtv/themes
-  $TS ../.. . > /dev/null
+    $TS ../.. . > /dev/null
+popd > /dev/null
+
+pushd ..
+    chmod a+x mythplugins
 popd > /dev/null
 
 for I in `ls ../mythplugins --file-type | grep "/$" | grep -v cleanup | grep -v mythweb` ; do
@@ -12,6 +20,6 @@ for I in `ls ../mythplugins --file-type | grep "/$" | grep -v cleanup | grep -v 
 done
 
 pushd .. > /dev/null
-  svn st
-  emacs `svn st | grep "^M" | sed -e "s/^M//"` &
+    svn st
+    emacs `svn st | grep "^M" | sed -e "s/^M//"` &
 popd > /dev/null
