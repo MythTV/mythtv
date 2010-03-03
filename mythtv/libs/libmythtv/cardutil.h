@@ -114,7 +114,7 @@ class MPUBLIC CardUtil
     {
         return
             (rawtype == "FIREWIRE")  || (rawtype == "IMPORT") ||
-            (rawtype == "HDPVR"      || (rawtype == "V4L"));
+            (rawtype == "HDPVR");
     }
 
     static bool         IsEITCapable(const QString &rawtype)

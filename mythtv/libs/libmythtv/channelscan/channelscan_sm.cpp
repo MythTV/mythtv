@@ -1517,7 +1517,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
     signalMonitor->Start();
 
     timer.start();
-    waitingForTables = true;
+    waitingForTables = (item.tuning.sistandard != "analog");
 }
 
 /** \fn ChannelScanSM::StopScanner(void)

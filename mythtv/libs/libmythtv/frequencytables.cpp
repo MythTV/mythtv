@@ -36,6 +36,12 @@ TransportScanItem::TransportScanItem(uint           sourceid,
 
     tuning.Clear();
     tuning.sistandard = _si_std;
+
+    if (_si_std == "analog")
+    {
+        tuning.sistandard = "analog";
+        tuning.modulation = DTVModulation::kModulationAnalog;
+    }
 }
 
 TransportScanItem::TransportScanItem(uint           _sourceid,
@@ -95,8 +101,17 @@ TransportScanItem::TransportScanItem(uint sourceid,
 
     // setup tuning params
     tuning.frequency  = freq;
-    tuning.sistandard = (std.toLower() != "atsc") ? "dvb" : "atsc";
+    tuning.sistandard = "dvb";
     tuning.modulation = ft.modulation;
+
+    if (std.toLower() == "atsc")
+        tuning.sistandard = "atsc";
+    else if (std.toLower() == "analog")
+    {
+        tuning.sistandard = "analog";
+        tuning.modulation = DTVModulation::kModulationAnalog;
+    }
+
     freq_offsets[1]   = ft.offset1;
     freq_offsets[2]   = ft.offset2;
 
@@ -148,17 +163,17 @@ QString TransportScanItem::toString() const
     str += QString("\tUseTimer(%1) scanning(%2)\n")
         .arg(UseTimer).arg(scanning);
     str += QString("\ttimeoutTune(%3 msec)\n").arg(timeoutTune);
-    if (tuning.sistandard == "atsc")
+    if (tuning.sistandard == "atsc" || tuning.sistandard == "analog")
     {
         str += QString("\tfrequency(%1) modulation(%2)\n")
             .arg(tuning.frequency)
-            .arg(tuning.modulation);
+            .arg(tuning.modulation.toString());
     }
     else
     {
         str += QString("\tfrequency(%1) constellation(%2)\n")
             .arg(tuning.frequency)
-            .arg(tuning.modulation);
+            .arg(tuning.modulation.toString());
         str += QString("\t  inv(%1) bandwidth(%2) hp(%3) lp(%4)\n")
             .arg(tuning.inversion)
             .arg(tuning.bandwidth)

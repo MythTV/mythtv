@@ -322,7 +322,13 @@ class DTVModulation : public DTVParamHelper
     QString toString() const { return toString(value); }
 
     static QString toString(int _value)
-        { return DTVParamHelper::toString(dbStr, _value, kDBStrCnt); }
+    {
+        if (kModulationInvalid == _value)
+            return "invalid";
+        else if (kModulationAnalog == _value)
+            return "analog";
+        return DTVParamHelper::toString(dbStr, _value, kDBStrCnt);
+    }
 };
 
 class DTVTransmitMode : public DTVParamHelper
