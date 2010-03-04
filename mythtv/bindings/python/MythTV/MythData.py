@@ -274,18 +274,20 @@ class FileTransfer( MythBEConn ):
         if whence == 0:
             if offset < 0:
                 offset = 0
-            if offset > self.size:
+            elif offset > self.size:
                 offset = self.size
         elif whence == 1:
             if offset + self.pos < 0:
                 offset = -self.pos
-            if offset + self.pos > self.size:
+            elif offset + self.pos > self.size:
                 offset = self.size - self.pos
         elif whence == 2:
             if offset > 0:
                 offset = 0
-            if offset < -self.size:
+            elif offset < -self.size:
                 offset = -self.size
+            whence = 0
+            offset = self.size+offset
 
         curhigh,curlow = self.control.splitInt(self.pos)
         offhigh,offlow = self.control.splitInt(offset)
