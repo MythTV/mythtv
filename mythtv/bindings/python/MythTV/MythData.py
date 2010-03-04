@@ -287,8 +287,8 @@ class FileTransfer( MythBEConn ):
             if offset < -self.size:
                 offset = -self.size
 
-        curhigh,curlow = self.splitInt(self.pos)
-        offhigh,offlow = self.splitInt(offset)
+        curhigh,curlow = self.control.splitInt(self.pos)
+        offhigh,offlow = self.control.splitInt(offset)
 
         res = self.control.backendCommand('QUERY_FILETRANSFER '+BACKEND_SEP\
                         .join([str(self.sockno),'SEEK',str(offhigh),
