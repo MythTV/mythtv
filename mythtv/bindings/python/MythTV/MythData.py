@@ -295,7 +295,7 @@ class FileTransfer( MythBEConn ):
                                 str(offlow),str(whence),str(curhigh),
                                 str(curlow)])\
                     ).split(BACKEND_SEP)
-        self.pos = self.joinInt(int(res[0]),int(res[1]))
+        self.pos = self.control.joinInt(int(res[0]),int(res[1]))
 
 class FileOps( MythBEBase ):
     __doc__ = MythBEBase.__doc__+"""
