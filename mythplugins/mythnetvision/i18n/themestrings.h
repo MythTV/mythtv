@@ -1,6 +1,25 @@
 void strings_null() {
-    ThemeUI::tr("Search Term:");
+    ThemeUI::tr("No search scripts found!  This usually indicates missing prerequisites.");
+    ThemeUI::tr("Page %1");
+    ThemeUI::tr("Search:");
     ThemeUI::tr("Author: %1");
+    ThemeUI::tr("Edit/Add a New RSS Feed");
+    ThemeUI::tr("Type the URL to an RSS 2.0 media feed below.  If editing an existing feed, modify any of the values you like.  Press \"Save\" to save/subscribe.\n\nFor new subscriptions, you can simply enter the URL and click \"Save.\"");
+    ThemeUI::tr("Title:");
+    ThemeUI::tr("URL:");
+    ThemeUI::tr("Author:");
+    ThemeUI::tr("Description:");
+    ThemeUI::tr("Download video from this feed automatically");
+    ThemeUI::tr("Select to change image...");
+    ThemeUI::tr("Save");
+    ThemeUI::tr("Cancel");
+    ThemeUI::tr("You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose \"Scan/Manage Subscriptions,\" then \"Manage Site Subscriptions.\"");
+    ThemeUI::tr("Manage Tree Subscriptions");
+    ThemeUI::tr("Choose the sites you wish to browse.");
+    ThemeUI::tr("New Site");
+    ThemeUI::tr("Edit Site");
+    ThemeUI::tr("Unsubscribe");
+    ThemeUI::tr("Search Term:");
     ThemeUI::tr("Size: %1");
     ThemeUI::tr("Description: %1");
     ThemeUI::tr("Can't find any search scripts!  This usually indicates missing search script prerequisites.  Try running a script from the command line.");
@@ -15,10 +34,7 @@ void strings_null() {
     ThemeUI::tr("Feed Author:");
     ThemeUI::tr("Download this feed automatically");
     ThemeUI::tr("Choose Image");
-    ThemeUI::tr("Cancel");
-    ThemeUI::tr("Save");
     ThemeUI::tr("Posted: %1");
-    ThemeUI::tr("You haven't added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose \"Scan/Manage Subscriptions,\" then \"Manage Site Subscriptions.\"");
     ThemeUI::tr("Runtime");
     ThemeUI::tr("Author");
     ThemeUI::tr("Rating");
