@@ -29,8 +29,11 @@ using namespace std;
 #include "programlist.h"
 #include "programinfoupdater.h"
 
-#define LOC QString("ProgramInfo: ")
-#define LOC_ERR QString("ProgramInfo, Error: ")
+#define LOC      QString("ProgramInfo: ")
+#define LOC_WARN QString("ProgramInfo, Warning: ")
+#define LOC_ERR  QString("ProgramInfo, Error: ")
+
+//#define DEBUG_IN_USE
 
 const char *kPlayerInUseID           = "player";
 const char *kPIPPlayerInUseID        = "pipplayer";
@@ -3527,6 +3530,11 @@ bool ProgramInfo::FillInRecordInfo(const vector<ProgramInfo *> &reclist)
 
 void ProgramInfo::UpdateInUseMark(bool force)
 {
+#ifdef DEBUG_IN_USE
+    VERBOSE(VB_IMPORTANT, LOC + QString("UpdateInUseMark(%1) '%2'")
+            .arg(force?"force":"no force").arg(inUseForWhat));
+#endif
+
     if (isVideo)
         return;
 
@@ -3611,7 +3619,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     bool notifyOfChange = false;
 
-    if (inuse && inUseForWhat.length() < 2)
+    if (inuse && inUseForWhat.isEmpty())
     {
         if (!usedFor.isEmpty())
             inUseForWhat = usedFor;
@@ -3622,8 +3630,17 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         notifyOfChange = true;
     }
 
-    if (!inuse && inUseForWhat.length() < 2)
+#ifdef DEBUG_IN_USE
+    VERBOSE(VB_IMPORTANT, LOC + QString("MarkAsInUse(%1, '%2'->'%3')")
+            .arg(inuse?"true":"false").arg(usedFor).arg(inUseForWhat));
+#endif
+
+    if (!inuse && inUseForWhat.isEmpty())
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "MarkAsInUse requires a key to delete in use mark");
         return; // can't delete if we don't have a key
+    }
 
     if (!inuse)
     {
@@ -3641,6 +3658,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
             MythDB::DBError("MarkAsInUse -- delete", query);
 
         inUseForWhat.clear();
+        lastInUseTime = mythCurrentDateTime().addSecs(-4 * 60 * 60);
         SendUpdateEvent();
         return;
     }
@@ -3688,7 +3706,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         recDir = testFile.path();
     }
 
-    lastInUseTime = mythCurrentDateTime();
+    QDateTime inUseTime = mythCurrentDateTime();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -3720,10 +3738,12 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         query.bindValue(":STARTTIME",  recstartts);
         query.bindValue(":HOSTNAME",   gContext->GetHostName());
         query.bindValue(":RECUSAGE",   inUseForWhat);
-        query.bindValue(":UPDATETIME", lastInUseTime);
+        query.bindValue(":UPDATETIME", inUseTime);
         
         if (!query.exec())
             MythDB::DBError("MarkAsInUse -- update failed", query);
+        else
+            lastInUseTime = inUseTime;
     }
     else // if (!query.value(0).toUInt())
     {
@@ -3738,12 +3758,14 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         query.bindValue(":STARTTIME",  recstartts);
         query.bindValue(":HOSTNAME",   gContext->GetHostName());
         query.bindValue(":RECUSAGE",   inUseForWhat);
-        query.bindValue(":UPDATETIME", lastInUseTime);
+        query.bindValue(":UPDATETIME", inUseTime);
         query.bindValue(":RECHOST",    hostname);
         query.bindValue(":RECDIR",     recDir);
         
         if (!query.exec())
             MythDB::DBError("MarkAsInUse -- insert failed", query);
+        else
+            lastInUseTime = inUseTime;
     }
 
     // Let others know we changed status

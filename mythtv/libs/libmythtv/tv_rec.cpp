@@ -1145,7 +1145,7 @@ void TVRec::TeardownRecorder(bool killFile)
 
         SendMythSystemRecEvent("REC_FINISHED", curRecording);
 
-        curRecording->MarkAsInUse(false);
+        curRecording->MarkAsInUse(false, kRecorderInUseID);
         delete curRecording;
         curRecording = NULL;
     }
@@ -3365,7 +3365,7 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
         if (curRecording)
         {
             FinishedRecording(curRecording);
-            curRecording->MarkAsInUse(false);
+            curRecording->MarkAsInUse(false, kRecorderInUseID);
             delete curRecording;
         }
         curRecording = new RecordingInfo(*pginfo);
@@ -3613,7 +3613,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         {
             ClearFlags(kFlagDummyRecorderRunning);
             FinishedRecording(curRecording);
-            curRecording->MarkAsInUse(false);
+            curRecording->MarkAsInUse(false, kRecorderInUseID);
         }
 
         if (request.flags & kFlagCloseRec)
@@ -3973,7 +3973,7 @@ void TVRec::TuningNewRecorder(MPEGStreamData *streamData)
     {
         ClearFlags(kFlagDummyRecorderRunning);
         FinishedRecording(curRecording);
-        curRecording->MarkAsInUse(false);
+        curRecording->MarkAsInUse(false, kRecorderInUseID);
         had_dummyrec = true;
     }
 
@@ -4129,7 +4129,7 @@ void TVRec::TuningRestartRecorder(void)
     if (curRecording)
     {
         FinishedRecording(curRecording);
-        curRecording->MarkAsInUse(false);
+        curRecording->MarkAsInUse(false, kRecorderInUseID);
 
         if (pseudoLiveTVRecording)
         {
@@ -4427,7 +4427,7 @@ bool TVRec::CreateLiveTVRingBuffer(void)
 
     if (curRecording)
     {
-        curRecording->MarkAsInUse(false);
+        curRecording->MarkAsInUse(false, kRecorderInUseID);
         delete curRecording;
     }
 
@@ -4488,7 +4488,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     {
         if (curRecording)
         {
-            curRecording->MarkAsInUse(false);
+            curRecording->MarkAsInUse(false, kRecorderInUseID);
             delete curRecording;
         }
         curRecording = pginfo;
