@@ -121,7 +121,9 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
                 .arg(m_DevicePath);
     
         VERBOSE(VB_MEDIA, QString("Executing '%1'").arg(MountCommand));
-        if (0 == myth_system(MountCommand)) 
+        if (0 == myth_system(MountCommand,
+                             MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                             MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU))
         {
             if (DoMount)
             {
