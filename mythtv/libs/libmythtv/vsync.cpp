@@ -65,9 +65,9 @@ int VideoSync::m_forceskip = 0;
                           refresh_interval, halve_frame_interval); \
         if (trial->TryInit()) \
         { \
-	    m_forceskip = skip; \
-	    tryingVideoSync = false; \
-	    return trial; \
+            m_forceskip = skip; \
+            tryingVideoSync = false; \
+            return trial; \
         } \
         delete trial; \
     } } while (false)
@@ -90,15 +90,15 @@ VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
     if (m_forceskip)
     {
         VERBOSE(VB_PLAYBACK, QString("A previous trial crashed,"
-		" skipping %1").arg(m_forceskip));
-    
-	skip = m_forceskip;
-	m_forceskip = 0;
+                " skipping %1").arg(m_forceskip));
+
+        skip = m_forceskip;
+        m_forceskip = 0;
     }
 
 #ifdef USING_VDPAU
 //    TESTVIDEOSYNC(VDPAUVideoSync);
-#endif    
+#endif
 #ifndef _WIN32
     TESTVIDEOSYNC(DRMVideoSync);
     if (tryOpenGL)
@@ -171,7 +171,7 @@ void VideoSync::OffsetTimeval(struct timeval& tv, int offset)
 
 /** \fn VideoSync::UpdateNexttrigger()
  *  \brief Internal method to tells video synchronization method to use
- *         the next frame (or field, if interlaced) for CalcDelay() 
+ *         the next frame (or field, if interlaced) for CalcDelay()
  *         and WaitForFrame().
  */
 void VideoSync::UpdateNexttrigger()
@@ -189,7 +189,7 @@ void VideoSync::UpdateNexttrigger()
  *
  *   Regardless of the timing method, if delay is greater than four full
  *   frames (could be greater than 20 or greater than 200), we don't want
- *   to freeze while waiting for a huge delay. Instead, contine playing 
+ *   to freeze while waiting for a huge delay. Instead, contine playing
  *   video at half speed and continue to read new audio and video frames
  *   from the file until the sync is 'in the ballpark'.
  *   Also prevent the nexttrigger from falling too far in the past in case
@@ -199,9 +199,9 @@ int VideoSync::CalcDelay()
 {
     struct timeval now;
     gettimeofday(&now, NULL);
-    //cout << "CalcDelay: next: " << timeval_str(m_nexttrigger) << " now " 
+    //cout << "CalcDelay: next: " << timeval_str(m_nexttrigger) << " now "
     // << timeval_str(now) << endl;
-        
+
     int ret_val = (m_nexttrigger.tv_sec - now.tv_sec) * 1000000 +
                   (m_nexttrigger.tv_usec - now.tv_usec);
 
@@ -314,7 +314,7 @@ bool DRMVideoSync::TryInit(void)
                 " %1, %2").arg(sm_dri_dev).arg(strerror(errno)));
         return false; // couldn't open device
     }
-    
+
     blank.request.type = DRM_VBLANK_RELATIVE;
     blank.request.sequence = 1;
     if (drmWaitVBlank(m_dri_fd, &blank))
@@ -334,19 +334,19 @@ void DRMVideoSync::Start(void)
     blank.request.type = DRM_VBLANK_RELATIVE;
     blank.request.sequence = 1;
     drmWaitVBlank(m_dri_fd, &blank);
-    VideoSync::Start(); 
+    VideoSync::Start();
 }
 
 void DRMVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
     OffsetTimeval(m_nexttrigger, sync_delay);
-    
+
     m_delay = CalcDelay();
     //cerr << "WaitForFrame at : " << m_delay;
 
     // Always sync to the next retrace execpt when we are very late.
-    if (m_delay > -(m_refresh_interval/2)) 
+    if (m_delay > -(m_refresh_interval/2))
     {
         drm_wait_vblank_t blank;
         blank.request.type = DRM_VBLANK_RELATIVE;
@@ -492,7 +492,7 @@ void OpenGLVideoSync::Start(void)
         err = gMythGLXWaitVideoSyncSGI(2, (count+1)%2 ,&count);
         checkGLSyncError("OpenGLVideoSync::Start(): A/V Sync", err);
     }
-    // Initialize next trigger 
+    // Initialize next trigger
     VideoSync::Start();
 #endif /* USING_OPENGL_VSYNC */
 }
@@ -517,13 +517,13 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
     if (!m_context)
         return;
     unsigned int frameNum = 0;
-    
+
     OpenGLContextLocker ctx_lock(m_context);
     err = gMythGLXGetVideoSyncSGI(&frameNum);
     checkGLSyncError("Frame Number Query", err);
 
     // Always sync to the next retrace execpt when we are very late.
-    if ((m_delay = CalcDelay()) > -(m_refresh_interval/2)) 
+    if ((m_delay = CalcDelay()) > -(m_refresh_interval/2))
     {
         err = gMythGLXWaitVideoSyncSGI(2, (frameNum+1)%2 ,&frameNum);
         checkGLSyncError(msg1, err);
@@ -538,7 +538,7 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         checkGLSyncError(msg2, err);
         m_delay = CalcDelay();
     }
-    
+
 #endif /* USING_OPENGL_VSYNC */
 }
 
@@ -590,7 +590,7 @@ bool RTCVideoSync::TryInit(void)
                 "timer interrupts, %1.").arg(strerror(errno)));
         return false;
     }
-    
+
     return true;
 }
 
@@ -658,8 +658,8 @@ void VDPAUVideoSync::AdvanceTrigger(void)
 #endif
 
 BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo,
-                                     int fr, int ri, bool intl) : 
-    VideoSync(vo, fr, ri, intl) 
+                                     int fr, int ri, bool intl) :
+    VideoSync(vo, fr, ri, intl)
 {
     m_cheat = 5000;
     m_fudge = 0;
@@ -689,7 +689,7 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
         // the CPU early for about half the frames.
         if (m_delay > (m_cheat - m_fudge))
             usleep(m_delay - (m_cheat - m_fudge));
-        
+
         // If late, draw the frame ASAP.  If early, hold the CPU until
         // half as late as the previous frame (fudge).
         m_delay = CalcDelay();
@@ -711,7 +711,7 @@ void BusyWaitVideoSync::AdvanceTrigger(void)
 }
 
 USleepVideoSync::USleepVideoSync(VideoOutput *vo,
-                                 int fr, int ri, bool intl) : 
+                                 int fr, int ri, bool intl) :
     VideoSync(vo, fr, ri, intl)
 {
 }
@@ -729,7 +729,7 @@ void USleepVideoSync::WaitForFrame(int sync_delay)
 {
     // Offset for externally-provided A/V sync delay
     OffsetTimeval(m_nexttrigger, sync_delay);
-    
+
     m_delay = CalcDelay();
     if (m_delay > 0)
         usleep(m_delay);

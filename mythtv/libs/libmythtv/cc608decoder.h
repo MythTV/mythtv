@@ -84,7 +84,7 @@ class CC608Decoder
     int lasttc[2];
     int lastcode[2];
     int lastcodetc[2];
-    int ccmode[2];	// 0=cc1/txt1, 1=cc2/txt2
+    int ccmode[2];      // 0=cc1/txt1, 1=cc2/txt2
     int xds[2];
     int txtmode[4];
 

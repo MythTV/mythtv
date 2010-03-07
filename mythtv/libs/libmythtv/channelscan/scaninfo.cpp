@@ -123,7 +123,7 @@ ScanDTVTransportList LoadScan(uint scanid)
             "FROM channelscan_channel "
             "WHERE transportid = :TRANSPORTID");
         query2.bindValue(":TRANSPORTID", query.value(15).toUInt());
-        
+
         if (!query2.exec())
         {
             MythDB::DBError("LoadScan 2", query2);
@@ -147,7 +147,7 @@ ScanDTVTransportList LoadScan(uint scanid)
 
                 query2.value(7).toUInt()/*atsc_major_channel*/,
                 query2.value(8).toUInt()/*atsc_minor_channel*/,
-                query2.value(9).toBool()/*use_on_air_guide*/,  
+                query2.value(9).toBool()/*use_on_air_guide*/,
                 query2.value(10).toBool()/*hidden*/,
                 query2.value(11).toBool()/*hidden_in_guide*/,
 
@@ -166,11 +166,11 @@ ScanDTVTransportList LoadScan(uint scanid)
 
                 si_standard,
 
-                query2.value(23).toBool()/*in_channels_conf*/,  
+                query2.value(23).toBool()/*in_channels_conf*/,
                 query2.value(24).toBool()/*in_pat*/,
-                query2.value(25).toBool()/*in_pmt*/,  
+                query2.value(25).toBool()/*in_pmt*/,
                 query2.value(26).toBool()/*in_vct*/,
-                query2.value(27).toBool()/*in_nit*/,  
+                query2.value(27).toBool()/*in_nit*/,
                 query2.value(28).toBool()/*in_sdt*/,
 
                 query2.value(29).toBool()/*is_encrypted*/,

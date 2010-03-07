@@ -503,7 +503,7 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     audio_lock.lock();
     if (audioOutput && unpauseaudio)
         audio_paused = false;
-    
+
     audio_lock.unlock();
     if (player_ctx->buffer)
         player_ctx->buffer->Unpause();
@@ -537,11 +537,11 @@ bool NuppelVideoPlayer::IsPaused(bool *is_pause_still_possible)
 void NuppelVideoPlayer::PauseVideo(bool wait)
 {
     QMutexLocker locker(&pauseUnpauseLock);
-    
+
     if (wait)
         video_actually_paused = false;
     pausevideo = true;
-    
+
     for (uint i = 0; wait && !video_actually_paused; i++)
     {
         videoThreadPaused.wait(&pauseUnpauseLock, 250);
@@ -1144,7 +1144,7 @@ void NuppelVideoPlayer::OpenDummy(void)
     isDummy = true;
 
     float displayAspect =
-        gContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio", 
+        gContext->GetFloatSettingOnHost("XineramaMonitorAspectRatio",
                                         gContext->GetHostName(), 1.3333);
 
     if (!videoOutput)
@@ -2600,7 +2600,7 @@ void NuppelVideoPlayer::AVSync(void)
             avsync_avg = 0;
             avsync_oldavg = 0;
         }
-    } 
+    }
     else
         audio_lock.unlock();
 }
@@ -6871,7 +6871,7 @@ int NuppelVideoPlayer::SetTrack(uint type, int trackNo)
         if (decoder)
         {
             msg = decoder->GetTrackDesc(type, GetTrack(type));
-            
+
             if (player_ctx->buffer->isDVD())
                 player_ctx->buffer->DVD()->SetTrack(type, trackNo);
         }
@@ -7602,10 +7602,10 @@ bool NuppelVideoPlayer::GoToDVDMenu(QString str)
 {
     if (!player_ctx->buffer->isDVD())
         return false;
-    
+
     textDisplayMode = kDisplayNone;
     bool ret = player_ctx->buffer->DVD()->GoToMenu(str);
-    
+
     if (!ret)
     {
         if (osd)
@@ -7613,7 +7613,7 @@ bool NuppelVideoPlayer::GoToDVDMenu(QString str)
         VERBOSE(VB_GENERAL, "No DVD Menu available.");
         return false;
     }
-    
+
     return true;
 }
 

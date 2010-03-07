@@ -767,7 +767,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
             int64_t st1 = av_rescale(ic->start_time,
                                     st->time_base.den,
                                     AV_TIME_BASE * (int64_t)st->time_base.num);
-            // If seeking near the start of stream sometimes the adjusted current dts time 
+            // If seeking near the start of stream sometimes the adjusted current dts time
             // is less than the start time (possibly due to the AVSEEK_FLAG_BACKWARD flag ?).
             // If so, set adjusted current dts to zero.
             if (adj_cur_dts < st1)
@@ -3642,7 +3642,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 ringBuffer->DVD()->InStillFrame())
             {
                 AVStream *curstream = ic->streams[pkt->stream_index];
-                if (curstream && 
+                if (curstream &&
                     curstream->codec->codec_type == CODEC_TYPE_VIDEO)
                 {
                     mpeg_seq_end_seen = false;
@@ -3948,9 +3948,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     {
                         GetBitContext gbc;
                         init_get_bits(&gbc, ptr, len * 8);
-                        if (!ff_ac3_parse_header(&gbc, &hdr)) 
+                        if (!ff_ac3_parse_header(&gbc, &hdr))
                         {
-                            if (hdr.channels != last_ac3_channels) 
+                            if (hdr.channels != last_ac3_channels)
                             {
                                 VERBOSE(VB_AUDIO, LOC + QString("AC3 changed from %1 to %2 channels (frame %3)")
                                         .arg(last_ac3_channels).arg(hdr.channels).arg(framesRead));
@@ -4052,7 +4052,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                                     VERBOSE(VB_PLAYBACK, QString("Cannot convert %1 sample format to %2 sample format")
                                             .arg(avcodec_get_sample_fmt_name(ctx->sample_fmt))
                                             .arg(avcodec_get_sample_fmt_name(SAMPLE_FMT_S16)));
-                                    
+
                                     avcodeclock->unlock();
                                     have_err = true;
                                     continue;
@@ -4060,7 +4060,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                                 audio_src_fmt = ctx->sample_fmt;
                             }
                         }
-                        
+
                         if (reformat_ctx)
                         {
                             const void *ibuf[6] = {audioSamples};
@@ -4072,7 +4072,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                                                  ibuf, istride, len) < 0)
                             {
                                 VERBOSE(VB_PLAYBACK, "av_audio_convert() failed");
-                    
+
                                 avcodeclock->unlock();
                                 have_err = true;
                                 continue;
@@ -4552,10 +4552,10 @@ void AvFormatDecoder::SetDisablePassThrough(bool disable)
 
 bool AvFormatDecoder::DoPassThrough(const AVCodecContext *ctx)
 {
-    bool passthru = false; 
+    bool passthru = false;
 
     if (ctx->codec_id == CODEC_ID_AC3)
-        passthru = allow_ac3_passthru && 
+        passthru = allow_ac3_passthru &&
                    ctx->channels >= (int)max_channels &&
                    !internal_vol;
     else if (ctx->codec_id == CODEC_ID_DTS)
@@ -4596,7 +4596,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
         if (codec_ctx)
         {
             using_passthru = DoPassThrough(codec_ctx);
-            info = AudioInfo(codec_ctx->codec_id, codec_ctx->sample_rate, 
+            info = AudioInfo(codec_ctx->codec_id, codec_ctx->sample_rate,
                             codec_ctx->channels, using_passthru);
         }
     }

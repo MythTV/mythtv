@@ -1391,7 +1391,7 @@ void VideoOutputD3D::ShowPIP(VideoFrame        *frame,
     const uint  pipVideoWidth  = pipVideoDim.width();
     const uint  pipVideoHeight = pipVideoDim.height();
 
-    if ((pipVideoAspect <= 0) || !pipimage || 
+    if ((pipVideoAspect <= 0) || !pipimage ||
         !pipimage->buf || (pipimage->codec != FMT_YV12) || !pipVisible)
     {
         pipplayer->ReleaseCurrentFrame(pipimage);
@@ -1458,7 +1458,7 @@ QStringList VideoOutputD3D::GetAllowedRenderers(
     QStringList list;
 
     if (codec_is_std(myth_codec_id) && !getenv("NO_DIRECT3D"))
-	    list += "direct3d";
+            list += "direct3d";
 
     return list;
 }

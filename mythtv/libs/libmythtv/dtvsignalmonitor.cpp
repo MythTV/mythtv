@@ -384,7 +384,7 @@ void DTVSignalMonitor::HandleMGT(const MasterGuideTable* mgt)
 
 void DTVSignalMonitor::HandleTVCT(
     uint, const TerrestrialVirtualChannelTable* tvct)
-{ 
+{
     AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_TVCTSeen);
     int idx = tvct->Find(majorChannel, minorChannel);
 
@@ -543,7 +543,7 @@ bool DTVSignalMonitor::WaitForLock(int timeout)
     t.start();
     while (t.elapsed()<timeout && running)
     {
-        SignalMonitorList slist = 
+        SignalMonitorList slist =
             SignalMonitorValue::Parse(GetStatusList());
         if (SignalMonitorValue::AllGood(slist))
             return true;

@@ -22,7 +22,7 @@
  *                   RRT (Censorship),
  *                   MGT (Guide management),
  *                   VCT (Channel Guide)
- *   
+ *
  *     MGT ---> (PID_A,EIT[0],version_number),
  *              (PID_B,EIT[1],version_number),      etc,
  *              (PID_X,RTT,version_number),
@@ -35,11 +35,11 @@
  *       EIT[0] is always the current programming.
  *       Other tables are described by descriptors,
  *       such as Subtitle Descriptors.
- *   
+ *
  *     VCT ---> (channel-A,source-id[0]),
  *              (channel-B,source-id[1]), etc.
  *   \endcode
- *   
+ *
  *   New VCTs can be sent with a new version number to update the programming
  *   in an EIT, then when the data is complete a new MGT is sent with an
  *   updated version_number for that EIT, updating the data.
@@ -81,7 +81,7 @@ class MasterGuideTable : public PSIPTable
     {
         // note MGT == MGTscte, but we check "both"
         assert(TableID::MGT == TableID() || TableID::MGTscte == TableID());
-        Parse();        
+        Parse();
     }
     MasterGuideTable(const PSIPTable& table) : PSIPTable(table)
     {
@@ -288,7 +288,7 @@ class VirtualChannelTable : public PSIPTable
     {
         return bool(_ptrs[i][26] & 0x2);
     }
-    //   reserved               6  25.7       0x3f 
+    //   reserved               6  25.7       0x3f
     //   service_type           6  26.2
     uint ServiceType(uint i) const
     {
@@ -384,7 +384,7 @@ class TerrestrialVirtualChannelTable : public VirtualChannelTable
     //   hidden                 1  26.3
     //   reserved               2  26.4          3
     //   hide_guide             1  26.6
-    //   reserved               6  26.7       0x3f 
+    //   reserved               6  26.7       0x3f
     //   service_type           6  27.2
     //   source_id             16  28.0
     //   reserved               6  30.0       0xfb
@@ -690,9 +690,9 @@ class SystemTimeTable : public PSIPTable
     // section_length          12   1.4
     // table_id_extension      16   3.0          0
     // reserved                 2   5.0          3
-    // version_number           5   5.2          0  
-    // current_next_indicator   1   5.7          1  
-    // section_number           8   6.0       0x00 
+    // version_number           5   5.2          0
+    // current_next_indicator   1   5.7          1
+    // section_number           8   6.0       0x00
     // last_section_number      8   7.0       0x00
     // protocol_version         8   8.0       0x00 for now
 
@@ -713,7 +713,7 @@ class SystemTimeTable : public PSIPTable
     time_t UTCUnix(void) const
         { return GPSUnix() - GPSOffset(); }
 
-    // GPS_UTC_offset           8  13.0 
+    // GPS_UTC_offset           8  13.0
     uint GPSOffset() const { return pesdata()[13]; }
     // daylight_savings        16  14.0
     //   DS_status              1  14.0
@@ -723,7 +723,7 @@ class SystemTimeTable : public PSIPTable
     bool InDaylightSavingsTime()     const { return pesdata()[14]&0x80; }
     uint DayDaylightSavingsStarts()  const { return pesdata()[14]&0x1f; }
     uint HourDaylightSavingsStarts() const { return pesdata()[15]; }
-    // for (I = 0;I< N;I++) { descriptor() } 
+    // for (I = 0;I< N;I++) { descriptor() }
     // CRC_32                  32
 
     QString toString() const

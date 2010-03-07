@@ -101,12 +101,12 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
             SetFrameRate(29.97);
         else if (value.toLower() == "atsc")
         {
-            // Here we set the TV format values for ATSC. ATSC isn't really 
+            // Here we set the TV format values for ATSC. ATSC isn't really
             // NTSC, but users who configure a non-ATSC-recorder as ATSC
             // are far more likely to be using a mix of ATSC and NTSC than
             // a mix of ATSC and PAL or SECAM. The atsc recorder itself
             // does not care about these values, except in so much as tv_rec
-            // cares anout video_frame_rate which should be neither 29.97 
+            // cares anout video_frame_rate which should be neither 29.97
             // nor 25.0, but based on the actual video.
             ntsc = true;
             SetFrameRate(29.97);
@@ -182,7 +182,7 @@ bool RecorderBase::WaitForPause(int timeout)
 }
 
 /** \fn RecorderBase::PauseAndWait(int)
- *  \brief If request_pause is true Paused and blocks up to timeout 
+ *  \brief If request_pause is true Paused and blocks up to timeout
  *         milliseconds.
  *  \param timeout number of milliseconds to wait defaults to 100.
  *  \return true if recorder is paused.

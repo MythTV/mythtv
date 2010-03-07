@@ -12,7 +12,7 @@
 class PaneDVBS2 : public HorizontalConfigurationGroup
 {
   public:
-    PaneDVBS2() : HorizontalConfigurationGroup(false,false,true,false) 
+    PaneDVBS2() : HorizontalConfigurationGroup(false,false,true,false)
     {
         setUseFrame(false);
         VerticalConfigurationGroup *left =
@@ -28,7 +28,7 @@ class PaneDVBS2 : public HorizontalConfigurationGroup
         right->addChild(pinversion  = new ScanInversion());
         right->addChild(prolloff    = new ScanRollOff());
         addChild(left);
-        addChild(right);     
+        addChild(right);
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }

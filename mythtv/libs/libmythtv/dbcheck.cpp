@@ -3471,7 +3471,7 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1209", dbver))
-	    return false;
+            return false;
     }
 
     if (dbver == "1209")
@@ -3492,7 +3492,7 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1210", dbver))
-	    return false;
+            return false;
     }
 
     if (dbver == "1210")
@@ -3514,7 +3514,7 @@ NULL
 NULL
 };
         if (!performActualUpdate(updates, "1211", dbver))
-	    return false;
+            return false;
     }
 
     if (dbver == "1211")
@@ -5158,7 +5158,7 @@ NULL
 
         dbver = "1253";
     }
-    
+
     if (dbver == "1253")
     {
         if (gContext->GetNumSetting("have-nit-fix") == 1)

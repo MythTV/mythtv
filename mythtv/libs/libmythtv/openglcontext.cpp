@@ -93,10 +93,10 @@ class PrivateContext
 /**
  * \class OpenGLContext
  *  A class used to create an OpenGL window, rendering context and associated
- *  OpenGL resources and perform limited OpenGL state management. Current 
+ *  OpenGL resources and perform limited OpenGL state management. Current
  *  implementations exist for GLX(X11/Linux), AGL(Max OS X) and WGL(Windows).
- *  Although originally written to handle cross-platform video rendering, 
- *  few member functions are video specific and hence it may be useful as a 
+ *  Although originally written to handle cross-platform video rendering,
+ *  few member functions are video specific and hence it may be useful as a
  *  general purpose OpenGL context and resource handler.
  *
  *  It tracks all resources that it has created and to a lesser
@@ -191,7 +191,7 @@ bool OpenGLContext::CreateCommon(bool colour_control, QRect display_visible)
     if (!debugged)
     {
         debugged = true;
-      
+
         VERBOSE(VB_PLAYBACK, LOC + QString("OpenGL vendor  : %1")
                 .arg((const char*) glGetString(GL_VENDOR)));
         VERBOSE(VB_PLAYBACK, LOC + QString("OpenGL renderer: %1")
@@ -259,7 +259,7 @@ void OpenGLContext::DeleteOpenGLResources(void)
  * \fn OpenGLContext::MakeCurrent(bool current)
  *  Ensure the OpenGLContext is current to the current thread and thread
  *  safety is ensured by locking the QMutex. Recursive calls are allowed
- *  and the level of nesting is tracked to minimise unnecessary calls 
+ *  and the level of nesting is tracked to minimise unnecessary calls
  *  to MakeContextCurrent() as well as to ensure the context is not released
  *  too early, which may cause unexpected behaviour.
  */
@@ -324,7 +324,7 @@ void OpenGLContext::Flush(bool use_fence)
     {
         glFlush();
     }
-    
+
     MakeCurrent(false);
 }
 
@@ -759,7 +759,7 @@ void OpenGLContext::DeleteTextures(void)
 
 /**
  * \fn OpenGLContext::GetTextureType(uint &current, bool &rect)
- *  Determine the preferred OpenGL texture type (typically 
+ *  Determine the preferred OpenGL texture type (typically
  *  GL_ARB_texture_rectangle or one of its proprietary equivalents)
  *  or default to GL_TEXTURE_2D.
  */
@@ -1218,12 +1218,12 @@ int OpenGLContext::SetPictureAttribute(
     return ret;
 }
 
-PictureAttributeSupported 
+PictureAttributeSupported
 OpenGLContext::GetSupportedPictureAttributes(void) const
 {
     return (!m_colour_control) ?
         kPictureAttributeSupported_None :
-        (PictureAttributeSupported) 
+        (PictureAttributeSupported)
         (kPictureAttributeSupported_Brightness |
          kPictureAttributeSupported_Contrast |
          kPictureAttributeSupported_Colour);
@@ -1242,7 +1242,7 @@ void OpenGLContext::SetColourParams(void)
                        pictureAttribs[kPictureAttribute_Colour],
                        0.5f);
 
-    MakeCurrent(false);    
+    MakeCurrent(false);
 }
 
 /**
@@ -1348,7 +1348,7 @@ bool OpenGLContextGLX::Create(MythXDisplay *disp, Window XJ_curwin,
                 .arg(major).arg(minor));
 
         return false;
-    } 
+    }
     else if ((1 == major) && (minor == 2))
     {
         m_attr_list = get_attr_cfg(kRenderRGBA);
@@ -1430,7 +1430,7 @@ bool OpenGLContextGLX::Create(MythXDisplay *disp, Window XJ_curwin,
             return false;
         }
     }
-   
+
     VERBOSE(VB_PLAYBACK, LOC + QString("Created GLX context."));
 
     static bool debugged = false;
@@ -1438,7 +1438,7 @@ bool OpenGLContextGLX::Create(MythXDisplay *disp, Window XJ_curwin,
     {
         debugged = true;
 
-        bool direct = false; 
+        bool direct = false;
         direct = glXIsDirect(d, m_glx_context);
         VERBOSE(VB_PLAYBACK, LOC + QString("GLX Version: %1.%2")
                 .arg(major).arg(minor));
@@ -1633,13 +1633,13 @@ bool OpenGLContextWGL::Create(WId window, const QRect &display_visible,
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + "Failed to chose pixel format");
         return false;
-    } 
- 
+    }
+
     if (!SetPixelFormat(hDC, pf, &pfd))
     {
         VERBOSE(VB_PLAYBACK, LOC_ERR + "Failed to set pixel format");
         return false;
-    } 
+    }
 
     DescribePixelFormat(hDC, pf, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 

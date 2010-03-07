@@ -48,7 +48,7 @@ bool IPTVChannel::Open(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "InitializeInputs() failed");
         return false;
     }
-    
+
     if (m_freeboxchannels.empty())
     {
         QString content = IPTVChannelFetcher::DownloadPlaylist(
@@ -124,7 +124,7 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
 
 IPTVChannelInfo IPTVChannel::GetChanInfo(
     const QString &channum, uint sourceid) const
-{ 
+{
     VERBOSE(VB_CHANNEL, LOC + "GetChanInfo() -- begin");
     QMutexLocker locker(&m_lock);
     VERBOSE(VB_CHANNEL, LOC + "GetChanInfo() -- locked");

@@ -199,7 +199,7 @@ void DVBStreamHandler::Start(void)
 {
     QMutexLocker locker(&_start_stop_lock);
 
-    _eit_pids.clear(); 
+    _eit_pids.clear();
 
     if (IsRunning() && _using_section_reader && !_allow_section_reader)
         Stop();
@@ -257,8 +257,8 @@ void DVBStreamHandler::Run(void)
  *  \brief Uses TS filtering devices to read a DVB device for tables & data
  *
  *  This supports all types of MPEG based stream data, but is extreemely
- *  slow with DVB over USB 1.0 devices which for efficiency reasons buffer 
- *  a stream until a full block transfer buffer full of the requested 
+ *  slow with DVB over USB 1.0 devices which for efficiency reasons buffer
+ *  a stream until a full block transfer buffer full of the requested
  *  tables is available. This takes a very long time when you are just
  *  waiting for a PAT or PMT table, and the buffer is hundreds of packets
  *  in size.
@@ -325,7 +325,7 @@ void DVBStreamHandler::RunTS(void)
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Device error detected");
                 _error = true;
             }
-            
+
             if (_device_read_buffer->IsEOF())
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "Device EOF detected");
@@ -782,7 +782,7 @@ void DVBStreamHandler::RetuneMonitor(void)
         {
             bool was_moving, is_moving;
             _sigmon->GetRotorStatus(was_moving, is_moving);
-            
+
             // Retune if move completes normally
             if (was_moving && !is_moving)
             {
@@ -793,7 +793,7 @@ void DVBStreamHandler::RetuneMonitor(void)
                 // RemoveFlags(kDTVSigMon_WaitForSDT);
             }
         }
-        else 
+        else
         {
             // If no rotor is present, pretend the movement is completed
             _sigmon->SetRotorValue(100);
@@ -939,11 +939,11 @@ bool PIDInfo::Open(const QString &dvb_dev, bool use_section_reader)
         }
         sctFilterParams.pid            = (__u16) _pid;
         sctFilterParams.timeout        = 0;
-        sctFilterParams.flags          = DMX_IMMEDIATE_START; 
+        sctFilterParams.flags          = DMX_IMMEDIATE_START;
 
         if (ioctl(mux_fd, DMX_SET_FILTER, &sctFilterParams) < 0)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + 
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Failed to set \"section\" filter " +
                     QString("(pid 0x%1) (filter %2)").arg(_pid, 0, 16)
                     .arg(sctFilterParams.filter.filter[0]));

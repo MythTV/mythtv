@@ -412,7 +412,7 @@ bool LinuxFirewireDevice::OpenNode(void)
 }
 
 bool LinuxFirewireDevice::CloseNode(void)
-{ 
+{
     if (m_priv->is_p2p_node_open)
         return CloseP2PNode();
 
@@ -818,7 +818,7 @@ void LinuxFirewireDevice::PrintDropped(uint dropped_packets)
     }
     else if (dropped_packets > 1)
     {
-        VERBOSE(VB_RECORD, LOC_ERR + 
+        VERBOSE(VB_RECORD, LOC_ERR +
                 QString("Dropped %1 TS packets").arg(dropped_packets));
     }
 }

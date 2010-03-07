@@ -48,7 +48,7 @@ typedef enum { XvVLD, XvIDCT, XvMC } XvMCAccelID;
 
 QString XvImageFormatToString(const XvImageFormatValues &fmt);
 
-class XvMCSurfaceTypes 
+class XvMCSurfaceTypes
 {
   public:
     XvMCSurfaceTypes(MythXDisplay *dpy, XvPortID port) : num(0), disp(dpy)
@@ -56,49 +56,49 @@ class XvMCSurfaceTypes
         XLOCK(disp, surfaces = XvMCListSurfaceTypes(disp->GetDisplay(),
                                                     port, &num));
     }
-        
-    ~XvMCSurfaceTypes() 
+
+    ~XvMCSurfaceTypes()
     {
         XLOCK(disp, XFree(surfaces));
     }
 
     /// Find an appropriate surface on the current port.
     inline int find(int pminWidth, int pminHeight, int chroma, bool vld,
-                    bool idct, int mpeg, int pminSubpictureWidth, 
+                    bool idct, int mpeg, int pminSubpictureWidth,
                     int pminSubpictureHeight);
 
-    bool hasChroma420(int surface) const 
+    bool hasChroma420(int surface) const
     {
         return XVMC_CHROMA_FORMAT_420 == surfaces[surface].chroma_format;
     }
 
-    bool hasChroma422(int surface) const 
+    bool hasChroma422(int surface) const
     {
         return XVMC_CHROMA_FORMAT_422 == surfaces[surface].chroma_format;
     }
 
-    bool hasChroma444(int surface) const 
+    bool hasChroma444(int surface) const
     {
         return XVMC_CHROMA_FORMAT_444 == surfaces[surface].chroma_format;
     }
 
-    bool hasOverlay(int surface) const 
+    bool hasOverlay(int surface) const
     {
         return surfaces[surface].flags & XVMC_OVERLAID_SURFACE;
     }
 
-    bool hasBackendSubpicture(int surface) const 
+    bool hasBackendSubpicture(int surface) const
     {
         return surfaces[surface].flags & XVMC_BACKEND_SUBPICTURE;
     }
 
-    bool hasSubpictureScaling(int surface) const 
+    bool hasSubpictureScaling(int surface) const
     {
         return surfaces[surface].flags & XVMC_SUBPICTURE_INDEPENDENT_SCALING;
     }
 
     // Format for motion compensation acceleration
-    bool isIntraUnsigned(int surface) const 
+    bool isIntraUnsigned(int surface) const
     {
         return surfaces[surface].flags & XVMC_INTRA_UNSIGNED;
     }
@@ -113,14 +113,14 @@ class XvMCSurfaceTypes
 #endif
     }
 
-    bool hasMotionCompensationAcceleration(int surface) const 
+    bool hasMotionCompensationAcceleration(int surface) const
     {
         // This line below is not a bug, XVMC_MOCOMP is defined
         // as a zero in the XVMC_IDCT flag locatation
         return XVMC_MOCOMP == (surfaces[surface].mc_type & XVMC_IDCT);
     }
 
-    bool hasIDCTAcceleration(int surface) const 
+    bool hasIDCTAcceleration(int surface) const
     {
         return XVMC_IDCT == (surfaces[surface].mc_type & XVMC_IDCT);
     }
@@ -130,52 +130,52 @@ class XvMCSurfaceTypes
         return XVMC_VLD == (surfaces[surface].mc_type & XVMC_VLD);
     }
 
-    bool hasMPEG1Support(int surface) const 
+    bool hasMPEG1Support(int surface) const
     {
         return XVMC_MPEG_1 == (surfaces[surface].mc_type & 0x7);
     }
 
-    bool hasMPEG2Support(int surface) const 
+    bool hasMPEG2Support(int surface) const
     {
         return XVMC_MPEG_2 == (surfaces[surface].mc_type & 0x7);
     }
 
-    bool hasH263Support(int surface) const 
+    bool hasH263Support(int surface) const
     {
         return XVMC_H263 == (surfaces[surface].mc_type & 0x7);
     }
 
-    bool hasMPEG4Support(int surface) const 
+    bool hasMPEG4Support(int surface) const
     {
         return XVMC_MPEG_4 == (surfaces[surface].mc_type & 0x7);
     }
 
-    int surfaceTypeID(int surface) const 
-    { 
-        return surfaces[surface].surface_type_id; 
-    }
-
-    unsigned short maxWidth(int surface) const 
+    int surfaceTypeID(int surface) const
     {
-        return surfaces[surface].max_width; 
+        return surfaces[surface].surface_type_id;
     }
 
-    unsigned short maxHeight(int surface) const 
+    unsigned short maxWidth(int surface) const
     {
-        return surfaces[surface].max_height; 
+        return surfaces[surface].max_width;
     }
 
-    unsigned short maxSubpictureWidth(int surface) const 
+    unsigned short maxHeight(int surface) const
+    {
+        return surfaces[surface].max_height;
+    }
+
+    unsigned short maxSubpictureWidth(int surface) const
     {
         return surfaces[surface].subpicture_max_width;
     }
 
-    unsigned short maxSubpictureHeight(int surface) const 
+    unsigned short maxSubpictureHeight(int surface) const
     {
         return surfaces[surface].subpicture_max_height;
     }
 
-    void set(int surface, XvMCSurfaceInfo* surfinfo) const 
+    void set(int surface, XvMCSurfaceInfo* surfinfo) const
     {
         memcpy(surfinfo, &surfaces[surface], sizeof(XvMCSurfaceInfo));
     }
@@ -184,7 +184,7 @@ class XvMCSurfaceTypes
 
     /// Find an appropriate surface on the current display.
     static void find(int minWidth, int minHeight, int chroma, bool vld,
-                     bool idct, int mpeg, int minSubpictureWidth, 
+                     bool idct, int mpeg, int minSubpictureWidth,
                      int minSubpictureHeight, MythXDisplay *dpy,
                      XvPortID portMin, XvPortID portMax,
                      XvPortID& port, int& surfNum);

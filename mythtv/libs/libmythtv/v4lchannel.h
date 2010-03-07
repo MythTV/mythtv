@@ -37,10 +37,10 @@ class V4LChannel : public DTVChannel
     void Close(void);
 
     // Sets
-    void SetFd(int fd); 
+    void SetFd(int fd);
     void SetFormat(const QString &format);
     int  SetDefaultFreqTable(const QString &name);
-    bool SetChannelByString(const QString &chan); 
+    bool SetChannelByString(const QString &chan);
 
     // Gets
     bool IsOpen(void)       const { return GetFd() >= 0; }
@@ -93,7 +93,7 @@ class V4LChannel : public DTVChannel
     QString     driver_name;
     QMap<QString,int> pict_attr_default;
 
-    struct CHANLIST *curList;  
+    struct CHANLIST *curList;
     int         totalChannels;
 
     QString     currentFormat;

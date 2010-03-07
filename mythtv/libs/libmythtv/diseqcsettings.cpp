@@ -388,10 +388,10 @@ static QString AngleToString(double angle)
 {
     QString str = QString::null;
     if (angle >= 0.0)
-        str = QString::number(angle) + 
+        str = QString::number(angle) +
             DeviceTree::tr("E", "Eastern Hemisphere");
     else /* if (angle < 0.0) */
-        str = QString::number(-angle) + 
+        str = QString::number(-angle) +
             DeviceTree::tr("W", "Western Hemisphere");
     return str;
 }

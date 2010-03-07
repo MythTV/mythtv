@@ -72,7 +72,7 @@ class MPUBLIC RingBuffer
     void Pause(void);
     void Unpause(void);
     void WaitForPause(void);
-    
+
     // Start/Stop commands
     void Start(void);
     void StopReads(void);
@@ -99,7 +99,7 @@ class MPUBLIC RingBuffer
 
     long long SetAdjustFilesize(void);
     void SetTimeout(bool fast) { oldfile = fast; }
-    
+
   protected:
     static void *StartReader(void *type);
     void ReadAheadThread(void);
@@ -127,7 +127,7 @@ class MPUBLIC RingBuffer
     int fd2;
 
     bool writemode;
- 
+
     long long readpos;
     long long writepos;
 
@@ -191,7 +191,7 @@ class MPUBLIC RingBuffer
     static QMutex subExtLock;
     static QStringList subExt;
     static QStringList subExtNoCheck;
- 
+
     // constants
   public:
     static const uint kBufferSize;

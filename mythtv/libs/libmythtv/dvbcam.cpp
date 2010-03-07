@@ -117,7 +117,7 @@ bool DVBCam::Start()
 }
 
 bool DVBCam::Stop()
-{    
+{
     if (ciThreadRunning)
     {
         exitCiThread = true;
@@ -271,7 +271,7 @@ void DVBCam::CiHandlerLoop()
         }
         usleep(10 * 1000);
     }
-    
+
     ciThreadRunning = false;
     VERBOSE(VB_DVBCAM, LOC + "CiHandler thread stopped");
 }
@@ -413,7 +413,7 @@ cCiCaPmt CreateCAPMT(const ProgramMapTable &pmt,
                 QString("Adding elementary stream: %1, pid(0x%2)")
                 .arg(pmt.StreamDescription(i, "dvb"))
                 .arg(pmt.StreamPID(i),0,16));
-            
+
         capmt.AddElementaryStream(pmt.StreamType(i), pmt.StreamPID(i));
 
         desc_list_t desc = MPEGDescriptor::ParseOnlyInclude(

@@ -533,10 +533,10 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     // Flush out events...
     WaitForEventThreadSleep();
 
-    // Rescan pending recordings since the event loop may have deleted  
-    // a stale entry.  If this happens the info pointer will not be valid 
-    // since the HandlePendingRecordings loop will have deleted it. 
-    it = pendingRecordings.find(cardid); 
+    // Rescan pending recordings since the event loop may have deleted
+    // a stale entry.  If this happens the info pointer will not be valid
+    // since the HandlePendingRecordings loop will have deleted it.
+    it = pendingRecordings.find(cardid);
 
     // If the needed input is in a shared input group, and we are
     // not canceling the recording anyway, check other recorders
@@ -1065,7 +1065,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
 
 /** \fn TVRec::TeardownRecorder(bool)
  *  \brief Tears down the recorder.
- *  
+ *
  *   If a "recorder" exists, RecorderBase::StopRecording() is called.
  *   We then wait for "recorder_thread" to exit, and finally we delete
  *   "recorder".
@@ -2352,7 +2352,7 @@ bool TVRec::CheckChannelPrefix(const QString &prefix,
     {
         for (uint j = 0; j < kSpacerListSize; j++)
         {
-	    QString qprefix = add_spacer(
+            QString qprefix = add_spacer(
                 prefix, (QString(spacers[j]) == "_") ? "\\_" : spacers[j]);
             query.prepare(basequery.arg(qprefix) + cardquery[i]);
 
@@ -2948,17 +2948,17 @@ void TVRec::ToggleChannelFavorite(QString changroupname)
                 "\t\t\tCould not toggle favorite.").arg(channum));
         return;
     }
-    
+
     int  changrpid;
     bool result;
-    
+
     changrpid = ChannelGroup::GetChannelGroupId(changroupname);
-    
+
     if (changrpid <1)
     {
           VERBOSE(VB_RECORD, LOC + QString("ToggleChannelFavorite: Invalid "
                    "channel group name %1, ").arg(changroupname));
-    }   
+    }
     else
     {
         result = ChannelGroup::ToggleChannel(chanid, changrpid, true);
@@ -3188,7 +3188,7 @@ void TVRec::GetNextProgram(int direction,
         }
         else if (BROWSE_RIGHT == direction)
         {
-	        chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
+                chanid = channel->GetNextChannel(channum, CHANNEL_DIRECTION_SAME);
             compare = ">";
             sortorder = "asc";
         }

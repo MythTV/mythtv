@@ -157,7 +157,7 @@ bool ThreadedFileWriter::Open(void)
 
     if (fd < 0)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
                 QString("Opening file '%1'.").arg(filename) + ENO);
         return false;
     }
@@ -222,7 +222,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
 
     if (count > tfw_buf_size)
     {
-        VERBOSE(VB_IMPORTANT, LOC + 
+        VERBOSE(VB_IMPORTANT, LOC +
                 QString("WARNING: count(%1), tfw_buf_size(%2)")
                 .arg(count).arg(tfw_buf_size));
     }
@@ -340,8 +340,8 @@ void ThreadedFileWriter::Flush(void)
  *
  *   NOTE: This doesn't even try flush our queue of data.
  *   This only ensures that data which has already been sent
- *   to the kernel for this file is written to disk. This 
- *   means that if this backend is writing the data over a 
+ *   to the kernel for this file is written to disk. This
+ *   means that if this backend is writing the data over a
  *   network filesystem like NFS, then the data will be visible
  *   to the NFS server after this is called. It is also useful
  *   in preventing the kernel from buffering up so many writes

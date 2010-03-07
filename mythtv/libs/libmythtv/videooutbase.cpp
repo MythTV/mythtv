@@ -256,7 +256,7 @@ VideoOutput *VideoOutput::Create(
  *         vo->ReleaseFrame(frame); // enqueues frame in "used" queue
  *     }
  * }
- *  
+ *
  * // In the displaying thread
  * while (playing)
  * {
@@ -291,7 +291,7 @@ VideoOutput *VideoOutput::Create(
  *        update an OSD for example.
  *
  *  The VideoBuffers class handles the buffer tracking,
- *  see it for more details on the states a buffer can 
+ *  see it for more details on the states a buffer can
  *  take before it becomes available for reuse.
  *
  * \see VideoBuffers, NuppelVideoPlayer
@@ -299,7 +299,7 @@ VideoOutput *VideoOutput::Create(
 
 /**
  * \fn VideoOutput::VideoOutput()
- * \brief This constructor for VideoOutput must be followed by an 
+ * \brief This constructor for VideoOutput must be followed by an
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
 VideoOutput::VideoOutput() :
@@ -478,7 +478,7 @@ bool VideoOutput::SetDeinterlacingEnabled(bool enable)
  * \return true if successful, false otherwise.
  * \param overridefilter optional, explicitly use this nondefault deint filter
  */
-bool VideoOutput::SetupDeinterlace(bool interlaced, 
+bool VideoOutput::SetupDeinterlace(bool interlaced,
                                    const QString& overridefilter)
 {
     PIPState pip_state = windows[0].GetPIPState();
@@ -502,14 +502,14 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
 
     m_deinterlacing = interlaced;
 
-    if (m_deinterlacing) 
+    if (m_deinterlacing)
     {
         m_deinterlaceBeforeOSD = true;
 
         VideoFrameType itmp = FMT_YV12;
         VideoFrameType otmp = FMT_YV12;
         int btmp;
-        
+
         if (db_vdisp_profile)
             m_deintfiltername = db_vdisp_profile->GetFilteredDeint(overridefilter);
         else
@@ -542,7 +542,7 @@ bool VideoOutput::SetupDeinterlace(bool interlaced,
             }
         }
 
-        if (m_deintFilter == NULL) 
+        if (m_deintFilter == NULL)
         {
             VERBOSE(VB_IMPORTANT,QString("Couldn't load deinterlace filter %1")
                     .arg(m_deintfiltername));
@@ -586,7 +586,7 @@ void VideoOutput::BestDeint(void)
  *   All adaptive full framerate deinterlacers require an extra
  *   ProcessFrame() call.
  *
- *  \return true if deint name contains doubleprocess 
+ *  \return true if deint name contains doubleprocess
  */
 bool VideoOutput::IsExtraProcessingRequired(void) const
 {
@@ -661,7 +661,7 @@ bool VideoOutput::InputChanged(const QSize &input_size,
         db_vdisp_profile->SetInput(windows[0].GetVideoDim());
 
     BestDeint();
-    
+
     DiscardFrames(true);
 
     return true;
@@ -691,7 +691,7 @@ void VideoOutput::EmbedInWidget(int x, int y, int w, int h)
  * \fn VideoOutput::StopEmbedding(void)
  * \brief Tells video output to stop embedding video in an existing window.
  * \sa EmbedInWidget(WId, int, int, int, int)
- */ 
+ */
 void VideoOutput::StopEmbedding(void)
 {
     windows[0].StopEmbedding();
@@ -1012,7 +1012,7 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
     const QSize pipVideoDim    = pipplayer->GetVideoBufferSize();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
-    if ((video_aspect <= 0) || (pipVideoAspect <= 0) || 
+    if ((video_aspect <= 0) || (pipVideoAspect <= 0) ||
         (frame->height <= 0) || (frame->width <= 0) ||
         !pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
     {
@@ -1051,7 +1051,7 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
 
             sws_scale(pip_scaling_context, img_in.data, img_in.linesize, 0,
                       piph, img_out.data, img_out.linesize);
-          
+
             if (pipActive)
             {
                 AVPicture img_padded;
@@ -1064,7 +1064,7 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
                                pip_display_size.height(),
                                pip_display_size.width(),
                                PIX_FMT_YUV420P, 10, 10, 10, 10, color);
-                
+
                 pipbuf = pip_tmp_buf2;
             }
             else
@@ -1090,12 +1090,12 @@ void VideoOutput::ShowPIP(VideoFrame        *frame,
 
     uint pip_height = pip_tmp_image.height;
     uint height[3] = { pip_height, pip_height>>1, pip_height>>1 };
-    
+
     for (int p = 0; p < 3; p++)
     {
         for (uint h = 2; h < height[p]; h++)
         {
-            memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) * 
+            memcpy((frame->buf + frame->offsets[p]) + (h + yoff2[p]) *
                    frame->pitches[p] + xoff2[p],
                    (pip_tmp_image.buf + pip_tmp_image.offsets[p]) + h *
                    pip_tmp_image.pitches[p], pip_tmp_image.pitches[p]);
@@ -1274,7 +1274,7 @@ void VideoOutput::SetVideoScalingAllowed(bool change)
  *  converted to greyscale.
  *
  * \return 1 if changed, -1 on error and 0 otherwise
- */ 
+ */
 int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
                             int revision)
 {
@@ -1338,10 +1338,10 @@ int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
 /**
  * \fn VideoOutput::CopyFrame(VideoFrame*, const VideoFrame*)
  * \brief Copies frame data from one VideoFrame to another.
- * 
+ *
  *  Note: The frames must have the same width, height, and format.
  * \param to   The destination frame.
- * \param from The source frame 
+ * \param from The source frame
  */
 void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
 {
@@ -1362,7 +1362,7 @@ void VideoOutput::CopyFrame(VideoFrame *to, const VideoFrame *from)
         memcpy(to->buf + to->offsets[1], from->buf + from->offsets[1],
                from->pitches[1] * (from->height>>1));
         memcpy(to->buf + to->offsets[2], from->buf + from->offsets[2],
-               from->pitches[2] * (from->height>>1));        
+               from->pitches[2] * (from->height>>1));
     }
     else
     {

@@ -134,7 +134,7 @@ void XvMCOSD::CreateBuffer(XvMCContext &xvmc_ctx, int width, int height)
             int V = 1 << (osd_subpict_info.v_sample_bits - 1);
             for (int j = 0; j < seb; j++)
             {
-                switch (osd_subpict.component_order[j]) 
+                switch (osd_subpict.component_order[j])
                 {
                     case 'U': osd_palette[i * seb + j] = U; break;
                     case 'V': osd_palette[i * seb + j] = V; break;
@@ -191,7 +191,7 @@ void XvMCOSD::CompositeOSD(VideoFrame* frame, VideoFrame* osdframe)
 
         XvMCSyncSubpicture(d, &osd_subpict);
         VideoOutputXv::SyncSurface(frame);
-        
+
         XvMCBlendSubpicture2(d, render->p_surface,
                              osdren->p_surface, &osd_subpict,
                              0, 0, XJ_width, XJ_height,

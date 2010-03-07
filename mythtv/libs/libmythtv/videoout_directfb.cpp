@@ -440,7 +440,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     windows[0].SetDisplayDim(display_dim);
 
     const QRect display_visible_rect = windows[0].GetDisplayVisibleRect();
-    VERBOSE(VB_PLAYBACK, LOC + 
+    VERBOSE(VB_PLAYBACK, LOC +
             QString("output : screen pixel size %1x%2")
             .arg(display_visible_rect.width())
             .arg(display_visible_rect.height()));
@@ -635,7 +635,7 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
 
     // Setup video input buffers
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
-                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
+                  kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
     desc.flags = (DFBSurfaceDescriptionFlags)
         (DSDESC_HEIGHT | DSDESC_WIDTH | DSDESC_PIXELFORMAT);
@@ -931,7 +931,7 @@ void VideoOutputDirectfb::ProcessFrame(VideoFrame *frame, OSD *osd,
         CopyFrame(&mem_frame, &pauseFrame);
 
     if (m_deinterlacing && m_deintFilter != NULL)
-	m_deintFilter->ProcessFrame(&mem_frame, scan);
+        m_deintFilter->ProcessFrame(&mem_frame, scan);
 
     if (filterList)
         filterList->ProcessFrame(&mem_frame);
@@ -1011,7 +1011,7 @@ void VideoOutputDirectfb::MoveResize(void)
             .arg(display_video_rect.width())
             .arg(display_video_rect.height()));
 
-    // TODO FIXME support for zooming when 
+    // TODO FIXME support for zooming when
     // dispwoff > screenwidth || disphoff > screenheight
 
     if (data->videoLayerDesc.caps & DLCAPS_SCREEN_LOCATION)

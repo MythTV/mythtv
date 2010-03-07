@@ -2,8 +2,8 @@
  * File  : uilistbtntype.cpp
  * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
  * Date  : 2004-02-04
- * Description : 
- * 
+ * Description :
+ *
  * Copyright 2004 by Renchi Raju
 
  * This program is free software; you can redistribute it
@@ -11,12 +11,12 @@
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 // ANSI C headers
@@ -82,7 +82,7 @@ OSDListTreeType::~OSDListTreeType()
 {
     OSDListBtnList::iterator it = listLevels.begin();
     for (; it != listLevels.end(); ++it)
-        delete *it;    
+        delete *it;
 }
 
 void OSDListTreeType::Reinit(float wmult, float hmult)
@@ -270,7 +270,7 @@ bool OSDListTreeType::HandleKeypress(QKeyEvent *e)
     return true;
 }
 
-void OSDListTreeType::Draw(OSDSurface *surface, int fade, int maxfade, 
+void OSDListTreeType::Draw(OSDSurface *surface, int fade, int maxfade,
                            int xoff, int yoff)
 {
     bool previousWasVisible = true;
@@ -288,7 +288,7 @@ void OSDListTreeType::Draw(OSDSurface *surface, int fade, int maxfade,
     }
 }
 
-void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item, 
+void OSDListTreeType::FillLevelFromTree(OSDGenericTree *item,
                                         uint level_num)
 {
     OSDListBtnType *list = GetLevel(level_num);
@@ -410,7 +410,7 @@ OSDListBtnType::OSDListBtnType(const QString &name, const QRect &area,
 }
 
 OSDListBtnType::~OSDListBtnType()
-{    
+{
     Reset();
 }
 
@@ -518,7 +518,7 @@ OSDListBtnTypeItem* OSDListBtnType::GetItemFirst(void)
     QMutexLocker lock(&m_update);
     if (!m_itemList.size())
         return NULL;
-    return m_itemList[0];    
+    return m_itemList[0];
 }
 
 OSDListBtnTypeItem* OSDListBtnType::GetItemNext(const OSDListBtnTypeItem *item)
@@ -539,7 +539,7 @@ int OSDListBtnType::GetCount(void) const
 OSDListBtnTypeItem* OSDListBtnType::GetItemAt(int pos)
 {
     QMutexLocker lock(&m_update);
-    return m_itemList[pos];    
+    return m_itemList[pos];
 }
 
 int OSDListBtnType::GetItemPos(const OSDListBtnTypeItem *item) const
@@ -579,10 +579,10 @@ void OSDListBtnType::MoveDown(void)
 
     bool scroll_down = m_topIndx + (int)m_itemsVisible <= m_selIndx;
     m_topIndx = (scroll_down) ? m_topIndx + 1 : m_topIndx;
-        
+
     m_showUpArrow = m_topIndx;
     m_showDnArrow = m_topIndx + m_itemsVisible < m_itemList.size();
-    
+
     SendItemSelected(m_itemList[m_selIndx]);
 }
 
@@ -644,7 +644,7 @@ void OSDListBtnType::Draw(OSDSurface *surface,
         Init();
 
     TTFFont *font = m_active ? m_fontActive : m_fontInactive;
-    
+
     int y = m_rect.y();
     for (uint i = m_topIndx; i < m_itemList.size(); i++)
     {
@@ -655,10 +655,10 @@ void OSDListBtnType::Draw(OSDSurface *surface,
         y += m_itemHeight + m_itemSpacing;
     }
 
-    if (m_showScrollArrows) 
+    if (m_showScrollArrows)
     {
         if (m_showUpArrow)
-            m_upArrowActPix.Draw(surface, fade, maxfade, 
+            m_upArrowActPix.Draw(surface, fade, maxfade,
                                  m_rect.x() + m_arrowsRect.x() + xoff,
                                  m_rect.y() + m_arrowsRect.y() + yoff);
         else
@@ -685,7 +685,7 @@ void OSDListBtnType::Init(void)
     m_itemHeight = max(sz1, sz2) + (int)(2 * m_itemMargin);
     m_itemHeight = m_itemHeight & ~0x1;
 
-    if (m_showScrollArrows) 
+    if (m_showScrollArrows)
     {
         LoadPixmap(m_upArrowRegPix, "uparrow-reg");
         LoadPixmap(m_upArrowActPix, "uparrow-sel");
@@ -695,15 +695,15 @@ void OSDListBtnType::Init(void)
         m_arrowsRect = QRect(0, m_rect.height() - m_upArrowActPix.height() - 1,
                              m_rect.width(), m_upArrowActPix.height());
     }
-    else 
+    else
         m_arrowsRect = QRect(0, 0, 0, 0);
-        
+
     m_contentsRect = QRect(0, 0, m_rect.width(), m_rect.height() -
                            m_arrowsRect.height() - 2 * m_itemMargin);
 
     m_itemsVisible = 0;
     int y = 0;
-    while (y <= m_contentsRect.height() - m_itemHeight) 
+    while (y <= m_contentsRect.height() - m_itemHeight)
     {
         y += m_itemHeight + m_itemSpacing;
         m_itemsVisible++;
@@ -753,7 +753,7 @@ void OSDListBtnType::InitItem(
         *ptr = black; // safe due to safety_margin
 
 #define CUR_POS (((uchar*)ptr)-data)
-    for (uint y = 1; y+1 < height; y++) 
+    for (uint y = 1; y+1 < height; y++)
     {
         *ptr = black; // safe due to safety_margin
         ptr++;
@@ -833,10 +833,10 @@ OSDListBtnTypeItem::OSDListBtnTypeItem(
     int pw     = m_pixmap ? m_pixmap->ImageSize().width() : 0;
     int ph     = m_pixmap ? m_pixmap->ImageSize().height() : 0;
 
-    if (m_checkable) 
+    if (m_checkable)
         m_checkRect  = QRect(margin, (height - ch)/2, cw, ch);
 
-    if (m_showArrow) 
+    if (m_showArrow)
         m_arrowRect  = QRect(width - aw - margin, (height - ah)/2, aw, ah);
 
     if (m_pixmap)
@@ -862,7 +862,7 @@ OSDListBtnTypeItem::~OSDListBtnTypeItem()
         m_parent->RemoveItem(this);
 }
 
-void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font, 
+void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
                                int fade, int maxfade, int x, int y)
 {
     if (this == m_parent->GetItemCurrent())
@@ -891,7 +891,7 @@ void OSDListBtnTypeItem::paint(OSDSurface *surface, TTFFont *font,
     {
         QRect cr(m_checkRect);
         cr.translate(x, y);
-        
+
         if (m_state == HalfChecked)
             m_parent->m_checkHalfPix.Draw(surface, fade, maxfade,
                                           cr.x(), cr.y());

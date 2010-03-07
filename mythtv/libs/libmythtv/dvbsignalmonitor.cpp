@@ -42,8 +42,8 @@
 DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                                    uint64_t _flags)
     : DTVSignalMonitor(db_cardnum, _channel, _flags),
-      // This snr setup is incorrect for API 3.x but works better 
-      // than int16_t range in practice, however this is correct 
+      // This snr setup is incorrect for API 3.x but works better
+      // than int16_t range in practice, however this is correct
       // for the 4.0 DVB API which uses a uint16_t for the snr
       signalToNoise    (QObject::tr("Signal To Noise"),    "snr",
                         0,      true,      0, 65535, 0),
@@ -231,7 +231,7 @@ void DVBSignalMonitor::UpdateValues(void)
     }
 
     AddFlags(kSigMon_WaitForSig);
- 
+
     DVBChannel *dvbchannel = GetDVBChannel();
     if (!dvbchannel)
         return;
@@ -269,9 +269,9 @@ void DVBSignalMonitor::UpdateValues(void)
     {
         QMutexLocker locker(&statusLock);
 
-        // BER and UB are actually uint32 values, but we 
+        // BER and UB are actually uint32 values, but we
         // clamp them at 64K. This is because these values
-        // are acutally cumulative, but we don't try to 
+        // are acutally cumulative, but we don't try to
         // normalize these to a time period.
 
         wasLocked = signalLock.IsGood();

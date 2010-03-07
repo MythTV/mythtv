@@ -65,7 +65,7 @@ bool IPTVFeederFile::Open(const QString &url)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Open() -- end 2");
         return false;
     }
-        
+
     // Begin by setting up our usage environment:
     if (!InitEnv())
         return false;
@@ -100,7 +100,7 @@ bool IPTVFeederFile::Open(const QString &url)
     vector<TSDataListener*>::iterator it = _listeners.begin();
     for (; it != _listeners.end(); ++it)
         _sink->AddListener(*it);
-        
+
     VERBOSE(VB_RECORD, LOC + "Open() -- end");
 
     return true;
@@ -145,7 +145,7 @@ void IPTVFeederFile::AddListener(TSDataListener *item)
     // add to local list
     QMutexLocker locker(&_lock);
     _listeners.push_back(item);
-    
+
     if (_sink)
         _sink->AddListener(item);
 

@@ -214,12 +214,12 @@ void OSDTypeTeletext::AddPageHeader(int page, int subpage,
         for (uint j = 8; j < 40; j++)
             ttpage->data[0][j] = m_bitswap[buf[j]];
     }
-    else 
+    else
     {
         memcpy(ttpage->data[0]+0, buf, 40);
     }
-    
-    if ( !(ttpage->flags & TP_INTERRUPTED_SEQ)) 
+
+    if ( !(ttpage->flags & TP_INTERRUPTED_SEQ))
     {
         memcpy(m_header, ttpage->data[0], 40);
         HeaderUpdated(ttpage->data[0],ttpage->lang);
@@ -229,7 +229,7 @@ void OSDTypeTeletext::AddPageHeader(int page, int subpage,
 /**
  *  \brief Adds Teletext Data from TeletextDecoder
  */
-void OSDTypeTeletext::AddTeletextData(int magazine, int row, 
+void OSDTypeTeletext::AddTeletextData(int magazine, int row,
                                       const uint8_t * buf, int vbimode)
 {
     OSDUpdateLocker locker(&m_lock, this);
@@ -252,8 +252,8 @@ void OSDTypeTeletext::AddTeletextData(int magazine, int row,
             {
                 for (uint j = 0; j < 40; j++)
                     ttpage->data[row][j] = m_bitswap[buf[j]];
-            } 
-            else 
+            }
+            else
             {
                 memcpy(ttpage->data[row], buf, 40);
             }
@@ -352,7 +352,7 @@ void OSDTypeTeletext::PageUpdated(int page, int subpage)
 
 /**
  *  \brief Updates the header (given in page with language lang)
- * 
+ *
  *  \param page Pointer to the header which should be displayed
  *  \param lang Language of the header
  *
@@ -384,7 +384,7 @@ void OSDTypeTeletext::HeaderUpdated(uint8_t * page, int lang)
  *
  *  \param page Page number
  *  \param direction find page before or after the given page
- *  \return TeletextPage (NULL if not found) 
+ *  \return TeletextPage (NULL if not found)
  */
 const TeletextPage *OSDTypeTeletext::FindPageInternal(
     int page, int direction) const
@@ -437,7 +437,7 @@ const TeletextPage *OSDTypeTeletext::FindPageInternal(
  *  \param subpage Subpage number (if set to -1, find the first subpage)
  *  \param direction find page before or after the given page
  *         (only if Subpage is not -1)
- *  \return TeletextSubPage (NULL if not found) 
+ *  \return TeletextSubPage (NULL if not found)
  */
 const TeletextSubPage *OSDTypeTeletext::FindSubPageInternal(
     int page, int subpage, int direction) const
@@ -548,7 +548,7 @@ void OSDTypeTeletext::KeyPress(uint key)
             newSubPage = -1;
             m_curpage_showheader = true;
             break;
-        } 
+        }
 
         case TTKey::kPrevPage:
         {
@@ -842,7 +842,7 @@ void OSDTypeTeletext::DrawRect(OSDSurface *surface, const QRect rect) const
 }
 
 /** \fn OSDTypeTeletext::DrawCharacter(OSDSurface*,int,int,QChar,int) const
- *  \brief Draws a character at posistion x, y 
+ *  \brief Draws a character at posistion x, y
  *
  *  \param x X position (40 cols)
  *  \param y Y position (25 rows)

@@ -137,7 +137,7 @@ bool VideoOutputNull::InputChanged(const QSize &input_size,
 }
 
 bool VideoOutputNull::Init(int width, int height, float aspect,
-                           WId winid, int winx, int winy, int winw, 
+                           WId winid, int winx, int winy, int winw,
                            int winh, WId embedid)
 {
     if ((width <= 0) || (height <= 0))
@@ -148,8 +148,8 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
-    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
-                  kPrebufferFramesNormal, kPrebufferFramesSmall, 
+    vbuffers.Init(kNumBuffers, true, kNeedFreeFrames,
+                  kPrebufferFramesNormal, kPrebufferFramesSmall,
                   kKeepPrebuffer);
 
     const QSize video_dim = windows[0].GetVideoDim();
@@ -173,7 +173,7 @@ void VideoOutputNull::EmbedInWidget(int x, int y, int w, int h)
     if (!windows[0].IsEmbedding())
         VideoOutput::EmbedInWidget(x, y, w, h);
 }
- 
+
 void VideoOutputNull::StopEmbedding(void)
 {
     QMutexLocker locker(&global_lock);

@@ -154,7 +154,7 @@ bool FilterManager::LoadFilterLib(const QString &path)
         const char *errmsg = dlerror();
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to load filter symbol: " +
                 QString("'%1'").arg(path) + "\n\t\t\t" + errmsg);
-        return false;        
+        return false;
     }
 
     for (; filtInfo->symbol; filtInfo++)
@@ -196,7 +196,7 @@ const FilterInfo *FilterManager::GetFilterInfo(const QString &name) const
     return finfo;
 }
 
-FilterChain *FilterManager::LoadFilters(QString Filters, 
+FilterChain *FilterManager::LoadFilters(QString Filters,
                                         VideoFrameType &inpixfmt,
                                         VideoFrameType &outpixfmt, int &width,
                                         int &height, int &bufsize,
@@ -291,7 +291,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
                     S2 = FC;
             }
         }
-                
+
         if (S1)
             FC = S1;
         else if (S2)
@@ -378,12 +378,12 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
         delete FiltChain;
         FiltChain = NULL;
     }
-    
+
     for (i = 0; i < FiltInfoChain.size(); i++)
     {
         QByteArray tmp = OptsList[i].toLocal8Bit();
         NewFilt = LoadFilter(FiltInfoChain[i], FmtList[i]->in,
-                             FmtList[i]->out, postfilt_width, 
+                             FmtList[i]->out, postfilt_width,
                              postfilt_height, tmp.constData(),
                              max_threads);
 
@@ -488,9 +488,9 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
     return FiltChain;
 }
 
-VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo, 
+VideoFilter * FilterManager::LoadFilter(const FilterInfo *FiltInfo,
                                         VideoFrameType inpixfmt,
-                                        VideoFrameType outpixfmt, int &width, 
+                                        VideoFrameType outpixfmt, int &width,
                                         int &height, const char *opts,
                                         int max_threads)
 {

@@ -1,5 +1,5 @@
 // -*- Mode: c++ -*-
-// Copyright (c) 2003-2005, Daniel Kristjansson 
+// Copyright (c) 2003-2005, Daniel Kristjansson
 
 #include <cassert>
 #include <cstdlib>
@@ -98,7 +98,7 @@ typedef enum
 
 typedef enum
 {
-    CW0=0x80, CW1, CW2, CW3, CW4, CW5, CW6, CW7,      
+    CW0=0x80, CW1, CW2, CW3, CW4, CW5, CW6, CW7,
     CLW,      DSW, HDW, TGW, DLW, DLY, DLC, RST,
     SPA=0x90, SPC, SPL,                     SWA=0x97,
     DF0,      DF1, DF2, DF3, DF4, DF5, DF6, DF7,
@@ -176,8 +176,8 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
         const int old_i = i;
         const int code = cc->buf[service_num][i];
         if (0x0 == code)
-        { 
-            i++; 
+        {
+            i++;
         }
         else if (code <= 0x1f)
         {
@@ -658,7 +658,7 @@ static void append_character(CC708Reader *cc, uint service_num, short ch)
 ushort CCtableG0[0x60] =
 {
 //   0    1    2    3       4    5    6    7
-//   8    9    a    b       c    d    e    f  
+//   8    9    a    b       c    d    e    f
     ' ', '!','\"', '#',    '$', '%', '&', '\'', /* 0x20-0x27 */
     '(', ')', '*', '+',    ',', '-', '.', '/',  /* 0x28-0x2f */
     '0', '1', '2', '3',    '4', '5', '6', '7',  /* 0x30-0x37 */
@@ -680,7 +680,7 @@ ushort CCtableG1[0x60] =
 //          0           1           2           3
 //          4           5           6           7
 //          8           9           a           b
-//          c           d           e           f  
+//          c           d           e           f
     0xA0, // unicode non-breaking space
                 (uchar)'¡', (uchar)'¢', (uchar)'£', /* 0xa0-0xa3 */
     (uchar)'¤', (uchar)'¥', (uchar)'¦', (uchar)'§', /* 0xa4-0xa7 */
@@ -729,11 +729,11 @@ ushort CCtableG2[0x60] =
     0x161,/*s under \/*/0,                     /* 0x38-0x3b */
     0x153, /* ce */     '#',   /* super SM */
     0,                  0x178,/*Y w/umlout*/   /* 0x3c-0x3f */
-    
+
 //  0         1         2         3
 //  4         5         6         7
 //  8         9         a         b
-//  c         d         e         f  
+//  c         d         e         f
     0,        0,        0,        0,
     0,        0,        0,        0, /* 0x40-0x47 */
     0,        0,        0,        0,
@@ -761,7 +761,7 @@ ushort CCtableG2[0x60] =
 
 ushort CCtableG3[0x60] =
 {
-//   0 1  2  3    4  5  6  7     8  9  a  b    c  d  e  f  
+//   0 1  2  3    4  5  6  7     8  9  a  b    c  d  e  f
     '#', /* [CC] closed captioning logo */
        0, 0, 0,   0, 0, 0, 0,    0, 0, 0, 0,   0, 0, 0, 0, /* 0xa0-0xaf */
     0, 0, 0, 0,   0, 0, 0, 0,    0, 0, 0, 0,   0, 0, 0, 0, /* 0xb0-0xbf */

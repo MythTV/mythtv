@@ -136,7 +136,7 @@ bool RecordingRule::Load()
         m_lastRecorded = query.value(40).toDateTime();
         m_lastDeleted = query.value(41).toDateTime();
         m_averageDelay = query.value(42).toInt();
-        
+
         m_isOverride = (m_type == kOverrideRecord || m_type == kDontRecord);
     }
     else
@@ -154,7 +154,7 @@ bool RecordingRule::LoadByProgram(const ProgramInfo* proginfo)
         return false;
 
     m_progInfo = proginfo;
-    
+
     if (proginfo->recordid)
     {
         m_recordID = proginfo->recordid;
@@ -223,7 +223,7 @@ bool RecordingRule::LoadBySearch(RecSearchType lsearch, QString textname,
                 searchType = QObject::tr("Unknown Search");
                 break;
         }
-        
+
         QString ltitle = QString("%1 (%2)").arg(textname).arg(searchType);
         m_title = ltitle;
         m_subtitle = from;
@@ -263,7 +263,7 @@ bool RecordingRule::MakeOverride(void)
 {
     if (m_recordID <= 0)
         return false;
-    
+
     if (m_type == kOverrideRecord || m_type == kDontRecord)
         return false;
 
@@ -277,7 +277,7 @@ bool RecordingRule::MakeOverride(void)
         m_searchType = kNoSearch;
 
     AssignProgramInfo();
-    
+
     return true;
 }
 
@@ -408,7 +408,7 @@ bool RecordingRule::Delete(bool sendSig)
     // not valid. Should you want, this allows a rule to be removed from the
     // database and then re-inserted with Save()
     m_recordID = 0;
-    
+
     return true;
 }
 

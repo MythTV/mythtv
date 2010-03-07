@@ -103,7 +103,7 @@ class PESPacket
 
     // At this point we should have the entire VCT table in buffer
     // at (buffer - 8), and without the tspacket 4 byte header
-    
+
         //if (TableID::TVCT == table_id)
         //VirtualChannelTable vct;
 
@@ -147,7 +147,7 @@ class PESPacket
 
     bool IsGood() const { return !_badPacket; }
 
-    const TSHeader* tsheader() const 
+    const TSHeader* tsheader() const
         { return reinterpret_cast<const TSHeader*>(_fullbuffer); }
     TSHeader* tsheader()
         { return reinterpret_cast<TSHeader*>(_fullbuffer); }

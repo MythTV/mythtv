@@ -149,7 +149,7 @@ static inline int __glCheck__(const QString &loc, const char* fileName, int n)
 {
     int error = glGetError();
     if (error)
-    { 
+    {
         VERBOSE(VB_IMPORTANT, loc << gluErrorString(error) << " @ "
                 << fileName << ", #" << n);
     }
@@ -289,7 +289,7 @@ extern MYTH_GLFINISHFENCEAPPLEPROC  gMythGLFinishFenceAPPLE;
 
 // win32 SwapBuffers
 #ifdef USING_MINGW
-typedef void (APIENTRY * MYTH_WGLSWAPBUFFERSPROC) (HDC hDC); 
+typedef void (APIENTRY * MYTH_WGLSWAPBUFFERSPROC) (HDC hDC);
 extern MYTH_WGLSWAPBUFFERSPROC gMythWGLSwapBuffers;
 #endif // USING_MINGW
 

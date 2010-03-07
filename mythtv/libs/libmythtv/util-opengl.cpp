@@ -247,7 +247,7 @@ int const *get_attr_cfg(FrameBufferType type)
         GLX_DOUBLEBUFFER, 1,
         None
     };
- 
+
     int const * attr_config = simple_rgba_config;
 
     if (kRenderRGBA == type)
@@ -255,8 +255,8 @@ int const *get_attr_cfg(FrameBufferType type)
 
     if (kSimpleRGBA == type)
         attr_config = simple_rgba_config;
-    
-    return attr_config;   
+
+    return attr_config;
 }
 
 
@@ -613,7 +613,7 @@ static inline void mmx_interp_endu(void)
     psllw_i2r (8, mm2);
     paddb_r2r (mm4, mm2);
 }
-    
+
 static inline void mmx_interp_endv(void)
 {
     movq_r2r  (mm4, mm3);
@@ -955,7 +955,7 @@ void pack_yv12interlaced(const unsigned char *source,
         }
 
         emms();
-        
+
         return;
     }
 #endif //MMX

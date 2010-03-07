@@ -46,7 +46,7 @@ class PaneDVBC : public HorizontalConfigurationGroup
         right->addChild(pmodulation = new ScanModulation());
         right->addChild(pfec        = new ScanFec());
         addChild(left);
-        addChild(right);     
+        addChild(right);
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }

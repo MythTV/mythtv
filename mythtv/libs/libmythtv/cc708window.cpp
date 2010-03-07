@@ -1,5 +1,5 @@
 // -*- Mode: c++ -*-
-// Copyright (c) 2003-2005, Daniel Kristjansson 
+// Copyright (c) 2003-2005, Daniel Kristjansson
 
 #include <cassert>
 #include <algorithm>
@@ -49,7 +49,7 @@ using namespace std;
       distributors must transmit captions in a format that will be
       understandable to this decoder circuitry in digital cable
       television sets when transmitting programming to digital
-      television devices. 
+      television devices.
 
 ******************************************************************************/
 
@@ -144,7 +144,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
     column_count      = _column_count;
     row_lock          = _row_lock;
     column_lock       = _column_lock;
-    
+
     if ((!_pen_style && !exists) || _pen_style)
         pen.SetPenStyle(_pen_style ? _pen_style : 1);
 
@@ -205,7 +205,7 @@ void CC708Window::DefineWindow(int _priority,         int _visible,
 
     exists = true;
 }
- 
+
 
 CC708Window::~CC708Window()
 {
@@ -218,7 +218,7 @@ CC708Window::~CC708Window()
     if (text)
     {
         delete [] text;
-        text = NULL; 
+        text = NULL;
     }
 }
 
@@ -387,7 +387,7 @@ void CC708Window::Scroll(int row, int col)
     {
         for (uint j = 0; j < true_row_count - 1; j++)
             for (uint i = 0; i < true_column_count; i++)
-                text[(true_column_count * j) + i] = 
+                text[(true_column_count * j) + i] =
                     text[(true_column_count * (j+1)) + i];
         //uint colsz = true_column_count * sizeof(CC708Character);
         //memmove(text, text + colsz, colsz * (true_row_count - 1));

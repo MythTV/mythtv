@@ -149,7 +149,7 @@ void DVBRecorder::TeardownAll(void)
     }
 }
 
-void DVBRecorder::SetOptionsFromProfile(RecordingProfile *profile, 
+void DVBRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                         const QString &videodev,
                                         const QString&, const QString&)
 {

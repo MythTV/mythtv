@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 /*
  *  Copyright (C) Kenneth Aafloy 2003
- *  
+ *
  *  Copyright notice is in dvbchannel.cpp of the MythTV project.
  */
 
@@ -67,7 +67,7 @@ class DVBChannel : public DTVChannel
     /// \brief Returns signal/noise in the range [0..1.0].
     /// Some drivers report the actual ratio, while others report
     /// the dB, but in this case some weak signals may report a
-    /// very high S/N since negative dB are not supported by 
+    /// very high S/N since negative dB are not supported by
     /// MythTV or the 4.0 version of the DVB API due to the
     /// large number of drivers that ignored the fact that this
     /// was a signed number in the 3.0 API.

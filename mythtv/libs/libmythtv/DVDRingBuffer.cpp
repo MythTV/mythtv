@@ -131,7 +131,7 @@ long long DVDRingBufferPriv::Seek(long long time)
         dvdRet = dvdnav_absolute_time_search(m_dvdnav, m_seektime, 1);
     }
 
-    VERBOSE(VB_PLAYBACK+VB_EXTRA, 
+    VERBOSE(VB_PLAYBACK+VB_EXTRA,
         QString("DVD Playback Seek() time: %1; seekSpeed: %2")
                         .arg(time).arg(seekSpeed));
 
@@ -267,7 +267,7 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
 
         dvdStat = dvdnav_get_next_cache_block(
             m_dvdnav, &blockBuf, &dvdEvent, &dvdEventSize);
-        
+
         bool isInMenu = IsInMenu(true);
         if (dvdStat == DVDNAV_STATUS_ERR)
         {

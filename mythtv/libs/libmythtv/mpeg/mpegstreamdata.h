@@ -199,7 +199,7 @@ class MPEGStreamData : public EITSource
     bool HasCachedAllPAT(uint tsid) const;
     bool HasCachedAnyPAT(uint tsid) const;
     bool HasCachedAnyPAT(void) const;
-    
+
     bool HasCachedAllPMT(uint program_num) const;
     bool HasCachedAnyPMT(uint program_num) const;
     bool HasCachedAllPMTs(void) const;
@@ -353,7 +353,7 @@ class MPEGStreamData : public EITSource
     sections_map_t            _pat_section_seen;
     sections_map_t            _pmt_section_seen;
 
-    // PSIP construction 
+    // PSIP construction
     pid_pes_map_t             _partial_pes_packet_cache;
 
     // Caching
@@ -403,7 +403,7 @@ inline void MPEGStreamData::SetPMTSingleProgram(ProgramMapTable* pmt)
 }
 
 inline int MPEGStreamData::VersionPATSingleProgram() const
-{ 
+{
     return (_pat_single_program) ? int(_pat_single_program->Version()) : -1;
 }
 
@@ -418,4 +418,4 @@ inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket*)
     //AdaptationFieldControl afc(tspacket.data()+4);
 }
 
-#endif 
+#endif

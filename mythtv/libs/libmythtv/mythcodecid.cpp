@@ -32,7 +32,7 @@ QString toString(MythCodecID codecid)
             return "VC-1";
         case kCodec_WMV3:
             return "WMV3";
-    
+
         case kCodec_MPEG1_XVMC:
             return "MPEG1 XvMC";
         case kCodec_MPEG2_XVMC:

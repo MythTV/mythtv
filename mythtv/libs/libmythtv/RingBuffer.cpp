@@ -91,7 +91,7 @@ QStringList RingBuffer::subExtNoCheck;
  *  This class, despite its name, no-longer provides a ring buffer.
  *  It can buffer reads and provide support for streaming files.
  *  It also provides a wrapper for the ThreadedFileWriter which
- *  makes sure that the file reader does not read past where the 
+ *  makes sure that the file reader does not read past where the
  *  wrapped TFW has written new data.
  *
  */
@@ -333,7 +333,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             QByteArray fname = filename.toLocal8Bit();
             fd2 = open(fname.constData(),
                        O_RDONLY|O_LARGEFILE|O_STREAMING|O_BINARY);
-                
+
             if (fd2 < 0)
             {
                 if (!check_permissions(filename))
@@ -459,7 +459,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
  *  \brief Returns true if the file is open for either reading or writing.
  */
 bool RingBuffer::IsOpen(void) const
-{ 
+{
 #ifdef USING_FRONTEND
     return tfw || (fd2 > -1) || remotefile || (dvdPriv && dvdPriv->IsOpen());
 #else // if !USING_FRONTEND
@@ -493,13 +493,13 @@ RingBuffer::~RingBuffer(void)
         close(fd2);
         fd2 = -1;
     }
-    
+
 #ifdef USING_FRONTEND
     if (dvdPriv)
     {
         delete dvdPriv;
     }
-#endif // USING_FRONTEND    
+#endif // USING_FRONTEND
 
     pthread_rwlock_unlock(&rwlock);
     pthread_rwlock_destroy(&rwlock);
@@ -508,7 +508,7 @@ RingBuffer::~RingBuffer(void)
 /** \fn RingBuffer::Start(void)
  *  \brief Starts the read-ahead thread.
  *
- *   If this RingBuffer is not in write-mode, the RingBuffer constructor 
+ *   If this RingBuffer is not in write-mode, the RingBuffer constructor
  *   was called with a usereadahead of true, and the read-ahead thread
  *   is not already running.
  */
@@ -611,7 +611,7 @@ int RingBuffer::safe_read(int fd, void *data, uint sz)
 
             zerocnt++;
 
-            // 0.36 second timeout for livetvchain with usleep(60000), 
+            // 0.36 second timeout for livetvchain with usleep(60000),
             // or 2.4 seconds if it's a new file less than 30 minutes old.
             if (zerocnt >= (livetvchain ? 6 : 40))
             {
@@ -746,7 +746,7 @@ void RingBuffer::CalcReadAheadThresh(void)
         // make this a multiple of ffmpeg block size..
         fill_min        = ((fill_min / KB32) + 1) * KB32;
     }
-#endif // USING_FRONTEND    
+#endif // USING_FRONTEND
 
     VERBOSE(VB_PLAYBACK, LOC +
             QString("CalcReadAheadThresh(%1 KB)\n\t\t\t -> "
@@ -778,7 +778,7 @@ int RingBuffer::ReadBufAvail(void) const
  *  \brief Restart the read-ahead thread at the 'newinternal' position.
  *
  *   This is called after a Seek(long long, int) so that the read-ahead
- *   buffer doesn't contain any stale data, and so that it will read 
+ *   buffer doesn't contain any stale data, and so that it will read
  *   any new data from the new position in the file.
  *
  *   WARNING: Must be called with rwlock in write lock state.
@@ -1009,7 +1009,7 @@ void RingBuffer::ReadAheadThread(void)
             }
 #ifdef USING_FRONTEND
             else if (dvdPriv)
-            {                        
+            {
                 ret = dvdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
                 internalreadpos += ret;
             }
@@ -1029,7 +1029,7 @@ void RingBuffer::ReadAheadThread(void)
             {
                 if (livetvchain)
                 {
-                    if (!setswitchtonext && !ignoreliveeof && 
+                    if (!setswitchtonext && !ignoreliveeof &&
                         livetvchain->HasNext())
                     {
                         livetvchain->SwitchToNext(true);
@@ -1166,7 +1166,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
 
     bool readone = false;
     int readErr = 0;
-    
+
     if (readaheadpaused && stopreads)
     {
         readone = true;
@@ -1190,8 +1190,8 @@ int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
                     VERBOSE(VB_IMPORTANT, "restarting readhead thread..");
                     KillReadAheadThread();
                     StartupReadAheadThread();
-                 }                    
- 
+                 }
+
                  if (readErr > 10)
                  {
                      VERBOSE(VB_IMPORTANT, LOC_ERR + "Took more than "
@@ -1203,12 +1203,12 @@ int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
             }
         }
     }
-    
+
     int avail = ReadBufAvail();
 
     if (ateof && avail < count)
         count = avail;
-    
+
     MythTimer t;
     t.start();
     while (avail < count && !stopreads)
@@ -1235,7 +1235,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
                 }
             }
 
-            bool quit = livetvchain && (livetvchain->NeedsToSwitch() || 
+            bool quit = livetvchain && (livetvchain->NeedsToSwitch() ||
                                         livetvchain->NeedsToJump() ||
                                         setswitchtonext);
 
@@ -1327,7 +1327,7 @@ int RingBuffer::Read(void *buf, int count)
         }
 #ifdef USING_FRONTEND
         else if (dvdPriv)
-        {                        
+        {
             ret = dvdPriv->safe_read(buf, count);
             readpos += ret;
         }
@@ -1502,7 +1502,7 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
 }
 
 /** \fn RingBuffer::WriterFlush(void)
- *  \brief Calls ThreadedFileWriter::Flush(void) and 
+ *  \brief Calls ThreadedFileWriter::Flush(void) and
  *         ThreadedFileWriter::Sync(void).
  */
 void RingBuffer::WriterFlush(void)

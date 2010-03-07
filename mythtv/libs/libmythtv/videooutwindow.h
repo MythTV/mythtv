@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 /*
  *  Copyright (C) Daniel Kristjansson, Jens Rehaag 2008
- *  
+ *
  *  Copyright notice is in videooutwindow.cpp of the MythTV project.
  */
 

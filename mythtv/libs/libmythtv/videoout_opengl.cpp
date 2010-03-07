@@ -68,7 +68,7 @@ VideoOutputOpenGL::~VideoOutputOpenGL()
 void VideoOutputOpenGL::TearDown(void)
 {
     QMutexLocker locker(&gl_context_lock);
-    
+
     DiscardFrames(true);
     vbuffers.DeleteBuffers();
     vbuffers.Reset();
@@ -270,11 +270,11 @@ void VideoOutputOpenGL::InitOSD(void)
     if (!gl_osdchain->Init(
             gl_context, db_use_picture_controls,
             GetTotalOSDBounds().size(),
-            GetTotalOSDBounds(), windows[0].GetDisplayVisibleRect(), 
+            GetTotalOSDBounds(), windows[0].GetDisplayVisibleRect(),
             QRect(QPoint(0, 0), GetTotalOSDBounds().size()), false,
             GetFilters(), true))
     {
-        VERBOSE(VB_PLAYBACK, LOC_ERR + 
+        VERBOSE(VB_PLAYBACK, LOC_ERR +
                 "InitOSD(): Failed to create OpenGL2 OSD");
         delete gl_osdchain;
         gl_osdchain = NULL;
@@ -284,7 +284,7 @@ void VideoOutputOpenGL::InitOSD(void)
     {
         gl_osdchain->SetMasterViewport(gl_videochain->GetViewPort());
     }
-}    
+}
 bool VideoOutputOpenGL::CreateBuffers(void)
 {
     QMutexLocker locker(&gl_context_lock);
@@ -526,7 +526,7 @@ bool VideoOutputOpenGL::SetupDeinterlace(
 
     m_deinterlacing = interlaced;
 
-    if (m_deinterlacing && !m_deintfiltername.isEmpty()) 
+    if (m_deinterlacing && !m_deintfiltername.isEmpty())
     {
         if (gl_videochain->GetDeinterlacer() != m_deintfiltername)
         {
@@ -641,7 +641,7 @@ void VideoOutputOpenGL::ShowPIP(VideoFrame        *frame,
     const uint  pipVideoHeight = pipVideoDim.height();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
-    if ((pipVideoAspect <= 0) || !pipimage || 
+    if ((pipVideoAspect <= 0) || !pipimage ||
         !pipimage->buf || pipimage->codec != FMT_YV12)
     {
         pipplayer->ReleaseCurrentFrame(pipimage);

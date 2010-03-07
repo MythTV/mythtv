@@ -107,7 +107,7 @@ VideoOutWindow::VideoOutWindow() :
             if (screen_num >= desktop->numScreens())
                 screen_num = 0;
         }
-    
+
         screen_geom = desktop->geometry();
         if (screen_num >= 0)
             screen_geom = desktop->screenGeometry(screen_num);
@@ -396,7 +396,7 @@ void VideoOutWindow::ApplyLetterboxing(void)
     else if (adjustfill == kAdjustFill_VerticalStretch)
     {
         // Vertical Stretch mode -- 1/6 of original is 1/8 of new
-        // Intended to be used to eliminate top/bottom bars on 16:9 
+        // Intended to be used to eliminate top/bottom bars on 16:9
         // material encoded to 4:3.
         display_video_rect.moveTop(
             display_video_rect.top() - (display_video_rect.height() / 6));

@@ -153,7 +153,7 @@ void ChannelScannerGUI::Process(const ScanDTVTransportList &_transports)
                        freeToAirOnly, serviceRequirements);
     ci.Process(_transports);
 }
-       
+
 void ChannelScannerGUI::InformUser(const QString &error)
 {
     MythPopupBox::showOkPopup(gContext->GetMainWindow(),

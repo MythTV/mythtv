@@ -74,7 +74,7 @@ static const float eps = 1E-5;
   have a normative effect on the decoding process are primary coded
   pictures. See also redundant coded picture.
 
-  * VCL: Video Coding Layer 
+  * VCL: Video Coding Layer
 
   - The VCL is specified to efficiently represent the content of the
   video data. The NAL is specified to format that data and provide
@@ -110,7 +110,7 @@ void H264Parser::Reset(void)
     prev_field_pic_flag = field_pic_flag = -1;
     prev_bottom_field_flag = bottom_field_flag = -1;
     prev_nal_ref_idc = nal_ref_idc = 0;
-    prev_pic_order_cnt_type = pic_order_cnt_type = 
+    prev_pic_order_cnt_type = pic_order_cnt_type =
     prev_pic_order_cnt_lsb = pic_order_cnt_lsb = 0;
     prev_delta_pic_order_cnt_bottom = delta_pic_order_cnt_bottom = 0;
     prev_delta_pic_order_cnt[0] = delta_pic_order_cnt[0] = 0;
@@ -149,14 +149,14 @@ bool H264Parser::new_AU(void)
       corresponding redundant coded pictures, and zero or more non-VCL NAL
       units. The association of VCL NAL units to primary or redundant coded
       pictures is described in subclause 7.4.1.2.5.
-      
+
       The first access unit in the bitstream starts with the first NAL unit
       of the bitstream.
-      
+
       The first of any of the following NAL units after the last VCL NAL
       unit of a primary coded picture specifies the start of a new access
       unit.
-      
+
       –    access unit delimiter NAL unit (when present)
       –    sequence parameter set NAL unit (when present)
       –    picture parameter set NAL unit (when present)
@@ -164,19 +164,19 @@ bool H264Parser::new_AU(void)
       –    NAL units with nal_unit_type in the range of 14 to 18, inclusive
       –    first VCL NAL unit of a primary coded picture (always present)
     */
-    
+
     /*
       7.4.1.2.4 Detection of the first VCL NAL unit of a primary coded
       picture This subclause specifies constraints on VCL NAL unit syntax
       that are sufficient to enable the detection of the first VCL NAL unit
       of each primary coded picture.
-      
+
       Any coded slice NAL unit or coded slice data partition A NAL unit of
       the primary coded picture of the current access unit shall be
       different from any coded slice NAL unit or coded slice data partition
       A NAL unit of the primary coded picture of the previous access unit in
       one or more of the following ways.
-      
+
       - frame_num differs in value. The value of frame_num used to
       test this condition is the value of frame_num that appears in
       the syntax of the slice header, regardless of whether that value
@@ -429,7 +429,7 @@ bool H264Parser::decode_Header(GetBitContext *gb)
       0 to 255, inclusive.
      */
     pic_parameter_set_id = get_ue_golomb(gb);
-    
+
     /*
       separate_colour_plane_flag equal to 1 specifies that the three
       colour components of the 4:4:4 chroma format are coded
@@ -629,7 +629,7 @@ void H264Parser::decode_SPS(GetBitContext * gb)
           8.2.1 as follows:
 
           MaxPicOrderCntLsb = 2( log2_max_pic_order_cnt_lsb_minus4 + 4 )
-          
+
           The value of log2_max_pic_order_cnt_lsb_minus4 shall be in
           the range of 0 to 12, inclusive.
          */
@@ -775,7 +775,7 @@ void H264Parser::decode_PPS(GetBitContext * gb)
       elements are not present in the slice headers.
      */
     pic_order_present_flag = get_bits1(gb);
-    
+
 #if 0 // Rest not currently needed, and requires <math.h>
     uint num_slice_groups = get_ue_golomb(gb) + 1;
     if (num_slice_groups > 1) // num_slice_groups (minus 1)
@@ -810,7 +810,7 @@ void H264Parser::decode_PPS(GetBitContext * gb)
             }
         }
     }
-        
+
     get_ue_golomb(gb); // num_ref_idx_10_active_minus1
     get_ue_golomb(gb); // num_ref_idx_11_active_minus1
     get_bits1(gb);     // weighted_pred_flag;
@@ -1060,6 +1060,6 @@ uint H264Parser::aspectRatio(void) const
         return 3;
     if (fabs(aspect - 2.21) < eps)
         return 4;
-    
+
     return aspect * 1000000;
 }

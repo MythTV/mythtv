@@ -16,7 +16,7 @@
  * - The floating window can only be created on the main screen?
  * - The fullscreen window doesn't display anything when created
  *   on any screen except, you guessed it, the main screen.
- * 
+ *
  * = REVISION
  * $Id$
  *

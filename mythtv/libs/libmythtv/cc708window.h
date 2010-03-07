@@ -1,5 +1,5 @@
 // -*- Mode: c++ -*-
-// Copyright (c) 2003-2005, Daniel Kristjansson 
+// Copyright (c) 2003-2005, Daniel Kristjansson
 
 #ifndef _CC708_WINDOW_
 #define _CC708_WINDOW_

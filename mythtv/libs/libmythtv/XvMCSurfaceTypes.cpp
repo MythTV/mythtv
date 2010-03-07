@@ -10,17 +10,17 @@ using namespace std;
 static inline MythXDisplay* createXvMCDisplay()
 {
     MythXDisplay *disp = OpenMythXDisplay();
-    if (!disp) 
+    if (!disp)
         return NULL;
 
-    unsigned int p_version, p_release, p_request_base, p_event_base, 
+    unsigned int p_version, p_release, p_request_base, p_event_base,
                  p_error_base;
 
     int ret = Success;
     XLOCK(disp, ret = XvQueryExtension(disp->GetDisplay(),
                                       &p_version, &p_release, &p_request_base,
                                       &p_event_base, &p_error_base));
-    if (ret != Success) 
+    if (ret != Success)
     {
         VERBOSE(VB_IMPORTANT, "XvQueryExtension failed");
         delete disp;
@@ -47,15 +47,15 @@ static inline MythXDisplay* createXvMCDisplay()
     return disp;
 }
 
-int XvMCSurfaceTypes::find(int pminWidth, int pminHeight, 
+int XvMCSurfaceTypes::find(int pminWidth, int pminHeight,
                            int chroma, bool vld, bool idct, int mpeg,
                            int pminSubpictureWidth,
-                           int pminSubpictureHeight) 
+                           int pminSubpictureHeight)
 {
-    if (0 == surfaces || 0 == num) 
+    if (0 == surfaces || 0 == num)
         return -1;
-    
-    for (int s = 0; s < size(); s++) 
+
+    for (int s = 0; s < size(); s++)
     {
         if (pminWidth > maxWidth(s))
             continue;
@@ -83,7 +83,7 @@ int XvMCSurfaceTypes::find(int pminWidth, int pminHeight,
             continue;
         if (pminSubpictureHeight > maxSubpictureHeight(s))
             continue;
-            
+
         return s;
     }
 
@@ -92,13 +92,13 @@ int XvMCSurfaceTypes::find(int pminWidth, int pminHeight,
 
 void XvMCSurfaceTypes::find(int minWidth, int minHeight,
                             int chroma, bool vld, bool idct, int mpeg,
-                            int minSubpictureWidth, 
+                            int minSubpictureWidth,
                             int minSubpictureHeight,
                             MythXDisplay *dpy, XvPortID portMin,
-                            XvPortID portMax, XvPortID& port, 
-                            int& surfNum) 
+                            XvPortID portMax, XvPortID& port,
+                            int& surfNum)
 {
-    VERBOSE(VB_PLAYBACK, 
+    VERBOSE(VB_PLAYBACK,
             QString("XvMCSurfaceTypes::find(w %1, h %2, chroma %3, vld %4, idct %5,"
                     " mpeg%6, sub-width %7, sub-height %8, disp, %9")
             .arg(minWidth).arg(minHeight).arg(chroma)
@@ -109,13 +109,13 @@ void XvMCSurfaceTypes::find(int minWidth, int minHeight,
 
     port = 0;
     surfNum = -1;
-    for (XvPortID p = portMin; p <= portMax; p++) 
+    for (XvPortID p = portMin; p <= portMax; p++)
     {
         VERBOSE(VB_PLAYBACK, QString("Trying XvMC port %1").arg(p));
         XvMCSurfaceTypes surf(dpy, p);
         int s = surf.find(minWidth, minHeight, chroma, vld, idct, mpeg,
                           minSubpictureWidth, minSubpictureHeight);
-        if (s >= 0) 
+        if (s >= 0)
         {
             VERBOSE(VB_PLAYBACK, QString("Found a suitable XvMC surface %1")
                                         .arg(s));
@@ -148,7 +148,7 @@ bool XvMCSurfaceTypes::has(MythXDisplay *pdisp,
     XLOCK(disp, ret = XvQueryAdaptors(disp->GetDisplay(), disp->GetRoot(),
                                      &p_num_adaptors, &ai));
 
-    if (ret != Success) 
+    if (ret != Success)
     {
         VERBOSE(VB_IMPORTANT, "XvQueryAdaptors failed.");
         if (!pdisp)
@@ -156,14 +156,14 @@ bool XvMCSurfaceTypes::has(MythXDisplay *pdisp,
         return false;
     }
 
-    if (!ai) 
+    if (!ai)
     {
         if (!pdisp)
             delete disp;
         return false; // huh? no xv capable video adaptors?
     }
 
-    for (unsigned int i = 0; i < p_num_adaptors; i++) 
+    for (unsigned int i = 0; i < p_num_adaptors; i++)
     {
         XvPortID p = 0;
         int s;
@@ -172,10 +172,10 @@ bool XvMCSurfaceTypes::has(MythXDisplay *pdisp,
         XvMCSurfaceTypes::find(width, height, chroma,
                                XvVLD == accel_type, XvIDCT == accel_type,
                                stream_type, osd_width, osd_height,
-                               disp, ai[i].base_id, 
+                               disp, ai[i].base_id,
                                ai[i].base_id + ai[i].num_ports - 1,
                                p, s);
-        if (0 != p) 
+        if (0 != p)
         {
             if (p_num_adaptors > 0)
                 XLOCK(disp, XvFreeAdaptorInfo(ai));
@@ -331,14 +331,14 @@ QString XvMCSurfaceTypes::XvMCDescription(MythXDisplay *pdisp)
     XLOCK(disp, ret = XvQueryAdaptors(d, disp->GetRoot(),
                                      &p_num_adaptors, &ai));
 
-    if (ret != Success) 
+    if (ret != Success)
     {
         if (!pdisp)
             delete disp;
         return "XvQueryAdaptors failed.";
     }
 
-    if (!ai) 
+    if (!ai)
     {
         if (!pdisp)
             delete disp;
@@ -346,7 +346,7 @@ QString XvMCSurfaceTypes::XvMCDescription(MythXDisplay *pdisp)
     }
 
     ostringstream os;
-    for (uint i = 0; i < p_num_adaptors; i++) 
+    for (uint i = 0; i < p_num_adaptors; i++)
     {
         QString type = "";
         type += (ai[i].type & XvInputMask)  ? "input, " : "";
@@ -373,7 +373,7 @@ QString XvMCSurfaceTypes::XvMCDescription(MythXDisplay *pdisp)
 
         XvPortID portMin = ai[i].base_id;
         XvPortID portMax = ai[i].base_id + ai[i].num_ports - 1;
-        for (XvPortID p = portMin; p <= portMax; p++) 
+        for (XvPortID p = portMin; p <= portMax; p++)
         {
             XvMCSurfaceTypes surf(pdisp, p);
             os<<"\tPort #"<<p<<"  size: "<<surf.size()<<endl;

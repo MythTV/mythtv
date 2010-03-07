@@ -138,7 +138,7 @@ class TSPacket : public TSHeader
         pkt->SetStartOfFieldPointer(0);
         return pkt;
     }
-    
+
     inline TSPacket* CreateClone() const {
         TSPacket *pkt = new TSPacket();
         memcpy(pkt, this, SIZE);

@@ -20,7 +20,7 @@ using namespace std;
 #define LOC QString("Dec: ")
 #define LOC_ERR QString("Dec, Error: ")
 
-DecoderBase::DecoderBase(NuppelVideoPlayer *parent, const ProgramInfo &pginfo) 
+DecoderBase::DecoderBase(NuppelVideoPlayer *parent, const ProgramInfo &pginfo)
     : m_parent(parent), m_playbackinfo(new ProgramInfo(pginfo)),
 
       ringBuffer(NULL),
@@ -124,7 +124,7 @@ bool DecoderBase::PosMapFromDb(void)
         if (!posMap.empty())
         {
             positionMapType = MARK_GOP_BYFRAME;
-            if (keyframedist == -1) 
+            if (keyframedist == -1)
                 keyframedist = 1;
         }
         else
@@ -165,7 +165,7 @@ bool DecoderBase::PosMapFromDb(void)
     m_positionMap.reserve(posMap.size());
 
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
-         it != posMap.end(); it++) 
+         it != posMap.end(); it++)
     {
         PosMapEntry e = {it.key(), it.key() * keyframedist, *it};
         m_positionMap.push_back(e);
@@ -213,7 +213,7 @@ bool DecoderBase::PosMapFromEnc(void)
     m_positionMap.reserve(m_positionMap.size() + posMap.size());
     long long last_index = m_positionMap.back().index;
     for (QMap<long long,long long>::const_iterator it = posMap.begin();
-         it != posMap.end(); it++) 
+         it != posMap.end(); it++)
     {
         if (it.key() <= last_index)
             continue; // we released the m_positionMapLock for a few ms...
@@ -277,7 +277,7 @@ bool DecoderBase::SyncPositionMap(void)
 
     if (livetv || watchingrecording)
     {
-        if (!posmapStarted) 
+        if (!posmapStarted)
         {
             // starting up -- try first from database
             PosMapFromDb();
@@ -288,7 +288,7 @@ bool DecoderBase::SyncPositionMap(void)
                     .arg(new_posmap_size));
         }
         // always try to get more from encoder
-        if (!PosMapFromEnc()) 
+        if (!PosMapFromEnc())
         {
             VERBOSE(VB_PLAYBACK, LOC +
                     QString("SyncPositionMap watchingrecording no entries "
@@ -323,13 +323,13 @@ bool DecoderBase::SyncPositionMap(void)
         int length = 0;
 
         if (ringBuffer->isDVD())
-        { 
+        {
             length = ringBuffer->DVD()->GetTotalTimeOfTitle();
             QMutexLocker locker(&m_positionMapLock);
             totframes = m_positionMap.back().index;
         }
         else
-        { 
+        {
             QMutexLocker locker(&m_positionMapLock);
             totframes = m_positionMap.back().index * keyframedist;
             if (fps)
@@ -363,7 +363,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     if (!search_adjusted && keyframedist > 0)
         desired_value /= keyframedist;
 
-    while (upper - 1 > lower) 
+    while (upper - 1 > lower)
     {
         long long i = (upper + lower) / 2;
         long long value;
@@ -371,7 +371,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
             value = m_positionMap[i].adjFrame;
         else
             value = m_positionMap[i].index - indexOffset;
-        if (value == desired_value) 
+        if (value == desired_value)
         {
             // found it
             upper_bound = i;
@@ -393,7 +393,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     }
     // Did not find it exactly -- return bounds
 
-    if (search_adjusted) 
+    if (search_adjusted)
     {
         while (lower >= 0 && m_positionMap[lower].adjFrame > desired_value)
             lower--;
@@ -405,7 +405,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
         while (lower >= 0 &&
                (m_positionMap[lower].index - indexOffset) > desired_value)
             lower--;
-        while (upper < size && 
+        while (upper < size &&
                (m_positionMap[upper].index - indexOffset) < desired_value)
             upper++;
     }
@@ -437,12 +437,12 @@ uint64_t DecoderBase::SavePositionMapDelta(uint64_t first, uint64_t last)
     MarkTypes type = positionMapType;
     uint64_t saved = 0;
 
-    if (!m_playbackinfo || (positionMapType == MARK_UNSET)) 
+    if (!m_playbackinfo || (positionMapType == MARK_UNSET))
         return saved;
 
     ctm.start();
     QMap<long long, long long> posMap;
-    for (uint i = 0; i < m_positionMap.size(); i++) 
+    for (uint i = 0; i < m_positionMap.size(); i++)
     {
         if ((uint64_t)m_positionMap[i].index < first)
             continue;
@@ -788,7 +788,7 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
 {
     if (!ringBuffer->isDVD())
         return;
-    
+
     bool result = true;
 
     if (ffw)
@@ -836,7 +836,7 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
         return (desiredTimePos * 90000LL);
     }
     return current_speed;
-} 
+}
 
 
 void DecoderBase::UpdateDVDFramesPlayed(void)
@@ -935,7 +935,7 @@ bool DecoderBase::InsertTrack(uint type, const StreamInfo &info)
     tracks[type].push_back(info);
 
     if (GetNVP())
-	GetNVP()->TracksChanged(type);
+        GetNVP()->TracksChanged(type);
 
     return true;
 }
@@ -959,7 +959,7 @@ int DecoderBase::AutoSelectTrack(uint type)
 {
     uint numStreams = tracks[type].size();
 
-    if ((currentTrack[type] >= 0) && 
+    if ((currentTrack[type] >= 0) &&
         (currentTrack[type] < (int)numStreams))
     {
         return true; // track already selected
@@ -1024,9 +1024,9 @@ int DecoderBase::AutoSelectTrack(uint type)
 
     if (wantedTrack[type].av_stream_index < 0)
         wantedTrack[type] = tmp;
-     
+
     int lang = tracks[type][currentTrack[type]].language;
-    VERBOSE(VB_PLAYBACK, LOC + 
+    VERBOSE(VB_PLAYBACK, LOC +
             QString("Selected track #%1 in the %2 language(%3)")
             .arg(currentTrack[type]+1)
             .arg(iso639_key_toName(lang)).arg(lang));

@@ -519,7 +519,7 @@ int cCiTransportConnection::CreateConnection(void)
            _connected=true;
            return OK;
         // the following is a workaround for CAMs that don't quite follow the specs...
-	} else {
+        } else {
            for (int i = 0; i < MAX_CONNECT_RETRIES; i++) {
                dsyslog("CAM: retrying to establish connection");
                if (RecvTPDU() == T_CTC_REPLY) {
@@ -1706,7 +1706,7 @@ bool cLlCiHandler::Process(void)
             {
                 switch (*Data)
                 {
-                    case ST_SESSION_NUMBER:         
+                    case ST_SESSION_NUMBER:
                         if (Length > 4)
                         {
                             int SessionId = ntohs(*(short *)&Data[2]);
@@ -1726,7 +1726,7 @@ bool cLlCiHandler::Process(void)
                                 esyslog("ERROR: unknown session id: %d", SessionId);
                         }
                         break;
-                    
+
                     case ST_OPEN_SESSION_REQUEST:
                         OpenSession(Length, Data);
                         break;
@@ -1865,13 +1865,13 @@ cHlCiHandler::~cHlCiHandler()
 int cHlCiHandler::CommHL(unsigned tag, unsigned function, struct ca_msg *msg)
 {
     if (tag) {
-	msg->msg[2] = tag & 0xff;
-	msg->msg[1] = (tag & 0xff00) >> 8;
-	msg->msg[0] = (tag & 0xff0000) >> 16;
- 	esyslog("Sending message=[%02x %02x %02x ]",
- 		       msg->msg[0], msg->msg[1], msg->msg[2]);
+        msg->msg[2] = tag & 0xff;
+        msg->msg[1] = (tag & 0xff00) >> 8;
+        msg->msg[0] = (tag & 0xff0000) >> 16;
+        esyslog("Sending message=[%02x %02x %02x ]",
+                       msg->msg[0], msg->msg[1], msg->msg[2]);
     }
-    
+
     return ioctl(fdCa, function, msg);
 }
 
@@ -1892,41 +1892,41 @@ bool cHlCiHandler::Process(void)
     struct ca_msg msg;
     switch(state) {
     case 0:
-	// Get CA_system_ids
-	/*	Enquire		*/
-	if ((SendData(AOT_CA_INFO_ENQ, &msg)) < 0) {
-	    esyslog("HLCI communication failed");
-	} else {
-	    dbgprotocol("==> Ca Info Enquiry");
-	    /*	Receive		*/
-	    if ((GetData(AOT_CA_INFO, &msg)) < 0) {
-		esyslog("HLCI communication failed");
-	    } else {
-		printf("Debug: ");
-		for(int i = 0; i < 20; i++) {
-		    printf("%d ", msg.msg[i]);
-		}
-		printf("\n");
-		dbgprotocol("<== Ca Info");
-		int l = msg.msg[3];
-		const uint8_t *d = &msg.msg[4];
-		while (l > 1) {
-		    unsigned short id = ((unsigned short)(*d) << 8) | *(d + 1);
-		    dbgprotocol(" %04X", id);
-		    d += 2;
-		    l -= 2;
-		    if (numCaSystemIds < MAXCASYSTEMIDS) {
-			caSystemIds[numCaSystemIds++] = id;
-			caSystemIds[numCaSystemIds] = 0;
-		    }
-		    else
-			esyslog("ERROR: too many CA system IDs!");
-		}
-		dbgprotocol("\n");
-	    }
-	    state = 1;
-	    break;
-	}
+        // Get CA_system_ids
+        /*      Enquire         */
+        if ((SendData(AOT_CA_INFO_ENQ, &msg)) < 0) {
+            esyslog("HLCI communication failed");
+        } else {
+            dbgprotocol("==> Ca Info Enquiry");
+            /*  Receive         */
+            if ((GetData(AOT_CA_INFO, &msg)) < 0) {
+                esyslog("HLCI communication failed");
+            } else {
+                printf("Debug: ");
+                for(int i = 0; i < 20; i++) {
+                    printf("%d ", msg.msg[i]);
+                }
+                printf("\n");
+                dbgprotocol("<== Ca Info");
+                int l = msg.msg[3];
+                const uint8_t *d = &msg.msg[4];
+                while (l > 1) {
+                    unsigned short id = ((unsigned short)(*d) << 8) | *(d + 1);
+                    dbgprotocol(" %04X", id);
+                    d += 2;
+                    l -= 2;
+                    if (numCaSystemIds < MAXCASYSTEMIDS) {
+                        caSystemIds[numCaSystemIds++] = id;
+                        caSystemIds[numCaSystemIds] = 0;
+                    }
+                    else
+                        esyslog("ERROR: too many CA system IDs!");
+                }
+                dbgprotocol("\n");
+            }
+            state = 1;
+            break;
+        }
     }
 
     bool result = true;
@@ -1966,25 +1966,25 @@ bool cHlCiHandler::SetCaPmt(cCiCaPmt &CaPmt, int)
 
     if (CaPmt.length > (256 - 4))
     {
-	esyslog("CA message too long");
-	return false;
+        esyslog("CA message too long");
+        return false;
     }
 
     memcpy(&msg.msg[4], CaPmt.capmt, CaPmt.length);
 
     if ((SendData(AOT_CA_PMT, &msg)) < 0) {
-	esyslog("HLCI communication failed");
-	return false;
+        esyslog("HLCI communication failed");
+        return false;
     }
-    
+
     return true;
 }
 
 bool cHlCiHandler::Reset(int)
 {
     if ((ioctl(fdCa, CA_RESET)) < 0) {
-	esyslog("ioctl CA_RESET failed.");
-	return false;
+        esyslog("ioctl CA_RESET failed.");
+        return false;
     }
     return true;
 }
@@ -1992,7 +1992,7 @@ bool cHlCiHandler::Reset(int)
 bool cHlCiHandler::NeedCaPmt(void)
 {
     if(state == 1)
-	return true;
+        return true;
 
     return false;
 }

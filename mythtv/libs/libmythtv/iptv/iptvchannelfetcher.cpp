@@ -145,7 +145,7 @@ void IPTVChannelFetcher::RunScan(void)
     if (_scan_monitor)
         _scan_monitor->ScanAppendTextToLog(QObject::tr("Adding Channels"));
     SetTotalNumChannels(channels.size());
-    fbox_chan_map_t::const_iterator it = channels.begin();    
+    fbox_chan_map_t::const_iterator it = channels.begin();
     for (uint i = 1; it != channels.end(); ++it, ++i)
     {
         QString channum = it.key();
@@ -155,7 +155,7 @@ void IPTVChannelFetcher::RunScan(void)
 
         int chanid = ChannelUtil::GetChanID(_sourceid, channum);
         if (chanid <= 0)
-        { 
+        {
             if (_scan_monitor)
             {
                 _scan_monitor->ScanAppendTextToLog(

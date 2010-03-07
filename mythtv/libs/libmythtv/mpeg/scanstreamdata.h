@@ -31,7 +31,7 @@ class ScanStreamData :
     void SetFreesatAdditionalSI(bool freesat_si);
 
   private:
-    virtual bool DeleteCachedTable(PSIPTable *psip) const;  
+    virtual bool DeleteCachedTable(PSIPTable *psip) const;
     /// listen for addiotional Freesat service information
     int dvb_uk_freesat_si;
 };

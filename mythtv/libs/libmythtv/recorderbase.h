@@ -20,7 +20,7 @@ class RecordingProfile;
 typedef QMap<long long, long long> PosMap;
 
 /** \class RecorderBase
- *  \brief This is the abstract base class for supporting 
+ *  \brief This is the abstract base class for supporting
  *         recorder hardware.
  *
  *  For a digital streams specialization, see the DTVRecorder.
@@ -93,8 +93,8 @@ class MPUBLIC RecorderBase
      *   about the recording profile as well as the devices
      *   to use.
      */
-    virtual void SetOptionsFromProfile(RecordingProfile *profile, 
-                                       const QString &videodev, 
+    virtual void SetOptionsFromProfile(RecordingProfile *profile,
+                                       const QString &videodev,
                                        const QString &audiodev,
                                        const QString &vbidev) = 0;
 
@@ -130,10 +130,10 @@ class MPUBLIC RecorderBase
 
     /** \brief Reset the recorder to the startup state.
      *
-     *   This is used after Pause(bool), WaitForPause() and 
+     *   This is used after Pause(bool), WaitForPause() and
      *   after the RingBuffer's StopReads() method has been called.
      */
-    virtual void Reset(void) = 0;   
+    virtual void Reset(void) = 0;
 
     /// \brief Tells whether the StartRecorder() loop is running.
     virtual bool IsRecording(void) = 0;
@@ -147,14 +147,14 @@ class MPUBLIC RecorderBase
      *   because frames may not be written in display order.
      */
     virtual long long GetFramesWritten(void) = 0;
-    
+
     /** \brief Open devices needed by recorder.
      *
      *   This is usually called by StartRecording().
      *  \return true if device was successfully opened.
      */
     virtual bool Open(void) = 0;
-    
+
     /** \brief Returns file descriptor of recorder device.
      *
      *   This is used by channel when only one open file descriptor
@@ -164,7 +164,7 @@ class MPUBLIC RecorderBase
      *   used for DVB.
      */
     virtual int GetVideoFd(void) = 0;
-    
+
     /** \brief Returns closest keyframe position before the desired frame.
      *
      *   This returns -1 if a keyframe position can not be found

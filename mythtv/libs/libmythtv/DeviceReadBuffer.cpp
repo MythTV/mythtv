@@ -330,7 +330,7 @@ bool DeviceReadBuffer::Poll(void) const
 {
 #ifdef USING_MINGW
 #warning mingw DeviceReadBuffer::Poll
-    VERBOSE(VB_IMPORTANT, LOC_ERR + 
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
             "mingw DeviceReadBuffer::Poll is not implemented");
     return false;
 #else
@@ -535,7 +535,7 @@ uint DeviceReadBuffer::WaitForUsed(uint needed) const
 }
 
 void DeviceReadBuffer::ReportStats(void)
-{ 
+{
 #if REPORT_RING_STATS
     if (lastReport.elapsed() > 20*1000 /* msg every 20 seconds */)
     {

@@ -31,7 +31,7 @@ class IPTVFeederLive : public IPTVFeeder
 
     void Run(void);
     void Stop(void);
-    
+
   protected:
     bool InitEnv(void);
     void FreeEnv(void);

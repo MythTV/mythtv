@@ -26,7 +26,7 @@ class SignalMonitorValue
     /// \brief Returns a space free name of the value. Used by GetStatus().
     QString GetShortName(void) const;
     /// \brief Returns a signal monitor value as one long string.
-    QString GetStatus() const 
+    QString GetStatus() const
     {
         QString str = (QString::null == noSpaceName) ? "(null)" : noSpaceName;
         return QString("%1 %2 %3 %4 %5 %6 %7 %8")
@@ -42,7 +42,7 @@ class SignalMonitorValue
     /// \brief Returns the threshold at which the value is considered "good".
     /// \sa IsHighThreshold(), IsGood()
     int GetThreshold() const { return threshold; }
-    /// \brief Returns true if values greater than the threshold are 
+    /// \brief Returns true if values greater than the threshold are
     ///        considered good, false otherwise.
     bool IsHighThreshold() const { return high_threshold; }
     /// \brief Returns how long to wait for a good value in milliseconds.

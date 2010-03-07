@@ -444,7 +444,7 @@ static inline void dithertoia44_8_mmx(unsigned char *src, unsigned char *dest,
     unsigned char tmp2[8];
 
     dithertoia44_8_c(src, tmp2, alpha, dmp, xpos, context);
-  
+
     unsigned char tmp[8];
 
     tmp[0] = dmp[((xpos+0) & (DM_WIDTH - 1))];
@@ -674,7 +674,7 @@ static void BlendToBlack(unsigned char *argbptr, uint width, uint outheight)
             g = (argb >> 8) & 0xff;
             b = (argb) & 0xff;
 
-            RGBA_OUT(&argbptr[i * 4], (a * r) >> 8, (a * g) >> 8, 
+            RGBA_OUT(&argbptr[i * 4], (a * r) >> 8, (a * g) >> 8,
                      (a * b) >> 8, 128);
         }
     }
@@ -692,7 +692,7 @@ static void BlendToBlack(unsigned char *argbptr, uint width, uint outheight)
  *  \param blend_to_black Uses Alpha to blend buffer to black
  *  \param threshold      Alpha threshold above which to perform blending
  */
-void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, 
+void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride,
                              uint outheight, bool blend_to_black,
                              uint threshold) const
 {
@@ -761,7 +761,7 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride,
                     dest += 32;
                     alpha += 8;
                     x += 7;
-                } 
+                }
             }
         }
     }
@@ -789,7 +789,7 @@ void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
     int amask = ifirst ? 0x0f : 0xf0;
 
     int ishift = ifirst ? 4 : 0;
-    int imask = ifirst ? 0xf0 : 0x0f; 
+    int imask = ifirst ? 0xf0 : 0x0f;
 
     dithertoia44_8_fun ditherer = dithertoia44_8_init(surface);
     dither8_context *dcontext = init_dithertoia44_8_context(ifirst);

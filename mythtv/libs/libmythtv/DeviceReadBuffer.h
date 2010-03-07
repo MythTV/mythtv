@@ -44,7 +44,7 @@ class DeviceReadBuffer
     bool IsPaused(void) const;
     bool WaitForUnpause(unsigned long timeout);
     bool WaitForPaused(unsigned long timeout);
-    
+
     bool IsErrored(void) const { return error; }
     bool IsEOF(void)     const { return eof;   }
     bool IsRunning(void) const;

@@ -53,12 +53,12 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
 
 /**
  * \class VideoBuffers
- *  This class creates tracks the state of the buffers used by 
+ *  This class creates tracks the state of the buffers used by
  *  various VideoOutput derived classes.
- *  
+ *
  *  The states available for a buffer are: available, limbo, used,
  *  process, and displayed.
- *  
+ *
  *  The two most important states are available and used.
  *  Used is implemented as a FIFO, and is used to buffer
  *  frames ready for display. A decoder may decode frames
@@ -68,7 +68,7 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
  *
  *  Generally a buffer leaves the available state via
  *  GetNextFreeFrame(bool,bool,BufferType) and enters the
- *  limbo state. It then leaves the limbo state via 
+ *  limbo state. It then leaves the limbo state via
  *  ReleaseFrame(VideoFrame*) and enters the used state.
  *  Then it leaves the used state via DoneDisplayingFrame()
  *  and enters the available state.
@@ -90,13 +90,13 @@ YUVInfo::YUVInfo(uint w, uint h, uint sz, const int *p, const int *o)
  *  but it can not yet be added to available because it is
  *  still being displayed. VideoOutputXv calls
  *  DiscardFrame(VideoFrame*) on the frames no longer
- *  being displayed at the end of the next 
+ *  being displayed at the end of the next
  *  DoneDisplayingFrame(), finally adding them to available.
  *
  *  Frame locking is also available, the locks are reqursive
  *  QMutex locks. If more than one frame lock is needed the
  *  LockFrames should generally be called with all the needed
- *  locks in the list, and no locks currently held. This 
+ *  locks in the list, and no locks currently held. This
  *  function will spin until all the locks can be held at
  *  once, avoiding deadlocks from mismatched locking order.
  *
@@ -130,20 +130,20 @@ VideoBuffers::~VideoBuffers()
 /**
  * \fn VideoBuffers::Init(uint, bool, uint, uint, uint, uint, bool)
  *  Creates buffers and sets various buffer management parameters.
- *  
+ *
  *  This normally creates numdecode buffers, but it creates
  *  one more buffer if extra_for_pause is true. Only numdecode
  *  buffers are added to available and hence into the buffer
  *  management handled by VideoBuffers. The availability of
  *  any scratch frame must be managed by the video output
  *  class itself.
- *  
+ *
  * \param numdecode            number of buffers to allocate for normal use
  * \param extra_for_pause      allocate an extra buffer, a scratch a frame for pause
  * \param need_free            maximum number of buffers needed in display
  *                             and pause
  * \param needprebuffer_normal number buffers you can put in used or limbo normally
- * \param needprebuffer_small  number of buffers you can put in used or limbo 
+ * \param needprebuffer_small  number of buffers you can put in used or limbo
  *                             after SetPrebuffering(false) has been called.
  * \param keepprebuffer        number of buffers in used or limbo that are considered
  *                             enough for decent playback.
@@ -151,7 +151,7 @@ VideoBuffers::~VideoBuffers()
  *                             this makes XvMC decoding safe, but adds some CPU
  *                             overhead. It is normally left off.
  */
-void VideoBuffers::Init(uint numdecode, bool extra_for_pause, 
+void VideoBuffers::Init(uint numdecode, bool extra_for_pause,
                         uint need_free, uint needprebuffer_normal,
                         uint needprebuffer_small, uint keepprebuffer,
                         bool enable_frame_locking)
@@ -197,7 +197,7 @@ void VideoBuffers::Reset()
 {
     QMutexLocker locker(&global_lock);
 
-    // Delete ffmpeg VideoFrames so we can create 
+    // Delete ffmpeg VideoFrames so we can create
     // a different number of buffers below
     frame_vector_t::iterator it = buffers.begin();
     for (;it != buffers.end(); it++)
@@ -223,7 +223,7 @@ void VideoBuffers::Reset()
  * \fn VideoBuffers::SetPrebuffering(bool normal)
  *  Sets prebuffering state to normal, or small.
  */
-void VideoBuffers::SetPrebuffering(bool normal) 
+void VideoBuffers::SetPrebuffering(bool normal)
 {
     QMutexLocker locker(&global_lock);
     needprebufferframes = (normal) ?
@@ -292,7 +292,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrameInternal(
 /**
  * \fn VideoBuffers::GetNextFreeFrame(bool,bool,BufferType)
  *  Gets a frame from available buffers list.
- *  
+ *
  * \param with_lock    locks the frame, so that UnlockFrame() must be
  *                     called before anyone else can use it.
  * \param allow_unsafe allows busy buffers to be used if no available
@@ -313,7 +313,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
 
         if (tries >= TRY_LOCK_SPINS)
         {
-            VERBOSE(VB_IMPORTANT, 
+            VERBOSE(VB_IMPORTANT,
                     QString("GetNextFreeFrame() unable to "
                             "lock frame %1 times. Discarding Frames.")
                     .arg(TRY_LOCK_SPINS));
@@ -768,7 +768,7 @@ void VideoBuffers::LockFrame(const VideoFrame *frame, const char* owner)
 {
     if (!use_frame_locks)
         return;
-    
+
     QMutex *mutex = NULL;
     (void)owner;
 
@@ -788,7 +788,7 @@ void VideoBuffers::LockFrame(const VideoFrame *frame, const char* owner)
     else
         mutex = it->second;
 
-    frame_lock.unlock(); 
+    frame_lock.unlock();
 
     mutex->lock();
 }
@@ -909,7 +909,7 @@ void VideoBuffers::AddInheritence(const VideoFrame *frame)
     (void)frame;
 #ifdef USING_XVMC
     QMutexLocker locker(&global_lock);
-    
+
     frame_map_t::iterator it = parents.find(frame);
     if (it == parents.end())
     {
@@ -1177,7 +1177,7 @@ bool VideoBuffers::CreateBuffer(int width, int height, uint num, void* data)
 
 #ifdef USING_XVMC
 bool VideoBuffers::CreateBuffers(int width, int height,
-                                 MythXDisplay *disp, 
+                                 MythXDisplay *disp,
                                  void *p_xvmc_ctx,
                                  void *p_xvmc_surf_info,
                                  vector<void*> surfs)
@@ -1244,7 +1244,7 @@ bool VideoBuffers::CreateBuffers(int width, int height,
 
         // from surface info
         render->idct = (xvmc_surf_info.mc_type & XVMC_IDCT) == XVMC_IDCT;
-        render->unsigned_intra  = (xvmc_surf_info.flags & 
+        render->unsigned_intra  = (xvmc_surf_info.flags &
                                   XVMC_INTRA_UNSIGNED) == XVMC_INTRA_UNSIGNED;
 
         xvmc_surf_to_frame[render->p_surface] = &buffers[i];

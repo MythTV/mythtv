@@ -191,7 +191,7 @@ QString PlayGroup::GetInitialName(const ProgramInfo *pi)
     return res;
 }
 
-int PlayGroup::GetSetting(const QString &name, const QString &field, 
+int PlayGroup::GetSetting(const QString &name, const QString &field,
                           int defval)
 {
     int res = defval;
@@ -218,7 +218,7 @@ PlayGroupEditor::PlayGroupEditor(void) :
     addChild(listbox);
 }
 
-void PlayGroupEditor::open(QString name) 
+void PlayGroupEditor::open(QString name)
 {
     lastValue = name;
     bool created = false;
@@ -226,7 +226,7 @@ void PlayGroupEditor::open(QString name)
     if (name == "__CREATE_NEW_GROUP__")
     {
         name = "";
-        bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), 
+        bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(),
             tr("Create New Playback Group"),
             tr("Enter group name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -255,7 +255,7 @@ void PlayGroupEditor::open(QString name)
     }
 };
 
-void PlayGroupEditor::doDelete(void) 
+void PlayGroupEditor::doDelete(void)
 {
     QString name = listbox->getValue();
     if (name == "__CREATE_NEW_GROUP__" || name == "Default")

@@ -48,7 +48,7 @@ void AnalogSignalMonitor::UpdateValues(void)
             isLocked = tuner.signal;
         }
     }
-    else 
+    else
     {
         struct video_tuner tuner;
         bzero(&tuner, sizeof(tuner));

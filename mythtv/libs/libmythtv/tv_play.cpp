@@ -8284,11 +8284,11 @@ void TV::ToggleUpmix(PlayerContext *ctx)
         text = tr("Upmixer On");
     else
         text = tr("Upmixer Off");
-    
+
     if (ctx->nvp->GetOSD() && !browsemode)
         ctx->nvp->GetOSD()->SetSettingsText(text, 5);
 }
-    
+
 // dir in 10ms jumps
 void TV::ChangeAudioSync(PlayerContext *ctx, int dir, bool allowEdit)
 {
@@ -8864,9 +8864,9 @@ void TV::customEvent(QEvent *e)
         DoEditSchedule(editType);
     }
 
-    if (message.left(11) == "EPG_EXITING" || 
-        message.left(18) == "PROGFINDER_EXITING" || 
-        message.left(21) == "VIEWSCHEDULED_EXITING" || 
+    if (message.left(11) == "EPG_EXITING" ||
+        message.left(18) == "PROGFINDER_EXITING" ||
+        message.left(21) == "VIEWSCHEDULED_EXITING" ||
         message.left(19)   == "PLAYBACKBOX_EXITING" ||
         message.left(22) == "SCHEDULEEDITOR_EXITING")
     {
@@ -8908,7 +8908,7 @@ void TV::customEvent(QEvent *e)
         {
             ProgramInfo *p = new ProgramInfo;
             QStringList nextProgStringList = me->ExtraDataList();
-            if (!nextProgStringList.isEmpty() && 
+            if (!nextProgStringList.isEmpty() &&
                 p->FromStringList(nextProgStringList, 0))
             {
                 PrepToSwitchToRecordedProgram(actx, p);
@@ -8916,7 +8916,7 @@ void TV::customEvent(QEvent *e)
             else
                delete p;
         }
-        
+
         ReturnPlayerLock(actx);
 
     }
@@ -11062,7 +11062,7 @@ bool TV::HandleJumpToProgramAction(
             (wants_pbp ? kPBPLeft : kPIPOff);
     }
 
-    if ((wants_pbp || wants_pip || db_jump_prefer_osd) && 
+    if ((wants_pbp || wants_pip || db_jump_prefer_osd) &&
         (StateIsPlaying(s) || StateIsLiveTV(s)))
     {
         QMutexLocker locker(&timerIdLock);

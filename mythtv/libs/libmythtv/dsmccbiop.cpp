@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) David C.J. Matthews 2005, 2006
- *     Derived from libdsmcc by Richard Palmer 
+ *     Derived from libdsmcc by Richard Palmer
  */
 //#include <stdio.h>
 #include <stdlib.h>
@@ -216,7 +216,7 @@ bool BiopMessage::ProcessDir(
 
     unsigned int bindings_count = buf[off] << 8 | buf[off + 1];
     off += 2;
-    
+
     DSMCCCacheReference ref(cachep->CarouselId(), cachep->ModuleId(),
                             cachep->StreamId(), m_objkey);
     DSMCCCacheDir *pDir;
@@ -391,7 +391,7 @@ int BiopConnbinder::Process(const unsigned char *data)
         //printf("Binder - assoc_tag %u\n", tap.assoc_tag);
         if (ret > 0)
             off += ret;
-        /* else TODO error */ 
+        /* else TODO error */
     }
 
     return off;

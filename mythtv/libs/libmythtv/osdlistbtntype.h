@@ -3,8 +3,8 @@
  * File  : uilistbtntype.h
  * Author: Renchi Raju <renchi@pooh.tam.uiuc.edu>
  * Date  : 2004-02-04
- * Description : 
- * 
+ * Description :
+ *
  * Copyright 2004 by Renchi Raju
 
  * This program is free software; you can redistribute it
@@ -12,12 +12,12 @@
  * Public License as published bythe Free Software Foundation;
  * either version 2, or (at your option)
  * any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * ============================================================ */
 
 #ifndef OSDLISTBTNTYPE_H
@@ -49,7 +49,7 @@ typedef vector<OSDListBtnTypeItem*> OSDListBtnItemList;
  *   name is the name of the item selected
  *   action is the action associated with the item
  */
- 
+
 class MPUBLIC OSDListTreeItemEnteredEvent : public QEvent
 {
   public:
@@ -117,8 +117,8 @@ class OSDGenericTree : public GenericTree
 {
   public:
     // This class will _not_ delete the image it's given, if any.
-    OSDGenericTree(OSDGenericTree *parent,        const QString &name, 
-                   const QString  &action = "",   int            check = -1, 
+    OSDGenericTree(OSDGenericTree *parent,        const QString &name,
+                   const QString  &action = "",   int            check = -1,
                    OSDTypeImage   *image  = NULL, QString        group = "") :
         GenericTree(name), m_image(image),     m_action(action),
         m_group(group),    m_checkable(check), m_parentButton(NULL)
@@ -159,7 +159,7 @@ class OSDListTreeType : public OSDType
     void SetListener(QObject *listener) { m_listener = listener; }
 
     bool IsVisible(void)          const { return m_visible;  }
- 
+
     void SetFontActive(TTFFont *font)   { m_active   = font; }
     void SetFontInactive(TTFFont *font) { m_inactive = font; }
 
@@ -201,7 +201,7 @@ class OSDListTreeType : public OSDType
     QColor    m_itemSelEnd;
     uint      m_itemRegAlpha;
     uint      m_itemSelAlpha;
-   
+
     uint      m_spacing;
     uint      m_margin;
     int       m_levelspacing;
@@ -224,7 +224,7 @@ class OSDListTreeType : public OSDType
 
     QObject  *m_listener;
 };
- 
+
 class OSDListBtnType : public OSDType
 {
     friend class OSDListBtnTypeItem;
@@ -371,9 +371,9 @@ class OSDListBtnTypeItem
         { m_state = (m_checkable) ? state : m_state; }
 
     void  Reinit(float,float) {}
-    void  paint(OSDSurface *surface, TTFFont *font, int fade, int maxfade, 
+    void  paint(OSDSurface *surface, TTFFont *font, int fade, int maxfade,
                 int x, int y);
-    
+
   protected:
     OSDListBtnType *m_parent;
     OSDTypeImage   *m_pixmap;

@@ -176,8 +176,8 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
     if (cardids.empty())
     {
         MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), 
-            QObject::tr("Transport Editor"), 
+            gContext->GetMainWindow(),
+            QObject::tr("Transport Editor"),
             QObject::tr(
                 "Sorry, the Transport Editor can only be used to "
                 "edit transports which are connected to a card input."));
@@ -201,8 +201,8 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
             (CardUtil::ERROR_PROBE   == nType))
         {
             MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(), 
-                QObject::tr("Transport Editor"), 
+                gContext->GetMainWindow(),
+                QObject::tr("Transport Editor"),
                 QObject::tr(
                     "Failed to probe a capture card connected to this "
                     "transport's video source. Please make sure the "
@@ -232,8 +232,8 @@ static CardUtil::CARD_TYPES get_cardtype(uint sourceid)
             continue;
 
         MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(), 
-            QObject::tr("Transport Editor"), 
+            gContext->GetMainWindow(),
+            QObject::tr("Transport Editor"),
             QObject::tr(
                 "The Video Sources to which this Transport is connected "
                 "are incompatible, please create seperate video sources "
@@ -265,7 +265,7 @@ void TransportList::SetSourceID(uint _sourceid)
 }
 
 TransportListEditor::TransportListEditor(uint sourceid) :
-    m_videosource(new VideoSourceSelector(sourceid, QString::null, false)), 
+    m_videosource(new VideoSourceSelector(sourceid, QString::null, false)),
     m_list(new TransportList())
 {
     setLabel(tr("Multiplex Editor"));
@@ -275,9 +275,9 @@ TransportListEditor::TransportListEditor(uint sourceid) :
     addChild(m_videosource);
     addChild(m_list);
 
-    connect(m_videosource, SIGNAL(valueChanged(const QString&)), 
+    connect(m_videosource, SIGNAL(valueChanged(const QString&)),
             m_list,        SLOT(  SetSourceID( const QString&)));
-    
+
     connect(m_list, SIGNAL(accepted(int)),            this, SLOT(Edit()));
     connect(m_list, SIGNAL(menuButtonPressed(int)),   this, SLOT(Menu()));
     connect(m_list, SIGNAL(editButtonPressed(int)),   this, SLOT(Edit()));
@@ -312,9 +312,9 @@ void TransportListEditor::Delete(void)
     uint mplexid = m_list->getValue().toInt();
 
     DialogCode val = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(), "", 
-        tr("Are you sure you would like to delete this transport?"), 
-        tr("Yes, delete the transport"), 
+        gContext->GetMainWindow(), "",
+        tr("Are you sure you would like to delete this transport?"),
+        tr("Yes, delete the transport"),
         tr("No, don't"), kDialogCodeButton1);
 
     if (kDialogCodeButton0 != val)
@@ -347,10 +347,10 @@ void TransportListEditor::Menu(void)
     }
 
     DialogCode val = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(), 
-        "", 
-        tr("Transport Menu"), 
-        tr("Edit.."), 
+        gContext->GetMainWindow(),
+        "",
+        tr("Transport Menu"),
+        tr("Edit.."),
         tr("Delete.."), kDialogCodeButton0);
 
     if (kDialogCodeButton0 == val)
@@ -403,7 +403,7 @@ class VideoSourceID : public IntegerSetting, public MuxDBStorage
 {
   public:
     VideoSourceID(const MultiplexID *id, uint _sourceid) :
-        IntegerSetting(this), 
+        IntegerSetting(this),
         MuxDBStorage(this, id, "sourceid")
     {
         setVisible(false);
@@ -414,8 +414,8 @@ class VideoSourceID : public IntegerSetting, public MuxDBStorage
 class DTVStandard : public ComboBoxSetting, public MuxDBStorage
 {
   public:
-    DTVStandard(const MultiplexID *id, 
-                bool is_dvb_country, 
+    DTVStandard(const MultiplexID *id,
+                bool is_dvb_country,
                 bool is_atsc_country) :
         ComboBoxSetting(this), MuxDBStorage(this, id, "sistandard")
     {
@@ -494,7 +494,7 @@ class Modulation : public ComboBoxSetting, public MuxDBStorage
 };
 
 Modulation::Modulation(const MultiplexID *id,  uint nType) :
-    ComboBoxSetting(this), 
+    ComboBoxSetting(this),
     MuxDBStorage(this, id, (CardUtil::OFDM == nType) ?
                  "constellation" : "modulation")
 {

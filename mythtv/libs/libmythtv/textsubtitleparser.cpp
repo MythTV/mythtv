@@ -22,7 +22,7 @@ using std::lower_bound;
 #include "textsubtitleparser.h"
 #include "xine_demux_sputext.h"
 
-bool operator<(const text_subtitle_t& left, 
+bool operator<(const text_subtitle_t& left,
                const text_subtitle_t& right)
 {
     return left.start < right.start;
@@ -38,7 +38,7 @@ bool operator<(const text_subtitle_t& left,
  *         of the current video position.
  *  \return True in case new subtitles should be displayed.
  */
-bool TextSubtitles::HasSubtitleChanged(uint64_t timecode) const 
+bool TextSubtitles::HasSubtitleChanged(uint64_t timecode) const
 {
     return (timecode < m_lastReturnedSubtitle.start ||
             timecode > m_lastReturnedSubtitle.end);
@@ -51,7 +51,7 @@ bool TextSubtitles::HasSubtitleChanged(uint64_t timecode) const
  *         current video position.
  *  \return The subtitles as a list of strings.
  */
-QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const 
+QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
 {
     QStringList list;
     if (m_subtitles.empty())
@@ -63,7 +63,7 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
         lower_bound(m_subtitles.begin(), m_subtitles.end(), searchTarget);
 
     uint64_t startCode = 0, endCode = 0;
-    if (nextSubPos != m_subtitles.begin()) 
+    if (nextSubPos != m_subtitles.begin())
     {
         TextSubtitleList::const_iterator currentSubPos = nextSubPos;
         currentSubPos--;
@@ -82,13 +82,13 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
         startCode = sub.end + 1;
     }
 
-    if (nextSubPos == m_subtitles.end()) 
+    if (nextSubPos == m_subtitles.end())
     {
         // at the end of video, the blank subtitle should last until
         // forever
         endCode = startCode + INT_MAX;
-    } 
-    else 
+    }
+    else
     {
         endCode = (*nextSubPos).start - 1;
     }
@@ -104,22 +104,22 @@ QStringList TextSubtitles::GetSubtitles(uint64_t timecode) const
 
 void TextSubtitles::AddSubtitle(const text_subtitle_t &newSub)
 {
-    m_subtitles.push_back(newSub); 
+    m_subtitles.push_back(newSub);
 }
 
-void TextSubtitles::Clear(void) 
+void TextSubtitles::Clear(void)
 {
-    m_subtitles.clear(); 
+    m_subtitles.clear();
 }
 
 bool TextSubtitleParser::LoadSubtitles(QString fileName, TextSubtitles &target)
 {
     demux_sputext_t sub_data;
     sub_data.rbuffer = new RingBuffer(fileName, 0, false);
-    
+
     if (!sub_data.rbuffer)
         return false;
-    
+
     subtitle_t *loaded_subs = sub_read_file(&sub_data);
     if (!loaded_subs)
     {

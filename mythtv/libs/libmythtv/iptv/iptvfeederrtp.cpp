@@ -56,14 +56,14 @@ bool IPTVFeederRTP::Open(const QString &url)
         VERBOSE(VB_RECORD, LOC + "Open() -- end 1");
         return true;
     }
-        
+
     QUrl parse(url);
     if (!parse.isValid() || parse.host().isEmpty() || (-1 == parse.port()))
     {
         VERBOSE(VB_RECORD, LOC + "Open() -- end 2");
         return false;
     }
-        
+
     struct in_addr addr;
     QByteArray host = parse.host().toLatin1();
     addr.s_addr = our_inet_addr(host.constData());
@@ -71,7 +71,7 @@ bool IPTVFeederRTP::Open(const QString &url)
     // Begin by setting up our usage environment:
     if (!InitEnv())
         return false;
-    
+
     Groupsock *socket = new Groupsock(*_live_env, addr, parse.port(), 0);
     if (!socket)
     {
@@ -79,7 +79,7 @@ bool IPTVFeederRTP::Open(const QString &url)
         FreeEnv();
         return false;
     }
-    
+
     _source = SimpleRTPSource::createNew(*_live_env, socket, 33, 90000,
                                          "video/MP2T", 0, False);
     if (!_source)
@@ -113,7 +113,7 @@ bool IPTVFeederRTP::Open(const QString &url)
     vector<TSDataListener*>::iterator it = _listeners.begin();
     for (; it != _listeners.end(); ++it)
         _sink->AddListener(*it);
-        
+
     VERBOSE(VB_RECORD, LOC + "Open() -- end");
 
     return true;
@@ -142,7 +142,7 @@ void IPTVFeederRTP::Close(void)
     }
 
     FreeEnv();
-    
+
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
@@ -161,7 +161,7 @@ void IPTVFeederRTP::AddListener(TSDataListener *item)
     // add to local list
     QMutexLocker locker(&_lock);
     _listeners.push_back(item);
-    
+
     if (_sink)
         _sink->AddListener(item);
 

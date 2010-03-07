@@ -40,17 +40,17 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent,
                              const ProgramInfo &pginfo)
     : DecoderBase(parent, pginfo),
       rtjd(0), video_width(0), video_height(0), video_size(0),
-      video_frame_rate(0.0f), audio_samplerate(44100), 
+      video_frame_rate(0.0f), audio_samplerate(44100),
 #ifdef WORDS_BIGENDIAN
       audio_bits_per_sample(0),
 #endif
       ffmpeg_extradatasize(0), ffmpeg_extradata(0), usingextradata(false),
-      disablevideo(false), totalLength(0), totalFrames(0), effdsp(0), 
+      disablevideo(false), totalLength(0), totalFrames(0), effdsp(0),
       directframe(NULL),            decoded_video_frame(NULL),
       mpa_vidcodec(0), mpa_vidctx(0), mpa_audcodec(0), mpa_audctx(0),
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       directrendering(false),
-      lastct('1'), strm(0), buf(0), buf2(0), 
+      lastct('1'), strm(0), buf(0), buf2(0),
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
     // initialize structures
@@ -168,7 +168,7 @@ bool NuppelDecoder::ReadFrameheader(struct rtframeheader *fh)
     return true;
 }
 
-int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, 
+int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                             char testbuf[kDecoderProbeBufferSize],
                             int)
 {
@@ -388,7 +388,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         long long currentpos = ringBuffer->GetReadPosition();
         struct rtframeheader kfa_frameheader;
 
-        int kfa_ret = ringBuffer->Seek(extradata.keyframeadjust_offset, 
+        int kfa_ret = ringBuffer->Seek(extradata.keyframeadjust_offset,
                                        SEEK_SET);
         if (kfa_ret == -1)
         {
@@ -441,13 +441,13 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 {
                     QMutexLocker locker(&m_positionMapLock);
-                    for (uint i = 0; i < m_positionMap.size(); i++) 
+                    for (uint i = 0; i < m_positionMap.size(); i++)
                     {
                         long long adj = m_positionMap[i].adjFrame;
 
                         if (keyFrameAdjustMap.contains(adj))
                             adjust += keyFrameAdjustMap[adj];
-                        
+
                         m_positionMap[i].adjFrame -= adjust;
                     }
                 }
@@ -500,7 +500,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         audio_bits_per_sample = extradata.audio_bits_per_sample;
 #endif
         GetNVP()->SetAudioParams(extradata.audio_bits_per_sample,
-                                 extradata.audio_channels, 
+                                 extradata.audio_channels,
                                  CODEC_ID_NONE,
                                  extradata.audio_sample_rate,
                                  false /* AC3/DTS pass through */);
@@ -790,7 +790,7 @@ static void CopyToVideo(unsigned char *buf, int video_width,
     memcpy(frame->buf + frame->offsets[1], planes[1], uvsize);
     memcpy(frame->buf + frame->offsets[2], planes[2], uvsize);
 }
-      
+
 bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                                 unsigned char *lstrm, VideoFrame *frame)
 {
@@ -905,7 +905,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
                 if (frame->qscale_table)
                     delete [] frame->qscale_table;
 
-                frame->qscale_table = new unsigned char[tablesize]; 
+                frame->qscale_table = new unsigned char[tablesize];
             }
 
             memcpy(frame->qscale_table, mpa_pic->qscale_table, tablesize);
@@ -943,11 +943,11 @@ bool NuppelDecoder::isValidFrametype(char type)
 void NuppelDecoder::StoreRawData(unsigned char *newstrm)
 {
     unsigned char *strmcpy;
-    if (newstrm) 
+    if (newstrm)
     {
         strmcpy = new unsigned char[frameheader.packetlength];
         memcpy(strmcpy, newstrm, frameheader.packetlength);
-    } 
+    }
     else
         strmcpy = NULL;
 
@@ -1034,7 +1034,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
         }
 
 
-        if (!ringBuffer->LiveMode() && 
+        if (!ringBuffer->LiveMode() &&
             ((frameheader.frametype == 'Q') || (frameheader.frametype == 'K')))
         {
             ateof = true;
@@ -1090,7 +1090,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
         {
             if (frameheader.comptype == 'A')
             {
-                if (frameheader.timecode > 2000000 && 
+                if (frameheader.timecode > 2000000 &&
                     frameheader.timecode < 5500000)
                 {
                     effdsp = frameheader.timecode;
@@ -1164,7 +1164,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 
             buf->frameNumber = framesPlayed;
             GetNVP()->ReleaseNextVideoFrame(buf, frameheader.timecode);
-            
+
             // We need to make the frame available ourselves
             // if we are not using ffmpeg/avlib.
             if (directframe)
@@ -1257,7 +1257,7 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
 #endif
                 VERBOSE(VB_PLAYBACK+VB_EXTRA, QString("A audio timecode %1")
                                               .arg(frameheader.timecode));
-                GetNVP()->AddAudioData((char *)strm, frameheader.packetlength, 
+                GetNVP()->AddAudioData((char *)strm, frameheader.packetlength,
                                        frameheader.timecode);
             }
         }
@@ -1329,7 +1329,7 @@ void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
             .arg(newKey).arg(skipFrames)
             .arg((doFlush) ? "do" : "don't")
             .arg((discardFrames) ? "do" : "don't"));
-    
+
     DecoderBase::SeekReset(newKey, skipFrames, doFlush, discardFrames);
 
     if (mpa_vidcodec && doFlush)

@@ -556,7 +556,7 @@ bool DTVRecorder::FindH264Keyframes(const TSPacket *tspacket)
                 hasKeyFrame = m_h264_parser.onKeyFrameStart();
                 hasFrame = true;
                 _seen_sps |= hasKeyFrame;
-            
+
                 width = m_h264_parser.pictureWidth();
                 height = m_h264_parser.pictureHeight();
                 aspectRatio = m_h264_parser.aspectRatio();

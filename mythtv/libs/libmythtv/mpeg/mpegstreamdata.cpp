@@ -74,7 +74,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _strip_pmt_descriptors(false),
       _normalize_stream_type(true),
       _pid_video_single_program(0xffffffff),
-      _pid_pmt_single_program(0xffffffff),      
+      _pid_pmt_single_program(0xffffffff),
       _pmt_single_program_num_video(1),
       _pmt_single_program_num_audio(0),
       _pat_single_program(NULL), _pmt_single_program(NULL),
@@ -289,7 +289,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         {
             if (partial->pesdata()[psip->SectionLength()] != 0xff)
             {
-#if 0 /* This doesn't work, you can't start PES packet like this 
+#if 0 /* This doesn't work, you can't start PES packet like this
          because the PayloadStart() flag won't be set in this TSPacket
          -- dtk  May 4th, 2007
        */
@@ -368,13 +368,13 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
 
     PSIPTable *psip = new PSIPTable(*tspacket); // must be complete packet
 
-    // There might be another section after this one in the 
-    // current packet. We need room before the end of the 
+    // There might be another section after this one in the
+    // current packet. We need room before the end of the
     // packet, and it must not be packet stuffing.
     if ((offset + psip->SectionLength() < TSPacket::SIZE) &&
         (pesdata[psip->SectionLength() + 1] != 0xff))
     {
-        // This isn't sutffing, so we need to put this 
+        // This isn't sutffing, so we need to put this
         // on as a partial packet.
         PESPacket *pesp = new PESPacket(*tspacket);
         pesp->SetPSIOffset(offset + psip->SectionLength());
@@ -484,7 +484,7 @@ desc_list_t extract_atsc_desc(const tvct_vec_t &tvct,
             desc_list_t vdesc = MPEGDescriptor::ParseOnlyInclude(
                 vct[i]->GlobalDescriptors(),
                 vct[i]->GlobalDescriptorsLength(),
-                DescriptorID::caption_service); 
+                DescriptorID::caption_service);
 
             if (vdesc.size())
                 desc.insert(desc.end(), vdesc.begin(), vdesc.end());
@@ -603,7 +603,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
         types.push_back(type);
     }
 
-    if (video_cnt < _pmt_single_program_num_video) 
+    if (video_cnt < _pmt_single_program_num_video)
     {
         VERBOSE(VB_RECORD, "Only "<<video_cnt<<" video streams seen in PMT, "
                 "but "<<_pmt_single_program_num_video<<" are required.");
@@ -634,7 +634,7 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable &pmt)
     int pcrpidIndex = pmt.FindPID(pmt.PCRPID());
     if (pcrpidIndex < 0)
     {
-        // the timecode reference stream is not in the PMT, 
+        // the timecode reference stream is not in the PMT,
         // add stream to misc record streams
         AddWritingPID(pmt.PCRPID());
     }
@@ -1017,12 +1017,12 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
 int MPEGStreamData::ResyncStream(const unsigned char *buffer, int curr_pos,
                                  int len)
 {
-    // Search for two sync bytes 188 bytes apart, 
+    // Search for two sync bytes 188 bytes apart,
     int pos = curr_pos;
     int nextpos = pos + TSPacket::SIZE;
     if (nextpos >= len)
         return -1; // not enough bytes; caller should try again
-    
+
     while (buffer[pos] != SYNC_BYTE || buffer[nextpos] != SYNC_BYTE)
     {
         pos++;
@@ -1605,7 +1605,7 @@ void MPEGStreamData::AddEncryptionTestPID(uint pnum, uint pid, bool isvideo)
     AddListeningPID(pid);
 
     _encryption_pid_to_info[pid] = CryptInfo((isvideo) ? 10000 : 500, 8);
-    
+
     _encryption_pid_to_pnums[pid].push_back(pnum);
     _encryption_pnum_to_pids[pnum].push_back(pid);
     _encryption_pnum_to_status[pnum] = kEncUnknown;

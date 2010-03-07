@@ -349,7 +349,7 @@ bool SourceUtil::IsAnySourceScanable(void)
         if (!IsUnscanable(query.value(0).toUInt()))
             return true;
     }
- 
+
     return false;
 }
 
@@ -362,7 +362,7 @@ bool SourceUtil::UpdateChannelsFromListings(uint sourceid, QString cardtype)
         cmd += QString("--cardtype %1 ").arg(cardtype);
 
     myth_system(cmd);
-                        
+
     return true;
 }
 

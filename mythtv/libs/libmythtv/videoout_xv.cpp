@@ -471,10 +471,10 @@ int VideoOutputXv::GrabSuitableXvPort(MythXDisplay* disp, Window root,
                           "XvMC surface found with MC support on port %1",
                           XvInputMask, XvAttributes::kFeatureXvMC));
     }
- 
+
     if (need_xv)
     {
-        req.push_back(XvAttributes( 
+        req.push_back(XvAttributes(
                           "XVideo surface found on port %1",
                           XvInputMask | XvImageMask,
                           XvAttributes::kFeatureNone));
@@ -1321,7 +1321,7 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
     static const char *attr_autopaint = "XV_AUTOPAINT_COLORKEY";
     int xv_val=0;
 
-    // handle autopaint.. Normally we try to disable it so that bob-deint 
+    // handle autopaint.. Normally we try to disable it so that bob-deint
     // doesn't actually bob up the top and bottom borders up and down...
     xv_draw_colorkey = true;
     if (xv_is_attrib_supported(disp, xv_port, attr_autopaint, &xv_val))
@@ -1355,7 +1355,7 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
     // the same color as the MythTV letterboxing (currently Black).
     // This avoids avoid bob-deint actually bobbing the borders of
     // the video up and down..
-    int letterbox_color = XJ_letterbox_colour; 
+    int letterbox_color = XJ_letterbox_colour;
     static const char *attr_chroma = "XV_COLORKEY";
     if (!xv_is_attrib_supported(disp, xv_port, attr_chroma, &xv_colorkey))
     {
@@ -1465,7 +1465,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
         return false;
 
     bool surface_has_vld = (XVMC_VLD == (xvmc_surf_info.mc_type & XVMC_VLD));
-    xvmc_surfs = CreateXvMCSurfaces(xvmc_buf_attr->GetMaxSurf(), 
+    xvmc_surfs = CreateXvMCSurfaces(xvmc_buf_attr->GetMaxSurf(),
                                     surface_has_vld);
 
     if (xvmc_surfs.size() < xvmc_buf_attr->GetMinSurf())
@@ -1565,12 +1565,12 @@ vector<void*> VideoOutputXv::CreateXvMCSurfaces(uint num, bool surface_has_vld)
         surfaces.push_back(surf);
     }
 
-    // For VLD decoding: the last 5 surface were allocated just to make 
+    // For VLD decoding: the last 5 surface were allocated just to make
     // sure we had enough space.  now, deallocate/destroy them. -- Tegue
 
     if (surface_has_vld)
     {
-        VERBOSE(VB_PLAYBACK, LOC + 
+        VERBOSE(VB_PLAYBACK, LOC +
                 QString("VLD - Allocated %1 surfaces, "
                         "now destroying 5 of them.").arg(surfaces.size()));
 
@@ -1760,7 +1760,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
 
             MythXLocker lock(disp);
             Display *d = disp->GetDisplay();
-            int bytes_per_line = disp->GetDepth() / 
+            int bytes_per_line = disp->GetDepth() /
                                     8 * display_visible_rect.width();
             int scrn = disp->GetScreen();
             Visual *visual = DefaultVisual(d, scrn);
@@ -3168,8 +3168,8 @@ int VideoOutputXv::SetPictureAttribute(
     }
 
     int tmpval2 = (newValue + valAdj) % 100;
-    int tmpval3 = (int) roundf(range * 0.01f * tmpval2); 
-    int value   = min(tmpval3 + port_min, port_max); 
+    int tmpval3 = (int) roundf(range * 0.01f * tmpval2);
+    int value   = min(tmpval3 + port_min, port_max);
 
     xv_set_attrib(disp, xv_port, cname, value);
 
@@ -3501,7 +3501,7 @@ QRect VideoOutputXv::GetPIPRect(PIPLocation        location,
             break;
         case kPIPBottomLeft:
             xoff += letterXadj;
-            yoff = video_disp_dim.height() - position.height() - 
+            yoff = video_disp_dim.height() - position.height() -
                 yoff - letterYadj;
             break;
         case kPIPTopRight:

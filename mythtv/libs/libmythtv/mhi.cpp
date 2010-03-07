@@ -91,7 +91,7 @@ bool MHIContext::LoadFont(QString name)
     FT_Error errorD = FT_New_Face(ft_library, fnameD.constData(), 0, &m_face);
     if (!errorD)
         return true;
-   
+
     VERBOSE(VB_IMPORTANT, QString("Unable to find font: %1").arg(name));
     return false;
 }
@@ -360,7 +360,7 @@ bool MHIContext::GetCarouselData(QString objectPath, QByteArray &result)
 }
 
 // Called from tv_play when a key is pressed.
-// If it is one in the current profile we queue it for the engine 
+// If it is one in the current profile we queue it for the engine
 // and return true otherwise we return false.
 bool MHIContext::OfferKey(QString key)
 {
@@ -481,7 +481,7 @@ void MHIContext::GetInitialStreams(int &audioTag, int &videoTag)
 
 // An area of the screen/image needs to be redrawn.
 // Called from the MHEG engine.
-// We always redraw the whole scene. 
+// We always redraw the whole scene.
 void MHIContext::RequireRedraw(const QRegion &)
 {
     m_display_lock.lock();
@@ -505,7 +505,7 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y)
     QImage img = image;
     int xboundary = dispx & 1;
     int yboundary = dispx & 1;
-    
+
     if (xboundary || yboundary)
     {
         int width = img.width(), height = img.height();
@@ -548,7 +548,7 @@ void MHIContext::AddToDisplay(const QImage &image, int x, int y)
     m_display.push_back(data);
 }
 
-// In MHEG the video is just another item in the display stack 
+// In MHEG the video is just another item in the display stack
 // but when we create the OSD we overlay everything over the video.
 // We need to cut out anything belowthe video on the display stack
 // to leave the video area clear.
@@ -884,7 +884,7 @@ void MHIContext::DrawBackground(const QRegion &reg)
         return;
 
     QRect bounds = reg.boundingRect();
-    DrawRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(), 
+    DrawRect(bounds.x(), bounds.y(), bounds.width(), bounds.height(),
              MHRgba(0, 0, 0, 255)/* black. */);
 }
 
@@ -920,7 +920,7 @@ void MHIText::SetFont(int size, bool isBold, bool isItalic)
 // Return the bounding rectangle for a piece of text drawn in the
 // current font. If maxSize is non-negative it sets strLen to the
 // number of characters that will fit in the space and returns the
-// bounds for those characters. 
+// bounds for those characters.
 // N.B.  The box is relative to the origin so the y co-ordinate will
 // be negative. It's also possible that the x co-ordinate could be
 // negative for slanted fonts but that doesn't currently happen.
@@ -953,7 +953,7 @@ QRect MHIText::GetBounds(const QString &str, int &strLen, int maxSize)
             FT_Get_Kerning(face, previous, glyphIndex,
                            FT_KERNING_DEFAULT, &delta);
             kerning = delta.x;
-        } 
+        }
 
         error = FT_Load_Glyph(face, glyphIndex, 0); // Don't need to render.
 
@@ -1036,7 +1036,7 @@ void MHIText::AddText(int x, int y, const QString &str, MHRgba colour)
             FT_Get_Kerning(face, previous, glyphIndex,
                            FT_KERNING_DEFAULT, &delta);
             posX += delta.x;
-        } 
+        }
         error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_RENDER);
 
         if (error)
@@ -1375,7 +1375,7 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
             lastX = thisX;
             lastY = thisY;
         }
-        
+
         // Find the intersections of each line in the line segment array
         // with the scan line.  Because UK MHEG says that figures should be
         // convex we only need to consider two intersections.
@@ -1388,7 +1388,7 @@ void MHIDLA::DrawPoly(bool isFilled, int nPoints, const int *xArray, const int *
             {
                 if (y >= lineArray[l].yBottom && y < lineArray[l].yTop)
                 {
-                    int x = (int)round((float)(y - lineArray[l].yBottom) * 
+                    int x = (int)round((float)(y - lineArray[l].yBottom) *
                         lineArray[l].slope) + lineArray[l].xBottom;
                     if (crossings == 0 || x < xMin)
                         xMin = x;

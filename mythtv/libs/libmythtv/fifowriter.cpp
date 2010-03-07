@@ -136,7 +136,7 @@ void FIFOWriter::FIFOWriteThread(void)
     int fd = -1;
     pthread_mutex_lock(&fifo_lock[id]);
     cur_id = -1;
-    while (1) 
+    while (1)
     {
         if (fb_inptr[id] == fb_outptr[id])
             pthread_cond_wait(&empty_cond[id],&fifo_lock[id]);

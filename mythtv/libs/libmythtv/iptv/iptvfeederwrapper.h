@@ -36,7 +36,7 @@ class IPTVFeederWrapper
 
     void AddListener(TSDataListener*);
     void RemoveListener(TSDataListener*);
-    
+
   private:
     bool InitFeeder(const QString &url);
 

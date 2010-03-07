@@ -169,7 +169,7 @@ QString BouquetAssociationTable::toString(void) const
     {
         str.append(QString("Bouquet descriptors length: %1\n")
                    .arg(BouquetDescriptorsLength()));
-        vector<const unsigned char*> desc = 
+        vector<const unsigned char*> desc =
             MPEGDescriptor::Parse(BouquetDescriptors(),
                                   BouquetDescriptorsLength());
         for (uint i = 0; i < desc.size(); i++)
@@ -189,7 +189,7 @@ QString BouquetAssociationTable::toString(void) const
         {
             str.append(QString("  Transport descriptors length: %1\n")
                        .arg(TransportDescriptorsLength(i)));
-            vector<const unsigned char*> desc = 
+            vector<const unsigned char*> desc =
                 MPEGDescriptor::Parse(TransportDescriptors(i),
                                       TransportDescriptorsLength(i));
             for (uint i = 0; i < desc.size(); i++)
@@ -243,14 +243,14 @@ QDateTime dvbdate2qt(const unsigned char *buf)
     {
         QDateTime result;
         result.setTimeSpec(Qt::UTC);
- 	// Modified Julian date as number of days since 17th November 1858.
- 	// 1st Jan 1970 was date 40587.
- 	uint secsSince1970 = (mjd - 40587)   * 86400;
- 	secsSince1970 += byteBCD2int(buf[2]) * 3600;
+        // Modified Julian date as number of days since 17th November 1858.
+        // 1st Jan 1970 was date 40587.
+        uint secsSince1970 = (mjd - 40587)   * 86400;
+        secsSince1970 += byteBCD2int(buf[2]) * 3600;
         secsSince1970 += byteBCD2int(buf[3]) * 60;
         secsSince1970 += byteBCD2int(buf[4]);
- 	result.setTime_t(secsSince1970);
- 	return result;
+        result.setTime_t(secsSince1970);
+        return result;
     }
 
     // Original function taken from dvbdate.c in linuxtv-apps code

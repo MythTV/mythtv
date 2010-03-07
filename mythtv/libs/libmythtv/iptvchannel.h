@@ -37,7 +37,7 @@ class IPTVChannel : public DTVChannel
 
     IPTVFeederWrapper       *GetFeeder(void)       { return m_feeder; }
     const IPTVFeederWrapper *GetFeeder(void) const { return m_feeder; }
-    
+
   private:
     IPTVChannelInfo GetChanInfo(
         const QString &channum, uint sourceid = 0) const;

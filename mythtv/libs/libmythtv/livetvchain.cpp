@@ -55,7 +55,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     LiveTVChainEntry newent;
     newent.chanid = pginfo->chanid;
     newent.starttime = pginfo->recstartts;
-    newent.starttime.setTime(QTime(tmptime.hour(), tmptime.minute(), 
+    newent.starttime.setTime(QTime(tmptime.hour(), tmptime.minute(),
                                    tmptime.second()));
     newent.discontinuity = discont;
     newent.hostprefix = m_hostprefix;
@@ -375,7 +375,7 @@ void LiveTVChain::ClearSwitch(void)
  *
  *   NOTE: The caller is resposible for deleting the ProgramInfo
  */
-ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype, 
+ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype,
                                            int &newid)
 {
     QMutexLocker lock(&m_lock);
@@ -465,7 +465,7 @@ void LiveTVChain::SwitchTo(int num)
         GetEntryAt(num, m_switchentry);
     }
     else
-        VERBOSE(VB_IMPORTANT, LOC + "SwitchTo() not switching to current");   
+        VERBOSE(VB_IMPORTANT, LOC + "SwitchTo() not switching to current");
 
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK))
     {

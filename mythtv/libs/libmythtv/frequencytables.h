@@ -59,8 +59,8 @@ class FrequencyTable
                    DTVBandwidth            _bandwidth,
                    DTVCodeRate             _coderate_hp,
                    DTVCodeRate             _coderate_lp,
-                   DTVModulation           _constellation,  
-                   DTVTransmitMode         _trans_mode, 
+                   DTVModulation           _constellation,
+                   DTVTransmitMode         _trans_mode,
                    DTVGuardInterval        _guard_interval,
                    DTVHierarchy            _hierarchy,
                    DTVModulation           _modulation,
@@ -168,7 +168,7 @@ class TransportScanItem
     QString   FriendlyName;     ///< Name to display in scanner dialog
     uint      friendlyNum;      ///< Frequency number (freqid w/freq table)
     int       SourceID;         ///< Associated SourceID
-    bool      UseTimer;         /**< Set if timer is used after 
+    bool      UseTimer;         /**< Set if timer is used after
                                      lock for getting PAT */
 
     bool      scanning;         ///< Probbably Unnecessary

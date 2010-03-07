@@ -1077,7 +1077,7 @@ void ProgramData::HandlePrograms(
     {
         if (mapiter.key().isEmpty())
             continue;
-        
+
         query.prepare(
             "SELECT chanid "
             "FROM channel "

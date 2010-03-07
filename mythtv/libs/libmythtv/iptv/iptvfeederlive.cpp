@@ -46,7 +46,7 @@ bool IPTVFeederLive::InitEnv(void)
         delete scheduler;
         return false;
     }
-    
+
     return true;
 }
 

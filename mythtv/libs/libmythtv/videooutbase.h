@@ -55,7 +55,7 @@ class VideoOutput
     virtual ~VideoOutput();
 
     virtual bool Init(int width, int height, float aspect,
-                      WId winid, int winx, int winy, int winw, 
+                      WId winid, int winx, int winy, int winw,
                       int winh, WId embedid = 0);
     virtual void InitOSD(OSD *osd);
     virtual void SetVideoFrameRate(float);
@@ -90,7 +90,7 @@ class VideoOutput
 
     virtual void MoveResize(void);
     virtual void Zoom(ZoomDirection direction);
- 
+
     virtual void GetOSDBounds(QRect &total, QRect &visible,
                               float &visibleAspect, float &fontScale,
                               float themeAspect) const;
@@ -198,11 +198,11 @@ class VideoOutput
     /// \brief Tell GetLastShownFrame() to return the next frame from the head
     ///        of the queue of frames to display.
     virtual void StartDisplayingFrame(void) { vbuffers.StartDisplayingFrame(); }
-    /// \brief Releases frame returned from GetLastShownFrame() onto the 
+    /// \brief Releases frame returned from GetLastShownFrame() onto the
     ///        queue of frames ready for decoding onto.
     virtual void DoneDisplayingFrame(VideoFrame *frame)
         { vbuffers.DoneDisplayingFrame(frame); }
-    /// \brief Releases frame from any queue onto the 
+    /// \brief Releases frame from any queue onto the
     ///        queue of frames ready for decoding onto.
     virtual void DiscardFrame(VideoFrame *frame) { vbuffers.DiscardFrame(frame); }
     /// \brief Releases all frames not being actively displayed from any queue
@@ -227,7 +227,7 @@ class VideoOutput
     /// \brief Tells the player to resize the video frame (used for ITV)
     void SetVideoResize(const QRect &videoRect);
 
-    void SetVideoScalingAllowed(bool change); 
+    void SetVideoScalingAllowed(bool change);
 
     /// \brief check if video underscan/overscan is allowed
     bool IsVideoScalingAllowed(void) const;

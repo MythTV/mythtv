@@ -56,7 +56,7 @@ extern "C" {
  *   The optional StatusSignalStrength signal should report the actual
  *   signal value.
  *
- *   Additional signals may be implemented, see DTVSignalMonitor and 
+ *   Additional signals may be implemented, see DTVSignalMonitor and
  *   DVBSignalMonitor for example.
  *
  *  \sa AnalocSignalMonitor, DTVSignalMonitor, DVBSignalMonitor,
@@ -94,7 +94,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 
 #ifdef USING_V4L
     if ((cardtype.toUpper() == "V4L") ||
-        (cardtype.toUpper() == "MPEG") || 
+        (cardtype.toUpper() == "MPEG") ||
         (cardtype.toUpper() == "HDPVR"))
     {
         V4LChannel *chan = dynamic_cast<V4LChannel*>(channel);

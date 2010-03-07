@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) David C.J. Matthews 2005, 2006
- *     Derived from libdsmcc by Richard Palmer 
+ *     Derived from libdsmcc by Richard Palmer
  */
 #include <stdint.h>
 
@@ -63,7 +63,7 @@ ObjCarousel *Dsmcc::GetCarouselById(unsigned int carouselId)
  *  \brief Add a tap.
  *
  *   This indicates the component tag of the stream that is to
- *   be used to receive subsequent messages for this carousel. 
+ *   be used to receive subsequent messages for this carousel.
  *
  *  \return carousel for this ID.
  */
@@ -371,7 +371,7 @@ void Dsmcc::ProcessSectionData(const unsigned char *data, int length)
     ObjCarousel *car = GetCarouselById(download_id);
     if (car != NULL)
         car->AddModuleData(download_id, &ddb, blockData + 6);
-    
+
     return;
 }
 

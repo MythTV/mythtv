@@ -41,7 +41,7 @@ class PESStreamID
         MPEG2ExtensionStartCode = 0xb5,
         MPEGReservedB6          = 0xb6,
         SEQEndCode              = 0xb7,
-        /// Group of Pictures (GOP) start code. Tells us how to 
+        /// Group of Pictures (GOP) start code. Tells us how to
         /// reorder frames from transmitted order to display order.
         /// Required in MPEG-1, but optional in MPEG-2.
         GOPStartCode            = 0xb8,
@@ -118,8 +118,8 @@ class StreamID
         DSMCC_DL       = 0x14, ///< ISO 13818-6 Download Protocol
         MetaDataPES    = 0x15, ///< Meta data in PES packets
         MetaDataSec    = 0x16, ///< Meta data in metadata_section's
-        MetaDataDC     = 0x17, ///< ISO 13818-6 Metadata in Data Carousel 
-        MetaDataOC     = 0x18, ///< ISO 13818-6 Metadata in Object Carousel 
+        MetaDataDC     = 0x17, ///< ISO 13818-6 Metadata in Data Carousel
+        MetaDataOC     = 0x18, ///< ISO 13818-6 Metadata in Object Carousel
         MetaDataDL     = 0x19, ///< ISO 13818-6 Metadata in Download Protocol
 
         // other
@@ -338,17 +338,17 @@ class PSIPTable : public PESPacket
         { ; }
   public:
     PSIPTable(const PSIPTable& table) : PESPacket(table)
-    { 
+    {
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
     PSIPTable(const PESPacket& table) : PESPacket(table)
-    { 
+    {
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
     PSIPTable(const TSPacket& table) : PESPacket(table)
-    { 
+    {
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
@@ -441,7 +441,7 @@ class PSIPTable : public PESPacket
  *  \brief The Program Association Table lists all the programs
  *         in a stream, and is alwyas found on PID 0.
  *
- *   Based on info in this table and the ProgramMapTable 
+ *   Based on info in this table and the ProgramMapTable
  *   for the program we are interested in we should
  *   be able determine which PID to write to the ringbuffer
  *   when given the program stream to record.
@@ -554,7 +554,7 @@ class ProgramMapTable : public PSIPTable
                                    const vector<uint>        &pids,
                                    const vector<uint>        &types,
                                    const vector<desc_list_t> &prog_desc);
-        
+
     /// stream that contrains program clock reference.
     uint PCRPID(void) const
         { return ((psipdata()[0] << 8) | psipdata()[1]) & 0x1fff; }

@@ -30,7 +30,7 @@
 #ifndef SISCAN_H
 #define SISCAN_H
 
-#include <pthread.h> 
+#include <pthread.h>
 
 // Qt includes
 #include <QString>

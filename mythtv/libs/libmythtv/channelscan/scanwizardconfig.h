@@ -97,7 +97,7 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
     uint    hw_cardid;
 };
 
-class ScanOptionalConfig : public TriggeredConfigurationGroup 
+class ScanOptionalConfig : public TriggeredConfigurationGroup
 {
     Q_OBJECT
 

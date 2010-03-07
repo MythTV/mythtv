@@ -57,7 +57,7 @@ class TextSubtitles
     bool IsFrameBasedTiming(void) const
         { return m_frameBasedTiming; }
 
-    void SetFrameBasedTiming(bool frameBasedTiming) 
+    void SetFrameBasedTiming(bool frameBasedTiming)
         { m_frameBasedTiming = frameBasedTiming; }
 
     void AddSubtitle(const text_subtitle_t& newSub);

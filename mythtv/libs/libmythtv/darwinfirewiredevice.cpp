@@ -198,7 +198,7 @@ void DarwinFirewireDevice::StopController(void)
         IOObjectRelease(m_priv->deviter);
         m_priv->deviter = NULL;
     }
-    
+
     if (m_priv->notify_source)
     {
         CFRunLoopSourceInvalidate(m_priv->notify_source);
@@ -212,7 +212,7 @@ void DarwinFirewireDevice::StopController(void)
     }
 
     CFRunLoopStop(m_priv->controller_thread_cf_ref);
-    
+
     while (m_priv->controller_thread_running)
     {
         m_lock.unlock();
@@ -244,7 +244,7 @@ bool DarwinFirewireDevice::OpenPort(void)
     if (!GetInfoPtr())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "No IEEE-1394 device with our GUID");
-        
+
         StopController();
         return false;
     }

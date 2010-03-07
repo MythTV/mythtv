@@ -1620,7 +1620,7 @@ void JobQueue::ProcessJob(JobQueueEntry job)
 
     ChangeJobStatus(jobID, JOB_PENDING);
     ProgramInfo *pginfo = NULL;
-    
+
     if (!job.chanid.isEmpty())
     {
         pginfo = ProgramInfo::GetProgramFromRecorded(job.chanid, job.starttime);
@@ -1852,7 +1852,7 @@ void JobQueue::DoTranscodeThread(int jobID)
     runningJobsLock->unlock();
 
     QString subtitle;
-    
+
     if (!program_info->subtitle.isEmpty())
         subtitle = QString(" \"%1\"").arg(program_info->subtitle);
 
@@ -2088,7 +2088,7 @@ void JobQueue::DoFlagCommercialsThread(int jobID)
     runningJobsLock->unlock();
 
     QString subtitle;
-    
+
     if (!program_info->subtitle.isEmpty())
         subtitle = QString(" \"%1\"").arg(program_info->subtitle);
 
@@ -2231,7 +2231,7 @@ void JobQueue::DoUserJobThread(int jobID)
     ChangeJobStatus(jobID, JOB_RUNNING);
 
     QString msg;
-    
+
     if (pginfo)
         msg = QString("Started %1 for \"%2\" recorded from channel %3 at %4")
                       .arg(jobDesc).arg(pginfo->title).arg(pginfo->chanid)

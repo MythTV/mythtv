@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 /*
  *  Copyright (C) Kenneth Aafloy 2003
- *  
+ *
  *  Copyright notice is in dvbrecorder.cpp of the MythTV project.
  */
 

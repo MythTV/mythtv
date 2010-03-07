@@ -67,7 +67,7 @@ class SignalMonitor
     bool HasSignalLock(void) const
     {
         QMutexLocker locker(&statusLock);
-        return signalLock.IsGood();        
+        return signalLock.IsGood();
     }
 
     virtual bool IsAllGood(void) const { return HasSignalLock(); }
@@ -104,7 +104,7 @@ class SignalMonitor
   protected:
     SignalMonitor(int db_cardnum, ChannelBase *_channel,
                   uint64_t wait_for_mask);
-    
+
     static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
 

@@ -115,7 +115,7 @@ OSD::~OSD(void)
 
     QMap<QString, OSDSet *>::iterator sets = setMap.begin();
     for (; sets != setMap.end(); ++sets)
-    { 
+    {
         if (*sets)
         {
             delete *sets;
@@ -326,8 +326,8 @@ bool OSD::InitCC708(void)
     container->SetPriority(30);
 
     AddSet(container, name);
-    OSDType708CC *ccpage = 
-        new OSDType708CC(name, ccfonts, xoffset, yoffset, 
+    OSDType708CC *ccpage =
+        new OSDType708CC(name, ccfonts, xoffset, yoffset,
                          displaywidth, displayheight);
     container->AddType(ccpage);
 
@@ -364,11 +364,11 @@ bool OSD::InitTeletext(void)
 
     OSDTypeTeletext *ttpage = new OSDTypeTeletext(
         name, font, area, wmult, hmult, this);
-  
+
     container->SetPriority(30);
     container->AddType(ttpage);
     return true;
-}   
+}
 
 void OSD::UpdateTeletext(void)
 {
@@ -448,12 +448,12 @@ void OSD::SetTextSubtitles(const QStringList &lines)
     QString name = "text_subtitles";
 
 
-    // I couldn't get the space using the LineSpacing accurately 
+    // I couldn't get the space using the LineSpacing accurately
     // (getting it through (SUBTITLE_LINE_SPACING - 1)*H resulted
     // in too small space. Just hard code it, it should work as
     // the variance in the count of subtitle lines is so low.
     const int totalSpaceBetweenLines = (subLines - 1) * 5;
-    const int subtitleTotalHeight = 
+    const int subtitleTotalHeight =
         subLines * SUBTITLE_FONT_SIZE + totalSpaceBetweenLines;
 
     // put the subtitles to the bottom of the screen
@@ -466,13 +466,13 @@ void OSD::SetTextSubtitles(const QStringList &lines)
     {
         font = LoadFont(gContext->GetSetting("OSDCCFont"), SUBTITLE_FONT_SIZE);
 
-        if (font) 
+        if (font)
         {
             // set outline so we can see the font in white background video
             font->setOutline(true);
             fontMap[fontname] = font;
-        } 
-        else 
+        }
+        else
         {
             VERBOSE(VB_IMPORTANT, "Cannot load font for text subtitles.");
             return;
@@ -480,7 +480,7 @@ void OSD::SetTextSubtitles(const QStringList &lines)
     }
 
     OSDTypeText *text = new OSDTypeText(name, font, "", area, wmult, hmult);
-  
+
     text->SetCentered(true);
     text->SetMultiLine(true);
     text->SetText(subText);
@@ -488,9 +488,9 @@ void OSD::SetTextSubtitles(const QStringList &lines)
     text->SetLineSpacing(SUBTITLE_LINE_SPACING);
     subtitleSet->AddType(text);
     SetVisible(subtitleSet, 0);
-}   
+}
 
-void OSD::ClearTextSubtitles() 
+void OSD::ClearTextSubtitles()
 {
     HideSet("subtitles");
     ClearAll("subtitles");
@@ -502,13 +502,13 @@ bool OSD::InitMenu(void)
         return true;
 
     QString name = "menu";
-    OSDSet *container = 
+    OSDSet *container =
         new OSDSet(name, true,
                    osdBounds.width(), osdBounds.height(),
                    wmult, hmult, frameint);
     container->SetListener(m_listener);
     AddSet(container, name);
- 
+
     QRect area = QRect(20, 40, 620, 300);
     QRect listarea = QRect(0, 0, 274, 260);
 
@@ -520,10 +520,10 @@ bool OSD::InitMenu(void)
                                               wmult, hmult);
 
     lb->SetListener(m_listener);
-    
+
     lb->SetItemRegColor(QColor("#505050"), QColor("#000000"), 100);
     lb->SetItemSelColor(QColor("#52CA38"), QColor("#349838"), 255);
- 
+
     lb->SetSpacing(2);
     lb->SetMargin(3);
 
@@ -636,7 +636,7 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
             sub_yoff = yoffset;
         }
         (*sets)->Reinit(osdBounds.width(), osdBounds.height(),
-                        sub_xoff, sub_yoff, sub_dispw, sub_disph, 
+                        sub_xoff, sub_yoff, sub_dispw, sub_disph,
                         wmult, hmult, frameint);
     }
 
@@ -851,7 +851,7 @@ void OSD::parseFont(QDomElement &element)
     QString fontfile = gContext->GetSetting("OSDFont");
     int size = -1;
     int sizeSmall = -1;
-    int sizeBig = -1;    
+    int sizeBig = -1;
     bool outline = false;
     QPoint shadowOffset = QPoint(0, 0);
     int color = 255;
@@ -938,7 +938,7 @@ void OSD::parseFont(QDomElement &element)
         if (sizeBig > 0)
             size = sizeBig;
     }
-    
+
     if (size <= 0)
     {
         VERBOSE(VB_IMPORTANT, "Error: font size specified as: " << size);
@@ -1010,7 +1010,7 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
         VERBOSE(VB_IMPORTANT, "Image needs a name");
         return;
     }
-    
+
     QString filename = "";
     QPoint pos = QPoint(0, 0);
 
@@ -1127,9 +1127,9 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
                 VERBOSE(VB_IMPORTANT, "Unknown tag in textarea: "
                         << info.tagName());
                 return;
-            }                   
+            }
         }
-    }    
+    }
 
     TTFFont *ttffont = GetFont(font);
     if (!ttffont)
@@ -1225,7 +1225,7 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
             if (info.tagName() == "area")
             {
                 area = parseRect(getFirstText(info));
-                normalizeRect(area);            
+                normalizeRect(area);
             }
             else if (info.tagName() == "filename")
             {
@@ -1378,7 +1378,7 @@ void OSD::parsePositionRects(OSDSet *container, QDomElement &element)
             }
         }
     }
-   
+
     container->AddType(rects);
 }
 
@@ -1462,7 +1462,7 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
-         child = child.nextSibling()) 
+         child = child.nextSibling())
     {
         QDomElement info = child.toElement();
         if (!info.isNull())
@@ -1491,38 +1491,38 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
                     fontActive = fontName;
                 else if (fontFcn.toLower() == "inactive")
                     fontInactive = fontName;
-                else 
+                else
                 {
                     VERBOSE(VB_IMPORTANT, "Unknown font function "
                             "for listtree area: " << fontFcn);
                     return;
                 }
             }
-            else if (info.tagName() == "showarrow") 
+            else if (info.tagName() == "showarrow")
             {
                 if (getFirstText(info).toLower() == "no")
                     showArrow = false;
             }
-            else if (info.tagName() == "showscrollarrows") 
+            else if (info.tagName() == "showscrollarrows")
             {
                 if (getFirstText(info).toLower() == "yes")
                     showScrollArrows = true;
             }
-            else if (info.tagName() == "gradient") 
+            else if (info.tagName() == "gradient")
             {
-                if (info.attribute("type","").toLower() == "selected") 
+                if (info.attribute("type","").toLower() == "selected")
                 {
                     grSelectedBeg = createColor(info.attribute("start"));
                     grSelectedEnd = createColor(info.attribute("end"));
                     grSelectedAlpha = info.attribute("alpha","255").toUInt();
                 }
-                else if (info.attribute("type","").toLower() == "unselected") 
+                else if (info.attribute("type","").toLower() == "unselected")
                 {
                     grUnselectedBeg = createColor(info.attribute("start"));
                     grUnselectedEnd = createColor(info.attribute("end"));
                     grUnselectedAlpha = info.attribute("alpha","100").toUInt();
                 }
-                else 
+                else
                 {
                     VERBOSE(VB_IMPORTANT,
                             "Unknown type for gradient in listtree area");
@@ -1530,7 +1530,7 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
                 }
 
                 if (!grSelectedBeg.isValid() || !grSelectedEnd.isValid() ||
-                    !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid()) 
+                    !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid())
                 {
                     VERBOSE(VB_IMPORTANT,
                             "Unknown color for gradient in listtree area");
@@ -1597,7 +1597,7 @@ void OSD::parseContainer(QDomElement &element)
     }
 
     OSDSet *container = GetSet(name);
-    if (container) 
+    if (container)
     {
         VERBOSE(VB_IMPORTANT, "Container: " << name << " already exists");
         return;
@@ -1614,7 +1614,7 @@ void OSD::parseContainer(QDomElement &element)
         container->SetPriority(prio.toInt());
     }
 
-    AddSet(container, name);    
+    AddSet(container, name);
 
     QString movement = element.attribute("fademovement", "");
     if (!movement.isNull() && !movement.isEmpty())
@@ -1695,7 +1695,7 @@ bool OSD::LoadTheme(void)
     if (!f.open(QIODevice::ReadOnly))
     {
         VERBOSE(VB_IMPORTANT, "OSD::LoadTheme(): Can't open: " << themefile);
-        return false; 
+        return false;
     }
 
     QString errorMsg;
@@ -1703,7 +1703,7 @@ bool OSD::LoadTheme(void)
     int errorColumn = 0;
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
-    { 
+    {
         VERBOSE(VB_IMPORTANT, QString("Error parsing: %1\n\t\t\t"
                                       "at line: %2  column: %3\n\t\t\t%4")
                 .arg(themefile).arg(errorLine).arg(errorColumn).arg(errorMsg));
@@ -1750,13 +1750,13 @@ bool OSD::LoadTheme(void)
 }
 
 void OSD::normalizeRect(QRect &rect)
-{   
+{
     rect.setWidth((int)(rect.width() * wmult));
     rect.setHeight((int)(rect.height() * hmult));
     rect.moveTopLeft(QPoint((int)(xoffset + rect.x() * wmult),
                             (int)(yoffset + rect.y() * hmult)));
     rect = rect.normalized();
-}       
+}
 
 QPoint OSD::parsePoint(QString text)
 {
@@ -1895,7 +1895,7 @@ void OSD::SetInfoText(InfoMap infoMap, int length)
 
 void OSD::SetInfoText(const QString &text, const QString &subtitle,
                       const QString &desc, const QString &category,
-                      const QString &start, const QString &end, 
+                      const QString &start, const QString &end,
                       const QString &callsign, const QString &iconpath,
                       int length)
 {
@@ -1991,7 +1991,7 @@ void OSD::ShowStatus(struct StatusPosInfo posInfo,
         if (exttext)
             exttext->SetText(posInfo.extdesc);
 
-        OSDTypeFillSlider *slider = 
+        OSDTypeFillSlider *slider =
                       (OSDTypeFillSlider *)container->GetType("statusslider");
         if (slider)
             slider->SetPosition(posInfo.position);
@@ -2134,7 +2134,7 @@ void OSD::SetChannumText(const QString &text, int length)
     }
 }
 
-void OSD::AddCCText(const QString &text, int x, int y, int color, 
+void OSD::AddCCText(const QString &text, int x, int y, int color,
                     bool teletextmode)
 {
     QMutexLocker locker(&osdlock);
@@ -2260,7 +2260,7 @@ void OSD::SetSettingsText(const QString &text, int length)
     }
 }
 
-void OSD::NewDialogBox(const QString &name, const QString &message, 
+void OSD::NewDialogBox(const QString &name, const QString &message,
                        QStringList &options, int length,
                        int initial_selection)
 {
@@ -2346,7 +2346,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         text->SetUseAlt(true);
     }
 
-    OSDTypePositionIndicator *opr = 
+    OSDTypePositionIndicator *opr =
         dynamic_cast<OSDTypePositionIndicator*>(container->GetType("selector"));
     if (!opr)
     {
@@ -2444,7 +2444,7 @@ void OSD::HighlightDialogSelection(OSDSet *container, int num)
         text = (OSDTypeText *)container->GetType(name);
         if (text)
         {
-            if (i == num + 1) 
+            if (i == num + 1)
                 text->SetUseAlt(false);
             else
                 text->SetUseAlt(true);
@@ -2493,7 +2493,7 @@ void OSD::DialogUp(const QString &raw_name)
     if (container)
     {
         OSDType *basetype = container->GetType("selector");
-        OSDTypePositionIndicator *type = 
+        OSDTypePositionIndicator *type =
                             dynamic_cast<OSDTypePositionIndicator*>(basetype);
         if (type)
         {
@@ -2715,7 +2715,7 @@ bool OSD::HideSets(QStringList &name)
     return ret;
 }
 
-void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker, 
+void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker,
                          const QString &edittime, const QString &framecnt)
 {
     QMutexLocker locker(&osdlock);
@@ -2790,7 +2790,7 @@ void OSD::DoEditSlider(QMap<long long, int> deleteMap, long long curFrame,
                     first = false;
                 }
             }
-           
+
             if (indelete)
             {
                 endpos = 1000;
@@ -2842,11 +2842,11 @@ OSDSurface *OSD::Display(void)
         return NULL;
 
     bool actuallydraw = false;
- 
+
     if (changed)
     {
         actuallydraw = true;
-        changed = false; 
+        changed = false;
     }
 
     drawSurface->SetChanged(false);
@@ -2951,7 +2951,7 @@ void OSD::AddSet(OSDSet *set, QString name, bool withlock)
     setMap[name] = set;
     setList->push_back(set);
 
-    sort(setList->begin(), setList->end(), comp());     
+    sort(setList->begin(), setList->end(), comp());
 
     if (withlock)
         osdlock.unlock();
@@ -3007,7 +3007,7 @@ void OSD::StartNotify(const UDPNotifyOSDSet *notifySet)
             container->DisplayFor(displaytime * 1000000);
         else
             container->Display();
-  
+
         m_setsvisible = true;
         changed = true;
     }
@@ -3027,7 +3027,7 @@ void OSD::ClearNotify(const QString &name)
     }
 }
 
-OSDListTreeType *OSD::ShowTreeMenu(const QString &name, 
+OSDListTreeType *OSD::ShowTreeMenu(const QString &name,
                                    OSDGenericTree *treeToShow)
 {
     if (runningTreeMenu || !treeToShow)

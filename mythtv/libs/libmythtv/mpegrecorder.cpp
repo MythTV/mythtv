@@ -300,8 +300,8 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
     }
 }
 
-void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile, 
-                                         const QString &videodev, 
+void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
+                                         const QString &videodev,
                                          const QString &audiodev,
                                          const QString &vbidev)
 {
@@ -478,18 +478,18 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
     {
         if (_device_read_buffer->IsRunning())
             _device_read_buffer->Stop();
-        
+
         delete _device_read_buffer;
         _device_read_buffer = NULL;
     }
 
     _device_read_buffer = new DeviceReadBuffer(this);
-    
+
     if (!_device_read_buffer)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
         _error = true;
-        return false;   
+        return false;
     }
 
     if (!_device_read_buffer->Setup(vdevice.constData(), readfd))
@@ -627,7 +627,7 @@ uint MpegRecorder::GetFilteredStreamType(void) const
             case 14: st = 10; break;
             case 11: st = 11; break;
             case 12: st = 12; break;
-            default: st = 0;  break;   
+            default: st = 0;  break;
         }
     }
 
@@ -760,7 +760,7 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
 {
     static QMutex control_description_lock;
     static QMap<uint32_t,QString> control_description;
-    
+
     control_description_lock.lock();
     if (control_description.isEmpty())
     {
@@ -793,7 +793,7 @@ static void set_ctrls(int fd, vector<struct v4l2_ext_control> &ext_ctrls)
         ctrls.ctrl_class  = V4L2_CTRL_CLASS_MPEG;
         ctrls.count       = 1;
         ctrls.controls    = &ext_ctrls[i];
-            
+
         if (ioctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls) < 0)
         {
             QMutexLocker locker(&control_description_lock);
@@ -814,14 +814,14 @@ bool MpegRecorder::SetV4L2DeviceOptions(int chanfd)
     {
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_SAMPLING_FREQ,
                      GetFilteredAudioSampleRate());
-        
+
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_VIDEO_ASPECT,
                      aspectratio - 1);
 
         uint audio_layer = GetFilteredAudioLayer();
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_ENCODING,
                      audio_layer - 1);
-        
+
         uint audbitrate  = GetFilteredAudioBitRate(audio_layer);
         add_ext_ctrl(ext_ctrls, V4L2_CID_MPEG_AUDIO_L2_BITRATE,
                      audbitrate - 1);
@@ -1032,7 +1032,7 @@ void MpegRecorder::StartRecording(void)
     }
 
     bool has_select = true;
-    
+
 #if defined(__FreeBSD__)
     // HACK. FreeBSD PVR150/500 driver doesn't currently support select()
     has_select = false;
@@ -1112,7 +1112,7 @@ void MpegRecorder::StartRecording(void)
     {
         if (PauseAndWait(100))
             continue;
-        
+
         if (deviceIsMpegFile)
         {
             if (dummyBPS && bytesRead)
@@ -1146,7 +1146,7 @@ void MpegRecorder::StartRecording(void)
 
                 if (readfd < 0)
                 {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
                             QString("Failed to open device '%1'")
                             .arg(videodevice));
                     continue;
@@ -1203,7 +1203,7 @@ void MpegRecorder::StartRecording(void)
                         // Force card to be reopened on next iteration..
                         readfd = -1;
                         continue;
-                
+
                     default:
                         break;
                 }
@@ -1216,18 +1216,18 @@ void MpegRecorder::StartRecording(void)
                 usleep(25 * 1000);
                 continue;
             }
-            
+
             if ((len == 0) && (deviceIsMpegFile))
             {
                 close(readfd);
                 readfd = open(vdevice.constData(), O_RDONLY);
-                
+
                 if (readfd >= 0)
                 {
                     len = read(readfd,
                                &(buffer[remainder]), bufferSize - remainder);
                 }
-                
+
                 if (len <= 0)
                 {
                     encoding = false;
@@ -1472,10 +1472,10 @@ bool MpegRecorder::PauseAndWait(int timeout)
         // an input switch and other channel format setting.
         if (requires_special_pause)
             StartEncoding(readfd);
-        
+
         if (_device_read_buffer)
             _device_read_buffer->SetRequestPause(false);
-        
+
         if (_stream_data)
             _stream_data->Reset(_stream_data->DesiredProgram());
 
@@ -1489,12 +1489,12 @@ void MpegRecorder::RestartEncoding(void)
     VERBOSE(VB_RECORD, LOC + "RestartEncoding");
 
     _device_read_buffer->Stop();
-    
+
     QMutexLocker locker(&start_stop_encoding_lock);
-    
+
     if (requires_special_pause)
         StopEncoding(readfd);
-    
+
     // Make sure the next things in the file are a PAT & PMT
     if (_stream_data &&
         _stream_data->PATSingleProgram() &&
@@ -1504,12 +1504,12 @@ void MpegRecorder::RestartEncoding(void)
         HandleSingleProgramPAT(_stream_data->PATSingleProgram());
         HandleSingleProgramPMT(_stream_data->PMTSingleProgram());
     }
-    
+
     if (requires_special_pause && !StartEncoding(readfd))
     {
         if (0 != close(readfd))
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Close error" + ENO);
-        
+
         readfd = -1;
         return;
     }
@@ -1728,7 +1728,7 @@ void MpegRecorder::HandleResolutionChanges(void)
     struct v4l2_format vfmt;
     memset(&vfmt, 0, sizeof(vfmt));
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            
+
     if (driver == "hdpvr")
         WaitFor_HDPVR();
 

@@ -211,7 +211,7 @@ class DVBStreamData : virtual public MPEGStreamData
     /// DVB table monitoring
     uint                      _desired_netid;
     uint                      _desired_tsid;
-    
+
     /// Decode DishNet's long-term DVB EIT
     bool                      _dvb_eit_dishnet_long;
     /// Tell us if the DVB service has EIT

@@ -416,7 +416,7 @@ bool V4LChannel::SetChannelByString(const QString &channum)
     QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
     QString loc_err = loc + ", Error: ";
     VERBOSE(VB_CHANNEL, loc);
-    
+
     if (!Open())
     {
         VERBOSE(VB_IMPORTANT, loc_err + "Channel object "
@@ -618,7 +618,7 @@ bool V4LChannel::Tune(uint frequency, QString inputname,
                         "(%1 Hz) to visual carrier frequency (%2 Hz).")
                 .arg(frequency).arg(frequency - 1750000));
         frequency -= 1750000; // convert to visual carrier
-    }        
+    }
 
     // Video4Linux version 2 tuning
     if (usingv4l2)
@@ -871,7 +871,7 @@ bool V4LChannel::SetInputAndFormat(int inputNum, QString newFmt)
         ok = (ioctlval >= 0);
         if (!ok)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg + 
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg +
                     "\n\t\t\twhile setting format (v4l v1)" + ENO);
         }
         else if (usingv4l2)

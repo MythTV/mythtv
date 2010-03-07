@@ -70,7 +70,7 @@ class VideoBuffers
     VideoBuffers();
     virtual ~VideoBuffers();
 
-    void Init(uint numdecode, bool extra_for_pause, 
+    void Init(uint numdecode, bool extra_for_pause,
               uint need_free, uint needprebuffer_normal,
               uint needprebuffer_small, uint keepprebuffer,
               bool enable_frame_locking = false);
@@ -138,7 +138,7 @@ class VideoBuffers
     const VideoFrame *GetLastShownFrame(void) const { return at(rpos); }
     uint size() const { return numbuffers; }
     uint allocSize() const { return buffers.size(); }
-    
+
     void LockFrame(const VideoFrame *, const char* owner);
     void LockFrames(vector<const VideoFrame*>&, const char* owner);
     bool TryLockFrame(const VideoFrame *, const char* owner);

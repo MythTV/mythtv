@@ -44,7 +44,7 @@ void ChannelGroupStorage::Load(void)
 
     if (!query.exec() || !query.isActive())
         MythDB::DBError("ChannelGroupStorage::Load", query);
-    else 
+    else
     {
       query.next();
       grpid = query.value(0).toUInt();
@@ -68,7 +68,7 @@ void ChannelGroupStorage::Save(void)
     if (value == "1")
         ChannelGroup::AddChannel(chanid, grpid);
     else
-        ChannelGroup::DeleteChannel(chanid, grpid);   
+        ChannelGroup::DeleteChannel(chanid, grpid);
 }
 
 void ChannelGroupStorage::Save(QString destination)
@@ -79,7 +79,7 @@ void ChannelGroupStorage::Save(QString destination)
 class ChannelCheckBox : public CheckBoxSetting, public ChannelGroupStorage
 {
   public:
-    ChannelCheckBox(const ChannelGroupConfig& _parent, const uint chanid, const QString channum, 
+    ChannelCheckBox(const ChannelGroupConfig& _parent, const uint chanid, const QString channum,
                const QString channame, const QString grpname):
         CheckBoxSetting(this),
         ChannelGroupStorage(this, chanid, grpname)
@@ -92,8 +92,8 @@ class ChannelCheckBox : public CheckBoxSetting, public ChannelGroupStorage
 ChannelGroupConfig::ChannelGroupConfig(QString _name)
     : name(_name)
 {
-    VerticalConfigurationGroup   *cgroup; 
-    HorizontalConfigurationGroup *columns; 
+    VerticalConfigurationGroup   *cgroup;
+    HorizontalConfigurationGroup *columns;
 
     DBChanList chanlist = ChannelUtil::GetChannels(0, true, "channum, callsign");
     ChannelUtil::SortChannels(chanlist, "channum", true);
@@ -106,7 +106,7 @@ ChannelGroupConfig::ChannelGroupConfig(QString _name)
     do
     {
         columns = new HorizontalConfigurationGroup(false,false,false,false);
-        columns->setLabel(getName() + " " + 
+        columns->setLabel(getName() + " " +
                           QObject::tr("Channel Group - Page ") + QString("%1").arg(p) +
                           QObject::tr("of") + QString("%1").arg(pages));
 
@@ -135,7 +135,7 @@ ChannelGroupEditor::ChannelGroupEditor(void) :
     addChild(listbox);
 }
 
-void ChannelGroupEditor::open(QString name) 
+void ChannelGroupEditor::open(QString name)
 {
     lastValue = name;
     bool created = false;
@@ -144,7 +144,7 @@ void ChannelGroupEditor::open(QString name)
     {
         name = "";
 
-        bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), 
+        bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(),
             tr("Create New Channel Group"),
             tr("Enter group name or press SELECT to enter text via the "
                "On Screen Keyboard"), name);
@@ -167,7 +167,7 @@ void ChannelGroupEditor::open(QString name)
 
 };
 
-void ChannelGroupEditor::doDelete(void) 
+void ChannelGroupEditor::doDelete(void)
 {
     QString name = listbox->getValue();
     if (name == "__CREATE_NEW_GROUP__")

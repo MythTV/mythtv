@@ -177,9 +177,9 @@ inline QString toString(PIPLocation location)
     return ret;
 }
 
-inline QString toString(AspectOverrideMode aspectmode) 
-{ 
-    QString ret = QObject::tr("Off"); 
+inline QString toString(AspectOverrideMode aspectmode)
+{
+    QString ret = QObject::tr("Off");
     switch (aspectmode)
     {
         case kAspect_4_3:    ret = QObject::tr("4:3");    break;
@@ -196,7 +196,7 @@ inline QString toString(AspectOverrideMode aspectmode)
 }
 
 inline QString toString(LetterBoxColour letterboxcolour)
-{ 
+{
     QString ret = QObject::tr("Black");
     switch (letterboxcolour)
     {
@@ -211,7 +211,7 @@ inline QString toString(LetterBoxColour letterboxcolour)
 }
 
 inline QString toXString(LetterBoxColour letterboxcolour)
-{ 
+{
     QString ret = "gray0";
     switch (letterboxcolour)
     {
@@ -241,8 +241,8 @@ inline float get_aspect_override(AspectOverrideMode aspectmode, float orig)
     return ret;
 }
 
-inline QString toString(AdjustFillMode aspectmode) 
-{ 
+inline QString toString(AdjustFillMode aspectmode)
+{
     QString ret = QObject::tr("Off");
     switch (aspectmode)
     {

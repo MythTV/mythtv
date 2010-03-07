@@ -73,7 +73,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
 
         case VBI_DVB:
         case VBI_DVB_SUBTITLE:
-            zahl1 = hamm84(buf,&err) * 16 + hamm84(buf+1,&err); 
+            zahl1 = hamm84(buf,&err) * 16 + hamm84(buf+1,&err);
 
             magazine = 0;
             if (buf[0] & 0x40)
@@ -118,7 +118,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                     b4 = hamm16(buf+6, &err);// language code + more flags
                     if (err & 0xf000)
                         return;
-                    
+
                     break;
 
                 case VBI_DVB:
@@ -129,7 +129,7 @@ void TeletextDecoder::Decode(const unsigned char *buf, int vbimode)
                     b4 = hamm84(buf+7, &err)*16+hamm84(buf+6, &err);
                     if (err == 1)
                         return;
-                    
+
                     break;
 
                 default:

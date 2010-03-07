@@ -127,7 +127,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor
   private:
     int Index(int i, int j) const { return (i<<8) | (j & 0xff); }
     const unsigned char* Offset(int i, int j) const
-        { return _ptrs[Index(i,j)]; }    
+        { return _ptrs[Index(i,j)]; }
 
   private:
     mutable IntToBuf _ptrs;
@@ -182,7 +182,7 @@ class ContentAdvisoryDescriptor : public MPEGDescriptor
     int Index(int i, int j) const { return (i<<8)|(j&0xff); }
     const unsigned char* Offset(int i, int j) const {
         return _ptrs[Index(i,j)];
-    }    
+    }
 };
 
 class ComponentNameDescriptor : public MPEGDescriptor {
@@ -326,7 +326,7 @@ class ContentIdentifierDescriptor : public MPEGDescriptor {
 /**
  *  \brief Provides the long channel name for the virtual channel containing
  *         this descriptor.
- * 
+ *
  *   See ATSC A/65B section 6.9.5.
  *   When used, this descriptor must be in the Virtual Channel Table.
  */

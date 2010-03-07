@@ -309,7 +309,7 @@ static void mmxext_rgb16 (uint8_t * image,
 static void mmxext_argb32 (uint8_t * image,
                            uint8_t * py, uint8_t * pu, uint8_t * pv,
                            int width, int height,
-                           int rgb_stride, int y_stride, int uv_stride, 
+                           int rgb_stride, int y_stride, int uv_stride,
                            int alphaones)
 {
     yuv420_argb32 (image, py, pu, pv, width, height,
@@ -319,7 +319,7 @@ static void mmxext_argb32 (uint8_t * image,
 static void mmx_rgb16 (uint8_t * image,
                        uint8_t * py, uint8_t * pu, uint8_t * pv,
                        int width, int height,
-                       int rgb_stride, int y_stride, int uv_stride, 
+                       int rgb_stride, int y_stride, int uv_stride,
                        int alphaones)
 {
     yuv420_rgb16 (image, py, pu, pv, width, height,
@@ -329,7 +329,7 @@ static void mmx_rgb16 (uint8_t * image,
 static void mmx_argb32 (uint8_t * image,
                         uint8_t * py, uint8_t * pu, uint8_t * pv,
                         int width, int height,
-                        int rgb_stride, int y_stride, int uv_stride, 
+                        int rgb_stride, int y_stride, int uv_stride,
                         int alphaones)
 {
     yuv420_argb32 (image, py, pu, pv, width, height,
@@ -392,12 +392,12 @@ yuv2rgb_fun yuv2rgb_init_mmx (int bpp, int mode)
 #define C_GU (13954 >> (16 - SCALE_BITS))
 #define C_GV (34903 >> (16 - SCALE_BITS))
 
-#if defined(__FreeBSD__) 
+#if defined(__FreeBSD__)
 // HACK: this is actually only needed on AMD64 at the moment,
-//       but is doesn't hurt the other architectures. 
-#undef  UCHAR_MAX 
-#define UCHAR_MAX  (int)__UCHAR_MAX 
-#endif 
+//       but is doesn't hurt the other architectures.
+#undef  UCHAR_MAX
+#define UCHAR_MAX  (int)__UCHAR_MAX
+#endif
 
 #define RGBOUT(r, g, b, y1)\
 {\
@@ -431,14 +431,14 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
 
     // squelch a warning
     rgb_stride = y_stride = uv_stride;
-    
+
     d = image;
     y1_ptr = py;
     cb_ptr = pu;
     cr_ptr = pv;
     dstwidth = h_size * 4;
     width2 = h_size / 2;
-    
+
     for(;v_size > 0; v_size -= 2) {
         d1 = d;
         d2 = d + h_size * 4;
@@ -474,7 +474,7 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
 }
 
 #define SCALEBITS 8
-#define ONE_HALF  (1 << (SCALEBITS - 1)) 
+#define ONE_HALF  (1 << (SCALEBITS - 1))
 #define FIX(x)          ((int) ((x) * (1L<<SCALEBITS) + 0.5))
 
 /**
@@ -482,13 +482,13 @@ static void yuv420_argb32_non_mmx(unsigned char *image, unsigned char *py,
  *        Despite the name, this actually converts to i420
  */
 void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
-                      unsigned char *alpha, unsigned char *src, 
+                      unsigned char *alpha, unsigned char *src,
                       int width, int height, int srcwidth)
-{           
+{
     int wrap, wrap4, x, y;
     int r, g, b, r1, g1, b1;
     unsigned char *p;
-                      
+
 // byte indices
 #ifdef WORDS_BIGENDIAN
 #define R_II  3
@@ -781,7 +781,7 @@ static void mmx_i420_2vuy(
     const uint8_t *py2 = py;
     const uint8_t *pu1 = pu;
     const uint8_t *pv1 = pv;
-    
+
     int x,y;
 
     if ((h_size % 16) || (v_size % 2))
@@ -791,7 +791,7 @@ static void mmx_i420_2vuy(
                           h_size, v_size);
         return;
     }
-                                 
+
     emms();
 
     for (y = 0; y < (v_size>>1); y++)
@@ -809,48 +809,48 @@ static void mmx_i420_2vuy(
             movq_m2r (*py2, mm1);     // y data
             movq_m2r (*pu1, mm2);     // u data
             movq_m2r (*pv1, mm3);     // v data
-            
+
             movq_r2r (mm2, mm4);      // Copy U
-            
+
             punpcklbw_r2r (mm3, mm2); // Combine low U & V  mm2 = uv low
             punpckhbw_r2r (mm3, mm4); // Combine high U & V mm4 = uv high
-            
+
             movq_r2r (mm2, mm5);      // Copy low UV  mm5 = uv low
             movq_r2r (mm2, mm6);      // Copy low UV  mm6 = uv low
             punpcklbw_r2r (mm0, mm5); // mm5 = y1 low uv low
             punpckhbw_r2r (mm0, mm6); // mm6 = y1 high uv high
-            
+
             movntq_r2m (mm5, *(pi1));
             movntq_r2m (mm6, *(pi1+8));
-    
+
             movq_r2r (mm2, mm5);      // Copy low UV mm5 = uv low
             movq_r2r (mm2, mm6);      // Copy low UV mm6 = uv low
-	    punpcklbw_r2r (mm1, mm5); // mm5 = y2 low uv low
+            punpcklbw_r2r (mm1, mm5); // mm5 = y2 low uv low
             punpckhbw_r2r (mm1, mm6); // mm6 = y2 high uv high
-    
+
             movntq_r2m (mm5, *(pi2));
             movntq_r2m (mm6, *(pi2+8));
-    
-    
+
+
             movq_m2r (*(py1+8), mm0); // y data
             movq_m2r (*(py2+8), mm1); // y data
-    
+
             movq_r2r (mm4, mm5);      // Copy high UV mm5 = uv high
             movq_r2r (mm4, mm6);      // Copy high UV mm6 = uv high
             punpcklbw_r2r (mm0, mm5); // mm5 = y1 low uv high
             punpckhbw_r2r (mm0, mm6); // mm6 = y1 high uv high
-            
+
             movntq_r2m (mm5, *(pi1+16));
             movntq_r2m (mm6, *(pi1+24));
-            
+
             movq_r2r (mm4, mm5);      // Copy high UV mm5 = uv high
-            movq_r2r (mm4, mm6);      // Copy high UV mm6 = uv high     
+            movq_r2r (mm4, mm6);      // Copy high UV mm6 = uv high
             punpcklbw_r2r (mm1, mm5); // mm5 = y2 low uv low
             punpckhbw_r2r (mm1, mm6); // mm6 = y2 high uv high
-    
+
             movntq_r2m (mm5, *(pi2+16));
             movntq_r2m (mm6, *(pi2+24));
-            
+
             pi1 += 32;
             pi2 += 32;
             py1 += 16;
@@ -867,7 +867,7 @@ static void mmx_i420_2vuy(
 
 #if HAVE_ALTIVEC
 
-// Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
+// Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara)
 
 #define VEC_NEXT_LINES()                                                    \
     pi1  = pi2;                                                             \
@@ -909,7 +909,7 @@ static void altivec_i420_2vuy(
     uint8_t *pi1, *pi2 = image;
     const uint8_t *py1;
     const uint8_t *py2 = py;
-        
+
     int x, y;
 
     vector unsigned char u_vec;
@@ -945,7 +945,7 @@ static void altivec_i420_2vuy(
                 VEC_MERGE(vec_mergel);
             }
         }
-    
+
     }
     else if (!((h_size % 16) || (v_size % 4)))
     {
@@ -960,15 +960,15 @@ static void altivec_i420_2vuy(
                 VEC_MERGE(vec_mergeh);
                 VEC_MERGE(vec_mergel);
             }
-            
+
             // Lines 1-2, pixels (width - 16) to width
             VEC_LOAD_UV();
             VEC_MERGE(vec_mergeh);
-            
+
             // Lines 3-4, pixels 0-16
             VEC_NEXT_LINES();
             VEC_MERGE(vec_mergel);
-            
+
             // Lines 3-4, pixels 16 to width
             for (x = h_size / 32; x--; )
             {
@@ -1060,7 +1060,7 @@ static void non_vec_2vuy_i420(
 
 #if HAVE_ALTIVEC
 
-// Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara) 
+// Altivec code adapted from VLC's i420_yuv2.c (thanks to Titer and Paul Jara)
 
 #define VEC_READ_LINE(ptr, y, uv)                                           \
     pa_vec = vec_ld(0, ptr); ptr += 16;                                     \
@@ -1084,7 +1084,7 @@ static void non_vec_2vuy_i420(
                     vec_sr((vector unsigned short)uvb_vec, eight_vec)),     \
            0, pu); pu += 16;
 
-    
+
 /** \brief Altivec 2VUY to YUV420 conversion routine
  *
  *  See http://developer.apple.com/quicktime/icefloe/dispatch019.html
@@ -1103,9 +1103,9 @@ static void altivec_2vuy_i420(
     const uint8_t *pi1;
     const uint8_t *pi2 = image;
     uint8_t *py1, *py2 = py;
-        
+
     int x, y;
-    
+
     vector unsigned short eight_vec = vec_splat_u16(8);
     vector unsigned char pa_vec, pb_vec,
                          uv1_vec, uv2_vec,
@@ -1153,15 +1153,15 @@ static void altivec_2vuy_i420(
                 VEC_SPLIT(uvb_vec);
                 VEC_STORE_UV();
             }
-            
+
             // Lines 1-2, pixels (width - 16) to width
             VEC_SPLIT(uva_vec);
-            
+
             // Lines 3-4, pixels 0-16
             VEC_NEXT_LINES();
             VEC_SPLIT(uvb_vec);
             VEC_STORE_UV();
-            
+
             // Lines 3-4, pixels 16 to width
             for (x = h_size / 32; x--; )
             {

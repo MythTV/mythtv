@@ -130,7 +130,7 @@ void DVBChannel::Close(DVBChannel *who)
         fd_frontend = -1;
         return;
     }
-    
+
     if (!is_open.empty())
         return; // not all callers have closed the DVB channel yet..
 
@@ -242,7 +242,7 @@ bool DVBChannel::Open(DVBChannel *who)
         if (diseqc_tree)
             diseqc_tree->Open(fd_frontend);
     }
-    
+
     dvbcam->Start();
 
     first_tune = true;
@@ -797,7 +797,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
             // make sure we tune to frequency, if the lnb has changed
             reset = first_tune = true;
         }
-        
+
         intermediate_freq = lnb->GetIntermediateFrequency(
             diseqc_settings, tuning);
 
@@ -1158,7 +1158,7 @@ static void drain_dvb_events(int fd)
  *   before we can read the event.
  *
  *   Using a FE_GET_FRONTEND has also been tried, but returns
- *   the old data until a 2 sec timeout elapses on at least 
+ *   the old data until a 2 sec timeout elapses on at least
  *   one DVB card.
  *
  *   We do not block until we have a lock, the signal

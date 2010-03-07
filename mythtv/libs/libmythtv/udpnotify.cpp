@@ -149,9 +149,9 @@ void UDPNotify::ParseTextArea(UDPNotifyOSDSet *container, QDomElement &element)
             {
                 VERBOSE(VB_IMPORTANT, QString("Unknown tag in text area: %1")
                                        .arg(info.tagName()));
-            }                   
+            }
         }
-    }    
+    }
 }
 
 UDPNotifyOSDSet *UDPNotify::ParseContainer(QDomElement &element)

@@ -81,7 +81,7 @@ QString iso639_Alpha3_toName(const unsigned char *iso639_2)
 
     if (_iso639_key_to_english_name.contains(alpha3))
         return _iso639_key_to_english_name[alpha3];
-        
+
     return "Unknown";
 }
 
@@ -91,7 +91,7 @@ QString iso639_Alpha2_toName(const unsigned char *iso639_1)
 
     if (_iso639_key2_to_key3.contains(alpha2))
         return _iso639_key_to_english_name[_iso639_key2_to_key3[alpha2]];
-        
+
     return "Unknown";
 }
 
@@ -101,7 +101,7 @@ QString iso639_str_toName(const unsigned char *iso639)
         return iso639_Alpha2_toName(iso639);
     else if (strlen((const char *)iso639) == 3)
         return iso639_Alpha3_toName(iso639);
-        
+
     return "Unknown";
 }
 

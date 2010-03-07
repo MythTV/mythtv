@@ -53,7 +53,7 @@ RecordingInfo &RecordingInfo::clone(const ProgramInfo &other)
 void RecordingInfo::clear(void)
 {
     ProgramInfo::clear();
-    
+
     delete record;
     record = NULL;
 }

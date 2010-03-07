@@ -80,7 +80,7 @@ uint MultipleStringStructure::GetIndexOfBestMatch(
         {
             match_idx = i;
             match_pri = *it;
-        }   
+        }
     }
 
     if (match_pri)
@@ -320,7 +320,7 @@ QString AudioStreamDescriptor::toString() const
 
 /** \fn ExtendedChannelNameDescriptor::ExtendedChannelNameDescriptor(const unsigned char*)
  *  \brief Creates a new ExtendedChannelNameDescriptor.
- * 
+ *
  *  \param data the raw data representing this descriptor
  */
 ExtendedChannelNameDescriptor::ExtendedChannelNameDescriptor(

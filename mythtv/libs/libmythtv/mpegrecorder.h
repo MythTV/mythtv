@@ -27,7 +27,7 @@ class MpegRecorder : public DTVRecorder,
     void SetVideoFilters(QString&) {}
 
     void SetOptionsFromProfile(RecordingProfile *profile,
-                               const QString &videodev, 
+                               const QString &videodev,
                                const QString &audiodev,
                                const QString &vbidev);
 

@@ -309,7 +309,7 @@ void RemoteEncoder::CancelNextRecording(bool cancel)
     QStringList strlist( QString("QUERY_RECORDER %1").arg(recordernum));
     strlist << "CANCEL_NEXT_RECORDING";
     strlist << QString::number((cancel) ? 1 : 0);
-                          
+
     SendReceiveStringList(strlist);
 }
 
@@ -404,7 +404,7 @@ QString RemoteEncoder::GetInput(void)
     if (SendReceiveStringList(strlist, 1))
     {
         lastinput = strlist[0];
-        return lastinput; 
+        return lastinput;
     }
 
     return "Error";
@@ -464,9 +464,9 @@ void RemoteEncoder::SetChannel(QString channel)
 /** \fn RemoteEncoder::SetSignalMonitoringRate(int,bool)
  *  \brief Sets the signal monitoring rate.
  *
- *  This will actually call SetupSignalMonitor() and 
+ *  This will actually call SetupSignalMonitor() and
  *  TeardownSignalMonitor(bool) as needed, so it can
- *  be used directly, without worrying about the 
+ *  be used directly, without worrying about the
  *  SignalMonitor instance.
  *
  *  \sa TVRec::SetSignalMonitoringRate(int,int),

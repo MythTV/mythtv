@@ -63,7 +63,7 @@ class NetworkInformationTable : public PSIPTable
         { return ((_tsc_ptr[0]<<8) | _tsc_ptr[1]) & 0xfff; }
     uint TransportStreamCount(void) const
         { return _ptrs.size() - 1; }
-    // for(i=0; i<N; i++) { 
+    // for(i=0; i<N; i++) {
     ///  transport_stream_id   16  0.0+p
     uint TSID(uint i) const { return (_ptrs[i][0]<<8) | _ptrs[i][1]; }
     ///  original_network_id   16  2.0+p
@@ -131,7 +131,7 @@ class ServiceDescriptionTable : public PSIPTable
     uint ServiceCount() const { return _ptrs.size()-1; }
 
     // reserved_future_use      8  10.0
-    // for (i=0;i<N;i++) { 
+    // for (i=0;i<N;i++) {
     ///  service_id            16  0.0+p
     uint ServiceID(uint i) const { return (_ptrs[i][0]<<8) | (_ptrs[i][1]); }
     //   reserved_future_use    6  2.0+p
@@ -197,7 +197,7 @@ class BouquetAssociationTable : public PSIPTable
     // reserved                 4   8         0x0d
     uint BouquetDescriptorsLength(void) const
         { return ((psipdata()[0]<<8) | psipdata()[1]) & 0xfff; }
-            
+
     // Bouquet descriptors len 12   8.4
     // for (i=0;i<N;i++)
     // Descriptor();
@@ -239,12 +239,12 @@ class DiscontinuityInformationTable : public PSIPTable
 {
     DiscontinuityInformationTable(const PSIPTable& table) : PSIPTable(table)
         { ; }
-    // table_id 8 
+    // table_id 8
     // section_syntax_indicator 1
     // reserved_future_use      1
     // reserved                 2
-    // section_length          12 
-    // transition_flag          1 
+    // section_length          12
+    // transition_flag          1
     // reserved_future_use      7
 };
 
@@ -252,29 +252,29 @@ class SelectionInformationTable : public PSIPTable
 {
     SelectionInformationTable(const PSIPTable& table) : PSIPTable(table)
         { ; }
-    // table_id 8 
+    // table_id 8
     // section_syntax_indicator 1
     // DVB_reserved_future_use  1
     // ISO_reserved             2
-    // section_length          12 
-    // DVB_reserved_future_use 16 
+    // section_length          12
+    // DVB_reserved_future_use 16
     // ISO_reserved             2
-    // version_number           5 
+    // version_number           5
     // current_next_indicator   1
-    // section_number           8 
-    // last_section_number      8 
-    // DVB_reserved_for_future_use 4 
+    // section_number           8
+    // last_section_number      8
+    // DVB_reserved_for_future_use 4
     // transmission_info_loop_length 12
     // for (i =0;i<N;i++) { descriptor() }
     // for (i=0;i<N;i++)
     // {
-    //   service_id 16 
-    //   DVB_reserved_future_use  1 
+    //   service_id 16
+    //   DVB_reserved_future_use  1
     //   running_status           3
     //   service_loop_length     12
     //   for(j=0;j<N;j++) { descriptor() }
     // }
-    // CRC_32 32 rpchof 
+    // CRC_32 32 rpchof
 };
 
 class DVBEventInformationTable : public PSIPTable

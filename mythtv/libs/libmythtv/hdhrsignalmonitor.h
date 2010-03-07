@@ -26,7 +26,7 @@ class HDHRSignalMonitor: public DTVSignalMonitor
     HDHRSignalMonitor(const HDHRSignalMonitor&);
 
     virtual void UpdateValues(void);
-    HDHRChannel *GetHDHRChannel(void); 
+    HDHRChannel *GetHDHRChannel(void);
 
   protected:
     bool               streamHandlerStarted;

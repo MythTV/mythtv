@@ -4,7 +4,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
-  
+
 #include "jitterometer.h"
 
 Jitterometer::Jitterometer(const char *nname, int ncycles) :
@@ -70,7 +70,7 @@ bool Jitterometer::RecordEndTime()
       mean /= num_cycles;
 
       fps = num_cycles / tottime * 1000000;
-          
+
       /* compute the sum of the squares of each deviation from the mean */
       for(i=0; i<num_cycles;i++)
         {

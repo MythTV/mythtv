@@ -201,7 +201,7 @@ void HDHRRecorder::HandlePMT(uint progNum, const ProgramMapTable *_pmt)
 }
 
 /** \fn HDHRRecorder::HandleMGT(const MasterGuideTable*)
- *  \brief Processes Master Guide Table, by enabling the 
+ *  \brief Processes Master Guide Table, by enabling the
  *         scanning of all PIDs listed.
  */
 /*
@@ -241,7 +241,7 @@ void HDHRRecorder::Close(void)
     VERBOSE(VB_RECORD, LOC + "Close() -- begin");
 
     if (IsOpen())
-        HDHRStreamHandler::Return(_stream_handler); 
+        HDHRStreamHandler::Return(_stream_handler);
 
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
@@ -305,7 +305,7 @@ void HDHRRecorder::StartRecording(void)
     _stream_data->AddAVListener(this);
     _stream_data->AddWritingListener(this);
     _stream_handler->AddListener(_stream_data);
-    
+
     while (_request_recording && !_error)
     {
         usleep(50000);

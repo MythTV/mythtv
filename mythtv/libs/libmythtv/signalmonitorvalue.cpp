@@ -32,7 +32,7 @@ void SignalMonitorValue::Init()
 }
 
 SignalMonitorValue::SignalMonitorValue(const QString& _name,
-                                       const QString& _noSpaceName, 
+                                       const QString& _noSpaceName,
                                        int _threshold,
                                        bool _high_threshold,
                                        int _min, int _max,
@@ -56,7 +56,7 @@ SignalMonitorValue::SignalMonitorValue(const QString& _name,
 }
 
 SignalMonitorValue::SignalMonitorValue(const QString& _name,
-                                       const QString& _noSpaceName, 
+                                       const QString& _noSpaceName,
                                        int _value, int _threshold,
                                        bool _high_threshold,
                                        int _min, int _max,

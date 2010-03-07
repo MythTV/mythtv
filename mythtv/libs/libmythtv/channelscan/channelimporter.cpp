@@ -244,7 +244,7 @@ uint ChannelImporter::DeleteUnusedTransports(uint sourceid)
 
     if (query.size() == 0)
         return 0;
-    
+
     DeleteAction action = QueryUserDelete(msg);
     if (kDeleteIgnoreAll == action)
         return 0;
@@ -353,7 +353,7 @@ void ChannelImporter::InsertChannels(
             UpdateAction action = QueryUserUpdate(msg);
             list = UpdateChannels(list, info, action, type, filtered);
         }
-    }    
+    }
 
     // print list of inserted channels
     // print list of ignored channels (by ignored reason category)
@@ -726,7 +726,7 @@ void ChannelImporter::FilterServices(ScanDTVTransportList &transports) const
 {
     bool require_av = (m_service_requirements & kRequireAV) == kRequireAV;
     bool require_a  = m_service_requirements & kRequireAudio;
-        
+
     for (uint i = 0; i < transports.size(); i++)
     {
         ChannelInsertInfoList filtered;
@@ -1030,7 +1030,7 @@ QString ChannelImporter::GetSummary(
     const ChannelImporterBasicStats      &info,
     const ChannelImporterUniquenessStats &stats)
 {
-    
+
     QString msg = QObject::tr("Found %n transport(s):\n", "", transport_count);
     msg += QObject::tr("Channels: FTA Enc Dec\n") +
         QString("ATSC      %1 %2 %3\n")
@@ -1147,7 +1147,7 @@ QString ChannelImporter::ComputeSuggestedChannelNum(
 
     if (!chan.atsc_minor_channel)
         chan_num = QString("%1").arg(chan.service_id);
-    
+
     if (!ChannelUtil::IsConflicting(chan_num, chan.source_id))
         return chan_num;
 

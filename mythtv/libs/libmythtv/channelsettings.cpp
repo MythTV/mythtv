@@ -84,7 +84,7 @@ class Source : public ComboBoxSetting, public ChannelDBStorage
         query.prepare("SELECT name, sourceid "
                       "FROM videosource "
                       "ORDER BY sourceid");
-        
+
         if (!query.exec() || !query.isActive())
         {
             MythDB::DBError("Source::fillSelections", query);
@@ -373,7 +373,7 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
     addChild(new Name(id));
 
     Source *source = new Source(id, default_sourceid);
-  
+
     HorizontalConfigurationGroup *group1 =
         new HorizontalConfigurationGroup(false,false,true,true);
     HorizontalConfigurationGroup *bottomhoz =
@@ -382,19 +382,19 @@ ChannelOptionsCommon::ChannelOptionsCommon(const ChannelID &id,
         new VerticalConfigurationGroup(false, true);
     VerticalConfigurationGroup *right =
         new VerticalConfigurationGroup(false, true);
-  
+
 
     left->addChild(new Channum(id));
     left->addChild(new Callsign(id));
     left->addChild(new Visible(id));
-  
+
     right->addChild(source);
     right->addChild(new ChannelTVFormat(id));
     right->addChild(new Priority(id));
 
     group1->addChild(left);
     group1->addChild(right);
-  
+
     bottomhoz->addChild(onairguide = new OnAirGuide(id));
     bottomhoz->addChild(xmltvID = new XmltvID(id));
     bottomhoz->addChild(new TimeOffset(id));

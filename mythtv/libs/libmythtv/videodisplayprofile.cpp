@@ -328,7 +328,7 @@ bool VideoDisplayProfile::CheckVideoRendererGroup(const QString renderer)
             return true;
     return false;
 }
-    
+
 bool VideoDisplayProfile::IsDecoderCompatible(const QString &decoder)
 {
     const QString dec = GetDecoder();

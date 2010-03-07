@@ -151,7 +151,7 @@ void ChromaKeyOSD::Reinit(int i)
 }
 
 /** \fn ChromaKeyOSD::ProcessOSD(OSD*)
- * 
+ *
  *  \return true if we need a repaint, false otherwise
  */
 bool ChromaKeyOSD::ProcessOSD(OSD *osd)

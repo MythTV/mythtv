@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) David C.J. Matthews 2005, 2006
- *     Derived from libdsmcc by Richard Palmer 
+ *     Derived from libdsmcc by Richard Palmer
  */
 #include <string.h> // For memcmp
 
@@ -23,9 +23,9 @@
  *   directories.  One of these gateways is referenced by a
  *   DownloadServerInitiate message and is the root for the particular
  *   carousel.  Crucially, directories and files may be shared between
- *   directories and gateways. For example, the BBC radio channels 
+ *   directories and gateways. For example, the BBC radio channels
  *   Radio 1, Radio 2, Radio 3 and Radio 4 all share the same object
- *   carousel and differ only in the DownloadServerInitiate message. 
+ *   carousel and differ only in the DownloadServerInitiate message.
  */
 
 DSMCCCache::DSMCCCache(Dsmcc *dsmcc)
@@ -271,7 +271,7 @@ DSMCCCacheDir *DSMCCCache::FindGateway(DSMCCCacheReference &ref)
 // Return the contents of an object if it exists.
 // Returns zero for success, -1 if we know the object does not
 // currently exist and +1 if the carousel has not so far loaded
-// the object or one of the parent files. 
+// the object or one of the parent files.
 int DSMCCCache::GetDSMObject(QStringList &objectPath, QByteArray &result)
 {
     DSMCCCacheDir *dir = FindGateway(m_GatewayRef);

@@ -105,7 +105,7 @@ class ScannedChannelInfo
     const MasterGuideTable *mgt;
     cvct_vec_t        cvcts;
     tvct_vec_t        tvcts;
-    
+
     // DVB
     nit_vec_t         nits;
     sdt_map_t         sdts;
@@ -114,8 +114,8 @@ class ScannedChannelInfo
 /** \class ChannelScanSM
  *  \brief Scanning class for cards that support a SignalMonitor class.
  *
- *   With ScanStreamData, we call ScanTransport() on each transport 
- *   and frequency offset in the list of transports. This list is 
+ *   With ScanStreamData, we call ScanTransport() on each transport
+ *   and frequency offset in the list of transports. This list is
  *   created from a FrequencyTable object.
  *
  *   Each ScanTransport() call resets the ScanStreamData and the
@@ -1480,7 +1480,7 @@ void ChannelScanSM::ScanTransport(const transport_scan_items_it_t transport)
 
     const TransportScanItem &item = *transport;
 
-    if (transport.offset() && 
+    if (transport.offset() &&
         (item.freq_offset(transport.offset()) == item.freq_offset(0)))
     {
         waitingForTables = false;
@@ -1559,7 +1559,7 @@ bool ChannelScanSM::ScanTransports(
     freq_table_list_t tables =
         get_matching_freq_tables(std, modulation, country);
 
-    VERBOSE(VB_CHANSCAN, LOC + 
+    VERBOSE(VB_CHANSCAN, LOC +
             QString("Looked up freq table (%1, %2, %3) w/%4 entries")
             .arg(std).arg(modulation).arg(country).arg(tables.size()));
 

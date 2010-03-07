@@ -1565,7 +1565,7 @@ void RecordingProfile::fillSelections(SelectSetting *setting, int group,
 QMap<int, QString> RecordingProfile::listProfiles(int group)
 {
     QMap<int, QString> profiles;
-    
+
     if (!group)
     {
         for (uint i = 0; !availProfiles[i].isEmpty(); i++)
@@ -1618,7 +1618,7 @@ QMap<int, QString> RecordingProfile::listProfiles(int group)
         QString lbl = QObject::tr("Record using the \"%1\" profile").arg(name);
         profiles[id] = lbl;
     } while (result.next());
-    
+
     return profiles;
 }
 

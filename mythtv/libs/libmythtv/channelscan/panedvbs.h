@@ -49,7 +49,7 @@ class PaneDVBS : public HorizontalConfigurationGroup
         right->addChild(pfec       = new ScanFec());
         right->addChild(pinversion = new ScanInversion());
         addChild(left);
-        addChild(right);     
+        addChild(right);
     }
 
     QString frequency(void)  const { return pfrequency->getValue();  }

@@ -91,7 +91,7 @@ bool CardUtil::IsCardTypePresent(const QString &rawtype, QString hostname)
         hostname = gContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString qstr = 
+    QString qstr =
         "SELECT count(cardtype) "
         "FROM capturecard, cardinput "
         "WHERE cardinput.cardid = capturecard.cardid AND "
@@ -155,7 +155,7 @@ QStringVec CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
         hostname = gContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString qstr = 
+    QString qstr =
         "SELECT videodevice "
         "FROM capturecard "
         "WHERE hostname = :HOSTNAME";
@@ -200,7 +200,7 @@ QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
         const QFileInfoList il = dir.entryInfoList();
         if (il.isEmpty())
             return devs;
-        
+
         QFileInfoList::const_iterator it = il.begin();
 
         for (; it != il.end(); ++it)
@@ -337,7 +337,7 @@ QString CardUtil::ProbeDVBFrontendName(const QString &device)
 }
 
 /** \fn CardUtil::HasDVBCRCBug(const QString &)
- *  \brief Returns true if and only if the device munges 
+ *  \brief Returns true if and only if the device munges
  *         PAT/PMT tables, and then doesn't fix the CRC.
  *
  *   Currently the list of broken DVB hardware and drivers includes:
@@ -439,7 +439,7 @@ bool set_on_source(const QString &to_set, uint cardid, uint sourceid,
 
 /**
  *  \brief Returns all cardids of cards that uses the specified
- *         videodevice if specified, and optionally rawtype and a non-local 
+ *         videodevice if specified, and optionally rawtype and a non-local
  *         hostname. The result is ordered from smallest to largest.
  *  \param videodevice Video device we want card ids for
  *  \param rawtype     Card type as used in DB or empty string for any type
@@ -456,7 +456,7 @@ vector<uint> CardUtil::GetCardIDs(QString videodevice,
         hostname = gContext->GetHostName();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString qstr = 
+    QString qstr =
         (videodevice.isEmpty()) ?
         "SELECT cardid "
         "FROM capturecard "
@@ -818,7 +818,7 @@ vector<uint> CardUtil::GetCloneCardIDs(uint cardid)
         MythDB::DBError("CardUtil::GetCloneCardIDs() 2", query);
         return list;
     }
-    
+
     while (query.next())
         list.push_back(query.value(0).toUInt());
 
@@ -1085,7 +1085,7 @@ vector<uint> CardUtil::GetInputIDs(uint cardid)
         "SELECT cardinputid "
         "FROM cardinput "
         "WHERE cardid = :CARDID");
-    
+
     query.bindValue(":CARDID", cardid);
 
     if (!query.exec())
@@ -1351,7 +1351,7 @@ vector<uint> CardUtil::GetGroupCardIDs(uint inputgroupid)
         "SELECT DISTINCT cardid "
         "FROM cardinput, inputgroup "
         "WHERE inputgroupid = :GROUPID AND "
-	"      cardinput.cardinputid = inputgroup.cardinputid "
+        "      cardinput.cardinputid = inputgroup.cardinputid "
         "ORDER BY cardid");
 
     query.bindValue(":GROUPID", inputgroupid);
@@ -1780,9 +1780,9 @@ void CardUtil::GetCardInputs(
             inputLabels.push_back(
                 dev_label + QString(" (%1) -> %2")
                 .arg(*it).arg(cardinput->getSourceName()));
-            cardInputs.push_back(cardinput);            
+            cardInputs.push_back(cardinput);
         }
-        
+
         // plus add one "new" input
         if (needs_conf)
         {

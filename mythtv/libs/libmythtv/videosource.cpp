@@ -1399,7 +1399,7 @@ void HDHomeRunIP::UpdateDevices(const QString &v)
        emit NewIP(v);
    }
 }
-       
+
 HDHomeRunTunerIndex::HDHomeRunTunerIndex()
 {
     setLabel(QObject::tr("Tuner"));
@@ -1543,7 +1543,7 @@ void HDHomeRunDeviceIDList::fillSelections(const QString &cur)
 
     QString usestr = QString(" -- ");
     usestr += QObject::tr("Warning: already in use");
- 
+
     for (uint i = 0; i < devs.size(); i++)
     {
         const QString dev = devs[i];
@@ -1681,7 +1681,7 @@ HDHomeRunConfigurationGroup::HDHomeRunConfigurationGroup
 {
     setUseLabel(false);
 
-    // Fill Device list 
+    // Fill Device list
     FillDeviceList();
 
     deviceid     = new HDHomeRunDeviceID(parent);
@@ -1757,7 +1757,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     for (it = db.begin(); it != db.end(); ++it)
     {
         QMap<QString, HDHomeRunDevice>::iterator dit;
-       
+
         dit = devicelist.find(*it);
 
         if (dit == devicelist.end())
@@ -2065,7 +2065,7 @@ void CaptureCard::fillSelections(SelectSetting *setting)
         QString cardtype    = query.value(2).toString();
 
         bool sharable = CardUtil::IsTunerSharingCapable(cardtype.toUpper());
-                       
+
         if (sharable && (1 != ++device_refs[videodevice]))
             continue;
 
@@ -3167,7 +3167,7 @@ void CardInputEditor::Load(void)
         QString cardtype    = query.value(2).toString();
 
         bool sharable = CardUtil::IsTunerSharingCapable(cardtype.toUpper());
-                       
+
         if (sharable && (1 != ++device_refs[videodevice]))
             continue;
 

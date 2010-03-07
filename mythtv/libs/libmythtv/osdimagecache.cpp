@@ -30,7 +30,7 @@ uint OSDImageCache::kMaximumMemoryCacheSize = 5 * 1024 * 1024;
 /**
  *  \brief The main constructor that takes the image data as arguments.
  *
- *   The image data becomes property of the OSDImageCacheValue 
+ *   The image data becomes property of the OSDImageCacheValue
  *   and will be deleted by it.
  */
 OSDImageCacheValue::OSDImageCacheValue(
@@ -45,7 +45,7 @@ OSDImageCacheValue::OSDImageCacheValue(
 {
     uint yuv_size = m_imagesize.width() * m_imagesize.height() * 3 / 2;
     m_size_in_bytes =
-        (sizeof(OSDImageCacheValue)) + yuv_size + 
+        (sizeof(OSDImageCacheValue)) + yuv_size +
         (m_imagesize.width() * m_imagesize.height());
 }
 
@@ -63,7 +63,7 @@ OSDImageCacheValue::~OSDImageCacheValue()
 /** \fn OSDImageCache::OSDImageCache()
  *  \brief Constructor, initializes the internal cache structures.
  */
-OSDImageCache::OSDImageCache() : 
+OSDImageCache::OSDImageCache() :
     m_cacheLock(QMutex::Recursive),
     m_memHits(0), m_diskHits(0), m_misses(0), m_cacheSize(0)
 {
@@ -72,7 +72,7 @@ OSDImageCache::OSDImageCache() :
 /** \fn OSDImageCache::~OSDImageCache()
  *  \brief Destructor, frees all cached OSD images.
  */
-OSDImageCache::~OSDImageCache() 
+OSDImageCache::~OSDImageCache()
 {
 #ifdef PRINT_OSD_IMAGE_CACHE_STATS
     int totalAccess = m_memHits + m_diskHits + m_misses;
@@ -81,12 +81,12 @@ OSDImageCache::~OSDImageCache()
 
 #define LOG_PREFIX "OSDImageCache: "
     VERBOSE(VB_IMPORTANT, LOC << " Statistics: " << endl
-            << LOG_PREFIX << m_imageCache.totalCost() << " bytes in cache\n" 
-            << LOG_PREFIX << " memory hits: " 
+            << LOG_PREFIX << m_imageCache.totalCost() << " bytes in cache\n"
+            << LOG_PREFIX << " memory hits: "
             << m_memHits << ", " << m_memHits*100.0/totalAccess << "%\n"
-            << LOG_PREFIX << "   disk hits: " 
+            << LOG_PREFIX << "   disk hits: "
             << m_diskHits << ", " << m_diskHits*100.0/totalAccess << "%\n"
-            << LOG_PREFIX << "      misses: " 
+            << LOG_PREFIX << "      misses: "
             << m_misses << ", " << m_misses*100.0/totalAccess << "%");
 #undef LOC_PREFIX
 #endif
@@ -137,7 +137,7 @@ bool OSDImageCache::InFileCache(const QString &key) const
     {
         cFile.dir().remove(cFile.completeBaseName());
         return false;
-    } 
+    }
 
     return true;
 }
@@ -185,7 +185,7 @@ OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
     uint32_t imheight = 0;
 
     QDataStream stream(&cacheFile);
-    stream >> imwidth >> imheight;   
+    stream >> imwidth >> imheight;
 
     uint yuv_size = imwidth * imheight * 3 / 2;
     uint tot_size = (sizeof(imwidth) * 2) + yuv_size + (imwidth * imheight);
@@ -203,7 +203,7 @@ OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
     stream.readRawData((char*)alpha, imwidth * imheight);
     cacheFile.close();
 
-    OSDImageCacheValue* value = 
+    OSDImageCacheValue* value =
         new OSDImageCacheValue(
             key,
             yuv, yuv,
@@ -218,7 +218,7 @@ OSDImageCacheValue *OSDImageCache::Get(const QString &key, bool useFile)
 /** \fn OSDImageCache::Insert(OSDImageCacheValue*)
  *  \brief Inserts OSD image data to memory cache.
  *
- *   The item becomes property of the OSDImageCache and may be 
+ *   The item becomes property of the OSDImageCache and may be
  *   deleted any time by it.
  *
  *  \param value The cache item.
@@ -305,7 +305,7 @@ void OSDImageCache::SaveToDisk(const OSDImageCacheValue *value)
     uint     yuv_size = imwidth * imheight * 3 / 2;
 
     QDataStream stream(&cacheFile);
-    stream << imwidth << imheight;   
+    stream << imwidth << imheight;
     stream.writeRawData((const char*)value->m_yuv, yuv_size);
     stream.writeRawData((const char*)value->m_alpha, imwidth * imheight);
     cacheFile.close();
@@ -316,7 +316,7 @@ void OSDImageCache::SaveToDisk(const OSDImageCacheValue *value)
  *
  *   The returned key is a string that can be safely used as a file name.
  */
-QString OSDImageCache::CreateKey(const QString &filename, float wmult, 
+QString OSDImageCache::CreateKey(const QString &filename, float wmult,
                                  float hmult, int scalew, int scaleh)
 {
     QString tmp = filename;

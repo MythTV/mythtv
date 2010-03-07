@@ -1306,7 +1306,7 @@ bool DiSEqCDevSwitch::ExecuteLegacy(const DiSEqCDevSettings &settings,
             cmds = sw21_cmds;
             num_ports = 2;
             if (horizontal)
-                horizcmd = 0x80;  
+                horizcmd = 0x80;
             break;
         case kTypeLegacySW42:
             cmds = sw42_cmds;
@@ -1618,7 +1618,7 @@ DiSEqCDevRotor::DiSEqCDevRotor(DiSEqCDevTree &tree, uint devid)
     : DiSEqCDevDevice(tree, devid),
       m_type(kTypeDiSEqC_1_3),
       m_speed_hi(2.5),          m_speed_lo(1.9),
-      m_child(NULL),            
+      m_child(NULL),
       m_last_position(0.0),     m_desired_azimuth(0.0),
       m_reset(true),            m_move_time(0.0),
       m_last_pos_known(false),  m_last_azimuth(0.0)

@@ -1,16 +1,16 @@
 /*
  * Copyright (C) 1999 Carsten Haitzler and various contributors
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
  * deal in the Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
  * sell copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -66,7 +66,7 @@ class TTFFontPrivate
     bool CacheGlyph(unsigned short c) const;
     Raster_Map *CalcSize(int *width, int *height, const QString &text,
                          bool double_size = false) const;
-    void RenderText(Raster_Map *rmap, Raster_Map *rchr, const QString &text, 
+    void RenderText(Raster_Map *rmap, Raster_Map *rchr, const QString &text,
                     int *xorblah, int *yor, bool double_size = false) const;
     unsigned int CalcWidth(const QString &text) const;
 
@@ -147,8 +147,8 @@ void TTFFont::setColor(const QColor &color, kTTF_Color k)
     }
 }
 
-void TTFFont::MergeText(OSDSurface *surface, Raster_Map * rmap, int offset_x, 
-                        int offset_y, int xstart, int ystart, int width, 
+void TTFFont::MergeText(OSDSurface *surface, Raster_Map * rmap, int offset_x,
+                        int offset_y, int xstart, int ystart, int width,
                         int height, int alphamod, kTTF_Color k) const
 {
     unsigned char * asrc, * ydst, * udst, * vdst, * adst;
@@ -176,7 +176,7 @@ void TTFFont::MergeText(OSDSurface *surface, Raster_Map * rmap, int offset_x,
 
     QRect drawRect(xstart, ystart, width, height);
     surface->AddRect(drawRect);
-    
+
     asrc = rmap->bitmap + rmap->cols * offset_y + offset_x;
     ydst = surface->y + surface->width * ystart + xstart;
     adst = surface->alpha + surface->width * ystart + xstart;
@@ -209,8 +209,8 @@ void TTFFont::MergeText(OSDSurface *surface, Raster_Map * rmap, int offset_x,
                                surface->pow_lut);
 }
 
-void TTFFont::DrawString(OSDSurface *surface, int x, int y, 
-                         const QString &text, int maxx, int maxy, 
+void TTFFont::DrawString(OSDSurface *surface, int x, int y,
+                         const QString &text, int maxx, int maxy,
                          int alphamod, bool double_size) const
 {
    int                  width, height, w, h, inx, iny, clipx, clipy;
@@ -236,7 +236,7 @@ void TTFFont::DrawString(OSDSurface *surface, int x, int y,
    is_pixmap = 1;
 
    y += m_priv->loadedfontsize;
-   
+
    width = maxx;
    height = (double_size) ? maxy<<1 : maxy;
 
@@ -571,7 +571,7 @@ Raster_Map *TTFFontPrivate::CalcSize(
     *width = pw + 4;
     *height = ph;
 
-    rtmp = create_font_raster(face->size->metrics.x_ppem + 32, 
+    rtmp = create_font_raster(face->size->metrics.x_ppem + 32,
                               face->size->metrics.y_ppem + 32);
     return rtmp;
 }
@@ -676,7 +676,7 @@ void TTFFontPrivate::RenderText(
             ymax = ymin + rtmp->rows - 1;
 
         // set up clipping and cursors
- 
+
         iread = 0;
         if (ymin < 0)
         {
@@ -709,7 +709,7 @@ void TTFFontPrivate::RenderText(
         _read = (char *)rtmp->bitmap + iread;
         _off = (char *)rmap->bitmap + ioff;
         _off2 = _off - rmap->cols;
-       
+
         for (y = ymin; y <= ymax; y++)
         {
             read = _read;

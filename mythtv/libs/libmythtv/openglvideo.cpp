@@ -35,7 +35,7 @@ class OpenGLFilter
 /**
  * \class OpenGLVideo
  *  A class used to display video frames and associated imagery
- *  using the OpenGL API. 
+ *  using the OpenGL API.
  *
  *  The basic operational concept is to use a series of filter stages to
  *  generate the desired video output, using limited software assistance
@@ -44,7 +44,7 @@ class OpenGLFilter
  *  (faster CPU->GPU memory transfers).
  *
  *  In the most basic case, for example, a YV12 frame pre-converted in software
- *  to BGRA format is simply blitted to the frame buffer. 
+ *  to BGRA format is simply blitted to the frame buffer.
  *  Currently, the most complicated example is the rendering of a standard
  *  definition, interlaced frame to a high(er) definition display using
  *  OpenGL (i.e. hardware based) deinterlacing, colourspace conversion and
@@ -124,7 +124,7 @@ void OpenGLVideo::Teardown(void)
  *  \param displayVisibleRect the bounding rectangle of the OpenGL window
  *  \param displayVideoRect   the bounding rectangle for the area to display
  *   the video frame
- *  \param videoRect          the portion of the video frame to display in 
+ *  \param videoRect          the portion of the video frame to display in
      displayVideoRect
  *  \param viewport_control   if true, this instance may permanently change
      the OpenGL viewport
@@ -278,7 +278,7 @@ bool OpenGLVideo::Init(OpenGLContext *glcontext, bool colour_control,
 
     CheckResize(false);
 
-    VERBOSE(VB_PLAYBACK, LOC + 
+    VERBOSE(VB_PLAYBACK, LOC +
             QString("Using packed textures with%1 mmx and with%2 PBOs")
             .arg(mmx ? "" : "out").arg(use_pbo ? "" : "out"));
 
@@ -478,7 +478,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
     {
         if (helperTexture)
             gl_context->DeleteTexture(helperTexture);
- 
+
         helperTexture = gl_context->CreateHelperTexture();
         if (!helperTexture)
             success = false;
@@ -650,7 +650,7 @@ bool OpenGLVideo::AddDeinterlacer(const QString &deinterlacer)
 
     hardwareDeinterlacer = "";
     TearDownDeinterlacer();
- 
+
     return false;
 }
 
@@ -810,7 +810,7 @@ void OpenGLVideo::UpdateInputFrame(const VideoFrame *frame, bool soft_bob)
  *  is available as the OpenGL OSD is not permitted if the correct hardware
  *  support is not detected.
  */
- 
+
 void OpenGLVideo::UpdateInput(const unsigned char *buf, const int *offsets,
                               int format, QSize size,
                               const unsigned char *alpha)
@@ -955,9 +955,9 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         }
 
         // vertex coordinates
-        QRect display = (filter->frameBuffers.empty() ||  
-                         filter->outputBuffer == kDefaultBuffer) ? 
-                         display_video_rect : frameBufferRect; 
+        QRect display = (filter->frameBuffers.empty() ||
+                         filter->outputBuffer == kDefaultBuffer) ?
+                         display_video_rect : frameBufferRect;
         QRect visible = (filter->frameBuffers.empty() ||
                          filter->outputBuffer == kDefaultBuffer) ?
                          display_visible_rect : frameBufferRect;
@@ -967,20 +967,20 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
         float vtop   = display.top();
         float vbot   = display.bottom();
 
-        // invert horizontally if last filter 
+        // invert horizontally if last filter
         if (it == filters.begin())
         {
-            // flip vertical positioning to translate from X coordinate system 
-            // to opengl coordinate system 
+            // flip vertical positioning to translate from X coordinate system
+            // to opengl coordinate system
             vtop = (visible.height()- 1) - display.top();
             vbot = vtop - (display.height() - 1);
-        } 
-        else if (it != filters.begin() && 
+        }
+        else if (it != filters.begin() &&
                 (filter->frameBuffers.empty() ||
                 filter->outputBuffer == kDefaultBuffer))
         {
-            // this is the last filter and we have already inverted the video frame 
-            // now need to adjust for vertical offsets 
+            // this is the last filter and we have already inverted the video frame
+            // now need to adjust for vertical offsets
             vbot = (visible.height()- 1) - display.top();
             vtop = vbot - (display.height() - 1);
         }
@@ -1099,7 +1099,7 @@ void OpenGLVideo::PrepareFrame(bool topfieldfirst, FrameScanType scan,
             }
             program = filter->fragmentPrograms[prog_ref];
         }
- 
+
         gl_context->EnableFragmentProgram(program);
 
         if (useColourControl &&
@@ -1215,13 +1215,13 @@ QString OpenGLVideo::FilterToString(OpenGLFilterType filt)
     return "";
 }
 
-static const QString attrib_fast = 
+static const QString attrib_fast =
 "ATTRIB tex  = fragment.texcoord[0];\n";
 
 static const QString var_alpha =
 "TEMP alpha;\n";
 
-static const QString tex_alpha = 
+static const QString tex_alpha =
 "TEX alpha, tex, texture[3], %1;\n";
 
 static const QString tex_fast =
@@ -1240,7 +1240,7 @@ static const QString end_alpha =
 static const QString var_fast =
 "TEMP tmp, res;\n";
 
-static const QString calc_fast_alpha = 
+static const QString calc_fast_alpha =
 "MOV result.color.a, res.g;\n";
 
 static const QString end_fast =
@@ -1659,7 +1659,7 @@ QString OpenGLVideo::GetProgramString(OpenGLFilterType name,
             break;
 
         case kGLFilterBicubic:
- 
+
             ret += bicubic;
             break;
 

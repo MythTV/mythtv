@@ -303,7 +303,7 @@ static void return_4096_block(unsigned char* ptr)
             }
             cerr<<endl;
         }
-#endif 
+#endif
 
     // free the allocator only if more than 1 block was used
     if (alloc4096.empty() && mem4096.size() > 1)

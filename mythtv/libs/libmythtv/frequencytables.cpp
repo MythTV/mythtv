@@ -17,7 +17,7 @@ TransportScanItem::TransportScanItem()
     : mplexid((uint)-1),  FriendlyName(""),
       friendlyNum(0),     SourceID(0),          UseTimer(false),
       scanning(false),    timeoutTune(1000)
-{ 
+{
     bzero(freq_offsets, sizeof(int)*3);
 
     tuning.Clear();
@@ -67,7 +67,7 @@ TransportScanItem::TransportScanItem(uint                _sourceid,
       SourceID(_sourceid), UseTimer(false),
       scanning(false),     timeoutTune(_timeoutTune)
 {
-    bzero(freq_offsets, sizeof(int) * 3); 
+    bzero(freq_offsets, sizeof(int) * 3);
     expectedChannels = _tuning.channels;
 
     tuning.Clear();
@@ -277,7 +277,7 @@ int get_closest_freqid(
 
     freq_table_list_t list =
         get_matching_freq_tables_internal(format, modulation, country);
-    
+
     for (uint i = 0; i < list.size(); ++i)
     {
         int min_freqid = list[i]->name_offset;

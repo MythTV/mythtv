@@ -177,7 +177,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
     if (sorted.empty())
       return -1;
 
-    // If grpid is all channels (-1), then return the first grpid  
+    // If grpid is all channels (-1), then return the first grpid
     if (grpid == -1)
       return sorted[0].grpid;
 
@@ -185,7 +185,7 @@ int ChannelGroup::GetNextChannelGroup(const ChannelGroupList &sorted, int grpid)
 
     // If grpid is not in the list, return -1 for all channels
     if (it == sorted.end())
-        return -1; 
+        return -1;
 
     ++it;
 
@@ -213,7 +213,7 @@ QString ChannelGroup::GetChannelGroupName(int grpid)
         MythDB::DBError("ChannelGroup::GetChannelGroups", query);
     else if (query.size() > 0)
     {
-        query.next();    
+        query.next();
         return query.value(0).toString();
     }
 
@@ -237,7 +237,7 @@ int ChannelGroup::GetChannelGroupId(QString changroupname)
         MythDB::DBError("ChannelGroup::GetChannelGroups", query);
     else if (query.size() > 0)
     {
-        query.next();    
+        query.next();
         return query.value(0).toUInt();
     }
 

@@ -232,7 +232,7 @@ void IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
                 _buffer_packets = !FindMPEG2Keyframes(&tspacket);
 
             if ((video_stream_type != StreamID::H264Video) || _seen_sps)
-                BufferedWrite(tspacket);            
+                BufferedWrite(tspacket);
         }
         else if (_stream_data->IsAudioPID(lpid))
         {

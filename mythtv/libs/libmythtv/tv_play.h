@@ -774,7 +774,7 @@ class MPUBLIC TV : public QThread
     bool         isEmbedded;       ///< are we currently embedded
     bool         ignoreKeyPresses; ///< should we ignore keypresses
     vector<bool> saved_pause;      ///< saved pause state before embedding
-    
+
     // IsTunable() cache, used by embedded program guide
     mutable QMutex                 is_tunable_cache_lock;
     QMap< uint,vector<InputInfo> > is_tunable_cache_inputs;
@@ -785,7 +785,7 @@ class MPUBLIC TV : public QThread
     QMap<int,int>             recorderPlaybackInfoTimerId;
     QMap<int,ProgramInfo>     recorderPlaybackInfo;
 
-    // Channel group stuff    
+    // Channel group stuff
     int channel_group_id;
     uint browse_changrp;
     ChannelGroupList m_changrplist;

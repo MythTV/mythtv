@@ -102,7 +102,7 @@ ScanNetwork::ScanNetwork() : ComboBoxSetting(this)
         country = "de";
     else if (qtcountry == QLocale::UnitedKingdom)
         country = "uk";
-    
+
     setLabel(tr("Country"));
     addSelection(QObject::tr("United Kingdom"), "uk", country == "uk");
     addSelection(QObject::tr("Germany"),        "de", country == "de");

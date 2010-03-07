@@ -787,13 +787,13 @@ const char *StreamID::toString(uint streamID)
 
     // DSMCC Object Carousel
     case StreamID::DSMCC_A:
-	return "dsmcc-a encap";
+        return "dsmcc-a encap";
     case StreamID::DSMCC_B:
-	return "dsmcc-b std data";
+        return "dsmcc-b std data";
     case StreamID::DSMCC_C:
-	return "dsmcc-c NPD data";
+        return "dsmcc-c NPD data";
     case StreamID::DSMCC_D:
-	return "dsmcc-d data";
+        return "dsmcc-d data";
 
     //case TableID::STUFFING: XXX: Duplicate?
     //    return "stuffing"; // optionally in any

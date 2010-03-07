@@ -49,7 +49,7 @@ int myth_sws_img_convert(AVPicture *dst, PixelFormat dst_pix_fmt, AVPicture *src
                 "the image conversion context");
         return -1;
     }
-    
+
     sws_scale(convert_ctx, src->data, src->linesize,
               0, height, dst->data, dst->linesize);
 

@@ -7,8 +7,8 @@ int AVF_Open(URLContext *h, const char *filename, int flags)
 
     h->priv_data = NULL;
     return 0;
-}   
-    
+}
+
 int AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
 {
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
@@ -17,12 +17,12 @@ int AVF_Read(URLContext *h, uint8_t *buf, int buf_size)
         return 0;
 
     return avfr->GetRingBuffer()->Read(buf, buf_size);
-}   
-    
+}
+
 int AVF_Write(URLContext *h, uint8_t *buf, int buf_size)
 {
     AVFRingBuffer *avfr = (AVFRingBuffer *)h->priv_data;
-  
+
     if (!avfr)
         return 0;
 
@@ -37,7 +37,7 @@ int64_t AVF_Seek(URLContext *h, int64_t offset, int whence)
         return 0;
 
     if (whence == AVSEEK_SIZE)
-        return avfr->GetRingBuffer()->GetRealFileSize(); 
+        return avfr->GetRingBuffer()->GetRealFileSize();
 
     if (whence == SEEK_END)
         return avfr->GetRingBuffer()->GetRealFileSize() + offset;
