@@ -162,96 +162,104 @@
         <source>Eject</source>
         <translation>Løs ut</translation>
     </message>
+    <message>
+        <source>Select One</source>
+        <translation>Velg en</translation>
+    </message>
+    <message>
+        <source>Clear One Marked</source>
+        <translation>Fjern en merket</translation>
+    </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Image viewer / slideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Billedviser / lysbilder</translation>
     </message>
     <message>
         <source>Start/Stop Slideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Start/stopp lysbildevisning</translation>
     </message>
     <message>
         <source>Go to the first image in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>G√• til f√∏rste bilde i forh√•ndsvisninger</translation>
     </message>
     <message>
         <source>Go to the last image in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>G√• til siste bilde i forh√•ndsvisninger</translation>
     </message>
     <message>
         <source>Start Slideshow in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>Start lysbilder i skjermbilde for forh√•ndsvisning</translation>
     </message>
     <message>
         <source>Start Random Slideshow in thumbnail view</source>
-        <translation type="unfinished"></translation>
+        <translation>Start tilfeldig lysbildevisning i skjermbilde for forh√•ndsvisning</translation>
     </message>
     <message>
         <source>Rotate image right 90 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>Roter bilde 90 grader til h√∏yre</translation>
     </message>
     <message>
         <source>Rotate image left 90 degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>Roter bilde 90 grader til venstre</translation>
     </message>
     <message>
         <source>Zoom image out</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom bilde ut</translation>
     </message>
     <message>
         <source>Zoom image in</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom bilde inn</translation>
     </message>
     <message>
         <source>Scroll image up</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom bilde opp</translation>
     </message>
     <message>
         <source>Scroll image left</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom bilde til venstre</translation>
     </message>
     <message>
         <source>Scroll image right</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom bilde til h√∏yre</translation>
     </message>
     <message>
         <source>Scroll image down</source>
-        <translation type="unfinished"></translation>
+        <translation>Zoom bilde ned</translation>
     </message>
     <message>
         <source>Recenter image</source>
-        <translation type="unfinished"></translation>
+        <translation>Resentrer bilde</translation>
     </message>
     <message>
         <source>Full-size (un-zoom) image</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilde i full st√∏rrelse</translation>
     </message>
     <message>
         <source>Go to the upper-left corner of the image</source>
-        <translation type="unfinished"></translation>
+        <translation>G√• til √∏verste venstre hj√∏rne av bildet</translation>
     </message>
     <message>
         <source>Go to the lower-right corner of the image</source>
-        <translation type="unfinished"></translation>
+        <translation>G√• til nederste h√∏yre hj√∏rne av bildet</translation>
     </message>
     <message>
         <source>Mark image</source>
-        <translation type="unfinished"></translation>
+        <translation>Marker bilde</translation>
     </message>
     <message>
         <source>Toggle scale to fullscreen/scale to fit</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg mellom skalering til fullskjerm/skalering for √• passe</translation>
     </message>
     <message>
         <source>MythGallery Media Handler 1/2</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery medieh√•ndterer 1/2</translation>
     </message>
     <message>
         <source>MythGallery Media Handler 2/2</source>
-        <translation type="unfinished"></translation>
+        <translation>MythGallery medieh√•ndterer 2/2</translation>
     </message>
 </context>
 <context>
@@ -374,47 +382,47 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
     </message>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Katalog:</translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished"></translation>
+        <translation>Opprettet:</translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished"></translation>
+        <translation>Modifisert:</translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Bredde</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished"></translation>
+        <translation>piksler</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>H√∏yde</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished"></translation>
+        <translation>Antall pixler</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation>megapiksler</translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotasjonsvinkel</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>grader</translation>
     </message>
 </context>
 <context>
@@ -422,6 +430,25 @@ Bekreft at mappen eksisterer, er lesbar og at innstillingene er korrekte.</trans
     <message>
         <source>Press SELECT to play again</source>
         <translation>Trykk VELG for å vise en gang til</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>No images are present in the pictures folder.</source>
+        <translation>Ingen bilder er tilgjengelig i billedmappen.</translation>
+    </message>
+    <message>
+        <source>Image Gallery</source>
+        <translation>Billedgalleri</translation>
+    </message>
+    <message>
+        <source>SELECT: View</source>
+        <translation>VELG: Vis</translation>
+    </message>
+    <message>
+        <source>MENU: Activate Menu</source>
+        <translation>MENY: Aktiver meny</translation>
     </message>
 </context>
 </TS>
