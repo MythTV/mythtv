@@ -259,7 +259,7 @@ void EditMetadataDialog::fillWidgets()
     m_titleEdit->SetText(m_workingMetadata->GetTitle());
     m_subtitleEdit->SetText(m_workingMetadata->GetSubtitle());
 
-    m_seasonSpin->SetRange(0,100,1);
+    m_seasonSpin->SetRange(0,9999,1);
     m_seasonSpin->SetValue(m_workingMetadata->GetSeason());
     m_episodeSpin->SetRange(0,999,1);
     m_episodeSpin->SetValue(m_workingMetadata->GetEpisode());
