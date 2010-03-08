@@ -848,7 +848,7 @@ Hver mappe må finnes og være tilgjengelig for brukeren som kjører MythVideo.<
     </message>
     <message>
         <source>Directory that holds movie/TV Banners</source>
-        <translation>Mappe som inneholder Banners for filmer og TV</translation>
+        <translation>Mappe som inneholder bannere for filmer og TV</translation>
     </message>
     <message>
         <source>Directory that holds movie fanart</source>
@@ -996,7 +996,7 @@ Undersøk instillingene for videobehandleren</translation>
     </message>
     <message>
         <source>Enable the setting and skipping to of a bookmark in DVD playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sl√• p√• innstillingen for √• hoppe til et bokmerke under DVD-avspilling.</translation>
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark.</source>
@@ -1364,6 +1364,418 @@ Undersøk instillingene for videobehandleren</translation>
     <message>
         <source>Configure playback and DVD ripping</source>
         <translation>Konfigurer avspilling og DVD ripping</translation>
+    </message>
+    <message>
+        <source>Select a Title to Rip</source>
+        <translation>Velg en tittel √• rippe</translation>
+    </message>
+    <message>
+        <source>Select the parts of the DVD you wish to copy.</source>
+        <translation>Velg hvilke deler av DVDen du √∏nsker √• kopiere.</translation>
+    </message>
+    <message>
+        <source>Film Name:</source>
+        <translation>Filmnavn:</translation>
+    </message>
+    <message>
+        <source>Track Length:</source>
+        <translation>Sporlengde:</translation>
+    </message>
+    <message>
+        <source>Rip Quality:</source>
+        <translation>Rippekvalitet:</translation>
+    </message>
+    <message>
+        <source>Rip AC-3 Audio</source>
+        <translation>Ripp AC-3 lyd</translation>
+    </message>
+    <message>
+        <source>Preview this title</source>
+        <translation>Forh√•ndsvis denne tittelen</translation>
+    </message>
+    <message>
+        <source>Rip This Track</source>
+        <translation>Ripp dette sporet</translation>
+    </message>
+    <message>
+        <source>Previous Title</source>
+        <translation>Forrige tittel</translation>
+    </message>
+    <message>
+        <source>Next Title</source>
+        <translation>Neste tittel</translation>
+    </message>
+    <message>
+        <source>Begin Ripping</source>
+        <translation>Start ripping</translation>
+    </message>
+    <message>
+        <source>No Current Jobs</source>
+        <translation>Ingen gjeldende jobber</translation>
+    </message>
+    <message>
+        <source>Select a Track to Rip</source>
+        <translation>Velg spor √• rippe</translation>
+    </message>
+    <message>
+        <source>Name of Film:</source>
+        <translation>Navnet p√• filmen:</translation>
+    </message>
+    <message>
+        <source>Selected track length:</source>
+        <translation>Valgt sporlengde:</translation>
+    </message>
+    <message>
+        <source>Check this box to select this track:</source>
+        <translation>Kryss av for √• velge dette sporet:</translation>
+    </message>
+    <message>
+        <source>Check to rip AC-3 audio:</source>
+        <translation>Kryss av for √• rippe AC-3 lyd:</translation>
+    </message>
+    <message>
+        <source>Press to view excerpt:</source>
+        <translation>Trykk for √• vise utdrag:</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Forrige</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Neste</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Skuespillere</translation>
+    </message>
+    <message>
+        <source>Plot</source>
+        <translation>Plott</translation>
+    </message>
+    <message>
+        <source>Season/Episode: %1</source>
+        <translation>Sesong/episode: %1</translation>
+    </message>
+    <message>
+        <source>Directed by %1</source>
+        <translation>Regissert av %1</translation>
+    </message>
+    <message>
+        <source>Starring: %1</source>
+        <translation>Stjerne: %1</translation>
+    </message>
+    <message>
+        <source>Parental Level 0</source>
+        <translation>Forelderniv√• 0</translation>
+    </message>
+    <message>
+        <source>Parental Level 1</source>
+        <translation>Forelderniv√• 1</translation>
+    </message>
+    <message>
+        <source>Parental Level 2</source>
+        <translation>Forelderniv√• 2</translation>
+    </message>
+    <message>
+        <source>Parental Level 3</source>
+        <translation>Forelderniv√• 3</translation>
+    </message>
+    <message>
+        <source>Parental Level 4</source>
+        <translation>Forelderniv√• 4</translation>
+    </message>
+    <message>
+        <source>Add New File Types</source>
+        <translation>Legg til nye filtyper</translation>
+    </message>
+    <message>
+        <source>On this screen, you can add new extensions to be recognized by the Video Plugin.  If a scan does not add your files, create a new extension below by clicking the &quot;New&quot; button.
+
+If you select &quot;Use Default Player,&quot; the player command set for the extension will be ignored.  &quot;Ignore This File Type&quot; prevents the items from appearing in a scan.</source>
+        <translation>P√• denne skjermen kan du legge til nye filendinger som skal gjennkjennes av Video tillegget.  Hvis et s√∏k ikke legger til filene dine, lag en ny ending under ved √• klikke p√• &quot;Ny&quot; knappen.
+
+Hvis du velger &quot;Bruk standardavspiller&quot; vil avspillerkommandoen for endingen ikke bli brukt. &quot;Ignorer denne filtypen&quot; forhindrer at filene med denne endingen vises i et s√∏k.</translation>
+    </message>
+    <message>
+        <source>Use Default Player</source>
+        <translation>Bruk standardavspiller</translation>
+    </message>
+    <message>
+        <source>Ignore This File Type</source>
+        <translation>Ignorer denne filtypen</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>Ny</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Slett</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation>Rediger metadata</translation>
+    </message>
+    <message>
+        <source>Modify your film&apos;s metadata.</source>
+        <translation>Endre metadata for filmen din.</translation>
+    </message>
+    <message>
+        <source>Rating:</source>
+        <translation>Rangering:</translation>
+    </message>
+    <message>
+        <source>TMDB Number:</source>
+        <translation>TMDB nummer:</translation>
+    </message>
+    <message>
+        <source>Homepage:</source>
+        <translation>Hjemmeside:</translation>
+    </message>
+    <message>
+        <source>Custom Player:</source>
+        <translation>Spesiell avspiller:</translation>
+    </message>
+    <message>
+        <source>Film has been Watched</source>
+        <translation>Filmen er sett</translation>
+    </message>
+    <message>
+        <source>Film is Browsable</source>
+        <translation>Filmen er visbar</translation>
+    </message>
+    <message>
+        <source>Next File:</source>
+        <translation>Neste fil:</translation>
+    </message>
+    <message>
+        <source>Click here to search existing coverart...</source>
+        <translation>Klikk her for √• s√∏ke i eksisterende plakatfiler...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing screenshots...</source>
+        <translation>Klikk her for √• s√∏ke i eksisterende screenshots...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing banners...</source>
+        <translation>Klikk her for √• s√∏ke i eksisterende bannere...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing fanart...</source>
+        <translation>Klikk her for √• s√∏ke i eksisterende fanart...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing trailers...</source>
+        <translation>Klikk her for √• s√∏ke i eksisterende trailere...</translation>
+    </message>
+    <message>
+        <source>Filter Videos</source>
+        <translation>Filtrer videoer</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Sjanger:</translation>
+    </message>
+    <message>
+        <source>Country:</source>
+        <translation>Land:</translation>
+    </message>
+    <message>
+        <source>Actor/Actress:</source>
+        <translation>Skuespille/-inne:</translation>
+    </message>
+    <message>
+        <source>Browse:</source>
+        <translation>Bla:</translation>
+    </message>
+    <message>
+        <source>TMDB/TVDB #:</source>
+        <translation>TMDB/TVDB nr:</translation>
+    </message>
+    <message>
+        <source>Coverart:</source>
+        <translation>Plakat:</translation>
+    </message>
+    <message>
+        <source>Sort By:</source>
+        <translation>Sorter etter:</translation>
+    </message>
+    <message>
+        <source>Watched:</source>
+        <translation>Sett :</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Lagre</translation>
+    </message>
+    <message>
+        <source>This item was released on %1.</source>
+        <translation>Dette elementet ble sluppet %1.</translation>
+    </message>
+    <message>
+        <source>It was added to your collection on %1.</source>
+        <translation>Den ble lagt til samlingen din p√• %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Video Player Settings</source>
+        <translation>Innstillinger for videoavspiller</translation>
+    </message>
+    <message>
+        <source>Default:</source>
+        <translation>Standard:</translation>
+    </message>
+    <message>
+        <source>DVD Player:</source>
+        <translation>DVD avspiller:</translation>
+    </message>
+    <message>
+        <source>DVD Drive:</source>
+        <translation>DVD stasjon:</translation>
+    </message>
+    <message>
+        <source>VCD Player:</source>
+        <translation>VCD avspiller:</translation>
+    </message>
+    <message>
+        <source>VCD Drive:</source>
+        <translation>VCD stasjon:</translation>
+    </message>
+    <message>
+        <source>Enable Alternate Player</source>
+        <translation>Sl√• p√• alternativ avspiller</translation>
+    </message>
+    <message>
+        <source>Alt. Player:</source>
+        <translation>Alt. avspiller:</translation>
+    </message>
+    <message>
+        <source>Video Metadata Settings</source>
+        <translation>Innstillinger for video metadata</translation>
+    </message>
+    <message>
+        <source>Movie Grab:</source>
+        <translation>Filmgrabb:</translation>
+    </message>
+    <message>
+        <source>TV Grab:</source>
+        <translation>TV grabb:</translation>
+    </message>
+    <message>
+        <source>Display unknown file types</source>
+        <translation>Vis ukjente filtyper</translation>
+    </message>
+    <message>
+        <source>Enable metadata in file browse mode</source>
+        <translation>Sl√• p√• Metadata i bla-modus for filer</translation>
+    </message>
+    <message>
+        <source>Enable Random Trailer Playback</source>
+        <translation>Sl√• p√• tilfelding avspilling av trailere</translation>
+    </message>
+    <message>
+        <source>Trailer #:</source>
+        <translation>Trailer nr:</translation>
+    </message>
+    <message>
+        <source>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
+        <translation>Ingen videoer i biblioteket, eller ingen filer funnet.  Hvis du har konfigurert en videokatalog, trykk &quot;M&quot; (eller MENY knappen) og velg &quot;S√∏k etter endringer.&quot;</translation>
+    </message>
+    <message>
+        <source>TMDB:</source>
+        <translation>TMDB:</translation>
+    </message>
+    <message>
+        <source>Parental Lvl:</source>
+        <translation>Foreldreniv√•:</translation>
+    </message>
+    <message>
+        <source>Browseable</source>
+        <translation>Visbar</translation>
+    </message>
+    <message>
+        <source>Watched</source>
+        <translation>Sett</translation>
+    </message>
+    <message>
+        <source>Player Command:</source>
+        <translation>Avspillingskommando:</translation>
+    </message>
+    <message>
+        <source>Text Filter :</source>
+        <translation>Tekstfilter:</translation>
+    </message>
+    <message>
+        <source>Seas/Ep:</source>
+        <translation>Ses/Ep:</translation>
+    </message>
+    <message>
+        <source>SELECT: Edit</source>
+        <translation>VELG: Rediger</translation>
+    </message>
+    <message>
+        <source>INFO - Action Menu</source>
+        <translation>INFO - aksjonsmeny</translation>
+    </message>
+    <message>
+        <source>Background:</source>
+        <translation>Bakgrunn:</translation>
+    </message>
+    <message>
+        <source>Video List Filters</source>
+        <translation>Filtre for videoliste</translation>
+    </message>
+    <message>
+        <source>Default Player:</source>
+        <translation>Standard avspiller:</translation>
+    </message>
+    <message>
+        <source>Enable Alternate Player:</source>
+        <translation>Sl√• p√• alternativ avspiller:</translation>
+    </message>
+    <message>
+        <source>Alternate Player:</source>
+        <translation>Alternativ avspiller:</translation>
+    </message>
+    <message>
+        <source>Movie Grabber:</source>
+        <translation>Filmgrabber:</translation>
+    </message>
+    <message>
+        <source>TV Grabber:</source>
+        <translation>TV grabber:</translation>
+    </message>
+    <message>
+        <source>Trailers to Play:</source>
+        <translation>Trailere som skal spilles:</translation>
+    </message>
+    <message>
+        <source>File Paths and general options</source>
+        <translation>Filstier og generelle opsjoner</translation>
+    </message>
+    <message>
+        <source>Player Applications and DVD/VCD Drives</source>
+        <translation>Avspillingsprogrammer og DVD/VCD stasjoner</translation>
+    </message>
+    <message>
+        <source>Metadata Settings</source>
+        <translation>Innstillinger for Metadata</translation>
+    </message>
+    <message>
+        <source>Grabber Setup and display preferences</source>
+        <translation>Grabberoppsett og visningsvalg</translation>
+    </message>
+    <message>
+        <source>Associate new file extensions</source>
+        <translation>Assosier ny filendinger</translation>
+    </message>
+    <message>
+        <source>DVD Rip and Transcode options</source>
+        <translation>DVD ripping og konverteringsopsjoner</translation>
     </message>
 </context>
 <context>
