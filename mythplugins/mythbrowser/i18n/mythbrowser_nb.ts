@@ -13,15 +13,15 @@
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation>Finn...</translation>
+        <translation type="obsolete">Finn...</translation>
     </message>
     <message>
         <source>Select a category</source>
@@ -91,11 +91,11 @@ Bruk &apos;Legg til bokmerker&apos; menyvalget for å legge til nye bokmerker</t
     </message>
     <message>
         <source>Ok</source>
-        <translation>OK</translation>
+        <translation type="obsolete">OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="obsolete">Avbryt</translation>
     </message>
     <message>
         <source>This is the command that will be used to show the web browser. Use &apos;Internal&apos; to use the built in web browser&apos;. %ZOOM% and %URL% will be replaced with the zoom level and URL list.</source>
@@ -229,6 +229,50 @@ Bruk &apos;Legg til bokmerker&apos; menyvalget for å legge til nye bokmerker</t
     <message>
         <source>Text Size:</source>
         <translation>Tekststørrelse:</translation>
+    </message>
+    <message>
+        <source>Web Bookmarks</source>
+        <translation>Web bokmerker</translation>
+    </message>
+    <message>
+        <source>Browse your favorite web sites.</source>
+        <translation>Utforsk favorittwebsidene dine.</translation>
+    </message>
+    <message>
+        <source>Browser:</source>
+        <translation>Webleser:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Configure Web Browser</source>
+        <translation>Konfigurer webleseren</translation>
+    </message>
+    <message>
+        <source>You can edit the name, URL, and category for the selected Web Site on this screen.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation>Du kan redigere navn, URL og kategori for den valgte websiden p√• denne skjermen.
+
+N√•r du er ferdig √• redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for √• fortsette.</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Sjanger:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Kanal:</translation>
+    </message>
+    <message>
+        <source>Click to choose from existing categories...</source>
+        <translation>Klikk for √• velge mellom eksisterende kategorier...</translation>
+    </message>
+    <message>
+        <source>Find</source>
+        <translation>Finn</translation>
     </message>
 </context>
 <context>
