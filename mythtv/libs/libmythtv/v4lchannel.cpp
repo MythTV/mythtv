@@ -125,6 +125,8 @@ static int format_to_mode(const QString &fmt, int v4l_version)
             return V4L2_STD_SECAM;
         else if (fmt == "SECAM-D")
             return V4L2_STD_SECAM_D;
+        else if (fmt == "SECAM-DK")
+            return V4L2_STD_SECAM_DK;
         else if (fmt == "PAL-NC")
             return V4L2_STD_PAL_Nc;
         else if (fmt == "PAL-M")

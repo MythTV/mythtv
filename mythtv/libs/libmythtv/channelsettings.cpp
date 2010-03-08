@@ -150,6 +150,7 @@ QStringList ChannelTVFormat::GetFormats(void)
     list.push_back("PAL-NC");
     list.push_back("SECAM");
     list.push_back("SECAM-D");
+    list.push_back("SECAM-DK");
 
     return list;
 }
