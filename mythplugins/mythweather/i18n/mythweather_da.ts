@@ -1,201 +1,201 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="da_DK">
 <context>
     <name>GlobalSetup</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig</translation>
     </message>
 </context>
 <context>
     <name>LocationDialog</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Søg</translation>
     </message>
     <message>
         <source>Searching ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Søger ...</translation>
     </message>
     <message>
         <source>Searching ... Results: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Søger ... Resultater: %1</translation>
     </message>
     <message>
         <source>Search Complete. Results: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Søgning fuldført. Resultater: %1</translation>
     </message>
     <message>
         <source>Source: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilde: %1</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Weather forecasts</source>
-        <translation type="unfinished"></translation>
+        <translation>Vejrudsigter</translation>
     </message>
     <message>
         <source>Pause current page</source>
-        <translation type="unfinished"></translation>
+        <translation>Pause nuværende side</translation>
     </message>
     <message>
         <source>Search List</source>
-        <translation type="unfinished"></translation>
+        <translation>Søgeliste</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuværende forhold</translation>
     </message>
     <message>
         <source>Three Day Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Tre-døgns udsigt</translation>
     </message>
     <message>
         <source>18 Hour Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>18 timers udsigt</translation>
     </message>
     <message>
         <source>Severe Weather Alerts</source>
-        <translation type="unfinished"></translation>
+        <translation>Alvorlige vejralarmer</translation>
     </message>
     <message>
         <source>Six Day Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>6-døgns udsigt</translation>
     </message>
     <message>
         <source>Static Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Statisk kort</translation>
     </message>
     <message>
         <source>Animated Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Animeret kort</translation>
     </message>
 </context>
 <context>
     <name>ScreenSetup</name>
     <message>
         <source>Active Screens</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktive sider</translation>
     </message>
     <message>
         <source>Inactive Screens</source>
-        <translation type="unfinished"></translation>
+        <translation>Inaktive sider</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj de ønskede sider til listen af aktive sider ved at trykker ENTER.</translation>
     </message>
     <message>
         <source>Sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilder</translation>
     </message>
     <message>
         <source>Units: </source>
-        <translation type="unfinished"></translation>
+        <translation>Enheder:</translation>
     </message>
     <message>
         <source>English Units</source>
-        <translation type="unfinished"></translation>
+        <translation>Engelske enheder</translation>
     </message>
     <message>
         <source>SI Units</source>
-        <translation type="unfinished"></translation>
+        <translation>SI enheder</translation>
     </message>
     <message>
         <source>Location: </source>
-        <translation type="unfinished"></translation>
+        <translation>Lokationer:</translation>
     </message>
     <message>
         <source>Not Defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke defineret</translation>
     </message>
     <message>
         <source>Source: </source>
-        <translation type="unfinished"></translation>
+        <translation>Kilde:</translation>
     </message>
     <message>
         <source>Press SELECT to </source>
-        <translation type="unfinished"></translation>
+        <translation>Tryk ENTER for at </translation>
     </message>
     <message>
         <source>change location; </source>
-        <translation type="unfinished"></translation>
+        <translation>skift lokation;</translation>
     </message>
     <message>
         <source>change units; </source>
-        <translation type="unfinished"></translation>
+        <translation>skift enheder;</translation>
     </message>
     <message>
         <source>move screen up or down; or remove screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>flyt siderne op og ned; eller slet siden.</translation>
     </message>
     <message>
         <source>Manipulate Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Ændre siden</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Flyt op</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Flyt ned</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <source>Change Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift lokation</translation>
     </message>
     <message>
         <source>Change Units</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift enheder</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
 </context>
 <context>
     <name>SourceManager</name>
     <message>
         <source>Searching for scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>Søger efter scripts</translation>
     </message>
     <message>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation type="unfinished"></translation>
+        <translation>Script %1 kører stadig når det forsøges at opdatere. Vær sikker på at den ikke hænger og at time-out tiderne er rimelige... Kører ikke denne gang</translation>
     </message>
 </context>
 <context>
     <name>SourceSetup</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <source>Author: </source>
-        <translation type="unfinished"></translation>
+        <translation>Forfatter:</translation>
     </message>
     <message>
         <source>Email: </source>
-        <translation type="unfinished"></translation>
+        <translation>Email:</translation>
     </message>
     <message>
         <source>Version: </source>
-        <translation type="unfinished"></translation>
+        <translation>Version:</translation>
     </message>
 </context>
 <context>
@@ -257,7 +257,7 @@
     </message>
     <message>
         <source>AM Showers</source>
-        <translation>Regn om formiddagen</translation>
+        <translation>Byger om formiddagen</translation>
     </message>
     <message>
         <source>Fog</source>
@@ -747,113 +747,253 @@
     </message>
     <message>
         <source>Wind(Gust)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vind(vindstød)</translation>
     </message>
     <message>
         <source>Wind Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Vindretning</translation>
     </message>
     <message>
         <source>Feels Like</source>
-        <translation type="unfinished"></translation>
+        <translation>Føles som</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Høj</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Lav</translation>
     </message>
     <message>
         <source>Global Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Globale indstillinger</translation>
     </message>
     <message>
         <source>Seconds to display each page:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sekunder hver side skal vises:</translation>
     </message>
     <message>
         <source>Retrieve data in the background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Modtag data i baggrunden:</translation>
     </message>
     <message>
         <source>Source Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilde opsætning</translation>
     </message>
     <message>
         <source>Data Retrieval Interval (minutes):</source>
-        <translation type="unfinished"></translation>
+        <translation>Datamodtagelsesinterval (minutter):</translation>
     </message>
     <message>
         <source>Source Update Timeout (seconds):</source>
-        <translation type="unfinished"></translation>
+        <translation>Timeout for opdatering af kilder (sekunder):</translation>
     </message>
     <message>
         <source>Weather Alerts</source>
-        <translation type="unfinished"></translation>
+        <translation>Vejralarmer</translation>
     </message>
     <message>
         <source>Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatur</translation>
     </message>
     <message>
         <source>Precip</source>
-        <translation type="unfinished"></translation>
+        <translation>Nedbør</translation>
     </message>
     <message>
         <source>Screen Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Side opsætning</translation>
     </message>
     <message>
         <source>Location Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokationssøgning</translation>
     </message>
     <message>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Angiv din nuværende lokation eller nærmeste større by. I nogle lande er postnumre også supporteret.</translation>
     </message>
     <message>
         <source>Enter Location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Angiv lokation:</translation>
+    </message>
+    <message>
+        <source>General weather plugin options</source>
+        <translation>Generelle vejrplugin indstillinger</translation>
+    </message>
+    <message>
+        <source>Screen Settings</source>
+        <translation>Side indstillinger</translation>
+    </message>
+    <message>
+        <source>Choose which weather forecasts to display</source>
+        <translation>Vælg hvilke vejrudsigter du vil vise</translation>
+    </message>
+    <message>
+        <source>Source Settings</source>
+        <translation>Kilde indstillinger</translation>
+    </message>
+    <message>
+        <source>Configure the behavior of weather scripts</source>
+        <translation>Konfigurer vejrscripts opførsel</translation>
+    </message>
+    <message>
+        <source>Last Updated %1</source>
+        <translation>Sidst opdateret %1</translation>
+    </message>
+    <message>
+        <source>High Temperature:  %1</source>
+        <translation>Høj temperatur:  %1</translation>
+    </message>
+    <message>
+        <source>Low Temperature:  %1</source>
+        <translation>Lav temperatur:  %1</translation>
+    </message>
+    <message>
+        <source>Temperature:  %1</source>
+        <translation>Temperatur:  %1</translation>
+    </message>
+    <message>
+        <source>Chance of Precipitation:  %1</source>
+        <translation>Sandsynlighed for nedbør:  %1</translation>
+    </message>
+    <message>
+        <source>Weather Screen Settings</source>
+        <translation>Vejrskærms indstillinger</translation>
+    </message>
+    <message>
+        <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
+
+When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
+        <translation>Denne skærm styrer vejrskærmenes opførsel.  Du kan aktivere en baggrunds-vejrupdate, som vil køre uanset om du er på vejrskærmen, og konfigurere hvor mange sekunder hver skærm vil blive vist.
+
+Når du er færdig med at konfigurere dette vejrplugin, så tryk &quot;Færdig&quot; for at fortsætte.</translation>
+    </message>
+    <message>
+        <source>Retrieve data in background:</source>
+        <translation>Modtag data i baggrunden:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Weather Setup</source>
+        <translation>Vejropsætning</translation>
+    </message>
+    <message>
+        <source>Available Screens</source>
+        <translation>Tilgængelige skærme</translation>
+    </message>
+    <message>
+        <source>Active Screens</source>
+        <translation>Aktive skærme</translation>
+    </message>
+    <message>
+        <source>Weather Script Settings</source>
+        <translation>Vejrscripts indstillinger</translation>
+    </message>
+    <message>
+        <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
+
+When you have completed your changes, click &quot;Finish&quot; to continue.</source>
+        <translation>Denne skærm styrer de individuelle vejrscripts opførsel.  Vælg det script som du ønsker at ændre opførsel for og tryk på den højre pil. Juster intervallet som data modtages med og timeouten når siden tilgås.
+
+Når du er færdig med at foretage ændringer, så tryk &quot;Færdig&quot; for at fortsætte.</translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation>Færdig</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Søg</translation>
+    </message>
+    <message>
+        <source>Enter Current Location</source>
+        <translation>Angiv nuværende lokation</translation>
+    </message>
+    <message>
+        <source>As of</source>
+        <translation>Fra og med</translation>
+    </message>
+    <message>
+        <source>Weather Location Search</source>
+        <translation>Vejrlokationssøgning</translation>
+    </message>
+    <message>
+        <source>Weather</source>
+        <translation>Vejr</translation>
+    </message>
+    <message>
+        <source>Severe Weather Alerts</source>
+        <translation>Alvorlige vejralarmer</translation>
+    </message>
+    <message>
+        <source>Global Setup</source>
+        <translation>Global opsætning</translation>
+    </message>
+    <message>
+        <source>Humidity:</source>
+        <translation>Luftfugtighed:</translation>
+    </message>
+    <message>
+        <source>Pressure:</source>
+        <translation>Lufttryk:</translation>
+    </message>
+    <message>
+        <source>Wind(Gust):</source>
+        <translation>Vind(vindstød):</translation>
+    </message>
+    <message>
+        <source>Wind Direction:</source>
+        <translation>Vindretning:</translation>
+    </message>
+    <message>
+        <source>Visibility:</source>
+        <translation>Sigtbarhed:</translation>
+    </message>
+    <message>
+        <source>Feels Like:</source>
+        <translation>Føles som:</translation>
     </message>
 </context>
 <context>
     <name>Weather</name>
     <message>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Pauset</translation>
     </message>
 </context>
 <context>
     <name>WeatherScreen</name>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished">Søndag</translation>
+        <translation>Søndag</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished">Mandag</translation>
+        <translation>Mandag</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished">Tirsdag</translation>
+        <translation>Tirsdag</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished">Onsdag</translation>
+        <translation>Onsdag</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished">Torsdag</translation>
+        <translation>Torsdag</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished">Fredag</translation>
+        <translation>Fredag</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished">Lørdag</translation>
+        <translation>Lørdag</translation>
     </message>
 </context>
 </TS>

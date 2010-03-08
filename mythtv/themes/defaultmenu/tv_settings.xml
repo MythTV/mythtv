@@ -8,7 +8,6 @@
         <text lang="ES">General</text>
         <text lang="NL">Algemeen</text>
         <text lang="DE">Allgemeines</text>
-        <text lang="DA">Generelt</text>
         <text lang="IS">Almennt</text>
         <text lang="PT">Configurações Gerais</text>
         <text lang="SV">Allmänt</text>
@@ -33,7 +32,6 @@
         <text lang="ES">Guía de Programas</text>
         <text lang="NL">Programmagids</text>
         <text lang="DE">Programmübersicht</text>
-        <text lang="DA">Programguide</text>
         <text lang="IS">Dagskrá</text>
         <text lang="PT">Configurar Guia de Programação</text>
         <text lang="SV">Programguide</text>
@@ -62,7 +60,6 @@
         <text lang="ES">Reproducción</text>
         <text lang="NL">Afspelen</text>
         <text lang="DE">Wiedergabe</text>
-        <text lang="DA">Afspilning</text>
         <text lang="IS">Spilun</text>
         <text lang="PT">Config. Visualização</text>
         <text lang="SV">Uppspelning</text>
@@ -140,7 +137,6 @@
         <text lang="ES">Grabación</text>
         <text lang="NL">Opnameprofielen</text>
         <text lang="DE">Aufnahmeprofile</text>
-        <text lang="DA">Optagelse</text>
         <text lang="IS">Upptökur</text>
         <text lang="PT">Perfis de Gravação</text>
         <text lang="SV">Inspelningsprofiler</text>
@@ -175,7 +171,6 @@
         <text lang="ZH_TW">錄影優先次序</text>
         <text lang="SL">Snemalne prioritete</text>
         <text lang="ET">Salvestamisprioriteedid</text>
-        <text lang="DA">Optagelselssprioriteter</text>
         <text lang="ES">Prioridades Grabación</text>
         <text lang="PT">Prioridades de Gravação</text>
         <text lang="NL">Opnameprioriteiten</text>

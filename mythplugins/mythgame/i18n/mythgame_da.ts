@@ -1,89 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="da_DK">
 <context>
     <name>GameUI</name>
     <message>
         <source>All Games</source>
-        <translation type="unfinished">Alle spil</translation>
+        <translation>Alle spil</translation>
     </message>
     <message>
         <source>-   By Genre</source>
-        <translation type="unfinished">-   Pr Genre</translation>
+        <translation>-   Efter genre</translation>
     </message>
     <message>
         <source>-   By Year</source>
-        <translation type="unfinished">-   Pr År</translation>
+        <translation>-   Efter år</translation>
     </message>
     <message>
         <source>-   By Name</source>
-        <translation type="unfinished">-   pr Navn</translation>
+        <translation>-   Efter navn</translation>
     </message>
     <message>
         <source>-   By Publisher</source>
-        <translation type="unfinished"></translation>
+        <translation>-   Efter udgiver</translation>
     </message>
     <message>
         <source>Choose System for</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg system for</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Show Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis information</translation>
     </message>
     <message>
         <source>Remove Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern favorit</translation>
     </message>
     <message>
         <source>Make Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Opret favorit</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger metadata</translation>
     </message>
     <message>
         <source>Game Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Spil søgning</translation>
+    </message>
+    <message>
+        <source>Favorites</source>
+        <translation>Favoritter</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Game frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Spil frontend</translation>
     </message>
     <message>
         <source>Toggle the current game as a favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Udvælg det aktuelle spil som en favorit</translation>
     </message>
     <message>
         <source>Show incremental search dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis inkremental søge dialog</translation>
     </message>
     <message>
         <source>Incremental search find next match</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkremental søgning - Find næste match</translation>
     </message>
 </context>
 <context>
     <name>MythGamePlayerEditor</name>
     <message>
         <source>Game Player Menu</source>
-        <translation>Spil menu</translation>
+        <translation>Spiller menu</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Ændre..</translation>
+        <translation>Rediger..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Slette..</translation>
+        <translation>Slet..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this item?</source>
@@ -99,14 +103,14 @@
     </message>
     <message>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Spillesystemer</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Game display order</source>
-        <translation>Spil visnings orden</translation>
+        <translation>Spil sorteringsrækkefølge</translation>
     </message>
     <message>
         <source>MythGame Settings -- General</source>
@@ -118,47 +122,47 @@
     </message>
     <message>
         <source>Order in which to sort the games - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Dette er den orden som spillene vises. Dette er for alle typer. Mulig valg: system, year, genre og gamename</translation>
+        <translation>Rækkefølge som spillene skal sorteres efter - Dette gælder for alle typer systemer. Mulige valg: system, year, genre og gamename</translation>
     </message>
     <message>
         <source>Favourite display order</source>
-        <translation>Favorit visnings orden</translation>
+        <translation>Favorit sorteringsrækkefølge</translation>
     </message>
     <message>
         <source>Order in which to sort the games marked as favourites - this is for all systems. Available choices: system, year, genre and gamename</source>
-        <translation>Dette er den orden som favorit spillene vises. Dette er for alle typer. Mulig valg: system, year, genre og gamename</translation>
+        <translation>Rækkefølge som favoritspillene skal sorteres efter - Dette gælder for alle typer systemer. Mulige valg: system, year, genre og gamename</translation>
     </message>
     <message>
         <source>Indepth Game Scan</source>
-        <translation>Skan spil grundigt</translation>
+        <translation>Scan spil grundigt</translation>
     </message>
     <message>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Gør at spil skanningen prøver at finde flere informationer om et spil og checker crc værdierne. Bemærk at dette kan gøre at skanning kan tage meget længere tid.</translation>
+        <translation>Gør at spil-scanningen prøver at finde flere informationer om et spil og checker crc værdierne. Bemærk at dette kan medføre at scanning tager meget længere tid, afhængig af antal spil.</translation>
     </message>
     <message>
         <source>Prompt for removal of deleted rom(s)</source>
-        <translation>Spørg for fjernelse af slettede rom(mer)</translation>
+        <translation>Spørg før fjernelse af slettede rom(s)</translation>
     </message>
     <message>
         <source>This enables a prompt for removing deleted roms from the database during a  gamescan</source>
-        <translation>Dette aktivere at der spørges om slettede rommer skal slettes fra databasen når der skannes efter spil</translation>
+        <translation>Dette aktiverer en dialogboks som spørger om slettede roms skal slettes fra databasen når der scannes efter spil</translation>
     </message>
     <message>
         <source>Display Files Names in Game Tree</source>
-        <translation>Vis filnavne i Spil træet</translation>
+        <translation>Vis filnavne i spiltræet</translation>
     </message>
     <message>
         <source>Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename</source>
-        <translation>Dette aktivere at filnavnene vises i spil træet istedetfor tilrettede spil navne</translation>
+        <translation>Dette medfører at filnavne vises i spiltræet fremfor spillenes navne</translation>
     </message>
     <message>
         <source>Allow games to span multiple roms/disks</source>
-        <translation>Tillad at spil ligger på flere rommer/diske</translation>
+        <translation>Tillad at spil ligger på flere roms/diske</translation>
     </message>
     <message>
         <source>This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game.</source>
-        <translation>Denne opsøtning gør at der bliver kigget efter ting som game.1.rom, game.2.rom og ser det som et spil.</translation>
+        <translation>Denne indstilling gør at der vil blive kigget efter filnavne som game.1.rom, game.2.rom og at disse vil blive tolket som ét samlet spil.</translation>
     </message>
     <message>
         <source>Command</source>
@@ -170,7 +174,7 @@
     </message>
     <message>
         <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation>Spil/emulator type. Mest til information. Har ingen virkning funktionerne på dit system. </translation>
+        <translation>Spil/emulator type. Mest til information, har ingen indvirkning på funktionaliteten af dit system.</translation>
     </message>
     <message>
         <source>Rom Path</source>
@@ -178,7 +182,7 @@
     </message>
     <message>
         <source>Location of the ROM files for this emulator</source>
-        <translation>Placering af rommer til denne emulator</translation>
+        <translation>Placering af ROM filer til denne emulator</translation>
     </message>
     <message>
         <source>Working Directory</source>
@@ -186,19 +190,19 @@
     </message>
     <message>
         <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation>Mappe som skal ændres inden emulator start. Blank er normalt ok</translation>
+        <translation>Mappe som systemet skal skifte til inden emulator start. Blankt er almindeligvis ok</translation>
     </message>
     <message>
         <source>File Extensions</source>
-        <translation>Fil endelse</translation>
+        <translation>Filendelser</translation>
     </message>
     <message>
         <source>Game Player Setup</source>
-        <translation>Spil System Opsætning</translation>
+        <translation>Opsætning af spillesystem</translation>
     </message>
     <message>
         <source>(New Game Player)</source>
-        <translation>(Nyt Spil System)</translation>
+        <translation>(Nyt spillesystem)</translation>
     </message>
     <message>
         <source>OTHER</source>
@@ -242,11 +246,11 @@
     </message>
     <message>
         <source>Player Name</source>
-        <translation>Spiller navn</translation>
+        <translation>System navn</translation>
     </message>
     <message>
         <source>Name of this Game and or Emulator</source>
-        <translation>Navnet på spillet og eller Emulator</translation>
+        <translation>Navn på spillet og/eller emulatoren</translation>
     </message>
     <message>
         <source>19xx</source>
@@ -262,7 +266,7 @@
     </message>
     <message>
         <source>No to all</source>
-        <translation>Nej til alt</translation>
+        <translation>Nej til alle</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -270,11 +274,11 @@
     </message>
     <message>
         <source>Yes to all</source>
-        <translation>Ja til alt</translation>
+        <translation>Ja til alle</translation>
     </message>
     <message>
         <source>File Missing</source>
-        <translation>Filen mangler</translation>
+        <translation>Fil mangler</translation>
     </message>
     <message>
         <source>%1 appears to be missing.
@@ -290,9 +294,9 @@ Fjern den fra databasen?</translation>
         <source>This will clear all Game Meta Data
 from the database. Are you sure you
 want to do this?</source>
-        <translation>Dette vil slette alt Spil Meta Data
-fra databsen. Er du sikker
-at du vil gøre det?</translation>
+        <translation>Dette vil slette alle spilmetadata
+fra databasen. Er du sikker på
+at du vil gøre dette?</translation>
     </message>
     <message>
         <source>SEGA/MASTER SYSYTEM</source>
@@ -300,59 +304,59 @@ at du vil gøre det?</translation>
     </message>
     <message>
         <source>A Comma seperated list of all file extensions for this emulator. Blank means any file under ROM PATH is considered to be used with this emulator</source>
-        <translation type="unfinished"></translation>
+        <translation>En kommasepareret liste af filendelser for denne emulator. Blank betyder at alle filer under Rom stien kan bruges med denne emulator</translation>
     </message>
     <message>
         <source>GAMEGEAR</source>
-        <translation type="unfinished"></translation>
+        <translation>GAMEGEAR</translation>
     </message>
     <message>
         <source>Updating %1(%2) ROM database</source>
-        <translation type="unfinished"></translation>
+        <translation>Opdaterer %1(%2) ROM database</translation>
     </message>
     <message>
         <source>Verifying %1 files</source>
-        <translation type="unfinished"></translation>
+        <translation>Verificerer %1 filer</translation>
     </message>
     <message>
         <source>Scanning for %1 game(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Scanner efter %1 spil...</translation>
     </message>
     <message>
         <source>Hash filenames in display</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash filenavne</translation>
     </message>
     <message>
         <source>Enable hashing of names in the display tree. This can make navigating long lists a little faster</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiver hashing af navne i spiltræet. Dette kan gøre navigationen en smule hurtigere på lange lister</translation>
     </message>
     <message>
         <source>Binary and optional parameters. Multiple commands seperated with &apos;;&apos; . Use %s for the rom name. %d1, %d2, %d3 and %d4 represent disks in a multidisk/game. %s auto appended if not specified</source>
-        <translation type="unfinished"></translation>
+        <translation>Program samt eventuelle parametre. Flere kommandoer kan adskilles med &apos;;&apos; . Brug %s for rom navn. %d1, %d2, %d3 og %d4 repræsenterer forskellige diske i et multidisk-spil. %s tilføjes automatisk til slutningen hvis den ikke specificeres</translation>
     </message>
     <message>
         <source>Directory where Game Screenshots are stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappe hvor spil-screenshots opbevares</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ved tildeling af screenshots vil denne mappe være standardmappe for browsing.</translation>
     </message>
     <message>
         <source>Directory where Game Fanart is stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappe hvor spil fanart opbevares</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ved tildeling af fanart (fan artwork) vil denne mappe være standardmappe for browsing.</translation>
     </message>
     <message>
         <source>Directory where Game Boxart is stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappe hvor spilcovers opbevares</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ved tildeling af spilcovers vil denne mappe være standardmappe for browsing.</translation>
     </message>
 </context>
 <context>
@@ -371,111 +375,179 @@ at du vil gøre det?</translation>
     </message>
     <message>
         <source>Favorite:</source>
-        <translation>Favoriter:</translation>
+        <translation>Favorit:</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished">Nej</translation>
+        <translation>Nej</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Ja</translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>Edit Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger spil informationer</translation>
     </message>
     <message>
         <source>Game Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spil navn:</translation>
     </message>
     <message>
         <source>Country:</source>
-        <translation type="unfinished"></translation>
+        <translation>Land:</translation>
     </message>
     <message>
         <source>Publisher:</source>
-        <translation type="unfinished"></translation>
+        <translation>Udgiver:</translation>
     </message>
     <message>
         <source>Plot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Plot:</translation>
     </message>
     <message>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Screenshot:</translation>
     </message>
     <message>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fanart:</translation>
     </message>
     <message>
         <source>Boxart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spilcover:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>/sti/til/billede.jpg</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <source>Game:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spil:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Type:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filnavn:</translation>
     </message>
     <message>
         <source>Rompath:</source>
-        <translation type="unfinished"></translation>
+        <translation>Romsti:</translation>
     </message>
     <message>
         <source>System(s):</source>
-        <translation type="unfinished"></translation>
+        <translation>System(er):</translation>
     </message>
     <message>
         <source>CRC:</source>
-        <translation type="unfinished"></translation>
+        <translation>CRC:</translation>
     </message>
     <message>
         <source>No Plot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Intet plot.</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Spil</translation>
     </message>
     <message>
         <source>Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Spil information</translation>
     </message>
     <message>
         <source>Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Spil</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Generelle indstillinger</translation>
     </message>
     <message>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Spillesystemer</translation>
     </message>
     <message>
         <source>Scan for Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Scan efter spil</translation>
     </message>
     <message>
         <source>Clear Game Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet spil metadata</translation>
+    </message>
+    <message>
+        <source>Game folders and general options</source>
+        <translation>Spil mapper og generelle indstillinger</translation>
+    </message>
+    <message>
+        <source>Configure an emulator</source>
+        <translation>Konfigurer en emulator</translation>
+    </message>
+    <message>
+        <source>Add games to your library</source>
+        <translation>Tilføj spil til dit bibliotek</translation>
+    </message>
+    <message>
+        <source>Empty your game library</source>
+        <translation>Ryd dit spilbliotek</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Afbryd</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation>Rediger metadata</translation>
+    </message>
+    <message>
+        <source>Modify your game&apos;s metadata.</source>
+        <translation>Rediger metadata for dit spil.</translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation>Titel:</translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation>Spilcover:</translation>
+    </message>
+    <message>
+        <source>Game is a Favorite</source>
+        <translation>Spillet er en favorit</translation>
+    </message>
+    <message>
+        <source>Click here to search existing coverart...</source>
+        <translation>Klik her for at søge efter eksisterende spilcovers...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing screenshots...</source>
+        <translation>Klik her for at søge efter eksisterende screenshots...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing fanart...</source>
+        <translation>Klik her for at søge efter eksisterende fanart...</translation>
+    </message>
+    <message>
+        <source>ROM Name:</source>
+        <translation>ROM navn:</translation>
+    </message>
+    <message>
+        <source>ROM Path:</source>
+        <translation>ROM sti:</translation>
+    </message>
+    <message>
+        <source>Video Manager</source>
+        <translation>Videomanager</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Beskrivelse:</translation>
     </message>
 </context>
 </TS>

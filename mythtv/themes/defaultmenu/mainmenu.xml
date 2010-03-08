@@ -14,7 +14,6 @@
         <text lang="ZH_TW">媒體館</text>
         <text lang="SL">Media</text>
         <text lang="ET">Meediakataloog</text>
-        <text lang="DA">Mediebibliotek</text>
         <text lang="ES">Mediateca</text>
         <text lang="PT">Galeria Multimédia</text>
         <text lang="RU">Мультимедиа</text>
@@ -39,7 +38,6 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="NL">Opnames Beheren</text>
         <text lang="DE">Aufnahmen verwalten</text>
-        <text lang="DA">Optag udsendelse</text>
         <text lang="IS">Upptaka útsendinga</text>
         <text lang="PT">Gerir Gravações</text>
         <text lang="SV">Hantera inspelningar</text>
@@ -77,7 +75,6 @@
         <text lang="ZH_TW">資訊中心</text>
         <text lang="SL">Info center</text>
         <text lang="ET">Infokeskus</text>
-        <text lang="DA">Informationscenter</text>
         <text lang="ES">Centro de Información</text>
         <text lang="EN_GB">Information Centre</text>
         <text lang="PT">Centro de Informação</text>
@@ -88,7 +85,6 @@
         <text lang="HU">Információk</text>
         <alttext lang="ES">Información</alttext>
         <alttext lang="DE">Infocenter</alttext>
-        <alttext lang="DA">Infocenter</alttext>
         <alttext lang="SV">Infocenter</alttext>
         <alttext lang="ET">Info</alttext>
         <alttext lang="PT">Informação</alttext>
@@ -114,7 +110,6 @@
         <text lang="ZH_TW">光碟</text>
         <text lang="SL">CD/DVD</text>
         <text lang="ET">DVD ja CD</text>
-        <text lang="DA">CD/DVD</text>
         <text lang="ES">CD/DVD</text>
         <text lang="EN_GB">CD/DVD</text>
         <text lang="PT">CD/DVD</text>
@@ -136,7 +131,6 @@
         <text lang="ES">Ver la TV</text>
         <text lang="NL">TV Kijken</text>
         <text lang="DE">Fernsehen</text>
-        <text lang="DA">Se TV</text>
         <text lang="IS">Horfa á sjónvarp</text>
         <text lang="PT">Ver Televisão</text>
         <text lang="SV">Se på TV</text>
@@ -161,7 +155,6 @@
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configuración</text>
         <text lang="DE">Zubehör / Konfiguration</text>
-        <text lang="DA">Tilbehør/Indstillinger</text>
         <text lang="IS">Uppsetning</text>
         <text lang="NL">Configuratie</text>
         <text lang="PT">Utensílios</text>
@@ -190,7 +183,6 @@
         <type>SHUTDOWN</type>
         <text>Shutdown</text>
         <text lang="SV">Avstängning</text>
-        <text lang="DA">Sluk</text>
         <text lang="NL">Uitschakelen</text>
         <text lang="DE">Beenden</text>
         <text lang="ET">Seiska</text>

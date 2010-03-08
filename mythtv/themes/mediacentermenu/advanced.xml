@@ -7,7 +7,6 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="NL">Opnames Beheren</text>
         <text lang="DE">Aufnahmen verwalten</text>
-        <text lang="DA">Optag udsendelse</text>
         <text lang="IS">Upptaka útsendinga</text>
         <text lang="PT">Gerir Gravações</text>
         <text lang="SV">Hantera inspelningar</text>
@@ -44,7 +43,6 @@
         <text lang="ZH_TW">光碟</text>
         <text lang="SL">CD/DVD</text>
         <text lang="ET">DVD ja CD</text>
-        <text lang="DA">CD/DVD</text>
         <text lang="ES">CD/DVD</text>
         <text lang="EN_GB">CD/DVD</text>
         <text lang="PT">CD/DVD</text>
@@ -71,7 +69,6 @@
         <text lang="ZH_TW">系統狀態</text>
         <text lang="SL">Status sistema</text>
         <text lang="ET">Süsteemi olek</text>
-        <text lang="DA">Systemstatus</text>
         <text lang="ES">Estado Sistema</text>
         <text lang="PT">Estado do Sistema</text>
         <text lang="RU">Состояние системы</text>
@@ -95,7 +92,6 @@
         <text lang="ZH_TW">音樂工具</text>
         <text lang="SL">Glasbena orodja</text>
         <text lang="ET">Muusikatööriistad</text>
-        <text lang="DA">Musikværktøjer</text>
         <text lang="ES">Gestionar Música</text>
         <text lang="PT">Gerir Música</text>
         <text lang="RU">Работа с музыкой</text>
@@ -114,7 +110,6 @@
         <text lang="IS">Stilla takka</text>
         <text lang="DE">Tastenbelegung ändern</text>
         <text lang="FI">Muokkaa Näppäimiä</text>
-        <text lang="DA">Redigér tasteindstillinger</text>
         <text lang="SV">Ändra knappar</text>
         <text lang="ES">Editar Teclas</text>
         <text lang="PT">Configurar Teclas</text>
@@ -136,7 +131,6 @@
         <text lang="IT">Impostazioni</text>
         <text lang="ES">Configurar</text>
         <text lang="DE">Konfiguration</text>
-        <text lang="DA">Indstillinger</text>
         <text lang="IS">Stillingar</text>
         <text lang="NL">Configuratie</text>
         <text lang="PT">Configurações</text>

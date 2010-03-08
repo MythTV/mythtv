@@ -8,7 +8,6 @@
         <text lang="CA">Veure la TV</text>
         <text lang="NL">TV Kijken</text>
         <text lang="DE">Fernsehen</text>
-        <text lang="DA">Se TV</text>
         <text lang="PT">Ver Televisão</text>
         <text lang="SV">Se på TV</text>
         <text lang="JA">TVを見る</text>
@@ -30,7 +29,6 @@
         <text lang="CA">Programar Gravacions</text>
         <text lang="NL">Opnames Plannen</text>
         <text lang="DE">Aufnahmen planen</text>
-        <text lang="DA">Optag udsendelse</text>
         <text lang="PT">Programar Gravações</text>
         <text lang="SV">Schemalägg inspelningar</text>
         <text lang="JA">録画予約</text>
@@ -43,7 +41,6 @@
         <alttext lang="IT">Pianifica</alttext>
         <alttext lang="ES">Temporizadores</alttext>
         <alttext lang="CA">Temporitzadors</alttext>
-        <alttext lang="DA">Optagelser</alttext>
         <alttext lang="NL">Planning</alttext>
         <alttext lang="PT">Programar</alttext>
         <alttext lang="SV">Schemalägg</alttext>
@@ -67,7 +64,6 @@
         <text lang="CA">Veure Gravacions</text>
         <text lang="NL">Opnames Bekijken</text>
         <text lang="DE">Aufnahmen ansehen</text>
-        <text lang="DA">Afspil optagelser</text>
         <text lang="PT">Ver Gravações</text>
         <text lang="SV">Visa inspelningar</text>
         <text lang="JA">録画再生</text>
@@ -93,7 +89,6 @@
         <text lang="CA">Esborrar Gravacions</text>
         <text lang="NL">Opnames Verwijderen</text>
         <text lang="DE">Aufnahmen löschen</text>
-        <text lang="DA">Slet optagelser</text>
         <text lang="PT">Apagar Gravações</text>
         <text lang="SV">Radera inspelningar</text>
         <text lang="JA">録画削除</text>
@@ -138,7 +133,6 @@
         <text lang="DE">Alte Aufnahmen</text>
         <text lang="SL">Že posneto</text>
         <text lang="ET">Varem salvestatud</text>
-        <text lang="DA">Gamle optagelser</text>
         <text lang="PT">Gravações Feitas</text>
         <text lang="ES">Grabaciones Antiguas</text>
         <text lang="NL">Eerdere Opnames</text>
@@ -160,7 +154,6 @@
         <text lang="JA">システムステータス</text>
         <text lang="SL">Status sistema</text>
         <text lang="ET">Süsteemi olek</text>
-        <text lang="DA">Systemstatus</text>
         <text lang="PT">Estado do Sistema</text>
         <text lang="ES">Estado Sistema</text>
         <text lang="NL">Systeemstatus</text>
@@ -179,7 +172,6 @@
         <text lang="CA">Configuració de TV</text>
         <text lang="ES">Configuración de TV</text>
         <text lang="DE">TV</text>
-        <text lang="DA">TV Indstillinger</text>
         <text lang="NL">TV Instellingen</text>
         <text lang="PT">Configurar Televisão</text>
         <text lang="SV">TV</text>

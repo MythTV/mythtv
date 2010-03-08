@@ -7,7 +7,6 @@
         <text lang="ES">Fotos</text>
         <text lang="NL">Foto's</text>
         <text lang="DE">Bilder ansehen</text>
-        <text lang="DA">Billeder</text>
         <text lang="IS">Ljósmyndir</text>
         <text lang="PT">Ver Fotos</text>
         <text lang="SV">Visa bilder</text>
@@ -32,7 +31,6 @@
         <text lang="ES">Juegos</text>
         <text lang="NL">Spelen</text>
         <text lang="DE">Spielen</text>
-        <text lang="DA">Spil</text>
         <text lang="IS">Spila leiki</text>
         <text lang="PT">Jogar</text>
         <text lang="SV">Spela spel</text>
@@ -64,7 +62,6 @@
         <text lang="ZH_TW">網上新聞</text>
         <text lang="SL">Novice</text>
         <text lang="ET">Uudised</text>
-        <text lang="DA">Nyheder</text>
         <text lang="PT">Notícias</text>
         <text lang="RU">Новости</text>
         <text lang="PL">Wiadomości</text>
@@ -103,7 +100,6 @@
         <text lang="ES">El Tiempo</text>
         <text lang="NL">Het Weer</text>
         <text lang="DE">Wetter</text>
-        <text lang="DA">Vejret</text>
         <text lang="IS">Veðrið</text>
         <text lang="PT">Meteorologia</text>
         <text lang="SV">Väder</text>
@@ -149,7 +145,6 @@
         <text lang="ZH_TW">互聯網</text>
         <text lang="SL">Splet</text>
         <text lang="ET">Veeb</text>
-        <text lang="DA">Web</text>
         <text lang="ES">Web</text>
         <text lang="PT">Navegação Web</text>
         <text lang="NL">Internet</text>

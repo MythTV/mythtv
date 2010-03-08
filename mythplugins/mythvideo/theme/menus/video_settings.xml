@@ -5,7 +5,6 @@
       <text>General Settings</text>
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
-      <text lang="DA">Generelle indstillinger</text>
       <text lang="DE">Grundeinstellungen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
@@ -27,7 +26,6 @@
       <text>Player Settings</text>
       <text lang="ES">Opciones de reproducción</text>
       <text lang="CA">Opcions de reproducció</text>
-      <text lang="DA">Afspiller indstillinger</text>
       <text lang="DE">Wiedergabe</text>
       <text lang="PT">Configurar Leitura</text>
       <text lang="SV">Uppspelning</text>
@@ -64,7 +62,6 @@
       <text lang="IT">Tipi di file</text>
       <text lang="SL">Tipi datotek</text>
       <text lang="FI">Tiedostotyypit</text>
-      <text lang="DA">Filtyper</text>
       <text lang="ET">Failitüübid</text>
       <text lang="RU">Типы файлов</text>
       <text lang="PL">Typy plików</text>
@@ -77,7 +74,6 @@
    <button>
       <type>DVD_RIP</type>
       <text>Rip Settings</text>
-      <text lang="DA">Genkodnings indstillinger</text>
       <text lang="PT">Conf. Importação DVDs</text>
       <text lang="DE">Import</text>
       <text lang="SV">Inställningar för kopiering</text>

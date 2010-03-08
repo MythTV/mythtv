@@ -9,7 +9,6 @@
         <text lang="CA">Guia de programes</text>
         <text lang="NL">Programmagids</text>
         <text lang="DE">Fernsehrogramm</text>
-        <text lang="DA">Program Guide</text>
         <text lang="PT">Guia de Programação</text>
         <text lang="SV">Programguide</text>
         <text lang="JA">番組ガイド</text>
@@ -24,7 +23,6 @@
         <alttext lang="ES">Guía</alttext>
         <alttext lang="CA">Guia</alttext>
         <alttext lang="DE">EPG</alttext>
-        <alttext lang="DA">Guide</alttext>
         <alttext lang="NL">Gids</alttext>
         <alttext lang="NL">Guia</alttext>
         <alttext lang="SV">Guide</alttext>
@@ -50,7 +48,6 @@
         <text lang="CA">Cercar programes</text>
         <text lang="NL">Programma's Zoeken</text>
         <text lang="DE">Alphabetische Suche</text>
-        <text lang="DA">Program Søger</text>
         <text lang="PT">Procurar Programa</text>
         <text lang="SV">Sök program</text>
         <text lang="JA">番組検索</text>
@@ -65,7 +62,6 @@
         <alttext lang="ES">Buscar</alttext>
         <alttext lang="CA">Cercar</alttext>
         <alttext lang="DE">ABC Suche</alttext>
-        <alttext lang="DA">Søger</alttext>
         <alttext lang="NL">Zoeken A-Z</alttext>
         <alttext lang="PT">Procurar</alttext>
         <alttext lang="SV">Sök</alttext>
@@ -89,7 +85,6 @@
         <text lang="NL">Gids Doorzoeken</text>
         <text lang="JA">リスト検索</text>
         <text lang="SL">Iskanje seznamov</text>
-        <text lang="DA">Søg på lister</text>
         <text lang="PT">Pesquisar Listagens</text>
         <text lang="ET">Kavade otsing</text>
         <text lang="ES">Buscar Listados</text>
@@ -101,7 +96,6 @@
         <alttext lang="SV">Sök tablå</alttext>
         <alttext lang="NL">Zoeken Gids</alttext>
         <alttext lang="SL">Iskanje</alttext>
-        <alttext lang="DA">Lister</alttext>
         <alttext lang="PT">Pesquisar</alttext>
         <alttext lang="ET">Otsing</alttext>
         <alttext lang="RU">Списки</alttext>
@@ -124,7 +118,6 @@
         <text lang="PT">Regras de Gravação</text>
         <text lang="ES">Avanzada</text>
         <text lang="NL">Geavanceerde Opname</text>
-        <text lang="DA">Avanceret</text>
         <text lang="RU">Дополнительно</text>
         <text lang="PL">Dostosuj nagrywanie</text>
         <text lang="HE">התאמת הקלטה</text>
@@ -141,7 +134,6 @@
         <text lang="ES">Programación Manual</text>
         <text lang="CA">Programar Gravacions</text>
         <text lang="DE">Manuelle Aufnahme</text>
-        <text lang="DA">Manuel programmering</text>
         <text lang="NL">Manuele Opname</text>
         <text lang="PT">Gravação Manual</text>
         <text lang="SV">Manuell schemaläggning</text>
@@ -157,7 +149,6 @@
         <alttext lang="ES">Manual</alttext>
         <alttext lang="CA">Programar</alttext>
         <alttext lang="DE">Manuell</alttext>
-        <alttext lang="DA">Manuel prog.</alttext>
         <alttext lang="NL">Manueel</alttext>
         <alttext lang="PT">Manual</alttext>
         <alttext lang="SV">Manuell</alttext>
@@ -191,7 +182,6 @@
         <text lang="CA">Resoldre Conflictes</text>
         <text lang="NL">Geplande Opnames</text>
         <text lang="DE">Aufnahmeplan</text>
-        <text lang="DA">Løs konflikter</text>
         <text lang="PT">Resolver Conflitos</text>
         <text lang="SV">Kommande Inspelningar</text>
         <text lang="JA">これからの録画</text>

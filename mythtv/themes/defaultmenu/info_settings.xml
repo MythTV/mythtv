@@ -8,7 +8,6 @@
         <text lang="ES">Configurar El Tiempo</text>
         <text lang="CA">Configurar El Temps</text>
         <text lang="DE">Wetter</text>
-        <text lang="DA">Vejr Indstillinger</text>
         <text lang="IS">Stillingar veðurs</text>
         <text lang="NL">"Het Weer" Instellingen</text>
         <text lang="PT">Configurar Meteorologia</text>
@@ -53,7 +52,6 @@
         <text lang="ZH_TW">網上新聞設定</text>
         <text lang="SL">Nastavitve novic</text>
         <text lang="ET">Uudiste sätted</text>
-        <text lang="DA">Nyheds Indstillingen</text>
         <text lang="PT">Configurar Notícias</text>
         <text lang="RU">Настройки новостей</text>
         <text lang="PL">Ustaw wiadomości</text>
@@ -74,7 +72,6 @@
         <text lang="SL">Nastavitve kino programa</text>
         <text lang="ET">Filmiaegade sätted</text>
         <text lang="SV">Biotider</text>
-        <text lang="DA">Biograf Indstillinger</text>
         <text lang="PT">Configurar Horários de Cinema</text>
         <text lang="DE">Kinoprogramm</text>
         <text lang="NL">Bioscoop Tijden</text>
@@ -125,7 +122,6 @@
         <text lang="ZH_TW">互聯網設定</text>
         <text lang="SL">Spletne nastavitve</text>
         <text lang="ET">Veebi sätted</text>
-        <text lang="DA">Web-indstillinger</text>
         <text lang="ES">Configurar Web</text>
         <text lang="PT">Configurar Navegação Web</text>
         <text lang="RU">Настройки браузера</text>
@@ -150,7 +146,6 @@
         <text lang="NL">Recepten Instellingen</text>    
         <text lang="SL">Nastavitve receptov</text>
         <text lang="ET">Retseptide sätted</text>    
-        <text lang="DA">Opskrifts Indstillinger</text>
         <text lang="ES">Recetas</text>
         <text lang="PT">Configurar Receitas</text>
         <text lang="RU">Настройки рецептов</text>

@@ -8,7 +8,6 @@
         <text lang="ES">Programar Grabaciones</text>
         <text lang="NL">Opnames Plannen</text>
         <text lang="DE">Aufnahmen planen</text>
-        <text lang="DA">Optag udsendelse</text>
         <text lang="IS">Stilla upptöku</text>
         <text lang="PT">Programar Gravações</text>
         <text lang="SV">Schemalägg inspelningar</text>
@@ -49,7 +48,6 @@
         <text lang="ES">Resolver Conflictos</text>
         <text lang="NL">Geplande Opnames</text>
         <text lang="DE">Aufnahmeplan</text>
-        <text lang="DA">Planlagte optagelser</text>
         <text lang="IS">Komandi upptökur</text>
         <text lang="PT">Resolver Conflitos</text>
         <text lang="SV">Kommande Inspelningar</text>
@@ -75,7 +73,6 @@
         <text lang="ES">Borrar Grabaciones</text>
         <text lang="NL">Opnames Verwijderen</text>
         <text lang="DE">Aufnahmen löschen</text>
-        <text lang="DA">Slet optagelser</text>
         <text lang="IS">Eyða upptöku</text>
         <text lang="PT">Apagar Gravações</text>
         <text lang="SV">Radera inspelningar</text>
@@ -111,7 +108,6 @@
         <text lang="ZH_TW">以前的錄影</text>
         <text lang="SL">Že posneto</text>
         <text lang="ET">Varem salvestatud</text>
-        <text lang="DA">Tidligere optagelser</text>
         <text lang="ES">Grabados Anteriormente</text>
         <text lang="PT">Gravações Feitas</text>
         <text lang="RU">Ранее записанное</text>
@@ -136,7 +132,6 @@
         <text lang="ZH_TW">錄影優先次序</text>
         <text lang="SL">Nastavitve prioritet</text>
         <text lang="ET">Prioriteetide muutmine</text>
-        <text lang="DA">Sæt prioriteter</text>
         <text lang="ES">Fijar Prioridades</text>
         <text lang="PT">Definir Prioridades</text>
         <text lang="RU">Установка приоритетов</text>

@@ -9,7 +9,6 @@
         <text lang="DE">TV</text>
         <text lang="SL">TV</text>
         <text lang="ET">TV</text>
-        <text lang="DA">TV</text>
         <text lang="ES">TV</text>
         <text lang="NL">TV</text>
         <text lang="PL">Telewizja</text>
@@ -33,7 +32,6 @@
         <text lang="CA">Música</text>
         <text lang="NL">Muziek</text>
         <text lang="DE">Musik</text>
-        <text lang="DA">Musik</text>
         <text lang="PT">Música</text>
         <text lang="SV">Musik</text>
         <text lang="JA">ミュージック</text>
@@ -54,7 +52,6 @@
         <text lang="CA">Vídeo</text>
         <text lang="NL">Films</text>
         <text lang="DE">Videos</text>
-        <text lang="DA">Film</text>
         <text lang="PT">Filmes</text>
         <text lang="SV">Video</text>
         <text lang="JA">ビデオ</text>
@@ -75,7 +72,6 @@
         <text lang="SL">Radio</text>
         <text lang="ET">Raadio</text>
         <text lang="SV">Radio</text>
-        <text lang="DA">Radio</text>
         <text lang="PT">Rádio FM</text>
         <text lang="ES">Radio</text>
         <text lang="NL">Radio</text>
@@ -102,7 +98,6 @@
         <text lang="CA">Imatges</text>
         <text lang="NL">Foto's</text>
         <text lang="DE">Bilder</text>
-        <text lang="DA">Billeder</text>
         <text lang="PT">Fotos</text>
         <text lang="SV">Bilder</text>
         <text lang="JA">イメージ</text>
@@ -123,7 +118,6 @@
         <text lang="CA">Jocs</text>
         <text lang="NL">Spelen</text>
         <text lang="DE">Spiele</text>
-        <text lang="DA">Spil</text>
         <text lang="PT">Jogos</text>
         <text lang="SV">Spel</text>
         <text lang="JA">ゲーム</text>
@@ -144,7 +138,6 @@
         <text lang="CA">El Temps</text>
         <text lang="NL">Het Weer</text>
         <text lang="DE">Wetter</text>
-        <text lang="DA">Vejret</text>
         <text lang="PT">Meteorologia</text>
         <text lang="SV">Väder</text>
         <text lang="JA">天気</text>
@@ -178,7 +171,6 @@
         <text lang="JA">ニュース</text>
         <text lang="SL">Novice</text>
         <text lang="ET">Uudised</text>
-        <text lang="DA">Nyheder</text>
         <text lang="PT">Notícias</text>
         <text lang="PL">Wiadomości</text>
         <text lang="RU">Новости</text>
@@ -209,7 +201,6 @@
         <text lang="JA">ウェブ</text>
         <text lang="SL">Splet</text>
         <text lang="ET">Veeb</text>
-        <text lang="DA">Web</text>
         <text lang="PT">Navegação Web</text>
         <text lang="ES">Web</text>
         <text lang="NL">Internet</text>
@@ -228,7 +219,6 @@
         <text lang="SL">Telefon</text>
         <text lang="ET">Telefon</text>
         <text lang="SV">Telefon</text>
-        <text lang="DA">Telefon</text>
         <text lang="PT">Telefone</text>
         <text lang="ES">Teléfono</text>
         <text lang="NL">Telefoon</text>
@@ -266,7 +256,6 @@
         <text lang="SV">Arkivera filer</text>
         <text lang="NL">Bestanden Archiveren</text>
         <text lang="RU">Архив файлов</text>
-        <text lang="DA">Arkivere filer</text>
         <text lang="PL">Archiwizuj pliki</text>
         <text lang="HU">Archíválás</text>
         <text lang="DE">Dateien archivieren</text>
@@ -311,7 +300,6 @@
         <text lang="ES">Configurar</text>
         <text lang="CA">Configurar</text>
         <text lang="DE">Konfiguration</text>
-        <text lang="DA">Konfiguration</text>
         <text lang="NL">Instellingen</text>
         <text lang="PT">Configurações</text>
         <text lang="SV">Inställningar</text>
@@ -333,7 +321,6 @@
         <text lang="SV">Avstängning</text>
         <text lang="DE">Beenden</text>
         <text lang="ET">Seiska</text>
-        <text lang="DA">Afslut</text>
         <text lang="PT">Desligar</text>
         <text lang="NL">Afsluiten</text>
         <text lang="PL">Zakończ pracę</text>

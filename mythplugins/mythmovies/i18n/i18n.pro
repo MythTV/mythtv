@@ -5,7 +5,7 @@ TEMPLATE = app
 CONFIG -= moc qt
 
 trans.path = $${PREFIX}/share/mythtv/i18n/
-trans.files += mythmovies_sv.qm mythmovies_hu.qm
+trans.files += mythmovies_sv.qm mythmovies_hu.qm mythmovies_da.qm
 
 INSTALLS += trans
 

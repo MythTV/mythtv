@@ -15,7 +15,6 @@
         <text lang="ZH_TW">網上新聞</text>
         <text lang="SL">Novice</text>
         <text lang="ET">Uudised</text>
-        <text lang="DA">Nyheder</text>
         <text lang="PT">Notícias</text>
         <text lang="RU">Новости</text>
         <text lang="PL">Wiadomości</text>
@@ -64,7 +63,6 @@
         <text lang="ES">El Tiempo</text>
         <text lang="NL">Het Weer</text>
         <text lang="DE">Wetter</text>
-        <text lang="DA">Vejret</text>
         <text lang="IS">Veðrið</text>
         <text lang="PT">Meteorologia</text>
         <text lang="SV">Väder</text>
@@ -123,7 +121,6 @@
         <text lang="ZH_TW">互聯網</text>
         <text lang="SL">Splet</text>
         <text lang="ET">Veeb</text>
-        <text lang="DA">Web</text>
         <text lang="ES">Web</text>
         <text lang="PT">Navegação Web</text>
         <text lang="NL">Internet</text>
@@ -150,7 +147,6 @@
         <text lang="FI">Reseptit</text>
         <text lang="SL">Recepti</text>
         <text lang="ET">Retseptid</text>
-        <text lang="DA">Opskrifter</text>
         <text lang="ES">Recetas</text>
         <text lang="PT">Receitas</text>
         <text lang="RU">Рецепты</text>
@@ -176,7 +172,6 @@
         <text lang="ZH_TW">系統狀態</text>
         <text lang="SL">Status sistema</text>
         <text lang="ET">Süsteemi olek</text>
-        <text lang="DA">Systemstatus</text>
         <text lang="ES">Estado Sistema</text>
         <text lang="PT">Estado do Sistema</text>
         <text lang="RU">Состояние системы</text>

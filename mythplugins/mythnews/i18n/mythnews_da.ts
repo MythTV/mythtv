@@ -1,81 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="da_DK">
 <context>
     <name>MythControls</name>
     <message>
         <location filename="../mythnews/main.cpp" line="27"/>
         <source>RSS News feed reader</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS nyhedsfeed læser</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="31"/>
         <source>Update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Opdater nyheder</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="33"/>
         <source>Force update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Gennemtving opdatering af nyheder</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="35"/>
         <source>Cancel news item updating</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd nyhedsopdateringen</translation>
     </message>
 </context>
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="437"/>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
         <source>Updated</source>
         <translation>Opdateret</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="444"/>
+        <location filename="../mythnews/mythnews.cpp" line="462"/>
         <source>Unknown</source>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="917"/>
+        <location filename="../mythnews/mythnews.cpp" line="936"/>
         <source>Cancel</source>
         <translation>Afbryd</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="913"/>
+        <location filename="../mythnews/mythnews.cpp" line="932"/>
         <source>Edit News Site</source>
-        <translation>Ændre nyheds site</translation>
+        <translation>Ændre nyhedsside</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="125"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
-        <translation type="unfinished"></translation>
+        <translation>Du har ikke konfigureret MythNews til at bruge nogen nyhedsider.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="455"/>
-        <location filename="../mythnews/mythnews.cpp" line="714"/>
+        <location filename="../mythnews/mythnews.cpp" line="473"/>
+        <location filename="../mythnews/mythnews.cpp" line="732"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 af %2 (%3 procent)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="786"/>
+        <location filename="../mythnews/mythnews.cpp" line="805"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der er ikke opsat nogen browser kommando! MythNews kræver at MythBrowser er installeret.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="914"/>
+        <location filename="../mythnews/mythnews.cpp" line="933"/>
         <source>Add News Site</source>
-        <translation>Tilføj Nyhedssite</translation>
+        <translation>Tilføj nyhedsside</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="916"/>
+        <location filename="../mythnews/mythnews.cpp" line="935"/>
         <source>Delete News Site</source>
-        <translation>Slet Nyhedssite</translation>
+        <translation>Slet nyhedsside</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="899"/>
+        <location filename="../mythnews/mythnews.cpp" line="918"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Indstillinger</translation>
     </message>
 </context>
 <context>
@@ -83,42 +83,42 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Edit Site Details</source>
-        <translation type="unfinished">Ændre site detaljer</translation>
+        <translation>Rediger detaljer for siden</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Enter Site Details</source>
-        <translation type="unfinished">Indtast site detaljer</translation>
+        <translation>Indtast detaljer for siden</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
         <source>Name:</source>
-        <translation type="unfinished">Navn:</translation>
+        <translation>Navn:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
         <source>Icon:</source>
-        <translation type="unfinished">Ikon:</translation>
+        <translation>Ikon:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
         <source>Podcast:</source>
-        <translation type="unfinished"></translation>
+        <translation>Podcast:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <translation>Afbryd</translation>
     </message>
 </context>
 <context>
@@ -133,48 +133,142 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="226"/>
         <source>No Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen hentede nyheder.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="245"/>
         <source>Failed to read downloaded file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejl ved læsning af den hentede fil.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Showing Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Viser hentede nyheder.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="274"/>
         <source>XML-file is not valid RSS-feed</source>
-        <translation type="unfinished"></translation>
+        <translation>XML-fil er ikke et gyldigt RSS-feed</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="218"/>
         <source>Retrieve Failed. </source>
-        <translation>Modtagelsen fejlede. </translation>
+        <translation>Hentning fejlede. </translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="705"/>
         <source>Downloading media...</source>
-        <translation type="unfinished"></translation>
+        <translation>Henter medie...</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Afbryd</translation>
+        <source>Edit RSS News Feeds</source>
+        <translation>Rediger RSS nyhedsfeeds</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
+        <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation>Du kan redigere navn, URL og sti til ikon for det valgte RSS feed på denne skærm.  Du kan også markere et feed som en podcast.
+
+Når du er færdig med at redigere, skal du vælge &quot;OK&quot; eller &quot;Afbryd&quot; for at fortsætte.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>Name:</source>
+        <translation>Navn:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>URL:</source>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>Icon:</source>
+        <translation>Ikon:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Podcast:</source>
+        <translation>Podcast:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Genre:</source>
+        <translation>Genre:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Channel:</source>
+        <translation>Kanal:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Cancel</source>
+        <translation>Afbryd</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>News Subscriptions</source>
+        <translation>Nyhedsabonnementer</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Choose the news sites you would like to read.</source>
+        <translation>Vælg de nyhedssites som du gerne vil læse.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Edit RSS News Feed</source>
+        <translation>Rediger RSS nyhedsfeed</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Contexts</source>
+        <translation>Kontekster</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Actions</source>
+        <translation>Handlinger</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>RSS Feeds</source>
+        <translation>RSS feeds</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>MythNews Configuration</source>
+        <translation>MythNews indstillinger</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Minutes</source>
+        <translation>Minutter</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>News Feeds</source>
+        <translation>Nyhedsfeeds</translation>
     </message>
 </context>
 </TS>

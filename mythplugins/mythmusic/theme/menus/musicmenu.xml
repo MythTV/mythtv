@@ -7,7 +7,6 @@
       <text lang="ES">Escuchar Música</text>
       <text lang="CA">Escoltar Música</text>
       <text lang="DE">Musik hören</text>
-      <text lang="DA">Afspil musik</text>
       <text lang="NL">Muziek Afspelen</text>
       <text lang="PT">Tocar Músicas</text>
       <text lang="SV">Spela musik</text>
@@ -28,7 +27,6 @@
       <text lang="ES">Seleccionar Música</text>
       <text lang="CA">Escollir Música</text>
       <text lang="DE">Lieder auswählen</text>
-      <text lang="DA">Vælg musik</text>
       <text lang="NL">Muziek Kiezen</text>
       <text lang="PT">Escolher Músicas</text>
       <text lang="SV">Välj musik</text>
@@ -49,7 +47,6 @@
       <text lang="ES">Importar CD</text>
       <text lang="CA">Importar CD</text>
       <text lang="DE">CD importieren</text>
-      <text lang="DA">Importér CD</text>
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Importar CD para Disco</text>
       <text lang="SV">Importera CD</text>
@@ -66,7 +63,6 @@
    <button>
        <type>MUSIC_IMPORT</type>
        <text>Import Files</text>
-       <text lang="DA">Importér filer</text>
        <text lang="SL">Uvoz datotek</text>
        <text lang="PL">Importuj muzykę</text>
        <text lang="FI">Tuo Tiedostoja</text>
@@ -82,7 +78,6 @@
       <text lang="ES">Actualizar Lista</text>
       <text lang="CA">Actualitzar llista</text>
       <text lang="DE">Sammlung aktualisieren</text>
-      <text lang="DA">Søg efter musik</text>
       <text lang="NL">Muziek Zoeken</text>
       <text lang="PT">Refresc. Lista Músicas</text>
       <text lang="SV">Scanna efter ny musik</text>
@@ -117,7 +112,6 @@
      <text lang="ES">Configurar Música</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
-     <text lang="DA">Musik Indstillinger</text>
      <text lang="IS">Stillingar tónlistar</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>

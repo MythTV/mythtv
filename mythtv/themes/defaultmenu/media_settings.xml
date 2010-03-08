@@ -8,7 +8,6 @@
         <text lang="ES">Configurar Música</text>
         <text lang="CA">Configurar Música</text>
         <text lang="DE">Musik</text>
-        <text lang="DA">Musik Indstillinger</text>
         <text lang="IS">Stillingar tónlistar</text>
         <text lang="NL">Muziek Instellingen</text>
         <text lang="PT">Configurar Música</text>
@@ -35,7 +34,6 @@
         <text lang="ES">Configurar Videos</text>
         <text lang="CA">Configurar Videos</text>
         <text lang="DE">Videos</text>
-        <text lang="DA">Video Indstillinger</text>
         <text lang="IS">Stillingar kvikmynda</text>
         <text lang="NL">Films Instellingen</text>
         <text lang="PT">Configurar Filmes</text>
@@ -62,7 +60,6 @@
         <text lang="ES">Configurar Fotos</text>
         <text lang="CA">Configurar Imatges</text>
         <text lang="DE">Bilder</text>
-        <text lang="DA">Billed indstillinger</text>
         <text lang="IS">Stillingar ljósmynda</text>
         <text lang="NL">Foto's Instellingen</text>
         <text lang="PT">Configurar Fotos</text>
@@ -89,7 +86,6 @@
         <text lang="ES">Configurar Juegos</text>
         <text lang="CA">Configurar Jocs</text>
         <text lang="DE">Spiele</text>
-        <text lang="DA">Spil Indstillinger</text>
         <text lang="IS">Stillingar leikja</text>
         <text lang="NL">Spelen Instellingen</text>
         <text lang="PT">Configurar Jogos</text>
@@ -120,7 +116,6 @@
         <text lang="FI">Radioasetukset</text>
         <text lang="SL">Radio nastavitve</text>
         <text lang="ET">Raadio sätted</text>
-        <text lang="DA">Radioindstillinger</text>
         <text lang="ES">Configurar Radio</text>
         <text lang="PT">Configurar Rádio</text>
         <text lang="NL">Radio Instellingen</text>
@@ -155,7 +150,6 @@
         <text lang="SV">Filarkivering</text>
         <text lang="ES">Archivado Ficheros</text>
         <text lang="RU">Настройки архива</text>
-        <text lang="DA">Fil Arkivering</text>
         <text lang="SL">Nastavitve arhiviranja</text>
         <text lang="PL">Ustaw pliki archiwum</text>
         <text lang="HE">הגדרות ארכיון קבצים</text>

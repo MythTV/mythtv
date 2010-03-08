@@ -11,7 +11,6 @@
      <text lang="FI">1. Yleiset</text>
      <text lang="SL">1. Splošno</text>
      <text lang="ET">1. Üldine</text>
-     <text lang="DA">1. Generelt</text>
      <text lang="ES">1. General</text>
      <text lang="RU">1. Общие</text>
      <text lang="HU">1. Általános</text>
@@ -29,7 +28,6 @@
      <text lang="FI">2. TV-kortit</text>
      <text lang="SL">2. Kartice za zajem</text>
      <text lang="ET">2. TV-kaardid</text>
-     <text lang="DA">2. TV-kort</text>
      <text lang="ES">2. Capturadoras</text>
      <text lang="RU">2. Карты захвата</text>
      <text lang="HU">2. Vevőkártyák</text>
@@ -47,7 +45,6 @@
      <text lang="FI">3. Kuvanlähteet</text>
      <text lang="SL">3. Video viri</text>
      <text lang="ET">3. Videosisendid</text>
-     <text lang="DA">3. Videokilder</text>
      <text lang="ES">3. Fuentes de Vídeo</text>
      <text lang="RU">3. Видео источники</text>
      <text lang="HU">3. Video források</text>
@@ -65,7 +62,6 @@
      <text lang="FI">4. Sisääntuloasetukset</text>
      <text lang="SL">4. Vhodne povezave</text>
      <text lang="ET">4. Sisendite ühendused</text>
-     <text lang="DA">4. Indgange</text>
      <text lang="ES">4. Conexiones</text>
      <text lang="RU">4. Соединение входов</text>
      <text lang="HU">4. Bemeneti kapcsolatok</text>
@@ -82,7 +78,6 @@
      <text lang="FI">5. Kanavanviritys</text>
      <text lang="SL">5. Urejanje kanalov</text>
      <text lang="ET">5. Kanaliredaktor</text>
-     <text lang="DA">5. Kanal opsætning</text>
      <text lang="ES">5. Editor Canales</text>
      <text lang="RU">5. Редактор каналов</text>
      <text lang="HU">5. Csatorna szerkesztő</text>

@@ -6,7 +6,6 @@
      <text lang="ES">Ver Videos</text>
      <text lang="CA">Veure vídeos</text>
      <text lang="DE">Videos ansehen</text>
-     <text lang="DA">Gennemse film</text>
      <text lang="PT">Navegar na Biblioteca de Filmes</text>
      <text lang="SV">Bläddra bland filmer</text>
      <text lang="NL">Blader door videos</text>
@@ -25,7 +24,6 @@
      <text>Video List</text>
      <text lang="ES">Listar Videos</text>
      <text lang="CA">Llistar vídeos</text>
-     <text lang="DA">Film oversigt</text>
      <text lang="DE">Liste</text>
      <text lang="PT">Lista de Filmes</text>
      <text lang="SV">Filmlista</text>
@@ -46,7 +44,6 @@
      <text lang="DE">Galerie</text>
      <text lang="SL">Galerija filmov</text>
      <text lang="FI">Videogalleria</text>
-     <text lang="DA">Film Galleri</text>
      <text lang="SV">Filmgalleri</text>
      <text lang="PT">Galeria de Filmes</text>
      <text lang="ES">Galería</text>
@@ -62,7 +59,6 @@
      <text>Video Manager</text>
      <text lang="ES">Gestionar Videos</text>
      <text lang="CA">Gestionar vídeos</text>
-     <text lang="DA">Film opsætning</text>
      <text lang="DE">Video-Manager</text>
      <text lang="PT">Gestor de Filmes</text>
      <text lang="SV">Filmhanterare</text>
@@ -81,7 +77,6 @@
    <button>
       <type>DVD_PLAY</type>
       <text>Play DVD</text>
-      <text lang="DA">Afspil DVD</text>
       <text lang="PT">Ver DVD</text>
       <text lang="DE">DVD abspielen</text>
       <text lang="SV">Spela DVD</text>
@@ -101,7 +96,6 @@
    <button>
       <type>VCD_PLAY</type>
       <text>Play VCD</text>
-      <text lang="DA">Afspil VCD</text>
       <text lang="PT">Ver VCD</text>
       <text lang="DE">VCD abspielen</text>
       <text lang="NL">VCD Afspelen</text>
@@ -117,7 +111,6 @@
    <button>
       <type>DVD_RIP</type>
       <text>Rip DVD</text>
-      <text lang="DA">Genkod DVD</text>
       <text lang="PT">Importar DVD p/ Disco</text>
       <text lang="DE">DVD importieren</text>
       <text lang="SV">Kopiera DVD</text>
@@ -151,7 +144,6 @@
         <text lang="ES">Configurar Videos</text>
         <text lang="CA">Configurar Videos</text>
         <text lang="DE">Videos</text>
-        <text lang="DA">Video Indstillinger</text>
         <text lang="IS">Stillingar kvikmynda</text>
         <text lang="NL">Films Instellingen</text>
         <text lang="PT">Configurar Filmes</text>

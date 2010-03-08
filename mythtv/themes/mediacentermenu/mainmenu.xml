@@ -7,7 +7,6 @@
         <text lang="ES">Ver Grabaciones</text>
         <text lang="NL">Opnames Bekijken</text>
         <text lang="DE">Aufnahmen ansehen</text>
-        <text lang="DA">Afspil optagelser</text>
         <text lang="IS">Horfa á upptökur</text>
         <text lang="PT">Ver Gravações de TV</text>
         <text lang="SV">Visa inspelningar</text>
@@ -34,7 +33,6 @@
         <text lang="IT">Guarda Video</text>
         <text lang="ES">Ver Videos</text>
         <text lang="DE">Videos ansehen</text>
-        <text lang="DA">Gennemse film</text>
         <text lang="IS">Horfa á myndir</text>
         <text lang="PT">Ver Filmes</text>
         <text lang="SV">Visa filmer</text>
@@ -61,7 +59,6 @@
         <type>DVD_PLAY</type>
         <text>Watch A DVD</text>
         <text lang="IT">Riproduci DVD</text>
-        <text lang="DA">Afspil DVD</text>
         <text lang="PT">Ver DVD</text>
         <text lang="IS">Spila DVD</text>
         <text lang="DE">DVD abspielen</text>
@@ -89,7 +86,6 @@
         <text lang="ES">Ver la TV</text>
         <text lang="NL">TV Kijken</text>
         <text lang="DE">Fernsehen</text>
-        <text lang="DA">Se TV</text>
         <text lang="IS">Horfa á sjónvarp</text>
         <text lang="PT">Ver Televisão</text>
         <text lang="SV">Se på TV</text>
@@ -138,7 +134,6 @@
         <text lang="IT">Esegui Brani Musicali</text>
         <text lang="ES">Escuchar Música</text>
         <text lang="DE">Musik hören</text>
-        <text lang="DA">Afspil musik</text>
         <text lang="IS">Spila tónlist</text>
         <text lang="NL">Muziek Afspelen</text>
         <text lang="PT">Tocar Músicas</text>
