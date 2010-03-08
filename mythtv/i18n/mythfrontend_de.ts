@@ -14028,7 +14028,7 @@ Möchten Sie weitersehen?</translation>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="4346"/>
         <source>Bookmark Saved</source>
-        <translation>Position gepeichert</translation>
+        <translation>Position gespeichert</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="4375"/>
