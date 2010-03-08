@@ -5,7 +5,7 @@ TEMPLATE = app
 CONFIG -= moc qt
 
 trans.path = $${PREFIX}/share/mythtv/i18n/
-trans.files += mythzoneminder_sv.qm mythzoneminder_hu.qm
+trans.files += mythzoneminder_sv.qm mythzoneminder_hu.qm mythzoneminder_da.qm
 
 INSTALLS += trans
 
