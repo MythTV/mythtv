@@ -1,201 +1,201 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="it_IT">
 <context>
     <name>GlobalSetup</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Fine</translation>
     </message>
 </context>
 <context>
     <name>LocationDialog</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca</translation>
     </message>
     <message>
         <source>Searching ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca in corso...</translation>
     </message>
     <message>
         <source>Searching ... Results: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca ... Risultati: %1</translation>
     </message>
     <message>
         <source>Search Complete. Results: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca Completa. Risultati: %1</translation>
     </message>
     <message>
         <source>Source: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorgente: %1</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Weather forecasts</source>
-        <translation type="unfinished"></translation>
+        <translation>Previsioni</translation>
     </message>
     <message>
         <source>Pause current page</source>
-        <translation type="unfinished"></translation>
+        <translation>Pausa la pagina corrente</translation>
     </message>
     <message>
         <source>Search List</source>
-        <translation type="unfinished"></translation>
+        <translation>Lista di ricerca</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Current Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>Condizioni Attuali</translation>
     </message>
     <message>
         <source>Three Day Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Previsioni a tre giorni</translation>
     </message>
     <message>
         <source>18 Hour Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Previsioni a 18 ore</translation>
     </message>
     <message>
         <source>Severe Weather Alerts</source>
-        <translation type="unfinished"></translation>
+        <translation>Allerta Meteo</translation>
     </message>
     <message>
         <source>Six Day Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Previsioni a 6 giorni</translation>
     </message>
     <message>
         <source>Static Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappa statica</translation>
     </message>
     <message>
         <source>Animated Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappa Animata</translation>
     </message>
 </context>
 <context>
     <name>ScreenSetup</name>
     <message>
         <source>Active Screens</source>
-        <translation type="unfinished"></translation>
+        <translation>Pannelli Attivi</translation>
     </message>
     <message>
         <source>Inactive Screens</source>
-        <translation type="unfinished"></translation>
+        <translation>Pannelli Inattivi</translation>
     </message>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Fine</translation>
     </message>
     <message>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungere il pannello desiderato alla lista dei pannelli attivi premendo SELECT.</translation>
     </message>
     <message>
         <source>Sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorgenti</translation>
     </message>
     <message>
         <source>Units: </source>
-        <translation type="unfinished"></translation>
+        <translation>Unità: </translation>
     </message>
     <message>
         <source>English Units</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistema Imperiale</translation>
     </message>
     <message>
         <source>SI Units</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistema SI</translation>
     </message>
     <message>
         <source>Location: </source>
-        <translation type="unfinished"></translation>
+        <translation>località:</translation>
     </message>
     <message>
         <source>Not Defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Non definito</translation>
     </message>
     <message>
         <source>Source: </source>
-        <translation type="unfinished"></translation>
+        <translation>Sorgente: </translation>
     </message>
     <message>
         <source>Press SELECT to </source>
-        <translation type="unfinished"></translation>
+        <translation>Premere SELECT per </translation>
     </message>
     <message>
         <source>change location; </source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiare località; </translation>
     </message>
     <message>
         <source>change units; </source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiare unità; </translation>
     </message>
     <message>
         <source>move screen up or down; or remove screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Spostare pannelli su o giù; o rimuovere pannelli.</translation>
     </message>
     <message>
         <source>Manipulate Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica Pannelli</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Spostare Su</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Spostare Giù</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimuovere</translation>
     </message>
     <message>
         <source>Change Location</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiare Località</translation>
     </message>
     <message>
         <source>Change Units</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiare Unità</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
 </context>
 <context>
     <name>SourceManager</name>
     <message>
         <source>Searching for scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca degli scripts</translation>
     </message>
     <message>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
-        <translation type="unfinished"></translation>
+        <translation>Lo script %1 è ancora in esecuzione, Assicurarsi che non sia bloccato, che i valori di timeout siano corretti... Non sarà eseguito questa volta</translation>
     </message>
 </context>
 <context>
     <name>SourceSetup</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Fine</translation>
     </message>
     <message>
         <source>Author: </source>
-        <translation type="unfinished"></translation>
+        <translation>Autore:</translation>
     </message>
     <message>
         <source>Email: </source>
-        <translation type="unfinished"></translation>
+        <translation>Email:</translation>
     </message>
     <message>
         <source>Version: </source>
-        <translation type="unfinished"></translation>
+        <translation>Versione:</translation>
     </message>
 </context>
 <context>
@@ -668,67 +668,68 @@
     <name>String::WindDirection</name>
     <message>
         <source>N</source>
-        <translation type="unfinished">Tramontana</translation>
+        <translation>N</translation>
     </message>
     <message>
         <source>NNE</source>
-        <translation type="unfinished">Tramontana/Grecale</translation>
+        <translation>NNE</translation>
     </message>
     <message>
         <source>NE</source>
-        <translation type="unfinished">Grecale</translation>
+        <translation>NE</translation>
     </message>
     <message>
         <source>ENE</source>
-        <translation type="unfinished">Levante/Grecale</translation>
+        <translatorcomment>ENE</translatorcomment>
+        <translation>Levante/Grecale</translation>
     </message>
     <message>
         <source>E</source>
-        <translation type="unfinished">Levante</translation>
+        <translation>E</translation>
     </message>
     <message>
         <source>ESE</source>
-        <translation type="unfinished">Levante/Scirocco</translation>
+        <translation>ESE</translation>
     </message>
     <message>
         <source>SE</source>
-        <translation type="unfinished">Scirocco</translation>
+        <translation>SE</translation>
     </message>
     <message>
         <source>SSE</source>
-        <translation type="unfinished">Ostro/Scirocco</translation>
+        <translation>SSE</translation>
     </message>
     <message>
         <source>S</source>
-        <translation type="unfinished">Ostro</translation>
+        <translation>S</translation>
     </message>
     <message>
         <source>SSW</source>
-        <translation type="unfinished">Ostro/Libeccio</translation>
+        <translation>SSO</translation>
     </message>
     <message>
         <source>SW</source>
-        <translation type="unfinished">Libeccio</translation>
+        <translation>SO</translation>
     </message>
     <message>
         <source>WSW</source>
-        <translation type="unfinished">Ponente/Libeccio</translation>
+        <translation>OSO</translation>
     </message>
     <message>
         <source>W</source>
-        <translation type="unfinished">Ponente</translation>
+        <translation>O</translation>
     </message>
     <message>
         <source>WNW</source>
-        <translation type="unfinished">Ponente/Maestro</translation>
+        <translation>ONOPonente/Maestro</translation>
     </message>
     <message>
         <source>NW</source>
-        <translation type="unfinished">Maestro</translation>
+        <translation>NOMaestro</translation>
     </message>
     <message>
         <source>NNW</source>
-        <translation type="unfinished">Tramontana/Maestro</translation>
+        <translation>NNOTramontana/Maestro</translation>
     </message>
 </context>
 <context>
@@ -747,55 +748,59 @@
     </message>
     <message>
         <source>Wind(Gust)</source>
-        <translation type="unfinished"></translation>
+        <translation>Vento (raffiche)</translation>
     </message>
     <message>
         <source>Wind Direction</source>
-        <translation type="unfinished"></translation>
+        <translation>Direzione del vento</translation>
     </message>
     <message>
         <source>Feels Like</source>
-        <translation type="unfinished"></translation>
+        <translation>Percepito</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Abbreviato per problemi di dimensioni</translatorcomment>
+        <translation>Max</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Abbreviato per problemi di dimensioni</translatorcomment>
+        <translation>Min</translation>
     </message>
     <message>
         <source>Global Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni globali</translation>
     </message>
     <message>
         <source>Seconds to display each page:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Brutto, non mi piace.</translatorcomment>
+        <translation>Secondi di visione pannello:</translation>
     </message>
     <message>
         <source>Retrieve data in the background:</source>
-        <translation type="unfinished"></translation>
+        <translation>Recupera dati in background:</translation>
     </message>
     <message>
         <source>Source Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazione sorgenti</translation>
     </message>
     <message>
         <source>Data Retrieval Interval (minutes):</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervallo Recupero Dati (minuti):</translation>
     </message>
     <message>
         <source>Source Update Timeout (seconds):</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Abbreviato per problemi di spazio</translatorcomment>
+        <translation>Timeout agg. sorgente (secondi):</translation>
     </message>
     <message>
         <source>Weather Alerts</source>
-        <translation type="unfinished"></translation>
+        <translation>Allerta Meteo</translation>
     </message>
     <message>
         <source>Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Temp</translation>
     </message>
     <message>
         <source>Precip</source>
@@ -803,57 +808,57 @@
     </message>
     <message>
         <source>Screen Setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Impostazioni schermo</translation>
     </message>
     <message>
         <source>Location Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Ricerca Località</translation>
     </message>
     <message>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Immettere la località corrente, o una grande città vicina. In alcune nazioni i codici postali sono supportati.</translation>
     </message>
     <message>
         <source>Enter Location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserire Località:</translation>
     </message>
 </context>
 <context>
     <name>Weather</name>
     <message>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Pausa</translation>
     </message>
 </context>
 <context>
     <name>WeatherScreen</name>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished">Domenica</translation>
+        <translation>Domenica</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished">Lunedì</translation>
+        <translation>Lunedì</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished">Martedì</translation>
+        <translation>Martedì</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished">Mercoledì</translation>
+        <translation>Mercoledì</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished">Giovedì</translation>
+        <translation>Giovedì</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished">Venerdì</translation>
+        <translation>Venerdì</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished">Sabato</translation>
+        <translation>Sabato</translation>
     </message>
 </context>
 </TS>
