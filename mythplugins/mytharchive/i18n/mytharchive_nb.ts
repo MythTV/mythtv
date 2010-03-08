@@ -999,12 +999,132 @@ Place a blank DVD in the drive and select an option below.</source>
         <source>Burn DVD</source>
         <translation>Brenn DVD</translation>
     </message>
+    <message>
+        <source>Choose where you would like your files archived.</source>
+        <translation>Velg hvor du vil at filene dine skal bli arkivert.</translation>
+    </message>
+    <message>
+        <source>Output Type:</source>
+        <translation>Utdata type:</translation>
+    </message>
+    <message>
+        <source>Destination:</source>
+        <translation>Mål:</translation>
+    </message>
+    <message>
+        <source>Click here to find an output location...</source>
+        <translation>Klikk her for å finne et utdatasted...</translation>
+    </message>
+    <message>
+        <source>Erase DVD-RW before burning</source>
+        <translation>Slett DVD-RW før brenning</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Forrige</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Neste</translation>
+    </message>
+    <message>
+        <source>Filter:</source>
+        <translation>Filter:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Select the file you wish to use.</source>
+        <translation>Velg hvilken fil du vil bruke.</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation>Tilbake</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation>Hjem</translation>
+    </message>
+    <message>
+        <source>See logs from your archive runs.</source>
+        <translation>Se logger fra arkiveringskjøringen.</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Oppdater</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Avslutt</translation>
+    </message>
+    <message>
+        <source>Choose the appearance of your DVD.</source>
+        <translation>Velg utseende for DVDen din.</translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation>Tema:</translation>
+    </message>
+    <message>
+        <source>Select the recordings and videos you wish to save.</source>
+        <translation>Velg hvilke opptak og videoer du vil lagre.</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation>Legg til opptak</translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation>Legg til video</translation>
+    </message>
+    <message>
+        <source>Add File</source>
+        <translation>Legg til fil</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Lagre</translation>
+    </message>
+    <message>
+        <source>Find</source>
+        <translation>Finn</translation>
+    </message>
+    <message>
+        <source>Prev</source>
+        <translation>Forrige</translation>
+    </message>
+    <message>
+        <source>Search Channel</source>
+        <translation>Søk i kanal</translation>
+    </message>
+    <message>
+        <source>Search Callsign</source>
+        <translation>Søk i kallesignal</translation>
+    </message>
+    <message>
+        <source>Search Name</source>
+        <translation>Søk i navn</translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation>Fullfør</translation>
+    </message>
+    <message>
+        <source>Add video</source>
+        <translation>Legg til video</translation>
+    </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
         <source>Save</source>
-        <translation>Lagre</translation>
+        <translation type="obsolete">Lagre</translation>
     </message>
     <message>
         <source>Cancel</source>
