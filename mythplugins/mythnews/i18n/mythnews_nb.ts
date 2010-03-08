@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>Options</source>
-        <translation>Instillinger</translation>
+        <translation>Innstillinger</translation>
     </message>
     <message>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
@@ -141,6 +141,82 @@
     <message>
         <source>Ok</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Edit RSS News Feeds</source>
+        <translation>Rediger RSS nyhetsfeeder</translation>
+    </message>
+    <message>
+        <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation>Du kan redigere navn, URL og ikonsti for den valgte RSS feeden p√• denne skjermen.  Du kan ogs√• velge at elementet er en podkast.
+
+N√•r du er ferdig √• redigere, velg &quot;OK&quot; eller &quot;Avbryt&quot; for √• fortsette.</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Navn:</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <source>Icon:</source>
+        <translation>Ikon:</translation>
+    </message>
+    <message>
+        <source>Podcast:</source>
+        <translation>Podkast:</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Sjanger:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Kanal:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>News Subscriptions</source>
+        <translation>Nyhetsabbonementer</translation>
+    </message>
+    <message>
+        <source>Choose the news sites you would like to read.</source>
+        <translation>Velg hvilke nyhetssiter du vil lese.</translation>
+    </message>
+    <message>
+        <source>Edit RSS News Feed</source>
+        <translation>Rediger RSS nyhetsfeed</translation>
+    </message>
+    <message>
+        <source>Contexts</source>
+        <translation>Kontekster</translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation>Aksjoner</translation>
+    </message>
+    <message>
+        <source>RSS Feeds</source>
+        <translation>RSS feeder</translation>
+    </message>
+    <message>
+        <source>MythNews Configuration</source>
+        <translation>MythNews konfigurasjon</translation>
+    </message>
+    <message>
+        <source>Minutes</source>
+        <translation>Minutter</translation>
+    </message>
+    <message>
+        <source>News Feeds</source>
+        <translation>Nyhetsfeeder</translation>
     </message>
 </context>
 </TS>
