@@ -1233,7 +1233,7 @@ class Video( DBDataWrite ):
         sep = '(?:\s?(?:-|/)?\s?)?'
         regex1 = re.compile('^(.*[^s0-9])'+sep \
                            +'(?:s|(?:Season))?'+sep \
-                           +'(\d{1,3})'+sep \
+                           +'(\d{1,4})'+sep \
                            +'(?:[ex/]|Episode)'+sep \
                            +'(\d{1,3})'+sep \
                            +'(.*)$', re.I)
