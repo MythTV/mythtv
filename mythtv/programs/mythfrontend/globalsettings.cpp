@@ -1915,16 +1915,6 @@ static HostCheckBox *AlwaysStreamFiles()
     return gc;
 }
 
-static HostCheckBox *UseVideoTimebase()
-{
-    HostCheckBox *gc = new HostCheckBox("UseVideoTimebase");
-    gc->setLabel(QObject::tr("Use video as timebase"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Use the video as the timebase and warp "
-                    "the audio to keep it in sync. (Experimental)"));
-    return gc;
-}
-
 static HostCheckBox *CCBackground()
 {
     HostCheckBox *gc = new HostCheckBox("CCBackground");
@@ -4279,7 +4269,6 @@ PlaybackSettings::PlaybackSettings()
         new VerticalConfigurationGroup(false, false, true, true);
     column1->addChild(RealtimePriority());
     column1->addChild(DecodeExtraAudio());
-    column1->addChild(UseVideoTimebase());
     column1->addChild(JumpToProgramOSD());
     columns->addChild(column1);
 
