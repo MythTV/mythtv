@@ -146,6 +146,9 @@ ChannelScanSM::ChannelScanSM(
       sourceID(_sourceID),
       signalTimeout(signal_timeout),
       channelTimeout(channel_timeout),
+      otherTableTimeout(0),
+      otherTableTime(0),
+      setOtherTables(false),
       inputname(_inputname),
       m_test_decryption(test_decryption),
       extend_scan_list(false),
@@ -190,6 +193,7 @@ ChannelScanSM::ChannelScanSM(
         data->AddMPEGListener(this);
         data->AddATSCMainListener(this);
         data->AddDVBMainListener(this);
+        data->AddDVBOtherListener(this);
     }
 }
 
@@ -375,11 +379,30 @@ void ChannelScanSM::HandleMGT(const MasterGuideTable *mgt)
     UpdateChannelInfo(true);
 }
 
-void ChannelScanSM::HandleSDT(uint, const ServiceDescriptionTable *sdt)
+void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
 {
     VERBOSE(VB_CHANSCAN, LOC +
             QString("Got a Service Description Table for %1")
             .arg((*current).FriendlyName) + "\n" + sdt->toString());
+
+    // If this is Astra 28.2 add start listening for Freesat BAT and SDTo
+    if (!setOtherTables && (sdt->OriginalNetworkID() == 2 || sdt->OriginalNetworkID() == 59))
+    {
+        GetDTVSignalMonitor()->GetScanStreamData()->SetFreesatAdditionalSI(true);
+        setOtherTables = true;
+        otherTableTimeout = 10000; // The whole BAT & SDTo group comes round in 10s
+        // Delay processing the SDT until we've seen BATs and SDTos
+        otherTableTime = timer.elapsed() + otherTableTimeout;
+
+        VERBOSE(VB_CHANSCAN, LOC + QString("SDT has OriginalNetworkID %1, look for "
+                                            "additional Freesat SI").arg(sdt->OriginalNetworkID()));
+    }
+
+    if (timer.elapsed() < otherTableTime)
+    {
+        // Set the version for the SDT so we see it again.
+        GetDTVSignalMonitor()->GetDVBStreamData()->SetVersionSDT(sdt->TSID(), -1, 0);
+    }
 
     uint id = sdt->OriginalNetworkID() << 16 | sdt->TSID();
     ts_scanned.insert(id);
@@ -402,6 +425,77 @@ void ChannelScanSM::HandleNIT(const NetworkInformationTable *nit)
             .arg((*current).FriendlyName) + "\n" + nit->toString());
 
     UpdateChannelInfo(true);
+}
+
+void ChannelScanSM::HandleBAT(const BouquetAssociationTable *bat)
+{
+    VERBOSE(VB_CHANSCAN, LOC + "Got a Bouquet Association Table\n" +
+            bat->toString());
+
+    otherTableTime = timer.elapsed() + otherTableTimeout;
+
+    for (uint i = 0; i < bat->TransportStreamCount(); i++)
+    {
+        uint tsid = bat->TSID(i);
+        uint netid = bat->OriginalNetworkID(i);
+        desc_list_t parsed =
+            MPEGDescriptor::Parse(bat->TransportDescriptors(i),
+                                  bat->TransportDescriptorsLength(i));
+        // Look for default authority
+        const unsigned char *def_auth =
+            MPEGDescriptor::Find(parsed, DescriptorID::default_authority);
+        const unsigned char *serv_list =
+            MPEGDescriptor::Find(parsed, DescriptorID::service_list);
+
+        if (def_auth && serv_list)
+        {
+            DefaultAuthorityDescriptor authority(def_auth);
+            ServiceListDescriptor services(serv_list);
+
+            for (uint j = 0; j < services.ServiceCount(); j++)
+            {
+               // If the default authority is given in the SDT this
+               // overrides any definition in the BAT (or in the NIT)
+                VERBOSE(VB_CHANSCAN, LOC + QString("found default authority(BAT) "
+                                                    "for service %1 %2 %3")
+                        .arg(netid).arg(tsid).arg(services.ServiceID(j)));
+               uint64_t index =
+                   ((uint64_t)netid << 32) | (tsid << 16) | services.ServiceID(j);
+               if (! defAuthorities.contains(index))
+                   defAuthorities[index] = authority.DefaultAuthority();
+            }
+        }
+    }
+}
+
+void ChannelScanSM::HandleSDTo(uint tsid, const ServiceDescriptionTable *sdt)
+{
+    VERBOSE(VB_CHANSCAN, LOC + "Got a Service Description Table (other)\n" +
+            sdt->toString());
+
+    otherTableTime = timer.elapsed() + otherTableTimeout;
+
+    uint netid = sdt->OriginalNetworkID();
+
+    for (uint i = 0; i < sdt->ServiceCount(); i++)
+    {
+        uint serviceId = sdt->ServiceID(i);
+        desc_list_t parsed =
+            MPEGDescriptor::Parse(sdt->ServiceDescriptors(i),
+                                  sdt->ServiceDescriptorsLength(i));
+        // Look for default authority
+        const unsigned char *def_auth =
+            MPEGDescriptor::Find(parsed, DescriptorID::default_authority);
+        if (def_auth)
+        {
+            DefaultAuthorityDescriptor authority(def_auth);
+            VERBOSE(VB_CHANSCAN, LOC + QString("found default authority(SDTo) "
+                                                "for service %1 %2 %3")
+                    .arg(netid).arg(tsid).arg(serviceId));
+            defAuthorities[((uint64_t)netid << 32) | (tsid << 16) | serviceId] =
+                authority.DefaultAuthority();
+        }
+    }
 }
 
 void ChannelScanSM::HandleEncryptionStatus(uint pnum, bool encrypted)
@@ -660,8 +754,11 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
     }
 
     // DVB
-    if ((!wait_until_complete || sd->HasCachedAllNIT()) && currentInfo->nits.empty())
+    if ((!wait_until_complete || sd->HasCachedAllNIT()) && (currentInfo->nits.empty() ||
+        timer.elapsed() > (int)otherTableTime))
+    {
         currentInfo->nits = sd->GetCachedNIT();
+    }
 
     sdt_vec_t sdttmp = sd->GetCachedSDTs();
     tsid_checked.clear();
@@ -823,6 +920,9 @@ bool ChannelScanSM::UpdateChannelInfo(bool wait_until_complete)
         currentEncryptionStatus.clear();
         currentEncryptionStatusChecked.clear();
 
+        setOtherTables = false;
+        otherTableTime = 0;
+
         if (scanning)
         {
             transportsScanned++;
@@ -886,7 +986,8 @@ static void update_info(ChannelInsertInfo &info,
 }
 
 static void update_info(ChannelInsertInfo &info,
-                        const ServiceDescriptionTable *sdt, uint i)
+                        const ServiceDescriptionTable *sdt, uint i,
+                        const QMap<uint64_t, QString> &defAuthorities)
 {
     // HACK beg -- special exception for this network
     //             (dbver == "1067")
@@ -925,6 +1026,7 @@ static void update_info(ChannelInsertInfo &info,
         (desc && !desc->IsDTV() && !desc->IsDigitalAudio());
     info.is_audio_service = (desc && desc->IsDigitalAudio());
 
+    info.service_id = sdt->ServiceID(i);
     info.sdt_tsid   = sdt->TSID();
     info.orig_netid = sdt->OriginalNetworkID();
     info.in_sdt     = true;
@@ -938,7 +1040,17 @@ static void update_info(ChannelInsertInfo &info,
     if (def_auth)
     {
         DefaultAuthorityDescriptor authority(def_auth);
+        VERBOSE(VB_CHANSCAN, QString("found default authority(SDT) "
+                                            "for service %1 %2 %3")
+                .arg(info.orig_netid).arg(info.sdt_tsid).arg(info.service_id));
         info.default_authority = authority.DefaultAuthority();
+    }
+    else
+    {
+        uint64_t index = (uint64_t)info.orig_netid << 32 |
+                        info.sdt_tsid << 16 | info.service_id;
+        if (defAuthorities.contains(index))
+            info.default_authority = defAuthorities[index];
     }
 }
 
@@ -1090,7 +1202,7 @@ ChannelScanSM::GetChannelList(transport_scan_items_it_t trans_info,
             {
                 uint pnum = (*sdt_it)->ServiceID(i);
                 PCM_INFO_INIT("dvb");
-                update_info(info, *sdt_it, i);
+                update_info(info, *sdt_it, i, defAuthorities);
             }
         }
     }

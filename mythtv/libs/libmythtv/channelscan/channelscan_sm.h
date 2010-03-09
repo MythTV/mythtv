@@ -81,7 +81,8 @@ class AnalogSignalHandler : public SignalMonitorListener
 
 class ChannelScanSM : public MPEGStreamListener,
                       public ATSCMainStreamListener,
-                      public DVBMainStreamListener
+                      public DVBMainStreamListener,
+                      public DVBOtherStreamListener
 {
     friend class AnalogSignalHandler;
 
@@ -144,6 +145,11 @@ class ChannelScanSM : public MPEGStreamListener,
     void HandleSDT(uint tsid, const ServiceDescriptionTable*);
     void HandleTDT(const TimeDateTable*) {}
 
+    // DVB Other
+    void HandleNITo(const NetworkInformationTable*) {}
+    void HandleSDTo(uint tsid, const ServiceDescriptionTable*);
+    void HandleBAT(const BouquetAssociationTable*);
+
   private:
     // some useful gets
     DTVChannel       *GetDTVChannel(void);
@@ -201,6 +207,9 @@ class ChannelScanSM : public MPEGStreamListener,
     int               sourceID;
     uint              signalTimeout;
     uint              channelTimeout;
+    uint              otherTableTimeout;
+    uint              otherTableTime;
+    bool              setOtherTables;
     QString           inputname;
     bool              m_test_decryption;
     bool              extend_scan_list;
@@ -224,6 +233,7 @@ class ChannelScanSM : public MPEGStreamListener,
     bool                        currentTestingDecryption;
     QMap<uint, uint>            currentEncryptionStatus;
     QMap<uint, bool>            currentEncryptionStatusChecked;
+    QMap<uint64_t, QString>     defAuthorities;
 
     /// Found Channel Info
     ChannelList       channelList;
