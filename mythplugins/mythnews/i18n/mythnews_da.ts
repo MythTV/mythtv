@@ -44,12 +44,12 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="932"/>
         <source>Edit News Site</source>
-        <translation>Ændre nyhedsside</translation>
+        <translation>Ændre nyhedskilde</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="125"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
-        <translation>Du har ikke konfigureret MythNews til at bruge nogen nyhedsider.</translation>
+        <translation>Du har ikke konfigureret MythNews til at bruge nogen nyhedskilder.</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="473"/>
@@ -65,12 +65,12 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="933"/>
         <source>Add News Site</source>
-        <translation>Tilføj nyhedsside</translation>
+        <translation>Tilføj nyhedskilde</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="935"/>
         <source>Delete News Site</source>
-        <translation>Slet nyhedsside</translation>
+        <translation>Slet nyhedskilde</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="918"/>
@@ -83,12 +83,12 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Edit Site Details</source>
-        <translation>Rediger detaljer for siden</translation>
+        <translation>Rediger detaljer for nyhedskilden</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Enter Site Details</source>
-        <translation>Indtast detaljer for siden</translation>
+        <translation>Indtast detaljer for nyhedskilden</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
@@ -228,7 +228,7 @@ Når du er færdig med at redigere, skal du vælge &quot;OK&quot; eller &quot;Af
     <message>
         <location filename="themestrings.h" line="13"/>
         <source>Choose the news sites you would like to read.</source>
-        <translation>Vælg de nyhedssites som du gerne vil læse.</translation>
+        <translation>Vælg de nyhedskilder som du gerne vil læse.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>
@@ -268,7 +268,8 @@ Når du er færdig med at redigere, skal du vælge &quot;OK&quot; eller &quot;Af
     <message>
         <location filename="themestrings.h" line="21"/>
         <source>News Feeds</source>
-        <translation>Nyhedsfeeds</translation>
+        <translatorcomment>Navn i hovedmenu, kilder lyder bedre end feeds</translatorcomment>
+        <translation>Nyhedskilder</translation>
     </message>
 </context>
 </TS>

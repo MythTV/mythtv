@@ -133,7 +133,7 @@ Brug &apos;Tilføj bogmærke&apos; for at tilføje nye bogmærker</translation>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="239"/>
         <source>Loading...</source>
-        <translation>Loader...</translation>
+        <translation>Indlæser...</translation>
     </message>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="335"/>
@@ -326,7 +326,7 @@ Når du er færdig, vælg da &quot;OK&quot; eller &quot;Afbryd&quot; for at fort
     <message>
         <location filename="../mythbrowser/webpage.cpp" line="129"/>
         <source>Loading...</source>
-        <translation>Loader...</translation>
+        <translation>Indlæser...</translation>
     </message>
 </context>
 </TS>

@@ -87,7 +87,7 @@ Tjek MythMovies indstillingerne</translation>
     <message>
         <location filename="../mythmovies/moviesui.cpp" line="352"/>
         <source>Update Movie Times</source>
-        <translation>Opdater film tider</translation>
+        <translation>Opdater fremvisningstider</translation>
     </message>
     <message>
         <location filename="../mythmovies/moviesui.cpp" line="353"/>
@@ -127,7 +127,7 @@ Tjek MythMovies indstillingerne</translation>
     <message>
         <location filename="themestrings.h" line="2"/>
         <source>Movie Times</source>
-        <translation>Film tider</translation>
+        <translation>Biograf fremvisningstider</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>

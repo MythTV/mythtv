@@ -11,7 +11,8 @@
     <message>
         <location filename="../mythnetvision/main.cpp" line="38"/>
         <source>Internet Television Client - Site/Tree View</source>
-        <translation>Internet TV klient - Site/træstruktur</translation>
+        <translatorcomment>&quot;Gennemse&quot; er valgt for at matche menupunkter</translatorcomment>
+        <translation>Internet TV klient - Gennemse</translation>
     </message>
 </context>
 <context>
@@ -19,12 +20,12 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="225"/>
         <source>Search Options</source>
-        <translation>Søge indstillinger</translation>
+        <translation>Søgeindstillinger</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="244"/>
         <source>Open Web Link</source>
-        <translation>Åbn web link</translation>
+        <translation>Åbn link</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="258"/>
@@ -54,7 +55,7 @@
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="430"/>
         <source>Searching %1 for &quot;%2&quot;...</source>
-        <translation>Søger %1 efter &quot;%2&quot;...</translation>
+        <translation>Søger på %1 efter &quot;%2&quot;...</translation>
     </message>
     <message>
         <location filename="../mythnetvision/netsearch.cpp" line="445"/>
@@ -125,12 +126,12 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="485"/>
         <source>Playback/Download Options</source>
-        <translation>Afspilnings/download indstillinger</translation>
+        <translation>Afspilning/download valgmuligheder</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="507"/>
         <source>Open Web Link</source>
-        <translation>Åbn web link</translation>
+        <translation>Åbn link</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="510"/>
@@ -140,7 +141,7 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="513"/>
         <source>Scan/Manage Subscriptions</source>
-        <translation>Scan/administrer abonnementer</translation>
+        <translation>Opdater/administrer abonnementer</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="514"/>
@@ -150,7 +151,7 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="528"/>
         <source>View Options</source>
-        <translation>Visnings indstillinger</translation>
+        <translation>Visningsindstillinger</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="540"/>
@@ -170,12 +171,12 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="556"/>
         <source>Subscription Management</source>
-        <translation>Abonnements administration</translation>
+        <translation>Abonnementshåndtering</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="567"/>
         <source>Update Site Maps</source>
-        <translation>Opdater sitemaps</translation>
+        <translation>Opdater sider</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="568"/>
@@ -185,7 +186,7 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="569"/>
         <source>Manage Site Subscriptions</source>
-        <translation>Administrer site abonnementer</translation>
+        <translation>Administrer side-abonnementer</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="570"/>
@@ -195,12 +196,12 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="572"/>
         <source>Enable Automatic Site Updates</source>
-        <translation>Aktiver automatisk opdatering af sites</translation>
+        <translation>Aktiver automatisk opdatering af sider</translation>
     </message>
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="574"/>
         <source>Disable Automatic Site Updates</source>
-        <translation>Deaktiver automatisk opdatering af sites</translation>
+        <translation>Deaktiver automatisk opdatering af sider</translation>
     </message>
     <message>
         <source>Enable Automatic RSS Updates</source>
@@ -241,7 +242,7 @@
     <message>
         <location filename="../mythnetvision/nettree.cpp" line="1360"/>
         <source>Updating Site Maps.  This could take a while...</source>
-        <translation>Opdaterer sitemaps.  Dette kan tage et stykke tid...</translation>
+        <translation>Opdaterer sider.  Dette kan tage et stykke tid...</translation>
     </message>
 </context>
 <context>
@@ -382,17 +383,17 @@ For nye abonnementer kan du blot skrive URLen og klikke på &quot;Gem.&quot;</tr
     <message>
         <location filename="themestrings.h" line="18"/>
         <source>Choose the sites you wish to browse.</source>
-        <translation>Vælg de sites som du ønsker at gennemse.</translation>
+        <translation>Vælg de sider som du ønsker at gennemse.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>New Site</source>
-        <translation>Nyt site</translation>
+        <translation>Nyt side</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Edit Site</source>
-        <translation>Rediger site</translation>
+        <translation>Rediger side</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="21"/>
@@ -417,7 +418,7 @@ For nye abonnementer kan du blot skrive URLen og klikke på &quot;Gem.&quot;</tr
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Manage Site Subscriptions</source>
-        <translation>Administrer site abonnementer</translation>
+        <translation>Administrer side-abonnementer</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
@@ -452,7 +453,7 @@ For nye abonnementer kan du blot skrive URLen og klikke på &quot;Gem.&quot;</tr
     <message>
         <location filename="themestrings.h" line="33"/>
         <source>Site Description:</source>
-        <translation>Site beskrivelse:</translation>
+        <translation>Sidebeskrivelse:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="34"/>
@@ -488,7 +489,7 @@ For nye abonnementer kan du blot skrive URLen og klikke på &quot;Gem.&quot;</tr
     <message>
         <location filename="themestrings.h" line="16"/>
         <source>You haven&apos;t added any Sites/RSS Feeds yet!  To add a site, press MENU, then choose &quot;Scan/Manage Subscriptions,&quot; then &quot;Manage Site Subscriptions.&quot;</source>
-        <translation>Du har ikke tilføjet nogen sites/RSS feeds endnu!  For at tilføje et site skal du trykke MENU, vælge &quot;Scan/administrer abonnementer&quot; efterfulgt af &quot;Administrer site abonnementer.&quot;</translation>
+        <translation>Du har ikke tilføjet nogen sider/RSS feeds endnu!  For at tilføje en side skal du trykke MENU, vælge &quot;Opdater/administrer abonnementer&quot; efterfulgt af &quot;Administrer side-abonnementer.&quot;</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="38"/>
@@ -513,17 +514,17 @@ For nye abonnementer kan du blot skrive URLen og klikke på &quot;Gem.&quot;</tr
     <message>
         <location filename="themestrings.h" line="42"/>
         <source>Search popular video sites</source>
-        <translation>Søg populære video sites</translation>
+        <translation>Søg populære videosider</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="43"/>
         <source>Browse Internet Video</source>
-        <translation>Naviger internet video</translation>
+        <translation>Gennemse internet video</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
         <source>Browse highlights and entire sites</source>
-        <translation>Naviger highlights og komplette sites</translation>
+        <translation>Gennemse highlights og komplette sider</translation>
     </message>
     <message>
         <source>Ok</source>

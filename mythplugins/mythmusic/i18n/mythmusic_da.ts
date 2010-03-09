@@ -831,12 +831,12 @@ Vil du fortsætte med at spille musik i baggrunden?</translation>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="416"/>
         <source>No - Exit, Stop Playing</source>
-        <translation>Nej - Afslut, stop afspilning</translation>
+        <translation>Nej - Afslut og stop afspilning</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="417"/>
         <source>Yes - Exit, Continue Playing</source>
-        <translation>Ja - Afslut, fortsæt afspilning</translation>
+        <translation>Ja - Afslut og fortsæt afspilning</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="418"/>
@@ -1091,7 +1091,7 @@ Vil du fortsætte med at spille musik i baggrunden?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="266"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to your rating of a given track when ordering a group of songs.</source>
-        <translation>Anvendes i shufflemode. Denne vægt fastsætter hvor meget din bedømmelse af en given sang betyder ved sortering af en gruppe af sange.</translation>
+        <translation>Anvendes i smart shufflemode. Denne vægt fastsætter hvor meget din bedømmelse af en given sang betyder ved sortering af en gruppe af sange.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="276"/>
@@ -1101,7 +1101,7 @@ Vil du fortsætte med at spille musik i baggrunden?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="278"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how many times a given track has been played when ordering a group of songs.</source>
-        <translation>Anvendes i shufflemode. Denne vægt fastsætter hvor meget afspilningshyppigheden for en given sang betyder ved sortering af en gruppe sange.</translation>
+        <translation>Anvendes i smart shufflemode. Denne vægt fastsætter hvor meget afspilningshyppigheden for en given sang betyder ved sortering af en gruppe sange.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="288"/>
@@ -1111,7 +1111,7 @@ Vil du fortsætte med at spille musik i baggrunden?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="290"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to how long it has been since a given track was played when ordering a group of songs.</source>
-        <translation>Anvendes i shufflemode. Denne vægt fastsætter hvor meget længden af tidsrummet siden sidste afspilning af en given sang betyder ved sortering af en gruppe sange.</translation>
+        <translation>Anvendes i smart shufflemode. Denne vægt fastsætter hvor meget længden af tidsrummet siden sidste afspilning af en given sang betyder ved sortering af en gruppe sange.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="300"/>
@@ -1121,7 +1121,7 @@ Vil du fortsætte med at spille musik i baggrunden?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="302"/>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>Anvendes i shufflemode. Denne vægt fastsætter hvor meget tilfældigheder spiller ind ved sortering af en gruppe sange.</translation>
+        <translation>Anvendes i smart shufflemode. Denne vægt fastsætter hvor meget tilfældigheder spiller ind ved sortering af en gruppe sange.</translation>
     </message>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="336"/>
@@ -2050,7 +2050,7 @@ Vil du fjerne det eksisterende nummer?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1677"/>
         <source>Smart Playlist Result Viewer</source>
-        <translation>Smart-afspilningsliste resultat visning</translation>
+        <translation>Smarte afspilningslister resultatviser</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1701"/>

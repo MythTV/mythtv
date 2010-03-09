@@ -700,12 +700,12 @@
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="698"/>
         <source>Power Search rules no longer reqiure a leading &quot;AND&quot;.</source>
-        <translation>Power Search regler behøver ikke længere at begynde med &quot;AND&quot;.</translation>
+        <translation>Avancerede søgeregler behøver ikke længere at begynde med &quot;AND&quot;.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="702"/>
         <source>Power Search rules can not include semicolon ( ; ) </source>
-        <translation>Power Search regler må ikke indeholde semikolon ( ; ) </translation>
+        <translation>Avancerede søgeregler må ikke indeholde semikolon ( ; ) </translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/customedit.cpp" line="703"/>
@@ -903,7 +903,7 @@
     <message>
         <location filename="../programs/mythfrontend/custompriority.cpp" line="454"/>
         <source>Power Priority</source>
-        <translation>Power prioritet</translation>
+        <translation>Avanceret prioritet</translation>
     </message>
 </context>
 <context>
@@ -2838,7 +2838,7 @@
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="711"/>
         <source>Clear editing cut points</source>
-        <translation>Slet redigerings klippepunkter</translation>
+        <translation>Slet klippepunkter</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/tv_play.cpp" line="713"/>
@@ -3583,7 +3583,7 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1810"/>
         <source>Select Search</source>
-        <translation>Vælg Søg</translation>
+        <translation>Vælg søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1811"/>
@@ -4388,7 +4388,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2095"/>
         <source>Select Search</source>
-        <translation>Vælg Søg</translation>
+        <translation>Vælg søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="2096"/>
@@ -4890,7 +4890,7 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../programs/mythfrontend/proglist.cpp" line="150"/>
         <location filename="../programs/mythfrontend/proglist.cpp" line="151"/>
         <source>Power Search</source>
-        <translation>Super søgning</translation>
+        <translation>Avanceret søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="152"/>
@@ -5176,7 +5176,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1030"/>
         <source>Power Recording Rule</source>
-        <translation>Power optagelses regel</translation>
+        <translation>Avanceret optagelsesregel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1076"/>
@@ -6130,7 +6130,7 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="290"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="318"/>
         <source>Sets the audio bitrate</source>
-        <translation>Sætter lyd bitrate</translation>
+        <translation>Sætter lyd bitraten</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="105"/>
@@ -6146,7 +6146,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="347"/>
         <source>Bitrate Settings</source>
-        <translation>Hastighedsopsætning</translation>
+        <translation>Bitrate indstillinger</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="397"/>
@@ -6183,12 +6183,12 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="526"/>
         <source>Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation>Hastighed er i kilobit/sekund. 2200Kbps giver maks. 1 gigabyte pr. time.</translation>
+        <translation>Bitraten er i kilobit/sekund. 2200Kbps giver maks. 1 gigabyte pr. time.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="538"/>
         <source>Scale bitrate for frame size</source>
-        <translation>Tilpas hastighed til framestørrelsen</translation>
+        <translation>Tilpas bitrate til framestørrelsen</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="553"/>
@@ -8038,7 +8038,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="744"/>
         <source>If enabled, MythTV modules will send event details to the database, where they can be viewed with MythLog or periodically emailed to the administrator.</source>
-        <translation>Hvis aktiv, vil MythTV modulerne sende event detaljer til databasen, hvor de kan læses med Myhtlog eller periodisk sendes pr. email til administratoren.</translation>
+        <translation>Hvis aktiv, vil MythTV modulerne sende eventdetaljer til databasen, hvor de kan læses med Myhtlog eller periodisk sendes pr. email til administratoren.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="753"/>
@@ -8156,7 +8156,7 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="252"/>
         <location filename="../libs/libmythtv/recordingrule.cpp" line="256"/>
         <source>Power Search</source>
-        <translation>Super søgning</translation>
+        <translation>Avanceret søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3983"/>
@@ -8745,12 +8745,12 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="764"/>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation>Denne globale indstilling tillader optageren at begynde før den planlagte starttid.  Den påvirker ikke planlægningen.  Den ignoreres når to udsendelser er planlagt uden tilstrækkelig tid imellem dem.</translation>
+        <translation>Denne globale indstilling tillader optageren at begynde før det planlagte starttidspunkt.  Den påvirker ikke planlægningen.  Den ignoreres når to udsendelser er planlagt uden tilstrækkelig tid imellem dem.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="777"/>
         <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation>Denne globale indstilling tillader optageren at optage efter den planlagte sluttid.  Den påvirker ikke planlægningen.  Den ignoreres når to udsendelser er planlagt uden tilstrækkelig tid imellem dem.</translation>
+        <translation>Denne globale indstilling tillader optageren at optage efter det planlagte sluttidspunkt.  Den påvirker ikke planlægningen.  Den ignoreres når to udsendelser er planlagt uden tilstrækkelig tid imellem dem.</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="964"/>
@@ -8786,22 +8786,22 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="566"/>
         <source>Job Queue Start Time</source>
-        <translation>Job kø start tid</translation>
+        <translation>Job kø starttidspunkt</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="567"/>
         <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation>Denne indstilling styrer starttid for jobkøen, som bestemmer hvornår nye job vil blive startet.</translation>
+        <translation>Denne indstilling styrer starttidspunkt for jobkøen, som bestemmer hvornår nye job vil blive startet.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="576"/>
         <source>Job Queue End Time</source>
-        <translation>Job kø slut tid</translation>
+        <translation>Job kø sluttidspunkt</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="577"/>
         <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation>Denne indstilling styrer sluttid for jobkøen, som bestemmer hvornår nye job vil blive startet.</translation>
+        <translation>Denne indstilling styrer sluttidspunkt for jobkøen, som bestemmer hvornår nye job vil blive startet.</translation>
     </message>
     <message>
         <location filename="../programs/mythtv-setup/backendsettings.cpp" line="597"/>
@@ -9800,7 +9800,7 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="37"/>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="38"/>
         <source>start time</source>
-        <translation>start tid</translation>
+        <translation>starttidspunkt</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="18"/>
@@ -9808,7 +9808,7 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="40"/>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="51"/>
         <source>Set both Start &amp; End times to 00:00 to disable.</source>
-        <translation>Sæt start &amp; slut tid til 00:00 for at deaktivere.</translation>
+        <translation>Sæt start- &amp; sluttidspunkt til 00:00 for at deaktivere.</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="26"/>
@@ -9816,7 +9816,7 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="48"/>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="49"/>
         <source>end time</source>
-        <translation>slut tid</translation>
+        <translation>sluttidspunkt</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/programinfo.cpp" line="2246"/>
@@ -9953,7 +9953,7 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="972"/>
         <source>, using your %1 rate of %2 Kb/sec</source>
-        <translation>, med din %1 hastighed på %2 kb/sek</translation>
+        <translation>, med din %1 bitrate på %2 kb/sek</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomesettings.cpp" line="17"/>
@@ -11998,7 +11998,7 @@ må ikke være tomt.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3153"/>
         <source>If set, the scheduler will avoid assigning shows from different channels to the same card if their end time and start time match. This will be allowed when necessary in order to resolve conflicts.</source>
-        <translation>Hvis aktiveret, vil planlæggeren undgå at tildele optagelser af forskellige kanaler til det samme kort hvis deres sluttid og starttid matcher. Dette vil blive tilladt såfremt at det er nødvendigt for at løse konflikter.</translation>
+        <translation>Hvis aktiveret, vil planlæggeren undgå at tildele optagelser af forskellige kanaler til det samme kort hvis deres sluttidspunkt og starttidspunkt matcher. Dette vil blive tilladt såfremt at det er nødvendigt for at løse konflikter.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3215"/>
@@ -12289,12 +12289,12 @@ må ikke være tomt.</translation>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1031"/>
         <source>Save database details</source>
-        <translation>Gem database detaljer</translation>
+        <translation>Gem databasedetaljer</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1032"/>
         <source>Save backend details</source>
-        <translation>Gem backend detaljer</translation>
+        <translation>Gem backenddetaljer</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythcontext.cpp" line="1033"/>
@@ -12395,7 +12395,7 @@ må ikke være tomt.</translation>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="6471"/>
         <source>%1 of %2 (%3 remaining)</source>
-        <translation>%1 af %2 (%3 mangler)</translation>
+        <translation>%1 af %2 (%3 tilbage)</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/signalmonitorvalue.cpp" line="24"/>
@@ -14940,13 +14940,13 @@ Du er formentlig nødt til at benytte eject-knappen på drevet.</translation>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="990"/>
         <source>%1 remaining</source>
         <comment>time</comment>
-        <translation>%1 mangler</translation>
+        <translation>%1 tilbage</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="994"/>
         <source>%1 and %2 remaining</source>
         <comment>time</comment>
-        <translation>%1 og %2 mangler</translation>
+        <translation>%1 og %2 tilbage</translation>
     </message>
     <message numerus="yes">
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1021"/>
@@ -15284,7 +15284,7 @@ Do you wish to continue watching?</source>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="258"/>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="507"/>
         <source>Change Ending Time</source>
-        <translation>Ændre sluttid</translation>
+        <translation>Ændre sluttidspunkt</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/schedulecommon.cpp" line="241"/>
@@ -15403,7 +15403,7 @@ Do you wish to continue watching?</source>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="235"/>
         <source>Power Search</source>
-        <translation>Super søgning</translation>
+        <translation>Avanceret søgning</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/scheduleeditor.cpp" line="238"/>
@@ -15936,12 +15936,13 @@ Ikke flere oplysninger</translation>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1059"/>
         <source>average</source>
-        <translation>gennemsnitlig</translation>
+        <translatorcomment>tilføjet -e for at få det til at passe med &quot;System status&quot;-skærmen</translatorcomment>
+        <translation>gennemsnitlige</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1075"/>
         <source>maximum</source>
-        <translation>maksimum</translation>
+        <translation>maksimale</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="1093"/>
@@ -16044,8 +16045,8 @@ Ikke flere oplysninger</translation>
         <location filename="../programs/mythfrontend/statusbox.cpp" line="572"/>
         <source>%n search rule(s) are defined</source>
         <translation>
-            <numerusform>%n søge regel er defineret</numerusform>
-            <numerusform>%n søge regler er defineret</numerusform>
+            <numerusform>%n søgeregel er defineret</numerusform>
+            <numerusform>%n søgeregler er defineret</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -17403,7 +17404,7 @@ Vælg en aktuel optagelse</translation>
     <message>
         <location filename="../themes/themestrings.h" line="5"/>
         <source>Move the selected arrow to the corner of the TV screen.  Press SELECT to edit the other arrow.  Press MENU to change the granularity of the adjustment or to quit without saving.  When you have finished, press BACK.</source>
-        <translation>Flyt den valgte pil til hjørnet af skærmen. Tryk ENTER for at flytte de andre pile. Tryk MENU for at skifte finheden af justeringen eller for at afslutte uden at gemme. Når du er færdig tryk BACK.</translation>
+        <translation>Flyt den valgte pil til hjørnet af skærmen. Tryk ENTER for at flytte de andre pile. Tryk MENU for at skifte finheden af justeringen eller for at afslutte uden at gemme. Når du er færdig tryk TILBAGE.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="6"/>
@@ -17682,7 +17683,7 @@ Når du har færdiggjort dine ændringer, klik på &quot;OK&quot; knappen.</tran
     <message>
         <location filename="../themes/themestrings.h" line="88"/>
         <source>To manually schedule a recording, enter a title (optional).  Then set the channel, date, start time, and duration of your recording.  Note that this recording will not have any listings data or other information provided by an EPG.</source>
-        <translation>For manuelt at planlæggeen optagelse, skriv en titel.  Vælg så kanal, dato, starttid og længde af din optagelse. Vær opmærksom på at denne optagelse ikke vil indeholde noget information fra programguiden.</translation>
+        <translation>For manuelt at planlæggeen optagelse, skriv en titel.  Vælg så kanal, dato, starttidspunkt og længde af din optagelse. Vær opmærksom på at denne optagelse ikke vil indeholde noget information fra programguiden.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="90"/>
@@ -17763,7 +17764,7 @@ Når du har færdiggjort din regel, kan du teste, slette eller installere den me
     <message>
         <location filename="../themes/themestrings.h" line="116"/>
         <source>Edit Power Search</source>
-        <translation>Rediger super søgning</translation>
+        <translation>Rediger avanceret søgning</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="117"/>
@@ -17868,7 +17869,7 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
     <message>
         <location filename="../themes/themestrings.h" line="141"/>
         <source>Recording Rule is Active</source>
-        <translation>Optagelses regel er aktiv</translation>
+        <translation>Optagelsesregel er aktiv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="142"/>
@@ -17992,7 +17993,7 @@ Til sidst, kan du teste, aktivere, lagre eller annulere din regel.</translation>
     <message>
         <location filename="../themes/themestrings.h" line="174"/>
         <source>Enter Your Twitter Login Details</source>
-        <translation>Angiv dine Twitter login detaljer</translation>
+        <translation>Angiv dine Twitter logindetaljer</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="175"/>
@@ -18965,7 +18966,7 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="489"/>
         <source>News Feeds</source>
-        <translation>Nyhedsfeeds</translation>
+        <translation>Nyhedskilder</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="490"/>
@@ -19196,7 +19197,8 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="296"/>
         <source>No listings found for this program.</source>
-        <translation>Ingen resultater fundet for denne udsendelse.</translation>
+        <translatorcomment>Rettet til &quot;søgning&quot; for at sætningen skal give mening.</translatorcomment>
+        <translation>Ingen resultater fundet under denne søgning.</translation>
     </message>
     <message>
         <source>Airdate:</source>
@@ -19557,7 +19559,7 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="210"/>
         <source>Start Time:</source>
-        <translation>Start tidspunkt:</translation>
+        <translation>Starttidspunkt:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="211"/>
@@ -19704,7 +19706,7 @@ For at planlægge en optagelse, afslut denne skærm og vælg &apos;Programguide&
     <message>
         <location filename="../themes/themestrings.h" line="228"/>
         <source>Edit Power Search Fields</source>
-        <translation>Rediger power søgefeltet</translation>
+        <translation>Rediger felter for avanceret søgning</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="229"/>
@@ -19804,7 +19806,7 @@ For at planlægge en optagelse, afslut denne skærm og vælg &apos;Programguide&
     <message>
         <location filename="../themes/themestrings.h" line="237"/>
         <source>Select the recording rule</source>
-        <translation>Vælg en optagelses regel</translation>
+        <translation>Vælg en optagelsesregel</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="123"/>
@@ -19897,7 +19899,7 @@ For at planlægge en optagelse, afslut denne skærm og vælg &apos;Programguide&
     <message>
         <location filename="../themes/themestrings.h" line="250"/>
         <source>Recording Rule Active</source>
-        <translation>Optagelses regel aktiv</translation>
+        <translation>Optagelsesregel aktiv</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="251"/>
@@ -20008,7 +20010,7 @@ For at planlægge en optagelse, afslut denne skærm og vælg &apos;Programguide&
     <message>
         <location filename="../themes/themestrings.h" line="525"/>
         <source>User Rating</source>
-        <translation>Bruger vurdering</translation>
+        <translation>Brugervurdering</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="612"/>
@@ -20293,7 +20295,7 @@ For at planlægge en optagelse, afslut denne skærm og vælg &apos;Programguide&
     <message>
         <location filename="../themes/themestrings.h" line="635"/>
         <source>Edit or delete any recording rule</source>
-        <translation>Rediger eller slet optagelses regeler</translation>
+        <translation>Rediger eller slet optagelsesregler</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="636"/>
@@ -20515,7 +20517,7 @@ For at planlægge en optagelse, afslut denne side og vælg &apos;Programguide&ap
     <message>
         <location filename="../themes/themestrings.h" line="506"/>
         <source>User Rating:</source>
-        <translation>Bruger vurdering:</translation>
+        <translation>Brugervurdering:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="509"/>
@@ -20606,7 +20608,7 @@ For at planlægge en optagelse, afslut denne side og vælg &apos;Programguide&ap
     <message>
         <location filename="../themes/themestrings.h" line="552"/>
         <source>User Rating :</source>
-        <translation>Bruger vurdering :</translation>
+        <translation>Brugervurdering :</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="553"/>

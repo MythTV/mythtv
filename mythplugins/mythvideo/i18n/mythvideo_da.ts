@@ -768,7 +768,7 @@
     </message>
     <message>
         <source>Loading videos ...</source>
-        <translation>Loader film ...</translation>
+        <translation>Indlæser film ...</translation>
     </message>
     <message>
         <source>No directory %1 - DVD importing will fail</source>
@@ -1939,7 +1939,7 @@ Hvis du vælger &quot;Brug standard afspiller&quot;, vil den valgte afspilningsk
     </message>
     <message>
         <source>Video dialog loading, or no videos available...</source>
-        <translation>Video dialog loader eller ingen tilgængelige videoer...</translation>
+        <translation>Video dialog indlæses eller ingen tilgængelige videoer...</translation>
     </message>
     <message>
         <source>Settings</source>
