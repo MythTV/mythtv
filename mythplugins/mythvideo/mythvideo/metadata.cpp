@@ -946,7 +946,7 @@ QString Metadata::FilenameToMeta(const QString &file_name, int position)
                   "%1" // optional separator
                   "(?:s|(?:%2))?" // season marker
                   "%1" // optional separator
-                  "(\\d{1,3})" // Season
+                  "(\\d{1,4})" // Season
                   "%1" // optional separator
                   "(?:[ex/]|%3)" // episode marker
                   "%1" // optional separator
