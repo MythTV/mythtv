@@ -211,10 +211,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(bool muted)
       audio_paused(false),
       repeat_delay(0),
       // Audio warping stuff
-      usevideotimebase(false),
       warpfactor(1.0f),             warpfactor_avg(1.0f),
-      warplbuff(NULL),              warprbuff(NULL),
-      warpbuffsize(0),
       // Time Code stuff
       prevtc(0),                    prevrp(0),
       tc_avcheck_framecounter(0),   tc_diff_estimate(0),
@@ -2258,8 +2255,6 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
 
 /// Max amount the warpfactor can change in 1 frame.
 #define MAXWARPDIFF 0.0005f
-/// How much dwe multiply the warp by when storing it in an integer.
-#define WARPMULTIPLIER 1000000000
 /// How long to average the warp over.
 #define WARPAVLEN (video_frame_rate * 600)
 /** How much we allow the warp to deviate from 1.0 (normal speed). */
@@ -2320,22 +2315,6 @@ void NuppelVideoPlayer::InitAVSync(void)
 
     repeat_delay = 0;
 
-    if (usevideotimebase)
-    {
-        warpfactor_avg = gContext->GetNumSetting("WarpFactor", 0);
-        if (warpfactor_avg)
-            warpfactor_avg /= WARPMULTIPLIER;
-        else
-            warpfactor_avg = 1;
-        // Reset the warpfactor if it's obviously bogus
-        if (warpfactor_avg < (1 - WARPCLIP))
-            warpfactor_avg = 1;
-        if (warpfactor_avg > (1 + (WARPCLIP * 2)) )
-            warpfactor_avg = 1;
-
-        warpfactor = warpfactor_avg;
-    }
-
     refreshrate = videoOutput ? videoOutput->GetDisplayInfo().rate : 0;
     if (refreshrate <= 0)
         refreshrate = frame_interval;
@@ -2343,11 +2322,6 @@ void NuppelVideoPlayer::InitAVSync(void)
 
     if (!using_null_videoout)
     {
-        if (usevideotimebase)
-            VERBOSE(VB_PLAYBACK, "Using video as timebase");
-        else
-            VERBOSE(VB_PLAYBACK, "Using audio as timebase");
-
         QString timing_type = videosync->getName();
 
         QString msg = QString("Video timing method: %1").arg(timing_type);
@@ -2573,27 +2547,24 @@ void NuppelVideoPlayer::AVSync(void)
             if (avsync_delay > 2000000 && player_ctx->buffer->isDVD())
                 avsync_delay = 90000;
             avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
-            if (!usevideotimebase)
-            {
-                /* If the audio time codes and video diverge, shift
-                   the video by one interlaced field (1/2 frame) */
 
-                if (!lastsync)
+            /* If the audio time codes and video diverge, shift
+               the video by one interlaced field (1/2 frame) */
+            if (!lastsync)
+            {
+                if (avsync_avg > frame_interval * 3 / 2)
                 {
-                    if (avsync_avg > frame_interval * 3 / 2)
-                    {
-                        avsync_adjustment = refreshrate;
-                        lastsync = true;
-                    }
-                    else if (avsync_avg < 0 - frame_interval * 3 / 2)
-                    {
-                        avsync_adjustment = -refreshrate;
-                        lastsync = true;
-                    }
+                    avsync_adjustment = refreshrate;
+                    lastsync = true;
                 }
-                else
-                    lastsync = false;
+                else if (avsync_avg < 0 - frame_interval * 3 / 2)
+                {
+                    avsync_adjustment = -refreshrate;
+                    lastsync = true;
+                }
             }
+            else
+                lastsync = false;
         }
         else
         {
@@ -2603,28 +2574,6 @@ void NuppelVideoPlayer::AVSync(void)
     }
     else
         audio_lock.unlock();
-}
-
-void NuppelVideoPlayer::ShutdownAVSync(void)
-{
-    if (usevideotimebase)
-    {
-        gContext->SaveSetting("WarpFactor",
-            (int)(warpfactor_avg * WARPMULTIPLIER));
-
-        if (warplbuff)
-        {
-            free(warplbuff);
-            warplbuff = NULL;
-        }
-
-        if (warprbuff)
-        {
-            free(warprbuff);
-            warprbuff = NULL;
-        }
-        warpbuffsize = 0;
-    }
 }
 
 void NuppelVideoPlayer::DisplayPauseFrame(void)
@@ -2920,8 +2869,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     refreshrate = 0;
     lastsync = false;
 
-    usevideotimebase = gContext->GetNumSetting("UseVideoTimebase", 0);
-
     if (VERBOSE_LEVEL_CHECK(VB_PLAYBACK))
         output_jmeter = new Jitterometer("video_output", 100);
     else
@@ -3056,8 +3003,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
         delete videoOutput;
         videoOutput = NULL;
     }
-
-    ShutdownAVSync();
 }
 
 void *NuppelVideoPlayer::kickoffOutputVideoLoop(void *player)
@@ -4063,45 +4008,10 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
         audioOutput->Drain();
     }
 
-    // If there is no warping, just send it to the audioOutput.
-    if (!usevideotimebase)
-    {
-        if (!audioOutput->AddSamples(buffer, samples, timecode))
-            VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p1: "
-                    "Audio buffer overflow, audio data lost!");
-        return;
-    }
-
-    // If we need warping, do it...
-    int newsamples = (int)(samples / warpfactor);
-    int newlen     = newsamples * samplesize;
-
-    // We resize the buffers if they aren't big enough
-    if ((warpbuffsize < newlen) || (!warplbuff))
-    {
-        warplbuff = (short int*) realloc(warplbuff, newlen);
-        warprbuff = (short int*) realloc(warprbuff, newlen);
-        warpbuffsize = newlen;
-    }
-
-    // Resample...
-    float incount  = 0.0f;
-    int   outcount = 0;
-    while ((incount < samples) && (outcount < newsamples))
-    {
-        char *out_ptr = ((char*)warplbuff) + (outcount * samplesize);
-        char *in_ptr  = buffer + (((int)incount) * samplesize);
-        memcpy(out_ptr, in_ptr, samplesize);
-
-        outcount += 1;
-        incount  += warpfactor;
-    }
-    samples = outcount;
-
-    // Send new warped audio to audioOutput
-    if (!audioOutput->AddSamples((char*)warplbuff, samples, timecode))
-        VERBOSE(VB_PLAYBACK,"NVP::AddAudioData():p2: "
+    if (!audioOutput->AddSamples(buffer, samples, timecode))
+        VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p1: "
                 "Audio buffer overflow, audio data lost!");
+    return;
 }
 
 /** \fn NuppelVideoPlayer::AddAudioData(short int*,short int*,int,long long)
@@ -4122,49 +4032,12 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
     if (!audioOutput)
         return;
 
-    // If there is no warping, just send it to the audioOutput.
-    if (!usevideotimebase)
-    {
-        buffers[0] = (char*) lbuffer;
-        buffers[1] = (char*) rbuffer;
-        if (!audioOutput->AddSamples(buffers, samples, timecode))
-            VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p3: "
-                    "Audio buffer overflow, audio data lost!");
-        return;
-    }
-
-    // If we need warping, do it...
-    int samplesize = sizeof(short int);
-    int newsamples = (int)(samples / warpfactor);
-    int newlen     = newsamples * samplesize;
-
-    // We resize the buffers if they aren't big enough
-    if ((warpbuffsize < newlen) || (!warplbuff) || (!warprbuff))
-    {
-        warplbuff = (short int*) realloc(warplbuff, newlen);
-        warprbuff = (short int*) realloc(warprbuff, newlen);
-        warpbuffsize = newlen;
-    }
-
-    // Resample...
-    float incount  = 0.0f;
-    int   outcount = 0;
-    while ((incount < samples) && (outcount < newsamples))
-    {
-        warplbuff[outcount] = lbuffer[(uint)round(incount)];
-        warprbuff[outcount] = rbuffer[(uint)round(incount)];
-
-        outcount += 1;
-        incount  += warpfactor;
-    }
-    samples = outcount;
-
-    // Send new warped audio to audioOutput
-    buffers[0] = (char*) warplbuff;
-    buffers[1] = (char*) warprbuff;
+    buffers[0] = (char*) lbuffer;
+    buffers[1] = (char*) rbuffer;
     if (!audioOutput->AddSamples(buffers, samples, timecode))
-        VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p4: "
+        VERBOSE(VB_PLAYBACK, "NVP::AddAudioData():p2: "
                 "Audio buffer overflow, audio data lost!");
+    return;
 }
 
 /**

@@ -512,7 +512,6 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     void  WrapTimecode(long long &timecode, TCTypes tc_type);
     void  InitAVSync(void);
     void  AVSync(void);
-    void  ShutdownAVSync(void);
     void  FallbackDeint(void);
     void  CheckExtraAudioDecode(void);
 
@@ -807,12 +806,8 @@ class MPUBLIC NuppelVideoPlayer : public CC608Reader, public CC708Reader
     int        repeat_delay;
 
     // Audio warping stuff
-    bool       usevideotimebase;
     float      warpfactor;
     float      warpfactor_avg;
-    short int *warplbuff;
-    short int *warprbuff;
-    int        warpbuffsize;
  
     // Time Code stuff
     int        prevtc;        ///< 32 bit timecode if last VideoFrame shown
