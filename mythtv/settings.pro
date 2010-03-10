@@ -94,7 +94,6 @@ QMAKE_CXXFLAGS_SHLIB = -DPIC -fPIC
 
 # Allow compilation with Qt Embedded, if Qt is compiled without "-fno-rtti"
 QMAKE_CXXFLAGS -= -fno-exceptions -fno-rtti
-macx:QMAKE_CXXFLAGS += -Wno-long-double
 
 release:contains( ARCH_POWERPC, yes ) {
     # Auto-inlining causes some Qt moc methods to go missing

@@ -84,7 +84,7 @@ macx {
 
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/ApplicationServices.framework/Frameworks
     QMAKE_CXXFLAGS += -F/System/Library/Frameworks/Carbon.framework/Frameworks
-    LIBS           += -framework IOKit
+    LIBS           += -framework IOKit -framework Cocoa -framework Carbon
 
     using_appleremote {
         HEADERS += AppleRemote.h   AppleRemoteListener.h
