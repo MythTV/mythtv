@@ -897,7 +897,7 @@ void PlayerContext::SetPlayingInfo(const ProgramInfo *info)
     if (playingInfo)
     {
         if (!ignoreDB)
-            playingInfo->MarkAsInUse(false);
+            playingInfo->MarkAsInUse(false, recUsage);
         delete playingInfo;
         playingInfo = NULL;
     }

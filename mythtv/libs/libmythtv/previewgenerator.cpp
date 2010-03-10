@@ -532,7 +532,7 @@ bool PreviewGenerator::LocalPreviewRun(void)
     if (data)
         delete[] data;
 
-    programInfo.MarkAsInUse(false);
+    programInfo.MarkAsInUse(false, kPreviewGeneratorInUseID);
 
     return ok;
 }

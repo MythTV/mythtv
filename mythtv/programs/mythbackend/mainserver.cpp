@@ -1979,7 +1979,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
             VERBOSE(VB_IMPORTANT, QString("Error truncating '%1'")
                     .arg(filename) + ENO);
             if (pginfo)
-                pginfo->MarkAsInUse(false);
+                pginfo->MarkAsInUse(false, kTruncatingDeleteInUseID);
             return 0 == close(fd);
         }
 
@@ -1996,7 +1996,7 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     bool ok = (0 == close(fd));
 
     if (pginfo)
-        pginfo->MarkAsInUse(false);
+        pginfo->MarkAsInUse(false, kTruncatingDeleteInUseID);
 
     VERBOSE(VB_FILE, QString("Finished truncating '%1'").arg(filename));
 

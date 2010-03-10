@@ -1778,7 +1778,7 @@ void JobQueue::RemoveRunningJob(int id)
         ProgramInfo *pginfo = runningJobs[id].pginfo;
         if (pginfo)
         {
-            pginfo->MarkAsInUse(false);
+            pginfo->MarkAsInUse(false, kJobQueueInUseID);
             delete pginfo;
         }
 

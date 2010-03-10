@@ -55,7 +55,7 @@ FileTransfer::~FileTransfer()
 
     if (pginfo)
     {
-        pginfo->MarkAsInUse(false);
+        pginfo->MarkAsInUse(false, kFileTransferInUseID);
         delete pginfo;
     }
 }
