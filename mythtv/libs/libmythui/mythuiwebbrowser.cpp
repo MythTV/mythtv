@@ -149,7 +149,7 @@ MythUIWebBrowser::MythUIWebBrowser(MythUIType *parent, const QString &name)
       m_image(NULL),         m_active(false),
       m_initialized(false),  m_lastUpdateTime(QTime()),
       m_updateInterval(0),   m_zoom(1.0),
-      m_bgColor("White"),    m_widgetUrl(QUrl()),
+      m_bgColor("White"),    m_widgetUrl(QUrl()), m_userCssFile(""),
       m_inputToggled(false), m_lastMouseAction(""),
       m_mouseKeyCount(0),    m_lastMouseActionTime()
 {
@@ -179,6 +179,21 @@ void MythUIWebBrowser::Init(void)
     m_browser->setFixedSize(m_Area.size());
     m_browser->move(m_Area.x(), m_Area.y());
     m_browser->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+
+    // if we have a valid css URL use that ...
+    if (!m_userCssFile.isEmpty())
+    {
+        QString filename = m_userCssFile;
+        if (GetMythUI()->FindThemeFile(filename))
+            LoadUserStyleSheet(QUrl("file://" + filename));
+    }
+    else
+    {
+        // ...otherwise use the default one
+        QString filename = "htmls/mythbrowser.css";
+        if (GetMythUI()->FindThemeFile(filename))
+            LoadUserStyleSheet(QUrl("file://" + filename));
+    }
 
     m_browser->winId();
 
@@ -275,6 +290,20 @@ void MythUIWebBrowser::SetHtml(const QString &html, const QUrl &baseUrl)
         return;
 
     m_browser->setHtml(html, baseUrl);
+}
+
+/** \fn MythUIWebBrowser::LoadUserStyleSheet(QUrl)
+ *  \brief Sets the specified user style sheet.
+ *  \param url The url to the style sheet
+ */
+void MythUIWebBrowser::LoadUserStyleSheet(QUrl url)
+{
+    if (!m_browser)
+        return;
+
+    VERBOSE(VB_IMPORTANT, "MythUIWebBrowser: Loading css from - " + url.toString());
+
+    m_browser->page()->settings()->setUserStyleSheetUrl(url);
 }
 
 /** \fn MythUIWebBrowser::SetBackgroundColor(QColor)
@@ -810,6 +839,10 @@ bool MythUIWebBrowser::ParseElement(
     {
         m_widgetUrl.setUrl(getFirstText(element));
     }
+    else if (element.tagName() == "userstylesheet")
+    {
+        m_userCssFile = getFirstText(element);
+    }
     else if (element.tagName() == "updateinterval")
     {
         QString interval = getFirstText(element);
@@ -843,6 +876,7 @@ void MythUIWebBrowser::CopyFrom(MythUIType *base)
     m_zoom = browser->m_zoom;
     m_bgColor = browser->m_bgColor;
     m_widgetUrl = browser->m_widgetUrl;
+    m_userCssFile = browser->m_userCssFile;
     m_updateInterval = browser->m_updateInterval;
 
     Init();

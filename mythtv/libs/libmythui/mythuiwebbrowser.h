@@ -45,6 +45,8 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     void LoadPage(QUrl url);
     void SetHtml(const QString &html, const QUrl &baseUrl = QUrl());
 
+    void LoadUserStyleSheet(QUrl url);
+
     virtual bool keyPressEvent(QKeyEvent *event);
     virtual void Pulse(void);
 
@@ -111,6 +113,7 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     float        m_zoom;
     QColor       m_bgColor;
     QUrl         m_widgetUrl;
+    QString      m_userCssFile;
 
     bool         m_inputToggled;
     QString      m_lastMouseAction;
