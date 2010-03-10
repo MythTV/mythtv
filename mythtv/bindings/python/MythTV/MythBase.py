@@ -825,6 +825,11 @@ class MythDBBase( object ):
         'SecurityPin' is given, UPnP detection will default to 0000, and if 
         successful, will populate '~/.mythtv/config.xml' with the necessary
         information.
+
+    Available methods:
+        obj.cursor()            - open a cursor for direct database
+                                  manipulation
+        obj.getStorageGroup()   - return a tuple of StorageGroup objects
     """
     logmodule = 'Python Database Connection'
     cursorclass = MythDBCursor
@@ -1126,7 +1131,6 @@ class MythDBBase( object ):
             self.log(MythLog.DATABASE|MythLog.IMPORTANT,
                     "%s schema mismatch: we speak %d but database speaks %s" \
                     % (name, local, sver))
-            self.db.close()
             self.db = None
             raise MythDBError(MythError.DB_SCHEMAMISMATCH, value, sver, local)
 
@@ -1170,6 +1174,17 @@ class MythBEConn( object ):
     logmodule = 'Python Backend Connection'
 
     def __init__(self, backend, type, db=None):
+        """
+        MythBEConn(backend, type, db=None) -> backend socket connection
+
+        'backend' can be either a hostname or IP address, or will default
+            to the master backend if None.
+        'type' is any value, as required by obj.announce(type). The stock
+            method passes 'Monitor' or 'Playback' during connection to 
+            backend. There is no checking on this input.
+        'db' will accept an existing MythDBBase object,
+            or any subclass there of.
+        """
         self.connected = False
         self.db = MythDBBase(db)
         self.log = MythLog(self.logmodule, db=self.db)
@@ -1281,7 +1296,7 @@ class MythBEConn( object ):
 
 class MythBEBase( object ):
     """
-    MythBEBase(backend=None, type='Monitor', db=None, single=False)
+    MythBEBase(backend=None, type='Monitor', db=None)
                                             -> MythBackend connection object
 
     Basic class for mythbackend socket connections.
@@ -1293,6 +1308,14 @@ class MythBEBase( object ):
     'db' allows an existing database object to be supplied.
     'type' specifies the type of connection to declare to the backend. Accepts
                 'Monitor' or 'Playback'.
+
+    Available methods:
+        joinInt()           - convert two signed ints to one 64-bit
+                              signed int
+        splitInt()          - convert one 64-bit signed int to two
+                              signed ints
+        backendCommand()    - Sends a formatted command to the backend
+                              and returns the response.
     """
     logmodule = 'Python Backend Connection'
     shared = weakref.WeakValueDictionary()
@@ -1333,13 +1356,15 @@ class MythBEBase( object ):
 
 class MythXMLConn( object ):
     """
-    MythXMLConn(backend=None, db=None) -> Backend status object
+    MythXMLConn(backend=None, db=None, port=None) -> Backend status object
 
     Basic access to MythBackend status page and XML data server
 
-    'backend' allows a hostname or IP, defaulting to the master backend. Port
-                is always retrieved from the database.
-    'db' allows an existing database connection.
+    'backend' allows a hostname or IP, defaulting to the master backend.
+    'port' defines the port used to access the backend, retrieved from the
+        database if not given.
+    'db' allows an existing database connection. Will only be used if
+        either 'backend' or 'port' is not defined.
     """
     def __repr__(self):
         return "<%s 'http://%s:%d/' at %s>" % \
@@ -1630,7 +1655,7 @@ class MythLog( object ):
 class MythError( Exception ):
     """
     MythError('Generic Error Code') -> Exception
-    MythError(error_code, additiona_arguments) -> Exception
+    MythError(error_code, additional_arguments) -> Exception
 
     Objects will have an error string available at obj.args as well as an 
         error code at obj.ecode.  Additional attributes may be available
@@ -1658,8 +1683,14 @@ class MythError( Exception ):
             self.args = ("External system call failed: code %d" %self.retcode,)
         elif args[0] == self.DB_RAW:
             self.ename = 'DB_RAW'
-            self.ecode, (self.sqlcode, self.sqlerr) = args
-            self.args = ("MySQL error %d: %s" % (self.sqlcode, self.sqlerr),)
+            self.ecode, sqlerr = args
+            if len(sqlerr) == 1:
+                self.sqlcode = 0
+                self.sqlerr = sqlerr[0]
+                self.args = ("MySQL error: %s" % self.sqlerr,)
+            else:
+                self.sqlcode, self.sqlerr = sqlerr
+                self.args = ("MySQL error %d: %s" % sqlerr,)
         elif args[0] == self.DB_CONNECTION:
             self.ename = 'DB_CONNECTION'
             self.ecode, self.dbconn = args
@@ -1791,13 +1822,23 @@ class Grabber( MythDBBase ):
         return str(self).encode('utf-8')
 
     def append(self, *args):
-        """Appends one or more strings to the grabber path."""
+        """
+        obj.append(*args) -> None
+
+        Permenantly appends one or more strings to the command
+            path, separated by spaces.
+        """
         self.path += ' '+' '.join(['%s' % a for a in args])
 
     def command(self, *args):
         """
-        Executed grabber command using one ore more additional strings.
-        Returns unaltered response as a string
+        obj.command(*args) -> output string
+
+        Executes external command, adding one or more strings to the
+            command during the call. If call exits with a code not 
+            equal to 0, a MythError will be raised. The error code and
+            stderr will be available in the exception and this object
+            as attributes 'returncode' and 'stderr'.
         """
         if self.path is '':
             return ''

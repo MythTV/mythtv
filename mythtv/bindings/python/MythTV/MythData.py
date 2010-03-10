@@ -301,7 +301,13 @@ class FileTransfer( MythBEConn ):
 
 class FileOps( MythBEBase ):
     __doc__ = MythBEBase.__doc__+"""
-    Includes several canned file management tasks.
+        getRecording()      - return a Program object for a recording
+        deleteRecording()   - notify the backend to delete a recording
+        forgetRecording()   - allow a recording to re-record
+        deleteFile()        - notify the backend to delete a file
+                              in a storage group
+        getHash()           - return the hash of a file in a storage group
+        reschedule()        - trigger a run of the scheduler
     """
     logmodule = 'Python Backend FileOps'
 
@@ -342,7 +348,7 @@ class FileOps( MythBEBase ):
                     'QUERY_FILE_HASH',file, sgroup)))
 
     def reschedule(self, recordid=-1):
-        """FileOps.getHash() -> None"""
+        """FileOps.reschedule() -> None"""
         self.backendCommand('RESCHEDULE_RECORDINGS '+str(recordid))
 
 
@@ -856,6 +862,8 @@ class Job( DBDataWrite ):
         elif (chanid is not None) and (starttime is not None):
             self.__dict__['where'] = 'chanid=%s AND starttime=%s'
             DBDataWrite.__init__(self, (chanid,starttime), db, None)
+        else:
+            DBDataWrite.__init__(self, None, db, None)
 
     def create(self, data=None):
         """Job.create(data=None) -> Job object"""

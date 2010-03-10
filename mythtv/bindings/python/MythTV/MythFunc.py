@@ -118,7 +118,31 @@ class databaseSearch( object ):
 
 class MythBE( FileOps ):
     __doc__ = FileOps.__doc__+"""
-    Includes several canned file backend functions.
+        getPendingRecordings()  - returns a list of scheduled recordings
+        getScheduledRecordings()- returns a list of scheduled recordings
+        getUpcomingRecordings() - returns a list of scheduled recordings
+        getRecorderList()       - returns a list of all recorder ids
+        getFreeRecorderList()   - returns a list of free recorder ids
+        lockTuner()             - requests a lock of a recorder
+        freeTuner()             - requests an unlock of a recorder
+        getCheckfile()          - returns the location of a recording
+        getExpiring()           - returns a list of expiring recordings
+        getFreeSpace()          - returns a list of FreeSpace objects
+        getFreeSpaceSummary()   - returns a tuple of total and used space
+        getLastGuideData()      - returns the last date of guide data
+        getLoad()               - returns a tuple of load averages
+        getRecordings()         - returns a list of all recordings
+        getSGFile()             - returns information on a single file
+        getSGList()             - returns lists of directories, 
+                                  files, and sizes
+        getUptime()             - returns system uptime in seconds
+        isActiveBackend()       - determines whether backend is
+                                  currently active
+        isRecording             - determinds whether recorder is
+                                  currently recording
+        walkSG()                - walks a storage group tree, similarly
+                                  to os.walk(). returns a tuple of dirnames
+                                  and dictionary of filenames with sizes
     """
 
     locked_tuners = []
@@ -586,15 +610,33 @@ class Frontend(object):
                         self.recv())
 
 class MythDB( MythDBBase ):
-    """
-    Several canned queries for general purpose access to the database
+    __doc__ = MythDBBase.__doc__+"""
+        obj.searchRecorded()    - return a list of matching Recorded objects
+        obj.getRecorded()       - return a single matching Recorded object
+        obj.searchOldRecorded() - return a list of matching
+                                  OldRecorded objects
+        obj.searchJobs()        - return a list of matching Job objects
+        obj.searchGuide()       - return a list of matching Guide objects
+        obj.searchRecord()      - return a list of matching Record rules
+        obj.getFrontends()      - return a list of available Frontends
+        obj.getFrontend()       - return a single Frontend object
+        obj.getChannels()       - return a list of all channels
     """
 
     @databaseSearch
     def searchRecorded(self, init=False, key=None, value=None):
         """
-        Tries to find recordings matching the given information.
-        Returns a tuple of Recorded objects
+        obj.searchRecorded(**kwargs) -> list of Recorded objects
+
+        Supports the following keywords:
+            title,      subtitle,   chanid,     starttime,  progstart,
+            category,   hostname,   autoexpire, commflagged,
+            stars,      recgroup,   playgroup,  duplicate,  transcoded,
+            watched,    storagegroup,           category_type,
+            airdate,    stereo,     subtitled,  hdtv,       closecaptioned,
+            partnumber, parttotal,  seriesid,   showtype,   programid,
+            manualid,   generic,    cast,       livetv,
+            syndicatedepisodenumber
         """
 
         if init:
@@ -630,8 +672,12 @@ class MythDB( MythDBBase ):
     @databaseSearch
     def searchOldRecorded(self, init=False, key=None, value=None):
         """
-        Tries to find old recordings matching the given information.
-        Returns a tuple of OldRecorded objects.
+        obj.searchOldRecorded(**kwargs) -> list of OldRecorded objects
+
+        Supports the following keywords:
+            title,      subtitle,   chanid,     starttime,  endtime,
+            category,   seriesid,   programid,  station,    duplicate,
+            generic
         """
 
         if init:
@@ -645,8 +691,11 @@ class MythDB( MythDBBase ):
     @databaseSearch
     def searchJobs(self, init=False, key=None, value=None):
         """
-        Tries to find jobs matching the given information.
-        Returns a tuple of Job objects.
+        obj.searchJobs(**kwars) -> list of Job objects
+
+        Supports the following keywords:
+            recorded,   starttime,  type,       status,     hostname,
+            title,      subtitle,   flags,      olderthan,  newerthan
         """
         if init:
             return ('jobqueue', Job, (),
@@ -666,8 +715,14 @@ class MythDB( MythDBBase ):
     @databaseSearch
     def searchGuide(self, init=False, key=None, value=None):
         """
-        Tries to find guide matching the given information.
-        Returns a tuple of Guide objects.
+        obj.searchGuide(**args) -> list of Guide objects
+
+        Supports the following keywords:
+            chanid,     starttime,  endtime,    title,      subtitle,
+            category,   airdate,    stars,      previouslyshown,
+            stereo,     subtitled,  hdtv,       closecaptioned,
+            partnumber, parttotal,  seriesid,   originalairdate,
+            showtype,   programid,  generic,    syndicatedepisodenumber
         """
         if init:
             return ('program', Guide, ())
@@ -690,8 +745,12 @@ class MythDB( MythDBBase ):
     @databaseSearch
     def searchRecord(self, init=False, key=None, value=None):
         """
-        Tries to find recording rules matching the given information.
-        Returns a tuple of Record objects.
+        obj.searchRecord(**kwargs) -> list of Record objects
+
+        Supports the following keywords:
+            type,       chanid,     starttime,  startdate,  endtime
+            enddate,    title,      subtitle,   category,   profile
+            recgroup,   station,    seriesid,   programid,  playgroup
         """
         if init:
             return ('record', Record, ())
@@ -882,8 +941,12 @@ class MythVideo( MythDBBase ):
         
     def scanStorageGroups(self, deleteold=True):
         """
-        Removes metadata from the database for files that no longer exist.
-        Respects 'Videos' storage groups and relative paths.
+        obj.scanStorageGroups(deleteold=True) ->
+                            tuple of (new videos, missing videos)
+
+        If deleteold is true, missing videos will be automatically
+            deleted from videometadata, as well as any matching 
+            country, cast, genre or markup data.
         """
         # pull available hosts and videos
         groups = self.getStorageGroup(groupname='Videos')
@@ -973,8 +1036,8 @@ class MythVideo( MythDBBase ):
     @databaseSearch
     def searchVideos(self, init=False, key=None, value=None):
         """
-        Tries to find videos matching the given information.
-        Returns a tuple of Video objects.
+        obj.searchVideos(**kwargs) -> list of Video objects
+
         Supports the following keywords:
             title, subtitle, season, episode, host, directory, year, cast,
             genre, country, category, insertedbefore, insertedafter, custom
