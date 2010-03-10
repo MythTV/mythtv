@@ -10,9 +10,6 @@
 #define VDP_VIDEO_MIXER_FEATURE_HIGH_QUALITY_SCALING_L1 (VdpVideoMixerFeature)11
 #endif
 #define NUM_SCALING_LEVELS 9
-#ifndef VDP_DECODER_PROFILE_MPEG4_PART2_ASP
-#define VDP_DECODER_PROFILE_MPEG4_PART2_ASP             (VdpDecoderProfile)13
-#endif
 
 #define LOC      QString("VDPAU: ")
 #define LOC_ERR  QString("VDPAU Error: ")
@@ -407,7 +404,7 @@ bool MythRenderVDPAU::Create(const QSize &size, WId window, uint colorkey)
     VERBOSE(VB_IMPORTANT, "Failed to create VDPAU render device.");
     return ok;
 }
-    
+
 bool MythRenderVDPAU::WasPreempted(void)
 {
     // tells the UI Painter to refresh its cache
@@ -967,7 +964,7 @@ void MythRenderVDPAU::DestroyLayer(uint id)
 
     m_layers.remove(id);
 }
-    
+
 bool MythRenderVDPAU::MixAndRend(uint id, VdpVideoMixerPictureStructure field,
                                  uint vid_surface, uint out_surface,
                                  const QVector<uint>* refs, bool top,
@@ -1629,11 +1626,15 @@ bool MythRenderVDPAU::CheckHardwareSupport(void)
 
         INIT_ST
         VdpBool supported = false;
+
+#ifdef VDP_DECODER_PROFILE_MPEG4_PART2_ASP
         uint32_t tmp1, tmp2, tmp3, tmp4;
         vdp_st = vdp_decoder_query_capabilities(m_device,
                     VDP_DECODER_PROFILE_MPEG4_PART2_ASP, &supported,
                     &tmp1, &tmp2, &tmp3, &tmp4);
         CHECK_ST
+#endif
+
         gVDPAUMPEG4Accel = (bool)supported;
 
         VERBOSE(VB_PLAYBACK, LOC +
@@ -1915,7 +1916,7 @@ void MythRenderVDPAU::Preempted(void)
         QHash<uint, VDPAUBitmapSurface>::iterator it;
         for (it = m_bitmapSurfaces.begin(); it != m_bitmapSurfaces.end(); ++it)
         {
-            uint check = CreateBitmapSurface(it.value().m_size, 
+            uint check = CreateBitmapSurface(it.value().m_size,
                                              it.value().m_fmt, it.key());
             if (check != it.key())
                 ok = false;
@@ -1975,7 +1976,7 @@ void MythRenderVDPAU::Preempted(void)
     m_flipReady = true;
     m_recreated = true;
 }
-    
+
 void MythRenderVDPAU::ResetVideoSurfaces(void)
 {
     LOCK_ALL
@@ -2007,12 +2008,12 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
     VERBOSE(VB_IMPORTANT, LOC +
         QString("Attempting to reset %1 video surfaces owned by this thread %2")
             .arg(surfaces_owned).arg(this_thread));
-                            
+
     // update old surfaces to map old vdpvideosurface to new vdpvideosurface
     QHash<uint, uint>::iterator old;
     for (old = old_surfaces.begin(); old != old_surfaces.end(); ++old)
         old.value() = m_videoSurfaces[old.value()].m_id;
-        
+
     // update any render structure surface entries
     for (it = m_videoSurfaces.begin(); it != m_videoSurfaces.end(); ++it)
     {
@@ -2042,12 +2043,14 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
             it.value().m_render.info.vc1.backward_reference = old_surfaces[back];
 
         // MPEG4
+#ifdef VDP_DECODER_PROFILE_MPEG4_PART2_ASP
         fwd  = it.value().m_render.info.mpeg4.forward_reference;
         back = it.value().m_render.info.mpeg4.backward_reference;
         if (fwd != VDP_INVALID_HANDLE && old_surfaces.contains(fwd))
             it.value().m_render.info.mpeg4.forward_reference = old_surfaces[fwd];
         if (back != VDP_INVALID_HANDLE && old_surfaces.contains(back))
             it.value().m_render.info.mpeg4.backward_reference = old_surfaces[back];
+#endif
     }
 
     if (ok)
@@ -2065,7 +2068,7 @@ void MythRenderVDPAU::ResetVideoSurfaces(void)
     VERBOSE(VB_IMPORTANT,
         LOC + QString("%1 of %2 video surfaces still need to be reset")
         .arg(remaining).arg(m_videoSurfaces.size()));
-        
+
     m_reset_video_surfaces = remaining;
     m_errored = !ok;
 }
