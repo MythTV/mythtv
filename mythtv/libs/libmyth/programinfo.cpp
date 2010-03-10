@@ -3619,21 +3619,58 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 
     bool notifyOfChange = false;
 
-    if (inuse && inUseForWhat.isEmpty())
+    if (inuse &&
+        (inUseForWhat.isEmpty() ||
+         (!usedFor.isEmpty() && usedFor != inUseForWhat)))
     {
         if (!usedFor.isEmpty())
+        {
+
+#ifdef DEBUG_IN_USE
+            if (!inUseForWhat.isEmpty())
+            {
+                VERBOSE(VB_IMPORTANT,
+                        LOC + QString("MarkAsInUse(true, '%1'->'%2')")
+                        .arg(inUseForWhat).arg(usedFor) +
+                        " -- use has changed");
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, LOC +
+                        QString("MarkAsInUse(true, ''->'%1')").arg(usedFor));
+            }
+#endif // DEBUG_IN_USE
+
             inUseForWhat = usedFor;
-        else
-            inUseForWhat = QString("%1 [%2]").arg(QObject::tr("Unknown"))
-                                             .arg(getpid());
+        }
+        else if (inUseForWhat.isEmpty())
+        {
+            QString oldInUseForWhat = inUseForWhat;
+            inUseForWhat = QString("%1 [%2]")
+                .arg(QObject::tr("Unknown")).arg(getpid());
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    QString("MarkAsInUse(true, ''->'%1')").arg(inUseForWhat) +
+                    " -- use was not explicitly set");
+        }
 
         notifyOfChange = true;
     }
 
+    if (!inuse && !usedFor.isEmpty() && usedFor != inUseForWhat)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("MarkAsInUse(false, '%1'->'%2')")
+                .arg(usedFor).arg(inUseForWhat) +
+                " -- use has changed since first setting as in use.");
+    }
 #ifdef DEBUG_IN_USE
-    VERBOSE(VB_IMPORTANT, LOC + QString("MarkAsInUse(%1, '%2'->'%3')")
-            .arg(inuse?"true":"false").arg(usedFor).arg(inUseForWhat));
-#endif
+    else if (!inuse)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + QString("MarkAsInUse(false, '%1')")
+                .arg(inUseForWhat));
+    }
+#endif // DEBUG_IN_USE
+
 
     if (!inuse && inUseForWhat.isEmpty())
     {
@@ -3666,7 +3703,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
     if (pathname == GetRecordBasename())
         pathname = GetPlaybackURL(false, true);
 
-    QString recDir;
+    QString recDir = "";
     QFileInfo testFile(pathname);
     if (testFile.exists() || hostname == gContext->GetHostName())
     {
