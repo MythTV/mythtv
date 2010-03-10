@@ -29,9 +29,9 @@ using namespace std;
 #include "programlist.h"
 #include "programinfoupdater.h"
 
-#define LOC      QString("ProgramInfo: ")
-#define LOC_WARN QString("ProgramInfo, Warning: ")
-#define LOC_ERR  QString("ProgramInfo, Error: ")
+#define LOC      QString("ProgramInfo(%1): ").arg(GetBasename())
+#define LOC_WARN QString("ProgramInfo(%1), Warning: ").arg(GetBasename())
+#define LOC_ERR  QString("ProgramInfo(%1), Error: ").arg(GetBasename())
 
 //#define DEBUG_IN_USE
 
@@ -1701,40 +1701,43 @@ bool ProgramInfo::SetRecordBasename(const QString &basename)
     return true;
 }
 
-/**
- *  \brief Returns a filename for a recording based on the
- *         recording channel and date.
+/** If pathname is set and fromDB is false, this returns
+ *  the file portion of the basename. Otherwise, this queries
+ *  the recorded table in the DB for the basename stored
+ *  there for this ProgramInfo's chanid and recstartts.
+ *  Returning an emptry string if it can not locate that
+ *  entry in the database.
  */
 QString ProgramInfo::GetRecordBasename(bool fromDB) const
 {
-    QString retval;
-
     if (!fromDB && !pathname.isEmpty())
-        retval = pathname.section('/', -1);
+        return GetBasename();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT basename "
+        "FROM recorded "
+        "WHERE chanid    = :CHANID AND "
+        "      starttime = :STARTTIME");
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("GetRecordBasename", query);
+    }
+    else if (query.next())
+    {
+        return query.value(0).toString();
+    }
     else
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT basename FROM recorded "
-                      "WHERE chanid = :CHANID AND "
-                      "      starttime = :STARTTIME;");
-        query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts);
-
-        if (!query.exec())
-        {
-            MythDB::DBError("GetRecordBasename", query);
-        }
-        else if (query.next())
-        {
-            retval = query.value(0).toString();
-        }
-        else
-            VERBOSE(VB_IMPORTANT, QString("GetRecordBasename found no entry "
-                    "for %1 @ %2")
-                    .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
+        VERBOSE(VB_IMPORTANT, QString("GetRecordBasename found no entry "
+                                      "for %1 @ %2")
+                .arg(chanid).arg(recstartts.toString(Qt::ISODate)));
     }
 
-    return retval;
+    return QString();
 }
 
 /** \brief Returns filename or URL to be used to play back this recording.

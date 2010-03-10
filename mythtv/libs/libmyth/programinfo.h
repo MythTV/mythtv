@@ -311,6 +311,7 @@ class MPUBLIC ProgramInfo
     void UpdateInUseMark(bool force = false);
     bool IsFileReadable(void) const;
     QString GetFileName(void) const { return pathname; }
+    QString GetBasename(void) const { return pathname.section('/', -1); }
     uint32_t GetProgramFlags(void) const { return programflags; }
     QString toString(void) const;
 
