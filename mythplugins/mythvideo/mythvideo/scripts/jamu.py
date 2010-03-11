@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.6.9"
+__version__=u"v0.7.0"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -294,6 +294,8 @@ __version__=u"v0.6.9"
  # 0.6.9 Fixed an abort when IMDBpy returns movie matches with incomplete data
  #       Fixed an abort where an IMDB# was being used instead of a TMDB#
  #       Fixed an abort when a storage directory name caused an UnicodeEncodeError or TypeError exception
+ # 0.7.0 Fixed an ()-MW) option abort when a recorded program or upcoming program did not have a title
+
 
 usage_txt=u'''
 JAMU - Just.Another.Metadata.Utility is a versatile utility for downloading graphics and meta data
@@ -4962,6 +4964,8 @@ class MythTvMetaData(VideoFiles):
 
         for prog in progs:
             record={}
+            if prog.title == None:
+                continue
             record['title'] = prog.title
             record['subtitle'] = prog.subtitle
             record['seriesid'] = prog.seriesid
@@ -4999,6 +5003,8 @@ class MythTvMetaData(VideoFiles):
             if recordedRecord.recgroup == u'Deleted':
                 continue
             recorded = {}
+            if recordedRecord.title == None:
+                continue
             if recordedRecord.chanid == 9999:
                 recorded[u'miro_tv'] = True
             recorded[u'title'] = recordedRecord.title
