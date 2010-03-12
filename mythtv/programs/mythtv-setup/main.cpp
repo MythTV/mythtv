@@ -31,41 +31,14 @@
 #include "backendsettings.h"
 #include "checksetup.h"
 #include "startprompt.h"
-#include "rawsettingseditor.h"
 #include "mythsystemevent.h"
+#include "expertsettingseditor.h"
 
 using namespace std;
 
 static MythThemeBase *themeBase   = NULL;
 ExitPrompter   *exitPrompt  = NULL;
 StartPrompter  *startPrompt = NULL;
-
-class ExpertSettingsEditor : public RawSettingsEditor
-{
-  public:
-    ExpertSettingsEditor(MythScreenStack *parent, const char *name = 0)
-      : RawSettingsEditor(parent, name)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        query.prepare("SELECT value, data "
-                        "FROM settings "
-                        "WHERE hostname = :HOSTNAME");
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-        if (query.exec())
-        {
-            while (query.next())
-            {
-                m_settings[query.value(0).toString()] =
-                    query.value(0).toString();
-            }
-        }
-
-        m_title = tr("Expert Settings Editor");
-        m_settings["EventCmdRecPending"] = tr("Recording Pending");
-    }
-};
 
 void SetupMenuCallback(void* data, QString& selection)
 {
