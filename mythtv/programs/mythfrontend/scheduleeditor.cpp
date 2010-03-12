@@ -37,9 +37,9 @@ void *ScheduleEditor::RunScheduleEditor(ProgramInfo *proginfo, void *player)
 {
     RecordingRule *rule = new RecordingRule();
     rule->LoadByProgram(proginfo);
-    
+
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ScheduleEditor *se = new ScheduleEditor(mainStack, rule, 
+    ScheduleEditor *se = new ScheduleEditor(mainStack, rule,
                                             static_cast<TV*>(player));
 
     if (se->Create())
@@ -99,18 +99,18 @@ bool ScheduleEditor::Create()
         return false;
 
     bool err = false;
-    
+
     UIUtilE::Assign(this, m_rulesList, "rules", &err);
-    
+
     UIUtilE::Assign(this, m_schedOptButton, "schedoptions", &err);
     UIUtilE::Assign(this, m_storeOptButton, "storeoptions", &err);
     UIUtilE::Assign(this, m_postProcButton, "postprocessing", &err);
     UIUtilE::Assign(this, m_schedInfoButton, "schedinfo", &err);
     UIUtilE::Assign(this, m_previewButton, "preview", &err);
-    
+
     UIUtilE::Assign(this, m_cancelButton, "cancel", &err);
     UIUtilE::Assign(this, m_saveButton, "save", &err);
-    
+
     if (err)
     {
         VERBOSE(VB_IMPORTANT, "ScheduleEditor, theme is missing "
@@ -126,7 +126,7 @@ bool ScheduleEditor::Create()
     connect(m_postProcButton, SIGNAL(Clicked()), SLOT(ShowPostProc()));
     connect(m_schedInfoButton, SIGNAL(Clicked()), SLOT(ShowSchedInfo()));
     connect(m_previewButton, SIGNAL(Clicked()), SLOT(ShowPreview()));
-    
+
     connect(m_cancelButton, SIGNAL(Clicked()), SLOT(Close()));
     connect(m_saveButton, SIGNAL(Clicked()), SLOT(Save()));
 
@@ -146,9 +146,9 @@ bool ScheduleEditor::Create()
             return false;
         }
     }
-    
+
     Load();
-    
+
     return true;
 }
 
@@ -166,7 +166,7 @@ void ScheduleEditor::Load()
     // Copy this now, it will change briefly after the first item is inserted
     // into the list by design of MythUIButtonList::itemSelected()
     RecordingType type = m_recordingRule->m_type;
-    
+
     // Rules List
     if (m_recordingRule->m_isOverride)
     {
@@ -184,7 +184,7 @@ void ScheduleEditor::Load()
     {
         bool hasChannel = !m_recordingRule->m_station.isEmpty();
         bool isManual = (m_recordingRule->m_searchType == kManualSearch);
-        
+
         new MythUIButtonListItem(m_rulesList, tr("Do not record this program"),
                                  ENUM_TO_QVARIANT(kNotRecording));
 
@@ -247,7 +247,7 @@ void ScheduleEditor::Load()
             progMap["searchType"] = tr("Unknown Search");
             break;
     }
-    
+
     SetTextFromMap(progMap);
 }
 
@@ -257,7 +257,7 @@ void ScheduleEditor::RuleChanged(MythUIButtonListItem *item)
         return;
 
     RecordingType type = static_cast<RecordingType>(item->GetData().toInt());
-    
+
     bool isScheduled = (type != kNotRecording);
 
     m_schedOptButton->SetEnabled(isScheduled);
@@ -416,10 +416,10 @@ void ScheduleEditor::showUpcomingByRule(void)
 void ScheduleEditor::showUpcomingByTitle(void)
 {
     QString title = m_recordingRule->m_title;
-    
+
     if (m_recordingRule->m_searchType != kNoSearch)
         title.remove(QRegExp(" \\(.*\\)$"));
-    
+
     ShowUpcoming(title);
 }
 
@@ -429,7 +429,7 @@ void ScheduleEditor::ShowPreview(void)
     m_recordingRule->UseTempTable(true, ttable);
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
-    ViewScheduleDiff *vsd = new ViewScheduleDiff(mainStack, ttable, 
+    ViewScheduleDiff *vsd = new ViewScheduleDiff(mainStack, ttable,
                                                  m_recordingRule->m_tempID,
                                                  m_recordingRule->m_title);
     if (vsd->Create())
@@ -513,11 +513,11 @@ bool SchedOptEditor::Create()
 void SchedOptEditor::Load()
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    
+
     // Priority
     m_prioritySpin->SetRange(-99,99,1,5);
     m_prioritySpin->SetValue(m_recordingRule->m_recPriority);
-    
+
     // Preferred Input
     new MythUIButtonListItem(m_inputList, tr("Use any available input"),
                              qVariantFromValue(0));
@@ -566,7 +566,7 @@ void SchedOptEditor::Load()
     new MythUIButtonListItem(m_dupmethodList,
                              tr("Don't match duplicates"),
                              ENUM_TO_QVARIANT(kDupCheckNone));
-    
+
     m_dupmethodList->SetValueByData(
                                 ENUM_TO_QVARIANT(m_recordingRule->m_dupMethod));
 
@@ -617,7 +617,7 @@ void SchedOptEditor::dupMatchChanged(MythUIButtonListItem *item)
         return;
 
     int dupMethod = item->GetData().toInt();
-    
+
     if (dupMethod <= 0)
         m_dupscopeList->SetEnabled(false);
     else
@@ -711,7 +711,7 @@ bool StoreOptEditor::Create()
 
     connect(m_recgroupList, SIGNAL(LosingFocus()),
                             SLOT(PromptForRecgroup()));
-                         
+
     connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     BuildFocusList();
@@ -741,9 +741,9 @@ void StoreOptEditor::Load()
     QStringList::Iterator it;
     QString value, dispValue;
     bool foundDefault = false;
-    
+
         // Count the ways the following is _wrong_
-    
+
     new MythUIButtonListItem(m_recgroupList,
                              tr("Create a new recording group"),
                              qVariantFromValue(QString("__NEW_GROUP__")));
@@ -784,7 +784,7 @@ void StoreOptEditor::Load()
                                      qVariantFromValue(QString("Default")));
             foundDefault = true;
         }
-        
+
         if (*it == "Default")
             dispValue = tr("Default");
         else
@@ -828,7 +828,7 @@ void StoreOptEditor::Load()
     }
 
     m_storagegroupList->SetValueByData(m_recordingRule->m_storageGroup);
-            
+
     // Playback Group
     label = tr("Use \"%1\" playback group settings");
     new MythUIButtonListItem(m_playgroupList, label.arg(tr("Default")),
@@ -859,8 +859,8 @@ void StoreOptEditor::Load()
                              tr("Delete oldest if this would exceed the max "
                                 "episodes"), qVariantFromValue(true));
     m_maxbehaviourList->SetValueByData(m_recordingRule->m_maxNewest);
-    
-    
+
+
     QHash<QString, QString> progMap;
     if (m_recInfo)
         m_recInfo->ToMap(progMap);
@@ -884,7 +884,7 @@ void StoreOptEditor::PromptForRecgroup()
 {
     if (m_recgroupList->GetDataValue().toString() != "__NEW_GROUP__")
         return;
-    
+
     MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
 
     QString label = tr("Create New Recording Group. Enter group name: ");
@@ -931,7 +931,7 @@ void StoreOptEditor::Save()
     // name when prompted, restore the original value
     if (m_recgroupList->GetDataValue().toString() == "__NEW_GROUP__")
         m_recgroupList->SetValueByData(m_recordingRule->m_recGroup);
-    
+
     // Recording Profile
     m_recordingRule->m_recProfile = m_recprofileList->GetDataValue().toString();
 
@@ -1027,7 +1027,7 @@ void PostProcEditor::Load()
 {
     // Auto-commflag
     m_commflagCheck->SetCheckState(m_recordingRule->m_autoCommFlag);
-    
+
     // Auto-transcode
     m_transcodeCheck->SetCheckState(m_recordingRule->m_autoTranscode);
 
@@ -1041,7 +1041,7 @@ void PostProcEditor::Load()
                                  qVariantFromValue(it.key()));
     }
     m_transcodeprofileList->SetValueByData(m_recordingRule->m_transcoder);
-    
+
     // User Job #1
     m_userjob1Check->SetCheckState(m_recordingRule->m_autoUserJob1);
     MythUIText *userjob1Text = NULL;
@@ -1073,7 +1073,7 @@ void PostProcEditor::Load()
     if (userjob4Text)
         userjob4Text->SetText(tr("Run '%1'")
                     .arg(gContext->GetSetting("UserJobDesc4", "User Job 4")));
-    
+
     QHash<QString, QString> progMap;
     if (m_recInfo)
         m_recInfo->ToMap(progMap);

@@ -30,7 +30,7 @@ class ScheduleEditor : public ScheduleCommon
   public:
     ScheduleEditor(MythScreenStack *parent, RecordingInfo* recinfo,
                    TV *player = NULL);
-    ScheduleEditor(MythScreenStack *parent, RecordingRule* recrule, 
+    ScheduleEditor(MythScreenStack *parent, RecordingRule* recrule,
                    TV *player = NULL);
    ~ScheduleEditor();
 
@@ -39,10 +39,10 @@ class ScheduleEditor : public ScheduleCommon
 
     /// Callback
     static void *RunScheduleEditor(ProgramInfo *proginfo, void *player = NULL);
-    
+
   signals:
     void ruleSaved(int ruleId);
-    
+
   protected slots:
     void RuleChanged(MythUIButtonListItem *item);
     void ShowSchedOpt(void);
@@ -52,7 +52,7 @@ class ScheduleEditor : public ScheduleCommon
     void ShowPreview(void);
     void Save(void);
     void Close(void);
-    
+
   private:
     void Load(void);
     void DeleteRule(void);
@@ -60,7 +60,7 @@ class ScheduleEditor : public ScheduleCommon
     void showPrevious(void);
     void showUpcomingByRule(void);
     void showUpcomingByTitle(void);
-    
+
     RecordingInfo *m_recInfo;
     RecordingRule *m_recordingRule;
 
@@ -70,13 +70,13 @@ class ScheduleEditor : public ScheduleCommon
     MythUIButton    *m_cancelButton;
 
     MythUIButtonList *m_rulesList;
-    
+
     MythUIButton    *m_schedOptButton;
     MythUIButton    *m_storeOptButton;
     MythUIButton    *m_postProcButton;
     MythUIButton    *m_schedInfoButton;
     MythUIButton    *m_previewButton;
-    
+
     TV *m_player;
 };
 
