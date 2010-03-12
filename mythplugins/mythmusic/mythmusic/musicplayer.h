@@ -12,6 +12,8 @@ class MainVisual;
 
 class MusicPlayer : public QObject
 {
+    Q_OBJECT
+
   public:
      MusicPlayer(QObject *parent, const QString &dev);
 
