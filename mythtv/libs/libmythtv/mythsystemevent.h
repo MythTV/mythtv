@@ -52,6 +52,8 @@ class MPUBLIC MythSystemEventHandler : public QObject
  */
 class MPUBLIC MythSystemEventEditor : public RawSettingsEditor
 {
+    Q_OBJECT
+
   public:
     MythSystemEventEditor(MythScreenStack *parent, const char *name = 0);
 };

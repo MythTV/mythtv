@@ -13,6 +13,8 @@ class RecordingInfo;
 
 class ScheduleCommon : public MythScreenType
 {
+    Q_OBJECT
+
   protected:
     ScheduleCommon(MythScreenStack *parent, const QString &name)
         : MythScreenType(parent, name) {};
