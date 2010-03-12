@@ -396,6 +396,9 @@ class DBDataWrite( DBData ):
             if value == self.origdata[key]:
             # filter unchanged data
                 del data[key]
+        if len(data) == 0:
+            # no updates
+            return
         format_string = ', '.join(['%s = %%s' % d for d in data])
         sql_values = data.values()
         sql_values.extend(self.wheredat)
@@ -687,7 +690,14 @@ class DBDataCRef( object ):
             id = c.lastrowid
 
         dat = self.SubData([id]+list(data),self.t_add+self.r_add)
-            
+
+        # double check for existing
+        fields = self.r_add+[self.r_ref]+self.w_field
+        where = ' AND '.join('%s=%%s' % d for d in fields)
+        if c.execute("""SELECT * FROM %s WHERE %s""" % (self.rtable, where),
+                                                    self._rdata(dat)) > 0:
+            return
+
         # add cross reference
         fields = ', '.join(self.r_add+[self.r_ref]+self.w_field)
         format = ', '.join(['%s' for d in fields.split(', ')])
@@ -914,7 +924,7 @@ class MythDBBase( object ):
                 c = self._db.cursor(self._log)
                 if key not in self._db.settings[self._host]:
                     c.execute("""INSERT INTO settings (value,data,hostname)
-                                    (%s,%s,%s)""", (key, value, self._host))
+                             VALUES (%s,%s,%s)""", (key, value, self._host))
                 else:
                     query = """UPDATE settings SET data=%s
                                 WHERE value=%s AND"""

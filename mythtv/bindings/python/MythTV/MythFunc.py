@@ -1028,7 +1028,7 @@ class MythVideo( MythDBBase ):
                     newvidlist.append(vid)
 
         if deleteold:
-            for vid in curvids:
+            for vid in curvids.values():
                 vid.delete()
 
         return (newvidlist, curvids.values())

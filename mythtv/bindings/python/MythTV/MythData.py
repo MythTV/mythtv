@@ -65,7 +65,7 @@ def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
                                 'attempting remote write outside base path')
         return FileTransfer(host, filename, sgroup, type, db)
 
-    sgs = db.getStorageGroup(groupname=sgroup, hostname=host)
+    sgs = db.getStorageGroup(groupname=sgroup)
 
     if type == 'w':
         # prefer local storage always
@@ -1067,7 +1067,7 @@ class Video( DBDataWrite ):
         c = self.db.cursor(self.log)
         fields = ' AND '.join(['%s=%%s' % f for f in \
                         ('title','subtitle','season','episode')])
-        count = c.execute("""SELECT inetref FROM videometadata WHERE %s""" %
+        count = c.execute("""SELECT intid FROM videometadata WHERE %s""" %
                 fields, (self.title, self.subtitle, self.season, self.episode))
         if count:
             id = c.fetchone()[0]
