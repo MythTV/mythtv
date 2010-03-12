@@ -2016,7 +2016,8 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
 
     if (d->serverSock)
     {
-        d->serverSock->writeStringList(strlist);
+        QStringList sendstrlist = strlist;
+        d->serverSock->writeStringList(sendstrlist);
         ok = d->serverSock->readStringList(strlist, quickTimeout);
 
         if (!ok)
@@ -2030,7 +2031,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
 
             if (d->serverSock)
             {
-                d->serverSock->writeStringList(strlist);
+                d->serverSock->writeStringList(sendstrlist);
                 ok = d->serverSock->readStringList(strlist, quickTimeout);
             }
         }
