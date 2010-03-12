@@ -577,7 +577,7 @@ contains( ARCH_ALPHA, yes ) {
 }
 
 contains( ARCH_ARM, yes ) {
-    SOURCES += arm/dsputil_arm.c
+    SOURCES += arm/dsputil_arm.S
     SOURCES += arm/dsputil_init_arm.c
     SOURCES += arm/fft_init_arm.c
     SOURCES += arm/h264pred_init_arm.c
@@ -600,7 +600,7 @@ contains( HAVE_ARMV6, yes ) {
  }
 
 contains( HAVE_ARMVFP, yes ) {
-    SOURCES += arm/dsputil_init_armvfp.c
+    SOURCES += arm/dsputil_init_vfp.c
     SOURCES += arm/dsputil_vfp.S
 }
 
@@ -611,7 +611,7 @@ contains( HAVE_IWMMXT, yes ) {
 
 contains( HAVE_NEON, yes ) {
     SOURCES += arm/dsputil_init_neon.c
-    SOURCES += arm/dsputil_neon.c
+    SOURCES += arm/dsputil_neon.S
     SOURCES += arm/simple_idct_neon.S
 
     contains( CONFIG_FFT, yes )            { SOURCES *= arm/fft_neon.S  }
