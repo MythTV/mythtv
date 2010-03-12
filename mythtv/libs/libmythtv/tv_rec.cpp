@@ -396,7 +396,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft,
     pendingRecordings[rcinfo->cardid] = pending;
 
     // If this isn't a recording for this instance to make, we are done
-    if (rcinfo->cardid != (uint)cardid)
+    if (rcinfo->cardid != cardid)
         return;
 
     // We also need to check our input groups
@@ -1630,7 +1630,7 @@ void TVRec::HandlePendingRecordings(void)
     it = pendingRecordings.begin();
     if ((1 == pendingRecordings.size()) &&
         (*it).ask &&
-        ((*it).info->cardid == (uint)cardid) &&
+        ((*it).info->cardid == cardid) &&
         (GetState() == kState_WatchingLiveTV))
     {
         CheckForRecGroupChange();

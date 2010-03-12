@@ -235,7 +235,7 @@ void IconData::UpdateSourceIcons(uint sourceid)
         if (m_u2fl.empty())
             break;
 
-        if (tm.elapsed() > (count * 500) + 2000)
+        if ((uint)tm.elapsed() > (count * 500) + 2000)
         {
             VERBOSE(VB_IMPORTANT, LOC_WARN +
                     "Timed out waiting for some icons to download, "

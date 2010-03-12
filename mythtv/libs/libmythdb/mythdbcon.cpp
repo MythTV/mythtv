@@ -258,7 +258,7 @@ void MDBManager::PurgeIdleConnections(void)
     while (it != m_pool.end())
     {
         totalConnections++;
-        if ((*it)->m_lastDBKick.secsTo(now) <= kPurgeTimeout)
+        if ((*it)->m_lastDBKick.secsTo(now) <= (int)kPurgeTimeout)
         {
             ++it;
             continue;

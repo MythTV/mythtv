@@ -398,7 +398,7 @@ void ChannelScanSM::HandleSDT(uint tsid, const ServiceDescriptionTable *sdt)
                                             "additional Freesat SI").arg(sdt->OriginalNetworkID()));
     }
 
-    if (timer.elapsed() < otherTableTime)
+    if ((uint)timer.elapsed() < otherTableTime)
     {
         // Set the version for the SDT so we see it again.
         GetDTVSignalMonitor()->GetDVBStreamData()->SetVersionSDT(sdt->TSID(), -1, 0);
