@@ -326,6 +326,7 @@
         <area>0,0,220,35</area>
         <layout>horizontal</layout>
         <buttonarea>18,0,184,100%</buttonarea>
+        <wrapstyle>selection</wrapstyle>
         <shape name="background">
             <area>0,0,100%,100%</area>
             <type>roundbox</type>
@@ -571,7 +572,7 @@
             <align>allcenter</align>
             <font>basesmall</font>
         </textarea>
-        
+
         <buttonlist name="list">
             <area>270,385,770,170</area>
             <buttonarea>0,0,770,170</buttonarea>
@@ -727,7 +728,7 @@
             <value>Playback starting …</value>
             <align>allcenter</align>
         </textarea>
-        
+
     </window>
 
     <window name="MythFileBrowser">
