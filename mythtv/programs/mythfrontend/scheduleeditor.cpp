@@ -147,8 +147,6 @@ bool ScheduleEditor::Create()
         }
     }
 
-    Load();
-
     return true;
 }
 
@@ -505,8 +503,6 @@ bool SchedOptEditor::Create()
 
     BuildFocusList();
 
-    Load();
-
     return true;
 }
 
@@ -715,8 +711,6 @@ bool StoreOptEditor::Create()
     connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     BuildFocusList();
-
-    Load();
 
     return true;
 }
@@ -1017,8 +1011,6 @@ bool PostProcEditor::Create()
     connect(m_backButton, SIGNAL(Clicked()), SLOT(Close()));
 
     BuildFocusList();
-
-    Load();
 
     return true;
 }
