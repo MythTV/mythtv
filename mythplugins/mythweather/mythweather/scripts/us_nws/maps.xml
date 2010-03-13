@@ -624,6 +624,18 @@
     <static_url>http://image.weather.com/images/maps/aviation/airport_impact_am_720_usen.jpg</static_url>
 </entry>
 <entry>
+    <description>New York City Doppler Radar 600</description>
+    <static_url>http://image.weather.com/web/radar/us_nyc_closeradar_plus_usen.jpg</static_url>
+    <animated>
+        <base_url>http://images.weather.com/looper/archive/us_nyc_closeradar_plus_usen/</base_url>
+        <image>1L.jpg</image>
+        <image>2L.jpg</image>
+        <image>3L.jpg</image>
+        <image>4L.jpg</image>
+        <image>5L.jpg</image>
+    </animated>
+</entry>
+<entry>
     <description>New Zealand Satellite</description>
     <static_url>http://image.weather.com/images/sat/new_zealsat_720x486.jpg</static_url>
     <animated>
