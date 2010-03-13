@@ -39,16 +39,29 @@ sub parseResults {
     my $response = shift;
     my $isresults = 0;
     my $resultline = "";
+    
+    # Initialise a hash for the $locid & $locname results.
+     
+    # Use of a hash indexed by $locid ensures that more informative results 
+    # (e.g. "Sale, Australia" vs. "Sale") coming from <p class="response"> 
+    # section will overwrite less informative results coming from 
+    # <span id="printbutton_Forecast"> section
+    
+    my %loc_hash = ();
 
     foreach (split("\n", $response)) {
-        if (/<p class=\"response\">/) {
+    
+    	# Declare a result if either the '<p class="response"> OR <span id="printbutton_Forecast"> strings are found
+	# This ensures that single and multiple matches are caught
+    
+        if (/<p class=\"response\">/ || /<span id=\"printbutton_Forecast\">/) {
             $isresults = 1;
         }
 
         my $locname;
         my $locid; 
         my $url;
-
+	
         if ($isresults) {
             last if (/There are no forecasts matching/);
 
@@ -70,11 +83,35 @@ sub parseResults {
                 $locname =~ s/.*<a id=\"result_\d*\".*>(.*)<\/a>.*/$1/s;
 
                 $resultline = $locid . "::" . $locname;
-                if (! grep(/^$locid/, @searchresults)) {
-                    push (@searchresults, $resultline);
-                }
+		
+		$loc_hash{$locid} = $locname;
             }
+	    
+	    # Extract location ID and name from "Print <location>" link
+	    
+	    # This string is always present (provided valid search result - invalid results are caught above)
+	    # irresepective of whether single or multiple matches are returned
+	    
+	    elsif (/<span id=\"printbutton_Forecast\"><a title=\"Print (.+)\" href=\"\/weather\/forecast\/(\d{0,5})?/o)
+	    {
+	    	$locid   = $2;
+		$locname = $1;
+	  	
+		$loc_hash{$locid} = $locname;		    
+	    }
         }
+    }
+    
+    # Loop through contents of %loc_hash, check for existence within @searchresults, and add as necessary
+    
+    foreach my $key (keys %loc_hash)
+    {
+    	my $resultline = $key."::".$loc_hash{$key};
+    
+   	if (! grep(/^$key/, @searchresults)) 
+	{
+		push (@searchresults, $resultline);
+	}
     }
 
     return @searchresults;
