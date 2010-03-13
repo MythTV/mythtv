@@ -90,7 +90,7 @@ bool SourceManager::findScripts()
     }
     QString busymessage = tr("Searching for scripts");
 
-    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("popup stack");
+    MythScreenStack *popupStack = GetMythMainWindow()->GetStack("weather stack");
 
     MythUIBusyDialog *busyPopup = new MythUIBusyDialog(busymessage, popupStack,
                                                        "mythweatherbusydialog");
