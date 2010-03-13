@@ -56,6 +56,10 @@ class MPUBLIC MythUIWebBrowser : public MythUIType
     void SetActive(bool active);
     bool IsActive(void) { return m_active; }
 
+    /// returns true if all keypresses are to be passed to the web page
+    bool IsInputToggled(void) { return m_inputToggled; }
+    void SetInputToggled(bool inputToggled) { m_inputToggled = inputToggled; }
+
     void  SetZoom(float zoom);
     float GetZoom(void);
 

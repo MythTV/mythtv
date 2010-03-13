@@ -48,8 +48,57 @@ MythWebView::MythWebView(QWidget *parent, MythUIWebBrowser *parentBrowser)
 
 void MythWebView::keyPressEvent(QKeyEvent *event)
 {
-    if (m_parentBrowser && !m_parentBrowser->keyPressEvent(event))
+    // if the QWebView widget has focus then all keypresses from a regular keyboard 
+    // get sent here first
+    if (m_parentBrowser && m_parentBrowser->IsInputToggled())
+    {
+        // input is toggled so pass all keypresses to the QWebView's handler
         QWebView::keyPressEvent(event);
+    }
+    else
+    {
+        // we need to convert a few keypress events so the QWebView does the right thing
+        QStringList actions;
+        bool handled = false;
+        handled = GetMythMainWindow()->TranslateKeyPress("Browser", event, actions);
+
+        for (int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+            if (action == "NEXTLINK")
+            {
+                QKeyEvent tabKey(event->type(), Qt::Key_Tab,
+                                 event->modifiers(), QString(),
+                                 event->isAutoRepeat(), event->count());
+                *event = tabKey;
+                QWebView::keyPressEvent(event);
+                return;
+            }
+            else if (action == "PREVIOUSLINK")
+            {
+                QKeyEvent shiftTabKey(event->type(), Qt::Key_Tab,
+                                      event->modifiers() | Qt::ShiftModifier,QString(),
+                                      event->isAutoRepeat(), event->count());
+                *event = shiftTabKey;
+                QWebView::keyPressEvent(event);
+                return;
+            }
+            else if (action == "FOLLOWLINK")
+            {
+                QKeyEvent returnKey(event->type(), Qt::Key_Return,
+                                    event->modifiers(), QString(),
+                                    event->isAutoRepeat(), event->count());
+                *event = returnKey;
+                QWebView::keyPressEvent(event);
+                return;
+            }
+        }
+
+        // pass the keyPress event to our main window handler so they get handled properly
+        // by the various mythui handlers
+        QCoreApplication::postEvent(GetMythMainWindow(), new QKeyEvent(*event));
+    }
 }
 
 void MythWebView::handleUnsupportedContent(QNetworkReply *reply)
@@ -594,33 +643,16 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
 
         if (action == "TOGGLEINPUT")
         {
-#if 0
-            if (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
-            {
-                if (inputToggled)
-                    return true;
-
-                inputToggled = true;
-                VirtualKeyboard *keyboard = new VirtualKeyboard(
-                    gContext->GetMainWindow(), m_browser);
-                gContext->GetMainWindow()->detach(keyboard);
-                keyboard->exec();
-                keyboard->deleteLater();
-
-                inputToggled = false;
-            }
-            else
-            {
-                m_inputToggled = !m_inputToggled;
-            }
-
+            m_inputToggled = !m_inputToggled;
             return true;
-#endif
         }
 
         // if input is toggled all input goes to the web page
         if (m_inputToggled)
-            return false;
+        {
+            m_browser->keyPressEvent(event);
+            return true;
+        }
 
         if (action == "UP")
         {
@@ -724,33 +756,15 @@ bool MythUIWebBrowser::keyPressEvent(QKeyEvent *event)
         }
         else if (action == "NEXTLINK")
         {
-            QKeyEvent tabKey(event->type(), Qt::Key_Tab,
-                             event->modifiers(), QString(),
-                             event->isAutoRepeat(), event->count());
-
-            *event = tabKey;
-
-            return false;
-
+            m_browser->keyPressEvent(event);
         }
         else if (action == "PREVIOUSLINK")
         {
-            QKeyEvent shiftTabKey(event->type(), Qt::Key_Tab,
-                          event->modifiers() | Qt::ShiftModifier,QString(),
-                          event->isAutoRepeat(), event->count());
-
-            *event = shiftTabKey;
-
-            return false;
+            m_browser->keyPressEvent(event);
         }
         else if (action == "FOLLOWLINK")
         {
-            QKeyEvent returnKey(event->type(), Qt::Key_Return,
-                                event->modifiers(), QString(),
-                                event->isAutoRepeat(), event->count());
-            *event = returnKey;
-
-            return false;
+            m_browser->keyPressEvent(event);
         }
         else if (action == "HISTORYBACK")
         {
