@@ -576,7 +576,7 @@ void ScreenSetup::doLocationDialog(ScreenListInfo *si)
     if (locdialog->Create())
         mainStack->AddScreen(locdialog);
     else
-           delete locdialog;
+        delete locdialog;
 }
 
 void ScreenSetup::showUnitsPopup(const QString &name, ScreenListInfo *si)
@@ -657,10 +657,12 @@ void ScreenSetup::customEvent(QEvent *event)
                 }
                 else if (buttonnum == 3)
                 {
+                    si->updating = true;
                     doLocationDialog(si);
                 }
                 else if (si->hasUnits && buttonnum == 4)
                 {
+                    si->updating = true;
                     showUnitsPopup(item->GetText(), si);
                     updateHelpText();
                 }
@@ -672,7 +674,7 @@ void ScreenSetup::customEvent(QEvent *event)
             {
                 ScreenListInfo *si =
                     qVariantValue<ScreenListInfo *>(dce->GetData());
-                                
+
                 if (buttonnum == 0)
                 {
                     si->units = ENG_UNITS;
@@ -681,7 +683,13 @@ void ScreenSetup::customEvent(QEvent *event)
                 {
                     si->units = SI_UNITS;
                 }
-                doLocationDialog(si);
+
+                updateHelpText();
+
+                if (si->updating)
+                    si->updating = false;
+                else
+                    doLocationDialog(si);
             }
         }
         else if (resultid == "location")
@@ -696,17 +704,25 @@ void ScreenSetup::customEvent(QEvent *event)
                     return;
             }
 
-            QString txt = si->title; txt.detach();
+            if (si->updating)
+            {
+                si->updating = false;
+                MythUIButtonListItem *item = m_activeList->GetItemCurrent();
+                if (item)
+                    item->SetData(qVariantFromValue(si));
+            }
+            else
+            {
+                QString txt = si->title; txt.detach();
+                MythUIButtonListItem *item = 
+                        new MythUIButtonListItem(m_activeList, txt);
+                item->SetData(qVariantFromValue(si));
+            }
 
-            MythUIButtonListItem *item =
-                new MythUIButtonListItem(m_activeList, txt);
-            item->SetData(qVariantFromValue(si));
             if (m_activeList->GetCount())
                 m_activeList->SetEnabled(true);
         }
-
     }
-
 }
 
 ///////////////////////////////////////////////////////////////////////

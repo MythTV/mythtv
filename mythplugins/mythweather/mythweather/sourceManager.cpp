@@ -288,7 +288,7 @@ void SourceManager::stopTimers()
     }
 }
 
-void SourceManager::doUpdate()
+void SourceManager::doUpdate(bool forceUpdate)
 {
     WeatherSource *src;
     for (int x = 0; x < m_sources.size(); x++)
@@ -301,7 +301,7 @@ void SourceManager::doUpdate()
                     "Not running this time around").arg(src->getName()));
         }
         else if (src->inUse())
-            src->startUpdate();
+            src->startUpdate(forceUpdate);
     }
 }
 

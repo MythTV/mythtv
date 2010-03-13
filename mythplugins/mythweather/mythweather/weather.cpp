@@ -18,7 +18,7 @@
 
 Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *srcMan)
     : MythScreenType(parent, name),
-      m_cur_screen(-1)
+      m_cur_screen(0)
 {
     m_weatherStack = new MythScreenStack(GetMythMainWindow(), "weather stack");
 
@@ -96,7 +96,7 @@ void Weather::clearScreens()
 {
     m_currScreen = NULL;
 
-    m_cur_screen = -1;
+    m_cur_screen = 0;
     while (!m_screens.empty())
     {
         WeatherScreen *screen = m_screens.back();
@@ -187,18 +187,16 @@ void Weather::setupScreens()
         }
 
         m_srcMan->startTimers();
-        m_srcMan->doUpdate();
+        m_srcMan->doUpdate(true);
     }
 }
 
 void Weather::screenReady(WeatherScreen *ws)
 {
-    WeatherScreen *nxt = nextScreen();
-
-    if (m_firstRun && ws == nxt)
+    if (m_firstRun && m_screens.size() && ws == m_screens[m_cur_screen])
     {
         m_firstRun = false;
-        showScreen(nxt);
+        showScreen(ws);
         m_nextpage_Timer->start((int)(1000 * m_nextpageInterval));
     }
     disconnect(ws, SIGNAL(screenReady(WeatherScreen *)), this,

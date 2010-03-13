@@ -489,40 +489,44 @@ QStringList WeatherSource::getLocationList(const QString &str)
     return locs;
 }
 
-void WeatherSource::startUpdate()
+void WeatherSource::startUpdate(bool forceUpdate)
 {
     m_buffer.clear();
 
     MSqlQuery db(MSqlQuery::InitCon());
     VERBOSE(VB_GENERAL, "Starting update of " + m_info->name);
-    db.prepare("SELECT updated FROM weathersourcesettings "
-               "WHERE sourceid = :ID AND "
-               "TIMESTAMPADD(SECOND,update_timeout,updated) > NOW()");
-    db.bindValue(":ID", getId());
-    if (db.exec() && db.size() > 0)
+
+    if (!forceUpdate)
     {
-        VERBOSE(VB_IMPORTANT, QString("%1 recently updated, skipping.")
-                                    .arg(m_info->name));
-
-        QString cachefile = QString("%1/cache_%2").arg(m_dir).arg(m_locale);
-        QFile cache(cachefile);
-        if (cache.exists() && cache.open( QIODevice::ReadOnly ))
+        db.prepare("SELECT updated FROM weathersourcesettings "
+                "WHERE sourceid = :ID AND "
+                "TIMESTAMPADD(SECOND,update_timeout,updated) > NOW()");
+        db.bindValue(":ID", getId());
+        if (db.exec() && db.size() > 0)
         {
-            m_buffer = cache.readAll();
-            cache.close();
+            VERBOSE(VB_IMPORTANT, QString("%1 recently updated, skipping.")
+                                        .arg(m_info->name));
 
-            processData();
-
-            if (m_connectCnt)
+            QString cachefile = QString("%1/cache_%2").arg(m_dir).arg(m_locale);
+            QFile cache(cachefile);
+            if (cache.exists() && cache.open( QIODevice::ReadOnly ))
             {
-                emit newData(m_locale, m_units, m_data);
+                m_buffer = cache.readAll();
+                cache.close();
+
+                processData();
+
+                if (m_connectCnt)
+                {
+                    emit newData(m_locale, m_units, m_data);
+                }
+                return;
             }
-            return;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, QString("No cachefile for %1, forcing "
-                                          "update.").arg(m_info->name));
+            else
+            {
+                VERBOSE(VB_IMPORTANT, QString("No cachefile for %1, forcing "
+                                            "update.").arg(m_info->name));
+            }
         }
     }
 

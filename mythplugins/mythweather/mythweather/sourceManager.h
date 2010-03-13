@@ -26,7 +26,7 @@ class SourceManager : public QObject
     QStringList getLocationList(ScriptInfo *si, const QString &str);
     void startTimers();
     void stopTimers();
-    void doUpdate();
+    void doUpdate(bool forceUpdate = false);
     bool findPossibleSources(QStringList types, QList<ScriptInfo *> &sources);
     void clearSources();
     bool findScripts();

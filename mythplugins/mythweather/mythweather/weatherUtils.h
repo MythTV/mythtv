@@ -60,8 +60,8 @@ typedef QMultiHash<QString, TypeListInfo> TypeListMap;
 class ScreenListInfo
 {
   public:
-    ScreenListInfo() {}
-    
+    ScreenListInfo() {updating = false;}
+
     ScreenListInfo(const ScreenListInfo& info) :
     name(info.name),
     title(info.title),
@@ -70,11 +70,12 @@ class ScreenListInfo
     sources(info.sources),
     units(info.units),
     hasUnits(info.hasUnits),
-    multiLoc(info.multiLoc)
+    multiLoc(info.multiLoc),
+    updating(info.updating)
     {
       types.detach();
     }
-    
+
     TypeListInfo GetCurrentTypeList(void) const;
 
   public:
@@ -87,6 +88,7 @@ class ScreenListInfo
     units_t units;
     bool hasUnits;
     bool multiLoc;
+    bool updating;
 };
 
 Q_DECLARE_METATYPE(ScreenListInfo *); 

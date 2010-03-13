@@ -59,7 +59,7 @@ class WeatherSource : public QObject
     void setLocale(const QString &locale) { m_locale = locale; }
     QString getLocale() { return m_locale; }
 
-    void startUpdate();
+    void startUpdate(bool forceUpdate = false);
     bool isRunning(void) const;
 
     int getScriptTimeout() { return m_info->scriptTimeout; }
