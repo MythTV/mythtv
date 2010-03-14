@@ -881,7 +881,7 @@ int reloadTheme(void)
 {
     LanguageSettings::reload();
 
-    GetMythMainWindow()->GetMainStack()->DisableEffects();
+    GetMythMainWindow()->SetEffectsEnabled(false);
 
     GetMythUI()->LoadQtConfig();
 
@@ -892,7 +892,7 @@ int reloadTheme(void)
 
     GetMythMainWindow()->ReinitDone();
 
-    GetMythMainWindow()->GetMainStack()->EnableEffects();
+    GetMythMainWindow()->SetEffectsEnabled(true);
 
     QString themename = gContext->GetSetting("Theme", DEFAULT_UI_THEME);
     QString themedir = GetMythUI()->FindThemeDir(themename);

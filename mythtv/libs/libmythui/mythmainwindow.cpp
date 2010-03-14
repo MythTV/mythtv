@@ -1050,6 +1050,7 @@ QWidget *MythMainWindow::currentWidget(void)
         return d->widgetList.back();
     return NULL;
 }
+/* FIXME: end compatibility */
 
 void MythMainWindow::SetDrawEnabled(bool enable)
 {
@@ -1067,7 +1068,17 @@ void MythMainWindow::SetDrawEnabled(bool enable)
     usleep(50 * 1000);
 }
 
-/* FIXME: end compatibility */
+void MythMainWindow::SetEffectsEnabled(bool enable)
+{
+    QVector<MythScreenStack *>::Iterator it;
+    for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
+    {
+        if (enable)
+            (*it)->EnableEffects();
+        else
+            (*it)->DisableEffects();
+    }
+}
 
 bool MythMainWindow::IsExitingToMain(void) const
 {

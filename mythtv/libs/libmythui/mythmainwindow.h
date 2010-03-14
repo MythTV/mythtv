@@ -108,6 +108,7 @@ class MPUBLIC MythMainWindow : public QWidget
     QWidget *currentWidget(void);
 
     void SetDrawEnabled(bool enable);
+    void SetEffectsEnabled(bool enable);
 
   public slots:
     void mouseTimeout();
