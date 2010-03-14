@@ -964,14 +964,17 @@
 
         <button name="ok_button" from="basebutton">
             <position>12,440</position>
+            <value>OK</value>
         </button>
 
         <button name="delete_button" from="basebutton">
             <position>172,440</position>
+            <value>Delete</value>
         </button>
 
         <button name="record_button" from="basebutton">
             <position>332,440</position>
+            <value>Record</value>
         </button>
 
     </window>
