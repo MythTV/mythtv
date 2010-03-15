@@ -2239,13 +2239,11 @@ bool PlaybackBox::loadArtwork(QString artworkFile, MythUIImage *image, QTimer *t
 QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
                                      QString imagetype, QString host)
 {
-    static QHash <QString, QString>imageFileCache;
-
     QString cacheKey = QString("%1:%2:%3").arg(imagetype).arg(seriesID)
                                .arg(titleIn);
 
-    if (imageFileCache.contains(cacheKey))
-        return imageFileCache[cacheKey];
+    if (m_imageFileCache.contains(cacheKey))
+        return m_imageFileCache[cacheKey];
 
     QString foundFile;
     QString sgroup;
@@ -2296,10 +2294,15 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
     dir.setSorting(QDir::Name | QDir::Reversed | QDir::IgnoreCase);
 
     QStringList entries = dir.entryList();
-    QStringList sgEntries;
+    QString grpHost = sgroup + ":" + host;
 
-    // TODO do this in another thread
-    RemoteGetFileList(host, "", &sgEntries, sgroup, true);
+    if (!m_fileListCache.contains(grpHost))
+    {
+        // TODO do this in another thread
+        QStringList sgEntries;
+        RemoteGetFileList(host, "", &sgEntries, sgroup, true);
+        m_fileListCache[grpHost] = sgEntries;
+    }
 
     int regIndex = 0;
     titleIn.replace(' ', "(?:\\s|-|_|\\.)?");
@@ -2339,8 +2342,8 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
                 break;
             }
         }
-        for (QStringList::const_iterator it = sgEntries.begin();
-            it != sgEntries.end(); ++it)
+        for (QStringList::const_iterator it = m_fileListCache[grpHost].begin();
+            it != m_fileListCache[grpHost].end(); ++it)
         {
             if (re.exactMatch(*it))
             {
@@ -2363,11 +2366,11 @@ QString PlaybackBox::findArtworkFile(QString &seriesID, QString &titleIn,
     if (!foundFile.isEmpty())
     {
         if (foundFile.startsWith("myth://"))
-            imageFileCache[cacheKey] = foundFile;
+            m_imageFileCache[cacheKey] = foundFile;
         else
-            imageFileCache[cacheKey] = QString("%1/%2").arg(localDir)
+            m_imageFileCache[cacheKey] = QString("%1/%2").arg(localDir)
                                                .arg(foundFile);
-        return imageFileCache[cacheKey];
+        return m_imageFileCache[cacheKey];
     }
     else
         return QString();

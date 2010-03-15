@@ -428,6 +428,10 @@ class PlaybackBox : public ScheduleCommon
     deque<QString>      m_networkControlCommands;
     bool                m_underNetworkControl;
 
+    // artwork filename cache for findArtworkFile()
+    QHash <QString, QString>    m_imageFileCache;
+    QMap <QString, QStringList> m_fileListCache;
+
     // Other
     TV                 *m_player;
     bool                m_player_selected_new_show;
