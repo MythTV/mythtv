@@ -1393,7 +1393,7 @@
             <area>150,350,190,30</area>
             <font>basesmallyellow</font>
             <align>right</align>
-            <value>Search For: </value>
+            <value>Search For:</value>
         </textarea>
         <textarea name="search" from="basetextarea">
             <area>370,350,300,30</area>

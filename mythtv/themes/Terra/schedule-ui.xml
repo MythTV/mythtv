@@ -1979,7 +1979,7 @@
             <area>25,250,190,30</area>
             <font>basesmallyellow</font>
             <align>right</align>
-            <value>Search For: </value>
+            <value>Search For:</value>
         </textarea>
         <textarea name="search" from="basetextarea">
             <area>230,250,300,30</area>
