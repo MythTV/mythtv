@@ -141,6 +141,8 @@ class AvFormatDecoder : public DecoderBase
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
 
+    virtual int64_t NormalizeVideoTimecode(int64_t timecode);
+
     virtual int  GetTeletextDecoderType(void) const;
     virtual void SetTeletextDecoderViewer(TeletextViewer*);
 

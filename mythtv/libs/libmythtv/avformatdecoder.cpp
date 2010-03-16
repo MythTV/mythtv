@@ -616,6 +616,36 @@ static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
     return  ((lsb - base_ts)&mask);
 }
 
+int64_t AvFormatDecoder::NormalizeVideoTimecode(int64_t timecode)
+{
+    AVStream *st = NULL;
+    for (uint i = 0; i < ic->nb_streams; i++)
+    {
+        AVStream *st1 = ic->streams[i];
+        if (st1 && st1->codec->codec_type == CODEC_TYPE_VIDEO)
+        {
+            st = st1;
+            break;
+        }
+    }
+    if (!st)
+        return false;
+
+   // convert timecode and start_time to AV_TIME_BASE units
+   int64_t start_ts = av_rescale(ic->start_time,
+                                 st->time_base.den,
+                                 AV_TIME_BASE * (int64_t)st->time_base.num);
+
+   int64_t ts = av_rescale(timecode / 1000.0 * AV_TIME_BASE,
+                           st->time_base.den,
+                           AV_TIME_BASE * (int64_t)st->time_base.num);
+
+   // adjust for start time and wrap
+   ts = lsb3full(ts, start_ts, st->pts_wrap_bits);
+
+   return (int64_t)(av_q2d(st->time_base) * ts * 1000);
+}
+
 int AvFormatDecoder::GetNumChapters()
 {
     return ic->nb_chapters;

@@ -7202,14 +7202,19 @@ void NuppelVideoPlayer::DisplayTextSubtitles(void)
     }
     else
     {
-        // BEGIN HACK
-        // Like frame based subtitles this can get out of sync after
-        // transcoding, using the raw timecode doesn't work either
-        // with DTV broadcasts where the timecode isn't zero on the
-        // first frame, and may roll over during the broadcast.
-        playPos = (uint64_t)
-            ((currentFrame->frameNumber / video_frame_rate) * 1000);
-        // END HACK
+        // Use timecodes for time based SRT subtitles. Feeding this into
+        // NormalizeVideoTimecode() should adjust for non-zero start times
+        // and wraps. For MPEG, wraps will occur just once every 26.5 hours
+        // and other formats less frequently so this should be sufficient.
+        // Note: timecodes should now always be valid even in the case
+        // when a frame doesn't have a valid timestamp. If an exception is
+        // found where this is not true then we need to use the frameNumber
+        // when timecode is not defined by uncommenting the following lines.
+        //if (currentFrame->timecode == 0)
+        //    playPos = (uint64_t)
+        //        ((currentFrame->frameNumber / video_frame_rate) * 1000);
+        //else
+        playPos = GetDecoder()->NormalizeVideoTimecode(currentFrame->timecode);
     }
 
     if (!textSubtitles.HasSubtitleChanged(playPos))
