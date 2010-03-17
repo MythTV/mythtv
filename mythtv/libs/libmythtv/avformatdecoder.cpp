@@ -774,9 +774,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 
     bool exactseeks = DecoderBase::getExactSeeks();
 
-    int flags = 0;
-    if (dorewind || exactseeks)
-        flags |= AVSEEK_FLAG_BACKWARD;
+    int flags = (dorewind || exactseeks) ? AVSEEK_FLAG_BACKWARD : 0;
 
     if (av_seek_frame(ic, -1, ts, flags) < 0)
     {
