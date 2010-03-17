@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.0"
+__version__=u"v0.7.1"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -295,6 +295,10 @@ __version__=u"v0.7.0"
  #       Fixed an abort where an IMDB# was being used instead of a TMDB#
  #       Fixed an abort when a storage directory name caused an UnicodeEncodeError or TypeError exception
  # 0.7.0 Fixed an ()-MW) option abort when a recorded program or upcoming program did not have a title
+ # 0.7.1 Fixed a bug where movies with punctutation ("Mr. Magoo") were not finding matches
+ #       Fixed bug with interactive mode when a user enters a reference number directly rather than
+ #       making a list selection
+ #       These bugs were both identified by Edi Iten (thanks)
 
 
 usage_txt=u'''
@@ -2869,7 +2873,7 @@ class VideoFiles(Tvdatabase):
                 self.config['log'].debug(u'matched reg:%s'%match.re.pattern)
                 seriesname, seasno, epno = match.groups()
 
-                        #remove ._- characters from name (- removed only if next to end of line)
+                #remove ._- characters from name (- removed only if next to end of line)
                 seriesname = re.sub("[\._]|\-(?=$)", " ", seriesname).strip()
                 seasno, epno = int(seasno), int(epno)
 
@@ -3176,20 +3180,46 @@ class MythTvMetaData(VideoFiles):
 
         TMDB_movies=[]
         IMDB_movies=[]
+        user_tmdb = False
 
-        try:
-            if IMDB:
-                results = self.config['tmdb_api'].searchTMDB(IMDB)
-            else:
-                results = self.config['tmdb_api'].searchTitle(tmp_title)
-        except TmdbMovieOrPersonNotFound, e:
-            results = [[]]
-        except Exception, errormsg:
-            self._displayMessage(u"themoviedb.com error for Movie(%s) invalid data error (%s)" % (title, errormsg))
-            return False
-        except:
-            self._displayMessage(u"themoviedb.com error for Movie(%s)" % title)
-            return False
+        while True:
+            try:
+                if IMDB:
+                    results = self.config['tmdb_api'].searchIMDB(IMDB)
+                elif user_tmdb:
+                    results = self.config['tmdb_api'].searchTMDB(user_tmdb)
+                    if rtnyear:
+                        if results.has_key('releasedate'):
+                            return {'name': "%s (%s)" % (results['title'], results['releasedate'][:4]), u'sid': results[u'inetref']}
+                        else:
+                            return {'name': "%s" % (results['title'], ), u'sid': results[u'inetref']}
+                    else:
+                        return results['inetref']
+                else:
+                    results = self.config['tmdb_api'].searchTitle(tmp_title)
+            except TmdbMovieOrPersonNotFound, e:
+                results = [[]]
+            except Exception, errormsg:
+                self._displayMessage(u"themoviedb.com error for Movie(%s) invalid data error (%s)" % (title, errormsg))
+                return False
+            except:
+                self._displayMessage(u"themoviedb.com error for Movie(%s)" % title)
+                return False
+
+            # Check if the user wants to skip this video
+            if len(results[0]) and self.config['interactive']:
+                if results[0]['id'] == '99999999':
+                    if rtnyear:
+                        return False
+                    else:
+                        return results[0]['id']
+            # Check if the user has entered a TMDB number themselves
+            if len(results[0]) and self.config['interactive']:
+                if results[0]['name'] == 'User selected':
+                    user_tmdb = results[0]['id']
+                    continue
+            break
+
 
         if IMDB: # This is required to allow graphic file searching both by a TMDB and IMDB numbers
             if len(results[0]):
@@ -3200,17 +3230,13 @@ class MythTvMetaData(VideoFiles):
             else:
                 return False
 
-        # Check if the user wants to skip this video
-        if len(results[0]) and self.config['interactive']:
-            if results[0]['id'] == '99999999':
-                return results[0]['id']
-
         if UI_title[-1:] == ')':
             name = UI_title[:-7].lower() # Just the movie title
             year = UI_title[-5:-1] # The movie release year
         else:
             name = tmp_title.lower()
             year = ''
+        name = name.strip().replace('  ', ' ')
 
         if len(results[0]):
             for movie in results:
