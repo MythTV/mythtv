@@ -10458,13 +10458,14 @@ void TV::FillMenuAVChapter(
     int size = QString::number(num_chapters).size();
     for (int i = 0; i < num_chapters; i++)
     {
-        int minutes = times[i] / 60;
-        int hours   = minutes / 60;
-        minutes = minutes - (hours * 60);
+        int hours   = times[i] / 60 / 60;
+        int minutes = (times[i] / 60) - (hours * 60);
+        int secs    = times[i] - (hours * 60 * 60 + minutes * 60);
         QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
         QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
-        QString desc = chapter1 + QString(" (%1:%2)")
-            .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48));
+        QString desc = chapter1 + QString(" (%1:%2:%3)")
+            .arg(hours, 2, 10, QChar(48)).arg(minutes, 2, 10, QChar(48))
+            .arg(secs, 2, 10, QChar(48));
         new OSDGenericTree(item, desc, QString("JUMPTOCHAPTER%1").arg(chapter2),
                            (current_chapter == i) ? 1 : 0);
     }
