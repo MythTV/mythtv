@@ -203,6 +203,8 @@ const char *codec_id_string(enum CodecID codec_id)
             /* subtitle codecs */
         case CODEC_ID_DVD_SUBTITLE:     return "DVD_SUBTITLE";
         case CODEC_ID_DVB_SUBTITLE:     return "DVB_SUBTITLE";
+        case CODEC_ID_HDMV_PGS_SUBTITLE:
+            return "HDMV_PGS_SUBTITLE";
         case CODEC_ID_DVB_TELETEXT:     return "DVB_TELETEXT";
 
         case CODEC_ID_MPEG2VBI:         return "MPEG2VBI";
