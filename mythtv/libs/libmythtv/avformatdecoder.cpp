@@ -769,8 +769,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
         ts = ic->start_time;
 
     // convert framenumber to normalized timestamp
-    long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE / fps;
-    ts += (long long)diff;
+    long double seekts = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE / fps;
+    ts += (long long)seekts;
 
     bool exactseeks = DecoderBase::getExactSeeks();
 
@@ -797,14 +797,20 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
             int64_t st1 = av_rescale(ic->start_time,
                                     st->time_base.den,
                                     AV_TIME_BASE * (int64_t)st->time_base.num);
-            // If seeking near the start of stream sometimes the adjusted current dts time
-            // is less than the start time (possibly due to the AVSEEK_FLAG_BACKWARD flag ?).
-            // If so, set adjusted current dts to zero.
-            if (adj_cur_dts < st1)
-                adj_cur_dts = 0;
-            else
-                adj_cur_dts = lsb3full(adj_cur_dts, st1, st->pts_wrap_bits);
+            adj_cur_dts = lsb3full(adj_cur_dts, st1, st->pts_wrap_bits);
         }
+
+        int64_t adj_seek_dts = av_rescale(seekts,
+                                          st->time_base.den,
+                                          AV_TIME_BASE * (int64_t)st->time_base.num);
+
+        int64_t max_dts = (st->pts_wrap_bits < 64) ? (1LL<<st->pts_wrap_bits)-1 : -1LL;
+
+        // When seeking near the start of a stream the current dts is sometimes
+        // less than the start time which causes lsb3full to return adj_cur_dts
+        // close to the maximum dts value. If so, set adj_cur_dts to zero.
+        if (adj_seek_dts < max_dts / 64 && adj_cur_dts > max_dts / 2)
+            adj_cur_dts = 0;
 
         long long newts = av_rescale(adj_cur_dts,
                                 (int64_t)AV_TIME_BASE * (int64_t)st->time_base.num,
