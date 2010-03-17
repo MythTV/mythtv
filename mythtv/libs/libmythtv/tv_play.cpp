@@ -10460,7 +10460,7 @@ void TV::FillMenuAVChapter(
     {
         int hours   = times[i] / 60 / 60;
         int minutes = (times[i] / 60) - (hours * 60);
-        int secs    = times[i] - (hours * 60 * 60 + minutes * 60);
+        int secs    = times[i] % 60;
         QString chapter1 = QString("%1").arg(i+1, size, 10, QChar(48));
         QString chapter2 = QString("%1").arg(i+1, 3   , 10, QChar(48));
         QString desc = chapter1 + QString(" (%1:%2:%3)")
