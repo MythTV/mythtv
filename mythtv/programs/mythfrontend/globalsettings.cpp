@@ -1274,7 +1274,7 @@ void PlaybackProfileConfig::pressed(QString cmd)
         uint i = cmd.mid(4).toUInt();
         PlaybackProfileItemConfig itemcfg(items[i]);
 
-        if (itemcfg.exec() != QDialog::Accepted)
+        if (itemcfg.exec() != kDialogCodeAccepted)
             VERBOSE(VB_IMPORTANT, QString("edit #%1").arg(i) + " rejected");
 
         InitLabel(i);
@@ -1294,7 +1294,7 @@ void PlaybackProfileConfig::pressed(QString cmd)
         ProfileItem item;
         PlaybackProfileItemConfig itemcfg(item);
 
-        if (itemcfg.exec() != QDialog::Accepted)
+        if (itemcfg.exec() != kDialogCodeAccepted)
             VERBOSE(VB_IMPORTANT, "addentry rejected");
 
         items.push_back(item);
