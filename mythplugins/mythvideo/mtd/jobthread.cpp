@@ -1247,7 +1247,11 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
         tc_arguments.push_back("0");
     }
     else
+    {
+        tc_arguments.push_back("--progress_rate"); 
+        tc_arguments.push_back("20"); 
         tc_arguments.push_back("--log_no_color");
+    }
 
     if (two_pass)
     {
