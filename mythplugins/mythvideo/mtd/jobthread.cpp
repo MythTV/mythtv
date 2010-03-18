@@ -1273,7 +1273,7 @@ bool DVDTranscodeThread::runTranscode(int which_run)
     // Set description strings to let the user
     // know what is going on.
 
-    SetSubName("Transcode is thinking . . .", 1);
+    SetSubName(QObject::tr("Transcode is thinking..."), 1);
     SetSubProgress(0.0, 1);
 
     // Second pass?
@@ -1489,6 +1489,8 @@ void DVDTranscodeThread::cleanUp(void)
     working_directory->rmdir(rip_name);
     delete working_directory;
     working_directory = NULL;
+    SetSubProgress(1, 1);
+    SetSubName(QObject::tr("Transcode complete."), 1);
 }
 
 /** \brief Clean up and remove any output files that may have been
