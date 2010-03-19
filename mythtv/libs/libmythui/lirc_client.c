@@ -1675,7 +1675,7 @@ int lirc_code2char(const struct lirc_state *state, struct lirc_config *config,ch
 		int success;
 		int ret;
 		
-		sprintf(command, "CODE %s", code);
+		sprintf(command, "CODE %s\n", code);
 		
 		ret = lirc_send_command(state, config->sockfd, command,
 					buf, &buf_len, &success);
