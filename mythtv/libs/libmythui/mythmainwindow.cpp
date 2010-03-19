@@ -863,7 +863,10 @@ void MythMainWindow::Init(void)
     GetMythUI()->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
                                    d->ybase, d->screenheight, d->hmult);
 
-    if (d->xbase > 0 || d->screenwidth > 0 || d->ybase > 0 || d->screenheight > 0)
+    if (GetMythDB()->GetNumSetting("GuiOffsetX") > 0 ||
+        GetMythDB()->GetNumSetting("GuiWidth")   > 0 ||
+        GetMythDB()->GetNumSetting("GuiOffsetY") > 0 ||
+        GetMythDB()->GetNumSetting("GuiHeight")  > 0)
         d->does_fill_screen = false;
     else
         d->does_fill_screen = true;
@@ -872,10 +875,16 @@ void MythMainWindow::Init(void)
     Qt::WindowFlags flags = Qt::Window;
 
     if (!GetMythDB()->GetNumSetting("RunFrontendInWindow", 0))
+    {
+        VERBOSE(VB_GENERAL, "Using Frameless Window");
         flags |= Qt::FramelessWindowHint;
-   
+    }
+
     if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
-            setWindowState(Qt::WindowFullScreen);
+    {
+        VERBOSE(VB_GENERAL, "Using Full Screen Window");
+        setWindowState(Qt::WindowFullScreen);
+    }
 
     // Workarounds for Qt/Mac bugs
 #ifdef Q_WS_MACX
