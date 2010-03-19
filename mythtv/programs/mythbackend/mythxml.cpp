@@ -1097,15 +1097,6 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         return;
     }
 
-    bool bDefaultPixmap = (nWidth == 0) && (nHeight == 0) && (nSecsIn >= 0);
-
-    // ----------------------------------------------------------------------
-    // If a specific size/time is requested, don't use cached image.
-    // ----------------------------------------------------------------------
-    // -=>TODO: should cache custom sized images...
-    //          would need to decide how to delete
-    // ----------------------------------------------------------------------
-
     QString sFileName     = GetPlaybackURL(pInfo);
     int     defaultOffset = gContext->GetNumSetting("PreviewPixmapOffset", 64);
     int     preRoll       = gContext->GetNumSetting("RecordPreRoll", 0);
@@ -1113,17 +1104,25 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     if (preRoll > 0)
         defaultOffset += preRoll;
 
-    if (nSecsIn <= 0 || nSecsIn == defaultOffset)
+    if (nSecsIn <= 0)
     {
         nSecsIn = defaultOffset;
     }
-    else
-        sFileName = QString("%1.%2").arg(sFileName).arg(nSecsIn);
 
     // ----------------------------------------------------------------------
     // check to see if default preview image is already created.
     // ----------------------------------------------------------------------
-    if (!QFile::exists( sFileName + ".png" ))
+    QString sPreviewFileName;
+    if ((nSecsIn == defaultOffset))
+    {
+        sPreviewFileName = sFileName + ".png";
+    }
+    else
+    {
+        sPreviewFileName = QString("%1.%2.png").arg(sFileName).arg(nSecsIn);
+    }
+
+    if (!QFile::exists( sPreviewFileName ))
     {
         // ------------------------------------------------------------------
         // Must generate Preview Image, Generate Image and save.
@@ -1139,7 +1138,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         PreviewGenerator *previewgen = new PreviewGenerator(
             pInfo, PreviewGenerator::kLocal);
         previewgen->SetPreviewTimeAsSeconds(nSecsIn);
-        previewgen->SetOutputFilename(sFileName + ".png");
+        previewgen->SetOutputFilename(sPreviewFileName);
         bool ok = previewgen->Run();
         if (!ok)
         {
@@ -1159,7 +1158,7 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
 
     float fAspect = 0.0;
 
-    QImage *pImage = new QImage(sFileName + ".png");
+    QImage *pImage = new QImage(sPreviewFileName);
 
     if (!pImage)
         return;
@@ -1173,6 +1172,8 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         return;
     }
 
+    bool bDefaultPixmap = (nWidth == 0) && (nHeight == 0);
+
     if ( nWidth == 0 )
         nWidth = (int)rint(nHeight * fAspect);
 
@@ -1180,18 +1181,17 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
         nHeight = (int)rint(nWidth / fAspect);
 
     if (bDefaultPixmap)
-        pRequest->m_sFileName = sFileName + ".png";
+        pRequest->m_sFileName = sPreviewFileName;
     else
-        pRequest->m_sFileName = QString( "%1.%2x%3.png" )
+        pRequest->m_sFileName = QString( "%1.%2.%3x%4.png" )
                                     .arg( sFileName )
+                                    .arg( nSecsIn   )
                                     .arg( nWidth    )
                                     .arg( nHeight   );
 
     // ----------------------------------------------------------------------
     // check to see if scaled preview image is already created.
     // ----------------------------------------------------------------------
-
-
 
     if (QFile::exists( pRequest->m_sFileName ))
     {
