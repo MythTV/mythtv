@@ -7682,8 +7682,6 @@ void NuppelVideoPlayer::DefineWindow(
     {
         int i = window_id;
         {
-            CC708Window &win = GetCCWin(service_num, i);
-
 #if 0
             if ((1<<i) & CC708DelayedDeletes[service_num&63])
             {
@@ -7699,14 +7697,6 @@ void NuppelVideoPlayer::DefineWindow(
                         .arg(service_num).arg(i).arg(txt));
             }
 #endif
-
-            win.exists = false;
-            if (win.text)
-            {
-                delete [] win.text;
-                win.text = NULL;
-            }
-
             CC708DelayedDeletes[service_num&63] &= ~(1<<i);
             if (GetOSD())
                 GetOSD()->CC708Updated();
@@ -7740,7 +7730,9 @@ void NuppelVideoPlayer::DeleteWindows(uint service_num, int window_map)
 {
     VERBOSE(VB_VBI, LOC + QString("DeleteWindows(%1, 0x%2)")
             .arg(service_num).arg(window_map,0,16));
-
+    for (uint i=0; i<8; i++)
+        if ((1<<i) & window_map)
+            GetCCWin(service_num, i).Clear();
     CC708DelayedDeletes[service_num&63] |= window_map;
 }
 
@@ -7969,8 +7961,12 @@ void NuppelVideoPlayer::TextWrite(uint service_num,
     if (!(textDisplayMode & kDisplayCC708))
         return;
 
-    for (uint i = 0; i < (uint)len; i++)
-        GetCCWin(service_num).AddChar(QChar(unicode_string[i]));
+    {
+        CC708Window &win = GetCCWin(service_num);
+        QMutexLocker locker(&win.lock);
+        for (uint i = 0; i < (uint)len; i++)
+            win.AddChar(QChar(unicode_string[i]));
+    }
 
     if (GetOSD())
         GetOSD()->CC708Updated();
