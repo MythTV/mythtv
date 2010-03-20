@@ -2046,6 +2046,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             case CODEC_TYPE_SUBTITLE:
             {
+                if (enc->codec_id == CODEC_ID_DVB_TELETEXT)
+                    ScanTeletextCaptions(i);
                 bitrate += enc->bit_rate;
                 VERBOSE(VB_PLAYBACK, LOC + QString("subtitle codec (%1)")
                         .arg(codec_type_string(enc->codec_type)));
