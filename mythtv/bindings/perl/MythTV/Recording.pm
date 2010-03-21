@@ -330,6 +330,7 @@ package MythTV::Recording;
             ($info{'width'})              = $altdata =~ m/^ID_VIDEO_WIDTH=0*([1-9]\d*)/m;
             ($info{'height'})             = $altdata =~ m/^ID_VIDEO_HEIGHT=0*([1-9]\d*)/m;
             ($info{'audio_bitrate'})      = $altdata =~ m/^ID_AUDIO_BITRATE=0*([1-9]\d*)/m;
+            ($info{'audio_bits_per_sample'}) = $altdata =~ m/^AUDIO:.+?ch,\s*[su](8|16)/mi;
             ($info{'audio_sample_rate'})  = $altdata =~ m/^ID_AUDIO_RATE=0*([1-9]\d*)/m;
             ($info{'audio_channels'})     = $altdata =~ m/^ID_AUDIO_NCH=0*([1-9]\d*)/m;
             ($info{'aspect'})             = $altdata =~ m/^ID_VIDEO_ASPECT=0*([1-9]\d*(?:[\.\,]\d+)?)/m;
