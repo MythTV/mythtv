@@ -324,7 +324,7 @@ package MythTV::Recording;
 
     # Mplayer can't find the needed details.  Let's try again, forcing the use
     # of the ffmpeg lavf demuxer
-        if (!defined($info{'width'})) {
+        if (!defined($info{'width'}) || !defined($info{'audio_sample_rate'})) {
             my $altdata = `$program $idargs -demuxer lavf '$file' 2>/dev/null`;
             study $altdata;
             ($info{'width'})              = $altdata =~ m/^ID_VIDEO_WIDTH=0*([1-9]\d*)/m;
