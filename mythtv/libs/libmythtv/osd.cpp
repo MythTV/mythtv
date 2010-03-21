@@ -348,14 +348,18 @@ bool OSD::InitTeletext(void)
     container->SetAllowFade(false);
     container->SetWantsUpdates(true);
     AddSet(container, name);
-    QRect area = QRect(20, 20, 620, 440);
+    QSize *size = m_themeinfo->BaseRes();
+    int safe_x = (int)(((float)size->width() * 0.05f) + 0.5f);
+    int safe_y = (int)(((float)size->height() * 0.05f) + 0.5f);
+    QRect area = QRect(safe_x, safe_y, size->width() - (2 * safe_x),
+                                       size->height() - (2 * safe_y));
     normalizeRect(area);
     // XXX TODO use special teletextfont
     QString fontname = "teletextfont";
     TTFFont *font = GetFont(fontname);
     if (!font)
     {
-        int fontsize = 440 / 26;
+        int fontsize = (size->height() - (2 * safe_y)) / 26;
         font = LoadFont(gContext->GetSetting("OSDCCFont"), fontsize);
 
         if (font)
