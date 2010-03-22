@@ -21,7 +21,7 @@
     <message>
         <location filename="../mythnews/main.cpp" line="35"/>
         <source>Cancel news item updating</source>
-        <translation>Afbryd nyhedsopdateringen</translation>
+        <translation>Annuller nyhedsopdateringen</translation>
     </message>
 </context>
 <context>
@@ -39,7 +39,7 @@
     <message>
         <location filename="../mythnews/mythnews.cpp" line="936"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="932"/>
@@ -118,7 +118,7 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
 </context>
 <context>
@@ -178,7 +178,7 @@
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
         <translation>Du kan redigere navn, URL og sti til ikon for det valgte RSS feed på denne skærm.  Du kan også markere et feed som en podcast.
 
-Når du er færdig med at redigere, skal du vælge &quot;OK&quot; eller &quot;Afbryd&quot; for at fortsætte.</translation>
+Når du er færdig med at redigere, skal du vælge &quot;OK&quot; eller &quot;Annuller&quot; for at fortsætte.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="4"/>
@@ -213,7 +213,7 @@ Når du er færdig med at redigere, skal du vælge &quot;OK&quot; eller &quot;Af
     <message>
         <location filename="themestrings.h" line="10"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="11"/>

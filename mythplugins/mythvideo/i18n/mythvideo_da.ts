@@ -1279,7 +1279,7 @@ Kontroller videomanager indstillinger</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Video Metadata Settings</source>

@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Show Information</source>
@@ -499,7 +499,7 @@ at du vil gøre dette?</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Edit Metadata</source>

@@ -89,7 +89,7 @@
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="194"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/backendselect.cpp" line="195"/>
@@ -911,7 +911,7 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="3472"/>
         <source>Recording Options</source>
-        <translation>Indstillinger for optagelse</translation>
+        <translation>Optagelsesindstillinger</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="3468"/>
@@ -1558,7 +1558,7 @@
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1403"/>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1652"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/guidegrid.cpp" line="1614"/>
@@ -1581,7 +1581,7 @@
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1704"/>
         <source>Recording Options</source>
-        <translation>Indstillinger for optagelse</translation>
+        <translation>Optagelsesindstillinger</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/videosource.cpp" line="1689"/>
@@ -1958,7 +1958,7 @@
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="180"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythmediamonitor.cpp" line="222"/>
@@ -2080,7 +2080,7 @@
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="260"/>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="624"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/mythcontrols.cpp" line="223"/>
@@ -3242,7 +3242,7 @@
         <location filename="../libs/libmyth/mythdialogs.cpp" line="763"/>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="797"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Ok</source>
@@ -3267,7 +3267,7 @@
     <message>
         <location filename="../libs/libmyth/mythdialogs.cpp" line="1815"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
 </context>
 <context>
@@ -3491,7 +3491,7 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="353"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="372"/>
@@ -3560,7 +3560,7 @@ Returning to the previous menu.</source>
     <message>
         <location filename="../libs/libmyth/mythwizard.cpp" line="123"/>
         <source>&amp;Cancel</source>
-        <translation>&amp;Afbryd</translation>
+        <translation>&amp;Annuller</translation>
     </message>
     <message>
         <location filename="../libs/libmyth/mythwizard.cpp" line="124"/>
@@ -3817,14 +3817,13 @@ Returning to the previous menu.</source>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2753"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2992"/>
         <source>Storage Options</source>
-        <translation>Opbevarelsesindstillinger</translation>
+        <translation>Opbevaringsindstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2919"/>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2994"/>
         <source>Recording Options</source>
-        <translatorcomment>Skal være &quot;Planlægningsindstillinger&quot;, ikke &quot;Indstillinger for optagelse&quot;</translatorcomment>
-        <translation>Planlægningsindstillinger</translation>
+        <translation>Optagelsesindstillinger</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/playbackbox.cpp" line="2568"/>
@@ -4748,7 +4747,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythfrontend/progdetails.cpp" line="718"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
 </context>
 <context>
@@ -4819,7 +4818,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="244"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/progfind.cpp" line="349"/>
@@ -5003,7 +5002,7 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../programs/mythfrontend/proglist.cpp" line="317"/>
         <location filename="../programs/mythfrontend/proglist.cpp" line="780"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="305"/>
@@ -5105,7 +5104,7 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../programs/mythfrontend/proglist.cpp" line="779"/>
         <location filename="../programs/mythfrontend/proglist.cpp" line="1718"/>
         <source>Remove all episodes for this title</source>
-        <translation>Fjern alle episode med denne titel</translation>
+        <translation>Fjern alle episoder med denne titel</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/proglist.cpp" line="963"/>
@@ -5274,7 +5273,7 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="634"/>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="663"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/programrecpriority.cpp" line="646"/>
@@ -5445,7 +5444,7 @@ Er du sikker på at du vil slette den:</translation>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1529"/>
         <location filename="../libs/libmythtv/recordingprofile.cpp" line="1154"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/NuppelVideoPlayer.cpp" line="5403"/>
@@ -5765,7 +5764,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1892"/>
         <source>Adjust this to move the image horizontally.</source>
-        <translation>Ret på denne for at flytte billedet vandret.</translation>
+        <translation>Ret på denne for at flytte billedet horisontalt.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1899"/>
@@ -5775,7 +5774,7 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1901"/>
         <source>Adjust this to move the image vertically.</source>
-        <translation>Ret på denne for at flytte billedet lodret.</translation>
+        <translation>Ret på denne for at flytte billedet vertikalt.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1931"/>
@@ -6812,12 +6811,12 @@ Er du sikker på at du vil slette den:</translation>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="483"/>
         <source>Horizontal</source>
-        <translation>Lodret</translation>
+        <translation>Horisontal</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="484"/>
         <source>Vertical</source>
-        <translation>Vandret</translation>
+        <translation>Vertikal</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/transporteditor.cpp" line="485"/>
@@ -9167,7 +9166,7 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3776"/>
         <source>If it is supported by your hardware/drivers, MythTV will use OpenGL vertical syncing for video timing, reducing frame jitter.</source>
-        <translation>Hvis det er understøttet af din hardware/software , så bruger MythTV OpenGL til vandret synkronisering af videoen.</translation>
+        <translation>Hvis det er understøttet af din hardware/software, så bruger MythTV OpenGL til vertikal synkronisering af videoen.</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="3788"/>
@@ -10646,7 +10645,7 @@ De fleste kort kan autodetektere dette, så vælg Auto medmindre det ikke virker
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="180"/>
         <source>Priority</source>
-        <translation>Prioriter</translation>
+        <translation>Prioritet</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelsettings.cpp" line="182"/>
@@ -11793,7 +11792,7 @@ må ikke være tomt.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1868"/>
         <source>Vertical scaling</source>
-        <translation>Lodret skalering</translation>
+        <translation>Vertikal skalering</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1870"/>
@@ -11803,7 +11802,7 @@ må ikke være tomt.</translation>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1879"/>
         <source>Horizontal scaling</source>
-        <translation>Vandret skalering</translation>
+        <translation>Horisontal skalering</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="1881"/>
@@ -13813,7 +13812,7 @@ Du er formentlig nødt til at benytte eject-knappen på drevet.</translation>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1446"/>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1530"/>
         <source>Cancel All</source>
-        <translation>Afbryd alle</translation>
+        <translation>Annuller alle</translation>
     </message>
     <message>
         <location filename="../libs/libmythtv/channelscan/channelimporter.cpp" line="1410"/>
@@ -17864,7 +17863,7 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
     <message>
         <location filename="../themes/themestrings.h" line="140"/>
         <source>Dup Scope:</source>
-        <translation>Duklikeringsområde:</translation>
+        <translation>Duplikeringsområde:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="141"/>
@@ -17946,9 +17945,9 @@ Når du har færdiggjort din konfiguration, så tryk &quot;OK&quot; for at søge
         <source>To create a custom recording rule, either select an existing rule, or create a new rule by typing in a name.  Then select a rule type and hit enter.  The SQL code will be transferred below, and you can edit it and insert your own program information.
 
 Finally, you can test, immediately activate, store, or cancel your rule.</source>
-        <translation>For at lave en brugerdefineret optagelsesregel, vælg endten en eksisterende regel eller lav en ny regel ved at skrive et navn. Vælg så typen af reglen og tryk ENTER. SQL koden vil blive overført nedenunder, og du kan redigere og indsætte din egen program information.
+        <translation>For at lave en brugerdefineret optagelsesregel, vælg enten en eksisterende regel eller lav en ny regel ved at skrive et navn. Vælg så typen af reglen og tryk ENTER. SQL koden vil blive overført nedenunder, og du kan redigere og indsætte din egen programinformation.
 
-Til sidst, kan du teste, aktivere, lagre eller annulere din regel.</translation>
+Til sidst kan du teste, aktivere, lagre eller annullere din regel.</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="164"/>
@@ -18085,7 +18084,7 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="249"/>
         <source>Dupe Scope:</source>
-        <translation>Duklikeringsområde:</translation>
+        <translation>Duplikeringsområde:</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="252"/>
@@ -18165,7 +18164,7 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="307"/>
         <source>Storage Options Editor</source>
-        <translation>Planlægningsindstillinger</translation>
+        <translation>Opbevaringsindstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="309"/>
@@ -19158,7 +19157,7 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="217"/>
         <source>Priority</source>
-        <translation>Prioriter</translation>
+        <translation>Prioritet</translation>
     </message>
     <message>
         <source>Final Priority</source>
@@ -19275,7 +19274,7 @@ For at planlægge en optagelse, forlad denne menu og vælg &quot;Programguide&qu
     <message>
         <location filename="../themes/themestrings.h" line="11"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="14"/>
@@ -19816,7 +19815,7 @@ For at planlægge en optagelse, afslut denne skærm og vælg &apos;Programguide&
     <message>
         <location filename="../themes/themestrings.h" line="124"/>
         <source>Storage Options</source>
-        <translation>Opbevarelsesindstillinger</translation>
+        <translation>Opbevaringsindstillinger</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="125"/>
@@ -21243,7 +21242,7 @@ For at planlægge en optagelse, afslut denne side og vælg &apos;Programguide&ap
     <message>
         <location filename="../libs/libmyth/uilistbtntype.cpp" line="1492"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
 </context>
 <context>
@@ -21267,7 +21266,7 @@ For at planlægge en optagelse, afslut denne side og vælg &apos;Programguide&ap
     <message>
         <location filename="../libs/libmyth/uitypes.cpp" line="3004"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
 </context>
 <context>
@@ -21445,7 +21444,7 @@ For at planlægge en optagelse, afslut denne side og vælg &apos;Programguide&ap
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="218"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/viewscheduled.cpp" line="487"/>
@@ -21577,7 +21576,7 @@ For at planlægge en optagelse, afslut denne side og vælg &apos;Programguide&ap
     <message>
         <location filename="../programs/mythwelcome/welcomedialog.cpp" line="616"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../programs/mythwelcome/welcomedialog.cpp" line="659"/>

@@ -232,7 +232,7 @@
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="643"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../mythmusic/editmetadata.cpp" line="683"/>
@@ -386,7 +386,7 @@ Kunne ikke kopierer fil til: %1</translation>
     <message>
         <location filename="../mythmusic/importmusic.cpp" line="569"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
 </context>
 <context>
@@ -841,7 +841,7 @@ Vil du fortsætte med at spille musik i baggrunden?</translation>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="418"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../mythmusic/playbackbox.cpp" line="640"/>
@@ -1878,7 +1878,7 @@ Vil du fjerne det eksisterende nummer?</translation>
     <message>
         <location filename="../mythmusic/search.cpp" line="52"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../mythmusic/search.cpp" line="224"/>
@@ -1959,7 +1959,7 @@ Vil du fjerne det eksisterende nummer?</translation>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="2537"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="2742"/>
@@ -2206,7 +2206,7 @@ Vil du fjerne det eksisterende nummer?</translation>
         <location filename="../mythmusic/smartplaylist.cpp" line="1064"/>
         <location filename="../mythmusic/smartplaylist.cpp" line="1339"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../mythmusic/smartplaylist.cpp" line="1072"/>
@@ -2724,7 +2724,7 @@ Vil du fjerne det eksisterende nummer?</translation>
     <message>
         <location filename="../mythmusic/globalsettings.cpp" line="759"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
 </context>
 </TS>

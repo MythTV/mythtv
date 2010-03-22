@@ -77,7 +77,7 @@ Brug &apos;Tilføj bogmærke&apos; for at tilføje nye bogmærker</translation>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="294"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../mythbrowser/bookmarkmanager.cpp" line="471"/>
@@ -178,7 +178,7 @@ Brug &apos;Tilføj bogmærke&apos; for at tilføje nye bogmærker</translation>
     <message>
         <location filename="../mythbrowser/mythbrowser.cpp" line="365"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
 </context>
 <context>
@@ -263,7 +263,7 @@ Brug &apos;Tilføj bogmærke&apos; for at tilføje nye bogmærker</translation>
 When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
         <translation>Du kan redigere navn, URL og kategori for det valgte website på denne skærm.
 
-Når du er færdig, vælg da &quot;OK&quot; eller &quot;Afbryd&quot; for at fortsætte.</translation>
+Når du er færdig, vælg da &quot;OK&quot; eller &quot;Annuller&quot; for at fortsætte.</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="13"/>
@@ -303,7 +303,7 @@ Når du er færdig, vælg da &quot;OK&quot; eller &quot;Afbryd&quot; for at fort
     <message>
         <location filename="themestrings.h" line="6"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>

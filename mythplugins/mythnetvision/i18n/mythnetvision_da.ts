@@ -473,7 +473,7 @@ For nye abonnementer kan du blot skrive URLen og klikke på &quot;Gem.&quot;</tr
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="14"/>

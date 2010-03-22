@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Add Recording</source>
@@ -156,7 +156,7 @@
     <name>LogViewer</name>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Update</source>
@@ -199,7 +199,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Add Recording</source>
@@ -626,7 +626,7 @@ Indsæt en blank DVD i drevet og vælg en af mulighederne nedenfor.</translation
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
@@ -645,7 +645,7 @@ Indsæt en blank DVD i drevet og vælg en af mulighederne nedenfor.</translation
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>OK</source>
@@ -998,7 +998,7 @@ Indsæt en blank DVD i drevet og vælg en af mulighederne nedenfor.</translation
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Prev</source>
@@ -1121,7 +1121,7 @@ Indsæt en blank DVD i drevet og vælg en af mulighederne nedenfor.</translation
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>Exit, Save Thumbnails</source>
@@ -1148,7 +1148,7 @@ Indsæt en blank DVD i drevet og vælg en af mulighederne nedenfor.</translation
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <source>OK</source>

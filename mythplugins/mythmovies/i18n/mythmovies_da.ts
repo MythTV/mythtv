@@ -92,7 +92,7 @@ Tjek MythMovies indstillingerne</translation>
     <message>
         <location filename="../mythmovies/moviesui.cpp" line="353"/>
         <source>Cancel</source>
-        <translation>Afbryd</translation>
+        <translation>Annuller</translation>
     </message>
     <message>
         <location filename="../mythmovies/moviesui.cpp" line="379"/>
