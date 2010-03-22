@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="TheTVDB.com Query";
 __author__="R.D.Vaughan"
-__version__="v1.0.7"
+__version__="v1.0.8"
 # Version .1    Initial development
 # Version .2    Add an option to get season and episode numbers from ep name
 # Version .3    Cleaned up the documentation and added a usage display option
@@ -126,6 +126,7 @@ __version__="v1.0.7"
 #               language is specified and there is no images for that language.
 #               New default location and name of the ttvdb.conf file is '~/.mythtv/ttvdb.conf'. The command
 #               line option "-c" can still override the default location and name.
+# Version 1.0.8 Removed any stderr messages for non-critical events. They cause dual pop-ups in MythVideo.
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -448,35 +449,21 @@ def searchseries(t, opts, series_season_ep):
     except tvdb_shownotfound:
         # No such show found.
         # Use the show-name from the files name, and None as the ep name
-        sys.stderr.write("! Warning: Series (%s) not found\n" % (
-            series_name )
-        )
-        sys.exit(1)
+        sys.exit(0)
     except (tvdb_seasonnotfound, tvdb_episodenotfound, tvdb_attributenotfound):
         # The season, episode or name wasn't found, but the show was.
         # Use the corrected show-name, but no episode name.
-        if len(series_season_ep)>2:
-            sys.stderr.write("! Warning: For Series (%s), season (%s) or Episode (%s) not found \n" % (
-                series_name, series_season_ep[1], series_season_ep[2] )
-            )
-        else:
-            sys.stderr.write("! Warning: For Series (%s), season (%s) not found \n" % (
-                series_name, series_season_ep[1] )
-            )
-        sys.exit(1)
+        sys.exit(0)
     except tvdb_error, errormsg:
         # Error communicating with thetvdb.com
         if SID == True: # Maybe the digits were a series name (e.g. 90210)
             SID = False
             return searchseries(t, opts, series_season_ep)
-        sys.stderr.write(
-            "! Warning: Error contacting www.thetvdb.com:\n%s\n" % (errormsg)
-        )
-        sys.exit(1)
+        sys.exit(0)
     except tvdb_userabort, errormsg:
         # User aborted selection (q or ^c)
         print "\n", errormsg
-        sys.exit(1)
+        sys.exit(0)
     else:
         if opts.raw==True:
             print "="*20
