@@ -1547,7 +1547,8 @@ static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item,
                 return;
             }
 
-            st->codec->flags = item->dvbci.data_id;
+            st->component_tag = item->dvbci.component_tag;
+            st->codec->flags  = item->dvbci.data_id;
             st->codec->sub_id = item->dvbci.carousel_id;
 
             ts->pmt_pids[ts->pid_cnt] = item->pid;
