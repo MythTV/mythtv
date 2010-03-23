@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>-   By Year</source>
-        <translation>-   Par années</translation>
+        <translation>-   Par année</translation>
     </message>
     <message>
         <source>-   By Name</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>-   By Publisher</source>
-        <translation>-    Par éditeur</translation>
+        <translation>-   Par éditeur</translation>
     </message>
     <message>
         <source>Choose System for</source>
@@ -49,14 +49,18 @@
     </message>
     <message>
         <source>Game Search</source>
-        <translation>Rechercher un jeux</translation>
+        <translation>Rechercher un jeu</translation>
+    </message>
+    <message>
+        <source>Favorites</source>
+        <translation>Favoris</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Game frontend</source>
-        <translation>Frontal du jeux</translation>
+        <translation>Frontal du jeu</translation>
     </message>
     <message>
         <source>Toggle the current game as a favorite</source>
@@ -91,11 +95,11 @@
     </message>
     <message>
         <source>Yes, delete It</source>
-        <translation>Oui, supprimez-le</translation>
+        <translation>Oui</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Non, pas ça</translation>
+        <translation>Non</translation>
     </message>
     <message>
         <source>Game Players</source>
@@ -138,7 +142,7 @@
     </message>
     <message>
         <source>Enabling this causes a game scan to gather crc values and attempt to find out more detailed information about the game: NOTE this can greatly increase the time a gamescan takes based on the amount of games scanned.</source>
-        <translation>Activer ceci provoque une analyse du jeu pour rassembler les valeurs crc et tenter de trouver des informations détaillées sur le jeu. NOTE : ceci peut grandement augmenter le temps qu&apos;une analyse des jeux peut prendre en fonction du nombre de jeux analysés.</translation>
+        <translation>Cocher ceci provoque une analyse du jeu pour rassembler les valeurs crc et tenter de trouver des informations détaillées sur le jeu. NOTE : ceci peut grandement augmenter le temps qu&apos;une analyse des jeux peut prendre en fonction du nombre de jeux analysés.</translation>
     </message>
     <message>
         <source>Prompt for removal of deleted rom(s)</source>
@@ -170,7 +174,7 @@
     </message>
     <message>
         <source>Directory where Game Boxart is stored</source>
-        <translation>Répertoire de sotockage des pochettes des jeux</translation>
+        <translation>Répertoire de stockage des pochettes des jeux</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning boxart.</source>
@@ -194,7 +198,7 @@
     </message>
     <message>
         <source>Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system.</source>
-        <translation>Type de jeu/émulateur. Principalement à titre d&apos;information et a peu d&apos;effet sur le fonctionnement de votre système.</translation>
+        <translation>Type de jeu/émulateur. Principalement à titre d&apos;information et avec peu d&apos;effet sur le fonctionnement de votre système.</translation>
     </message>
     <message>
         <source>Rom Path</source>
@@ -399,7 +403,8 @@ de jeu de la base de données.
     </message>
     <message>
         <source>Fanart:</source>
-        <translation>Fanart :</translation>
+        <translatorcomment>à vérifier</translatorcomment>
+        <translation>Affiche personnalisée :.</translation>
     </message>
     <message>
         <source>Boxart:</source>
@@ -476,6 +481,75 @@ de jeu de la base de données.
     <message>
         <source>Clear Game Data</source>
         <translation>Effacer les données sur les jeux</translation>
+    </message>
+    <message>
+        <source>Game folders and general options</source>
+        <translation>Répertoire de jeux et options générales</translation>
+    </message>
+    <message>
+        <source>Configure an emulator</source>
+        <translation>Configurer un émulateur</translation>
+    </message>
+    <message>
+        <source>Add games to your library</source>
+        <translation>Ajouter des jeux à votre bibliothèque</translation>
+    </message>
+    <message>
+        <source>Empty your game library</source>
+        <translation>Effacer le contenu de votre bibliothèque</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation>Éditer les méta-données</translation>
+    </message>
+    <message>
+        <source>Modify your game&apos;s metadata.</source>
+        <translation>Modifier vos méta-données de jeux.</translation>
+    </message>
+    <message>
+        <source>Title:</source>
+        <translation>Titre :</translation>
+    </message>
+    <message>
+        <source>Cover Art:</source>
+        <translation>Pochette :</translation>
+    </message>
+    <message>
+        <source>Game is a Favorite</source>
+        <translation>Ce jeu fait partie des favoris</translation>
+    </message>
+    <message>
+        <source>Click here to search existing coverart...</source>
+        <translation>Cliquer ici pour rechercher une pochette existante ...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing screenshots...</source>
+        <translation>Cliquez ici pour rechercher les captures d&apos;écran existantes ...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing fanart...</source>
+        <translation>Cliquer ici pour rechercher une affiche personnalisée existante ...</translation>
+    </message>
+    <message>
+        <source>ROM Name:</source>
+        <translation>Nom de la ROM :</translation>
+    </message>
+    <message>
+        <source>ROM Path:</source>
+        <translatorcomment>vérier la longueur</translatorcomment>
+        <translation>Chemin d&apos;accès à la ROM : .</translation>
+    </message>
+    <message>
+        <source>Video Manager</source>
+        <translation>Gestion video</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation>Description :</translation>
     </message>
 </context>
 </TS>

@@ -35,7 +35,7 @@
     <name>MythControls</name>
     <message>
         <source>Weather forecasts</source>
-        <translation>Prévisions météo</translation>
+        <translation>Prévisions météorologiques</translation>
     </message>
     <message>
         <source>Pause current page</source>
@@ -93,7 +93,7 @@
     </message>
     <message>
         <source>Add desired screen to the Active Screens list by pressing SELECT.</source>
-        <translation>Ajouter cette page à la liste des pages actives en appuyant sur SÉLECT</translation>
+        <translation>Ajouter cette page à la liste des pages actives en appuyant sur SÉLECT.</translation>
     </message>
     <message>
         <source>Sources</source>
@@ -101,7 +101,7 @@
     </message>
     <message>
         <source>Units: </source>
-        <translation>Unités</translation>
+        <translation>Unités : </translation>
     </message>
     <message>
         <source>English Units</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>Location: </source>
-        <translation>Localisation</translation>
+        <translation>Localisation : </translation>
     </message>
     <message>
         <source>Not Defined</source>
@@ -129,15 +129,15 @@
     </message>
     <message>
         <source>change location; </source>
-        <translation>Modifier la localisation : </translation>
+        <translation>modifier la localisation; </translation>
     </message>
     <message>
         <source>change units; </source>
-        <translation>Changer d&apos;unités : </translation>
+        <translation>changer d&apos;unités; </translation>
     </message>
     <message>
         <source>move screen up or down; or remove screen.</source>
-        <translation>Deplacer la page vers le haut ou le bas; ou la supprimer</translation>
+        <translation>Déplacer la page vers le haut ou le bas; ou la supprimer.</translation>
     </message>
     <message>
         <source>Manipulate Screen</source>
@@ -145,7 +145,7 @@
     </message>
     <message>
         <source>Move Up</source>
-        <translation>Deplacer vers le haut</translation>
+        <translation>Déplacer vers le haut</translation>
     </message>
     <message>
         <source>Move Down</source>
@@ -172,7 +172,7 @@
     <name>SourceManager</name>
     <message>
         <source>Searching for scripts</source>
-        <translation>Rechercher un script</translation>
+        <translation>Recherche de scripts</translation>
     </message>
     <message>
         <source>Script %1 is still running when trying to do update, Make sure it isn&apos;t hanging, make sure timeout values are sane... Not running this time around</source>
@@ -281,23 +281,23 @@
     </message>
     <message>
         <source>AM Clouds/PM Sun</source>
-        <translation>Nuages Matin/Soleil A-Midi</translation>
+        <translation>Nuages matin/Soleil l&apos;après-midi</translation>
     </message>
     <message>
         <source>Isolated T-Storms</source>
-        <translation>Orages Isolés</translation>
+        <translation>Orages isolés</translation>
     </message>
     <message>
         <source>Scattered Thunderstorms</source>
-        <translation>Orages Violents</translation>
+        <translation>Orages violents</translation>
     </message>
     <message>
         <source>PM Showers</source>
-        <translation>Averses A-Midi</translation>
+        <translation>Averses l&apos;après-midi</translation>
     </message>
     <message>
         <source>PM Showers/Wind</source>
-        <translation>Averses A-Midi/Vent</translation>
+        <translation>Averses l&apos;après-midi/Vent</translation>
     </message>
     <message>
         <source>Rain/Snow Showers</source>
@@ -317,7 +317,7 @@
     </message>
     <message>
         <source>Mostly Cloudy/Windy</source>
-        <translation>Plutôt Nuageux/Vent</translation>
+        <translation>Plutôt nuageux/Vent</translation>
     </message>
     <message>
         <source>Rain/Thunder</source>
@@ -329,11 +329,11 @@
     </message>
     <message>
         <source>AM Rain/Snow Showers</source>
-        <translation>Pluies/neige Matinales</translation>
+        <translation>Pluies/Neige matinales</translation>
     </message>
     <message>
         <source>Light Rain/Wind</source>
-        <translation>Pluie Légère/Vent</translation>
+        <translation>Pluie légère/Vent</translation>
     </message>
     <message>
         <source>Showers/Wind</source>
@@ -341,7 +341,7 @@
     </message>
     <message>
         <source>Mostly Sunny/Wind</source>
-        <translation>Plutôt Ensoleillé/Vent</translation>
+        <translation>Plutôt ensoleillé/Vent</translation>
     </message>
     <message>
         <source>Flurries</source>
@@ -357,11 +357,11 @@
     </message>
     <message>
         <source>Sct Strong Storms</source>
-        <translation>Orages Violents</translation>
+        <translation>Orages violents</translation>
     </message>
     <message>
         <source>PM T-Storms</source>
-        <translation>Orages A-Midi</translation>
+        <translation>Orages l&apos;après-midi</translation>
     </message>
     <message>
         <source>Thunderstorms</source>
@@ -373,15 +373,15 @@
     </message>
     <message>
         <source>AM Thunderstorms</source>
-        <translation>Orages Matinaux</translation>
+        <translation>Orages matinaux</translation>
     </message>
     <message>
         <source>AM Rain</source>
-        <translation>Pluie Matinale</translation>
+        <translation>Pluie matinale</translation>
     </message>
     <message>
         <source>Iso T-Storms/Wind</source>
-        <translation>Orages Isolés/Vent</translation>
+        <translation>Orages isolés/Vent</translation>
     </message>
     <message>
         <source>Rain/Snow</source>
@@ -389,11 +389,11 @@
     </message>
     <message>
         <source>Sct T-Storms/Wind</source>
-        <translation>Orages Violents/Vent</translation>
+        <translation>Orages violents/Vent</translation>
     </message>
     <message>
         <source>AM Showers/Wind</source>
-        <translation>Averses Matinales/Vent</translation>
+        <translation>Averses matinales/Vent</translation>
     </message>
     <message>
         <source>Sct Snow Showers</source>
@@ -413,27 +413,27 @@
     </message>
     <message>
         <source>PM Light Rain</source>
-        <translation>Pluie légère l&apos;A-Midi</translation>
+        <translation>Pluie légère l&apos;après-midi</translation>
     </message>
     <message>
         <source>PM Rain</source>
-        <translation>Pluie l&apos;A-Midi</translation>
+        <translation>Pluie l&apos;après-midi</translation>
     </message>
     <message>
         <source>Snow Showers</source>
-        <translation>Averses de Neige</translation>
+        <translation>Averses de neige</translation>
     </message>
     <message>
         <source>Rain to Snow</source>
-        <translation>Pluie puis Neige</translation>
+        <translation>Pluie puis neige</translation>
     </message>
     <message>
         <source>PM Rain/Snow</source>
-        <translation>Pluie/Neige A-Midi</translation>
+        <translation>Pluie/Neige l&apos;après-midi</translation>
     </message>
     <message>
         <source>Few Showers/Wind</source>
-        <translation>Quelques Averses/Vent</translation>
+        <translation>Quelques averses/Vent</translation>
     </message>
     <message>
         <source>Snow/Wind</source>
@@ -441,15 +441,15 @@
     </message>
     <message>
         <source>PM Rain/Snow Showers</source>
-        <translation>Averses Neige/pluie A-Midi</translation>
+        <translation>Averses Neige/Pluie l&apos;après-midi</translation>
     </message>
     <message>
         <source>PM Rain/Snow/Wind</source>
-        <translation>Pluie/neige/vent A-Midi</translation>
+        <translation>Pluie/Neige/Vent l&apos;après-midi</translation>
     </message>
     <message>
         <source>Rain/Snow Showers/Wind</source>
-        <translation>Vent Averses Pluie/neige</translation>
+        <translation>Vent Averses pluie/neige</translation>
     </message>
     <message>
         <source>Rain/Snow/Wind</source>
@@ -461,27 +461,27 @@
     </message>
     <message>
         <source>PM Snow</source>
-        <translation>Neige l&apos;A-Midi</translation>
+        <translation>Neige l&apos;après-midi</translation>
     </message>
     <message>
         <source>Few Snow Showers/Wind</source>
-        <translation>Quelques Averses de Neige/Vent</translation>
+        <translation>Quelques averses de neige/Vent</translation>
     </message>
     <message>
         <source>Light Snow/Wind</source>
-        <translation>Quelques flocons/vent</translation>
+        <translation>Quelques flocons/Vent</translation>
     </message>
     <message>
         <source>Wintry Mix</source>
-        <translation>Temps Hivernal</translation>
+        <translation>Temps hivernal</translation>
     </message>
     <message>
         <source>AM Wintry Mix</source>
-        <translation>Temps Hivernal le matin</translation>
+        <translation>Temps hivernal le matin</translation>
     </message>
     <message>
         <source>Hvy Rain/Freezing Rain</source>
-        <translation>Forte Pluie/Pluie Verglaçante</translation>
+        <translation>Forte pluie/Pluie verglaçante</translation>
     </message>
     <message>
         <source>AM Light Snow</source>
@@ -501,11 +501,11 @@
     </message>
     <message>
         <source>AM Snow Showers</source>
-        <translation>Averses de Neige le matin</translation>
+        <translation>Averses de neige le matin</translation>
     </message>
     <message>
         <source>AM Clouds/PM Sun/Wind</source>
-        <translation>Matin Nuageux/Soleil A-Midi/Vent</translation>
+        <translation>Matin nuageux/Soleil l&apos;après-midi/Vent</translation>
     </message>
     <message>
         <source>AM Rain/Snow/Wind</source>
@@ -513,23 +513,23 @@
     </message>
     <message>
         <source>Rain to Snow/Wind</source>
-        <translation>Pluie puis Neige/Vent</translation>
+        <translation>Pluie puis neige/Vent</translation>
     </message>
     <message>
         <source>Snow to Wintry Mix</source>
-        <translation>Neige puis Temps Hivernal</translation>
+        <translation>Neige puis temps hivernal</translation>
     </message>
     <message>
         <source>PM Snow Showers/Wind</source>
-        <translation>Averses de Neige A-Midi/Vent</translation>
+        <translation>Averses de neige l&apos;après-midi/Vent</translation>
     </message>
     <message>
         <source>Snow and Ice to Rain</source>
-        <translation>Neige et Verglas puis Pluie</translation>
+        <translation>Neige et verglas puis pluie</translation>
     </message>
     <message>
         <source>Heavy Rain</source>
-        <translation>Forte Pluie</translation>
+        <translation>Forte pluie</translation>
     </message>
     <message>
         <source>AM Rain/Ice</source>
@@ -537,7 +537,7 @@
     </message>
     <message>
         <source>AM Snow Showers/Wind</source>
-        <translation>Averses de Neige le matin/Vent</translation>
+        <translation>Averses de neige le matin/Vent</translation>
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
@@ -545,23 +545,23 @@
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
-        <translation>Pluie légère A-Midi/Vent</translation>
+        <translation>Pluie légère l&apos;après-midi/Vent</translation>
     </message>
     <message>
         <source>AM Light Wintry Mix</source>
-        <translation>Léger Temps Hivernal le matin</translation>
+        <translation>Léger temps hivernal le matin</translation>
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation>Légère Neige A-Midi/Vent</translation>
+        <translation>Légère neige l&apos;après-midi/Vent</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
-        <translation>Forte Pluie/Vent</translation>
+        <translation>Forte pluie/Vent</translation>
     </message>
     <message>
         <source>PM Snow Shower</source>
-        <translation>Averses de Neige A-Midi</translation>
+        <translation>Averses de neige l&apos;après-midi</translation>
     </message>
     <message>
         <source>Snow to Rain/Wind</source>
@@ -569,7 +569,7 @@
     </message>
     <message>
         <source>PM Light Rain/Ice</source>
-        <translation>Pluie légère A-Midi/Grêle</translation>
+        <translation>Pluie légère l&apos;après-midi/Grêle</translation>
     </message>
     <message>
         <source>AM Snow</source>
@@ -581,11 +581,11 @@
     </message>
     <message>
         <source>Wintry Mix/Wind</source>
-        <translation>Temps Hivernal/Vent</translation>
+        <translation>Temps hivernal/Vent</translation>
     </message>
     <message>
         <source>PM Light Snow</source>
-        <translation>Neige légère l&apos;A-Midi</translation>
+        <translation>Neige légère l&apos;après-midi</translation>
     </message>
     <message>
         <source>AM Drizzle</source>
@@ -597,7 +597,7 @@
     </message>
     <message>
         <source>PM Drizzle</source>
-        <translation>Bruine l&apos;A-Midi</translation>
+        <translation>Bruine l&apos;après-midi</translation>
     </message>
     <message>
         <source>Drizzle</source>
@@ -613,11 +613,11 @@
     </message>
     <message>
         <source>Wintry Mix to Snow</source>
-        <translation>Temps hivernal puis Neige</translation>
+        <translation>Temps hivernal puis neige</translation>
     </message>
     <message>
         <source>Snow Showers/Windy</source>
-        <translation>Averses de Neige/Vent</translation>
+        <translation>Averses de neige/Vent</translation>
     </message>
     <message>
         <source>Light Rain Shower</source>
@@ -625,7 +625,7 @@
     </message>
     <message>
         <source>Light Rain with Thunder</source>
-        <translation>Pluie légère et Tonnerre</translation>
+        <translation>Pluie légère et tonnerre</translation>
     </message>
     <message>
         <source>Light Drizzle</source>
@@ -641,23 +641,23 @@
     </message>
     <message>
         <source>Haze</source>
-        <translation>Ciel Voilé</translation>
+        <translation>Ciel voilé</translation>
     </message>
     <message>
         <source>Light Snow Shower</source>
-        <translation>Légères averses de Neige</translation>
+        <translation>Légères averses de neige</translation>
     </message>
     <message>
         <source>Light Snow Shower/ Windy</source>
-        <translation>Légères averses de Neige/Vent</translation>
+        <translation>Légères averses de neige/Vent</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation>Temps Clair</translation>
+        <translation>Temps clair</translation>
     </message>
     <message>
         <source>A Few Clouds</source>
-        <translation>Quelques Nuages</translation>
+        <translation>Quelques nuages</translation>
     </message>
     <message>
         <source>Fair</source>
@@ -811,11 +811,151 @@
     </message>
     <message>
         <source>Enter your current location, nearest large town or city. In some countries postal codes are also supported.</source>
-        <translation>Entrez votre emplacement actuel, le plus près d&apos;une grande ville. Dans certains pays le code postal est Ãélement supporté.</translation>
+        <translation>Entrez votre emplacement actuel ou la grande ville la plus proche. Dans certains pays, le code postal est également supporté.</translation>
     </message>
     <message>
         <source>Enter Location:</source>
         <translation>Entrez l&apos;emplacement :</translation>
+    </message>
+    <message>
+        <source>General weather plugin options</source>
+        <translation>Options générales du module météo</translation>
+    </message>
+    <message>
+        <source>Screen Settings</source>
+        <translation>Réglages des écrans</translation>
+    </message>
+    <message>
+        <source>Choose which weather forecasts to display</source>
+        <translation>Choisir quelles prévisions météo afficher</translation>
+    </message>
+    <message>
+        <source>Source Settings</source>
+        <translation>Réglages des sources</translation>
+    </message>
+    <message>
+        <source>Configure the behavior of weather scripts</source>
+        <translation>Configurer le comportement des scripts météo</translation>
+    </message>
+    <message>
+        <source>Last Updated %1</source>
+        <translation>Dernière mise à jour %1</translation>
+    </message>
+    <message>
+        <source>High Temperature:  %1</source>
+        <translation>Température max. :   %1</translation>
+    </message>
+    <message>
+        <source>Low Temperature:  %1</source>
+        <translation>Température min. :  %1</translation>
+    </message>
+    <message>
+        <source>Temperature:  %1</source>
+        <translation>Température :  %1</translation>
+    </message>
+    <message>
+        <source>Chance of Precipitation:  %1</source>
+        <translation>Précipitation probable:  %1</translation>
+    </message>
+    <message>
+        <source>Weather Screen Settings</source>
+        <translation>Réglages des écrans météo</translation>
+    </message>
+    <message>
+        <source>This screen governs the behavior of the weather screens.  You can enable a background weather update which will run regardless of being on the weather screen, and configure how many seconds each screen will display.
+
+When you are done configuring the Weather Plugin, click &quot;Finish&quot; to continue.</source>
+        <translation>Cet écran régit le comportement des écrans météo. Vous pouvez activer une mise à jour de la météo en arrière-plan qui sera éxécuté que vous soyez ou non dans l&apos;écran de la météo, et configurer le nombre de secondes d&apos;affichage de chaque écran .
+
+Lorsque vous avez terminé de configurer le module météo, cliquez sur &quot;Terminer&quot; pour continuer.</translation>
+    </message>
+    <message>
+        <source>Retrieve data in background:</source>
+        <translation>Récupérer les données en arrière-plan : </translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Valider</translation>
+    </message>
+    <message>
+        <source>Weather Setup</source>
+        <translation>Configuration météo</translation>
+    </message>
+    <message>
+        <source>Available Screens</source>
+        <translation>Écrans disponibles</translation>
+    </message>
+    <message>
+        <source>Active Screens</source>
+        <translation>Écrans actifs</translation>
+    </message>
+    <message>
+        <source>Weather Script Settings</source>
+        <translation>Configuration des scripts météo</translation>
+    </message>
+    <message>
+        <source>This settings screen governs the behavior of individual weather scripts.  Select the script whose behavior you with to change and press the right arrow. Adjust the interval at which data is retrieved, and the timeout for accessing the site.
+
+When you have completed your changes, click &quot;Finish&quot; to continue.</source>
+        <translation>Cet écran régit le comportement de chaque script météo. Sélectionnez le script que vous souhaitez modifier et appuyez sur la flèche droite. Réglez l&apos;intervalle entre les récupérations de données et le délai d&apos;attente pour accéder au site.
+
+Lorsque vous avez terminé de configurer le module météo, cliquez sur &quot;Terminer&quot; pour continuer.</translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation>Terminé</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Rechercher</translation>
+    </message>
+    <message>
+        <source>Enter Current Location</source>
+        <translation>Entrez votre emplacement</translation>
+    </message>
+    <message>
+        <source>As of</source>
+        <translation>En date du</translation>
+    </message>
+    <message>
+        <source>Weather Location Search</source>
+        <translation>Recherche de l&apos;emplacement météo</translation>
+    </message>
+    <message>
+        <source>Weather</source>
+        <translation>Météo</translation>
+    </message>
+    <message>
+        <source>Severe Weather Alerts</source>
+        <translation>Alertes météo sévères</translation>
+    </message>
+    <message>
+        <source>Global Setup</source>
+        <translation>Configuration Générale</translation>
+    </message>
+    <message>
+        <source>Humidity:</source>
+        <translation>Humidité :</translation>
+    </message>
+    <message>
+        <source>Pressure:</source>
+        <translation>Pression :</translation>
+    </message>
+    <message>
+        <source>Wind(Gust):</source>
+        <translation>Vent (Bourrasques) :</translation>
+    </message>
+    <message>
+        <source>Wind Direction:</source>
+        <translation>Direction du vent :</translation>
+    </message>
+    <message>
+        <source>Visibility:</source>
+        <translation>Visibilité.:</translation>
+    </message>
+    <message>
+        <source>Feels Like:</source>
+        <translation>Température ressentie :</translation>
     </message>
 </context>
 <context>

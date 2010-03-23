@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Cancel news item updating</source>
-        <translation>Effacer la mise à jour les pages de nouvelles</translation>
+        <translation>Effacer la mise à jour des pages de nouvelles</translation>
     </message>
 </context>
 <context>
@@ -102,7 +102,7 @@
     <name>NewsSite</name>
     <message>
         <source>Retrieve Failed. </source>
-        <translation>La récupération a échouée</translation>
+        <translation>La récupération a échouée .</translation>
     </message>
     <message>
         <source>Failed to retrieve news</source>
@@ -110,15 +110,15 @@
     </message>
     <message>
         <source>No Cached News.</source>
-        <translation>Pas de nouvelles en mémoire</translation>
+        <translation>Pas de nouvelles en mémoire ..</translation>
     </message>
     <message>
         <source>Failed to read downloaded file.</source>
-        <translation>Impossible de lire le fichier téléchargé</translation>
+        <translation>Impossible de lire le fichier téléchargé .</translation>
     </message>
     <message>
         <source>Showing Cached News.</source>
-        <translation>Montrer les nouvelles en mémoire</translation>
+        <translation>Montrer les nouvelles en mémoire .</translation>
     </message>
     <message>
         <source>XML-file is not valid RSS-feed</source>
@@ -141,6 +141,83 @@
     <message>
         <source>Ok</source>
         <translation>Valider</translation>
+    </message>
+    <message>
+        <source>Edit RSS News Feeds</source>
+        <translation>Editer les flux RSS de nouvelles</translation>
+    </message>
+    <message>
+        <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation>Vous pouvez modifer le nom, l&apos;adresse URL et le chemin de l&apos;icône pour le flux RSS sur cet écran. Vous pouvez aussi désigner ce flux comme un podcast.
+
+Après modifications, taper &quot;Valider&quot; ou &quot;Annuler&quot; pour continuer.</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nom :</translation>
+    </message>
+    <message>
+        <source>URL:</source>
+        <translation>URL :</translation>
+    </message>
+    <message>
+        <source>Icon:</source>
+        <translation>Icône :</translation>
+    </message>
+    <message>
+        <source>Podcast:</source>
+        <translation>Podcast :</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Genre :</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Chaîne :</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Accepter</translation>
+    </message>
+    <message>
+        <source>News Subscriptions</source>
+        <translation>Abonnements aux sites de nouvelles</translation>
+    </message>
+    <message>
+        <source>Choose the news sites you would like to read.</source>
+        <translation>Choisir les sites de nouvelles que vous souhaitez lire .</translation>
+    </message>
+    <message>
+        <source>Edit RSS News Feed</source>
+        <translation>Editer un nouveau flux RSS</translation>
+    </message>
+    <message>
+        <source>Contexts</source>
+        <translatorcomment>à valider</translatorcomment>
+        <translation>Contextes .</translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation>Actions</translation>
+    </message>
+    <message>
+        <source>RSS Feeds</source>
+        <translation>Flux RSS</translation>
+    </message>
+    <message>
+        <source>MythNews Configuration</source>
+        <translation>Configuration de MythNews</translation>
+    </message>
+    <message>
+        <source>Minutes</source>
+        <translation>Minutes</translation>
+    </message>
+    <message>
+        <source>News Feeds</source>
+        <translation>Flux de nouvelles</translation>
     </message>
 </context>
 </TS>

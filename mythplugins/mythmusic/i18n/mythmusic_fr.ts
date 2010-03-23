@@ -68,7 +68,7 @@
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
-        <translation>Toutes ma musique ~ Chargement des données musicales</translation>
+        <translation>Toute ma musique ~ Chargement des données musicales</translation>
     </message>
     <message>
         <source>Loading Music Data</source>
@@ -127,8 +127,8 @@
         <translation>Artiste de compilation :</translation>
     </message>
     <message>
-        <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
-        <translation>Le thème que vous utilisez ne contient aucune ligne dans l&apos;élément musique. Veuillez communiquer avec l&apos;auteur du thème pour lui demander de le mettre à jour.</translation>
+        <source>The theme you are using does not contain enough info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
+        <translation>Le thème que vous utilisez ne contient pas assez de lignes d&apos;information dans l&apos;élément musique. Veuillez contacter l&apos;auteur du thème pour lui demander de le mettre à jour.</translation>
     </message>
 </context>
 <context>
@@ -187,7 +187,8 @@
     </message>
     <message>
         <source>Track Info.</source>
-        <translation>Info. sur la piste</translation>
+        <translatorcomment>valider la longueur</translatorcomment>
+        <translation>Données piste</translation>
     </message>
     <message>
         <source>Album Art</source>
@@ -330,7 +331,7 @@ N&apos;a pu copier le fichier vers : %1</translation>
     </message>
     <message>
         <source>Shuffle Mode: </source>
-        <translation>Mode Mélange : </translation>
+        <translation>Mode mélange : </translation>
     </message>
     <message>
         <source>Smart</source>
@@ -511,6 +512,10 @@ N&apos;a pu copier le fichier vers : %1</translation>
         <source>MythMusic Media Handler 2/2</source>
         <translation>Configurateur média de MythMusic 2/2</translation>
     </message>
+    <message>
+        <source>Toggle audio upmixer</source>
+        <translation>Changer de type de conversion audio</translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
@@ -644,7 +649,7 @@ N&apos;a pu copier le fichier vers : %1</translation>
     </message>
     <message>
         <source>Smart</source>
-        <translation>intelligent</translation>
+        <translation>Intelligent</translation>
     </message>
     <message>
         <source>Rand</source>
@@ -698,7 +703,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Tracks with same Title</source>
-        <translation>Pistes avec le même Titre</translation>
+        <translation>Pistes avec le même titre</translation>
     </message>
     <message>
         <source>Speed: </source>
@@ -713,7 +718,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Updating music database</source>
-        <translation>Mise à jour de la Base de Données Musicales</translation>
+        <translation>Mise à jour de la base de données musicales</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -733,7 +738,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythMusic needs to have write permission to the directory.</source>
-        <translation>Ce dossier doit exister et l&apos;utilisateur qui a lancé MythMusic doit avoi les permissions d&apos;écriture dans ce dossier.</translation>
+        <translation>Ce répertoire doit exister et l&apos;utilisateur de MythMusic doit avoir la permission d&apos;écrire dans ce répertoire.</translation>
     </message>
     <message>
         <source>Audio device</source>
@@ -745,7 +750,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>CDRom device used for ripping/playback.</source>
-        <translation>Périphérique CD/DVD utilisé pour l&apos;extraction/lecture.</translation>
+        <translation>Périphérique CD/DVD utilisé pour l&apos;importation et la lecture.</translation>
     </message>
     <message>
         <source>Tree Sorting</source>
@@ -757,7 +762,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>If present this script will be executed after a CD Rip is completed.</source>
-        <translation>Si le script est fourni, il sera executé après l&apos;import de CD.</translation>
+        <translation>Si un script est fourni, il sera executé après l&apos;importation de CD.</translation>
     </message>
     <message>
         <source>Filename Format</source>
@@ -769,7 +774,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>If set, MythMusic will skip checking ID3 tags in files and just try to determine Genre, Artist, Album, and Track number and title from the filename.</source>
-        <translation>Si cette option est activée, MythMusic ne lira pas les champs ID3 dans les fichier et tentera seulement de déterminer le genre, l&apos;artiste, l&apos;album, le numéro de piste et le titre en fonction du nom de fichier.</translation>
+        <translation>MythMusic ignore les champs ID3 dans les fichiers et tentera de déterminer le genre, l&apos;artiste, l&apos;album, le numéro de piste et le titre en fonction du nom de fichier.</translation>
     </message>
     <message>
         <source>Automatically lookup CDs</source>
@@ -777,7 +782,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Automatically lookup an audio CD if it is present and show its information in the Music Selection Tree.</source>
-        <translation>Scrute automatiquement les CD audio et affiche les information dans l&apos;arborescence de sélection musicale.</translation>
+        <translation>Scrute automatiquement les CD audio et affiche les informations dans l&apos;arborescence de sélection musicale.</translation>
     </message>
     <message>
         <source>Use Keyboard/Remote Accelerated Buttons</source>
@@ -785,7 +790,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>If this is not set, you will need to use arrow keys to select and activate various functions.</source>
-        <translation>Si non actif, vous aurez besoin des fléches pour selectionner et activer différentes fonctions.</translation>
+        <translation>Si non coché, vous aurez besoin des fléches pour selectionner et activer différentes fonctions.</translation>
     </message>
     <message>
         <source>Encoding</source>
@@ -801,11 +806,11 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
-        <translation>Encodeur audio utilisé pour l&apos;extraction de CD. N.B.: le niveau de qualité &quot;Parfait&quot; utilisera l&apos;encodeur FLAC.</translation>
+        <translation>Encodeur audio utilisé pour l&apos;importation de CD. N.B.: le niveau de qualité &quot;Parfaite&quot; utilisera l&apos;encodeur FLAC.</translation>
     </message>
     <message>
         <source>File storage location</source>
-        <translation>Localisation du stockage des fichiers</translation>
+        <translation>Emplacement du stockage des fichiers</translation>
     </message>
     <message>
         <source>Replace &apos; &apos; with &apos;_&apos;</source>
@@ -829,15 +834,15 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Paranoia level of the CD ripper. Set to faster if you&apos;re not concerned about possible errors in the audio.</source>
-        <translation>Niveau de paranoia de l&apos;import de CD. Paramétrer &quot;Rapide&quot; si les erreurs Audio ne vous concerne pas.</translation>
+        <translation>Niveau de paranoia de l&apos;importation de CD. Paramétrer &quot;Rapide&quot; si les erreurs audio ne vous concerne pas.</translation>
     </message>
     <message>
         <source>Automatically eject CDs after ripping</source>
-        <translation>Éjection automatique du CD à la fin de l&apos;extraction</translation>
+        <translation>Éjection automatique du CD à la fin de l&apos;importation</translation>
     </message>
     <message>
         <source>If set, the CD tray will automatically open after the CD has been ripped.</source>
-        <translation>Si coché, le CD est automatiquement éjecté après le RIP.</translation>
+        <translation>Si coché, le CD est automatiquement éjecté après l&apos;importation.</translation>
     </message>
     <message>
         <source>Rating Weight</source>
@@ -869,7 +874,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Used in &quot;Smart&quot; Shuffle mode. This weighting affects how much strength is given to good old (peudo-)randomness when ordering a group of songs.</source>
-        <translation>Utilisé dans le mode mélange « intelligent ». Ce poids affecte l&apos;importance donnée aux anciens bon choix (pseudo-)aléatoire lors du tri d&apos;un groupe de morceaux.</translation>
+        <translation>Utilisé dans le mode mélange « intelligent ». Ce poids affecte l&apos;importance donnée aux anciens bons choix (pseudo-)aléatoires lors du tri d&apos;un groupe de morceaux.</translation>
     </message>
     <message>
         <source>Show Song Ratings</source>
@@ -877,7 +882,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Show song ratings on the playback screen.</source>
-        <translation>Afficher les évaluations des morceaux dans l&apos;a fenêtre de lecture.</translation>
+        <translation>Afficher les évaluations des morceaux dans la fenêtre de lecture.</translation>
     </message>
     <message>
         <source>List as Shuffled</source>
@@ -917,7 +922,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Change Visualizer on each song</source>
-        <translation>Alterne la visualisation à chaque morceau</translation>
+        <translation>Change la visualisation à chaque morceau</translation>
     </message>
     <message>
         <source>Width for Visual Scaling</source>
@@ -925,7 +930,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>If set to &quot;2&quot;, visualizations will be scaled in half.  Currently only used by the goom visualization.  Reduces CPU load on slower machines.</source>
-        <translation>Si &quot;2&quot; est configuré, la visualisation est à l&apos;echelle 1/2. Actuellement cela n&apos;est utilisé que par la visualisation Goom. Cela diminue la consommation CPU sur les machines lentes.</translation>
+        <translation>Si configuré à &quot;2&quot;, la visualisation est à l&apos;echelle 1/2. Actuellement cela n&apos;est utilisé que par la visualisation Goom. Cela diminue la consommation CPU sur les machines lentes.</translation>
     </message>
     <message>
         <source>Height for Visual Scaling</source>
@@ -937,7 +942,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
-        <translation>Qualité d&apos;extraction par défault</translation>
+        <translation>Qualité d&apos;importation par défaut</translation>
     </message>
     <message>
         <source>Low</source>
@@ -957,7 +962,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Default quality for new CD rips.</source>
-        <translation>Qualité par défaut des nouvelles extractions de CD.</translation>
+        <translation>Qualité par défaut des nouvelles importations de CD. N.B.: le niveau de qualité &quot;Parfaite&quot; utilisera l&apos;encodeur FLAC.</translation>
     </message>
     <message>
         <source>Playback Settings</source>
@@ -969,7 +974,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>CD Ripper Settings</source>
-        <translation>Réglages de l&apos;extraction de CD</translation>
+        <translation>Réglages de l&apos;importation de CD</translation>
     </message>
     <message>
         <source>Unknown Artist</source>
@@ -1025,15 +1030,15 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Use variable bitrates</source>
-        <translation>Utiliser des débits variables</translation>
+        <translation>Utiliser les débits variables</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation>Si coché, l&apos;encodeur MP3 utilisera des débits binaires variables (VBR) sauf pour les réglages basses qualité. L&apos;encodeur Ogg utilisera toujours le débit binaire variable.</translation>
+        <translation>Si coché, l&apos;encodeur MP3 utilisera des débits binaires variables (VBR) sauf pour les réglages basse qualité. L&apos;encodeur Ogg utilisera toujours le débit binaire variable.</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
-        <translation>Paramétres d&apos;extraction de CD (2e partie)</translation>
+        <translation>Paramétres d&apos;importation de CD (2e partie)</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
@@ -1081,7 +1086,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation>Type d&apos;effaçage du CD</translation>
+        <translation>Type d&apos;effacement du CD</translation>
     </message>
     <message>
         <source>Fast</source>
@@ -1093,7 +1098,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation>Méthode de mise à blanc du CD. Rapide prend 1 minute. Complet jusqu&apos;à 20 minutes.</translation>
+        <translation>Méthode d&apos;effacement du CD. Rapide prend 1 minute. Complet jusqu&apos;à 20 minutes.</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
@@ -1133,7 +1138,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
-        <translation>Choisir un périphérique SCSI ou IDR pour l&apos;écriture du CD.</translation>
+        <translation>Choisir un périphérique SCSI ou IDE pour l&apos;écriture du CD.</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
@@ -1149,7 +1154,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Audio Device used for playback. &apos;default&apos; will use the device specified in MythTV</source>
-        <translation>Périphérique audio utilisé pour la lecture. &apos;default&apos; utilisera le périphérique utilisé par MythTV</translation>
+        <translation>Périphérique audio utilisé pour la lecture. &apos;défaut&apos; utilisera le périphérique utilisé par MythTV</translation>
     </message>
     <message>
         <source>Unknown Title</source>
@@ -1161,7 +1166,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Directory and filename Format used to grab information if no ID3 information is found. Accepts GENRE, ARTIST, ALBUM, TITLE, ARTIST_TITLE and TRACK_TITLE.</source>
-        <translation>Format des répertoires et des noms de fichiers utilisés pour obtenir l&apos;information, si l&apos;information ID3 est absente. Réglages acceptés : GENRE, ARTIST, TITLE, ARTIST_TITLE et TRACK_TITLE.</translation>
+        <translation>Format des répertoires et des noms de fichiers utilisés pour obtenir l&apos;information, si l&apos;information ID3 est absente. Acceptés : GENRE, ARTIST, TITLE, ARTIST_TITLE et TRACK_TITLE.</translation>
     </message>
     <message>
         <source>Tag Encoding</source>
@@ -1181,7 +1186,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Some mp3 players don&apos;t understand tags encoded in UTF8 or UTF16, this setting allows you to change the encoding format used. Currently applies only to ID3 tags.</source>
-        <translation>Certains lecteurs mp3 ne peuvent lire les métadonnées encodées en UTF8 ou en UTF16. Ce réglage vous permet de changer le format utilisé. Ne s&apos;applique présentement qu&apos;aux métadonnées ID3.</translation>
+        <translation>Certains lecteurs mp3 ne peuvent lire les métadonnées encodées en UTF8 ou en UTF16. Choisir le format à utiliser. Ne s&apos;applique qu&apos;aux métadonnées ID3.</translation>
     </message>
     <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR</source>
@@ -1193,11 +1198,11 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Used to limit the number of results returned when using the search feature.</source>
-        <translation>Utilisé pour limiter le nombre de résultats affichés par une recherche.</translation>
+        <translation>Utilisé pour limiter le nombre de résultats affichés par recherche.</translation>
     </message>
     <message>
         <source>Resume mode</source>
-        <translation>Reprendre le mode</translation>
+        <translation>Reprise de lecture</translation>
     </message>
     <message>
         <source>Off</source>
@@ -1213,7 +1218,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Resume playback at either the beginning of the active play queue, the beginning of the last track, an exact point within the last track.</source>
-        <translation>Reprendre la lecture au début de la liste de lecture, au début de la dernière piste ou à un point précis dans la piste actuelle.</translation>
+        <translation>Reprendre la lecture au début de la liste de lecture (Eteint), au début de la dernière piste (Piste) ou à un point précis dans la piste actuelle (Exact).</translation>
     </message>
     <message>
         <source>Playback Settings (2)</source>
@@ -1221,7 +1226,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>The theme you are using does not contain the %1 element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
-        <translation>Le thème que vous utilisez ne contient pas l&apos;élément %1. Veuillez communiquer avec l&apos;auteur du thème pour lui demander de le mettre à jour.&lt;br&gt;&lt;br&gt;Le prochain écran sera vide. Appuyez la touche Échap pour retourner au menu.</translation>
+        <translation>Le thème que vous utilisez ne contient pas l&apos;élément %1. Veuillez prendre contact avec l&apos;auteur du thème pour lui demander de le mettre à jour.&lt;br&gt;&lt;br&gt;Le prochain écran sera vide. Appuyez la touche Échap pour retourner au menu.</translation>
     </message>
     <message>
         <source>Number of Artists Tree Groups</source>
@@ -1241,11 +1246,11 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Determines how many groups we have in the artist tree.  Few gives &apos;A B C D&apos; as per the old behaviour, average gives two letters per group, many gives one letter per group.</source>
-        <translation>Détermine le nombre de groupes dans l&apos;arborescence des artistes. &apos;Peu&apos; regroupe les artistes done le nom commence par &apos;A B C D&apos;, comme c&apos;était le cas auparavant; &apos;Moyen&apos; regroupe les artistes par groupes de deux lettres et &apos;Beaucoup&apos; créée un groupe par lettre.</translation>
+        <translation>Détermine le nombre de groupes dans l&apos;arborescence des artistes. &apos;Peu&apos; regroupe les artistes donc le nom commence par &apos;A B C D&apos;, comme c&apos;était le cas auparavant; &apos;Moyen&apos; regroupe les artistes par groupes de deux lettres et &apos;Beaucoup&apos; créée un groupe par lettre.</translation>
     </message>
     <message>
         <source>If selected, you can navigate your entire music tree from the playing screen. N.B. Does not work with accelerated buttons disabled</source>
-        <translation>Si cette option est sélectionnée, vous pouvez naviguer dans toute votre collection à partir de la liste de lecture. N.B.: Cette option doit être utilisée avec l&apos;option &apos;bouton accéléré&apos;</translation>
+        <translation>Vous permet de naviguer dans toute votre collection à partir de la liste de lecture. N.B.: Cette option doit être utilisée avec l&apos;option &apos;bouton accéléré&apos;</translation>
     </message>
     <message>
         <source>Album</source>
@@ -1265,7 +1270,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>When the song changes and the new song has an album art image display it in the visualizer for a short period.</source>
-        <translation>Lorsque le morceau change et que le nouveau possède une illustration d&apos;album, l&apos;afficher dans le visualiseur durant une courte période.</translation>
+        <translation>Lorsque le morceau change et que le nouveau possède une pochette d&apos;album, l&apos;afficher dans le visualiseur durant une courte période.</translation>
     </message>
     <message>
         <source>Randomize Visualizer order</source>
@@ -1277,7 +1282,7 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>List of visualizations to use during playback. Click the button below to edit this list</source>
-        <translation>Liste des visualisations à utiliser pendant la lecture. Cliquer le bouton ci-dessous pour modifier la liste</translation>
+        <translation>Liste des visualisations à utiliser pendant la lecture. Cliquer sur le bouton ci-dessous pour modifier la liste</translation>
     </message>
     <message>
         <source>Edit Visualizations</source>
@@ -1305,15 +1310,15 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Cleaning music database</source>
-        <translation>Nettoie la bibliothèque musicale</translation>
+        <translation>Nettoyer la bibliothèque musicale</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation>Recherche les fichiers musicaux</translation>
+        <translation>Rechercher les fichiers musicaux</translation>
     </message>
     <message>
         <source>Scanning Album Artwork</source>
-        <translation>Recherche les illustrations d&apos;album</translation>
+        <translation>Rechercher les pochettes d&apos;album</translation>
     </message>
     <message>
         <source>Action on exit</source>
@@ -1333,15 +1338,15 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
     </message>
     <message>
         <source>Specify what action to take when exiting mythmusic plugin.</source>
-        <translation>Spécifie l&apos;action à entreprendre lorsque l&apos;on quitte le greffon mythmusic.</translation>
+        <translation>Spécifie l&apos;action à entreprendre lorsque l&apos;on quitte Mythmusic.</translation>
     </message>
     <message>
         <source>Internal Decoder</source>
-        <translation>Décodeur Interne</translation>
+        <translation>Décodeur interne</translation>
     </message>
     <message>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation>« Par défaut » laissera le MediaMonitor choisir un périphérique.</translation>
+        <translation>« default » laissera le MediaMonitor choisir un périphérique.</translation>
     </message>
     <message>
         <source>front</source>
@@ -1379,12 +1384,20 @@ Désirez-vous continuer à l&apos;écouter en arrière-plan ?</translation>
         <source>Something is Wrong</source>
         <translation>Quelque chose ne va pas</translation>
     </message>
+    <message>
+        <source>Upconvert stereo to 5.1 surround</source>
+        <translation>Convertir le son stéréo en surround 5.1</translation>
+    </message>
+    <message>
+        <source>MythTV can upconvert stereo tracks to 5.1 audio. Set this option to enable it by default. You can enable or disable the upconversion during playback at anytime.</source>
+        <translation>MythTV peut convertir les pistes stéréo au son surround 5.1. Choisir cette option valide la conversion par défaut. Vous pouvez à tout moment au cours de la lecture, activer ou dé-activer cette conversion.</translation>
+    </message>
 </context>
 <context>
     <name>RipStatus</name>
     <message>
         <source>Are you sure you want to cancel ripping the CD?</source>
-        <translation>Désirez-vous vraiment interrompre l&apos;extraction de ce CD ?</translation>
+        <translation>Désirez-vous vraiment interrompre l&apos;importation de ce CD ?</translation>
     </message>
     <message>
         <source>The encoder failed to create the file.
@@ -1431,7 +1444,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     </message>
     <message>
         <source>Rip completed successfully.</source>
-        <translation>L&apos;extraction s&apos;est terminée avec succès.</translation>
+        <translation>L&apos;importation s&apos;est terminée avec succès.</translation>
     </message>
     <message>
         <source>Ejecting CD. Please Wait ...</source>
@@ -1602,7 +1615,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation>Voir les résultats de playlist subtile</translation>
+        <translation>Voir les résultats de la liste de lecture</translation>
     </message>
     <message>
         <source>Exit</source>
@@ -1634,7 +1647,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation>N° Piste</translation>
+        <translation>N° Piste.</translation>
     </message>
 </context>
 <context>
@@ -1815,7 +1828,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     </message>
     <message>
         <source>Comp. Artist:</source>
-        <translation>Artiste de comp. : </translation>
+        <translation>Artiste de compil. : </translation>
     </message>
     <message>
         <source>Album Art</source>
@@ -1823,7 +1836,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     </message>
     <message>
         <source>No Album Art Found</source>
-        <translation>Aucune illustration d&apos;album trouvée</translation>
+        <translation>Aucune pochette d&apos;album trouvée</translation>
     </message>
     <message>
         <source>Type:</source>
@@ -1955,7 +1968,7 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     </message>
     <message>
         <source>Ripper Settings</source>
-        <translation>Réglages de l&apos;extracteur</translation>
+        <translation>Réglages de l&apos;importateur</translation>
     </message>
     <message>
         <source>Play Music</source>
@@ -1987,7 +2000,121 @@ Désirez-vous vraiment retirer la piste existante ?</translation>
     </message>
     <message>
         <source>Configure playback and CD ripping</source>
-        <translation>Configurer la lecture et l&apos;extraction de CD</translation>
+        <translation>Configurer la lecture et l&apos;importation de CD</translation>
+    </message>
+    <message>
+        <source>Music folders and general options</source>
+        <translation>Répertoires de musique et options générales</translation>
+    </message>
+    <message>
+        <source>Music playback options</source>
+        <translation>Options de lecture de musique</translation>
+    </message>
+    <message>
+        <source>CD copying options</source>
+        <translation>Options de copie CD</translation>
+    </message>
+    <message>
+        <source>Import Coverart</source>
+        <translation>Importer des pochettes</translation>
+    </message>
+    <message>
+        <source>Browse cover images on your system.</source>
+        <translation>Parcourir les pochettes sur votre système.</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Précédent</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <source>Import local music files.</source>
+        <translation>Importer des fichiers de musique locale.</translation>
+    </message>
+    <message>
+        <source>Track is part of a compilation</source>
+        <translation>Cette piste fait partie d&apos;une compilation</translation>
+    </message>
+    <message>
+        <source>Click to browse directories...</source>
+        <translation>Cliquer pour parcourir les répertoires ...</translation>
+    </message>
+    <message>
+        <source>Choose Coverart</source>
+        <translation>Choisir une pochette
+</translation>
+    </message>
+    <message>
+        <source>Rip A CD</source>
+        <translation>Encoder un CD</translation>
+    </message>
+    <message>
+        <source>Input metadata for the CD you have inserted.</source>
+        <translation>Entrer les méta-données du CD inséré.</translation>
+    </message>
+    <message>
+        <source>Album Name:</source>
+        <translation>Nom d&apos;album :</translation>
+    </message>
+    <message>
+        <source>Album Year:</source>
+        <translation>Année de l&apos;album :</translation>
+    </message>
+    <message>
+        <source>Album is a compilation</source>
+        <translation>Cet album est une compilation</translation>
+    </message>
+    <message>
+        <source>Click here to search existing artists...</source>
+        <translation>Cliquer ici pour rechercher un artiste existant ...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing albums...</source>
+        <translation>Cliquer ici pour rechercher un album existant ...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing genres...</source>
+        <translation>Cliquer ici pour rechercher un genre existant ...</translation>
+    </message>
+    <message>
+        <source>Edit Playlist</source>
+        <translation>Éditer la liste</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation>Editer les méta-données</translation>
+    </message>
+    <message>
+        <source>Edit AlbumArt</source>
+        <translation>Editer la pochette de l&apos;album</translation>
+    </message>
+    <message>
+        <source>Ripping CD</source>
+        <translation>Encoder un CD</translation>
+    </message>
+    <message>
+        <source>Directory Finder</source>
+        <translatorcomment>A valider</translatorcomment>
+        <translation>Chercheur de répertoire.</translation>
+    </message>
+    <message>
+        <source>/some/file/goes/here/test.mp3</source>
+        <translation>/le/fichier/est/placé/ici/test.mp3</translation>
+    </message>
+    <message>
+        <source>123 of 345</source>
+        <translation>123 de 345</translation>
+    </message>
+    <message>
+        <source>All ready in database</source>
+        <translation>Déjà présent dans la base de données</translation>
+    </message>
+    <message>
+        <source>%1%</source>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>

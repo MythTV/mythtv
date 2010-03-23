@@ -5,7 +5,7 @@ TEMPLATE = app
 CONFIG -= moc qt
 
 trans.path = $${PREFIX}/share/mythtv/i18n/
-trans.files += mythnetvision_da.qm
+trans.files += mythnetvision_da.qm mythnetvision_fr.qm
 
 INSTALLS += trans
 

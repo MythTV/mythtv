@@ -22,7 +22,9 @@
         <source>No bookmarks defined.
 
 Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
-        <translation>Utiliser l&apos;option de menu « Ajouter un signet » pour ajouter de nouveaux signets</translation>
+        <translation>Vous n&apos;avez aucun signet.
+
+Utiliser l&apos;option « Ajouter un signet » du menu pour ajouter de nouveaux signets</translation>
     </message>
     <message>
         <source>Actions</source>
@@ -54,7 +56,7 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     </message>
     <message>
         <source>Clear Marked</source>
-        <translation>Annuler les marques</translation>
+        <translation>Effacer les marqués</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -81,7 +83,7 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     </message>
     <message>
         <source>This is the default text size that will be used. Valid values for the Internal browser are from 0.3 to 5.0 with 1.0 being normal size less than 1 is smaller and greater than 1 is larger than normal size.</source>
-        <translation>C&apos;est la taille de texte par défaut qui sera utilisée. Les valeurs valides pour le navigateur Interne vont de 0.3 à 5.0 avec 1.0 étant la taille normale, moins de 1 étant plus petit et plus de 1 étant plus grand que la taille normale.</translation>
+        <translation>C&apos;est la taille de texte utilisée par défaut. Les valeurs autorisées pour le navigateur interne vont de 0.3 à 5.0 avec 1.0 étant la taille normale, moins de 1 étant plus petit et plus de 1 étant plus grand que la taille normale.</translation>
     </message>
     <message>
         <source>Exit without saving settings</source>
@@ -206,7 +208,51 @@ Use the &apos;Add Bookmark&apos; menu option to add new bookmarks</source>
     </message>
     <message>
         <source>Text Size:</source>
-        <translation>Taille du texte</translation>
+        <translation>Taille texte :</translation>
+    </message>
+    <message>
+        <source>Web Bookmarks</source>
+        <translation>Signets Web</translation>
+    </message>
+    <message>
+        <source>Browse your favorite web sites.</source>
+        <translation>Parcourir vos sites Web favoris.</translation>
+    </message>
+    <message>
+        <source>Browser:</source>
+        <translation>Navigateur :</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Valider</translation>
+    </message>
+    <message>
+        <source>Configure Web Browser</source>
+        <translation>Configurer le navigateur Internet</translation>
+    </message>
+    <message>
+        <source>You can edit the name, URL, and category for the selected Web Site on this screen.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation>Vous pouvez modifier le nom, l&apos;adresse URL et la catégorie du site Web sélectionné dans cet écran.
+
+Après modifications, choisir &quot;Valider&quot; ou &quot;Annuler&quot; pour continuer.</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Genre :</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Chaîne :</translation>
+    </message>
+    <message>
+        <source>Click to choose from existing categories...</source>
+        <translation>Cliquer pour choisir une catégorie existante ...</translation>
+    </message>
+    <message>
+        <source>Find</source>
+        <translation>Rechercher</translation>
     </message>
 </context>
 <context>
