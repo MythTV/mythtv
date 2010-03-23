@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+#
+# Return details about a particular MythTV recording
+#
+# @url       $URL$
+# @date      $Date$
+# @version   $Revision$
+# @author    $Author$
+# @license   GPL
+#
+
+# Add a couple of include paths so we can load the various export and gui modules
+    use English;
+    use File::Basename;
+    use Cwd 'abs_path';
+    use lib dirname(abs_path($0 or $PROGRAM_NAME)), '/usr/share/nuvexport', '/usr/local/share/nuvexport';
+
+# Load the MythTV utilities
+    use MythTV;
+
+# No file specified?
+    unless ($ARGV[0]) {
+        print <<EOF;
+usage:
+
+    nuvinfo /path/to/file.nuv
+    nuvinfo chanid starttime
+
+EOF
+        exit 0;
+    }
+
+# Connect to the backend
+    my $myth = new MythTV;
+
+# Get the info about the requested file
+    my ($show, $search);
+    if ($ARGV[1]) {
+        $search = "chanid: $ARGV[0], starttime: $ARGV[1]";
+        $show = $myth->new_recording($ARGV[0], $ARGV[1]);
+    }
+    else {
+        $search = 'filename: '.basename($ARGV[0]);
+        $show = $myth->new_recording(basename($ARGV[0]));
+    }
+
+# Print the info
+    print "\ninfo for $search\n\n";
+    foreach $key (sort keys %{$show}) {
+        next unless ($key && defined $show->{$key});
+        next if ($key eq '_mythtv' || $key eq 'channel');
+        print ' ' x (23 - length($key)) if (length($key) < 23);
+        if ($key eq 'credits') {
+            print "$key: ";
+            my $i = 0;
+            foreach $role (sort keys %{$show->{$key}}) {
+                $i++;
+                if ($i > 1) {
+                    print ';';
+                }
+                print ' ', ucfirst($role),
+                      ' (',
+                      join(', ', @{$show->{$key}{$role}}),
+                      ')';
+            }
+            print "\n";
+        }
+        else {
+            print "$key:  $show->{$key}\n";
+        }
+    }
+    print "\ndone\n\n";
+
+
+
