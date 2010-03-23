@@ -8,62 +8,15 @@
         <translation>Trouver un fichier à importer</translation>
     </message>
     <message>
-        <source>Next</source>
-        <translation>Suivant</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation>Précédent</translation>
-    </message>
-    <message>
-        <source>Back</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation>Départ</translation>
-    </message>
-    <message>
         <source>The selected item is not a valid archive file!</source>
         <translation>L&apos;élément sélectionné n&apos;est pas un fichier archive valide !</translation>
     </message>
 </context>
 <context>
-    <name>EditMetadataDialog</name>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
-</context>
-<context>
     <name>ExportNative</name>
     <message>
-        <source>Finish</source>
-        <translation>Terminer</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation>Prédécent</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Add Recording</source>
-        <translation>Ajouter un enregistrement</translation>
-    </message>
-    <message>
-        <source>Add Video</source>
-        <translation>Ajouter une vidéo</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
@@ -85,55 +38,27 @@
 <context>
     <name>FileSelector</name>
     <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Back</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation>Répertoire personnel</translation>
-    </message>
-    <message>
         <source>The selected item is not a directory!</source>
         <translation>L&apos;élément sélectionné n&apos;est pas un répertoire !</translation>
     </message>
     <message>
         <source>Find File</source>
-        <translation>Rechercer un fichier</translation>
+        <translation>Rechercher un fichier</translation>
     </message>
     <message>
         <source>Find Directory</source>
-        <translation>Trouver un répertoire</translation>
+        <translation>Rechercher un répertoire</translation>
     </message>
     <message>
         <source>Find Files</source>
-        <translation>Trouver des fichiers</translation>
+        <translation>Rechercher des fichiers</translation>
     </message>
 </context>
 <context>
     <name>ImportNative</name>
     <message>
-        <source>Finish</source>
-        <translation>Terminer</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation>Précédent</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
         <source>You need to select a valid chanID!</source>
-        <translation>Vous devez sélectionner un chanID valide !</translation>
+        <translation>Vous devez sélectionner un &apos;chanID&apos; valide !</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
@@ -141,11 +66,11 @@
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation>Sélectionner un ChanID</translation>
+        <translation>Sélectionner un &apos;ChanID&apos;</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation>Sélectionner un ChanNo</translation>
+        <translation>Sélectionner un numéro de chaîne;</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
@@ -161,14 +86,6 @@
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>Mettre à jour</translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation>Quitter</translation>
     </message>
     <message>
         <source>Show Progress Log</source>
@@ -194,28 +111,8 @@
 <context>
     <name>MythBurn</name>
     <message>
-        <source>Finish</source>
-        <translation>Terminer</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation>Précédent</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Add Recording</source>
-        <translation>Ajouter un enregistrement</translation>
-    </message>
-    <message>
-        <source>Add Video</source>
-        <translation>Ajouter une vidéo</translation>
-    </message>
-    <message>
-        <source>Add File</source>
-        <translation>Ajouter un fichier</translation>
     </message>
     <message>
         <source>Using Cutlist</source>
@@ -306,21 +203,14 @@
     </message>
 </context>
 <context>
-    <name>ProfileDialog</name>
-    <message>
-        <source>Ok</source>
-        <translation>OK</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Myth Archive Temp Directory</source>
-        <translation>Répertoire Temporaire de MythArchive</translation>
+        <translation>Répertoire temporaire de MythArchive</translation>
     </message>
     <message>
         <source>Myth Archive Share Directory</source>
-        <translation>Répertoire Partage de MythArchive</translation>
+        <translation>Répertoire de partage de MythArchive</translation>
     </message>
     <message>
         <source>Location where MythArchive stores its scripts, intro movies and theme files</source>
@@ -340,7 +230,7 @@
     </message>
     <message>
         <source>The file name filter to use in the file selector.</source>
-        <translation>Liste des type de fichiers visibles dans le sélecteur de fichiers.</translation>
+        <translation>Liste des types de fichiers visibles dans le sélecteur de fichiers.</translation>
     </message>
     <message>
         <source>Location of DVD</source>
@@ -420,17 +310,17 @@
     </message>
     <message>
         <source>MythArchive External Commands (1)</source>
-        <translation>Commandes externes MythArchive (1)</translation>
+        <translation>MythArchive - Commandes externes  (1)</translation>
     </message>
     <message>
         <source>MythArchive External Commands (2)</source>
-        <translation>Commandes externes MythArchive (2)</translation>
+        <translation>MythArchive - Commandes externes  (2)</translation>
     </message>
     <message>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
-        <translation>Une interruption de la tâche de creation en arrière-plan a été demandée. 
-Veuillez patienter quelques minutes...</translation>
+        <translation>Une interruption de la tâche de création en arrière-plan a été demandée. 
+Veuillez patienter quelques minutes.</translation>
     </message>
     <message>
         <source>Location where MythArchive should create its temporory work files. LOTS of free space required here.</source>
@@ -442,7 +332,7 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>If set audio tracks will always be re-encoded to AC3 for better compatibility with DVD players in NTSC countries.</source>
-        <translation>Si activé, les pistes audios seront toujours réencodées en AC3 pour une meilleure compatibilité avec les lecteurs DVD des pays en NTSC.</translation>
+        <translation>Si coché, les pistes audios seront toujours réencodées en AC3 pour une meilleure compatibilité avec les lecteurs DVD des pays en NTSC.</translation>
     </message>
     <message>
         <source>Copy remote files</source>
@@ -450,7 +340,7 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>If set files on remote filesystems will be copied over to the local filesystem before processing. Speeds processing and reduces bandwidth on the network</source>
-        <translation>Si activé, les fichiers sur les systèmes de fichiers distants seront copiés sur le système de fichier local avant traitement. Ceci accélère le traitement et réduit la bande passante sur le réseau</translation>
+        <translation>Si coché, les fichiers sur les systèmes de fichiers distants seront copiés sur le système de fichier local avant traitement. Ceci accélère le traitement et réduit la bande passante sur le réseau</translation>
     </message>
     <message>
         <source>Always Use Mythtranscode</source>
@@ -458,7 +348,7 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>Use FIFOs</source>
-        <translation>Utiliser des FIFO</translation>
+        <translation>Utiliser FIFO</translation>
     </message>
     <message>
         <source>Main Menu Aspect Ratio</source>
@@ -486,11 +376,11 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>Samples are shown using today&apos;s date.</source>
-        <translation>Les échantillons sont affichés à la date d&apos;aujourd&apos;hui.</translation>
+        <translation>Les exemples sont affichés à la date d&apos;aujourd&apos;hui.</translation>
     </message>
     <message>
         <source>Samples are shown using tomorrow&apos;s date.</source>
-        <translation>Les échantillons sont affichés à la date de demain.</translation>
+        <translation>Les exemples sont affichés à la date de demain.</translation>
     </message>
     <message>
         <source>Your preferred date format to use on DVD menus.</source>
@@ -506,7 +396,7 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>jpeg2yuv command</source>
-        <translation>commande jpeg2yuv</translation>
+        <translation>Commande jpeg2yuv</translation>
     </message>
     <message>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
@@ -518,15 +408,15 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
-        <translation>Commande pour tester un DVD créé. Internal utilisera le lecteur interne de MythTV. %f sera remplacé par le chemin d&apos;accès à la structure du DVD créé, par exemple xine -pfhq --no-splash dvd:/%f.</translation>
+        <translation>Commande pour tester un DVD créé. &apos;Internal&apos; utilisera le lecteur interne de MythTV. %f sera remplacé par le chemin d&apos;accès à la structure du DVD créé, par exemple xine -pfhq --no-splash dvd:/%f.</translation>
     </message>
     <message>
         <source>DVD Drive Write Speed</source>
-        <translation>Vitesse d&apos;écriture du graveur de DVD</translation>
+        <translation>Vitesse d&apos;écriture du graveur DVD</translation>
     </message>
     <message>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
-        <translation>La vitesse d&apos;écriture à utiliser lors de la gravure de DVD. Placez à 0 pour laisser growisofs choisir la vitesse la plus rapide possible.</translation>
+        <translation>La vitesse d&apos;écriture à utiliser lors de la gravure de DVD. Placez à 0 pour laisser &apos;growisofs&apos; choisir la vitesse la plus rapide possible.</translation>
     </message>
     <message>
         <source>Default Encoder Profile</source>
@@ -538,7 +428,7 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation>Si activé, les fichiers mpeg2 passeront toujours par mythtranscode pour réparer toute erreur. Ceci peut éliminer certains problèmes audio. Ceci est ignoré si &apos;Utiliser ProjectX&apos; est activé.</translation>
+        <translation>Si coché, les fichiers mpeg2 passeront toujours par mythtranscode pour réparer toute erreur. Ceci peut éliminer certains problèmes audio. Ceci est ignoré si &apos;Utiliser ProjectX&apos; est activé.</translation>
     </message>
     <message>
         <source>Use ProjectX</source>
@@ -546,11 +436,11 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
-        <translation>Si activé, ProjectX sera utilisé pour couper les pubs et découper les fichiers mpeg2 au lieu de mythtranscode et mythreplex.</translation>
+        <translation>Si coché, ProjectX sera utilisé pour couper les pubs et découper les fichiers mpeg2 au lieu de mythtranscode et mythreplex.</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
-        <translation>Le script utilisera des FIFO pour passer la sortie de mplex à dvdauthor au lieu de créer des fichiers intermédiaires. Ceci fait gagner du temps et de l&apos;espace disque durant les opérations de multiplexage mais n&apos;est pas supporté sous Windows</translation>
+        <translation>Le script utilisera les FIFO pour passer la sortie de mplex à dvdauthor au lieu de créer des fichiers intermédiaires. Ceci fait gagner du temps et de l&apos;espace disque durant les opérations de multiplexage mais n&apos;est pas supporté sous Windows</translation>
     </message>
     <message>
         <source>Add Subtitles</source>
@@ -558,11 +448,11 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
-        <translation>Si disponible, cette option ajoutera des sous-titres au DVD final. Ceci requiert Utiliser ProjectX activé.</translation>
+        <translation>Si disponible, cette option ajoutera des sous-titres au DVD final. Ceci requiert que &apos;Utiliser ProjectX&apos; soit activé.</translation>
     </message>
     <message>
         <source>projectx command</source>
-        <translation>Commande projectx</translation>
+        <translation>Commande ProjectX</translation>
     </message>
     <message>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
@@ -570,7 +460,7 @@ Veuillez patienter quelques minutes...</translation>
     </message>
     <message>
         <source>DVD Menu Settings</source>
-        <translation>Réglages de Menu DVD</translation>
+        <translation>Réglages de menu DVD</translation>
     </message>
     <message>
         <source>Cannot find any logs to show!</source>
@@ -594,11 +484,11 @@ Suppression du fichier verrou.</translation>
     </message>
     <message>
         <source>Last run did not create a playable DVD.</source>
-        <translation>Le dernier lancement n&apos;a pas créé un DVD jouable.</translation>
+        <translation>La dernière exécution n&apos;a pas créée un DVD jouable.</translation>
     </message>
     <message>
         <source>Last run failed to create a DVD.</source>
-        <translation>Le dernier lancement a échoué à la création d&apos;un DVD.</translation>
+        <translation>La dernière demande de création d&apos;un DVD a échouée.</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
@@ -608,7 +498,7 @@ Suppression du fichier verrou.</translation>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>Ne peut graver un DVD.
-La dernière exécution a échoué dans la création d&apos;un DVD.</translation>
+La dernière demande de création d&apos;un DVD a échouée.</translation>
     </message>
     <message>
         <source>
@@ -651,16 +541,12 @@ Place a blank DVD in the drive and select an option below.</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
-    <message>
         <source>All Recordings</source>
         <translation>Tous les enregistrements</translation>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation>Récupère la liste d&apos;enregistrements. Veuillez patienter...</translation>
+        <translation>Récupère la liste des enregistrements. Veuillez patienter...</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
@@ -673,22 +559,6 @@ Place a blank DVD in the drive and select an option below.</source>
 </context>
 <context>
     <name>SelectDestination</name>
-    <message>
-        <source>Next</source>
-        <translation>Suivant</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation>Précédent</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Find...</source>
-        <translation>Trouver...</translation>
-    </message>
     <message>
         <source>Single Layer DVD</source>
         <translation>DVD simple couche</translation>
@@ -719,26 +589,11 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Any file accessable from your filesystem.</source>
-        <translation>Aucun fichier accessible dans votre système de fichier</translation>
+        <translation>Aucun fichier accessible dans votre système de fichier.</translation>
     </message>
     <message>
         <source>Unknown</source>
         <translation>Inconnu</translation>
-    </message>
-</context>
-<context>
-    <name>ThemeSelector</name>
-    <message>
-        <source>Next</source>
-        <translation>Suivant</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation>Précédent</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -857,7 +712,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>xxxxx mb</source>
-        <translation>xxxx Mo</translation>
+        <translation>xxxxx Mo</translation>
     </message>
     <message>
         <source>0 mb</source>
@@ -995,13 +850,129 @@ Place a blank DVD in the drive and select an option below.</source>
         <source>Burn DVD</source>
         <translation>Graver un DVD</translation>
     </message>
-</context>
-<context>
-    <name>ThumbFinder</name>
+    <message>
+        <source>Find</source>
+        <translation>Rechercher</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Prev</source>
+        <translation>Précédent</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Suivant</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>Valider</translation>
+    </message>
+    <message>
+        <source>Back</source>
+        <translation>Retour</translation>
+    </message>
+    <message>
+        <source>Home</source>
+        <translation>Accueil</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Mise à jour</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Sortir</translation>
+    </message>
+    <message>
+        <source>Add Recording</source>
+        <translation>Ajouter un enregistrement</translation>
+    </message>
+    <message>
+        <source>Add Video</source>
+        <translation>Ajouter une vidéo</translation>
+    </message>
+    <message>
+        <source>Add File</source>
+        <translation>Ajouter un fichier</translation>
+    </message>
     <message>
         <source>Save</source>
         <translation>Sauvegarder</translation>
     </message>
+    <message>
+        <source>Search Channel</source>
+        <translation>Rechercher une chaîne</translation>
+    </message>
+    <message>
+        <source>Search Callsign</source>
+        <translation>Rechercher un indicatif</translation>
+    </message>
+    <message>
+        <source>Search Name</source>
+        <translation>Rechercher un nom</translation>
+    </message>
+    <message>
+        <source>Finish</source>
+        <translation>Terminer</translation>
+    </message>
+    <message>
+        <source>Add video</source>
+        <translation>Ajouter une vidéo</translation>
+    </message>
+    <message>
+        <source>Choose where you would like your files archived.</source>
+        <translation>Choisir l&apos;emplacement de stockage des archives.</translation>
+    </message>
+    <message>
+        <source>Output Type:</source>
+        <translation>Type de sortie :</translation>
+    </message>
+    <message>
+        <source>Destination:</source>
+        <translation>Destination :</translation>
+    </message>
+    <message>
+        <source>Click here to find an output location...</source>
+        <translation>Cliquer ici pour trouver un emplacement de stockage ...</translation>
+    </message>
+    <message>
+        <source>Erase DVD-RW before burning</source>
+        <translation>Effacer le DVD-RW avant la gravure</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Précédent</translation>
+    </message>
+    <message>
+        <source>Filter:</source>
+        <translation>Filtre :</translation>
+    </message>
+    <message>
+        <source>Select the file you wish to use.</source>
+        <translation>Sélectionner les fichiers que vous souhaitez utiliser.</translation>
+    </message>
+    <message>
+        <source>See logs from your archive runs.</source>
+        <translation>Voir le journal de suivi de votre demande d&apos;archivage .</translation>
+    </message>
+    <message>
+        <source>Choose the appearance of your DVD.</source>
+        <translation>Choisir l&apos;apparence de votre DVD.</translation>
+    </message>
+    <message>
+        <source>Theme:</source>
+        <translation>Thème :</translation>
+    </message>
+    <message>
+        <source>Select the recordings and videos you wish to save.</source>
+        <translation>Sélectionner les enregistrements et les vidéos à sauvegarder .</translation>
+    </message>
+</context>
+<context>
+    <name>ThumbFinder</name>
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
@@ -1032,10 +1003,6 @@ Place a blank DVD in the drive and select an option below.</source>
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
     </message>
     <message>
         <source>All Videos</source>

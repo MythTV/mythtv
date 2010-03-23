@@ -5,7 +5,7 @@
     <name>GLSingleView</name>
     <message>
         <source>Press SELECT to play again</source>
-        <translation>Appuyez sur SÉLECT pour afficher à nouveau</translation>
+        <translation>Appuyez sur SÉLECT pour afficher « à nouveau »</translation>
     </message>
 </context>
 <context>
@@ -40,11 +40,11 @@
     </message>
     <message>
         <source>Gallery Options</source>
-        <translation>Options de la galerie</translation>
+        <translation>Options du mode galerie</translation>
     </message>
     <message>
         <source>Random</source>
-        <translation>Aléatoire</translation>
+        <translation>Lecture aléatoire</translation>
     </message>
     <message>
         <source>Meta Data Menu</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
         <source>Create Dir</source>
-        <translation>Créer Répertoire</translation>
+        <translation>Créer un répertoire</translation>
     </message>
     <message>
         <source>Delete Current File or Folder</source>
@@ -116,7 +116,7 @@
     </message>
     <message>
         <source>Deleting 1 folder, including any subfolders and files.</source>
-        <translation>Suppression d&apos;un dossier, incluant tout sous-répertoire et fichier.</translation>
+        <translation>Suppression d&apos;un dossier, incluant tous les sous-répertoires et fichiers.</translation>
     </message>
     <message>
         <source>Deleting 1 image.</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>Deleting %1 images and folders, including any subfolders and files.</source>
-        <translation>Suppression de %1 image(s) et dossier(s), incluant tout sous-répertoire et fichier.</translation>
+        <translation>Suppression de %1 image(s) et dossier(s), incluant tous les sous-répertoires et fichiers.</translation>
     </message>
     <message>
         <source>New Folder</source>
@@ -161,6 +161,14 @@
     <message>
         <source>Gallery Home</source>
         <translation>Accueil Galerie</translation>
+    </message>
+    <message>
+        <source>Select One</source>
+        <translation>Choisir un item</translation>
+    </message>
+    <message>
+        <source>Clear One Marked</source>
+        <translation>Effacer un item marqué</translation>
     </message>
 </context>
 <context>
@@ -223,7 +231,7 @@
     </message>
     <message>
         <source>Recenter image</source>
-        <translation>Recenter l&apos;image</translation>
+        <translation>Recentrer l&apos;image</translation>
     </message>
     <message>
         <source>Full-size (un-zoom) image</source>
@@ -370,7 +378,7 @@
 Check the directory exists, is readable and the setting is correct on MythGallery&apos;s settings page.</source>
         <translation>MythGallery ne peut trouver son répertoire de départ.
 %1
-Vérifiez que le répertoire existe, est accessible en lecture et que les réglages sont corrects sur la page de réglages de MythGallery.</translation>
+Vérifiez que le répertoire existe et est accessible en lecture et que les réglages sont corrects sur la page de réglages de MythGallery.</translation>
     </message>
     <message>
         <source>Folder: </source>
@@ -422,6 +430,26 @@ Vérifiez que le répertoire existe, est accessible en lecture et que les régla
     <message>
         <source>Press SELECT to play again</source>
         <translation>Veuillez appuyer sur SÉLECT pour rejouer</translation>
+    </message>
+</context>
+<context>
+    <name>ThemeUI</name>
+    <message>
+        <source>No images are present in the pictures folder.</source>
+        <translation>Aucune photo dans le repertoire de stockage des photos.</translation>
+    </message>
+    <message>
+        <source>Image Gallery</source>
+        <translation>Galerie de photos</translation>
+    </message>
+    <message>
+        <source>SELECT: View</source>
+        <translation>SELECTION : Vue</translation>
+    </message>
+    <message>
+        <source>MENU: Activate Menu</source>
+        <translatorcomment>a valider</translatorcomment>
+        <translation>MENU : Activer menu.</translation>
     </message>
 </context>
 </TS>
