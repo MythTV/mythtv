@@ -1989,6 +1989,7 @@ void MythContext::OverrideSettingForSession(const QString &key,
 bool MythContext::SendReceiveStringList(QStringList &strlist,
                                         bool quickTimeout, bool block)
 {
+/*
     if (!IsBackend() && QThread::currentThread() == d->m_UIThread)
     {
         QString msg = "SendReceiveStringList(";
@@ -1998,6 +1999,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
         msg += " called from UI thread";
         VERBOSE(VB_IMPORTANT, msg);
     }
+ */
 
     QString query_type = "UNKNOWN";
 
