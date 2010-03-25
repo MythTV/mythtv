@@ -34,7 +34,6 @@ typedef deque<RecordingInfo*> RecList;
 
 typedef RecList::const_iterator RecConstIter;
 typedef RecList::iterator RecIter;
-typedef RecList::const_iterator RecConstIter;
 
 class Scheduler : public QObject
 {
@@ -51,8 +50,8 @@ class Scheduler : public QObject
     void FillRecordListFromMaster(void);
 
     void UpdateRecStatus(RecordingInfo *pginfo);
-    void UpdateRecStatus(int cardid, const QString &chanid, 
-                         const QDateTime &startts, RecStatusType recstatus, 
+    void UpdateRecStatus(int cardid, const QString &chanid,
+                         const QDateTime &startts, RecStatusType recstatus,
                          const QDateTime &recendts);
 
     bool getAllPending(RecList *retList);
@@ -63,7 +62,7 @@ class Scheduler : public QObject
     void getConflicting(RecordingInfo *pginfo, QStringList &strlist);
     void getConflicting(RecordingInfo *pginfo, RecList *retlist);
 
-    void PrintList(bool onlyFutureRecordings = false) 
+    void PrintList(bool onlyFutureRecordings = false)
         { PrintList(reclist, onlyFutureRecordings); };
     void PrintList(RecList &list, bool onlyFutureRecordings = false);
     void PrintRec(const RecordingInfo *p, const char *prefix = NULL);
@@ -161,7 +160,7 @@ class Scheduler : public QObject
     bool schedulingEnabled;
     QMap<int, bool> schedAfterStartMap;
 
-    QMap<int, EncoderLink *> *m_tvList;   
+    QMap<int, EncoderLink *> *m_tvList;
     AutoExpire *expirer;
 
     QMap<QString, bool> recPendingList;
