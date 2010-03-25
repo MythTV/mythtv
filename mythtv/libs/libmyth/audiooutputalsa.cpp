@@ -858,7 +858,8 @@ QMap<QString, QString> GetALSAPCMDevices(void)
     QMap<QString, QString> alsadevs;
     void **hints, **n;
     char *name, *desc;
-    snd_device_name_hint(-1, "pcm", &hints);
+    if (snd_device_name_hint(-1, "pcm", &hints) < 0)
+        return alsadevs;
     n = hints;
 
     while (*n != NULL)
@@ -868,6 +869,7 @@ QMap<QString, QString> GetALSAPCMDevices(void)
           alsadevs.insert(name, desc);
           n++;
     }
+    snd_device_name_free_hint(hints);
 
     return alsadevs;
 }
