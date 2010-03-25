@@ -17,7 +17,7 @@
 //mythfrontend
 #include "viewschedulediff.h"
 
-ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable, 
+ViewScheduleDiff::ViewScheduleDiff(MythScreenStack *parent, QString altTable,
                                    int recordidDiff, QString title)
         : MythScreenType(parent, "ViewScheduleDiff")
 {
@@ -108,7 +108,7 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
 
     QString message = pi->title;
 
-    if (pi->subtitle != "")
+    if (!pi->subtitle.isEmpty())
         message += QString(" - \"%1\"").arg(pi->subtitle);
 
     message += "\n\n";
@@ -132,7 +132,7 @@ void ViewScheduleDiff::showStatus(MythUIButtonListItem *item)
                 message += QString("%1 - %2  %3")
                     .arg(pa->recstartts.toString(timeFormat))
                     .arg(pa->recendts.toString(timeFormat)).arg(pa->title);
-                if (pa->subtitle != "")
+                if (!pa->subtitle.isEmpty())
                     message += QString(" - \"%1\"").arg(pa->subtitle);
                 message += "\n";
             }
@@ -316,20 +316,20 @@ void ViewScheduleDiff::updateUIList(void)
         else
             state = "warning";
 
-        MythUIButtonListItem *item = new 
+        MythUIButtonListItem *item = new
                 MythUIButtonListItem(m_conflictList, "", qVariantFromValue(pginfo));
         InfoMap infoMap;
         pginfo->ToMap(infoMap);
         item->SetTextFromMap(infoMap, state);
 
-        if (s.before) 
+        if (s.before)
             item->SetText(s.before->RecStatusChar(), "statusbefore");
-        else 
+        else
             item->SetText("-", "statusbefore");
 
-        if (s.after) 
+        if (s.after)
             item->SetText(s.after->RecStatusChar(), "statusafter");
-        else 
+        else
             item->SetText("-", "statusafter");
     }
 
@@ -356,7 +356,7 @@ void ViewScheduleDiff::updateInfo(MythUIButtonListItem *item)
     }
 }
 
-ProgramInfo *ViewScheduleDiff::CurrentProgram() 
+ProgramInfo *ViewScheduleDiff::CurrentProgram()
 {
     int pos = m_conflictList->GetCurrentPos();
     if (pos >= (int)m_recList.size())
@@ -364,8 +364,8 @@ ProgramInfo *ViewScheduleDiff::CurrentProgram()
 
     ProgramStruct s = m_recList[pos];
 
-    if (s.after) 
+    if (s.after)
         return s.after;
-    else 
+    else
         return s.before;
 }

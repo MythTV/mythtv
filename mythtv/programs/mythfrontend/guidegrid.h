@@ -38,6 +38,7 @@ class JumpToChannel;
 class JumpToChannelListener
 {
   public:
+    virtual ~JumpToChannelListener() {}
     virtual void GoTo(int start, int cur_row) = 0;
     virtual void SetJumpToChannel(JumpToChannel *ptr) = 0;
     virtual int  FindChannel(uint chanid, const QString &channum,

@@ -435,7 +435,7 @@ bool GuideGrid::keyPressEvent(QKeyEvent *event)
                 if (i >= 0)
                 {
                     m_jumpToChannel = new JumpToChannel(this, event->text(),
-                                                        m_currentStartChannel, 
+                                                        m_currentStartChannel,
                                                         m_currentRow, m_channelCount);
                     updateJumpToChannel();
                 }
@@ -644,7 +644,7 @@ PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
 
 const PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel) const
 {
-    return ((GuideGrid*)this)->GetChannelInfo(chan_idx, sel);
+    return (this->GetChannelInfo(chan_idx, sel));
 }
 
 uint GuideGrid::GetChannelCount(void) const
@@ -995,7 +995,6 @@ void GuideGrid::fillTimeInfos()
     m_timeList->Reset();
 
     QDateTime t = m_currentStartTime;
-    int cnt = 0;
 
     m_firstTime = m_currentStartTime;
     m_lastTime = m_firstTime.addSecs(m_timeCount * 60 * 4);
@@ -1009,8 +1008,6 @@ void GuideGrid::fillTimeInfos()
             int hour = t.time().hour();
             QString timeStr = QTime(hour, mins).toString(m_timeFormat);
             new MythUIButtonListItem(m_timeList, timeStr);
-
-            cnt++;
         }
 
         t = t.addSecs(5 * 60);
@@ -1442,8 +1439,6 @@ void GuideGrid::infoTimeout(void)
 
 void GuideGrid::updateChannels(void)
 {
-    bool channelsChanged = false;
-
     m_channelList->Reset();
 
     PixmapChannel *chinfo = GetChannelInfo(m_currentStartChannel);
@@ -1485,7 +1480,6 @@ void GuideGrid::updateChannels(void)
                 unavailable = false;
                 m_channelInfoIdx[chanNumber] = alt;
                 chinfo = GetChannelInfo(chanNumber);
-                channelsChanged = true;
             }
 
             // Try alternates with different channum if applicable
@@ -1791,14 +1785,9 @@ void GuideGrid::cursorUp()
 
 void GuideGrid::scrollLeft()
 {
-    bool updatedate = false;
-
     QDateTime t = m_currentStartTime;
 
     t = m_currentStartTime.addSecs(-30 * 60);
-
-    if (t.date().day() != m_currentStartTime.date().day())
-        updatedate = true;
 
     m_currentStartTime = t;
 
@@ -1813,13 +1802,8 @@ void GuideGrid::scrollLeft()
 
 void GuideGrid::scrollRight()
 {
-    bool updatedate = false;
-
     QDateTime t = m_currentStartTime;
     t = m_currentStartTime.addSecs(30 * 60);
-
-    if (t.date().day() != m_currentStartTime.date().day())
-        updatedate = true;
 
     m_currentStartTime = t;
 
@@ -1968,7 +1952,7 @@ void GuideGrid::Close()
     // that this is the right solution
     if (GetMythMainWindow()->GetStack("popup stack")->TotalScreens() > 0)
         return;
-        
+
     if (m_updateTimer)
         m_updateTimer->stop();
 
@@ -2046,7 +2030,7 @@ void GuideGrid::deleteRule()
         delete record;
         return;
     }
-    
+
     QString message = tr("Delete '%1' %2 rule?").arg(record->m_title)
                                                 .arg(pginfo->RecTypeText());
 

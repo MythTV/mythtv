@@ -933,7 +933,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
 
     osdfade->setHelpText(
         tr("When unchecked the OSD will not fade away but instead "
-           "will disappear abruptly.") + "\n" +
+           "will disappear abruptly.") + '\n' +
         tr("Uncheck this if the video studders while the OSD is "
            "fading away."));
 
@@ -2239,7 +2239,7 @@ static HostComboBox *AllowQuitShutdown()
 static HostComboBox *OverrideExitMenu()
 {
     HostComboBox *gc = new HostComboBox("OverrideExitMenu");
-    gc->setLabel(QObject::tr("Customise exit menu options"));
+    gc->setLabel(QObject::tr("Customize exit menu options"));
     gc->addSelection(QObject::tr("Autodetect"), "0");
     gc->addSelection(QObject::tr("Show quit"), "1");
     gc->addSelection(QObject::tr("Show quit and shutdown"), "2");
@@ -3451,7 +3451,7 @@ class AudioSystemAdvancedSettings : public TriggeredConfigurationGroup
 static ConfigurationGroup *AudioSystemSettingsGroup()
 {
     ConfigurationGroup *vcg = new VerticalConfigurationGroup(false, true, false, false);
-    
+
     vcg->setLabel(QObject::tr("Audio System"));
     vcg->setUseLabel(false);
 
@@ -3494,12 +3494,12 @@ static ConfigurationGroup *AudioSystemSettingsGroup()
             new HorizontalConfigurationGroup(false, false, false, false);
 
     Setting *srcqualityoverride = SRCQualityOverride();
-    
+
     AudioSystemAdvancedSettings *sub3 =
         new AudioSystemAdvancedSettings(srcqualityoverride, SRCQuality());
     settings2->addChild(srcqualityoverride);
     settings2->addChild(sub3);
-    
+
     group2->addChild(settings2);
     group2->addChild(AggressiveBuffer());
 

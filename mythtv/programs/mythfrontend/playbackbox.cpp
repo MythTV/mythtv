@@ -483,7 +483,7 @@ bool PlaybackBox::Create()
 {
     if (m_type == kDeleteBox &&
             LoadWindowFromXML("recordings-ui.xml", "deleterecordings", this))
-        VERBOSE(VB_EXTRA, "Found a customised delete recording screen");
+        VERBOSE(VB_EXTRA, "Found a customized delete recording screen");
     else
         if (!LoadWindowFromXML("recordings-ui.xml", "watchrecordings", this))
             return false;
@@ -3163,11 +3163,9 @@ void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
 {
     ProgramInfo *tmpItem;
     QStringList::Iterator it;
-    int jobID;
 
     for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
-        jobID = 0;
         tmpItem = FindProgramInUILists(*it);
         if (tmpItem &&
             (!JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
@@ -3187,11 +3185,9 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
 {
     ProgramInfo *tmpItem;
     QStringList::Iterator it;
-    int jobID;
 
     for (it = m_playList.begin(); it != m_playList.end(); ++it)
     {
-        jobID = 0;
         tmpItem = FindProgramInUILists(*it);
         if (tmpItem &&
             (JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
@@ -3875,7 +3871,7 @@ void PlaybackBox::customEvent(QEvent *event)
                     m_recordingList->GetItemByData(qVariantFromValue(pginfo));
                 if (uiItem)
                     m_recordingList->RemoveItem(uiItem);
-            }            
+            }
             if (!list.empty())
                 m_helper.DeleteRecordings(list);
         }

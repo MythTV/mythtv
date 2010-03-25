@@ -91,9 +91,9 @@ namespace
 
         bool Create()
         {
-            QString msg = QObject::tr("DVD/Video contains a bookmark"); 
-            QString btn0msg = QObject::tr("Play from bookmark"); 
-            QString btn1msg = QObject::tr("Play from beginning"); 
+            QString msg = QObject::tr("DVD/Video contains a bookmark");
+            QString btn0msg = QObject::tr("Play from bookmark");
+            QString btn1msg = QObject::tr("Play from beginning");
 
             MythDialogBox *popup = new MythDialogBox(msg, GetScreenStack(), "bookmarkdialog");
             if (!popup->Create())
@@ -120,7 +120,7 @@ namespace
                 if (dce->GetId() == "bookmarkdialog")
                 {
                     if (buttonnum == 1)
-                        pgi->setIgnoreBookmark(true); 
+                        pgi->setIgnoreBookmark(true);
                     else if (buttonnum != 0)
                     {
                         delete pgi;
@@ -612,7 +612,7 @@ void TVMenuCallback(void *data, QString &selection)
     {
         ChannelGroupEditor editor;
         editor.exec();
-    } 
+    }
     else if (sel == "settings generalrecpriorities")
     {
         GeneralRecPrioritiesSettings settings;
@@ -735,8 +735,8 @@ int internal_play_media(const QString &mrl, const QString &plot,
     {
         QString errorText = QObject::tr("Failed to open \n '%1' in %2 \n"
                                         "Check if the video exists")
-                                        .arg(mrl.section("/", -1))
-                                        .arg(mrl.section("/", 0, -2));
+                                        .arg(mrl.section('/', -1))
+                                        .arg(mrl.section('/', 0, -2));
         ShowOkPopup(errorText);
         return res;
     }
@@ -794,11 +794,11 @@ int internal_play_media(const QString &mrl, const QString &plot,
         {
             RingBuffer *tmprbuf = new RingBuffer(pginfo->pathname, false);
 
-            if (!tmprbuf) 
-            { 
-                delete pginfo; 
-                return res;               
-            } 
+            if (!tmprbuf)
+            {
+                delete pginfo;
+                return res;
+            }
             QString name;
             QString serialid;
             if (tmprbuf->isDVD() &&
@@ -815,10 +815,10 @@ int internal_play_media(const QString &mrl, const QString &plot,
         }
     }
     else if (pginfo->isVideo)
-        pos = pginfo->GetBookmark(); 
- 
-    if (pos > 0) 
-    { 
+        pos = pginfo->GetBookmark();
+
+    if (pos > 0)
+    {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
         BookmarkDialog *bookmarkdialog = new BookmarkDialog(pginfo, mainStack);
         if (!bookmarkdialog->Create())
@@ -1110,10 +1110,10 @@ int log_rotate(int report_error)
     }
 
 #ifdef WINDOWS_CLOSE_CONSOLE
-    // pure Win32 GUI app does not have standard IO streams 
-    // simply assign the file descriptors to the logfile 
-    *stdout = *(_fdopen(new_logfd, "w")); 
-    *stderr = *stdout; 
+    // pure Win32 GUI app does not have standard IO streams
+    // simply assign the file descriptors to the logfile
+    *stdout = *(_fdopen(new_logfd, "w"));
+    *stderr = *stdout;
     setvbuf(stdout, NULL, _IOLBF, 256);
 #else
     while (dup2(new_logfd, 1) < 0 && errno == EINTR);
@@ -1217,7 +1217,7 @@ int main(int argc, char **argv)
             if (a.argc()-1 > argpos)
             {
                 logfile = a.argv()[argpos+1];
-                if (logfile.startsWith("-"))
+                if (logfile.startsWith('-'))
                 {
                     cerr << "Invalid or missing argument"
                             " to -l/--logfile option\n";
@@ -1331,7 +1331,7 @@ int main(int argc, char **argv)
             }
         }
         else if ((argpos + 1 == a.argc()) &&
-                 (!QString(a.argv()[argpos]).startsWith("-")))
+                 (!QString(a.argv()[argpos]).startsWith('-')))
         {
             pluginname = a.argv()[argpos];
         }
@@ -1514,8 +1514,7 @@ int main(int argc, char **argv)
 
     int ret = qApp->exec();
 
-    if (sysEventHandler)
-        delete sysEventHandler;
+    delete sysEventHandler;
 
     pmanager->DestroyAllPlugins();
 

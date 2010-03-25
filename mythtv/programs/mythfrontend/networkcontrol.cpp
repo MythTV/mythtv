@@ -217,7 +217,7 @@ NetworkControl::NetworkControl() :
     pthread_create(&command_thread, NULL, CommandThread, this);
 
     gContext->addListener(this);
-    
+
     connect(this, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
 
@@ -308,7 +308,7 @@ void NetworkControl::processNetworkControlCommand(NetworkCommand *nc)
     else if (is_abbrev("help", nc->getArg(0)))
         result = processHelp(nc);
     else if ((nc->getArg(0).toLower() == "exit") || (nc->getArg(0).toLower() == "quit"))
-        QCoreApplication::postEvent(this, 
+        QCoreApplication::postEvent(this,
                                 new NetworkControlCloseEvent(nc->getClient()));
     else if (! nc->getArg(0).isEmpty())
         result = QString("INVALID command '%1', try 'help' for more info")
@@ -409,7 +409,6 @@ void NetworkControlClient::readClient(void)
         return;
 
     QString lineIn;
-    QStringList tokens;
     while (socket->canReadLine())
     {
         lineIn = socket->readLine();
@@ -420,8 +419,6 @@ void NetworkControlClient::readClient(void)
         if (lineIn.isEmpty())
             continue;
 
-        tokens = lineIn.simplified().split(" ");
-        
         VERBOSE(VB_NETWORK, LOC +
             QString("emit commandReceived(%1)").arg(lineIn));
         emit commandReceived(lineIn);
@@ -432,10 +429,10 @@ void NetworkControl::receiveCommand(QString &command)
 {
     VERBOSE(VB_NETWORK, LOC +
             QString("NetworkControl::receiveCommand(%1)").arg(command));
-    NetworkControlClient *ncc = (NetworkControlClient *)sender();
+    NetworkControlClient *ncc = static_cast<NetworkControlClient *>(sender());
     if (!ncc)
          return;
- 
+
     ncLock.lock();
     networkControlCommands.push_back(new NetworkCommand(ncc,command));
     ncCond.wakeOne();
@@ -1144,7 +1141,7 @@ void NetworkControl::customEvent(QEvent *e)
     }
     else if (e->type() == NetworkControlCloseEvent::kEventType)
     {
-        NetworkControlCloseEvent *ncce = (NetworkControlCloseEvent*)e;
+        NetworkControlCloseEvent *ncce = static_cast<NetworkControlCloseEvent*>(e);
         NetworkControlClient     *ncc  = ncce->getClient();
 
         deleteClient(ncc);
