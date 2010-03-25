@@ -4908,7 +4908,7 @@ PlaybackSock *MainServer::getSlaveByHostname(QString &hostname)
     sockListLock.lockForRead();
 
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
-    for (; iter != playbackList.end(); iter++)
+    for (; iter != playbackList.end(); ++iter)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->isSlaveBackend() &&
