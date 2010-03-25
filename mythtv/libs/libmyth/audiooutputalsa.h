@@ -5,6 +5,8 @@
 #define ALSA_PCM_NEW_SW_PARAMS_API
 #include <alsa/asoundlib.h>
 
+#include <QMap>
+
 #include "audiooutputbase.h"
 
 using namespace std;
@@ -93,6 +95,8 @@ class AudioOutputALSA : public AudioOutputBase
     snd_pcm_sframes_t (*pcm_write_func)(snd_pcm_t*, const void*, 
                                         snd_pcm_uframes_t);
 };
+
+QMap<QString, QString> GetALSAPCMDevices(void);
 
 #endif
 

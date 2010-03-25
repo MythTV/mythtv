@@ -11,6 +11,20 @@
 
 class QFileInfo;
 
+class AudioOutputDevice : public HostComboBox
+{
+    Q_OBJECT
+
+  public:
+    AudioOutputDevice();
+
+  private slots:
+    void AudioDescriptionHelp(void);
+
+  private:
+    QMap<QString, QString> audiodevs;
+};
+
 class ThemeSelector : public HostImageSelect
 {
   public:

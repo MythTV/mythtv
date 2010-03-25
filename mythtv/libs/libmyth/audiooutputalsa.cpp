@@ -852,3 +852,24 @@ ALSAVolumeInfo AudioOutputALSA::GetVolumeRange(snd_mixer_elem_t *elem) const
 
     return vinfo;
 }
+
+QMap<QString, QString> GetALSAPCMDevices(void)
+{
+    QMap<QString, QString> alsadevs;
+    void **hints, **n;
+    char *name, *desc;
+    snd_device_name_hint(-1, "pcm", &hints);
+    n = hints;
+
+    while (*n != NULL)
+    {
+          name = snd_device_name_get_hint(*n, "NAME");
+          desc = snd_device_name_get_hint(*n, "DESC");
+          alsadevs.insert(name, desc);
+    VERBOSE(VB_IMPORTANT, QString("Name: %1, Desc: %2")
+            .arg(name).arg(desc));
+          n++;
+    }
+
+    return alsadevs;
+}

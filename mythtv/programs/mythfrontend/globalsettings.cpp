@@ -7,6 +7,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef USING_ALSA
+#include <audiooutputalsa.h>
+#endif
+
 // Qt headers
 #include <QCoreApplication>
 #include <QEvent>
@@ -38,54 +42,65 @@
 #include "mythdirs.h"
 #include "mythuihelper.h"
 
-static HostComboBox *AudioOutputDevice()
+AudioOutputDevice::AudioOutputDevice() : HostComboBox("AudioOutputDevice", true)
 {
-    HostComboBox *gc = new HostComboBox("AudioOutputDevice", true);
-    gc->setLabel(QObject::tr("Audio output device"));
+    setLabel(QObject::tr("Audio output device"));
 
 #ifdef USING_ALSA
-    gc->addSelection("ALSA:default",       "ALSA:default");
-    gc->addSelection("ALSA:spdif",         "ALSA:spdif");
-    gc->addSelection("ALSA:surround51",    "ALSA:surround51");
-    gc->addSelection("ALSA:analog",        "ALSA:analog");
-    gc->addSelection("ALSA:digital",       "ALSA:digital");
-    gc->addSelection("ALSA:mixed-analog",  "ALSA:mixed-analog");
-    gc->addSelection("ALSA:mixed-digital", "ALSA:mixed-digital");
-    gc->addSelection("ALSA:hdmi",          "ALSA:hdmi");
-    gc->addSelection("ALSA:plughw:0,3",    "ALSA:plughw:0,3");
+    QMap<QString, QString> alsadevs = GetALSAPCMDevices();
+
+    if (!alsadevs.empty())
+    {
+        for (QMap<QString, QString>::const_iterator i = alsadevs.begin();
+             i != alsadevs.end(); ++i)
+        {
+            QString key = i.key();
+            QString value = i.value();
+            audiodevs.insert(QString("ALSA:%1").arg(key), value);
+            QString devname = QString("ALSA:%1").arg(key);
+            addSelection(devname, devname);
+        }
+    }
 #endif
 #ifdef USING_PULSEOUTPUT
-    gc->addSelection("PulseAudio:default", "PulseAudio:default");
+    addSelection("PulseAudio:default", "PulseAudio:default");
 #endif
 #ifdef USING_OSS
     QDir dev("/dev", "dsp*", QDir::Name, QDir::System);
-    gc->fillSelectionsFromDir(dev);
+    fillSelectionsFromDir(dev);
     dev.setNameFilters(QStringList("adsp*"));
-    gc->fillSelectionsFromDir(dev);
+    fillSelectionsFromDir(dev);
 
     dev.setPath("/dev/sound");
     if (dev.exists())
     {
         dev.setNameFilters(QStringList("dsp*"));
-        gc->fillSelectionsFromDir(dev);
+        fillSelectionsFromDir(dev);
         dev.setNameFilters(QStringList("adsp*"));
-        gc->fillSelectionsFromDir(dev);
+        fillSelectionsFromDir(dev);
     }
 #endif
 #ifdef USING_JACK
-    gc->addSelection("JACK:output", "JACK:output");
+    addSelection("JACK:output", "JACK:output");
 #endif
 #ifdef USING_COREAUDIO
-    gc->addSelection("CoreAudio:", "CoreAudio:");
+    addSelection("CoreAudio:", "CoreAudio:");
 #endif
 #ifdef USING_MINGW
-    gc->addSelection("Windows:");
-    gc->addSelection("DirectX:Primary Sound Driver");
+    addSelection("Windows:");
+    addSelection("DirectX:Primary Sound Driver");
 #endif
 
-    gc->addSelection("NULL", "NULL");
+    connect(this, SIGNAL(valueChanged(const QString&)), this,
+            SLOT(AudioDescriptionHelp()));
 
-    return gc;
+    addSelection("NULL", "NULL");
+}
+
+void AudioOutputDevice::AudioDescriptionHelp(void)
+{
+    QString desc = audiodevs.value(getValue());
+    setHelpText(desc);
 }
 
 static HostComboBox *MaxAudioChannels()
@@ -3440,7 +3455,7 @@ static ConfigurationGroup *AudioSystemSettingsGroup()
     vcg->setLabel(QObject::tr("Audio System"));
     vcg->setUseLabel(false);
 
-    vcg->addChild(AudioOutputDevice());
+    vcg->addChild(new AudioOutputDevice());
 
     Setting *numchannels = MaxAudioChannels();
     vcg->addChild(numchannels);
