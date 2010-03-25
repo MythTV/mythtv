@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: mediaserver.cpp
-//                                                                            
+//
 // Purpose - uPnp Media Server main Class
-//                                                                            
+//
 // Created By  : David Blain                    Created On : Jan. 15, 2007
-// Modified By :                                Modified On:                  
-//                                                                            
+// Modified By :                                Modified On:
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #include "mediaserver.h"
@@ -28,7 +28,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
-MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ ) 
+MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
 {
     VERBOSE(VB_UPNP, QString("MediaServer::Begin"));
 
@@ -54,7 +54,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     }
 
 
-    m_pHttpServer = new HttpServer(); 
+    m_pHttpServer = new HttpServer();
 
     if (!m_pHttpServer->listen(QHostAddress::Any, nPort))
     {
@@ -120,7 +120,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     // BackendServerIP is only one IP address at this time... Doing Split anyway
     // ----------------------------------------------------------------------
 
-    QStringList sIPAddrList = sIP.split(";", QString::SkipEmptyParts);
+    QStringList sIPAddrList = sIP.split(';', QString::SkipEmptyParts);
 
     // ----------------------------------------------------------------------
     // Initialize UPnp Stack
@@ -130,7 +130,7 @@ MediaServer::MediaServer( bool bIsMaster, bool bDisableUPnp /* = FALSE */ )
     {
 
         // ------------------------------------------------------------------
-        // Register any HttpServerExtensions... Only The Master Backend 
+        // Register any HttpServerExtensions... Only The Master Backend
         // ------------------------------------------------------------------
 
         if (bIsMaster)
@@ -202,8 +202,7 @@ MediaServer::~MediaServer()
 
 //    gContext->removeListener(this);
 
-    if (m_pHttpServer)
-        delete m_pHttpServer;
+    delete m_pHttpServer;
 }
 
 //////////////////////////////////////////////////////////////////////////////

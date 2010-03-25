@@ -26,7 +26,7 @@ typedef enum {
 class PlaybackSock
 {
   public:
-    PlaybackSock(MainServer *parent, MythSocket *lsock, 
+    PlaybackSock(MainServer *parent, MythSocket *lsock,
                  QString lhostname, PlaybackSockEventsMode eventsMode);
     virtual ~PlaybackSock();
 
@@ -34,33 +34,33 @@ class PlaybackSock
     bool DownRef(void);
 
     void SetDisconnected(void) { disconnected = true; }
-    bool IsDisconnected(void) { return disconnected; }
+    bool IsDisconnected(void) const { return disconnected; }
 
-    MythSocket *getSocket(void) { return sock; }
-    QString getHostname(void) { return hostname; }
+    MythSocket *getSocket(void) const { return sock; }
+    QString getHostname(void) const { return hostname; }
 
-    bool isLocal(void) { return local; }
-    bool wantsEvents(void);
-    bool wantsNonSystemEvents(void);
-    bool wantsSystemEvents(void);
-    bool wantsOnlySystemEvents(void);
-    PlaybackSockEventsMode eventsMode(void);
+    bool isLocal(void) const { return local; }
+    bool wantsEvents(void) const;
+    bool wantsNonSystemEvents(void) const;
+    bool wantsSystemEvents(void) const;
+    bool wantsOnlySystemEvents(void) const;
+    PlaybackSockEventsMode eventsMode(void) const;
 
-    bool getBlockShutdown(void) { return blockshutdown; }
+    bool getBlockShutdown(void) const { return blockshutdown; }
     void setBlockShutdown(bool value) { blockshutdown = value; }
 
     // all backend<->backend stuff below here
-    bool isSlaveBackend(void) { return backend; }
+    bool isSlaveBackend(void) const { return backend; }
     void setAsSlaveBackend(void) { backend = true; }
 
-    bool isExpectingReply(void) { return expectingreply; }
+    bool isExpectingReply(void) const { return expectingreply; }
 
     void setIP(QString &lip) { ip = lip; }
-    QString getIP(void) { return ip; }
+    QString getIP(void) const { return ip; }
 
     bool GoToSleep(void);
     void GetDiskSpace(QStringList &o_strlist);
-    int DeleteFile(const QString filename, const QString sgroup);
+    int DeleteFile(const QString &filename, const QString &sgroup);
     int StopRecording(const ProgramInfo *pginfo);
     int CheckRecordingActive(const ProgramInfo *pginfo);
     int DeleteRecording(const ProgramInfo *pginfo, bool forceMetadataDelete = false);
@@ -86,7 +86,7 @@ class PlaybackSock
     long long GetMaxBitrate(int capturecardnum);
     ProgramInfo *GetRecording(int capturecardnum);
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
-    RecStatusType StartRecording(int capturecardnum, 
+    RecStatusType StartRecording(int capturecardnum,
                                  const ProgramInfo *pginfo);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo,
                        int secsleft, bool hasLater);

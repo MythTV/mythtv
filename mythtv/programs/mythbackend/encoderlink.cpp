@@ -37,7 +37,7 @@ using namespace std;
 /** \fn EncoderLink::EncoderLink(int, PlaybackSock*, QString)
  *  \brief This is the EncoderLink constructor for non-local recorders.
  */
-EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock, 
+EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
                          QString lhostname)
     : m_capturecardnum(capturecardnum), sock(lsock), hostname(lhostname),
       freeDiskSpaceKB(-1), tv(NULL), local(false), locked(false),
@@ -58,7 +58,7 @@ EncoderLink::EncoderLink(int capturecardnum, PlaybackSock *lsock,
  *  \brief This is the EncoderLink constructor for local recorders.
  */
 EncoderLink::EncoderLink(int capturecardnum, TVRec *ltv)
-    : m_capturecardnum(capturecardnum), sock(NULL), hostname(QString::null),
+    : m_capturecardnum(capturecardnum), sock(NULL),
       freeDiskSpaceKB(-1), tv(ltv), local(true), locked(false),
       sleepStatus(sStatus_Undefined), chanid("")
 {
@@ -122,7 +122,7 @@ void EncoderLink::SetSleepStatus(SleepStatus newStatus)
 }
 
 /** \fn EncoderLink::IsBusy(TunedInputInfo*,int)
- *  \brief  Returns true if the recorder is busy, or will be within the 
+ *  \brief  Returns true if the recorder is busy, or will be within the
  *          next time_buffer seconds.
  *  \sa IsBusyRecording(void), TVRec::IsBusy(TunedInputInfo*)
  */
@@ -219,7 +219,7 @@ bool EncoderLink::IsRecording(const ProgramInfo *rec)
 
 /** \fn EncoderLink::MatchesRecording(const ProgramInfo *rec)
  *  \brief Returns true if rec is actually being recorded by TVRec.
- *  
+ *
  *   This waits for TVRec to enter a state other than kState_ChangingState
  *   Then it checks TVRec::GetRecording() against rec.
  *  \param rec Recording to check against TVRec::GetRecording().
@@ -240,7 +240,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
 
         if (tvrec)
         {
-            if (tvrec->chanid == rec->chanid && 
+            if (tvrec->chanid == rec->chanid &&
                 tvrec->recstartts == rec->recstartts)
             {
                 retval = true;
@@ -317,7 +317,7 @@ void EncoderLink::GetDiskSpace(QStringList &o_strlist)
 
 /** \fn EncoderLink::GetMaxBitrate()
  *  \brief Returns maximum bits per second this recorder might output.
- * 
+ *
  *  \sa TVRec::GetFreeSpace(long long), RemoteEncoder::GetFreeSpace(long long)
  *   May be a local or remote query.
  */
@@ -376,7 +376,7 @@ int EncoderLink::LockTuner()
     if (locked)
         return -2;
 
-    locked = true;  
+    locked = true;
     return m_capturecardnum;
 }
 
@@ -561,7 +561,7 @@ bool EncoderLink::GetKeyframePositions(
 
 /** \fn EncoderLink::FrontendReady()
  *  \brief Tells TVRec that the frontend is ready for data.
- *         <b>This only works on local recorders.</b> 
+ *         <b>This only works on local recorders.</b>
  *  \sa TVRec::, RemoteEncoder::
  */
 void EncoderLink::FrontendReady(void)
@@ -700,7 +700,7 @@ QString EncoderLink::GetInput(void) const
         return tv->GetInput();
 
     VERBOSE(VB_IMPORTANT, "Should be local only query: GetInput");
-    return QString::null;
+    return QString();
 }
 
 /** \fn EncoderLink::SetInput(QString)
@@ -719,7 +719,7 @@ QString EncoderLink::SetInput(QString input)
         return tv->SetInput(input);
 
     VERBOSE(VB_IMPORTANT, "Should be local only query: SetInput");
-    return QString::null;
+    return QString();
 }
 
 /**
@@ -813,7 +813,7 @@ int EncoderLink::ChangePictureAttribute(PictureAdjustType type,
  *  \param name Channel to verify against current tuner.
  *  \return true if it succeeds, false otherwise.
  *  \sa TVRec::CheckChannel(QString),
- *      RemoteEncoder::CheckChannel(QString), 
+ *      RemoteEncoder::CheckChannel(QString),
  *      ShouldSwitchToAnotherCard(const QString&)
  */
 bool EncoderLink::CheckChannel(const QString &name)
@@ -876,9 +876,9 @@ bool EncoderLink::CheckChannelPrefix(
  *         <b>This only works on local recorders.</b>
  */
 void EncoderLink::GetNextProgram(int direction,
-                                 QString &title,       QString &subtitle, 
-                                 QString &desc,        QString &category, 
-                                 QString &starttime,   QString &endtime, 
+                                 QString &title,       QString &subtitle,
+                                 QString &desc,        QString &category,
+                                 QString &starttime,   QString &endtime,
                                  QString &callsign,    QString &iconpath,
                                  QString &channelname, QString &chanid,
                                  QString &seriesid,    QString &programid)

@@ -208,7 +208,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
     maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     vector<FileSystemInfo>::iterator it1, it2;
     int bSize = 32;
-    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
+    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
         if (it1->fsID == -1)
         {
@@ -217,8 +217,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
                 it1->hostname.section(".", 0, 0) + ":" + it1->directory;
         }
 
-        it2 = it1;
-        for (it2++; it2 != fsInfos.end(); it2++)
+        for (it2 = it1 + 1; it2 != fsInfos.end(); ++it2)
         {
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
@@ -241,7 +240,7 @@ void BackendQueryDiskSpace(QStringList &strlist,
     // Passed the cleaned list back
     totalKB = 0;
     usedKB  = 0;
-    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
+    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
         strlist << it1->hostname;
         strlist << it1->directory;
@@ -301,7 +300,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
     maxWriteFiveSec = max((size_t)2048, maxWriteFiveSec); // safety for NFS mounted dirs
     vector<FileSystemInfo>::iterator it1, it2;
     int bSize = 32;
-    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
+    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
     {
         if (it1->fsID == -1)
             it1->fsID = GetfsID(it1);
@@ -314,8 +313,8 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
                     .arg(it1->hostname).arg(it1->directory)
                     .arg(it1->fsID).arg(it1->dirID)
                     .arg(it1->usedSpaceKB).arg(it1->totalSpaceKB));
-        it2 = it1;
-        for (it2++; it2 != fsInfos.end(); it2++)
+
+        for (it2 = it1 + 1; it2 != fsInfos.end(); ++it2)
         {
             // our fuzzy comparison uses the maximum of the two block sizes
             // or 32, whichever is greater
@@ -325,7 +324,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
                         .arg(it2->hostname).arg(it2->directory).arg(it2->dirID)
                         .arg(it2->usedSpaceKB).arg(it2->totalSpaceKB));
             VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
-                QString("        Total KB Diff: %1 (want <= %2)") 
+                QString("        Total KB Diff: %1 (want <= %2)")
                 .arg((long)absLongLong(it1->totalSpaceKB - it2->totalSpaceKB))
                 .arg(bSize));
             VERBOSE(VB_SCHEDULE+VB_FILE+VB_EXTRA,
@@ -351,7 +350,7 @@ void GetFilesystemInfos(QMap<int, EncoderLink*> *tvList,
     if (VERBOSE_LEVEL_CHECK(VB_FILE|VB_SCHEDULE))
     {
         cout << "--- GetFilesystemInfos directory list start ---" << endl;
-        for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
+        for (it1 = fsInfos.begin(); it1 != fsInfos.end(); ++it1)
         {
             QString msg = QString("Dir: %1:%2")
                 .arg(it1->hostname).arg(it1->directory);

@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: upnpcdsmusic.cpp
-//                                                                            
-// Purpose - uPnp Content Directory Extension for Music  
-//                                                                            
+//
+// Purpose - uPnp Content Directory Extension for Music
+//
 // Created By  : David Blain                    Created On : Jan. 24, 2005
-// Modified By :                                Modified On:                  
-//                                                                            
+// Modified By :                                Modified On:
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #include <climits>
@@ -28,9 +28,9 @@
         - <Album 1>                 Music/artist/artistKey=Pink Floyd/album/albumKey=The Wall
           + <Track 1>               Music/artist/artistKey=Pink Floyd/album/albumKey=The Wall/item?Id=1
           + <Track 2>
-    - By Album                     
-      - <Album 1>                  
-        + <Track 1>              
+    - By Album
+      - <Album 1>
+        + <Track 1>
         + <Track 2>
     - By Recently Added
       + <Track 1>
@@ -43,7 +43,7 @@
             + <Track 2>
 */
 
-UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] = 
+UPnpCDSRootInfo UPnpCDSMusic::g_RootNodes[] =
 {
     {   "All Music",
         "*",
@@ -113,9 +113,9 @@ int UPnpCDSMusic::g_nRootCount = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo
 /////////////////////////////////////////////////////////////////////////////
 
 UPnpCDSRootInfo *UPnpCDSMusic::GetRootInfo( int nIdx )
-{ 
+{
     if ((nIdx >=0 ) && ( nIdx < g_nRootCount ))
-        return &(g_RootNodes[ nIdx ]); 
+        return &(g_RootNodes[ nIdx ]);
 
     return NULL;
 }
@@ -191,7 +191,7 @@ bool UPnpCDSMusic::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     VERBOSE( VB_UPNP, "UPnpCDSMusic::IsBrowseRequestForUs - Not sure... Calling base class." );
@@ -222,7 +222,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if (pRequest->m_sContainerID == "4") 
+    if (pRequest->m_sContainerID == "4")
     {
         pRequest->m_sObjectId       = "Music";
         pRequest->m_sSearchCriteria = "object.item.audioItem.musicTrack";
@@ -233,7 +233,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     VERBOSE( VB_UPNP, "UPnpCDSMusic::IsSearchRequestForUs... Don't know, calling base class." );
@@ -247,7 +247,7 @@ bool UPnpCDSMusic::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
 void UPnpCDSMusic::AddItem( const QString           &sObjectId,
                             UPnpCDSExtensionResults *pResults,
-                            bool                     bAddRef, 
+                            bool                     bAddRef,
                             MSqlQuery               &query )
 {
     QString        sName;
@@ -296,7 +296,7 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
     // ----------------------------------------------------------------------
 
     QString sURIBase   = QString( "http://%1:%2/Myth/" )
-                            .arg( sServerIp ) 
+                            .arg( sServerIp )
                             .arg( sPort     );
 
     QString sURIParams = QString( "?Id=%1" )
@@ -307,8 +307,8 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
                             .arg( sObjectId )
                             .arg( sURIParams );
 
-    CDSObject *pItem   = CDSObject::CreateMusicTrack( sId, 
-                                                      sName, 
+    CDSObject *pItem   = CDSObject::CreateMusicTrack( sId,
+                                                      sName,
                                                       sObjectId );
     pItem->m_bRestricted  = true;
     pItem->m_bSearchable  = true;
@@ -352,13 +352,13 @@ void UPnpCDSMusic::AddItem( const QString           &sObjectId,
     // ----------------------------------------------------------------------
     // Add Music Resource Element based on File extension (HTTP)
     // ----------------------------------------------------------------------
-    
+
     QFileInfo fInfo( sFileName );
 
     QString sMimeType = HTTPRequest::GetMimeType( fInfo.suffix() );
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetMusic%2").arg( sURIBase   )
-                                                .arg( sURIParams ); 
+                                                .arg( sURIParams );
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 

@@ -22,7 +22,7 @@
 UPnpMedia::UPnpMedia(bool runthread, bool ismaster)
 {
 
-    if (gContext->GetNumSetting("UPnP/RebuildDelay",30) > 0) 
+    if (gContext->GetNumSetting("UPnP/RebuildDelay",30) > 0)
     {
         VERBOSE(VB_GENERAL,"Enabling Upnpmedia rebuild thread.");
         if ((runthread) && (ismaster))
@@ -48,7 +48,7 @@ void UPnpMedia::RunRebuildLoop(void)
 
     irebuildDelay = gContext->GetNumSetting("UPnP/RebuildDelay",30) * 60;
 
-    if (irebuildDelay < 60) 
+    if (irebuildDelay < 60)
         irebuildDelay = 60;
 
     while (1)
@@ -62,7 +62,7 @@ void UPnpMedia::RunRebuildLoop(void)
 
 void *UPnpMedia::doUPnpMediaThread(void *param)
 {
-    UPnpMedia *upnpmedia = (UPnpMedia*)param;
+    UPnpMedia *upnpmedia = static_cast<UPnpMedia*>(param);
     upnpmedia->RunRebuildLoop();
 
     return NULL;
@@ -123,7 +123,7 @@ int UPnpMedia::buildFileList(QString directory, int rootID, int itemID, MSqlQuer
     //VERBOSE(VB_UPNP, QString("buildFileList = %1, rootID = %2, itemID =
     //%3").arg(directory).arg(rootID).arg(itemID));
 
-    if (rootID > 0) 
+    if (rootID > 0)
         parentid = rootID;
     else
         parentid = itemID;
@@ -222,19 +222,14 @@ void UPnpMedia::BuildMediaMap(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString RootVidDir;
-    int filecount;
-    int nextID;
-
     // For now this class only does the video stuff, but eventually other media too
     sMediaType = "VIDEO";
 
     if (sMediaType == "VIDEO")
     {
+        QString RootVidDir = gContext->GetSetting("VideoStartupDir");
 
-        RootVidDir = gContext->GetSetting("VideoStartupDir");
-
-        if ((!RootVidDir.isNull()) && (RootVidDir != ""))  
+        if (!RootVidDir.isEmpty())
         {
 
             FillMetaMaps();
@@ -254,14 +249,14 @@ void UPnpMedia::BuildMediaMap(void)
             VERBOSE(VB_UPNP, LOC + QString("VideoStartupDir = %1")
                                             .arg(RootVidDir));
 
-            QStringList parts = RootVidDir.split( ":", QString::SkipEmptyParts);
+            QStringList parts = RootVidDir.split(':', QString::SkipEmptyParts);
 
-            nextID = STARTING_VIDEO_OBJECTID;
+            int nextID = STARTING_VIDEO_OBJECTID;
 
             for ( QStringList::Iterator it = parts.begin(); it != parts.end();
                                                                         ++it )
             {
-                filecount = nextID;
+                int filecount = nextID;
 
                 VERBOSE(VB_GENERAL, LOC + QString("BuildMediaMap %1 scan "
                                                 "starting in :%2:")
@@ -271,11 +266,13 @@ void UPnpMedia::BuildMediaMap(void)
                 nextID = buildFileList(*it,STARTING_VIDEO_OBJECTID, nextID,
                                                                         query);
 
-		if (!gContext->GetSetting("UPnP/RecordingsUnderVideos").isEmpty()) {
-			VERBOSE(VB_ALL, "ARMAGEDDON!");
-		 //   nextID = buildRecordingList(*it,STARTING_VIDEO_OBJECTID,
-		//		                                        nextID,query);
-	        }
+                if (!gContext->GetSetting("UPnP/RecordingsUnderVideos").isEmpty())
+                {
+                    VERBOSE(VB_ALL, "uPnP Unspecified error line 275, "
+                                    "upnpmedia.cpp");
+                    //   nextID = buildRecordingList(*it,STARTING_VIDEO_OBJECTID,
+                    //                                        nextID,query);
+                }
 
                 filecount = (filecount - nextID) * -1;
 

@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: mediaserver.h
-//                                                                            
+//
 // Purpose - uPnp Media Server main Class
-//                                                                            
+//
 // Created By  : David Blain                    Created On : Jan. 15, 2007
-// Modified By :                                Modified On:                  
-//                                                                            
+// Modified By :                                Modified On:
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef __MEDIASERVER_H__
@@ -31,15 +31,15 @@ class MediaServer : public UPnp
 {
 
     protected:
-        
-        UPnpCDS         *m_pUPnpCDS;      // Do not delete (auto deleted)
-        UPnpCMGR        *m_pUPnpCMGR;     // Do not delete (auto deleted)
-        UPnpMedia	*upnpMedia;
+
+        UPnpCDS         *m_pUPnpCDS;     // Do not delete (auto deleted)
+        UPnpCMGR        *m_pUPnpCMGR;    // Do not delete (auto deleted)
+        UPnpMedia       *upnpMedia;
 
         QString          m_sSharePath;
 
     public:
-                 MediaServer( bool bMaster, bool bDisableUPnp = FALSE );
+        explicit MediaServer( bool bMaster, bool bDisableUPnp = false );
 
         virtual ~MediaServer();
 

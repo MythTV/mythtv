@@ -31,13 +31,13 @@ class EncoderLink
     /// \brief Used to set the asleep status of an encoder
     void SetSleepStatus(SleepStatus newStatus);
     /// \brief Get the last time the sleep status was changed
-    QDateTime GetSleepStatusTime(void) { return sleepStatusTime; }
+    QDateTime GetSleepStatusTime(void) const { return sleepStatusTime; }
     /// \brief Get the last time the encoder was put to sleep
-    QDateTime GetLastSleepTime(void) { return lastSleepTime; }
+    QDateTime GetLastSleepTime(void) const { return lastSleepTime; }
     /// \brief Used to set the last wake time of an encoder
     void SetLastWakeTime(QDateTime newTime) { lastWakeTime = newTime; }
     /// \brief Get the last time the encoder was awakened
-    QDateTime GetLastWakeTime(void) { return lastWakeTime; }
+    QDateTime GetLastWakeTime(void) const { return lastWakeTime; }
 
     /// \brief Returns the remote host for a non-local EncoderLink.
     QString GetHostName(void) const { return hostname; }

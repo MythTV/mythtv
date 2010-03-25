@@ -130,7 +130,7 @@ void AutoExpire::CalcParams()
     vector<FileSystemInfo> fsInfos;
     GetFilesystemInfos(encoderList, fsInfos);
 
-    if (fsInfos.size() == 0)
+    if (fsInfos.empty())
     {
         QString msg = "ERROR: Filesystem Info cache is empty, unable to "
                       "calculate necessary parameters.";
@@ -160,7 +160,7 @@ void AutoExpire::CalcParams()
     instance_lock.unlock();
 
     vector<FileSystemInfo>::iterator fsit;
-    for (fsit = fsInfos.begin(); fsit != fsInfos.end(); fsit++)
+    for (fsit = fsInfos.begin(); fsit != fsInfos.end(); ++fsit)
     {
         if (fsMap.contains(fsit->fsID))
             continue;
@@ -368,7 +368,7 @@ void AutoExpire::ExpireRecordings(void)
 
     GetFilesystemInfos(encoderList, fsInfos);
 
-    if (fsInfos.size() == 0)
+    if (fsInfos.empty())
     {
         QString msg = "ERROR: Filesystem Info cache is empty, unable to "
                       "determine what Recordings to expire";
@@ -399,7 +399,7 @@ void AutoExpire::ExpireRecordings(void)
                     "%1:%2 has an in-progress truncating delete.")
                     .arg(rechost).arg(recdir));
 
-            for (fsit = fsInfos.begin(); fsit != fsInfos.end(); fsit++)
+            for (fsit = fsInfos.begin(); fsit != fsInfos.end(); ++fsit)
             {
                 if ((fsit->hostname == rechost) &&
                     (fsit->directory == recdir))
@@ -412,7 +412,7 @@ void AutoExpire::ExpireRecordings(void)
     }
 
     QMap <int, bool> fsMap;
-    for (fsit = fsInfos.begin(); fsit != fsInfos.end(); fsit++)
+    for (fsit = fsInfos.begin(); fsit != fsInfos.end(); ++fsit)
     {
         if (fsMap.contains(fsit->fsID))
             continue;
@@ -434,7 +434,7 @@ void AutoExpire::ExpireRecordings(void)
             VERBOSE(VB_FILE, QString("Directories on filesystem ID %1:")
                     .arg(fsit->fsID));
             vector<FileSystemInfo>::iterator fsit2;
-            for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); fsit2++)
+            for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); ++fsit2)
             {
                 if (fsit2->fsID == fsit->fsID)
                 {
@@ -467,7 +467,7 @@ void AutoExpire::ExpireRecordings(void)
             VERBOSE(VB_FILE, QString("    Directories on filesystem ID %1:")
                     .arg(fsit->fsID));
 
-            for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); fsit2++)
+            for (fsit2 = fsInfos.begin(); fsit2 != fsInfos.end(); ++fsit2)
             {
                 if (fsit2->fsID == fsit->fsID)
                 {
@@ -535,7 +535,7 @@ void AutoExpire::ExpireRecordings(void)
                 }
 
                 QFileInfo vidFile(p->pathname);
-                if (dirList.contains(p->hostname + ":" + vidFile.path()))
+                if (dirList.contains(p->hostname + ':' + vidFile.path()))
                 {
                     fsit->freeSpaceKB += (p->filesize / 1024);
                     deleteList.push_back(p);
@@ -566,7 +566,7 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
 {
     QString msg;
 
-    if (deleteList.size() == 0)
+    if (deleteList.empty())
     {
         VERBOSE(VB_FILE, LOC + "SendDeleteMessages. Nothing to expire.");
         return;
@@ -608,7 +608,7 @@ void AutoExpire::SendDeleteMessages(pginfolist_t &deleteList)
  */
 void *AutoExpire::ExpirerThread(void *param)
 {
-    AutoExpire *expirer = (AutoExpire *)param;
+    AutoExpire *expirer = static_cast<AutoExpire *>(param);
     expirer->RunExpirer();
 
     return NULL;
@@ -650,7 +650,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
     VERBOSE(VB_FILE, LOC + "Checking episode count for each recording "
                            "profile using max episodes");
-    for (maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); maxIter++)
+    for (maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); ++maxIter)
     {
         query.prepare("SELECT chanid, starttime, title, progstart, progend, "
                           "filesize, duplicate "
@@ -774,7 +774,7 @@ void AutoExpire::PrintExpireList(QString expHost)
     cout << msg.toLocal8Bit().constData() << endl;
 
     pginfolist_t::iterator i = expireList.begin();
-    for (; i != expireList.end(); i++)
+    for (; i != expireList.end(); ++i)
     {
         ProgramInfo *first = (*i);
 
@@ -821,7 +821,7 @@ void AutoExpire::GetAllExpiring(QStringList &strList)
     strList << QString::number(expireList.size());
 
     pginfolist_t::iterator it = expireList.begin();
-    for (; it != expireList.end(); it++)
+    for (; it != expireList.end(); ++it)
         (*it)->ToStringList(strList);
 
     ClearExpireList(expireList);
@@ -844,7 +844,7 @@ void AutoExpire::GetAllExpiring(pginfolist_t &list)
                   emOldestFirst));
 
     pginfolist_t::iterator it = expireList.begin();
-    for (; it != expireList.end(); it++)
+    for (; it != expireList.end(); ++it)
         list.push_back( new ProgramInfo( *(*it) ));
 
     ClearExpireList(expireList);
@@ -856,7 +856,7 @@ void AutoExpire::GetAllExpiring(pginfolist_t &list)
 void AutoExpire::ClearExpireList(pginfolist_t &expireList, bool deleteProg)
 {
     ProgramInfo *pginfo = NULL;
-    while (expireList.size() > 0)
+    while (!expireList.empty())
     {
         if (deleteProg)
             pginfo = expireList.back();
@@ -1029,7 +1029,7 @@ void AutoExpire::FillDBOrdered(pginfolist_t &expireList, int expMethod)
 void *SpawnUpdateThread(void *autoExpireInstance)
 {
     sleep(5);
-    AutoExpire *ae = (AutoExpire*) autoExpireInstance;
+    AutoExpire *ae = static_cast<AutoExpire*>(autoExpireInstance);
     ae->CalcParams();
     ae->instance_lock.lock();
     ae->update_pending = false;
@@ -1115,7 +1115,7 @@ void AutoExpire::UpdateDontExpireSet(void)
         uint chanid = query.value(0).toUInt();
         QDateTime recstartts = query.value(1).toDateTime();
         QDateTime lastupdate = query.value(2).toDateTime();
-            
+
         if (lastupdate.secsTo(curTime) < 2 * 60 * 60)
         {
             QString key = QString("%1_%2")

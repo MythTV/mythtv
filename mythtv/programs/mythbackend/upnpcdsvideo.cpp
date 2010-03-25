@@ -1,7 +1,7 @@
 // Program Name: upnpcdsvideo.cpp
-//                                                                            
+//
 // Purpose - uPnp Content Directory Extension for MythVideo Videos
-//                                                                            
+//
 //////////////////////////////////////////////////////////////////////////////
 
 // POSIX headers
@@ -21,9 +21,9 @@
 #define LOC_WARN QString("UPnpCDSVideo, Warning: ")
 #define LOC_ERR QString("UPnpCDSVideo, Error: ")
 
-UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] = 
+UPnpCDSRootInfo UPnpCDSVideo::g_RootNodes[] =
 {
-    {   "VideoRoot", 
+    {   "VideoRoot",
         "*",
         "SELECT 0 as key, "
           "title as name, "
@@ -47,7 +47,7 @@ int UPnpCDSVideo::g_nRootCount = 1;
 UPnpCDSRootInfo *UPnpCDSVideo::GetRootInfo( int nIdx )
 {
     if ((nIdx >=0 ) && ( nIdx < g_nRootCount ))
-        return &(g_RootNodes[ nIdx ]); 
+        return &(g_RootNodes[ nIdx ]);
 
     return NULL;
 }
@@ -111,7 +111,7 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
     // Xbox360 compatibility code.
     // ----------------------------------------------------------------------
 
-    if (pRequest->m_sContainerID == "15") 
+    if (pRequest->m_sContainerID == "15")
     {
         pRequest->m_sObjectId = "Videos/0";
 
@@ -119,7 +119,7 @@ bool UPnpCDSVideo::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     // ----------------------------------------------------------------------
@@ -163,7 +163,7 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
         return true;
     }
 
-    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     // ----------------------------------------------------------------------
@@ -177,10 +177,10 @@ bool UPnpCDSVideo::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     if (  bOurs && ( pRequest->m_sObjectId == "0"))
     {
 
-        if ( gContext->GetSetting("UPnP/WMPSource") == "1")
+        if ( gContext->GetSetting("UPnP/WMPSource") == "1") // GetBoolSetting()?
         {
             pRequest->m_sObjectId = "Videos/0";
-            pRequest->m_sParentId = "8";        // -=>TODO: Not sure why this was added.
+            pRequest->m_sParentId = '8';        // -=>TODO: Not sure why this was added.
         }
         else
             bOurs = false;
@@ -217,7 +217,7 @@ int UPnpCDSVideo::GetDistinctCount( UPnpCDSRootInfo *pInfo )
 /////////////////////////////////////////////////////////////////////////////
 
 UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRequest,
-                                                    UPnpCDSExtensionResults *pResults, 
+                                                    UPnpCDSExtensionResults *pResults,
                                                     QStringList             &idPath )
 {
     pResults->m_nTotalMatches   = 0;
@@ -227,7 +227,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRe
         return pResults;
 
     QStringList tokens = pRequest->m_sObjectId
-        .split("/", QString::SkipEmptyParts);
+        .split('/', QString::SkipEmptyParts);
     QString     sId    = tokens.last();
 
     if (sId.startsWith("Id"))
@@ -247,7 +247,7 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRe
 
             MSqlQuery query(MSqlQuery::InitCon());
 
-            if (query.isConnected())                                                           
+            if (query.isConnected())
             {
                 BuildItemQuery( query, mapParams );
 
@@ -281,26 +281,26 @@ UPnpCDSExtensionResults *UPnpCDSVideo::ProcessItem( UPnpCDSRequest          *pRe
 void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
                                 UPnpCDSExtensionResults *pResults,
                                 int                      nNodeIdx,
-                                const QString           &sKey, 
+                                const QString           &sKey,
                                 bool                     bAddRef )
 {
     pResults->m_nTotalMatches = 0;
     pResults->m_nUpdateID     = 1;
-    QString ParentClause;
 
     UPnpCDSRootInfo *pInfo = GetRootInfo( nNodeIdx );
 
     if (pInfo == NULL)
         return;
 
-    if (pRequest->m_nRequestedCount == 0) 
+    if (pRequest->m_nRequestedCount == 0)
         pRequest->m_nRequestedCount = SHRT_MAX;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (query.isConnected())
     {
-        QString sWhere( "" );
+        QString ParentClause;
+        QString sWhere;
 
         if ( sKey.length() > 0)
         {
@@ -310,7 +310,7 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
 
         if (pRequest->m_sObjectId.startsWith("Videos"))
         {
-            if (pRequest->m_sParentId != "") 
+            if (!pRequest->m_sParentId.isEmpty())
             {
                 if (pRequest->m_sParentId == "Videos/0")
                 {
@@ -318,17 +318,17 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
                                 .arg(STARTING_VIDEO_OBJECTID);
                 }
             }
-            else 
+            else
             {
                 QStringList tokens =
-                    pRequest->m_sObjectId.split("=", QString::SkipEmptyParts);
+                    pRequest->m_sObjectId.split('=', QString::SkipEmptyParts);
                 pRequest->m_sParentId = tokens.last();
             }
 
-            if (pRequest->m_sSearchClass == "")
+            if (pRequest->m_sSearchClass.isEmpty())
                 ParentClause = " AND parentid = \"" + pRequest->m_sParentId + "\"";
             else
-                pRequest->m_sParentId = "8";
+                pRequest->m_sParentId = '8';
 
             if (pRequest->m_sObjectId.startsWith("Videos/0"))
             {
@@ -340,10 +340,10 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
                                      "pRequest->m_sObjectId=:%2:, sKey=:%3:")
                                                  .arg(pRequest->m_sParentId)
                                                  .arg(pRequest->m_sObjectId)
-                                                 .arg(sKey)); 
+                                                 .arg(sKey));
              */
 
-            if ((pRequest->m_sParentId != "") && (pRequest->m_sParentId != "8"))
+            if ((!pRequest->m_sParentId.isEmpty()) && (pRequest->m_sParentId != "8"))
                 pResults->m_nTotalMatches = GetCount( "parentid", pRequest->m_sParentId );
         }
         else
@@ -363,7 +363,7 @@ void UPnpCDSVideo::CreateItems( UPnpCDSRequest          *pRequest,
 
         if (query.exec())
         {
-            while(query.next()) 
+            while(query.next())
                 AddItem( pRequest->m_sObjectId, pResults, bAddRef, query );
 
         }
@@ -423,7 +423,7 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
 
     CDSObject *pItem = NULL;
 
-    if (sItemType == "FOLDER") 
+    if (sItemType == "FOLDER")
     {
         pItem   = CDSObject::CreateStorageFolder( sId, sName, sParentID);
         pItem->SetChildCount( GetCount( "parentid",QString( "%1" ).arg( nVidID )) );
@@ -433,12 +433,12 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     else if (sItemType == "FILE" )
         pItem   = CDSObject::CreateVideoItem( sId, sName, sParentID );
 
-    if (!pItem) 
-    { 
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "AddItem(): " + 
-        QString("sItemType has unknown type '%1'").arg(sItemType)); 
- 
-        return; 
+    if (!pItem)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "AddItem(): " +
+        QString("sItemType has unknown type '%1'").arg(sItemType));
+
+        return;
     }
 
     pItem->m_bRestricted  = false;
@@ -450,7 +450,7 @@ void UPnpCDSVideo::AddItem( const QString           &sObjectId,
     pItem->SetPropValue( "creator"        , "[Unknown Author]"    );
     pItem->SetPropValue( "album"          , "[Unknown Series]"    );
 
-    if ((sCoverArt != "") && (sCoverArt != "No Cover"))
+    if ((!sCoverArt.isEmpty()) && (sCoverArt != "No Cover"))
         pItem->SetPropValue( "albumArtURI"    , sAlbumArtURI);
 
     if ( bAddRef )

@@ -37,6 +37,8 @@ typedef RecList::iterator RecIter;
 
 class Scheduler : public QObject
 {
+    Q_OBJECT
+
   public:
     Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
               QString recordTbl = "record", Scheduler *master_sched = NULL);

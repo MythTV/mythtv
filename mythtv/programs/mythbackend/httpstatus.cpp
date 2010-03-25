@@ -39,7 +39,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster )
-          : HttpServerExtension( "HttpStatus" , QString::null)
+          : HttpServerExtension( "HttpStatus" , QString())
 {
     m_pEncoders = tvList;
     m_pSched    = sched;
@@ -236,7 +236,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     unsigned int iNumRecordings = 0;
 
     RecConstIter itProg = recordingList.begin();
-    for (; (itProg != recordingList.end()) && iNumRecordings < iNum; itProg++)
+    for (; (itProg != recordingList.end()) && iNumRecordings < iNum; ++itProg)
     {
         if (((*itProg)->recstatus  <= rsWillRecord) &&
             ((*itProg)->recstartts >= QDateTime::currentDateTime()))
@@ -246,7 +246,7 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
         }
     }
 
-    while (recordingList.size() > 0)
+    while (!recordingList.empty())
     {
         ProgramInfo *pginfo = recordingList.back();
         delete pginfo;
@@ -481,10 +481,10 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
             }
             else
             {
-                QStringList output = input.split("\n", QString::SkipEmptyParts);
+                QStringList output = input.split('\n', QString::SkipEmptyParts);
 
                 QStringList::iterator iter = output.begin();
-                for (; iter != output.end(); iter++)
+                for (; iter != output.end(); ++iter)
                 {
                     QDomElement info = pDoc->createElement("Information");
 
@@ -969,7 +969,7 @@ int HttpStatus::PrintJobQueue( QTextStream &os, QDomElement jobs )
         QString timeDateFormat;
 
         timeDateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d") +
-                         " " + gContext->GetSetting("TimeFormat", "h:mm AP");
+                         ' ' + gContext->GetSetting("TimeFormat", "h:mm AP");
 
         os << "    Jobs currently in Queue or recently ended:\r\n<br />"
            << "    <div class=\"schedule\">\r\n";

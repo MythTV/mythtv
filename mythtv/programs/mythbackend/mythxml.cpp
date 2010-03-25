@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: MythXML.cpp
-//  
+//
 // Purpose - Html & XML status HttpServerExtension
-//  
+//
 // Created By  : David Blain                    Created On : Oct. 24, 2005
 // Modified By : Daniel Kristjansson            Modified On: Oct. 31, 2007
-//  
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
@@ -35,27 +35,27 @@
 
 static QString extract_id(const QString &raw_request)
 {
-    QStringList idPath = raw_request.split( "/", QString::SkipEmptyParts);
+    QStringList idPath = raw_request.split('/', QString::SkipEmptyParts);
     if (idPath.size() < 2)
         return "";
 
-    idPath = idPath[idPath.size() - 2].split(" ", QString::SkipEmptyParts);
+    idPath = idPath[idPath.size() - 2].split(' ', QString::SkipEmptyParts);
     if (idPath.empty())
         return "";
 
-    idPath = idPath[0].split("?", QString::SkipEmptyParts);
+    idPath = idPath[0].split('?', QString::SkipEmptyParts);
     if (idPath.empty())
         return "";
 
     QString sId = idPath[0];
-    return (sId.startsWith("Id")) ? sId.right(sId.length() - 2) : "";
+    return (sId.startsWith("Id")) ? sId.right(sId.length() - 2) : QString();
 }
 
 /////////////////////////////////////////////////////////////////////////////
 //
 /////////////////////////////////////////////////////////////////////////////
 
-MythXML::MythXML( UPnpDevice *pDevice , const QString sSharePath)
+MythXML::MythXML( UPnpDevice *pDevice , const QString &sSharePath)
   : Eventing( "MythXML", "MYTHTV_Event", sSharePath)
 {
     m_pEncoders = &tvList;
@@ -569,7 +569,7 @@ void MythXML::GetProgramGuide( HTTPRequest *pRequest )
     // ----------------------------------------------------------------------
 
     for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
+                 itRecList != recList.end();  ++itRecList)
     {
         schedList.push_back( *itRecList );
     }
@@ -681,7 +681,7 @@ void MythXML::GetProgramDetails( HTTPRequest *pRequest )
     // ----------------------------------------------------------------------
 
     for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
+                 itRecList != recList.end(); ++itRecList)
     {
         schedList.push_back( *itRecList );
     }
@@ -967,7 +967,7 @@ void MythXML::GetRecorded( HTTPRequest *pRequest )
     // ----------------------------------------------------------------------
 
     for (RecIter itRecList =  recList.begin();
-                 itRecList != recList.end();   itRecList++)
+                 itRecList != recList.end(); ++itRecList)
     {
         schedList.push_back( *itRecList );
     }
@@ -1021,7 +1021,7 @@ void MythXML::GetExpiring( HTTPRequest *pRequest )
     doc.appendChild(root);
 
     pginfolist_t::iterator it = infoList.begin();
-    for (; it !=infoList.end(); it++)
+    for (; it !=infoList.end(); ++it)
     {
         ProgramInfo *pInfo = (*it);
 
@@ -1252,7 +1252,7 @@ void MythXML::GetRecording( HttpWorkerThread *pThread,
     // Check to see if this is another request for the same recording...
     // ----------------------------------------------------------------------
 
-    ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
+    ThreadData *pData = static_cast<ThreadData *>(pThread->GetWorkerData());
 
     if (pData != NULL)
     {
@@ -1366,7 +1366,7 @@ void MythXML::GetMusic( HttpWorkerThread *pThread,
     // Check to see if this is another request for the same recording...
     // ----------------------------------------------------------------------
 
-    ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
+    ThreadData *pData = static_cast<ThreadData *>(pThread->GetWorkerData());
 
     if (pData != NULL)
     {
@@ -1476,7 +1476,7 @@ void MythXML::GetVideo( HttpWorkerThread *pThread,
     // Check to see if this is another request for the same recording...
     // ----------------------------------------------------------------------
 
-    ThreadData *pData = (ThreadData *)pThread->GetWorkerData();
+    ThreadData *pData = static_cast<ThreadData *>(pThread->GetWorkerData());
 
     if (pData != NULL)
     {

@@ -2654,7 +2654,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         {
         case kPowerSearch:
             qphrase.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
-            qphrase.remove(";");
+            qphrase.remove(';');
             from << result.value(2).toString();
             where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
                       QString(" AND program.manualid = 0 AND ( %2 )")
@@ -2795,7 +2795,7 @@ void Scheduler::UpdateMatches(int recordid) {
 
     if (VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
     {
-        for (clause = 0; clause < fromclauses.count(); clause++)
+        for (clause = 0; clause < fromclauses.count(); ++clause)
         {
             QString msg = QString("Query %1: %2/%3")
                 .arg(clause).arg(fromclauses[clause]).arg(whereclauses[clause]);
@@ -2803,7 +2803,7 @@ void Scheduler::UpdateMatches(int recordid) {
         }
     }
 
-    for (clause = 0; clause < fromclauses.count(); clause++)
+    for (clause = 0; clause < fromclauses.count(); ++clause)
     {
         QString query = QString(
 "INSERT INTO recordmatch (recordid, chanid, starttime, manualid) "
@@ -3082,7 +3082,7 @@ void Scheduler::AddNewRecords(void)
         {
             QString sclause = result.value(1).toString();
             sclause.remove(QRegExp("^\\s*AND\\s+", Qt::CaseInsensitive));
-            sclause.remove(";");
+            sclause.remove(';');
             pwrpri += QString(" + (%1) * %2").arg(sclause)
                                              .arg(result.value(0).toInt());
         }
@@ -3615,8 +3615,6 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
         proginfo->recpriority = result.value(8).toInt();
         proginfo->channame =
             result.value(10).toString();
-        if (proginfo->channame.isNull())
-            proginfo->channame = "";
         proginfo->recgroup =
             result.value(12).toString();
         proginfo->playgroup =
@@ -3627,8 +3625,6 @@ void Scheduler::findAllScheduledPrograms(RecList &proglist)
         proginfo->chancommfree =
             COMM_DETECT_COMMFREE == result.value(15).toInt();
         proginfo->chanstr = result.value(16).toString();
-        if (proginfo->chanstr.isNull())
-            proginfo->chanstr = "";
         proginfo->chansign =
             result.value(17).toString();
         proginfo->seriesid = result.value(18).toString();
@@ -3899,7 +3895,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
 
                         // need to offset all directories on this filesystem
                         for (fsit2 = fsInfoCache.begin();
-                             fsit2 != fsInfoCache.end(); fsit2++)
+                             fsit2 != fsInfoCache.end(); ++fsit2)
                         {
                             FileSystemInfo *fs2 = &(*fsit2);
                             if (fs2->fsID == fs->fsID)
@@ -3952,7 +3948,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                         .arg(fs->fsID).arg(weightPerRecording));
 
                 for (fsit2 = fsInfoCache.begin();
-                     fsit2 != fsInfoCache.end(); fsit2++)
+                     fsit2 != fsInfoCache.end(); ++fsit2)
                 {
                     FileSystemInfo *fs2 = &(*fsit2);
                     if (fs2->fsID == fs->fsID)
@@ -4021,7 +4017,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
     // can't find a directory that way we loop through and pick the first good
     // one from the list no matter how much free space it has.  We assume that
     // something will have to be expired for us to finish the recording.
-    // pass 1: try to fit onto an existing file system with enought free space
+    // pass 1: try to fit onto an existing file system with enough free space
     // pass 2: fit onto the file system with the lowest priority files to be
     //         expired this is used only with multiple file systems
     //         Estimates are made by simulating each expiry until one of
@@ -4034,7 +4030,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
 
         if ((pass == 2) && simulateAutoExpire)
         {
-            // setup a container of remaing space for all the file systems
+            // setup a container of remaining space for all the file systems
             QMap <int , long long> remainingSpaceKB;
             for (fslistit = fsInfoList.begin();
                 fslistit != fsInfoList.end(); ++fslistit)
@@ -4111,7 +4107,7 @@ int Scheduler::FillRecordingDir(RecordingInfo *pginfo, RecList& reclist)
                     continue;
                 }
 
-                // add this files size to the remaing free space
+                // add this files size to the remaining free space
                 remainingSpaceKB[fs->fsID] += (*it)->filesize / 1024;
 
                 // check if we have enough space for new file

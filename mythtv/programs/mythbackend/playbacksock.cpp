@@ -62,29 +62,29 @@ bool PlaybackSock::DownRef(void)
     return false;
 }
 
-bool PlaybackSock::wantsEvents(void)
+bool PlaybackSock::wantsEvents(void) const
 {
     return (m_eventsMode != kPBSEvents_None);
 }
 
-bool PlaybackSock::wantsNonSystemEvents(void)
+bool PlaybackSock::wantsNonSystemEvents(void) const
 {
     return ((m_eventsMode == kPBSEvents_Normal) ||
             (m_eventsMode == kPBSEvents_NonSystem));
 }
 
-bool PlaybackSock::wantsSystemEvents(void)
+bool PlaybackSock::wantsSystemEvents(void) const
 {
     return ((m_eventsMode == kPBSEvents_Normal) ||
             (m_eventsMode == kPBSEvents_SystemOnly));
 }
 
-bool PlaybackSock::wantsOnlySystemEvents(void)
+bool PlaybackSock::wantsOnlySystemEvents(void) const
 {
     return (m_eventsMode == kPBSEvents_SystemOnly);
 }
 
-PlaybackSockEventsMode PlaybackSock::eventsMode(void)
+PlaybackSockEventsMode PlaybackSock::eventsMode(void) const
 {
     return m_eventsMode;
 }
@@ -175,7 +175,7 @@ int PlaybackSock::CheckRecordingActive(const ProgramInfo *pginfo)
     return 0;
 }
 
-int PlaybackSock::DeleteFile(const QString filename, const QString sgroup)
+int PlaybackSock::DeleteFile(const QString &filename, const QString &sgroup)
 {
     QStringList strlist("DELETE_FILE");
     strlist << filename;

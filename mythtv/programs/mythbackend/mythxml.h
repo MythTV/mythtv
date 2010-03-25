@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: mythxml.h
-//                                                                            
-// Purpose - Myth XML protocol HttpServerExtension 
-//                                                                            
+//
+// Purpose - Myth XML protocol HttpServerExtension
+//
 // Created By  : David Blain                    Created On : Oct. 24, 2005
-// Modified By :                                Modified On:                  
-//                                                                            
+// Modified By :                                Modified On:
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef MYTHXML_H_
@@ -13,7 +13,7 @@
 
 #include <QDomDocument>
 #include <QMap>
-#include <QDateTime> 
+#include <QDateTime>
 
 #include "upnp.h"
 #include "mainserver.h"
@@ -28,7 +28,7 @@ extern QMap<int, EncoderLink *> tvList;
 extern AutoExpire              *expirer;
 extern Scheduler               *sched;
 
-typedef enum 
+typedef enum
 {
     MXML_Unknown                =  0,
     MXML_GetServiceDescription  =  1,
@@ -59,7 +59,7 @@ typedef enum
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
-// 
+//
 //
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -108,34 +108,34 @@ class MythXML : public Eventing
 
         void    GetExpiring    ( HTTPRequest *pRequest );
 
-        void    GetRecording   ( HttpWorkerThread *pThread, 
+        void    GetRecording   ( HttpWorkerThread *pThread,
                                  HTTPRequest      *pRequest );
 
-        void    GetMusic       ( HttpWorkerThread *pThread, 
+        void    GetMusic       ( HttpWorkerThread *pThread,
                                  HTTPRequest      *pRequest );
 
         void    GetVideo       ( HttpWorkerThread *pThread,
                                  HTTPRequest      *pRequest );
 
 
-        void    GetDeviceDesc  ( HTTPRequest *pRequest ); 
+        void    GetDeviceDesc  ( HTTPRequest *pRequest );
         void    GetFile        ( HTTPRequest *pRequest, QString sFileName );
 
     public:
-                 MythXML( UPnpDevice *pDevice , const QString sSharePath);
+                 MythXML( UPnpDevice *pDevice , const QString &sSharePath);
         virtual ~MythXML();
 
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 
         // Static methods shared with HttpStatus
 
-        static void FillProgramInfo ( QDomDocument *pDoc, 
-                                      QDomNode     &node, 
+        static void FillProgramInfo ( QDomDocument *pDoc,
+                                      QDomNode     &node,
                                       ProgramInfo  *pInfo,
                                       bool          bIncChannel = true,
                                       bool          bDetails    = true );
 
-        static void FillChannelInfo ( QDomElement  &channel, 
+        static void FillChannelInfo ( QDomElement  &channel,
                                       ProgramInfo  *pInfo,
                                       bool          bDetails = true );
 
@@ -144,7 +144,7 @@ class MythXML : public Eventing
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
-// 
+//
 //
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -162,11 +162,11 @@ class ThreadData : public HttpWorkerData
 
 
         } ThreadDataType;
-        
+
 
         ThreadDataType  m_eType;
 
-        QString         m_sChanId;   
+        QString         m_sChanId;
         QString         m_sStartTime;
         QString         m_sFileName;
         QString         m_sVideoID;
@@ -203,11 +203,11 @@ class ThreadData : public HttpWorkerData
         }
 
 
-        virtual ~ThreadData() 
+        virtual ~ThreadData()
         {
         }
 
-        bool IsSameRecording( const QString &sChanId, 
+        bool IsSameRecording( const QString &sChanId,
                               const QString &sStartTime )
         {
             return( (sChanId == m_sChanId ) && (sStartTime == m_sStartTime ));

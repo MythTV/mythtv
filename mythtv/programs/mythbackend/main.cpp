@@ -66,7 +66,7 @@ using namespace std;
 
 #ifdef Q_OS_MACX
     // 10.6 uses handle 3 for its new Grand Central Dispatch thingy
-    #define UNUSED_FILENO 4 
+    #define UNUSED_FILENO 4
 #else
     #define UNUSED_FILENO 3
 #endif
@@ -77,7 +77,7 @@ Scheduler   *sched        = NULL;
 JobQueue    *jobqueue     = NULL;
 QString      pidfile;
 HouseKeeper *housekeeping = NULL;
-QString      logfile      = QString::null;
+QString      logfile;
 
 MediaServer *g_pUPnp      = NULL;
 
@@ -411,7 +411,7 @@ bool parse_preview_info(const QString &param,
     if (xat > 0)
     {
         QString widthStr  = param.left(xat);
-        QString heightStr = QString::null;
+        QString heightStr;
         if (aat > xat)
             heightStr = param.mid(xat + 1, aat - xat - 1);
         else
@@ -430,8 +430,8 @@ bool parse_preview_info(const QString &param,
         return true;
 
     QString lastChar = param.at(param.length() - 1).toLower();
-    QString frameNumStr = QString::null;
-    QString secsStr = QString::null;
+    QString frameNumStr;
+    QString secsStr;
     if (lastChar == "f")
         frameNumStr = param.mid(aat + 1, param.length() - aat - 2);
     else if (lastChar == "s")
@@ -555,24 +555,24 @@ int main(int argc, char **argv)
     long long previewFrameNumber = -2;
     long long previewSeconds     = -2;
     QSize previewSize(0,0);
-    QString chanid    = QString::null;
-    QString starttime = QString::null;
-    QString infile    = QString::null;
-    QString outfile   = QString::null;
+    QString chanid;
+    QString starttime;
+    QString infile;
+    QString outfile;
 
     bool daemonize = false;
     bool printsched = false;
     bool testsched = false;
     bool setverbose = false;
-    QString newverbose = "";
-    QString username = "";
+    QString newverbose;
+    QString username;
     bool resched = false;
     bool nosched = false;
     bool noupnp = false;
     bool nojobqueue = false;
     bool nohousekeeper = false;
     bool noexpirer = false;
-    QString printexpire = "";
+    QString printexpire;
     bool clearsettingscache = false;
     bool wantupnprebuild = false;
     QString eventString;
@@ -643,7 +643,7 @@ int main(int argc, char **argv)
             {
                 newverbose = a.argv()[argpos+1];
                 ++argpos;
-            } 
+            }
             else
             {
                 cerr << "Missing argument to --setverbose option\n";
@@ -730,7 +730,7 @@ int main(int argc, char **argv)
         }
         else if (!strcmp(a.argv()[argpos],"--generate-preview"))
         {
-            QString tmp = QString::null;
+            QString tmp;
             if ((argpos + 1) < a.argc())
             {
                 tmp = a.argv()[argpos+1];
@@ -740,7 +740,7 @@ int main(int argc, char **argv)
                 if (ok)
                     argpos++;
                 else
-                    tmp = QString::null;
+                    tmp.clear();
             }
 
             if (!parse_preview_info(tmp, previewFrameNumber, previewSeconds,
@@ -957,7 +957,7 @@ int main(int argc, char **argv)
 
         if (gContext->ConnectToMasterServer())
         {
-            QString message = "SET_VERBOSE "; 
+            QString message = "SET_VERBOSE ";
             message += newverbose;
 
             RemoteSendMessage(message);
@@ -1153,6 +1153,7 @@ int main(int argc, char **argv)
         cerr << "No setting found for this machine's BackendServerIP.\n"
              << "Please run setup on this machine and modify the first page\n"
              << "of the general settings.\n";
+        delete sysEventHandler;
         return BACKEND_EXIT_NO_IP_ADDRESS;
     }
 
@@ -1185,6 +1186,7 @@ int main(int argc, char **argv)
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
     {
+        delete sysEventHandler;
         return BACKEND_EXIT_CAP_CARD_SETUP_ERROR;
     }
 
@@ -1258,6 +1260,7 @@ int main(int argc, char **argv)
     {
         VERBOSE(VB_IMPORTANT, "Backend exiting, MainServer initialization "
                 "error.");
+        delete mainServer;
         return exitCode;
     }
 
@@ -1276,8 +1279,8 @@ int main(int argc, char **argv)
 
     gContext->LogEntry("mythbackend", LP_INFO, "MythBackend exiting", "");
 
-    if (sysEventHandler)
-        delete sysEventHandler;
+    delete sysEventHandler;
+    delete mainServer;
 
     return exitCode ? exitCode : BACKEND_EXIT_OK;
 }

@@ -308,7 +308,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
     QString line = listline[0];
 
     line = line.simplified();
-    QStringList tokens = line.split(" ", QString::SkipEmptyParts);
+    QStringList tokens = line.split(' ', QString::SkipEmptyParts);
     QString command = tokens[0];
     //cerr << "command='" << command << "'\n";
     if (command == "MYTH_PROTO_VERSION")
@@ -480,7 +480,7 @@ void MainServer::ProcessRequestWork(MythSocket *sock)
         HandleSGGetFileList(listline, pbs);
     }
     else if (command == "QUERY_SG_FILEQUERY")
-    {   
+    {
         HandleSGFileQuery(listline, pbs);
     }
     else if (command == "GET_FREE_RECORDER")
@@ -951,7 +951,7 @@ void MainServer::customEvent(QEvent *e)
         QStringList sentSetSystemEvent(gContext->GetHostName());
 
         vector<PlaybackSock*>::const_iterator iter;
-        for (iter = localPBSList.begin(); iter != localPBSList.end(); iter++)
+        for (iter = localPBSList.begin(); iter != localPBSList.end(); ++iter)
         {
             PlaybackSock *pbs = *iter;
 
@@ -1013,7 +1013,7 @@ void MainServer::customEvent(QEvent *e)
         }
 
         // Done with the pbs list, so decrement all the instances..
-        for (iter = localPBSList.begin(); iter != localPBSList.end(); iter++)
+        for (iter = localPBSList.begin(); iter != localPBSList.end(); ++iter)
         {
             PlaybackSock *pbs = *iter;
             pbs->DownRef();
@@ -1036,7 +1036,7 @@ void MainServer::HandleVersion(MythSocket *socket, QString version)
     {
         VERBOSE(VB_GENERAL,
                 "MainServer::HandleVersion - Client speaks protocol version "
-                + version + " but we speak " + MYTH_PROTO_VERSION + "!");
+                + version + " but we speak " + MYTH_PROTO_VERSION + '!');
         retlist << "REJECT" << MYTH_PROTO_VERSION;
         socket->writeStringList(retlist);
         HandleDone(socket);
@@ -1081,7 +1081,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
     sockListLock.lockForRead();
     vector<PlaybackSock *>::iterator iter = playbackList.begin();
-    for (; iter != playbackList.end(); iter++)
+    for (; iter != playbackList.end(); ++iter)
     {
         PlaybackSock *pbs = *iter;
         if (pbs->getSocket() == socket)
@@ -1390,12 +1390,12 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         if ((proginfo->hostname == gContext->GetHostName()) ||
             (!slave && masterBackendOverride))
         {
-            proginfo->pathname = QString("myth://") + ip + ":" + port
-                + "/" + proginfo->pathname;
+            proginfo->pathname = QString("myth://") + ip + ':' + port
+                + '/' + proginfo->pathname;
             if (proginfo->filesize == 0)
             {
                 QString tmpURL = GetPlaybackURL(proginfo);
-                if (tmpURL.startsWith("/"))
+                if (tmpURL.startsWith('/'))
                 {
                     QFile checkFile(tmpURL);
                     if (!tmpURL.isEmpty() && checkFile.exists())
@@ -2062,11 +2062,9 @@ void MainServer::DoHandleStopRecording(
     {
         PlaybackSock *slave = getSlaveByHostname(recinfo.hostname);
 
-        int num = -1;
-
         if (slave)
         {
-            num = slave->StopRecording(&recinfo);
+            int num = slave->StopRecording(&recinfo);
 
             if (num > 0)
             {
@@ -2215,11 +2213,9 @@ void MainServer::DoHandleDeleteRecording(
     {
         PlaybackSock *slave = getSlaveByHostname(recinfo.hostname);
 
-        int num = -1;
-
         if (slave)
         {
-            num = slave->DeleteRecording(&recinfo, forceMetadataDelete);
+            int num = slave->DeleteRecording(&recinfo, forceMetadataDelete);
 
             if (num > 0)
             {
@@ -3294,7 +3290,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
 
     if (commands.size() < 2 || slist.size() < 2)
         return;
-    
+
     int recnum = commands[1].toInt();
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
@@ -3581,7 +3577,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "CHECK_CHANNEL_PREFIX")
     {
-        QString needed_spacer = QString::null;
+        QString needed_spacer;
         QString prefix        = slist[2];
         uint    is_complete_valid_channel_on_rec = 0;
         bool    is_extra_char_useful             = false;
@@ -4374,7 +4370,7 @@ void MainServer::HandleSetVerbose(QStringList &slist, PlaybackSock *pbs)
 {
     MythSocket *pbssock = pbs->getSocket();
     QStringList retlist;
-    
+
     QString newverbose = slist[1];
     int len=newverbose.length();
     if (len > 12)
@@ -4432,7 +4428,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     bool      time_fmt_sec   = true;
     long long time           = -1;
-    QString   outputfile     = QString::null;
+    QString   outputfile;
     int       width          = -1;
     int       height         = -1;
     bool      has_extra_data = false;
@@ -4556,7 +4552,6 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
     pginfo->FromStringList(slist, 1);
     pginfo->pathname = GetPlaybackURL(pginfo);
 
-    QDateTime lastmodified;
     QStringList strlist;
 
     if ((ismaster) &&
@@ -4603,7 +4598,7 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
 
     if (finfo.exists())
     {
-        lastmodified = finfo.lastModified();
+        QDateTime lastmodified = finfo.lastModified();
         strlist = QStringList(QString::number(lastmodified.toTime_t()));
     }
     else
@@ -5062,7 +5057,7 @@ void MainServer::SetExitCode(int exitCode, bool closeApplication)
         QCoreApplication::exit(m_exitCode);
 }
 
-QString MainServer::LocalFilePath(const QUrl &url, const QString wantgroup)
+QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
 {
     QString lpath = url.path();
 
@@ -5279,7 +5274,7 @@ bool MainServer::isClientConnected()
 void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
 {
 // TODO FIXME We should issue a MythEvent and have customEvent
-// send this with the proper syncronization and locking.
+// send this with the proper syncronisation and locking.
 
     QStringList bcast( "SHUTDOWN_NOW" );
     bcast << haltcmd;

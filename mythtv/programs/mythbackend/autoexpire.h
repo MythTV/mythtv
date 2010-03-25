@@ -14,6 +14,7 @@ using namespace std;
 #include <QMutex>
 #include <QSet>
 #include <QMap>
+#include <QDateTime>
 
 class ProgramInfo;
 class EncoderLink;
@@ -34,6 +35,8 @@ enum ExpireMethodType {
 
 class AutoExpire : public QObject
 {
+    Q_OBJECT
+
   public:
     AutoExpire(QMap<int, EncoderLink *> *encoderList);
     AutoExpire(void);

@@ -32,7 +32,7 @@ class MainServer : public QObject, public MythSocketCBs
 {
     Q_OBJECT
   public:
-    MainServer(bool master, int port, 
+    MainServer(bool master, int port,
                QMap<int, EncoderLink *> *tvList,
                Scheduler *sched, AutoExpire *expirer);
 
@@ -43,7 +43,7 @@ class MainServer : public QObject, public MythSocketCBs
     bool isClientConnected();
     void ShutSlaveBackendsDown(QString &haltcmd);
 
-    void ProcessRequest(MythSocket *sock); 
+    void ProcessRequest(MythSocket *sock);
     void MarkUnused(ProcessRequestThread *prt);
 
     void readyRead(MythSocket *socket);
@@ -78,7 +78,7 @@ class MainServer : public QObject, public MythSocketCBs
     } DeleteStruct;
 
     void ProcessRequestWork(MythSocket *sock);
-    void HandleAnnounce(QStringList &slist, QStringList commands, 
+    void HandleAnnounce(QStringList &slist, QStringList commands,
                         MythSocket *socket);
     void HandleDone(MythSocket *socket);
 
@@ -122,7 +122,7 @@ class MainServer : public QObject, public MythSocketCBs
                              PlaybackSock *pbs);
     void HandleSetNextLiveTVDir(QStringList &commands, PlaybackSock *pbs);
     void HandleFileTransferQuery(QStringList &slist, QStringList &commands,
-                                 PlaybackSock *pbs); 
+                                 PlaybackSock *pbs);
     void HandleGetRecorderNum(QStringList &slist, PlaybackSock *pbs);
     void HandleGetRecorderFromNum(QStringList &slist, PlaybackSock *pbs);
     void HandleMessage(QStringList &slist, PlaybackSock *pbs);
@@ -157,7 +157,7 @@ class MainServer : public QObject, public MythSocketCBs
     void HandleQueryMemStats(PlaybackSock *pbs);
     void HandleQueryTimeZone(PlaybackSock *pbs);
     void HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs);
-    
+
     void SendResponse(MythSocket *pbs, QStringList &commands);
 
     void getGuideDataThrough(QDateTime &GuideDataThrough);
@@ -167,7 +167,7 @@ class MainServer : public QObject, public MythSocketCBs
     FileTransfer *GetFileTransferByID(int id);
     FileTransfer *GetFileTransferBySock(MythSocket *socket);
 
-    QString LocalFilePath(const QUrl &url, const QString wantgroup);
+    QString LocalFilePath(const QUrl &url, const QString &wantgroup);
 
     static void *SpawnTruncateThread(void *param);
     void DoTruncateThread(const DeleteStruct *ds);
@@ -204,7 +204,7 @@ class MainServer : public QObject, public MythSocketCBs
 
     QTimer *masterServerReconnect; // audited ref #5318
     PlaybackSock *masterServer;
-    
+
     bool ismaster;
 
     QMutex deletelock;
@@ -219,8 +219,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     struct DeferredDeleteStruct
     {
-        PlaybackSock *sock; 
-        QDateTime ts; 
+        PlaybackSock *sock;
+        QDateTime ts;
     };
 
     QMutex deferredDeleteLock;

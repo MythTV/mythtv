@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: upnpcdstv.cpp
-//                                                                            
-// Purpose - uPnp Content Directory Extension for Recorded TV  
-//                                                                            
+//
+// Purpose - uPnp Content Directory Extension for Recorded TV
+//
 // Created By  : David Blain                    Created On : Jan. 24, 2005
-// Modified By :                                Modified On:                  
-//                                                                            
+// Modified By :                                Modified On:
+//
 //////////////////////////////////////////////////////////////////////////////
 
 // POSIX headers
@@ -36,9 +36,9 @@
 */
 
 
-UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] = 
+UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
 {
-    {   "All Recordings", 
+    {   "All Recordings",
         "*",
         "SELECT 0 as key, "
           "CONCAT( title, ': ', subtitle) as name, "
@@ -48,7 +48,7 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "ORDER BY starttime DESC",
         "" },
 
-    {   "By Title", 
+    {   "By Title",
         "title",
         "SELECT title as id, "
           "title as name, "
@@ -56,11 +56,11 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "FROM recorded "
             "%1 "
             "GROUP BY title "
-            "ORDER BY title", 
+            "ORDER BY title",
         "WHERE title=:KEY" },
 
-    {   "By Genre", 
-        "category", 
+    {   "By Genre",
+        "category",
         "SELECT category as id, "
           "category as name, "
           "count( category ) as children "
@@ -81,8 +81,8 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
             "ORDER BY starttime DESC",
         "WHERE DATE_FORMAT(starttime, '%Y-%m-%d') =:KEY" },
 
-    {   "By Channel", 
-        "chanid", 
+    {   "By Channel",
+        "chanid",
         "SELECT channel.chanid as id, "
           "CONCAT(channel.channum, ' ', channel.callsign) as name, "
           "count( channum ) as children "
@@ -94,8 +94,8 @@ UPnpCDSRootInfo UPnpCDSTv::g_RootNodes[] =
         "WHERE channel.chanid=:KEY" },
 
 
-    {   "By Group", 
-        "recgroup", 
+    {   "By Group",
+        "recgroup",
         "SELECT recgroup as id, "
           "recgroup as name, count( recgroup ) as children "
             "FROM recorded "
@@ -112,9 +112,9 @@ int UPnpCDSTv::g_nRootCount = sizeof( g_RootNodes ) / sizeof( UPnpCDSRootInfo );
 /////////////////////////////////////////////////////////////////////////////
 
 UPnpCDSRootInfo *UPnpCDSTv::GetRootInfo( int nIdx )
-{ 
+{
     if ((nIdx >=0 ) && ( nIdx < g_nRootCount ))
-        return &(g_RootNodes[ nIdx ]); 
+        return &(g_RootNodes[ nIdx ]);
 
     return NULL;
 }
@@ -181,7 +181,7 @@ bool UPnpCDSTv::IsBrowseRequestForUs( UPnpCDSRequest *pRequest )
 
     // WMP11 compatibility code
 
-    if (( pRequest->m_sObjectId                  == "13") && 
+    if (( pRequest->m_sObjectId                  == "13") &&
         ( gContext->GetSetting("UPnP/WMPSource") !=  "1") )
     {
         pRequest->m_sObjectId = "RecTv/0";
@@ -209,7 +209,7 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
     // XBox 360 compatibility code
     // ----------------------------------------------------------------------
 
-    if ((pRequest->m_sObjectId == "") && (pRequest->m_sContainerID != ""))
+    if ((pRequest->m_sObjectId.isEmpty()) && (!pRequest->m_sContainerID.isEmpty()))
         pRequest->m_sObjectId = pRequest->m_sContainerID;
 
     // ----------------------------------------------------------------------
@@ -222,10 +222,10 @@ bool UPnpCDSTv::IsSearchRequestForUs( UPnpCDSRequest *pRequest )
 
     if ( bOurs && ( pRequest->m_sObjectId == "0" ))
     {
-        if ( gContext->GetSetting("UPnP/WMPSource") != "1")
+        if ( gContext->GetSetting("UPnP/WMPSource") != "1") // GetBoolSetting()?
         {
             pRequest->m_sObjectId = "RecTv/0";
-            pRequest->m_sParentId = "8";        // -=>TODO: Not sure why this was added
+            pRequest->m_sParentId = '8';        // -=>TODO: Not sure why this was added
         }
         else
             bOurs = false;
@@ -276,7 +276,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     QString sName      = sTitle + ": " + (sSubtitle.isEmpty() ? sDescription : sSubtitle);
 
     QString sURIBase   = QString( "http://%1:%2/Myth/" )
-                            .arg( m_mapBackendIp  [ sHostName ] ) 
+                            .arg( m_mapBackendIp  [ sHostName ] )
                             .arg( m_mapBackendPort[ sHostName ] );
 
     QString sURIParams = QString( "?ChanId=%1&amp;StartTime=%2" )
@@ -287,8 +287,8 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
                             .arg( sObjectId )
                             .arg( sURIParams );
 
-    CDSObject *pItem   = CDSObject::CreateVideoItem( sId, 
-                                                     sName, 
+    CDSObject *pItem   = CDSObject::CreateVideoItem( sId,
+                                                     sName,
                                                      sObjectId );
     pItem->m_bRestricted  = false;
     pItem->m_bSearchable  = true;
@@ -317,7 +317,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     //pItem->SetPropValue( "region"         , );
 
     // ----------------------------------------------------------------------
-    // Needed for Microsoft Media Player Compatibility 
+    // Needed for Microsoft Media Player Compatibility
     // (Won't display correct Title without them)
     // ----------------------------------------------------------------------
 
@@ -345,7 +345,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     // DLNA string below is temp fix for ps3 seeking.
     QString sProtocol = QString( "http-get:*:%1:DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000" ).arg( sMimeType  );
     QString sURI      = QString( "%1GetRecording%2").arg( sURIBase   )
-                                                    .arg( sURIParams ); 
+                                                    .arg( sURIParams );
 
     Resource *pRes = pItem->AddResource( sProtocol, sURI );
 
@@ -385,7 +385,7 @@ void UPnpCDSTv::AddItem( const QString           &sObjectId,
     // ----------------------------------------------------------------------
 
     sURI = QString( "%1GetPreviewImage%2").arg( sURIBase   )
-                                          .arg( sURIParams ); 
+                                          .arg( sURIParams );
 
     pItem->SetPropValue( "albumArtURI", sURI );
 

@@ -315,7 +315,7 @@ void HouseKeeper::flushLogs()
 
 void *HouseKeeper::runMFDThread(void *param)
 {
-    HouseKeeper *keep = (HouseKeeper *)param;
+    HouseKeeper *keep = static_cast<HouseKeeper *>(param);
     keep->RunMFD();
     return NULL;
 }
@@ -627,7 +627,7 @@ void HouseKeeper::RunStartupTasks(void)
 
 void *HouseKeeper::doHouseKeepingThread(void *param)
 {
-    HouseKeeper *hkeeper = (HouseKeeper*)param;
+    HouseKeeper *hkeeper = static_cast<HouseKeeper*>(param);
     hkeeper->RunHouseKeeping();
 
     return NULL;
