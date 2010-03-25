@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: upnpcdstv.h
-//                                                                            
-// Purpose - uPnp Content Directory Extention for Recorded TV 
-//                                                                            
+//
+// Purpose - uPnp Content Directory Extension for Video
+//
 // Created By  : David Blain                    Created On : Jan. 24, 2005
-// Modified By :                                Modified On:                  
-//                                                                            
+// Modified By :                                Modified On:
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef UPnpCDSVIDEO_H_
@@ -13,7 +13,7 @@
 
 #include "mainserver.h"
 #include "upnpcds.h"
-              
+
 typedef QMap<int, QString> IntMap;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ class UPnpCDSVideo : public UPnpCDSExtension
         virtual void             CreateItems   ( UPnpCDSRequest          *pRequest,
                                                  UPnpCDSExtensionResults *pResults,
                                                  int                      nNodeIdx,
-                                                 const QString           &sKey, 
+                                                 const QString           &sKey,
                                                  bool                     bAddRef );
 
         virtual bool             IsBrowseRequestForUs( UPnpCDSRequest *pRequest );
@@ -52,12 +52,12 @@ class UPnpCDSVideo : public UPnpCDSExtension
         virtual QString          GetTableName  ( QString sColumn );
         virtual QString          GetItemListSQL( QString sColumn = "");
 
-        virtual void             BuildItemQuery( MSqlQuery        &query, 
+        virtual void             BuildItemQuery( MSqlQuery        &query,
                                                  const QStringMap &mapParams );
 
         virtual void             AddItem( const QString           &sObjectId,
                                           UPnpCDSExtensionResults *pResults,
-                                          bool                     bAddRef, 
+                                          bool                     bAddRef,
                                           MSqlQuery               &query );
 
     public:

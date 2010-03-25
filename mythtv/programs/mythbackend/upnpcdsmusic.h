@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
 // Program Name: upnpcdsmusic.h
-//                                                                            
-// Purpose - uPnp Content Directory Extention for Recorded TV 
-//                                                                            
+//
+// Purpose - uPnp Content Directory Extension for Music
+//
 // Created By  : David Blain                    Created On : Jan. 24, 2005
-// Modified By :                                Modified On:                  
-//                                                                            
+// Modified By :                                Modified On:
+//
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef UPnpCDSMusic_H_
@@ -14,7 +14,7 @@
 #include <QString>
 
 #include "upnpcds.h"
-              
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -36,12 +36,12 @@ class UPnpCDSMusic : public UPnpCDSExtension
         virtual QString          GetTableName  ( QString sColumn );
         virtual QString          GetItemListSQL( QString sColumn = "" );
 
-        virtual void             BuildItemQuery( MSqlQuery        &query, 
+        virtual void             BuildItemQuery( MSqlQuery        &query,
                                                  const QStringMap &mapParams );
 
         virtual void             AddItem( const QString           &sObjectId,
                                           UPnpCDSExtensionResults *pResults,
-                                          bool                     bAddRef, 
+                                          bool                     bAddRef,
                                           MSqlQuery               &query );
     public:
 
