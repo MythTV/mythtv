@@ -341,6 +341,7 @@ public slots:
                       bool select = false);
     bool removeSelection(const QString &label,
                          QString value = QString::null);
+    void editTextChanged(const QString &newText);
 
 private:
     bool rw;

@@ -643,31 +643,24 @@ QWidget* ComboBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     for(unsigned int i = 0 ; i < labels.size() ; ++i)
         cbwidget->insertItem(labels[i]);
 
+    cbwidget->setMaxCount(cbwidget->count() + rw);
+
     if (isSet)
         cbwidget->setCurrentIndex(current);
 
     if (1 < step)
         cbwidget->setStep(step);
 
-    if (rw)
-    {
-        connect(cbwidget, SIGNAL(highlighted(const QString &)),
-                this, SLOT(setValue(const QString &)));
-        connect(cbwidget, SIGNAL(activated(const QString &)),
-                this, SLOT(setValue(const QString &)));
-        connect(cbwidget, SIGNAL(editTextChanged(const QString &)),
-                this, SLOT(setValue(const QString &)));
-    }
-    else
-    {
-        connect(cbwidget, SIGNAL(highlighted(int)),
-                this, SLOT(setValue(int)));
-        connect(cbwidget, SIGNAL(activated(int)),
-                this, SLOT(setValue(int)));
-    }
-
+    connect(cbwidget, SIGNAL(highlighted(int)),
+            this, SLOT(setValue(int)));
+    connect(cbwidget, SIGNAL(activated(int)),
+            this, SLOT(setValue(int)));
     connect(this, SIGNAL(selectionsCleared()),
             cbwidget, SLOT(clear()));
+
+    if (rw)
+        connect(cbwidget, SIGNAL(editTextChanged(const QString &)),
+                this, SLOT(editTextChanged(const QString &)));
 
     if (cg)
         connect(cbwidget, SIGNAL(changeHelpText(QString)), cg,
@@ -728,14 +721,14 @@ void ComboBoxSetting::setValue(QString newValue)
         if (cbwidget)
             cbwidget->setCurrentIndex(current);
     }
-};
+}
 
 void ComboBoxSetting::setValue(int which)
 {
     if (cbwidget)
         cbwidget->setCurrentIndex(which);
     SelectSetting::setValue(which);
-};
+}
 
 void ComboBoxSetting::addSelection(
     const QString &label, QString value, bool select)
@@ -769,6 +762,30 @@ bool ComboBoxSetting::removeSelection(const QString &label, QString value)
     }
 
     return false;
+}
+
+void ComboBoxSetting::editTextChanged(const QString &newText)
+{
+    if (cbwidget)
+    {
+        for (uint i = 0; i < labels.size(); i++)
+            if (labels[i] == newText)
+                return;
+
+        if (labels.size() == static_cast<size_t>(cbwidget->maxCount()))
+        {
+            SelectSetting::removeSelection(labels[cbwidget->maxCount() - 1],
+                                           values[cbwidget->maxCount() - 1]);
+            cbwidget->setItemText(cbwidget->maxCount() - 1, newText);
+        }
+        else
+        {
+            cbwidget->insertItem(newText);
+        }
+
+        SelectSetting::addSelection(newText, newText, true);
+        cbwidget->setCurrentIndex(cbwidget->maxCount() - 1);
+    }
 }
 
 void ComboBoxSetting::setHelpText(const QString &str)
