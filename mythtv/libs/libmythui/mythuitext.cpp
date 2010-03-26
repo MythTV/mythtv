@@ -519,7 +519,7 @@ QString MythUIText::cutDown(const QString &data, MythFontProperties *font,
                                                data.left(index + margin + 1)
                                                ).height();
         else
-            diff = maxwidth - fm.width(data, index + margin);
+            diff = maxwidth - fm.width(data, index + margin + 1);
         if (diff >= 0)
             index += margin;
 
