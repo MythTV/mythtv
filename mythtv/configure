@@ -641,10 +641,6 @@ add_asflags(){
     append ASFLAGS $($filter_asflags "$@")
 }
 
-add_ecflags(){
-    append ECFLAGS "$@"
-}
-
 add_optflags(){
     append OPTFLAGS "$@"
 }
@@ -670,14 +666,14 @@ check_cc(){
     log check_cc "$@"
     cat > $TMPC
     log_file $TMPC
-    check_cmd $cc $CPPFLAGS $CFLAGS $ECFLAGS $OPTFLAGS "$@" -c -o $TMPO $TMPC
+    check_cmd $cc $CPPFLAGS $CFLAGS $OPTFLAGS "$@" -c -o $TMPO $TMPC
 }
 
 check_cpp(){
     log check_cpp "$@"
     cat > $TMPC
     log_file $TMPC
-    check_cmd $cc $CPPFLAGS $CFLAGS $ECFLAGS $OPTFLAGS "$@" -E -o $TMPO $TMPC
+    check_cmd $cc $CPPFLAGS $CFLAGS $OPTFLAGS "$@" -E -o $TMPO $TMPC
 }
 
 check_cxx(){
@@ -747,13 +743,6 @@ check_cflags(){
     log check_cflags "$@"
     set -- $($filter_cflags "$@")
     check_cc "$@" <<EOF && append CFLAGS "$@"
-int x;
-EOF
-}
-
-check_ecflags(){
-    log check_ecflags "$@"
-    check_cc $@ <<EOF && add_ecflags "$@" || echolog "WARNING! An unknown C compiler flag in: \"$@\". Option(s) will be ignored."
 int x;
 EOF
 }
@@ -1958,8 +1947,6 @@ for opt do
     --compile-type=*) compile_type=$optval
     ;;
     --libdir-name=*) libdir_name=$optval
-    ;;
-    --extra-cflags=*) add_ecflags $optval
     ;;
     --extra-cxxflags=*) add_cxxflags $optval
     ;;
@@ -4292,7 +4279,6 @@ ASFLAGS=$ASFLAGS
 CC_O=$CC_O
 PROFILEFLAGS=$PROFILEFLAGS
 OPTFLAGS=$OPTFLAGS
-ECFLAGS=$CFLAGS $ECFLAGS
 ECXXFLAGS=$ECXXFLAGS
 LDFLAGS=$LDFLAGS
 FFSERVERLDFLAGS=$FFSERVERLDFLAGS
