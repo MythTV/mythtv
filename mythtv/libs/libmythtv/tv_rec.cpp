@@ -1936,9 +1936,9 @@ bool TVRec::SetupDTVSignalMonitor(void)
         }
 
         asd->Reset();
-        sd->SetRecordingType(recording_type);
         sm->SetStreamData(sd);
         sm->SetChannel(major, minor);
+        sd->SetRecordingType(recording_type);
 
         // Try to get pid of VCT from cache and
         // require MGT if we don't have VCT pid.
@@ -1977,9 +1977,9 @@ bool TVRec::SetupDTVSignalMonitor(void)
             sd->SetIgnoreCRC(GetDVBChannel()->HasCRCBug());
 
         dsd->Reset();
-        sd->SetRecordingType(recording_type);
         sm->SetStreamData(sd);
         sm->SetDVBService(netid, tsid, progNum);
+        sd->SetRecordingType(recording_type);
 
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPMT |
                      SignalMonitor::kDTVSigMon_WaitForSDT |
@@ -2014,9 +2014,9 @@ bool TVRec::SetupDTVSignalMonitor(void)
 #endif // USING_DVB
 
         sd->Reset();
-        sd->SetRecordingType(recording_type);
         sm->SetStreamData(sd);
         sm->SetProgramNumber(progNum);
+        sd->SetRecordingType(recording_type);
 
         sm->AddFlags(SignalMonitor::kDTVSigMon_WaitForPAT |
                      SignalMonitor::kDTVSigMon_WaitForPMT |
