@@ -3223,7 +3223,7 @@ Returning to the previous menu.</translation>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="383"/>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../libs/libmythui/myththemedmenu.cpp" line="935"/>
@@ -12585,7 +12585,7 @@ name can not be blank.</source>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2231"/>
         <source>Customise exit menu options</source>
-        <translation type="unfinished"></translation>
+        <translation>Customize exit menu options</translation>
     </message>
     <message>
         <location filename="../programs/mythfrontend/globalsettings.cpp" line="2233"/>
@@ -17757,7 +17757,7 @@ Select a Current Recording</source>
     <message>
         <location filename="../themes/themestrings.h" line="194"/>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../themes/themestrings.h" line="195"/>
