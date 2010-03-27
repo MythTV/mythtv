@@ -644,7 +644,15 @@ PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel)
 
 const PixmapChannel *GuideGrid::GetChannelInfo(uint chan_idx, int sel) const
 {
-    return (this->GetChannelInfo(chan_idx, sel));
+    sel = (sel >= 0) ? sel : m_channelInfoIdx[chan_idx];
+
+    if (chan_idx >= GetChannelCount())
+        return NULL;
+
+    if (sel >= (int) m_channelInfos[chan_idx].size())
+        return NULL;
+
+    return &(m_channelInfos[chan_idx][sel]);
 }
 
 uint GuideGrid::GetChannelCount(void) const
