@@ -81,8 +81,12 @@ BrowserConfig::~BrowserConfig()
 
 void BrowserConfig::slotSave(void)
 {
-    //FIXME should check the zoom level is a valid value 0.3 to 5.0
-    gContext->SaveSetting("WebBrowserZoomLevel", m_zoomEdit->GetText());
+    float zoom = m_zoomEdit->GetText().toFloat();
+    if (zoom > 5.0)
+        zoom = 5.0;
+    if (zoom < 0.3)
+        zoom = 0.3; 
+    gContext->SaveSetting("WebBrowserZoomLevel", QString("%1").arg(zoom));
     gContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
 
     Close();
