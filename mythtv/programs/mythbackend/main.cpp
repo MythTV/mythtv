@@ -7,6 +7,7 @@
 #include <libgen.h>
 #include <signal.h>
 #include <pwd.h>
+#include <grp.h>
 
 #include "mythconfig.h"
 #if CONFIG_DARWIN
@@ -893,6 +894,11 @@ int main(int argc, char **argv)
             if (setgid(user_info->pw_gid) == -1)
             {
                 VERBOSE(VB_IMPORTANT, "Error setting effective group.");
+                return BACKEND_EXIT_PERMISSIONS_ERROR;
+            }
+            if (initgroups(user_info->pw_name, user_info->pw_gid) == -1)
+            {
+                VERBOSE(VB_IMPORTANT, "Error setting groups.");
                 return BACKEND_EXIT_PERMISSIONS_ERROR;
             }
             if (setuid(user_info->pw_uid) == -1)
