@@ -3904,7 +3904,7 @@ if test -d ${sysroot}/usr/share/nvidia/include/GL; then
     append CONFIG_INCLUDEPATH "${sysroot}/usr/share/nvidia/include"
 fi
 
-check_foo_config directfb directfb directfb.h DirectFBInit
+! disabled directfb && check_foo_config directfb directfb directfb.h DirectFBInit
 
 if enabled directfb; then
     CONFIG_DIRECTFB_LIBS=`directfb-config --libs`
