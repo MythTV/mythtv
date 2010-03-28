@@ -478,9 +478,6 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
             .arg(desiredFrame).arg(framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
-    if (!GetPositionMapSize())
-        return false;
-
     if (!DoRewindSeek(desiredFrame))
         return false;
 
@@ -520,6 +517,12 @@ bool DecoderBase::DoRewindSeek(long long desiredFrame)
     }
 
     ConditionallyUpdatePosMap(desiredFrame);
+
+    if (!GetPositionMapSize())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "PosMap is empty, can't seek");
+        return false;
+    }
 
     // Find keyframe <= desiredFrame, store in lastKey (frames)
     int pre_idx, post_idx;
