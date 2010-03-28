@@ -283,7 +283,7 @@ void parseAudio(QDomElement &element, ProgInfo *pginfo)
 ProgInfo *XMLTVParser::parseProgram(
     QDomElement &element, int localTimezoneOffset)
 {
-    QString uniqueid, seriesid, season, episode;
+    QString uniqueid, season, episode;
     int dd_progid_done = 0;
     ProgInfo *pginfo = new ProgInfo();
 
@@ -528,11 +528,8 @@ ProgInfo *XMLTVParser::parseProgram(
         programid.append(uniqueid);
     else
     {
-        if (seriesid.isEmpty()) //need to hash ourself a seriesid from the title
-        {
-            seriesid = QString::number(ELFHash(pginfo->title.toLocal8Bit()
+        QString seriesid = QString::number(ELFHash(pginfo->title.toLocal8Bit()
                                                .constData()));
-        }
         pginfo->seriesId = seriesid;
         programid.append(seriesid);
 

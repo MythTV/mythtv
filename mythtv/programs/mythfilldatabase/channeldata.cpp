@@ -136,7 +136,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
     fileprefix += "/";
 
     QList<ChanInfo>::iterator i = chanlist->begin();
-    for (; i != chanlist->end(); i++)
+    for (; i != chanlist->end(); ++i)
     {
         QString localfile;
 
@@ -425,7 +425,7 @@ void ChannelData::handleChannels(int id, QList<ChanInfo> *chanlist)
                                                      false /*hidden in guide*/,
                                                      (*i).freqid,
                                                      localfile,
-                                                     (*i).tvformat, 
+                                                     (*i).tvformat,
                                                      (*i).xmltvid
                                                             );
                     if (!retval)

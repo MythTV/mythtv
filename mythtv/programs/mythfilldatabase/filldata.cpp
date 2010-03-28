@@ -817,25 +817,21 @@ bool FillData::Run(SourceList &sourcelist)
 
                 if (refresh_request[i])
                 {
-		  if( i == 1 )
+                    if ( i == 1 )
                     {
-		      VERBOSE(VB_GENERAL,
-			      "Data Refresh always needed for tomorrow");
+                        VERBOSE(VB_GENERAL,
+                            "Data Refresh always needed for tomorrow");
                     }
-		  else
-		    {
-		      VERBOSE(VB_GENERAL,
-			      "Data Refresh needed because of user request");
-		    }
+                    else
+                    {
+                        VERBOSE(VB_GENERAL,
+                            "Data Refresh needed because of user request");
+                    }
                     download_needed = true;
                 }
                 else
                 {
                     // Check to see if we already downloaded data for this date.
-                    int prevChanCount = 0;
-                    int currentChanCount = 0;
-                    int previousDayCount = 0;
-                    int currentDayCount = 0;
 
                     querystr = "SELECT c.chanid, COUNT(p.starttime) "
                                "FROM channel c "
@@ -851,6 +847,11 @@ bool FillData::Run(SourceList &sourcelist)
                     if (query.exec(querystr.arg(i-1).arg(i).arg((*it).id)) &&
                         query.isActive())
                     {
+                        int prevChanCount = 0;
+                        int currentChanCount = 0;
+                        int previousDayCount = 0;
+                        int currentDayCount = 0;
+
                         VERBOSE(VB_CHANNEL, QString(
                                 "Checking program counts for day %1").arg(i-1));
 

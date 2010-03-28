@@ -58,10 +58,7 @@ class DOMException
     DOMException() : message("Unknown DOMException") {}
     virtual ~DOMException() {}
     DOMException(const QString &mes) : message(mes) {}
-    QString getMessage()
-    {
-        return message;
-    }
+    QString getMessage() const { return message; }
 };
 
 class DOMBadElementConversion : public DOMException
@@ -286,7 +283,7 @@ void IconData::Update(
     }
 
     while (!http_error && !fil.empty())
-    {            
+    {
         Save(fil.back(), data);
         fil.pop_back();
     }
@@ -459,7 +456,7 @@ void IconData::ExportIconMap(const QString &filename)
         QDomElement roote = iconmap.createElement(IM_DOC_TAG);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        
+
         query.prepare("SELECT * FROM callsignnetworkmap ORDER BY callsign;");
         if (query.exec())
         {
