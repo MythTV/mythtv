@@ -866,6 +866,8 @@ QMap<QString, QString> GetALSAPCMDevices(void)
     {
           name = snd_device_name_get_hint(*n, "NAME");
           desc = snd_device_name_get_hint(*n, "DESC");
+          VERBOSE(VB_AUDIO, QString("Found ALSA device: %1, (%2)")
+                                    .arg(name).arg(desc));
           alsadevs.insert(name, desc);
           n++;
     }

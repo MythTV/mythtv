@@ -56,8 +56,8 @@ AudioOutputDevice::AudioOutputDevice() : HostComboBox("AudioOutputDevice", true)
         {
             QString key = i.key();
             QString value = i.value();
-            audiodevs.insert(QString("ALSA:%1").arg(key), value);
             QString devname = QString("ALSA:%1").arg(key);
+            audiodevs.insert(devname, value);
             addSelection(devname, devname);
         }
     }
