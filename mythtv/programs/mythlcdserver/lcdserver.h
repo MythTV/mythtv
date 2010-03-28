@@ -1,9 +1,9 @@
 #ifndef LCDSERVER_H_
 #define LCDSERVER_H_
 /*
-	lcdserver.h
+    lcdserver.h
 
-	Headers for the core lcdserver object
+    Headers for the core lcdserver object
 
 */
 
@@ -17,7 +17,7 @@
 /*
   control how much debug info we get
   0 = none
-  1 = LCDServer info & LCDd info 
+  1 = LCDServer info & LCDd info
   2 = screen switch info
   10 = every command sent and error received
 */

@@ -1,7 +1,7 @@
 /*
-	main.cpp
+    main.cpp
 
-	Starting point for the myth lcd server daemon
+    Starting point for the myth lcd server daemon
 
 */
 

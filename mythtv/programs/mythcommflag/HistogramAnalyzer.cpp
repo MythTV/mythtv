@@ -236,10 +236,10 @@ HistogramAnalyzer::nuppelVideoPlayerInited(NuppelVideoPlayer *nvp,
             .arg(width).arg(height).arg(details));
 
     if (pgmConverter->nuppelVideoPlayerInited(nvp))
-	    return FrameAnalyzer::ANALYZE_FATAL;
+        return FrameAnalyzer::ANALYZE_FATAL;
 
     if (borderDetector->nuppelVideoPlayerInited(nvp))
-	    return FrameAnalyzer::ANALYZE_FATAL;
+        return FrameAnalyzer::ANALYZE_FATAL;
 
     mean = new float[nframes];
     median = new unsigned char[nframes];

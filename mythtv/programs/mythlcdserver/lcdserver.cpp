@@ -1,13 +1,13 @@
 /*
-	lcdserver.cpp
+    lcdserver.cpp
 
-	Methods for the core lcdserver object
+    Methods for the core lcdserver object
 */
 
 
 /*
     Command list
- 
+
     SWITCH_TO_TIME
     SWITCH_TO_MUSIC "Artist" "Album" "Track"
     SWITCH_TO_VOLUME "AppName"
@@ -17,24 +17,24 @@
         AppName is a string
         Popup can be TRUE or FALSE
         Text is a string
-        Checked can be CHECKED, UNCHECKED, NOTCHECKABLE     
+        Checked can be CHECKED, UNCHECKED, NOTCHECKABLE
         Selected can be TRUE or FALSE
         Scroll can be TRUE or FALSE
         Indent is an integer
         ... repeat as required
-        
+
     SWITCH_TO_GENERIC RowNo Align "Text" "Screen" Scrollable ...
         RowNo is an integer
         Align can be ALIGN_LEFT, ALIGN_RIGHT, ALIGN_CENTERED
-        Scrollable can be TRUE or FALSE 
+        Scrollable can be TRUE or FALSE
         ... repeat as required
-    
+
     SET_VOLUME_LEVEL <level>
         level is a float between 0.0 and 1.0
-    
+
     SET_CHANNEL_PROGRESS <progress>
         progress is a float between 0.0 and 1.0
-    
+
     SET_MUSIC_PROGRESS "Time" <progress>
         time is a string
         progress is a float between 0.0 and 1.0
@@ -82,7 +82,7 @@ LCDServer::LCDServer(int port, QString message, int messageTime)
     if (!m_lcd->SetupLCD())
     {
         delete m_lcd;
-        m_lcd = NULL; 
+        m_lcd = NULL;
     }
 
     //  Create the socket to listen to for connections
@@ -146,7 +146,7 @@ void LCDServer::endConnection(void)
 
 void LCDServer::readSocket()
 {
-    QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());    
+    QTcpSocket *socket = dynamic_cast<QTcpSocket*>(sender());
     m_lastSocket = socket;
 
     while(socket->canReadLine())
@@ -178,7 +178,7 @@ QStringList LCDServer::parseCommand(QString &command)
         {
             tokens.append(s);
             s = "";
-        }    
+        }
         else
             s = s + c;
     }
@@ -272,7 +272,7 @@ void LCDServer::parseTokens(const QStringList &tokens, QTcpSocket *socket)
         QString did_not_parse = tokens.join(" ");
 
         if (debug_level > 0)
-            VERBOSE(VB_IMPORTANT, "LCDServer::failed to parse this: " 
+            VERBOSE(VB_IMPORTANT, "LCDServer::failed to parse this: "
                 << did_not_parse);
 
         sendMessage(socket, "HUH?");
@@ -304,7 +304,7 @@ void LCDServer::sendKeyPress(QString key_pressed)
 
     // send key press to last client that sent us a message
     if (m_lastSocket)
-        sendMessage(m_lastSocket, "KEY " + key_pressed);  
+        sendMessage(m_lastSocket, "KEY " + key_pressed);
 }
 
 void LCDServer::sendConnected(QTcpSocket *socket)
@@ -378,7 +378,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         int row = tokens[x].toInt(&bOK);
         if (!bOK)
         {
-            VERBOSE(VB_IMPORTANT, "LCDServer: bad row no. in SWITCH_TO_GENERIC " 
+            VERBOSE(VB_IMPORTANT, "LCDServer: bad row no. in SWITCH_TO_GENERIC "
                     "command: " << tokens[x]);
             sendMessage(socket, "HUH?");
             return;
@@ -387,13 +387,13 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         TEXT_ALIGNMENT align;
         if (tokens[x + 1] == "ALIGN_LEFT")
             align = ALIGN_LEFT;
-        else if (tokens[x + 1] == "ALIGN_RIGHT") 
+        else if (tokens[x + 1] == "ALIGN_RIGHT")
             align = ALIGN_RIGHT;
         else if (tokens[x + 1] == "ALIGN_CENTERED")
             align = ALIGN_CENTERED;
         else
         {
-            VERBOSE(VB_IMPORTANT, "LCDServer: bad align in SWITCH_TO_GENERIC " 
+            VERBOSE(VB_IMPORTANT, "LCDServer: bad align in SWITCH_TO_GENERIC "
                     "command: " << tokens[x + 1]);
             sendMessage(socket, "HUH?");
             return;
@@ -405,7 +405,7 @@ void LCDServer::switchToGeneric(const QStringList &tokens, QTcpSocket *socket)
         if (tokens[x + 4] == "TRUE")
             scrollable = true;
         else if (tokens[x + 4] == "FALSE")
-            scrollable = false; 
+            scrollable = false;
         else
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad scrollable bool in "
@@ -432,7 +432,7 @@ void LCDServer::switchToChannel(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 4)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_CHANNEL command: " 
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_CHANNEL command: "
                 << flat);
         sendMessage(socket, "HUH?");
         return;
@@ -453,7 +453,7 @@ void LCDServer::switchToVolume(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 2)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_VOLUME command: " 
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SWITCH_TO_VOLUME command: "
                 << flat);
         sendMessage(socket, "HUH?");
         return;
@@ -485,7 +485,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
 
     if ((tokens.count() - 3) % 5 != 0)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad no. of args SWITCH_TO_MENU command: " 
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad no. of args SWITCH_TO_MENU command: "
                 << flat);
         sendMessage(socket, "HUH?");
         return;
@@ -497,10 +497,10 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
     if (tokens[2] == "TRUE")
         bPopup = true;
     else if (tokens[2] == "FALSE")
-        bPopup = false; 
+        bPopup = false;
     else
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad popup bool in SWITCH_TO_MENU " 
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad popup bool in SWITCH_TO_MENU "
                         "command: " << tokens[2]);
         sendMessage(socket, "HUH?");
         return;
@@ -514,14 +514,14 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
 
         CHECKED_STATE checked;
         if (tokens[x + 1] == "CHECKED")
-            checked = CHECKED;    
-        else if (tokens[x + 1] == "UNCHECKED") 
+            checked = CHECKED;
+        else if (tokens[x + 1] == "UNCHECKED")
             checked = UNCHECKED;
         else if (tokens[x + 1] == "NOTCHECKABLE")
             checked = NOTCHECKABLE;
         else
         {
-            VERBOSE(VB_IMPORTANT, "LCDServer: bad checked state in " 
+            VERBOSE(VB_IMPORTANT, "LCDServer: bad checked state in "
                     "SWITCH_TO_MENU command: " << tokens[x + 1]);
             sendMessage(socket, "HUH?");
             return;
@@ -531,7 +531,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         if (tokens[x + 2] == "TRUE")
             selected = true;
         else if (tokens[x + 2] == "FALSE")
-            selected = false; 
+            selected = false;
         else
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad selected state in "
@@ -544,7 +544,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         if (tokens[x + 3] == "TRUE")
             scrollable = true;
         else if (tokens[x + 3] == "FALSE")
-            scrollable = false; 
+            scrollable = false;
         else
         {
             VERBOSE(VB_IMPORTANT, "LCDServer: bad scrollable bool in "
@@ -557,7 +557,7 @@ void LCDServer::switchToMenu(const QStringList &tokens, QTcpSocket *socket)
         int indent = tokens[x + 4].toInt(&bOK);
         if (!bOK)
         {
-            VERBOSE(VB_IMPORTANT, "LCDServer: bad indent in SWITCH_TO_MENU " 
+            VERBOSE(VB_IMPORTANT, "LCDServer: bad indent in SWITCH_TO_MENU "
                             "command: " << tokens[x + 4]);
             sendMessage(socket, "HUH?");
             return;
@@ -591,7 +591,7 @@ void LCDServer::setChannelProgress(const QStringList &tokens, QTcpSocket *socket
     float progress = tokens[1].toFloat(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad float value in " 
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad float value in "
                 "SET_CHANNEL_PROGRESS command: %1" << tokens[1]);
         sendMessage(socket, "HUH?");
         return;
@@ -651,7 +651,7 @@ void LCDServer::setMusicProgress(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 3)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_MUSIC_PROGRESS command: " 
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_MUSIC_PROGRESS command: "
                 << flat);
         sendMessage(socket, "HUH?");
         return;
@@ -750,7 +750,7 @@ void LCDServer::setVolumeLevel(const QStringList &tokens, QTcpSocket *socket)
 
     if (tokens.count() != 2)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_VOLUME_LEVEL command: " 
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_VOLUME_LEVEL command: "
                 << flat);
         sendMessage(socket, "HUH?");
         return;
@@ -790,7 +790,7 @@ void LCDServer::updateLEDs(const QStringList &tokens, QTcpSocket *socket)
     int mask = tokens[1].toInt(&bOK);
     if (!bOK)
     {
-        VERBOSE(VB_IMPORTANT, "LCDServer: bad mask in UPDATE_LEDS " 
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad mask in UPDATE_LEDS "
                               "command: " << tokens[1]);
         sendMessage(socket, "HUH?");
         return;

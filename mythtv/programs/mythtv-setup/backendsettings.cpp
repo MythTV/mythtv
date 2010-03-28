@@ -176,7 +176,7 @@ static GlobalComboBox *StorageScheduler()
     gc->setHelpText(QObject::tr("This setting controls how the Storage Group "
                     "scheduling code will balance new recordings across "
                     "directories.  'Balanced Free Space' is the recommended "
-					"method for most users." ));
+                    "method for most users." ));
     return gc;
 };
 
@@ -438,7 +438,7 @@ static GlobalSpinBox *idleTimeoutSecs()
                     "auto shutdown."));
     return gc;
 };
-    
+
 static GlobalSpinBox *idleWaitForRecordingTime()
 {
     GlobalSpinBox *gc = new GlobalSpinBox("idleWaitForRecordingTime", 0, 120, 1);
@@ -632,7 +632,7 @@ static GlobalLineEdit *UserJobDesc(uint job_num)
                                             .arg(job_num));
     gc->setLabel(QObject::tr("User Job #%1 Description").arg(job_num));
     gc->setValue(QObject::tr("User Job #%1").arg(job_num));
-    gc->setHelpText(QObject::tr("The Description for this User Job."));  
+    gc->setHelpText(QObject::tr("The Description for this User Job."));
     return gc;
 };
 
@@ -716,8 +716,9 @@ static HostSpinBox *UPNPRebuildDelay()
 {
     HostSpinBox *gc = new HostSpinBox("UPnP/RebuildDelay", 0, 1440, 1);
     gc->setLabel(QObject::tr("Upnp Media Update Time"));
-    gc->setHelpText(QObject::tr("The number of minutes between mythbackend checking "
-			   " for new videos to serve via upnp. 0 = Off. "));
+    gc->setHelpText(QObject::tr("The number of minutes between mythbackend "
+                                "checking for new videos to serve via upnp. "
+                                "0 = Off. "));
     gc->setValue(30);
     return gc;
 };
@@ -1005,7 +1006,7 @@ BackendSettings::BackendSettings() {
     locale->addChild(FreqTable());
     locale->addChild(TimeOffset());
     addChild(locale);
-    
+
     VerticalConfigurationGroup* group2 = new VerticalConfigurationGroup(false);
     group2->setLabel(QObject::tr("Miscellaneous Settings"));
     VerticalConfigurationGroup* fm = new VerticalConfigurationGroup();
@@ -1025,7 +1026,7 @@ BackendSettings::BackendSettings() {
     addChild(group2);
 
     VerticalConfigurationGroup* group2a1 = new VerticalConfigurationGroup(false);
-    group2a1->setLabel(QObject::tr("EIT Scanner Options"));                
+    group2a1->setLabel(QObject::tr("EIT Scanner Options"));
     //group2a1->addChild(EITTimeOffset());
     group2a1->addChild(EITTransportTimeout());
     group2a1->addChild(EITIgnoresSource());
@@ -1043,7 +1044,7 @@ BackendSettings::BackendSettings() {
     group3->addChild(SetWakeuptimeCommand());
     group3->addChild(ServerHaltCommand());
     group3->addChild(preSDWUCheckCommand());
-    addChild(group3);    
+    addChild(group3);
 
     VerticalConfigurationGroup* group4 = new VerticalConfigurationGroup(false);
     group4->setLabel(QObject::tr("Backend Wakeup settings"));
@@ -1054,7 +1055,7 @@ BackendSettings::BackendSettings() {
     backend->addChild(WOLbackendConnectRetry());
     backend->addChild(WOLbackendCommand());
     group4->addChild(backend);
-    
+
     VerticalConfigurationGroup* slaveBackend = new VerticalConfigurationGroup();
     slaveBackend->setLabel(QObject::tr("Slave Backends"));
     slaveBackend->addChild(SleepCommand());
@@ -1067,7 +1068,7 @@ BackendSettings::BackendSettings() {
     backendControl->addChild(BackendStopCommand());
     backendControl->addChild(BackendStartCommand());
     addChild(backendControl);
-    
+
     VerticalConfigurationGroup* group5 = new VerticalConfigurationGroup(false);
     group5->setLabel(QObject::tr("Job Queue (Backend-Specific)"));
     group5->addChild(JobQueueMaxSimultaneousJobs());
@@ -1092,7 +1093,7 @@ BackendSettings::BackendSettings() {
     group5a2->addChild(JobAllowUserJob(4));
     group5a->addChild(group5a2);
     group5->addChild(group5a);
-    addChild(group5);    
+    addChild(group5);
 
     VerticalConfigurationGroup* group6 = new VerticalConfigurationGroup(false);
     group6->setLabel(QObject::tr("Job Queue (Global)"));
@@ -1102,7 +1103,7 @@ BackendSettings::BackendSettings() {
     group6->addChild(JobQueueTranscodeCommand());
     group6->addChild(AutoTranscodeBeforeAutoCommflag());
     group6->addChild(SaveTranscoding());
-    addChild(group6);    
+    addChild(group6);
 
     VerticalConfigurationGroup* group7 = new VerticalConfigurationGroup(false);
     group7->setLabel(QObject::tr("Job Queue (Job Commands)"));
@@ -1128,5 +1129,5 @@ BackendSettings::BackendSettings() {
 
     MythFillSettings *mythfill = new MythFillSettings();
     addChild(mythfill);
-    
+
 }

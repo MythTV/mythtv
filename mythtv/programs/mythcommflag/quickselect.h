@@ -15,7 +15,7 @@ float quick_select_float(float *arr, int nelems, int select);
 float quick_select_median_float(float *arr, int nelems);
 
 #ifdef __cplusplus
-}	/* extern "C" */
+}   /* extern "C" */
 #endif /* __cplusplus */
 
 #endif  /* !__QUICKSELECT_H__ */
