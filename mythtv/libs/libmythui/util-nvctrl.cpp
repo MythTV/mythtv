@@ -8,6 +8,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <cmath>
+#include <sstream>
+#include <locale>
 
 #include "mythxdisplay.h"
 
@@ -211,7 +213,9 @@ int GetNvidiaRates(t_screenrate& screenmap)
                     vfl = strtol(buf[8], NULL, 10);
                     hfl = strtol(buf[4], NULL, 10);
                     h = strtol(buf[5], NULL, 10);
-                    dcl = strtod(buf[0], NULL);
+                    istringstream istr(buf[0]);
+                    istr.imbue(locale("C"));
+                    istr >> dcl;
                     r = (dcl * 1000000.0) / (vfl * hfl);
                     irate = (int) round(r * 1000.0);
                     key = DisplayResScreen::CalcKey(w, h, (double) id);
