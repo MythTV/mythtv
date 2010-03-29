@@ -492,6 +492,8 @@ void RSSEditor::fillRSSButtonList()
         item->SetData(qVariantFromValue(*i));
         item->SetImage((*i)->GetImage());
         }
+        else
+            delete item;
     }
 }
 

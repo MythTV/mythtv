@@ -376,6 +376,8 @@ void NetSearch::fillGrabberButtonList()
         item->SetData((*i)->GetCommandline());
         item->SetImage((*i)->GetImage());
         }
+        else
+            delete item;
     }
 }
 
@@ -633,6 +635,8 @@ void NetSearch::populateResultList(ResultVideo::resultList list)
                                         pos);
             }
         }
+        else
+            delete item;
     }
     m_imageDownload->start();
 }
