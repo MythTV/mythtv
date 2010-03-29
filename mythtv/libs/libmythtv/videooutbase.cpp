@@ -1150,7 +1150,7 @@ void VideoOutput::ResizeVideo(VideoFrame *frame)
     // if resize == existing frame, no need to carry on
     abort |= !resize.left() && !resize.top() && (resize.size() == frameDim);
 
-    if (abort)
+    if (abort || !vsz_tmp_buf)
     {
         vsz_enabled = false;
         ShutdownVideoResize();

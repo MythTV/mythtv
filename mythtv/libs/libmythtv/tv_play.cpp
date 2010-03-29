@@ -2888,8 +2888,9 @@ void TV::timerEvent(QTimerEvent *te)
     {
         PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
         OSD *osd = GetOSDLock(actx);
-        if (osd && osd->GetSet("status") &&
-            osd->GetSet("status")->Displaying() &&
+        OSDSet *osdset = NULL;
+        if (osd && (osdset = osd->GetSet("status")) &&
+            osdset->Displaying() &&
             (StateIsLiveTV(actx->GetState()) ||
              StateIsPlaying(actx->GetState())))
         {
@@ -2945,7 +2946,7 @@ void TV::timerEvent(QTimerEvent *te)
             error = true;
         }
 
-        for (uint i = 0; mctx && (i < player.size()); i++)
+        for (uint i = 0; i < player.size(); i++)
         {
             PlayerContext *ctx = GetPlayer(mctx, i);
             if (error || ctx->IsErrored())
@@ -3081,6 +3082,8 @@ void TV::ScheduleStateChange(PlayerContext *ctx)
 
 void TV::SetErrored(PlayerContext *ctx)
 {
+    if (!ctx)
+        return;
     QMutexLocker locker(&timerIdLock);
     ctx->errored = true;
     KillTimer(errorRecoveryTimerId);
@@ -4709,7 +4712,7 @@ void TV::ProcessNetworkControlCommand(PlayerContext *ctx,
     }
 
     OSD *osd = GetOSDLock(ctx);
-    QString dlg = QString::null;
+    QString dlg;
     if (osd)
         dlg = osd->GetDialogActive();
     ReturnOSDLock(ctx, osd);
@@ -7533,13 +7536,16 @@ void TV::UpdateOSDSignal(const PlayerContext *ctx, const QStringList &strlist)
     //osd->ClearAllText("signal_info");
     //osd->SetText("signal_info", infoMap, -1);
 
-    osd = GetOSDLock(ctx);
-    osd->ClearAllText("channel_number");
-    osd->SetText("channel_number", infoMap, osd_prog_info_timeout);
-
     infoMap["description"] = sigDesc;
-    osd->ClearAllText("program_info");
-    osd->SetText("program_info", infoMap, osd_prog_info_timeout);
+
+    osd = GetOSDLock(ctx);
+    if (osd)
+    {
+        osd->ClearAllText("channel_number");
+        osd->SetText("channel_number", infoMap, osd_prog_info_timeout);
+        osd->ClearAllText("program_info");
+        osd->SetText("program_info", infoMap, osd_prog_info_timeout);
+    }
     ReturnOSDLock(ctx, osd);
 
     ctx->lastSignalMsg.clear();
@@ -8668,7 +8674,7 @@ void TV::customEvent(QEvent *e)
                               timeuntil, hasrec, haslater);
         }
 
-        for (uint i = 1; mctx && (i < player.size()); i++)
+        for (uint i = 1; i < player.size(); i++)
         {
             PlayerContext *ctx = GetPlayer(mctx, i);
             if (ctx->recorder && ctx->GetCardID() == cardnum)
@@ -10904,7 +10910,8 @@ void TV::ToggleAutoExpire(PlayerContext *ctx)
         if (ctx->CalcNVPSliderPosition(posInfo))
         {
             OSD *osd = GetOSDLock(ctx);
-            osd->ShowStatus(posInfo, false, desc, 1);
+            if (osd)
+                osd->ShowStatus(posInfo, false, desc, 1);
             ReturnOSDLock(ctx, osd);
         }
         SetUpdateOSDPosition(false);
@@ -10930,7 +10937,8 @@ void TV::SetAutoCommercialSkip(const PlayerContext *ctx,
         if (ctx->CalcNVPSliderPosition(posInfo))
         {
             OSD *osd = GetOSDLock(ctx);
-            osd->ShowStatus(posInfo, false, desc, 1);
+            if (osd)
+                osd->ShowStatus(posInfo, false, desc, 1);
             ReturnOSDLock(ctx, osd);
         }
         SetUpdateOSDPosition(false);
@@ -10952,7 +10960,8 @@ void TV::SetManualZoom(const PlayerContext *ctx, bool zoomON, QString desc)
         if (ctx->CalcNVPSliderPosition(posInfo))
         {
             OSD *osd = GetOSDLock(ctx);
-            osd->ShowStatus(posInfo, false, desc, 1);
+            if (osd)
+                osd->ShowStatus(posInfo, false, desc, 1);
             ReturnOSDLock(ctx, osd);
         }
         SetUpdateOSDPosition(false);
