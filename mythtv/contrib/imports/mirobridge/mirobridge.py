@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.5.7"
+__version__=u"v0.5.8"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -180,6 +180,7 @@ __version__=u"v0.5.7"
 # 0.5.7 The "DeletesFollowLinks" setting is incompatible with MiroBridge processings. A check
 #       and termination of MiroBridge with an appropriate error message has been added.
 #       Added better system error messages when an IOError exception occurs
+# 0.5.8 Add support for Miro version 3.0
 
 
 examples_txt=u'''
@@ -323,6 +324,14 @@ except Exception, e:
 
 # Find out if the Miro python bindings can be accessed and instances can be created
 try:
+    # Initialize locale as required for Miro v3.x
+    try:
+        # Setup gconf_name early on so we can load config values
+        from miro.plat import utils
+        utils.initialize_locale()
+    except:
+        pass
+
     # Set up gettext before everything else
     from miro import gtcache
     gtcache.init()
@@ -354,13 +363,15 @@ try:
     if config.get(prefs.APP_VERSION) < u"2.5.2":
         logger.info("Using mirobridge_interpreter_2_0_3")
         from mirobridge.mirobridge_interpreter_2_0_3 import MiroInterpreter
-    else:
+    elif config.get(prefs.APP_VERSION) < u"3.0":
         logger.info("Using mirobridge_interpreter_2_5_2")
         from mirobridge.mirobridge_interpreter_2_5_2 import MiroInterpreter
+    else:
+        logger.info("Using mirobridge_interpreter_3_0_0")
+        from mirobridge.mirobridge_interpreter_3_0_0 import MiroInterpreter
 except Exception, e:
     logger.critical(u"Importing mirobridge functions has failed. The following mirobridge files must be in the subdirectory 'mirobridge'.\n'mirobridge_interpreter_2_0_3.py' and 'mirobridge_interpreter_2_5_2.py', error(%s)" % e)
     sys.exit(1)
-
 
 def _can_int(x):
     """Takes a string, checks if it is numeric.
@@ -369,6 +380,8 @@ def _can_int(x):
     >>> _can_int("A test")
     False
     """
+    if x == None:
+        return False
     try:
         int(x)
     except ValueError:
