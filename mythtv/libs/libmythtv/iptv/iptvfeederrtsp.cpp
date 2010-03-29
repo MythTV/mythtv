@@ -107,6 +107,7 @@ bool IPTVFeederRTSP::Open(const QString &url)
                 QString("Failed to create RTSP client: %1")
                 .arg(_live_env->getResultMsg()));
         FreeEnv();
+        return false;
     }
 
     // Setup URL for the current session

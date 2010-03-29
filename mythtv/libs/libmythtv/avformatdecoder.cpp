@@ -1367,7 +1367,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
 
     float aspect_ratio = 0.0;
 
-    if (ringBuffer->isDVD())
+    if (ringBuffer && ringBuffer->isDVD())
         directrendering = false;
 
     if (selectedStream)
@@ -1795,7 +1795,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     map<int,uint> lang_sub_cnt;
     map<int,uint> lang_aud_cnt;
 
-    if (ringBuffer->isDVD() &&
+    if (ringBuffer && ringBuffer->isDVD() &&
         ringBuffer->DVD()->AudioStreamsChanged())
     {
         ringBuffer->DVD()->AudioStreamsChanged(false);
@@ -2382,6 +2382,9 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
 
     VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(true);
+
+    if (!frame)
+        return 0;
 
     for (int i = 0; i < 3; i++)
     {
@@ -4620,7 +4623,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
     AudioInfo old_in  = audioIn;
     bool using_passthru = false;
 
-    if ((currentTrack[kTrackTypeAudio] >= 0) &&
+    if ((currentTrack[kTrackTypeAudio] >= 0) && ic &&
         (selectedTrack[kTrackTypeAudio].av_stream_index <=
          (int) ic->nb_streams) &&
         (curstream = ic->streams[selectedTrack[kTrackTypeAudio]

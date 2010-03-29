@@ -4497,6 +4497,9 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
 {
     long long framesRead, framesLeft = 0;
 
+    if (!player_ctx)
+        return false;
+
     player_ctx->LockPlayingInfo(__FILE__, __LINE__);
     if (!player_ctx->playingInfo || player_ctx->playingInfo->isVideo ||
         !GetDecoder())
@@ -4513,7 +4516,7 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
 
     framesRead = GetDecoder()->GetFramesRead();
 
-    if (player_ctx && !player_ctx->IsPIP() &&
+    if (!player_ctx->IsPIP() &&
         player_ctx->GetState() == kState_WatchingPreRecorded)
     {
         framesLeft = margin;

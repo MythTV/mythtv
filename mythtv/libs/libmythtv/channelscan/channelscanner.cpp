@@ -419,7 +419,7 @@ void ChannelScanner::PreScanCommon(
 
 #ifdef USING_DVB
     dvbm = sigmonScanner->GetDVBSignalMonitor();
-    if (dvbm)
+    if (dvbm && mon)
         using_rotor = mon->HasFlags(SignalMonitor::kDVBSigMon_WaitForPos);
 #endif // USING_DVB
 

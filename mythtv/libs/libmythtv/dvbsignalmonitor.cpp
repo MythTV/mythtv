@@ -129,6 +129,8 @@ void DVBSignalMonitor::GetRotorStatus(bool &was_moving, bool &is_moving)
         return;
 
     const DiSEqCDevRotor *rotor = dvbchannel->GetRotor();
+    if (!rotor)
+        return;
 
     QMutexLocker locker(&statusLock);
     was_moving = rotorPosition.GetValue() < 100;

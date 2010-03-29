@@ -964,12 +964,18 @@ void LinuxFirewireDevice::UpdateDeviceListItem(uint64_t guid, void *pitem)
 
 LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void)
 {
+    if (!m_priv)
+        return NULL;
+
     avcinfo_list_t::iterator it = m_priv->devices.find(m_guid);
     return (it == m_priv->devices.end()) ? NULL : *it;
 }
 
 const LinuxAVCInfo *LinuxFirewireDevice::GetInfoPtr(void) const
 {
+    if (!m_priv)
+        return NULL;
+
     avcinfo_list_t::iterator it = m_priv->devices.find(m_guid);
     return (it == m_priv->devices.end()) ? NULL : *it;
 }

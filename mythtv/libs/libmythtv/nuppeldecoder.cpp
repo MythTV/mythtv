@@ -1154,6 +1154,8 @@ bool NuppelDecoder::GetFrame(DecodeType decodetype)
             }
 
             VideoFrame *buf = GetNVP()->GetNextVideoFrame();
+            if (!buf)
+                continue;
 
             ret = DecodeFrame(&frameheader, strm, buf);
             if (!ret)

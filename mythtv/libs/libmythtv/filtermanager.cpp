@@ -402,7 +402,7 @@ FilterChain *FilterManager::LoadFilters(QString Filters,
             break;
         }
 
-        if (NewFilt->filter)
+        if (NewFilt->filter && FiltChain)
         {
             FiltChain->Append(NewFilt);
         }
