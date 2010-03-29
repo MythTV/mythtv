@@ -12,27 +12,27 @@
 <context>
     <name>LocationDialog</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="944"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="948"/>
         <source>Search</source>
         <translation>Suchen</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="955"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="959"/>
         <source>Searching ...</source>
         <translation>Suche...</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="977"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="981"/>
         <source>Searching ... Results: %1</source>
         <translation>Suche.. Treffer: %1</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1025"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1029"/>
         <source>Search Complete. Results: %1</source>
         <translation>Suche beendet, %1 Treffer.</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="1046"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="1050"/>
         <source>Source: %1</source>
         <translation>Quelle: %1</translation>
     </message>
@@ -54,7 +54,7 @@
         <location filename="../mythweather/main.cpp" line="37"/>
         <location filename="../mythweather/main.cpp" line="39"/>
         <source>Search List</source>
-        <translation type="unfinished"></translation>
+        <translation>Listensuche</translation>
     </message>
 </context>
 <context>
@@ -228,22 +228,22 @@
 <context>
     <name>SourceSetup</name>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="770"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="774"/>
         <source>Finish</source>
         <translation> Beenden</translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="884"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="888"/>
         <source>Author: </source>
         <translation>Autor: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="886"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="890"/>
         <source>Email: </source>
         <translation>Email: </translation>
     </message>
     <message>
-        <location filename="../mythweather/weatherSetup.cpp" line="887"/>
+        <location filename="../mythweather/weatherSetup.cpp" line="891"/>
         <source>Version: </source>
         <translation>Version: </translation>
     </message>
@@ -996,12 +996,12 @@
     <message>
         <location filename="themestrings.h" line="11"/>
         <source>Temp</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatur</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="12"/>
         <source>Precip</source>
-        <translation type="unfinished"></translation>
+        <translation>Niederschlag</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="16"/>

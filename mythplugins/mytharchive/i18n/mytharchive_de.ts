@@ -9,32 +9,27 @@
         <translation>Datei für den Import finden</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="205"/>
         <source>Next</source>
-        <translation>Weiter</translation>
+        <translation type="obsolete">Weiter</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="208"/>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="211"/>
         <source>Previous</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="218"/>
         <source>Back</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="221"/>
         <source>Home</source>
-        <translation>Anfang</translation>
+        <translation type="obsolete">Anfang</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="271"/>
+        <location filename="../mytharchive/importnative.cpp" line="260"/>
         <source>The selected item is not a valid archive file!</source>
         <translation>Der gewählte Eintrag ist keine gültige Archivdatei!</translation>
     </message>
@@ -42,61 +37,54 @@
 <context>
     <name>EditMetadataDialog</name>
     <message>
-        <location filename="../mytharchive/editmetadata.cpp" line="46"/>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/editmetadata.cpp" line="43"/>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
 </context>
 <context>
     <name>ExportNative</name>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="87"/>
         <source>Finish</source>
-        <translation>Fertigstellen</translation>
+        <translation type="obsolete">Fertigstellen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="90"/>
         <source>Previous</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="93"/>
-        <location filename="../mytharchive/exportnative.cpp" line="385"/>
+        <location filename="../mytharchive/exportnative.cpp" line="374"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="101"/>
         <source>Add Recording</source>
-        <translation>Aufnahme hinzufügen</translation>
+        <translation type="obsolete">Aufnahme hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="104"/>
         <source>Add Video</source>
-        <translation>Video hinzufügen</translation>
+        <translation type="obsolete">Video hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="226"/>
+        <location filename="../mytharchive/exportnative.cpp" line="215"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Sie müssen mindestens einen Eintrag zum Archivieren hinzufügen!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="377"/>
+        <location filename="../mytharchive/exportnative.cpp" line="366"/>
         <source>Menu</source>
         <translation>Menü</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="384"/>
+        <location filename="../mytharchive/exportnative.cpp" line="373"/>
         <source>Remove Item</source>
         <translation>Eintrag entfernen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="517"/>
+        <location filename="../mytharchive/exportnative.cpp" line="506"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Es existieren keine Videos!</translation>
     </message>
@@ -104,27 +92,23 @@
 <context>
     <name>FileSelector</name>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="85"/>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="88"/>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="95"/>
         <source>Back</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="98"/>
         <source>Home</source>
-        <translation>Anfang</translation>
+        <translation type="obsolete">Anfang</translation>
     </message>
     <message>
-        <location filename="../mytharchive/fileselector.cpp" line="321"/>
+        <location filename="../mytharchive/fileselector.cpp" line="312"/>
         <source>The selected item is not a directory!</source>
         <translation>Der gewählte Eintrag ist kein Verzeichnis!</translation>
     </message>
@@ -147,47 +131,44 @@
 <context>
     <name>ImportNative</name>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="350"/>
         <source>Finish</source>
-        <translation>Fertigstellen</translation>
+        <translation type="obsolete">Fertigstellen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="353"/>
         <source>Previous</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="356"/>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="418"/>
+        <location filename="../mytharchive/importnative.cpp" line="399"/>
         <source>You need to select a valid chanID!</source>
         <translation>Sie müssen eine gültige chanID auswählen!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="448"/>
+        <location filename="../mytharchive/importnative.cpp" line="429"/>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
         <translation>Es war nicht möglich das Archiv zu importieren. Während der Ausführung von &quot;mytharchivehelper&quot; ist ein Fehler aufgetreten.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="578"/>
+        <location filename="../mytharchive/importnative.cpp" line="559"/>
         <source>Select a ChanID</source>
         <translation>ChanID wählen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="604"/>
+        <location filename="../mytharchive/importnative.cpp" line="585"/>
         <source>Select a ChanNo</source>
         <translation>ChanNo wählen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="630"/>
+        <location filename="../mytharchive/importnative.cpp" line="611"/>
         <source>Select a Channel Name</source>
         <translation>Sendername wählen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/importnative.cpp" line="656"/>
+        <location filename="../mytharchive/importnative.cpp" line="637"/>
         <source>Select a Callsign</source>
         <translation>Kurzname wählen</translation>
     </message>
@@ -195,43 +176,40 @@
 <context>
     <name>LogViewer</name>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="81"/>
-        <location filename="../mytharchive/logviewer.cpp" line="310"/>
+        <location filename="../mytharchive/logviewer.cpp" line="302"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="84"/>
         <source>Update</source>
-        <translation>Aktualisieren</translation>
+        <translation type="obsolete">Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="87"/>
         <source>Exit</source>
-        <translation>Beenden</translation>
+        <translation type="obsolete">Beenden</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="296"/>
+        <location filename="../mytharchive/logviewer.cpp" line="288"/>
         <source>Menu</source>
         <translation>Menü</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="304"/>
+        <location filename="../mytharchive/logviewer.cpp" line="296"/>
         <source>Don&apos;t Auto Update</source>
         <translation>Nicht autom. aktualisieren</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="306"/>
+        <location filename="../mytharchive/logviewer.cpp" line="298"/>
         <source>Auto Update</source>
         <translation>Autom. aktualisieren</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="308"/>
+        <location filename="../mytharchive/logviewer.cpp" line="300"/>
         <source>Show Progress Log</source>
         <translation>Fortschritt anzeigen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="309"/>
+        <location filename="../mytharchive/logviewer.cpp" line="301"/>
         <source>Show Full Log</source>
         <translation>ganzes Protokoll anzeigen</translation>
     </message>
@@ -239,106 +217,100 @@
 <context>
     <name>MythBurn</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="111"/>
         <source>Finish</source>
-        <translation>Fertigstellen</translation>
+        <translation type="obsolete">Fertigstellen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="114"/>
         <source>Previous</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="117"/>
-        <location filename="../mytharchive/mythburn.cpp" line="826"/>
+        <location filename="../mytharchive/mythburn.cpp" line="812"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="126"/>
         <source>Add Recording</source>
-        <translation>Aufnahme hinzufügen</translation>
+        <translation type="obsolete">Aufnahme hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="130"/>
         <source>Add Video</source>
-        <translation>Video hinzufügen</translation>
+        <translation type="obsolete">Video hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="133"/>
         <source>Add File</source>
-        <translation>Datei hinzufügen</translation>
+        <translation type="obsolete">Datei hinzufügen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="344"/>
-        <location filename="../mytharchive/mythburn.cpp" line="464"/>
+        <location filename="../mytharchive/mythburn.cpp" line="330"/>
+        <location filename="../mytharchive/mythburn.cpp" line="450"/>
         <source>Using Cutlist</source>
         <translation>Verwende Schnittliste</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="349"/>
-        <location filename="../mytharchive/mythburn.cpp" line="469"/>
+        <location filename="../mytharchive/mythburn.cpp" line="335"/>
+        <location filename="../mytharchive/mythburn.cpp" line="455"/>
         <source>Not Using Cutlist</source>
         <translation>Verwende keine Schnittliste</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="355"/>
-        <location filename="../mytharchive/mythburn.cpp" line="475"/>
+        <location filename="../mytharchive/mythburn.cpp" line="341"/>
+        <location filename="../mytharchive/mythburn.cpp" line="461"/>
         <source>No Cut List</source>
         <translation>Keine Schnittliste</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="366"/>
+        <location filename="../mytharchive/mythburn.cpp" line="352"/>
         <source>You need to add at least one item to archive!</source>
         <translation>Sie müssen mindestens einen Eintrag zum Archivieren hinzufügen!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="412"/>
+        <location filename="../mytharchive/mythburn.cpp" line="398"/>
         <source>Retrieving File Information. Please Wait...</source>
         <translation>Hole Dateiinformationen. Bitte warten...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="478"/>
+        <location filename="../mytharchive/mythburn.cpp" line="464"/>
         <source>Encoder: </source>
         <translation>Kodierer: </translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="804"/>
+        <location filename="../mytharchive/mythburn.cpp" line="790"/>
         <source>Menu</source>
         <translation>Menü</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="815"/>
+        <location filename="../mytharchive/mythburn.cpp" line="801"/>
         <source>Don&apos;t Use Cutlist</source>
         <translation>Keine Schnittliste verwenden</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="818"/>
+        <location filename="../mytharchive/mythburn.cpp" line="804"/>
         <source>Use Cutlist</source>
         <translation>Schnittliste verwenden</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="822"/>
+        <location filename="../mytharchive/mythburn.cpp" line="808"/>
         <source>Remove Item</source>
         <translation>Eintrag entfernen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="823"/>
+        <location filename="../mytharchive/mythburn.cpp" line="809"/>
         <source>Edit Details</source>
         <translation>Details bearbeiten</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="824"/>
+        <location filename="../mytharchive/mythburn.cpp" line="810"/>
         <source>Change Encoding Profile</source>
         <translation>Kodierprofil wechseln</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="825"/>
+        <location filename="../mytharchive/mythburn.cpp" line="811"/>
         <source>Edit Thumbnails</source>
         <translation>Miniaturbilder bearbeiten</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="961"/>
+        <location filename="../mytharchive/mythburn.cpp" line="947"/>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
         <translation>Die Erstellung der DVD war nicht möglich. Während des Ausführens der Skripte ist ein Fehler aufgetreten.</translation>
     </message>
@@ -384,9 +356,8 @@
 <context>
     <name>ProfileDialog</name>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1090"/>
         <source>Ok</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
 </context>
 <context>
@@ -532,7 +503,7 @@
         <translation>MythArchive externe Kommandos (2)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/logviewer.cpp" line="168"/>
+        <location filename="../mytharchive/logviewer.cpp" line="160"/>
         <source>Background creation has been asked to stop.
 This may take a few minutes.</source>
         <translation>Die Hintergrundverarbeitung wurde zum Anhalten angewiesen.
@@ -714,12 +685,12 @@ Dies kann einige Minuten in Anspruch nehmen.</translation>
         <translation>DVD-Menü Einstellungen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1004"/>
+        <location filename="../mytharchive/mythburn.cpp" line="990"/>
         <source>You don&apos;t have any videos!</source>
         <translation>Es existieren keine Videos!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/exportnative.cpp" line="480"/>
+        <location filename="../mytharchive/exportnative.cpp" line="469"/>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
         <translation>Die Erstellung der DVD war nicht möglich. Während des Ausführens der Skripte ist ein Fehler aufgetreten.</translation>
     </message>
@@ -753,42 +724,42 @@ Lösche Lock-Datei.</translation>
         <translation>Der letzte Durchgang hat keine DVD erzeugt.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1146"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1127"/>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
         <translation>Kann keine DVD brennen.
 Der letzte Durchgang hat keine DVD erzeugt.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1153"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1134"/>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
         <translation>
 Legen Sie eine leere DVD ins Laufwerk und wählen Sie eine Option.</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1152"/>
-        <location filename="../mytharchive/mythburn.cpp" line="1164"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1133"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1145"/>
         <source>Burn DVD</source>
         <translation>DVD brennen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1165"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1146"/>
         <source>Burn DVD Rewritable</source>
         <translation>DVD-RW brennen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1166"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1147"/>
         <source>Burn DVD Rewritable (Force Erase)</source>
         <translation>DVD-RW brennen (löschen forcieren)</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1167"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1148"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/mythburn.cpp" line="1222"/>
+        <location filename="../mytharchive/mythburn.cpp" line="1198"/>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
         <translation>Konnte mytharchivehelper nicht starten um die DVD zu brennen.</translation>
     </message>
@@ -796,45 +767,43 @@ Legen Sie eine leere DVD ins Laufwerk und wählen Sie eine Option.</translation>
 <context>
     <name>RecordingSelector</name>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="203"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="197"/>
         <source>Clear All</source>
         <translation>Auswahl löschen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="204"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="198"/>
         <source>Select All</source>
         <translation>Alles auswählen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="99"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="205"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="199"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="96"/>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="102"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="405"/>
-        <location filename="../mytharchive/recordingselector.cpp" line="475"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="99"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="399"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="469"/>
         <source>All Recordings</source>
         <translation>Alle Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="123"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="117"/>
         <source>Retrieving Recording List. Please Wait...</source>
         <translation>Hole Aufnahmenliste. Bitte warten...</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="147"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="141"/>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
         <translation>Entweder es existieren keine Aufnahmen oder sie sind nicht lokal verfügbar!</translation>
     </message>
     <message>
-        <location filename="../mytharchive/recordingselector.cpp" line="196"/>
+        <location filename="../mytharchive/recordingselector.cpp" line="190"/>
         <source>Menu</source>
         <translation>Menü</translation>
     </message>
@@ -842,24 +811,20 @@ Legen Sie eine leere DVD ins Laufwerk und wählen Sie eine Option.</translation>
 <context>
     <name>SelectDestination</name>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="72"/>
         <source>Next</source>
-        <translation>Weiter</translation>
+        <translation type="obsolete">Weiter</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="75"/>
         <source>Previous</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="78"/>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="90"/>
         <source>Find...</source>
-        <translation>Finden...</translation>
+        <translation type="obsolete">Finden...</translation>
     </message>
     <message>
         <location filename="../mytharchive/archiveutil.cpp" line="29"/>
@@ -902,8 +867,8 @@ Legen Sie eine leere DVD ins Laufwerk und wählen Sie eine Option.</translation>
         <translation>Jede verfügbare Datei</translation>
     </message>
     <message>
-        <location filename="../mytharchive/selectdestination.cpp" line="281"/>
-        <location filename="../mytharchive/selectdestination.cpp" line="337"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="272"/>
+        <location filename="../mytharchive/selectdestination.cpp" line="328"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
@@ -911,19 +876,16 @@ Legen Sie eine leere DVD ins Laufwerk und wählen Sie eine Option.</translation>
 <context>
     <name>ThemeSelector</name>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="73"/>
         <source>Next</source>
-        <translation>Weiter</translation>
+        <translation type="obsolete">Weiter</translation>
     </message>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="76"/>
         <source>Previous</source>
-        <translation>Zurück</translation>
+        <translation type="obsolete">Zurück</translation>
     </message>
     <message>
-        <location filename="../mytharchive/themeselector.cpp" line="79"/>
         <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <translation type="obsolete">Abbrechen</translation>
     </message>
 </context>
 <context>
@@ -1247,28 +1209,26 @@ Legen Sie eine leere DVD ins Laufwerk und wählen Sie eine Option.</translation>
 <context>
     <name>ThumbFinder</name>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="154"/>
         <source>Save</source>
-        <translation>Speichern</translation>
+        <translation type="obsolete">Speichern</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="157"/>
-        <location filename="../mytharchive/thumbfinder.cpp" line="902"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="896"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="900"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="894"/>
         <source>Exit, Save Thumbnails</source>
         <translation>Beenden, Miniaturbilder speichern</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="901"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="895"/>
         <source>Exit, Don&apos;t Save Thumbnails</source>
         <translation>Beenden, Miniaturbilder nicht speichern</translation>
     </message>
     <message>
-        <location filename="../mytharchive/thumbfinder.cpp" line="893"/>
+        <location filename="../mytharchive/thumbfinder.cpp" line="887"/>
         <source>Menu</source>
         <translation>Menü</translation>
     </message>
@@ -1276,39 +1236,37 @@ Legen Sie eine leere DVD ins Laufwerk und wählen Sie eine Option.</translation>
 <context>
     <name>VideoSelector</name>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="154"/>
+        <location filename="../mytharchive/videoselector.cpp" line="148"/>
         <source>Clear All</source>
         <translation>Auswahl löschen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="155"/>
+        <location filename="../mytharchive/videoselector.cpp" line="149"/>
         <source>Select All</source>
         <translation>Alles auswählen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="76"/>
-        <location filename="../mytharchive/videoselector.cpp" line="156"/>
+        <location filename="../mytharchive/videoselector.cpp" line="150"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="73"/>
         <source>OK</source>
-        <translation>Ok</translation>
+        <translation type="obsolete">Ok</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="354"/>
-        <location filename="../mytharchive/videoselector.cpp" line="474"/>
+        <location filename="../mytharchive/videoselector.cpp" line="348"/>
+        <location filename="../mytharchive/videoselector.cpp" line="479"/>
         <source>All Videos</source>
         <translation>Alle Videos</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="570"/>
+        <location filename="../mytharchive/videoselector.cpp" line="575"/>
         <source>Parental Pin:</source>
         <translation>Kindersicherungs-PIN:</translation>
     </message>
     <message>
-        <location filename="../mytharchive/videoselector.cpp" line="147"/>
+        <location filename="../mytharchive/videoselector.cpp" line="141"/>
         <source>Menu</source>
         <translation>Menü</translation>
     </message>
