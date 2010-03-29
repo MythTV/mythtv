@@ -26,8 +26,6 @@ installbliptvlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python
 installbliptvlibs.files = scripts/nv_python_libs/bliptv/*.py
 installdailymotionlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/dailymotion
 installdailymotionlibs.files = scripts/nv_python_libs/dailymotion/*.py
-installjoostlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/joost
-installjoostlibs.files = scripts/nv_python_libs/joost/*.py
 installmtvlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/mtv
 installmtvlibs.files = scripts/nv_python_libs/mtv/*.py
 installtmdblibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/tmdb
@@ -50,7 +48,7 @@ installmusicicons.path = $${PREFIX}/share/mythtv/mythnetvision/icons/directories
 installmusicicons.files = icons/directories/music_genres/*.png icons/directories/music_genres/*.jpg
 
 INSTALLS += installfiles installscripts installicons installpylibs
-INSTALLS += installbliptvlibs installdailymotionlibs installjoostlibs
+INSTALLS += installbliptvlibs installdailymotionlibs
 INSTALLS += installmtvlibs installtmdblibs installvimeolibs installvimeooauth installyoutubelibs
 INSTALLS += installdiricons installtopicicons installfilmicons installmusicicons
 
