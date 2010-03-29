@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.1"
+__version__=u"v0.7.2"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -294,11 +294,12 @@ __version__=u"v0.7.1"
  # 0.6.9 Fixed an abort when IMDBpy returns movie matches with incomplete data
  #       Fixed an abort where an IMDB# was being used instead of a TMDB#
  #       Fixed an abort when a storage directory name caused an UnicodeEncodeError or TypeError exception
- # 0.7.0 Fixed an ()-MW) option abort when a recorded program or upcoming program did not have a title
+ # 0.7.0 Fixed an (-MW) option abort when a recorded program or upcoming program did not have a title
  # 0.7.1 Fixed a bug where movies with punctutation ("Mr. Magoo") were not finding matches
  #       Fixed bug with interactive mode when a user enters a reference number directly rather than
  #       making a list selection
  #       These bugs were both identified by Edi Iten (thanks)
+ # 0.7.2 Fixed a bug where an inetref field was not properly initialized and caused an abort. Ticket #8243
 
 
 usage_txt=u'''
@@ -800,6 +801,8 @@ def _can_int(x):
     >>> _can_int("A test")
     False
     """
+    if x == None:
+        return False
     try:
         int(x)
     except ValueError:
@@ -5647,6 +5650,10 @@ class MythTvMetaData(VideoFiles):
             vim = Video(id=intid, db=mythvideo)
             for key in vim.keys():
                 meta_dict[key] = vim[key]
+
+            # Fix a metadata record that has an incorrectly initialized inetref number value
+            if meta_dict['inetref'] == None:
+                meta_dict['inetref'] = u'00000000'
             available_metadata = dict(meta_dict)
 
             available_metadata['season']=cfile['seasno']
