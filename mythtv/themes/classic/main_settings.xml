@@ -81,7 +81,7 @@
         <text lang="PL">Ustaw klawisze</text>
         <text lang="HE">עריכת מקשים</text>
         <text lang="HU">Billentyűzet beállítása</text>
-        <description>Change mythtv key bindings.</description>
+        <description>Change MythTV key bindings.</description>
         <description lang="DE">Tastaturbelegung anpassen</description>
         <action>SETUP_KEYS</action>
     </button>
