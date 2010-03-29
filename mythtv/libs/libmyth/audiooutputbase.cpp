@@ -305,10 +305,25 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
             resample = false;
     }
 
+    // Force resampling if we are encoding to AC3 and sr > 48k
+    if (audio_enc && audio_samplerate > 48000)
+    {
+        VERBOSE(VB_AUDIO, LOC + "Forcing resample to 48k for AC3 encode");
+        if (src_quality < 0)
+            src_quality = 1;
+        resample = true;
+    }
+
     if (resample && src_quality >= 0)
     {
         int error;
         audio_samplerate = rates.back();
+        // Limit sr to 48k if we are encoding to AC3
+        if (audio_enc && audio_samplerate > 48000)
+        {
+            VERBOSE(VB_AUDIO, LOC + "Limiting samplerate to 48k for AC3 encode");
+            audio_samplerate = 48000;
+        }
         VERBOSE(VB_GENERAL, LOC + QString("Using resampler. From: %1 to %2")
             .arg(settings.samplerate).arg(audio_samplerate));
         src_ctx = src_new(2-src_quality, source_audio_channels, &error);
@@ -332,9 +347,10 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
         encoder = new AudioOutputDigitalEncoder();
         if (!encoder->Init(CODEC_ID_AC3, 448000, audio_samplerate, audio_channels))
         {
-            VERBOSE(VB_AUDIO, LOC + "Can't create AC-3 encoder");
+            VERBOSE(VB_IMPORTANT, LOC + "Can't create AC-3 encoder");
             delete encoder;
             encoder = NULL;
+            audio_enc = false;
         }
     }
 
