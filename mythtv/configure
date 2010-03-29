@@ -2840,7 +2840,7 @@ case $target_os in
         append CCONFIG "freebsd"
         enable malloc_aligned
         # Workaround compile errors from missing u_int/uint def
-        CFLAGS=`echo $CFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
+        CPPFLAGS=`echo $CPPFLAGS | sed 's/-D_POSIX_C_SOURCE=200112//'`
         disable ivtv
         enable backend
         ;;
@@ -3841,7 +3841,7 @@ if test x"$xvmc_lib" != x""; then
     VENDOR_XVMC_LIBS="-l"$xvmc_lib
     disable xvmcw
 elif enabled xvmcw; then
-    VENDOR_XVMC_LIBS="-lXvMCW -ldl"
+    VENDOR_XVMC_LIBS="-lXvMCW $ldl"
 elif enabled xvmc_pro; then
     if has_library libviaXvMCPro ; then
         VENDOR_XVMC_LIBS="-lviaXvMCPro"
