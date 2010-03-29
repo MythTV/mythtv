@@ -89,15 +89,10 @@ bool ProgFinder::Create()
     return true;
 }
 
-void ProgFinder::Load(void)
-{
-    getShowNames();
-}
-
 void ProgFinder::Init(void)
 {
     m_allowKeypress = true;
-    
+
     m_timeFormat = gContext->GetSetting("TimeFormat");
     m_dateFormat = gContext->GetSetting("DateFormat");
 
@@ -670,22 +665,34 @@ bool ProgFinder::formatSelectedData(QString& data)
     bool retval = true;
     QString searchChar = m_alphabetList->GetValue();
 
-    if (searchChar == "T" || searchChar == "A")
+    if (searchChar == "T")
     {
-        if (data.left(5) == "The T" && searchChar == "T")
-            data = data.mid(4) + ", The";
-        else if (data.left(5) == "The A" && searchChar == "A")
-            data = data.mid(4) + ", The";
-        else if (data.left(3) == "A T" && searchChar == "T")
-            data = data.mid(2) + ", A";
-        else if (data.left(3) == "A A" && searchChar == "A")
-             data = data.mid(2) + ", A";
-        else if (data.left(4) == "An A" && searchChar == "A")
-             data = data.mid(3) + ", An";
-        else if (data.left(4) != "The " && data.left(2) != "A ")
+        if (data.left(4) != "The " && data.left(2) != "A ")
         {
              // nothing, use as is
         }
+        else if (data.left(5) == "The T")
+            data = data.mid(4) + ", The";
+        else if (data.left(3) == "A T")
+            data = data.mid(2) + ", A";
+        else
+        {
+            // don't add
+            retval = false;
+        }
+    }
+    else if (searchChar == "A")
+    {
+        if (data.left(4) != "The " && data.left(2) != "A ")
+        {
+             // nothing, use as is
+        }
+        else if (data.left(5) == "The A")
+            data = data.mid(4) + ", The";
+        else if (data.left(3) == "A A")
+             data = data.mid(2) + ", A";
+        else if (data.left(4) == "An A")
+             data = data.mid(3) + ", An";
         else
         {
             // don't add
@@ -696,9 +703,9 @@ bool ProgFinder::formatSelectedData(QString& data)
     {
         if (data.left(4) == "The ")
             data = data.mid(4) + ", The";
-        if (data.left(2) == "A ")
+        else if (data.left(2) == "A ")
             data = data.mid(2) + ", A";
-        if (data.left(3) == "An ")
+        else if (data.left(3) == "An ")
             data = data.mid(3) + ", An";
     }
 

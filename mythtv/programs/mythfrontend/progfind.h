@@ -53,7 +53,6 @@ class ProgFinder : public ScheduleCommon
   protected:
     typedef QMap<QString,QString> ShowName;
 
-    virtual void Load(void);
     virtual void Init(void);
 
     virtual void initAlphabetList(void);
@@ -98,7 +97,7 @@ class ProgFinder : public ScheduleCommon
 class JaProgFinder : public ProgFinder
 {
   public:
-    explicit JaProgFinder(MythScreenStack *parentStack, bool gg = false, 
+    explicit JaProgFinder(MythScreenStack *parentStack, bool gg = false,
                  TV *player = NULL, bool embedVideo = false);
 
   protected:
@@ -116,7 +115,7 @@ class JaProgFinder : public ProgFinder
 class HeProgFinder : public ProgFinder
 {
   public:
-    explicit HeProgFinder(MythScreenStack *parentStack, bool gg = false, 
+    explicit HeProgFinder(MythScreenStack *parentStack, bool gg = false,
                  TV *player = NULL, bool embedVideo = false);
 
   protected:
