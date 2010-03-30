@@ -507,6 +507,7 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
 
     RemoveFilter(filter);
     filters.erase(filter);
+    delete temp; // If temp wasn't added to the filter list, we need to delete
 
     return false;
 }

@@ -1025,6 +1025,7 @@ static void update_info(ChannelInsertInfo &info,
     info.is_data_service =
         (desc && !desc->IsDTV() && !desc->IsDigitalAudio());
     info.is_audio_service = (desc && desc->IsDigitalAudio());
+    delete desc;
 
     info.service_id = sdt->ServiceID(i);
     info.sdt_tsid   = sdt->TSID();

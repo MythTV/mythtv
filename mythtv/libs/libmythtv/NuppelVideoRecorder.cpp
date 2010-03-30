@@ -2627,6 +2627,7 @@ void NuppelVideoRecorder::doVbiThread(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Failed to query vbi capabilities (v4l1)");
+            cc_close(ntsc_cc);
             return;
         }
         VERBOSE(VB_RECORD, LOC + "vbi_format  rate: "<<vfmt.sampling_rate
@@ -2648,6 +2649,7 @@ void NuppelVideoRecorder::doVbiThread(void)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "VBI format has too many samples per frame");
+            cc_close(ntsc_cc);
             return;
         }
     }
