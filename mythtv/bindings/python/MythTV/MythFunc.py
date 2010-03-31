@@ -1088,7 +1088,7 @@ class MythVideo( MythDBBase ):
 
 # wrappers for backwards compatibility of old functions
     def pruneMetadata(self):
-        self.scanStorageGroups(returnnew=False)
+        self.scanStorageGroups()
 
     def getTitleId(self, title, subtitle=None, episode=None,
                             array=False, host=None):
