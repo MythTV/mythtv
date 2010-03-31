@@ -322,7 +322,7 @@
                     <filename>wide_button_background.png</filename>
                 </imagetype>
                 <textarea name="text">
-                    <area>5,6,173,30</area>
+                    <area>5,6,280,30</area>
                     <align>allcenter</align>
                     <font>basemediumwhite</font>
                     <font state="selected">basemediumwhite</font>

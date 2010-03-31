@@ -350,15 +350,15 @@
 
     <!-- Base definition of a wide button -->
     <button name="basewidebutton">
-        <area>0,0,188,44</area>
+        <position>0,0</area>
         <statetype name="buttonstate">
             <state name="active">
                 <imagetype name="background">
-                    <area>0,0,187,43</area>
+                    <position>0,0</position>
                     <filename>wide_button_background.png</filename>
                 </imagetype>
                 <textarea name="text">
-                    <area>4,2,290,40</area>
+                    <area>2,2,282,43</area>
                     <align>allcenter</align>
                     <font>basemedium_normal_button</font>
                     <font state="selected">basemedium_selected_button</font>
@@ -367,14 +367,14 @@
             </state>
             <state name="selected" from="active">
                 <imagetype name="background">
-                    <area>0,0,187,43</area>
+                    <area>2,2,282,43</area>
                     <filename>wide_button_selected_background.png</filename>
                 </imagetype>
             </state>
             <state name="disabled" from="active" />
             <state name="pushed" from="active">
                 <imagetype name="background">
-                    <area>0,0,187,43</area>
+                    <area>0,0,282,43</area>
                     <filename>wide_button_pushed_background.png</filename>
                 </imagetype>
                 <textarea name="text">

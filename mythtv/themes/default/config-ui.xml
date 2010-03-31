@@ -98,7 +98,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>0,39,775,270</area>
+            <area>10,39,780,275</area>
         </shape>
 
         <imagetype name="channum_column">
@@ -169,18 +169,49 @@
             <position>30,490</position>
         </checkbox>
 
-        <button name="scan" from="basewidebutton">
-            <position>55,540</position>
+        <button name="scan">
+            <area>35,540,220,43</area>
+            <statetype name="buttonstate">
+                <state name="active">
+                    <imagetype name="background">
+                        <area>0,0,220,43</area>
+                        <filename>wide_button_background.png</filename>
+                    </imagetype>
+                    <textarea name="text">
+                        <area>5,6,210,30</area>
+                        <align>allcenter</align>
+                        <font>basemedium</font>
+                        <font state="selected">basemedium</font>
+                        <font state="disabled">basemediumgrey</font>
+                    </textarea>
+                </state>
+                <state name="selected" from="active">
+                    <imagetype name="background">
+                        <area>0,0,220,43</area>
+                        <filename>wide_button_selected_background.png</filename>
+                    </imagetype>
+                </state>
+                <state name="disabled" from="active" />
+                <state name="pushed" from="active">
+                    <imagetype name="background">
+                        <area>0,0,220,43</area>
+                        <filename>wide_button_pushed_background.png</filename>
+                    </imagetype>
+                    <textarea name="text">
+                        <position>8,8</position>
+                    </textarea>
+                </state>
+            </statetype>
             <value>Channel Scan</value>
         </button>
 
-        <button name="importicons" from="basewidebutton">
-            <position>325,540</position>
+        <button name="importicons" from="scan">
+            <position>290,540</position>
             <value>Icon Download</value>
         </button>
 
-        <button name="edittransport" from="basewidebutton">
-            <position>585,540</position>
+        <button name="edittransport" from="scan">
+            <position>545,540</position>
             <value>Edit Transports</value>
         </button>
 
