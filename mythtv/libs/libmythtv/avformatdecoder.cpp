@@ -3412,21 +3412,51 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
     if (selTrack < 0 && numStreams)
     {
         VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (w/lang)");
+
+        // try to get the language track matching the frontend language.
+        QString language_key_convert = iso639_str2_to_str3(GetMythUI()->GetLanguage());
+        uint language_key = iso639_str3_to_key(language_key_convert);
+        uint canonical_key = iso639_key_to_canonical_key(language_key);
+
+        vector<int> flang = filter_lang(atracks, canonical_key);
+
+        selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+
+        if (selTrack < 0)
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
+
+        if (!transcoding && selTrack < 0)
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
+
+        if (selTrack < 0)
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_AC3);
+
+        if (selTrack < 0)
+            selTrack = filter_max_ch(ic, atracks, flang);
+
         // try to get best track for most preferred language
-        selTrack = -1;
-        vector<int>::const_iterator it = languagePreference.begin();
-        for (; it !=  languagePreference.end() && selTrack<0; ++it)
+        // Set by the "Guide Data" language prefs in Appearance.
+        if (selTrack < 0)
         {
-            vector<int> flang = filter_lang(atracks, *it);
+            vector<int>::const_iterator it = languagePreference.begin();
+            for (; it !=  languagePreference.end() && selTrack < 0; ++it)
+            {
+                vector<int> flang = filter_lang(atracks, *it);
 
-            if (allow_dts_passthru && !transcoding)
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
 
-            if (selTrack < 0)
-                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_AC3);
+                if (selTrack < 0)
+                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
 
-            if (selTrack < 0)
-                selTrack = filter_max_ch(ic, atracks, flang);
+                if (!transcoding && selTrack < 0)
+                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
+
+                if (selTrack < 0)
+                    selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_AC3);
+
+                if (selTrack < 0)
+                    selTrack = filter_max_ch(ic, atracks, flang);
+            }
         }
         // try to get best track for any language
         if (selTrack < 0)
@@ -3434,7 +3464,12 @@ int AvFormatDecoder::AutoSelectAudioTrack(void)
             VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (wo/lang)");
             vector<int> flang = filter_lang(atracks, -1);
 
-            if (allow_dts_passthru && !transcoding)
+            selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_TRUEHD);
+
+            if (selTrack < 0)
+                selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_EAC3);
+
+            if (!transcoding && selTrack < 0)
                 selTrack = filter_max_ch(ic, atracks, flang, CODEC_ID_DTS);
 
             if (selTrack < 0)
