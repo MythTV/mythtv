@@ -59,7 +59,7 @@
             date & time
         -->
         <clock name="date">
-            <area>20,20,200,70</area>
+            <area>20,20,250,70</area>
             <font>time</font>
             <format>dddd\ndd MMM yyyy</format>
             <align>left,top</align>
@@ -125,7 +125,7 @@
             start frontend button
         -->
         <button name="startfrontend_button" from="basewidebutton">
-            <position>306,535</position>
+            <position>255,535</position>
             <value>Start Frontend</value>
         </button>
 
