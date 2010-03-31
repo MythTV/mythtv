@@ -11,11 +11,10 @@ using namespace std;
 #import <AGL/agl.h>
 #import <OpenGL/glext.h>
 
-#include <qmutex.h>
-#include <qstring.h>
-#include <q3ptrqueue.h>
-#include <qmap.h>
-#include <qsize.h>
+#include <QMutex>
+#include <QString>
+#include <QMap>
+#include <QSize>
 
 #include "libmyth/mythconfig.h"
 #include "libmyth/mythverbose.h"
