@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="fi_FI">
 <context>
     <name>AlbumArtImages</name>
     <message>
@@ -61,6 +61,10 @@
     <message>
         <source>All My Music</source>
         <translation>Kaikki Musiikki</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain enough info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
+        <translation>Käyttämäsi teema ei sisällä riittävästi tietorivejä musiikkielementissä. Ole hyvä ja ota yhteyttä teeman tekijään ja kysy, jos he voisivat päivittää sen.</translation>
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
@@ -156,7 +160,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element. Please contact the theme creator and ask if they could please update it.</source>
-        <translation>Käyttämäsi teema ei sisällä tietoalinjoja musiikkielementissä. Ole hyvä ja ota yhteyttä teeman tekijään ja kysy, jos he voisivat päivittää sen.</translation>
+        <translation type="obsolete">Käyttämäsi teema ei sisällä tietoalinjoja musiikkielementissä. Ole hyvä ja ota yhteyttä teeman tekijään ja kysy, jos he voisivat päivittää sen.</translation>
     </message>
 </context>
 <context>
@@ -400,16 +404,17 @@
     </message>
     <message>
         <source>Already in Database</source>
-        <translation type="unfinished"></translation>
+        <translation>On jo tietokannassa</translation>
     </message>
     <message>
         <source>Not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei löytynyt</translation>
     </message>
     <message>
         <source>Copy Failed
 Could not copy file to: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiointi epäonnistui
+Ei pystynyt kopioimaan tiedostoa kohteeseen %1</translation>
     </message>
 </context>
 <context>
@@ -501,7 +506,7 @@ Could not copy file to: %1</source>
     <message>
         <source>%1  by  %2</source>
         <comment>Music track &apos;title by artist&apos;</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2</translation>
     </message>
 </context>
 <context>
@@ -515,115 +520,115 @@ Could not copy file to: %1</source>
     <name>MythControls</name>
     <message>
         <source>Play music</source>
-        <translation type="unfinished"></translation>
+        <translation>Soita musiikkia</translation>
     </message>
     <message>
         <source>Select music playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse musiikin soittolistat</translation>
     </message>
     <message>
         <source>Rip CD</source>
-        <translation type="unfinished">Tuo CD</translation>
+        <translation>Tuo CD</translation>
     </message>
     <message>
         <source>Scan music</source>
-        <translation type="unfinished"></translation>
+        <translation>Hae musiikkia</translation>
     </message>
     <message>
         <source>Show Music Miniplayer</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä musiikin minisoitin</translation>
     </message>
     <message>
         <source>Move to the next track</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirry seuraavaan kappaleeseen</translation>
     </message>
     <message>
         <source>Move to the previous track</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirry edelliseen kappaleeseen</translation>
     </message>
     <message>
         <source>Fast forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Pikakelaus eteenpäin</translation>
     </message>
     <message>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Pikakelaus taaksepäin</translation>
     </message>
     <message>
         <source>Pause/Start playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Pysäytä/jatka soittoa</translation>
     </message>
     <message>
         <source>Start playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloita soitto</translation>
     </message>
     <message>
         <source>Stop playback</source>
-        <translation type="unfinished"></translation>
+        <translation>Pysäytä soitto</translation>
     </message>
     <message>
         <source>Volume down</source>
-        <translation type="unfinished"></translation>
+        <translation>Äänenvoimakkuus alas</translation>
     </message>
     <message>
         <source>Volume up</source>
-        <translation type="unfinished"></translation>
+        <translation>Äänenvoimakkuus ylös</translation>
     </message>
     <message>
         <source>Mute</source>
-        <translation type="unfinished"></translation>
+        <translation>Mykistä</translation>
     </message>
     <message>
         <source>Toggle audio upmixer</source>
-        <translation type="unfinished"></translation>
+        <translation>Äänen mixaus päällä/pois</translation>
     </message>
     <message>
         <source>Cycle visualizer mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda visualisointimoodia</translation>
     </message>
     <message>
         <source>Blank screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyhjä näyttö</translation>
     </message>
     <message>
         <source>Increase rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Kasvata arvostelua</translation>
     </message>
     <message>
         <source>Decrease rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Laske arvostelua</translation>
     </message>
     <message>
         <source>Refresh music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivitä musiikkipuu</translation>
     </message>
     <message>
         <source>Filter All My Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Suodata kaikki musiikkini</translation>
     </message>
     <message>
         <source>Show incremental search dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä inkrementaalisen haun ikkuna</translation>
     </message>
     <message>
         <source>Incremental search find next match</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkrementaalisen haun seuraava osuma</translation>
     </message>
     <message>
         <source>Increase Play Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Kasvata soittonopeutta</translation>
     </message>
     <message>
         <source>Decrease Play Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Hidasta soittonopeutta</translation>
     </message>
     <message>
         <source>MythMusic Media Handler 1/2</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMusic mediakäsittelijä 1/2</translation>
     </message>
     <message>
         <source>MythMusic Media Handler 2/2</source>
-        <translation type="unfinished"></translation>
+        <translation>MythMusic mediakäsittelijä 2/2</translation>
     </message>
 </context>
 <context>
@@ -1619,35 +1624,35 @@ Jatketaanko musiikin toistoa taustalla?</translation>
     </message>
     <message>
         <source>Upconvert stereo to 5.1 surround</source>
-        <translation type="unfinished"></translation>
+        <translation>Muunna stereo 5.1 tilaääneksi</translation>
     </message>
     <message>
         <source>MythTV can upconvert stereo tracks to 5.1 audio. Set this option to enable it by default. You can enable or disable the upconversion during playback at anytime.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV voi muuntaa stereo raidat 5.1 tilaääneksi. Aseta tämä valinta jotta se aktivoidaan oletuksena. Voit myös kytkeä muunnoksen päälle/pois milloin vain soiton aikana.</translation>
     </message>
     <message>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="unfinished"></translation>
+        <translation> &apos;oletus&apos; antaa Mediamonitorin valita laitteen.</translation>
     </message>
     <message>
         <source>front</source>
-        <translation type="unfinished">etu</translation>
+        <translation>etu</translation>
     </message>
     <message>
         <source>back</source>
-        <translation type="unfinished">taka</translation>
+        <translation>taka</translation>
     </message>
     <message>
         <source>inlay</source>
-        <translation type="unfinished">sisä</translation>
+        <translation>sisä</translation>
     </message>
     <message>
         <source>cd</source>
-        <translation type="unfinished">cd</translation>
+        <translation>cd</translation>
     </message>
     <message>
         <source>cover</source>
-        <translation type="unfinished">kansi</translation>
+        <translation>kansi</translation>
     </message>
 </context>
 <context>
@@ -2137,7 +2142,7 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     <name>ThemeUI</name>
     <message>
         <source>Please Wait...</source>
-        <translation type="unfinished">Pieni Hetki...</translation>
+        <translation>Pieni Hetki...</translation>
     </message>
     <message>
         <source>Track Information</source>
@@ -2257,15 +2262,15 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>123 of 345</source>
-        <translation type="obsolete">123/345</translation>
+        <translation>123/345</translation>
     </message>
     <message>
         <source>All ready in database</source>
-        <translation type="obsolete">Löytyy jo tietokannasta</translation>
+        <translation>Löytyy jo tietokannasta</translation>
     </message>
     <message>
         <source>/some/file/goes/here/test.mp3</source>
-        <translation type="obsolete">/some/file/goes/here/test.mp3</translation>
+        <translation>/joku/tiedosto/menee/tänne/testi.mp3</translation>
     </message>
     <message>
         <source>Compilation Artist</source>
@@ -2285,7 +2290,7 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Directory Finder</source>
-        <translation type="obsolete">Hakemiston etsin</translation>
+        <translation>Hakemistoselain</translation>
     </message>
     <message>
         <source>Import Cover Art</source>
@@ -2309,95 +2314,191 @@ Poistetaanko olemassaoleva tiedosto?</translation>
     </message>
     <message>
         <source>Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Metatieto</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">Valmis</translation>
+        <translation>Valmis</translation>
     </message>
     <message>
         <source>Switch Titles</source>
-        <translation type="unfinished">Vaihda Nimikkeitä</translation>
+        <translation>Vaihda Nimikkeitä</translation>
     </message>
     <message>
         <source>Scan CD</source>
-        <translation type="unfinished">Selaa CD</translation>
+        <translation>Selaa CD</translation>
     </message>
     <message>
         <source>Already in database</source>
-        <translation type="unfinished"></translation>
+        <translation>On jo tietokannassa</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Etsi</translation>
+        <translation>Etsi</translation>
     </message>
     <message>
         <source>Cover Art</source>
-        <translation type="unfinished">Kansitaide</translation>
+        <translation>Kansikuva</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished">Toista</translation>
+        <translation>Toista</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Lisää</translation>
+        <translation>Lisää</translation>
     </message>
     <message>
         <source>Next New</source>
-        <translation type="unfinished">Seuraava uusi</translation>
+        <translation>Seuraava uusi</translation>
     </message>
     <message>
         <source>Add All New</source>
-        <translation type="unfinished">Lisää kaikki uudet</translation>
+        <translation>Lisää kaikki uudet</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Kopioi</translation>
+        <translation>Kopioi</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished">Yleiset Asetukset</translation>
+        <translation>Yleiset Asetukset</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Soittimen asetukset</translation>
     </message>
     <message>
         <source>Ripper Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuontiasetukset</translation>
     </message>
     <message>
         <source>Play Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Soita musiikkia</translation>
+    </message>
+    <message>
+        <source>Import Coverart</source>
+        <translation>Tuo kansikuvia</translation>
+    </message>
+    <message>
+        <source>Browse cover images on your system.</source>
+        <translation>Selaa kansikuvia järjestelmästäsi.</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Edellinen</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Seuraava</translation>
+    </message>
+    <message>
+        <source>Import local music files.</source>
+        <translation>Tuo paikallisia musiikkitiedostoja.</translation>
+    </message>
+    <message>
+        <source>Track is part of a compilation</source>
+        <translation>Kappale on osa kokoelmaa</translation>
+    </message>
+    <message>
+        <source>Click to browse directories...</source>
+        <translation>Paina selatakesi hakemistoja...</translation>
+    </message>
+    <message>
+        <source>Choose Coverart</source>
+        <translation>Valitse kansikuva</translation>
+    </message>
+    <message>
+        <source>Rip A CD</source>
+        <translation>Tuo CD</translation>
+    </message>
+    <message>
+        <source>Input metadata for the CD you have inserted.</source>
+        <translation>Syötä metatietoja sisään laittamallesi CD:lle.</translation>
+    </message>
+    <message>
+        <source>Album Name:</source>
+        <translation>Albumin nimi:</translation>
+    </message>
+    <message>
+        <source>Album Year:</source>
+        <translation>Albumin vuosi:</translation>
+    </message>
+    <message>
+        <source>Album is a compilation</source>
+        <translation>Albumi on kokoelma</translation>
+    </message>
+    <message>
+        <source>Click here to search existing artists...</source>
+        <translation>Paina tästä etsiäksesi olemassa olevia artisteja...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing albums...</source>
+        <translation>Paina tästä etsiäksesi olemassa olevia albumeita...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing genres...</source>
+        <translation>Paina tästä etsiäksesi olemassa olevia lajeja...</translation>
+    </message>
+    <message>
+        <source>Edit Playlist</source>
+        <translation>Muokkaa Soittolistaa</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation>Muokkaa metatietoja</translation>
+    </message>
+    <message>
+        <source>Edit AlbumArt</source>
+        <translation>Muokkaa kansikuvaa</translation>
+    </message>
+    <message>
+        <source>Ripping CD</source>
+        <translation>Tuo CD:tä</translation>
+    </message>
+    <message>
+        <source>%1%</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Music folders and general options</source>
+        <translation>Musiikkihakemistot ja yleiset valinnat</translation>
+    </message>
+    <message>
+        <source>Music playback options</source>
+        <translation>Musiikin soiton valinnat</translation>
+    </message>
+    <message>
+        <source>CD copying options</source>
+        <translation>CD kopioinnin valinnat</translation>
     </message>
     <message>
         <source>Select Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse musiikkia</translation>
     </message>
     <message>
         <source>Import CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuo CD</translation>
     </message>
     <message>
         <source>Import Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuo tiedostoja</translation>
     </message>
     <message>
         <source>Scan for New Music</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi uutta musiikkia</translation>
     </message>
     <message>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista media</translation>
     </message>
     <message>
         <source>Music Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Musiikkiasetukset</translation>
     </message>
     <message>
         <source>Configure playback and CD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa soiton ja CD:n tuonnin asetuksia</translation>
     </message>
 </context>
 <context>
