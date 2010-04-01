@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="fi_FI">
 <context>
     <name></name>
     <message>
@@ -45,15 +45,15 @@
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="unfinished">Asettamalla tämän arvon asetus kaikille numeroille tekee elämästäsi paljon helpompaa.</translation>
+        <translation type="obsolete">Asettamalla tämän arvon asetus kaikille numeroille tekee elämästäsi paljon helpompaa.</translation>
     </message>
     <message>
         <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
-        <translation type="unfinished"></translation>
+        <translation>Yritettiin kirjoittaa %1, mutta se vaikuttaa olevan HTML uudelleenohjaus (tiedoston koko %2).</translation>
     </message>
     <message>
         <source>Error writing image to file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Virhe kirjoitettaessa kuvaa tiedostoon %1.</translation>
     </message>
 </context>
 <context>
@@ -221,15 +221,15 @@
     </message>
     <message>
         <source>Done</source>
-        <translation>Valmis</translation>
+        <translation type="obsolete">Valmis</translation>
     </message>
     <message>
         <source>New</source>
-        <translation>Uusi</translation>
+        <translation type="obsolete">Uusi</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation>Poista</translation>
+        <translation type="obsolete">Poista</translation>
     </message>
     <message>
         <source>Enter the new extension:</source>
@@ -237,121 +237,160 @@
     </message>
 </context>
 <context>
+    <name>MetadataSettings</name>
+    <message>
+        <source>Searching for Grabbers...</source>
+        <translation>Etsitään kaappareita...</translation>
+    </message>
+    <message>
+        <source>This is the script used to search for and download Movie Metadata.</source>
+        <translation>Tätä skriptiä käytetään etsimään ja lataamaan elokuvien metadataa.</translation>
+    </message>
+    <message>
+        <source>This is the script used to search for and download Television Metadata.</source>
+        <translation>Tätä skriptiä käytetään etsimään ja lataamaan television metadataa.</translation>
+    </message>
+    <message>
+        <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
+        <translation>Jos asetettu, valikkoon ilmestyy painike, &quot;Katso trailereiden kanssa&quot;, joka näyttää käyttäjän määrittelemän määrän trailereita ennen elokuvan alkua.</translation>
+    </message>
+    <message>
+        <source>Number of trailers to play before a film.</source>
+        <translation>Ennen elokuvaa esitettävien trailereiden määrä.</translation>
+    </message>
+    <message>
+        <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored.</source>
+        <translation>Jos asetettu, kaikki tiedostot Myth Video kansiossa tullaan näyttämään, ellei tiettyä tiedostotyyppiä ole erikseen asetetettu piilotettavaksi.</translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
+        <translation>Jos asetettu &apos;Selaa tiedostoja&apos; kanssa, Videolista näyttää kaiken tunnetun metatiedon tietokannasta. Tämän poistaminen voi suuresti nopeuttaa Videolistan latausta.</translation>
+    </message>
+    <message>
+        <source>Exit without saving settings</source>
+        <translation>Poistu tallentamatta asetuksia</translation>
+    </message>
+    <message>
+        <source>Save settings and Exit</source>
+        <translation>Tallenna asetukset ja poistu</translation>
+    </message>
+</context>
+<context>
     <name>MythControls</name>
     <message>
         <source>The MythVideo default view</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideon oletusnäkymä</translation>
     </message>
     <message>
         <source>The MythVideo video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideon videoiden hallinta</translation>
     </message>
     <message>
         <source>The MythVideo video browser</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideon videoselain</translation>
     </message>
     <message>
         <source>The MythVideo video listings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideon videolista</translation>
     </message>
     <message>
         <source>The MythVideo video gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideon videogalleria</translation>
     </message>
     <message>
         <source>Play selected item in alternate player</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista kohde valinnaisessa toistimessa</translation>
     </message>
     <message>
         <source>Open video filter dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Avaa videosuodinikkuna</translation>
     </message>
     <message>
         <source>Change browsable in video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda selattavaksi videoiden hallinnassa</translation>
     </message>
     <message>
         <source>Increase Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Nosta ikäluokitusta</translation>
     </message>
     <message>
         <source>Decrease Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Laske ikäluokitusta</translation>
     </message>
     <message>
         <source>Show Incremental Search Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä inkrementaalinen haku -ikkuna</translation>
     </message>
     <message>
         <source>Download metadata for current item</source>
-        <translation type="unfinished"></translation>
+        <translation>Lataa metatiedot valitulle kohteelle</translation>
     </message>
     <message>
         <source>Display Item Detail Popup</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä kohteen tiedot -ikkuna</translation>
     </message>
     <message>
         <source>Go to the first video</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirry ensimmäiseen videoon</translation>
     </message>
     <message>
         <source>Go to the last video</source>
-        <translation type="unfinished"></translation>
+        <translation>Siirry viimeiseen videoon</translation>
     </message>
     <message>
         <source>Play a DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista DVD</translation>
     </message>
     <message>
         <source>MythDVD DVD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD DVD median käsittelijä</translation>
     </message>
     <message>
         <source>Play a VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista VCD</translation>
     </message>
     <message>
         <source>MythDVD VCD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD VCD median käsittelijä</translation>
     </message>
     <message>
         <source>Import a DVD into your MythVideo database</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuo DVD MythVideo tietokantaasi</translation>
     </message>
 </context>
 <context>
     <name>PlayerSettings</name>
     <message>
         <source>This is the command used for any file whose extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tätä komentoa käytetään mille tahansa tiedostolle, jonka tiedostopäätettä ei ole erikseen määritelty. Voit myös syöttää jonkin toistoliitännäisen nimen, kuten &apos;Internal&apos;.</translation>
     </message>
     <message>
         <source>This can be any command to launch a DVD  player. Internal is the default.  For other players, %d will be substituted for the DVD device (e.g. /dev/dvd).</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä voi olla mikä tahansa komento, jolla käynnistää DVD -soitin. Internal on oletus. Toisille soittimille, %d korvaa DVD -laitteen (esim. /dev/dvd).</translation>
     </message>
     <message>
         <source>This device must exist, and the user playing the DVD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Laiteen tulee olla olemassa, ja käyttäjällä joka soittaa DVD:tä tulee olla lukuoikeudet laitteeseen. &apos;default&apos; antaa MediaMonitorin valita laitteen.</translation>
     </message>
     <message>
         <source>This can be any command to launch a VCD player. The Internal player will not play VCDs. %d will be substituted for the VCD device (e.g. /dev/cdrom).</source>
-        <translation type="unfinished"></translation>
+        <translation>Tämä voi olla mikä tahansa komento, jolla käynnistää VCD -soitin. Sisäinen soitin (Internal) ei toista VCD:itä. %d korvaa VCD -laitteen (esim. /dev/cdrom).</translation>
     </message>
     <message>
         <source>This device must exist, and the user playing the VCD needs to have read permission on the device.  &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="unfinished"></translation>
+        <translation>Laiteen tulee olla olemassa, ja käyttäjällä joka soittaa VCD:itä tulee olla lukuoikeudet laitteeseen. &apos;default&apos; antaa MediaMonitorin valita laitteen.</translation>
     </message>
     <message>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos oletus soitin ei jostain syystä toista videota, voit soittaa sen valinnaisessa soittimessa valitsemalla &apos;Toista valinnaisessa soittimessa.&apos;</translation>
     </message>
     <message>
         <source>Exit without saving settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistu tallentamatta asetuksia</translation>
     </message>
     <message>
         <source>Save settings and Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna asetukset ja poistu</translation>
     </message>
 </context>
 <context>
@@ -386,11 +425,11 @@
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation>Näytä Tuntemattomat Tiedostotyypit</translation>
+        <translation type="obsolete">Näytä Tuntemattomat Tiedostotyypit</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation>Jos asetettu, kaikki tiedostot Mth Video kansiossa tullaan näyttämään, ellei tiettyä tiedostotyyppiä ol erikseen asetetettu piilotettavaksi.</translation>
+        <translation type="obsolete">Jos asetettu, kaikki tiedostot Mth Video kansiossa tullaan näyttämään, ellei tiettyä tiedostotyyppiä ol erikseen asetetettu piilotettavaksi.</translation>
     </message>
     <message>
         <source>Video List browses files</source>
@@ -546,7 +585,7 @@
     </message>
     <message>
         <source>Video List Loads Video Meta Data</source>
-        <translation>Videolistaus Lataa Videoiden Metatiedot</translation>
+        <translation type="obsolete">Videolistaus Lataa Videoiden Metatiedot</translation>
     </message>
     <message>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
@@ -784,6 +823,10 @@ DVD-asemaa ei ole määritelty.</translation>
         <translation>Odotetaan Lupaa Aloittaa Jälkikäsittely</translation>
     </message>
     <message>
+        <source>Transcode is thinking...</source>
+        <translation>Transkooderi miettii...</translation>
+    </message>
+    <message>
         <source>Transcoding Pass 1 of 2 ~</source>
         <translation>Jälkikäsittelyn Vaihe 1 2:sta ~</translation>
     </message>
@@ -794,6 +837,10 @@ DVD-asemaa ei ole määritelty.</translation>
     <message>
         <source>Transcoding ~</source>
         <translation>Jälkikäsitellään ~</translation>
+    </message>
+    <message>
+        <source>Transcode complete.</source>
+        <translation>Jälkikäsittely valmis.</translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
@@ -927,7 +974,7 @@ Poistetaanko tietokannasta?</translation>
     </message>
     <message>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="obsolete">Asettamalla tämän arvon asetus kaikille numeroille tekee elämästäsi paljon helpompaa.</translation>
+        <translation>Asettamalla tämän arvon asetus kaikille numeroille tekee elämästäsi paljon helpompaa.</translation>
     </message>
     <message>
         <source>Parental Level 4 PIN</source>
@@ -955,15 +1002,15 @@ Poistetaanko tietokannasta?</translation>
     </message>
     <message>
         <source>Video Tree remembers last selected position</source>
-        <translation>Videpuu muistaa viimeisen valitun kohdan</translation>
+        <translation type="obsolete">Videpuu muistaa viimeisen valitun kohdan</translation>
     </message>
     <message>
         <source>If set, the current position in the Video Tree is persistent.</source>
-        <translation>Jos asetettu, nykyinen paikka Videopuussa säilyy.</translation>
+        <translation type="obsolete">Jos asetettu, nykyinen paikka Videopuussa säilyy.</translation>
     </message>
     <message>
         <source>Directories that hold videos</source>
-        <translation>Kansio joka sisältää videoita</translation>
+        <translation>Hakemisto joka sisältää videoita</translation>
     </message>
     <message>
         <source>Multiple directories can be separated by &apos;:&apos;. Each directory must exist and be readable by the user running MythVideo.</source>
@@ -1133,15 +1180,15 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Enable random trailers before videos</source>
-        <translation>Mahdollista satunnaisten trailereiden näyttäminen videoiden alussa</translation>
+        <translation type="obsolete">Mahdollista satunnaisten trailereiden näyttäminen videoiden alussa</translation>
     </message>
     <message>
         <source>If set, this will enable a button called &quot;Watch With Trailers&quot; which will play a user-specified number of trailers before the movie.</source>
-        <translation>Jos asetettu, valikkoon ilmestyy painike, &quot;Katso trailereiden kanssa&quot;, joka näyttää käyttäjän määrittelemän määrän satunnaisia trailereita ennen elokuvan alkua.</translation>
+        <translation type="obsolete">Jos asetettu, valikkoon ilmestyy painike, &quot;Katso trailereiden kanssa&quot;, joka näyttää käyttäjän määrittelemän määrän satunnaisia trailereita ennen elokuvan alkua.</translation>
     </message>
     <message>
         <source>Number of trailers to play</source>
-        <translation>Lukumäärä toistettavia trailereita</translation>
+        <translation type="obsolete">Lukumäärä toistettavia trailereita</translation>
     </message>
     <message>
         <source>The number of trailers to play before playing the film itself </source>
@@ -1165,87 +1212,67 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Virhe: Uuden tiedostotyypin &apos;%1&apos; lisäys epäonnistui</translation>
     </message>
     <message>
-        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Movie Grabber Script</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the script used to search for and download Movie Metadata.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Television Grabber Script</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the script used to search for and download Television Metadata.</source>
-        <translation type="unfinished"></translation>
+        <source>Error: failed to hash file &apos;%1&apos;</source>
+        <translation>Virhe: Tiedoston &apos;%1&apos; tarkisteen teko epäonnistui</translation>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor).</source>
-        <translation type="unfinished"></translation>
+        <translation>Mediamonitori täytyy olla päällä tämän toiminnon sallimiseksi (Asetukset -&gt; Yleiset -&gt; CD/DVD Monitori).</translation>
     </message>
     <message>
         <source>Delete DVD Bookmarks that are older than the number of days specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistaa DVD -kirjainmerkit, jotka ovat vanhempia kuin annettu määrä päiviä.</translation>
     </message>
     <message>
         <source>Enable the setting and skipping to of a bookmark in DVD playback.</source>
-        <translation type="unfinished"></translation>
+        <translation>Salli kirjanmerkkien lisäys ja niihin siirtyminen DVD soitossa.</translation>
     </message>
     <message>
         <source>Display a prompt to choose whether to play the DVD from the beginning or from the bookmark.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The number of trailers to play before playing the film itself.</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä kysymys, josta valita toistetaanko DVD alusta vai kirjainmerkistä.</translation>
     </message>
     <message>
         <source>Parental Control Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikälukon asetukset</translation>
     </message>
     <message>
         <source>No directory %1 - DVD importing will fail</source>
-        <translation type="unfinished"></translation>
+        <translation>Hakemistoa &apos;%1&apos; ei löydy - DVD:n tuonti tulee epäonnistumaan</translation>
     </message>
     <message>
         <source>Season</source>
-        <translation type="unfinished"></translation>
+        <translation>Kausi</translation>
     </message>
     <message>
         <source>Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakso</translation>
     </message>
     <message>
         <source>Parental PIN:</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN-koodi (Ikäluokitus):</translation>
     </message>
     <message>
         <source>Season/Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Kausi/Jakso</translation>
     </message>
     <message>
         <source>Television</source>
-        <translation type="unfinished"></translation>
+        <translation>Televisio</translation>
     </message>
     <message>
         <source>Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Elokuvat</translation>
     </message>
     <message>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kausi %1</translation>
     </message>
     <message>
         <source>Storage Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallennusryhmät</translation>
     </message>
 </context>
 <context>
@@ -1428,7 +1455,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation type="obsolete">VALITSE: Muokkaa</translation>
+        <translation>VALITSE: Muokkaa</translation>
     </message>
     <message>
         <source>Parental</source>
@@ -1452,7 +1479,7 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="obsolete">INFO - Toimintovalikko</translation>
+        <translation>INFO - Toimintovalikko</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
@@ -1504,171 +1531,575 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>0:00:00</source>
-        <translation>0:00:00</translation>
+        <translation></translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Directed by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjaaja:</translation>
     </message>
     <message>
         <source>User Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Arvostelu:</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">Valmis</translation>
+        <translation>Valmis</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista</translation>
     </message>
     <message>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>Alhaisin</translation>
     </message>
     <message>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Alhainen</translation>
     </message>
     <message>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Keskitaso</translation>
     </message>
     <message>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Korkea</translation>
     </message>
     <message>
         <source>Video Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikäluokitus</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimi:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aliotsikko:</translation>
     </message>
     <message>
         <source>Season:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kausi:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakso:</translation>
     </message>
     <message>
         <source>Item has been watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kohde on katsottu:</translation>
     </message>
     <message>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvankaappaus:</translation>
+    </message>
+    <message>
+        <source>Select a Title to Rip</source>
+        <translation>Valitse tuotava nimike</translation>
+    </message>
+    <message>
+        <source>Select the parts of the DVD you wish to copy.</source>
+        <translation>Valitse kopioitavat DVD:n osiot.</translation>
+    </message>
+    <message>
+        <source>Film Name:</source>
+        <translation>Elokuvan nimi:</translation>
+    </message>
+    <message>
+        <source>Track Length:</source>
+        <translation>Raidan kesto:</translation>
+    </message>
+    <message>
+        <source>Rip Quality:</source>
+        <translation>Tuonnin laatu:</translation>
+    </message>
+    <message>
+        <source>Rip AC-3 Audio</source>
+        <translation>Tuo AC-3 audio</translation>
+    </message>
+    <message>
+        <source>Preview this title</source>
+        <translation>Esikatsele nimikettä</translation>
+    </message>
+    <message>
+        <source>Rip This Track</source>
+        <translation>Tuo raita</translation>
+    </message>
+    <message>
+        <source>Previous Title</source>
+        <translation>Edellinen nimike</translation>
+    </message>
+    <message>
+        <source>Next Title</source>
+        <translation>Seuraava nimike</translation>
+    </message>
+    <message>
+        <source>Begin Ripping</source>
+        <translation>Aloita tuonti</translation>
+    </message>
+    <message>
+        <source>No Current Jobs</source>
+        <translation>Ei töitä tällä hetkellä</translation>
+    </message>
+    <message>
+        <source>Select a Track to Rip</source>
+        <translation>Valitse tuotava raita</translation>
+    </message>
+    <message>
+        <source>Name of Film:</source>
+        <translation>Elokuvan nimi:</translation>
+    </message>
+    <message>
+        <source>Selected track length:</source>
+        <translation>Valitun raidan kesto:</translation>
+    </message>
+    <message>
+        <source>Check this box to select this track:</source>
+        <translation>Merkitse ruutu valitaksesi raidan:</translation>
+    </message>
+    <message>
+        <source>Check to rip AC-3 audio:</source>
+        <translation>Merkitse tuodaksesi AC-3 audion:</translation>
+    </message>
+    <message>
+        <source>Press to view excerpt:</source>
+        <translation>Paina nähdäksesi leikkeen:</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Edellinen</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Seuraava</translation>
+    </message>
+    <message>
+        <source>Cast</source>
+        <translation>Esiintyjät</translation>
+    </message>
+    <message>
+        <source>Plot</source>
+        <translation>Kuvaus</translation>
+    </message>
+    <message>
+        <source>Season/Episode: %1</source>
+        <translation>Kausi/Jakso: %1</translation>
+    </message>
+    <message>
+        <source>Directed by %1</source>
+        <translation>Ohjaaja: %1</translation>
+    </message>
+    <message>
+        <source>Starring: %1</source>
+        <translation>Päähenkilö(t): %1</translation>
+    </message>
+    <message>
+        <source>Parental Level 0</source>
+        <translation>Ikäluokitus 0</translation>
+    </message>
+    <message>
+        <source>Parental Level 1</source>
+        <translation>Ikäluokitus 1</translation>
+    </message>
+    <message>
+        <source>Parental Level 2</source>
+        <translation>Ikäluokitus 2</translation>
+    </message>
+    <message>
+        <source>Parental Level 3</source>
+        <translation>Ikäluokitus 3</translation>
+    </message>
+    <message>
+        <source>Parental Level 4</source>
+        <translation>Ikäluokitus 4</translation>
+    </message>
+    <message>
+        <source>Add New File Types</source>
+        <translation>Lisää uusia tiedostotyyppejä</translation>
+    </message>
+    <message>
+        <source>On this screen, you can add new extensions to be recognized by the Video Plugin.  If a scan does not add your files, create a new extension below by clicking the &quot;New&quot; button.
+
+If you select &quot;Use Default Player,&quot; the player command set for the extension will be ignored.  &quot;Ignore This File Type&quot; prevents the items from appearing in a scan.</source>
+        <translation>Tässä ikkunassa voit lisätä uusia laajennoksia Video liitännäisen löydettäväksi. Jos haku ei löydä tiedostojasi, luo alla uusi laajennos valitsemalla &quot;Uusi&quot; -painike.
+
+Jos valitset &quot;Käytä oletus toistinta,&quot; laajennoksen toistokomento jätetään huomioimatta. &quot;Älä huomioi tiedostotyyppiä&quot; estää kohteiden esittämisen hakutuloksissa.</translation>
+    </message>
+    <message>
+        <source>Use Default Player</source>
+        <translation>Käytä oletus toistinta</translation>
+    </message>
+    <message>
+        <source>Ignore This File Type</source>
+        <translation>Älä huomioi tiodostotyyppiä</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>Uusi</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Poista</translation>
+    </message>
+    <message>
+        <source>Edit Metadata</source>
+        <translation>Muokkaa metatietoja</translation>
+    </message>
+    <message>
+        <source>Modify your film&apos;s metadata.</source>
+        <translation>Muokkaa elokuvasi metatietoja.</translation>
+    </message>
+    <message>
+        <source>Rating:</source>
+        <translation>Arvostelu:</translation>
+    </message>
+    <message>
+        <source>TMDB Number:</source>
+        <translation>TMDB-numero:</translation>
     </message>
     <message>
         <source>Banner:</source>
-        <translation type="unfinished"></translation>
+        <translation>Banneri:</translation>
     </message>
     <message>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fanikuvitus:</translation>
     </message>
     <message>
         <source>Trailer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Traileri:</translation>
+    </message>
+    <message>
+        <source>Homepage:</source>
+        <translation>Kotisivu:</translation>
+    </message>
+    <message>
+        <source>Custom Player:</source>
+        <translation>Oma toistaja:</translation>
+    </message>
+    <message>
+        <source>Film has been Watched</source>
+        <translation>Elokuva on katsottu</translation>
+    </message>
+    <message>
+        <source>Film is Browsable</source>
+        <translation>Elokuva on selattavissa</translation>
+    </message>
+    <message>
+        <source>Next File:</source>
+        <translation>Seuraava tiedosto:</translation>
+    </message>
+    <message>
+        <source>Click here to search existing coverart...</source>
+        <translation>Paina tästä käynnistääksesi kansikuvahaun...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing screenshots...</source>
+        <translation>Paina tästä käynnistääksesi kuvankaappaushaun...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing banners...</source>
+        <translation>Paina tästä käynnistääksesi bannerihaun...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing fanart...</source>
+        <translation>Paina tästä käynnistääksesi fanikuvitushaun...</translation>
+    </message>
+    <message>
+        <source>Click here to search existing trailers...</source>
+        <translation>Paina tästä käynnistääksesi trailerihaun...</translation>
+    </message>
+    <message>
+        <source>Filter Videos</source>
+        <translation>Videoiden Suodatus</translation>
+    </message>
+    <message>
+        <source>Genre:</source>
+        <translation>Laji:</translation>
+    </message>
+    <message>
+        <source>Country:</source>
+        <translation>Maa:</translation>
+    </message>
+    <message>
+        <source>Actor/Actress:</source>
+        <translation>Näyttelijä:</translation>
+    </message>
+    <message>
+        <source>Browse:</source>
+        <translation>Selaa:</translation>
+    </message>
+    <message>
+        <source>TMDB/TVDB #:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Coverart:</source>
+        <translation>Kansikuva:</translation>
+    </message>
+    <message>
+        <source>Sort By:</source>
+        <translation>Järjestä:</translation>
+    </message>
+    <message>
+        <source>Watched:</source>
+        <translation>Katsottu:</translation>
     </message>
     <message>
         <source>Text Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekstisuodin:</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Tallenna</translation>
+    </message>
+    <message>
+        <source>This item was released on %1.</source>
+        <translation>Kohde julkaistiin %1.</translation>
+    </message>
+    <message>
+        <source>It was added to your collection on %1.</source>
+        <translation>Se lisättiin kokoelmaasi %1.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Peru</translation>
+    </message>
+    <message>
+        <source>Video Player Settings</source>
+        <translation>Videon toisto-asetukset</translation>
+    </message>
+    <message>
+        <source>Default:</source>
+        <translation>Oletus:</translation>
+    </message>
+    <message>
+        <source>DVD Player:</source>
+        <translation>DVD soitin:</translation>
+    </message>
+    <message>
+        <source>DVD Drive:</source>
+        <translation>DVD asema:</translation>
+    </message>
+    <message>
+        <source>VCD Player:</source>
+        <translation>VCD soitin:</translation>
+    </message>
+    <message>
+        <source>VCD Drive:</source>
+        <translation>VCD asema:</translation>
+    </message>
+    <message>
+        <source>Enable Alternate Player</source>
+        <translation>Salli valinnainen toistin</translation>
+    </message>
+    <message>
+        <source>Alt. Player:</source>
+        <translation>Val. toistin:</translation>
+    </message>
+    <message>
+        <source>Video Metadata Settings</source>
+        <translation>Videoiden metatietojen asetukset</translation>
+    </message>
+    <message>
+        <source>Movie Grab:</source>
+        <translation>Elokuvakaappaus:</translation>
+    </message>
+    <message>
+        <source>TV Grab:</source>
+        <translation>TV kaappaus:</translation>
+    </message>
+    <message>
+        <source>Display unknown file types</source>
+        <translation>Näytä tuntemattomat tiedostotyypit</translation>
+    </message>
+    <message>
+        <source>Enable metadata in file browse mode</source>
+        <translation>Mahdollista metatiedot tiedostojen selaustilassa</translation>
+    </message>
+    <message>
+        <source>Enable Random Trailer Playback</source>
+        <translation>Mahdollista satunnaisten trailereiden toisto</translation>
+    </message>
+    <message>
+        <source>Trailer #:</source>
+        <translation>Traileri #:</translation>
+    </message>
+    <message>
+        <source>No videos in library, or no files found.  If you have configured a video directory, press &quot;M&quot; (or the MENU key) and select &quot;Scan for Changes.&quot;</source>
+        <translation>Ei videoita kirjastossa, tai tiedostoja ei löydy. Jos olet asettanut videohakemiston, paina &quot;M&quot; (tai MENU näppäintä) ja valitse &quot;Etsi muutoksia.&quot;</translation>
+    </message>
+    <message>
+        <source>TMDB:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Parental Lvl:</source>
+        <translation>Ikäluokitus:</translation>
+    </message>
+    <message>
+        <source>Browseable</source>
+        <translation>Selattavissa</translation>
+    </message>
+    <message>
+        <source>Watched</source>
+        <translation>Katsottu</translation>
+    </message>
+    <message>
+        <source>Player Command:</source>
+        <translation>Toisto-komento:</translation>
     </message>
     <message>
         <source>Actor/Actress :</source>
-        <translation type="unfinished"></translation>
+        <translation>Näyttelijä:</translation>
     </message>
     <message>
         <source>InetRef :</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cover File :</source>
-        <translation type="unfinished"></translation>
+        <translation>Kansikuva :</translation>
     </message>
     <message>
         <source>Watched :</source>
-        <translation type="unfinished"></translation>
+        <translation>Katsottu :</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>Tulos</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished">Tallenna oletukseksi</translation>
+        <translation>Tallenna oletukseksi</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished">Yleiset Asetukset</translation>
+        <translation>Yleiset Asetukset</translation>
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished">Toistoasetukset</translation>
+        <translation>Toistoasetukset</translation>
     </message>
     <message>
         <source>File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiedostotyypit</translation>
     </message>
     <message>
         <source>Rip Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Tuonnin asetukset</translation>
     </message>
     <message>
         <source>Browse Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Selaa videoita</translation>
     </message>
     <message>
         <source>Video List</source>
-        <translation type="unfinished"></translation>
+        <translation>Videolista</translation>
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished">Videogalleria</translation>
+        <translation>Videogalleria</translation>
+    </message>
+    <message>
+        <source>Text Filter :</source>
+        <translation>Tekstisuodin :</translation>
+    </message>
+    <message>
+        <source>Seas/Ep:</source>
+        <translation>Kausi/Jakso:</translation>
+    </message>
+    <message>
+        <source>Background:</source>
+        <translation>Taustakuva:</translation>
+    </message>
+    <message>
+        <source>Video List Filters</source>
+        <translation>Videolistan suotimet</translation>
+    </message>
+    <message>
+        <source>Default Player:</source>
+        <translation>Oletus toistaja:</translation>
+    </message>
+    <message>
+        <source>Enable Alternate Player:</source>
+        <translation>Mahdollista valinnainen toistin:</translation>
+    </message>
+    <message>
+        <source>Alternate Player:</source>
+        <translation>Valinnainen toistin:</translation>
+    </message>
+    <message>
+        <source>Movie Grabber:</source>
+        <translation>Elokuvakaappari:</translation>
+    </message>
+    <message>
+        <source>TV Grabber:</source>
+        <translation>TV kaappari:</translation>
+    </message>
+    <message>
+        <source>Trailers to Play:</source>
+        <translation>Toistettavia trailereita:</translation>
+    </message>
+    <message>
+        <source>File Paths and general options</source>
+        <translation>Tiedostopolut ja yleiset valinnat</translation>
+    </message>
+    <message>
+        <source>Player Applications and DVD/VCD Drives</source>
+        <translation>Toisto-ohjelmat ja DVD/VCD asemat</translation>
+    </message>
+    <message>
+        <source>Metadata Settings</source>
+        <translation>Metatietojen asetukset</translation>
+    </message>
+    <message>
+        <source>Grabber Setup and display preferences</source>
+        <translation>Kaapparin ja näytön asetukset</translation>
+    </message>
+    <message>
+        <source>Associate new file extensions</source>
+        <translation>Yhdistä uusia tiedostopäätteitä</translation>
+    </message>
+    <message>
+        <source>DVD Rip and Transcode options</source>
+        <translation>DVD tuonti ja transkoodaus valinnat</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished">Videoiden Hallinta</translation>
+        <translation>Videoiden Hallinta</translation>
     </message>
     <message>
         <source>Play DVD</source>
-        <translation type="unfinished">Toistetaan DVD</translation>
+        <translation>Toista DVD</translation>
     </message>
     <message>
         <source>Play VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista VCD</translation>
     </message>
     <message>
         <source>Rip DVD</source>
-        <translation type="unfinished">Kopioidaan DVD</translation>
+        <translation>Tuo DVD</translation>
     </message>
     <message>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista media</translation>
     </message>
     <message>
         <source>Videos Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoasetukset</translation>
     </message>
     <message>
         <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa toiston ja DVD tuonnin asetuksia</translation>
     </message>
 </context>
 <context>
@@ -1933,153 +2364,186 @@ Tarkista Videomanagerin asetukset</translation>
     </message>
     <message>
         <source>Video dialog loading, or no videos available...</source>
-        <translation type="unfinished"></translation>
+        <translation>Video ikkunaa ladataan, tai videoita ei ole saatavilla...</translation>
     </message>
     <message>
         <source>Season</source>
-        <translation type="unfinished"></translation>
+        <translation>Kausi</translation>
     </message>
     <message>
         <source>Video Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Videohaku</translation>
     </message>
     <message>
         <source>Video Options
 %1
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Video valinnat
+%1
+%2</translation>
     </message>
     <message>
         <source>Video Options
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Video valinnat
+%1</translation>
     </message>
     <message>
         <source>Video Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Video valinnat</translation>
     </message>
     <message>
         <source>Play...</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista...</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista</translation>
     </message>
     <message>
         <source>Mark as Unwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Merkitse katsomattomaksi</translation>
     </message>
     <message>
         <source>Mark as Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Merkitse katsotuksi</translation>
     </message>
     <message>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Metatieto valinnat</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Poista</translation>
+        <translation>Poista</translation>
     </message>
     <message>
         <source>Play Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Toistokansio</translation>
     </message>
     <message>
         <source>Playback Options
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Toiston valinnat
+%1</translation>
     </message>
     <message>
         <source>Play in Alternate Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista valinnaisessa toistimessa</translation>
     </message>
     <message>
         <source>Play With Trailers</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista trailereiden kanssa</translation>
     </message>
     <message>
         <source>Play Trailer</source>
-        <translation type="unfinished"></translation>
+        <translation>Toista traileri</translation>
     </message>
     <message>
         <source>Video Display Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoiden näyttö -valikko</translation>
     </message>
     <message>
         <source>Browse By...</source>
-        <translation type="unfinished"></translation>
+        <translation>Selausperuste...</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Asetukset</translation>
+    </message>
+    <message>
+        <source>Video Settings</source>
+        <translation>Videoasetukset</translation>
+    </message>
+    <message>
+        <source>Player Settings</source>
+        <translation>Toistoasetukset</translation>
+    </message>
+    <message>
+        <source>Metadata Settings</source>
+        <translation>Metatietojen asetukset</translation>
+    </message>
+    <message>
+        <source>File Type Settings</source>
+        <translation>Tiedostotyyppiasetukset</translation>
     </message>
     <message>
         <source>Browse By</source>
-        <translation type="unfinished"></translation>
+        <translation>Selausperuste</translation>
     </message>
     <message>
         <source>Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Esiintyjät</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategoria</translation>
     </message>
     <message>
         <source>Date Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivämäärä kun lisätty</translation>
     </message>
     <message>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjaaja</translation>
     </message>
     <message>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Hakemisto</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Laji</translation>
     </message>
     <message>
         <source>TV/Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>TV/Elokuvat</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished">Arvostelu</translation>
+        <translation>Arvostelu</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished">Vuosi</translation>
+        <translation>Vuosi</translation>
+    </message>
+    <message>
+        <source>View Homepage</source>
+        <translation>Kotisivu</translation>
     </message>
     <message>
         <source>Mark as Non-Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Merkitse selaus estetyksi</translation>
     </message>
     <message>
         <source>Mark as Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Merkitse selattavaksi</translation>
     </message>
     <message>
         <source>Manage Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Hallitse metatietoja</translation>
     </message>
     <message>
         <source>Search TV by Title/Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>TV haku nimellä/aliotsikolla</translation>
+    </message>
+    <message>
+        <source>No browser command set! MythVideo needs MythBrowser installed to display the homepage.</source>
+        <translation>Ei selainkomentoa asetettu! MythVideo tarvitsee MythBrowserin asennettuna näyttääkseen kotisivun.</translation>
     </message>
     <message>
         <source>Are you sure you want to delete:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Haluatko varmasti poistaa:
+%1</translation>
     </message>
     <message>
         <source>%1 download finished: %2 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 lataus valmis: %2 %3</translation>
     </message>
     <message>
         <source>%1 exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 löyty1 kohteelle, mutta sitä ei voitu hakea aikarajoituksen sisällä.</translation>
     </message>
 </context>
 <context>
