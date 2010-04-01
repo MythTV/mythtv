@@ -12,7 +12,7 @@
         <text lang="PT">Programar Gravações</text>
         <text lang="SV">Schemalägg inspelningar</text>
         <text lang="JA">録画予約</text>
-        <text lang="FI">Ajasta Nauhoituksia</text>
+        <text lang="FI">Ajasta Tallennuksia</text>
         <text lang="ZH_TW">預設錄影</text>
         <text lang="SL">Planiranje snemanj</text>
         <text lang="ET">Salvestamiste plaanimine</text>
@@ -52,7 +52,7 @@
         <text lang="PT">Resolver Conflitos</text>
         <text lang="SV">Kommande Inspelningar</text>
         <text lang="JA">これからの録画</text>
-        <text lang="FI">Tulevat Nauhoitukset</text>
+        <text lang="FI">Tulevat Tallennukset</text>
         <text lang="ZH_TW">修正預設錄影衝突</text>
         <text lang="SL">Prihajajoča snemanja</text>
         <text lang="ET">Tulevased salvestamised</text>
@@ -77,7 +77,7 @@
         <text lang="PT">Apagar Gravações</text>
         <text lang="SV">Radera inspelningar</text>
         <text lang="JA">録画削除</text>
-        <text lang="FI">Poista Nauhoituksia</text>
+        <text lang="FI">Poista Tallenteita</text>
         <text lang="ZH_TW">刪除錄影</text>
         <text lang="SL">Brisanje snemanj</text>
         <text lang="ET">Salvestiste kustutamine</text>
@@ -104,7 +104,7 @@
         <text lang="DE">Alte Aufnahmen</text>
         <text lang="IS">Fyrri upptökur</text>
         <text lang="NL">Vorige Opnames</text>     
-        <text lang="FI">Aiemmin Nauhoitetut</text>
+        <text lang="FI">Aiemmin Tallennetut</text>
         <text lang="ZH_TW">以前的錄影</text>
         <text lang="SL">Že posneto</text>
         <text lang="ET">Varem salvestatud</text>
