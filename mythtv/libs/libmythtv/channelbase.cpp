@@ -44,6 +44,9 @@ ChannelBase::ChannelBase(TVRec *parent)
 
 ChannelBase::~ChannelBase(void)
 {
+    InputMap::iterator it = m_inputs.begin();
+    for (; it != m_inputs.end(); ++it)
+        delete *it;
 }
 
 bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
