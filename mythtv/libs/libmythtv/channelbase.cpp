@@ -44,6 +44,7 @@ ChannelBase::ChannelBase(TVRec *parent)
 
 ChannelBase::~ChannelBase(void)
 {
+    ClearInputMap();
 }
 
 bool ChannelBase::Init(QString &inputname, QString &startchannel, bool setchan)
@@ -760,7 +761,7 @@ int ChannelBase::GetChanID() const
  */
 bool ChannelBase::InitializeInputs(void)
 {
-    inputs.clear();
+    ClearInputMap();
 
     uint cardid = max(GetCardID(), 0);
     if (!cardid)
@@ -986,4 +987,12 @@ bool ChannelBase::CheckChannel(const QString &channum,
         ret = true;
 
     return ret;
+}
+
+void ChannelBase::ClearInputMap(void)
+{
+    InputMap::iterator it = inputs.begin();
+    for (; it != inputs.end(); ++it)
+        delete *it;
+    inputs.clear();
 }

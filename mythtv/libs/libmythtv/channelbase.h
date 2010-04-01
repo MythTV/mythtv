@@ -71,7 +71,7 @@ class ChannelBase
     virtual vector<InputInfo> GetFreeInputs(
         const vector<uint> &excluded_cards) const;
     virtual QStringList GetConnectedInputs(void) const;
-    
+
     /// \brief Returns true iff commercial detection is not required
     //         on current channel, for BBC, CBC, etc.
     bool IsCommercialFree(void) const { return commfree; }
@@ -109,7 +109,7 @@ class ChannelBase
 
     virtual int GetCardID(void) const;
   protected:
-    /// \brief Switches to another input on hardware, 
+    /// \brief Switches to another input on hardware,
     ///        and sets the channel is setstarting is true.
     virtual bool SwitchToInput(int inputNum, bool setstarting);
     virtual bool IsInputAvailable(
@@ -118,6 +118,7 @@ class ChannelBase
     virtual bool ChangeExternalChannel(const QString &newchan);
     static void StoreInputChannels(const InputMap&);
     static void StoreDefaultInput(uint cardid, const QString &input);
+    void ClearInputMap(void);
 
     TVRec   *pParent;
     QString  curchannelname;
