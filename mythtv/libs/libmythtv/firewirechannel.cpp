@@ -43,12 +43,12 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
     QString loc = LOC + QString("SetChannelByString(%1)").arg(channum);
     VERBOSE(VB_CHANNEL, loc);
 
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (it == inputs.end())
+    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
+    if (it == m_inputs.end())
         return false;
 
     uint mplexid_restriction;
-    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+    if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
     {
         VERBOSE(VB_IMPORTANT, loc + " " + QString(
                     "Requested channel '%1' is on input '%2' "
@@ -70,7 +70,7 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
         dtv_si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, commfree))
+        mplexid, m_commfree))
     {
         VERBOSE(VB_IMPORTANT, loc + " " + QString(
                     "Requested channel '%1' is on input '%2' "
@@ -108,7 +108,7 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
         // Set the current channum to the new channel's channum
         QString tmp = channum;
         tmp.detach();
-        curchannelname = tmp;
+        m_curchannelname = tmp;
         tmp.detach();
         (*it)->startChanNum = tmp;
     }
@@ -131,10 +131,10 @@ bool FirewireChannel::Open(void)
     if (!InitializeInputs())
         return false;
 
-    if (inputs.find(currentInputID) == inputs.end())
+    if (m_inputs.find(m_currentInputID) == m_inputs.end())
         return false;
 
-    InputMap::const_iterator it = inputs.find(currentInputID);
+    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     if (!FirewireDevice::IsSTBSupported(fw_opts.model) &&
         (*it)->externalChanger.isEmpty())
     {
