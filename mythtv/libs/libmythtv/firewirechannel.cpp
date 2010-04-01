@@ -53,7 +53,7 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
         VERBOSE(VB_IMPORTANT, loc + " " + QString(
                     "Requested channel '%1' is on input '%2' "
                     "which is in a busy input group")
-                .arg(channum).arg(currentInputID));
+                .arg(channum).arg(m_currentInputID));
 
         return false;
     }
@@ -75,7 +75,7 @@ bool FirewireChannel::SetChannelByString(const QString &channum)
         VERBOSE(VB_IMPORTANT, loc + " " + QString(
                     "Requested channel '%1' is on input '%2' "
                     "which is in a busy input group")
-                .arg(channum).arg(currentInputID));
+                .arg(channum).arg(m_currentInputID));
 
         return false;
     }
