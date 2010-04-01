@@ -3594,10 +3594,11 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             bool cellChanged = ringBuffer->DVD()->CellChanged();
             bool inDVDStill = ringBuffer->DVD()->InStillFrame();
             bool inDVDMenu  = ringBuffer->DVD()->IsInMenu();
+            int storedPktCount = storedPackets.count();
             selectedVideoIndex = 0;
             if (dvdTitleChanged)
             {
-                if ((storedPackets.count() > 10 && !decodeStillFrame) ||
+                if ((storedPktCount > 10 && !decodeStillFrame) ||
                     decodeStillFrame)
                 {
                     storevideoframes = false;
@@ -3611,17 +3612,18 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             {
                 storevideoframes = false;
 
-                if (storedPackets.count() < 2 && !decodeStillFrame)
+                if (storedPktCount < 2 && !decodeStillFrame)
                     storevideoframes = true;
 
                 VERBOSE(VB_PLAYBACK+VB_EXTRA, QString("DVD Playback Debugging "
                     "inDVDMenu %1 storedPacketcount %2 dvdstill %3")
-                    .arg(inDVDMenu).arg(storedPackets.count()).arg(inDVDStill));
+                    .arg(inDVDMenu).arg(storedPktCount).arg(inDVDStill));
 
-                if (inDVDMenu && storedPackets.count() > 0)
-                    ringBuffer->DVD()->SetRunSeekCellStart(false);
-                else if (storedPackets.count() == 0)
+                if (inDVDStill && (storedPktCount == 0) &&
+                    (GetNVP()->getVideoOutput()->ValidVideoFrames() == 0))
+                {
                     ringBuffer->DVD()->RunSeekCellStart();
+                }
             }
             if (GetNVP()->AtNormalSpeed() &&
                 ((cellChanged) || (lastdvdtitle != dvdtitle)))

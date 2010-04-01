@@ -827,9 +827,6 @@ void NuppelVideoPlayer::ReinitVideo(void)
         DisableCaptions(textDisplayMode, false);
         SetCaptionsEnabled(true, false);
     }
-
-    if (player_ctx->buffer->InDVDMenuOrStillFrame())
-        player_ctx->buffer->DVD()->SetRunSeekCellStart(true);
 }
 
 QString NuppelVideoPlayer::ReinitAudio(void)

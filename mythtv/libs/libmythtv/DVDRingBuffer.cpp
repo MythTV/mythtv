@@ -50,7 +50,6 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       m_lastcellid(0), m_vobid(0),
       m_lastvobid(0), m_cellRepeated(false),
       m_buttonstreamid(0), m_runningCellStart(false),
-      m_runSeekCellStart(false),
       m_menupktpts(0), m_curAudioTrack(0),
       m_curSubtitleTrack(0),
       m_autoselectsubtitle(true),
@@ -1252,24 +1251,18 @@ bool DVDRingBufferPriv::IsSameChapter(int tmpcellid, int tmpvobid)
     return false;
 }
 
-/** \brief Run SeekCellStart its okay to run seekcellstart
- ** ffmpeg for some reason doesnt' output menu spu if seekcellstart
+/** \brief Run SeekCellStart.
+ ** ffmpeg for some reason does not output menu spu if seekcellstart
  ** is started too soon after a video codec/resolution change
  */
 void DVDRingBufferPriv::RunSeekCellStart(void)
 {
-    if (!m_runSeekCellStart)
-        return;
-
     bool ret = true;
     if (NumMenuButtons() > 0 && !m_buttonExists)
         ret = false;
 
     if (ret)
-    {
         ret = SeekCellStart();
-        m_runSeekCellStart = false;
-    }
 }
 
 /** \brief seek the beginning of a dvd cell

@@ -107,10 +107,8 @@ class MPUBLIC DVDRingBufferPriv
     void JumpToTitle(bool change) { m_jumptotitle = change; }
     void SetDVDSpeed(void);
     void SetDVDSpeed(int speed);
-    void SetRunSeekCellStart(bool change) { m_runSeekCellStart = change; }
 
     void SetParent(NuppelVideoPlayer *p) { m_parent = p; }
-
 
   protected:
     dvdnav_t      *m_dvdnav;
@@ -155,7 +153,6 @@ class MPUBLIC DVDRingBufferPriv
     bool           m_cellRepeated;
     int            m_buttonstreamid;
     bool           m_runningCellStart;
-    bool           m_runSeekCellStart;
     long long      m_menupktpts;
     int            m_curAudioTrack;
     int8_t         m_curSubtitleTrack;
