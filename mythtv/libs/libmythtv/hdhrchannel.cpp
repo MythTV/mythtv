@@ -135,12 +135,12 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
 
     ClearDTVInfo();
 
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (it == inputs.end())
+    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
+    if (it == m_inputs.end())
         return false;
 
     uint mplexid_restriction;
-    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+    if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
         return false;
 
     // Fetch tuning data from the database.
@@ -155,7 +155,7 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, commfree))
+        mplexid, m_commfree))
     {
         return false;
     }
@@ -193,14 +193,14 @@ bool HDHRChannel::SetChannelByString(const QString &channum)
 
     // Set the current channum to the new channel's channum
     QString tmp = channum; tmp.detach();
-    curchannelname = tmp;
+    m_curchannelname = tmp;
 
     // Set the major and minor channel for any additional multiplex tuning
     SetDTVInfo(atsc_major, atsc_minor, netid, tsid, mpeg_prog_num);
 
     // Set this as the future start channel for this source
-    QString tmpX = curchannelname; tmpX.detach();
-    inputs[currentInputID]->startChanNum = tmpX;
+    QString tmpX = m_curchannelname; tmpX.detach();
+    m_inputs[m_currentInputID]->startChanNum = tmpX;
 
     // Turn on the program filtering if tuning to MPEG stream
     if (mpeg_prog_num && (GetTuningMode() == "mpeg"))

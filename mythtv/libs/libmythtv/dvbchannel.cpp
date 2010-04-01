@@ -182,7 +182,7 @@ bool DVBChannel::Open(DVBChannel *who)
             return false;
         }
 
-        nextInputID = currentInputID;
+        nextInputID = m_currentInputID;
 
         return true;
     }
@@ -253,7 +253,7 @@ bool DVBChannel::Open(DVBChannel *who)
         return false;
     }
 
-    nextInputID = currentInputID;
+    nextInputID = m_currentInputID;
 
     if (fd_frontend >= 0)
         is_open[who] = true;
@@ -317,13 +317,13 @@ bool DVBChannel::SetChannelByString(const QString &channum)
     }
 
     // If CheckChannel filled in the inputName we need to change inputs.
-    if (!inputName.isEmpty() && (nextInputID == currentInputID))
+    if (!inputName.isEmpty() && (nextInputID == m_currentInputID))
         nextInputID = GetInputByName(inputName);
 
     // Get the input data for the channel
-    int inputid = (nextInputID >= 0) ? nextInputID : currentInputID;
-    InputMap::const_iterator it = inputs.find(inputid);
-    if (it == inputs.end())
+    int inputid = (nextInputID >= 0) ? nextInputID : m_currentInputID;
+    InputMap::const_iterator it = m_inputs.find(inputid);
+    if (it == m_inputs.end())
         return false;
 
     uint mplexid_restriction;
@@ -345,7 +345,7 @@ bool DVBChannel::SetChannelByString(const QString &channum)
         tvformat, modulation, freqtable, freqid,
         finetune, frequency,
         si_std, mpeg_prog_num, atsc_major, atsc_minor, tsid, netid,
-        mplexid, commfree))
+        mplexid, m_commfree))
     {
         VERBOSE(VB_IMPORTANT, loc_err +
                 "Unable to find channel in database.");
@@ -383,13 +383,13 @@ bool DVBChannel::SetChannelByString(const QString &channum)
     }
 
     QString tmpX = channum; tmpX.detach();
-    curchannelname = tmpX;
+    m_curchannelname = tmpX;
 
     VERBOSE(VB_CHANNEL, loc + "Tuned to frequency.");
 
-    currentInputID = nextInputID;
-    QString tmpY = curchannelname; tmpY.detach();
-    inputs[currentInputID]->startChanNum = tmpY;
+    m_currentInputID = nextInputID;
+    QString tmpY = m_curchannelname; tmpY.detach();
+    m_inputs[m_currentInputID]->startChanNum = tmpY;
 
     return true;
 }
@@ -417,12 +417,12 @@ bool DVBChannel::SwitchToInput(int newInputNum, bool setstarting)
 {
     (void)setstarting;
 
-    InputMap::const_iterator it = inputs.find(newInputNum);
-    if (it == inputs.end() || (*it)->startChanNum.isEmpty())
+    InputMap::const_iterator it = m_inputs.find(newInputNum);
+    if (it == m_inputs.end() || (*it)->startChanNum.isEmpty())
         return false;
 
     uint mplexid_restriction;
-    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+    if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
         return false;
 
     nextInputID = newInputNum;
@@ -603,7 +603,7 @@ void DVBChannel::SetTimeOffset(double offset)
 
 bool DVBChannel::Tune(const DTVMultiplex &tuning, QString inputname)
 {
-    int inputid = inputname.isEmpty() ? currentInputID : GetInputByName(inputname);
+    int inputid = inputname.isEmpty() ? m_currentInputID : GetInputByName(inputname);
     if (inputid < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Tune(): Invalid input '%1'.")
@@ -904,7 +904,7 @@ bool DVBChannel::Tune(const DTVMultiplex &tuning,
 
 bool DVBChannel::Retune(void)
 {
-    return Tune(desired_tuning, currentInputID, true, true);
+    return Tune(desired_tuning, m_currentInputID, true, true);
 }
 
 QString DVBChannel::GetFrontendName(void) const
@@ -1014,7 +1014,7 @@ int DVBChannel::GetChanID() const
                   "      channel.channum = :CHANNUM AND "
                   "      cardinput.cardid = :CARDID");
 
-    query.bindValue(":CHANNUM", curchannelname);
+    query.bindValue(":CHANNUM", m_curchannelname);
     query.bindValue(":CARDID",  cardid);
 
     if (!query.exec() || !query.isActive())

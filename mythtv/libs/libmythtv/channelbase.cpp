@@ -37,8 +37,8 @@ using namespace std;
 
 ChannelBase::ChannelBase(TVRec *parent)
     :
-    pParent(parent), curchannelname(""),
-    currentInputID(-1), commfree(false), cardid(0)
+    m_pParent(parent), m_curchannelname(""),
+    m_currentInputID(-1), m_commfree(false), m_cardid(0)
 {
 }
 
@@ -163,12 +163,12 @@ bool ChannelBase::IsTunable(const QString &input, const QString &channum) const
 {
     QString loc = LOC + QString("IsTunable(%1,%2)").arg(input).arg(channum);
 
-    int inputid = currentInputID;
+    int inputid = m_currentInputID;
     if (!input.isEmpty())
         inputid = GetInputByName(input);
 
-    InputMap::const_iterator it = inputs.find(inputid);
-    if (it == inputs.end())
+    InputMap::const_iterator it = m_inputs.find(inputid);
+    if (it == m_inputs.end())
     {
         VERBOSE(VB_IMPORTANT, loc + " " + QString(
                     "Requested non-existant input '%1':'%2' ")
@@ -227,24 +227,24 @@ uint ChannelBase::GetNextChannel(uint chanid, int direction) const
 {
     if (!chanid)
     {
-        InputMap::const_iterator it = inputs.find(currentInputID);
-        if (it == inputs.end())
+        InputMap::const_iterator it = m_inputs.find(m_currentInputID);
+        if (it == m_inputs.end())
             return 0;
 
-        chanid = ChannelUtil::GetChanID((*it)->sourceid, curchannelname);
+        chanid = ChannelUtil::GetChanID((*it)->sourceid, m_curchannelname);
     }
 
     uint mplexid_restriction = 0;
-    IsInputAvailable(currentInputID, mplexid_restriction);
+    IsInputAvailable(m_currentInputID, mplexid_restriction);
 
     return ChannelUtil::GetNextChannel(
-        allchannels, chanid, mplexid_restriction, direction);
+        m_allchannels, chanid, mplexid_restriction, direction);
 }
 
 uint ChannelBase::GetNextChannel(const QString &channum, int direction) const
 {
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (it == inputs.end())
+    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
+    if (it == m_inputs.end())
         return 0;
 
     uint chanid = ChannelUtil::GetChanID((*it)->sourceid, channum);
@@ -254,19 +254,19 @@ uint ChannelBase::GetNextChannel(const QString &channum, int direction) const
 int ChannelBase::GetNextInputNum(void) const
 {
     // Exit early if inputs don't exist..
-    if (!inputs.size())
+    if (!m_inputs.size())
         return -1;
 
     // Find current input
     InputMap::const_iterator it;
-    it = inputs.find(currentInputID);
+    it = m_inputs.find(m_currentInputID);
 
     // If we can't find the current input, start at
     // the beginning and don't increment initially.
     bool skip_incr = false;
-    if (it == inputs.end())
+    if (it == m_inputs.end())
     {
-        it = inputs.begin();
+        it = m_inputs.begin();
         skip_incr = true;
     }
 
@@ -277,7 +277,7 @@ int ChannelBase::GetNextInputNum(void) const
         if (!skip_incr)
         {
             ++it;
-            it = (it == inputs.end()) ? inputs.begin() : it;
+            it = (it == m_inputs.end()) ? m_inputs.begin() : it;
         }
         skip_incr = false;
 
@@ -296,8 +296,8 @@ QStringList ChannelBase::GetConnectedInputs(void) const
 {
     QStringList list;
 
-    InputMap::const_iterator it = inputs.begin();
-    for (; it != inputs.end(); ++it)
+    InputMap::const_iterator it = m_inputs.begin();
+    for (; it != m_inputs.end(); ++it)
         if ((*it)->sourceid)
             list.push_back((*it)->name);
 
@@ -309,8 +309,8 @@ QStringList ChannelBase::GetConnectedInputs(void) const
  */
 QString ChannelBase::GetInputByNum(int capchannel) const
 {
-    InputMap::const_iterator it = inputs.find(capchannel);
-    if (it != inputs.end())
+    InputMap::const_iterator it = m_inputs.find(capchannel);
+    if (it != m_inputs.end())
         return (*it)->name;
     return QString::null;
 }
@@ -320,8 +320,8 @@ QString ChannelBase::GetInputByNum(int capchannel) const
  */
 int ChannelBase::GetInputByName(const QString &input) const
 {
-    InputMap::const_iterator it = inputs.begin();
-    for (; it != inputs.end(); ++it)
+    InputMap::const_iterator it = m_inputs.begin();
+    for (; it != m_inputs.end(); ++it)
     {
         if ((*it)->name == input)
             return (int)it.key();
@@ -363,8 +363,8 @@ bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
 
 bool ChannelBase::SwitchToInput(int newInputNum, bool setstarting)
 {
-    InputMap::const_iterator it = inputs.find(newInputNum);
-    if (it == inputs.end() || (*it)->startChanNum.isEmpty())
+    InputMap::const_iterator it = m_inputs.find(newInputNum);
+    if (it == m_inputs.end() || (*it)->startChanNum.isEmpty())
         return false;
 
     uint mplexid_restriction;
@@ -500,7 +500,7 @@ bool ChannelBase::IsInputAvailable(
     // Cache our busy input if applicable
     uint cid = GetCardID();
     TunedInputInfo info;
-    busyrec[cid] = pParent->IsBusy(&info);
+    busyrec[cid] = m_pParent->IsBusy(&info);
     if (busyrec[cid])
     {
         busyin[cid] = info;
@@ -544,7 +544,7 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
     // Cache our busy input if applicable
     TunedInputInfo info;
     uint cid = GetCardID();
-    busyrec[cid] = pParent->IsBusy(&info);
+    busyrec[cid] = m_pParent->IsBusy(&info);
     if (busyrec[cid])
     {
         busyin[cid] = info;
@@ -582,19 +582,19 @@ vector<InputInfo> ChannelBase::GetFreeInputs(
 
 uint ChannelBase::GetInputCardID(int inputNum) const
 {
-    InputMap::const_iterator it = inputs.find(inputNum);
-    if (it != inputs.end())
+    InputMap::const_iterator it = m_inputs.find(inputNum);
+    if (it != m_inputs.end())
         return (*it)->cardid;
     return 0;
 }
 
 DBChanList ChannelBase::GetChannels(int inputNum) const
 {
-    int inputid = (inputNum > 0) ? inputNum : currentInputID;
+    int inputid = (inputNum > 0) ? inputNum : m_currentInputID;
 
     DBChanList ret;
-    InputMap::const_iterator it = inputs.find(inputid);
-    if (it != inputs.end())
+    InputMap::const_iterator it = m_inputs.find(inputid);
+    if (it != m_inputs.end())
         ret = (*it)->channels;
 
     return ret;
@@ -602,7 +602,7 @@ DBChanList ChannelBase::GetChannels(int inputNum) const
 
 DBChanList ChannelBase::GetChannels(const QString &inputname) const
 {
-    int inputid = currentInputID;
+    int inputid = m_currentInputID;
     if (!inputname.isEmpty())
     {
         int tmp = GetInputByName(inputname);
@@ -619,7 +619,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
             QString("ChangeExternalChannel is not implemented in MinGW."));
     return false;
 #else
-    InputMap::const_iterator it = inputs.find(currentInputID);
+    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
     QString changer = (*it)->externalChanger;
 
     if (changer.isEmpty())
@@ -715,11 +715,11 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
  */
 int ChannelBase::GetCardID(void) const
 {
-    if (cardid > 0)
-        return cardid;
+    if (m_cardid > 0)
+        return m_cardid;
 
-    if (pParent)
-        return pParent->GetCaptureCardNum();
+    if (m_pParent)
+        return m_pParent->GetCaptureCardNum();
 
     if (GetDevice().isEmpty())
         return -1;
@@ -730,8 +730,8 @@ int ChannelBase::GetCardID(void) const
 
 int ChannelBase::GetChanID() const
 {
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (it == inputs.end())
+    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
+    if (it == m_inputs.end())
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -739,7 +739,7 @@ int ChannelBase::GetChanID() const
     query.prepare("SELECT chanid FROM channel "
                   "WHERE channum  = :CHANNUM AND "
                   "      sourceid = :SOURCEID");
-    query.bindValue(":CHANNUM", curchannelname);
+    query.bindValue(":CHANNUM", m_curchannelname);
     query.bindValue(":SOURCEID", (*it)->sourceid);
 
     if (!query.exec() || !query.isActive())
@@ -760,7 +760,7 @@ int ChannelBase::GetChanID() const
  */
 bool ChannelBase::InitializeInputs(void)
 {
-    inputs.clear();
+    m_inputs.clear();
 
     uint cardid = max(GetCardID(), 0);
     if (!cardid)
@@ -794,7 +794,7 @@ bool ChannelBase::InitializeInputs(void)
         return false;
     }
 
-    allchannels.clear();
+    m_allchannels.clear();
     QString order = gContext->GetSetting("ChannelOrdering", "channum");
     while (query.next())
     {
@@ -803,26 +803,26 @@ bool ChannelBase::InitializeInputs(void)
 
         ChannelUtil::SortChannels(channels, order);
 
-        inputs[query.value(0).toUInt()] = new ChannelInputInfo(
+        m_inputs[query.value(0).toUInt()] = new ChannelInputInfo(
             query.value(1).toString(), query.value(2).toString(),
             query.value(3).toString(), query.value(4).toString(),
             sourceid,                  cardid,
             query.value(0).toUInt(),   0,
             channels);
 
-        allchannels.insert(allchannels.end(),
+        m_allchannels.insert(m_allchannels.end(),
                            channels.begin(), channels.end());
     }
-    ChannelUtil::SortChannels(allchannels, order);
-    ChannelUtil::EliminateDuplicateChanNum(allchannels);
+    ChannelUtil::SortChannels(m_allchannels, order);
+    ChannelUtil::EliminateDuplicateChanNum(m_allchannels);
 
     // Set initial input to first connected input
-    currentInputID = -1;
-    currentInputID = GetNextInputNum();
+    m_currentInputID = -1;
+    m_currentInputID = GetNextInputNum();
 
     // print em
     InputMap::const_iterator it;
-    for (it = inputs.begin(); it != inputs.end(); ++it)
+    for (it = m_inputs.begin(); it != m_inputs.end(); ++it)
     {
         VERBOSE(VB_CHANNEL, LOC + QString("Input #%1: '%2' schan(%3) "
                                           "sourceid(%4) ccid(%5)")
@@ -832,7 +832,7 @@ bool ChannelBase::InitializeInputs(void)
     VERBOSE(VB_CHANNEL, LOC + QString("Current Input #%1: '%2'")
             .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
 
-    return inputs.size();
+    return m_inputs.size();
 }
 
 /** \fn ChannelBase::Renumber(uint,const QString&,const QString&)
@@ -842,9 +842,9 @@ void ChannelBase::Renumber(uint sourceid,
                            const QString &oldChanNum,
                            const QString &newChanNum)
 {
-    InputMap::iterator it = inputs.begin();
+    InputMap::iterator it = m_inputs.begin();
 
-    for (; it != inputs.end(); ++it)
+    for (; it != m_inputs.end(); ++it)
     {
         bool skip = ((*it)->name.isEmpty()                ||
                      (*it)->startChanNum.isEmpty()        ||
@@ -854,10 +854,10 @@ void ChannelBase::Renumber(uint sourceid,
             (*it)->startChanNum = newChanNum;
     }
 
-    if (GetCurrentSourceID() == sourceid && oldChanNum == curchannelname)
-        curchannelname = newChanNum;
+    if (GetCurrentSourceID() == sourceid && oldChanNum == m_curchannelname)
+        m_curchannelname = newChanNum;
 
-    StoreInputChannels(inputs);
+    StoreInputChannels(m_inputs);
 }
 
 /** \fn ChannelBase::StoreInputChannels(const InputMap&)

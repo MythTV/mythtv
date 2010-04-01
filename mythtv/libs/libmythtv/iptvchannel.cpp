@@ -89,12 +89,12 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
     QMutexLocker locker(&m_lock);
     VERBOSE(VB_CHANNEL, LOC + "SetChannelByString() -- locked");
 
-    InputMap::const_iterator it = inputs.find(currentInputID);
-    if (it == inputs.end())
+    InputMap::const_iterator it = m_inputs.find(m_currentInputID);
+    if (it == m_inputs.end())
         return false;
 
     uint mplexid_restriction;
-    if (!IsInputAvailable(currentInputID, mplexid_restriction))
+    if (!IsInputAvailable(m_currentInputID, mplexid_restriction))
         return false;
 
     // Verify that channel exists
@@ -111,7 +111,7 @@ bool IPTVChannel::SetChannelByString(const QString &channum)
 
     // Set the current channum to the new channel's channum
     QString tmp = channum; tmp.detach();
-    curchannelname = tmp;
+    m_curchannelname = tmp;
 
     // Set the dtv channel info for any additional multiplex tuning
     SetDTVInfo(/*atsc_major*/ 0, /*atsc_minor*/ 0,
@@ -140,8 +140,8 @@ IPTVChannelInfo IPTVChannel::GetChanInfo(
 
     if (!sourceid)
     {
-        InputMap::const_iterator it = inputs.find(currentInputID);
-        if (it == inputs.end())
+        InputMap::const_iterator it = m_inputs.find(m_currentInputID);
+        if (it == m_inputs.end())
         {
             VERBOSE(VB_IMPORTANT, msg);
             return dummy;

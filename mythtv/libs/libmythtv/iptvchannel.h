@@ -33,7 +33,7 @@ class IPTVChannel : public DTVChannel
         { return false; } // TODO
 
     IPTVChannelInfo GetCurrentChanInfo(void) const
-        { return GetChanInfo(curchannelname); }
+        { return GetChanInfo(m_curchannelname); }
 
     IPTVFeederWrapper       *GetFeeder(void)       { return m_feeder; }
     const IPTVFeederWrapper *GetFeeder(void) const { return m_feeder; }

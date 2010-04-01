@@ -51,19 +51,19 @@ class ChannelBase
     virtual int GetInputByName(const QString &input) const;
     virtual QString GetInputByNum(int capchannel) const;
     virtual QString GetCurrentName(void) const
-        { return curchannelname; }
+        { return m_curchannelname; }
     virtual int GetChanID(void) const;
     virtual int GetCurrentInputNum(void) const
-        { return currentInputID; }
+        { return m_currentInputID; }
     virtual QString GetCurrentInput(void) const
-        { return inputs[GetCurrentInputNum()]->name; }
+        { return m_inputs[GetCurrentInputNum()]->name; }
     virtual int GetNextInputNum(void) const;
     virtual QString GetNextInput(void) const
-        { return inputs[GetNextInputNum()]->name; }
+        { return m_inputs[GetNextInputNum()]->name; }
     virtual QString GetNextInputStartChan(void)
-        { return inputs[GetNextInputNum()]->startChanNum; }
+        { return m_inputs[GetNextInputNum()]->startChanNum; }
     virtual uint GetCurrentSourceID(void) const
-        { return inputs[GetCurrentInputNum()]->sourceid; }
+        { return m_inputs[GetCurrentInputNum()]->sourceid; }
     virtual uint GetInputCardID(int inputNum) const;
     virtual DBChanList GetChannels(int inputNum) const;
     virtual DBChanList GetChannels(const QString &inputname) const;
@@ -73,7 +73,7 @@ class ChannelBase
 
     /// \brief Returns true iff commercial detection is not required
     //         on current channel, for BBC, CBC, etc.
-    bool IsCommercialFree(void) const { return commfree; }
+    bool IsCommercialFree(void) const { return m_commfree; }
     /// \brief Returns String representing device, useful for debugging
     virtual QString GetDevice(void) const { return ""; }
 
@@ -92,7 +92,7 @@ class ChannelBase
 
     /// Saves current channel as the default channel for the current input.
     virtual void StoreInputChannels(void)
-        { StoreInputChannels(inputs);
+        { StoreInputChannels(m_inputs);
           StoreDefaultInput(GetCardID(), GetCurrentInput()); }
 
     // Picture attribute settings
@@ -104,7 +104,7 @@ class ChannelBase
     bool CheckChannel(const QString &channum, QString& inputName) const;
 
     // \brief Set cardid for scanning
-    void SetCardID(uint _cardid) { cardid = _cardid; }
+    void SetCardID(uint _cardid) { m_cardid = _cardid; }
 
     virtual int GetCardID(void) const;
   protected:
@@ -118,13 +118,13 @@ class ChannelBase
     static void StoreInputChannels(const InputMap&);
     static void StoreDefaultInput(uint cardid, const QString &input);
 
-    TVRec   *pParent;
-    QString  curchannelname;
-    int      currentInputID;
-    bool     commfree;
-    uint     cardid;
-    InputMap inputs;
-    DBChanList allchannels; ///< channels across all inputs
+    TVRec   *m_pParent;
+    QString  m_curchannelname;
+    int      m_currentInputID;
+    bool     m_commfree;
+    uint     m_cardid;
+    InputMap m_inputs;
+    DBChanList m_allchannels; ///< channels across all inputs
 };
 
 #endif
