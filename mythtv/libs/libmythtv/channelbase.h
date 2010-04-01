@@ -117,6 +117,7 @@ class ChannelBase
     virtual bool ChangeExternalChannel(const QString &newchan);
     static void StoreInputChannels(const InputMap&);
     static void StoreDefaultInput(uint cardid, const QString &input);
+    void ClearInputMap(void);
 
     TVRec   *m_pParent;
     QString  m_curchannelname;
