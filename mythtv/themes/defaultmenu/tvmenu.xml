@@ -36,7 +36,7 @@
         <text lang="PT">Programar Gravações</text>
         <text lang="SV">Schemalägg inspelningar</text>
         <text lang="JA">録画予約</text>
-        <text lang="FI">Ajasta Nauhoituksia</text>
+        <text lang="FI">Ajasta Tallennuksia</text>
         <text lang="ZH_TW">預設錄影</text>
         <text lang="SL">Plan snemanj</text>
         <text lang="ET">Salvestamiste plaanimine</text>
@@ -72,7 +72,7 @@
         <text lang="PT">Ver Gravações</text>
         <text lang="SV">Visa inspelningar</text>
         <text lang="JA">録画再生</text>
-        <text lang="FI">Katso Nauhoitukset</text>
+        <text lang="FI">Katso Tallenteita</text>
         <text lang="ZH_TW">觀看預錄節目</text>
         <text lang="SL">Predvajanje snemanj</text>
         <text lang="ET">Salvestiste vaatamine</text>
@@ -98,7 +98,7 @@
         <text lang="PT">Apagar Gravações</text>
         <text lang="SV">Radera inspelningar</text>
         <text lang="JA">録画削除</text>
-        <text lang="FI">Poista Nauhoituksia</text>
+        <text lang="FI">Poista Tallenteita</text>
         <text lang="ZH_TW">刪除錄影</text>
         <text lang="SL">Brisanje snemanj</text>
         <text lang="ET">Salvestiste kustutamine</text>
