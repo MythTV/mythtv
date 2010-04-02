@@ -872,13 +872,10 @@ bool telnet(const QString &host, int port)
 {
     MythSocket *s = new MythSocket();
 
-    if (s->connect(host, port))
-    {
-        s->close();
-        return true;
-    }
+    bool connected = s->connect(host, port);
+    s->DownRef();
 
-    return false;
+    return connected;
 }
 
 /** \fn copy(QFile&,QFile&,uint)
