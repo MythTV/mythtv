@@ -502,14 +502,15 @@ bool OpenGLVideo::AddFilter(OpenGLFilterType filter)
         success &= OptimiseFilters();
     }
 
-    if (success)
-        return true;
+    if (!success)
+    {
+        RemoveFilter(filter);
+        filters.erase(filter);
+        delete temp; // If temp wasn't added to the filter list, we need to delete
+        return false;
+    }
 
-    RemoveFilter(filter);
-    filters.erase(filter);
-    delete temp; // If temp wasn't added to the filter list, we need to delete
-
-    return false;
+    return true;
 }
 
 bool OpenGLVideo::RemoveFilter(OpenGLFilterType filter)
