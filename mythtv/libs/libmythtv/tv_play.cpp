@@ -206,6 +206,7 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed initializing TV");
         delete tv;
+        delete curProgram;
         return false;
     }
 
