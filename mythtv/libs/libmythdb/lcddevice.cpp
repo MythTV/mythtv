@@ -123,6 +123,10 @@ void LCD::SetupLCD (void)
     lcd_port = GetMythDB()->GetNumSetting("LCDServerPort", 6545);
     m_enabled = GetMythDB()->GetNumSetting("LCDEnable", 0);
 
+    // workaround a problem with Ubuntu not resolving localhost properly
+    if (lcd_host == "localhost")
+        lcd_host = "127.0.0.1";
+
     if (m_enabled && lcd_host.length() > 0 && lcd_port > 1024)
     {
         class LCD * lcd = LCD::Get();
