@@ -330,6 +330,7 @@ MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
                 m_IgnoreList += target;
             }
         }
+        delete fi;
     }
 }
 
