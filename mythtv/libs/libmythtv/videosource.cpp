@@ -897,6 +897,7 @@ class VideoDevice : public PathSetting, public CaptureCardDBStorage
             // add to list of minors discovered to avoid duplicates
             minor_list[minor_num] = 1;
         }
+        delete driverExp;
 
         return cnt;
     }
