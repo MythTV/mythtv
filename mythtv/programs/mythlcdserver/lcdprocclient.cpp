@@ -205,7 +205,7 @@ void LCDProcClient::sendToServer(const QString &someText)
     }
 
     QTextStream os(socket);
-    //os.setCodec(Q3TextStream::Latin1);
+    os.setCodec("ISO 8859-1");
 
     last_command = someText;
 
