@@ -138,7 +138,10 @@ bool BackendSelect::Connect(DeviceLocation *dev)
             MythPopupBox::showOkPopup(m_parent, "",
                                       tr(message.toLatin1().constData()));
             if (TryDBfromURL("", dev->m_sLocation))
+            {
+                delete xml;
                 return true;
+            }
             break;
 
         case UPnPResult_ActionNotAuthorized:
@@ -160,7 +163,10 @@ bool BackendSelect::Connect(DeviceLocation *dev)
             }
             while (stat == UPnPResult_ActionNotAuthorized);
             if (stat == UPnPResult_Success)
+            {
+                delete xml;
                 return true;
+            }
             break;
 
         default:
@@ -171,6 +177,7 @@ bool BackendSelect::Connect(DeviceLocation *dev)
 
     // Back to the list, so the user can choose a different backend:
     m_backends->setFocus();
+    delete xml;
     return false;
 }
 
