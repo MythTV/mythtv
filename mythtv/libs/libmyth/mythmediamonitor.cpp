@@ -24,12 +24,12 @@ using namespace std;
 #include "util.h"
 
 #ifdef USING_DARWIN_DA
-#include "mediamonitor-darwin.h" 
+#include "mediamonitor-darwin.h"
 #endif
 #if CONFIG_CYGWIN || defined(_WIN32)
-#include "mediamonitor-windows.h" 
+#include "mediamonitor-windows.h"
 #else
-#include "mediamonitor-unix.h" 
+#include "mediamonitor-unix.h"
 #endif
 
 QEvent::Type MediaEvent::kEventType =
@@ -38,18 +38,18 @@ QEvent::Type MediaEvent::kEventType =
 MediaMonitor *MediaMonitor::c_monitor = NULL;
 
 // MonitorThread
-MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval) 
+MonitorThread::MonitorThread(MediaMonitor* pMon, unsigned long interval)
              : QThread()
 {
     m_Monitor = pMon;
     m_Interval = interval;
 }
 
-// Nice and simple, as long as our monitor is valid and active, 
+// Nice and simple, as long as our monitor is valid and active,
 // loop and check it's devices.
 void MonitorThread::run(void)
 {
-    while (m_Monitor && m_Monitor->IsActive())        
+    while (m_Monitor && m_Monitor->IsActive())
     {
         m_Monitor->CheckDevices();
         msleep(m_Interval);
@@ -66,10 +66,10 @@ MediaMonitor* MediaMonitor::GetMediaMonitor(void)
         return c_monitor;
 
 #ifdef USING_DARWIN_DA
-    c_monitor = new MediaMonitorDarwin(NULL, 500, true); 
+    c_monitor = new MediaMonitorDarwin(NULL, 500, true);
 #else
   #if CONFIG_CYGWIN || defined(_WIN32)
-    c_monitor = new MediaMonitorWindows(NULL, 500, true); 
+    c_monitor = new MediaMonitorWindows(NULL, 500, true);
   #else
     c_monitor = new MediaMonitorUnix(NULL, 500, true);
   #endif
@@ -106,7 +106,7 @@ void MediaMonitor::SetCDSpeed(const char *device, int speed)
 // When ejecting one of multiple devices, present a nice name to the user
 static const QString DevName(MythMediaDevice *d)
 {
-    QString str = d->getVolumeID();  // First choice, the name of the media 
+    QString str = d->getVolumeID();  // First choice, the name of the media
 
     if (str.isEmpty())
     {
@@ -127,11 +127,11 @@ static const QString DevName(MythMediaDevice *d)
 
 /**
  * \brief Generate a list of removable drives.
- *  
+ *
  * Has to iterate through all devices to check if any are suitable.
- */ 
+ */
 QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted)
-{       
+{
     QList <MythMediaDevice *>           drives;
     QList <MythMediaDevice *>::iterator it;
     QMutexLocker                        locker(&m_DevicesLock);
@@ -151,9 +151,9 @@ QList<MythMediaDevice*> MediaMonitor::GetRemovable(bool showMounted)
 
 /**
  * \brief List removable drives, let the user select one.
- *  
+ *
  * prevent drawing a list if there is only one drive, et cetera
- */ 
+ */
 MythMediaDevice * MediaMonitor::selectDrivePopup(const QString label,
                                                  bool          showMounted)
 {
@@ -281,8 +281,8 @@ void MediaMonitor::AttemptEject(MythMediaDevice *device)
  * \bug    If the user changes the MonitorDrives or IgnoreDevices settings,
  *         it will have no effect until the frontend is restarted.
  */
-MediaMonitor::MediaMonitor(QObject* par, unsigned long interval, 
-                           bool allowEject) 
+MediaMonitor::MediaMonitor(QObject* par, unsigned long interval,
+                           bool allowEject)
     : QObject(par), m_Active(false), m_Thread(NULL),
       m_MonitorPollingInterval(interval), m_AllowEject(allowEject)
 {
@@ -392,7 +392,7 @@ void MediaMonitor::CheckDevices(void)
 
     QList<MythMediaDevice*>::iterator itr = m_Devices.begin();
     MythMediaDevice* pDev;
-    while (itr != m_Devices.end()) 
+    while (itr != m_Devices.end())
     {
         pDev = *itr;
         if (pDev)
@@ -655,7 +655,7 @@ void MediaMonitor::JumpToMediaHandler(MythMediaDevice* pMedia)
 }
 
 // Signal handler.
-void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus, 
+void MediaMonitor::mediaStatusChanged(MediaStatus oldStatus,
                                       MythMediaDevice* pMedia)
 {
     // If we're not active then ignore signal.
@@ -773,7 +773,7 @@ bool MediaMonitor::eventFilter(QObject *obj, QEvent *event)
  */
 
 QString MediaMonitor::defaultDevice(QString dbSetting,
-                                    QString label, 
+                                    QString label,
                                     const char *hardCodedDefault)
 {
     QString device = gContext->GetSetting(dbSetting);
@@ -836,12 +836,12 @@ QString MediaMonitor::defaultDVDdevice()
                          tr("Select a DVD drive"), "/dev/dvd");
 }
 
-/** 
- * \brief CDWriterDeviceLocation, user-selected drive, or /dev/cdrom 
- */ 
-QString MediaMonitor::defaultCDWriter() 
-{ 
-    return defaultDevice("CDWriterDeviceLocation", 
+/**
+ * \brief CDWriterDeviceLocation, user-selected drive, or /dev/cdrom
+ */
+QString MediaMonitor::defaultCDWriter()
+{
+    return defaultDevice("CDWriterDeviceLocation",
                          tr("Select a CD writer"), "/dev/cdrom");
 }
 
