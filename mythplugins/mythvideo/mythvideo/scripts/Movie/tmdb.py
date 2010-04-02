@@ -28,7 +28,7 @@
 # License:Creative Commons GNU GPL v2
 # (http://creativecommons.org/licenses/GPL/2.0/)
 #-------------------------------------
-__title__ ="TheMovieDB APIv2 Query";
+__title__ ="TheMovieDB Query";
 __author__="R.D.Vaughan"
 __version__="v0.1.8"
 # 0.1.0 Initial development
