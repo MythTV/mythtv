@@ -354,6 +354,7 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
     {
         VERBOSE(VB_IMPORTANT, "DDLS: fillSelections "
                 "did not successfully load selections");
+        pdlg->deleteLater();
         return;
     }
     const DDLineupList lineups = ddp.GetLineups();
