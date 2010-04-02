@@ -208,6 +208,7 @@ class VDPAUResource
   public:
     VDPAUResource() {}
     VDPAUResource(uint id, QSize size) : m_id(id), m_size(size) { }
+    virtual ~VDPAUResource() {}
 
     uint  m_id;
     QSize m_size;
