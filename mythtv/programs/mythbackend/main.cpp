@@ -953,6 +953,7 @@ int main(int argc, char **argv)
 
         UPnpMedia *rebuildit = new UPnpMedia(false,false);
         rebuildit->BuildMediaMap();
+        delete rebuildit;
 
         return BACKEND_EXIT_OK;
     }
