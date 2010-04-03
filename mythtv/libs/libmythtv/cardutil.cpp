@@ -1190,16 +1190,13 @@ bool CardUtil::CreateInputGroupIfNeeded(uint cardid)
 
     if (ingrps.empty() && !inputs.empty())
     {
-        QString dev = CardUtil::GetVideoDevice(cardid);
-        QString name = QString::null;
+        QString name = CardUtil::GetRawCardType(cardid) + "_" +
+            CardUtil::GetVideoDevice(cardid);
         uint id = 0;
         for (uint i = 0; !id && (i < 100); i++)
         {
-            bool ok;
-            name = QString("DVB%1").arg(dev.toUInt(&ok));
-            if (!ok)
-                name = QString("HDHR_%1").arg(dev);
-            name += (i) ? QString(":%1").arg(i) : QString("");
+            if (i)
+                name += QString(":%1").arg(i);
             id = CardUtil::CreateInputGroup(name);
         }
         if (!id)
