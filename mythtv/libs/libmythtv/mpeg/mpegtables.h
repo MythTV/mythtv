@@ -661,7 +661,7 @@ class ProgramMapTable : public PSIPTable
 
     void SetProgramInfoLength(uint length)
     {
-        psipdata()[2] = ((length<<8) & 0x0f) | (psipdata()[2] & 0xf0);
+        psipdata()[2] = ((length>>8) & 0x0f) | (psipdata()[2] & 0xf0);
         psipdata()[3] = length & 0xff;
     }
 
