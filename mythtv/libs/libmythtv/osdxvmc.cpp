@@ -209,12 +209,12 @@ void XvMCOSD::CompositeOSD(VideoFrame* frame, VideoFrame* osdframe)
     disp->Unlock();
 }
 
-bool XvMCOSD::NeedFrame()
+bool XvMCOSD::NeedFrame() const
 {
     return osd_subpict_mode == BLEND_SUBPICTURE;
 }
 
-bool XvMCOSD::IsValid()
+bool XvMCOSD::IsValid() const
 {
     return osd_subpict_mode != NO_SUBPICTURE &&
         osd_subpict_mode != OVERLAY_SUBPICTURE;

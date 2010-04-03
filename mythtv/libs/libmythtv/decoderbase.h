@@ -91,7 +91,7 @@ class DecoderBase
                          int testbufsize = kDecoderProbeBufferSize) = 0;
 
     void setExactSeeks(bool exact) { exactseeks = exact; }
-    bool getExactSeeks(void)       { return exactseeks;  }
+    bool getExactSeeks(void) const { return exactseeks;  }
     void setLiveTVMode(bool live)  { livetv = live;      }
 
     // Must be done while player is paused.
@@ -150,10 +150,10 @@ class DecoderBase
 
     void setTranscoding(bool value) { transcoding = value; };
 
-    bool IsErrored() { return errored; }
+    bool IsErrored() const { return errored; }
 
     void SetWaitForChange(void);
-    bool GetWaitForChange(void);
+    bool GetWaitForChange(void) const;
     void SetReadAdjust(long long adjust);
 
     // DVD public stuff

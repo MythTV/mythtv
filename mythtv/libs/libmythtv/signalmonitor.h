@@ -58,9 +58,9 @@ class SignalMonitor
 
     /// \brief Returns whether or not a SIGNAL MythEvent is being sent
     ///        regularly to the frontend.
-    bool GetNotifyFrontend() { return notify_frontend; }
+    bool GetNotifyFrontend() const { return notify_frontend; }
     /// \brief Returns milliseconds between signal monitoring events.
-    int GetUpdateRate() { return update_rate; }
+    int GetUpdateRate() const { return update_rate; }
     virtual QStringList GetStatusList(bool kick = true);
 
     /// \brief Returns true iff signalLock.IsGood() returns true

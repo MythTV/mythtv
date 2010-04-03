@@ -154,7 +154,7 @@ class VideoOutput
     /// \brief Returns true if a fatal error has been encountered.
     bool IsErrored() { return errorState != kError_None; }
     /// \brief Returns error type
-    VideoErrorState GetError(void) { return errorState; }
+    VideoErrorState GetError(void) const { return errorState; }
     // Video Buffer Management
     /// \brief Sets whether to use a normal number of buffers or fewer buffers.
     void SetPrebuffering(bool normal) { vbuffers.SetPrebuffering(normal); }

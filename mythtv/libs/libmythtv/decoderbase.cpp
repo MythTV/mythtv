@@ -782,7 +782,7 @@ void DecoderBase::SetWaitForChange(void)
     waitingForChange = true;
 }
 
-bool DecoderBase::GetWaitForChange(void)
+bool DecoderBase::GetWaitForChange(void) const
 {
     return waitingForChange;
 }

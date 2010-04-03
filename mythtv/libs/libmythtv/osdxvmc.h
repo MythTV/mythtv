@@ -33,9 +33,9 @@ class XvMCOSD
 
     void SetRevision(int rev) { revision = rev; }
 
-    int GetRevision() { return revision; }
-    bool NeedFrame();
-    bool IsValid();
+    int GetRevision() const { return revision; }
+    bool NeedFrame() const;
+    bool IsValid() const;
 
   private:
     XvMCOSD(); // dummy, don't use

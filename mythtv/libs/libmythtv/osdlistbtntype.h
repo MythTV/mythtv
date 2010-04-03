@@ -56,8 +56,8 @@ class MPUBLIC OSDListTreeItemEnteredEvent : public QEvent
     OSDListTreeItemEnteredEvent(const QString &name, const QString &action) :
         QEvent(kEventType), m_name(name), m_action(action) { }
 
-    QString GetName() { return m_name; }
-    QString GetAction() { return m_action; }
+    QString GetName() const { return m_name; }
+    QString GetAction() const { return m_action; }
 
     static Type kEventType;
 
@@ -370,7 +370,7 @@ class OSDListBtnTypeItem
     void setChecked(CheckState state)
         { m_state = (m_checkable) ? state : m_state; }
 
-    void  Reinit(float,float) {}
+    void  Reinit(float,float) const {}
     void  paint(OSDSurface *surface, TTFFont *font, int fade, int maxfade,
                 int x, int y);
 

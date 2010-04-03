@@ -100,7 +100,7 @@ class OSDSet
                 float wmult,      float hmult,
                 int frint);
 
-    bool NeedsUpdate(void) { return m_needsupdate; }
+    bool NeedsUpdate(void) const { return m_needsupdate; }
 
     // Gets 
     QString  GetName(void)          const { return m_name;         }
@@ -194,7 +194,7 @@ class OSDType
 
     void SetParent(OSDSet *parent) { m_parent = parent; }
     void Hide(bool hidden = true) { m_hidden = hidden; }
-    bool isHidden(void) { return m_hidden; }
+    bool isHidden(void) const { return m_hidden; }
 
     QString Name();
 
@@ -505,9 +505,9 @@ class OSDTypePositionIndicator
    ~OSDTypePositionIndicator();
 
     void SetOffset(int offset) { m_offset = offset; }
-    int GetOffset(void) { return m_offset; }
+    int GetOffset(void) const { return m_offset; }
 
-    int GetPosition() { return m_curposition - m_offset; }
+    int GetPosition() const { return m_curposition - m_offset; }
     void SetPosition(int pos);
 
     void PositionUp();

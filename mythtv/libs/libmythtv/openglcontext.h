@@ -105,7 +105,7 @@ class OpenGLContext
     virtual void StopEmbedding(void) { }
 
     /// \brief Return the size of the OpenGL window.
-    void GetWindowRect(QRect &rect) { rect = m_window_rect; }
+    void GetWindowRect(QRect &rect) const { rect = m_window_rect; }
     bool MakeCurrent(bool current);
     void Flush(bool use_fence);
     void SetViewPort(const QSize &size);
@@ -137,7 +137,7 @@ class OpenGLContext
     bool CreateFrameBuffer(uint &fb, uint tex);
     void DeleteFrameBuffer(uint fb);
     void BindFramebuffer(uint fb);
-    uint GetFeatures(void) { return m_ext_supported; }
+    uint GetFeatures(void) const { return m_ext_supported; }
     void SetFeatures(uint features) { m_ext_used = features; }
 
     int SetPictureAttribute(PictureAttribute attributeType, int newValue);

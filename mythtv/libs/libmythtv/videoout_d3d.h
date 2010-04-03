@@ -71,8 +71,8 @@ class D3D9Video
     D3D9Video(D3D9Context *ctx, QSize size, bool alpha = false);
     ~D3D9Video();
 
-    bool  IsValid(void) { return m_valid; }
-    QSize GetSize(void) { return m_size; }
+    bool  IsValid(void) const { return m_valid; }
+    QSize GetSize(void) const { return m_size; }
     bool  UpdateVideo(VideoFrame *frame, const unsigned char *alpha = NULL);
     bool  UpdateVertices(QRect dvr, QRect vr);
     bool  Draw(bool border = false);

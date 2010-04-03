@@ -31,14 +31,14 @@ class OSDSurface
     bool IntersectsDrawn(QRect &newrect);
     void AddRect(QRect &newrect);
 
-    bool Changed(void) { return changed; }
+    bool Changed(void) const { return changed; }
     void SetChanged(bool change)
     {
         changed = change;
         if (change) 
             ++revision;
     }
-    int GetRevision() { return revision; }
+    int GetRevision() const { return revision; }
 
     void BlendToYV12(unsigned char *yptr,
                      unsigned char *uptr,
