@@ -487,11 +487,8 @@ MediaStatus MythCDROMLinux::checkMedia()
                 // grained detection of the type of data on this disc
                 if (isMounted())
                     onDeviceMounted();
-                else
-                    if (mount())
-                        ;    // onDeviceMounted() called as side-effect
-                    else
-                        return setStatus(MEDIASTAT_ERROR, OpenedHere);
+                else if (!mount()) // onDeviceMounted() called as side-effect
+                    return setStatus(MEDIASTAT_ERROR, OpenedHere);
 
                 if (isMounted())
                 {
