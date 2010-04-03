@@ -766,7 +766,7 @@ int Transcode::TranscodeFile(
         // framecontrol is true if we want to enforce fifo sync.
         if (framecontrol)
             VERBOSE(VB_GENERAL, "Enforcing sync on fifos");
-        fifow = new FIFOWriter::FIFOWriter(2, framecontrol);
+        fifow = new FIFOWriter(2, framecontrol);
 
         if (!fifow->FIFOInit(0, QString("video"), vidfifo, vidSize, 50) ||
             !fifow->FIFOInit(1, QString("audio"), audfifo, audio_size, 25))
