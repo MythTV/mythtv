@@ -350,7 +350,7 @@
 
     <!-- Base definition of a wide button -->
     <button name="basewidebutton">
-        <position>0,0</area>
+        <position>0,0</position>
         <statetype name="buttonstate">
             <state name="active">
                 <imagetype name="background">
