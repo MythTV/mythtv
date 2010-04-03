@@ -6,7 +6,7 @@
 #include "upnputil.h" // for QStringMap
 
 #define STARTING_VIDEO_OBJECTID 100000
-              
+
 //////////////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ class UPnpMedia
 
   public:
     UPnpMedia(bool runthread, bool master);
-    ~UPnpMedia();
+    ~UPnpMedia() {};
 
     void SetMediaType(QString mediatype) { sMediaType = mediatype; }
 
