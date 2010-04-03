@@ -35,6 +35,7 @@ ManualSchedule::ManualSchedule(MythScreenStack *parent)
     m_dateformat = gContext->GetSetting("DateFormat", "ddd MMMM d");
     m_timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
 
+    m_daysahead = 0;
     m_titleEdit = NULL;
     m_channelList = m_startdateList = NULL;
     m_recordButton = m_cancelButton = NULL;
@@ -172,7 +173,7 @@ void ManualSchedule::minuteRollover(void)
 void ManualSchedule::dateChanged(void)
 {
     disconnectSignals();
-    daysahead = m_startdateList->GetCurrentPos();
+    m_daysahead = m_startdateList->GetCurrentPos();
     m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
 
     int hr = m_starthourSpin->GetIntValue();

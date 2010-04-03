@@ -34,8 +34,8 @@ class ManualSchedule : public MythScreenType
   private:
     void connectSignals();
     void disconnectSignals();
-    int daysahead;
-    int prev_weekday;
+    
+    int m_daysahead;
 
     QStringList m_chanids;
 
