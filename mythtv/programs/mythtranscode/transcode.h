@@ -38,7 +38,7 @@ class Transcode : public QObject
     PlayerContext          *player_ctx;
     RingBuffer             *inRingBuffer;
     RingBuffer             *outRingBuffer;
-    FIFOWriter::FIFOWriter *fifow;
+    FIFOWriter             *fifow;
     KFATable               *kfa_table;
     bool                    showprogress;
     QString                 recorderOptions;
