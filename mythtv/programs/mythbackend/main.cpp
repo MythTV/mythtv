@@ -1203,6 +1203,7 @@ int main(int argc, char **argv)
         int err = sched->GetError();
         if (err)
         {
+            delete sysEventHandler;
             return err;
         }
 
