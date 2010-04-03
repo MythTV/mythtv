@@ -105,9 +105,8 @@ void CustomEdit::loadData(void)
     CustomRuleInfo rule;
     rule.recordid = '0';
 
-    MythUIButtonListItem *item;
-    item = new MythUIButtonListItem(m_ruleList, tr("<New rule>"),
-                                    qVariantFromValue(rule));
+    new MythUIButtonListItem(m_ruleList, tr("<New rule>"),
+                             qVariantFromValue(rule));
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare("SELECT recordid, title, subtitle, description "
@@ -126,8 +125,9 @@ void CustomEdit::loadData(void)
             rule.subtitle = result.value(2).toString();
             rule.description = result.value(3).toString();
 
-            item = new MythUIButtonListItem(m_ruleList, rule.title,
-                                            qVariantFromValue(rule));
+            MythUIButtonListItem *item =
+                new MythUIButtonListItem(m_ruleList, rule.title,
+                                         qVariantFromValue(rule));
 
             if (trimTitle == baseTitle ||
                 result.value(0).toInt() == m_pginfo->recordid)
