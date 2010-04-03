@@ -1133,16 +1133,19 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
         }
         else
         {
-            if (proginfo == *program)
+            if (proginfo && proginfo == *program)
             {
                 proginfo->spread++;
             }
             else
             {
                 proginfo = *program;
-                proginfo->startCol = x;
-                proginfo->spread = 1;
-                unknown = false;
+                if (proginfo)
+                {
+                    proginfo->startCol = x;
+                    proginfo->spread = 1;
+                    unknown = false;
+                }
             }
         }
         m_programInfos[row][x] = proginfo;
@@ -1490,18 +1493,19 @@ void GuideGrid::updateChannels(void)
             }
         }
 
-        MythUIButtonListItem *item = new MythUIButtonListItem(
-                m_channelList, chinfo->GetFormatted(m_channelFormat));
+        MythUIButtonListItem *item =
+            new MythUIButtonListItem(m_channelList,
+                                     chinfo ? chinfo->GetFormatted(m_channelFormat) : QString());
 
         QString state;
         if (unavailable)
             state = (m_changrpid == -1) ? "unavailable" : "favunavailable";
-        else
-            state = (m_changrpid == -1) ? "" : "favourite";
+        else if (m_changrpid != -1)
+            state = "favourite";
 
         item->SetText(chinfo->GetFormatted(m_channelFormat), "buttontext", state);
 
-        if (showChannelIcon && !chinfo->icon.isEmpty())
+        if (showChannelIcon && chinfo && !chinfo->icon.isEmpty())
         {
             if (chinfo->CacheChannelIcon())
             {

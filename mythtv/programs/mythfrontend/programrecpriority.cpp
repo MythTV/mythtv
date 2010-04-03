@@ -952,6 +952,9 @@ void ProgramRecPriority::remove(void)
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
 
+    if (!pgRecInfo)
+        return;
+
     RecordingRule *record = new RecordingRule();
     record->m_recordID = pgRecInfo->recordid;
     if (!record->Load())
@@ -1038,6 +1041,8 @@ void ProgramRecPriority::upcoming(void)
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
 
+    if (!pgRecInfo)
+        return;
 
     if (m_listMatch[pgRecInfo->recordid] > 0)
     {
@@ -1084,6 +1089,9 @@ void ProgramRecPriority::changeRecPriority(int howMuch)
 
     ProgramRecPriorityInfo *pgRecInfo =
                         qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+
+    if (!pgRecInfo)
+        return;
 
     int tempRecPriority;
     // inc/dec recording priority

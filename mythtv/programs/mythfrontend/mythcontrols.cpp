@@ -483,8 +483,12 @@ uint MythControls::GetCurrentButton(void)
  */
 QString MythControls::GetCurrentKey(void)
 {
-    if (m_leftListType == kKeyList)
-        return m_leftList->GetItemCurrent()->GetText();
+    MythUIButtonListItem* currentButton;
+    if (m_leftListType == kKeyList &&
+        (currentButton = m_leftList->GetItemCurrent()))
+    {
+        return currentButton->GetText();
+    }
 
     if (GetFocusWidget() == m_leftList)
         return QString();
@@ -502,7 +506,11 @@ QString MythControls::GetCurrentKey(void)
         return QString();
     }
 
-    QString desc = m_rightList->GetItemCurrent()->GetText();
+    currentButton = m_rightList->GetItemCurrent();
+    QString desc;
+    if (currentButton)
+        desc = currentButton->GetText();
+
     int loc = desc.indexOf(" => ");
     if (loc == -1)
         return QString(); // Should not happen

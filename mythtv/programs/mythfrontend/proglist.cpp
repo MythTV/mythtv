@@ -1485,8 +1485,11 @@ void ProgLister::updateDisplay(bool restorePosition)
     MythUIButtonListItem *currentItem = m_progList->GetItemCurrent();
     ProgramInfo *selected = NULL;
     if (currentItem)
-        selected = new ProgramInfo(*(qVariantValue<ProgramInfo*>
-                                        (currentItem->GetData())));
+    {
+        ProgramInfo* variantProgramInfo = qVariantValue<ProgramInfo*>(currentItem->GetData());
+        if (variantProgramInfo)
+            selected = new ProgramInfo(*variantProgramInfo);
+    }
     int selectedOffset =
         m_progList->GetCurrentPos() - m_progList->GetTopItemPos();
 

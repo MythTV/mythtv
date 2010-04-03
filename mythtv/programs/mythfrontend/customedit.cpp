@@ -794,6 +794,8 @@ void CustomEdit::storeRule(bool is_search, bool is_new)
 void CustomEdit::deleteRule(void)
 {
     MythUIButtonListItem* item = m_clauseList->GetItemCurrent();
+    if (!item)
+        return;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM customexample "
