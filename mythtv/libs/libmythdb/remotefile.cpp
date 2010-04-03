@@ -95,7 +95,14 @@ MythSocket *RemoteFile::openSocket(bool control)
     {
         strlist.append( QString("ANN Playback %1 %2").arg(hostname).arg(false) );
         lsock->writeStringList(strlist);
-        lsock->readStringList(strlist, true);
+        if (!lsock->readStringList(strlist, true))
+        {
+            VERBOSE(VB_IMPORTANT, loc_err +
+                    QString("\n\t\t\tCould not read string list from server "
+                            "%1:%2").arg(host).arg(port));
+            lsock->DownRef();
+            return NULL;
+        }
     }
     else
     {
@@ -108,8 +115,16 @@ MythSocket *RemoteFile::openSocket(bool control)
         for (; it != possibleauxfiles.end(); ++it)
             strlist << *it;
 
-        lsock->writeStringList(strlist);
-        lsock->readStringList(strlist, true);
+        if (!lsock->writeStringList(strlist) ||
+            !lsock->readStringList(strlist, true))
+        {
+            VERBOSE(VB_IMPORTANT, loc_err +
+                    QString("Did not get proper response from %1:%2")
+                    .arg(host).arg(port));
+            strlist.clear();
+            strlist.push_back("ERROR");
+            strlist.push_back("invalid response");
+        }
 
         if (strlist.size() >= 4)
         {
@@ -468,9 +483,11 @@ int RemoteFile::Write(const void *data, int size)
 
         if (controlSock->bytesAvailable() > 0)
         {
-            controlSock->readStringList(strlist, true);
-            recv = strlist[0].toInt(); // -1 on backend error
-            response = true;
+            if (controlSock->readStringList(strlist, true))
+            {
+                recv = strlist[0].toInt(); // -1 on backend error
+                response = true;
+            }
         }
     }
 
