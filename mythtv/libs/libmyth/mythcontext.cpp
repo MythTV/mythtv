@@ -173,7 +173,7 @@ static void exec_program_tv_cb(const QString &cmd)
     QString s = cmd;
     QStringList tokens = cmd.simplified().split(" ");
     QStringList strlist;
-   
+
     bool cardidok;
     int wantcardid = tokens[0].toInt(&cardidok, 10);
 
@@ -600,6 +600,7 @@ bool MythContextPrivate::WriteSettingsFile(const DatabaseParams &params,
 
     if (!overwrite && f->exists())
     {
+        delete f;
         return false;
     }
 
@@ -1016,10 +1017,12 @@ int MythContextPrivate::ChooseBackend(const QString &error)
     {
         case kDialogCodeRejected:
             VERBOSE(VB_IMPORTANT, "User canceled database configuration");
+            delete BEsel;
             return 0;
 
         case kDialogCodeButton0:
             VERBOSE(VB_IMPORTANT, "User requested Manual Config");
+            delete BEsel;
             return -1;
     }
     //BEsel->hide();
@@ -2003,7 +2006,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
 
     if (!strlist.isEmpty())
         query_type = strlist[0];
-    
+
     QMutexLocker locker(&d->sockLock);
 
     if (!d->serverSock)
@@ -2081,12 +2084,12 @@ bool MythContext::SendReceiveStringList(QStringList &strlist,
                 VERBOSE(VB_GENERAL, QString("Protocol query '%1' reponded "
                                         "with an error, but no error message.")
                                         .arg(query_type));
-                
+
             ok = false;
         }
 
     }
-    
+
     return ok;
 }
 
