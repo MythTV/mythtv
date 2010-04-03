@@ -96,7 +96,7 @@ class AudioReencodeBuffer : public AudioOutput
         ab_len[ab_count] = samples * bytes_per_sample;
         ab_offset[ab_count] = audiobuffer_len;
 
-        memcpy(audiobuffer + audiobuffer_len, buffer, 
+        memcpy(audiobuffer + audiobuffer_len, buffer,
                samples * bytes_per_sample);
         audiobuffer_len += samples * bytes_per_sample;
 
@@ -169,11 +169,11 @@ class AudioReencodeBuffer : public AudioOutput
     }
 
     virtual int GetVolumeChannel(int) const
-    { 
+    {
         // Do nothing
         return 100;
     }
-    virtual void SetVolumeChannel(int, int) 
+    virtual void SetVolumeChannel(int, int)
     {
         // Do nothing
     }
@@ -182,7 +182,7 @@ class AudioReencodeBuffer : public AudioOutput
         // Do nothing
     }
     virtual uint GetCurrentVolume(void) const
-    { 
+    {
         // Do nothing
         return 100;
     }
@@ -190,15 +190,15 @@ class AudioReencodeBuffer : public AudioOutput
     {
         // Do nothing
     }
-    virtual void AdjustCurrentVolume(int) 
+    virtual void AdjustCurrentVolume(int)
     {
         // Do nothing
     }
-    virtual void SetMute(bool) 
+    virtual void SetMute(bool)
     {
         // Do nothing
     }
-    virtual void ToggleMute(void) 
+    virtual void ToggleMute(void)
     {
         // Do nothing
     }
@@ -212,7 +212,7 @@ class AudioReencodeBuffer : public AudioOutput
         // Do nothing
         return kMuteOff;
     }
-    virtual bool ToggleUpmix(void) 
+    virtual bool ToggleUpmix(void)
     {
         // Do nothing
         return false;
@@ -254,7 +254,7 @@ Transcode::Transcode(ProgramInfo *pginfo) :
     fifow(NULL),
     kfa_table(NULL),
     showprogress(false),
-    recorderOptions("")   
+    recorderOptions("")
 {
 }
 
@@ -492,7 +492,7 @@ int Transcode::TranscodeFile(
     QSize buf_size = nvp->GetVideoBufferSize();
     int video_width = buf_size.width();
     int video_height = buf_size.height();
-     
+
     if (video_height == 1088) {
        VERBOSE(VB_IMPORTANT, "Found video height of 1088.  This is unusual and "
                "more than likely the video is actually 1080 so mythtranscode "
@@ -622,7 +622,7 @@ int Transcode::TranscodeFile(
                  (recorderOptionsMap["videocodec"] == "mpeg2video"))
         {
             nvr->SetOption("videocodec", "mpeg2video");
-        
+
             nvr->SetIntOption(&profile, "mpeg2bitrate");
             nvr->SetIntOption(&profile, "scalebitrate");
 #ifdef USING_FFMPEG_THREADS
@@ -788,10 +788,10 @@ int Transcode::TranscodeFile(
 
     QMap<long long, int>::Iterator dm_iter = NULL;
     bool writekeyframe = true;
-   
+
     int num_keyframes = 0;
 
-    int did_ff = 0; 
+    int did_ff = 0;
 
     long curFrameNum = 0;
     frame.frameNumber = 1;
@@ -919,7 +919,7 @@ int Transcode::TranscodeFile(
         {
             // Encoding from NuppelVideo to NuppelVideo with MP3 audio
             // So let's not decode/reencode audio
-            if (!nvp->GetRawAudioState()) 
+            if (!nvp->GetRawAudioState())
             {
                 // The Raw state changed during decode.  This is not good
                 VERBOSE(VB_IMPORTANT, "Transcoding aborted, NuppelVideoPlayer "
@@ -932,7 +932,7 @@ int Transcode::TranscodeFile(
                 return REENCODE_ERROR;
             }
 
-            if (forceKeyFrames) 
+            if (forceKeyFrames)
                 writekeyframe = true;
             else
             {
@@ -1022,8 +1022,8 @@ int Transcode::TranscodeFile(
             }
             audioOutput->Reset();
             nvp->FlushTxtBuffers();
-        } 
-        else 
+        }
+        else
         {
             if (did_ff == 1)
             {
@@ -1118,7 +1118,7 @@ int Transcode::TranscodeFile(
             statustime = QDateTime::currentDateTime();
             statustime = statustime.addSecs(5);
         }
-        if (QDateTime::currentDateTime() > curtime) 
+        if (QDateTime::currentDateTime() > curtime)
         {
             if (honorCutList && m_proginfo &&
                 m_proginfo->CheckMarkupFlag(MARK_UPDATED_CUT))
