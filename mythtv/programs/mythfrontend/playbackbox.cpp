@@ -3793,22 +3793,22 @@ void PlaybackBox::customEvent(QEvent *event)
                 m_ncLock.unlock();
 
                 // This should be an impossible keypress we're simulating
-                QKeyEvent *event;
+                QKeyEvent *keyevent;
                 Qt::KeyboardModifiers modifiers =
                     Qt::ShiftModifier |
                     Qt::ControlModifier |
                     Qt::AltModifier |
                     Qt::MetaModifier |
                     Qt::KeypadModifier;
-                event = new QKeyEvent(QEvent::KeyPress, Qt::Key_LaunchMedia,
+                keyevent = new QKeyEvent(QEvent::KeyPress, Qt::Key_LaunchMedia,
                                       modifiers);
                 QCoreApplication::postEvent((QObject*)(gContext->GetMainWindow()),
-                                        event);
+                                        keyevent);
 
-                event = new QKeyEvent(QEvent::KeyRelease, Qt::Key_LaunchMedia,
+                keyevent = new QKeyEvent(QEvent::KeyRelease, Qt::Key_LaunchMedia,
                                       modifiers);
                 QCoreApplication::postEvent((QObject*)(gContext->GetMainWindow()),
-                                        event);
+                                        keyevent);
             }
         }
         else if (message.left(17) == "UPDATE_FILE_SIZE")
