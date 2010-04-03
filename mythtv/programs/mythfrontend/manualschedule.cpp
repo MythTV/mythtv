@@ -174,7 +174,7 @@ void ManualSchedule::dateChanged(void)
 {
     disconnectSignals();
     m_daysahead = m_startdateList->GetCurrentPos();
-    m_startDateTime.setDate(m_nowDateTime.addDays(daysahead).date());
+    m_startDateTime.setDate(m_nowDateTime.addDays(m_daysahead).date());
 
     int hr = m_starthourSpin->GetIntValue();
     int min = m_startminuteSpin->GetIntValue();
