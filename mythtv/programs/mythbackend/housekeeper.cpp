@@ -362,9 +362,12 @@ void HouseKeeper::RunMFD(void)
         }
     }
 
-    myth_system(command,
-                MYTH_SYSTEM_DONT_BLOCK_LIRC |
-                MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+    if (myth_system(command, MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                             MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU))
+    {
+        VERBOSE(VB_IMPORTANT, QString("MythFillDatabase command '%1' failed")
+                                        .arg(command));
+    }
 
     HouseKeeper_filldb_running = false;
 }
