@@ -104,7 +104,8 @@ vector<int> AudioOutputALSA::GetSupportedRates()
     VERBOSE(VB_AUDIO, QString("AudioOutputALSA::GetSupportedRates opening %1")
             .arg(real_device));
 
-    if((err = snd_pcm_open(&pcm_handle, real_device.toAscii(),
+    QByteArray device = real_device.toAscii();
+    if((err = snd_pcm_open(&pcm_handle, device.constData(),
                            SND_PCM_STREAM_PLAYBACK, 
                            SND_PCM_NONBLOCK|SND_PCM_NO_AUTO_RESAMPLE)) < 0)
     { 
@@ -858,6 +859,7 @@ QMap<QString, QString> GetALSAPCMDevices(void)
     QMap<QString, QString> alsadevs;
     void **hints, **n;
     char *name, *desc;
+
     if (snd_device_name_hint(-1, "pcm", &hints) < 0)
         return alsadevs;
     n = hints;
@@ -869,9 +871,21 @@ QMap<QString, QString> GetALSAPCMDevices(void)
           VERBOSE(VB_AUDIO, QString("Found ALSA device: %1, (%2)")
                                     .arg(name).arg(desc));
           alsadevs.insert(name, desc);
+          if (name != NULL)
+              free(name);
+          if (desc != NULL)
+              free(desc);
           n++;
     }
     snd_device_name_free_hint(hints);
-
+        // Work around ALSA bug < 1.0.22 ; where snd_device_name_hint can corrupt
+        // global ALSA memory context
+#if SND_LIB_MAJOR == 1
+#if SND_LIB_MINOR == 0
+#if SND_LIB_SUBMINOR < 22
+    snd_config_update_free_global();
+#endif
+#endif
+#endif
     return alsadevs;
 }
