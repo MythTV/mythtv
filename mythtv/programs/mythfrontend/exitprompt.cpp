@@ -62,15 +62,16 @@ bool DBusHalt(void)
 
 void ExitPrompter::halt()
 {
-    if (!DBusHalt())
+
+    QString halt_cmd = gContext->GetSetting("HaltCommand","");
+    if (!halt_cmd.isEmpty()) /* Use user specified command if it exists */
     {
-        QString halt_cmd = gContext->GetSetting("HaltCommand",
-                                            "sudo /sbin/halt -p");
-        if (!halt_cmd.isEmpty())
-            myth_system(halt_cmd);
-        else
-            VERBOSE(VB_IMPORTANT, "Cannot halt - null command!");
+        myth_system(halt_cmd);
+    } else if (!DBusHalt()) /* If supported, use DBus to shutdown */
+    {
+        myth_system("sudo /sbin/halt -p"); 
     }
+
 }
 
 bool DBusReboot(void)
@@ -117,15 +118,16 @@ bool DBusReboot(void)
 
 void ExitPrompter::reboot()
 {
-    if (!DBusReboot())
+
+    QString reboot_cmd = gContext->GetSetting("RebootCommand","");
+    if (!reboot_cmd.isEmpty()) /* Use user specified command if it exists */
     {
-        QString reboot_cmd = gContext->GetSetting("RebootCommand",
-                                              "sudo /sbin/reboot");
-        if (!reboot_cmd.isEmpty())
-            myth_system(reboot_cmd);
-        else
-            VERBOSE(VB_IMPORTANT, "Cannot reboot - null command!");
+        myth_system(reboot_cmd);
+    } else if (!DBusReboot()) /* If supported, use DBus to reboot */
+    {
+        myth_system("sudo /sbin/reboot");
     }
+
 }
 
 void ExitPrompter::handleExit()
