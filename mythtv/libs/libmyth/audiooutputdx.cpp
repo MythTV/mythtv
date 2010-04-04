@@ -506,28 +506,6 @@ void AudioOutputDX::WriteAudio(unsigned char * buffer, int size)
    	if (size == 0)
         return;
 
-    if (audio_channels == 6)
-    {
-        // Linux and Windows have different 5.1 channel order conventions
-        const uint kReorder[6] = {0,1,4,5,2,3};
-        int abytes = audio_bits / 8;
-        unsigned char p_tmp[24];
-        unsigned char *obuf = buffer;
-        for(int i = 0; i < size / audio_channels / abytes; i++)
-        {
-            for(int j = 0; j < audio_channels; j++)
-            {
-                for(int k = 0; k < abytes; k++)
-                {
-                    p_tmp[abytes * kReorder[j] + k] = buffer[abytes * j + k];
-                }
-            }
-            memcpy(buffer, p_tmp, abytes * audio_channels);
-            buffer += abytes * audio_channels;
-        }
-        buffer = obuf;
-    }
-
     m_priv->FillBuffer(buffer, size);
     if (!pauseaudio)
         m_priv->StartPlayback();
