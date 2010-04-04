@@ -23,7 +23,6 @@ using namespace std;
 #include "oldsettings.h"
 #include "tv_play.h"
 #include "tv_rec.h"
-#include "proglist.h"
 #include "customedit.h"
 #include "util.h"
 #include "remoteutil.h"
