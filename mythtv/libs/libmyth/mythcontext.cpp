@@ -1,11 +1,6 @@
 #include <QCoreApplication>
-#include <QPixmap>
-#include <QImage>
-#include <QUrl>
 #include <QDir>
 #include <QFileInfo>
-#include <QDesktopWidget>
-#include <QPainter>
 #include <QDebug>
 #include <QMutex>
 
