@@ -96,10 +96,9 @@ class MPUBLIC VideoDisplayProfile
     uint GetMaxCPUs(void) const
         { return GetPreference("pref_max_cpus").toUInt(); }
 
-    bool IsDeblockingFilterEnabled(void) const
-        { QString val = GetPreference("pref_skiploop");
-            val == QString::null ? 1 : val.toInt(); }
-    
+    bool IsSkipLoopEnabled(void) const
+        { return GetPreference("pref_skiploop").toInt(); }     
+
     QString GetVideoRenderer(void) const
         { return GetPreference("pref_videorenderer"); }
 
