@@ -22,7 +22,7 @@ class ProgramStruct
 
 class QKeyEvent;
 
-class MPUBLIC ViewScheduleDiff : public MythScreenType
+class ViewScheduleDiff : public MythScreenType
 {
     Q_OBJECT
   public:
