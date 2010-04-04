@@ -19,6 +19,7 @@
 #   include <sys/sysinfo.h>
 # else
 #   ifdef __FreeBSD__
+#     include <sys/param.h>
 #     include <sys/mount.h>
 #   endif
 #   if CONFIG_CYGWIN
