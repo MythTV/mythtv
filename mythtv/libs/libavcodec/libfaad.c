@@ -96,6 +96,9 @@ typedef struct {
 
 } FAACContext;
 
+// SMPTE Order: [ Front Left ] [ Front Right ] [ Center ] [ LFE ] [ Surround Left ] [ Surround Right ]
+static const uint8_t faad_channel_map[10] = { -1, 2, 0, 1, 4, 5, 4, 5, -1, 3 };
+
 static const unsigned long faac_srates[] =
 {
     96000, 88200, 64000, 48000, 44100, 32000,
@@ -162,6 +165,7 @@ static int faac_decode_frame(AVCodecContext *avctx,
 #else
     faacDecFrameInfo frame_info;
     void *out;
+    unsigned long samples;
 #endif
     if(buf_size == 0)
         return 0;
@@ -201,11 +205,52 @@ static int faac_decode_frame(AVCodecContext *avctx,
     }
     if (!avctx->frame_size)
         avctx->frame_size = frame_info.samples/avctx->channels;
-    frame_info.samples *= s->sample_size;
-    memcpy(data, out, frame_info.samples); // CHECKME - can we cheat this one
+
+	// Re-order 5.1 AAC channel order to SMPTE. Assume 6 channels is 5.1
+    if (frame_info.channels == 6 && frame_info.channels == avctx->channels) {
+        samples = frame_info.samples / 6;
+        switch (s->sample_size) {
+            case 2:
+            {
+                uint16_t *t16_out = out;
+                uint16_t *t16_data = data;
+                for (unsigned long i = 0; i < samples; i++) {
+                    t16_data[faad_channel_map[frame_info.channel_position[0]]] = *t16_out++;
+                    t16_data[faad_channel_map[frame_info.channel_position[1]]] = *t16_out++;
+                    t16_data[faad_channel_map[frame_info.channel_position[2]]] = *t16_out++;
+                    t16_data[faad_channel_map[frame_info.channel_position[3]]] = *t16_out++;
+                    t16_data[faad_channel_map[frame_info.channel_position[4]]] = *t16_out++;
+                    t16_data[faad_channel_map[frame_info.channel_position[5]]] = *t16_out++;
+                    t16_data += 6;
+                }
+            }
+                break;
+            case 4:
+            {
+                uint32_t *t32_out = out;
+                uint32_t *t32_data = data;
+                for (unsigned long i = 0; i < samples; i++) {
+                    t32_data[faad_channel_map[frame_info.channel_position[0]]] = *t32_out++;
+                    t32_data[faad_channel_map[frame_info.channel_position[1]]] = *t32_out++;
+                    t32_data[faad_channel_map[frame_info.channel_position[2]]] = *t32_out++;
+                    t32_data[faad_channel_map[frame_info.channel_position[3]]] = *t32_out++;
+                    t32_data[faad_channel_map[frame_info.channel_position[4]]] = *t32_out++;
+                    t32_data[faad_channel_map[frame_info.channel_position[5]]] = *t32_out++;
+                    t32_data += 6;
+                }
+            }
+                break;
+            default:
+                memcpy(data, out, frame_info.samples * s->sample_size);
+                break;
+        }
+    }
+    else {
+        memcpy(data, out, frame_info.samples * s->sample_size); // CHECKME - can we cheat this one
+    }
 
     if (data_size)
-        *data_size = frame_info.samples;
+        *data_size = frame_info.samples * s->sample_size;
 
     return (buf_size < (int)frame_info.bytesconsumed)
         ? buf_size : (int)frame_info.bytesconsumed;
@@ -295,7 +340,7 @@ static av_cold int faac_decode_init(AVCodecContext *avctx)
 #ifdef FAAD2_VERSION
             faac_cfg->outputFormat = FAAD_FMT_24BIT;
 #endif
-            s->sample_size = 3;
+            s->sample_size = 4;
             break;
         case 32:
 #ifdef FAAD2_VERSION
