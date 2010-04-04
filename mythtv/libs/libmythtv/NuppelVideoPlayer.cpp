@@ -681,8 +681,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         {
             MythMainWindow *window = gContext->GetMainWindow();
 
-            QWidget *widget =
-                window->findChild<QWidget*>("video playback window");
+            widget = window->findChild<QWidget*>("video playback window");
 
             if (!widget)
             {
