@@ -1138,8 +1138,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (ringBuffer->isDVD())
     {
         AVPacket pkt1;
-        while (ic->nb_streams == 0)
-            ret = av_read_frame(ic,&pkt1);
+        ret = av_read_frame(ic,&pkt1);
         av_free_packet(&pkt1);
         ringBuffer->Seek(0, SEEK_SET);
         ringBuffer->DVD()->IgnoreStillOrWait(false);
