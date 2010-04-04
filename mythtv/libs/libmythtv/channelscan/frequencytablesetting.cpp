@@ -83,16 +83,16 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
 
     setLabel(tr("Country"));
     addSelection(QObject::tr("Australia"),      "au", country == "au");
+    addSelection(QObject::tr("Czech Republic"), "cz", country == "cz");
+    addSelection(QObject::tr("Denmark"),        "da", country == "da");
     addSelection(QObject::tr("Finland"),        "fi", country == "fi");
+    addSelection(QObject::tr("France"),         "fr", country == "fr");
+    addSelection(QObject::tr("Germany"),        "de", country == "de");
+    addSelection(QObject::tr("Greece"),         "gr", country == "gr");
+    addSelection(QObject::tr("New Zealand"),    "nz", country == "nz");
+    addSelection(QObject::tr("Spain"),          "es", country == "es");
     addSelection(QObject::tr("Sweden"),         "se", country == "se");
     addSelection(QObject::tr("United Kingdom"), "uk", country == "uk");
-    addSelection(QObject::tr("Germany"),        "de", country == "de");
-    addSelection(QObject::tr("Czech Republic"), "cz", country == "cz");
-    addSelection(QObject::tr("Spain"),          "es", country == "es");
-    addSelection(QObject::tr("New Zealand"),    "nz", country == "nz");
-    addSelection(QObject::tr("France"),         "fr", country == "fr");
-    addSelection(QObject::tr("Greece"),         "gr", country == "gr");
-    addSelection(QObject::tr("Denmark"),        "da", country == "da");
 }
 
 
@@ -107,7 +107,7 @@ ScanNetwork::ScanNetwork() : ComboBoxSetting(this)
         country = "uk";
 
     setLabel(tr("Country"));
-    addSelection(QObject::tr("United Kingdom"), "uk", country == "uk");
     addSelection(QObject::tr("Germany"),        "de", country == "de");
+    addSelection(QObject::tr("United Kingdom"), "uk", country == "uk");
 }
 
