@@ -155,6 +155,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
     if (kFixNL & event.fixup)
         FixNL(event);
 
+    if (kFixCategory & event.fixup)
+        FixCategory(event);
+
     if (event.fixup)
     {
         if (!event.title.isEmpty())
@@ -1482,4 +1485,15 @@ void EITFixUp::FixNL(DBEventEIT &event) const
     event.title       = event.title.trimmed();
     event.subtitle    = event.subtitle.trimmed();
 
+}
+
+void EITFixUp::FixCategory(DBEventEIT &event) const
+{
+    // remove category movie from short events
+    if (event.categoryType == kCategoryMovie &&
+        event.starttime.secsTo(event.endtime) < kMinMovieDuration)
+    {
+        /* default taken from ContentDescriptor::GetMythCategory */
+        event.categoryType = kCategoryTVShow;
+    }
 }

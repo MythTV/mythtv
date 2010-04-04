@@ -25,6 +25,8 @@ class EITFixUp
      static const uint kMaxQuestionExclamation = 2;
      // max number of difference in words between a period and a colon
      static const uint kMaxDotToColon = 5;
+     // minimum duration of an event to consider it as movie
+     static const int kMinMovieDuration = 75*60;
 
   public:
     enum FixUpType
@@ -45,6 +47,7 @@ class EITFixUp
         kFixPremiere   = 0x0400,
         kFixHDTV       = 0x0800,
         kFixNL         = 0x1000,
+        kFixCategory   = 0x8000,
 
         // Early fixups
         kEFixForceISO8859_1  = 0x2000,
@@ -81,6 +84,7 @@ class EITFixUp
     void FixFI(DBEventEIT &event) const;            // Finland DVB-T
     void FixPremiere(DBEventEIT &event) const;      // german pay-tv Premiere
     void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
+    void FixCategory(DBEventEIT &event) const;      // Generic Category fixes
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 

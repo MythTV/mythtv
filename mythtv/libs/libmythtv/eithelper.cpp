@@ -750,7 +750,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[  2819LL << 32 |  8468U << 16] = // DVB-T Niedersachsen + Bremen
         fix[  8706LL << 32 |  8468U << 16] = // DVB-T NRW
         fix[ 12801LL << 32 |  8468U << 16] = // DVB-T Bayern
-        EITFixUp::kFixRTL;
+        EITFixUp::kFixRTL | EITFixUp::kFixCategory;
 
     // Premiere EIT processing
     fix[   1LL << 32 |  133 << 16] = EITFixUp::kFixPremiere;
@@ -771,7 +771,7 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
     fix[      8438U << 16] = // DVB-T Espoo
         fix[ 42249U << 16] = // DVB-C Welho
         fix[    15U << 16] = // DVB-C Welho
-        EITFixUp::kFixFI;
+        EITFixUp::kFixFI | EITFixUp::kFixCategory;
 
     ///////////////////////////////////////////////////////////////////////////
     // Special Early fixups for providers that break DVB EIT spec.
