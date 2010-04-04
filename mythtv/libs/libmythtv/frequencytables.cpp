@@ -424,6 +424,16 @@ static void init_freq_tables(freq_table_map_t &fmap)
         DTVGuardInterval::kGuardIntervalAuto, DTVHierarchy::kHierarchyNone,
         DTVModulation::kModulationQAMAuto, 167000, -166000);
 
+    // Denmark
+    fmap["dvbt_ofdm_da0"] = new FrequencyTable(
+        474000000, 858000000, 8000000, "Channel %1", 21,
+        DTVInversion::kInversionOff,
+        DTVBandwidth::kBandwidth8MHz, DTVCodeRate::kFEC_2_3,
+        DTVCodeRate::kFECNone, DTVModulation::kModulationQAM64,
+        DTVTransmitMode::kTransmissionMode8K,
+        DTVGuardInterval::kGuardInterval_1_4, DTVHierarchy::kHierarchyNone,
+        DTVModulation::kModulationQAM64, 0, 0);
+
     // DVB-C Germany
     fmap["dvbc_qam_de0"] = new FrequencyTable(
          73000000,  73000000, 8000000, "Channel D%1", 73,

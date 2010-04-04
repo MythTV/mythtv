@@ -78,6 +78,8 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
         country = "fr";
     else if (qtcountry == QLocale::Greece)
         country = "gr";
+    else if (qtcountry == QLocale::Denmark)
+        country = "da";
 
     setLabel(tr("Country"));
     addSelection(QObject::tr("Australia"),      "au", country == "au");
@@ -90,6 +92,7 @@ ScanCountry::ScanCountry() : ComboBoxSetting(this)
     addSelection(QObject::tr("New Zealand"),    "nz", country == "nz");
     addSelection(QObject::tr("France"),         "fr", country == "fr");
     addSelection(QObject::tr("Greece"),         "gr", country == "gr");
+    addSelection(QObject::tr("Denmark"),        "da", country == "da");
 }
 
 
