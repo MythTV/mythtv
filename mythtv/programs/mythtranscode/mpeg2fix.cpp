@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <stdint.h>
+#include <sys/stat.h>
 
 #include "config.h"
 #include "mpeg2fix.h"

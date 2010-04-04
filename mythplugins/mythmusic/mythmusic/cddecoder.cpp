@@ -41,7 +41,7 @@ CdDecoder::CdDecoder(const QString &file, DecoderFactory *d, QIODevice *i,
     chan(0),         output_size(0),
     totalTime(0.0),  seekTime(-1.0),
     settracknum(-1), tracknum(0),
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
     device(NULL),    paranoia(NULL),
 #endif
     start(0),        end(0),

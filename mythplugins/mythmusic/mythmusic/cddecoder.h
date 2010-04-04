@@ -9,7 +9,7 @@
 #include <vector>
 #endif
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
 #include <cdaudio.h>
 extern "C" {
 #include <cdda_interface.h>
@@ -80,7 +80,7 @@ class CdDecoder : public Decoder
     int settracknum;
     int tracknum;
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
     cdrom_drive *device;
     cdrom_paranoia *paranoia;
 #endif
