@@ -56,12 +56,14 @@ vector<int> AudioOutputJACK::GetSupportedRates()
             return rates;
         }
         else
+        {
             if (err == ERR_RATE_MISMATCH)
                 it = rates.erase(it);
             else
                 it++;
-
-        JACK_Close(audioid);
+        }
+        if (err == ERR_SUCCESS)
+            JACK_Close(audioid);
         audioid = -1;
     }
     return rates;
