@@ -319,7 +319,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    gContext->ConnectToMasterServer();
+    if (!gContext->ConnectToMasterServer())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to connect to master server");
+        return GENERIC_EXIT_UNKNOWN_ERROR;
+    }
 
     jobqueue = new JobQueue(false);
 

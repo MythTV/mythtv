@@ -63,9 +63,9 @@ void StartPrompter::backendRunningPrompt(void)
 {
     bool backendIsRecording = false;
     // Get recording status
-    if (!gContext->IsConnectedToMaster())
+    if (!gContext->IsConnectedToMaster() &&
+        gContext->ConnectToMasterServer(false))
     {
-        gContext->ConnectToMasterServer(false);
         backendIsRecording = RemoteGetRecordingStatus(NULL, false);
     }
     

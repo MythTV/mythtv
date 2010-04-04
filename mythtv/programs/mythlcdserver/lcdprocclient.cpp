@@ -300,7 +300,9 @@ void LCDProcClient::checkConnections()
     {
         if (debug_level > 0)
            VERBOSE(VB_GENERAL, "LCDProcClient: connecting to master server");
-        gContext->ConnectToMasterServer(false);
+        if (!gContext->ConnectToMasterServer(false))
+            VERBOSE(VB_IMPORTANT, "LCDProcClient: connecting to master server "
+                                  "failed");
     }
 
     //check connection to LCDProc server
