@@ -105,7 +105,7 @@ bool MythSocket::DownRef(void)
     return false;
 }
 
-MythSocket::State MythSocket::state(void)
+MythSocket::State MythSocket::state(void) const
 {
     return m_state;
 }
@@ -121,7 +121,7 @@ void MythSocket::setState(const State state)
     }
 }
 
-QString MythSocket::stateToString(const State state)
+QString MythSocket::stateToString(const State state) const
 {
     switch(state)
     {
@@ -138,7 +138,7 @@ QString MythSocket::stateToString(const State state)
     }
 }
 
-QString MythSocket::errorToString(const Error error)
+QString MythSocket::errorToString(const Error error) const
 {
     switch(error)
     {

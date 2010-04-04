@@ -19,21 +19,21 @@ class MPUBLIC HttpComms : public QObject
     HttpComms(QUrl &url, QHttpRequestHeader &header, int timeoutms = -1);
     virtual ~HttpComms();
 
-    bool isDone(void) { return m_done; }
-    int getProgress(void) { return m_progress; }
-    int getTotal(void) { return m_total; }
+    bool isDone(void) const { return m_done; }
+    int getProgress(void) const { return m_progress; }
+    int getTotal(void) const { return m_total; }
 
-    int getStatusCode(void) { return m_statusCode; }
-    QString getResponseReason(void) { return m_responseReason; }
+    int getStatusCode(void) const { return m_statusCode; }
+    QString getResponseReason(void) const { return m_responseReason; }
 
-    QString getData(void) { return QString(m_data); }
-    QByteArray getRawData(void) { return m_data; }
+    QString getData(void) const { return QString(m_data); }
+    QByteArray getRawData(void) const { return m_data; }
 
-    QString getRedirectedURL(void)  { return m_redirectedURL; }
+    QString getRedirectedURL(void) const { return m_redirectedURL; }
 
     void stop();
 
-    bool isTimedout(void) { return m_timeout; }
+    bool isTimedout(void) const { return m_timeout; }
 
     class Credentials
     {

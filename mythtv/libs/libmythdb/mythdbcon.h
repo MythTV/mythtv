@@ -26,8 +26,8 @@ class MPUBLIC MSqlDatabase
     bool isOpen(void);
     bool OpenDatabase(void);
     bool KickDatabase(void);
-    QString GetConnectionName(void) { return m_name; }
-    QSqlDatabase db(void) { return m_db; }
+    QString GetConnectionName(void) const { return m_name; }
+    QSqlDatabase db(void) const { return m_db; }
 
   private:
     QString m_name;

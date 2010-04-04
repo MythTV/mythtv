@@ -175,7 +175,7 @@ QString MythDB::DBErrorMessage(const QSqlError& err)
         .arg(err.databaseText());
 }
 
-DatabaseParams MythDB::GetDatabaseParams(void)
+DatabaseParams MythDB::GetDatabaseParams(void) const
 {
     return d->m_DBparams;
 }
@@ -194,7 +194,7 @@ void MythDB::SetLocalHostname(const QString &name)
     }
 }
 
-QString MythDB::GetHostName(void)
+QString MythDB::GetHostName(void) const
 {
     return d->m_localhostname;
 }

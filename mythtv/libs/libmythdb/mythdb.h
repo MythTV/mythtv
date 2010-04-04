@@ -21,11 +21,11 @@ class MPUBLIC MythDB
     static void DBError(const QString &where, const QSqlQuery &query);
     static QString DBErrorMessage(const QSqlError& err);
 
-    DatabaseParams GetDatabaseParams(void);
+    DatabaseParams GetDatabaseParams(void) const;
     void SetDatabaseParams(const DatabaseParams &params);
 
     void SetLocalHostname(const QString &name);
-    QString GetHostName(void);
+    QString GetHostName(void) const;
 
     void IgnoreDatabase(bool bIgnore);
     bool IsDatabaseIgnored(void) const;

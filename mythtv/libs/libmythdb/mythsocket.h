@@ -34,12 +34,12 @@ class MPUBLIC MythSocket : public MSocketDevice
     void UpRef(void);
     bool DownRef(void);
 
-    State   state(void);
-    QString stateToString(void) { return stateToString(state()); }
-    QString stateToString(const State state);
+    State   state(void) const;
+    QString stateToString(void) const { return stateToString(state()); }
+    QString stateToString(const State state) const;
 
-    QString errorToString(void) { return errorToString(error()); }
-    QString errorToString(const Error error);
+    QString errorToString(void) const { return errorToString(error()); }
+    QString errorToString(const Error error) const;
 
     void setSocket(int socket, Type type = MSocketDevice::Stream);
     void setCallbacks(MythSocketCBs *cb);
