@@ -1851,6 +1851,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     vdp.SetInput(QSize(width, height));
                     dec = vdp.GetDecoder();
                     thread_count = vdp.GetMaxCPUs();
+                    bool deblocking_filter = vdp.IsDeblockingFilterEnabled();
+                    if  (!deblocking_filter)
+                    {
+                        enc->skip_loop_filter = AVDISCARD_NONKEY;
+                    }  
                 }
 
                 bool handled = false;

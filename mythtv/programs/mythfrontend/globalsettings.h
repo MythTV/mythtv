@@ -106,6 +106,7 @@ class PlaybackProfileItemConfig : public QObject, public ConfigurationWizard
     TransSpinBoxSetting  *height[2];
     TransComboBoxSetting *decoder;
     TransSpinBoxSetting  *max_cpus;
+    TransCheckBoxSetting *skiploop;
     TransComboBoxSetting *vidrend;
     TransComboBoxSetting *osdrend;
     TransCheckBoxSetting *osdfade;

@@ -883,6 +883,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     height[1] = new TransSpinBoxSetting(0, 1088, 64, true);
     decoder   = new TransComboBoxSetting();
     max_cpus  = new TransSpinBoxSetting(1, HAVE_THREADS ? 4 : 1, 1, true);
+    skiploop  = new TransCheckBoxSetting();
     vidrend   = new TransComboBoxSetting();
     osdrend   = new TransComboBoxSetting();
     osdfade   = new TransCheckBoxSetting();
@@ -914,6 +915,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
 
     decoder->setLabel(tr("Decoder"));
     max_cpus->setLabel(tr("Max CPUs"));
+    skiploop->setLabel(tr("Deblocking filter"));
     vidrend->setLabel(tr("Video Renderer"));
     osdrend->setLabel(tr("OSD Renderer"));
     osdfade->setLabel(tr("OSD Fade"));
@@ -931,6 +933,11 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
     filters->setHelpText(
         QObject::tr("Example Custom filter list: 'ivtc,denoise3d'"));
 
+    skiploop->setHelpText(
+        tr("When unchecked the deblocking loopfilter will be disabled ") + "\n" +
+        tr("Disabling will significantly reduce the load on the CPU "
+           "when watching HD h264 but may significantly reduce video quality."));
+
     osdfade->setHelpText(
         tr("When unchecked the OSD will not fade away but instead "
            "will disappear abruptly.") + '\n' +
@@ -939,7 +946,7 @@ PlaybackProfileItemConfig::PlaybackProfileItemConfig(ProfileItem &_item) :
 
     vid_row->addChild(decoder);
     vid_row->addChild(max_cpus);
-
+    vid_row->addChild(skiploop);
     osd_row->addChild(vidrend);
     osd_row->addChild(osdrend);
     osd_row->addChild(osdfade);
@@ -992,6 +999,7 @@ void PlaybackProfileItemConfig::Load(void)
 
     QString pdecoder  = item.Get("pref_decoder");
     QString pmax_cpus = item.Get("pref_max_cpus");
+    QString pskiploop  = item.Get("pref_skiploop");
     QString prenderer = item.Get("pref_videorenderer");
     QString posd      = item.Get("pref_osdrenderer");
     QString posdfade  = item.Get("pref_osdfade");
@@ -1019,6 +1027,9 @@ void PlaybackProfileItemConfig::Load(void)
 
     if (!pmax_cpus.isEmpty())
         max_cpus->setValue(pmax_cpus.toUInt());
+
+    skiploop->setValue((!pskiploop.isEmpty()) ? (bool) pskiploop.toInt() : true);
+
     if (!prenderer.isEmpty())
         vidrend->setValue(prenderer);
     if (!posd.isEmpty())
@@ -1052,6 +1063,7 @@ void PlaybackProfileItemConfig::Save(void)
 
     item.Set("pref_decoder",       decoder->getValue());
     item.Set("pref_max_cpus",      max_cpus->getValue());
+    item.Set("pref_skiploop",       (skiploop->boolValue()) ? "1" : "0");
     item.Set("pref_videorenderer", vidrend->getValue());
     item.Set("pref_osdrenderer",   osdrend->getValue());
     item.Set("pref_osdfade",       (osdfade->boolValue()) ? "1" : "0");
