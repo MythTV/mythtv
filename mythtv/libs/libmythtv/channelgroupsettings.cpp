@@ -17,7 +17,7 @@ class ChannelGroupStorage : public Storage
   public:
     ChannelGroupStorage(Setting *_setting,
                     uint _chanid, QString _grpname) :
-        setting(_setting), chanid(_chanid), grpname(_grpname) {}
+        setting(_setting), chanid(_chanid), grpname(_grpname), grpid(0) {}
     virtual ~ChannelGroupStorage() {};
 
     virtual void Load(void);

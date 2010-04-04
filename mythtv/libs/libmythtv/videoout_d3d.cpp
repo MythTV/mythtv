@@ -953,7 +953,8 @@ VideoOutputD3D::VideoOutputD3D(void)
     m_hWnd(NULL),          m_ctx(NULL),
     m_video(NULL),         m_osd(NULL),
     m_d3d_osd(false),      m_osd_ready(false),
-    m_ctx_valid(false),    m_ctx_reset(false)
+    m_ctx_valid(false),    m_ctx_reset(false),
+    m_pip_active(NULL)
 {
     m_pauseFrame.buf = NULL;
 }
