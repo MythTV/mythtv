@@ -1098,23 +1098,14 @@ void MythXML::GetPreviewImage( HTTPRequest *pRequest )
     }
 
     QString sFileName     = GetPlaybackURL(pInfo);
-    int     defaultOffset = gContext->GetNumSetting("PreviewPixmapOffset", 64);
-    int     preRoll       = gContext->GetNumSetting("RecordPreRoll", 0);
-
-    if (preRoll > 0)
-        defaultOffset += preRoll;
-
-    if (nSecsIn <= 0)
-    {
-        nSecsIn = defaultOffset;
-    }
 
     // ----------------------------------------------------------------------
     // check to see if default preview image is already created.
     // ----------------------------------------------------------------------
     QString sPreviewFileName;
-    if ((nSecsIn == defaultOffset))
+    if (nSecsIn <= 0)
     {
+        nSecsIn = -1;
         sPreviewFileName = sFileName + ".png";
     }
     else

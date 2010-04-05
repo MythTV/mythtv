@@ -2147,18 +2147,6 @@ static HostSpinBox *LiveTVIdleTimeout()
     return gs;
 }
 
-static GlobalSpinBox *PreviewPixmapOffset()
-{
-    GlobalSpinBox *bs = new GlobalSpinBox("PreviewPixmapOffset", 0, 600, 1);
-    bs->setLabel(QObject::tr("Time offset for thumbnail preview images"));
-    bs->setHelpText(QObject::tr("MythTV will use this offset to make a "
-                    "thumbnail image this many seconds from the beginning "
-                    "of the recording, unless this offset happens to be "
-                    "between cutpoints or inside a flagged advertisement."));
-    bs->setValue(64);
-    return bs;
-}
-
 static HostCheckBox *PlaybackPreview()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackPreview");
@@ -4358,7 +4346,6 @@ PlaybackSettings::PlaybackSettings()
     pbox->addChild(PlayBoxOrdering());
     pbox->addChild(PlayBoxEpisodeSort());
     pbox->addChild(GeneratePreviewRemotely());
-    pbox->addChild(PreviewPixmapOffset());
     pbox->addChild(PlaybackPreview());
     pbox->addChild(HWAccelPlaybackPreview());
     pbox->addChild(PBBStartInTitle());

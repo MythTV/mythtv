@@ -5752,9 +5752,11 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
                 if (player_ctx->playingInfo)
                     player_ctx->playingInfo->GetCommBreakList(commBreakMap);
 
-                while ((FrameIsInMap(number, commBreakMap) ||
-                        (FrameIsInMap(number, deleteMap))))
+                bool started_in_break_map = false;
+                while (FrameIsInMap(number, commBreakMap) ||
+                       FrameIsInMap(number, deleteMap))
                 {
+                    started_in_break_map = true;
                     number += (long long) (30 * video_frame_rate);
                     if (number >= totalFrames)
                     {
@@ -5765,6 +5767,15 @@ char *NuppelVideoPlayer::GetScreenGrabAtFrame(long long frameNum, bool absolute,
 
                 commBreakMapLock.unlock();
                 player_ctx->UnlockPlayingInfo(__FILE__, __LINE__);
+
+                // Advance a few seconds from the end of the break
+                if (started_in_break_map)
+                {
+                    oldnumber = number;
+                    number += (long long) (10 * video_frame_rate);
+                    if (number >= totalFrames)
+                        number = oldnumber;
+                }
             }
         }
     }

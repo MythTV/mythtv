@@ -512,8 +512,28 @@ bool PreviewGenerator::LocalPreviewRun(void)
     if (captime < 0)
     {
         timeInSeconds = true;
-        captime = (gContext->GetNumSetting("PreviewPixmapOffset", 64) +
-                   gContext->GetNumSetting("RecordPreRoll",       0));
+        int startEarly = 0;
+        int programDuration = 0;
+        int preroll =  gContext->GetNumSetting("RecordPreRoll", 0);
+        if (programInfo.startts.isValid() &&
+            programInfo.endts.isValid() &&
+            (programInfo.startts != programInfo.endts))
+        {
+            programDuration = programInfo.startts.secsTo(programInfo.endts);
+        }
+        if (programInfo.recstartts.isValid() &&
+            programInfo.startts.isValid() &&
+            (programInfo.recstartts != programInfo.startts))
+        {
+            startEarly = programInfo.recstartts.secsTo(programInfo.startts);
+        }
+        if (programDuration > 0)
+        {
+            captime = startEarly + (programDuration / 3);
+        }
+        if (captime < 0)
+            captime = 600;
+        captime += preroll;
     }
 
     len = width = height = sz = 0;
