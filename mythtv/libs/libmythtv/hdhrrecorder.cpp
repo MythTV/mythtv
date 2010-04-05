@@ -45,7 +45,6 @@ using namespace std;
 HDHRRecorder::HDHRRecorder(TVRec *rec, HDHRChannel *channel)
     : DTVRecorder(rec),
       _channel(channel),        _stream_handler(NULL),
-      _stream_data(NULL),
       _pid_lock(QMutex::Recursive),
       _input_pat(NULL),         _input_pmt(NULL),
       _has_no_av(false)
@@ -61,11 +60,6 @@ void HDHRRecorder::TeardownAll(void)
 {
     StopRecording();
     Close();
-    if (_stream_data)
-    {
-        delete _stream_data;
-        _stream_data = NULL;
-    }
 
     if (_input_pat)
     {
@@ -246,18 +240,8 @@ void HDHRRecorder::Close(void)
     VERBOSE(VB_RECORD, LOC + "Close() -- end");
 }
 
-void HDHRRecorder::SetStreamData(MPEGStreamData *data)
+void HDHRRecorder::SetStreamData(void)
 {
-    if (data == _stream_data)
-        return;
-
-    MPEGStreamData *old_data = _stream_data;
-    _stream_data = data;
-    if (old_data)
-        delete old_data;
-
-    if (_stream_data)
-    {
         _stream_data->AddMPEGSPListener(this);
         _stream_data->AddMPEGListener(this);
 
@@ -272,7 +256,6 @@ void HDHRRecorder::SetStreamData(MPEGStreamData *data)
                                     atsc->DesiredMinorChannel());
         else if (_stream_data->DesiredProgram() >= 0)
             _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
-    }
 }
 
 ATSCStreamData *HDHRRecorder::GetATSCStreamData(void)

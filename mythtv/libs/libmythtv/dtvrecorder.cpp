@@ -50,6 +50,7 @@ DTVRecorder::DTVRecorder(TVRec *rec) :
     // state
     _recording(false),
     _error(false),
+    _stream_data(NULL),
     // TS packet buffer
     _buffer(0),                     _buffer_size(0),
     // keyframe TS buffer
@@ -173,6 +174,21 @@ void DTVRecorder::Reset(void)
     if (curRecording)
         curRecording->ClearPositionMap(MARK_GOP_BYFRAME);
 }
+
+void DTVRecorder::SetStreamData(MPEGStreamData *data)
+{
+    if (data == _stream_data)
+        return;
+
+    MPEGStreamData *old_data = _stream_data;
+    _stream_data = data;
+    if (old_data)
+        delete old_data;
+
+    if (_stream_data)
+        SetStreamData();
+}
+
 
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
 {

@@ -45,8 +45,7 @@ class MpegRecorder : public DTVRecorder,
     int GetVideoFd(void) { return chanfd; }
 
     // TS
-    virtual void SetStreamData(MPEGStreamData*);
-    virtual MPEGStreamData *GetStreamData(void) { return _stream_data; }
+    virtual void SetStreamData(void);
 
     // TSPacketListener
     bool ProcessTSPacket(const TSPacket &tspacket);
@@ -142,7 +141,6 @@ class MpegRecorder : public DTVRecorder,
     DeviceReadBuffer *_device_read_buffer;
 
     // TS
-    MPEGStreamData *_stream_data;
     unsigned char   _stream_id[0x1fff  + 1];
     unsigned char   _pid_status[0x1fff + 1];
     unsigned char   _continuity_counter[0x1fff + 1];

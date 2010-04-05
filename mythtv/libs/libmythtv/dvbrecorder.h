@@ -93,8 +93,7 @@ class DVBRecorder :
     // Common audio/visual processing
     bool ProcessAVTSPacket(const TSPacket &tspacket);
 
-    void SetStreamData(MPEGStreamData*);
-    MPEGStreamData* GetStreamData(void) { return _stream_data; }
+    void SetStreamData(void);
 
     void BufferedWrite(const TSPacket &tspacket);
 
@@ -112,7 +111,6 @@ class DVBRecorder :
     DVBStreamHandler        *_stream_handler;
 
     // general recorder stuff
-    MPEGStreamData          *_stream_data;
     mutable QMutex           _pid_lock;
     ProgramAssociationTable *_input_pat; ///< PAT on input side
     ProgramMapTable         *_input_pmt; ///< PMT on input side

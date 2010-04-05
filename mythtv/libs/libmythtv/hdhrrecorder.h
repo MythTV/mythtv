@@ -76,8 +76,7 @@ class HDHRRecorder : public DTVRecorder,
     // Common audio/visual processing
     bool ProcessAVTSPacket(const TSPacket &tspacket);
 
-    void SetStreamData(MPEGStreamData*);
-    MPEGStreamData *GetStreamData(void) { return _stream_data; }
+    void SetStreamData(void);
     ATSCStreamData *GetATSCStreamData(void);
 
     void BufferedWrite(const TSPacket &tspacket);
@@ -93,7 +92,6 @@ class HDHRRecorder : public DTVRecorder,
     HDHRStreamHandler        *_stream_handler;
 
     // general recorder stuff
-    MPEGStreamData          *_stream_data;
     mutable QMutex           _pid_lock;
     ProgramAssociationTable *_input_pat; ///< PAT on input side
     ProgramMapTable         *_input_pmt; ///< PMT on input side

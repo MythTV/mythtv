@@ -37,6 +37,8 @@ class ImportRecorder : public DTVRecorder
     bool Open(void);
     void Close(void);
 
+    void SetStreamData(void) {}
+
   private:
     int             _import_fd;
 

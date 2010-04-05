@@ -50,10 +50,7 @@ class FirewireRecorder : public DTVRecorder,
                                const QString &videodev,
                                const QString &audiodev,
                                const QString &vbidev);
-    void SetStreamData(MPEGStreamData*);
-
-    // Gets
-    MPEGStreamData *GetStreamData(void) { return _stream_data; }
+    void SetStreamData(void);
 
     // MPEG Single Program
     void HandleSingleProgramPAT(ProgramAssociationTable*);
@@ -63,7 +60,6 @@ class FirewireRecorder : public DTVRecorder,
     FirewireRecorder(TVRec *rec);
 
   private:
-    MPEGStreamData        *_stream_data;
     FirewireChannel       *channel;
     bool                   isopen;
     vector<unsigned char>  buffer;

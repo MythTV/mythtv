@@ -16,14 +16,13 @@
 #define LOC_ERR QString("FireRecBase(%1), Error: ").arg(channel->GetDevice())
 
 FirewireRecorder::FirewireRecorder(TVRec *rec, FirewireChannel *chan) :
-    DTVRecorder(rec), _stream_data(NULL),
+    DTVRecorder(rec),
     channel(chan), isopen(false)
 {
 }
 
 FirewireRecorder::~FirewireRecorder()
 {
-    SetStreamData(NULL);
     Close();
 }
 
@@ -194,23 +193,12 @@ bool FirewireRecorder::PauseAndWait(int timeout)
     return paused;
 }
 
-void FirewireRecorder::SetStreamData(MPEGStreamData *data)
+void FirewireRecorder::SetStreamData(void)
 {
-    if (data == _stream_data)
-        return;
-
-    MPEGStreamData *old_data = _stream_data;
-    _stream_data = data;
-    if (old_data)
-        delete old_data;
-
-    if (_stream_data)
-    {
         _stream_data->AddMPEGSPListener(this);
 
         if (_stream_data->DesiredProgram() >= 0)
             _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
-    }
 }
 
 void FirewireRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)

@@ -107,8 +107,6 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
     // Input file descriptors
     chanfd(-1),                   readfd(-1),
     _device_read_buffer(NULL),
-    // TS packet handling
-    _stream_data(NULL),
     // Statistics
     _continuity_error_count(0),   _stream_overflow_count(0),
     _bad_packet_count(0)
@@ -1055,7 +1053,7 @@ void MpegRecorder::StartRecording(void)
         int progNum = 1;
         MPEGStreamData *sd = new MPEGStreamData(progNum, true);
         sd->SetRecordingType(_recording_type);
-        SetStreamData(sd);
+        DTVRecorder::SetStreamData(sd);
 
         _stream_data->AddAVListener(this);
         _stream_data->AddWritingListener(this);
@@ -1279,7 +1277,7 @@ void MpegRecorder::StartRecording(void)
     FinishRecording();
 
     delete[] buffer;
-    SetStreamData(NULL);
+    DTVRecorder::SetStreamData(NULL);
     encoding = false;
 
     QMutexLocker locker(&recording_wait_lock);
@@ -1567,29 +1565,10 @@ bool MpegRecorder::StopEncoding(int fd)
     return false;
 }
 
-void MpegRecorder::SetStreamData(MPEGStreamData *data)
+void MpegRecorder::SetStreamData(void)
 {
-    VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- begin");
-
-    if (data == _stream_data)
-    {
-        VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 0");
-
-        return;
-    }
-
-    MPEGStreamData *old_data = _stream_data;
-    _stream_data = data;
-    if (old_data)
-        delete old_data;
-
-    if (_stream_data)
-    {
         _stream_data->AddMPEGSPListener(this);
         _stream_data->SetDesiredProgram(1);
-    }
-
-    VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 1");
 }
 
 void MpegRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)

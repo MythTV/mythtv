@@ -23,8 +23,7 @@
 
 IPTVRecorder::IPTVRecorder(TVRec *rec, IPTVChannel *channel) :
     DTVRecorder(rec),
-    _channel(channel),
-    _stream_data(NULL)
+    _channel(channel)
 {
     _channel->GetFeeder()->AddListener(this);
 }
@@ -246,26 +245,9 @@ void IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
     }
 }
 
-void IPTVRecorder::SetStreamData(MPEGStreamData *data)
+void IPTVRecorder::SetStreamData(void)
 {
-    VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- begin");
-
-    if (data == _stream_data)
-    {
-        VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 0");
-
-        return;
-    }
-
-    MPEGStreamData *old_data = _stream_data;
-    _stream_data = data;
-    if (old_data)
-        delete old_data;
-
-    if (_stream_data)
         _stream_data->AddMPEGSPListener(this);
-
-    VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 1");
 }
 
 void IPTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)

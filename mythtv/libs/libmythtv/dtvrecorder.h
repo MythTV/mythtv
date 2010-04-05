@@ -41,8 +41,9 @@ class DTVRecorder: public RecorderBase
     int GetVideoFd(void) { return _stream_fd; }
 
     virtual void SetNextRecording(const ProgramInfo*, RingBuffer*);
-    virtual void SetStreamData(MPEGStreamData*) {}
-    virtual MPEGStreamData *GetStreamData(void) { return NULL; }
+    virtual void SetStreamData(void) = 0;
+    void SetStreamData(MPEGStreamData* sd);
+    MPEGStreamData *GetStreamData(void) const { return _stream_data; }
 
     virtual void Reset();
 
@@ -103,6 +104,8 @@ class DTVRecorder: public RecorderBase
     bool _recording;
     /// True iff irrecoverable recording error detected
     bool _error;
+
+    MPEGStreamData          *_stream_data;
 
     // packet buffer
     unsigned char* _buffer;

@@ -39,8 +39,7 @@ class IPTVRecorder : public DTVRecorder, public TSDataListener,
     virtual void SetOptionsFromProfile(RecordingProfile*, const QString&,
                                        const QString&, const QString&) {}
 
-    virtual void SetStreamData(MPEGStreamData*);
-    virtual MPEGStreamData *GetStreamData(void) { return _stream_data; }
+    virtual void SetStreamData(void);
 
   private:
     void ProcessTSPacket(const TSPacket& tspacket);
@@ -54,7 +53,6 @@ class IPTVRecorder : public DTVRecorder, public TSDataListener,
 
   private:
     IPTVChannel *_channel;
-    MPEGStreamData *_stream_data;
     QWaitCondition  _cond_recording;
 
   private:
