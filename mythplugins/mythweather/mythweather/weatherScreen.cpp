@@ -167,7 +167,8 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
         return value + (m_units == ENG_UNITS ? " mi" : " km");
 
     if (key == "temp" || key == "appt" || key.contains("low",Qt::CaseInsensitive) ||
-        key.contains("high",Qt::CaseInsensitive))
+        key.contains("high",Qt::CaseInsensitive) ||
+        key.contains("temp",Qt::CaseInsensitive))
     {
        if ( (value == "NA") || (value == "N/A") )
           return value;
@@ -176,7 +177,7 @@ QString WeatherScreen::formatDataItem(const QString &key, const QString &value)
     }
 
     if (key == "wind_gust" || key == "wind_spdgst" || key == "wind_speed")
-        return value + (m_units == ENG_UNITS ? " mph" : " kph");
+        return value + (m_units == ENG_UNITS ? " mph" : " km/h");
 
     /*The days of the week will be translated if the script sends elements from
      the enum DaysOfWeek.*/

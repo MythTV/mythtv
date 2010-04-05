@@ -8,7 +8,7 @@
 
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1004";
+const QString currentDatabaseVersion = "1005";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -191,6 +191,16 @@ bool InitializeDatabase()
                    " WHERE action = 'DELETE' AND context = 'Weather';";
 
         if (!performActualUpdate(updates, "1004", dbver))
+            return false;
+    }
+
+    if (dbver == "1004")
+    {
+        QStringList updates;
+        updates << "ALTER TABLE weatherdatalayout"
+                   "  MODIFY location varchar(128) CHARACTER SET utf8 NOT NULL;";
+
+        if (!performActualUpdate(updates, "1005", dbver))
             return false;
     }
 

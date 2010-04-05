@@ -8,10 +8,10 @@ Usage: script -v
        script -u units [-d dir] location
 
 -v -- Information about the script in format
-name,version,author,email
+	name,version,author,email
 
 -T -- default timeout values specified by this script in form
-        updateTimeout,retieveTimeout
+        updateTimeout,retrieveTimeout
         updateTimeout -- time between updates
         retrieveTimeout -- timeout when trying to retrieve data
 
@@ -42,7 +42,7 @@ For example:
 
 item::This is a 
 item::multi-line 
-itme::data item
+item::data item
 
 These must be printed successively, behavior is undefined otherwise.
 
@@ -60,15 +60,10 @@ the scripts information is stored in the database.  When entering the screen
 setup screen the scripts directory is searched for scripts.  New scripts are
 added to the database and existing scripts are checked for version changes.
 
-Types are the screen items as defined in weather-ui.xml.  A data item with no
-modifiers before it is a static item and the plugin will not search for a script
-to provide data to it. A * signifies an item that is dynamic, but not required
-to display the screen, these are not provided by scripts, they are things like
-pause text or the current date and time.  A + prepending the item name signifies
-an item that is required to show the screen, these are provided by scripts.  The
-text of the name within the weather-ui.xml file (with prepending flag removed)
-must match exactly the string returned by the '-t' flag; as well as the token
-returned when retrieving data.
+Types are the screen items as defined in weather-screens.xml.
+The text of the name within the weather-screens.xml file must match exactly the
+string returned by the '-t' flag; as well as the token returned when retrieving 
+data.
 
 If you want to see the code that controls the scripts within the plugin, look at
 weatherSource.cpp and sourceManager.cpp.  If you have any problems with the
