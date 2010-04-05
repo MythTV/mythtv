@@ -53,7 +53,7 @@ class FirewireRecorder : public DTVRecorder,
     void SetStreamData(MPEGStreamData*);
 
     // Gets
-    MPEGStreamData *GetStreamData(void) { return _mpeg_stream_data; }
+    MPEGStreamData *GetStreamData(void) { return _stream_data; }
 
     // MPEG Single Program
     void HandleSingleProgramPAT(ProgramAssociationTable*);
@@ -63,7 +63,7 @@ class FirewireRecorder : public DTVRecorder,
     FirewireRecorder(TVRec *rec);
 
   private:
-    MPEGStreamData        *_mpeg_stream_data;
+    MPEGStreamData        *_stream_data;
     FirewireChannel       *channel;
     bool                   isopen;
     vector<unsigned char>  buffer;

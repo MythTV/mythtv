@@ -16,7 +16,7 @@
 #define LOC_ERR QString("FireRecBase(%1), Error: ").arg(channel->GetDevice())
 
 FirewireRecorder::FirewireRecorder(TVRec *rec, FirewireChannel *chan) :
-    DTVRecorder(rec), _mpeg_stream_data(NULL),
+    DTVRecorder(rec), _stream_data(NULL),
     channel(chan), isopen(false)
 {
 }
@@ -196,11 +196,11 @@ bool FirewireRecorder::PauseAndWait(int timeout)
 
 void FirewireRecorder::SetStreamData(MPEGStreamData *data)
 {
-    if (data == _mpeg_stream_data)
+    if (data == _stream_data)
         return;
 
-    MPEGStreamData *old_data = _mpeg_stream_data;
-    _mpeg_stream_data = data;
+    MPEGStreamData *old_data = _stream_data;
+    _stream_data = data;
     if (old_data)
         delete old_data;
 
