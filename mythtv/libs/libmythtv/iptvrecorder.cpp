@@ -247,7 +247,7 @@ void IPTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
 
 void IPTVRecorder::SetStreamData(void)
 {
-        _stream_data->AddMPEGSPListener(this);
+    _stream_data->AddMPEGSPListener(this);
 }
 
 void IPTVRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)

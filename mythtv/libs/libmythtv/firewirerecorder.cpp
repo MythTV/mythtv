@@ -195,10 +195,10 @@ bool FirewireRecorder::PauseAndWait(int timeout)
 
 void FirewireRecorder::SetStreamData(void)
 {
-        _stream_data->AddMPEGSPListener(this);
+    _stream_data->AddMPEGSPListener(this);
 
-        if (_stream_data->DesiredProgram() >= 0)
-            _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
+    if (_stream_data->DesiredProgram() >= 0)
+        _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
 }
 
 void FirewireRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)

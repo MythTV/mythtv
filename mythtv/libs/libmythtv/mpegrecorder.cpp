@@ -1567,8 +1567,8 @@ bool MpegRecorder::StopEncoding(int fd)
 
 void MpegRecorder::SetStreamData(void)
 {
-        _stream_data->AddMPEGSPListener(this);
-        _stream_data->SetDesiredProgram(1);
+    _stream_data->AddMPEGSPListener(this);
+    _stream_data->SetDesiredProgram(1);
 }
 
 void MpegRecorder::HandleSingleProgramPAT(ProgramAssociationTable *pat)
