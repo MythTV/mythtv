@@ -204,12 +204,12 @@ void FirewireRecorder::SetStreamData(MPEGStreamData *data)
     if (old_data)
         delete old_data;
 
-    if (data)
+    if (_stream_data)
     {
-        data->AddMPEGSPListener(this);
+        _stream_data->AddMPEGSPListener(this);
 
-        if (data->DesiredProgram() >= 0)
-            data->SetDesiredProgram(data->DesiredProgram());
+        if (_stream_data->DesiredProgram() >= 0)
+            _stream_data->SetDesiredProgram(_stream_data->DesiredProgram());
     }
 }
 

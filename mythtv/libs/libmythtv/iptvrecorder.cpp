@@ -262,8 +262,8 @@ void IPTVRecorder::SetStreamData(MPEGStreamData *data)
     if (old_data)
         delete old_data;
 
-    if (data)
-        data->AddMPEGSPListener(this);
+    if (_stream_data)
+        _stream_data->AddMPEGSPListener(this);
 
     VERBOSE(VB_RECORD, LOC + "SetStreamData("<<data<<") -- end 1");
 }
