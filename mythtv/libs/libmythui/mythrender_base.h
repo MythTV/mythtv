@@ -16,8 +16,8 @@ class MythRender
    ~MythRender() { }
 
     void  SetMaster(RenderMaster master) { m_master = master; }
-    bool  IsErrored(void)                { return m_errored;  }
-    QSize GetSize(void)                  { return m_size;     }
+    bool  IsErrored(void) const          { return m_errored;  }
+    QSize GetSize(void) const            { return m_size;     }
 
   protected:
     RenderMaster  m_master;
