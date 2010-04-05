@@ -5,12 +5,12 @@
     <textarea name="searchlab" from="basetextarea">
         <font>basesmall</font>
         <area>30,30,150,50</area>
-        <align>left,vcenter</align>
+        <align>right,vcenter</align>
         <value>Search Term:</value>
     </textarea>
 
     <textedit name="search" from="basetextedit">
-        <position>160,30</position>
+        <position>190,30</position>
     </textedit>
 
     <buttonlist name="sites" from="basebuttonlist">
