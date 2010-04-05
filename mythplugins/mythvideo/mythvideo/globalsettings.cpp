@@ -183,45 +183,6 @@ HostSlider *SetDVDDriveSpeed()
     return gs;
 }
 
-HostCheckBox *EnableDVDBookmark()
-{
-    HostCheckBox *gc = new HostCheckBox("EnableDVDBookmark");
-    gc->setLabel(QObject::tr("Enable DVD Bookmark Support"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enable the setting and skipping to "
-                                "of a bookmark in DVD playback."));
-    return gc;
-}
-
-HostCheckBox *DVDBookmarkPrompt()
-{
-    HostCheckBox *gc = new HostCheckBox("DVDBookmarkPrompt");
-    gc->setLabel(QObject::tr("DVD Bookmark Prompt"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Display a prompt to choose whether "
-                "to play the DVD from the beginning or from the bookmark."));
-    return gc;
-}
-
-class DVDBookmarkSettings : public TriggeredConfigurationGroup
-{
-    public:
-        DVDBookmarkSettings():
-            TriggeredConfigurationGroup(false, false, true, true)
-        {
-            Setting *dvdbookmarkSettings = EnableDVDBookmark();
-            addChild(dvdbookmarkSettings);
-            setTrigger(dvdbookmarkSettings);
-
-            ConfigurationGroup *settings =
-                    new VerticalConfigurationGroup(false);
-            settings->addChild(DVDBookmarkPrompt());
-            settings->addChild(DVDBookmarkDays());
-            addTarget("1", settings);
-            addTarget("0", new VerticalConfigurationGroup(true));
-        }
-};
-
 // Ripper Settings
 
 HostLineEdit *SetRipDirectory()
@@ -479,7 +440,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     VConfigPage page2(pages, false);
     page2->addChild(SetOnInsertDVD());
     page2->addChild(SetDVDDriveSpeed());
-    page2->addChild(new DVDBookmarkSettings());
+    page2->addChild(DVDBookmarkDays());
 
     // page 3
     VerticalConfigurationGroup *pctrl =

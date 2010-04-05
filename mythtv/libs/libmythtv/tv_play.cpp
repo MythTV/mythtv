@@ -798,9 +798,9 @@ TV::TV(void)
       db_auto_set_watched(false),   db_end_of_rec_exit_prompt(false),
       db_jump_prefer_osd(true),     db_use_gui_size_for_tv(false),
       db_start_in_guide(false),     db_toggle_bookmark(false),
-      db_run_jobs_on_remote(false), db_use_dvd_bookmark(false),
-      db_continue_embedded(false),  db_use_fixed_size(true),
-      db_browse_always(false),      db_browse_all_tuners(false),
+      db_run_jobs_on_remote(false), db_continue_embedded(false),
+      db_use_fixed_size(true),      db_browse_always(false),
+      db_browse_all_tuners(false),
 
       smartChannelChange(false),
       MuteIndividualChannels(false), arrowAccel(false),
@@ -890,7 +890,6 @@ TV::TV(void)
     kv["WatchTVGuide"]             = "0";
     kv["AltClearSavedPosition"]    = "1";
     kv["JobsRunOnRecordHost"]      = "0";
-    kv["EnableDVDBookmark"]        = "0";
     kv["ContinueEmbeddedTVPlay"]   = "0";
     kv["UseFixedWindowSize"]       = "1";
     kv["PersistentBrowseMode"]     = "0";
@@ -939,7 +938,6 @@ TV::TV(void)
     db_start_in_guide      = kv["WatchTVGuide"].toInt();
     db_toggle_bookmark     = kv["AltClearSavedPosition"].toInt();
     db_run_jobs_on_remote  = kv["JobsRunOnRecordHost"].toInt();
-    db_use_dvd_bookmark    = kv["EnableDVDBookmark"].toInt();
     db_continue_embedded   = kv["ContinueEmbeddedTVPlay"].toInt();
     db_use_fixed_size      = kv["UseFixedWindowSize"].toInt();
     db_browse_always       = kv["PersistentBrowseMode"].toInt();
@@ -11463,8 +11461,7 @@ bool TV::IsBookmarkAllowed(const PlayerContext *ctx) const
 
     ctx->UnlockPlayingInfo(__FILE__, __LINE__);
 
-    return (!isDVD || (db_use_dvd_bookmark &&
-                       ctx->buffer->DVD()->GetTotalTimeOfTitle() >= 120));
+    return (!isDVD || (ctx->buffer->DVD()->GetTotalTimeOfTitle() >= 120));
 }
 
 /* \fn TV::IsDeleteAllowed(const PlayerContext*) const

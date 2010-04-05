@@ -619,7 +619,6 @@ class MPUBLIC TV : public QThread
     bool    db_start_in_guide;
     bool    db_toggle_bookmark;
     bool    db_run_jobs_on_remote;
-    bool    db_use_dvd_bookmark;
     bool    db_continue_embedded;
     bool    db_use_fixed_size;
     bool    db_browse_always;

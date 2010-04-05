@@ -787,32 +787,26 @@ int internal_play_media(const QString &mrl, const QString &plot,
 
     if (pginfo->pathname.startsWith("dvd:"))
     {
-        bool allowdvdbookmark = gContext->GetNumSetting("EnableDVDBookmark", 0);
-        pginfo->setIgnoreBookmark(!allowdvdbookmark);
-        if (allowdvdbookmark &&
-            gContext->GetNumSetting("DVDBookmarkPrompt", 0))
-        {
-            RingBuffer *tmprbuf = new RingBuffer(pginfo->pathname, false);
+        RingBuffer *tmprbuf = new RingBuffer(pginfo->pathname, false);
 
-            if (!tmprbuf)
-            {
-                delete pginfo;
-                return res;
-            }
-            QString name;
-            QString serialid;
-            if (tmprbuf->isDVD() &&
-                 tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
-            {
-                QStringList fields = pginfo->GetDVDBookmark(serialid, false);
-                if (!fields.empty())
-                {
-                    QStringList::Iterator it = fields.begin();
-                    pos = (long long)((*++it).toLongLong() & 0xffffffffLL);
-                }
-            }
-            delete tmprbuf;
+        if (!tmprbuf)
+        {
+            delete pginfo;
+            return res;
         }
+        QString name;
+        QString serialid;
+        if (tmprbuf->isDVD() &&
+             tmprbuf->DVD()->GetNameAndSerialNum(name, serialid))
+        {
+            QStringList fields = pginfo->GetDVDBookmark(serialid, false);
+            if (!fields.empty())
+            {
+                QStringList::Iterator it = fields.begin();
+                pos = (long long)((*++it).toLongLong() & 0xffffffffLL);
+            }
+        }
+        delete tmprbuf;
     }
     else if (pginfo->isVideo)
         pos = pginfo->GetBookmark();
