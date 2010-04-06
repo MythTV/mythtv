@@ -37,7 +37,7 @@
 #-------------------------------------
 __title__ ="TheTVDB.com Query";
 __author__="R.D.Vaughan"
-__version__="v1.0.8"
+__version__="v1.0.9"
 # Version .1    Initial development
 # Version .2    Add an option to get season and episode numbers from ep name
 # Version .3    Cleaned up the documentation and added a usage display option
@@ -127,6 +127,7 @@ __version__="v1.0.8"
 #               New default location and name of the ttvdb.conf file is '~/.mythtv/ttvdb.conf'. The command
 #               line option "-c" can still override the default location and name.
 # Version 1.0.8 Removed any stderr messages for non-critical events. They cause dual pop-ups in MythVideo.
+# Version 1.0.9 Removed another stderr messages when a non-supported language code is passed.
 
 usage_txt='''
 This script fetches TV series information from theTVdb.com web site. The script conforms to MythTV's
@@ -955,10 +956,6 @@ def main():
 
     # Validate language as specified by user
     if not opts.language in valid_languages:
-        valid_langs = ''
-        for lang in valid_languages: valid_langs+= lang+', '
-        valid_langs=valid_langs[:-2]
-        sys.stderr.write("! Specified language(%s) must match one of the following languages supported by thetvdb.com wiki:\n(%s)\nDefaulting to English 'en' and ignoring specified language code.\n" % (opts.language, valid_langs))
         opts.language = 'en'    # Set the default to English when an invalid language was specified
 
     # Access thetvdb.com API with banners (Posters, Fanart, banners, screenshots) data retrieval enabled
