@@ -1306,8 +1306,8 @@ $ su
 <img src="stop.png">
 <caption><bf>NOTE</bf>: It is good practice to set a root password for MySQL.
 Instructions for doing so can be found on MySQL's web site at <url
-url="http://www.mysql.com/doc/en/Security.html"
-name="http://www.mysql.com/doc/en/Security.html">.
+url="http://dev.mysql.com/doc/mysql/en/security.html"
+name="http://dev.mysql.com/doc/mysql/en/security.html">.
 </caption>
 </figure>
 <sect2>Modifying access to the MySQL database for multiple systems <label
