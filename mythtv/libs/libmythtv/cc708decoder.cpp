@@ -10,9 +10,11 @@
 #define LOC QString("CC708: ")
 #define LOC_ERR QString("CC708, Error: ")
 
+#define DEBUG_CAPTIONS         0
 #define DEBUG_CC_SERVICE       0
 #define DEBUG_CC_SERVICE_2     0
 #define DEBUG_CC_RAWPACKET     0
+#define DEBUG_CC_VALIDPACKET   0
 #define DEBUG_CC_SERVICE_BLOCK 0
 
 typedef enum
@@ -31,7 +33,8 @@ const char* cc_types[4] =
     "DTVCC Channel Packet Start"
 };
 
-static void parse_cc_packet(CC708Reader *cb_cbs, CaptionPacket *pkt);
+static void parse_cc_packet(CC708Reader *cb_cbs, CaptionPacket *pkt,
+                            time_t last_seen[64]);
 
 CC708Reader::CC708Reader()
 {
@@ -65,7 +68,7 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
         //        .arg(data1,0,16).arg(data2,0,16));
 
         if (partialPacket.size && reader)
-            parse_cc_packet(reader, &partialPacket);
+            parse_cc_packet(reader, &partialPacket, last_seen);
 
         partialPacket.data[0] = data1;
         partialPacket.data[1] = data2;
@@ -82,7 +85,15 @@ void CC708Decoder::decode_cc_data(uint cc_type, uint data1, uint data2)
     }
 }
 
-#define DEBUG_CAPTIONS 0
+void CC708Decoder::services(uint seconds, bool seen[64]) const
+{
+    time_t now = time(NULL);
+    time_t then = now - seconds;
+
+    seen[0] = false; // service zero is not allowed in CEA-708-D
+    for (uint i = 1; i < 64; i++)
+        seen[i] = (last_seen[i] >= then);
+}
 
 typedef enum
 {
@@ -212,9 +223,9 @@ static void parse_cc_service_stream(CC708Reader* cc, uint service_num)
         if (old_i == i)
         {
 #if DEBUG_CC_SERVICE
-            fprintf(stderr, "old_i == i == %1\n", i);
-            for (int i=0; i < blk_size; i++)
-                fprintf(stderr, "0x%x ", cc->buf[service_num][i]);
+            fprintf(stderr, "old_i == i == %i\n", i);
+            for (int j = 0; j < blk_size; j++)
+                fprintf(stderr, "0x%x ", cc->buf[service_num][j]);
             fprintf(stderr, "\n");
 #endif
             if (blk_size - i > 10)
@@ -561,7 +572,8 @@ static void append_cc(CC708Reader* cc, uint service_num,
     parse_cc_service_stream(cc, service_num);
 }
 
-static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt)
+static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt,
+                            time_t last_seen[64])
 {
     const unsigned char* pkt_buf = pkt->data;
     const int pkt_size = pkt->size;
@@ -573,13 +585,19 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt)
 
     if (len < 0)
         return;
+
 #if DEBUG_CC_RAWPACKET
-#else
+    if (1)
+#elif DEBUG_CAPTIONS
     if (len > pkt_size)
+#else
+    if (0)
 #endif
     {
         int j;
-        fprintf(stderr, "CC length(%2i) seq_num(%i) ", len, seq_num);
+        int srv = (pkt_buf[off]>>5) & 0x7;
+        fprintf(stderr, "CC708 len %2i srv0 %i seq %i ",
+                len, srv, seq_num);
         for (j = 0; j < pkt_size; j++)
             fprintf(stderr, "0x%x ", pkt_buf[j]);
         fprintf(stderr, "\n");
@@ -621,6 +639,8 @@ static void parse_cc_packet(CC708Reader* cb_cbs, CaptionPacket* pkt)
 #endif
             append_cc(cb_cbs, service_number,
                       &pkt_buf[block_data_offset], block_size);
+
+            last_seen[service_number] = time(NULL);
         }
         off+=block_size+1;
     }

@@ -5,6 +5,7 @@
 #define CC708DECODER_H_
 
 #include <stdint.h>
+#include <time.h>
 
 #include "format.h"
 #include "compat.h"
@@ -82,14 +83,21 @@ class CC708Decoder
 {
   public:
     CC708Decoder(CC708Reader *ccr) : reader(ccr)
-        { bzero(&partialPacket, sizeof(CaptionPacket)); }
+    {
+        memset(&partialPacket, 0, sizeof(CaptionPacket));
+        memset(last_seen,      0, sizeof(last_seen));
+    }
    ~CC708Decoder() {}
 
     void decode_cc_data(uint cc_type, uint data1, uint data2);
 
+    /// \return Services seen in last few seconds as specified.
+    void services(uint seconds, bool[64]) const;
+
   private:
     CaptionPacket  partialPacket;
     CC708Reader   *reader;
+    time_t         last_seen[64];
 };
 
 #endif // CC708DECODER_H_

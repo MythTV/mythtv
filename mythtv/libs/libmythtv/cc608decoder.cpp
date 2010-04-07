@@ -96,6 +96,14 @@ void CC608Decoder::FormatCC(int tc, int code1, int code2)
     FormatCCField(tc, 1, code2);
 }
 
+void CC608Decoder::GetServices(uint seconds, bool seen[4]) const
+{
+    time_t now = time(NULL);
+    time_t then = now - seconds;
+    for (uint i = 0; i < 4; i++)
+        seen[i] = (last_seen[i] >= then);
+}
+
 static const int rowdata[] =
 {
     11, -1, 1, 2, 3, 4, 12, 13,
@@ -665,6 +673,17 @@ void CC608Decoder::BufferCC(int mode, int len, int clr)
     }
 
     reader->AddTextData(rbuf, len, timecode[mode], 'C');
+    int ccmode = rbuf[3] & CC_MODE_MASK;
+    int stream = -1;
+    switch (ccmode)
+    {
+        case CC_CC1: stream = 0; break;
+        case CC_CC2: stream = 1; break;
+        case CC_CC3: stream = 2; break;
+        case CC_CC4: stream = 3; break;
+    }
+    if (stream >= 0)
+        last_seen[stream] = time(NULL);
 
     resumetext[mode] = 0;
     if (clr && !len)

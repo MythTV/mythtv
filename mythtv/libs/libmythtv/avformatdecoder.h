@@ -158,6 +158,8 @@ class AvFormatDecoder : public DecoderBase
     virtual int AutoSelectTrack(uint type);
 
     void ScanATSCCaptionStreams(int av_stream_index);
+    void UpdateATSCCaptionTracks(void);
+    void UpdateCaptionTracksFromStreams(bool check_608, bool check_708);
     void ScanTeletextCaptions(int av_stream_index);
     void ScanDSMCCStreams(void);
     int AutoSelectAudioTrack(void);
@@ -260,6 +262,24 @@ class AvFormatDecoder : public DecoderBase
     CC708Decoder     *ccd708;
     TeletextDecoder  *ttd;
     int               cc608_parity_table[256];
+    /// Lookup table for whether a stream was seen in the PMT
+    /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
+    /// entries 4-67 corresport to CEA-708 streams 0 through 64
+    bool              ccX08_in_pmt[64+4];
+    /// Lookup table for whether a stream is represented in the UI
+    /// entries 0-3 correspond to CEA-608 CC1 through CC4, while
+    /// entries 4-67 corresport to CEA-708 streams 0 through 64
+    bool              ccX08_in_tracks[64+4];
+    /// StreamInfo for 608 and 708 Captions seen in the PMT descriptor
+    QList<StreamInfo> pmt_tracks;
+    /// TrackType (608 or 708) for Captions seen in the PMT descriptor
+    QList<TrackType>  pmt_track_types;
+    /// StreamInfo for 608 and 708 Captions seen in the caption stream itself
+    /// but not seen in the PMT
+    QList<StreamInfo> stream_tracks;
+    /// TrackType (608 or 708) for Captions seen in the caption stream itself
+    /// but not seen in the PMT
+    QList<TrackType>  stream_track_types;
 
     // MHEG
     InteractiveTV    *itv;                ///< MHEG/MHP decoder

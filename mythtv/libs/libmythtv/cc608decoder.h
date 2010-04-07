@@ -3,6 +3,7 @@
 #ifndef CCDECODER_H_
 #define CCDECODER_H_
 
+#include <time.h>
 #include <stdint.h>
 
 #include <vector>
@@ -59,6 +60,9 @@ class CC608Decoder
     QString GetProgramType(bool future) const;
     QString GetXDS(const QString &key) const;
 
+    /// \return Services seen in last few seconds as specified.
+    void GetServices(uint seconds, bool[4]) const;
+
   private:
     QChar CharCC(int code) const { return stdchar[code]; }
     void ResetCC(int mode);
@@ -78,6 +82,8 @@ class CC608Decoder
     CC608Reader *reader;
 
     bool ignore_time_code;
+
+    time_t last_seen[4];
 
     // per-field
     int badvbi[2];

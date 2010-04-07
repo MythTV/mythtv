@@ -1532,15 +1532,6 @@ static int xvmc_pixel_format(enum PixelFormat pix_fmt)
 }
 #endif // USING_XVMC
 
-void default_captions(sinfo_vec_t *tracks, int av_index)
-{
-    if (tracks[kTrackTypeCC608].empty())
-    {
-        tracks[kTrackTypeCC608].push_back(StreamInfo(av_index, 0, 0, 1));
-        tracks[kTrackTypeCC608].push_back(StreamInfo(av_index, 0, 2, 3));
-    }
-}
-
 // CC Parity checking
 // taken from xine-lib libspucc
 
@@ -1589,13 +1580,15 @@ static int cc608_good_parity(const int *parity_table, uint16_t data)
 
 void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
 {
-    tracks[kTrackTypeCC608].clear();
-    tracks[kTrackTypeCC708].clear();
+    memset(ccX08_in_pmt, 0, sizeof(ccX08_in_pmt));
+    pmt_tracks.clear();
+    pmt_track_types.clear();
 
     // Figure out languages of ATSC captions
     if (!ic->cur_pmt_sect)
     {
-        default_captions(tracks, av_index);
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                "ScanATSCCaptionStreams() called with no PMT");
         return;
     }
 
@@ -1614,16 +1607,12 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
     }
 
     if (!pmt.IsVideo(i, "dvb"))
-    {
-        default_captions(tracks, av_index);
         return;
-    }
 
     const desc_list_t desc_list = MPEGDescriptor::ParseOnlyInclude(
         pmt.StreamInfo(i), pmt.StreamInfoLength(i),
         DescriptorID::caption_service);
 
-    map<int,uint> lang_cc_cnt[2];
     for (uint j = 0; j < desc_list.size(); j++)
     {
         const CaptionServiceDescriptor csd(desc_list[j]);
@@ -1631,37 +1620,92 @@ void AvFormatDecoder::ScanATSCCaptionStreams(int av_index)
         {
             int lang = csd.CanonicalLanguageKey(k);
             int type = csd.Type(k) ? 1 : 0;
-            int lang_indx = lang_cc_cnt[type][lang];
-            lang_cc_cnt[type][lang]++;
             if (type)
             {
-                StreamInfo si(av_index, lang, lang_indx,
+                StreamInfo si(av_index, lang, 0/*lang_idx*/,
                               csd.CaptionServiceNumber(k),
                               csd.EasyReader(k),
                               csd.WideAspectRatio(k));
-
-                tracks[kTrackTypeCC708].push_back(si);
-
-                VERBOSE(VB_PLAYBACK, LOC + QString(
-                            "EIA-708 caption service #%1 "
-                            "is in the %2 language.")
-                        .arg(csd.CaptionServiceNumber(k))
-                        .arg(iso639_key_toName(lang)));
+                uint key = csd.CaptionServiceNumber(k) + 4;
+                ccX08_in_pmt[key] = true;
+                pmt_tracks.push_back(si);
+                pmt_track_types.push_back(kTrackTypeCC708);
             }
             else
             {
-                int line21 = csd.Line21Field(k) ? 2 : 1;
-                StreamInfo si(av_index, lang, lang_indx, line21);
-                tracks[kTrackTypeCC608].push_back(si);
-
-                VERBOSE(VB_PLAYBACK, LOC + QString(
-                            "EIA-608 caption %1 is in the %2 language.")
-                        .arg(line21).arg(iso639_key_toName(lang)));
+                int line21 = csd.Line21Field(k) ? 3 : 1;
+                StreamInfo si(av_index, lang, 0/*lang_idx*/, line21);
+                ccX08_in_pmt[line21-1] = true;
+                pmt_tracks.push_back(si);
+                pmt_track_types.push_back(kTrackTypeCC608);
             }
         }
     }
+}
 
-    default_captions(tracks, av_index);
+void AvFormatDecoder::UpdateATSCCaptionTracks(void)
+{
+    tracks[kTrackTypeCC608].clear();
+    tracks[kTrackTypeCC708].clear();
+    memset(ccX08_in_tracks, 0, sizeof(ccX08_in_tracks));
+
+    uint pidx = 0, sidx = 0;
+    map<int,uint> lang_cc_cnt[2];
+    while (true)
+    {
+        bool pofr = pidx >= (uint)pmt_tracks.size();
+        bool sofr = sidx >= (uint)stream_tracks.size();
+        if (pofr && sofr)
+            break;
+
+        // choose lowest available next..
+        // stream_id's of 608 and 708 streams alias, but this
+        // is ok as we just want each list to be ordered.
+        StreamInfo const *si = NULL;
+        int type = 0; // 0 if 608, 1 if 708
+        bool isp = true; // if true use pmt_tracks next, else stream_tracks
+
+        if (pofr && !sofr)
+            isp = false;
+        else if (!pofr && sofr)
+            isp = true;
+        else if (stream_tracks[sidx] < pmt_tracks[pidx])
+            isp = false;
+
+        if (isp)
+        {
+            si = &pmt_tracks[pidx];
+            type = kTrackTypeCC708 == pmt_track_types[pidx] ? 1 : 0;
+            pidx++;
+        }
+        else
+        {
+            si = &stream_tracks[sidx];
+            type = kTrackTypeCC708 == stream_track_types[sidx] ? 1 : 0;
+            sidx++;
+        }
+
+        StreamInfo nsi(*si);
+        int lang_indx = lang_cc_cnt[type][nsi.language];
+        lang_cc_cnt[type][nsi.language]++;
+        nsi.language_index = lang_indx;
+        tracks[(type) ? kTrackTypeCC708 : kTrackTypeCC608].push_back(nsi);
+        int key = (int)nsi.stream_id + ((type) ? 4 : -1);
+        if (key < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "Programmer Error in_tracks key too small");
+        }
+        else
+        {
+            ccX08_in_tracks[key] = true;
+        }
+        VERBOSE(VB_PLAYBACK, LOC + QString(
+                    "%1 caption service #%2 is in the %3 language.")
+                .arg((type) ? "EIA-708" : "EIA-608")
+                .arg(nsi.stream_id)
+                .arg(iso639_key_toName(nsi.language)));
+    }
 }
 
 void AvFormatDecoder::ScanTeletextCaptions(int av_index)
@@ -2010,6 +2054,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                                selectedVideoIndex == (int) i);
 
                 ScanATSCCaptionStreams(i);
+                UpdateATSCCaptionTracks();
 
                 VERBOSE(VB_PLAYBACK, LOC +
                         QString("Using %1 for video decoding")
@@ -2663,6 +2708,7 @@ void decode_cc_dvd(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
     }
   done:
     nd->lastccptsu = utc;
+    nd->UpdateCaptionTracksFromStreams(true, false);
 }
 
 void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
@@ -2682,6 +2728,7 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
     // reserved                8 1.0   0xff
     // em_data                 8 2.0
 
+    bool had_608 = false, had_708 = false;
     for (uint cur = 0; cur < cc_count; cur++)
     {
         uint cc_code  = buf[2+(cur*3)];
@@ -2697,11 +2744,79 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
         if (cc_type <= 0x1) // EIA-608 field-1/2
         {
             if (cc608_good_parity(cc608_parity_table, data))
+            {
+                had_608 = true;
                 ccd608->FormatCCField(lastccptsu / 1000, cc_type, data);
+            }
         }
-        else // EIA-708 CC data
+        else
+        {
+            had_708 = true;
             ccd708->decode_cc_data(cc_type, data1, data2);
+        }
     }
+    UpdateCaptionTracksFromStreams(had_608, had_708);
+}
+
+void AvFormatDecoder::UpdateCaptionTracksFromStreams(
+    bool check_608, bool check_708)
+{
+    bool need_change_608 = false;
+    bool seen_608[4];
+    if (check_608)
+    {
+        ccd608->GetServices(15/*seconds*/, seen_608);
+        for (uint i = 0; i < 4; i++)
+        {
+            need_change_608 |= (seen_608[i] && !ccX08_in_tracks[i]) ||
+                (!seen_608[i] && ccX08_in_tracks[i] && !ccX08_in_pmt[i]);
+        }
+    }
+
+    bool need_change_708 = false;
+    bool seen_708[64];
+    if (check_708 || need_change_608)
+    {
+        ccd708->services(15/*seconds*/, seen_708);
+        for (uint i = 1; i < 64 && !need_change_608 && !need_change_708; i++)
+        {
+            need_change_708 |= (seen_708[i] && !ccX08_in_tracks[i+4]) ||
+                (!seen_708[i] && ccX08_in_tracks[i+4] && !ccX08_in_pmt[i+4]);
+        }
+        if (need_change_708 && !check_608)
+            ccd608->GetServices(15/*seconds*/, seen_608);
+    }
+
+    if (!need_change_608 && !need_change_708)
+        return;
+
+    ScanATSCCaptionStreams(selectedVideoIndex);
+
+    stream_tracks.clear();
+    stream_track_types.clear();
+    int av_index = selectedVideoIndex;
+    int lang = iso639_str3_to_key("und");
+    for (uint i = 0; i < 4; i++)
+    {
+        if (seen_608[i])
+        {
+            StreamInfo si(av_index, lang, 0/*lang_idx*/,
+                          i+1, false/*easy*/, false/*wide*/);
+            stream_tracks.push_back(si);
+            stream_track_types.push_back(kTrackTypeCC608);
+        }
+    }
+    for (uint i = 1; i < 64; i++)
+    {
+        if (seen_708[i] && !ccX08_in_pmt[i+4])
+        {
+            StreamInfo si(av_index, lang, 0/*lang_idx*/,
+                          i, false/*easy*/, true/*wide*/);
+            stream_tracks.push_back(si);
+            stream_track_types.push_back(kTrackTypeCC708);
+        }
+    }
+    UpdateATSCCaptionTracks();
 }
 
 void AvFormatDecoder::HandleGopStart(
@@ -3060,6 +3175,7 @@ void AvFormatDecoder::ProcessVBIDataPacket(
         buf += 43;
     }
     lastccptsu = utc;
+    UpdateCaptionTracksFromStreams(true, false);
 }
 
 /** \fn AvFormatDecoder::ProcessDVBDataPacket(const AVStream*, const AVPacket*)
@@ -4348,6 +4464,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                             }
                         }
                         lastccptsu = utc;
+                        UpdateCaptionTracksFromStreams(true, false);
                     }
 
                     VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);
