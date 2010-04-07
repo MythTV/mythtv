@@ -848,8 +848,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
             (mz_scale_v < kManualZoomMaxVerticalZoom))
         {
-            mz_scale_h *= 1.1f;
-            mz_scale_v *= 1.1f;
+            mz_scale_h *= 1.05f;
+            mz_scale_v *= 1.05f;
         }
         else
         {
@@ -863,8 +863,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
             (mz_scale_v > kManualZoomMinVerticalZoom))
         {
-            mz_scale_h *= 1.0f / 1.1f;
-            mz_scale_v *= 1.0f / 1.1f;
+            mz_scale_h *= 1.0f / 1.05f;
+            mz_scale_v *= 1.0f / 1.05f;
         }
         else
         {
@@ -878,8 +878,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h < kManualZoomMaxHorizontalZoom) &&
             (mz_scale_v > kManualZoomMinVerticalZoom))
         {
-            mz_scale_h *= 1.1f;
-            mz_scale_v *= 1.0 / 1.1f;
+            mz_scale_h *= 1.05f;
+            mz_scale_v *= 1.0 / 1.05f;
         }
     }
     else if (kZoomAspectDown == direction)
@@ -887,8 +887,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
         if ((mz_scale_h > kManualZoomMinHorizontalZoom) &&
             (mz_scale_v < kManualZoomMaxVerticalZoom))
         {
-            mz_scale_h *= 1.0 / 1.1f;
-            mz_scale_v *= 1.1f;
+            mz_scale_h *= 1.0 / 1.05f;
+            mz_scale_v *= 1.05f;
         }
     }
     else if (kZoomUp    == direction && (mz_move.y() <= +kManualZoomMaxMove))
@@ -900,8 +900,8 @@ void VideoOutWindow::Zoom(ZoomDirection direction)
     else if (kZoomRight == direction && (mz_move.x() >= -kManualZoomMaxMove))
         mz_move.setX(mz_move.x() - 2);
 
-    mz_scale_v = snap(mz_scale_v, 1.0f, 0.05f);
-    mz_scale_h = snap(mz_scale_h, 1.0f, 0.05f);
+    mz_scale_v = snap(mz_scale_v, 1.0f, 0.03f);
+    mz_scale_h = snap(mz_scale_h, 1.0f, 0.03f);
 }
 
 /// Correct for rounding errors
