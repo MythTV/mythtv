@@ -147,9 +147,9 @@ QStringList CardUtil::GetCardTypes(void)
  *  \param rawtype  Card type as used in DB or empty string for all cardids
  *  \param hostname Host to check, or empty string for current host
  */
-QStringVec CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
+QStringList CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
 {
-    QStringVec list;
+    QStringList list;
 
     if (hostname.isEmpty())
         hostname = gContext->GetHostName();
@@ -190,9 +190,9 @@ QStringVec CardUtil::GetVideoDevices(const QString &rawtype, QString hostname)
     return list;
 }
 
-QStringVec CardUtil::ProbeVideoDevices(const QString &rawtype)
+QStringList CardUtil::ProbeVideoDevices(const QString &rawtype)
 {
-    QStringVec devs;
+    QStringList devs;
 
     if (rawtype.toUpper() == "DVB")
     {

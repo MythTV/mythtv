@@ -1093,19 +1093,20 @@ class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
         clearSelections();
 
         // Get devices from filesystem
-        vector<QString> sdevs = CardUtil::ProbeVideoDevices("DVB");
+        QStringList sdevs = CardUtil::ProbeVideoDevices("DVB");
 
         // Add current if needed
-        if (!current.isEmpty() && (find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
+        if (!current.isEmpty() &&
+            (find(sdevs.begin(), sdevs.end(), current) == sdevs.end()))
         {
             stable_sort(sdevs.begin(), sdevs.end());
         }
 
-        vector<QString> db = CardUtil::GetVideoDevices("DVB");
+        QStringList db = CardUtil::GetVideoDevices("DVB");
 
         QMap<QString,bool> in_use;
         QString sel = current;
-        for (uint i = 0; i < sdevs.size(); i++)
+        for (uint i = 0; i < (uint)sdevs.size(); i++)
         {
             const QString dev = sdevs[i];
             in_use[sdevs[i]] = find(db.begin(), db.end(), dev) != db.end();
@@ -1119,7 +1120,7 @@ class DVBCardNum : public ComboBoxSetting, public CaptureCardDBStorage
         QString usestr = QString(" -- ");
         usestr += QObject::tr("Warning: already in use");
 
-        for (uint i = 0; i < sdevs.size(); i++)
+        for (uint i = 0; i < (uint)sdevs.size(); i++)
         {
             const QString dev = sdevs[i];
             QString desc = dev + (in_use[sdevs[i]] ? usestr : "");
@@ -1721,9 +1722,9 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
 
     // Find physical devices first
     // ProbeVideoDevices returns "deviceid ip" pairs
-    vector<QString> devs = CardUtil::ProbeVideoDevices("HDHOMERUN");
+    QStringList devs = CardUtil::ProbeVideoDevices("HDHOMERUN");
 
-    vector<QString>::iterator it;
+    QStringList::const_iterator it;
 
     for (it = devs.begin(); it != devs.end(); ++it)
     {
@@ -1754,7 +1755,7 @@ void HDHomeRunConfigurationGroup::FillDeviceList(void)
     // Now find configured devices
 
     // returns "xxxxxxxx-n" or "ip.ip.ip.ip-n" values
-    vector<QString> db = CardUtil::GetVideoDevices("HDHOMERUN");
+    QStringList db = CardUtil::GetVideoDevices("HDHOMERUN");
 
     for (it = db.begin(); it != db.end(); ++it)
     {

@@ -20,7 +20,6 @@ using namespace std;
 class InputInfo;
 class CardInput;
 typedef QMap<int,QString> InputNames;
-typedef vector<QString>   QStringVec;
 
 MPUBLIC QString get_on_cardid(const QString&, uint);
 
@@ -167,7 +166,7 @@ class MPUBLIC CardUtil
                                           QString hostname = QString::null);
     static QStringList  GetCardTypes(void); // card types on ALL hosts
 
-    static QStringVec   GetVideoDevices(const QString &rawtype,
+    static QStringList  GetVideoDevices(const QString &rawtype,
                                         QString hostname = QString::null);
 
     static QString      GetRawCardType(uint cardid)
@@ -245,7 +244,7 @@ class MPUBLIC CardUtil
     static vector<uint> GetCardList(void);
 
     // General info from OS
-    static QStringVec   ProbeVideoDevices(const QString &rawtype);
+    static QStringList  ProbeVideoDevices(const QString &rawtype);
 
     // Other
     static bool         CloneCard(uint src_cardid, uint dst_cardid);
