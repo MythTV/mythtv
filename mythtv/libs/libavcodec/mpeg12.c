@@ -2301,6 +2301,12 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
                 s->tmp_atsc_cc_len += cclen;
             }
         }
+        else if (user_data_type_code == 0x04) {
+            // additional CEA-608 data, as per SCTE 21
+        }
+        else if (user_data_type_code == 0x05) {
+            // luma PAM data, as per SCTE 21
+        }
         else if (user_data_type_code == 0x06) {
             // bar data (letterboxing info)
         }
@@ -2324,40 +2330,59 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         }
 
         if (dvb_cc_type == 0x02) { /* 2-byte caption, can be repeated */
+            int type = 0x00; // line 21 field 1 == 0x00, field 2 == 0x01
+            uint8_t cc608_hdr = 0xf8 | 0x04/*valid*/ | type;
             uint8_t hi = p[1] & 0xFF;
             uint8_t lo = p[2] & 0xFF;
 
             dvb_cc_type = p[3];
 
-            if ((2 <= buf_end - p) && ((2 + s->tmp_dvb_cc_len) < DVB_CC_BUF_SIZE)) {
-                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = hi;
-                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = lo;
+            if ((2 <= buf_end - p) && ((3 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&1/*cc_count*/);
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = hi;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = lo;
 
                 /* Only repeat characters when the next type flag
                  * is 0x04 and the characters are repeatable (i.e., less than
                  * 32 with the parity stripped).
                  */
                 if (dvb_cc_type == 0x04 && (hi & 0x7f) < 32) {
-                    if ((4 <= buf_end - p) &&
-                        ((4 + s->tmp_dvb_cc_len) < DVB_CC_BUF_SIZE)) {
-                        s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = hi;
-                        s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = lo;
+                    if ((2 <= buf_end - p) && ((3 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&1/*cc_count*/);
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = hi;
+                        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = lo;
                     }
                 }
             }
 
             p += 6;
         } else if (dvb_cc_type == 0x04) { /* 4-byte caption, not repeated */
-            if ((4 <= buf_end - p) && ((4 + s->tmp_dvb_cc_len) < DVB_CC_BUF_SIZE)) {
-                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = p[1] & 0xFF;
-                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = p[2] & 0xFF;
-                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = p[3] & 0xFF;
-                s->tmp_dvb_cc_buf[s->tmp_dvb_cc_len++] = p[4] & 0xFF;
+            if ((4 <= buf_end - p) &&
+                ((6 + s->tmp_atsc_cc_len) < ATSC_CC_BUF_SIZE)) {
+                int type = 0x00; // line 21 field 1 == 0x00, field 2 == 0x01
+                uint8_t cc608_hdr = 0xf8 | 0x04/*valid*/ | type;
+
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&2/*cc_count*/);
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[1] & 0xFF;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[2] & 0xFF;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[3] & 0xFF;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = p[4] & 0xFF;
             }
 
             p += 9;
         }
     }
+    // For other CEA-608 embedding options see:
+    /* SCTE 20 */
+    /* SCTE 21 */
+    /* ETSI EN 301 775 */
 }
 
 static void mpeg_decode_gop(AVCodecContext *avctx,

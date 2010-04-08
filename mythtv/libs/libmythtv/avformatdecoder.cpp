@@ -2711,8 +2711,11 @@ void decode_cc_dvd(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
     nd->UpdateCaptionTracksFromStreams(true, false);
 }
 
-void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
+void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len)
 {
+    if (!len)
+        return;
+
     // closed caption data
     //cc_data() {
     // reserved                1 0.0   1
@@ -2725,8 +2728,10 @@ void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf)
     //bool additional_data = buf[0] & 0x20;
     // cc_count                5 0.3   uimsbf
     uint cc_count = buf[0] & 0x1f;
-    // reserved                8 1.0   0xff
-    // em_data                 8 2.0
+    // em_data                 8 1.0
+
+    if (len < 2+(3*cc_count))
+        return;
 
     bool had_608 = false, had_708 = false;
     for (uint cur = 0; cur < cc_count; cur++)
@@ -4438,33 +4443,12 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         continue;
                     }
 
-                    // Decode ATSC captions
+                    // Decode CEA-608 and CEA-708 captions
                     for (uint i = 0; i < (uint)mpa_pic.atsc_cc_len;
                          i += ((mpa_pic.atsc_cc_buf[i] & 0x1f) * 3) + 2)
                     {
-                        DecodeDTVCC(mpa_pic.atsc_cc_buf + i);
-                    }
-
-                    // Decode DVB captions from MPEG user data
-                    if (mpa_pic.dvb_cc_len > 0)
-                    {
-                        unsigned long long utc = lastccptsu;
-
-                        for (uint i = 0; i < (uint)mpa_pic.dvb_cc_len; i += 2)
-                        {
-                            uint8_t cc_lo = mpa_pic.dvb_cc_buf[i];
-                            uint8_t cc_hi = mpa_pic.dvb_cc_buf[i+1];
-
-                            uint16_t cc_dt = (cc_hi << 8) | cc_lo;
-
-                            if (cc608_good_parity(cc608_parity_table, cc_dt))
-                            {
-                                ccd608->FormatCCField(utc/1000, 0, cc_dt);
-                                utc += 33367;
-                            }
-                        }
-                        lastccptsu = utc;
-                        UpdateCaptionTracksFromStreams(true, false);
+                        DecodeDTVCC(mpa_pic.atsc_cc_buf + i,
+                                    mpa_pic.atsc_cc_len - i);
                     }
 
                     VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);

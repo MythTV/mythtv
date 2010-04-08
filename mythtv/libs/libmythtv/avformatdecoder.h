@@ -181,7 +181,7 @@ class AvFormatDecoder : public DecoderBase
     friend int64_t seek_avf(URLContext *h, int64_t offset, int whence);
     friend int close_avf(URLContext *h);
 
-    void DecodeDTVCC(const uint8_t *buf);
+    void DecodeDTVCC(const uint8_t *buf, uint buf_size);
     void InitByteContext(void);
     void InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                         bool selectedStream = false);

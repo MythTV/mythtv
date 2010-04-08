@@ -924,18 +924,12 @@ typedef struct AVPanScan{
      */\
     void *hwaccel_picture_private;\
 \
-    /** ATSC CC data\
+    /** ATSC CC data CEA-608/708 \
      * - encoding: unused\
+     * - decoding: Set by libavcodec
      */\
     uint8_t atsc_cc_buf[1024];\
     int atsc_cc_len;\
-\
-    /** DVB CC data\
-     * - encoding: unused\
-     * - decoding: set by lavc\
-     */\
-    uint8_t dvb_cc_buf[128];\
-    int dvb_cc_len;\
 \
 
 #define FF_QSCALE_TYPE_MPEG1 0
