@@ -1,7 +1,7 @@
 /*
  * hdhomerun_device_selector.c
  *
- * Copyright © 2009-2010 Silicondust USA Inc. <www.silicondust.com>.
+ * Copyright © 2009 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -68,11 +68,6 @@ void hdhomerun_device_selector_destroy(struct hdhomerun_device_selector_t *hds, 
 	free(hds);
 }
 
-LIBTYPE int hdhomerun_device_selector_get_device_count(struct hdhomerun_device_selector_t *hds)
-{
-	return (int)hds->hd_count;
-}
-
 void hdhomerun_device_selector_add_device(struct hdhomerun_device_selector_t *hds, struct hdhomerun_device_t *hd)
 {
 	size_t index;
@@ -134,11 +129,11 @@ struct hdhomerun_device_t *hdhomerun_device_selector_find_device(struct hdhomeru
 	return NULL;
 }
 
-int hdhomerun_device_selector_load_from_file(struct hdhomerun_device_selector_t *hds, char *filename)
+void hdhomerun_device_selector_load_from_file(struct hdhomerun_device_selector_t *hds, char *filename)
 {
 	FILE *fp = fopen(filename, "r");
 	if (!fp) {
-		return 0;
+		return;
 	}
 
 	while(1) {
@@ -156,17 +151,16 @@ int hdhomerun_device_selector_load_from_file(struct hdhomerun_device_selector_t 
 	}
 
 	fclose(fp);
-	return (int)hds->hd_count;
 }
 
 #if defined(__WINDOWS__)
-int hdhomerun_device_selector_load_from_windows_registry(struct hdhomerun_device_selector_t *hds, wchar_t *wsource)
+void hdhomerun_device_selector_load_from_windows_registry(struct hdhomerun_device_selector_t *hds, wchar_t *wsource)
 {
 	HKEY tuners_key;
 	LONG ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Silicondust\\HDHomeRun\\Tuners", 0, KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS, &tuners_key);
 	if (ret != ERROR_SUCCESS) {
-		hdhomerun_debug_printf(hds->dbg, "hdhomerun_device_selector_load_from_windows_registry: failed to open tuners registry key (%ld)\n", (long)ret);
-		return 0;
+		hdhomerun_debug_printf(hds->dbg, "hdhomerun_device_selector_load_from_windows_registry: failed to open tuners registry key (%ld)\n", ret);
+		return;
 	}
 
 	DWORD index = 0;
@@ -183,7 +177,7 @@ int hdhomerun_device_selector_load_from_windows_registry(struct hdhomerun_device
 		HKEY device_key;
 		ret = RegOpenKeyEx(tuners_key, wdevice_name, 0, KEY_QUERY_VALUE, &device_key);
 		if (ret != ERROR_SUCCESS) {
-			hdhomerun_debug_printf(hds->dbg, "hdhomerun_device_selector_load_from_windows_registry: failed to open registry key for %S (%ld)\n", wdevice_name, (long)ret);
+			hdhomerun_debug_printf(hds->dbg, "hdhomerun_device_selector_load_from_windows_registry: failed to open registry key for %S (%ld)\n", wdevice_name, ret);
 			continue;
 		}
 
@@ -213,7 +207,6 @@ int hdhomerun_device_selector_load_from_windows_registry(struct hdhomerun_device
 	}
 
 	RegCloseKey(tuners_key);
-	return (int)hds->hd_count;
 }
 #endif
 
@@ -275,16 +268,21 @@ static bool_t hdhomerun_device_selector_choose_test(struct hdhomerun_device_sele
 	/*
 	 * Test local port.
 	 */
-	hdhomerun_sock_t test_sock = hdhomerun_sock_create_udp();
-	if (test_sock == HDHOMERUN_SOCK_INVALID) {
+	int test_sock = (int)socket(AF_INET, SOCK_DGRAM, 0);
+	if (test_sock == -1) {
 		hdhomerun_debug_printf(hds->dbg, "hdhomerun_device_selector_choose_test: device %s in use, failed to create test sock\n", name);
 		return FALSE;
 	}
 
-	bool_t inuse = (hdhomerun_sock_bind(test_sock, INADDR_ANY, (uint16_t)target_port) == FALSE);
-	hdhomerun_sock_destroy(test_sock);
+	struct sockaddr_in sock_addr;
+	memset(&sock_addr, 0, sizeof(sock_addr));
+	sock_addr.sin_family = AF_INET;
+	sock_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	sock_addr.sin_port = htons((uint16_t)target_port);
+	ret = bind(test_sock, (struct sockaddr *)&sock_addr, sizeof(sock_addr));
+	close(test_sock);
 
-	if (inuse) {
+	if (ret != 0) {
 		hdhomerun_debug_printf(hds->dbg, "hdhomerun_device_selector_choose_test: device %s in use by local machine\n", name);
 		return FALSE;
 	}
