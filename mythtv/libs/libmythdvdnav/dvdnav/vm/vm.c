@@ -698,12 +698,15 @@ int vm_get_current_title_part(vm_t *vm, int *title_result, int *part_result) {
  */
 int vm_get_audio_stream(vm_t *vm, int audioN) {
   int streamN = -1;
-  const uint AC3_OFFSET = 0x80;
-  const uint DTS_OFFSET = 0x88;
+  const uint AC3_OFFSET  = 0x80;
+  const uint DTS_OFFSET  = 0x88;
   const uint LPCM_OFFSET = 0xA0;
+  const uint MP2_OFFSET  = 0xC0;
 
   int stream_id = audioN;
-  if (stream_id >= LPCM_OFFSET) {
+  if (stream_id >= MP2_OFFSET) {
+    stream_id -= MP2_OFFSET;
+  } else if (stream_id >= LPCM_OFFSET) {
     stream_id -= LPCM_OFFSET;
   } else if (stream_id >= DTS_OFFSET) {
     stream_id -= DTS_OFFSET;
