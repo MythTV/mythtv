@@ -452,12 +452,7 @@ void ProgramRecPriority::Load(void)
 
 void ProgramRecPriority::Init(void)
 {
-    MythUIButtonListItem *item = m_programList->GetItemCurrent();
-
-    if (item)
-        m_currentItem = qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
-
-    UpdateList();
+    SortList();
 }
 
 bool ProgramRecPriority::keyPressEvent(QKeyEvent *event)
@@ -1254,8 +1249,6 @@ void ProgramRecPriority::FillList(void)
             }
         } while (result.next());
     }
-
-    SortList();
 }
 
 void ProgramRecPriority::countMatches()
@@ -1291,6 +1284,11 @@ void ProgramRecPriority::countMatches()
 
 void ProgramRecPriority::SortList()
 {
+    MythUIButtonListItem *item = m_programList->GetItemCurrent();
+
+    if (item)
+        m_currentItem = qVariantValue<ProgramRecPriorityInfo*>(item->GetData());
+
     int i, j;
     vector<RecPriorityInfo> sortingList;
     QMap<QString, ProgramRecPriorityInfo>::Iterator pit;
@@ -1379,6 +1377,8 @@ void ProgramRecPriority::SortList()
 
         m_sortedProgram[QString::number(999-i)] = &(*pit);
     }
+
+    UpdateList();
 }
 
 void ProgramRecPriority::UpdateList()
