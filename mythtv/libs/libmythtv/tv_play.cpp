@@ -4256,9 +4256,6 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
             }
         }
     }
-    else if (!isDVDStill && SeekHandleAction(ctx, actions, isDVD))
-    {
-    }
     else if (has_action("JUMPRWND", actions))
     {
         if (isDVD)
@@ -4446,6 +4443,9 @@ bool TV::ActiveHandleAction(PlayerContext *ctx,
         }
         else
             ToggleOSD(ctx, true);
+    }
+    else if (!isDVDStill && SeekHandleAction(ctx, actions, isDVD))
+    {
     }
     else
     {
