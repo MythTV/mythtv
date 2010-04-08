@@ -125,7 +125,7 @@ class UPNP_PUBLIC UPnp
                  UPnp();
         virtual ~UPnp();
 
-        void SetConfiguration( Configuration *pConfig );
+        static void SetConfiguration( Configuration *pConfig );
 
         bool Initialize( int nServicePort, HttpServer *pHttpServer );
         bool Initialize( QStringList &sIPAddrList, int nServicePort, HttpServer *pHttpServer );
