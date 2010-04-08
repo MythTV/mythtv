@@ -2,6 +2,7 @@
 using namespace std;
 
 #include <QFile>
+#include <QSize>
 
 #include "mythcommandlineparser.h"
 #include "exitcodes.h"
@@ -10,9 +11,41 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythversion.h"
 
-MythCommandLineParser::MythCommandLineParser(int things_to_parse) :
+static bool parse_preview_info(
+    const QString &param,
+    long long     &previewFrameNumber,
+    long long     &previewSeconds,
+    QSize         &previewSize);
+
+MythCommandLineParser::MythCommandLineParser(uint64_t things_to_parse) :
     parseTypes(things_to_parse),
-    display(QString::null), geometry(QString::null),
+    display(), geometry(),
+    logfile(),
+    pidfile(),
+    infile(),
+    outfile(),
+    newverbose(),
+    username(),
+    printexpire(),
+    eventString(),
+    previewSize(0,0),
+    starttime(),
+    chanid(0),
+    previewFrameNumber(-2),
+    previewSeconds(-2),
+    daemonize(false),
+    printsched(false),
+    testsched(false),
+    setverbose(false),
+    resched(false),
+    nosched(false),
+    noupnp(false),
+    nojobqueue(false),
+    nohousekeeper(false),
+    noexpirer(false),
+    clearsettingscache(false),
+    wantupnprebuild(false),
+
     wantsToExit(false)
 {
 }
@@ -21,6 +54,8 @@ bool MythCommandLineParser::PreParse(
     int argc, const char * const * argv, int &argpos, bool &err)
 {
     err = false;
+
+    binname = basename(argv[0]);
 
     if (argpos >= argc)
         return false;
@@ -95,14 +130,29 @@ bool MythCommandLineParser::PreParse(
         }
         return true;
     }
+    else if ((parseTypes & kCLPSetVerbose) &&
+             !strcmp(argv[argpos],"--setverbose"))
+    {
+        setverbose = true;
+        if ((argc - 1) > argpos)
+        {
+            newverbose = argv[argpos+1];
+            ++argpos;
+        }
+        else
+        {
+            cerr << "Missing argument to --setverbose option\n";
+            return BACKEND_EXIT_INVALID_CMDLINE;
+        }
+    }
     else if ((parseTypes & kCLPHelp) &&
              (!strcmp(argv[argpos],"-h") ||
               !strcmp(argv[argpos],"--help") ||
               !strcmp(argv[argpos],"--usage")))
     {
-        QString help = GetHelpString(false);
+        QString help = GetHelpString(true);
         QByteArray ahelp = help.toLocal8Bit();
-        cerr << ahelp.constData();
+        cout << ahelp.constData();
         wantsToExit = true;
         return true;
     }
@@ -152,6 +202,73 @@ bool MythCommandLineParser::Parse(
               !strcmp(argv[argpos],"--no-windowed")))
     {
         settingsOverride["RunFrontendInWindow"] = "0";
+        return true;
+    }
+    else if ((parseTypes & kCLPDaemon) &&
+             (!strcmp(argv[argpos],"-d") ||
+              !strcmp(argv[argpos],"--daemon")))
+    {
+        daemonize = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPPrintSchedule) &&
+             !strcmp(argv[argpos],"--printsched"))
+    {
+        printsched = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPTestSchedule) &&
+             !strcmp(argv[argpos],"--testsched"))
+    {
+        testsched = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPReschedule) &&
+             !strcmp(argv[argpos],"--resched"))
+    {
+        resched = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPNoSchedule) &&
+             !strcmp(argv[argpos],"--nosched"))
+    {
+        nosched = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPNoUPnP) &&
+             !strcmp(argv[argpos],"--noupnp"))
+    {
+        noupnp = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPUPnPRebuild) &&
+             !strcmp(argv[argpos],"--upnprebuild"))
+    {
+        wantupnprebuild = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPNoJobqueue) &&
+             !strcmp(argv[argpos],"--nojobqueue"))
+    {
+        nojobqueue = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPNoHousekeeper) &&
+             !strcmp(argv[argpos],"--nohousekeeper"))
+    {
+        nohousekeeper = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPNoAutoExpire) &&
+             !strcmp(argv[argpos],"--noautoexpire"))
+    {
+        noexpirer = true;
+        return true;
+    }
+    else if ((parseTypes && kCLPClearCache) &&
+             !strcmp(argv[argpos],"--clearcache"))
+    {
+        clearsettingscache = true;
         return true;
     }
     else if ((parseTypes & kCLPOverrideSettingsFile) &&
@@ -252,7 +369,7 @@ bool MythCommandLineParser::Parse(
             QString tmpArg = argv[argpos+1];
             if (tmpArg.startsWith("-"))
             {
-                cerr << "Invalid or missing argument to "
+                cerr << "Invalid argument to "
                      << "-G/--get-setting option\n";
                 err = true;
                 return true;
@@ -262,13 +379,264 @@ bool MythCommandLineParser::Parse(
         }
         else
         {
-            cerr << "Invalid or missing argument to "
+            cerr << "Missing argument to "
                  << "-G/--get-setting option\n";
             err = true;
             return true;
         }
 
         ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPLogFile) &&
+             (!strcmp(argv[argpos],"-l") ||
+              !strcmp(argv[argpos],"--logfile")))
+    {
+        if ((argc - 1) > argpos)
+        {
+            logfile = argv[argpos+1];
+            if (logfile.startsWith("-"))
+            {
+                cerr << "Invalid argument to -l/--logfile option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to -l/--logfile option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPPidFile) &&
+             (!strcmp(argv[argpos],"-p") ||
+              !strcmp(argv[argpos],"--pidfile")))
+    {
+        if ((argc - 1) > argpos)
+        {
+            pidfile = argv[argpos+1];
+            if (pidfile.startsWith("-"))
+            {
+                cerr << "Invalid argument to -p/--pidfile option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to -p/--pidfile option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPInFile) &&
+             !strcmp(argv[argpos],"--infile"))
+    {
+        if ((argc - 1) > argpos)
+        {
+            infile = argv[argpos+1];
+            if (infile.startsWith("-"))
+            {
+                cerr << "Invalid argument to --infile option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to --infile option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPOutFile) &&
+             !strcmp(argv[argpos],"--outfile"))
+    {
+        if ((argc - 1) > argpos)
+        {
+            outfile = argv[argpos+1];
+            if (outfile.startsWith("-"))
+            {
+                cerr << "Invalid argument to --outfile option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to --outfile option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPUsername) &&
+             !strcmp(argv[argpos],"--user"))
+    {
+        if ((argc - 1) > argpos)
+        {
+            username = argv[argpos+1];
+            if (username.startsWith("-"))
+            {
+                cerr << "Invalid argument to --user option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to --user option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPEvent) &&
+             (!strcmp(argv[argpos],"--event")))
+    {
+        if ((argc - 1) > argpos)
+        {
+            eventString = argv[argpos+1];
+            if (eventString.startsWith("-"))
+            {
+                cerr << "Invalid argument to --event option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to --event option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPSystemEvent) &&
+             (!strcmp(argv[argpos],"--systemevent")))
+    {
+        if ((argc - 1) > argpos)
+        {
+            eventString = argv[argpos+1];
+            if (eventString.startsWith("-"))
+            {
+                cerr << "Invalid argument to --systemevent option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to --systemevent option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPChannelId) &&
+             (!strcmp(argv[argpos],"-c") ||
+              !strcmp(argv[argpos],"--chanid")))
+    {
+        if ((argc - 1) > argpos)
+        {
+            chanid = QString(argv[argpos+1]).toUInt();
+            if (!chanid)
+            {
+                cerr << "Invalid argument to -c/--chanid option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to -c/--chanid option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPStartTime) &&
+             (!strcmp(argv[argpos],"-s") ||
+              !strcmp(argv[argpos],"--starttime")))
+    {
+        if ((argc - 1) > argpos)
+        {
+            QString tmp = argv[argpos+1];
+            starttime = QDateTime::fromString(tmp, Qt::ISODate);
+            if (!starttime.isValid())
+            {
+                cerr << "Invalid argument to -s/--starttime option\n";
+                err = true;
+                return true;
+            }
+        }
+        else
+        {
+            cerr << "Missing argument to -s/--starttime option\n";
+            err = true;
+            return true;
+        }
+
+        ++argpos;
+        return true;
+    }
+    else if ((parseTypes & kCLPPrintExpire) &&
+             (!strcmp(argv[argpos],"--printexpire")))
+    {
+        printexpire = "ALL";
+        if (((argc - 1) > argpos) &&
+            QString(argv[argpos+1]).startsWith("-"))
+        {
+            printexpire = argv[argpos+1];
+            ++argpos;
+        }
+        return true;
+    }
+    else if ((parseTypes & kCLPGeneratePreview) &&
+             !strcmp(argv[argpos],"--generate-preview"))
+    {
+        QString tmp;
+        if ((argc - 1) < argpos)
+        {
+            tmp = argv[argpos+1];
+            bool ok = true;
+            if (tmp.left(1) == "-")
+                tmp.left(2).toInt(&ok);
+            if (ok)
+                argpos++;
+            else
+                tmp.clear();
+        }
+
+        if (!parse_preview_info(tmp, previewFrameNumber, previewSeconds,
+                                previewSize))
+        {
+            cerr << "Unable to parse --generate-preview option '"
+                 << tmp.toAscii().constData() << "'" << endl;
+
+            err = true;
+        }
+
         return true;
     }
     else
@@ -283,7 +651,38 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
     QTextStream msg(&str, QIODevice::WriteOnly);
 
     if (with_header)
+    {
+        extern const char *myth_source_version;
+        extern const char *myth_source_path;
+        QString versionStr = QString("%1 version: %2 [%3] www.mythtv.org")
+            .arg(binname).arg(myth_source_path).arg(myth_source_version);
+        msg << versionStr << endl;
         msg << "Valid options are: " << endl;
+    }
+
+    if (parseTypes & kCLPHelp)
+    {
+        msg << "-h or --help                   "
+            << "List valid command line parameters" << endl;
+    }
+
+    if (parseTypes & kCLPLogFile)
+    {
+        msg << "-l or --logfile filename       "
+            << "Writes STDERR and STDOUT messages to filename" << endl;
+    }
+
+    if (parseTypes & kCLPPidFile)
+    {
+        msg << "-p or --pidfile filename       "
+            << "Write PID of mythbackend to filename" << endl;
+    }
+
+    if (parseTypes & kCLPDaemon)
+    {
+        msg << "-d or --daemon                 "
+            << "Runs program as a daemon" << endl;
+    }
 
     if (parseTypes & kCLPDisplay)
     {
@@ -345,7 +744,189 @@ QString MythCommandLineParser::GetHelpString(bool with_header) const
         msg << "-v or --verbose debug-level    Use '-v help' for level info" << endl;
     }
 
+    if (parseTypes & kCLPSetVerbose)
+    {
+        msg << "--setverbose debug-level       "
+            << "Change debug level of running master backend" << endl;
+    }
+
+    if (parseTypes & kCLPUsername)
+    {
+        msg << "--user username                "
+            << "Drop permissions to username after starting"  << endl;
+    }
+
+    if (parseTypes & kCLPPrintExpire)
+    {
+        msg << "--printexpire                  "
+            << "List of auto-expire programs" << endl;
+    }
+
+    if (parseTypes & kCLPPrintSchedule)
+    {
+        msg << "--printsched                   "
+            << "Upcoming scheduled programs" << endl;
+    }
+
+    if (parseTypes & kCLPTestSchedule)
+    {
+        msg << "--testsched                    "
+            << "Test run scheduler (ignore existing schedule)" << endl;
+    }
+
+    if (parseTypes & kCLPReschedule)
+    {
+        msg << "--resched                      "
+            << "Force the scheduler to update" << endl;
+    }
+
+    if (parseTypes & kCLPNoSchedule)
+    {
+        msg << "--nosched                      "
+            << "Do not perform any scheduling" << endl;
+    }
+
+    if (parseTypes & kCLPNoUPnP)
+    {
+        msg << "--noupnp                       "
+            << "Do not enable the UPNP server" << endl;
+    }
+
+    if (parseTypes & kCLPNoJobqueue)
+    {
+        msg << "--nojobqueue                   "
+            << "Do not start the JobQueue" << endl;
+    }
+
+    if (parseTypes & kCLPNoHousekeeper)
+    {
+        msg << "--nohousekeeper                "
+            << "Do not start the Housekeeper" << endl;
+    }
+
+    if (parseTypes & kCLPNoAutoExpire)
+    {
+        msg << "--noautoexpire                 "
+            << "Do not start the AutoExpire thread" << endl;
+    }
+
+    if (parseTypes & kCLPClearCache)
+    {
+        msg << "--clearcache                   "
+            << "Clear the settings cache on all myth servers" << endl;
+    }
+
+    if (parseTypes & kCLPGeneratePreview)
+    {
+        msg << "--generate-preview             "
+            << "Generate a preview image" << endl;
+    }
+
+    if (parseTypes & kCLPUPnPRebuild)
+    {
+        msg << "--upnprebuild                  "
+            << "Force an update of UPNP media" << endl;
+    }
+
+    if (parseTypes & kCLPInFile)
+    {
+        msg << "--infile                       "
+            << "Input file for preview generation" << endl;
+    }
+
+    if (parseTypes & kCLPOutFile)
+    {
+        msg << "--outfile                      "
+            << "Optional output file for preview generation" << endl;
+    }
+
+    if (parseTypes & kCLPChannelId)
+    {
+        msg << "--chanid                       "
+            << "Channel ID for preview generation" << endl;
+    }
+
+    if (parseTypes & kCLPStartTime)
+    {
+        msg << "--starttime                    "
+            << "Recording start time for preview generation" << endl;
+    }
+
+    if (parseTypes & kCLPEvent)
+    {
+        msg << "--event EVENTTEXT              "
+            << "Send a backend event test message" << endl;
+    }
+
+    if (parseTypes & kCLPSystemEvent)
+    {
+        msg << "--systemevent EVENTTEXT        "
+            << "Send a backend SYSTEM_EVENT test message" << endl;
+    }
+
     msg.flush();
 
     return str;
+}
+
+// [WxH] | [WxH@]seconds[S] | [WxH@]frame_numF
+static bool parse_preview_info(
+    const QString &param,
+    long long     &previewFrameNumber,
+    long long     &previewSeconds,
+    QSize         &previewSize)
+{
+    previewFrameNumber = -1;
+    previewSeconds = -1;
+    previewSize = QSize(0,0);
+    if (param.isEmpty())
+        return true;
+
+    int xat = param.indexOf("x", 0, Qt::CaseInsensitive);
+    int aat = param.indexOf("@", 0);
+    if (xat > 0)
+    {
+        QString widthStr  = param.left(xat);
+        QString heightStr;
+        if (aat > xat)
+            heightStr = param.mid(xat + 1, aat - xat - 1);
+        else
+            heightStr = param.mid(xat + 1);
+
+        bool ok1, ok2;
+        previewSize = QSize(widthStr.toInt(&ok1), heightStr.toInt(&ok2));
+        if (!ok1 || !ok2)
+        {
+            VERBOSE(VB_IMPORTANT, QString(
+                        "Error: Failed to parse --generate-preview "
+                        "param '%1'").arg(param));
+        }
+    }
+    if ((xat > 0) && (aat < xat))
+        return true;
+
+    QString lastChar = param.at(param.length() - 1).toLower();
+    QString frameNumStr;
+    QString secsStr;
+    if (lastChar == "f")
+        frameNumStr = param.mid(aat + 1, param.length() - aat - 2);
+    else if (lastChar == "s")
+        secsStr = param.mid(aat + 1, param.length() - aat - 2);
+    else
+        secsStr = param.mid(aat + 1, param.length() - aat - 1);
+
+    bool ok = false;
+    if (!frameNumStr.isEmpty())
+        previewFrameNumber = frameNumStr.toUInt(&ok);
+    else if (!secsStr.isEmpty())
+        previewSeconds = secsStr.toUInt(&ok);
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Error: Failed to parse --generate-preview "
+                    "param '%1'").arg(param));
+    }
+
+    return ok;
 }
