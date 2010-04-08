@@ -90,8 +90,8 @@ extern LIBTYPE uint32_t hdhomerun_device_get_device_id_requested(struct hdhomeru
 extern LIBTYPE uint32_t hdhomerun_device_get_device_ip_requested(struct hdhomerun_device_t *hd);
 extern LIBTYPE unsigned int hdhomerun_device_get_tuner(struct hdhomerun_device_t *hd);
 
-extern LIBTYPE int hdhomerun_device_set_device(struct hdhomerun_device_t *hd, uint32_t device_id, uint32_t device_ip);
-extern LIBTYPE int hdhomerun_device_set_tuner(struct hdhomerun_device_t *hd, unsigned int tuner);
+extern LIBTYPE void hdhomerun_device_set_device(struct hdhomerun_device_t *hd, uint32_t device_id, uint32_t device_ip);
+extern LIBTYPE void hdhomerun_device_set_tuner(struct hdhomerun_device_t *hd, unsigned int tuner);
 extern LIBTYPE int hdhomerun_device_set_tuner_from_str(struct hdhomerun_device_t *hd, const char *tuner_str);
 
 /*
@@ -148,9 +148,10 @@ extern LIBTYPE int hdhomerun_device_set_tuner_filter(struct hdhomerun_device_t *
 extern LIBTYPE int hdhomerun_device_set_tuner_filter_by_array(struct hdhomerun_device_t *hd, unsigned char filter_array[0x2000]);
 extern LIBTYPE int hdhomerun_device_set_tuner_program(struct hdhomerun_device_t *hd, const char *program);
 extern LIBTYPE int hdhomerun_device_set_tuner_target(struct hdhomerun_device_t *hd, const char *target);
+extern LIBTYPE int hdhomerun_device_set_tuner_target_to_local_protocol(struct hdhomerun_device_t *hd, const char *protocol);
+extern LIBTYPE int hdhomerun_device_set_tuner_target_to_local(struct hdhomerun_device_t *hd);
 extern LIBTYPE int hdhomerun_device_set_ir_target(struct hdhomerun_device_t *hd, const char *target);
 extern LIBTYPE int hdhomerun_device_set_lineup_location(struct hdhomerun_device_t *hd, const char *location);
-extern LIBTYPE int hdhomerun_device_set_sys_dvbc_modulation(struct hdhomerun_device_t *hd, const char *modulation_list);
 
 /*
  * Get/set a named control variable on the device.
@@ -223,6 +224,7 @@ extern LIBTYPE int hdhomerun_device_wait_for_lock(struct hdhomerun_device_t *hd,
  * The hdhomerun_device_stream_stop function tells the device to stop streaming data.
  */
 extern LIBTYPE int hdhomerun_device_stream_start(struct hdhomerun_device_t *hd);
+extern LIBTYPE int hdhomerun_device_stream_refresh_target(struct hdhomerun_device_t *hd);
 extern LIBTYPE uint8_t *hdhomerun_device_stream_recv(struct hdhomerun_device_t *hd, size_t max_size, size_t *pactual_size);
 extern LIBTYPE void hdhomerun_device_stream_flush(struct hdhomerun_device_t *hd);
 extern LIBTYPE void hdhomerun_device_stream_stop(struct hdhomerun_device_t *hd);
@@ -234,6 +236,17 @@ extern LIBTYPE int hdhomerun_device_channelscan_init(struct hdhomerun_device_t *
 extern LIBTYPE int hdhomerun_device_channelscan_advance(struct hdhomerun_device_t *hd, struct hdhomerun_channelscan_result_t *result);
 extern LIBTYPE int hdhomerun_device_channelscan_detect(struct hdhomerun_device_t *hd, struct hdhomerun_channelscan_result_t *result);
 extern LIBTYPE uint8_t hdhomerun_device_channelscan_get_progress(struct hdhomerun_device_t *hd);
+
+/*
+ * Check that the device is running the recommended firmware.
+ *
+ * uint32_t features: Reserved for future use. Set to zero.
+ *
+ * Returns 1 if the firmware meets the minimum requriements for all operations.
+ * Returns 0 if th firmware does not meet the minimum requriements for all operations.
+ * Returns -1 if an error occurs.
+ */
+extern LIBTYPE int hdhomerun_device_firmware_version_check(struct hdhomerun_device_t *hd, uint32_t features);
 
 /*
  * Upload new firmware to the device.
