@@ -315,8 +315,8 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         return;
     }
 
-    QString dateFormat = gContext->GetSetting("DateFormat", "ddd - dd/MM");
-    QString timeFormat = gContext->GetSetting("TimeFormat", "hh:mm:ss");
+    QString dateFormat = gContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
+    QString timeFormat = gContext->GetSetting("ZoneMinderTimeFormat", "hh:mm:ss");
 
     QStringList::Iterator it = strList.begin();
     it++; it++;

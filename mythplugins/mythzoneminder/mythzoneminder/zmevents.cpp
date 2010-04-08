@@ -363,7 +363,7 @@ void ZMEvents::getDateList(void)
 
         zm->getEventDates(monitorName, m_oldestFirst, m_dateList);
 
-        QString dateFormat = gContext->GetSetting("DateFormat", "ddd - dd/MM");
+        QString dateFormat = gContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
 
         new MythUIButtonListItem(m_dateSelector, tr("All Dates"));
 
