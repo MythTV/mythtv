@@ -787,6 +787,13 @@ QString MythThemedMenu::findMenuFile(const QString &menuname)
     else
         VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
 
+    testdir = GetShareDir() + "themes/defaultmenu/" + menuname;
+    file.setFileName(testdir);
+    if (file.exists())
+        return testdir;
+    else
+        VERBOSE(VB_FILE+VB_EXTRA, "No menu file " + testdir);
+
     return QString();
 }
 
