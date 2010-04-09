@@ -56,8 +56,8 @@ using namespace std;
 #define LOC_ERR  QString("MythBackend, Error: ")
 
 #ifdef Q_OS_MACX 
-    // 10.6 uses handle 3 for its new Grand Central Dispatch thingy 
-    #define UNUSED_FILENO 4  
+    // 10.6 uses some file handles for its new Grand Central Dispatch thingy 
+    #define UNUSED_FILENO 5
 #else 
     #define UNUSED_FILENO 3 
 #endif
