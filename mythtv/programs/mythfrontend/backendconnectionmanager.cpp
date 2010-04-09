@@ -6,6 +6,9 @@
 #include <QTimer>
 
 #include "mythcontext.h"
+#include "mythdialogbox.h"
+#include "mythscreenstack.h"
+#include "mythmainwindow.h"
 #include "exitcodes.h"
 #include "util.h" // for checkTimeZone()
 #include "backendconnectionmanager.h"
@@ -82,7 +85,25 @@ void BackendConnectionManager::customEvent(QEvent *event)
                 VERBOSE(VB_IMPORTANT,
                         "Unable to run with invalid time settings. "
                         "Exiting.");
-                qApp->exit(FRONTEND_EXIT_INVALID_TIMEZONE);
+                MythScreenStack *popupStack = GetMythMainWindow()->
+                                                 GetStack("popup stack");
+                QString message = tr("Your frontend and backend are configured "
+                                     "in different timezones.  You must correct "
+                                     "this mismatch to continue.");
+                MythConfirmationDialog *error =  new MythConfirmationDialog(
+                                                     popupStack, message, false);
+                if (error->Create())
+                {
+                    QObject::connect(error, SIGNAL(haveResult(bool)), 
+                                     qApp, SLOT(quit()));
+                    popupStack->AddScreen(error);
+                }
+                else
+                {
+                    delete error;
+                    delete popupStack;
+                    qApp->exit(FRONTEND_EXIT_INVALID_TIMEZONE);
+                }
             }
             m_first_time = false;
         }
