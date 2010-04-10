@@ -22,6 +22,7 @@ using namespace std;
 #include "util.h"
 #include "transcode.h"
 #include "mpeg2fix.h"
+#include "remotefile.h"
 
 void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
@@ -730,92 +731,26 @@ int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
     return 0;
 }
 
-int slowDelete(QString filename)
+int transUnlink(QString filename, ProgramInfo *pginfo)
 {
-    bool inBackground = true;
-    int increment =
-        gContext->GetNumSetting("TruncateIncrement", 10 * 1024 * 1024);
-    QByteArray fname = filename.toLocal8Bit();
-    QString msg = QString("Error Truncating '%1'").arg(fname.constData());
-
-    QFileInfo info(filename);
-    long long fsize = info.size();
-    if (fsize <= increment)
+    if (pginfo != NULL && !pginfo->storagegroup.isEmpty() &&
+        !pginfo->hostname.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, msg + " could not determine size of "
-                "the file, unlinking immediately.");
-        return unlink(fname.constData());
-    }
-
-    int fd = open(fname.constData(), O_WRONLY);
-    if (fd == -1)
-    {
-        VERBOSE(VB_IMPORTANT, msg + " could not open " + ENO +
-                ", unlinking immediately.");
-        return unlink(fname.constData());
-    }
-
-    if (unlink(fname.constData()))
-    {
-        close(fd);
-        VERBOSE(VB_IMPORTANT, msg + " could not unlink " + ENO);
-        return unlink(fname.constData());
-    }
-
-    VERBOSE(VB_FILE, QString("Truncating %1.").arg(filename));
-
-#ifndef USING_MINGW
-    pid_t child = fork();
-
-    if (child > 0)
-    {
-        VERBOSE(VB_FILE,
-                QString("Truncating %1 in the background.").arg(filename));
-        close(fd);
-        return 0;
-    }
-    else if (child < 0)
-    {
-        inBackground = false;
-        VERBOSE(VB_IMPORTANT,
-                QString("Fork() failed, truncating %1 in the foreground.")
-                        .arg(filename));
-    }
-#else
-    inBackground = false;
-#endif
-
-    while (fsize > 0) {
-        int err = ftruncate(fd, fsize);
-
-        if (err) {
-            if (inBackground)
-                exit(1);
-            else
-                VERBOSE(VB_IMPORTANT, QString("ERROR truncating %1, file "
-                                      "immediately removed.").arg(filename));
+        QString ip = gContext->GetSettingOnHost("BackendServerIP",
+                                                pginfo->hostname);
+        QString port = gContext->GetSettingOnHost("BackendServerPort",
+                                                  pginfo->hostname);
+        QString basename = filename.section('/', -1);
+        QString uri = QString("myth://%1@%2:%3/%4").arg(pginfo->storagegroup)
+                              .arg(ip).arg(port).arg(basename);
+        VERBOSE(VB_IMPORTANT, QString("Requesting delete for file '%1'.")
+                                      .arg(uri));
+        bool ok = RemoteFile::DeleteFile(uri);
+        if (ok)
             return 0;
-        }
-
-        fsize -= increment;
-
-        usleep(500000);
     }
 
-    if (inBackground)
-        exit(0);
-    else
-        VERBOSE(VB_IMPORTANT,
-                QString("Finished truncating %1.").arg(filename));
-
-    return 0;
-}
-
-int transUnlink(QString filename)
-{
-    if (gContext->GetNumSetting("TruncateDeletesSlowly", 0))
-        return slowDelete(filename);
-
+    VERBOSE(VB_IMPORTANT, QString("Deleting file '%1'.").arg(filename));
     return unlink(filename.toLocal8Bit().constData());
 }
 
@@ -884,7 +819,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             {
                 QString link = getSymlinkTarget(oldfile);
                 QByteArray alink = link.toLocal8Bit();
-                err = transUnlink(alink.constData());
+                err = transUnlink(alink.constData(), pginfo);
 
                 if (err)
                 {
@@ -907,7 +842,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
             }
             else
             {
-                if ((err = transUnlink(aoldfile.constData())))
+                if ((err = transUnlink(aoldfile.constData(), pginfo)))
                     VERBOSE(VB_IMPORTANT, QString(
                             "mythtranscode: Error deleting '%1', %2")
                             .arg(oldfile).arg(strerror(errno)));
@@ -936,7 +871,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
                 const QString oldfileop = QString("%1/%2")
                     .arg(fInfo.path()).arg(dir[nIdx]);
                 const QByteArray aoldfileop = oldfileop.toLocal8Bit();
-                transUnlink(aoldfileop.constData());
+                transUnlink(aoldfileop.constData(), pginfo);
             }
         }
 
@@ -1028,7 +963,7 @@ void CompleteJob(int jobID, ProgramInfo *pginfo, bool useCutlist, int &resultCod
         QString filename_tmp = filename + ".tmp";
         QByteArray fname_tmp = filename_tmp.toLocal8Bit();
         VERBOSE(VB_IMPORTANT, QString("Deleting %1").arg(filename_tmp));
-        transUnlink(fname_tmp.constData());
+        transUnlink(fname_tmp.constData(), pginfo);
 
         QString filename_map = filename + ".tmp.map";
         QByteArray fname_map = filename_map.toLocal8Bit();

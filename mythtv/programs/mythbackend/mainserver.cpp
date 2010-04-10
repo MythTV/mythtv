@@ -1958,9 +1958,6 @@ bool MainServer::TruncateAndClose(ProgramInfo *pginfo, int fd,
     const size_t tps = max(min_tps, calc_tps);
     const size_t increment  = (size_t) (tps * (sleep_time * 0.001f));
 
-    // Save this for mythtranscode's use
-    gContext->SaveSetting("TruncateIncrement", increment);
-
     VERBOSE(VB_FILE,
             QString("Truncating '%1' by %2 MB every %3 milliseconds")
             .arg(filename)
