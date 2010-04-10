@@ -78,6 +78,7 @@ int main(int argc, char **argv)
 {
     bool cmdline_err;
     MythCommandLineParser cmdline(
+        kCLPDaemon               |
         kCLPHelp                 |
         kCLPOverrideSettingsFile |
         kCLPOverrideSettings     |
