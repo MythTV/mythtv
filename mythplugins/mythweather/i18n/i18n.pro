@@ -10,6 +10,7 @@ trans.files += mythweather_da.qm mythweather_pt.qm mythweather_sv.qm
 trans.files += mythweather_de.qm mythweather_ja.qm mythweather_it.qm
 trans.files += mythweather_fr.qm mythweather_sl.qm mythweather_fi.qm
 trans.files += mythweather_ru.qm mythweather_cs.qm mythweather_hu.qm
+trans.files += mythweather_et.qm
 
 INSTALLS += trans
 

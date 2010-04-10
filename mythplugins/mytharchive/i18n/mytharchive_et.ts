@@ -1,85 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="et_EE">
 <context>
     <name>ArchiveFileSelector</name>
     <message>
         <source>Find File To Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali importimiseks fail</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Järgmine</translation>
+        <translation>Järgmine</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Eelmine</translation>
+        <translation>Eelmine</translation>
     </message>
     <message>
         <source>Back</source>
-        <translation type="unfinished">Tagasi</translation>
+        <translation>Tagasi</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation type="unfinished">Algusesse</translation>
+        <translation>Algusesse</translation>
     </message>
     <message>
         <source>The selected item is not a valid archive file!</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitud vail pole arhiivifail!</translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Cancel</source>
-        <translation>Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Valmis</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>ExportNative</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Lõpeta</translation>
+        <translation>Lõpeta</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Eelmine</translation>
+        <translation>Eelmine</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisa salvestis</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisa video</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Pead arhiveerimiseks midagi valima!</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Eemalda element</translation>
+        <translation>Eemalda element</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sul pole ühtegi videot!</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menüü</translation>
     </message>
 </context>
 <context>
@@ -90,7 +90,7 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Back</source>
@@ -106,61 +106,61 @@
     </message>
     <message>
         <source>Find File</source>
-        <translation type="unfinished"></translation>
+        <translation>Otsi faili</translation>
     </message>
     <message>
         <source>Find Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Otsi kausta</translation>
     </message>
     <message>
         <source>Find Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Otsi faile</translation>
     </message>
 </context>
 <context>
     <name>ImportNative</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Lõpeta</translation>
+        <translation>Lõpeta</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Eelmine</translation>
+        <translation>Eelmine</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>You need to select a valid chanID!</source>
-        <translation type="unfinished">Sa pead valima sobiva kanali!</translation>
+        <translation>Sa pead valima sobiva kanali!</translation>
     </message>
     <message>
         <source>It was not possible to import the Archive.  An error occured when running &apos;mytharchivehelper&apos;</source>
-        <translation type="unfinished">Arhiivi importimine pole võimalik. mytharchivehelper-i töös tekkis viga</translation>
+        <translation>Arhiivi importimine pole võimalik. mytharchivehelper-i töös tekkis viga</translation>
     </message>
     <message>
         <source>Select a ChanID</source>
-        <translation type="unfinished">Vali kanali ID</translation>
+        <translation>Vali kanali ID</translation>
     </message>
     <message>
         <source>Select a ChanNo</source>
-        <translation type="unfinished">Vali kanali number</translation>
+        <translation>Vali kanali number</translation>
     </message>
     <message>
         <source>Select a Channel Name</source>
-        <translation type="unfinished">Vali kanali nimi</translation>
+        <translation>Vali kanali nimi</translation>
     </message>
     <message>
         <source>Select a Callsign</source>
-        <translation type="unfinished">Vali kanali kutsung</translation>
+        <translation>Vali kanali kutsung</translation>
     </message>
 </context>
 <context>
     <name>LogViewer</name>
     <message>
         <source>Cancel</source>
-        <translation>Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Update</source>
@@ -172,144 +172,144 @@
     </message>
     <message>
         <source>Show Progress Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita toimingu logi</translation>
     </message>
     <message>
         <source>Show Full Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita kogu logi</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Ära uuenda automaatselt</translation>
     </message>
     <message>
         <source>Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Uuenda automaatselt</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menüü</translation>
     </message>
 </context>
 <context>
     <name>MythBurn</name>
     <message>
         <source>Finish</source>
-        <translation type="unfinished">Lõpeta</translation>
+        <translation>Lõpeta</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Eelmine</translation>
+        <translation>Eelmine</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Add Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisa salvestis</translation>
     </message>
     <message>
         <source>Add Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisa video</translation>
     </message>
     <message>
         <source>Add File</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisa fail</translation>
     </message>
     <message>
         <source>Using Cutlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Kasutan lõikeloendit</translation>
     </message>
     <message>
         <source>Not Using Cutlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei kasuta lõikeloendit</translation>
     </message>
     <message>
         <source>No Cut List</source>
-        <translation type="unfinished"></translation>
+        <translation>Lõikeloendit pole</translation>
     </message>
     <message>
         <source>You need to add at least one item to archive!</source>
-        <translation type="unfinished"></translation>
+        <translation>Pead midagi arhiveerimiseks valima!</translation>
     </message>
     <message>
         <source>Retrieving File Information. Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Uuendan faili infot. Palun oota...</translation>
     </message>
     <message>
         <source>Encoder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Enkooder:</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menüü</translation>
     </message>
     <message>
         <source>Don&apos;t Use Cutlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Ära kasuta lõikeloendit</translation>
     </message>
     <message>
         <source>Use Cutlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Kasuta lõikeloendit</translation>
     </message>
     <message>
         <source>Remove Item</source>
-        <translation type="unfinished">Eemalda element</translation>
+        <translation>Eemalda element</translation>
     </message>
     <message>
         <source>Edit Details</source>
-        <translation type="unfinished">Muuda üksikasju</translation>
+        <translation>Muuda üksikasju</translation>
     </message>
     <message>
         <source>Change Encoding Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda kodeerimisprofiili</translation>
     </message>
     <message>
         <source>Edit Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda pisipilte</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD.  An error occured when running the scripts</source>
-        <translation type="unfinished">DVD valmistamine pole võimalik.  Skriptide töös tekkis viga</translation>
+        <translation>DVD valmistamine pole võimalik. Skriptide töös tekkis viga</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Toggle use cut list state for selected program</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaheta lõikeloendi kasutamise valikut valitud saate jaoks</translation>
     </message>
     <message>
         <source>Create DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Loo DVD</translation>
     </message>
     <message>
         <source>Create Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Loo arhiiv</translation>
     </message>
     <message>
         <source>Import Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Impordi arhiiv</translation>
     </message>
     <message>
         <source>View Archive Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaata arhiivi logi</translation>
     </message>
     <message>
         <source>Play Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita loodud DVD</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjuta DVD</translation>
     </message>
 </context>
 <context>
     <name>ProfileDialog</name>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -506,135 +506,137 @@ Selleks võib kuluda mõni minut.</translation>
     </message>
     <message>
         <source>DVD Drive Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD kirjutamise kiirus</translation>
     </message>
     <message>
         <source>This is the write speed to use when burning a DVD. Set to 0 to allow growisofs to choose the fastest available speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>See on DVD kirjutamise kiirus. Kui on 0 valib growisofs ise kiireima võimaliku.</translation>
     </message>
     <message>
         <source>Command to play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD esitamise käsk</translation>
     </message>
     <message>
         <source>Command to run when test playing a created DVD. &apos;Internal&apos; will use the internal MythTV player. %f will be replaced with the path to the created DVD structure eg. &apos;xine -pfhq --no-splash dvd:/%f&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käsk, mida kasutatakse loodud DVD testimiseks. &apos;Sisemine&apos; kasutab MythTV sisemist mängijat. %f asendatakse loodud DVD struktuuri asukohaga. Näiteks &apos;xine -pfhg --no-splash dvd:/%f&apos;.</translation>
     </message>
     <message>
         <source>If set mpeg2 files will always be passed though mythtranscode to clean up any errors. May help to fix some audio problems. Ignored if &apos;Use ProjectX&apos; is set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valides läbivad mpeg2 failid alati vigade eemaldamiseks mythtranscode. Aitab parandada audio probleeme. Ignoreeritakse kui &apos;Kasuta ProjectX-i&apos; on valitud.</translation>
     </message>
     <message>
         <source>Use ProjectX</source>
-        <translation type="unfinished"></translation>
+        <translation>Kasuta ProjectX-i</translation>
     </message>
     <message>
         <source>If set ProjectX will be used to cut commercials and split mpeg2 files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valides kasutatakse mythtranscode ja mythreplex-i asemel reklaamide eemaldamiseks mpeg2 failide tükeldamiseks ProjectX-1.</translation>
     </message>
     <message>
         <source>The script will use FIFOs to pass the output of mplex into dvdauthor rather than creating intermediate files. Saves time and disk space during multiplex operations but not  supported on Windows platform</source>
-        <translation type="unfinished"></translation>
+        <translation>Script kasutab mplex-i väljundi saatmiseks dvdauthor-isse FIFO-t vahefailide asemel. Säästab aega ja kettaruumi, kuid pole toetatud Windowsis</translation>
     </message>
     <message>
         <source>Add Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisa subtiitrid</translation>
     </message>
     <message>
         <source>If available this option will add subtitles to the final DVD. Requires &apos;Use ProjectX&apos; to be on.</source>
-        <translation type="unfinished"></translation>
+        <translation>See vailik lisab olemasolu korral DVD-le ka subtiitrid. Vajalik on ka &apos;Kasuta ProjectX-i&apos; sisse lülitamine.</translation>
     </message>
     <message>
         <source>Default Encoder Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaikimisi kodeerimise profiil</translation>
     </message>
     <message>
         <source>Default encoding profile to use if a file needs re-encoding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaikimisi kodeerimis profiil mida kasutatakse kui fail nõuab transkodeerimist.</translation>
     </message>
     <message>
         <source>jpeg2yuv command</source>
-        <translation type="unfinished"></translation>
+        <translation>jpeg2yuv käsk</translation>
     </message>
     <message>
         <source>Command to run jpeg2yuv. Part of mjpegtools package</source>
-        <translation type="unfinished"></translation>
+        <translation>Käsk jpeg2yuv käivitamiseks. mjpegtools paki koosseisus</translation>
     </message>
     <message>
         <source>projectx command</source>
-        <translation type="unfinished"></translation>
+        <translation>projectx käsk</translation>
     </message>
     <message>
         <source>Command to run ProjectX. Will be used to cut commercials and split mpegs files instead of mythtranscode and mythreplex.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käsk ProjectX-i käivitamiseks. Kasutatakse mythtranscode ja mythreplex asemel reklaamide eemaldamiseks ja mpeg failide tükeldamiseks.</translation>
     </message>
     <message>
         <source>DVD Menu Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD menüü seaded</translation>
     </message>
     <message>
         <source>Cannot find the MythArchive work directory.
 Have you set the correct path in the settings?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei leia MythArchive töö kausta
+Sisestasid ikka õige asukoha seadistustes?</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Valmis</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>It was not possible to create the DVD. An error occured when running the scripts</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD-d ei olnud võimalik luua. Skripti töös ilmnesid vead</translation>
     </message>
     <message>
         <source>Cannot find any logs to show!</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei leia ühtegi logi mida näidata!</translation>
     </message>
     <message>
         <source>Found a lock file but the owning process isn&apos;t running!
 Removing stale lock file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Leidsin lukustusfaili, kuid seda omavat protsessi pole enam! Eemaldan faili.</translation>
     </message>
     <message>
         <source>Last run did not create a playable DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Viimane käivitus ei loonud esitatavat DVD-d.</translation>
     </message>
     <message>
         <source>Last run failed to create a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Viimasel käivitusel DVD loomine ebaõnnestus.</translation>
     </message>
     <message>
         <source>You don&apos;t have any videos!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sul pole ühtegi videot!</translation>
     </message>
     <message>
         <source>Cannot burn a DVD.
 The last run failed to create a DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei saa DVD-d kirjutada.
+Viimasel käivitusel DVD loomine ebaõnnestus.</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjuta DVD</translation>
     </message>
     <message>
         <source>
 Place a blank DVD in the drive and select an option below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta DVD toorik seadmesseja tee allpool valik.</translation>
     </message>
     <message>
         <source>Burn DVD Rewritable</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjuta ülekirjutatav DVD</translation>
     </message>
     <message>
         <source>Burn DVD Rewritable (Force Erase)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjuta ülekirjutatav DVD (kustuta enne)</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>It was not possible to run mytharchivehelper to burn the DVD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pole võimalik  mytharchivehelper-it DVD kirjutamiseks käivitada.</translation>
     </message>
 </context>
 <context>
@@ -649,7 +651,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>OK</source>
@@ -661,363 +663,363 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Retrieving Recording List. Please Wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Hangin salvestiste loendit. Palun oota...</translation>
     </message>
     <message>
         <source>Either you don&apos;t have any recordings or no recordings are available locally!</source>
-        <translation type="unfinished"></translation>
+        <translation>Sul pole kas ühtegi salvestist või pole need lokaalselt kätte saadavad!</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menüü</translation>
     </message>
 </context>
 <context>
     <name>SelectDestination</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Järgmine</translation>
+        <translation>Järgmine</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Eelmine</translation>
+        <translation>Eelmine</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Find...</source>
-        <translation type="unfinished"></translation>
+        <translation>Otsi...</translation>
     </message>
     <message>
         <source>Single Layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Ühekihiline DVD</translation>
     </message>
     <message>
         <source>Single Layer DVD (4482Mb)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ühekihiline DVD (4482Mb)</translation>
     </message>
     <message>
         <source>Dual Layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kahekihiline DVD</translation>
     </message>
     <message>
         <source>Dual Layer DVD (8964Mb)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kahekihiline DVD (8964Mb)</translation>
     </message>
     <message>
         <source>DVD +/- RW</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Rewritable DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Ülekirjutatav DVD</translation>
     </message>
     <message>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Fail</translation>
     </message>
     <message>
         <source>Any file accessable from your filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Suvaline fail failisüsteemist.</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Tundmatu</translation>
     </message>
 </context>
 <context>
     <name>ThemeSelector</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Järgmine</translation>
+        <translation>Järgmine</translation>
     </message>
     <message>
         <source>Previous</source>
-        <translation type="unfinished">Eelmine</translation>
+        <translation>Eelmine</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Select Destination</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali sihtkoht</translation>
     </message>
     <message>
         <source>description goes here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjeldus läheb siia.</translation>
     </message>
     <message>
         <source>Free Space:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaba ruum:</translation>
     </message>
     <message>
         <source>0.00Gb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Make ISO Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Loos ISO tõmmis</translation>
     </message>
     <message>
         <source>Burn to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjuta DVD-le</translation>
     </message>
     <message>
         <source>Force Overwrite of DVD-RW Media</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD-RW üle kirjutamine</translation>
     </message>
     <message>
         <source>Select Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali salvestised</translation>
     </message>
     <message>
         <source>Show Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita salvestisi</translation>
     </message>
     <message>
         <source>File Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Faili otsija</translation>
     </message>
     <message>
         <source>Select Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaili videoid</translation>
     </message>
     <message>
         <source>Video Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Video kategooria</translation>
     </message>
     <message>
         <source>title goes here</source>
-        <translation type="unfinished"></translation>
+        <translation>pealkiri läheb siia</translation>
     </message>
     <message>
         <source>x.xx Gb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>PL:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No videos available</source>
-        <translation type="unfinished"></translation>
+        <translation>Videod puuduvad</translation>
     </message>
     <message>
         <source>Log Viewer</source>
-        <translation type="unfinished">Logivaataja</translation>
+        <translation>Logi vaataja</translation>
     </message>
     <message>
         <source>Change Encoding Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda kodeerimis profiili</translation>
     </message>
     <message>
         <source>12.34GB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>DVD Menu Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>DVD menüü teema</translation>
     </message>
     <message>
         <source>Select a theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali teema</translation>
     </message>
     <message>
         <source>Intro</source>
-        <translation type="unfinished"></translation>
+        <translation>Intro</translation>
     </message>
     <message>
         <source>Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Peamenüü</translation>
     </message>
     <message>
         <source>Chapter Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Peatüki menüü</translation>
     </message>
     <message>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Üksikasjad</translation>
     </message>
     <message>
         <source>Select Archive Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali arhiivi elemendid</translation>
     </message>
     <message>
         <source>No files are selected for archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Arhiivi pole midagi valitud</translation>
     </message>
     <message>
         <source>xxxxx mb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>0 mb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Archive Item Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Arhiivi elementide üksikasjad</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pealkiri:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Alapealkiri:</translation>
     </message>
     <message>
         <source>Start Date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Algusaeg:</translation>
     </message>
     <message>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aeg:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjeldus:</translation>
     </message>
     <message>
         <source>Thumb Image Selector</source>
-        <translation type="unfinished"></translation>
+        <translation>Pisipildi valija</translation>
     </message>
     <message>
         <source>Current Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Hetke asukoht</translation>
     </message>
     <message>
         <source>0:00:00.00</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Seek Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Otsingu ulatus</translation>
     </message>
     <message>
         <source>Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaader</translation>
     </message>
     <message>
         <source>sep 13, 2004 11:00 pm (1h 15m)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>File Finder To Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Imporditav faili otsija</translation>
     </message>
     <message>
         <source>Start Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Algusaeg:</translation>
     </message>
     <message>
         <source>Select Associated Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali seotud kanal</translation>
     </message>
     <message>
         <source>Archived Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Arhiveeritud kanal</translation>
     </message>
     <message>
         <source>Chan. ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanali ID:</translation>
     </message>
     <message>
         <source>Chan. No:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanali nr.:</translation>
     </message>
     <message>
         <source>Callsign:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kutsung:</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimi:</translation>
     </message>
     <message>
         <source>Local Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Lokaalne kanal</translation>
     </message>
     <message>
         <source>A high quality profile giving approx. 1 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kõrge kvaliteet mahutab ühekihilisele DVD-le umbes 1 tunni videot</translation>
     </message>
     <message>
         <source>A standard play profile giving approx. 2 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard mahutab ühekihilisele DVD-le umbes 2 tundi videot</translation>
     </message>
     <message>
         <source>A long play profile giving approx. 4 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kauamängiv profiil mahutab ühekihilisele DVD-le umbes 4 tundi videot</translation>
     </message>
     <message>
         <source>A extended play profile giving approx. 6 hour of video on a single layer DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Laiendatud kauamängiv profiil mahutab ühekihilisele DVD-le umbes 6 tundi videot</translation>
     </message>
     <message>
         <source>Create DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Loo DVD</translation>
     </message>
     <message>
         <source>Create Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Loo arhiiv</translation>
     </message>
     <message>
         <source>Encode Video File</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodeeri video fail</translation>
     </message>
     <message>
         <source>Import Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Impordi arhiiv</translation>
     </message>
     <message>
         <source>Archive Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation>Arhiivi tööriistad</translation>
     </message>
     <message>
         <source>Show Log Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita logi vaatajat</translation>
     </message>
     <message>
         <source>Play Created DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita loodud DVD</translation>
     </message>
     <message>
         <source>Burn DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjuta DVD</translation>
     </message>
 </context>
 <context>
     <name>ThumbFinder</name>
     <message>
         <source>Save</source>
-        <translation type="unfinished">Salvesta</translation>
+        <translation>Salvesta</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Exit, Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Välju, salvesta pisipildid</translation>
     </message>
     <message>
         <source>Exit, Don&apos;t Save Thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Välju, ära salvesta pisipilte</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menüü</translation>
     </message>
 </context>
 <context>
@@ -1032,7 +1034,7 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Katkesta</translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>OK</source>
@@ -1044,11 +1046,11 @@ Place a blank DVD in the drive and select an option below.</source>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation>Lapsevanema PIN:</translation>
+        <translation>Vanemlik PIN:</translation>
     </message>
     <message>
         <source>Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Menüü</translation>
     </message>
 </context>
 </TS>

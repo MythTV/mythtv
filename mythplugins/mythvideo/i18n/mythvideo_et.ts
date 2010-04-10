@@ -6,57 +6,57 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="51"/>
         <source>Setting this value to all numbers will make your life much easier.</source>
-        <translation type="unfinished">Ainult numbrite kasutamine teeb edaspidi selle sisestamise palju lihtsamaks.</translation>
+        <translation>Ainult numbrite kasutamine teeb edaspidi selle sisestamise palju lihtsamaks.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="742"/>
         <source>G</source>
         <comment>PL 1 default search string.</comment>
-        <translation type="unfinished">G</translation>
+        <translation>G</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="744"/>
         <source>PG</source>
         <comment>PL 2 default search string.</comment>
-        <translation type="unfinished">PG</translation>
+        <translation>PG</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="746"/>
         <source>PG-13</source>
         <comment>PL3 default search string.</comment>
-        <translation type="unfinished">PG-13</translation>
+        <translation>PG-13</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="748"/>
         <source>R:NC-17</source>
         <comment>PL4 default search string.</comment>
-        <translation type="unfinished">R:NC-17</translation>
+        <translation>R:NC-17</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="208"/>
         <location filename="../mythvideo/videodlg.cpp" line="253"/>
         <source>Tried to write %1, but it appears to be an HTML redirect (filesize %2).</source>
-        <translation type="unfinished"></translation>
+        <translation>Proovisin sisestada %1 kui tundub, et see on HTML ümbersuunamine (faili suurus %2).</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="231"/>
         <source>Error writing image to file %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Piltide faili %1 salvestamine ebaõnnestus.</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="265"/>
         <source>Error writing data to file %1.</source>
-        <translation type="unfinished">Andmete faili &quot;%1&quot; kirjutamise viga.</translation>
+        <translation>Andmete faili %1 kirjutamine ebaõnnestus.</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="273"/>
         <source>Error: file error &apos;%1&apos; for file %2</source>
-        <translation type="unfinished">Viga: faili &quot;%2&quot; viga &quot;%1&quot;</translation>
+        <translation>Viga: faili %2 viga %1</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="368"/>
         <source>No command to run.</source>
-        <translation type="unfinished">Käivitamiskäsk puudub.</translation>
+        <translation>Käivitamiskäsk puudub.</translation>
     </message>
 </context>
 <context>
@@ -165,102 +165,102 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="344"/>
         <source>The MythVideo default view</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythvideo vaikimisi vaade</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="346"/>
         <source>The MythVideo video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythvideo videohaldur</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="348"/>
         <source>The MythVideo video browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythvideo vide sirvija</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="350"/>
         <source>The MythVideo video listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythvideo videoloend</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="352"/>
         <source>The MythVideo video gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythvideo videoalbum</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="355"/>
         <source>Play selected item in alternate player</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita valitud alternatiivses mängijas</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="358"/>
         <source>Open video filter dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava video filtreerimis dialoog</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="361"/>
         <source>Change browsable in video manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda sirvitav videohalduris</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="363"/>
         <source>Increase Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Tõsta vanemlikku taset</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="365"/>
         <source>Decrease Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Langeta vanemlikku taset</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="368"/>
         <source>Show Incremental Search Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita täienevat otsingu dialoogi</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="370"/>
         <source>Download metadata for current item</source>
-        <translation type="unfinished"></translation>
+        <translation>Laadi info alla</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="372"/>
         <source>Display Item Detail Popup</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita detailidega hüpikakent</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="375"/>
         <source>Go to the first video</source>
-        <translation type="unfinished"></translation>
+        <translation>Esimesele videole</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="377"/>
         <source>Go to the last video</source>
-        <translation type="unfinished"></translation>
+        <translation>Viimasele videole</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="381"/>
         <source>Play a DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita DVD</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="383"/>
         <source>MythDVD DVD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD DVD haldur</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="387"/>
         <source>Play a VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita VCD</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="389"/>
         <source>MythDVD VCD Media Handler</source>
-        <translation type="unfinished"></translation>
+        <translation>MythDVD VCD haldur</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="393"/>
         <source>Import a DVD into your MythVideo database</source>
-        <translation type="unfinished"></translation>
+        <translation>Impordi DVD MythVideo andmebaasi</translation>
     </message>
 </context>
 <context>
@@ -407,7 +407,7 @@
     <message>
         <location filename="../mythvideo/parentalcontrols.cpp" line="306"/>
         <source>Parental Pin:</source>
-        <translation type="unfinished">Vanemlik kood:</translation>
+        <translation>Vanemlik kood:</translation>
     </message>
     <message>
         <location filename="../mtd/dvdprobe.cpp" line="416"/>
@@ -448,12 +448,12 @@
     <message>
         <location filename="../mythvideo/metadata.cpp" line="865"/>
         <source>Season</source>
-        <translation type="unfinished"></translation>
+        <translation>Hooaeg</translation>
     </message>
     <message>
         <location filename="../mythvideo/metadata.cpp" line="866"/>
         <source>Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Osa</translation>
     </message>
     <message>
         <location filename="../mythvideo/metadata.cpp" line="940"/>
@@ -499,7 +499,7 @@
     <message>
         <location filename="../mythvideo/videofilter.cpp" line="806"/>
         <source>Season/Episode</source>
-        <translation type="unfinished"></translation>
+        <translation>Hooaeg/osa</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="159"/>
@@ -707,7 +707,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="875"/>
         <source>Television in MythVideo</source>
-        <translation type="unfinished"></translation>
+        <translation>Televisioon MythVideos</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="913"/>
@@ -815,17 +815,17 @@
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1170"/>
         <source>Television</source>
-        <translation type="unfinished"></translation>
+        <translation>Televisioon</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1173"/>
         <source>Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Filmid</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1185"/>
         <source>Season %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hooaeg %1</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1231"/>
@@ -835,7 +835,7 @@
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1235"/>
         <source>Storage Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Säilitusgruppid</translation>
     </message>
     <message>
         <location filename="../mythvideo/videolist.cpp" line="1329"/>
@@ -950,107 +950,107 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="113"/>
         <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly speed up how long it takes to load the Video List tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Kui on seatud faile sirvima, siis laeb video loend kogu info andmebaasist alla. Välja lülitamine vähendab märgatavalt video loendi laadimise aega</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="144"/>
         <source>Enable Metadata Browse Modes</source>
-        <translation type="unfinished"></translation>
+        <translation>Luba info sirvimine</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="146"/>
         <source>If set, metadata groupings of your video directory will be shown in supported views.  Default group is set below.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lubades grupeeritakse toetatud vaadetes videod info  järgi. Vaikimisi grupp on seatud allpool.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="155"/>
         <source>Group based on</source>
-        <translation type="unfinished"></translation>
+        <translation>Grupeeri lähtudes</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="156"/>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaustast</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="157"/>
         <source>Genres</source>
-        <translation type="unfinished"></translation>
+        <translation>Žanrist</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="158"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategooriast</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="160"/>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>Režissöörist</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="161"/>
         <source>Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Näitlejatest</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="163"/>
         <source>Date Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisatud ajast</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="164"/>
         <source>TV/Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>TV/film</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="165"/>
         <source>Group videos in the tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Grupeeri videod puus</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="202"/>
         <source>Command to search for movie fanart</source>
-        <translation>&quot;fanart&quot; otsingukäsk</translation>
+        <translation>Filmiplakatite otsingukäsk</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="222"/>
         <source>Command to search for TV shows in MythVideo</source>
-        <translation type="unfinished"></translation>
+        <translation>MythVideos TV sarjade otsingukäsk</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="232"/>
         <source>Command to search for TV Season posters</source>
-        <translation type="unfinished"></translation>
+        <translation>TV hooaja plakatite otsingukäsk</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="242"/>
         <source>Command to search for TV fanart</source>
-        <translation type="unfinished"></translation>
+        <translation>TV kinoplakatite otsingukäsk</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="252"/>
         <source>Command to search for TV banners</source>
-        <translation type="unfinished"></translation>
+        <translation>TV bännerite otsingukäsk</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="262"/>
         <source>Command to search for TV Screenshots</source>
-        <translation type="unfinished"></translation>
+        <translation>TV ekraanitõmmiste otsingukäsk</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="272"/>
         <source>Command to extract data for TV Episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>TV sarja osade info eraldamise käsk</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="282"/>
         <source>Command to search for TV by Title/Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>TV saadete pealkirja/alapealkirja otsingukäsk</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="314"/>
         <source>Directory that holds movie screenshots</source>
-        <translation>Piltide salvestamise kataloog</translation>
+        <translation>Ekraanitõmmiste salvestamise kataloog</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="325"/>
@@ -1060,7 +1060,7 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="336"/>
         <source>Directory that holds movie fanart</source>
-        <translation>&quot;fanart&quot; kataloog</translation>
+        <translation>Filmiplakatite kataloog</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="347"/>
@@ -1070,28 +1070,28 @@
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="372"/>
         <source>Enable Alternate Video Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Luba alternatiivne video mängija</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="374"/>
         <source>If checked, you can select an alternate player command for videos when the default choice fails.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valides lubad alternatiivse videomängija kui vaikimisi mängija ebaõnnestub.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="383"/>
         <source>Alternate Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Alternatiivne video mängija</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="385"/>
         <source>If for some reason the default player doesn&apos;t play a video, you can play it in an alternate player by selecting &apos;Play in Alternate Player.&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Kui mingil põhjusel vaikimisi mängijaga esitamine ebaõnnestub, saad valida alternatiivi &apos;Esita alternatiivse mängijaga&apos;.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="423"/>
         <location filename="../mythvideo/globalsettings.cpp" line="436"/>
         <source> &apos;default&apos; will let the MediaMonitor choose a device.</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;vaikimisi&apos; laseb meedia jälgijal seadme valida.</translation>
     </message>
     <message>
         <location filename="../mythvideo/globalsettings.cpp" line="457"/>
@@ -1136,7 +1136,7 @@
     <message>
         <location filename="../mythvideo/main.cpp" line="126"/>
         <source>No directory %1 - DVD importing will fail</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaust %1 puudub - DVD importimine ebaõnnestub</translation>
     </message>
     <message>
         <location filename="../mythvideo/main.cpp" line="164"/>
@@ -1170,7 +1170,7 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="../mythvideo/dbcheck.cpp" line="36"/>
         <source>Error: failed to add new file type &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Viga: uue failitüübi &apos;%1&apos; lisamine ebaõnnestus</translation>
     </message>
 </context>
 <context>
@@ -1188,27 +1188,27 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="14"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="15"/>
         <source>Directed by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Režissöör:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="17"/>
         <source>User Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hinnang:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="19"/>
         <source>Done</source>
-        <translation type="unfinished">Valmis</translation>
+        <translation>Valmis</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="20"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="22"/>
@@ -1223,22 +1223,22 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="24"/>
         <source>Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>Madalaim</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="25"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation>Madal</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="26"/>
         <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <translation>Keskmine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="27"/>
         <source>High</source>
-        <translation type="unfinished"></translation>
+        <translation>Kõrge</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="28"/>
@@ -1323,32 +1323,32 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="32"/>
         <source>Video Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Video num.:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="37"/>
         <source>Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Vanemlik tase</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="44"/>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Pealkiri:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="45"/>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Alapealkiri:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="46"/>
         <source>Season:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hooaeg:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="47"/>
         <source>Episode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Osa:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="48"/>
@@ -1373,7 +1373,7 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="52"/>
         <source>Item has been watched:</source>
-        <translation type="unfinished"></translation>
+        <translation>On juba vaadatud:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="53"/>
@@ -1383,22 +1383,22 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="54"/>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekraanitõmmis:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="55"/>
         <source>Banner:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bänner:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="56"/>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kinoplakat:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="57"/>
         <source>Trailer:</source>
-        <translation type="unfinished"></translation>
+        <translation>Treiler:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="58"/>
@@ -1418,7 +1418,7 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="61"/>
         <source>Text Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekstifilter:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="62"/>
@@ -1438,7 +1438,7 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="65"/>
         <source>Actor/Actress :</source>
-        <translation type="unfinished"></translation>
+        <translation>Näitleja:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="66"/>
@@ -1463,12 +1463,12 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="70"/>
         <source>InetRef :</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="71"/>
         <source>Cover File :</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaanepilt:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="72"/>
@@ -1478,87 +1478,87 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="themestrings.h" line="73"/>
         <source>Watched :</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaadatud:</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="74"/>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>Tulem</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="75"/>
         <source>Save as default</source>
-        <translation type="unfinished">Salvesta vaikeväärtuseks</translation>
+        <translation>Salvesta vaikimisi</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="76"/>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Üldised seaded</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="77"/>
         <source>Player Settings</source>
-        <translation type="unfinished">Mängija seadistused</translation>
+        <translation>Mängija seaded</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="78"/>
         <source>File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Failitüübid</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="79"/>
         <source>Rip Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Rippimis seaded</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="80"/>
         <source>Browse Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Sirvi videoid</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="81"/>
         <source>Video List</source>
-        <translation type="unfinished"></translation>
+        <translation>Video loend</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="82"/>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Video album</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="83"/>
         <source>Video Manager</source>
-        <translation type="unfinished">Videohaldur</translation>
+        <translation>Videohaldur</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="84"/>
         <source>Play DVD</source>
-        <translation type="unfinished">Mängi DVD</translation>
+        <translation>Esita DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="85"/>
         <source>Play VCD</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita VCD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="86"/>
         <source>Rip DVD</source>
-        <translation type="unfinished">Ripi DVD</translation>
+        <translation>Ripi DVD</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="87"/>
         <source>Eject media</source>
-        <translation type="unfinished"></translation>
+        <translation>Väljasta</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="88"/>
         <source>Videos Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Video seaded</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="89"/>
         <source>Configure playback and DVD ripping</source>
-        <translation type="unfinished"></translation>
+        <translation>Seadista taasesitus ja DVD rippimine</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="2"/>
@@ -1717,106 +1717,110 @@ Kontolli videohalduse seadeid</translation>
         <location filename="../mythvideo/videodlg.cpp" line="2040"/>
         <location filename="../mythvideo/videodlg.cpp" line="2053"/>
         <source>Season</source>
-        <translation type="unfinished"></translation>
+        <translation>Hooaeg</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="2986"/>
         <source>Video Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Vide otsing</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3112"/>
         <source>Video Options
 %1
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Video valikud
+%1
+%2</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3115"/>
         <source>Video Options
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Video valikud
+%1</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3118"/>
         <location filename="../mythvideo/videodlg.cpp" line="3143"/>
         <location filename="../mythvideo/videodlg.cpp" line="3350"/>
         <source>Video Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Video valikud</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3134"/>
         <source>Play...</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita...</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3136"/>
         <location filename="../mythvideo/videodlg.cpp" line="3172"/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3138"/>
         <location filename="../mythvideo/videodlg.cpp" line="3362"/>
         <source>Mark as Unwatched</source>
-        <translation type="unfinished"></translation>
+        <translation>Märgi mitte vaadatuks</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3140"/>
         <location filename="../mythvideo/videodlg.cpp" line="3364"/>
         <source>Mark as Watched</source>
-        <translation type="unfinished"></translation>
+        <translation>Märgi vaadatuks</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3142"/>
         <source>Metadata Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Info valikud</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3144"/>
         <source>Delete</source>
-        <translation type="unfinished">Kustuta</translation>
+        <translation>Kustuta</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3147"/>
         <source>Play Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita kaust</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3161"/>
         <source>Playback Options
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Taasesituse valikud
+%1</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3176"/>
         <source>Play in Alternate Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita alternatiivse mängijaga</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3181"/>
         <source>Play With Trailers</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita treileritega</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3189"/>
         <source>Play Trailer</source>
-        <translation type="unfinished"></translation>
+        <translation>Esita treiler</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3200"/>
         <source>Video Display Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Video ekraanimenüü</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3213"/>
         <source>Browse By...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sirvi...</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3222"/>
         <source>Enable File Browse Mode</source>
-        <translation>Luba failide lehitsemine</translation>
+        <translation>Luba failide sirvimine</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3226"/>
@@ -1831,52 +1835,52 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3270"/>
         <source>Browse By</source>
-        <translation type="unfinished"></translation>
+        <translation>Sirvi</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3282"/>
         <source>Cast</source>
-        <translation type="unfinished"></translation>
+        <translation>Näitleja</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3286"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategooria</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3290"/>
         <source>Date Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisamise kuupäev</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3294"/>
         <source>Director</source>
-        <translation type="unfinished"></translation>
+        <translation>Režissöör</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3298"/>
         <source>Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaust</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3302"/>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Žanr</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3306"/>
         <source>TV/Movies</source>
-        <translation type="unfinished"></translation>
+        <translation>TV/film</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3310"/>
         <source>User Rating</source>
-        <translation type="unfinished">Kasutaja reiting</translation>
+        <translation>Hinnang</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3314"/>
         <source>Year</source>
-        <translation type="unfinished">Aasta</translation>
+        <translation>Aasta</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3335"/>
@@ -1896,17 +1900,17 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3367"/>
         <source>Mark as Non-Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Märgi sirvimatuks</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3369"/>
         <source>Mark as Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>Märgi sirvitavaks</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3378"/>
         <source>Manage Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Halda infot</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3387"/>
@@ -1921,12 +1925,12 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3389"/>
         <source>Download Images Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Laadi ainult pildid alla</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3391"/>
         <source>Search TV by Title/Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Otsi sarju Pealkirja/alampealkirja järgi</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3393"/>
@@ -1941,24 +1945,26 @@ Kontolli videohalduse seadeid</translation>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3397"/>
         <source>Reset Metadata</source>
-        <translation>Tühista metaandmed</translation>
+        <translation>Tühista info</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="4088"/>
         <source>Are you sure you want to delete:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Soovid ikka kindlasti kustutada
+%1</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="4520"/>
         <source>%1 download finished: %2 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 alla laadimine lõppenud: %2 %3</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="4525"/>
         <source>%1 exists for this item but could not be retrieved within the timeout period.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>%1 on olemas, kuid alla laadimise ajalimiit on ületatud.
+</translation>
     </message>
     <message>
         <location filename="../mythvideo/videodlg.cpp" line="3615"/>
