@@ -193,6 +193,7 @@ QStringList LanguageSettings::getLanguages(void)
               << "AR"                                   // Arabic
           << QString::fromUtf8("Hrvatski")    << "HR"   // Croatian
           << QString::fromUtf8("Magyar")    << "HU"   // Hungarian
+          << QString::fromUtf8("Ελληνικά")    << "EL"   // Hellenic          
           ;
     return langs;
 }
