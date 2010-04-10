@@ -1,74 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="et_EE">
 <context>
     <name>GameUI</name>
     <message>
         <source>All Games</source>
-        <translation type="unfinished">Kõik mängud</translation>
+        <translation>Kõik mängud</translation>
     </message>
     <message>
         <source>-   By Genre</source>
-        <translation type="unfinished">-   žanri järgi</translation>
+        <translation>-   žanri järgi</translation>
     </message>
     <message>
         <source>-   By Year</source>
-        <translation type="unfinished">-   aasta järgi</translation>
+        <translation>-   aasta järgi</translation>
     </message>
     <message>
         <source>-   By Name</source>
-        <translation type="unfinished">-   nime järgi</translation>
+        <translation>-   nime järgi</translation>
     </message>
     <message>
         <source>-   By Publisher</source>
-        <translation type="unfinished"></translation>
+        <translation>-   avaldaja järgi</translation>
     </message>
     <message>
         <source>Choose System for</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali süsteem</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Tühista</translation>
     </message>
     <message>
         <source>Show Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita infot</translation>
     </message>
     <message>
         <source>Remove Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Eemalda lemmik</translation>
     </message>
     <message>
         <source>Make Favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Loo lemmik</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda infot</translation>
     </message>
     <message>
         <source>Game Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängu otsing</translation>
     </message>
 </context>
 <context>
     <name>MythControls</name>
     <message>
         <source>Game frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängu klient</translation>
     </message>
     <message>
         <source>Toggle the current game as a favorite</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda see mäng lemmikuks</translation>
     </message>
     <message>
         <source>Show incremental search dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita täienevat otsingu dialoogi</translation>
     </message>
     <message>
         <source>Incremental search find next match</source>
-        <translation type="unfinished"></translation>
+        <translation>Täienev otsing, leia järgmine vaste</translation>
     </message>
 </context>
 <context>
@@ -99,7 +99,7 @@
     </message>
     <message>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängijad</translation>
     </message>
 </context>
 <context>
@@ -226,7 +226,7 @@ Oled sa ikka kindel, et soovid seda?</translation>
     </message>
     <message>
         <source>Directory to change to before launching emulator. Blank is usually fine</source>
-        <translation>Aktiivne ataloog emulaatori käivitamisel. Tavaliselt võib jätta tühjaks.</translation>
+        <translation>Aktiivne ataloog emulaatori käivitamisel. Tavaliselt võib jätta tühjaks</translation>
     </message>
     <message>
         <source>File Extensions</source>
@@ -322,39 +322,39 @@ Oled sa ikka kindel, et soovid seda?</translation>
     </message>
     <message>
         <source>Updating %1(%2) ROM database</source>
-        <translation type="unfinished"></translation>
+        <translation>Uuendan %1(%2) ROM-ide andmebaasi</translation>
     </message>
     <message>
         <source>Verifying %1 files</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrollin %1 faili</translation>
     </message>
     <message>
         <source>Scanning for %1 game(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanneerin %1 mäng(u)...</translation>
     </message>
     <message>
         <source>Directory where Game Screenshots are stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängude ekraanitõmmiste kataloog</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning screenshots.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekraanitõmmised pannakse vaikimisi siia kausta.</translation>
     </message>
     <message>
         <source>Directory where Game Fanart is stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängude reklaamplakatite kaust</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning fanart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklaamplakatid pannakse vaikimisi siia kausta.</translation>
     </message>
     <message>
         <source>Directory where Game Boxart is stored</source>
-        <translation type="unfinished"></translation>
+        <translation>Karbikujunduse kaust</translation>
     </message>
     <message>
         <source>This directory will be the default browse location when assigning boxart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Karbikujundus pannakse vaikimisi siia kausta.</translation>
     </message>
 </context>
 <context>
@@ -377,107 +377,107 @@ Oled sa ikka kindel, et soovid seda?</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished">Ei</translation>
+        <translation>Ei</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Jah</translation>
+        <translation>Jah</translation>
     </message>
     <message>
         <source>Edit Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda mängu infot</translation>
     </message>
     <message>
         <source>Game Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängu nimi:</translation>
     </message>
     <message>
         <source>Country:</source>
-        <translation type="unfinished"></translation>
+        <translation>Maa:</translation>
     </message>
     <message>
         <source>Publisher:</source>
-        <translation type="unfinished"></translation>
+        <translation>Avaldaja:</translation>
     </message>
     <message>
         <source>Plot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjeldus:</translation>
     </message>
     <message>
         <source>Screenshot:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekraanitõmmis:</translation>
     </message>
     <message>
         <source>Fanart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklaamplakat:</translation>
     </message>
     <message>
         <source>Boxart:</source>
-        <translation type="unfinished"></translation>
+        <translation>Karbikujundus:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>/tee/pildini/pilt.jpg</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Tehtud</translation>
     </message>
     <message>
         <source>Game:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mäng:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüüp:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Failinimi:</translation>
     </message>
     <message>
         <source>Rompath:</source>
-        <translation type="unfinished"></translation>
+        <translation>ROMi asukoht:</translation>
     </message>
     <message>
         <source>System(s):</source>
-        <translation type="unfinished"></translation>
+        <translation>Süsteem(id):</translation>
     </message>
     <message>
         <source>CRC:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>No Plot.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kirjeldus puudub.</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängi</translation>
     </message>
     <message>
         <source>Game Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängu info</translation>
     </message>
     <message>
         <source>Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängud</translation>
     </message>
     <message>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Üldised seaded</translation>
     </message>
     <message>
         <source>Game Players</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängijad</translation>
     </message>
     <message>
         <source>Scan for Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Otsi mänge</translation>
     </message>
     <message>
         <source>Clear Game Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Puhasta mängude andmed</translation>
     </message>
 </context>
 </TS>
