@@ -1,81 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.0" language="cs_CZ">
 <context>
     <name>MythControls</name>
     <message>
         <location filename="../mythnews/main.cpp" line="27"/>
         <source>RSS News feed reader</source>
-        <translation type="unfinished"></translation>
+        <translation>RSS čtečka novinek</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="31"/>
         <source>Update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualizovat novinky</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="33"/>
         <source>Force update news items</source>
-        <translation type="unfinished"></translation>
+        <translation>Vynutit aktualizaci novinek</translation>
     </message>
     <message>
         <location filename="../mythnews/main.cpp" line="35"/>
         <source>Cancel news item updating</source>
-        <translation type="unfinished"></translation>
+        <translation>Zrušit aktualizaci novinek</translation>
     </message>
 </context>
 <context>
     <name>MythNews</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="437"/>
+        <location filename="../mythnews/mythnews.cpp" line="455"/>
         <source>Updated</source>
-        <translation type="unfinished">Aktualizovaný</translation>
+        <translation>Aktualizovaný</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="444"/>
+        <location filename="../mythnews/mythnews.cpp" line="462"/>
         <source>Unknown</source>
-        <translation type="unfinished">Neznámý</translation>
+        <translation>Neznámý</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="917"/>
+        <location filename="../mythnews/mythnews.cpp" line="936"/>
         <source>Cancel</source>
-        <translation type="unfinished">Zrušit</translation>
+        <translation>Zrušit</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="913"/>
+        <location filename="../mythnews/mythnews.cpp" line="932"/>
         <source>Edit News Site</source>
-        <translation type="unfinished">Upravit zdroj zpráv</translation>
+        <translatorcomment>Upravit stránku novinek (?)</translatorcomment>
+        <translation>Upravit zdroj zpráv</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnews.cpp" line="125"/>
         <source>You haven&apos;t configured MythNews to use any sites.</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>MythNews není zkonfigurován pro použití stránek (zdroje zpráv).</translatorcomment>
+        <translation>MythNews není zkonfigurován pro použití zdroje zpráv.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="455"/>
-        <location filename="../mythnews/mythnews.cpp" line="714"/>
+        <location filename="../mythnews/mythnews.cpp" line="473"/>
+        <location filename="../mythnews/mythnews.cpp" line="732"/>
         <source>%1 of %2 (%3 percent)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 of %2 (%3 procent)</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="786"/>
+        <location filename="../mythnews/mythnews.cpp" line="805"/>
         <source>No browser command set! MythNews needs MythBrowser to be installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Není nastaven příkaz pro spuštění prohlížeče! MythNews vyžaduje instalovaný MythBrowser.</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="914"/>
+        <location filename="../mythnews/mythnews.cpp" line="933"/>
         <source>Add News Site</source>
-        <translation type="unfinished">Přidat zdroj zpráv</translation>
+        <translation>Přidat zdroj zpráv</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="916"/>
+        <location filename="../mythnews/mythnews.cpp" line="935"/>
         <source>Delete News Site</source>
-        <translation type="unfinished">Smazat zdroj zpráv</translation>
+        <translatorcomment>Smazat novinky stránek/stránku novinek  (?)</translatorcomment>
+        <translation>Smazat zdroj zpráv</translation>
     </message>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="899"/>
+        <location filename="../mythnews/mythnews.cpp" line="918"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Možnosti</translation>
     </message>
 </context>
 <context>
@@ -83,42 +86,46 @@
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Edit Site Details</source>
-        <translation type="unfinished">Upravit detaily zdroje</translation>
+        <translatorcomment>Upravit detaily zdroje</translatorcomment>
+        <translation>Upravit detaily zdroje zpráv</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="81"/>
         <source>Enter Site Details</source>
-        <translation type="unfinished">Zadat detaily zdroje</translation>
+        <translatorcomment>Zadat detaily zdroje</translatorcomment>
+        <translation>Zadat detaily zdroje zpráv</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="85"/>
         <source>Name:</source>
-        <translation type="unfinished">Jméno:</translation>
+        <translatorcomment>Jméno:</translatorcomment>
+        <translation>Název:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="87"/>
         <source>URL:</source>
-        <translation type="unfinished">URL:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="89"/>
         <source>Icon:</source>
-        <translation type="unfinished">Ikona:</translation>
+        <translation>Ikona:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="91"/>
         <source>Podcast:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Audio RSS:</translatorcomment>
+        <translation>Podcast:</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="93"/>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../mythnews/mythnewseditor.cpp" line="94"/>
         <source>Cancel</source>
-        <translation type="unfinished">Zrušit</translation>
+        <translation>Zrušit</translation>
     </message>
 </context>
 <context>
@@ -126,55 +133,149 @@
     <message>
         <location filename="../mythnews/newssite.cpp" line="218"/>
         <source>Retrieve Failed. </source>
-        <translation type="unfinished">Načítání selhalo.</translation>
+        <translation>Načítání selhalo.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="225"/>
         <location filename="../mythnews/newssite.cpp" line="234"/>
         <location filename="../mythnews/newssite.cpp" line="243"/>
         <source>Failed to retrieve news</source>
-        <translation type="unfinished">Načítání zpráv selhalo</translation>
+        <translation>Načítání zpráv selhalo</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="226"/>
         <source>No Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Žádné uložené novinky.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="245"/>
         <source>Failed to read downloaded file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chyba při čtení staženého souboru.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="253"/>
         <source>Showing Cached News.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zobrazování uložených novinek.</translation>
     </message>
     <message>
         <location filename="../mythnews/newssite.cpp" line="274"/>
         <source>XML-file is not valid RSS-feed</source>
-        <translation type="unfinished"></translation>
+        <translation>XML soubor není platným zdrojem RSS</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../mythnews/mythnews.cpp" line="687"/>
+        <location filename="../mythnews/mythnews.cpp" line="705"/>
         <source>Downloading media...</source>
-        <translation type="unfinished">Stahuji média...</translation>
+        <translation>Stahuji média...</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <location filename="themestrings.h" line="2"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Zrušit</translation>
+        <source>Edit RSS News Feeds</source>
+        <translation type="unfinished">c</translation>
     </message>
     <message>
         <location filename="themestrings.h" line="3"/>
-        <source>Ok</source>
+        <source>You can edit the name, URL, and icon path for the selected RSS Feed on this screen.  You can also designate the item as a podcast.
+
+When you have finished editing, select &quot;OK&quot; or &quot;Cancel&quot; to continue.</source>
+        <translation type="unfinished">Na této obrazovce můžete upravit Název, URL, cestu k ikoně pro vybrané zdroje zpráv. Také můžete nastavit položku jako podcast.
+
+Až budete hotovi, vyberte OK nebo zrušit pro pokračování.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="4"/>
+        <source>Name:</source>
+        <translation>Název:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="5"/>
+        <source>URL:</source>
+        <translation>URL:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="6"/>
+        <source>Icon:</source>
+        <translation>Ikona:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="7"/>
+        <source>Podcast:</source>
+        <translation>Podcast:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="8"/>
+        <source>Genre:</source>
+        <translation>Žánr:</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="9"/>
+        <source>Channel:</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="10"/>
+        <source>Cancel</source>
+        <translation>Zrušit</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="11"/>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="12"/>
+        <source>News Subscriptions</source>
+        <translation type="unfinished">Odběr zpráv</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="13"/>
+        <source>Choose the news sites you would like to read.</source>
+        <translation type="unfinished">Vyberte zdroje zpráv, které chcete číst.</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="14"/>
+        <source>Edit RSS News Feed</source>
+        <translation type="unfinished">Upravit zdroj RSS zpráv</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="15"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="16"/>
+        <source>Contexts</source>
+        <translation>Kontexty</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="17"/>
+        <source>Actions</source>
+        <translation>Akce</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="18"/>
+        <source>RSS Feeds</source>
+        <translation type="unfinished">Zdroje RSS</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="19"/>
+        <source>MythNews Configuration</source>
+        <translation type="unfinished">Konfigurace MythNews</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="20"/>
+        <source>Minutes</source>
+        <translation type="unfinished">Minuty</translation>
+    </message>
+    <message>
+        <location filename="themestrings.h" line="21"/>
+        <source>News Feeds</source>
+        <translation type="unfinished">Zdroje zpráv</translation>
     </message>
 </context>
 </TS>
