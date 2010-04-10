@@ -628,7 +628,7 @@ bool MythCommandLineParser::Parse(
              !strcmp(argv[argpos],"--generate-preview"))
     {
         QString tmp;
-        if ((argc - 1) < argpos)
+        if ((argc - 1) > argpos)
         {
             tmp = argv[argpos+1];
             bool ok = true;
