@@ -330,11 +330,18 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
     QRect area = data->drawArea;
     area.translate(m_Area.x(), m_Area.y());
     area.adjust(breakin, breakin, -breakin, -breakin);
+    int status = data->recStat;
 
     if (m_selType == "roundbox")
     {
         QColor fillColor = calcColor(m_selFillColor, alphaMod);
         QColor lineColor = calcColor(m_selLineColor, alphaMod);
+
+        if (status == 1)
+            lineColor = m_recordingColor;
+        else if (status == 2)
+            lineColor = m_conflictingColor;
+
         p->DrawRoundRect(area, 10, m_drawSelFill, fillColor, 
                          m_drawSelLine, 2, lineColor);
     }
@@ -348,6 +355,11 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
         else
             fillColor = calcColor(m_solidColor, m_categoryAlpha, alphaMod);
 
+        if (status == 1)
+            lineColor = m_recordingColor;
+        else if (status == 2)
+            lineColor = m_conflictingColor;
+
         p->DrawRect(area, true, fillColor.lighter(), m_drawSelLine, 2, lineColor);
     }
     else
@@ -355,6 +367,12 @@ void MythUIGuideGrid::drawCurrent(MythPainter *p, UIGTCon *data, int alphaMod)
         // default to "box" selection type
         QColor fillColor = calcColor(m_selFillColor, alphaMod);
         QColor lineColor = calcColor(m_selLineColor, alphaMod);
+
+        if (status == 1)
+            lineColor = m_recordingColor;
+        else if (status == 2)
+            lineColor = m_conflictingColor;
+
         p->DrawRect(area, m_drawSelFill, fillColor, m_drawSelLine, 2, lineColor);
     }
 }

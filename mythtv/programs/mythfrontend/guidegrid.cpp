@@ -1273,7 +1273,7 @@ void GuideGrid::fillProgramRowInfos(unsigned int row, bool useExistingData)
             if (pginfo->recstatus == rsConflict ||
                 pginfo->recstatus == rsOffLine)
                 recStat = 2;
-            if (pginfo->recstatus <= rsWillRecord)
+            else if (pginfo->recstatus <= rsWillRecord)
                 recStat = 1;
             else
                 recStat = 0;
