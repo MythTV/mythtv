@@ -2310,6 +2310,54 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         else if (user_data_type_code == 0x06) {
             // bar data (letterboxing info)
         }
+    } else if (buf_end - p >= 3 && p[0] == 0x03 && ((p[1]&0x7f) == 0x01)) {
+        /// SCTE 20 encoding of CEA-608
+        uint cc_count = p[2]>>3;
+        uint cc_bits = cc_count * 26;
+        uint cc_bytes = (cc_bits + 7 - 3) / 8;
+        Mpeg1Context *s1 = avctx->priv_data;
+        MpegEncContext *s = &s1->mpeg_enc_ctx;
+        if (buf_end - p >= (2+cc_bytes) /*&& (s->tmp_atsc_cc_len + 2 + 3*cc_count) < ATSC_CC_BUF_SIZE*/) {
+            int atsc_cnt_loc = s->tmp_atsc_cc_len;
+            uint8_t real_count = 0, marker = 1, i;
+            GetBitContext gb;
+            init_get_bits(&gb, p+2, (buf_end-p-2) * sizeof(uint8_t));
+            get_bits(&gb, 5); // swallow cc_count
+            s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&cc_count);
+            s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+            for (i = 0; i < cc_count; i++) {
+                uint8_t valid, cc608_hdr;
+                uint8_t priority = get_bits(&gb, 2);
+                uint8_t field_no = get_bits(&gb, 2);
+                uint8_t line_offset = get_bits(&gb, 5);
+                uint8_t cc_data_1 = av_reverse[get_bits(&gb, 8)];
+                uint8_t cc_data_2 = av_reverse[get_bits(&gb, 8)];
+                uint8_t type = (1 == field_no) ? 0x00 : 0x01;
+                marker &= get_bits(&gb, 1);
+                // dump if marker bit missing or if data is padding
+                valid = (marker && (cc_data_1!=0x80 || cc_data_2!=0x80));
+                // ignore forbidden and repeated (3:2 pulldown) field numbers
+                valid = valid && (1 == field_no || 2 == field_no);
+                // ignore content not in line 21
+                valid = valid && (11 == line_offset);
+                if (!valid)
+                    continue;
+                cc608_hdr = 0xf8 | (valid ? 0x04 : 0x00) | type;
+                real_count++;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_1;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_2;
+            }
+            if (!real_count)
+            {
+                s->tmp_atsc_cc_len = atsc_cnt_loc;
+            }
+            else
+            {
+                s->tmp_atsc_cc_buf[atsc_cnt_loc] = 0x40 | (0x1f&real_count);
+                s->tmp_atsc_cc_len = atsc_cnt_loc + 2 + 3 * real_count;
+            }
+        }
     } else if (buf_end - p >= 11 &&
                p[0] == 0x05 && p[1] == 0x02) {
         /* parse EIA-608 captions embedded in a DVB stream. */
@@ -2380,7 +2428,6 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         }
     }
     // For other CEA-608 embedding options see:
-    /* SCTE 20 */
     /* SCTE 21 */
     /* ETSI EN 301 775 */
 }
