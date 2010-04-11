@@ -1,7 +1,7 @@
 include (../../settings.pro)
 include (../programs-libs.pro)
 
-QT += sql
+QT += sql network
 
 TEMPLATE = app
 CONFIG += thread
