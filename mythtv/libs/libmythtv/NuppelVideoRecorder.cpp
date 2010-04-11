@@ -75,8 +75,8 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
     compression = 1;
     compressaudio = 1;
     usebttv = 1;
-    w = 352;
-    h = 240;
+    width  = 352;
+    height = 240;
     pip_mode = 0;
     video_aspect = 1.33333;
 
@@ -250,9 +250,9 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
 void NuppelVideoRecorder::SetOption(const QString &opt, int value)
 {
     if (opt == "width")
-        w_out = w = value;
+        w_out = width = value;
     else if (opt == "height")
-        h_out = h = value;
+        h_out = height = value;
     else if (opt == "rtjpegchromafilter")
         M1 = value;
     else if (opt == "rtjpeglumafilter")
@@ -523,7 +523,7 @@ bool NuppelVideoRecorder::SetupAVCodecVideo(void)
     }
 
     mpa_vidctx->width = w_out;
-    mpa_vidctx->height = (int)(h * height_multiplier);
+    mpa_vidctx->height = (int)(height * height_multiplier);
 
     int usebitrate = targetbitrate * 1000;
     if (scalebitrate)
@@ -633,24 +633,24 @@ void NuppelVideoRecorder::Initialize(void)
 
         MJPEGInit();
 
-        w = hmjpg_maxw / hmjpg_hdecimation;
+        width = hmjpg_maxw / hmjpg_hdecimation;
 
         if (ntsc)
         {
             switch (hmjpg_vdecimation)
             {
-                case 2: h = 240; break;
-                case 4: h = 120; break;
-                default: h = 480; break;
+                case 2: height = 240; break;
+                case 4: height = 120; break;
+                default: height = 480; break;
             }
         }
         else
         {
             switch (hmjpg_vdecimation)
             {
-                case 2: h = 288; break;
-                case 4: h = 144; break;
-                default: h = 576; break;
+                case 2: height = 288; break;
+                case 4: height = 144; break;
+                default: height = 576; break;
             }
         }
     }
@@ -810,8 +810,8 @@ void NuppelVideoRecorder::InitFilters(void)
 
     QString tmpVideoFilterList;
 
-    w_out = w;
-    h_out = h;
+    w_out = width;
+    h_out = height;
     VideoFrameType tmp = FMT_YV12;
 
     if (correct_bttv && !videoFilterList.contains("adjust"))
@@ -846,7 +846,7 @@ void NuppelVideoRecorder::InitBuffers(void)
             video_buffer_size = w_out * h_out * 3 / 2;
     }
 
-    if (w >= 480 || h > 288)
+    if (width >= 480 || height > 288)
         videomegs = 20;
     else
         videomegs = 12;
@@ -912,7 +912,7 @@ void NuppelVideoRecorder::StopRecording(void)
 
 void NuppelVideoRecorder::StreamAllocate(void)
 {
-    strm = new signed char[w * h * 2 + 10];
+    strm = new signed char[width * height * 2 + 10];
 }
 
 bool NuppelVideoRecorder::Open(void)
@@ -1152,8 +1152,8 @@ void NuppelVideoRecorder::DoV4L(void)
         return;
     }
 
-    mm.height = h;
-    mm.width  = w;
+    mm.height = height;
+    mm.width  = width;
     if (inpixfmt == FMT_YUV422P)
         mm.format = VIDEO_PALETTE_YUV422P;
     else
@@ -1248,8 +1248,8 @@ bool NuppelVideoRecorder::SetFormatV4L2(void)
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    vfmt.fmt.pix.width = w;
-    vfmt.fmt.pix.height = h;
+    vfmt.fmt.pix.width = width;
+    vfmt.fmt.pix.height = height;
     vfmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
 
     if (go7007)
@@ -1301,16 +1301,16 @@ bool NuppelVideoRecorder::SetFormatV4L2(void)
         VERBOSE(VB_RECORD, LOC + "v4l2: format set, getting yuv420 from v4l");
 
     // VIDIOC_S_FMT might change the format, check it
-    if (w != (int)vfmt.fmt.pix.width ||
-        h != (int)vfmt.fmt.pix.height)
+    if (width  != (int)vfmt.fmt.pix.width ||
+        height != (int)vfmt.fmt.pix.height)
     {
         VERBOSE(VB_RECORD, LOC + QString("v4l2: resolution changed. reuested "
                                          "%1x%2, using %3x%4 now")
-                .arg(w).arg(h)
+                .arg(width).arg(height)
                 .arg(vfmt.fmt.pix.width)
                 .arg(vfmt.fmt.pix.height));
-        w_out = w = vfmt.fmt.pix.width;
-        h_out = h = vfmt.fmt.pix.height;
+        w_out = width  = vfmt.fmt.pix.width;
+        h_out = height = vfmt.fmt.pix.height;
     }
 
     v4l2_pixelformat = vfmt.fmt.pix.pixelformat;
@@ -1387,7 +1387,7 @@ void NuppelVideoRecorder::DoV4L2(void)
         int usebitrate = targetbitrate * 1000;
         if (scalebitrate)
         {
-            float diff = (w * h) / (640.0 * 480.0);
+            float diff = (width * height) / (640.0 * 480.0);
             usebitrate = (int)(diff * usebitrate);
         }
 
@@ -1566,12 +1566,12 @@ again:
                  *   don't use the stack for the conversion buffer
                  *   use swscale directly
                  */
-                unsigned conversion_buffer_size = h * w * 3 / 2;
+                unsigned conversion_buffer_size = height * width * 3 / 2;
                 uint8_t conversion_buffer[conversion_buffer_size];
                 AVPicture img_in, img_out;
-                avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, w, h);
-                avpicture_fill(&img_in, buffers[frame], PIX_FMT_YUYV422, w, h);
-                myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_YUYV422, w, h);
+                avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, width, height);
+                avpicture_fill(&img_in, buffers[frame], PIX_FMT_YUYV422, width, height);
+                myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_YUYV422, width, height);
                 BufferIt(conversion_buffer, video_buffer_size);
             }
             else if (v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
@@ -1581,12 +1581,12 @@ again:
                  *   don't use the stack for the conversion buffer
                  *   use swscale directly
                  */
-                unsigned conversion_buffer_size = h * w * 3 / 2;
+                unsigned conversion_buffer_size = height * width * 3 / 2;
                 uint8_t conversion_buffer[conversion_buffer_size];
                 AVPicture img_in, img_out;
-                avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, w, h);
-                avpicture_fill(&img_in, buffers[frame], PIX_FMT_UYVY422, w, h);
-                myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_UYVY422, w, h);
+                avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, width, height);
+                avpicture_fill(&img_in, buffers[frame], PIX_FMT_UYVY422, width, height);
+                myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_UYVY422, width, height);
                 BufferIt(conversion_buffer, video_buffer_size);
             }
             else
@@ -2810,7 +2810,7 @@ void NuppelVideoRecorder::doWriteThread(void)
                 VideoFrame frame;
                 init(&frame,
                      FMT_YV12, videobuffer[act_video_encode]->buffer,
-                     w, h, 12, videobuffer[act_video_encode]->bufferlen);
+                     width, height, 12, videobuffer[act_video_encode]->bufferlen);
 
                 frame.frameNumber = videobuffer[act_video_encode]->sample;
                 frame.timecode = videobuffer[act_video_encode]->timecode;

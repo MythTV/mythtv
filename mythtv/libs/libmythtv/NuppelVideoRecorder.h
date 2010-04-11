@@ -148,7 +148,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     signed char *strm;
     unsigned int lf, tf;
     int M1, M2, Q;
-    int w, h;
+    int width, height;
     int pip_mode;
     int pid, pid2;
     int inputchannel;
