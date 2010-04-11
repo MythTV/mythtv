@@ -3630,6 +3630,11 @@ void VideoDialog::playVideoAlt()
  */
 void VideoDialog::playFolder()
 {
+    const int WATCHED_WATERMARK = 10000; // Play less then this milisec and the chain of
+                                         // videos will not be followed when
+                                         // playing.
+    QTime playing_time;
+
     MythUIButtonListItem *item = GetItemCurrent();
     MythGenericTree *node = GetNodePtrFromButton(item);
     int list_count;
@@ -3641,18 +3646,25 @@ void VideoDialog::playFolder()
 
     if (list_count > 0)
     {
-        for (int i = 0; i < list_count; i++)
+        bool video_started;
+        int i = 0;
+        while (i < list_count &&
+               (!video_started || playing_time.elapsed() > WATCHED_WATERMARK))
         {
+            video_started = false;
             MythGenericTree *subnode = node->getChildAt(i);
             if (subnode)
             {
                 Metadata *metadata = GetMetadataPtrFromNode(subnode);
                 if (metadata)
                 {
+                    playing_time.start();
+                    video_started = true;
                     PlayVideo(metadata->GetFilename(), 
                                        m_d->m_videoList->getListCache());
                 }
             }
+	    i++;
         }
     }
 }
