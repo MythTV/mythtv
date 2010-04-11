@@ -153,6 +153,9 @@ class ImportIconsWizard : public MythScreenType
     void askSubmit(const QString& strParam);
     void Close();
 
+  private slots:
+    void itemChanged(MythUIButtonListItem *item);
+
   protected:
     void Init(void);
     
@@ -184,6 +187,9 @@ class ImportIconsWizard : public MythScreenType
     MythUIButton     *m_manualButton;  //!< manual button field
     MythUIButton     *m_skipButton;    //!< button skip
     MythUIText       *m_statusText;
+
+    MythUIImage      *m_preview;
+    MythUIText       *m_previewtitle;
 
 };
 

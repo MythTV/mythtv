@@ -75,6 +75,8 @@ bool ImportIconsWizard::Create()
     m_manualButton = dynamic_cast<MythUIButton *>(GetChild("search"));
     m_skipButton = dynamic_cast<MythUIButton *>(GetChild("skip"));
     m_statusText = dynamic_cast<MythUIText *>(GetChild("status"));
+    m_preview = dynamic_cast<MythUIImage *>(GetChild("preview"));
+    m_previewtitle = dynamic_cast<MythUIText *>(GetChild("previewtitle"));
 
     if (!m_iconsList || !m_manualEdit || !m_nameText || !m_manualButton ||
         !m_skipButton || !m_statusText)
@@ -96,6 +98,8 @@ bool ImportIconsWizard::Create()
     connect(m_skipButton, SIGNAL(Clicked()), SLOT(skip()));
     connect(m_iconsList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(menuSelection(MythUIButtonListItem *)));
+    connect(m_iconsList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            SLOT(itemChanged(MythUIButtonListItem *)));
             
     BuildFocusList();
 
@@ -236,6 +240,26 @@ void ImportIconsWizard::menuSelection(MythUIButtonListItem *item)
             Close();
     }
 
+}
+
+void ImportIconsWizard::itemChanged(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    if (m_preview)
+    {
+        m_preview->Reset();
+        QString iconpath = item->GetImage("icon");
+        if (!iconpath.isEmpty())
+        {
+            m_preview->SetFilename(iconpath);
+            m_preview->Load();
+        }
+    }
+
+    if (m_previewtitle)
+        m_previewtitle->SetText(item->GetText("iconname"));
 }
 
 bool ImportIconsWizard::initialLoad(QString name)
@@ -660,12 +684,16 @@ bool ImportIconsWizard::search(const QString& strParam)
 
                 QString iconfile = entry.strLogo.section('/', -1);
                 iconfile = m_tmpDir.absoluteFilePath(iconfile);
+                QString iconname = entry.strName;
                 bool haveIcon = true;
                 if (!QFile(iconfile).exists())
                     haveIcon = HttpComms::getHttpFile(iconfile, entry.strLogo);
 
                 if (haveIcon)
+                {
                     item->SetImage(iconfile, "icon");
+                    item->SetText(iconname, "iconname");
+                }
                 prevIconName = entry.strName;
                 if (m_progressDialog)
                     m_progressDialog->SetProgress(x+1);

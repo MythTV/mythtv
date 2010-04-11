@@ -33,6 +33,9 @@ class ChannelEditor : public MythScreenType
     void setHideMode(bool hide);
     void fillList();
 
+  private slots:
+    void itemChanged(MythUIButtonListItem *item);
+
   private:
     enum sourceFilter {
         FILTER_ALL = -1,
@@ -46,6 +49,14 @@ class ChannelEditor : public MythScreenType
 
     MythUIButtonList *m_channelList;
     MythUIButtonList *m_sourceList;
+
+    MythUIImage      *m_preview;
+    MythUIText       *m_channame;
+    MythUIText       *m_channum;
+    MythUIText       *m_callsign;
+    MythUIText       *m_chanid;
+    MythUIText       *m_sourcename;
+    MythUIText       *m_compoundname;
 };
 
 class ChannelID;

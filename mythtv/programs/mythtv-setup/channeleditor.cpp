@@ -140,6 +140,13 @@ bool ChannelEditor::Create()
     MythUIButtonList *sortList = dynamic_cast<MythUIButtonList *>(GetChild("sorting"));
     m_sourceList = dynamic_cast<MythUIButtonList *>(GetChild("source"));
     m_channelList = dynamic_cast<MythUIButtonList *>(GetChild("channels"));
+    m_preview = dynamic_cast<MythUIImage *>(GetChild("preview"));
+    m_channame = dynamic_cast<MythUIText *>(GetChild("name"));
+    m_channum = dynamic_cast<MythUIText *>(GetChild("channum"));
+    m_callsign = dynamic_cast<MythUIText *>(GetChild("callsign"));
+    m_chanid = dynamic_cast<MythUIText *>(GetChild("chanid"));
+    m_sourcename = dynamic_cast<MythUIText *>(GetChild("sourcename"));
+    m_compoundname = dynamic_cast<MythUIText *>(GetChild("compoundname"));
 
     MythUIButton *deleteButton = dynamic_cast<MythUIButton *>(GetChild("delete"));
     MythUIButton *scanButton = dynamic_cast<MythUIButton *>(GetChild("scan"));
@@ -210,6 +217,8 @@ bool ChannelEditor::Create()
     // Other signals
     connect(m_channelList, SIGNAL(itemClicked(MythUIButtonListItem *)),
             SLOT(edit(MythUIButtonListItem *)));
+    connect(m_channelList, SIGNAL(itemSelected(MythUIButtonListItem *)),
+            SLOT(itemChanged(MythUIButtonListItem *)));
     connect(scanButton, SIGNAL(Clicked()), SLOT(scan()));
     connect(deleteButton,  SIGNAL(Clicked()), SLOT(deleteChannels()));
 
@@ -246,6 +255,41 @@ bool ChannelEditor::keyPressEvent(QKeyEvent *event)
         handled = true;
 
     return handled;
+}
+
+void ChannelEditor::itemChanged(MythUIButtonListItem *item)
+{
+    if (!item)
+        return;
+
+    if (m_preview)
+    {
+        m_preview->Reset();
+        QString iconpath = item->GetImage();
+        if (!iconpath.isEmpty())
+        {
+            m_preview->SetFilename(iconpath);
+            m_preview->Load();
+        }
+    }
+
+    if (m_channame)
+        m_channame->SetText(item->GetText("name"));
+
+    if (m_channum)
+        m_channum->SetText(item->GetText("channum"));
+
+    if (m_callsign)
+        m_callsign->SetText(item->GetText("callsign"));
+
+    if (m_chanid)
+        m_chanid->SetText(item->GetText("chanid"));
+
+    if (m_sourcename)
+        m_sourcename->SetText(item->GetText("sourcename"));
+
+    if (m_compoundname)
+        m_compoundname->SetText(item->GetText("compoundname"));
 }
 
 void ChannelEditor::fillList(void)
