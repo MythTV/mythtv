@@ -73,7 +73,7 @@ int mythplugin_run(void)
         gContext->GetSetting("MythMovies.Grabber") == "")
     {
         VERBOSE(VB_IMPORTANT,
-                QString("Invalid configuration options supplied."));
+                QString("MythMovies: Invalid configuration options supplied."));
         gContext->ActivateSettingsCache(true);
         return -1;
     }
