@@ -71,10 +71,16 @@ static uint safe_write(int fd, const void *data, uint sz, bool &ok)
                 VERBOSE(VB_IMPORTANT, LOC + "safe_write(): Got EAGAIN.");
                 continue;
             }
-
+            if (errno == ENOSPC)
+            {
+                VERBOSE(VB_IMPORTANT, LOC + "safe_write(): Got ENOSPC (No space left on device).");
+		errcnt = 10;
+		tot = 0;
+                break;
+            }
             errcnt++;
             VERBOSE(VB_IMPORTANT, LOC_ERR + "safe_write(): File I/O " +
-                    QString(" errcnt: %1").arg(errcnt) + ENO);
+                    QString(" errcnt: %1").arg(errcnt) + ENO + QString(" errno: %1").arg(errno));
 
             if (errcnt == 3)
                 break;
@@ -474,19 +480,30 @@ void ThreadedFileWriter::DiskLoop(void)
             size = safe_write(fd, buf + trpos, size, write_ok);
         }
 
-
-        if (!ignore_writes && !write_ok && (EFBIG == errno))
+        if (!ignore_writes && !write_ok && ((EFBIG == errno) || (ENOSPC == errno)))
         {
-            QString msg =
-                "Maximum file size exceeded by '%1'"
-                "\n\t\t\t"
-                "You must either change the process ulimits, configure"
-                "\n\t\t\t"
-                "your operating system with \"Large File\" support, or use"
-                "\n\t\t\t"
-                "a filesystem which supports 64-bit or 128-bit files."
-                "\n\t\t\t"
-                "HINT: FAT32 is a 32-bit filesystem.";
+            QString msg;
+            switch (errno)
+            {
+                case EFBIG:
+                    msg =
+                        "Maximum file size exceeded by '%1'"
+                        "\n\t\t\t"
+                        "You must either change the process ulimits, configure"
+                        "\n\t\t\t"
+                        "your operating system with \"Large File\" support, or use"
+                        "\n\t\t\t"
+                        "a filesystem which supports 64-bit or 128-bit files."
+                        "\n\t\t\t"
+                        "HINT: FAT32 is a 32-bit filesystem.";
+                    break;
+                case ENOSPC:
+                    msg =
+                        "No space left on the device for file '%1'"
+                        "\n\t\t\t"
+                        "file will be truncated, no further writing will be done.";
+                    break;
+            }
 
             VERBOSE(VB_IMPORTANT, msg.arg(filename));
             ignore_writes = true;
