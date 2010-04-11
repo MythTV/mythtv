@@ -31,7 +31,6 @@ using namespace std;
 #include "tv_rec.h"
 #include "tv_play.h"
 #include "audioinput.h"
-#include "myth_imgconvert.h"
 
 #ifdef WORDS_BIGENDIAN
 extern "C" {
@@ -41,6 +40,7 @@ extern "C" {
 
 extern "C" {
 #include "vbitext/vbi.h"
+#include "libswscale/swscale.h"
 }
 
 #include "videodev_myth.h"
@@ -1470,6 +1470,40 @@ void NuppelVideoRecorder::DoV4L2(void)
     recording = true;
     resetcapture = false;
 
+    // setup pixel format conversions for YUYV and UYVY
+    uint8_t *output_buffer = NULL;
+    struct SwsContext *convert_ctx = NULL;
+    AVPicture img_out;
+    if (v4l2_pixelformat == V4L2_PIX_FMT_YUYV ||
+        v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
+    {
+        PixelFormat in_pixfmt = v4l2_pixelformat == V4L2_PIX_FMT_YUYV ?
+                                PIX_FMT_YUYV422 :
+                                PIX_FMT_UYVY422;
+
+        output_buffer = (uint8_t*)av_malloc(height * width * 3 / 2);
+        if (!output_buffer)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot initialize image conversion"
+                    "buffer");
+            errored = true;
+            return;
+        }
+
+        convert_ctx = sws_getCachedContext(convert_ctx, width, height, in_pixfmt,
+                                           width, height, PIX_FMT_YUV420P,
+                                           SWS_FAST_BILINEAR, NULL, NULL, NULL);
+        if (!convert_ctx)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Cannot initialize image conversion "
+                    "context");
+            errored = true;
+            return;
+        }
+
+        avpicture_fill(&img_out, output_buffer, PIX_FMT_YUV420P, width, height);
+    }
+
     // Qt4 requires a QMutex as a parameter...
     // not sure if this is the best solution.  Mutex Must be locked before wait.
     QMutex mutex;
@@ -1561,33 +1595,19 @@ again:
         {
             if (v4l2_pixelformat == V4L2_PIX_FMT_YUYV)
             {
-                // Convert YUYV to YUV420P
-                /* FIXME:
-                 *   don't use the stack for the conversion buffer
-                 *   use swscale directly
-                 */
-                unsigned conversion_buffer_size = height * width * 3 / 2;
-                uint8_t conversion_buffer[conversion_buffer_size];
-                AVPicture img_in, img_out;
-                avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, width, height);
+                AVPicture img_in;
                 avpicture_fill(&img_in, buffers[frame], PIX_FMT_YUYV422, width, height);
-                myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_YUYV422, width, height);
-                BufferIt(conversion_buffer, video_buffer_size);
+                sws_scale(convert_ctx, img_in.data, img_in.linesize,
+                          0, height, img_out.data, img_out.linesize);
+                BufferIt(output_buffer, video_buffer_size);
             }
             else if (v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
             {
-                // Convert UYVY to YUV420P
-                /* FIXME:
-                 *   don't use the stack for the conversion buffer
-                 *   use swscale directly
-                 */
-                unsigned conversion_buffer_size = height * width * 3 / 2;
-                uint8_t conversion_buffer[conversion_buffer_size];
-                AVPicture img_in, img_out;
-                avpicture_fill(&img_out, conversion_buffer, PIX_FMT_YUV420P, width, height);
+                AVPicture img_in;
                 avpicture_fill(&img_in, buffers[frame], PIX_FMT_UYVY422, width, height);
-                myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_UYVY422, width, height);
-                BufferIt(conversion_buffer, video_buffer_size);
+                sws_scale(convert_ctx, img_in.data, img_in.linesize,
+                          0, height, img_out.data, img_out.linesize);
+                BufferIt(output_buffer, video_buffer_size);
             }
             else
             {
@@ -1610,6 +1630,9 @@ again:
     }
 
     FinishRecording();
+
+    av_free(output_buffer);
+    sws_freeContext(convert_ctx);
 
     recording = false;
     close(fd);
