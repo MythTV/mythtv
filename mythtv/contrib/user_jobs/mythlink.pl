@@ -223,9 +223,9 @@ options:
     format.
 
     Renaming the recording files is no longer supported.  Instead, use
-    contrib/exports/mythfs.py to create a FUSE file system that represents
-    recordings using human-readable file names or use mythlink.pl to create
-    links with human-readable names to the recording files.
+    http://www.mythtv.org/wiki/mythfs.py to create a FUSE file system that
+    represents recordings using human-readable file names or use mythlink.pl to
+    create links with human-readable names to the recording files.
 
 --verbose
 
