@@ -65,6 +65,10 @@ static IOReturn dfd_tspacket_handler_thunk(
     long unsigned int tsPacketCount, UInt32 **ppBuf, void *callback_data);
 static void dfd_update_device_list(void *dfd, io_iterator_t iterator);
 static void dfd_streaming_log_message(char *pString);
+void *dfd_controller_thunk(void *param);
+void dfd_stream_msg(long unsigned int msg, long unsigned int param1,
+                    long unsigned int param2, void *callback_data);
+int dfd_no_data_notification(void *callback_data);
 
 class DFDPriv
 {
