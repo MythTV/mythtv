@@ -132,6 +132,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
     int CreateNuppelFile(void);
 
     void ProbeV4L2(void);
+    bool SetFormatV4L2(void);
     void DoV4L(void);
     void DoV4L2(void);
     void DoMJPEG(void);
@@ -259,6 +260,7 @@ class MPUBLIC NuppelVideoRecorder : public RecorderBase, public CC608Reader
 
     VideoFrameType inpixfmt;
     PixelFormat picture_format;
+    uint32_t v4l2_pixelformat;
     int w_out;
     int h_out;
 

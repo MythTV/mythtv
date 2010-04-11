@@ -126,6 +126,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
     audio_bytes_per_sample = audio_channels * audio_bits / 8;
 
     picture_format = PIX_FMT_YUV420P;
+    v4l2_pixelformat = 0;
 
     avcodec_register_all();
 
@@ -983,6 +984,20 @@ void NuppelVideoRecorder::StartRecording(void)
         return;
     }
 
+    if (!Open())
+    {
+        errored = true;
+        return;
+    }
+
+    ProbeV4L2();
+
+    if (usingv4l2 && !SetFormatV4L2())
+    {
+        errored = true;
+        return;
+    }
+
     StreamAllocate();
 
     positionMapLock.lock();
@@ -1028,14 +1043,6 @@ void NuppelVideoRecorder::StartRecording(void)
 
     // try to get run at higher scheduling priority, ignore failure
     myth_nice(-10);
-
-    if (!Open())
-    {
-        errored = true;
-        return;
-    }
-
-    ProbeV4L2();
 
     if (usingv4l2)
     {
@@ -1234,23 +1241,10 @@ void NuppelVideoRecorder::DoV4L(void)
     close(fd);
 }
 
-void NuppelVideoRecorder::DoV4L2(void)
+bool NuppelVideoRecorder::SetFormatV4L2(void)
 {
     struct v4l2_format     vfmt;
-    struct v4l2_buffer     vbuf;
-    struct v4l2_requestbuffers vrbuf;
-    struct v4l2_control    vc;
-
     memset(&vfmt, 0, sizeof(vfmt));
-    memset(&vbuf, 0, sizeof(vbuf));
-    memset(&vrbuf, 0, sizeof(vrbuf));
-    memset(&vc, 0, sizeof(vc));
-
-    vc.id = V4L2_CID_AUDIO_MUTE;
-    vc.value = 0;
-
-    if (ioctl(fd, VIDIOC_S_CTRL, &vc) < 0)
-        perror("VIDIOC_S_CTRL:V4L2_CID_AUDIO_MUTE");
 
     vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
@@ -1277,8 +1271,7 @@ void NuppelVideoRecorder::DoV4L2(void)
             if (ioctl(fd, VIDIOC_S_FMT, &vfmt) < 0)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: Unable to set desired format");
-                errored = true;
-                return;
+                return false;
             }
             else
             {
@@ -1287,8 +1280,7 @@ void NuppelVideoRecorder::DoV4L2(void)
                 {
                     VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: uyvy format supported, but yuv422 requested.");
                     VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: unfortunately, this converter hasn't been written yet, exiting");
-                    errored = true;
-                    return;
+                    return false;
                 }
                 VERBOSE(VB_RECORD, LOC + "v4l2: format set, getting uyvy from v4l, converting");
             }
@@ -1300,14 +1292,47 @@ void NuppelVideoRecorder::DoV4L2(void)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: yuyv format supported, but yuv422 requested.");
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "v4l2: unfortunately, this converter hasn't been written yet, exiting");
-                errored = true;
-                return;
+                return false;
             }
             VERBOSE(VB_RECORD, LOC + "v4l2: format set, getting yuyv from v4l, converting");
         }
     }
     else // cool, we can do our preferred format, most likely running on bttv.
         VERBOSE(VB_RECORD, LOC + "v4l2: format set, getting yuv420 from v4l");
+
+    // VIDIOC_S_FMT might change the format, check it
+    if (w != (int)vfmt.fmt.pix.width ||
+        h != (int)vfmt.fmt.pix.height)
+    {
+        VERBOSE(VB_RECORD, LOC + QString("v4l2: resolution changed. reuested "
+                                         "%1x%2, using %3x%4 now")
+                .arg(w).arg(h)
+                .arg(vfmt.fmt.pix.width)
+                .arg(vfmt.fmt.pix.height));
+        w_out = w = vfmt.fmt.pix.width;
+        h_out = h = vfmt.fmt.pix.height;
+    }
+
+    v4l2_pixelformat = vfmt.fmt.pix.pixelformat;
+
+    return true;
+}
+
+void NuppelVideoRecorder::DoV4L2(void)
+{
+    struct v4l2_buffer     vbuf;
+    struct v4l2_requestbuffers vrbuf;
+    struct v4l2_control    vc;
+
+    memset(&vbuf, 0, sizeof(vbuf));
+    memset(&vrbuf, 0, sizeof(vrbuf));
+    memset(&vc, 0, sizeof(vc));
+
+    vc.id = V4L2_CID_AUDIO_MUTE;
+    vc.value = 0;
+
+    if (ioctl(fd, VIDIOC_S_CTRL, &vc) < 0)
+        perror("VIDIOC_S_CTRL:V4L2_CID_AUDIO_MUTE");
 
     if (go7007)
     {
@@ -1534,7 +1559,7 @@ again:
 
         if (!request_pause)
         {
-            if (vfmt.fmt.pix.pixelformat == V4L2_PIX_FMT_YUYV)
+            if (v4l2_pixelformat == V4L2_PIX_FMT_YUYV)
             {
                 // Convert YUYV to YUV420P
                 /* FIXME:
@@ -1549,7 +1574,7 @@ again:
                 myth_sws_img_convert(&img_out, PIX_FMT_YUV420P, &img_in, PIX_FMT_YUYV422, w, h);
                 BufferIt(conversion_buffer, video_buffer_size);
             }
-            else if (vfmt.fmt.pix.pixelformat == V4L2_PIX_FMT_UYVY)
+            else if (v4l2_pixelformat == V4L2_PIX_FMT_UYVY)
             {
                 // Convert UYVY to YUV420P
                 /* FIXME:
