@@ -5,6 +5,7 @@
 
 #if defined(__FreeBSD__) || CONFIG_DARWIN || defined(USING_MINGW)
 #include <sys/types.h>
+#include <stdint.h>
 typedef uint32_t __u32; 
 typedef uint16_t __u16; 
 typedef int32_t  __s32; 
