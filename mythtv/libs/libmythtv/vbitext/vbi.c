@@ -532,12 +532,12 @@ setup_dev(struct vbi *vbi)
 #ifdef _WIN32
     (void) vbi;
 #else // if !_WIN32
-    struct v4l2_format v4l2_format[1];
-    struct v4l2_vbi_format *vbifmt = &v4l2_format->fmt.vbi;
+    struct v4l2_format v4l2_format;
+    struct v4l2_vbi_format *vbifmt = &v4l2_format.fmt.vbi;
 
     memset(&v4l2_format, 0, sizeof(v4l2_format));
-    v4l2_format->type = V4L2_BUF_TYPE_VBI_CAPTURE;
-    if (ioctl(vbi->fd, VIDIOC_G_FMT, v4l2_format) == -1)
+    v4l2_format.type = V4L2_BUF_TYPE_VBI_CAPTURE;
+    if (ioctl(vbi->fd, VIDIOC_G_FMT, &v4l2_format) == -1)
     {
        // not a v4l2 device.  assume bttv and create a standard fmt-struct.
        int size;
