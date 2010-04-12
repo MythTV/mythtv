@@ -213,8 +213,8 @@ static HostLineEdit *MiscStatusScript()
     he->setValue("");
     he->setHelpText(QObject::tr("External application or script that outputs "
                                 "extra information for inclusion in the "
-                                "backend status page.  See "
-                                "contrib/info/misc_status_info/README"));
+                                "backend status page.  See http://www.mythtv."
+                                "org/wiki/Miscellaneous_Status_Information"));
     return he;
 }
 
