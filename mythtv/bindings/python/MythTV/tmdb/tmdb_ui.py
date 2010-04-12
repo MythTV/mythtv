@@ -16,12 +16,15 @@ __title__ ="tmdb_ui - Is a simple console user interface for the tmdb_api. The i
 __author__="dbr/Ben modified by R.D. Vaughan"
 __purpose__='''Console interface for selecting a movie from themoviedb.org. This interface would be invoked when an exact match is not found and the invoking script has specified the "interactive = True" when creating an instance of MovieDb().
 '''
-__version__="v0.1.4"
+__version__="v0.1.5"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Release bump - no changes to this code
 # 0.1.3 Release bump - no changes to this code
 # 0.1.4 Release bump - no changes to this code
+# 0.1.5 Modified automated selection when there was only one search result. It was causing
+#       too many incorrect selections.
+#       Also removed a duplicate initialization of the version number.
 
 
 """Contains included user interfaces for tmdb movie/person selection.
@@ -67,10 +70,7 @@ Then to use it..
 [{"Avatar",'19995'}]
 """
 
-__version__=u"v0.1.0"
- # 0.1.0 Initial development
-
-import os, struct, sys
+import os, struct, sys, string
 from tmdb_exceptions import TmdbUiAbort
 
 class OutStreamEncoder(object):
@@ -101,6 +101,21 @@ class OutStreamEncoder(object):
 sys.stdout = OutStreamEncoder(sys.stdout, 'utf8')
 sys.stderr = OutStreamEncoder(sys.stderr, 'utf8')
 
+# Two routines used for movie title search and matching
+def is_punct_char(char):
+    '''check if char is punctuation char
+    return True if char is punctuation
+    return False if char is not punctuation
+    '''
+    return char in string.punctuation
+
+def is_not_punct_char(char):
+    '''check if char is not punctuation char
+    return True if char is not punctuation
+    return False if chaar is punctuation
+    '''
+    return not is_punct_char(char)
+
 
 def makeDict(movieORperson):
     '''Make a dictionary out of the chosen movie data
@@ -116,9 +131,10 @@ def makeDict(movieORperson):
 class BaseUI:
     """Default non-interactive UI, which auto-selects first results
     """
-    def __init__(self, config, log):
+    def __init__(self, config, log, searchTerm=None):
         self.config = config
         self.log = log
+        self.searchTerm = searchTerm
 
     def selectMovieOrPerson(self, allElements):
         return makeDict([allElements[0]])
@@ -127,6 +143,23 @@ class BaseUI:
 class ConsoleUI(BaseUI):
     """Interactively allows the user to select a movie or person from a console based UI
     """
+
+    def removeCommonWords(self, title):
+        '''Remove common words from a title
+        return title striped of common words
+        '''
+        if not title:
+            return u' '
+        wordList = [u'the ', u'a ', u'  '] # common word list. Leave double space as the last value.
+        title = title.lower()
+        for word in wordList:
+            title = title.replace(word, u'')
+        if not title:
+            return u' '
+        title = title.strip()
+        return filter(is_not_punct_char, title)
+    # end removeCommonWords()
+
 
     def _displayMovie(self, allElements):
         """Helper function, lists movies or people with corresponding ID
@@ -172,14 +205,18 @@ class ConsoleUI(BaseUI):
 
         refsize = 5     # The number of digits required in a TMDB number is directly entered
         if len(allElements) == 2 and morp == u'movie':
-            # Single result, return it!
-            print u"Automatically selecting only result"
-            return [makeDict(allElements[0])]
+            data = makeDict(allElements[0])
+            if self.removeCommonWords(data['name']) == self.removeCommonWords(self.searchTerm) and data.has_key('released'):
+                # Single result, return it!
+                print u"Automatically selecting only result"
+                return [data]
 
         if len(allElements) == 1 and morp == u'person':
-            # Single result, return it!
-            print u"Automatically selecting only result"
-            return [makeDict(allElements[0])]
+            data = makeDict(allElements[0])
+            if self.removeCommonWords(data['name']) == self.removeCommonWords(self.searchTerm):
+                # Single result, return it!
+                print u"Automatically selecting only result"
+                return [data]
 
         if self.config['select_first'] is True:
             print u"Automatically returning first search result"
@@ -209,7 +246,7 @@ class ConsoleUI(BaseUI):
                 elif ans == "?":
                     print u"## Help"
                     print u"# Enter the number that corresponds to the correct movie."
-                    print u"# Paste a TMDB %s ID number (pad with leading zeros to make 5 digits) for themoviedb.org and hit 'Enter'" % morp
+                    print u"# Paste a TMDB %s ID number (pad with leading zeros to make 5 digits) from themoviedb.org and hit 'Enter'" % morp
                     print u"# ? - this help"
                     print u"# q - abort/skip movie selection"
                 else:
@@ -218,10 +255,12 @@ class ConsoleUI(BaseUI):
             else:
                 self.log.debug('Trying to return ID: %d' % (selected_id))
                 try:
-                    return [makeDict(allElements[selected_id])]
+                    data = makeDict(allElements[selected_id])
+                    data['userResponse'] = u'User selected'
+                    return [data]
                 except IndexError:
                     if len(ans) == refsize:
-                        return [{'name': u'User selected', 'id': u'%d' % int(ans)}]
+                        return [{'userResponse': u'User input', 'id': u'%d' % int(ans)}]
             #end try
         #end while not valid_input
 	# end selectMovieOrPerson()

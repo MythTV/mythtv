@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.2"
+__version__=u"v0.7.3"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -300,6 +300,8 @@ __version__=u"v0.7.2"
  #       making a list selection
  #       These bugs were both identified by Edi Iten (thanks)
  # 0.7.2 Fixed a bug where an inetref field was not properly initialized and caused an abort. Ticket #8243
+ # 0.7.3 Fixed a bug where a user selected TMDB# was not being used.
+ #       Minor change to fuzzy matching of a file named parsed title with those from TMDB and TVDB.
 
 
 usage_txt=u'''
@@ -990,13 +992,13 @@ class jamu_ConsoleUI(BaseUI):
                 except IndexError:
                     if len(ans) == refsize and reftype != u'Series id':
                         UI_selectedtitle = u''
-                        return {'name': u'User selected', 'sid': ans}
+                        return {'name': u'User input', 'sid': ans}
                     elif reftype == u'Series id':
                         if len(ans) >= refsize:
                             UI_selectedtitle = u''
-                            return {'name': u'User selected', 'sid': ans}
+                            return {'name': u'User input', 'sid': ans}
                     self.log.debug(u'Invalid number entered!')
-                    print u'Invalid number (%d) selected! A directly entered %s must be a full %d zero padded digits (e.g. 905 should be entered as %s)' % (selected_id, reftype, refsize, refformat % 905)
+                    print u'Invalid number (%d) input! A directly entered %s must be a full %d zero padded digits (e.g. 905 should be entered as %s)' % (selected_id, reftype, refsize, refformat % 905)
                     UI_selectedtitle = u''
                     self._displaySeries(allSeries)
             #end try
@@ -3161,6 +3163,22 @@ class MythTvMetaData(VideoFiles):
     # end rtnAbsolutePath
 
 
+    def removeCommonWords(self, title):
+        '''Remove common words from a title
+        return title striped of common words
+        '''
+        if not title:
+            return u' '
+        wordList = [u'the ', u'a ', u'  '] # common word list. Leave double space as the last value.
+        title = title.lower()
+        for word in wordList:
+            title = title.replace(word, u'')
+        if not title:
+            return u' '
+        return filter(is_not_punct_char, title.strip())
+    # end removeCommonWords()
+
+
     def _getTmdbIMDB(self, title, watched=False, IMDB=False, rtnyear=False):
         '''Find and exact match of the movie name with what's on themoviedb.com
         If IMDB is True return an imdb#
@@ -3188,7 +3206,7 @@ class MythTvMetaData(VideoFiles):
         while True:
             try:
                 if IMDB:
-                    results = self.config['tmdb_api'].searchIMDB(IMDB)
+                    results = [self.config['tmdb_api'].searchIMDB(IMDB)]
                 elif user_tmdb:
                     results = self.config['tmdb_api'].searchTMDB(user_tmdb)
                     if rtnyear:
@@ -3201,7 +3219,7 @@ class MythTvMetaData(VideoFiles):
                 else:
                     results = self.config['tmdb_api'].searchTitle(tmp_title)
             except TmdbMovieOrPersonNotFound, e:
-                results = [[]]
+                results = [{}]
             except Exception, errormsg:
                 self._displayMessage(u"themoviedb.com error for Movie(%s) invalid data error (%s)" % (title, errormsg))
                 return False
@@ -3209,25 +3227,35 @@ class MythTvMetaData(VideoFiles):
                 self._displayMessage(u"themoviedb.com error for Movie(%s)" % title)
                 return False
 
-            # Check if the user wants to skip this video
+            # Check if user's interactive response (Skip, selection, input #)
             if len(results[0]) and self.config['interactive']:
+                if results[0].has_key('userResponse'):
+                    # Check if the user selected a specific movie from the list
+                    if results[0]['userResponse'] == 'User selected':
+                        if rtnyear:
+                            if results[0].has_key('released'):
+                                data = {'name': "%s (%s)" % (results[0]['name'], results[0]['released'][:4]), u'sid': results[0][u'id']}
+                            else:
+                                data = {'name': "%s" % (results[0]['name'], ), u'sid': results[0][u'id']}
+                            return data
+                        else:
+                            return results[0]['id']
+                    # Check if the user has entered a TMDB number themselves
+                    if results[0]['userResponse'] == 'User input':
+                        user_tmdb = results[0]['id']
+                        continue
+                # Check if the user wants this video to be ignored by Jamu from now on
                 if results[0]['id'] == '99999999':
                     if rtnyear:
                         return False
                     else:
                         return results[0]['id']
-            # Check if the user has entered a TMDB number themselves
-            if len(results[0]) and self.config['interactive']:
-                if results[0]['name'] == 'User selected':
-                    user_tmdb = results[0]['id']
-                    continue
             break
-
 
         if IMDB: # This is required to allow graphic file searching both by a TMDB and IMDB numbers
             if len(results[0]):
-                if results.has_key('imdb_id'):
-                    return results['imdb_id'][2:]
+                if results[0].has_key('imdb_id'):
+                    return results[0]['imdb_id'][2:]
                 else:
                     return False
             else:
@@ -3243,7 +3271,7 @@ class MythTvMetaData(VideoFiles):
 
         if len(results[0]):
             for movie in results:
-                if filter(is_not_punct_char, movie['name']).lower() == filter(is_not_punct_char, name):
+                if self.removeCommonWords(movie['name']) == self.removeCommonWords(name):
                     if not year:
                         if movie.has_key('released'):
                             TMDB_movies.append({'name': "%s (%s)" % (movie['name'], movie['released'][:4]), u'sid': movie[u'id']})
@@ -3262,7 +3290,7 @@ class MythTvMetaData(VideoFiles):
                         TMDB_movies.append({'name': "%s" % (movie['name'], ), u'sid': movie[u'id']})
                         continue
                 elif movie.has_key('alternative_name'):
-                    if filter(is_not_punct_char, movie['alternative_name']).lower() == filter(is_not_punct_char, name):
+                    if self.removeCommonWords(movie['alternative_name']) == self.removeCommonWords(name):
                         if not year:
                             if movie.has_key('released'):
                                 TMDB_movies.append({'name': "%s (%s)" % (movie['alternative_name'], movie['released'][:4]), u'sid': movie[u'id']})
@@ -3310,7 +3338,7 @@ class MythTvMetaData(VideoFiles):
                     continue
                 tmp_movies[temp.keys()[0]] = temp[temp.keys()[0]]
             for movie in tmp_movies:
-                if tmp_movies[movie][:-7].lower() == name or filter(is_not_punct_char, tmp_movies[movie][:-7]).lower() == filter(is_not_punct_char, name):
+                if tmp_movies[movie][:-7].lower() == name or self.removeCommonWords(tmp_movies[movie][:-7]) == self.removeCommonWords(name):
                     if year:
                         if tmp_movies[movie][-5:-1] == year:
                             if rtnyear:
@@ -3320,7 +3348,7 @@ class MythTvMetaData(VideoFiles):
                 IMDB_movies.append({'name': tmp_movies[movie], u'sid': movie})
 
         if len(IMDB_movies) == 1: # If this is the only choice and titles matched then auto pick it
-            if filter(is_not_punct_char, IMDB_movies[0]['name'][:-7]).lower() == filter(is_not_punct_char, name):
+            if self.removeCommonWords(IMDB_movies[0]['name'][:-7]) == self.removeCommonWords(name):
                 if rtnyear:
                     return IMDB_movies[0]
                 else:
@@ -3358,7 +3386,7 @@ class MythTvMetaData(VideoFiles):
                 if inetref['sid'] == '99999999':
                     return inetref['sid']
                 if rtnyear:
-                    if inetref['name'] == u'User selected':
+                    if inetref['name'] == u'User input':
                         try:
                             data = imdb_access.get_movie(inetref['sid'])
                             if data.has_key('long imdb title'):
