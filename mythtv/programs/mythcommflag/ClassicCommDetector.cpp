@@ -292,7 +292,7 @@ bool ClassicCommDetector::go()
     int requiredHeadStart = requiredBuffer;
     bool wereRecording = stillRecording;
 
-    emit statusUpdate("Building Head Start Buffer");
+    emit statusUpdate(QObject::tr("Building Head Start Buffer"));
     secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
     while (stillRecording && (secsSince < requiredHeadStart))
     {
@@ -317,7 +317,7 @@ bool ClassicCommDetector::go()
         requiredHeadStart += max(0,recordingStartedAt.secsTo(startedAt));
         requiredHeadStart += logoDetector->getRequiredAvailableBufferForSearch();
 
-        emit statusUpdate("Building Logo Detection Buffer");
+        emit statusUpdate(QObject::tr("Building Logo Detection Buffer"));
         secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
         while (stillRecording && (secsSince < requiredHeadStart))
         {
@@ -346,7 +346,7 @@ bool ClassicCommDetector::go()
 
     if (commDetectMethod & COMM_DETECT_LOGO)
     {
-        emit statusUpdate("Searching for Logo");
+        emit statusUpdate(QObject::tr("Searching for Logo"));
 
         if (showProgress)
         {

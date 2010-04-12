@@ -36,6 +36,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "RingBuffer.h"
 #include "mythcommandlineparser.h"
+#include "langsettings.h"
 
 // Commercial Flagging headers
 #include "CommDetectorBase.h"
@@ -1205,6 +1206,8 @@ int main(int argc, char *argv[])
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return COMMFLAG_EXIT_NO_MYTHCONTEXT;
     }
+
+    LanguageSettings::load("mythfrontend");
 
     if (settingsOverride.size())
     {

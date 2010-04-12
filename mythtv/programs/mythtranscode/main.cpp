@@ -23,6 +23,7 @@ using namespace std;
 #include "transcode.h"
 #include "mpeg2fix.h"
 #include "remotefile.h"
+#include "langsettings.h"
 
 void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
@@ -431,6 +432,8 @@ int main(int argc, char *argv[])
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return TRANSCODE_EXIT_NO_MYTHCONTEXT;
     }
+
+    LanguageSettings::load("mythfrontend");
 
     if (settingsOverride.size())
     {

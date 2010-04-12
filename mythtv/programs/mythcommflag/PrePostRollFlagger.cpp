@@ -41,7 +41,7 @@ bool PrePostRollFlagger::go()
     secsSince = startedAt.secsTo(QDateTime::currentDateTime());
     while (stillRecording && (secsSince < requiredHeadStart))
     {
-        emit statusUpdate("Waiting to pass preroll + head start");
+        emit statusUpdate(QObject::tr("Waiting to pass preroll + head start"));
 
         emit breathe();
         if (m_bStop)
@@ -154,7 +154,7 @@ bool PrePostRollFlagger::go()
             emit breathe();
             if (m_bStop)
                 return false;
-            emit statusUpdate("Waiting for recording to finish");
+            emit statusUpdate(QObject::tr("Waiting for recording to finish"));
             sleep(5);
         }
         stillRecording = false;

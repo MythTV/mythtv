@@ -15,6 +15,9 @@ using namespace std;
 #include "mythverbose.h"
 #include "mythversion.h"
 #include "util.h"
+#include "langsettings.h"
+
+#include "mythconfig.h"
 
 // libmythtv headers
 #include "scheduledrecording.h"
@@ -508,6 +511,8 @@ int main(int argc, char *argv[])
         delete gContext;
         return FILLDB_EXIT_NO_MYTHCONTEXT;
     }
+
+    LanguageSettings::load("mythfrontend");
 
     if (!UpgradeTVDatabaseSchema(false))
     {

@@ -593,7 +593,7 @@ bool CommDetector2::go(void)
         struct timeval getframetime;
 
         if (searchingForLogo(logoFinder, *currentPass))
-            emit statusUpdate("Performing Logo Identification");
+            emit statusUpdate(QObject::tr("Performing Logo Identification"));
 
         clock.start();
         passTime.start();
