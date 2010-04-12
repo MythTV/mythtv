@@ -2312,9 +2312,9 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         }
     } else if (buf_end - p >= 3 && p[0] == 0x03 && ((p[1]&0x7f) == 0x01)) {
         /// SCTE 20 encoding of CEA-608
-        uint cc_count = p[2]>>3;
-        uint cc_bits = cc_count * 26;
-        uint cc_bytes = (cc_bits + 7 - 3) / 8;
+        unsigned int cc_count = p[2]>>3;
+        unsigned int cc_bits = cc_count * 26;
+        unsigned int cc_bytes = (cc_bits + 7 - 3) / 8;
         Mpeg1Context *s1 = avctx->priv_data;
         MpegEncContext *s = &s1->mpeg_enc_ctx;
         if (buf_end - p >= (2+cc_bytes) /*&& (s->tmp_atsc_cc_len + 2 + 3*cc_count) < ATSC_CC_BUF_SIZE*/) {

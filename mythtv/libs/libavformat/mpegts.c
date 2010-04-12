@@ -27,7 +27,6 @@
 #include "libavutil/intreadwrite.h"
 #include "libavcodec/bytestream.h"
 #include "avformat.h"
-#include "libmythdb/compat.h"  // for uint on MinGW (Windows)
 #include <pthread.h>
 #include "mpegts.h"
 #include "internal.h"
@@ -84,7 +83,7 @@ typedef struct
 } pmt_entry_t;
 
 static int is_pat_same(MpegTSContext *mpegts_ctx,
-                       int *pmt_pnums, int *pmts_pids, uint pmt_count);
+                       int *pmt_pnums, int *pmts_pids, unsigned int pmt_count);
 
 static void mpegts_add_stream(MpegTSContext *ts, int id, pmt_entry_t* item, uint32_t prog_reg_desc, int pcr_pid);
 static int is_pmt_same(MpegTSContext *mpegts_ctx, pmt_entry_t* items,
@@ -1363,7 +1362,7 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 }
 
 static int is_pat_same(MpegTSContext *mpegts_ctx,
-                       int *pmt_pnums, int *pmt_pids, uint pmt_count)
+                       int *pmt_pnums, int *pmt_pids, unsigned int pmt_count)
 {
     int idx;
     if (mpegts_ctx->nb_prg != pmt_count)
@@ -1663,7 +1662,7 @@ static void pat_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
 
     int pmt_pnums[PAT_MAX_PMT];
     int pmt_pids[PAT_MAX_PMT];
-    uint pmt_count = 0;
+    unsigned int pmt_count = 0;
     int i;
 
 #ifdef DEBUG
