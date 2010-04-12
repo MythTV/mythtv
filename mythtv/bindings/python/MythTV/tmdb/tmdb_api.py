@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.6"
+__version__="v0.1.7"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -29,6 +29,7 @@ __version__="v0.1.6"
 #       More data massaging added.
 # 0.1.5 Added a superclass to perform TMDB Trailer searches for the Mythnetvison grabber tmdb_nv.py
 # 0.1.6 Improved displayed error messages on an exception abort
+# 0.1.7 Fixed issues with interactive movie selection
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -255,8 +256,8 @@ class MovieDb(object):
         debug (True/False):
              shows verbose debugging information
 
-        custom_ui (tvdb_ui.BaseUI subclass):
-            A callable subclass of tvdb_ui.BaseUI (overrides interactive option)
+        custom_ui (tmdb_ui.BaseUI subclass):
+            A callable subclass of tmdb_ui.BaseUI (overrides interactive option)
 
         language (2 character language abbreviation):
             The language of the returned data. Is also the language search
@@ -581,14 +582,14 @@ class MovieDb(object):
         # Select the first result (most likely match) or invoke user interaction to select the correct movie
         if self.config['custom_ui'] is not None:
             self.log.debug("Using custom UI %s" % (repr(self.config['custom_ui'])))
-            ui = self.config['custom_ui'](config = self.config, log = self.log)
+            ui = self.config['custom_ui'](config = self.config, log = self.log, searchTerm = org_title)
         else:
             if not self.config['interactive']:
                 self.log.debug('Auto-selecting first search result using BaseUI')
-                ui = BaseUI(config = self.config, log = self.log)
+                ui = BaseUI(config = self.config, log = self.log, searchTerm = org_title)
             else:
                 self.log.debug('Interactivily selecting movie using ConsoleUI')
-                ui = ConsoleUI(config = self.config, log = self.log)
+                ui = ConsoleUI(config = self.config, log = self.log, searchTerm = org_title)
         return ui.selectMovieOrPerson(search_results)
     # end searchTitle()
 
@@ -775,14 +776,14 @@ class MovieDb(object):
         # Select the first result (most likely match) or invoke user interaction to select the correct movie
         if self.config['custom_ui'] is not None:
             self.log.debug("Using custom UI %s" % (repr(self.config['custom_ui'])))
-            ui = self.config['custom_ui'](config = self.config, log = self.log)
+            ui = self.config['custom_ui'](config = self.config, log = self.log, searchTerm = name.strip())
         else:
             if not self.config['interactive']:
                 self.log.debug('Auto-selecting first search result using BaseUI')
-                ui = BaseUI(config = self.config, log = self.log)
+                ui = BaseUI(config = self.config, log = self.log, searchTerm = name.strip())
             else:
                 self.log.debug('Interactivily selecting movie using ConsoleUI')
-                ui = ConsoleUI(config = self.config, log = self.log)
+                ui = ConsoleUI(config = self.config, log = self.log, searchTerm = name.strip())
         return ui.selectMovieOrPerson(people)
     # end searchPeople()
 
