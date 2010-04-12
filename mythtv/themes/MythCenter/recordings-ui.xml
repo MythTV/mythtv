@@ -152,17 +152,17 @@
 
         <imagetype name="autoexpire">
             <filename>autoexpire.png</filename>
-            <position>648,500</position>
+            <position>633,500</position>
         </imagetype>
 
         <imagetype name="commflagged">
             <filename>commflagged.png</filename>
-            <position>682,500</position>
+            <position>667,500</position>
         </imagetype>
 
         <imagetype name="bookmark">
             <filename>bookmark.png</filename>
-            <position>716,500</position>
+            <position>701,500</position>
         </imagetype>
 
         <imagetype name="cutlist">
@@ -171,7 +171,7 @@
         </imagetype>
 
         <statetype name="audioprops">
-            <position>648,540</position>
+            <position>633,540</position>
             <showempty>yes</showempty>
             <state name="stereo">
                 <imagetype name="stereo">
@@ -196,7 +196,7 @@
         </statetype>
 
         <statetype name="subtitletypes">
-            <position>682,540</position>
+            <position>667,540</position>
             <showempty>yes</showempty>
             <state name="cc">
                 <imagetype name="cc">
@@ -216,7 +216,7 @@
         </statetype>
 
         <statetype name="videoprops">
-            <position>716,540</position>
+            <position>701,540</position>
             <showempty>yes</showempty>
             <state name="hd1080">
                 <imagetype name="hd1080">
