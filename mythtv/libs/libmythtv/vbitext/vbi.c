@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#include "videodev_myth.h"
+
 // vbitext headers
 #include "vt.h"
 #include "vbi.h"
@@ -24,50 +26,8 @@ static int rawbuf_size;                // its current size
 
 
 /***** bttv api *****/
-
-#define BASE_VIDIOCPRIVATE     192
-#define BTTV_VERSION           _IOR('v' , BASE_VIDIOCPRIVATE+6, int)
 #define BTTV_VBISIZE           _IOR('v' , BASE_VIDIOCPRIVATE+8, int)
 
-/***** v4l2 vbi-api *****/
-
-/* #include "/usr/src/linux/include/linux/videodev2.h" */
-
-enum v4l2_buf_type {
-	V4L2_BUF_TYPE_VIDEO_CAPTURE  = 1,
-	V4L2_BUF_TYPE_VIDEO_OUTPUT   = 2,
-	V4L2_BUF_TYPE_VIDEO_OVERLAY  = 3,
-	V4L2_BUF_TYPE_VBI_CAPTURE    = 4,
-	V4L2_BUF_TYPE_VBI_OUTPUT     = 5,
-	V4L2_BUF_TYPE_PRIVATE        = 0x80,
-};
-
-struct v4l2_vbi_format
-{
-    unsigned int sampling_rate;                /* in 1 Hz */
-    unsigned int offset;                       /* sampling starts # samples after rising hs */
-    unsigned int samples_per_line;
-    unsigned int sample_format;                /* V4L2_VBI_SF_* */
-    signed int start[2];
-    unsigned int count[2];
-    unsigned int flags;                        /* V4L2_VBI_* */
-    unsigned int reserved2;            /* must be zero */
-};
-
-struct v4l2_format
-{
-    enum v4l2_buf_type type;                   /* V4L2_BUF_TYPE_* */
-    union
-    {
-       struct v4l2_vbi_format vbi;     /*  VBI data  */
-       unsigned char raw_data[200];            /* user-defined */
-    } fmt;
-};
-
-#define V4L2_PIX_FMT_GREY     0x59455247 /* v4l2_fourcc('G','R','E','Y') *//*  8  Greyscale     */
-#define VIDIOC_G_FMT           _IOWR('V',  4, struct v4l2_format)
-
-/***** end of api definitions *****/
 
 static void
 error(const char *str, ...)
