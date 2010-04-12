@@ -2433,7 +2433,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
     VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(true);
 
     if (!frame)
-        return 0;
+        return -1;
 
     for (int i = 0; i < 3; i++)
     {
@@ -2446,7 +2446,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 
     pic->age = 256 * 256 * 256 * 64;
 
-    return 1;
+    return 0;
 }
 
 /** \brief remove audio streams from the context
@@ -2521,7 +2521,7 @@ int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
     render->next_free_data_block_num = 0;
 #endif
 
-    return 1;
+    return 0;
 }
 
 void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
