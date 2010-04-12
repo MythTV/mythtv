@@ -88,7 +88,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1032";
+    const QString currentDatabaseVersion = "1033";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -1152,6 +1152,37 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                 return false;
 
             dbver = "1032";
+        }
+
+        if (dbver == "1032")
+        {
+            QStringList updates;
+            updates += "CREATE TEMPORARY TABLE bad_videometadatacast"
+                        "       AS SELECT * FROM videometadatacast;";
+            updates += "CREATE TEMPORARY TABLE bad_videometadatagenre"
+                       "       AS SELECT * FROM videometadatagenre;";
+            updates += "CREATE TEMPORARY TABLE bad_videometadatacountry"
+                       "       AS SELECT * FROM videometadatacountry;";
+            updates += "TRUNCATE TABLE videometadatacast;";
+            updates += "TRUNCATE TABLE videometadatagenre;";
+            updates += "TRUNCATE TABLE videometadatacountry;";
+            updates += "INSERT videometadatacast SELECT idvideo,idcast"
+                       "       FROM bad_videometadatacast GROUP BY idvideo,idcast;";
+            updates += "INSERT videometadatagenre SELECT idvideo,idgenre"
+                       "       FROM bad_videometadatagenre GROUP BY idvideo,idgenre;";
+            updates += "INSERT videometadatacountry SELECT idvideo,idcountry"
+                       "       FROM bad_videometadatacountry GROUP BY idvideo,idcountry;";
+            updates += "DROP TEMPORARY TABLE bad_videometadatacast;";
+            updates += "DROP TEMPORARY TABLE bad_videometadatagenre;";
+            updates += "DROP TEMPORARY TABLE bad_videometadatacountry;";
+            updates += "ALTER TABLE videometadatacast ADD UNIQUE INDEX (`idvideo`,`idcast`);";
+            updates += "ALTER TABLE videometadatagenre ADD UNIQUE INDEX (`idvideo`,`idgenre`);";
+            updates +="ALTER TABLE videometadatacountry ADD UNIQUE INDEX (`idvideo`,`idcountry`);";
+            if (!performActualUpdate(updates, "1033", dbver,
+                                     MythVideoVersionName))
+                return false;
+
+            dbver = "1033";
         }
 
         return true;
