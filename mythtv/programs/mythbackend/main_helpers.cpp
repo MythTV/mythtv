@@ -817,7 +817,7 @@ int run_backend(const MythCommandLineParser &cmdline)
         if (cmdline.IsHouseKeeperEnabled())
             housekeeping = new HouseKeeper(true, ismaster, sched);
 
-        if (!cmdline.IsAutoExpirerEnabled())
+        if (cmdline.IsAutoExpirerEnabled())
         {
             expirer = new AutoExpire(&tvList);
             if (sched)
