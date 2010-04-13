@@ -582,18 +582,10 @@ bool MythCommandLineParser::Parse(
         if ((argc - 1) > argpos)
         {
             QString tmp = QString(argv[argpos+1]).trimmed();
-            starttime = QDateTime::fromString(tmp, Qt::ISODate);
-            if (!starttime.isValid() && tmp.length() >= 14)
+            starttime = QDateTime::fromString(tmp, "yyyyMMddHHmmss");
+            if (!starttime.isValid() && tmp.length() == 19)
             {
-                bool tok = true, ok;
-                uint y = tmp.left(4).toUInt(&ok,10);           tok &= ok;
-                uint m = tmp.left(6).right(2).toUInt(&ok,10);  tok &= ok;
-                uint d = tmp.left(8).right(2).toUInt(&ok,10);  tok &= ok;
-                uint H = tmp.left(10).right(2).toUInt(&ok,10); tok &= ok;
-                uint M = tmp.left(12).right(2).toUInt(&ok,10); tok &= ok;
-                uint S = tmp.left(14).right(2).toUInt(&ok,10); tok &= ok;
-                if (tok)
-                    starttime = QDateTime(QDate(y,m,d),QTime(H,M,S));
+                starttime = QDateTime::fromString(tmp, Qt::ISODate);
             }
             if (!starttime.isValid())
             {
