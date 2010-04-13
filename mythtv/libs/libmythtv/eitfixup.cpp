@@ -1032,7 +1032,7 @@ void EITFixUp::FixMCA(DBEventEIT &event) const
     position = event.description.indexOf(m_mcaDD);
     if ((position > 0) && (position > (int) (event.description.length() - 7)))
     {
-        event.audioProps |= AUD_STEREO;
+        event.audioProps |= AUD_DOLBY;
         dd = true;
         event.description.replace(m_mcaDD, "");
     }
