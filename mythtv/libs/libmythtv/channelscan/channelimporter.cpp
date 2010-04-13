@@ -829,7 +829,12 @@ ScanDTVTransportList ChannelImporter::GetDBTransports(
 
         if (!newt_found)
         {
+            /* XXX HACK -- begin
+             * disabling adding transponders not found in the scan list
+             * to the db list to avoid deleting many channels as off air
+             * for a single transponder scan
             not_in_scan.push_back(newt);
+             * XXX HACK -- end */
         }
         else
         {
