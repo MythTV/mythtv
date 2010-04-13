@@ -1356,6 +1356,18 @@ static enum PixelFormat get_format_vdpau(struct AVCodecContext *avctx,
     return fmt[i];
 }
 
+static bool IS_DR1_PIX_FMT(const enum PixelFormat fmt)
+{
+    switch (fmt)
+    {
+    case PIX_FMT_YUV420P:
+    case PIX_FMT_YUVJ420P:
+        return true;
+    default:
+        return false;
+    }
+}
+
 void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
                                      bool selectedStream)
 {
@@ -1450,7 +1462,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
         directrendering     |= selectedStream;
     }
-    else if (codec && codec->capabilities & CODEC_CAP_DR1)
+    else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
+             IS_DR1_PIX_FMT(enc->pix_fmt))
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
         enc->get_buffer      = get_avf_buffer;
