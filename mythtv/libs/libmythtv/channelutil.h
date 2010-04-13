@@ -143,8 +143,6 @@ class MPUBLIC ChannelUtil
         uint    &atsc_major,      uint          &atsc_minor,
         uint    &dvb_transportid, uint          &dvb_networkid,
         uint    &mplexid,         bool          &commfree);
-    static bool    GetChannelSettings(int chanid, bool &useonairguide,
-                                    bool &hidden);
     static int     GetProgramNumber(uint sourceid, const QString &channum)
         { return GetChannelValueInt("serviceid", sourceid, channum); }
     static QString GetVideoFilters(uint sourceid, const QString &channum)
