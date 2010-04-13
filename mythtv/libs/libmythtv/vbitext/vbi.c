@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <sys/ioctl.h>
+
 // ANSI C headers
 #include <stdlib.h>
 #include <string.h>
