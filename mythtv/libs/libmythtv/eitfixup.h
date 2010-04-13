@@ -48,6 +48,7 @@ class EITFixUp
         kFixHDTV       = 0x0800,
         kFixNL         = 0x1000,
         kFixCategory   = 0x8000,
+        kFixNO         = 0x10000,
 
         // Early fixups
         kEFixForceISO8859_1  = 0x2000,
@@ -85,6 +86,7 @@ class EITFixUp
     void FixPremiere(DBEventEIT &event) const;      // german pay-tv Premiere
     void FixNL(DBEventEIT &event) const;            // Netherlands DVB-C
     void FixCategory(DBEventEIT &event) const;      // Generic Category fixes
+    void FixNO(DBEventEIT &event) const;            // Norwegian DVB-S
 
     static QString AddDVBEITAuthority(uint chanid, const QString &id);
 
@@ -174,6 +176,7 @@ class EITFixUp
     const QRegExp m_nlDirector;
     const QRegExp m_nlCat;
     const QRegExp m_nlOmroep;
+    const QRegExp m_noRerun;
 };
 
 #endif // EITFIXUP_H

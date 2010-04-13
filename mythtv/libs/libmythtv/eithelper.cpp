@@ -773,6 +773,9 @@ static void init_fixup(QMap<uint64_t,uint> &fix)
         fix[    15U << 16] = // DVB-C Welho
         EITFixUp::kFixFI | EITFixUp::kFixCategory;
 
+    // DVB-S(2) Thor 0.8W Norwegian
+    fix[70U << 16] = EITFixUp::kFixNO;
+
     ///////////////////////////////////////////////////////////////////////////
     // Special Early fixups for providers that break DVB EIT spec.
     // transport_id<<32 | netword_id<<16 | service_id

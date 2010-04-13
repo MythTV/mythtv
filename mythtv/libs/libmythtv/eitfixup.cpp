@@ -103,7 +103,8 @@ EITFixUp::EITFixUp()
       m_nlYear2("([\\s]{1}[\\(]{1}[A-Z]{0,3}/?)([1-2]{2}[0-9]{2})([\\)]{1})"),
       m_nlDirector("(?=\\svan\\s)(([A-Z]{1}[a-z]+\\s)|([A-Z]{1}\\.\\s))"),
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
-      m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$")
+      m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$"),
+      m_noRerun(" \\(R\\)")
 
 {
 }
@@ -154,6 +155,9 @@ void EITFixUp::Fix(DBEventEIT &event) const
 
     if (kFixNL & event.fixup)
         FixNL(event);
+
+    if (kFixNO & event.fixup)
+        FixNO(event);
 
     if (kFixCategory & event.fixup)
         FixCategory(event);
@@ -1495,5 +1499,19 @@ void EITFixUp::FixCategory(DBEventEIT &event) const
     {
         /* default taken from ContentDescriptor::GetMythCategory */
         event.categoryType = kCategoryTVShow;
+    }
+}
+
+/** \fn EITFixUp::FixNO(DBEventEIT&) const
+ *  \brief Use this to clean DVB-S guide in Norway.
+ */
+void EITFixUp::FixNO(DBEventEIT &event) const
+{
+    // Check for "title (R)" in the title
+    int position = event.title.indexOf(m_noRerun);
+    if (position != -1)
+    {
+      event.previouslyshown = true;
+      event.title = event.title.replace(m_noRerun, "");
     }
 }
