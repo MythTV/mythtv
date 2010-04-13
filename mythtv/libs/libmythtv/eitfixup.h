@@ -158,10 +158,8 @@ class EITFixUp
     const QRegExp m_RTLEpisodeNo2;
     const QRegExp m_fiRerun;
     const QRegExp m_fiRerun2;
-    const QRegExp m_Stereo;
     const QRegExp m_dePremiereInfos;
     const QRegExp m_dePremiereOTitle;
-    const QRegExp m_nlStereo;
     const QRegExp m_nlTxt;
     const QRegExp m_nlWide;
     const QRegExp m_nlRepeat;
@@ -177,6 +175,7 @@ class EITFixUp
     const QRegExp m_nlCat;
     const QRegExp m_nlOmroep;
     const QRegExp m_noRerun;
+    const QRegExp m_Stereo;
 };
 
 #endif // EITFIXUP_H

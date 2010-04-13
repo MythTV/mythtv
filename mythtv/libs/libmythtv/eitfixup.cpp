@@ -85,11 +85,9 @@ EITFixUp::EITFixUp()
       m_RTLEpisodeNo2("^(\\d{1,2}\\/[IVX]+)\\.*\\s*"),
       m_fiRerun("\\ ?Uusinta[a-zA-Z\\ ]*\\.?"),
       m_fiRerun2("\\([Uu]\\)"),
-      m_Stereo("(Stereo)"),
       m_dePremiereInfos("([^.]+)?\\s?([0-9]{4})\\.\\s[0-9]+\\sMin\\.(?:\\sVon"
                         "\\s([^,]+)(?:,|\\su\\.\\sa\\.)\\smit\\s(.+)\\.)?"),
       m_dePremiereOTitle("\\s*\\(([^\\)]*)\\)$"),
-      m_nlStereo("stereo"),
       m_nlTxt("txt"),
       m_nlWide("breedbeeld"),
       m_nlRepeat("herh."),
@@ -104,7 +102,8 @@ EITFixUp::EITFixUp()
       m_nlDirector("(?=\\svan\\s)(([A-Z]{1}[a-z]+\\s)|([A-Z]{1}\\.\\s))"),
       m_nlCat("^(Amusement|Muziek|Informatief|Nieuws/actualiteiten|Jeugd|Animatie|Sport|Serie/soap|Kunst/Cultuur|Documentaire|Film|Natuur|Erotiek|Comedy|Misdaad|Religieus)\\.\\s"),
       m_nlOmroep ("\\s\\(([A-Z]+/?)+\\)$"),
-      m_noRerun(" \\(R\\)")
+      m_noRerun(" \\(R\\)"),
+      m_Stereo("\\b\\(?[sS]tereo\\)?\\b")
 
 {
 }
@@ -300,11 +299,11 @@ void EITFixUp::FixBellExpressVu(DBEventEIT &event) const
     }
 
     // Check for (Stereo) in the decription and set the <audio> tags
-    position = event.description.indexOf("(Stereo)");
+    position = event.description.indexOf(m_Stereo);
     if (position != -1)
     {
         event.audioProps |= AUD_STEREO;
-        event.description = event.description.replace("(Stereo)", "");
+        event.description = event.description.replace(m_Stereo, "");
     }
 
     // Check for "title (All Day)" in the title
@@ -1352,10 +1351,10 @@ void EITFixUp::FixNL(DBEventEIT &event) const
 
     // Get stereo info
     int position;
-    if ((position = fullinfo.indexOf(m_nlStereo)) != -1)
+    if ((position = fullinfo.indexOf(m_Stereo)) != -1)
     {
         event.audioProps |= AUD_STEREO;
-        fullinfo = fullinfo.replace("stereo", ".");
+        fullinfo = fullinfo.replace(m_Stereo, ".");
     }
 
     //Get widescreen info
