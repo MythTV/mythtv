@@ -942,8 +942,8 @@ void InitJumpPoints(void)
          "", "", startManageRecordingRules);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Channel Recording "
          "Priorities"), "", "", startChannelRecPriorities);
-     REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "TV Recording Playback"),
-         "", "", startPlayback);
+     REG_JUMPLOC(QT_TRANSLATE_NOOP("MythControls", "TV Recording Playback"),
+         "", "", startPlayback, "JUMPREC");
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "TV Recording Deletion"),
          "", "", startDelete);
      REG_JUMP(QT_TRANSLATE_NOOP("MythControls", "Live TV"),
