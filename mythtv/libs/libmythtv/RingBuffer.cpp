@@ -256,7 +256,7 @@ static QString local_sub_filename(QFileInfo &fileInfo)
     QStringList::const_iterator cit = candidates.begin();
     for (; cit != candidates.end(); ++cit)
     {
-        QFileInfo fi(dirName + "/" + baseName + (*cit).right(4));
+        QFileInfo fi(dirName + "/" + *cit);
         if (fi.exists() && (fi.size() >= RingBuffer::kReadTestSize))
             return fi.absoluteFilePath();
     }
