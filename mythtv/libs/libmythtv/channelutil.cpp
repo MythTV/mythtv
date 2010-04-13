@@ -1566,6 +1566,37 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     return true;
 }
 
+void ChannelUtil::UpdateInsertInfoFromDB(ChannelInsertInfo &chan)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT xmltvid, useonairguide "
+        "FROM channel "
+        "WHERE chanid = :ID");
+    query.bindValue(":ID", chan.channel_id);
+
+    if (!query.exec())
+    {
+        MythDB::DBError("UpdateInsertInfoFromDB", query);
+        return;
+    }
+
+    if (query.next())
+    {
+        QString xmltvid = query.value(0).toString();
+        bool useeit     = query.value(1).toInt();
+
+        if (!xmltvid.isEmpty())
+        {
+            if (useeit)
+                VERBOSE(VB_GENERAL, "Using EIT and xmltv for the same channel "
+                        "is a unsupported configuration.");
+            chan.xmltvid = xmltvid;
+            chan.use_on_air_guide = useeit;
+        }
+    }
+}
+
 bool ChannelUtil::DeleteChannel(uint channel_id)
 {
     MSqlQuery query(MSqlQuery::InitCon());
