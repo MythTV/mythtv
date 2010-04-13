@@ -619,6 +619,8 @@ ScanDTVTransportList ChannelImporter::UpdateChannels(
                 cout<<"Update("<<chan.si_standard.toAscii().constData()<<"): "
                     <<chan.chan_num.toAscii().constData()<<endl;
 
+                ChannelUtil::UpdateInsertInfoFromDB(chan);
+
                 updated = ChannelUtil::UpdateChannel(
                     chan.db_mplexid,
                     chan.source_id,

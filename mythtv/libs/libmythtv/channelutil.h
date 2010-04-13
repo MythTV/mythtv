@@ -112,6 +112,8 @@ class MPUBLIC ChannelUtil
                                  QString xmltvid = QString::null,
                                  QString default_authority = QString::null);
 
+    static void    UpdateInsertInfoFromDB(ChannelInsertInfo &chan);
+
     static bool    DeleteChannel(uint channel_id);
 
     static bool    SetVisible(uint channel_id, bool hidden);
