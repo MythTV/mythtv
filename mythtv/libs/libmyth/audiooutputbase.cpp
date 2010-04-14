@@ -377,7 +377,6 @@ void AudioOutputBase::Reconfigure(const AudioSettings &orig_settings)
 
     // Only used for software volume
     if (set_initial_vol && internal_vol) 
-        volume = gContext->GetNumSetting("PCMMixerVolume", 80);
     {
         QString controlLabel = gContext->GetSetting("MixerControl", "PCM");
         controlLabel += "MixerVolume";
