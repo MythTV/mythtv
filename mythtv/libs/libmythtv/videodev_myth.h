@@ -12,6 +12,7 @@ typedef uint8_t  __u8;
 typedef uint32_t __u64; 
 typedef int32_t  __s64;  // HACK. Non 64bit FreeBSD kernels require this for ioctls
 #else
+#undef __STRICT_ANSI__   // HACK. Broken kernel headers < 2.6.25 fail compile in videodev2_myth.h
 #include <linux/types.h>
 #include <linux/version.h>
 #endif /* __FreeBSD__ */
