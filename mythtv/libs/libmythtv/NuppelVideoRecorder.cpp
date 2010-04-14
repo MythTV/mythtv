@@ -2924,7 +2924,8 @@ void NuppelVideoRecorder::FinishRecording(void)
 void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
                                      bool forcekey)
 {
-    int tmp = 0, out_len = OUT_LEN;
+    int tmp = 0;
+    lzo_uint out_len = OUT_LEN;
     struct rtframeheader frameheader;
     int raw = 0, compressthis = compression;
     uint8_t *planes[3];
@@ -3068,10 +3069,10 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             int r = 0;
             if (raw)
                 r = lzo1x_1_compress((unsigned char*)buf, len,
-                                     out, (lzo_uint *)&out_len, wrkmem);
+                                     out, &out_len, wrkmem);
             else
                 r = lzo1x_1_compress((unsigned char *)strm, tmp, out,
-                                     (lzo_uint *)&out_len, wrkmem);
+                                     &out_len, wrkmem);
             if (r != LZO_E_OK)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR + "lzo compression failed");
@@ -3110,7 +3111,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
             ringBuffer->Write(strm, tmp);
         }
     }
-    else if (compressthis == 0 || (tmp < out_len))
+    else if (compressthis == 0 || (tmp < (int)out_len))
     {
         if (!raw)
         {
