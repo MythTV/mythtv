@@ -112,7 +112,7 @@ int GetNvidiaRates(t_screenrate& screenmap)
                            (unsigned char **)&pMetaModes, &MetaModeLen);
     if (!ret)
     {
-        VERBOSE(VB_PLAYBACK, QString("Unknown error. Failed to query the enabled Display Devices."));
+        VERBOSE(VB_PLAYBACK, QString("Failed to query the metamode on selected display device."));
         delete d;
         return -1;
     }
