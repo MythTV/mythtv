@@ -27,6 +27,8 @@ class InteractiveTV;
 class ProgramInfo;
 class MythSqlDatabase;
 
+struct SwsContext;
+
 #define AUDIOMAXFRAMES       30
 
 extern "C" void HandleStreamChange(void*);
@@ -227,6 +229,7 @@ class AvFormatDecoder : public DecoderBase
     VideoFrame *decoded_video_frame;
     AVFRingBuffer *avfRingBuffer;
 
+    struct SwsContext *sws_ctx;
     bool directrendering;
     bool drawband;
 

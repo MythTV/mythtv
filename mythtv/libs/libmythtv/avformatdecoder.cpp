@@ -27,7 +27,6 @@ using namespace std;
 #include "DVDRingBuffer.h"
 #include "videodisplayprofile.h"
 #include "mythuihelper.h"
-#include "myth_imgconvert.h"
 
 #include "lcddevice.h"
 
@@ -53,6 +52,7 @@ extern "C" {
 #include "ac3_parser.h"
 extern const uint8_t *ff_find_start_code(const uint8_t *p, const uint8_t *end, uint32_t *state);
 #include "avio.h"
+#include "libswscale/swscale.h"
 #include "../libmythmpeg2/mpeg2.h"
 #include "ivtv_myth.h"
 }
@@ -473,7 +473,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       m_h264_parser(new H264Parser()),
       ic(NULL),
       frame_decoded(0),             decoded_video_frame(NULL),
-      avfRingBuffer(NULL),
+      avfRingBuffer(NULL),          sws_ctx(NULL),
       directrendering(false),       drawband(false),
       gopset(false),                seen_gop(false),
       seq_count(0),                 firstgoppos(0),
@@ -4474,6 +4474,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         picframe = GetNVP()->GetNextVideoFrame(false);
 
                         unsigned char *buf = picframe->buf;
+                        avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P,
+                                       context->width, context->height);
                         tmppicture.data[0] = buf + picframe->offsets[0];
                         tmppicture.data[1] = buf + picframe->offsets[1];
                         tmppicture.data[2] = buf + picframe->offsets[2];
@@ -4481,12 +4483,22 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         tmppicture.linesize[1] = picframe->pitches[1];
                         tmppicture.linesize[2] = picframe->pitches[2];
 
-                        myth_sws_img_convert(
-                            &tmppicture, PIX_FMT_YUV420P,
-                                    (AVPicture *)&mpa_pic,
-                                    context->pix_fmt,
-                                    context->width,
-                                    context->height);
+                        sws_ctx = sws_getCachedContext(sws_ctx, context->width,
+                                      context->height, context->pix_fmt,
+                                      context->width, context->height,
+                                      PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                                      NULL, NULL, NULL);
+                        if (!sws_ctx)
+                        {
+                            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                                    "Failed to allocate sws context");
+                            have_err = true;
+                            continue;
+                        }
+                        sws_scale(sws_ctx, mpa_pic.data, mpa_pic.linesize,
+                                  0, context->height, tmppicture.data,
+                                  tmppicture.linesize);
+
 
                         if (xf)
                         {
