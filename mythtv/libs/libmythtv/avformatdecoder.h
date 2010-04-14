@@ -231,7 +231,6 @@ class AvFormatDecoder : public DecoderBase
 
     struct SwsContext *sws_ctx;
     bool directrendering;
-    bool drawband;
 
     bool no_dts_hack;
     bool dorewind;
@@ -243,7 +242,6 @@ class AvFormatDecoder : public DecoderBase
 
     QList<AVPacket*> storedPackets;
 
-    int firstgoppos;
     int prevgoppos;
 
     bool gotvideo;
