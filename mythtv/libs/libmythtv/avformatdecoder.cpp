@@ -1463,7 +1463,9 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         directrendering     |= selectedStream;
     }
     else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
-             IS_DR1_PIX_FMT(enc->pix_fmt))
+             IS_DR1_PIX_FMT(enc->pix_fmt) /* HACK -- begin */ &&
+             /*   allow unknown pixel format to avoid regressions*/
+             enc->pix_fmt == PIX_FMT_NONE /* HACK -- end*/)
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
         enc->get_buffer      = get_avf_buffer;
