@@ -3541,6 +3541,40 @@ bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
     return true;
 }
 
+bool AvFormatDecoder::ProcessDataPacket(AVStream *curstream, AVPacket *pkt,
+                                        DecodeType decodetype)
+{
+    enum CodecID codec_id = curstream->codec->codec_id;
+
+    switch (codec_id)
+    {
+    case CODEC_ID_MPEG2VBI:
+        ProcessVBIDataPacket(curstream, pkt);
+        break;
+    case CODEC_ID_DVB_VBI:
+        ProcessDVBDataPacket(curstream, pkt);
+        break;
+#ifdef USING_MHEG
+    case CODEC_ID_DSMCC_B:
+    {
+        ProcessDSMCCPacket(curstream, pkt);
+
+        // Have to return regularly to ensure that the OSD is updated.
+        // This applies both to MHEG and also channel browsing.
+        if (!(decodetype & kDecodeVideo))
+        {
+            allowedquit |= (itv && itv->ImageHasChanged());
+            OSD *osd = NULL;
+            if (!allowedquit && GetNVP() && (osd = GetNVP()->GetOSD()))
+                allowedquit |=  osd->HasChanged();
+        }
+        break;
+    }
+#endif // USING_MHEG:
+    }
+    return true;
+}
+
 int AvFormatDecoder::SetTrack(uint type, int trackNo)
 {
     bool ret = DecoderBase::SetTrack(type, trackNo);
@@ -4531,51 +4565,17 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
         }
 
-        if (codec_type == CODEC_TYPE_DATA &&
-            curstream->codec->codec_id   == CODEC_ID_MPEG2VBI)
-        {
-            ProcessVBIDataPacket(curstream, pkt);
-
-            av_free_packet(pkt);
-            continue;
-        }
-
-        if (((codec_type == CODEC_TYPE_DATA &&
-              curstream->codec->codec_id   == CODEC_ID_DVB_VBI) ||
-             (codec_type == CODEC_TYPE_SUBTITLE &&
-              curstream->codec->codec_id   == CODEC_ID_DVB_TELETEXT)))
+        if (codec_type == CODEC_TYPE_SUBTITLE &&
+            curstream->codec->codec_id == CODEC_ID_DVB_TELETEXT)
         {
             ProcessDVBDataPacket(curstream, pkt);
-
             av_free_packet(pkt);
             continue;
         }
 
-#ifdef USING_MHEG
-        if (codec_type == CODEC_TYPE_DATA &&
-            curstream->codec->codec_id   == CODEC_ID_DSMCC_B)
-        {
-            ProcessDSMCCPacket(curstream, pkt);
-
-            av_free_packet(pkt);
-
-            // Have to return regularly to ensure that the OSD is updated.
-            // This applies both to MHEG and also channel browsing.
-            if (!(decodetype & kDecodeVideo))
-            {
-                allowedquit |= (itv && itv->ImageHasChanged());
-                OSD *osd = NULL;
-                if (!allowedquit && GetNVP() && (osd = GetNVP()->GetOSD()))
-                    allowedquit |=  osd->HasChanged();
-            }
-
-            continue;
-        }
-#endif // USING_MHEG
-
-        // we don't care about other data streams
         if (codec_type == CODEC_TYPE_DATA)
         {
+            ProcessDataPacket(curstream, pkt, decodetype);
             av_free_packet(pkt);
             continue;
         }
