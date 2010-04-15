@@ -3956,281 +3956,266 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
-                AVPacket tmp_pkt;
-                tmp_pkt.data = pkt->data;
-                tmp_pkt.size = pkt->size;
-                while (!errored && tmp_pkt.size > 0)
+    AVPacket tmp_pkt;
+    tmp_pkt.data = pkt->data;
+    tmp_pkt.size = pkt->size;
+    while (!errored && tmp_pkt.size > 0)
+    {
+        bool reselectAudioTrack = false;
+        char *s;
+
+        /// HACK HACK HACK -- begin See #3731
+        if (!GetNVP()->HasAudioIn())
+        {
+            VERBOSE(VB_AUDIO, LOC + "Audio is disabled - trying to restart it");
+            reselectAudioTrack = true;
+        }
+        /// HACK HACK HACK -- end
+
+        // detect switches between stereo and dual languages
+        bool wasDual = audSubIdx != -1;
+        bool isDual = curstream->codec->avcodec_dual_language;
+        if ((wasDual && !isDual) || (!wasDual &&  isDual))
+        {
+            SetupAudioStreamSubIndexes(audIdx);
+            reselectAudioTrack = true;
+        }
+
+        // detect channels on streams that need
+        // to be decoded before we can know this
+        bool already_decoded = false;
+        if (!curstream->codec->channels)
+        {
+            QMutexLocker locker(avcodeclock);
+            VERBOSE(VB_IMPORTANT, LOC + QString("Setting channels to %1")
+                    .arg(audioOut.channels));
+
+            if (DoPassThrough(curstream->codec))
+            {
+                // for passthru let it select the max number of channels
+                curstream->codec->channels = 0;
+                curstream->codec->request_channels = 0;
+            }
+            else
+            {
+                curstream->codec->channels = audioOut.channels;
+                curstream->codec->request_channels = audioOut.channels;
+            }
+            data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+            ret = avcodec_decode_audio3(curstream->codec, audioSamples,
+                                        &data_size, &tmp_pkt);
+            already_decoded = true;
+
+            reselectAudioTrack |= curstream->codec->channels;
+        }
+
+        if (curstream->codec->codec_id == CODEC_ID_AC3)
+        {
+            GetBitContext gbc;
+            init_get_bits(&gbc, tmp_pkt.data, tmp_pkt.size * 8);
+            if (!ff_ac3_parse_header(&gbc, &hdr))
+            {
+                if (hdr.channels != last_ac3_channels)
                 {
-                    bool reselectAudioTrack = false;
-                    char *s;
+                    VERBOSE(VB_AUDIO, LOC + QString("AC3 changed from %1 to %2 channels (frame %3)")
+                            .arg(last_ac3_channels).arg(hdr.channels).arg(framesRead));
+                    if ((framesRead - last_framesRead) > AUDIOMAXFRAMES ||
+                        hdr.channels < last_ac3_channels)
+                        curstream->codec->channels = hdr.channels;
+                    last_ac3_channels = hdr.channels;
+                    last_framesRead = framesRead;
+                    SetupAudioStream();
+                }
+            }
+        }
 
-                    /// HACK HACK HACK -- begin See #3731
-                    if (!GetNVP()->HasAudioIn())
+        if (reselectAudioTrack)
+        {
+            QMutexLocker locker(avcodeclock);
+            currentTrack[kTrackTypeAudio] = -1;
+            selectedTrack[kTrackTypeAudio].av_stream_index = -1;
+            audIdx = -1;
+            audSubIdx = -1;
+            AutoSelectAudioTrack();
+            audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
+            audSubIdx = selectedTrack[kTrackTypeAudio].av_substream_index;
+        }
+
+        if (!(decodetype & kDecodeAudio) ||
+            (pkt->stream_index != audIdx))
+        {
+            tmp_pkt.size = 0;
+            continue;
+        }
+
+        if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
+            lastapts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
+
+        if (skipaudio)
+        {
+            if ((lastapts < lastvpts - (10.0 / fps)) || lastvpts == 0)
+            {
+                tmp_pkt.size = 0;
+                continue;
+            }
+            else
+                skipaudio = false;
+        }
+
+        avcodeclock->lock();
+        data_size = 0;
+
+        if (audioOut.do_passthru)
+        {
+            data_size = tmp_pkt.size;
+            dts = CODEC_ID_DTS == curstream->codec->codec_id;
+            ret = encode_frame(dts, tmp_pkt.data, tmp_pkt.size, audioSamples,
+                               data_size);
+            s = (char *)audioSamples;
+        }
+        else
+        {
+            AVCodecContext *ctx = curstream->codec;
+
+            if ((ctx->channels == 0) ||
+                (ctx->channels > audioOut.channels))
+            {
+                ctx->channels = audioOut.channels;
+            }
+
+            if (!already_decoded)
+            {
+                curstream->codec->request_channels = audioOut.channels;
+                data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                ret = avcodec_decode_audio3(ctx, audioSamples, &data_size,
+                                            &tmp_pkt);
+            }
+
+            // Convert sample format if required (Myth only handles 8 and 16 bits audio)
+            if (ctx->sample_fmt != SAMPLE_FMT_S16 && ctx->sample_fmt != SAMPLE_FMT_U8)
+            {
+                if (audio_src_fmt != ctx->sample_fmt)
+                {
+                    if (reformat_ctx)
+                        av_audio_convert_free(reformat_ctx);
+                    reformat_ctx = av_audio_convert_alloc(SAMPLE_FMT_S16, 1,
+                                                          ctx->sample_fmt, 1,
+                                                          NULL, 0);
+                    if (!reformat_ctx ||
+                        (!audioSamplesResampled &&
+                         !(audioSamplesResampled = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
+                                                                           sizeof(*audioSamplesResampled)))))
                     {
-                        VERBOSE(VB_AUDIO, LOC + "Audio is disabled - trying to restart it");
-                        reselectAudioTrack = true;
-                    }
-                    /// HACK HACK HACK -- end
+                        VERBOSE(VB_PLAYBACK, QString("Cannot convert %1 sample format to %2 sample format")
+                                .arg(avcodec_get_sample_fmt_name(ctx->sample_fmt))
+                                .arg(avcodec_get_sample_fmt_name(SAMPLE_FMT_S16)));
 
-                    // detect switches between stereo and dual languages
-                    bool wasDual = audSubIdx != -1;
-                    bool isDual = curstream->codec->avcodec_dual_language;
-                    if ((wasDual && !isDual) || (!wasDual &&  isDual))
-                    {
-                        SetupAudioStreamSubIndexes(audIdx);
-                        reselectAudioTrack = true;
-                    }
-
-                    // detect channels on streams that need
-                    // to be decoded before we can know this
-                    bool already_decoded = false;
-                    if (!curstream->codec->channels)
-                    {
-                        QMutexLocker locker(avcodeclock);
-                        VERBOSE(VB_IMPORTANT, LOC +
-                                QString("Setting channels to %1")
-                                .arg(audioOut.channels));
-
-                        if (DoPassThrough(curstream->codec))
-                        {
-                            // for passthru let it select the max number
-                            // of channels
-                            curstream->codec->channels = 0;
-                            curstream->codec->request_channels = 0;
-                        }
-                        else
-                        {
-                            curstream->codec->channels = audioOut.channels;
-                            curstream->codec->request_channels =
-                                audioOut.channels;
-                        }
-                        data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                        ret = avcodec_decode_audio3(curstream->codec,
-                                                    audioSamples, &data_size,
-                                                    &tmp_pkt);
-                        already_decoded = true;
-
-                        reselectAudioTrack |= curstream->codec->channels;
-                    }
-
-                    if (curstream->codec->codec_id == CODEC_ID_AC3)
-                    {
-                        GetBitContext gbc;
-                        init_get_bits(&gbc, tmp_pkt.data, tmp_pkt.size * 8);
-                        if (!ff_ac3_parse_header(&gbc, &hdr))
-                        {
-                            if (hdr.channels != last_ac3_channels)
-                            {
-                                VERBOSE(VB_AUDIO, LOC + QString("AC3 changed from %1 to %2 channels (frame %3)")
-                                        .arg(last_ac3_channels).arg(hdr.channels).arg(framesRead));
-                                if ((framesRead - last_framesRead) > AUDIOMAXFRAMES ||
-                                    hdr.channels < last_ac3_channels)
-                                    curstream->codec->channels = hdr.channels;
-                                last_ac3_channels = hdr.channels;
-                                last_framesRead = framesRead;
-                                SetupAudioStream();
-                            }
-                        }
-                    }
-
-                    if (reselectAudioTrack)
-                    {
-                        QMutexLocker locker(avcodeclock);
-                        currentTrack[kTrackTypeAudio] = -1;
-                        selectedTrack[kTrackTypeAudio]
-                            .av_stream_index = -1;
-                        audIdx = -1;
-                        audSubIdx = -1;
-                        AutoSelectAudioTrack();
-                        audIdx = selectedTrack[kTrackTypeAudio]
-                            .av_stream_index;
-                        audSubIdx = selectedTrack[kTrackTypeAudio]
-                            .av_substream_index;
-                    }
-
-                    if (!(decodetype & kDecodeAudio) ||
-                        (pkt->stream_index != audIdx))
-                    {
-                        tmp_pkt.size = 0;
-                        continue;
-                    }
-
-                    if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
-                        lastapts = (long long)(av_q2d(curstream->time_base) *
-                                               pkt->pts * 1000);
-
-                    if (skipaudio)
-                    {
-                        if ((lastapts < lastvpts - (10.0 / fps)) ||
-                            lastvpts == 0)
-                        {
-                            tmp_pkt.size = 0;
-                            continue;
-                        }
-                        else
-                            skipaudio = false;
-                    }
-
-                    avcodeclock->lock();
-                    data_size = 0;
-
-                    if (audioOut.do_passthru)
-                    {
-                        data_size = tmp_pkt.size;
-                        dts = CODEC_ID_DTS == curstream->codec->codec_id;
-                        ret = encode_frame(dts, tmp_pkt.data, tmp_pkt.size,
-                                           audioSamples, data_size);
-                        s = (char *)audioSamples;
-                    }
-                    else
-                    {
-                        AVCodecContext *ctx = curstream->codec;
-
-                        if ((ctx->channels == 0) ||
-                            (ctx->channels > audioOut.channels))
-                        {
-                            ctx->channels = audioOut.channels;
-                        }
-
-                        if (!already_decoded)
-                        {
-                            curstream->codec->request_channels =
-                                audioOut.channels;
-                            data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                            ret = avcodec_decode_audio3(ctx, audioSamples,
-                                                        &data_size, &tmp_pkt);
-                        }
-
-                            // Convert sample format if required (Myth only handles 8 and 16 bits audio)
-                        if (ctx->sample_fmt != SAMPLE_FMT_S16 && ctx->sample_fmt != SAMPLE_FMT_U8)
-                        {
-                            if (audio_src_fmt != ctx->sample_fmt)
-                            {
-                                if (reformat_ctx)
-                                    av_audio_convert_free(reformat_ctx);
-                                reformat_ctx = av_audio_convert_alloc(SAMPLE_FMT_S16, 1,
-                                                                      ctx->sample_fmt, 1,
-                                                                      NULL, 0);
-                                if (!reformat_ctx ||
-                                    (!audioSamplesResampled &&
-                                    !(audioSamplesResampled = (short int *)av_mallocz(AVCODEC_MAX_AUDIO_FRAME_SIZE *
-                                                                                      sizeof(*audioSamplesResampled)))))
-                                {
-                                    VERBOSE(VB_PLAYBACK, QString("Cannot convert %1 sample format to %2 sample format")
-                                            .arg(avcodec_get_sample_fmt_name(ctx->sample_fmt))
-                                            .arg(avcodec_get_sample_fmt_name(SAMPLE_FMT_S16)));
-
-                                    avcodeclock->unlock();
-                                    return false;
-                                }
-                                audio_src_fmt = ctx->sample_fmt;
-                            }
-                        }
-
-                        if (reformat_ctx)
-                        {
-                            const void *ibuf[6] = {audioSamples};
-                            void *obuf[6] = {audioSamplesResampled};
-                            int istride[6] = {av_get_bits_per_sample_format(ctx->sample_fmt)/8};
-                            int ostride[6] = {2};
-                            int len = data_size/istride[0];
-                            if (av_audio_convert(reformat_ctx, obuf, ostride,
-                                                 ibuf, istride, len) < 0)
-                            {
-                                VERBOSE(VB_PLAYBACK, "av_audio_convert() failed");
-
-                                avcodeclock->unlock();
-                                return false;
-                            }
-
-                            data_size = len * 2;
-                            s = (char *)audioSamplesResampled;
-                        }
-                        else
-                            s = (char *)audioSamples;
-
-                        // When decoding some audio streams the number of
-                        // channels, etc isn't known until we try decoding it.
-                        if ((ctx->sample_rate != audioOut.sample_rate) ||
-                            (ctx->channels    != audioOut.channels))
-                        {
-                            VERBOSE(VB_IMPORTANT, "audio stream changed");
-                            currentTrack[kTrackTypeAudio] = -1;
-                            selectedTrack[kTrackTypeAudio]
-                                .av_stream_index = -1;
-                            audIdx = -1;
-                            AutoSelectAudioTrack();
-                            data_size = 0;
-                        }
-                    }
-                    avcodeclock->unlock();
-
-                    if (ret < 0)
-                    {
-                        if (!dts)
-                        {
-                            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                                    "Unknown audio decoding error");
-                        }
+                        avcodeclock->unlock();
                         return false;
                     }
+                    audio_src_fmt = ctx->sample_fmt;
+                }
+            }
 
-                    if (data_size <= 0)
-                    {
-                        tmp_pkt.data += ret;
-                        tmp_pkt.size -= ret;
-                        continue;
-                    }
+            if (reformat_ctx)
+            {
+                const void *ibuf[6] = {audioSamples};
+                void *obuf[6] = {audioSamplesResampled};
+                int istride[6] = {av_get_bits_per_sample_format(ctx->sample_fmt)/8};
+                int ostride[6] = {2};
+                int len = data_size/istride[0];
+                if (av_audio_convert(reformat_ctx, obuf, ostride,
+                                     ibuf, istride, len) < 0)
+                {
+                    VERBOSE(VB_PLAYBACK, "av_audio_convert() failed");
 
-                    long long temppts = lastapts;
+                    avcodeclock->unlock();
+                    return false;
+                }
 
-                    // calc for next frame
-                    lastapts += (long long)((double)(data_size * 1000) /
+                data_size = len * 2;
+                s = (char *)audioSamplesResampled;
+            }
+            else
+                s = (char *)audioSamples;
+
+            // When decoding some audio streams the number of
+            // channels, etc isn't known until we try decoding it.
+            if ((ctx->sample_rate != audioOut.sample_rate) ||
+                (ctx->channels    != audioOut.channels))
+            {
+                VERBOSE(VB_IMPORTANT, "audio stream changed");
+                currentTrack[kTrackTypeAudio] = -1;
+                selectedTrack[kTrackTypeAudio].av_stream_index = -1;
+                audIdx = -1;
+                AutoSelectAudioTrack();
+                data_size = 0;
+            }
+        }
+        avcodeclock->unlock();
+
+        if (ret < 0)
+        {
+            if (!dts)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Unknown audio decoding error");
+            }
+            return false;
+        }
+
+        if (data_size <= 0)
+        {
+            tmp_pkt.data += ret;
+            tmp_pkt.size -= ret;
+            continue;
+        }
+
+        long long temppts = lastapts;
+
+        // calc for next frame
+        lastapts += (long long)((double)(data_size * 1000) /
                                 (curstream->codec->channels * 2) /
                                 curstream->codec->sample_rate);
 
-                    VERBOSE(VB_PLAYBACK+VB_TIMESTAMP,
-                            LOC + QString("audio timecode %1 %2 %3 %4")
-                            .arg(pkt->pts).arg(pkt->dts)
-                            .arg(temppts).arg(lastapts));
+        VERBOSE(VB_PLAYBACK+VB_TIMESTAMP,
+                LOC + QString("audio timecode %1 %2 %3 %4")
+                .arg(pkt->pts).arg(pkt->dts).arg(temppts).arg(lastapts));
 
-                    if (audSubIdx != -1)
-                    {
-                        extract_mono_channel(audSubIdx, &audioOut,
-                                             s, data_size);
-                    }
+        if (audSubIdx != -1)
+        {
+            extract_mono_channel(audSubIdx, &audioOut, s, data_size);
+        }
 
-                    GetNVP()->AddAudioData(s, data_size, temppts);
+        GetNVP()->AddAudioData(s, data_size, temppts);
 
-                    total_decoded_audio += data_size;
+        total_decoded_audio += data_size;
 
-                    allowedquit |= ringBuffer->InDVDMenuOrStillFrame();
-                    allowedquit |= !(decodetype & kDecodeVideo) &&
-                        (ofill + total_decoded_audio > othresh);
+        allowedquit |= ringBuffer->InDVDMenuOrStillFrame();
+        allowedquit |= !(decodetype & kDecodeVideo) &&
+                       (ofill + total_decoded_audio > othresh);
 
-                    // top off audio buffers initially in audio only mode
-                    if (!allowedquit && !(decodetype & kDecodeVideo))
-                    {
-                        uint fill, total;
-                        if (GetNVP()->GetAudioBufferStatus(fill, total))
-                        {
-                            total /= 6; // HACK needed for some audio files
-                            allowedquit =
-                                (fill == 0) || (fill > (total>>1)) ||
-                                ((total - fill) < (uint) data_size) ||
-                                (ofill + total_decoded_audio > (total>>2)) ||
-                                ((total - fill) < (uint) data_size * 2);
-                        }
-                        else
-                        {
-                            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                                    "GetFrame() : Failed to top off "
-                                    "buffers in audio only mode");
-                        }
-                    }
-                    tmp_pkt.data += ret;
-                    tmp_pkt.size -= ret;
-                }
+        // top off audio buffers initially in audio only mode
+        if (!allowedquit && !(decodetype & kDecodeVideo))
+        {
+            uint fill, total;
+            if (GetNVP()->GetAudioBufferStatus(fill, total))
+            {
+                total /= 6; // HACK needed for some audio files
+                allowedquit = (fill == 0) || (fill > (total>>1)) ||
+                              ((total - fill) < (uint) data_size) ||
+                              (ofill + total_decoded_audio > (total>>2)) ||
+                              ((total - fill) < (uint) data_size * 2);
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "GetFrame() : Failed to top off "
+                        "buffers in audio only mode");
+            }
+        }
+        tmp_pkt.data += ret;
+        tmp_pkt.size -= ret;
+    }
 
     return true;
 }
