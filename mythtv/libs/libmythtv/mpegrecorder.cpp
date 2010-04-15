@@ -1397,6 +1397,12 @@ void MpegRecorder::ResetForNewFile(void)
     bzero(_stream_id,  sizeof(_stream_id));
     bzero(_pid_status, sizeof(_pid_status));
     memset(_continuity_counter, 0xff, sizeof(_continuity_counter));
+
+    if (driver == "hdpvr")
+    {
+        m_h264_parser.Reset();
+        _wait_for_keyframe_option = true;
+    }
 }
 
 void MpegRecorder::Reset(void)
