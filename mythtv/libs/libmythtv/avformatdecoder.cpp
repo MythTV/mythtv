@@ -3119,6 +3119,54 @@ bool AvFormatDecoder::H264PreProcessPkt(AVStream *stream, AVPacket *pkt)
     return on_frame;
 }
 
+bool AvFormatDecoder::PreProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
+{
+            AVCodecContext *context = curstream->codec;
+            bool on_frame = true;
+
+            if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
+            {
+                if (!ringBuffer->isDVD())
+                    MpegPreProcessPkt(curstream, pkt);
+            }
+            else if (CODEC_IS_H264(context->codec_id))
+            {
+                on_frame = H264PreProcessPkt(curstream, pkt);
+            }
+            else
+            {
+                if (pkt->flags & PKT_FLAG_KEY)
+                {
+                    HandleGopStart(pkt, false);
+                    seen_gop = true;
+                }
+                else
+                {
+                    seq_count++;
+                    if (!seen_gop && seq_count > 1)
+                    {
+                        HandleGopStart(pkt, false);
+                    }
+                }
+            }
+
+            if (framesRead == 0 && !justAfterChange &&
+                !(pkt->flags & PKT_FLAG_KEY))
+            {
+                av_free_packet(pkt);
+                return false;
+            }
+
+            if (on_frame)
+                framesRead++;
+            justAfterChange = false;
+
+            if (exitafterdecoded)
+                gotvideo = 1;
+
+            return true;
+}
+
 /** \fn AvFormatDecoder::ProcessVBIDataPacket(const AVStream*, const AVPacket*)
  *  \brief Process ivtv proprietary embedded vertical blanking
  *         interval captions.
@@ -3971,48 +4019,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         if (len > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO &&
             pkt->stream_index == selectedVideoIndex)
         {
-            AVCodecContext *context = curstream->codec;
-            bool on_frame = true;
-
-            if (CODEC_IS_FFMPEG_MPEG(context->codec_id))
-            {
-                if (!ringBuffer->isDVD())
-                    MpegPreProcessPkt(curstream, pkt);
-            }
-            else if (CODEC_IS_H264(context->codec_id))
-            {
-                on_frame = H264PreProcessPkt(curstream, pkt);
-            }
-            else
-            {
-                if (pkt->flags & PKT_FLAG_KEY)
-                {
-                    HandleGopStart(pkt, false);
-                    seen_gop = true;
-                }
-                else
-                {
-                    seq_count++;
-                    if (!seen_gop && seq_count > 1)
-                    {
-                        HandleGopStart(pkt, false);
-                    }
-                }
-            }
-
-            if (framesRead == 0 && !justAfterChange &&
-                !(pkt->flags & PKT_FLAG_KEY))
-            {
-                av_free_packet(pkt);
+            if (!PreProcessVideoPacket(curstream, pkt))
                 continue;
-            }
-
-            if (on_frame)
-                framesRead++;
-            justAfterChange = false;
-
-            if (exitafterdecoded)
-                gotvideo = 1;
 
             // If the resolution changed in XXXPreProcessPkt, we may
             // have a fatal error, so check for this before continuing.
