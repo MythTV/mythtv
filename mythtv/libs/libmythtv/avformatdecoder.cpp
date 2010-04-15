@@ -4257,7 +4257,6 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 {
     AVPacket *pkt = NULL;
-    long long pts;
     bool have_err = false;
 
     gotvideo = false;
@@ -4459,8 +4458,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        pts = 0;
-
         AVStream *curstream = ic->streams[pkt->stream_index];
 
         if (!curstream)
@@ -4469,9 +4466,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             av_free_packet(pkt);
             continue;
         }
-
-        if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
-            pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
         if (ringBuffer->isDVD() &&
             curstream->codec->codec_type == CODEC_TYPE_VIDEO)
@@ -4606,7 +4600,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     break;
                 }
 
-                if (pts != (int64_t) AV_NOPTS_VALUE)
+                if (pkt->pts != (int64_t) AV_NOPTS_VALUE)
                 {
                     lastccptsu = (long long)
                                  (av_q2d(curstream->time_base)*pkt->pts*1000000);
