@@ -192,6 +192,7 @@ class AvFormatDecoder : public DecoderBase
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
     bool H264PreProcessPkt(AVStream *stream, AVPacket *pkt);
     bool PreProcessVideoPacket(AVStream *stream, AVPacket *pkt);
+    bool ProcessVideoPacket(AVStream *stream, AVPacket *pkt);
 
     void ProcessVBIDataPacket(const AVStream *stream, const AVPacket *pkt);
     void ProcessDVBDataPacket(const AVStream *stream, const AVPacket *pkt);
