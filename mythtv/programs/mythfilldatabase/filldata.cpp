@@ -655,7 +655,7 @@ bool FillData::Run(SourceList &sourcelist)
 
             if (grabber_capabilities_proc.waitForStarted(1000))
             {
-                bool ok = grabber_capabilities_proc.waitForFinished(15*1000);
+                bool ok = grabber_capabilities_proc.waitForFinished(25*1000);
 
                 if (ok &&
                     QProcess::NormalExit ==
