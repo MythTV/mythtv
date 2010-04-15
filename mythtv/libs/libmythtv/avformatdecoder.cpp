@@ -3969,12 +3969,12 @@ static void extract_mono_channel(uint channel, AudioInfo *audioInfo,
 }
 
 bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
-                                         DecodeType decodetype, bool firstloop)
+                                         DecodeType decodetype)
 {
     long long pts = 0;
     AC3HeaderInfo hdr;
     int ret = 0, data_size = 0;
-    bool errored = false, dts = false;
+    bool errored = false, dts = false, firstloop = true;
 
     avcodeclock->lock();
     int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
@@ -4251,6 +4251,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         }
         tmp_pkt.data += ret;
         tmp_pkt.size -= ret;
+        firstloop = false;
     }
 
     return true;
@@ -4261,7 +4262,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 {
     AVPacket *pkt = NULL;
     long long pts;
-    bool firstloop = false, have_err = false;
+    bool have_err = false;
 
     gotvideo = false;
 
@@ -4592,14 +4593,13 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        firstloop = true;
         have_err = false;
 
         switch (codec_type)
         {
         case CODEC_TYPE_AUDIO:
             {
-                if (!ProcessAudioPacket(curstream, pkt, decodetype, firstloop))
+                if (!ProcessAudioPacket(curstream, pkt, decodetype))
                     have_err = true;
                 break;
             }
@@ -4610,7 +4610,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     break;
                 }
 
-                if (firstloop && pts != (int64_t) AV_NOPTS_VALUE)
+                if (pts != (int64_t) AV_NOPTS_VALUE)
                 {
                     lastccptsu = (long long)
                                  (av_q2d(curstream->time_base)*pkt->pts*1000000);
@@ -4648,7 +4648,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         if (!have_err)
         {
             frame_decoded = 1;
-            firstloop = false;
         }
 
         av_free_packet(pkt);
