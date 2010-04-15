@@ -3974,7 +3974,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     long long pts = 0;
     AC3HeaderInfo hdr;
     int ret = 0, data_size = 0;
-    bool errored = false, dts = false, firstloop = true;
+    bool dts = false, firstloop = true;
 
     avcodeclock->lock();
     int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
@@ -3995,7 +3995,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
     AVPacket tmp_pkt;
     tmp_pkt.data = pkt->data;
     tmp_pkt.size = pkt->size;
-    while (!errored && tmp_pkt.size > 0)
+    while (tmp_pkt.size > 0)
     {
         bool reselectAudioTrack = false;
         char *s;
@@ -4079,10 +4079,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
 
         if (!(decodetype & kDecodeAudio) ||
             (pkt->stream_index != audIdx))
-        {
-            tmp_pkt.size = 0;
-            continue;
-        }
+            break;
 
         if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
             lastapts = (long long)(av_q2d(curstream->time_base) * pkt->pts * 1000);
@@ -4090,10 +4087,7 @@ bool AvFormatDecoder::ProcessAudioPacket(AVStream *curstream, AVPacket *pkt,
         if (skipaudio)
         {
             if ((lastapts < lastvpts - (10.0 / fps)) || lastvpts == 0)
-            {
-                tmp_pkt.size = 0;
-                continue;
-            }
+                break;
             else
                 skipaudio = false;
         }
