@@ -3178,157 +3178,150 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
     if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
-                avcodeclock->lock();
-                if (d->HasDecoder())
-                {
-                    if (decodeStillFrame)
-                    {
-                        int count = 0;
-                        // HACK
-                        while (!gotpicture && count < 5)
-                        {
-                            ret = d->DecodeMPEG2Video(context, &mpa_pic,
-                                                      &gotpicture, pkt);
-                            count++;
-                        }
-                    }
-                    else
-                    {
-                        ret = d->DecodeMPEG2Video(context, &mpa_pic,
-                                                  &gotpicture, pkt);
-                    }
-                }
-                else
-                {
-                    ret = avcodec_decode_video2(context, &mpa_pic,
-                                                &gotpicture, pkt);
-                    // Reparse it to not drop the DVD still frame
-                    if (decodeStillFrame)
-                        ret = avcodec_decode_video2(context, &mpa_pic,
-                                                    &gotpicture, pkt);
-                }
-                avcodeclock->unlock();
+    avcodeclock->lock();
+    if (d->HasDecoder())
+    {
+        if (decodeStillFrame)
+        {
+            int count = 0;
+            // HACK
+            while (!gotpicture && count < 5)
+            {
+                ret = d->DecodeMPEG2Video(context, &mpa_pic, &gotpicture, pkt);
+                count++;
+            }
+        }
+        else
+        {
+            ret = d->DecodeMPEG2Video(context, &mpa_pic, &gotpicture, pkt);
+        }
+    }
+    else
+    {
+        ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
+        // Reparse it to not drop the DVD still frame
+        if (decodeStillFrame)
+            ret = avcodec_decode_video2(context, &mpa_pic, &gotpicture, pkt);
+    }
+    avcodeclock->unlock();
 
-                if (ret < 0)
-                {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown decoding error");
-                    return false;
-                }
+    if (ret < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown decoding error");
+        return false;
+    }
 
-                if (!gotpicture)
-                {
-                    return true;
-                }
+    if (!gotpicture)
+    {
+        return true;
+    }
 
-                // Decode CEA-608 and CEA-708 captions
-                for (uint i = 0; i < (uint)mpa_pic.atsc_cc_len;
-                i += ((mpa_pic.atsc_cc_buf[i] & 0x1f) * 3) + 2)
-                {
-                    DecodeDTVCC(mpa_pic.atsc_cc_buf + i,
-                                mpa_pic.atsc_cc_len - i);
-                }
+    // Decode CEA-608 and CEA-708 captions
+    for (uint i = 0; i < (uint)mpa_pic.atsc_cc_len;
+    i += ((mpa_pic.atsc_cc_buf[i] & 0x1f) * 3) + 2)
+    {
+        DecodeDTVCC(mpa_pic.atsc_cc_buf + i,
+                    mpa_pic.atsc_cc_len - i);
+    }
 
-                VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);
+    VideoFrame *picframe = (VideoFrame *)(mpa_pic.opaque);
 
-                if (!directrendering)
-                {
-                    AVPicture tmppicture;
+    if (!directrendering)
+    {
+        AVPicture tmppicture;
 
-                    VideoFrame *xf = picframe;
-                    picframe = GetNVP()->GetNextVideoFrame(false);
+        VideoFrame *xf = picframe;
+        picframe = GetNVP()->GetNextVideoFrame(false);
 
-                    unsigned char *buf = picframe->buf;
-                    avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P,
-                                   context->width, context->height);
-                    tmppicture.data[0] = buf + picframe->offsets[0];
-                    tmppicture.data[1] = buf + picframe->offsets[1];
-                    tmppicture.data[2] = buf + picframe->offsets[2];
-                    tmppicture.linesize[0] = picframe->pitches[0];
-                    tmppicture.linesize[1] = picframe->pitches[1];
-                    tmppicture.linesize[2] = picframe->pitches[2];
+        unsigned char *buf = picframe->buf;
+        avpicture_fill(&tmppicture, buf, PIX_FMT_YUV420P, context->width,
+                       context->height);
+        tmppicture.data[0] = buf + picframe->offsets[0];
+        tmppicture.data[1] = buf + picframe->offsets[1];
+        tmppicture.data[2] = buf + picframe->offsets[2];
+        tmppicture.linesize[0] = picframe->pitches[0];
+        tmppicture.linesize[1] = picframe->pitches[1];
+        tmppicture.linesize[2] = picframe->pitches[2];
 
-                    sws_ctx = sws_getCachedContext(sws_ctx, context->width,
-                                           context->height, context->pix_fmt,
-                                           context->width, context->height,
-                                           PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
-                                           NULL, NULL, NULL);
-                    if (!sws_ctx)
-                    {
-                        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                                "Failed to allocate sws context");
-                        return false;
-                    }
-                    sws_scale(sws_ctx, mpa_pic.data, mpa_pic.linesize,
-                              0, context->height, tmppicture.data,
-                              tmppicture.linesize);
+        sws_ctx = sws_getCachedContext(sws_ctx, context->width,
+                                       context->height, context->pix_fmt,
+                                       context->width, context->height,
+                                       PIX_FMT_YUV420P, SWS_FAST_BILINEAR,
+                                       NULL, NULL, NULL);
+        if (!sws_ctx)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate sws context");
+            return false;
+        }
+        sws_scale(sws_ctx, mpa_pic.data, mpa_pic.linesize, 0, context->height,
+                  tmppicture.data, tmppicture.linesize);
 
 
-                    if (xf)
-                    {
-                        // Set the frame flags, but then discard it
-                        // since we are not using it for display.
-                        xf->interlaced_frame = mpa_pic.interlaced_frame;
-                        xf->top_field_first = mpa_pic.top_field_first;
-                        xf->frameNumber = framesPlayed;
-                        GetNVP()->DiscardVideoFrame(xf);
-                    }
-                }
+        if (xf)
+        {
+            // Set the frame flags, but then discard it
+            // since we are not using it for display.
+            xf->interlaced_frame = mpa_pic.interlaced_frame;
+            xf->top_field_first = mpa_pic.top_field_first;
+            xf->frameNumber = framesPlayed;
+            GetNVP()->DiscardVideoFrame(xf);
+        }
+    }
 
-                long long temppts = pts;
+    long long temppts = pts;
 
-                // Validate the video pts against the last pts. If it's
-                // a little bit smaller, equal or not available, compute
-                // it from the last. Otherwise assume a wraparound.
-                if (!ringBuffer->isDVD() &&
-                    temppts <= lastvpts &&
-                    (temppts + 10000 > lastvpts || temppts <= 0))
-                {
-                    temppts = lastvpts;
-                    temppts += (long long)(1000 / fps);
-                    // MPEG2/H264 frames can be repeated, update pts accordingly
-                    temppts += (long long)(mpa_pic.repeat_pict * 500 / fps);
-                }
+    // Validate the video pts against the last pts. If it's
+    // a little bit smaller, equal or not available, compute
+    // it from the last. Otherwise assume a wraparound.
+    if (!ringBuffer->isDVD() &&
+        temppts <= lastvpts &&
+        (temppts + 10000 > lastvpts || temppts <= 0))
+    {
+        temppts = lastvpts;
+        temppts += (long long)(1000 / fps);
+        // MPEG2/H264 frames can be repeated, update pts accordingly
+        temppts += (long long)(mpa_pic.repeat_pict * 500 / fps);
+    }
 
-                VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
-                        QString("video timecode %1 %2 %3 %4")
-                        .arg(pkt->pts).arg(pkt->dts).arg(temppts)
-                        .arg(lastvpts));
+    VERBOSE(VB_PLAYBACK+VB_TIMESTAMP, LOC +
+            QString("video timecode %1 %2 %3 %4").arg(pkt->pts).arg(pkt->dts)
+            .arg(temppts).arg(lastvpts));
 
 /* XXX: Broken.
-                if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
-                    context->height == picframe->height)
-                {
-                    int tblsize = mpa_pic.qstride *
-                                  ((picframe->height + 15) / 16);
+    if (mpa_pic.qscale_table != NULL && mpa_pic.qstride > 0 &&
+        context->height == picframe->height)
+    {
+        int tblsize = mpa_pic.qstride *
+                      ((picframe->height + 15) / 16);
 
-                    if (picframe->qstride != mpa_pic.qstride ||
-                        picframe->qscale_table == NULL)
-                    {
-                        picframe->qstride = mpa_pic.qstride;
-                        if (picframe->qscale_table)
-                            delete [] picframe->qscale_table;
-                        picframe->qscale_table = new unsigned char[tblsize];
-                    }
+        if (picframe->qstride != mpa_pic.qstride ||
+            picframe->qscale_table == NULL)
+        {
+            picframe->qstride = mpa_pic.qstride;
+            if (picframe->qscale_table)
+                delete [] picframe->qscale_table;
+            picframe->qscale_table = new unsigned char[tblsize];
+        }
 
-                    memcpy(picframe->qscale_table, mpa_pic.qscale_table,
-                           tblsize);
-                }
+        memcpy(picframe->qscale_table, mpa_pic.qscale_table,
+               tblsize);
+    }
 */
 
-                picframe->interlaced_frame = mpa_pic.interlaced_frame;
-                picframe->top_field_first = mpa_pic.top_field_first;
-                picframe->repeat_pict = mpa_pic.repeat_pict;
+    picframe->interlaced_frame = mpa_pic.interlaced_frame;
+    picframe->top_field_first = mpa_pic.top_field_first;
+    picframe->repeat_pict = mpa_pic.repeat_pict;
 
-                picframe->frameNumber = framesPlayed;
-                GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
-                if (d->HasMPEG2Dec() && mpa_pic.data[3])
-                    context->release_buffer(context, &mpa_pic);
+    picframe->frameNumber = framesPlayed;
+    GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
+    if (d->HasMPEG2Dec() && mpa_pic.data[3])
+        context->release_buffer(context, &mpa_pic);
 
-                decoded_video_frame = picframe;
-                gotvideo = 1;
-                framesPlayed++;
+    decoded_video_frame = picframe;
+    gotvideo = 1;
+    framesPlayed++;
 
-                lastvpts = temppts;
+    lastvpts = temppts;
 
     return true;
 }
