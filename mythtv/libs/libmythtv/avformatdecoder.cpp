@@ -550,6 +550,8 @@ AvFormatDecoder::~AvFormatDecoder()
     delete d;
     delete m_h264_parser;
 
+    sws_freeContext(sws_ctx);
+
     av_freep((void *)&audioSamples);
 
     if (audioSamplesResampled)
