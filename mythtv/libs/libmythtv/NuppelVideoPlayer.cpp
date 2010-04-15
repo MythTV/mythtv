@@ -331,6 +331,12 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         output_jmeter = NULL;
     }
 
+    if (detect_letter_box)
+    {
+        delete detect_letter_box;
+        detect_letter_box = NULL;
+    }
+
     ShutdownYUVResize();
 }
 
