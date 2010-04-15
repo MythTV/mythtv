@@ -478,6 +478,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       gopset(false),                seen_gop(false),
       seq_count(0),
       prevgoppos(0),                gotvideo(false),
+      skipaudio(false),             allowedquit(false),
       start_code_state(0xffffffff),
       lastvpts(0),                  lastapts(0),
       lastccptsu(0),
@@ -3685,14 +3686,14 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
     frame_decoded = 0;
     decoded_video_frame = NULL;
 
-    bool allowedquit = false;
+    allowedquit = false;
     bool storevideoframes = false;
 
     avcodeclock->lock();
     AutoSelectTracks();
     avcodeclock->unlock();
 
-    bool skipaudio = (lastvpts == 0);
+    skipaudio = (lastvpts == 0);
 
     bool has_video = HasVideo(ic);
 

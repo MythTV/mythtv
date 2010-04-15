@@ -246,6 +246,10 @@ class AvFormatDecoder : public DecoderBase
 
     bool gotvideo;
 
+    // from full GetFrame implementation
+    bool skipaudio;
+    bool allowedquit;
+
     uint32_t  start_code_state;
 
     long long lastvpts;
