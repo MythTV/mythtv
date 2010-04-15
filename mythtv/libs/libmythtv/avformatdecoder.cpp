@@ -3490,7 +3490,7 @@ void AvFormatDecoder::ProcessDSMCCPacket(
 
 bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
 {
-    long long pts;
+    long long pts = 0;
 
     if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
         pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
