@@ -3646,12 +3646,11 @@ void VideoDialog::playFolder()
 
     if (list_count > 0)
     {
-        bool video_started;
+        bool video_started = false;
         int i = 0;
         while (i < list_count &&
                (!video_started || playing_time.elapsed() > WATCHED_WATERMARK))
         {
-            video_started = false;
             MythGenericTree *subnode = node->getChildAt(i);
             if (subnode)
             {
