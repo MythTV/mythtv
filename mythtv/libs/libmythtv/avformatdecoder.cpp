@@ -4505,8 +4505,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
         }
 
-        if (storevideoframes &&
-            curstream->codec->codec_type == CODEC_TYPE_VIDEO)
+        enum CodecType codec_type = curstream->codec->codec_type;
+
+        if (storevideoframes && codec_type == CODEC_TYPE_VIDEO)
         {
             av_dup_packet(pkt);
             storedPackets.append(pkt);
@@ -4514,7 +4515,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (curstream->codec->codec_type == CODEC_TYPE_VIDEO &&
+        if (codec_type == CODEC_TYPE_VIDEO &&
             pkt->stream_index == selectedVideoIndex)
         {
             if (!PreProcessVideoPacket(curstream, pkt))
@@ -4530,7 +4531,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
         }
 
-        if (curstream->codec->codec_type == CODEC_TYPE_DATA &&
+        if (codec_type == CODEC_TYPE_DATA &&
             curstream->codec->codec_id   == CODEC_ID_MPEG2VBI)
         {
             ProcessVBIDataPacket(curstream, pkt);
@@ -4539,9 +4540,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (((curstream->codec->codec_type == CODEC_TYPE_DATA &&
+        if (((codec_type == CODEC_TYPE_DATA &&
               curstream->codec->codec_id   == CODEC_ID_DVB_VBI) ||
-             (curstream->codec->codec_type == CODEC_TYPE_SUBTITLE &&
+             (codec_type == CODEC_TYPE_SUBTITLE &&
               curstream->codec->codec_id   == CODEC_ID_DVB_TELETEXT)))
         {
             ProcessDVBDataPacket(curstream, pkt);
@@ -4551,7 +4552,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         }
 
 #ifdef USING_MHEG
-        if (curstream->codec->codec_type == CODEC_TYPE_DATA &&
+        if (codec_type == CODEC_TYPE_DATA &&
             curstream->codec->codec_id   == CODEC_ID_DSMCC_B)
         {
             ProcessDSMCCPacket(curstream, pkt);
@@ -4573,7 +4574,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 #endif // USING_MHEG
 
         // we don't care about other data streams
-        if (curstream->codec->codec_type == CODEC_TYPE_DATA)
+        if (codec_type == CODEC_TYPE_DATA)
         {
             av_free_packet(pkt);
             continue;
@@ -4584,7 +4585,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             VERBOSE(VB_PLAYBACK, LOC +
                     QString("No codec for stream index %1, type(%2) id(%3:%4)")
                     .arg(pkt->stream_index)
-                    .arg(codec_type_string(curstream->codec->codec_type))
+                    .arg(codec_type_string(codec_type))
                     .arg(codec_id_string(curstream->codec->codec_id))
                     .arg(curstream->codec->codec_id));
             av_free_packet(pkt);
@@ -4593,9 +4594,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         firstloop = true;
         have_err = false;
-        int ctype  = curstream->codec->codec_type;
 
-        switch (ctype)
+        switch (codec_type)
         {
         case CODEC_TYPE_AUDIO:
             {
