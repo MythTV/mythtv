@@ -3484,6 +3484,63 @@ void AvFormatDecoder::ProcessDSMCCPacket(
 #endif // USING_MHEG
 }
 
+bool AvFormatDecoder::ProcessSubtitlePacket(AVStream *curstream, AVPacket *pkt)
+{
+    long long pts;
+
+    if (pkt->dts != (int64_t)AV_NOPTS_VALUE)
+        pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
+
+    avcodeclock->lock();
+    int subIdx = selectedTrack[kTrackTypeSubtitle].av_stream_index;
+    avcodeclock->unlock();
+
+                int gotSubtitles = 0;
+                AVSubtitle subtitle;
+                memset(&subtitle, 0, sizeof(AVSubtitle));
+
+                if (ringBuffer->isDVD())
+                {
+                    if (ringBuffer->DVD()->NumMenuButtons() > 0)
+                    {
+                        ringBuffer->DVD()->GetMenuSPUPkt(pkt->data, pkt->size,
+                                                         curstream->id);
+                    }
+                    else
+                    {
+                        if (pkt->stream_index == subIdx)
+                        {
+                            QMutexLocker locker(avcodeclock);
+                            ringBuffer->DVD()->DecodeSubtitles(&subtitle,
+                                                               &gotSubtitles,
+                                                               pkt->data,
+                                                               pkt->size);
+                        }
+                    }
+                }
+                else if (pkt->stream_index == subIdx)
+                {
+                    QMutexLocker locker(avcodeclock);
+                    avcodec_decode_subtitle2(curstream->codec,
+                                             &subtitle, &gotSubtitles, pkt);
+                }
+
+                if (gotSubtitles)
+                {
+                    subtitle.start_display_time += pts;
+                    subtitle.end_display_time += pts;
+                    GetNVP()->AddAVSubtitle(subtitle);
+
+                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
+                            QString("subtl timecode %1 %2 %3 %4")
+                            .arg(pkt->pts).arg(pkt->dts)
+                            .arg(subtitle.start_display_time)
+                            .arg(subtitle.end_display_time));
+                }
+
+    return true;
+}
+
 int AvFormatDecoder::SetTrack(uint type, int trackNo)
 {
     bool ret = DecoderBase::SetTrack(type, trackNo);
@@ -4255,7 +4312,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         int ctype  = curstream->codec->codec_type;
         int audIdx = selectedTrack[kTrackTypeAudio].av_stream_index;
         int audSubIdx = selectedTrack[kTrackTypeAudio].av_substream_index;
-        int subIdx = selectedTrack[kTrackTypeSubtitle].av_stream_index;
         avcodeclock->unlock();
 
         int ret = 0;
@@ -4570,49 +4626,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
         case CODEC_TYPE_SUBTITLE:
             {
-                int gotSubtitles = 0;
-                AVSubtitle subtitle;
-                memset(&subtitle, 0, sizeof(AVSubtitle));
-
-                if (ringBuffer->isDVD())
-                {
-                    if (ringBuffer->DVD()->NumMenuButtons() > 0)
-                    {
-                        ringBuffer->DVD()->GetMenuSPUPkt(pkt->data, pkt->size,
-                                                         curstream->id);
-                    }
-                    else
-                    {
-                        if (pkt->stream_index == subIdx)
-                        {
-                            QMutexLocker locker(avcodeclock);
-                            ringBuffer->DVD()->DecodeSubtitles(&subtitle,
-                                                               &gotSubtitles,
-                                                               pkt->data,
-                                                               pkt->size);
-                        }
-                    }
-                }
-                else if (pkt->stream_index == subIdx)
-                {
-                    QMutexLocker locker(avcodeclock);
-                    avcodec_decode_subtitle2(curstream->codec,
-                                             &subtitle, &gotSubtitles, pkt);
-                }
-
-                if (gotSubtitles)
-                {
-                    subtitle.start_display_time += pts;
-                    subtitle.end_display_time += pts;
-                    GetNVP()->AddAVSubtitle(subtitle);
-
-                    VERBOSE(VB_PLAYBACK|VB_TIMESTAMP, LOC +
-                            QString("subtl timecode %1 %2 %3 %4")
-                            .arg(pkt->pts).arg(pkt->dts)
-                            .arg(subtitle.start_display_time)
-                            .arg(subtitle.end_display_time));
-                }
-
+                if (!ProcessSubtitlePacket(curstream, pkt))
+                    have_err = true;
                 break;
             }
                 default:
