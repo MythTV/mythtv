@@ -205,7 +205,7 @@ class AvFormatDecoderPrivate
     void DestroyMPEG2();
     void ResetMPEG2();
     int DecodeMPEG2Video(AVCodecContext *avctx, AVFrame *picture,
-                         int *got_picture_ptr, uint8_t *buf, int buf_size);
+                         int *got_picture_ptr, AVPacket *pkt);
 
     // Mac OS X Hardware DVD-Video decoder
     bool SetVideoSize(const QSize &video_dim);
@@ -292,7 +292,7 @@ void AvFormatDecoderPrivate::ResetMPEG2()
 int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                                              AVFrame *picture,
                                              int *got_picture_ptr,
-                                             uint8_t *buf, int buf_size)
+                                             AVPacket *pkt)
 {
     if (dvdvdec)
     {
@@ -303,8 +303,8 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
             return -1;
         }
 
-        int ret = avcodec_decode_video(avctx, picture,
-                                       got_picture_ptr, buf, buf_size);
+        int ret = avcodec_decode_video2(avctx, picture,
+                                       got_picture_ptr, pkt);
 
         dvdvdec->PostProcessFrame(avctx, (VideoFrame *)(picture->opaque),
                                   picture->pict_type, *got_picture_ptr);
@@ -313,7 +313,7 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
 
     *got_picture_ptr = 0;
     const mpeg2_info_t *info = mpeg2_info(mpeg2dec);
-    mpeg2_buffer(mpeg2dec, buf, buf + buf_size);
+    mpeg2_buffer(mpeg2dec, pkt->data, pkt->data + pkt->size);
     while (1)
     {
         switch (mpeg2_parse(mpeg2dec))
@@ -355,7 +355,7 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                             <<"           "<<msg);
 #endif
                 }
-                return buf_size;
+                return pkt->size;
             case STATE_INVALID:
                 // This is the error state. The decoder must be
                 // reset on an error.
@@ -3723,8 +3723,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 {
     AVPacket *pkt = NULL;
     AC3HeaderInfo hdr;
-    int len;
-    unsigned char *ptr;
     int data_size = 0;
     long long pts;
     bool firstloop = false, have_err = false;
@@ -3928,8 +3926,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        len = pkt->size;
-        ptr = pkt->data;
         pts = 0;
 
         AVStream *curstream = ic->streams[pkt->stream_index];
@@ -4016,7 +4012,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (len > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO &&
+        if (curstream->codec->codec_type == CODEC_TYPE_VIDEO &&
             pkt->stream_index == selectedVideoIndex)
         {
             if (!PreProcessVideoPacket(curstream, pkt))
@@ -4032,8 +4028,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             }
         }
 
-        if (len > 0 &&
-            curstream->codec->codec_type == CODEC_TYPE_DATA &&
+        if (curstream->codec->codec_type == CODEC_TYPE_DATA &&
             curstream->codec->codec_id   == CODEC_ID_MPEG2VBI)
         {
             ProcessVBIDataPacket(curstream, pkt);
@@ -4042,8 +4037,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             continue;
         }
 
-        if (len > 0 &&
-            ((curstream->codec->codec_type == CODEC_TYPE_DATA &&
+        if (((curstream->codec->codec_type == CODEC_TYPE_DATA &&
               curstream->codec->codec_id   == CODEC_ID_DVB_VBI) ||
              (curstream->codec->codec_type == CODEC_TYPE_SUBTITLE &&
               curstream->codec->codec_id   == CODEC_ID_DVB_TELETEXT)))
@@ -4055,8 +4049,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         }
 
 #ifdef USING_MHEG
-        if (len > 0 &&
-            curstream->codec->codec_type == CODEC_TYPE_DATA &&
+        if (curstream->codec->codec_type == CODEC_TYPE_DATA &&
             curstream->codec->codec_id   == CODEC_ID_DSMCC_B)
         {
             ProcessDSMCCPacket(curstream, pkt);
@@ -4106,7 +4099,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
         int subIdx = selectedTrack[kTrackTypeSubtitle].av_stream_index;
         avcodeclock->unlock();
 
-        while (!have_err && len > 0)
         {
             int ret = 0;
             bool dts = false;
@@ -4114,6 +4106,11 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
             {
                 case CODEC_TYPE_AUDIO:
                 {
+                    AVPacket tmp_pkt;
+                    tmp_pkt.data = pkt->data;
+                    tmp_pkt.size = pkt->size;
+                    while (!have_err && tmp_pkt.size > 0)
+                    {
                     bool reselectAudioTrack = false;
                     char *s;
 
@@ -4158,9 +4155,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                                 audioOut.channels;
                         }
                         data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                        ret = avcodec_decode_audio2(curstream->codec,
+                        ret = avcodec_decode_audio3(curstream->codec,
                                                     audioSamples, &data_size,
-                                                    ptr, len);
+                                                    &tmp_pkt);
                         already_decoded = true;
 
                         reselectAudioTrack |= curstream->codec->channels;
@@ -4169,7 +4166,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     if (curstream->codec->codec_id == CODEC_ID_AC3)
                     {
                         GetBitContext gbc;
-                        init_get_bits(&gbc, ptr, len * 8);
+                        init_get_bits(&gbc, tmp_pkt.data, tmp_pkt.size * 8);
                         if (!ff_ac3_parse_header(&gbc, &hdr))
                         {
                             if (hdr.channels != last_ac3_channels)
@@ -4204,8 +4201,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     if (!(decodetype & kDecodeAudio) ||
                         (pkt->stream_index != audIdx))
                     {
-                        ptr += len;
-                        len = 0;
+                        tmp_pkt.size = 0;
                         continue;
                     }
 
@@ -4218,8 +4214,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         if ((lastapts < lastvpts - (10.0 / fps)) ||
                             lastvpts == 0)
                         {
-                            ptr += len;
-                            len = 0;
+                            tmp_pkt.size = 0;
                             continue;
                         }
                         else
@@ -4231,9 +4226,9 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
                     if (audioOut.do_passthru)
                     {
-                        data_size = pkt->size;
+                        data_size = tmp_pkt.size;
                         dts = CODEC_ID_DTS == curstream->codec->codec_id;
-                        ret = encode_frame(dts, ptr, len,
+                        ret = encode_frame(dts, tmp_pkt.data, tmp_pkt.size,
                                            audioSamples, data_size);
                         s = (char *)audioSamples;
                     }
@@ -4252,8 +4247,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                             curstream->codec->request_channels =
                                 audioOut.channels;
                             data_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                            ret = avcodec_decode_audio2(ctx, audioSamples,
-                                                        &data_size, ptr, len);
+                            ret = avcodec_decode_audio3(ctx, audioSamples,
+                                                        &data_size, &tmp_pkt);
                         }
 
                             // Convert sample format if required (Myth only handles 8 and 16 bits audio)
@@ -4335,8 +4330,8 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
                     if (data_size <= 0)
                     {
-                        ptr += ret;
-                        len -= ret;
+                        tmp_pkt.data += ret;
+                        tmp_pkt.size -= ret;
                         continue;
                     }
 
@@ -4386,16 +4381,16 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                                     "buffers in audio only mode");
                         }
                     }
-
+                    tmp_pkt.data += ret;
+                    tmp_pkt.size -= ret;
+                    }
                     break;
                 }
                 case CODEC_TYPE_VIDEO:
                 {
                     if (pkt->stream_index != selectedVideoIndex)
                     {
-                        ptr += pkt->size;
-                        len -= pkt->size;
-                        continue;
+                        break;
                     }
 
                     if (firstloop && pts != (int64_t) AV_NOPTS_VALUE)
@@ -4408,9 +4403,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     {
                         framesPlayed++;
                         gotvideo = 1;
-                        ptr += pkt->size;
-                        len -= pkt->size;
-                        continue;
+                        break;
                     }
 
                     AVCodecContext *context = curstream->codec;
@@ -4429,24 +4422,24 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                             while (!gotpicture && count < 5)
                             {
                                 ret = d->DecodeMPEG2Video(context, &mpa_pic,
-                                                  &gotpicture, ptr, len);
+                                                  &gotpicture, pkt);
                                 count++;
                             }
                         }
                         else
                         {
                             ret = d->DecodeMPEG2Video(context, &mpa_pic,
-                                                &gotpicture, ptr, len);
+                                                &gotpicture, pkt);
                         }
                     }
                     else
                     {
-                        ret = avcodec_decode_video(context, &mpa_pic,
-                                                   &gotpicture, ptr, len);
+                        ret = avcodec_decode_video2(context, &mpa_pic,
+                                                   &gotpicture, pkt);
                         // Reparse it to not drop the DVD still frame
                         if (decodeStillFrame)
-                            ret = avcodec_decode_video(context, &mpa_pic,
-                                                        &gotpicture, ptr, len);
+                            ret = avcodec_decode_video2(context, &mpa_pic,
+                                                        &gotpicture, pkt);
                     }
                     avcodeclock->unlock();
 
@@ -4455,14 +4448,12 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                         VERBOSE(VB_IMPORTANT, LOC_ERR +
                                 "Unknown decoding error");
                         have_err = true;
-                        continue;
+                        break;
                     }
 
                     if (!gotpicture)
                     {
-                        ptr += ret;
-                        len -= ret;
-                        continue;
+                        break;
                     }
 
                     // Decode CEA-608 and CEA-708 captions
@@ -4502,7 +4493,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                             VERBOSE(VB_IMPORTANT, LOC_ERR +
                                     "Failed to allocate sws context");
                             have_err = true;
-                            continue;
+                            break;
                         }
                         sws_scale(sws_ctx, mpa_pic.data, mpa_pic.linesize,
                                   0, context->height, tmppicture.data,
@@ -4587,7 +4578,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     {
                         if (ringBuffer->DVD()->NumMenuButtons() > 0)
                         {
-                            ringBuffer->DVD()->GetMenuSPUPkt(ptr, len,
+                            ringBuffer->DVD()->GetMenuSPUPkt(pkt->data, pkt->size,
                                                              curstream->id);
                         }
                         else
@@ -4597,21 +4588,18 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                                 QMutexLocker locker(avcodeclock);
                                 ringBuffer->DVD()->DecodeSubtitles(&subtitle,
                                                                    &gotSubtitles,
-                                                                   ptr, len);
+                                                                   pkt->data,
+                                                                   pkt->size);
                             }
                         }
                     }
                     else if (pkt->stream_index == subIdx)
                     {
                         QMutexLocker locker(avcodeclock);
-                        avcodec_decode_subtitle(curstream->codec,
+                        avcodec_decode_subtitle2(curstream->codec,
                                                 &subtitle, &gotSubtitles,
-                                                ptr, len);
+                                                pkt);
                     }
-
-                    // the subtitle decoder always consumes the whole packet
-                    ptr += len;
-                    len = 0;
 
                     if (gotSubtitles)
                     {
@@ -4642,8 +4630,6 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
             if (!have_err)
             {
-                ptr += ret;
-                len -= ret;
                 frame_decoded = 1;
                 firstloop = false;
             }
