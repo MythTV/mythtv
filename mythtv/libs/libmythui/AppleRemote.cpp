@@ -138,6 +138,19 @@ void AppleRemote::_initCookieMap()
     cookieToButtonMapping["31_18_31_18_"]         = MenuHold;
     cookieToButtonMapping["35_31_18_35_31_18_"]   = PlaySleep;
     cookieToButtonMapping["39_"]                  = ControlSwitched;
+
+    // 10.6 sequences:
+    cookieToButtonMapping["33_31_30_21_20_2_"]    = VolumePlus;
+    cookieToButtonMapping["33_32_30_21_20_2_"]    = VolumeMinus;
+    cookieToButtonMapping["33_22_21_20_2_33_22_21_20_2_"] = Menu;
+    cookieToButtonMapping["33_23_21_20_2_33_23_21_20_2_"] = Play;
+    cookieToButtonMapping["33_24_21_20_2_33_24_21_20_2_"] = Right;
+    cookieToButtonMapping["33_25_21_20_2_33_25_21_20_2_"] = Left;
+    cookieToButtonMapping["33_21_20_14_12_2_"]    = RightHold;
+    cookieToButtonMapping["33_21_20_13_12_2_"]    = LeftHold;
+    cookieToButtonMapping["33_21_20_2_33_21_20_2_"] = MenuHold;
+    cookieToButtonMapping["37_33_21_20_2_37_33_21_20_2_"] = PlaySleep;
+    cookieToButtonMapping["19_"]                  = ControlSwitched;
 }
 
 // private
