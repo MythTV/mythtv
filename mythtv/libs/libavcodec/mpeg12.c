@@ -2283,17 +2283,17 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
             avctx->decode_cc_dvd(avctx, p, buf_end - p);
     } else if (buf_end - p >= 6 &&
                p[0] == 'G' && p[1] == 'A' && p[2] == '9' && p[3] == '4') {
-        /* parse ATSC info (EIA-708 Closed Captions && letterbox info) */
+        /* Parse CEA-708/608 Closed Captions in ATSC user data */
         int user_data_type_code = p[4];
         if (user_data_type_code == 0x03) { // caption data
-            p += 5;
-
             Mpeg1Context   *s1 = avctx->priv_data;
             MpegEncContext *s  = &s1->mpeg_enc_ctx;
-            int cccnt = p[0] & 0x1f;
+            int cccnt = p[5] & 0x1f;
             int cclen = 3 * cccnt + 2;
-            int proc  = (p[0] >> 6) & 1;
+            int proc  = (p[5] >> 6) & 1;
             int blen  = s->tmp_atsc_cc_len;
+
+            p += 5;
 
             if ((cclen <= buf_end - p) && ((cclen + blen) < ATSC_CC_BUF_SIZE)) {
                 uint8_t *dst = s->tmp_atsc_cc_buf + s->tmp_atsc_cc_len;
@@ -2311,13 +2311,13 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
             // bar data (letterboxing info)
         }
     } else if (buf_end - p >= 3 && p[0] == 0x03 && ((p[1]&0x7f) == 0x01)) {
-        /// SCTE 20 encoding of CEA-608
+        // SCTE 20 encoding of CEA-608
         unsigned int cc_count = p[2]>>3;
         unsigned int cc_bits = cc_count * 26;
         unsigned int cc_bytes = (cc_bits + 7 - 3) / 8;
         Mpeg1Context *s1 = avctx->priv_data;
         MpegEncContext *s = &s1->mpeg_enc_ctx;
-        if (buf_end - p >= (2+cc_bytes) /*&& (s->tmp_atsc_cc_len + 2 + 3*cc_count) < ATSC_CC_BUF_SIZE*/) {
+        if (buf_end - p >= (2+cc_bytes) && (s->tmp_atsc_cc_len + 2 + 3*cc_count) < ATSC_CC_BUF_SIZE) {
             int atsc_cnt_loc = s->tmp_atsc_cc_len;
             uint8_t real_count = 0, marker = 1, i;
             GetBitContext gb;
@@ -2333,9 +2333,10 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
                 uint8_t cc_data_1 = av_reverse[get_bits(&gb, 8)];
                 uint8_t cc_data_2 = av_reverse[get_bits(&gb, 8)];
                 uint8_t type = (1 == field_no) ? 0x00 : 0x01;
+                (void) priority; // we use all the data, don't need priority
                 marker &= get_bits(&gb, 1);
-                // dump if marker bit missing or if data is padding
-                valid = (marker && (cc_data_1!=0x80 || cc_data_2!=0x80));
+                // dump if marker bit missing
+                valid = marker;
                 // ignore forbidden and repeated (3:2 pulldown) field numbers
                 valid = valid && (1 == field_no || 2 == field_no);
                 // ignore content not in line 21
@@ -2361,13 +2362,10 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
     } else if (buf_end - p >= 11 &&
                p[0] == 0x05 && p[1] == 0x02) {
         /* parse EIA-608 captions embedded in a DVB stream. */
-        p += 2;
-
         Mpeg1Context   *s1 = avctx->priv_data;
         MpegEncContext *s  = &s1->mpeg_enc_ctx;
-
-        uint8_t dvb_cc_type = p[5];
-        p += 6;
+        uint8_t dvb_cc_type = p[7];
+        p += 8;
 
         /* Predictive frame tag, but MythTV reorders predictive
          * frames for us along with the CC data, so we ignore it.
