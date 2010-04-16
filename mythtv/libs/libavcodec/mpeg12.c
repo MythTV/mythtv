@@ -2275,12 +2275,46 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
                 return;
             avctx->dtg_active_format = p[0] & 0x0f;
         }
-    } else if (buf_end - p >= 3 &&
-               p[0] == 'C' && p[1] == 'C') {
-        /* parse DVD Closed Caption data */
-        p += 2;
-        if (avctx->decode_cc_dvd)
-            avctx->decode_cc_dvd(avctx, p, buf_end - p);
+    } else if (buf_end - p >= 6 &&
+               p[0] == 0x43 && p[1] == 0x43 && p[2] == 0x01 && p[3] == 0xf8 &&
+               p[4] == 0x9e) {
+#undef fprintf
+        Mpeg1Context *s1 = avctx->priv_data;
+        MpegEncContext *s = &s1->mpeg_enc_ctx;
+        int atsc_cnt_loc = s->tmp_atsc_cc_len;
+        uint8_t real_count = 0;
+        uint i;
+
+        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&real_count);
+        s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
+
+        for (i=5; i < (buf_end - p - 2) &&
+                 (s->tmp_atsc_cc_len + 3) < ATSC_CC_BUF_SIZE; i++)
+        {
+            if ((p[i]&0xfe) == 0xfe) // CC1&CC2 || CC3&CC4
+            {
+                uint8_t type = (p[i] & 0x01) ^ 0x01;
+                uint8_t cc_data_1 = p[++i];
+                uint8_t cc_data_2 = p[++i];
+                uint8_t valid = 1;
+                uint8_t cc608_hdr = 0xf8 | (valid ? 0x04 : 0x00) | type;
+                real_count++;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc608_hdr;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_1;
+                s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = cc_data_2;
+                continue;
+            }
+            break;
+        }
+        if (!real_count)
+        {
+            s->tmp_atsc_cc_len = atsc_cnt_loc;
+        }
+        else
+        {
+            s->tmp_atsc_cc_buf[atsc_cnt_loc] = 0x40 | (0x1f&real_count);
+            s->tmp_atsc_cc_len = atsc_cnt_loc + 2 + 3 * real_count;
+        }
     } else if (buf_end - p >= 6 &&
                p[0] == 'G' && p[1] == 'A' && p[2] == '9' && p[3] == '4') {
         /* Parse CEA-708/608 Closed Captions in ATSC user data */

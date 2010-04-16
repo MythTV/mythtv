@@ -415,9 +415,6 @@ enum PixelFormat avcodec_default_get_format(struct AVCodecContext *s, const enum
     return fmt[0];
 }
 
-void avcodec_default_decode_cc_dvd(AVCodecContext *c, const uint8_t *buf, int buf_size){
-}
-
 void avcodec_get_frame_defaults(AVFrame *pic){
     memset(pic, 0, sizeof(AVFrame));
 

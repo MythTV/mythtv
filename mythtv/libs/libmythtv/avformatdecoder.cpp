@@ -84,7 +84,6 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height);
-void decode_cc_dvd(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
 
 int get_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
 void release_avf_buffer_vdpau(struct AVCodecContext *c, AVFrame *pic);
@@ -2059,8 +2058,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                     }
                 }
 
-                enc->decode_cc_dvd  = decode_cc_dvd;
-
                 // Set the default stream to the stream
                 // that is found first in the PMT
                 if (selectedVideoIndex < 0)
@@ -2653,80 +2650,6 @@ void render_slice_vdpau(struct AVCodecContext *s, const AVFrame *src,
         VERBOSE(VB_IMPORTANT, LOC +
                 "render_slice_vdpau called with bad avctx or src");
     }
-}
-
-void decode_cc_dvd(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
-{
-    // taken from xine-lib libspucc by Christian Vogler
-
-    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
-    unsigned long long utc = nd->lastccptsu;
-
-    const uint8_t *current = buf;
-    int curbytes = 0;
-    uint8_t data1, data2;
-    uint8_t cc_code;
-    int odd_offset = 1;
-
-    while (curbytes < buf_size)
-    {
-        int skip = 2;
-
-        cc_code = *current++;
-        curbytes++;
-
-        if (buf_size - curbytes < 2)
-            break;
-
-        data1 = *current;
-        data2 = *(current + 1);
-
-        switch (cc_code)
-        {
-            case 0xfe:
-                /* expect 2 byte encoding (perhaps CC3, CC4?) */
-                /* ignore for time being */
-                skip = 2;
-                break;
-
-            case 0xff:
-            {
-                /* expect EIA-608 CC1/CC2 encoding */
-                int tc = utc / 1000;
-                int data = (data2 << 8) | data1;
-                if (cc608_good_parity(nd->cc608_parity_table, data))
-                    nd->ccd608->FormatCCField(tc, 0, data);
-                utc += 33367;
-                skip = 5;
-                break;
-            }
-
-            case 0x00:
-                /* This seems to be just padding */
-                skip = 2;
-                break;
-
-            case 0x01:
-                odd_offset = data2 & 0x80;
-                if (odd_offset)
-                    skip = 2;
-                else
-                    skip = 5;
-                break;
-
-            default:
-                // rest is not needed?
-                goto done;
-                //skip = 2;
-                //break;
-        }
-        current += skip;
-        curbytes += skip;
-
-    }
-  done:
-    nd->lastccptsu = utc;
-    nd->UpdateCaptionTracksFromStreams(true, false);
 }
 
 void AvFormatDecoder::DecodeDTVCC(const uint8_t *buf, uint len)

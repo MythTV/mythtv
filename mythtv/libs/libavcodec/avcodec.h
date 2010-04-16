@@ -2627,13 +2627,6 @@ typedef struct AVCodecContext {
     int xvmc_vld_hwslice;
 
     /**
-     * Closed Caption decoder
-     * - encoding: forbidden
-     * - decoding: set by decoder
-     */
-    void (*decode_cc_dvd)(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
-
-    /**
      * DVD Video (Mac OS X Hardware MPEG) decoding
      *     (originally by John Dagliesh
      *      http://www.defyne.org/dvb/accellent.html)
@@ -3819,8 +3812,6 @@ int av_picture_pad(AVPicture *dst, const AVPicture *src, int height, int width, 
 
 unsigned int av_xiphlacing(unsigned char *s, unsigned int v);
 
-void avcodec_default_decode_cc_dvd(AVCodecContext *c, const uint8_t *buf, int buf_size);
-void avcodec_default_decode_cc_atsc(AVCodecContext *c, const uint8_t *buf, int buf_size);
 const char *codec_id_string(enum CodecID codec_id);
 const char *codec_type_string(enum CodecType codec_type);
 
