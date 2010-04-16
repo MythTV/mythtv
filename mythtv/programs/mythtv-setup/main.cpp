@@ -506,6 +506,14 @@ int main(int argc, char *argv[])
         int ret = 0;
         int firstBreak   = scanTableName.indexOf("-");
         int secondBreak  = scanTableName.lastIndexOf("-");
+        if (!firstBreak || !secondBreak || firstBreak == secondBreak)
+        {
+            cerr << "Failed to parse the frequence table parameter "
+                 << scanTableName.toLocal8Bit().constData() << endl
+                 << "Please make sure it is in the format freq_std-"
+                    "modulation-country." << endl;
+            return BACKEND_EXIT_INVALID_CMDLINE;
+        }
         QString freq_std = scanTableName.mid(0, firstBreak).toLower();
         QString mod      = scanTableName.mid(
             firstBreak+1, secondBreak-firstBreak-1).toLower();
