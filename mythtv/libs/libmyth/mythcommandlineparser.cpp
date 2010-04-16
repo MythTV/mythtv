@@ -2,6 +2,7 @@
 using namespace std;
 
 #include <QFile>
+#include <QFileInfo>
 #include <QSize>
 
 #include "mythcommandlineparser.h"
@@ -55,7 +56,7 @@ bool MythCommandLineParser::PreParse(
 {
     err = false;
 
-    binname = basename(argv[0]);
+    binname = QFileInfo(argv[0]).baseName();
 
     if (argpos >= argc)
         return false;

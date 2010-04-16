@@ -7,10 +7,6 @@
 
 #include <stdint.h>   // for uint64_t
 
-#ifdef Q_OS_MACX // Required for basename
-#include <libgen.h>
-#endif
-
 #include "mythexp.h"
 
 typedef enum {
