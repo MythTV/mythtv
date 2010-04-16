@@ -1672,6 +1672,12 @@ bool ChannelScanSM::ScanTransports(
     freq_table_list_t tables =
         get_matching_freq_tables(std, modulation, country);
 
+    if (tables.size() == 0)
+    {
+        QString msg = QString("No freq table for (%1, %2, %3) found")
+                      .arg(std).arg(modulation).arg(country);
+        scan_monitor->ScanAppendTextToLog(msg);
+    }
     VERBOSE(VB_CHANSCAN, LOC +
             QString("Looked up freq table (%1, %2, %3) w/%4 entries")
             .arg(std).arg(modulation).arg(country).arg(tables.size()));
