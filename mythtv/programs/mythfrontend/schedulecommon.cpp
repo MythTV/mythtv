@@ -233,7 +233,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
             {
                 if (recinfo.recstatus == rsRecording)
                 {
-                    menuPopup->AddButton(tr("Change Ending Time"),
+                    menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
                 }
                 else
@@ -255,7 +255,7 @@ void ScheduleCommon::ShowRecordingDialog(const RecordingInfo& recinfo)
             {
                 if (recinfo.recstatus == rsRecording)
                 {
-                    menuPopup->AddButton(tr("Change Ending Time"),
+                    menuPopup->AddButton(tr("Modify Recording Options"),
                                          qVariantFromValue(recinfo));
                 }
                 else
@@ -504,7 +504,7 @@ void ScheduleCommon::customEvent(QEvent *event)
             }
             else if (resulttext == tr("Clear Override"))
                 recInfo.ApplyRecordStateChange(kNotRecording);
-            else if (resulttext == tr("Change Ending Time"))
+            else if (resulttext == tr("Modify Recording Options"))
             {
                 if (recInfo.rectype == kSingleRecord ||
                     recInfo.rectype == kOverrideRecord ||
