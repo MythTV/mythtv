@@ -612,9 +612,6 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
         infoMap["title"] = m_groupDisplayName;
         infoMap["group"] = m_groupDisplayName;
         infoMap["show"]  = ProgramInfo::i18n("All Programs");
-
-        if (m_fanart)
-            m_fanart->Reset();
     }
     else
     {
@@ -623,8 +620,15 @@ void PlaybackBox::updateGroupInfo(const QString &groupname,
                                              .arg(grouplabel);
         infoMap["group"] = m_groupDisplayName;
         infoMap["show"]  = grouplabel;
+    }
 
-        if (m_fanart)
+    if (m_fanart)
+    {
+        if (groupname.isEmpty() || countInGroup == 0)
+        {
+            m_fanart->Reset();
+        }
+        else
         {
             static int itemsPast = 0;
             QString artworkHost;
