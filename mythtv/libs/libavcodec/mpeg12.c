@@ -2283,7 +2283,7 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
         MpegEncContext *s = &s1->mpeg_enc_ctx;
         int atsc_cnt_loc = s->tmp_atsc_cc_len;
         uint8_t real_count = 0;
-        uint8_t i;
+        unsigned int i;
 
         s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x40 | (0x1f&real_count);
         s->tmp_atsc_cc_buf[s->tmp_atsc_cc_len++] = 0x00; // em_data
