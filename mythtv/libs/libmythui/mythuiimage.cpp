@@ -1,8 +1,11 @@
 
 #include "mythuiimage.h"
 
-// C/C++
+// C
 #include <cstdlib>
+
+// POSIX
+#include <stdint.h>
 
 // QT
 #include <QFile>
@@ -27,9 +30,10 @@ class ImageLoadThread;
 
 const int kImageLoadEventType = 35112;
 
-#define LOC      QString("MythUIImage(%1): ").arg((long long)this)
-#define LOC_ERR  QString("MythUIImage(%1) ERROR: ").arg((long long)this)
-#define LOC_WARN QString("MythUIImage(%1) WARNING: ").arg((long long)this)
+#define LOC      QString("MythUIImage(0x%1): ").arg((uintptr_t)this,0,16)
+#define LOC_ERR  QString("MythUIImage(0x%1) Error: ").arg((uintptr_t)this,0,16)
+#define LOC_WARN QString("MythUIImage(0x%1) Warning: ") \
+                     .arg((uintptr_t)this,0,16)
 
 /*!
  * \class ImageLoadThread
@@ -565,8 +569,9 @@ bool MythUIImage::Load(bool allowLoadInBackground)
 
         filename = bFilename;
 
-        VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("Auto-generated gradient "
-                "filename of '%1'").arg(bFilename));
+        VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC +
+                QString("Auto-generated gradient filename of '%1'")
+                .arg(bFilename));
     }
 
     QString imagelabel;
@@ -591,8 +596,8 @@ bool MythUIImage::Load(bool allowLoadInBackground)
             (!GetMythUI()->LoadCacheImage(filename, imagelabel, cacheMode)) &&
             (!getenv("DISABLETHREADEDMYTHUIIMAGE")))
         {
-            VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("Load(), spawning "
-                    "thread to load '%1'").arg(filename));
+            VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
+                        "Load(), spawning thread to load '%1'").arg(filename));
             ImageLoadThread *bImgThread =
                 new ImageLoadThread(this, bFilename, filename, i,
                                     bForceSize);
@@ -601,8 +606,8 @@ bool MythUIImage::Load(bool allowLoadInBackground)
         else
         {
             // Perform a blocking load
-            VERBOSE(VB_FILE+VB_EXTRA, LOC + QString("Load(), loading "
-                    "'%1' in foreground").arg(filename));
+            VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
+                        "Load(), loading '%1' in foreground").arg(filename));
             MythImage *image = LoadImage(filename, i, bForceSize);
             if (image)
             {
@@ -645,9 +650,10 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
     if ((m_loadingImages.contains(filename)) &&
         (m_loadingImages[filename] == this))
     {
-        VERBOSE(VB_FILE+VB_EXTRA, QString("MythUIImage::LoadImage(%1), this "
-                "file is already being loaded by this same MythUIImage in "
-                "another thread.").arg(filename));
+        VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC + QString(
+                    "MythUIImage::LoadImage(%1), this "
+                    "file is already being loaded by this same MythUIImage in "
+                    "another thread.").arg(filename));
         m_loadingImagesLock.unlock();
         return NULL;
     }
@@ -659,8 +665,8 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
     m_loadingImages[filename] = this;
     m_loadingImagesLock.unlock();
 
-    VERBOSE(VB_FILE, QString("MythUIImage::LoadImage(%1, %2) Object %3")
-            .arg((long long)this).arg(filename).arg(objectName()));
+    VERBOSE(VB_GUI|VB_FILE, LOC + QString("LoadImage(%2) Object %3")
+            .arg(filename).arg(objectName()));
 
     MythImage *image = NULL;
 
@@ -689,8 +695,11 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
     if (image)
     {
         image->UpRef();
-        VERBOSE(VB_FILE, QString("MythUIImage::LoadImage found in cache "
-                ":%1: RefCount = %2").arg(imagelabel).arg(image->RefCount()));
+
+        VERBOSE(VB_GUI|VB_FILE, LOC +
+                QString("LoadImage found in cache :%1: RefCount = %2")
+                .arg(imagelabel).arg(image->RefCount()));
+
         if (m_isReflected)
             image->setIsReflected(true);
 
@@ -700,9 +709,10 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
     {
         if (m_gradient)
         {
-            VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Not Found in "
-                                     "cache. Creating Gradient :%1:")
-                                     .arg(filename));
+            VERBOSE(VB_GUI|VB_FILE, LOC +
+                    QString("LoadImage Not Found in cache. "
+                            "Creating Gradient :%1:").arg(filename));
+
             QSize gradsize;
             if (!m_Area.isEmpty())
                 gradsize = GetArea().size();
@@ -716,15 +726,18 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
         }
         else
         {
-            VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Not Found in "
-                                     "cache. Loading Directly :%1:")
-                                     .arg(filename));
+            VERBOSE(VB_GUI|VB_FILE, LOC +
+                    QString("LoadImage Not Found in cache. "
+                            "Loading Directly :%1:").arg(filename));
+
             image = GetMythPainter()->GetFormatImage();
             image->UpRef();
             if (!image->Load(filename))
             {
-                VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Could not load "
-                                         ":%1:").arg(filename));
+                VERBOSE(VB_GUI|VB_FILE, LOC +
+                        QString("LoadImage Could not load :%1:")
+                        .arg(filename));
+
                 image->DownRef();
 
                 m_loadingImagesLock.lock();
@@ -775,8 +788,9 @@ MythImage *MythUIImage::LoadImage(const QString &imFile, int imageNumber,
 
     if (image->isNull())
     {
-        VERBOSE(VB_FILE, QString("MythUIImage::LoadImage Image is NULL :%1:")
-                                                            .arg(filename));
+        VERBOSE(VB_GUI|VB_FILE, LOC + QString("LoadImage Image is NULL :%1:")
+                .arg(filename));
+
         image->DownRef();
         Reset();
 
@@ -1055,7 +1069,7 @@ void MythUIImage::CopyFrom(MythUIType *base)
     MythUIImage *im = dynamic_cast<MythUIImage *>(base);
     if (!im)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR, bad parsing");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "bad parsing");
         d->m_UpdateLock.unlock();
         return;
     }
@@ -1183,10 +1197,11 @@ void MythUIImage::customEvent(QEvent *event)
         if (le->GetBasefile() != m_Filename)
         {
             d->m_UpdateLock.unlock();
-
-            //VERBOSE(VB_FILE+VB_EXTRA,QString("MythUIImage::customEvent(%1): "
-            //        "Expecting '%2', got '%3'").arg((long long)this)
-            //        .arg(m_Filename).arg(le->GetBasefile()));
+#if 0
+            VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC +
+                    QString("customEvent(): Expecting '%2', got '%3'")
+                    .arg(m_Filename).arg(le->GetBasefile()));
+#endif
             image->DownRef();
             return;
         }

@@ -515,7 +515,7 @@ bool XMLParseBase::LoadWindowFromXML(const QString &xmlfile,
     for (; it != searchpath.end(); ++it)
     {
         QString themefile = *it + xmlfile;
-        VERBOSE(VB_GENERAL, LOC + "Loading window theme from " + themefile);
+        VERBOSE(VB_GUI, LOC + "Loading window theme from " + themefile);
         if (doLoad(windowname, parent, themefile,
                    onlyLoadWindows, showWarnings))
         {
@@ -653,7 +653,7 @@ bool XMLParseBase::LoadBaseTheme(void)
         if (doLoad(QString(), GetGlobalObjectStore(), themefile,
                    loadOnlyWindows, showWarnings))
         {
-            VERBOSE(VB_GENERAL, LOC +
+            VERBOSE(VB_GUI, LOC +
                     QString("Loaded base theme from '%1'").arg(themefile));
             // Don't complain about duplicate definitions after first
             // successful load (set showWarnings to false).
@@ -662,7 +662,7 @@ bool XMLParseBase::LoadBaseTheme(void)
         }
         else
         {
-            VERBOSE(VB_FILE|VB_EXTRA, LOC_WARN +
+            VERBOSE(VB_GUI|VB_FILE, LOC_WARN +
                     QString("No theme file '%1'").arg(themefile));
         }
     }

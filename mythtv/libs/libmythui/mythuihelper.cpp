@@ -29,6 +29,10 @@
 #include "mythimage.h"
 #include "remotefile.h"
 
+#define LOC      QString("MythUIHelper: ")
+#define LOC_ERR  QString("MythUIHelper, Error: ")
+#define LOC_WARN QString("MythUIHelper, Warning: ")
+
 static MythUIHelper *mythui = NULL;
 static QMutex uiLock;
 QString MythUIHelper::x11_display;
@@ -200,35 +204,40 @@ void MythUIHelperPrivate::GetScreenBounds()
     int              screen;
 
     if (hasXinerama)
-        VERBOSE(VB_GENERAL+VB_EXTRA,
+    {
+        VERBOSE(VB_GUI, LOC +
                 QString("Total desktop dim: %1x%2, over %3 screen[s].")
                 .arg(desktop->width()).arg(desktop->height()).arg(numScreens));
+    }
+
     if (numScreens > 1)
+    {
         for (screen = 0; screen < numScreens; ++screen)
         {
             QRect dim = desktop->screenGeometry(screen);
-            VERBOSE(VB_GENERAL+VB_EXTRA,
+            VERBOSE(VB_GUI, LOC +
                     QString("Screen %1 dim: %2x%3.")
                     .arg(screen).arg(dim.width()).arg(dim.height()));
         }
+    }
 
     screen = desktop->primaryScreen();
-    VERBOSE(VB_GENERAL, QString("Primary screen: %1.").arg(screen));
+    VERBOSE(VB_GUI, LOC + QString("Primary screen: %1.").arg(screen));
 
     if (hasXinerama)
         screen = GetMythDB()->GetNumSetting("XineramaScreen", screen);
 
     if (screen == -1)       // Special case - span all screens
     {
-        VERBOSE(VB_GENERAL+VB_EXTRA, QString("Using all %1 screens.")
-                                     .arg(numScreens));
         m_xbase  = 0;
         m_ybase  = 0;
         m_width  = desktop->width();
         m_height = desktop->height();
 
-        VERBOSE(VB_GENERAL, QString("Total width = %1, height = %2")
-                            .arg(m_width).arg(m_height));
+        VERBOSE(VB_GUI, LOC + QString("Using all %1 screens. ")
+                .arg(numScreens) + QString("Dimensions: %1x%2")
+                .arg(m_width).arg(m_height));
+
         return;
     }
 
@@ -236,7 +245,7 @@ void MythUIHelperPrivate::GetScreenBounds()
     {
         if (screen < 0 || screen >= numScreens)
         {
-            VERBOSE(VB_IMPORTANT, QString(
+            VERBOSE(VB_IMPORTANT, LOC_WARN + QString(
                         "Xinerama screen %1 was specified,"
                         " but only %2 available, so using screen 0.")
                     .arg(screen).arg(numScreens));
@@ -251,7 +260,7 @@ void MythUIHelperPrivate::GetScreenBounds()
         bool inWindow = GetMythDB()->GetNumSetting("RunFrontendInWindow", 0);
 
         if (inWindow)
-            VERBOSE(VB_IMPORTANT, QString("Running in a window"));
+            VERBOSE(VB_GUI, LOC + QString("Running in a window"));
 
         if (inWindow)
             // This doesn't include the area occupied by the
@@ -265,9 +274,9 @@ void MythUIHelperPrivate::GetScreenBounds()
         m_width  = bounds.width();
         m_height = bounds.height();
 
-        VERBOSE(VB_GENERAL, QString("Using screen %1, %2x%3 at %4,%5")
-                            .arg(screen).arg(m_width).arg(m_height)
-                            .arg(m_xbase).arg(m_ybase));
+        VERBOSE(VB_GUI, LOC + QString("Using screen %1, %2x%3 at %4,%5")
+                .arg(screen).arg(m_width).arg(m_height)
+                .arg(m_xbase).arg(m_ybase));
     }
 }
 
@@ -307,16 +316,17 @@ void MythUIHelperPrivate::StoreGUIsettings()
 
     if (m_screenheight < 160 || m_screenwidth < 160)
     {
-        VERBOSE(VB_IMPORTANT, "Somehow, your screen size settings are bad.");
-        VERBOSE(VB_IMPORTANT, QString("GuiResolution: %1")
-                        .arg(GetMythDB()->GetSetting("GuiResolution")));
-        VERBOSE(VB_IMPORTANT, QString("  old GuiWidth: %1")
-                        .arg(GetMythDB()->GetNumSetting("GuiWidth")));
-        VERBOSE(VB_IMPORTANT, QString("  old GuiHeight: %1")
-                        .arg(GetMythDB()->GetNumSetting("GuiHeight")));
-        VERBOSE(VB_IMPORTANT, QString("m_width: %1").arg(m_width));
-        VERBOSE(VB_IMPORTANT, QString("m_height: %1").arg(m_height));
-        VERBOSE(VB_IMPORTANT, "Falling back to 640x480");
+        VERBOSE(VB_IMPORTANT, LOC +
+                "Somehow, your screen size settings are bad.\n\t\t\t" +
+                QString("GuiResolution: %1\n\t\t\t")
+                .arg(GetMythDB()->GetSetting("GuiResolution")) +
+                QString("  old GuiWidth: %1\n\t\t\t")
+                .arg(GetMythDB()->GetNumSetting("GuiWidth")) +
+                QString("  old GuiHeight: %1\n\t\t\t")
+                .arg(GetMythDB()->GetNumSetting("GuiHeight")) +
+                QString("m_width: %1").arg(m_width) +
+                QString("m_height: %1\n\t\t\t").arg(m_height) +
+                "Falling back to 640x480");
 
         m_screenwidth  = 640;
         m_screenheight = 480;
@@ -374,8 +384,8 @@ void MythUIHelper::Init(MythUIMenuCallbacks &cbs)
                                 * 1024 * 1024;
     d->m_cacheSizeLock->unlock();
 
-    VERBOSE(VB_GENERAL, QString("MythUI Image Cache size set to %1 bytes")
-                        .arg(d->maxImageCacheSize));
+    VERBOSE(VB_GUI, LOC + QString("MythUI Image Cache size set to %1 bytes")
+            .arg(d->maxImageCacheSize));
 }
 
 MythUIMenuCallbacks *MythUIHelper::GetMenuCBs(void)
@@ -430,8 +440,8 @@ void MythUIHelper::LoadQtConfig(void)
         d->m_isWide = themeinfo->IsWide();
         d->m_baseWidth = themeinfo->BaseRes()->width();
         d->m_baseHeight = themeinfo->BaseRes()->height();
-        VERBOSE(VB_GENERAL, QString("Using theme base resolution of %1x%2")
-                                    .arg(d->m_baseWidth).arg(d->m_baseHeight));
+        VERBOSE(VB_GUI, LOC + QString("Using theme base resolution of %1x%2")
+                .arg(d->m_baseWidth).arg(d->m_baseHeight));
         delete themeinfo;
     }
 
@@ -531,7 +541,9 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
     if (!nodisk)
     {
         QString dstfile = GetMythUI()->GetThemeCacheDir() + '/' + url;
-        VERBOSE(VB_FILE, QString("Saved to Cache (%1)").arg(dstfile));
+
+        VERBOSE(VB_GUI|VB_FILE,
+                LOC + QString("Saved to Cache (%1)").arg(dstfile));
 
         // This would probably be better off somewhere else before any
         // Load() calls at all.
@@ -566,13 +578,14 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
             }
         }
 
-        VERBOSE(VB_FILE,
+        VERBOSE(VB_GUI|VB_FILE, LOC +
                 QString("%1 images are eligible for expiry").arg(count));
 
         if (count > 0)
         {
-            VERBOSE(VB_FILE, QString("Cache too big (%1), removing :%2:")
-                            .arg(d->m_cacheSize + im->numBytes()).arg(oldestKey));
+            VERBOSE(VB_GUI|VB_FILE, LOC +
+                    QString("Cache too big (%1), removing :%2:")
+                    .arg(d->m_cacheSize + im->numBytes()).arg(oldestKey));
 
             d->imageCache[oldestKey]->DownRef();
             d->imageCache.remove(oldestKey);
@@ -596,13 +609,15 @@ MythImage *MythUIHelper::CacheImage(const QString &url, MythImage *im,
         d->CacheTrack[url] = QDateTime::currentDateTime().toTime_t();
 
         im->SetIsInCache(true);
-        VERBOSE(VB_FILE, QString("NOT IN RAM CACHE, Adding, and adding to size "
-                                 ":%1: :%2:").arg(url).arg(im->numBytes()));
+        VERBOSE(VB_GUI|VB_FILE, LOC +
+                QString("NOT IN RAM CACHE, Adding, and adding to size "
+                        ":%1: :%2:").arg(url).arg(im->numBytes()));
     }
 
-    VERBOSE(VB_FILE, QString("MythUIHelper::CacheImage : Cache Count = :%1: "
-                             "size :%2:")
-                             .arg(d->imageCache.count()).arg(d->m_cacheSize));
+    VERBOSE(VB_GUI|VB_FILE, LOC +
+            QString("MythUIHelper::CacheImage : Cache Count = :%1: "
+                    "size :%2:")
+            .arg(d->imageCache.count()).arg(d->m_cacheSize));
 
     return d->imageCache[url];
 }
@@ -623,8 +638,9 @@ void MythUIHelper::RemoveFromCacheByURL(const QString &url)
     QString dstfile;
 
     dstfile = GetThemeCacheDir() + '/' + url;
-    VERBOSE(VB_FILE, QString("RemoveFromCacheByURL removed :%1: "
-                             "from cache").arg(dstfile));
+    VERBOSE(VB_GUI|VB_FILE, LOC +
+            QString("RemoveFromCacheByURL removed :%1: "
+                    "from cache").arg(dstfile));
     QFile::remove(dstfile);
 }
 
@@ -653,8 +669,9 @@ void MythUIHelper::RemoveFromCacheByFile(const QString &fname)
         QFileInfo fileInfo = list.at(i);
         if (fileInfo.fileName().contains(partialKey))
         {
-            VERBOSE(VB_FILE, QString("RemoveFromCacheByFile removed :%1: "
-                                     "from cache").arg(fileInfo.fileName()));
+            VERBOSE(VB_GUI|VB_FILE, LOC +
+                    QString("RemoveFromCacheByFile removed :%1: "
+                            "from cache").arg(fileInfo.fileName()));
             QFile::remove(fileInfo.fileName());
         }
      }
@@ -727,8 +744,9 @@ void MythUIHelper::ClearOldImageCache(void)
     const size_t max_cached = GetMythDB()->GetNumSetting("ThemeCacheSize", 1);
     while ((size_t)dirtimes.size() >= max_cached)
     {
-        VERBOSE(VB_FILE, QString("Removing cache dir: %1")
+        VERBOSE(VB_GUI|VB_FILE, LOC + QString("Removing cache dir: %1")
                 .arg(dirtimes.begin().value()));
+
         RemoveCacheDir(dirtimes.begin().value());
         dirtimes.erase(dirtimes.begin());
     }
@@ -736,8 +754,8 @@ void MythUIHelper::ClearOldImageCache(void)
     QMap<QDateTime, QString>::const_iterator dit = dirtimes.begin();
     for (; dit != dirtimes.end(); ++dit)
     {
-        VERBOSE(VB_FILE, QString("Keeping cache dir: %1")
-                .arg(*dit));
+        VERBOSE(VB_GUI|VB_FILE, LOC +
+                QString("Keeping cache dir: %1").arg(*dit));
     }
 }
 
@@ -847,8 +865,9 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Geometry does not match either form -");
-        VERBOSE(VB_IMPORTANT, "WIDTHxHEIGHT or WIDTHxHEIGHT+XOFF+YOFF");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Geometry does not match either form -\n\t\t\t"
+                "WIDTHxHEIGHT or WIDTHxHEIGHT+XOFF+YOFF");
         return;
     }
 
@@ -858,7 +877,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     tmp_w = geo[1].toInt(&parsed);
     if (!parsed)
     {
-        VERBOSE(VB_IMPORTANT, "Could not parse width of geometry override");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not parse width of geometry override");
     }
 
     if (parsed)
@@ -866,7 +886,8 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
         tmp_h = geo[2].toInt(&parsed);
         if (!parsed)
         {
-            VERBOSE(VB_IMPORTANT, "Could not parse height of geometry override");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Could not parse height of geometry override");
         }
     }
 
@@ -874,12 +895,13 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
     {
         MythUIHelperPrivate::w_override = tmp_w;
         MythUIHelperPrivate::h_override = tmp_h;
-        VERBOSE(VB_IMPORTANT, QString("Overriding GUI size: width=%1 height=%2")
-                          .arg(tmp_w).arg(tmp_h));
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("Overriding GUI size: width=%1 height=%2")
+                .arg(tmp_w).arg(tmp_h));
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Failed to override GUI size.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to override GUI size.");
     }
 
     if (longForm)
@@ -887,7 +909,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
         tmp_x = geo[3].toInt(&parsed);
         if (!parsed)
         {
-            VERBOSE(VB_IMPORTANT,
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Could not parse horizontal offset of geometry override");
         }
 
@@ -896,7 +918,7 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
             tmp_y = geo[4].toInt(&parsed);
             if (!parsed)
             {
-            VERBOSE(VB_IMPORTANT,
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "Could not parse vertical offset of geometry override");
             }
         }
@@ -905,12 +927,14 @@ void MythUIHelper::ParseGeometryOverride(const QString &geometry)
         {
             MythUIHelperPrivate::x_override = tmp_x;
             MythUIHelperPrivate::y_override = tmp_y;
-            VERBOSE(VB_IMPORTANT, QString("Overriding GUI offset: x=%1 y=%2")
-                              .arg(tmp_x).arg(tmp_y));
+            VERBOSE(VB_GENERAL, LOC +
+                    QString("Overriding GUI offset: x=%1 y=%2")
+                    .arg(tmp_x).arg(tmp_y));
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "Failed to override GUI offset.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to override GUI offset.");
         }
     }
 }
@@ -943,17 +967,15 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
         dir.setPath(testdir);
         if (dir.exists())
             return testdir;
-        else
-            VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " +
-                    dir.absolutePath());
 
         testdir = GetThemesParentDir() + themename;
         dir.setPath(testdir);
         if (dir.exists())
             return testdir;
-        else
-            VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " +
-                    dir.absolutePath());
+
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("No theme dir: '%1'")
+                .arg(dir.absolutePath()));
     }
 
     testdir = GetThemesParentDir() + DEFAULT_UI_THEME;
@@ -965,8 +987,10 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
         GetMythDB()->OverrideSettingForSession("Theme", DEFAULT_UI_THEME);
         return testdir;
     }
-    else
-        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
+
+    VERBOSE(VB_IMPORTANT, LOC_WARN +
+            QString("No default theme dir: '%1'")
+            .arg(dir.absolutePath()));
 
     testdir = GetThemesParentDir() + FALLBACK_UI_THEME;
     dir.setPath(testdir);
@@ -977,10 +1001,11 @@ QString MythUIHelper::FindThemeDir(const QString &themename)
         GetMythDB()->OverrideSettingForSession("Theme", FALLBACK_UI_THEME);
         return testdir;
     }
-    else
-        VERBOSE(VB_IMPORTANT+VB_EXTRA, "No theme dir: " + dir.absolutePath());
 
-    VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1").arg(themename));
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("No fallback GUI theme dir: '%1'")
+            .arg(dir.absolutePath()));
+
     return QString();
 }
 
@@ -1012,15 +1037,17 @@ QString MythUIHelper::FindMenuThemeDir(const QString &menuname)
     dir.setPath(testdir);
     if (dir.exists())
     {
-        VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1 - "
-                "Switching to default").arg(menuname));
+        VERBOSE(VB_IMPORTANT, LOC + QString(
+                    "Could not find menu theme: %1 - Switching to default")
+                .arg(menuname));
+
         GetMythDB()->SaveSetting("MenuTheme", "default");
         return testdir;
     }
-    else {
-        VERBOSE(VB_IMPORTANT, QString("Could not find menu theme: %1 - "
-                "Fallback to default failed.").arg(menuname));
-    }
+
+    VERBOSE(VB_IMPORTANT, LOC + QString(
+                "Could not find menu theme: %1 - Fallback to default failed.")
+            .arg(menuname));
 
     return QString();
 }
@@ -1175,14 +1202,15 @@ bool MythUIHelper::FindThemeFile(QString &path)
 
 QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
 {
-    //VERBOSE(VB_GENERAL, QString("LoadScaleImage  : %1 ").arg(filename));
+    VERBOSE(VB_GUI|VB_FILE, LOC + QString("LoadScaleImage(%1)").arg(filename));
+
     if (filename.isEmpty() || filename == "none")
         return NULL;
 
     if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to find image file: %1").arg(filename));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("LoadScaleImage(%1)")
+                .arg(filename) + "Unable to find image file");
 
         return NULL;
     }
@@ -1205,33 +1233,43 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
         if (loaded)
             tmpimage.loadFromData(data);
         else
-            VERBOSE(VB_GENERAL, QString("MythImage::Load failed to load remote image %1").arg(filename));
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("LoadScaleImage(%1) failed to load remote image")
+                    .arg(filename));
+        }
     }
-    else 
+    else
+    {
         tmpimage.load(filename);
+    }
 
     if (width != d->m_baseWidth || height != d->m_baseHeight)
     {
         if (tmpimage.isNull())
         {
-            VERBOSE(VB_IMPORTANT,
-                    "Error loading image to scale, from file: " + filename);
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("LoadScaleImage(%1) failed to load image")
+                    .arg(filename));
 
             return NULL;
         }
-        QImage tmp2 = tmpimage.scaled((int)(tmpimage.width() * wmult),
-                                           (int)(tmpimage.height() * hmult),
-                                           Qt::IgnoreAspectRatio,
-                                           Qt::SmoothTransformation);
+
+        QImage tmp2 = tmpimage.scaled(
+            (int)(tmpimage.width() * wmult),
+            (int)(tmpimage.height() * hmult),
+            Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
         ret = new QImage(tmp2);
     }
     else
     {
         ret = new QImage(tmpimage);
-        if (ret->width() == 0)
+        if (!ret->width() || !ret->height())
         {
-            VERBOSE(VB_IMPORTANT, "Error loading image from file: "
-                                  + filename + " - QImage->width()=0");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("LoadScaleImage(%1) invalid image dimensions")
+                    .arg(filename));
 
             delete ret;
             return NULL;
@@ -1243,14 +1281,15 @@ QImage *MythUIHelper::LoadScaleImage(QString filename, bool fromcache)
 
 QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 {
-    //VERBOSE(VB_GENERAL, QString("LoadScalePixmap  : %1 ").arg(filename));
+    VERBOSE(VB_GUI|VB_FILE, LOC + QString("LoadScalePixmap(%1)").arg(filename));
+
     if (filename.isEmpty() || filename == "none")
         return NULL;
 
     if (!FindThemeFile(filename) && (!filename.startsWith("myth:")))
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("Unable to find image file: %1").arg(filename));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("LoadScalePixmap(%1)")
+                .arg(filename) + "Unable to find image file");
 
         return NULL;
     }
@@ -1270,19 +1309,28 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
         delete rf;
 
         if (loaded)
+        {
             tmpimage.loadFromData(data);
+        }
         else
-            VERBOSE(VB_GENERAL, QString("MythImage::Load failed to load remote image %1").arg(filename));
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("LoadScalePixmap(%1): failed to load remote image")
+                    .arg(filename));
+        }
     }
     else
+    {
         tmpimage.load(filename);
+    }
 
     if (width != d->m_baseWidth || height != d->m_baseHeight)
     {
         if (tmpimage.isNull())
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Error loading image file: %1").arg(filename));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("LoadScalePixmap(%1) failed to load image")
+                    .arg(filename));
 
             return NULL;
         }
@@ -1295,10 +1343,11 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
     else
     {
         ret = new QPixmap(QPixmap::fromImage(tmpimage));
-        if (ret->width() == 0)
+        if (!ret->width() || !ret->height())
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Error loading image file: %1").arg(filename));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("LoadScalePixmap(%1) invalid image dimensions")
+                    .arg(filename));
 
             delete ret;
             return NULL;
@@ -1311,7 +1360,8 @@ QPixmap *MythUIHelper::LoadScalePixmap(QString filename, bool fromcache)
 MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
                                         ImageCacheMode cacheMode)
 {
-    //VERBOSE(VB_FILE+VB_EXTRA, QString("LoadCacheImage %1:%2").arg(srcfile).arg(label));
+    VERBOSE(VB_GUI|VB_FILE, LOC +
+            QString("LoadCacheImage(%1,%2)").arg(srcfile).arg(label));
 
     if (srcfile.isEmpty() || label.isEmpty())
         return NULL;
@@ -1353,8 +1403,10 @@ MythImage *MythUIHelper::LoadCacheImage(QString srcfile, QString label,
                 ret = GetMythPainter()->GetFormatImage();
                 if (!ret->Load(cachefilepath, false))
                 {
-                    VERBOSE(VB_FILE, QString("MythUIHelper::LoadCacheImage "
-                                     "Could not load :%1").arg(cachefilepath));
+                    VERBOSE(VB_GUI|VB_FILE, LOC_WARN +
+                            QString("LoadCacheImage: "
+                                    "Could not load :%1").arg(cachefilepath));
+
                     ret->DownRef();
                     ret = NULL;
                 }

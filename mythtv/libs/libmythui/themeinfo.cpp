@@ -7,12 +7,16 @@
 #include <QDir>
 #include <QDomElement>
 
-// Mythdb headers
+// MythTV headers
 #include "mythverbose.h"
+#include "xmlparsebase.h" // for VERBOSE_XML
+
+#define LOC      QString("ThemeInfo: ")
+#define LOC_ERR  QString("ThemeInfo, Error: ")
+#define LOC_WARN QString("ThemeInfo, Warning: ")
 
 ThemeInfo::ThemeInfo(QString theme)
 {
-
     m_theme = new QFileInfo (theme);
     m_type = THEME_UNKN;
     m_baseres = QSize(800, 600);
@@ -20,9 +24,9 @@ ThemeInfo::ThemeInfo(QString theme)
 
     if (!parseThemeInfo())
     {
-        VERBOSE(VB_GENERAL, QString("WARNING: The theme (%1) is missing a "
-                                    "themeinfo.xml file, ignoring.")
-                                    .arg(m_theme->fileName()));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("The theme (%1) is missing a themeinfo.xml file.")
+                .arg(m_theme->fileName()));
     }
 }
 
@@ -40,14 +44,18 @@ bool ThemeInfo::parseThemeInfo()
 
     if (!f.open(QIODevice::ReadOnly))
     {
-        VERBOSE(VB_FILE, QString("Unable to open themeinfo.xml "
-                                      "for %1").arg(m_theme->absoluteFilePath()));
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                QString("Unable to open themeinfo.xml "
+                        "for %1").arg(m_theme->absoluteFilePath()));
         return false;
     }
 
-    if ( !doc.setContent( &f ) ) {
-        VERBOSE(VB_IMPORTANT, QString("Unable to parse themeinfo.xml "
-                                      "for %1").arg(m_theme->fileName()));
+    if (!doc.setContent(&f))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unable to parse themeinfo.xml "
+                        "for %1").arg(m_theme->fileName()));
+
         f.close();
         return false;
     }
@@ -101,10 +109,9 @@ bool ThemeInfo::parseThemeInfo()
                             }
                             else
                             {
-                                VERBOSE(VB_IMPORTANT, QString("Invalid theme "
-                                                      "type seen when parsing "
-                                                      "%2")
-                                                      .arg(m_theme->fileName()));
+                                VERBOSE_XML(VB_IMPORTANT,
+                                            m_theme->fileName(),
+                                            ce, LOC_ERR + "Invalid theme type");
                             }
                         }
                     }

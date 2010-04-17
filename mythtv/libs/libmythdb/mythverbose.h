@@ -90,6 +90,8 @@
                              1, "System idle messages")                       \
     F(VB_CHANSCAN,  0x02000000, "channelscan",                          \
                              1, "Channel Scanning messages")                  \
+    F(VB_GUI,       0x04000000, "gui",                                        \
+                             1, "GUI related messages")                       \
     /* space for more flags */                                                \
     /* space for more flags */                                                \
     /* space for more flags */                                                \

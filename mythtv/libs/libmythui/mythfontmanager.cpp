@@ -9,6 +9,10 @@
 
 static MythFontManager *gFontManager = NULL;
 
+#define LOC      QString("MythFontManager: ")
+#define LOC_ERR  QString("MythFontManager, Error: ")
+#define LOC_WARN QString("MythFontManager, Warning: ")
+
 /**
  *  \brief Loads the fonts in font files within the given directory structure
  *
@@ -61,22 +65,25 @@ void MythFontManager::ReleaseFonts(const QString &registeredFor)
         MythFontReference *fontRef = it.value();
         if (registeredFor == fontRef->GetRegisteredFor())
         {
-            VERBOSE(VB_FILE + VB_EXTRA, QString("Removing application "
-                    "font '%1'").arg(fontRef->GetFontPath()));
+            VERBOSE(VB_FILE|VB_EXTRA, LOC +
+                    QString("Removing application font '%1'")
+                    .arg(fontRef->GetFontPath()));
+
             it = m_fontPathToReference.erase(it);
             if (!IsFontFileLoaded(fontRef->GetFontPath()))
             {
                 if (QFontDatabase::removeApplicationFont(fontRef->GetFontID()))
                 {
-                    VERBOSE(VB_FILE + VB_EXTRA, QString("Successfully removed "
-                                                "application font '%1'")
-                                                .arg(fontRef->GetFontPath()));
+                    VERBOSE(VB_FILE|VB_EXTRA, LOC +
+                            QString("Successfully removed "
+                                    "application font '%1'")
+                            .arg(fontRef->GetFontPath()));
                 }
                 else
                 {
-                    VERBOSE(VB_FILE + VB_EXTRA, QString("Unable to remove "
-                                                "application font '%1'")
-                                                .arg(fontRef->GetFontPath()));
+                    VERBOSE(VB_IMPORTANT, LOC_WARN +
+                            QString("Unable to remove application font '%1'")
+                            .arg(fontRef->GetFontPath()));
                 }
             }
             delete fontRef;
@@ -103,8 +110,9 @@ void MythFontManager::LoadFontsFromDirectory(const QString &directory,
     if (directory.isEmpty() || registeredFor.isEmpty())
         return;
 
-    VERBOSE(VB_FILE + VB_EXTRA, QString("Scanning directory '%1' "
-                                        "for font files.").arg(directory));
+    VERBOSE(VB_FILE|VB_EXTRA, LOC +
+            QString("Scanning directory '%1' for font files.").arg(directory));
+
     QDir dir(directory);
     QStringList nameFilters = QStringList() << "*.ttf" << "*.otf" << "*.ttc";
     QStringList fontFiles = dir.entryList(nameFilters);
@@ -130,30 +138,43 @@ void MythFontManager::LoadFontFile(const QString &fontPath,
     QMutexLocker locker(&m_lock);
     if (IsFontFileLoaded(fontPath))
     {
-        VERBOSE(VB_FILE, QString("Font file '%1' already loaded")
-                                 .arg(fontPath));
+        VERBOSE(VB_GUI|VB_FILE, LOC + QString("Font file '%1' already loaded")
+                .arg(fontPath));
+
         if (!RegisterFont(fontPath, registeredFor))
-            VERBOSE(VB_FILE, QString("Unable to load font(s) in file '%1'")
-                                     .arg(fontPath));
+        {
+            VERBOSE(VB_GUI|VB_FILE, LOC +
+                    QString("Unable to load font(s) in file '%1'")
+                    .arg(fontPath));
+        }
     }
     else
     {
-        VERBOSE(VB_FILE, QString("Loading font file: '%1'").arg(fontPath));
+        VERBOSE(VB_GUI|VB_FILE, LOC +
+                QString("Loading font file: '%1'").arg(fontPath));
+
         int result = QFontDatabase::addApplicationFont(fontPath);
         if (result > -1)
         {
-            VERBOSE(VB_FILE + VB_EXTRA,
+            VERBOSE(VB_GUI|VB_FILE|VB_EXTRA, LOC +
                     QString("In file '%1', found font(s) '%2'")
                     .arg(fontPath)
                     .arg(QFontDatabase::applicationFontFamilies(result)
                          .join(", ")));
+
             if (!RegisterFont(fontPath, registeredFor, result))
-                VERBOSE(VB_FILE, QString("Unable to load font(s) in file '%1'")
-                                         .arg(fontPath));
+            {
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Unable to register font(s) in file '%1'")
+                        .arg(fontPath));
+            }
         }
         else
-            VERBOSE(VB_FILE, QString("Unable to load font(s) in file '%1'")
-                                     .arg(fontPath));
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    QString("Unable to load font(s) in file '%1'")
+                    .arg(fontPath));
+        }
     }
 }
 
