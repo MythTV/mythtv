@@ -626,9 +626,8 @@ void VideoFilterDialog::update_numvideo()
 
     if (video_count > 0)
     {
-        m_numvideosText->SetText(
-                QString(tr("Result of this filter : %1 video(s)"))
-                .arg(video_count));
+        m_numvideosText->SetText(tr("Result of this filter : %n video(s)", "",
+                                    video_count));
     }
     else
     {
