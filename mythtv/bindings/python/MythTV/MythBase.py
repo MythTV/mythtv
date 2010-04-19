@@ -194,6 +194,39 @@ class DictData( object ):
         """obj.joinInt(64-bit int) -> (high, low)"""
         return integer/(2**32),integer%2**32 - (integer%2**32 > 2**31)*2**32
 
+class QuickDictData( DictData ):
+    """
+    QuickDictData.__init__(raw) -> QuickDictData object
+
+    A simple DictData implementation that accepts raw information as
+    a tuple of two-tuples. Accepts new information stored as attributes
+    or keys.
+    """
+    _localvars = ['field_order','data','log']
+    def __init__(self, raw):
+        self._setDefs()
+        self.field_order = [k for k,v in raw]
+        self.data.update(raw)
+
+    def _setDefs(self):
+        self.__dict__['field_order'] = []
+        DictData._setDefs(self)
+
+    def __setattr__(self, name, value):
+        if name in self._localvars:
+            self.__dict__[name] = value
+        else:
+            self.__setitem__(name, value)
+
+    def __setitem__(self, key, value):
+        if key not in self.field_order:
+            self.field_order.append(key)
+        self.data[key] = value
+
+    def clear(self):
+        self.field_order = []
+        self.data.clear()
+
 class DBData( DictData ):
     """
     DBData.__init__(data=None, db=None, raw=None) --> DBData object
@@ -1798,14 +1831,14 @@ class StorageGroup( DBData ):
         else:
             self.local = False
 
-class Grabber( MythDBBase ):
+class System( MythDBBase ):
     """
-    Grabber(path=None, setting=None, db=None) -> Grabber object
+    System(path=None, setting=None, db=None) -> System object
 
     'path' sets the object to use a path to an external command
     'setting' pulls the external command from a setting in the database
     """
-    logmodule = 'Python Metadata Grabber'
+    logmodule = 'Python system call handler'
 
     def __init__(self, path=None, setting=None, db=None):
         MythDBBase.__init__(self, db=db)
@@ -1822,6 +1855,8 @@ class Grabber( MythDBBase ):
             raise MythError('Invalid input to Grabber()')
         self.returncode = 0
         self.stderr = ''
+
+    def __call__(self, *args): return self.command(*args)
 
     def __str__(self):
         return "<%s '%s' at %s>" % \
@@ -1862,4 +1897,4 @@ class Grabber( MythDBBase ):
             raise MythError(MythError.SYSTEM,self.returncode,arg,self.stderr)
         return stdout
 
-    
+class Grabber( System ): pass    
