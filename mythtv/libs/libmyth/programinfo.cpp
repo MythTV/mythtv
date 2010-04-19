@@ -145,20 +145,6 @@ ProgramInfo::ProgramInfo(void) :
     programid(""),
     catType(""),
 
-    actors(""),
-    director(""),
-    producer(""),
-    execProducer(""),
-    writer(""),
-    guestStar(""),
-    host(""),
-    adapter(""),
-    presenter(""),
-    commentator(""),
-    guest(""),
-
-    people(""),
-
     sortTitle(""),
 
     // Private
@@ -253,20 +239,6 @@ ProgramInfo::ProgramInfo(const ProgramInfo &other) :
     programid(other.programid),
     catType(other.catType),
 
-    actors(other.actors),
-    director(other.director),
-    producer(other.producer),
-    execProducer(other.execProducer),
-    writer(other.writer),
-    guestStar(other.guestStar),
-    host(other.host),
-    adapter(other.adapter),
-    presenter(other.presenter),
-    commentator(other.commentator),
-    guest(other.guest),
-
-    people(other.people),
-
     sortTitle(other.sortTitle),
 
     // Private
@@ -356,20 +328,6 @@ ProgramInfo::ProgramInfo(
     seriesid(""),
     programid(""),
     catType(""),
-
-    actors(""),
-    director(""),
-    producer(""),
-    execProducer(""),
-    writer(""),
-    guestStar(""),
-    host(""),
-    adapter(""),
-    presenter(""),
-    commentator(""),
-    guest(""),
-
-    people(""),
 
     sortTitle(""),
 
@@ -553,20 +511,6 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     programid = other.programid;
     catType = other.catType;
 
-    actors = other.actors;
-    director = other.director;
-    producer = other.producer;
-    execProducer = other.execProducer;
-    writer = other.writer;
-    guestStar = other.guestStar;
-    host = other.host;
-    adapter = other.adapter;
-    presenter = other.presenter;
-    commentator = other.commentator;
-    guest = other.guest;
-
-    people = other.people;
-
     sortTitle = other.sortTitle;
 
     ignoreBookmark = other.ignoreBookmark;
@@ -600,20 +544,6 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     seriesid.detach();
     programid.detach();
     catType.detach();
-
-    actors.detach();
-    director.detach();
-    producer.detach();
-    execProducer.detach();
-    writer.detach();
-    guestStar.detach();
-    host.detach();
-    adapter.detach();
-    presenter.detach();
-    commentator.detach();
-    guest.detach();
-
-    people.detach();
 
     sortTitle.detach();
     inUseForWhat.detach();
@@ -699,20 +629,6 @@ void ProgramInfo::clear(void)
     seriesid.clear();
     programid.clear();
     catType.clear();
-
-    actors.clear();
-    director.clear();
-    producer.clear();
-    execProducer.clear();
-    writer.clear();
-    guestStar.clear();
-    host.clear();
-    adapter.clear();
-    presenter.clear();
-    commentator.clear();
-    guest.clear();
-
-    people.clear();
 
     sortTitle.clear();
 
@@ -820,18 +736,6 @@ void ProgramInfo::ToStringList(QStringList &list) const
     INT_TO_LIST(videoproperties)
     INT_TO_LIST(subtitleType)
     STR_TO_LIST(year)
-    STR_TO_LIST(actors)
-    STR_TO_LIST(director)
-    STR_TO_LIST(producer)
-    STR_TO_LIST(execProducer)
-    STR_TO_LIST(writer)
-    STR_TO_LIST(guestStar)
-    STR_TO_LIST(host)
-    STR_TO_LIST(adapter)
-    STR_TO_LIST(presenter)
-    STR_TO_LIST(commentator)
-    STR_TO_LIST(guest)
-    STR_TO_LIST(people)
 /* do not forget to update the NUMPROGRAMLINES defines! */
 }
 
@@ -944,18 +848,6 @@ bool ProgramInfo::FromStringList(QStringList::const_iterator &it,
     INT_FROM_LIST(videoproperties)
     INT_FROM_LIST(subtitleType)
     STR_FROM_LIST(year)
-    STR_FROM_LIST(actors)
-    STR_FROM_LIST(director)
-    STR_FROM_LIST(producer)
-    STR_FROM_LIST(execProducer)
-    STR_FROM_LIST(writer)
-    STR_FROM_LIST(guestStar)
-    STR_FROM_LIST(host)
-    STR_FROM_LIST(adapter)
-    STR_FROM_LIST(presenter)
-    STR_FROM_LIST(commentator)
-    STR_FROM_LIST(guest)
-    STR_FROM_LIST(people)
 
     return true;
 }
@@ -1184,20 +1076,6 @@ void ProgramInfo::ToMap(InfoMap &progMap, bool showrerecord) const
     progMap["seriesid"] = seriesid;
     progMap["programid"] = programid;
     progMap["catType"] = catType;
-
-    progMap["actors"] = actors;
-    progMap["director"] = director;
-    progMap["producer"] = producer;
-    progMap["execproducer"] = execProducer;
-    progMap["writer"] = writer;
-    progMap["gueststar"] = guestStar;
-    progMap["host"] = host;
-    progMap["adapter"] = adapter;
-    progMap["presenter"] = presenter;
-    progMap["commentator"] = commentator;
-    progMap["guest"] = guest;
-
-    progMap["people"] = people;
 
     progMap["year"] = year == "0" ? "" : year;
 
@@ -1597,85 +1475,6 @@ bool ProgramInfo::LoadProgramFromRecorded(
 
     QString old_basename = pathname.section('/', -1);
     QString new_basename = query.value(25).toString();
-
-// Now let's grab the cast.
-
-    MSqlQuery query2(MSqlQuery::InitCon());
-    query2.prepare("SELECT role,people.name FROM recordedcredits"
-                      " AS credits"
-                      " LEFT JOIN people ON credits.person = people.person"
-                      " WHERE credits.chanid = :CHANID"
-                      " AND credits.starttime = :STARTTIME"
-                      " ORDER BY role;");
-    query2.bindValue(":CHANID", chanid);
-    query2.bindValue(":STARTTIME", startts);
-
-    if (query2.exec() && query2.size() > 0)
-    {
-        QString rstr, plist;
-        QString role, pname;
-
-        while(query2.next())
-        {
-            role = query2.value(0).toString();
-            pname = query2.value(1).toString();
-
-            if (rstr == role)
-                plist += ", " + pname;
-            else
-            {
-                if (rstr == "actor")
-                    actors = plist;
-                else if (rstr == "director")
-                    director = plist;
-                else if (rstr == "producer")
-                    producer = plist;
-                else if (rstr == "executive_producer")
-                    execProducer = plist;
-                else if (rstr == "writer")
-                    writer = plist;
-                else if (rstr == "guest_star")
-                    guestStar = plist;
-                else if (rstr == "host")
-                    host = plist;
-                else if (rstr == "adapter")
-                    adapter = plist;
-                else if (rstr == "presenter")
-                    presenter = plist;
-                else if (rstr == "commentator")
-                    commentator = plist;
-                else if (rstr == "guest")
-                    guest =  plist;
-
-                rstr = role;
-                plist = pname;
-            }
-        }
-        if (rstr == "actor")
-            actors = plist;
-        else if (rstr == "director")
-            director = plist;
-        else if (rstr == "producer")
-            producer = plist;
-        else if (rstr == "executive_producer")
-            execProducer = plist;
-        else if (rstr == "writer")
-            writer = plist;
-        else if (rstr == "guest_star")
-            guestStar = plist;
-        else if (rstr == "host")
-            host = plist;
-        else if (rstr == "adapter")
-            adapter = plist;
-        else if (rstr == "presenter")
-            presenter = plist;
-        else if (rstr == "commentator")
-            commentator = plist;
-        else if (rstr == "guest")
-            guest =  plist;
-    }
-
-    people = actors;
 
     if (new_basename != old_basename)
     {

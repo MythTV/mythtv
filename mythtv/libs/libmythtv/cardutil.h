@@ -12,7 +12,6 @@ using namespace std;
 // Qt headers
 #include <QStringList>
 #include <QMap>
-#include <QDomDocument>
 
 // MythTV headers
 #include "settings.h"
@@ -284,10 +283,6 @@ class MPUBLIC CardUtil
     // HDHomeRun info
     static bool         HDHRdoesDVB(const QString &device);
     static QString      GetHDHRdesc(const QString &device);
-
-    static QDomDocument GetCardXML(void);
-    static QList<QDomElement> GetConfiguredCardXML(void);
-    static QList<QDomElement> GetProbedCardXML(void);
 
   private:
     static QStringList  ProbeV4LVideoInputs(QString device);

@@ -1101,14 +1101,14 @@ class ImageSize : public VerticalConfigurationGroup
         {
             maxsize     = QSize(1920, 1088);
             if (tvFormat.toLower() == "ntsc" || tvFormat.toLower() == "atsc")
-                defaultsize = QSize(720, 480);
+                defaultsize = QSize(480, 480);
             else
-                defaultsize = QSize(720, 576);
+                defaultsize = QSize(480, 576);
         }
         else if (tvFormat.toLower().left(4) == "ntsc")
         {
             maxsize     = QSize(720, 480);
-            defaultsize = QSize(720, 480);
+            defaultsize = (ivtv) ? QSize(720, 480) : QSize(480, 480);
         }
         else if (tvFormat.toLower() == "atsc")
         {
@@ -1118,7 +1118,7 @@ class ImageSize : public VerticalConfigurationGroup
         else
         {
             maxsize     = QSize(768, 576);
-            defaultsize = QSize(720, 576);
+            defaultsize = (ivtv) ? QSize(720, 576) : QSize(480, 576);
         }
 
         imgSize->addChild(new Width(parent, defaultsize.width(),

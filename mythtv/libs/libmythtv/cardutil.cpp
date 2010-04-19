@@ -1755,7 +1755,9 @@ void CardUtil::GetCardInputs(
     {
         CardInput *cardinput = new CardInput(is_dtv, false, false, cardid);
         cardinput->loadByInput(cardid, (*it));
-        inputLabels.push_back(QString("%1").arg(*it));
+        inputLabels.push_back(
+            dev_label + QString(" (%1) -> %2")
+            .arg(*it).arg(cardinput->getSourceName()));
         cardInputs.push_back(cardinput);
     }
 
@@ -1772,7 +1774,9 @@ void CardUtil::GetCardInputs(
         {
             CardInput *cardinput = new CardInput(is_dtv, true, false, cardid);
             cardinput->loadByInput(cardid, *it);
-            inputLabels.push_back(QString("%1").arg(*it));
+            inputLabels.push_back(
+                dev_label + QString(" (%1) -> %2")
+                .arg(*it).arg(cardinput->getSourceName()));
             cardInputs.push_back(cardinput);
         }
 
@@ -1989,95 +1993,4 @@ QString CardUtil::GetHDHRdesc(const QString &device)
     (void) device;
     return connectErr;
 #endif
-}
-
-QDomDocument CardUtil::GetCardXML(void)
-{
-    QDomDocument doc("Capture Configuration");
-    QDomElement root = doc.createElement("config");
-    doc.appendChild(root);
-
-    QList<QDomElement> existingDevices = GetConfiguredCardXML();
-
-    QList<QDomElement>::iterator it;
-    for (it = existingDevices.begin(); it != existingDevices.end(); ++it)
-    {
-        QDomElement tmp(*it);
-        root.appendChild(tmp);
-    }
-
-    return doc;
-}
-
-QList<QDomElement> CardUtil::GetConfiguredCardXML(void)
-{
-    QList<QDomElement> ret;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT cardid, videodevice, audiodevice, cardtype "
-        "FROM capturecard "
-        "WHERE hostname = :HOSTNAME "
-        "ORDER BY cardid");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-    if (!query.exec())
-    {
-        MythDB::DBError("CardUtil::GetConfiguredCardXML", query);
-        return ret;
-    }
-
-    uint j = 0;
-    QMap<QString, uint> device_refs;
-    while (query.next())
-    {
-        uint    cardid      = query.value(0).toUInt();
-        QString videodevice = query.value(1).toString();
-        QString audiodevice = query.value(2).toString();
-        QString cardtype    = query.value(3).toString();
-
-        QDomDocument temp("");
-        QDomElement card = temp.createElement("device");
-
-        card.setAttribute(QString("cardtype"), cardtype);
-        card.setAttribute(QString("videodevice"), videodevice);
-        card.setAttribute(QString("audiodevice"), audiodevice);
-        card.setAttribute(QString("cardid"), cardid);
-
-        bool sharable = IsTunerSharingCapable(cardtype.toUpper());
-
-        if (sharable && (1 != ++device_refs[videodevice]))
-            continue;
-
-        QStringList        inputLabels;
-        vector<CardInput*> cardInputs;
-
-        GetCardInputs(cardid, videodevice, cardtype,
-                      inputLabels, cardInputs);
-
-        for (int i = 0; i < inputLabels.size(); i++, j++)
-        {
-            uint inputid = cardInputs[i]->getInputID();
-            if (inputid > 0)
-            {
-                QDomElement input = temp.createElement("input");
-                card.appendChild(input);
-                input.setAttribute(QString("name"), GetInputName(inputid));
-                input.setAttribute(QString("sourceid"), GetSourceID(inputid));
-                input.setAttribute(QString("sourcename"), cardInputs[i]->getSourceName());
-                input.setAttribute(QString("inputid"), inputid);
-            }
-            QDomElement probedinput = temp.createElement("probedinput");
-            card.appendChild(probedinput);
-            probedinput.setAttribute(QString("name"), inputLabels[i]);
-        }
-        ret.append(card);
-    }
-    return ret;
-}
-
-QList<QDomElement> CardUtil::GetProbedCardXML(void)
-{
-    QList<QDomElement> ret;
-    return ret;
 }

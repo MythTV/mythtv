@@ -42,7 +42,7 @@ typedef QMap<long long, int> frm_dir_map_t;
    mythtv/bindings/perl/MythTV/Program.pm
    mythtv/bindings/python/MythTV/MythTV.py
 */
-#define NUMPROGRAMLINES 59
+#define NUMPROGRAMLINES 47
 
 typedef enum {
     MARK_UNSET         = -10,
@@ -491,12 +491,6 @@ class MPUBLIC ProgramInfo
     QString seriesid;
     QString programid;
     QString catType;
-
-    QString actors, director, producer, execProducer;
-    QString writer, guestStar, host, adapter;
-    QString presenter, commentator, guest;
-
-    QString people;
 
     QString sortTitle;
 
