@@ -7,5 +7,4 @@ TRANSLATIONS += mythgallery_nl.ts mythgallery_de.ts mythgallery_da.ts
 TRANSLATIONS += mythgallery_pt.ts mythgallery_sv.ts mythgallery_fr.ts
 TRANSLATIONS += mythgallery_ja.ts mythgallery_sl.ts mythgallery_nb.ts
 TRANSLATIONS += mythgallery_fi.ts mythgallery_et.ts mythgallery_ru.ts
-TRANSLATIONS += mythgallery_cs.ts
-TRANSLATIONS += mythgallery_hu.ts
+TRANSLATIONS += mythgallery_cs.ts mythgallery_hu.ts mythgallery_en_gb.ts
