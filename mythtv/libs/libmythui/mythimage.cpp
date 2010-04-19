@@ -279,6 +279,10 @@ bool MythImage::Load(const QString &filename, bool scale)
 //                VERBOSE(VB_GENERAL, QString("MythImage::Load failed to load remote image %1").arg(filename));
 
         }
+        else if (filename.startsWith("http://"))
+        {
+            
+        }
         else
         {
             im = new QImage(filename);

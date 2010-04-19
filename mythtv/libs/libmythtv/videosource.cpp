@@ -3143,6 +3143,9 @@ void CardInputEditor::Load(void)
     cardinputs.clear();
     listbox->clearSelections();
 
+    QDomDocument doc = CardUtil::GetCardXML();
+    VERBOSE(VB_IMPORTANT, QString("XML for inputs is:/n%1").arg(doc.toString()));
+
     // We do this manually because we want custom labels.  If
     // SelectSetting provided a facility to edit the labels, we
     // could use CaptureCard::fillSelections
