@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2009-11-18, v0.22.02
+<date>2010-03-08, v0.22.03
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3555,13 +3555,13 @@ recording rule.
 To familiarize yourself with how you can create custom rules, create a
 simple rule to record "Nova" only in primetime.
 
-The first item at the top of the page allows you to edit an existing rule
-or create a new rule. Leave it on "&lt;New rule&gt;". Arrow down to the
-third item which says "Match an exact title". Right and left arrows would
-allow you to select any of several prefabricated pieces or full examples
-but leave it on the default for now. Arrow down to "Add this example
-clause" and press SELECT (Enter or Space on a keyboard). The large text
-box should now show:
+The first item at the top of the page allows you to edit an existing rule or
+create a new rule.  Leave it on "&lt;New rule&gt;".  Arrow down to the third
+item which says "Match an exact title".  Right and left arrows would allow
+you to select any of several prefabricated pieces or full examples but leave
+it on the default for now.  Arrow down to "OK" and press SELECT (Enter or
+Space on a keyboard).  The large text box should now show:
+
 <tscreen><verb>
      program.title = 'Nova'
 </verb></tscreen>
@@ -6870,7 +6870,7 @@ v0.22.01, 2009-11-12.  Remove the "rsize" stuff from the NFS example.
 Autonegotiation is best.
 v0.22.02, 2009-11-18.  Point shutdown/wakeup at wiki - better docs there
 than in the HOWTO.
-
+v0.22.03, 2010-03-08.  Update Power Recording rule example.
 
 
 -->
