@@ -162,10 +162,10 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
     *Plot = QObject::tr("Unknown");
     *Publisher = QObject::tr("Unknown");
     *Version = QObject::tr("0");
-    *Fanart = QObject::tr("");
-    *Boxart = QObject::tr("");
+    (*Fanart).clear();
+    (*Boxart).clear();
 
-    if (*CRC32 != "")
+    if (!(*CRC32).isEmpty())
     {
         if (romDB.contains(key)) 
         {
@@ -186,7 +186,7 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
     };
 
-    if ((*Genre == "Unknown") || (*Genre == ""))
+    if ((*Genre == "Unknown") || (*Genre).isEmpty())
         *Genre = QString("Unknown%1").arg( handler->GameType() );
     
 }
@@ -309,9 +309,7 @@ static void UpdateGameCounts(QStringList updatelist)
     int diskcount = 0;
     int pos = 0;
 
-    QString lastrom = "";
-    QString firstname = "";
-    QString basename = "";
+    QString lastrom, firstname, basename;
 
     for ( QStringList::Iterator it = updatelist.begin(); it != updatelist.end(); ++it ) 
     {
@@ -403,25 +401,15 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 
     GameScanMap::Iterator iter;
 
-    QString GameName;
-    QString Genre;
-    QString Country;
-    QString CRC32;
-    QString thequery;
-    QString queryvalues;
-    QString Year;
-    QString Plot;
-    QString Publisher;
-    QString Version;
-    QString Fanart;
-    QString Boxart;
-    QString ScreenShot;
+    QString GameName, Genre, Country, CRC32, Year, Plot;
+    QString Publisher, Version, Fanart, Boxart, ScreenShot;
+    QString thequery, queryvalues;
 
     int removalprompt = gContext->GetSetting("GameRemovalPrompt").toInt();
     int indepth = gContext->GetSetting("GameDeepScan").toInt();
     QString screenShotPath = gContext->GetSetting("mythgame.screenshotdir");
 
-    for (iter = m_GameMap.begin(); iter != m_GameMap.end(); iter++)
+    for (iter = m_GameMap.begin(); iter != m_GameMap.end(); ++iter)
     {
 
         if (iter.value().FoundLoc() == inFileSystem)
@@ -435,14 +423,14 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             {
                 Genre = QObject::tr("Unknown") + handler->GameType();
                 Country = QObject::tr("Unknown");
-                CRC32 = "";
+                CRC32.clear();
                 Year = QObject::tr("19xx");
                 GameName = QObject::tr("Unknown");
                 Plot = QObject::tr("Unknown");
                 Publisher = QObject::tr("Unknown");
                 Version = QObject::tr("0");
-                Fanart = QObject::tr("");
-                Boxart = QObject::tr("");
+                Fanart.clear();
+                Boxart.clear();
             }
 
             if (GameName == QObject::tr("Unknown")) 
@@ -463,7 +451,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
             else if (QFile(baseName + ".gif").exists())
                 ScreenShot = baseName + ".gif";
             else
-                ScreenShot = "";
+                ScreenShot.clear();
 
             //VERBOSE(VB_GENERAL, QString("file %1 - genre %2 ").arg(iter.data().Rom()).arg(Genre));
             //VERBOSE(VB_GENERAL, QString("screenshot %1").arg(ScreenShot));
