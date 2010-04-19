@@ -5285,15 +5285,15 @@ void TV::PxPCreateView(PlayerContext *actx, bool wantPBP)
     QString err_msg = QString::null;
     if ((player.size() > kMaxPBPCount) && (wantPBP || actx->IsPBP()))
     {
-        err_msg = tr("Sorry, PBP only supports %1 video streams")
-            .arg(kMaxPBPCount);
+        err_msg = tr("Sorry, PBP only supports %n video stream(s)", "",
+                     kMaxPBPCount);
     }
 
     if ((player.size() > kMaxPIPCount) &&
         (!wantPBP || GetPlayer(actx,1)->IsPIP()))
     {
-        err_msg = tr("Sorry, PIP only supports %1 video streams")
-            .arg(kMaxPIPCount);
+        err_msg = tr("Sorry, PIP only supports %n video stream(s)", "",
+                     kMaxPIPCount);
     }
 
     if ((player.size() > 1) && (wantPBP ^ actx->IsPBP()))
