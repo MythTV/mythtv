@@ -13,6 +13,8 @@ __all__ = ['MythStatic', \
             \
            'MythBE', 'Frontend', 'MythDB', 'MythVideo', 'MythXML']
 
+__version__ = (0,23,0,1)
+
 import26 = """
 import warnings
 with warnings.catch_warnings():
