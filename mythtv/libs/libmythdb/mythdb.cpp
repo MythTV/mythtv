@@ -804,9 +804,9 @@ void MythDB::ClearSettingsCache(const QString &_key)
         clear(d->settingsCache, d->overriddenSettings, myKey);
 
         // To be safe always clear any local[ized] version too
-        QStringList mkl = myKey.split(QChar(' '));
-        if (mkl.size() == 2)
-            clear(d->settingsCache, d->overriddenSettings, mkl[1]);        
+        QString mkl = myKey.section(QChar(' '), 1);
+        if (!mkl.isEmpty())
+            clear(d->settingsCache, d->overriddenSettings, mkl);
     }
 
     d->settingsCacheLock.unlock();
