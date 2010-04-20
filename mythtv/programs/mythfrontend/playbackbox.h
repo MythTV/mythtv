@@ -302,6 +302,7 @@ class PlaybackBox : public ScheduleCommon
     void UpdateUsageUI(void);
     void updateGroupInfo(const QString &groupname, const QString &grouplabel);
 
+    void SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo);
     void UpdateUIListItem(
         ProgramInfo *ProgramInfo_pointer_from_FindProgramInUILists);
     void UpdateUIListItem(MythUIButtonListItem *item, bool is_sel,
