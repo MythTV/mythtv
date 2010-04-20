@@ -729,6 +729,30 @@ void PlaybackBox::UpdateUIListItem(ProgramInfo *pginfo)
     }
 }
 
+static const char *disp_flags[] = { "playlist", "watched", "preserve",
+                                    "cutlist", "autoexpire", "editing",
+                                    "bookmark", "inuse", "commflagged",
+                                    "transcoded" };
+
+void PlaybackBox::SetItemIcons(MythUIButtonListItem *item, ProgramInfo* pginfo)
+{
+    bool disp_flag_stat[sizeof(disp_flags)/sizeof(char*)];
+
+    disp_flag_stat[0] = !m_playList.filter(pginfo->MakeUniqueKey()).empty();
+    disp_flag_stat[1] = pginfo->programflags & FL_WATCHED;
+    disp_flag_stat[2] = pginfo->programflags & FL_PRESERVED;
+    disp_flag_stat[3] = pginfo->programflags & FL_CUTLIST;
+    disp_flag_stat[4] = pginfo->programflags & FL_AUTOEXP;
+    disp_flag_stat[5] = pginfo->programflags & FL_EDITING;
+    disp_flag_stat[6] = pginfo->programflags & FL_BOOKMARK;
+    disp_flag_stat[7] = pginfo->programflags & FL_INUSEPLAYING;
+    disp_flag_stat[8] = pginfo->programflags & FL_COMMFLAG;
+    disp_flag_stat[9] = pginfo->programflags & FL_TRANSCODED;
+
+    for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
+        item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
+}
+
 void PlaybackBox::UpdateUIListItem(
     MythUIButtonListItem *item, bool is_sel, bool force_preview_reload)
 {
@@ -770,9 +794,7 @@ void PlaybackBox::UpdateUIListItem(
     QString job = extract_job_state(*pginfo);
     item->DisplayState(job, "jobstate");
 
-    // Watched status
-//     QString watched =
-//     item->DisplayState(, "watched");
+    SetItemIcons(item, pginfo);
 
     QString rating = QString::number((int)((pginfo->stars * 10.0) + 0.5));
 
@@ -1147,12 +1169,6 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
 
     ProgramList &progList = *pmit;
 
-    static const char *disp_flags[] = { "playlist", "watched", "preserve",
-                                        "cutlist", "autoexpire", "editing",
-                                        "bookmark", "inuse", "commflagged",
-                                        "transcoded" };
-    bool disp_flag_stat[sizeof(disp_flags)/sizeof(char*)];
-
     QMap<AudioProps, QString> audioFlags;
     audioFlags[AUD_DOLBY] = "dolby";
     audioFlags[AUD_SURROUND] = "surround";
@@ -1202,19 +1218,7 @@ void PlaybackBox::updateRecList(MythUIButtonListItem *sel_item)
         item->DisplayState(QString::number((int)((*it)->stars + 0.5)),
                             "ratingstate");
 
-        disp_flag_stat[0] = !m_playList.filter((*it)->MakeUniqueKey()).empty();
-        disp_flag_stat[1] = (*it)->programflags & FL_WATCHED;
-        disp_flag_stat[2] = (*it)->programflags & FL_PRESERVED;
-        disp_flag_stat[3] = (*it)->programflags & FL_CUTLIST;
-        disp_flag_stat[4] = (*it)->programflags & FL_AUTOEXP;
-        disp_flag_stat[5] = (*it)->programflags & FL_EDITING;
-        disp_flag_stat[6] = (*it)->programflags & FL_BOOKMARK;
-        disp_flag_stat[7] = (*it)->programflags & FL_INUSEPLAYING;
-        disp_flag_stat[8] = (*it)->programflags & FL_COMMFLAG;
-        disp_flag_stat[9] = (*it)->programflags & FL_TRANSCODED;
-
-        for (uint i = 0; i < sizeof(disp_flags) / sizeof(char*); ++i)
-            item->DisplayState(disp_flag_stat[i]?"yes":"no", disp_flags[i]);
+        SetItemIcons(item, (*it));
 
         QMap<AudioProps, QString>::iterator ait;
         for (ait = audioFlags.begin(); ait != audioFlags.end(); ++ait)
