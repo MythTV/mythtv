@@ -793,6 +793,8 @@ int run_backend(const MythCommandLineParser &cmdline)
                            "MythBackend started as a slave backend", "");
     }
 
+    print_warnings(cmdline);
+
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
