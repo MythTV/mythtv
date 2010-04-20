@@ -68,10 +68,11 @@ class DictData( object ):
         # accesses real attributes, falls back to data fields, and errors
         if name in self.__dict__:
             return self.__dict__[name]
-        elif name in self.field_order:
-            return self.data[name]
         else:
-            raise AttributeError("'DictData' object has no attribute '%s'"%name)
+            try:
+                return self[name]
+            except KeyError:
+                raise AttributeError(str(name))
 
     def __setattr__(self,name,value):
         # function for class attribute access of data fields
@@ -146,11 +147,15 @@ class DictData( object ):
         """
         return list(self.iteritems())
         
-    def pop(self,key):
-        raise NotImplementedError
+    def pop(self,key): raise NotImplementedError
     
-    def popitem(self):
-        raise NotImplementedError
+    def popitem(self): raise NotImplementedError
+
+    def __len__(self):
+        return len(self.field_order)
+
+    def __length_hint__(self):
+        return len(self.field_order)
         
     def update(self, *args, **keywords):
         self.data.update(*args, **keywords)
@@ -158,7 +163,6 @@ class DictData( object ):
     ### additional management functions
     def _setDefs(self):
         self.data = {}
-        self.field = 0
         self.log = MythLog(self.logmodule)
         
     def __init__(self, raw):
@@ -883,106 +887,143 @@ class MythDBBase( object ):
                 (str(self.__class__).split("'")[1].split(".")[-1], 
                  self.ident, hex(id(self)))
 
-    class _TableFields(object):
+    class _TableFields( QuickDictData ):
         """Provides a dictionary-like list of table fieldnames"""
-        def __init__(self, db, log):
-            self._db = db
-            self._log = log
-        def __getattr__(self,key):
-            if key in self.__dict__:
-                return self.__dict__[key]
-            elif key in self._db.tablefields:
-                return self._db.tablefields[key]
-            else:
-                return self.__getitem__(key)
-        def __getitem__(self,key):
-            if key in self._db.tablefields:
-                return self._db.tablefields[key]
-            table_names = []
-            c = self._db.cursor(self._log)
-            try:
-                c.execute("DESC %s" % (key,))
-            except:
-                return None
-            
-            for name in c.fetchall():
-                table_names.append(name[0])
-            c.close()
-            self._db.tablefields[key] = tuple(table_names)
-            return table_names
-
-    class _Settings(object):
-        """Provides dictionary-like list of hosts"""
-        class __Settings(object):
-            """Provides dictionary-like list of settings"""
-            def __repr__(self):
-                return str(self._shared.keys())
-            def __init__(self, db, log, host):
-                self._db = db
-                self._log = log
-                self._host = host
-            def __getattr__(self,name):
-                if name in self.__dict__:
-                    return self.__dict__[name]
-                else:
-                    return self.__getitem__(name)
-            def __setattr__(self,name,value):
-                if name in ('_db','_host','_log'):
-                    self.__dict__[name] = value
-                else:
-                    self.__setitem__(name,value)
+        class _FieldData( QuickDictData ):
+            def __str__(self): return str(list(self))
+            def __repr__(self): return str(self).encode('utf-8')
+            def __iter__(self): return self.DictIterator(1,self)
+            def __init__(self, result):
+                data = [(row[0],
+                         QuickDictData(zip( \
+                                ('type','null','key','default','extra'),
+                                row[1:])) \
+                         )for row in result]
+                QuickDictData.__init__(self, data)
             def __getitem__(self,key):
-                if key in self._db.settings[self._host]:
-                    return self._db.settings[self._host][key]
-                if self._host == 'NULL':
+                if key in self.data:
+                    return self.data[key]
+                else:
+                    try:
+                        return self.field_order[key]
+                    except:
+                        raise KeyError(str(key))
+        _localvars = QuickDictData._localvars+['db']
+        def __str__(self): return str(list(self))
+        def __repr__(self): return str(self).encode('utf-8')
+        def __iter__(self): return self.DictIterator(1,self)
+        def __init__(self, db, log):
+            QuickDictData.__init__(self, ())
+            self.db = db
+            self.log = log
+            self.data = self.db.tablefields
+            self.field_order = self.data.keys()
+
+        def __getitem__(self,key):
+            if key not in self.data:
+                # pull field list from database
+                c = self.db.cursor(self.log)
+                try:
+                    c.execute("DESC %s" % (key,))
+                except:
+                    return None
+
+                self.field_order.append(key)
+                self.data[key] = self._FieldData(c.fetchall())
+                c.close()
+
+            # return cached information
+            return self.data[key]
+
+    class _Settings( QuickDictData ):
+        """Provides dictionary-like list of hosts"""
+        class _HostSettings( QuickDictData ):
+            _localvars = QuickDictData._localvars+['db','host']
+            def __str__(self): return str(list(self))
+            def __repr__(self): return str(self).encode('utf-8')
+            def __iter__(self): return self.DictIterator(1,self)
+            def __init__(self, db, log, host):
+                QuickDictData.__init__(self, ())
+                self.db = db
+                self.host = host
+                self.log = log
+            
+            def __getitem__(self, key):
+                if key not in self.data:
+                    if self.host == 'NULL':
+                        where = 'IS NULL'
+                        wheredat = (key,)
+                    else:
+                        where = 'LIKE(%s)'
+                        wheredat = (key, self.host)
+
+                    c = self.db.cursor(self.log)
+                    if c.execute("""SELECT data FROM settings
+                                    WHERE  value=%%s
+                                    AND    hostname %s
+                                    LIMIT 1""" % where,
+                                    wheredat) > 0:
+                        self.data[key] = c.fetchone()[0]
+                    else:
+                        self.data[key] = None
+                    self.field_order.append(key)
+                    c.close()
+                return self.data[key]
+
+            def __setitem__(self, key, value):
+                if key not in self.data:
+                    self.__getitem__(key)
+                c = self.db.cursor(self.log)
+                if self.data[key] is None:
+                    c.execute("""INSERT INTO settings
+                                        (value, data, hostname)
+                                 VALUES (%s,%s,%s)""",
+                                 (key, value, self.host))
+                else:
+                    if self._host == 'NULL':
+                        where = 'IS NULL'
+                        wheredat = (value, key)
+                    else:
+                        where = 'LIKE(%s)'
+                        wheredat = (value, key, self.host)
+                    c.execute("""UPDATE settings
+                                 SET    data=%%s
+                                 WHERE  value=%%s
+                                 AND    hostname %s""" % where, wheredat)
+                self.data[key] = value
+
+            def getall(self):
+                c = self.db.cursor(self.log)
+                if self.host == 'NULL':
                     where = 'IS NULL'
-                    wheredat = (key,)
+                    wheredat = ()
                 else:
                     where = 'LIKE(%s)'
-                    wheredat = (key, self._host)
-                c = self._db.cursor(self._log)
-                c.execute("""SELECT data FROM settings
-                             WHERE value=%%s AND hostname %s
-                             LIMIT 1""" % where, wheredat)
-                row = c.fetchone()
-                c.close()
-                if row:
-                    self._db.settings[self._host][key] = row[0]
-                    return row[0]
-                else:
-                    return None
-            def __setitem__(self, key, value):
-                if key not in self._db.settings[self._host]:
-                    self.__getitem__(key)
-                c = self._db.cursor(self._log)
-                if key not in self._db.settings[self._host]:
-                    c.execute("""INSERT INTO settings (value,data,hostname)
-                             VALUES (%s,%s,%s)""", (key, value, self._host))
-                else:
-                    query = """UPDATE settings SET data=%s
-                                WHERE value=%s AND"""
-                    dat = [value, key]
-                    if self._host == 'NULL':
-                        query += ' hostname IS NULL'
-                    else:
-                        query += ' hostname=%s'
-                        dat.append(self._host)
-                    c.execute(query, dat)
-                self._db.settings[self._host][key] = value
-        def __repr__(self):
-            return str(self._db.settings.keys())
+                    wheredat = (self.host,)
+                c.execute("""SELECT value,data FROM settings
+                             WHERE hostname %s""" % where, wheredat)
+                for k,v in c.fetchall():
+                    self.data[k] = v
+                    if k not in self.field_order:
+                        self.field_order.append(k)
+                return self.items()
+
+        _localvars = QuickDictData._localvars+['db']
+        def __str__(self): return str(list(self))
+        def __repr__(self): return str(self).encode('utf-8')
+        def __iter__(self): return self.DictIterator(1,self)
         def __init__(self, db, log):
-            self._db = db
-            self._log = log
-        def __getattr__(self,key):
-            if key in self.__dict__:
-                return self.__dict__[key]
-            else:
-                return self.__getitem__(key)
-        def __getitem__(self,key):
-            if key not in self._db.settings:
-                self._db.settings[key] = {}
-            return self.__Settings(self._db, self._log, key)
+            QuickDictData.__init__(self, ())
+            self.db = db
+            self.log = log
+            self.data = self.db.settings
+            self.field_order = self.data.keys()
+
+        def __getitem__(self, key):
+            if key not in self.data:
+                self.data[key] = self._HostSettings(self.db, self.log, key)
+                self.field_order.append(key)
+            return self.data[key]
 
     def __init__(self, db=None, args=None, **dbconn):
         self.db = None
