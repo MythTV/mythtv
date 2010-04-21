@@ -181,6 +181,7 @@ __version__=u"v0.5.8"
 #       and termination of MiroBridge with an appropriate error message has been added.
 #       Added better system error messages when an IOError exception occurs
 # 0.5.8 Add support for Miro version 3.0
+# 0.5.9 Update for changes in Python Bindings
 
 
 examples_txt=u'''
@@ -291,7 +292,7 @@ try:
     get the directories to store poster, fanart, banner and episode graphics.
     '''
     from MythTV import OldRecorded, Recorded, RecordedProgram, Channel, \
-                        MythDB, Video, MythVideo, MythBE, FileOps, MythError, MythLog
+                        MythDB, Video, MythVideo, MythBE, MythError, MythLog
     mythdb = None
     mythvideo = None
     mythbeconn = None
@@ -310,7 +311,7 @@ try:
             logger.critical(u'Check that (%s) is correctly configured\n' % filename)
         sys.exit(1)
     except Exception, e:
-        logger.critical(u'''Creating an instance caused an error for one of: MythDBConn or MythVideo, error(%s)
+        logger.critical(u'''Creating an instance caused an error for one of: MythDB or MythVideo, error(%s)
 ''' % e)
         sys.exit(1)
     try:
@@ -551,15 +552,15 @@ class delOldRecorded( OldRecorded ):
         """
         Delete video entry from database.
         """
-        if (self.where is None) or \
-                (self.wheredat is None) or \
-                (self.data is None):
+        if (self._where is None) or \
+                (self._wheredat is None) or \
+                (self._data is None):
             return
-        c = self.db.cursor()
-        query = """DELETE FROM %s WHERE %s""" % (self.table, self.where)
-        self.log(self.log.DATABASE, query, str(self.wheredat))
+        c = self._db.cursor()
+        query = """DELETE FROM %s WHERE %s""" % (self._table, self._where)
+        self._log(self._log.DATABASE, query, str(self._wheredat))
         try:
-            c.execute(query, self.wheredat)
+            c.execute(query, self._wheredat)
         except Exception, e:
             logger.warning(u"Oldrecorded record delete failed (%s)" % (e, ))
             pass
@@ -574,7 +575,7 @@ def hashFile(filename):
     '''
     # Use the MythVideo hashing protocol when the video is in a storage groups
     if filename[0] != u'/':
-        hash_value = FileOps(mythbeconn.hostname).getHash(filename, u'Videos')
+        hash_value = mythbeconn.getHash(filename, u'Videos')
         if hash_value == u'NULL':
             return u''
         else:
@@ -622,15 +623,15 @@ class delRecordedProgram( RecordedProgram ):
         """
         Delete video entry from database.
         """
-        if (self.where is None) or \
-                (self.wheredat is None) or \
-                (self.data is None):
+        if (self._where is None) or \
+                (self._wheredat is None) or \
+                (self._data is None):
             return
-        c = self.db.cursor()
-        query = """DELETE FROM %s WHERE %s""" % (self.table, self.where)
-        self.log(self.log.DATABASE, query, str(self.wheredat))
+        c = self._db.cursor()
+        query = """DELETE FROM %s WHERE %s""" % (self._table, self._where)
+        self._log(self._log.DATABASE, query, str(self._wheredat))
         try:
-            c.execute(query, self.wheredat)
+            c.execute(query, self._wheredat)
         except Exception, e:
             logger.warning(u"Recordedprogram record delete failed (%s)" % (e, ))
             pass
@@ -844,7 +845,7 @@ def setUseroptions():
                     channel_mythvideo_only[filter(is_not_punct_char, option.lower())] = cfg.get(section, option)
             for key in channel_mythvideo_only.keys():
                 if not channel_mythvideo_only[key].startswith(vid_graphics_dirs[u'mythvideo']):
-                    logger.critical(u"All Mythvideo only configuration (%s) directories (%s) must be a subrirectory of the MythVideo base directory (%s)." % (key, channel_mythvideo_only[key], vid_graphics_dirs[u'mythvideo']))
+                    logger.critical(u"All Mythvideo only configuration (%s) directories (%s) must be a subdirectory of the MythVideo base directory (%s)." % (key, channel_mythvideo_only[key], vid_graphics_dirs[u'mythvideo']))
                     sys.exit(1)
                 if channel_mythvideo_only[key][-1] != u'/':
                     channel_mythvideo_only[key]+=u'/'
@@ -1142,10 +1143,10 @@ def getOldrecordedOrphans():
     global channel_icon_override
     global graphic_suffix, graphic_path_suffix, graphic_name_suffix
 
-    recorded_array = MythDB(mythdb).searchRecorded(chanid=channel_id, hostname=localhostname)
+    recorded_array = mythdb.searchRecorded(chanid=channel_id, hostname=localhostname)
     if not recorded_array:
         recorded_array = []
-    oldrecorded_array = MythDB(mythdb).searchOldRecorded(chanid=channel_id, )
+    oldrecorded_array = mythdb.searchOldRecorded(chanid=channel_id, )
     if not oldrecorded_array:
         oldrecorded_array = []
     videometadata = mythvideo.searchVideos(category=u'Miro', custom=(('inetref=%s',u'99999999'),))
@@ -1709,7 +1710,7 @@ def getPlayedMiroVideos():
     global localhostname, vid_graphics_dirs, storagegroups, verbose, channel_id, statistics
 
     filenames=[]
-    recorded = MythDB(mythdb).searchRecorded(chanid=channel_id, hostname=localhostname)
+    recorded = mythdb.searchRecorded(chanid=channel_id, hostname=localhostname)
     if not recorded:
         return None
 
@@ -1746,7 +1747,7 @@ def updateMythRecorded(items):
         items_copy.append(item)
 
     # Deal with existing Miro videos already in the MythTV data base
-    recorded = MythDB(mythdb).searchRecorded(chanid=channel_id, hostname=localhostname)
+    recorded = mythdb.searchRecorded(chanid=channel_id, hostname=localhostname)
     if recorded:
         for record in recorded:
             if storagegroups.has_key(u'default'):
@@ -1774,7 +1775,7 @@ def updateMythRecorded(items):
                     except Exception, e:
                         pass
 
-    recorded = MythDB(mythdb).searchRecorded(chanid=channel_id, hostname=localhostname)
+    recorded = mythdb.searchRecorded(chanid=channel_id, hostname=localhostname)
     if recorded:
         for record in recorded:    # Skip any item already in MythTV data base
             for item in items:
@@ -1900,7 +1901,7 @@ def updateMythVideo(items):
                     else:
                         Video(id=record[u'intid'], db=mythvideo).delete()
                         try: # An orphaned oldrecorded record may not exist
-                            for oldrecorded in MythDB(mythdb).searchOldRecorded(title=record[u'title'], subtitle=record[u'subtitle'] ):
+                            for oldrecorded in mythdb.searchOldRecorded(title=record[u'title'], subtitle=record[u'subtitle'] ):
                                 delOldRecorded((channel_id, oldrecorded.starttime)).delete()
                         except Exception, e:
                             pass
