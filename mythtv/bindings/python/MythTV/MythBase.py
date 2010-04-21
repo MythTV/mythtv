@@ -6,10 +6,15 @@ Provides base classes for accessing MythTV
 
 from MythStatic import *
 
-import os, re, socket, sys, locale, weakref
+import os
+import re
+import socket
+import sys
+import locale
+import weakref
 import xml.etree.cElementTree as etree
 from datetime import datetime
-from time import sleep, time
+from time import sleep, time, mktime
 from urllib import urlopen
 from subprocess import Popen
 from sys import version_info
@@ -25,9 +30,9 @@ class DictData( object ):
     Must be subclassed for use.
 
     Subclasses must provide:
-        field_order
+        _field_order
             string list of field names
-        field_type
+        _field_type
             integer list of field types by:
                 0: integer  - int(value)
                 1: float    - float(value)
@@ -42,7 +47,7 @@ class DictData( object ):
         obj['field_name']
     """
 
-    class DictIterator( object ):
+    class _DictIterator( object ):
         def __init__(self, mode, parent):
             # modes = 1:keys, 2:values, 3:items
             self.index = 0
@@ -51,9 +56,9 @@ class DictData( object ):
         def __iter__(self): return self
         def next(self):
             self.index += 1
-            if self.index > len(self.data.field_order):
+            if self.index > len(self.data._field_order):
                 raise StopIteration
-            key = self.data.field_order[self.index-1]
+            key = self.data._field_order[self.index-1]
             if self.mode == 1:
                 return key
             elif self.mode == 2:
@@ -61,10 +66,10 @@ class DictData( object ):
             elif self.mode == 3:
                 return (key, self.data[key])
 
-    logmodule = 'Python DictData'
-    # class emulation functions
+    _logmodule = 'Python DictData'
+    # class emulation methods
     def __getattr__(self,name):
-        # function for class attribute access of data fields
+        # method for class attribute access of data fields
         # accesses real attributes, falls back to data fields, and errors
         if name in self.__dict__:
             return self.__dict__[name]
@@ -75,57 +80,57 @@ class DictData( object ):
                 raise AttributeError(str(name))
 
     def __setattr__(self,name,value):
-        # function for class attribute access of data fields
+        # method for class attribute access of data fields
         # sets value in data fields, falling back to real attributes
-        if name in self.field_order:
-            self.data[name] = value
+        if name in self._field_order:
+            self._data[name] = value
         else:
             self.__dict__[name] = value
 
-    # container emulation functions
+    # container emulation methods
     def __getitem__(self,key):
-        # function for and dist-like access to content
+        # method for and dict-like access to content
         # as a side effect of dual operation, dict data cannot be indexed
         #       keyed off integer values
-        if key in self.data:
-            return self.data[key]
+        if key in self._data:
+            return self._data[key]
         else:
             raise KeyError("'DictData' object has no key '%s'" %key)
 
     def __setitem__(self,key,value):
-        # function for dist-like access to content
+        # method for dist-like access to content
         # does not allow setting of data not already in field_order
-        if key in self.field_order:
-            self.data[key] = value
+        if key in self._field_order:
+            self._data[key] = value
         else:
             raise KeyError("'DictData' does not allow new data")
 
     def __contains__(self,item):
-        return bool(item in self.data.keys())
+        return bool(item in self._data.keys())
 
     def __iter__(self):
-        return self.DictIterator(2,self)
+        return self._DictIterator(2,self)
         
     def iterkeys(self):
         """
         obj.iterkeys() -> an iterator over the keys of obj
                                                 ordered by self.field_order
         """
-        return self.DictIterator(1,self)
+        return self._DictIterator(1,self)
         
     def itervalues(self):
         """
         obj.itervalues() -> an iterator over the values of obj
                                                 ordered by self.field_order
         """
-        return self.DictIterator(2,self)
+        return self._DictIterator(2,self)
     
     def iteritems(self):
         """
         obj.iteritems() -> an iterator of over the (key,value) pairs of obj
                                                 ordered by self.field_order
         """
-        return self.DictIterator(3,self)
+        return self._DictIterator(3,self)
 
     def keys(self):
         """obj.keys() -> list of self.field_order"""
@@ -139,7 +144,7 @@ class DictData( object ):
         return list(self.itervalues())
         
     def get(self,key):
-        return self.data[key]
+        return self._data[key]
         
     def items(self):
         """
@@ -148,45 +153,63 @@ class DictData( object ):
         return list(self.iteritems())
         
     def pop(self,key): raise NotImplementedError
-    
     def popitem(self): raise NotImplementedError
 
     def __len__(self):
-        return len(self.field_order)
+        return len(self._field_order)
 
     def __length_hint__(self):
-        return len(self.field_order)
+        return len(self._field_order)
         
     def update(self, *args, **keywords):
-        self.data.update(*args, **keywords)
+        self._data.update(*args, **keywords)
 
     ### additional management functions
     def _setDefs(self):
-        self.data = {}
-        self.log = MythLog(self.logmodule)
+        self._data = {}
+        self._log = MythLog(self._logmodule)
         
     def __init__(self, raw):
         self._setDefs()
-        self.data.update(self._process(raw))
+        self._data.update(self._process(raw))
 
     def _process(self, data):
         data = list(data)
-        for i in range(0, len(data)):
+        for i in range(len(data)):
             if data[i] == '':
                 data[i] = None
-            elif self.field_type == 'Pass':
+            elif self._field_type == 'Pass':
                 data[i] = data[i]
-            elif self.field_type[i] == 0:
+            elif self._field_type[i] == 0:
                 data[i] = int(data[i])
-            elif self.field_type[i] == 1:
+            elif self._field_type[i] == 1:
                 data[i] = locale.atof(data[i])
-            elif self.field_type[i] == 2:
+            elif self._field_type[i] == 2:
                 data[i] = bool(data[i])
-            elif self.field_type[i] == 3:
+            elif self._field_type[i] == 3:
                 data[i] = data[i]
-            elif self.field_type[i] == 4:
+            elif self._field_type[i] == 4:
                 data[i] = datetime.fromtimestamp(int(data[i]))
-        return dict(zip(self.field_order,data))
+        return dict(zip(self._field_order,data))
+
+    def _deprocess(self):
+        data = self.values()
+        for i in range(len(data)):
+            if data[i] is None:
+                data[i] = ''
+            elif self._field_type == 'Pass':
+                pass
+            elif self._field_type[i] == 0:
+                data[i] = str(data[i])
+            elif self._field_type[i] == 1:
+                data[i] = locale.format("%0.6f", data[i])
+            elif self._field_type[i] == 2:
+                data[i] = str(int(data[i]))
+            elif self._field_type[i] == 3:
+                pass
+            elif self._field_type[i] == 4:
+                data[i] = str(int(mktime(data[i].timetuple())))
+        return data
 
     @staticmethod
     def joinInt(high,low):
@@ -206,14 +229,14 @@ class QuickDictData( DictData ):
     a tuple of two-tuples. Accepts new information stored as attributes
     or keys.
     """
-    _localvars = ['field_order','data','log']
+    _localvars = ['_field_order','_data','_log']
     def __init__(self, raw):
         self._setDefs()
-        self.field_order = [k for k,v in raw]
-        self.data.update(raw)
+        self._field_order = [k for k,v in raw]
+        self._data.update(raw)
 
     def _setDefs(self):
-        self.__dict__['field_order'] = []
+        self.__dict__['_field_order'] = []
         DictData._setDefs(self)
 
     def __setattr__(self, name, value):
@@ -223,13 +246,13 @@ class QuickDictData( DictData ):
             self.__setitem__(name, value)
 
     def __setitem__(self, key, value):
-        if key not in self.field_order:
-            self.field_order.append(key)
-        self.data[key] = value
+        if key not in self._field_order:
+            self._field_order.append(key)
+        self._data[key] = value
 
     def clear(self):
-        self.field_order = []
-        self.data.clear()
+        self._field_order = []
+        self._data.clear()
 
 class DBData( DictData ):
     """
@@ -239,19 +262,19 @@ class DBData( DictData ):
     Must be subclassed for use.
 
     Subclasses must provide:
-        table
+        _table
             Name of database table to be accessed
-        where
+        _where
             String defining WHERE clause for database lookup
-        setwheredat
+        _setwheredat
             String of comma separated variables to be evaluated to set
             'wheredat'. 'eval(setwheredat)' must return a tuple, so string must 
             contain at least one comma.
 
     Subclasses may provide:
-        allow_empty
+        _allow_empty
             Controls whether DBData() will allow an empty instance.
-        schema_value, schema_local, schema_name
+        _schema_value, _schema_local, _schema_name
             Allows checking of alternate plugin schemas
 
     Can be populated in two manners:
@@ -261,71 +284,71 @@ class DBData( DictData ):
         raw
             Raw list as returned by 'select * from mytable'
     """
-    field_type = 'Pass'
-    allow_empty = False
-    logmodule = 'Python DBData'
-    schema_value = 'DBSchemaVer'
-    schema_local = SCHEMA_VERSION
-    schema_name = 'Database'
+    _field_type = 'Pass'
+    _allow_empty = False
+    _logmodule = 'Python DBData'
+    _schema_value = 'DBSchemaVer'
+    _schema_local = SCHEMA_VERSION
+    _schema_name = 'Database'
 
     def getAllEntries(self):
         """obj.getAllEntries() -> tuple of DBData objects"""
-        c = self.db.cursor(self.log)
-        query = """SELECT * FROM %s""" % self.table
-        self.log(MythLog.DATABASE, query)
+        c = self._db.cursor(self._log)
+        query = """SELECT * FROM %s""" % self._table
+        self._log(MythLog.DATABASE, query)
         if c.execute(query) == 0:
             return ()
         objs = []
         for row in c.fetchall():
-            objs.append(self.__class__(db=self.db, raw=row))
+            objs.append(self.__class__(db=self._db, raw=row))
         c.close()
         return objs
 
     def _setDefs(self):
-        self.__dict__['field_order'] = self.db.tablefields[self.table]
+        self.__dict__['_field_order'] = self._db.tablefields[self._table]
         DictData._setDefs(self)
         self._fillNone()
-        self.wheredat = None
-        self.log = MythLog(self.logmodule, db=self.db)
+        self._wheredat = None
+        self._log = MythLog(self._logmodule, db=self._db)
 
     def __init__(self, data=None, db=None, raw=None):
-        self.__dict__['db'] = MythDBBase(db)
-        self.db._check_schema(self.schema_value, 
-                                self.schema_local, self.schema_name)
+        self.__dict__['_db'] = MythDBBase(db)
+        self._db._check_schema(self._schema_value, 
+                                self._schema_local, self._schema_name)
         self._setDefs()
 
         if raw is not None:
-            if len(raw) == len(self.field_order):
-                self.data.update(self._process(raw))
-                self.wheredat = eval(self.setwheredat)
+            if len(raw) == len(self._field_order):
+                self._data.update(self._process(raw))
+                self._wheredat = eval(self._setwheredat)
             else:
                 raise MythError('Incorrect raw input length to DBData()')
         elif data is not None:
             if None not in data:
-                self.wheredat = tuple(data)
+                self._wheredat = tuple(data)
                 self._pull()
         else:
-            if self.allow_empty:
+            if self._allow_empty:
                 self._fillNone()
             else:
                 raise MythError('DBData() not given sufficient information')
 
     def _pull(self):
         """Updates table with data pulled from database."""
-        c = self.db.cursor(self.log)
+        c = self._db.cursor(self._log)
         c.execute("""SELECT * FROM %s WHERE %s""" \
-                           % (self.table, self.where), self.wheredat)
+                           % (self._table, self._where), self._wheredat)
         data = c.fetchone()
         c.close()
         if data is None:
             return
-        self.data.update(self._process(data))
+        self._data.update(self._process(data))
 
     def _fillNone(self):
         """Fills out dictionary fields with empty data"""
-        self.field_order = self.db.tablefields[self.table]
-        for field in self.field_order:
-            self.data[field] = None
+        self._field_order = self._db.tablefields[self._table]
+        for field in self._field_order:
+            self._data[field] = None
 
 class DBDataWrite( DBData ):
     """
@@ -335,17 +358,17 @@ class DBDataWrite( DBData ):
     Must be subclassed for use.
 
     Subclasses must provide:
-        table
+        _table
             Name of database table to be accessed
-        where
+        _where
             String defining WHERE clause for database lookup
-        setwheredat
+        _setwheredat
             String of comma separated variables to be evaluated to set
             'wheredat'. 'eval(setwheredat)' must return a tuple, so string must 
             contain at least one comma.
 
     Subclasses may provide:
-        defaults
+        _defaults
             Dictionary of default values to be used when creating new 
             database entries. Additionally, values of 'None' will be stripped
             and not used to alter the database.
@@ -358,24 +381,24 @@ class DBDataWrite( DBData ):
             Raw list as returned by 'select * from mytable'
     Additionally, can be left uninitialized to allow creation of a new entry
     """
-    defaults = None
-    allow_empty = True
-    logmodule = 'Python DBDataWrite'
+    _defaults = None
+    _allow_empty = True
+    _logmodule = 'Python DBDataWrite'
 
     def _sanitize(self, data, fill=True):
         """Remove fields from dictionary that are not in database table."""
         data = data.copy()
         for key in data.keys():
-            if key not in self.field_order:
+            if key not in self._field_order:
                 del data[key]
-        if self.defaults is not None:
-            for key in self.defaults:
+        if self._defaults is not None:
+            for key in self._defaults:
                 if key in data:
-                    if self.defaults[key] is None:
+                    if self._defaults[key] is None:
                         del data[key]
                     elif data[key] is None:
                         if fill:
-                            data[key] = self.defaults[key]
+                            data[key] = self._defaults[key]
         return data
 
     def _setDefs(self):
@@ -384,12 +407,12 @@ class DBDataWrite( DBData ):
 
     def _fillDefs(self):
         self._fillNone()
-        self.data.update(self.defaults)
+        self._data.update(self._defaults)
 
     def __init__(self, data=None, db=None, raw=None):
         DBData.__init__(self, data, db, raw)
         if raw is not None:
-            self.origdata = self.data.copy()
+            self._origdata = self._data.copy()
 
     def create(self,data=None):
         """
@@ -400,37 +423,37 @@ class DBDataWrite( DBData ):
         before pushing the entire set onto the database.
         Will only function with an uninitialized object.
         """
-        if self.wheredat is not None:
+        if self._wheredat is not None:
             raise MythError('DBDataWrite object already bound to '+\
                                                     'existing instance')
 
         if data is not None:
             data = self._sanitize(data, False)
-            self.data.update(data)
-        data = self._sanitize(self.data)
+            self._data.update(data)
+        data = self._sanitize(self._data)
         for key in data.keys():
             if data[key] is None:
                 del data[key]
-        c = self.db.cursor(self.log)
+        c = self._db.cursor(self._log)
         fields = ', '.join(data.keys())
         format_string = ', '.join(['%s' for d in data.values()])
         c.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
-                        % (self.table, fields, format_string), data.values())
+                        % (self._table, fields, format_string), data.values())
         intid = c.lastrowid
         c.close()
         return intid
 
     def _pull(self):
         DBData._pull(self)
-        self.origdata = self.data.copy()
+        self._origdata = self._data.copy()
 
     def _push(self):
-        if (self.where is None) or (self.wheredat is None):
+        if (self._where is None) or (self._wheredat is None):
             return
-        c = self.db.cursor(self.log)
-        data = self._sanitize(self.data)
+        c = self._db.cursor(self._log)
+        data = self._sanitize(self._data)
         for key, value in data.items():
-            if value == self.origdata[key]:
+            if value == self._origdata[key]:
             # filter unchanged data
                 del data[key]
         if len(data) == 0:
@@ -438,10 +461,10 @@ class DBDataWrite( DBData ):
             return
         format_string = ', '.join(['%s = %%s' % d for d in data])
         sql_values = data.values()
-        sql_values.extend(self.wheredat)
+        sql_values.extend(self._wheredat)
 
         c.execute("""UPDATE %s SET %s WHERE %s""" \
-                    % (self.table, format_string, self.where), sql_values)
+                    % (self._table, format_string, self._where), sql_values)
         c.close()
         self._pull()
         
@@ -456,7 +479,7 @@ class DBDataWrite( DBData ):
 
         data = {}
         data.update(*args, **keywords)
-        self.data.update(self._sanitize(data))
+        self._data.update(self._sanitize(data))
         self._push()
 
     def delete(self):
@@ -465,13 +488,13 @@ class DBDataWrite( DBData ):
 
         Delete video entry from database.
         """
-        if (self.where is None) or \
-                (self.wheredat is None) or \
-                (self.data is None):
+        if (self._where is None) or \
+                (self._wheredat is None) or \
+                (self._data is None):
             return
-        c = self.db.cursor(self.log)
+        c = self._db.cursor(self._log)
         c.execute("""DELETE FROM %s WHERE %s""" \
-                        % (self.table, self.where), self.wheredat)
+                        % (self._table, self._where), self._wheredat)
         c.close()
 
 class DBDataRef( object ):
@@ -491,17 +514,17 @@ class DBDataRef( object ):
 
     class SubData( DictData ):
         def _setDefs(self):
-            self.__dict__['field_order'] = []
+            self.__dict__['_field_order'] = []
             DictData._setDefs(self)
         def __repr__(self):
             return str(tuple(self))
         def __init__(self,data,fields):
             self._setDefs()
-            self.field_order = fields
-            self.field_type = 'Pass'
-            self.data.update(self._process(data))
+            self._field_order = fields
+            self._field_type = 'Pass'
+            self._data.update(self._process(data))
         def __hash__(self):
-            dat = self.data.copy()
+            dat = self._data.copy()
             keys = dat.keys()
             keys.sort()
             return hash(str([hash(dat[k]) for k in keys]))
@@ -618,17 +641,17 @@ class DBDataCRef( object ):
 
     class SubData( DictData ):
         def _setDefs(self):
-            self.__dict__['field_order'] = []
+            self.__dict__['_field_order'] = []
             DictData._setDefs(self)
         def __repr__(self):
-            return str(tuple(self.data.values()))
+            return str(tuple(self._data.values()))
         def __init__(self,data,fields):
             self._setDefs()
-            self.field_order = ['cross']+fields
-            self.field_type = 'Pass'
-            self.data.update(self._process(data))
+            self._field_order = ['cross']+fields
+            self._field_type = 'Pass'
+            self._data.update(self._process(data))
         def __hash__(self):
-            dat = self.data.copy()
+            dat = self._data.copy()
             del dat['cross']
             keys = dat.keys()
             keys.sort()
@@ -892,7 +915,7 @@ class MythDBBase( object ):
         class _FieldData( QuickDictData ):
             def __str__(self): return str(list(self))
             def __repr__(self): return str(self).encode('utf-8')
-            def __iter__(self): return self.DictIterator(1,self)
+            def __iter__(self): return self._DictIterator(1,self)
             def __init__(self, result):
                 data = [(row[0],
                          QuickDictData(zip( \
@@ -901,129 +924,129 @@ class MythDBBase( object ):
                          )for row in result]
                 QuickDictData.__init__(self, data)
             def __getitem__(self,key):
-                if key in self.data:
-                    return self.data[key]
+                if key in self._data:
+                    return self._data[key]
                 else:
                     try:
-                        return self.field_order[key]
+                        return self._field_order[key]
                     except:
                         raise KeyError(str(key))
-        _localvars = QuickDictData._localvars+['db']
+        _localvars = QuickDictData._localvars+['_db']
         def __str__(self): return str(list(self))
         def __repr__(self): return str(self).encode('utf-8')
-        def __iter__(self): return self.DictIterator(1,self)
+        def __iter__(self): return self._DictIterator(1,self)
         def __init__(self, db, log):
             QuickDictData.__init__(self, ())
-            self.db = db
-            self.log = log
-            self.data = self.db.tablefields
-            self.field_order = self.data.keys()
+            self._db = db
+            self._log = log
+            self._data = self._db.tablefields
+            self._field_order = self._data.keys()
 
         def __getitem__(self,key):
-            if key not in self.data:
+            if key not in self._data:
                 # pull field list from database
-                c = self.db.cursor(self.log)
+                c = self._db.cursor(self._log)
                 try:
                     c.execute("DESC %s" % (key,))
                 except:
                     return None
 
-                self.field_order.append(key)
-                self.data[key] = self._FieldData(c.fetchall())
+                self._field_order.append(key)
+                self._data[key] = self._FieldData(c.fetchall())
                 c.close()
 
             # return cached information
-            return self.data[key]
+            return self._data[key]
 
     class _Settings( QuickDictData ):
         """Provides dictionary-like list of hosts"""
         class _HostSettings( QuickDictData ):
-            _localvars = QuickDictData._localvars+['db','host']
+            _localvars = QuickDictData._localvars+['_db','_host']
             def __str__(self): return str(list(self))
             def __repr__(self): return str(self).encode('utf-8')
-            def __iter__(self): return self.DictIterator(1,self)
+            def __iter__(self): return self._DictIterator(1,self)
             def __init__(self, db, log, host):
                 QuickDictData.__init__(self, ())
-                self.db = db
-                self.host = host
-                self.log = log
+                self._db = db
+                self._host = host
+                self._log = log
             
             def __getitem__(self, key):
-                if key not in self.data:
-                    if self.host == 'NULL':
+                if key not in self._data:
+                    if self._host == 'NULL':
                         where = 'IS NULL'
                         wheredat = (key,)
                     else:
                         where = 'LIKE(%s)'
-                        wheredat = (key, self.host)
+                        wheredat = (key, self._host)
 
-                    c = self.db.cursor(self.log)
+                    c = self._db.cursor(self._log)
                     if c.execute("""SELECT data FROM settings
                                     WHERE  value=%%s
                                     AND    hostname %s
                                     LIMIT 1""" % where,
                                     wheredat) > 0:
-                        self.data[key] = c.fetchone()[0]
+                        self._data[key] = c.fetchone()[0]
                     else:
-                        self.data[key] = None
-                    self.field_order.append(key)
+                        self._data[key] = None
+                    self._field_order.append(key)
                     c.close()
-                return self.data[key]
+                return self._data[key]
 
             def __setitem__(self, key, value):
-                if key not in self.data:
+                if key not in self._data:
                     self.__getitem__(key)
-                c = self.db.cursor(self.log)
-                if self.data[key] is None:
+                c = self._db.cursor(self._log)
+                if self._data[key] is None:
                     c.execute("""INSERT INTO settings
                                         (value, data, hostname)
                                  VALUES (%s,%s,%s)""",
-                                 (key, value, self.host))
+                                 (key, value, self._host))
                 else:
                     if self._host == 'NULL':
                         where = 'IS NULL'
                         wheredat = (value, key)
                     else:
                         where = 'LIKE(%s)'
-                        wheredat = (value, key, self.host)
+                        wheredat = (value, key, self._host)
                     c.execute("""UPDATE settings
                                  SET    data=%%s
                                  WHERE  value=%%s
                                  AND    hostname %s""" % where, wheredat)
-                self.data[key] = value
+                self._data[key] = value
 
             def getall(self):
-                c = self.db.cursor(self.log)
-                if self.host == 'NULL':
+                c = self._db.cursor(self._log)
+                if self._host == 'NULL':
                     where = 'IS NULL'
                     wheredat = ()
                 else:
                     where = 'LIKE(%s)'
-                    wheredat = (self.host,)
+                    wheredat = (self._host,)
                 c.execute("""SELECT value,data FROM settings
                              WHERE hostname %s""" % where, wheredat)
                 for k,v in c.fetchall():
-                    self.data[k] = v
-                    if k not in self.field_order:
-                        self.field_order.append(k)
+                    self._data[k] = v
+                    if k not in self._field_order:
+                        self._field_order.append(k)
                 return self.items()
 
-        _localvars = QuickDictData._localvars+['db']
+        _localvars = QuickDictData._localvars+['_db']
         def __str__(self): return str(list(self))
         def __repr__(self): return str(self).encode('utf-8')
         def __iter__(self): return self.DictIterator(1,self)
         def __init__(self, db, log):
             QuickDictData.__init__(self, ())
-            self.db = db
-            self.log = log
-            self.data = self.db.settings
-            self.field_order = self.data.keys()
+            self._db = db
+            self._log = log
+            self._data = self._db.settings
+            self._field_order = self._data.keys()
 
         def __getitem__(self, key):
-            if key not in self.data:
-                self.data[key] = self._HostSettings(self.db, self.log, key)
-                self.field_order.append(key)
-            return self.data[key]
+            if key not in self._data:
+                self._data[key] = self._HostSettings(self._db, self._log, key)
+                self._field_order.append(key)
+            return self._data[key]
 
     def __init__(self, db=None, args=None, **dbconn):
         self.db = None
@@ -1850,10 +1873,10 @@ class StorageGroup( DBData ):
     StorageGroup(id=None, db=None, raw=None) -> StorageGroup object
     Represents a single storage group entry
     """
-    table = 'storagegroup'
-    where = 'id=%s'
-    setwheredat = 'self.id,'
-    logmodule = 'Python StorageGroup'
+    _table = 'storagegroup'
+    _where = 'id=%s'
+    _setwheredat = 'self.id,'
+    _logmodule = 'Python StorageGroup'
     
     def __str__(self):
         return u"<StorageGroup 'myth://%s@%s%s' at %s" % \
@@ -1864,7 +1887,7 @@ class StorageGroup( DBData ):
 
     def __init__(self, id=None, db=None, raw=None):
         DBData.__init__(self, (id,), db, raw)
-        if self.wheredat is None:
+        if self._wheredat is None:
             return
         if (self.hostname == socket.gethostname()) or \
               os.access(self.dirname.encode('utf-8'), os.F_OK):

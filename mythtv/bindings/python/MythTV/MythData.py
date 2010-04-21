@@ -7,7 +7,10 @@ Provides data access classes for accessing and managing MythTV data
 from MythStatic import *
 from MythBase import *
 
-import re, sys, socket, os
+import re
+import sys
+import socket
+import os
 import xml.etree.cElementTree as etree
 from time import mktime, strftime, strptime
 from datetime import date, time, datetime
@@ -354,11 +357,11 @@ class FileOps( MythBEBase ):
 
 class FreeSpace( DictData ):
     """Represents a FreeSpace entry."""
-    field_order = [ 'host',         'path',     'islocal',
+    _field_order = [ 'host',         'path',     'islocal',
                     'disknumber',   'sgroupid', 'blocksize',
                     'ts_high',      'ts_low',   'us_high',
                     'us_low']
-    field_type = [3, 3, 2, 0, 0, 0, 0, 0, 0, 0]
+    _field_type = [3, 3, 2, 0, 0, 0, 0, 0, 0, 0]
     def __str__(self):
         return "<FreeSpace '%s@%s' at %s>"\
                     % (self.path, self.host, hex(id(self)))
@@ -400,38 +403,38 @@ class Program( DictData ):
     INACTIVE            = 10
     NEVERRECORD         = 11
 
-    field_order = [ 'title',        'subtitle',     'description',
-                    'category',     'chanid',       'channum',
-                    'callsign',     'channame',     'filename',
-                    'fs_high',      'fs_low',       'starttime',
-                    'endtime',      'duplicate',    'shareable',
-                    'findid',       'hostname',     'sourceid',
-                    'cardid',       'inputid',      'recpriority',
-                    'recstatus',    'recordid',     'rectype',
-                    'dupin',        'dupmethod',    'recstartts',
-                    'recendts',     'repeat',       'programflags',
-                    'recgroup',     'commfree',     'outputfilters',
-                    'seriesid',     'programid',    'lastmodified',
-                    'stars',        'airdate',      'hasairdate',
-                    'playgroup',    'recpriority2', 'parentid',
-                    'storagegroup', 'audio_props',  'video_props',
-                    'subtitle_type','year']
-    field_type = [  3,      3,      3,
-                    3,      0,      3,
-                    3,      3,      3,
-                    0,      0,      4,
-                    4,      0,      0,
-                    0,      3,      0,
-                    0,      0,      0,
-                    0,      0,      3,
-                    0,      0,      4,
-                    4,      0,      3,
-                    3,      0,      3,
-                    3,      3,      3,
-                    1,      3,      0,
-                    3,      0,      3,
-                    3,      0,      0,
-                    0,      0]
+    _field_order = [ 'title',        'subtitle',     'description',
+                     'category',     'chanid',       'channum',
+                     'callsign',     'channame',     'filename',
+                     'fs_high',      'fs_low',       'starttime',
+                     'endtime',      'duplicate',    'shareable',
+                     'findid',       'hostname',     'sourceid',
+                     'cardid',       'inputid',      'recpriority',
+                     'recstatus',    'recordid',     'rectype',
+                     'dupin',        'dupmethod',    'recstartts',
+                     'recendts',     'repeat',       'programflags',
+                     'recgroup',     'commfree',     'outputfilters',
+                     'seriesid',     'programid',    'lastmodified',
+                     'stars',        'airdate',      'hasairdate',
+                     'playgroup',    'recpriority2', 'parentid',
+                     'storagegroup', 'audio_props',  'video_props',
+                     'subtitle_type','year']
+    _field_type = [  3,      3,      3,
+                     3,      0,      3,
+                     3,      3,      3,
+                     0,      0,      4,
+                     4,      0,      0,
+                     0,      3,      0,
+                     0,      0,      0,
+                     0,      0,      3,
+                     0,      0,      4,
+                     4,      0,      3,
+                     3,      0,      3,
+                     3,      3,      3,
+                     1,      3,      0,
+                     3,      0,      3,
+                     3,      0,      0,
+                     0,      0]
     def __str__(self):
         return u"<Program '%s','%s' at %s>" % (self.title,
                  self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
@@ -468,15 +471,15 @@ class Program( DictData ):
 
             raw = []
             defs = (0,0,0,'',0)
-            for i in range(len(self.field_order)):
-                if self.field_order[i] in dat:
-                    raw.append(dat[self.field_order[i]])
+            for i in range(len(self._field_order)):
+                if self._field_order[i] in dat:
+                    raw.append(dat[self._field_order[i]])
                 else:
-                    raw.append(defs[self.field_type[i]])
+                    raw.append(defs[self._field_type[i]])
             DictData.__init__(self, raw)
         else:
             raise InputError("Either 'raw' or 'etree' must be provided")
-        self.db = MythDBBase(db)
+        self._db = MythDBBase(db)
         self.filesize = self.joinInt(self.fs_high,self.fs_low)
 
     def toString(self):
@@ -484,23 +487,7 @@ class Program( DictData ):
         Program.toString() -> string representation
                     for use with backend protocol commands
         """
-        data = []
-        for i in range(0,PROGRAM_FIELDS):
-            if self.data[self.field_order[i]] == None:
-                datum = ''
-            elif self.field_type[i] == 0:
-                datum = str(self.data[self.field_order[i]])
-            elif self.field_type[i] == 1:
-                datum = locale.format("%0.6f", self.data[self.field_order[i]])
-            elif self.field_type[i] == 2:
-                datum = str(int(self.data[self.field_order[i]]))
-            elif self.field_type[i] == 3:
-                datum = self.data[self.field_order[i]]
-            elif self.field_type[i] == 4:
-                datum = str(int(mktime(self.data[self.field_order[i]].\
-                                                            timetuple())))
-            data.append(datum)
-        return BACKEND_SEP.join(data)
+        return BACKEND_SEP.join(self._deprocess())
 
     def delete(self, force=False, rerecord=False):
         """
@@ -509,7 +496,7 @@ class Program( DictData ):
                 'force' forces a delete if the file cannot be found.
                 'rerecord' sets the file as recordable in oldrecorded
         """
-        be = FileOps(db=self.db)
+        be = FileOps(db=self._db)
         res = int(be.deleteRecording(self, force=force))
         if res < -1:
             raise MythBEError('Failed to delete file')
@@ -519,7 +506,7 @@ class Program( DictData ):
 
     def getRecorded(self):
         """Program.getRecorded() -> Recorded object"""
-        return Recorded((self.chanid,self.recstartts), db=self.db)
+        return Recorded((self.chanid,self.recstartts), db=self._db)
 
     def open(self, type='r'):
         """Program.open(type='r') -> file or FileTransfer object"""
@@ -545,19 +532,19 @@ class Record( DBDataWrite ):
     kFindDailyRecord    = 9
     kFindWeeklyRecord   = 10
 
-    table = 'record'
-    where = 'recordid=%s'
-    setwheredat = 'self.recordid,'
-    defaults = {'recordid':None,    'type':kAllRecord,      'title':u'Unknown',
-                'subtitle':'',      'description':'',       'category':'',
-                'station':'',       'seriesid':'',          'search':0,
-                'last_record':datetime(1900,1,1),
-                'next_record':datetime(1900,1,1),
-                'last_delete':datetime(1900,1,1)}
-    logmodule = 'Python Record'
+    _table = 'record'
+    _where = 'recordid=%s'
+    _setwheredat = 'self.recordid,'
+    _defaults = {'recordid':None,    'type':kAllRecord,      'title':u'Unknown',
+                 'subtitle':'',      'description':'',       'category':'',
+                 'station':'',       'seriesid':'',          'search':0,
+                 'last_record':datetime(1900,1,1),
+                 'next_record':datetime(1900,1,1),
+                 'last_delete':datetime(1900,1,1)}
+    _logmodule = 'Python Record'
 
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized Record Rule at %s>" % hex(id(self))
         return u"<Record Rule '%s', Type %d at %s>" \
                                     % (self.title, self.type, hex(id(self)))
@@ -570,35 +557,35 @@ class Record( DBDataWrite ):
 
     def create(self, data=None):
         """Record.create(data=None) -> Record object"""
-        self.wheredat = (DBDataWrite.create(self, data),)
+        self._wheredat = (DBDataWrite.create(self, data),)
         self._pull()
-        FileOps(db=self.db).reschedule(self.recordid)
+        FileOps(db=self._db).reschedule(self.recordid)
         return self
 
     def update(self, *args, **keywords):
         DBDataWrite.update(*args, **keywords)
-        FileOps(db=self.db).reschedule(self.recordid)
+        FileOps(db=self._db).reschedule(self.recordid)
 
 class Recorded( DBDataWrite ):
     """
     Recorded(data=None, db=None, raw=None) -> Recorded object
             'data' is a tuple containing (chanid, storagegroup)
     """
-    table = 'recorded'
-    where = 'chanid=%s AND starttime=%s'
-    setwheredat = 'self.chanid,self.starttime'
-    defaults = {'title':u'Unknown', 'subtitle':'',          'description':'',
-                'category':'',      'hostname':'',          'bookmark':0,
-                'editing':0,        'cutlist':0,            'autoexpire':0,
-                'commflagged':0,    'recgroup':'Default',   'seriesid':'',
-                'programid':'',     'lastmodified':'CURRENT_TIMESTAMP',
-                'filesize':0,       'stars':0,              'previouslyshown':0,
-                'preserve':0,       'bookmarkupdate':0,
-                'findid':0,         'deletepending':0,      'transcoder':0,
-                'timestretch':1,    'recpriority':0,        'playgroup':'Default',
-                'profile':'No',     'duplicate':1,          'transcoded':0,
-                'watched':0,        'storagegroup':'Default'}
-    logmodule = 'Python Recorded'
+    _table = 'recorded'
+    _where = 'chanid=%s AND starttime=%s'
+    _setwheredat = 'self.chanid,self.starttime'
+    _defaults = {'title':u'Unknown', 'subtitle':'',          'description':'',
+                 'category':'',      'hostname':'',          'bookmark':0,
+                 'editing':0,        'cutlist':0,            'autoexpire':0,
+                 'commflagged':0,    'recgroup':'Default',   'seriesid':'',
+                 'programid':'',     'lastmodified':'CURRENT_TIMESTAMP',
+                 'filesize':0,       'stars':0,              'previouslyshown':0,
+                 'preserve':0,       'bookmarkupdate':0,
+                 'findid':0,         'deletepending':0,      'transcoder':0,
+                 'timestretch':1,    'recpriority':0,        'playgroup':'Default',
+                 'profile':'No',     'duplicate':1,          'transcoded':0,
+                 'watched':0,        'storagegroup':'Default'}
+    _logmodule = 'Python Recorded'
 
     class _Cast( DBDataCRef ):
         table = 'people'
@@ -627,7 +614,7 @@ class Recorded( DBDataWrite ):
         wfield = ['chanid','starttime']
         
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized Recorded at %s>" % hex(id(self))
         return u"<Recorded '%s','%s' at %s>" % (self.title,
                 self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
@@ -638,18 +625,18 @@ class Recorded( DBDataWrite ):
     def __init__(self, data=None, db=None, raw=None):
         DBDataWrite.__init__(self, data, db, raw)
         if (data is not None) or (raw is not None):
-            self.cast = self._Cast(self.wheredat, self.db)
-            self.seek = self._Seek(self.wheredat, self.db)
-            self.markup = self._Markup(self.wheredat, self.db)
+            self.cast = self._Cast(self._wheredat, self._db)
+            self.seek = self._Seek(self._wheredat, self._db)
+            self.markup = self._Markup(self._wheredat, self._db)
 
     def create(self, data=None):
         """Recorded.create(data=None) -> Recorded object"""
         DBDataWrite.create(self, data)
-        self.wheredat = (self.chanid,self.starttime)
+        self._wheredat = (self.chanid,self.starttime)
         self._pull()
-        self.cast = self._Cast(self.wheredat, self.db)
-        self.seek = self._Seek(self.wheredat, self.db)
-        self.markup = self._Markup(self.wheredat, self.db)
+        self.cast = self._Cast(self._wheredat, self._db)
+        self.seek = self._Seek(self._wheredat, self._db)
+        self.markup = self._Markup(self._wheredat, self._db)
         return self
 
     def delete(self, force=False, rerecord=False):
@@ -665,17 +652,17 @@ class Recorded( DBDataWrite ):
         """Recorded.open(type='r') -> file or FileTransfer object"""
         return ftopen("myth://%s@%s/%s" % ( self.storagegroup, \
                                             self.hostname,\
-                                            self.basename), type, db=self.db)
+                                            self.basename), type, db=self._db)
 
     def getProgram(self):
         """Recorded.getProgram() -> Program object"""
-        be = FileOps(db=self.db)
+        be = FileOps(db=self._db)
         return be.getRecording(self.chanid, 
                     int(self.starttime.strftime('%Y%m%d%H%M%S')))
 
     def getRecordedProgram(self):
         """Recorded.getRecordedProgram() -> RecordedProgram object"""
-        return RecordedProgram((self.chanid,self.progstart), db=self.db)
+        return RecordedProgram((self.chanid,self.progstart), db=self._db)
 
     def formatPath(self, path, replace=None):
         """
@@ -710,28 +697,29 @@ class Recorded( DBDataWrite ):
         return path
 
 class RecordedProgram( DBDataWrite ):
+
     """
     RecordedProgram(data=None, db=None, raw=None) -> RecordedProgram object
             'data' is a tuple containing (chanid, storagegroup)
     """
-    table = 'recordedprogram'
-    where = 'chanid=%s AND starttime=%s'
-    setwheredat = 'self.chanid,self.starttime'
-    defaults = {'title':'',     'subtitle':'',
-                'category':'',  'category_type':'',     'airdate':0,
-                'stars':0,      'previouslyshown':0,    'title_pronounce':'',
-                'stereo':0,     'subtitled':0,          'hdtv':0,
-                'partnumber':0, 'closecaptioned':0,     'parttotal':0,
-                'seriesid':'',  'originalairdate':'',   'showtype':u'',
-                'colorcode':'', 'syndicatedepisodenumber':'',
-                'programid':'', 'manualid':0,           'generic':0,
-                'first':0,      'listingsource':0,      'last':0,
-                'audioprop':u'','videoprop':u'',        
-                'subtitletypes':u''}
-    logmodule = 'Python RecordedProgram'
+    _table = 'recordedprogram'
+    _where = 'chanid=%s AND starttime=%s'
+    _setwheredat = 'self.chanid,self.starttime'
+    _defaults = {'title':'',     'subtitle':'',
+                 'category':'',  'category_type':'',     'airdate':0,
+                 'stars':0,      'previouslyshown':0,    'title_pronounce':'',
+                 'stereo':0,     'subtitled':0,          'hdtv':0,
+                 'partnumber':0, 'closecaptioned':0,     'parttotal':0,
+                 'seriesid':'',  'originalairdate':'',   'showtype':u'',
+                 'colorcode':'', 'syndicatedepisodenumber':'',
+                 'programid':'', 'manualid':0,           'generic':0,
+                 'first':0,      'listingsource':0,      'last':0,
+                 'audioprop':u'','videoprop':u'',        
+                 'subtitletypes':u''}
+    _logmodule = 'Python RecordedProgram'
 
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized RecordedProgram at %s>" % hex(id(self))
         return u"<RecordedProgram '%s','%s' at %s>" % (self.title,
                 self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
@@ -742,7 +730,7 @@ class RecordedProgram( DBDataWrite ):
     def create(self, data=None):
         """RecordedProgram.create(data=None) -> RecordedProgram object"""
         DBDataWrite.create(self, data)
-        self.wheredat = (self.chanid, self.starttime)
+        self._wheredat = (self.chanid, self.starttime)
         self._pull()
         return self
 
@@ -751,18 +739,44 @@ class OldRecorded( DBDataWrite ):
     OldRecorded(data=None, db=None, raw=None) -> OldRecorded object
             'data' is a tuple containing (chanid, storagegroup)
     """
-    table = 'oldrecorded'
-    where = 'chanid=%s AND starttime=%s'
-    setwheredat = 'self.chanid,self.starttime'
-    defaults = {'title':'',     'subtitle':'',      
-                'category':'',  'seriesid':'',      'programid':'',
-                'findid':0,     'recordid':0,       'station':'',
-                'rectype':0,    'duplicate':0,      'recstatus':-3,
-                'reactivate':0, 'generic':0}
-    logmodule = 'Python OldRecorded'
+
+    #recstatus
+    rsFailed            = -9
+    rsTunerBusy         = -8
+    rsLowDiskSpace      = -7
+    rsCancelled         = -6
+    rsMissed            = -5
+    rsAborted           = -4
+    rsRecorded          = -3
+    rsRecording         = -2
+    rsWillRecord        = -1
+    rsUnknown           = 0
+    rsDontRecord        = 1
+    rsPreviousRecording = 2
+    rsCurrentRecording  = 3
+    rsEarlierShowing    = 4
+    rsTooManyRecordings = 5
+    rsNotListed         = 6
+    rsConflict          = 7
+    rsLaterShowing      = 8
+    rsRepeat            = 9
+    rsInactive          = 10
+    rsNeverRecord       = 11
+    rsOffline           = 12
+    rsOtherShowing      = 13
+
+    _table = 'oldrecorded'
+    _where = 'chanid=%s AND starttime=%s'
+    _setwheredat = 'self.chanid,self.starttime'
+    _defaults = {'title':'',     'subtitle':'',      
+                 'category':'',  'seriesid':'',      'programid':'',
+                 'findid':0,     'recordid':0,       'station':'',
+                 'rectype':0,    'duplicate':0,      'recstatus':-3,
+                 'reactivate':0, 'generic':0}
+    _logmodule = 'Python OldRecorded'
 
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized OldRecorded at %s>" % hex(id(self))
         return u"<OldRecorded '%s','%s' at %s>" % (self.title,
                 self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
@@ -773,7 +787,7 @@ class OldRecorded( DBDataWrite ):
     def create(self, data=None):
         """OldRecorded.create(data=None) -> OldRecorded object"""
         DBDataWrite.create(self, data)
-        self.wheredat = (self.chanid, self.starttime)
+        self._wheredat = (self.chanid, self.starttime)
         self._pull()
         return self
 
@@ -782,11 +796,11 @@ class OldRecorded( DBDataWrite ):
         OldRecorded.setDuplicate(record=False) -> None
                 Toggles re-recordability
         """
-        c = self.db.cursor(self.log)
+        c = self._db.cursor(self._log)
         c.execute("""UPDATE oldrecorded SET duplicate=%%s
-                     WHERE %s""" % self.where, \
-                tuple([record]+list(self.wheredat)))
-        FileOps(db=self.db).reschedule(0)
+                     WHERE %s""" % self._where, \
+                tuple([record]+list(self._wheredat)))
+        FileOps(db=self._db).reschedule(0)
 
     def update(self, *args, **keywords):
         """OldRecorded entries can not be altered"""
@@ -838,12 +852,12 @@ class Job( DBDataWrite ):
     ERRORED      = 0x0130
     CANCELLED    = 0x0140
 
-    table = 'jobqueue'
-    logmodule = 'Python Jobqueue'
-    defaults = {'id': None}
+    _table = 'jobqueue'
+    _logmodule = 'Python Jobqueue'
+    _defaults = {'id': None}
 
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized Job at %s>" % hex(id(self))
         return u"<Job '%s' at %s>" % (self.id, hex(id(self)))
 
@@ -852,15 +866,15 @@ class Job( DBDataWrite ):
 
     def __init__(self, id=None, chanid=None, starttime=None, \
                         db=None, raw=None):
-        self.__dict__['where'] = 'id=%s'
-        self.__dict__['setwheredat'] = 'self.id,'
+        self.__dict__['_where'] = 'id=%s'
+        self.__dict__['_setwheredat'] = 'self.id,'
 
         if raw is not None:
             DBDataWrite.__init__(self, None, db, raw)
         elif id is not None:
             DBDataWrite.__init__(self, (id,), db, None)
         elif (chanid is not None) and (starttime is not None):
-            self.__dict__['where'] = 'chanid=%s AND starttime=%s'
+            self.__dict__['_where'] = 'chanid=%s AND starttime=%s'
             DBDataWrite.__init__(self, (chanid,starttime), db, None)
         else:
             DBDataWrite.__init__(self, None, db, None)
@@ -868,8 +882,8 @@ class Job( DBDataWrite ):
     def create(self, data=None):
         """Job.create(data=None) -> Job object"""
         id = DBDataWrite.create(self, data)
-        self.where = 'id=%s'
-        self.wheredat = (id,)
+        self._where = 'id=%s'
+        self._wheredat = (id,)
         return self
 
     def setComment(self,comment):
@@ -884,21 +898,21 @@ class Job( DBDataWrite ):
 
 class Channel( DBDataWrite ):
     """Channel(chanid=None, data=None, raw=None) -> Channel object"""
-    table = 'channel'
-    where = 'chanid=%s'
-    setwheredat = 'self.chanid,'
-    defaults = {'icon':'none',          'videofilters':'',  'callsign':u'',
-                'xmltvid':'',           'recpriority':0,    'contrast':32768,
-                'brightness':32768,     'colour':32768,     'hue':32768,
-                'tvformat':u'Default',  'visible':1,        'outputfilters':'',
-                'useonairguide':0,      'atsc_major_chan':0,
-                'tmoffset':0,           'default_authority':'',
-                'commmethod':-1,        'atsc_minor_chan':0,
-                'last_record':datetime(1900,1,1)}
-    logmodule = 'Python Channel'
-    
+    _table = 'channel'
+    _where = 'chanid=%s'
+    _setwheredat = 'self.chanid,'
+    _defaults = {'icon':'none',          'videofilters':'',  'callsign':u'',
+                 'xmltvid':'',           'recpriority':0,    'contrast':32768,
+                 'brightness':32768,     'colour':32768,     'hue':32768,
+                 'tvformat':u'Default',  'visible':1,        'outputfilters':'',
+                 'useonairguide':0,      'atsc_major_chan':0,
+                 'tmoffset':0,           'default_authority':'',
+                 'commmethod':-1,        'atsc_minor_chan':0,
+                 'last_record':datetime(1900,1,1)}
+    _logmodule = 'Python Channel'
+
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized Channel at %s>" % hex(id(self))
         return u"<Channel '%s','%s' at %s>" % \
                         (self.chanid, self.name, hex(id(self)))
@@ -912,7 +926,7 @@ class Channel( DBDataWrite ):
     def create(self, data=None):
         """Channel.create(data=None) -> Channel object"""
         DBDataWrite.create(self, data)
-        self.wheredat = (self.chanid,)
+        self._wheredat = (self.chanid,)
         self._pull()
         return self
 
@@ -921,13 +935,13 @@ class Guide( DBData ):
     Guide(data=None, db=None, raw=None) -> Guide object
             Data is a tuple of (chanid, starttime).
     """
-    table = 'program'
-    where = 'chanid=%s AND starttime=%s'
-    setwheredat = 'self.chanid,self.starttime'
-    logmodule = 'Python Guide'
+    _table = 'program'
+    _where = 'chanid=%s AND starttime=%s'
+    _setwheredat = 'self.chanid,self.starttime'
+    _logmodule = 'Python Guide'
     
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized Guide at %s>" % hex(id(self))
         return u"<Guide '%s','%s' at %s>" % (self.title,
                 self.starttime.strftime('%Y-%m-%d %H:%M:%S'), hex(id(self)))
@@ -964,7 +978,7 @@ class Guide( DBData ):
             DBData.__init__(self, data=data, db=db, raw=raw)
 
     def record(self, type=Record.kAllRecord):
-        rec = Record(db=self.db)
+        rec = Record(db=self._db)
         for key in ('chanid','title','subtitle','description', 'category',
                     'seriesid','programid'):
             rec[key] = self[key]
@@ -974,7 +988,7 @@ class Guide( DBData ):
         rec.enddate = self.endtime.date()
         rec.endtime = self.endtime-datetime.combine(rec.enddate, time())
 
-        rec.station = Channel(self.chanid, db=self.db).callsign
+        rec.station = Channel(self.chanid, db=self._db).callsign
         rec.type = type
         return rec.create()
 
@@ -983,59 +997,59 @@ class Guide( DBData ):
 
 class Video( DBDataWrite ):
     """Video(id=None, db=None, raw=None) -> Video object"""
-    table = 'videometadata'
-    where = 'intid=%s'
-    setwheredat = 'self.intid,'
-    defaults = {'subtitle':u'',             'director':u'Unknown',
-                'rating':u'NR',             'inetref':u'00000000',
-                'year':1895,                'userrating':0.0,
-                'length':0,                 'showlevel':1,
-                'coverfile':u'No Cover',    'host':u'',
-                'intid':None,               'homepage':u'',
-                'watched':False,            'category':'none',
-                'browse':True,              'hash':u'',
-                'season':0,                 'episode':0,
-                'releasedate':date(1,1,1),  'childid':-1,
-                'insertdate': datetime.now()}
-    logmodule = 'Python Video'
-    schema_value = 'mythvideo.DBSchemaVer'
-    schema_local = MVSCHEMA_VERSION
-    schema_name = 'MythVideo'
-    category_map = [{'None':0},{0:'None'}]
+    _table = 'videometadata'
+    _where = 'intid=%s'
+    _setwheredat = 'self.intid,'
+    _defaults = {'subtitle':u'',             'director':u'Unknown',
+                 'rating':u'NR',             'inetref':u'00000000',
+                 'year':1895,                'userrating':0.0,
+                 'length':0,                 'showlevel':1,
+                 'coverfile':u'No Cover',    'host':u'',
+                 'intid':None,               'homepage':u'',
+                 'watched':False,            'category':'none',
+                 'browse':True,              'hash':u'',
+                 'season':0,                 'episode':0,
+                 'releasedate':date(1,1,1),  'childid':-1,
+                 'insertdate': datetime.now()}
+    _logmodule = 'Python Video'
+    _schema_value = 'mythvideo.DBSchemaVer'
+    _schema_local = MVSCHEMA_VERSION
+    _schema_name = 'MythVideo'
+    _category_map = [{'None':0},{0:'None'}]
 
     def _fill_cm(self, name=None, id=None):
         if name:
-            if name not in self.category_map[0]:
-                c = self.db.cursor(self.log)
+            if name not in self._category_map[0]:
+                c = self._db.cursor(self._log)
                 q1 = """SELECT intid FROM videocategory WHERE category=%s"""
                 q2 = """INSERT INTO videocategory SET category=%s"""
                 if c.execute(q1, name) == 0:
                     c.execute(q2, name)
                     c.execute(q1, name)
                 id = c.fetchone()[0]
-                self.category_map[0][name] = id
-                self.category_map[1][id] = name
+                self._category_map[0][name] = id
+                self._category_map[1][id] = name
 
         elif id:
-            if id not in self.category_map[1]:
-                c = self.db.cursor(self.log)
+            if id not in self._category_map[1]:
+                c = self._db.cursor(self._log)
                 if c.execute("""SELECT category FROM videocategory
                                                WHERE intid=%s""", id) == 0:
                     raise MythDBError('Invalid ID found in videometadata.category')
                 else:
                     name = c.fetchone()[0]
-                self.category_map[0][name] = id
-                self.category_map[1][id] = name
+                self._category_map[0][name] = id
+                self._category_map[1][id] = name
 
     def _pull(self):
         DBDataWrite._pull(self)
         self._fill_cm(id=self.category)
-        self.category = self.category_map[1][self.category]
+        self.category = self._category_map[1][self.category]
 
     def _push(self):
         name = self.category
         self._fill_cm(name=name)
-        self.category = self.category_map[0][name]
+        self.category = self._category_map[0][name]
         DBDataWrite._push(self)
         self.category = name
 
@@ -1043,7 +1057,7 @@ class Video( DBDataWrite ):
         return str(self).encode('utf-8')
 
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized Video at %s>" % hex(id(self))
         res = self.title
         if self.season and self.episode:
@@ -1056,15 +1070,15 @@ class Video( DBDataWrite ):
         DBDataWrite.__init__(self, (id,), db, raw)
         if raw is not None:
             self._fill_cm(id=self.category)
-            self.category = self.category_map[1][self.category]
+            self.category = self._category_map[1][self.category]
         if (id is not None) or (raw is not None):
-            self.cast = self._Cast((self.intid,), self.db)
-            self.genre = self._Genre((self.intid,), self.db)
-            self.country = self._Country((self.intid,), self.db)
+            self.cast = self._Cast((self.intid,), self._db)
+            self.genre = self._Genre((self.intid,), self._db)
+            self.country = self._Country((self.intid,), self._db)
 
     def create(self, data=None):
         """Video.create(data=None) -> Video object"""
-        c = self.db.cursor(self.log)
+        c = self._db.cursor(self._log)
         fields = ' AND '.join(['%s=%%s' % f for f in \
                         ('title','subtitle','season','episode')])
         count = c.execute("""SELECT intid FROM videometadata WHERE %s""" %
@@ -1075,16 +1089,16 @@ class Video( DBDataWrite ):
             if data:
                 if 'category' in data:
                     self._fill_cm(name=data['category'])
-                    data['category'] = self.category_map[0][data['category']]
+                    data['category'] = self._category_map[0][data['category']]
             self._fill_cm(name=self.category)
-            self.category = self.category_map[0][self.category]
+            self.category = self._category_map[0][self.category]
             id = DBDataWrite.create(self, data)
         c.close()
-        self.wheredat = (id,)
+        self._wheredat = (id,)
         self._pull()
-        self.cast = self._Cast((self.intid,), self.db)
-        self.genre = self._Genre((self.intid,), self.db)
-        self.country = self._Country((self.intid,), self.db)
+        self.cast = self._Cast((self.intid,), self._db)
+        self.genre = self._Genre((self.intid,), self._db)
+        self.country = self._Country((self.intid,), self._db)
         return self
 
     class _Cast( DBDataCRef ):
@@ -1167,25 +1181,25 @@ class Video( DBDataWrite ):
         sgroup = {  'filename':'Videos',        'banner':'Banners',
                     'coverfile':'Coverart',     'fanart':'Fanart',
                     'screenshot':'Screenshots', 'trailer':'Trailers'}
-        if self.data is None:
+        if self._data is None:
             return None
         if type not in sgroup:
             raise MythFileError(MythError.FILE_ERROR,
                             'Invalid type passed to Video._open(): '+str(type))
-        SG = self.db.getStorageGroup(sgroup[type], self.host)
+        SG = self._db.getStorageGroup(sgroup[type], self.host)
         if len(SG) == 0:
-            SG = self.db.getStorageGroup('Videos', self.host)
+            SG = self._db.getStorageGroup('Videos', self.host)
             if len(SG) == 0:
                 raise MythFileError(MythError.FILE_ERROR,
                                     'Could not find MythVideo Storage Groups')
         return ftopen('myth://%s@%s/%s' % ( SG[0].groupname,
                                             self.host,
-                                            self.data[type]),
-                            mode, False, nooverwrite, self.db)
+                                            self[type]),
+                            mode, False, nooverwrite, self._db)
 
     def delete(self):
         """Video.delete() -> None"""
-        if self.data is None:
+        if self._data is None:
             return
         self.cast.clean()
         self.genre.clean()
@@ -1231,7 +1245,7 @@ class Video( DBDataWrite ):
         return hash
 
     def fromFilename(self, filename):
-        if self.wheredat is not None:
+        if self._wheredat is not None:
             return self
         self.filename = filename
         filename = filename[:filename.rindex('.')]
@@ -1386,15 +1400,15 @@ class NetVisionRSSItem( DBData ):
     """
     Represents a single program from the netvisionrssitems table
     """
-    table = 'netvisionrssitems'
-    where = 'feedtitle=%s AND title=%s'
-    setwheredat = 'self.feedtitle,self.title'
-    schema_value = 'NetvisionDBSchemaVer'
-    schema_local = NVSCHEMA_VERSION
-    schema_name = 'NetVision'
+    _table = 'netvisionrssitems'
+    _where = 'feedtitle=%s AND title=%s'
+    _setwheredat = 'self.feedtitle,self.title'
+    _schema_value = 'NetvisionDBSchemaVer'
+    _schema_local = NVSCHEMA_VERSION
+    _schema_name = 'NetVision'
     
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized NetVisionRSSItem at %s>" % hex(id(self))
         return u"<NetVisionRSSItem '%s@%s' at %s>" % \
                     (self.title, self.feedtitle, hex(id(self)))
@@ -1406,15 +1420,15 @@ class NetVisionTreeItem( DBData ):
     """
     Represents a single program from the netvisiontreeitems table
     """
-    table = 'netvisiontreeitems'
-    where = 'feedtitle=%s AND path=%s'
-    setwheredat = 'self.feedtitle,self.path'
-    schema_value = 'NetvisionDBSchemaVer'
-    schema_local = NVSCHEMA_VERSION
-    schema_name = 'NetVision'
+    _table = 'netvisiontreeitems'
+    _where = 'feedtitle=%s AND path=%s'
+    _setwheredat = 'self.feedtitle,self.path'
+    _schema_value = 'NetvisionDBSchemaVer'
+    _schema_local = NVSCHEMA_VERSION
+    _schema_name = 'NetVision'
 
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized NetVisionTreeItem at %s>" % hex(id(self))
         return u"<NetVisionTreeItem '%s@%s' at %s>" % \
                     (self.path, self.feedtitle, hex(id(self)))
@@ -1426,15 +1440,15 @@ class NetVisionSite( DBData ):
     """
     Represents a single site from the netvisionsites table
     """
-    table = 'netvisionsites'
-    where = 'name=%'
-    setwheredat = 'name,'
-    schema_value = 'NetvisionDBSchemaVer'
-    schema_local = NVSCHEMA_VERSION
-    schema_name = 'NetVision'
+    _table = 'netvisionsites'
+    _where = 'name=%'
+    _setwheredat = 'name,'
+    _schema_value = 'NetvisionDBSchemaVer'
+    _schema_local = NVSCHEMA_VERSION
+    _schema_name = 'NetVision'
 
     def __str__(self):
-        if self.wheredat is None:
+        if self._wheredat is None:
             return u"<Uninitialized NetVisionSite at %s>" % hex(id(self))
         return u"<NetVisionSite '%s','%s' at %s>" % \
                     (self.name, self.url, hex(id(self)))
