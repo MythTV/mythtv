@@ -696,7 +696,7 @@ class MythDB( MythDBBase ):
             return ('recordedprogram.%s=%%s' % key, value, 1)
 
         if key == 'cast':
-            return ('people.name=%s', value, 2|4)
+            return ('people.name', 'recordedcredits', 4, 1)
 
         if key == 'livetv':
             if value is None:
@@ -729,7 +729,7 @@ class MythDB( MythDBBase ):
         obj.searchJobs(**kwars) -> list of Job objects
 
         Supports the following keywords:
-            recorded,   starttime,  type,       status,     hostname,
+            chanid,     starttime,  type,       status,     hostname,
             title,      subtitle,   flags,      olderthan,  newerthan
         """
         if init:
@@ -760,13 +760,17 @@ class MythDB( MythDBBase ):
             showtype,   programid,  generic,    syndicatedepisodenumber
         """
         if init:
-            return ('program', Guide, ())
+            return ('program', Guide, (),
+                    ('credits','program',('chanid','starttime')),
+                    ('people','credits',('person',)))
         if key in ('chanid','starttime','endtime','title','subtitle',
                         'category','airdate','stars','previouslyshown','stereo',
                         'subtitled','hdtv','closecaptioned','partnumber',
                         'parttotal','seriesid','originalairdate','showtype',
                         'syndicatedepisodenumber','programid','generic'):
             return ('%s=%%s' % key, value, 0)
+        if key == 'cast':
+            return ('people.name', 'credits', 2, 0)
         if key == 'startbefore':
             return ('starttime<%s', value, 0)
         if key == 'startafter':
