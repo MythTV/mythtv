@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.3"
+__version__=u"v0.7.4"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -302,6 +302,7 @@ __version__=u"v0.7.3"
  # 0.7.2 Fixed a bug where an inetref field was not properly initialized and caused an abort. Ticket #8243
  # 0.7.3 Fixed a bug where a user selected TMDB# was not being used.
  #       Minor change to fuzzy matching of a file named parsed title with those from TMDB and TVDB.
+ # 0.7.4 Update for changes in Python bindings
 
 
 usage_txt=u'''
@@ -488,7 +489,7 @@ try:
     '''If the MythTV python interface is found, we can insert data directly to MythDB or
     get the directories to store poster, fanart, banner and episode graphics.
     '''
-    from MythTV import MythDB, DBData, Video, MythVideo, MythBE, FileOps, MythError, MythLog
+    from MythTV import MythDB, DBData, Video, MythVideo, MythBE, MythError, MythLog
     mythdb = None
     mythvideo = None
     mythbeconn = None
@@ -578,10 +579,10 @@ if imdb_lib:
         sys.exit(1)
 
 class VideoTypes( DBData ):
-    table = 'videotypes'
-    where = 'intid=%s'
-    setwheredat = 'self.intid,'
-    logmodule = 'Python VideoType'
+    _table = 'videotypes'
+    _where = 'intid=%s'
+    _setwheredat = 'self.intid,'
+    _logmodule = 'Python VideoType'
     @staticmethod
     def getAll(db=None):
         db = MythDB(db)
@@ -602,8 +603,8 @@ class VideoTypes( DBData ):
         elif id is not None:
             DBData.__init__(self, data=(id,), db=db)
         elif ext is not None:
-            self.__dict__['where'] = 'extension=%s'
-            self.__dict__['wheredat'] = 'self.extension,'
+            self.__dict__['_where'] = 'extension=%s'
+            self.__dict__['_wheredat'] = 'self.extension,'
             DBData.__init__(self, data=(ext,), db=db)
 # end VideoTypes()
 
@@ -3076,7 +3077,7 @@ class MythTvMetaData(VideoFiles):
         filename = self.rtnRelativePath(name, u'mythvideo')
         # Use the MythVideo hashing protocol when the video is in a storage groups
         if filename[0] != u'/':
-            hash_value = FileOps(mythbeconn.hostname).getHash(filename, u'Videos')
+            hash_value = mythbeconn.getHash(filename, u'Videos')
             if hash_value == u'NULL':
                 return u''
             else:
@@ -5014,7 +5015,7 @@ class MythTvMetaData(VideoFiles):
 
         # Get pending recordings
         try:
-            progs = MythBE(backend=mythbeconn.hostname, db=mythbeconn.db).getUpcomingRecordings()
+            progs = mythbeconn.getUpcomingRecordings()
         except MythError, e:
             sys.stderr.write(u"\n! Error: Getting Upcoming Recordings list: %s\n" % e.args[0])
             return programs
@@ -5042,7 +5043,7 @@ class MythTvMetaData(VideoFiles):
 
         # Get recorded table field names:
         try:
-            recordedlist = MythBE(backend=mythbeconn.hostname, db=mythbeconn.db).getRecordings()
+            recordedlist = mythbeconn.getRecordings()
         except MythError, e:
             sys.stderr.write(u"\n! Error: Getting recorded programs list: %s\n" % e.args[0])
             return programs
