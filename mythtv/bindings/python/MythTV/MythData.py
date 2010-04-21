@@ -686,7 +686,7 @@ class Recorded( DBDataWrite ):
                             ('R','description'), ('C','category'),
                             ('U','recgroup'), ('hn','hostname'),
                             ('c','chanid') ):
-            tmp = str(self[data]).replace('/','-')
+            tmp = unicode(self[data]).replace('/','-')
             path = path.replace('%'+tag, tmp)
         for (data, pre) in (   ('starttime','%'), ('endtime','%e'),
                                ('progstart','%p'),('progend','%pe') ):
