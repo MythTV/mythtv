@@ -57,10 +57,26 @@ class databaseSearch( object ):
             res = self.func(self.inst, key=key, value=val)
             if res is None:
                 raise TypeError("%s got an unexpected keyword arguemnt '%s'" \
-                                    % (self.__name__, key))  
-            where.append(res[0])
-            fields.append(res[1])
-            joinbit = joinbit|res[2]
+                                    % (self.__name__, key))
+
+            if len(res) == 3:
+                where.append(res[0])
+                fields.append(res[1])
+                joinbit = joinbit|res[2]
+            elif len(res) == 4:
+                lval = val.split(',')
+                where.append('(%s)=%d' %\
+                    (self.buildQuery(
+                        (   self.buildJoinOn(res[3]),
+                            '(%s)' % \
+                                 ' OR '.join(['%s=%%s' % res[0] \
+                                                    for f in lval])),
+                        'COUNT( DISTINCT %s )' % res[0],
+                        res[1],
+                        res[2]),
+                    len(lval)))
+                fields += lval
+                            
         for key in self.require:
             if key not in kwargs:
                 res = self.func(self.inst, key=key)
@@ -70,33 +86,8 @@ class databaseSearch( object ):
                 fields.append(res[1])
                 joinbit = joinbit|res[2]
 
-        # build joins
-        joins = []
-        for i in range(len(self.joins)):
-            if (2**i)&joinbit:
-                if len(self.joins[i]) == 3:
-                    on = ' AND '.join(['%s.%s=%s.%s' % \
-                            (self.joins[i][0], field, self.joins[i][1], field)\
-                            for field in self.joins[i][2]])
-                else:
-                    on = ' AND '.join(['%s.%s=%s.%s' % \
-                        (self.joins[i][0], ffield, self.joins[i][1], tfield)\
-                        for ffield, tfield in \
-                                    zip(self.joins[i][2],self.joins[i][3])])
-                joins.append('JOIN %s ON %s' % (self.joins[i][0], on))
-        joins = ' '.join(joins)
-
-        # build where
-        where = ' AND '.join(where)
-
-        # build query
-        if len(where) > 0:
-            query = """SELECT %s.* FROM %s %s WHERE %s""" \
-                                    % (self.table, self.table, joins, where)
-        else:
-            query = """SELECT %s.* FROM %s""" % (self.table, self.table)
-
         # process query
+        query = self.buildQuery(where, joinbit=joinbit)
         c = self.inst.cursor(self.inst.log)
         if len(where) > 0:
             c.execute(query, fields)
@@ -114,6 +105,50 @@ class databaseSearch( object ):
             return records
         else:
             return None
+
+    def buildJoinOn(self, i):
+        if len(self.joins[i]) == 3:
+            # shared field name
+            on = ' AND '.join(['%s.%s=%s.%s' % \
+                    (self.joins[i][0], field,\
+                     self.joins[i][1], field)\
+                             for field in self.joins[i][2]])
+        else:
+            # separate field name
+            on = ' AND '.join(['%s.%s=%s.%s' % \
+                    (self.joins[i][0], ffield,\
+                     self.joins[i][1], tfield)\
+                             for ffield, tfield in zip(\
+                                    self.joins[i][2],\
+                                    self.joins[i][3])])
+        return on
+
+    def buildQuery(self, where, select=None, tfrom=None, joinbit=0):
+        sql = 'SELECT '
+        if select:
+            sql += select
+        elif tfrom:
+            sql += tfrom+'.*'
+        else:
+            sql += self.table+'.*'
+
+        sql += ' FROM '
+        if tfrom:
+            sql += tfrom
+        else:
+            sql += self.table
+
+        if joinbit:
+            for i in range(len(self.joins)):
+                if (2**i)&joinbit:
+                    sql += ' JOIN %s ON %s' % \
+                            (self.joins[i][0], self.buildJoinOn(i))
+
+        if len(where):
+            sql += ' WHERE '
+            sql += ' AND '.join(where)
+
+        return sql
 
 
 class MythBE( FileOps ):
@@ -1062,9 +1097,14 @@ class MythVideo( MythDBBase ):
         if key in ('title','subtitle','season','episode','host',
                         'director','year'):
             return('videometadata.%s=%%s' % key, value, 0)
-        vidref = {'cast':1|2, 'genre':4|8, 'country':16|32, 'category':64}
+        vidref = {'cast':(2,0), 'genre':(8,2), 'country':(32,4)}
         if key in vidref:
-            return ('video%s.%s=%%s' % (key, key), value, vidref[key])
+            return ('video%s.%s' % (key,key),
+                    'videometadata%s' % key,
+                    vidref[key][0],
+                    vidref[key][1])
+        if key == 'category':
+            return ('videocategory.%s=%%s' % key, value, 64)
         if key == 'exactfile':
             return ('videometadata.filename=%s', value, 0)
         if key == 'file':
