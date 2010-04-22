@@ -2644,6 +2644,7 @@ AVChapter *ff_new_chapter(AVFormatContext *s, int id, AVRational time_base, int6
 void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
     int i;
     int changes = 0;
+
     for (i=0; i<s->nb_streams; i++) {
         if (s->streams[i]->id != id)
             continue;
@@ -2695,6 +2696,9 @@ void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
     }
     if (changes)
     {
+        // flush queued packets after a stream change (might need to make smarter)
+        flush_packet_queue(s);
+
         /* renumber the streams */
         av_log(NULL, AV_LOG_DEBUG, "av_remove_stream: renumbering streams\n");
         for (i=0; i<s->nb_streams; i++)
