@@ -605,6 +605,12 @@ int ff_h264_execute_ref_pic_marking(H264Context *h, MMCO *mmco, int mmco_count){
             h->short_ref[0]= s->current_picture_ptr;
             h->short_ref_count++;
             s->current_picture_ptr->reference |= s->picture_structure;
+
+            // do not add more reference frames than allowed after seeing frame num gap
+            if (!mmco_count && h->short_ref_count > h->sps.ref_frame_count) {
+                pic = h->short_ref[h->short_ref_count - 1];
+                remove_short(h, pic->frame_num, 0);
+            }
         }
     }
 
