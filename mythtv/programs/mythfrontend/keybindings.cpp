@@ -247,7 +247,7 @@ bool KeyBindings::RemoveActionKey(const QString &context_name,
 {
     ActionID id(context_name, action_name);
 
-    // Don't remove the last manditory binding
+    // Don't remove the last mandatory binding
     if (m_mandatoryBindings.contains(id) &&
         (m_actionSet.GetKeys(id).count() < 2))
     {

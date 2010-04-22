@@ -576,7 +576,7 @@ void MythControls::DeleteKey(void)
         return;
     }
 
-    QString label = tr("This action is manditory and needs at least one key "
+    QString label = tr("This action is mandatory and needs at least one key "
                        "bound to it. Instead, try rebinding with another key.");
 
     MythScreenStack *popupStack =
