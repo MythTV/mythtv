@@ -4386,7 +4386,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
 
         if (!curstream)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Bad stream (NULL)");;
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Bad stream (NULL)");
             av_free_packet(pkt);
             continue;
         }
