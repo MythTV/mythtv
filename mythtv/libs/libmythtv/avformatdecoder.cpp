@@ -1475,6 +1475,13 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         if (selectedStream)
             directrendering = true;
     }
+    else
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("Using software scaling to convert pixel format %1 for "
+                        "codec %2").arg(enc->pix_fmt)
+                .arg(codec_id_string(enc->codec_id)));
+    }
 
     if (selectedStream)
     {
