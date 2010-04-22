@@ -1146,7 +1146,7 @@ QString StorageGroup::GetGroupToUse(
         else
         {
             VERBOSE(VB_FILE+VB_EXTRA,
-                    QString("GetHostSGToUse(): "
+                    QString("GetGroupToUse(): "
                             "falling back to Videos Storage Group for host %1 "
                             "since it does not have a %2 Storage Group.")
                     .arg(host).arg(sgroup));
