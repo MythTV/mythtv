@@ -4375,7 +4375,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                 pkt->pos -= readAdjust;
         }
 
-        if (pkt->stream_index > (int) ic->nb_streams)
+        if (pkt->stream_index >= (int)ic->nb_streams)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Bad stream");
             av_free_packet(pkt);
