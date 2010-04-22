@@ -1137,18 +1137,14 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
 
     int ret = -1;
-    if (ringBuffer->isDVD())
-    {
-        AVPacket pkt1;
-        ret = av_read_frame(ic,&pkt1);
-        av_free_packet(&pkt1);
-        ringBuffer->Seek(0, SEEK_SET);
-        ringBuffer->DVD()->IgnoreStillOrWait(false);
-    }
-    else
     {
         QMutexLocker locker(avcodeclock);
         ret = av_find_stream_info(ic);
+    }
+    if (ringBuffer->isDVD())
+    {
+        ringBuffer->Seek(0, SEEK_SET);
+        ringBuffer->DVD()->IgnoreStillOrWait(false);
     }
 
     if (ret < 0)
@@ -1464,9 +1460,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         directrendering     |= selectedStream;
     }
     else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
-             IS_DR1_PIX_FMT(enc->pix_fmt) /* HACK -- begin */ &&
-             /*   allow unknown pixel format to avoid regressions*/
-             enc->pix_fmt == PIX_FMT_NONE /* HACK -- end*/)
+             IS_DR1_PIX_FMT(enc->pix_fmt))
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
         enc->get_buffer      = get_avf_buffer;
