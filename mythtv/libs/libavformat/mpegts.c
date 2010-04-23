@@ -838,6 +838,7 @@ static void new_pes_packet(PESContext *pes, AVPacket *pkt)
     pes->dts = AV_NOPTS_VALUE;
     pes->buffer = NULL;
     pes->data_index = 0;
+    pes->total_size = 0;
 }
 
 /* return non zero if a packet could be constructed */
@@ -1010,6 +1011,11 @@ static int mpegts_push_data(MpegTSFilter *filter,
                 pes->data_index += buf_size;
             }
             buf_size = 0;
+            // emit completed packets
+            if (pes->pes_header_size + pes->data_index >= pes->total_size + 4) {
+                ts->stop_parse = 1;
+                new_pes_packet(pes, ts->pkt);
+            }
             break;
         case MPEGTS_SKIP:
             buf_size = 0;
