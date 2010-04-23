@@ -226,6 +226,16 @@ bool DVDRingBufferPriv::OpenFile(const QString &filename)
     }
 }
 
+
+void DVDRingBufferPriv::StartFromBeginning(void)
+{
+    if (m_dvdnav)
+    {
+        QMutexLocker lock(&m_seekLock);
+        dvdnav_first_play(m_dvdnav);
+    }
+}
+
 /** \brief returns current position in the PGC.
  */
 long long DVDRingBufferPriv::GetReadPosition(void)

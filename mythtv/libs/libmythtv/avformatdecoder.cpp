@@ -1143,10 +1143,9 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     }
     if (ringBuffer->isDVD())
     {
-        ringBuffer->Seek(0, SEEK_SET);
+        ringBuffer->DVD()->StartFromBeginning();
         ringBuffer->DVD()->IgnoreStillOrWait(false);
     }
-
     if (ret < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not find codec parameters. " +

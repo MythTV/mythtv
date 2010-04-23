@@ -122,6 +122,13 @@ dvdnav_status_t dvdnav_current_title_info(dvdnav_t *this, int32_t *title, int32_
   return DVDNAV_STATUS_ERR;
 }
 
+void dvdnav_first_play(dvdnav_t *this) {
+  pthread_mutex_lock(&this->vm_lock);
+  vm_start(this->vm);
+  this->started = 1;
+  pthread_mutex_unlock(&this->vm_lock);
+}
+
 dvdnav_status_t dvdnav_title_play(dvdnav_t *this, int32_t title) {
   return dvdnav_part_play(this, title, 1);
 }
@@ -135,11 +142,13 @@ dvdnav_status_t dvdnav_part_play(dvdnav_t *this, int32_t title, int32_t part) {
     pthread_mutex_unlock(&this->vm_lock);
     return DVDNAV_STATUS_ERR;
   }
-  if (!this->started) {
-    /* don't report an error but be nice */
-    vm_start(this->vm);
-    this->started = 1;
-  }
+  
+  pthread_mutex_unlock(&this->vm_lock);
+  if (!this->started)
+    dvdnav_first_play(this);
+  pthread_mutex_lock(&this->vm_lock);
+
+
   if (!this->vm->state.pgc) {
     printerr("No current PGC.");
     pthread_mutex_unlock(&this->vm_lock);
