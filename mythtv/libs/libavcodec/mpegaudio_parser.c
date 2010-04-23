@@ -116,7 +116,7 @@ static int mpegaudio_parse(AVCodecParserContext *s1,
                     s->header_count++;
                     s->frame_size = ret-4;
 
-                    if(s->header_count > 1){
+                    if(s->header_count > 1 || avctx->sample_rate == 0) {
                         avctx->sample_rate= sr;
                         avctx->channels   = channels;
                         avctx->frame_size = frame_size;
