@@ -373,7 +373,7 @@ static int pcm_decode_frame(AVCodecContext *avctx,
 
     n = buf_size/sample_size;
 
-    switch(avctx->codec_id) {
+    switch(avctx->codec->id) {
     case CODEC_ID_PCM_U32LE:
         DECODE(uint32_t, le32, src, samples, n, 0, 0x80000000)
         break;
