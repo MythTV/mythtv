@@ -352,6 +352,36 @@ bool MythRenderVDPAU::IsMPEG4Available(void)
     return false;
 }
 
+bool MythRenderVDPAU::H264DecoderSizeSupported(uint width, uint height)
+{
+    int mbs = ceil((double)width / 16.0f);
+    // see Appendix H of the NVIDIA proprietary driver README
+    int check = (mbs == 49 ) || (mbs == 54 ) || (mbs == 59 ) || (mbs == 64) ||
+                (mbs == 113) || (mbs == 118) || (mbs == 123) || (mbs == 128);
+    if (!check)
+        return true;
+
+    VERBOSE(VB_PLAYBACK, LOC +
+        QString("Checking support for H.264 video with width %1").arg(width));
+    bool supported = true;
+    MythRenderVDPAU *dummy = new MythRenderVDPAU();
+    if (dummy && dummy->CreateDummy())
+    {
+        uint test = dummy->CreateDecoder(QSize(width, height),
+                                         VDP_DECODER_PROFILE_H264_HIGH, 2);
+        if (!test)
+            supported = false;
+        else
+            dummy->DestroyDecoder(test);
+    }
+    VERBOSE(VB_IMPORTANT, (supported ? LOC : LOC_WARN) +
+            QString("Hardware decoding of this H.264 video is %1supported "
+                    "on this video card.").arg(supported ? "" : "NOT "));
+    if (dummy)
+        delete dummy;
+    return supported;
+}
+
 bool MythRenderVDPAU::CreateDummy(void)
 {
     LOCK_ALL
