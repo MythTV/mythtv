@@ -2139,6 +2139,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             enc->codec_type != CODEC_TYPE_SUBTITLE)
             continue;
 
+        // skip DVB teletext, there is no libavcodec decoder
+        if (enc->codec_type == CODEC_TYPE_SUBTITLE &&
+            enc->codec_id   == CODEC_ID_DVB_TELETEXT)
+            continue;
+
         VERBOSE(VB_PLAYBACK, LOC + QString("Looking for decoder for %1")
                 .arg(codec_id_string(enc->codec_id)));
 
