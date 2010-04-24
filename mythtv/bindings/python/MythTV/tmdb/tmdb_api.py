@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.7"
+__version__="v0.1.8"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -30,6 +30,7 @@ __version__="v0.1.7"
 # 0.1.5 Added a superclass to perform TMDB Trailer searches for the Mythnetvison grabber tmdb_nv.py
 # 0.1.6 Improved displayed error messages on an exception abort
 # 0.1.7 Fixed issues with interactive movie selection
+# 0.1.8 Fixed the error message reporting when the machines Internet connection or DNS is not working
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -83,7 +84,7 @@ class XmlHandler:
     def _grabUrl(self, url):
         try:
             urlhandle = urllib.urlopen(url)
-        except IOError:
+        except IOError, errormsg:
             raise TmdHttpError(errormsg)
         return urlhandle.read()
 
