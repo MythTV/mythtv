@@ -3980,23 +3980,27 @@ void MainServer::BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
     if (allHosts)
     {
         QMap <QString, bool> backendsCounted;
-        QString encoderHost;
-        QMap<int, EncoderLink *>::Iterator eit = encoderList->begin();
-        while (eit != encoderList->end())
+        QString pbsHost;
+
+        sockListLock.lockForRead();
+
+        vector<PlaybackSock *>::iterator pbsit = playbackList.begin();
+        for (; pbsit != playbackList.end(); ++pbsit)
         {
-            encoderHost = (*eit)->GetHostName();
-            if ((*eit)->IsConnected() &&
-                !(*eit)->IsLocal() &&
-                !backendsCounted.contains(encoderHost))
-            {
-                backendsCounted[encoderHost] = true;
+            PlaybackSock *pbs = *pbsit;
 
-                (*eit)->GetDiskSpace(strlist);
+            if ((pbs->IsDisconnected()) ||
+                (!pbs->isSlaveBackend()) ||
+                (pbs->isLocal()) ||
+                (backendsCounted.contains(pbs->getHostname())))
+                continue;
 
-                allHostList += "," + encoderHost;
-            }
-            ++eit;
+            backendsCounted[pbs->getHostname()] = true;
+            pbs->GetDiskSpace(strlist);
+            allHostList += "," + pbs->getHostname();
         }
+
+        sockListLock.unlock();
     }
 
     if (!consolidated)
