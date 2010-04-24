@@ -55,6 +55,7 @@
             <area>32,568,1216,36</area>
             <font>basesmallyellow</font>
             <pixelsize>22</pixelsize>
+            <align>hcenter</align>
             <value>WARNING: There are conflicting scheduled recordings!</value>
         </textarea>
 
