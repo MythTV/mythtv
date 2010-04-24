@@ -19,7 +19,7 @@ metadata, video and image URLs from MTV. These routines are based on the api. Sp
 for this api are published at http://developer.mtvnservices.com/docs
 '''
 
-__version__="v0.2.2"
+__version__="v0.2.3"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree View Processing
 # 0.1.2 Modified Reee view code and structure to be standandized across all grabbers
@@ -31,6 +31,7 @@ __version__="v0.2.2"
 #       Better handling of invalid unicode data from source
 # 0.2.2 Complete abort error message display improvements
 #       Removed the import and use of the feedparser library
+# 0.2.3 Fixed an exception message output code error in two places
 
 import os, struct, sys, re, time
 from datetime import datetime, timedelta
@@ -85,16 +86,16 @@ try:
 		MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
 		mythdb = MythDB()
 	except MythError, e:
-		sys.stderr(u'\n! Warning - %s\n' % e.args[0])
+		sys.stderr.write(u'\n! Warning - %s\n' % e.args[0])
 		filename = os.path.expanduser("~")+'/.mythtv/config.xml'
 		if not os.path.isfile(filename):
-			sys.stderr(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
+			sys.stderr.write(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
 		else:
-			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
+			sys.stderr.write(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
 	except Exception, e:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
+		sys.stderr.write(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
 except Exception, e:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
+	sys.stderr.write(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
 	mythdb = None
 
 from socket import gethostname, gethostbyname
@@ -109,7 +110,7 @@ class XmlHandler:
     def _grabUrl(self, url):
         try:
             urlhandle = urllib.urlopen(url)
-        except IOError:
+        except IOError, errormsg:
             raise MtvHttpError(errormsg)
         return urlhandle.read()
 

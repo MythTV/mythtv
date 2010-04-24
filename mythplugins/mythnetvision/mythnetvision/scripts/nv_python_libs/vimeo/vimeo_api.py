@@ -36,7 +36,7 @@ metadata and video/image URLs from vimeo. These routines are based on the v2 api
 for this api are published at http://vimeo.com/api/docs/advanced-api
 '''
 
-__version__="v0.2.3"
+__version__="v0.2.4"
 # 0.1.0 Initial development
 # 0.1.1 Added Tree view processing
 # 0.1.2 Documentation review
@@ -48,6 +48,7 @@ __version__="v0.2.3"
 # 0.2.3 Completed the exception error reporting improvements
 #       Fixed an exception message error when vimeo returns poorly formed XML.
 #       For example search term "flute" returns bad XML while "Flute music" returns proper XML
+# 0.2.4 Fixed an exception message output code error
 
 """
 Python module to interact with Vimeo through its API (version 2)
@@ -628,16 +629,16 @@ try:
 		MythLog._setlevel('none') # Some non option -M cannot have any logging on stdout
 		mythdb = MythDB()
 	except MythError, e:
-		sys.stderr(u'\n! Warning - %s\n' % e.args[0])
+		sys.stderr.write(u'\n! Warning - %s\n' % e.args[0])
 		filename = os.path.expanduser("~")+'/.mythtv/config.xml'
 		if not os.path.isfile(filename):
-			sys.stderr(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
+			sys.stderr.write(u'\n! Warning - A correctly configured (%s) file must exist\n' % filename)
 		else:
-			sys.stderr(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
+			sys.stderr.write(u'\n! Warning - Check that (%s) is correctly configured\n' % filename)
 	except Exception, e:
-		sys.stderr(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
+		sys.stderr.write(u"\n! Warning - Creating an instance caused an error for one of: MythDB. error(%s)\n" % e)
 except Exception, e:
-	sys.stderr(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
+	sys.stderr.write(u"\n! Warning - MythTV python bindings could not be imported. error(%s)\n" % e)
 	mythdb = None
 
 from socket import gethostname, gethostbyname
