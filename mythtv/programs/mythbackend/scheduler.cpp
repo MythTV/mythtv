@@ -4212,7 +4212,8 @@ void Scheduler::FillDirectoryInfoCache(bool force)
 
     fsInfoCache.clear();
 
-    GetFilesystemInfos(m_tvList, fsInfos);
+    if (m_mainServer)
+        m_mainServer->GetFilesystemInfos(fsInfos);
 
     QMap <int, bool> fsMap;
     vector<FileSystemInfo>::iterator it1;

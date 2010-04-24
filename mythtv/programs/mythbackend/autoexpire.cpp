@@ -36,6 +36,7 @@ using namespace std;
 #include "remoteencoder.h"
 #include "encoderlink.h"
 #include "backendutil.h"
+#include "mainserver.h"
 #include "compat.h"
 
 #define LOC     QString("AutoExpire: ")
@@ -83,6 +84,8 @@ AutoExpire::AutoExpire(void)
  */
 void AutoExpire::Init(void)
 {
+    mainServer         = NULL;
+
     desired_freq       = 15;
     update_pending     = false;
 }
@@ -128,7 +131,8 @@ void AutoExpire::CalcParams()
     VERBOSE(VB_FILE, LOC + "CalcParams()");
 
     vector<FileSystemInfo> fsInfos;
-    GetFilesystemInfos(encoderList, fsInfos);
+    if (mainServer)
+        mainServer->GetFilesystemInfos(fsInfos);
 
     if (fsInfos.empty())
     {
@@ -366,7 +370,8 @@ void AutoExpire::ExpireRecordings(void)
 
     VERBOSE(VB_FILE, LOC + "ExpireRecordings()");
 
-    GetFilesystemInfos(encoderList, fsInfos);
+    if (mainServer)
+        mainServer->GetFilesystemInfos(fsInfos);
 
     if (fsInfos.empty())
     {

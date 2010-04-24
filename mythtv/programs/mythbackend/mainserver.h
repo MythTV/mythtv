@@ -53,6 +53,11 @@ class MainServer : public QObject, public MythSocketCBs
 
     void DeletePBS(PlaybackSock *pbs);
 
+    size_t GetCurrentMaxBitrate(void);
+    void BackendQueryDiskSpace(QStringList &strlist, bool consolidated,
+                               bool allHosts);
+    void GetFilesystemInfos(vector <FileSystemInfo> &fsInfos);
+
     int GetExitCode() const { return m_exitCode; }
 
   protected slots:
@@ -169,6 +174,8 @@ class MainServer : public QObject, public MythSocketCBs
 
     QString LocalFilePath(const QUrl &url, const QString &wantgroup);
 
+    int GetfsID(vector<FileSystemInfo>::iterator fsInfo);
+
     static void *SpawnTruncateThread(void *param);
     void DoTruncateThread(const DeleteStruct *ds);
     static void *SpawnDeleteThread(void *param);
@@ -229,6 +236,9 @@ class MainServer : public QObject, public MythSocketCBs
 
     QTimer *autoexpireUpdateTimer; // audited ref #5318
     static QMutex truncate_and_close_lock;
+
+    QMap<QString, int> fsIDcache;
+    QMutex fsIDcacheLock;
 
     int m_exitCode;
 

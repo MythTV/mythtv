@@ -23,7 +23,6 @@
 
 // MythTV headers
 #include "httpstatus.h"
-#include "backendutil.h"
 #include "mythxml.h"
 
 #include "mythcontext.h"
@@ -47,6 +46,8 @@ HttpStatus::HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, Auto
     m_bIsMaster = bIsMaster;
 
     m_nPreRollSeconds = gContext->GetNumSetting("RecordPreRoll", 0);
+
+    m_pMainServer = NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -338,7 +339,9 @@ void HttpStatus::FillStatusXML( QDomDocument *pDoc )
     QString ids;
     long long iTotal = -1, iUsed = -1, iAvail = -1;
 
-    BackendQueryDiskSpace(strlist, m_pEncoders, true, m_bIsMaster);
+    if (m_pMainServer)
+        m_pMainServer->BackendQueryDiskSpace(strlist, true, m_bIsMaster);
+
     QDomElement total;
 
     // Make a temporary list to hold the per-filesystem elements so that the

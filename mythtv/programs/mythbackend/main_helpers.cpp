@@ -212,14 +212,12 @@ bool setupTVs(bool ismaster, bool &error)
 
     if (tvList.empty())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                "No valid capture cards are defined in the database.\n\t\t\t"
-                "Perhaps you should re-read the installation instructions?");
+        VERBOSE(VB_IMPORTANT, LOC_WARN +
+                "No valid capture cards are defined in the database.");
 
-        gContext->LogEntry("mythbackend", LP_CRITICAL,
+        gContext->LogEntry("mythbackend", LP_WARNING,
                            "No capture cards are defined",
-                           "Please run the setup program.");
-        return false;
+                           "This backend will not be used for recording.");
     }
 
     return true;
@@ -835,13 +833,15 @@ int run_backend(const MythCommandLineParser &cmdline)
         jobqueue = new JobQueue(ismaster);
 
     // Setup status server
+    HttpStatus *httpStatus = NULL;
     HttpServer *pHS = g_pUPnp->GetHttpServer();
     if (pHS)
     {
         VERBOSE(VB_IMPORTANT, "Main::Registering HttpStatus Extension");
 
-        pHS->RegisterExtension( new HttpStatus( &tvList, sched,
-                                                expirer, ismaster ));
+        httpStatus = new HttpStatus(&tvList, sched, expirer, ismaster);
+        if (httpStatus)
+            pHS->RegisterExtension(httpStatus);
     }
 
     if (ismaster)
@@ -864,6 +864,9 @@ int run_backend(const MythCommandLineParser &cmdline)
         delete mainServer;
         return exitCode;
     }
+
+    if (httpStatus && mainServer)
+        httpStatus->SetMainServer(mainServer);
 
     StorageGroup::CheckAllStorageGroupDirs();
 

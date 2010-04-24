@@ -19,6 +19,7 @@ using namespace std;
 class ProgramInfo;
 class EncoderLink;
 class FileSystemInfo;
+class MainServer;
 
 typedef vector<ProgramInfo*> pginfolist_t;
 typedef vector<EncoderLink*> enclinklist_t;
@@ -53,6 +54,8 @@ class AutoExpire : public QObject
 
     static void Update(int encoder, int fsID, bool immediately);
     static void Update(bool immediately) { Update(0, -1, immediately); }
+
+    void SetMainServer(MainServer *ms) { mainServer = ms; }
 
     QMap<int, EncoderLink *> *encoderList;
 
@@ -90,6 +93,8 @@ class AutoExpire : public QObject
 
     QMutex         instance_lock;
     QWaitCondition instance_cond;
+
+    MainServer *mainServer;
 
     // update info
     bool          update_pending;

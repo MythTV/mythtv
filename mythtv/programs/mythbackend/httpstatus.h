@@ -36,6 +36,7 @@ typedef enum
 class Scheduler;
 class AutoExpire;
 class EncoderLink;
+class MainServer;
 
 class HttpStatus : public HttpServerExtension
 {
@@ -44,6 +45,7 @@ class HttpStatus : public HttpServerExtension
         Scheduler                   *m_pSched;
         QMap<int, EncoderLink *>    *m_pEncoders;
         AutoExpire                  *m_pExpirer;
+        MainServer                  *m_pMainServer;
         bool                         m_bIsMaster;
         int                          m_nPreRollSeconds;
         QMutex                       m_settingLock;
@@ -67,6 +69,9 @@ class HttpStatus : public HttpServerExtension
     public:
                  HttpStatus( QMap<int, EncoderLink *> *tvList, Scheduler *sched, AutoExpire *expirer, bool bIsMaster );
         virtual ~HttpStatus();
+
+        void     SetMainServer(MainServer *mainServer)
+		             { m_pMainServer = mainServer; }
 
         bool     ProcessRequest( HttpWorkerThread *pThread, HTTPRequest *pRequest );
 };
