@@ -475,43 +475,31 @@ session.screen0.focusModel:     SloppyFocus
 
 <H3>Red Hat And Mandriva</H3>
 
-<P>Here's a method for automatically starting mythbackend submitted by Mike
+<P>A method for automatically starting mythbackend submitted by Mike
 Thomson (
 <A HREF="mailto:linux@m-thomson.net">mailto:linux@m-thomson.net</A>) and Stu Tomlinson (
-<A HREF="mailto:stu@nosnilmot.com">mailto:stu@nosnilmot.com</A>).</P>
-<P>Copy the files from the MythTV <CODE>contrib</CODE> directory or from Mike's web
-site (
-<A HREF="http://m-thomson.net/mythtv/">http://m-thomson.net/mythtv/</A>) as follows:</P>
-<P><CODE>etc.rc.d.init.mythbackend</CODE> should be made executable and copied to
-<CODE>/etc/rc.d/init.d/</CODE>:
+<A HREF="mailto:stu@nosnilmot.com">mailto:stu@nosnilmot.com</A>) has subsequently been updated by Axel Thimm (<A HREF="mailto:axel.thimm@atrpms.net">mailto:axel.thimm@atrpms.net</A>) and is now maintained by the MythTV Development Team.</P>
+<P>Copy the files from the MythTV <CODE>contrib</CODE> directory as follows (the paths in this example are based on the locations used in MythBuntu, yours may vary):</P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd contrib
+$ cd /usr/share/doc/mythtv-backend/contrib/Linux/init_scripts/
 $ su
-# chmod a+x etc.rc.d.init.d.mythbackend
-# cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+# gunzip fedora.init.myth*
+# cp fedora.init.mythbackend /etc/init.d/mythbackend
+# cp fedora.init.mythjobqueue /etc/init.d/mythjobqueue
+# chmod u+x /etc/init.d/myth*
+# cp fedora.sysconfig.mythbackend /etc/sysconfig/mythbackend
+# cp fedora.sysconfig.mythjobqueue /etc/sysconfig/mythjobqueue
 </PRE>
 </CODE></BLOCKQUOTE>
-</P>
-<P><CODE>etc.sysconfig.mythbackend</CODE> should be copied to
-<CODE>/etc/sysconfig/</CODE>:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd contrib
-$ su
-# cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Edit <CODE>/etc/sysconfig/mythbackend</CODE> if you want to change the defaults
-(the userid that should start mythbackend, location of the logfile and (if
-required) the name and location of the mythbackend binary).</P>
-<P>Use <B>chkconfig</B> to make sure the script is called when
+<P>Review the contents of <CODE>/etc/sysconfig/mythbackend</CODE> and <CODE>/etc/sysconfig/mythjobqueue</CODE> then edit them if you want to change any of the defaults</P>
+<P>Use <B>chkconfig</B> to make sure the scripts are called when
 entering runlevels 3, 4 or 5:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
 # chkconfig --level 345 mythbackend on
+# chkconfig --level 345 mythjobqueue on
 # exit
 $
 </PRE>
