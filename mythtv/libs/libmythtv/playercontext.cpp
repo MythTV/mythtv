@@ -639,6 +639,10 @@ QString PlayerContext::PopPreviousChannel(void)
         return QString::null;
 
     QString chan = prevChan.back();
+    prevChan.pop_back();
+    // add the current channel back to the list, to allow easy flipping between
+    // two channels using PREVCHAN
+    PushPreviousChannel();
     chan.detach();
     return chan;
 }
