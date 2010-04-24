@@ -120,6 +120,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
 DVBRecorder::~DVBRecorder()
 {
     TeardownAll();
+    SetStreamData(NULL);
 }
 
 void DVBRecorder::TeardownAll(void)

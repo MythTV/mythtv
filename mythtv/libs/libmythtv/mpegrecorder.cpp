@@ -119,6 +119,7 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
 MpegRecorder::~MpegRecorder()
 {
     TeardownAll();
+    SetStreamData(NULL);
 }
 
 void MpegRecorder::TeardownAll(void)

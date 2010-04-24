@@ -33,6 +33,7 @@ IPTVRecorder::~IPTVRecorder()
 {
     StopRecording();
     _channel->GetFeeder()->RemoveListener(this);
+    SetStreamData(NULL);
 }
 
 bool IPTVRecorder::Open(void)
