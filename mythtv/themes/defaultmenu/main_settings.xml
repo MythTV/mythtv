@@ -64,13 +64,6 @@
     </button>
 
     <button>
-        <type>THEMEPICKER</type>
-        <text>Theme Picker</text>
-        <description>Change MythTV's layout and behavior.</description>
-        <action>THEMEPICKER</action>
-    </button>
-
-    <button>
         <type>SETTINGS_TV</type>
         <text>TV Settings</text>
         <text lang="IT">Impostazioni TV</text>
