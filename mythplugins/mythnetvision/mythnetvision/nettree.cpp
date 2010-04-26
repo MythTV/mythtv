@@ -53,8 +53,8 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
       m_resolution(NULL),            m_thumbImage(NULL),
       m_downloadable(NULL),          m_busyPopup(NULL),
       m_menuPopup(NULL),             m_popupStack(),
-      m_type(type),                  m_lock(QMutex::Recursive),
-      m_parse(new Parse())
+      m_externaldownload(NULL),      m_type(type),
+      m_lock(QMutex::Recursive)
 {
     m_download = new DownloadManager(this);
     m_imageDownload = new ImageDownloadManager(this);
@@ -183,6 +183,21 @@ NetTree::~NetTree()
 {
     QMutexLocker locker(&m_lock);
 
+    qDeleteAll(m_grabberList);
+    m_grabberList.clear();
+
+    if (m_siteGeneric)
+    {
+        delete m_siteGeneric;
+        m_siteGeneric = NULL;
+    }
+
+    if (m_externaldownload)
+    {
+        delete m_externaldownload;
+        m_externaldownload = NULL;
+    }
+
     if (m_download)
     {
         delete m_download;
@@ -200,6 +215,11 @@ NetTree::~NetTree()
         delete m_gdt;
         m_gdt = NULL;
     }
+
+    m_rssList.clear();
+
+    qDeleteAll(m_videos);
+    m_videos.clear();
 
     cleanCacheDir();
 }
@@ -476,6 +496,11 @@ void NetTree::createBusyDialog(QString title)
 
     if (m_busyPopup->Create())
         m_popupStack->AddScreen(m_busyPopup);
+    else
+    {
+        delete m_busyPopup;
+        m_busyPopup = NULL;
+    }
 }
 
 void NetTree::showMenu(void)
@@ -487,7 +512,7 @@ void NetTree::showMenu(void)
     MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
                                                     "mythnettreemenupopup");
 
-    ResultVideo *item;
+    ResultVideo *item = NULL;
     if (m_type == DLG_TREE)
         item = qVariantValue<ResultVideo *>(m_siteMap->GetCurrentNode()->GetData());
     else
@@ -669,6 +694,11 @@ void NetTree::fillTree()
 
     if (m_rssList.count() > 0)
         m_siteGeneric->addNode(m_rssGeneric);
+    else
+    {
+        delete m_rssGeneric;
+        m_rssGeneric = NULL;
+    }
 
     // Now let's add all the grabber trees
 
@@ -764,6 +794,7 @@ int NetTree::AddFileNode(MythGenericTree *where_to_add, ResultVideo *video)
     MythGenericTree *sub_node = where_to_add->
                     addNode(title, 0, true);
     sub_node->SetData(qVariantFromValue(video));
+    m_videos.append(video);
     return 1;
 }
 
@@ -859,10 +890,13 @@ void NetTree::slotDeleteVideo()
             new MythConfirmationDialog(m_popupStack,message);
 
     if (confirmdialog->Create())
+    {
         m_popupStack->AddScreen(confirmdialog);
-
-    connect(confirmdialog, SIGNAL(haveResult(bool)),
-            SLOT(doDeleteVideo(bool)));
+        connect(confirmdialog, SIGNAL(haveResult(bool)),
+                SLOT(doDeleteVideo(bool)));
+    }
+    else
+        delete confirmdialog;
 }
 
 void NetTree::doDeleteVideo(bool remove)
@@ -1345,11 +1379,10 @@ void NetTree::updateRSS()
     createBusyDialog(title);
 
     RSSManager *rssMan = new RSSManager();
-    rssMan->startTimer();
-    rssMan->doUpdate();
-
     connect(rssMan, SIGNAL(finished()), this,
                    SLOT(doTreeRefresh()));
+    rssMan->startTimer();
+    rssMan->doUpdate();
 }
 
 void NetTree::updateTrees()

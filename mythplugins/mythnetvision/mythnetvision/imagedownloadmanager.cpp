@@ -47,16 +47,17 @@ void ImageDownloadManager::addURL(const QString& title, const QString& url,
 void ImageDownloadManager::cancel()
 {
     m_mutex.lock();
+    qDeleteAll(m_fileList);
     m_fileList.clear();
+    m_parent = NULL;
     m_mutex.unlock();
 }
 
 void ImageDownloadManager::run()
 {
-    while (moreWork())
+    ImageData* idat;
+    while ((idat = moreWork()) != NULL)
     {
-        ImageData *idat = m_fileList.takeFirst();
-
         QString fileprefix = GetConfDir();
 
         QDir dir(fileprefix);
@@ -89,21 +90,25 @@ void ImageDownloadManager::run()
             HttpComms::getHttpFile(sFilename, url, 20000, 1, 2);
 
         // inform parent we have thumbnail ready for it
-        if (QFile::exists(sFilename))
+        if (QFile::exists(sFilename) && m_parent)
         {
             VERBOSE(VB_GENERAL|VB_EXTRA, QString("Threaded Image Download: %1").arg(sFilename));
             idat->filename = sFilename;
             QCoreApplication::postEvent(m_parent, new ImageDLEvent(idat));
         }
+        else
+        {
+            delete idat;
+        }
     }
 }
 
-bool ImageDownloadManager::moreWork()
+ImageData* ImageDownloadManager::moreWork()
 {
-    bool result;
+    ImageData* result = NULL;
     m_mutex.lock();
-    result = !m_fileList.isEmpty();
+    if (!m_fileList.isEmpty())
+        result = m_fileList.takeFirst();
     m_mutex.unlock();
     return result;
 }
-

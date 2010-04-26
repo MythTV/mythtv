@@ -44,6 +44,9 @@ TreeEditor::~TreeEditor()
 {
     QMutexLocker locker(&m_lock);
 
+    qDeleteAll(m_grabberList);
+    m_grabberList.clear();
+
     if (m_changed)
         emit itemsChanged();
 }

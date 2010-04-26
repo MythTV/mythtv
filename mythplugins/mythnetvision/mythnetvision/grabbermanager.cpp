@@ -81,14 +81,14 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
 {
     QMutexLocker locker(&m_lock);
 
-    Parse *parse = new Parse();
+    Parse parse;
 
     // File Handling
     QDomElement fileitem = domElem.firstChildElement("item");
     while (!fileitem.isNull())
     {
         insertTreeArticleInDB(feedtitle, path,
-                       pathThumb, parse->ParseItem(fileitem));
+                       pathThumb, parse.ParseItem(fileitem));
         fileitem = fileitem.nextSiblingElement("item");
     }
 
@@ -169,6 +169,7 @@ GrabberDownloadThread::~GrabberDownloadThread()
 void GrabberDownloadThread::cancel()
 {
     m_mutex.lock();
+    qDeleteAll(m_scripts);
     m_scripts.clear();
     m_mutex.unlock();
 }
@@ -195,6 +196,7 @@ void GrabberDownloadThread::run()
                                   .arg(script->GetTitle()));
             script->run();
         }
+        delete script;
     }
     QCoreApplication::postEvent(m_parent, new GrabberUpdateEvent());
 }

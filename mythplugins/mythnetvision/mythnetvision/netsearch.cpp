@@ -150,6 +150,15 @@ NetSearch::~NetSearch()
 
     cleanCacheDir();
 
+    qDeleteAll(m_grabberList);
+    m_grabberList.clear();
+
+    if (m_netSearch)
+    {
+        delete m_netSearch;
+        m_netSearch = NULL;
+    }
+
     if (m_download)
     {
         delete m_download;
@@ -161,7 +170,6 @@ NetSearch::~NetSearch()
         delete m_imageDownload;
         m_imageDownload = NULL;
     }
-
 }
 
 void NetSearch::loadData(void)
@@ -216,6 +224,11 @@ void NetSearch::createBusyDialog(QString title)
 
     if (m_busyPopup->Create())
         m_popupStack->AddScreen(m_busyPopup);
+    else
+    {
+        delete m_busyPopup;
+        m_busyPopup = NULL;
+    }
 }
 
 void NetSearch::showMenu(void)
@@ -515,7 +528,7 @@ void NetSearch::searchFinished(Search *item)
     populateResultList(list);
 }
 
-void NetSearch::searchTimeout(Search *item)
+void NetSearch::searchTimeout(Search *)
 {
     QMutexLocker locker(&m_lock);
 
@@ -537,10 +550,11 @@ void NetSearch::searchTimeout(Search *item)
         if (m_okPopup->Create())
             m_popupStack->AddScreen(m_okPopup);
         else
+        {
             delete m_okPopup;
+            m_okPopup = NULL;
+        }
     }
-
-    searchFinished(item);
 }
 
 void NetSearch::populateResultList(ResultVideo::resultList list)
@@ -708,10 +722,13 @@ void NetSearch::slotDeleteVideo()
             new MythConfirmationDialog(m_popupStack,message);
 
     if (confirmdialog->Create())
+    {
         m_popupStack->AddScreen(confirmdialog);
-
-    connect(confirmdialog, SIGNAL(haveResult(bool)),
-            SLOT(doDeleteVideo(bool)));
+        connect(confirmdialog, SIGNAL(haveResult(bool)),
+                SLOT(doDeleteVideo(bool)));
+    }
+    else
+        delete confirmdialog;
 }
 
 void NetSearch::doDeleteVideo(bool remove)
@@ -999,8 +1016,11 @@ void NetSearch::customEvent(QEvent *event)
         if (!id)
             return;
 
-        if (!((uint)m_searchResultList->GetCount() >= id->pos))
+        if ((uint)m_searchResultList->GetCount() <= id->pos)
+        {
+            delete id;
             return;
+        }
 
         MythUIButtonListItem *item =
                   m_searchResultList->GetItemAt(id->pos);
