@@ -44,7 +44,7 @@ class ImageDownloadManager : public QThread
 
   private:
 
-    bool moreWork();
+    ImageData* moreWork();
 
     QObject            *m_parent;
     QList<ImageData*>  m_fileList;

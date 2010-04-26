@@ -53,25 +53,28 @@ RSSEditPopup::RSSEditPopup(QString url, bool edit,
                                MythScreenStack *parent,
                                const QString name) :
     MythScreenType(parent, name),
-    m_lock(QMutex::Recursive),
     m_urlText(url),        m_editing(edit),
     m_thumbImage(NULL),    m_thumbButton(NULL),
     m_urlEdit(NULL),       m_titleEdit(NULL),
     m_descEdit(NULL),      m_authorEdit(NULL),
     m_okButton(NULL),      m_cancelButton(NULL),
-    m_download(NULL)
+    m_download(NULL),      m_manager(NULL),
+    m_reply(NULL)
 {
 }
 
 RSSEditPopup::~RSSEditPopup()
 {
-    QMutexLocker locker(&m_lock);
+    if (m_manager)
+    {
+        m_manager->disconnect();
+        m_manager->deleteLater();
+        m_manager = NULL;
+    }
 }
 
 bool RSSEditPopup::Create(void)
 {
-    QMutexLocker locker(&m_lock);
-
     // Load the theme for this screen
     bool foundtheme = LoadWindowFromXML("netvision-ui.xml", "rsseditpopup", this);
 
@@ -146,7 +149,6 @@ bool RSSEditPopup::keyPressEvent(QKeyEvent *event)
 
 void RSSEditPopup::parseAndSave(void)
 {
-    QMutexLocker locker(&m_lock);
     if (m_editing)
     {
         QString title = m_titleEdit->GetText();
@@ -207,14 +209,15 @@ void RSSEditPopup::slotCheckRedirect(QNetworkReply* reply)
 //        urlRedirectedTo.clear();
         slotSave(reply);
     }
+    reply->deleteLater();
 }
 
 void RSSEditPopup::slotSave(QNetworkReply* reply)
 {
-    QDomDocument *document = new QDomDocument();
-    document->setContent(reply->read(reply->bytesAvailable()), true);
+    QDomDocument document;
+    document.setContent(reply->read(reply->bytesAvailable()), true);
 
-    QString text = document->toString();
+    QString text = document.toString();
 
     QString title = m_titleEdit->GetText();
     QString description = m_descEdit->GetText();
@@ -229,17 +232,17 @@ void RSSEditPopup::slotSave(QNetworkReply* reply)
 
     VERBOSE(VB_GENERAL|VB_EXTRA, QString("Text to Parse: %1").arg(text));
 
-    QDomElement root = document->documentElement();
+    QDomElement root = document.documentElement();
     QDomElement channel = root.firstChildElement ("channel");
     if (!channel.isNull ())
     {
-        Parse *parser = new Parse();
+        Parse parser;
         if (title.isEmpty())
             title = channel.firstChildElement("title").text().trimmed();
         if (description.isEmpty())
             description = channel.firstChildElement("description").text();
         if (author.isEmpty())
-            author = parser->GetAuthor(channel);
+            author = parser.GetAuthor(channel);
         if (author.isEmpty())
             author = channel.firstChildElement("managingEditor").text();
         if (author.isEmpty())
@@ -423,6 +426,7 @@ bool RSSEditor::Create(void)
 
 void RSSEditor::loadData()
 {
+    qDeleteAll(m_siteList);
     m_siteList = findAllDBRSS();
     fillRSSButtonList();
     if (m_sites->GetCount() == 0)
@@ -541,10 +545,14 @@ void RSSEditor::slotDeleteSite()
             new MythConfirmationDialog(m_popupStack,message);
 
     if (confirmdialog->Create())
+    {
         m_popupStack->AddScreen(confirmdialog);
 
-    connect(confirmdialog, SIGNAL(haveResult(bool)),
-            SLOT(doDeleteSite(bool)));
+        connect(confirmdialog, SIGNAL(haveResult(bool)),
+                SLOT(doDeleteSite(bool)));
+    }
+    else
+        delete confirmdialog;
 }
 
 void RSSEditor::slotEditSite()

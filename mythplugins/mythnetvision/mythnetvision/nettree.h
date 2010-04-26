@@ -92,6 +92,9 @@ class NetTree : public MythScreenType
 
     void switchView(void);
 
+    // Only to keep track of what to delete
+    QList<ResultVideo*> m_videos;
+
     MythUIButtonTree   *m_siteMap;
     MythUIButtonList   *m_siteButtonList;
     MythGenericTree    *m_siteGeneric;
@@ -138,8 +141,6 @@ class NetTree : public MythScreenType
     DialogType          m_type;
 
     mutable QMutex      m_lock;
-
-    Parse              *m_parse;
 
     uint                m_updateFreq;
     bool                m_rssAutoUpdate;

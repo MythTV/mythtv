@@ -1,3 +1,4 @@
+#include <QtAlgorithms>
 #include <QFile>
 #include <QDataStream>
 #include <QDomDocument>
@@ -18,6 +19,7 @@ using namespace std;
 //========================================================================================
 
 Search::Search()
+    : m_searchProcess(NULL)
 {
     m_videoList.clear();
     m_timer = new QTimer();
@@ -25,8 +27,19 @@ Search::Search()
     m_timer->setSingleShot(true);
 }
 
-Search::~Search(){
-    m_videoList.clear();
+Search::~Search()
+{
+    reset();
+
+    delete m_searchProcess;
+    m_searchProcess = NULL;
+
+    if (m_timer)
+    {
+        m_timer->disconnect();
+        m_timer->deleteLater();
+        m_timer = NULL;
+    }
 }
 
 
@@ -66,6 +79,7 @@ void Search::executeSearch(const QString &script, const QString &query, uint pag
 
 void Search::reset()
 {
+    qDeleteAll(m_videoList);
     m_videoList.clear();
 }
 
@@ -86,8 +100,8 @@ uint Search::numIndex()
 
 void Search::process()
 {
-    Parse *parse = new Parse();
-    m_videoList = parse->parseRSS(m_document);
+    Parse parse;
+    m_videoList = parse.parseRSS(m_document);
 }
 
 uint Search::parseNumResults(QDomDocument domDoc)
@@ -183,15 +197,17 @@ void Search::slotProcessSearchExit(int exitcode, QProcess::ExitStatus exitstatus
         (exitcode != 0))
     {
         m_document.setContent(QString());
-        emit finishedSearch(this);
-        return;
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL|VB_EXTRA, "MythNetVision: Script Execution Successfully Completed");
+
+        m_data = m_searchProcess->readAllStandardOutput();
+        m_document.setContent(m_data, true);
     }
 
-    VERBOSE(VB_GENERAL|VB_EXTRA, "MythNetVision: Script Execution Successfully Completed");
-
-    m_data = m_searchProcess->readAllStandardOutput();
-    m_document.setContent(m_data, true);
-
+    m_searchProcess->deleteLater();
+    m_searchProcess = NULL;
     emit finishedSearch(this);
 }
 
@@ -202,8 +218,8 @@ void Search::slotSearchTimeout()
     if (m_searchProcess)
     {
         m_searchProcess->close();
+        m_searchProcess->deleteLater();
         m_searchProcess = NULL;
     }
     emit searchTimedOut(this);
 }
-

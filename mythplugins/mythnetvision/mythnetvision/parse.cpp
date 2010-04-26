@@ -494,12 +494,12 @@ private:
             }
         }
 
-        int raverage;
-        int rcount;
-        int rmin;
-        int rmax;
-        int views;
-        int favs;
+        int raverage = 0;
+        int rcount = 0;
+        int rmin = 0;
+        int rmax = 0;
+        int views = 0;
+        int favs = 0;
         QString tags;
         {
             QList<QDomNode> comms = GetDirectChildrenNS(element, Parse::MediaRSS,

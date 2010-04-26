@@ -38,7 +38,6 @@ class RSSEditPopup : public MythScreenType
     QUrl redirectUrl(const QUrl& possibleRedirectUrl,
                      const QUrl& oldRedirectUrl) const;
 
-    mutable QMutex          m_lock;
     RSSSite                *m_site;
     QString                 m_urlText;
     bool                    m_editing;

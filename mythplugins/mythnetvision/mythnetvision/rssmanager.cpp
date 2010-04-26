@@ -68,7 +68,10 @@ void RSSManager::doUpdate()
 void RSSManager::slotRefreshRSS()
 {
     if (m_sites.empty())
+    {
+        emit finished();
         return;
+    }
 
     RSSSite::rssList::iterator i = m_sites.begin();
     for (; i != m_sites.end(); ++i)
@@ -287,8 +290,8 @@ void RSSSite::process(void)
     if (rootName == "rss" || rootName == "rdf:RDF")
     {
         ResultVideo::resultList items;
-        Parse *parser = new Parse();
-        items = parser->parseRSS(domDoc);
+        Parse parser;
+        items = parser.parseRSS(domDoc);
 
         for (ResultVideo::resultList::iterator i = items.begin();
                 i != items.end(); ++i)
