@@ -1,8 +1,0 @@
-# /etc/security/msec/perm.local
-#
-# Local overrides to the msec program that runs from cron.hourly
-#
-# Full file path		user.group		permissions
-#
-/var/log/mythtv/		root.mythtv		775
-/var/log/mythtv/*		root.mythtv		664
