@@ -402,7 +402,7 @@ class MPUBLIC TV : public QThread
     QString GetQueuedChanNum(void) const;
     uint    GetQueuedChanID(void)  const { return queuedChanID; }
 
-    void SwitchSource(uint source_direction);
+    void SwitchSource(PlayerContext*, uint source_direction);
     void SwitchInputs(PlayerContext*, uint inputid);
     void ToggleInputs(PlayerContext*, uint inputid = 0);
     void SwitchCards(PlayerContext*,

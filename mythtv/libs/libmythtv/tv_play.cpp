@@ -4615,9 +4615,9 @@ bool TV::ActivePostQHandleAction(PlayerContext *ctx,
     else if (has_action("NEXTFAV", actions) && islivetv)
         ChangeChannel(ctx, CHANNEL_DIRECTION_FAVORITE);
     else if (has_action("NEXTSOURCE", actions) && islivetv)
-        SwitchSource(kNextSource);
+        SwitchSource(ctx, kNextSource);
     else if (has_action("PREVSOURCE", actions) && islivetv)
-        SwitchSource(kPreviousSource);
+        SwitchSource(ctx, kPreviousSource);
     else if (has_action("NEXTINPUT", actions) && islivetv)
         ToggleInputs(ctx);
     else if (has_action("NEXTCARD", actions) && islivetv)
@@ -6313,17 +6313,11 @@ void TV::DoSkipCommercials(PlayerContext *ctx, int direction)
         SetMuteTimer(ctx, kMuteTimeout);
 }
 
-void TV::SwitchSource(uint source_direction)
+void TV::SwitchSource(PlayerContext *ctx, uint source_direction)
 {
-    PlayerContext *actx = GetPlayerReadLock(-1, __FILE__, __LINE__);
-    if (!actx->recorder)
-    {
-        ReturnPlayerLock(actx);
-        return;
-    }
     QMap<uint,InputInfo> sources;
     vector<uint> cardids = RemoteRequestFreeRecorderList();
-    uint         cardid  = actx->GetCardID();
+    uint         cardid  = ctx->GetCardID();
     cardids.push_back(cardid);
     stable_sort(cardids.begin(), cardids.end());
 
@@ -6331,7 +6325,7 @@ void TV::SwitchSource(uint source_direction)
     excluded_cardids.push_back(cardid);
 
     InfoMap info;
-    actx->recorder->GetChannelInfo(info);
+    ctx->recorder->GetChannelInfo(info);
     uint sourceid = info["sourceid"].toUInt();
 
     vector<uint>::const_iterator it = cardids.begin();
@@ -6361,7 +6355,6 @@ void TV::SwitchSource(uint source_direction)
 
     if (sit == sources.end())
     {
-        ReturnPlayerLock(actx);
         return;
     }
 
@@ -6389,12 +6382,10 @@ void TV::SwitchSource(uint source_direction)
 
     if (sit == beg)
     {
-        ReturnPlayerLock(actx);
         return;
     }
 
     switchToInputId = (*sit).inputid;
-    ReturnPlayerLock(actx);
 
     QMutexLocker locker(&timerIdLock);
     if (!switchToInputTimerId)
