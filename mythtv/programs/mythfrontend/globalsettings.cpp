@@ -47,7 +47,7 @@ AudioOutputDevice::AudioOutputDevice() : HostComboBox("AudioOutputDevice", true)
     setLabel(QObject::tr("Audio output device"));
 
 #ifdef USING_ALSA
-    QMap<QString, QString> alsadevs = GetALSAPCMDevices();
+    QMap<QString, QString> alsadevs = GetALSADevices("pcm");
 
     if (!alsadevs.empty())
     {

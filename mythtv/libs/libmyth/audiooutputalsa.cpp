@@ -854,13 +854,13 @@ ALSAVolumeInfo AudioOutputALSA::GetVolumeRange(snd_mixer_elem_t *elem) const
     return vinfo;
 }
 
-QMap<QString, QString> GetALSAPCMDevices(void)
+QMap<QString, QString> GetALSADevices(const char *type)
 {
     QMap<QString, QString> alsadevs;
     void **hints, **n;
     char *name, *desc;
 
-    if (snd_device_name_hint(-1, "pcm", &hints) < 0)
+    if (snd_device_name_hint(-1, type, &hints) < 0)
         return alsadevs;
     n = hints;
 

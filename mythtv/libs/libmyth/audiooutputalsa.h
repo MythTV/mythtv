@@ -96,7 +96,7 @@ class AudioOutputALSA : public AudioOutputBase
                                         snd_pcm_uframes_t);
 };
 
-MPUBLIC QMap<QString, QString> GetALSAPCMDevices(void);
+MPUBLIC QMap<QString, QString> GetALSADevices(const char *type);
 
 #endif
 
