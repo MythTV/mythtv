@@ -7,9 +7,14 @@ from time import time
 from thread import start_new_thread, allocate_lock
 from time import sleep, time
 from MythTV import QuickDictData
-import lxml.html, lxml.etree
 import cPickle
 import os
+
+try:
+    import lxml.html, lxml.etree
+except:
+    raise Exception("The wikiscripts module requires the 'lxml' libraries"
+                    " be available for use")
 
 BASEURL = 'http://mythtv.org/wiki'
 
