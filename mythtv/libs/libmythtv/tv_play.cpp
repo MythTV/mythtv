@@ -251,6 +251,12 @@ bool TV::StartTV(ProgramInfo *tvrec, bool startInGuide,
                 tv->SetExitPlayer(true, true);
                 quitAll = true;
             }
+            else if (!startSysEventSent)
+            {
+                startSysEventSent = true;
+                SendMythSystemEvent("LIVETV_STARTED");
+            }
+
             VERBOSE(VB_PLAYBACK, LOC + "tv->LiveTV() -- end");
         }
         else if (!ConfiguredTunerCards())

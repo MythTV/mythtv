@@ -59,6 +59,7 @@ using namespace std;
 #include "util-osx-cocoa.h"
 #include "mythverbose.h"
 #include "myth_imgconvert.h"
+#include "mythsystemevent.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -3275,6 +3276,8 @@ void NuppelVideoPlayer::JumpToProgram(void)
         delete pginfo;
         return;
     }
+
+    SendMythSystemPlayEvent("PLAY_CHANGED", pginfo);
 
     player_ctx->buffer->OpenFile(pginfo->GetPlaybackURL());
     if (!player_ctx->buffer->IsOpen())
