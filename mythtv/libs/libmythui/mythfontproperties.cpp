@@ -325,7 +325,7 @@ MythFontProperties *MythFontProperties::ParseFromXml(
                     newFont->m_face.setWeight(QFont::Black);
                 else if (weight == "ultrablack" ||
                          weight == "7")
-                    newFont->m_face.setWeight(100);
+                    newFont->m_face.setWeight(99);
                 else
                     newFont->m_face.setWeight(QFont::Normal);
             }
