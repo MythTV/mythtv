@@ -8,8 +8,8 @@ __all__ = ['MythStatic', \
             \
            'ftopen', 'FileTransfer', 'FreeSpace', 'Program', 'Record', \
            'Recorded', 'RecordedProgram', 'OldRecorded', 'Job', 'Channel', \
-           'Guide', 'Video', 'VideoGrabber', 'NetVisionRSSItems', \
-           'NetVisionTreeItems', 'NetVisionSites', 'NetVisionGrabber', \
+           'Guide', 'Video', 'VideoGrabber', 'NetVisionRSSItem', \
+           'NetVisionTreeItem', 'NetVisionSite', 'NetVisionGrabber', \
             \
            'MythBE', 'Frontend', 'MythDB', 'MythVideo', 'MythXML']
 

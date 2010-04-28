@@ -1,0 +1,62 @@
+#!python
+
+from MythTV.wikiscripts import *
+from time import time
+import os.path
+import sys
+
+if __name__ == '__main__':
+    banner = 'MythTV Interactive Script Downloader.'
+    tic = time()
+    scripts = getScripts()
+    print 'Loading took %0.2f seconds' % (time()-tic)
+
+    while True:
+        print '  0: Quit'
+        for i in range(len(scripts)):
+            size = sum([len(c) for c in scripts[i].code.values()])
+            if i == 0:
+                print '%s:' % scripts[i].info['category']
+            elif scripts[i].info['category'] != scripts[i-1].info['category']:
+                print '%s:' % scripts[i].info['category']
+            print '  %d: %s - %s (%d)' % (i+1, scripts[i].info['name'], scripts[i].info['short'], size)
+
+        print '\nPlease choose script to install:'
+        i = -2
+        while (i >= len(scripts)) or (i < 0):
+            try:
+                i = int(raw_input('> '))-1
+                script = scripts[i]
+            except KeyboardInterrupt:
+                sys.exit()
+            except EOFError:
+                sys.exit()
+            except:
+                print 'This input only accepts integers.  Use Ctrl-C to exit'
+            if i == -1:
+                sys.exit()
+
+        print 'Author: '+script.info['author']
+        print 'Description: '+script.info['long']
+        print 'Webpage: '+script.info['webpage']
+
+        for name in script.code.keys():
+            if name[0] in ('/','~'):
+                path = name
+            else:
+                path = '~/bin/'+name
+
+            try:
+                inp = raw_input('Save to [%s]:' % path)
+            except EOFError:
+                sys.exit()
+            except KeyboardInterrupt:
+                print '\n\n\n'
+                continue
+            except:
+                sys.exit()
+
+            if len(inp):
+                path = inp
+            script.saveScript(name, os.path.expanduser(path))
+        print '\n\n\n'
