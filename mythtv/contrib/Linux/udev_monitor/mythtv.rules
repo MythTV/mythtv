@@ -1,6 +1,0 @@
-# Add this to your udev rules, and copy the mythtv-udev-monitor.sh
-# script to /etc/udev/scripts to enable monitoring of hotpluggable
-# disk drives, such as USB keychains and USB connected cameras.
-# NOTE: You need udev version 0.71 or later for this functionality.
-
-SUBSYSTEM=="block", RUN+="/etc/udev/scripts/mythtv_udev_monitor.sh"
