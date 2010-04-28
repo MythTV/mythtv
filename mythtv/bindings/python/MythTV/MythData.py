@@ -18,9 +18,10 @@ from socket import gethostbyaddr, gethostname
 
 #### FILE ACCESS ####
 
-def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
+def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
+                       chanid=None, starttime=None):
     """
-    ftopen(file, type, forceremote=False, nooverwrite=False, db=None)
+    ftopen(file, mode, forceremote=False, nooverwrite=False, db=None)
                                         -> FileTransfer object
                                         -> file object
     Method will attempt to open file locally, falling back to remote access
@@ -28,16 +29,16 @@ def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
     'forceremote' will force a FileTransfer object if possible.
     'file' takes a standard MythURI:
                 myth://<group>@<host>:<port>/<path>
-    'type' takes a 'r' or 'w'
+    'mode' takes a 'r' or 'w'
     'nooverwrite' will refuse to open a file writable, if a local file is found.
     """
-    db = MythDBBase(db)
+    db = DBCache(db)
     log = MythLog('Python File Transfer', db=db)
     reuri = re.compile(\
-        'myth://((?P<group>.*)@)?(?P<host>[a-zA-Z0-9\.]*)(:[0-9]*)?/(?P<file>.*)')
+        'myth://((?P<group>.*)@)?(?P<host>[a-zA-Z0-9_\.]*)(:[0-9]*)?/(?P<file>.*)')
     reip = re.compile('(?:\d{1,3}\.){3}\d{1,3}')
 
-    if type not in ('r','w'):
+    if mode not in ('r','w'):
         raise TypeError("File I/O must be of type 'r' or 'w'")
 
     # process URI (myth://<group>@<host>[:<port>]/<path/to/file>)
@@ -57,20 +58,22 @@ def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
                         WHERE value='BackendServerIP'
                         AND data=%s""", host) == 0:
             c.close()
-            raise MythDBError(MythError.DB_SETTING, 'BackendServerIP', backend)
+            raise MythDBError(MythError.DB_SETTING, \
+                              'BackendServerIP', backend)
         host = c.fetchone()[0]
         c.close()
 
     # user forced to remote access
     if forceremote:
-        if (type == 'w') and (filename.find('/') != -1):
+        if (mode == 'w') and (filename.find('/') != -1):
             raise MythFileError(MythError.FILE_FAILED_WRITE, file, 
                                 'attempting remote write outside base path')
-        return FileTransfer(host, filename, sgroup, type, db)
+        return FileTransfer(host, filename, sgroup, mode, db, \
+                                  chanid, starttime)
 
     sgs = db.getStorageGroup(groupname=sgroup)
 
-    if type == 'w':
+    if mode == 'w':
         # prefer local storage always
         for i in range(len(sgs)-1,-1,-1):
             if not sgs[i].local:
@@ -94,7 +97,7 @@ def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
                     raise MythDBError(MythError.FILE_FAILED_WRITE, file,
                                         'refusing to overwrite existing file')
             log(log.FILE, 'Opening local file (w)', sg.dirname+filename)
-            return open(sg.dirname+filename, 'w')
+            return open(sg.dirname+filename, mode)
         elif len(sgs) == 1:
             if filename.find('/') != -1:
                 path = sgs[0].dirname+filename.rsplit('/',1)[0]
@@ -105,12 +108,13 @@ def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
                     raise MythFileError(MythError.FILE_FAILED_WRITE, file,
                                         'refusing to overwrite existing file')
             log(log.FILE, 'Opening local file (w)', sgs[0].dirname+filename)
-            return open(sgs[0].dirname+filename, 'w')
+            return open(sgs[0].dirname+filename, mode)
         else:
             if filename.find('/') != -1:
                 raise MythFileError(MythError.FILE_FAILED_WRITE, file, 
                                 'attempting remote write outside base path')
-            return FileTransfer(host, filename, sgroup, 'w', db)
+            return FileTransfer(host, filename, sgroup, 'w', db, \
+                                      chanid, starttime)
     else:
         # search for file in local directories
         for sg in sgs:
@@ -119,73 +123,101 @@ def ftopen(file, type, forceremote=False, nooverwrite=False, db=None):
                     # file found, open local
                     log(log.FILE, 'Opening local file (r)',
                                                 sg.dirname+filename)
-                    return open(sg.dirname+filename, type)
+                    return open(sg.dirname+filename, mode)
         # file not found, open remote
-        return FileTransfer(host, filename, sgroup, type, db)
+        return FileTransfer(host, filename, sgroup, mode, db, \
+                                  chanid=None, starttime=None)
 
-class FileTransfer( MythBEConn ):
+class FileTransfer( BEEvent ):
     """
     A connection to mythbackend intended for file transfers.
     Emulates the primary functionality of the local 'file' object.
     """
     logmodule = 'Python FileTransfer'
+
+    class BETransConn( BEConnection ):
+        def __init__(self, host, port, filename, sgroup, mode):
+            self.filename = filename
+            self.sgroup = sgroup
+            self.mode = mode
+            BEConnection.__init__(self, host, port)
+
+        def announce(self):
+            if self.mode == 'r':
+                write = False
+            elif self.mode == 'w':
+                write = True
+
+            res = self.backendCommand('ANN FileTransfer %s %d %d %s' \
+                      % (self.localname, write, False, 
+                         BACKEND_SEP.join(
+                                ['-1', self.filename, self.sgroup])))
+            if res.split(BACKEND_SEP)[0] != 'OK':
+                raise MythBEError(MythError.PROTO_ANNOUNCE,
+                                  self.host, self.port, res)
+            else:
+                sp = res.split(BACKEND_SEP)
+                self._sockno = int(sp[1])
+                self._size = sp[2:]
+
+        def __del__(self):
+            self.socket.shutdown(1)
+            self.socket.close()
+
     def __repr__(self):
         return "<open file 'myth://%s:%s/%s', mode '%s' at %s>" % \
                           (self.sgroup, self.host, self.filename, \
-                                self.type, hex(id(self)))
+                                self.mode, hex(id(self)))
 
-    def __init__(self, host, filename, sgroup, type, db=None):
-        if type not in ('r','w'):
-            raise MythError("FileTransfer type must be read ('r') "+
-                                "or write ('w')")
+    def _listhandlers(self):
+        if self.chanid and self.starttime:
+            self.re_update = re.compile(\
+                    BACKEND_SEP.join(['BACKEND_MESSAGE',
+                             'UPDATE_FILE_SIZE %s %s (?P<size>[0-9]*)' %\
+                            (self.chanid, \
+                             self.starttime.strftime('%Y-%m-%dT%H-%M-%S')),
+                             'empty']))
+            return [self.updatesize]
+        return []
 
-        self.host = host
+    def updatesize(self, event):
+        if event is None:
+            return self.re_update
+        match = self.re_update(event)
+        self._size = match.group('size')
+
+    def __init__(self, host, filename, sgroup, mode, db=None, \
+                       chanid=None, starttime=None):
         self.filename = filename
         self.sgroup = sgroup
-        self.type = type
+        self.mode = mode
+        self.chanid = chanid
+        self.starttime = starttime
 
-        self.tsize = 2**15
-        self.tmax = 2**17
-        self.count = 0
-        self.step = 2**12
-
-        self.open = False
-        # create control socket
-        self.control = MythBEBase(host, 'Playback', db=db)
-        self.control.log.module = 'Python FileTransfer Control'
-        # continue normal Backend initialization
-        MythBEConn.__init__(self, host, type, db=db)
+        # open control socket
+        BEEvent.__init__(self, host, True, db=db)
+        # open transfer socket
+        self.ftsock = self.BETransConn(self.host, self.port, self.filename,
+                                       self.sgroup, self.mode)
         self.open = True
 
-    def announce(self, type):
-        # replacement announce for Backend object
-        if type == 'w':
-            self.w = True
-        elif type == 'r':
-            self.w = False
-        res = self.backendCommand('ANN FileTransfer %s %d %d %s' \
-                    % (socket.gethostname(), self.w, False,
-                        BACKEND_SEP.join(['-1',self.filename,self.sgroup])))
-        if res.split(BACKEND_SEP)[0] != 'OK':
-            raise MythError(MythError.PROTO_ANNOUNCE, self.host, self.port, res)
-        else:
-            sp = res.split(BACKEND_SEP)
-            self.sockno = int(sp[1])
-            self.pos = 0
-            self.size = (int(sp[2]) + (int(sp[3])<0))*2**32 + int(sp[3])
+        self._sockno = self.ftsock._sockno
+        self._size = self.joinInt(*self.ftsock._size)
+        self._pos = 0
+        self._tsize = 2**15
+        self._tmax = 2**17
+        self._count = 0
+        self._step = 2**12
 
     def __del__(self):
-        if not self.open:
-            return
-        self.control.backendCommand('QUERY_FILETRANSFER '\
-                    +BACKEND_SEP.join([str(self.sockno), 'JOIN']))
-        self.socket.shutdown(1)
-        self.socket.close()
+        self.backendCommand('QUERY_FILETRANSFER '+BACKEND_SEP.join(
+                                        [str(self._sockno), 'JOIN']))
+        del self.ftsock
         self.open = False
 
     def tell(self):
         """FileTransfer.tell() -> current offset in file"""
-        return self.pos
+        return self._pos
 
     def close(self):
         """FileTransfer.close() -> None"""
@@ -201,48 +233,52 @@ class FileTransfer( MythBEConn ):
             Requests over 128KB will be buffered internally.
         """
 
-        def recv(self, size):
-            buff = ''
-            while len(buff) < size:
-                buff += self.socket.recv(size-len(buff))
-            return buff
-
-        if self.w:
+        # some sanity checking
+        if self.mode != 'r':
             raise MythFileError('attempting to read from a write-only socket')
         if size == 0:
             return ''
-
-        final = self.pos+size
-        if final > self.size:
-            final = self.size
+        if self._pos + size > self._size:
+            size = self._size - self._pos
 
         buff = ''
-        while self.pos < final:
-            self.count += 1
-            size = final - self.pos
-            if size > self.tsize:
-                size = self.tsize
-            res = self.control.backendCommand('QUERY_FILETRANSFER '+\
-                        BACKEND_SEP.join([  str(self.sockno),
-                                            'REQUEST_BLOCK',
-                                            str(size)]))
-            #print '%s - %s' % (int(res), size)
-            if int(res) == size:
-                if (self.count == 10) and (self.tsize < self.tmax) :
-                    self.count = 0
-                    self.tsize += self.step
+        while len(buff) < size:
+            ct = size - len(buff)
+            if ct > self._tsize:
+                # drop size and bump counter if over limit
+                self._count += 1
+                ct = self._tsize
+
+            # request transfer
+            res = self.backendCommand('QUERY_FILETRANSFER '\
+                        +BACKEND_SEP.join(
+                                [str(self._sockno),
+                                 'REQUEST_BLOCK',
+                                 str(ct)]))
+
+            if int(res) == ct:
+                if (self._count >= 5) and (self._tsize < self._tmax):
+                    # multiple successful transfers, bump transfer limit
+                    self._count = 0
+                    self._tsize += self._step
+
             else:
                 if int(res) == -1:
-                    self.seek(self.pos)
+                    # complete failure, hard reset position and retry
+                    self._count = 0
+                    self.seek(self._pos)
                     continue
-                size = int(res)
-                self.count = 0
-                self.tsize -= self.step
-                if self.tsize < self.step:
-                    self.tsize = self.step
 
-            buff += recv(self, size)
-            self.pos += size
+                # partial failure, reset counter and drop transfer limit
+                ct = int(res)
+                self._count = 0
+                self._tsize -= 2*self._step
+                if self._tsize < self._step:
+                    self._tsize = self._step
+
+            # append data and move position
+            buff += self.ftsock._recv(ct)
+            self._pos += ct
         return buff
 
     def write(self, data):
@@ -250,21 +286,27 @@ class FileTransfer( MythBEConn ):
         FileTransfer.write(data) -> None
             Requests over 128KB will be buffered internally
         """
-        if not self.w:
+        if self.mode != 'w':
             raise MythFileError('attempting to write to a read-only socket')
         while len(data) > 0:
             size = len(data)
-            if size > self.tsize:
-                buff = data[self.tsize:]
-                data = data[:self.tsize]
+            # check size for buffering
+            if size > self._tsize:
+                size = self._tsize
+                buff = data[:size]
+                data = data[size:]
             else:
                 buff = data
                 data = ''
-            self.pos += int(self.socket.send(data))
-            self.control.backendCommand('QUERY_FILETRANSFER '+BACKEND_SEP\
-                    .join([str(self.sockno),'WRITE_BLOCK',str(size)]))
+            # push data to server
+            self.pos += int(self.ftsock._send(buff, False))
+            # inform server of new data
+            self.backendCommand('QUERY_FILETRANSFER '\
+                    +BACKEND_SEP.join(\
+                            [str(self._sockno),
+                             'WRITE_BLOCK',
+                             str(size)]))
         return
-
 
     def seek(self, offset, whence=0):
         """
@@ -277,33 +319,35 @@ class FileTransfer( MythBEConn ):
         if whence == 0:
             if offset < 0:
                 offset = 0
-            elif offset > self.size:
-                offset = self.size
+            elif offset > self._size:
+                offset = self._size
         elif whence == 1:
-            if offset + self.pos < 0:
-                offset = -self.pos
-            elif offset + self.pos > self.size:
-                offset = self.size - self.pos
+            if offset + self._pos < 0:
+                offset = -self._pos
+            elif offset + self._pos > self._size:
+                offset = self._size - self._pos
         elif whence == 2:
             if offset > 0:
                 offset = 0
-            elif offset < -self.size:
-                offset = -self.size
+            elif offset < -self._size:
+                offset = -self._size
             whence = 0
-            offset = self.size+offset
+            offset = self._size+offset
 
-        curhigh,curlow = self.control.splitInt(self.pos)
-        offhigh,offlow = self.control.splitInt(offset)
+        curhigh,curlow = self.splitInt(self._pos)
+        offhigh,offlow = self.splitInt(offset)
 
-        res = self.control.backendCommand('QUERY_FILETRANSFER '+BACKEND_SEP\
-                        .join([str(self.sockno),'SEEK',str(offhigh),
-                                str(offlow),str(whence),str(curhigh),
-                                str(curlow)])\
-                    ).split(BACKEND_SEP)
-        self.pos = self.control.joinInt(int(res[0]),int(res[1]))
-
-class FileOps( MythBEBase ):
-    __doc__ = MythBEBase.__doc__+"""
+        res = self.backendCommand('QUERY_FILETRANSFER '\
+                +BACKEND_SEP.join(
+                        [str(self._sockno),'SEEK',
+                         str(offhigh),str(offlow),
+                         str(whence),
+                         str(curhigh),str(curlow)])\
+                 ).split(BACKEND_SEP)
+        self._pos = self.joinInt(*res)
+        
+class FileOps( BEEvent ):
+    __doc__ = BEEvent.__doc__+"""
         getRecording()      - return a Program object for a recording
         deleteRecording()   - notify the backend to delete a recording
         forgetRecording()   - allow a recording to re-record
@@ -354,6 +398,56 @@ class FileOps( MythBEBase ):
         """FileOps.reschedule() -> None"""
         self.backendCommand('RESCHEDULE_RECORDINGS '+str(recordid))
 
+class Record( DBDataWrite ):
+    """
+    Record(id=None, db=None, raw=None) -> Record object
+    """
+
+    kNotRecording       = 0
+    kSingleRecord       = 1
+    kTimeslotRecord     = 2
+    kChannelRecord      = 3
+    kAllRecord          = 4
+    kWeekslotRecord     = 5
+    kFindOneRecord      = 6
+    kOverrideRecord     = 7
+    kDontRecord         = 8
+    kFindDailyRecord    = 9
+    kFindWeeklyRecord   = 10
+
+    _table = 'record'
+    _where = 'recordid=%s'
+    _setwheredat = 'self.recordid,'
+    _defaults = {'recordid':None,    'type':kAllRecord,      'title':u'Unknown',
+                 'subtitle':'',      'description':'',       'category':'',
+                 'station':'',       'seriesid':'',          'search':0,
+                 'last_record':datetime(1900,1,1),
+                 'next_record':datetime(1900,1,1),
+                 'last_delete':datetime(1900,1,1)}
+    _logmodule = 'Python Record'
+
+    def __str__(self):
+        if self._wheredat is None:
+            return u"<Uninitialized Record Rule at %s>" % hex(id(self))
+        return u"<Record Rule '%s', Type %d at %s>" \
+                                    % (self.title, self.type, hex(id(self)))
+
+    def __repr__(self):
+        return str(self).encode('utf-8')
+
+    def __init__(self, id=None, db=None, raw=None):
+        DBDataWrite.__init__(self, (id,), db, raw)
+
+    def create(self, data=None):
+        """Record.create(data=None) -> Record object"""
+        self._wheredat = (DBDataWrite.create(self, data),)
+        self._pull()
+        FileOps(db=self._db).reschedule(self.recordid)
+        return self
+
+    def update(self, *args, **keywords):
+        DBDataWrite.update(*args, **keywords)
+        FileOps(db=self._db).reschedule(self.recordid)
 
 class FreeSpace( DictData ):
     """Represents a FreeSpace entry."""
@@ -479,7 +573,7 @@ class Program( DictData ):
             DictData.__init__(self, raw)
         else:
             raise InputError("Either 'raw' or 'etree' must be provided")
-        self._db = MythDBBase(db)
+        self._db = DBCache(db)
         self.filesize = self.joinInt(self.fs_high,self.fs_low)
 
     def toString(self):
@@ -513,58 +607,25 @@ class Program( DictData ):
         if type != 'r':
             raise MythFileError(MythError.FILE_FAILED_WRITE, self.filename, 
                             'Program () objects cannot be opened for writing')
-        return ftopen(self.filename, 'r')
+        return ftopen(self.filename, 'r', chanid=self.chanid, \
+                      starttime=self.starttime)
 
-class Record( DBDataWrite ):
-    """
-    Record(id=None, db=None, raw=None) -> Record object
-    """
+    def record(self, type=Record.kSingleRecord):
+        if datetime.now() > self.endtime:
+            raise MythError('Cannot create recording rule for past recording.')
+        rec = Record(db=self._db)
+        for key in ('chanid','title','subtitle','description','category',
+                    'seriesid','programid'):
+            rec[key] = self[key]
 
-    kNotRecording       = 0
-    kSingleRecord       = 1
-    kTimeslotRecord     = 2
-    kChannelRecord      = 3
-    kAllRecord          = 4
-    kWeekslotRecord     = 5
-    kFindOneRecord      = 6
-    kOverrideRecord     = 7
-    kDontRecord         = 8
-    kFindDailyRecord    = 9
-    kFindWeeklyRecord   = 10
+        rec.startdate = self.starttime.date()
+        rec.starttime = self.starttime-datetime.combine(rec.startdate, time())
+        rec.enddate = self.endtime.date()
+        rec.endtime = self.endtime-datetime.combine(rec.enddate, time())
 
-    _table = 'record'
-    _where = 'recordid=%s'
-    _setwheredat = 'self.recordid,'
-    _defaults = {'recordid':None,    'type':kAllRecord,      'title':u'Unknown',
-                 'subtitle':'',      'description':'',       'category':'',
-                 'station':'',       'seriesid':'',          'search':0,
-                 'last_record':datetime(1900,1,1),
-                 'next_record':datetime(1900,1,1),
-                 'last_delete':datetime(1900,1,1)}
-    _logmodule = 'Python Record'
-
-    def __str__(self):
-        if self._wheredat is None:
-            return u"<Uninitialized Record Rule at %s>" % hex(id(self))
-        return u"<Record Rule '%s', Type %d at %s>" \
-                                    % (self.title, self.type, hex(id(self)))
-
-    def __repr__(self):
-        return str(self).encode('utf-8')
-
-    def __init__(self, id=None, db=None, raw=None):
-        DBDataWrite.__init__(self, (id,), db, raw)
-
-    def create(self, data=None):
-        """Record.create(data=None) -> Record object"""
-        self._wheredat = (DBDataWrite.create(self, data),)
-        self._pull()
-        FileOps(db=self._db).reschedule(self.recordid)
-        return self
-
-    def update(self, *args, **keywords):
-        DBDataWrite.update(*args, **keywords)
-        FileOps(db=self._db).reschedule(self.recordid)
+        rec.station = self.callsign
+        rec.type = type
+        return rec.create()
 
 class Recorded( DBDataWrite ):
     """
@@ -650,9 +711,11 @@ class Recorded( DBDataWrite ):
 
     def open(self, type='r'):
         """Recorded.open(type='r') -> file or FileTransfer object"""
-        return ftopen("myth://%s@%s/%s" % ( self.storagegroup, \
-                                            self.hostname,\
-                                            self.basename), type, db=self._db)
+        return ftopen("myth://%s@%s/%s" % ( self.storagegroup,
+                                            self.hostname,
+                                            self.basename),
+                      type, db=self._db,
+                      chanid=self.chanid, starttime=self.starttime)
 
     def getProgram(self):
         """Recorded.getProgram() -> Program object"""
@@ -951,7 +1014,7 @@ class Guide( DBData ):
 
     def __init__(self, data=None, db=None, raw=None, etree=None):
         if etree:
-            db = MythDBBase(db)
+            db = DBCache(db)
             dat = {'chanid':etree[0]}
             attrib = etree[1].attrib
             for key in ('title','subTitle','category','seriesId',
@@ -1461,7 +1524,7 @@ class NetVisionGrabber( Grabber ):
 
     @staticmethod
     def grabberList(types='search,tree', db=None):
-        db = MythDBBase(db)
+        db = DBCache(db)
         db._check_schema('NetvisionDBSchemaVer',
                                 NVSCHEMA_VERSION, 'NetVision')
         c = db.cursor(self.log)
@@ -1485,7 +1548,7 @@ class NetVisionGrabber( Grabber ):
         if commandline:
             Grabber.__init__(path=commandline, db=db)
         else:
-            db = MythDBBase(db)
+            db = DBCache(db)
             self.log = MythLog(self.logmodule, db=self)
             if c.execute("""SELECT commandline
                             FROM netvision%sgrabbers

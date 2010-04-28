@@ -2,18 +2,20 @@
 
 __all__ = ['MythStatic', \
             \
-           'DictData', 'DBData', 'DBDataWrite', 'DBDataCRef', 'MythDBConn', \
-           'MythBEConn', 'MythXMLConn', 'MythLog', 'MythError', \
-           'StorageGroup', 'Grabber', \
+           'DictData', 'QuickDictData', 'DBData', 'DBDataWrite', \
+           'DBDataRef', 'DBDataCRef', 'DBConnection', 'DBCache', \
+           'BEConnection', 'BECache', 'BEEvent', 'XMLConnection', \
+           'MythLog', 'MythError', 'StorageGroup', 'System', \
             \
            'ftopen', 'FileTransfer', 'FreeSpace', 'Program', 'Record', \
            'Recorded', 'RecordedProgram', 'OldRecorded', 'Job', 'Channel', \
            'Guide', 'Video', 'VideoGrabber', 'NetVisionRSSItem', \
            'NetVisionTreeItem', 'NetVisionSite', 'NetVisionGrabber', \
             \
-           'MythBE', 'Frontend', 'MythDB', 'MythVideo', 'MythXML']
+           'MythBE', 'BEEventMonitor', 'Frontend', 'MythDB', 'MythVideo', \
+           'MythXML']
 
-__version__ = (0,23,0,3)
+__version__ = (0,23,0,5)
 
 import26 = """
 import warnings

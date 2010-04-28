@@ -8,7 +8,9 @@ from MythStatic import *
 from MythBase import *
 from MythData import *
 
-import os, re, socket
+import os
+import re
+import socket
 from datetime import datetime
 
 
@@ -513,10 +515,14 @@ class MythBE( FileOps ):
         """
         return self.backendCommand('QUERY_GUIDEDATATHROUGH')
 
-class MythTV( MythBE ):
-    # renamed to MythBE()
-    pass
+class BEEventMonitor( BEEvent ):
+    def _listhandlers(self):
+        return [self.eventMonitor]
 
+    def eventMonitor(self, event=None):
+        if event is None:
+            return re.compile('BACKEND_MESSAGE')
+        self.log(MythLog.ALL, event)
 
 class Frontend(object):
     isConnected = False
@@ -644,8 +650,8 @@ class Frontend(object):
         return re.findall('play ([\w -:]*\w+)[ \r\n]+- ([\w /:,\(\)]+)',
                         self.recv())
 
-class MythDB( MythDBBase ):
-    __doc__ = MythDBBase.__doc__+"""
+class MythDB( DBCache ):
+    __doc__ = DBCache.__doc__+"""
         obj.searchRecorded()    - return a list of matching Recorded objects
         obj.getRecorded()       - return a single matching Recorded object
         obj.searchOldRecorded() - return a list of matching
@@ -670,7 +676,7 @@ class MythDB( MythDBBase ):
             watched,    storagegroup,           category_type,
             airdate,    stereo,     subtitled,  hdtv,       closecaptioned,
             partnumber, parttotal,  seriesid,   showtype,   programid,
-            manualid,   generic,    cast,       livetv,
+            manualid,   generic,    cast,       livetv,     basename,
             syndicatedepisodenumber
         """
 
@@ -685,7 +691,7 @@ class MythDB( MythDBBase ):
         if key in ('title','subtitle','chanid','starttime','progstart',
                         'category','hostname','autoexpire','commflagged',
                         'stars','recgroup','playgroup','duplicate',
-                        'transcoded','watched','storagegroup'):
+                        'transcoded','watched','storagegroup','basename'):
             return ('recorded.%s=%%s' % key, value, 0)
 
         # recordedprogram matches
@@ -871,7 +877,7 @@ class MythDB( MythDBBase ):
             hostname = 'NULL'
         self.settings[hostname][value] = data
 
-class MythXML( MythXMLConn ):
+class MythXML( XMLConnection ):
     """
     Provides convenient methods to access the backend XML server.
     """
@@ -964,7 +970,7 @@ class MythXML( MythXMLConn ):
             progs.append(Program(db=self.db, etree=prog))
         return progs
 
-class MythVideo( MythDBBase ):
+class MythVideo( DBCache ):
     """
     Provides convenient methods to access the MythTV MythVideo database.
     """
@@ -972,7 +978,7 @@ class MythVideo( MythDBBase ):
         """
         Initialise the MythDB connection.
         """
-        MythDBBase.__init__(self,db)
+        DBCache.__init__(self,db)
 
         # check schema version
         self._check_schema('mythvideo.DBSchemaVer', 
