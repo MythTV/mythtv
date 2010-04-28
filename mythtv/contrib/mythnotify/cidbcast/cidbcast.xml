@@ -1,8 +1,0 @@
-<telephone-event type="callerID" TTY="%cid_port%">
-  <time stamp="%cid_time_stamp%" zone="%cid_time_zone%" daylight-savings="%cid_daylight_saving%" second="%cid_time_second%" minute="%cid_time_minute%" hour="%cid_time_hour%" day="%cid_time_day%" month="%cid_time_month%" year="%cid_time_year%">%cid_time_string%</time>
-  <ring-type>%cid_ring_type%</ring-type>
-  <from>
-    <name>%cid_name%</name>
-    <number>%cid_number%</number>
-  </from>
-</telephone-event>
