@@ -11,23 +11,23 @@ Returns a pointer to a FilterInfo describing the named filter, or NULL
 if no such filter is found.
 
 QPtrList<FilterInfo> GetAllFilterInfo(void):
-Returns a QPtrList of FilterInfo containing all known filters.  This may 
-be useful for providing the user with a list of filters to select from.  
-The list is a duplicate of the FilterManager's internal list, and items 
-can be removed from it or reordered as desired.  This is a list of 
-pointers, so the FilterInfo structures should be duplicated if they need 
+Returns a QPtrList of FilterInfo containing all known filters.  This may
+be useful for providing the user with a list of filters to select from.
+The list is a duplicate of the FilterManager's internal list, and items
+can be removed from it or reordered as desired.  This is a list of
+pointers, so the FilterInfo structures should be duplicated if they need
 to be modified.
 
 VideoFilter *LoadFilter(FilterInfo *Filt, VideoFrameType inpixfmt,
                         VideoFrameType outpixfmt, int &width,
-			int &height, char *opts):
+                        int &height, char *opts):
 Returns a pointer to a single VideoFilter, corresponding to the given
 FilterInfo, or NULL if the filter can not be loaded.  Inpixfmt and
 outpixfmt give the input and output pixel formats requested of the
 filter.  The filter load will fail if the filter can not provide the
 requested format conversion.  Width and height are the dimensions of the
 video which will be input to the filter.  If the filter alters the frame
-dimensions of the video, width and height will be modified accordingly. 
+dimensions of the video, width and height will be modified accordingly.
 Opts is a NULL-terminated string of options for the video filter, and
 its interpretation depends on the filter.
 
@@ -50,22 +50,22 @@ destroying the filters.
 FilterChain objects provide the following method:
 
 void ProcessFrame(VideoFrame *Frame):
-Applies filters loaded in the FilterChain to the video frame.  Will 
-return immediately if Frame==NULL, but does no other checking on the 
-frame's validity.  It is expected that a FilterChain will never be used 
-to process video which is not in format and size requested when it was 
+Applies filters loaded in the FilterChain to the video frame.  Will
+return immediately if Frame==NULL, but does no other checking on the
+frame's validity.  It is expected that a FilterChain will never be used
+to process video which is not in format and size requested when it was
 created.
 
-FilterChain objects also provide all of the methods of QPtrList, most of 
-which need not be used.  The clear(void) method may occasionally be 
-useful, for emptying the filter chain and destroying the filters in it.  
+FilterChain objects also provide all of the methods of QPtrList, most of
+which need not be used.  The clear(void) method may occasionally be
+useful, for emptying the filter chain and destroying the filters in it.
 FilterChains will automatically be cleared upon deletion.
 
 
 Adding new filters
 ~~~~~~~~~~~~~~~~~~
 
-Writing a new filter is fairly simple.  A filter will need to provide a 
+Writing a new filter is fairly simple.  A filter will need to provide a
 structure based on this one:
 
 typedef struct VideoFilter_
@@ -89,9 +89,9 @@ typedef struct VideoFilter_
 } VideoFilter;
 
 
-This structure is defined in filter.h and may be used as-is by filters 
-which do not need to store any private data.  To avoid potential errors 
-from copying or retyping this structure definition, you may want to use 
+This structure is defined in filter.h and may be used as-is by filters
+which do not need to store any private data.  To avoid potential errors
+from copying or retyping this structure definition, you may want to use
 something like this for filters with private data:
 
 struct MyFilter
@@ -100,11 +100,11 @@ struct MyFilter
   int foo myprivateint;
 };
 
-This saves hassle and helps to prevent errors, and allows your code to 
-recompile without change if new fields are added to VideoFilter (unless 
+This saves hassle and helps to prevent errors, and allows your code to
+recompile without change if new fields are added to VideoFilter (unless
 the filter function needs to set the new fields).
 
-To create new filter instances, you must provide a function with the 
+To create new filter instances, you must provide a function with the
 following prototype:
 VideoFilter *new_filter(VideoFrameType inpixfmt,
                         VideoFrameType outpixfmt, int *width,
@@ -129,7 +129,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt,
                         int *height, char *options)
 {
     VideoFilter *filter;
-    
+
     (void)width;
     (void)height;
     (void)options;
@@ -137,7 +137,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt,
     if( (inpixfmt != outpixfmt) || (inpixfmt != FMT_YV12 &&
         inpixfmt != FMT_RGB24 && inpixfmt != FMT_YUV422P) )
         return NULL;
-    
+
     filter = malloc(sizeof(VideoFilter));
 
     if (filter == NULL)
@@ -155,12 +155,12 @@ buffers, so it does not need a cleanup function.  The memory used by the
 VideoFilter structure will be freed by the FilterChain into which the
 filter is loaded.
 
-Here's the filter function from the invert filter.  It's very simple, 
-and can invert video in most formats, but can not convert between 
+Here's the filter function from the invert filter.  It's very simple,
+and can invert video in most formats, but can not convert between
 formats.
 
 int invert(VideoFilter *vf, VideoFrame *frame)
-{  
+{
     int size = frame->size;
     unsigned char *buf = frame->buf;
     (void)vf;
@@ -175,15 +175,15 @@ int invert(VideoFilter *vf, VideoFrame *frame)
 }
 
 As a special case, a filter's init function may return a pointer to a
-VideoFilter structure in which the filter function pointer is set to 
-NULL.  This will cause the filter to be removed from the chain, while 
-leaving the rest of the chain intact.  See the "force" filter directory 
+VideoFilter structure in which the filter function pointer is set to
+NULL.  This will cause the filter to be removed from the chain, while
+leaving the rest of the chain intact.  See the "force" filter directory
 for an example of this feature.
 
 A filter library must also provide an array of FilterInfo structures,
 named filter_table.  The FilterInfo structure is defined as follow:
 
-typedef struct FilterInfo_ 
+typedef struct FilterInfo_
 {
     char *symbol;    // the symol name of the new filter function
     char *name;      // name of the filter, should not contain any '='
@@ -209,7 +209,7 @@ FMT_NULL, and should be ordered by preference, with the filter's fastest
 and highest-quality conversions listed first.  The filter_table list
 must be terminated by the marker value FILT_NULL.
 
-This is much easier to understand than it is to describe.  Here is an 
+This is much easier to understand than it is to describe.  Here is an
 example filter_table definition, also from the invert filter:
 
 FmtConv FmtList[] =
@@ -234,30 +234,30 @@ FilterInfo filter_table[] =
 
 Because only the name of the filter's new filter function is needed, and
 not a pointer to the function itself, multi-filter libraries can easily
-put all of the filter definitions together in a separate source file 
+put all of the filter definitions together in a separate source file
 from filter implementations.
 
-filter.h also provides several macros for use in benchmarking filters. 
+filter.h also provides several macros for use in benchmarking filters.
 To support benchmarking of your filter, add TF_STRUCT in your filter
 structure definition, call TF_INIT() with a pointer to your filter
-structure in your filter init, add TF_VARS to the variable declaration 
-of your filter function, and TF_START before the actual filter code, and 
-call TF_END with a pointer to the filter structure and an informational 
-string to be prefix to the output before your filter function returns.  
+structure in your filter init, add TF_VARS to the variable declaration
+of your filter function, and TF_START before the actual filter code, and
+call TF_END with a pointer to the filter structure and an informational
+string to be prefix to the output before your filter function returns.
 Look at the quickdnr, kerneldeint, and denoise3d filters for examples.
 
 The benchmarking macros will do nothing unless activated by defining
 TIME_FILTER.  You can also adjust the reporting interval, in frames, by
 defining TF_INTERVAL.  If you set TF_TYPE_TSC, the P5 TSC registers are
 use for timing, otherwise gettimeofday is used.  If you use the TSC
-method, you can use /contrib/tsc-calibrate.c to determine the correct
-value for TF_TSC_TICKS for your system.  If this value is set, TSC
-benchmarking will report speeds in frames per second.  Otherwise, they
-will be reported in ticks per frame.  The gettimeofday benchmark will
-always report in frames per second, but may incur more overhead and/or
-be slightly less accurate.
+method, you can use contrib/development/tsc-calibrate/tsc-calibrate.c to
+determine the correct value for TF_TSC_TICKS for your system.  If this
+value is set, TSC benchmarking will report speeds in frames per second.
+Otherwise, they will be reported in ticks per frame.  The gettimeofday
+benchmark will always report in frames per second, but may incur more
+overhead and/or be slightly less accurate.
 
-This API is subject to change, as the needs of MythTV and of filter 
+This API is subject to change, as the needs of MythTV and of filter
 writers may change in the future.
 
 Please email any suggestions or questions to andrewmahone AT eml DOT cc
