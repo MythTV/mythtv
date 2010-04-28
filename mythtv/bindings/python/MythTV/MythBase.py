@@ -164,7 +164,7 @@ class DictData( object ):
     def update(self, *args, **keywords):
         self._data.update(*args, **keywords)
 
-    def __setstate(self, dat):
+    def __setstate__(self, dat):
         for k,v in dat.items():
             self.__dict__[k] = v
 
