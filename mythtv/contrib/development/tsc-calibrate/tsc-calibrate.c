@@ -1,5 +1,6 @@
 /*
  * Calibration program for TSC filter benchmarking
+ * See mythtv/filters/README for more information
  * compile with gcc -o tsc-calibrate tsc-calibrate.c
  */
 
