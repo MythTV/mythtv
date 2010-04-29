@@ -274,7 +274,7 @@ class moviedbQueries():
                 custom_ui = custom_ui,
                 language = language,
                 search_all_languages = search_all_languages,)
-        self.mythtvgrabber = [u'Title', u'Subtitle', u'Year', u'ReleaseDate', u'InetRef', u'URL', u'Director', u'Plot', u'UserRating', u'MovieRating', u'Runtime', u'Season', u'Episode', u'Coverart', u'Fanart', u'Banner', u'Screenshot', u'Cast', u'Genres', u'Countries', u'ScreenPlay', u'Studios', u'Producer', u'ProductionDesign', u'DirectorOfPhotography', u'OriginalMusicComposer', u'Story', u'CostumeDesign', u'Editor', u'Type', u'Casting', u'AssociateProducer', u'Popularity', u'Budget', u'Imdb', u'ArtDirection']
+        self.mythtvgrabber = [u'Title', u'Subtitle', u'Year', u'ReleaseDate', u'InetRef', u'URL', u'Director', u'Plot', u'UserRating', u'MovieRating', u'Runtime', u'Season', u'Episode', u'Coverart', u'Fanart', u'Banner', u'Screenshot', u'Cast', u'Genres', u'Countries', u'ScreenPlay', u'Studios', u'Producer', u'ProductionDesign', u'DirectorOfPhotography', u'OriginalMusicComposer', u'Story', u'CostumeDesign', u'Editor', u'Type', u'Casting', u'AssociateProducer', u'Popularity', u'Budget', u'Imdb', u'ArtDirection', u'MovieRating']
         self.error_messages = {'TmdHttpError': u"! Error: A connection error to themoviedb.org was raised (%s)\n", 'TmdXmlError': u"! Error: Invalid XML was received from themoviedb.org (%s)\n", 'TmdBaseError': u"! Error: A user interface error was raised (%s)\n", 'TmdbUiAbort': u"! Error: A user interface input error was raised (%s)\n", }
     # end __init__()
 
