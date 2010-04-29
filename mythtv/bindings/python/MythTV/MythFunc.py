@@ -187,30 +187,44 @@ class MythBE( FileOps ):
     def __del__(self):
         self.freeTuner()
 
+    def _getPrograms(self, query, recstatus=None, header=0):
+        def sort_programs_by_starttime(x, y):
+            if x.starttime > y.starttime:
+                return 1
+            elif x.starttime == y.starttime:
+                return 0
+            else:
+                return -1
+
+        programs = []
+        res = self.backendCommand(query).split(BACKEND_SEP)
+        for i in range(header):
+            res.pop(0)
+
+        num_progs = int(res.pop(0))
+        for i in range(num_progs):
+            offs = i * PROGRAM_FIELDS
+            programs.append(Program(res[offs:offs+PROGRAM_FIELDS], db=self.db))
+
+        if recstatus:
+            for i in reversed(range(num_progs)):
+                if programs[i].recstatus != recstatus:
+                    programs.pop(i)
+
+        return sorted(programs, cmp=sort_programs_by_starttime)
+        
+
     def getPendingRecordings(self):
         """
         Returns a list of Program objects which are scheduled to be recorded.
         """
-        programs = []
-        res = self.backendCommand('QUERY_GETALLPENDING').split(BACKEND_SEP)
-        has_conflict = int(res.pop(0))
-        num_progs = int(res.pop(0))
-        for i in range(num_progs):
-            programs.append(Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS)
-                + PROGRAM_FIELDS], db=self.db))
-        return programs
+        return self._getPrograms('QUERY_GETALLPENDING', header=1)
 
     def getScheduledRecordings(self):
         """
         Returns a list of Program objects which are scheduled to be recorded.
         """
-        programs = []
-        res = self.backendCommand('QUERY_GETALLSCHEDULED').split(BACKEND_SEP)
-        num_progs = int(res.pop(0))
-        for i in range(num_progs):
-            programs.append(Program(res[i * PROGRAM_FIELDS:(i * PROGRAM_FIELDS)
-                + PROGRAM_FIELDS], db=self.db))
-        return programs
+        return self._getPrograms('QUERY_GETALLSCHEDULED')
 
     def getUpcomingRecordings(self):
         """
@@ -219,20 +233,15 @@ class MythBE( FileOps ):
         Sorts the list by recording start time and only returns those with
         record status of WillRecord.
         """
-        def sort_programs_by_starttime(x, y):
-            if x.starttime > y.starttime:
-                return 1
-            elif x.starttime == y.starttime:
-                return 0
-            else:
-                return -1
-        programs = []
-        res = self.getPendingRecordings()
-        for p in res:
-            if p.recstatus == p.WILLRECORD:
-                programs.append(p)
-        programs.sort(sort_programs_by_starttime)
-        return programs
+        return self._getPrograms('QUERY_GETALLPENDING', \
+                                recstatus=Program.WILLRECORD, header=1)
+
+    def getConflictedRecordings(self):
+        """
+        Retuns a list of Program objects subject to conflicts in the schedule.
+        """
+        return self._getPrograms('QUERY_GETALLPENDING', \
+                                recstatus=Program.CONFLICT, header=1)
 
     def getRecorderList(self):
         """
@@ -354,25 +363,13 @@ class MythBE( FileOps ):
         """
         Returns a list of all Program objects which have already recorded
         """
-        programs = []
-        res = self.backendCommand('QUERY_RECORDINGS Play').split(BACKEND_SEP)
-        num_progs = int(res.pop(0))
-        for i in range(num_progs):
-            programs.append(Program(res[i * PROGRAM_FIELDS:(i*PROGRAM_FIELDS)
-                + PROGRAM_FIELDS], db=self.db))
-        return programs
+        return self._getPrograms('QUERY_RECORDINGS Play')
 
     def getExpiring(self):
         """
         Returns a tuple of all Program objects nearing expiration
         """
-        programs = []
-        res = self.backendCommand('QUERY_GETEXPIRING').split(BACKEND_SEP)
-        num_progs = int(res.pop(0))
-        for i in range(num_progs):
-            programs.append(Program(res[i * PROGRAM_FIELDS:(i*PROGRAM_FIELDS)
-                + PROGRAM_FIELDS], db=self.db))
-        return programs
+        return self._getPrograms('QUERY_GETEXPIRING')
 
     def getCheckfile(self,program):
         """
