@@ -379,13 +379,18 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                     m_parent->HideDVDButton(true);
 
                 ClearSubtitlesOSD();
-
-                if (isInMenu)
+                if (isInMenu || NumMenuButtons() > 0)
                 {
                     m_buttonstreamid = 32;
                     int aspect = dvdnav_get_video_aspect(m_dvdnav);
-                    if (aspect != 0 && spu->physical_wide > 0)
-                        m_buttonstreamid += spu->physical_wide;
+
+                    // workaround where dvd menu is
+                    // present in VTS_DOMAIN. dvdnav adds 0x80 to stream id
+                    // proper fix should be put in dvdnav sometime
+                    int physical_wide = (spu->physical_wide & 0xF);
+
+                    if (aspect != 0 && physical_wide > 0)
+                        m_buttonstreamid += physical_wide;
 
                     if (m_parent && m_parent->GetCaptionMode())
                         m_parent->SetCaptionsEnabled(false, false);
