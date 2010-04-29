@@ -337,7 +337,7 @@ class MovieDb(object):
         self.config[u'urls'][u'hash.info'] = u'%(base_url)s/Hash.getInfo/%(language)s/xml/%(apikey)s/%%s' % (self.config)
 
         # Translation of TMDB elements into MythTV keys/db grabber names
-        self.config[u'mythtv_translation'] = {u'actor': u'cast', u'backdrop': u'fanart', u'categories': u'genres', u'director':  u'director', u'id': u'inetref', u'name': u'title', u'overview': u'plot', u'rating': u'userrating', u'poster': u'coverart', u'production_countries': u'countries', u'released': u'releasedate', u'runtime': u'runtime', u'url': u'url', u'imdb_id': u'imdb', }
+        self.config[u'mythtv_translation'] = {u'actor': u'cast', u'backdrop': u'fanart', u'categories': u'genres', u'director':  u'director', u'id': u'inetref', u'name': u'title', u'overview': u'plot', u'rating': u'userrating', u'poster': u'coverart', u'production_countries': u'countries', u'released': u'releasedate', u'runtime': u'runtime', u'url': u'url', u'imdb_id': u'imdb', u'certification': u'movierating', }
         self.config[u'image_extentions'] = ["png", "jpg", "bmp"] # Acceptable image extentions
         self.thumbnails = False
     # end __init__()
