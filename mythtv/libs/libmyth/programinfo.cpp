@@ -1376,7 +1376,8 @@ bool ProgramInfo::LoadProgramFromRecorded(
         "       r.commflagged,      r.cutlist,     r.autoexpire,      "//28-30
         "       r.editing,          r.bookmark,    r.watched,         "//31-33
         "       r.preserve,         r.transcoded,  r.deletepending,   "//34-36
-        "       p.audioprop+0,      p.videoprop+0, p.subtitletypes+0  "//37-39
+        "       p.audioprop+0,      p.videoprop+0, p.subtitletypes+0, "//37-39
+        "       p.airdate                                             "//40
         "FROM recorded AS r "
         "LEFT JOIN (channel AS c, recordedprogram AS p) "
         "ON (r.chanid    = c.chanid AND "
@@ -1418,6 +1419,7 @@ bool ProgramInfo::LoadProgramFromRecorded(
         QDateTime::fromString(query.value(14).toString(),
                               Qt::ISODate);
 
+    year         = query.value(40).toString();
     stars        = query.value(15).toDouble();
     repeat       = query.value(16).toInt();
 
