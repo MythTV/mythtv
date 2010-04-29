@@ -189,14 +189,6 @@ class MythBE( FileOps ):
         self.freeTuner()
 
     def _getPrograms(self, query, recstatus=None, header=0):
-        def sort_programs_by_starttime(x, y):
-            if x.starttime > y.starttime:
-                return 1
-            elif x.starttime == y.starttime:
-                return 0
-            else:
-                return -1
-
         programs = []
         res = self.backendCommand(query).split(BACKEND_SEP)
         for i in range(header):
@@ -212,7 +204,7 @@ class MythBE( FileOps ):
                 if programs[i].recstatus != recstatus:
                     programs.pop(i)
 
-        return sorted(programs, cmp=sort_programs_by_starttime)
+        return sorted(programs, key=lambda p: p.starttime)
         
 
     def getPendingRecordings(self):

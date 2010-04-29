@@ -12,11 +12,33 @@ import sys
 import socket
 import os
 import xml.etree.cElementTree as etree
-from time import mktime, strftime, strptime
-from datetime import date, time, datetime
+from time import mktime, strftime, strptime, altzone
+from datetime import date, time, datetime, timedelta
 from socket import gethostbyaddr, gethostname
 
 #### FILE ACCESS ####
+
+def findfile(file, sgroup, db=None):
+    """
+    findfile(file, sgroup, db=None) -> StorageGroup object
+
+    Will search through all matching storage groups, searching for file.
+    Returns matching storage group upon success.
+    """
+    db = DBCache(db)
+    for sg in db.getStorageGroup(groupname=sgroup):
+        # search given group
+        if not sg.local:
+            continue
+        if os.access(sg.dirname+filename, os.F_OK):
+            return sg
+    for sg in db.getStorageGroup():
+        # not found, search all other groups
+        if not sg.local:
+            continue
+        if os.access(sg.dirname+filename, os.F_OK):
+            return sg
+    return None
 
 def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                        chanid=None, starttime=None):
@@ -68,47 +90,47 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
         if (mode == 'w') and (filename.find('/') != -1):
             raise MythFileError(MythError.FILE_FAILED_WRITE, file, 
                                 'attempting remote write outside base path')
+        if nooverwrite and FileOps(host, db=db).fileExists(filename, sgroup):
+            raise MythFileError(MythError.FILE_FAILED_WRITE, file, 
+                                'refusing to overwrite existing file')
         return FileTransfer(host, filename, sgroup, mode, db, \
                                   chanid, starttime)
 
-    sgs = db.getStorageGroup(groupname=sgroup)
-
     if mode == 'w':
-        # prefer local storage always
-        for i in range(len(sgs)-1,-1,-1):
+        # check for pre-existing file
+        path = FileOps(host, db=db).fileExists(filename, sgroup)
+        sgs = db.getStorageGroup(groupname=sgroup)
+        if path is not None:
+            if nooverwrite:
+                raise MythFileError(MythError.FILE_FAILED_WRITE, file, 
+                                'refusing to overwrite existing file')
+            for sg in sgs:
+                if sg.dirname in path:
+                    if sg.local:
+                        return open(sg.dirname+filename, mode)
+                    else:
+                        return FileTransfer(host, filename, sgroup, 'w', \
+                                    db, chanid, starttime)
+
+        # prefer local storage for new files
+        for i in reversed(range(len(sgs))):
             if not sgs[i].local:
                 sgs.pop(i)
             else:
                 st = os.statvfs(sgs[i].dirname)
                 sgs[i].free = st[0]*st[3]
-        if len(sgs) > 1:
+        if len(sgs) > 0:
             # choose path with most free space
-            sg = sgs.pop()
-            while len(sgs):
-                if sgs[0].free > sg.free: sg = sgs.pop()
-                else: sgs.pop()
-            # check that folder exists
+            sg = sorted(sgs, key=lambda sg: sg.free, reverse=True)[0]
+            # create folder if it does not exist
             if filename.find('/') != -1:
                 path = sg.dirname+filename.rsplit('/',1)[0]
                 if not os.access(path, os.F_OK):
                     os.makedirs(path)
-            if nooverwrite:
-                if os.access(sg.dirname+filename, os.F_OK):
-                    raise MythDBError(MythError.FILE_FAILED_WRITE, file,
-                                        'refusing to overwrite existing file')
             log(log.FILE, 'Opening local file (w)', sg.dirname+filename)
             return open(sg.dirname+filename, mode)
-        elif len(sgs) == 1:
-            if filename.find('/') != -1:
-                path = sgs[0].dirname+filename.rsplit('/',1)[0]
-                if not os.access(path, os.F_OK):
-                    os.makedirs(path)
-            if nooverwrite:
-                if os.access(sgs[0].dirname+filename, os.F_OK):
-                    raise MythFileError(MythError.FILE_FAILED_WRITE, file,
-                                        'refusing to overwrite existing file')
-            log(log.FILE, 'Opening local file (w)', sgs[0].dirname+filename)
-            return open(sgs[0].dirname+filename, mode)
+
+        # fallback to remote write
         else:
             if filename.find('/') != -1:
                 raise MythFileError(MythError.FILE_FAILED_WRITE, file, 
@@ -117,15 +139,15 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                                       chanid, starttime)
     else:
         # search for file in local directories
-        for sg in sgs:
-            if sg.local:
-                if os.access(sg.dirname+filename, os.F_OK):
-                    # file found, open local
-                    log(log.FILE, 'Opening local file (r)',
-                                                sg.dirname+filename)
-                    return open(sg.dirname+filename, mode)
+        sg = findfile(filename, sgroup, db)
+        if sg is not None:
+            # file found, open local
+            log(log.FILE, 'Opening local file (r)',
+                           sg.dirname+filename)
+            return open(sg.dirname+filename, mode)
+        else:
         # file not found, open remote
-        return FileTransfer(host, filename, sgroup, mode, db, \
+            return FileTransfer(host, filename, sgroup, mode, db, \
                                   chanid=None, starttime=None)
 
 class FileTransfer( BEEvent ):
@@ -397,6 +419,15 @@ class FileOps( BEEvent ):
     def reschedule(self, recordid=-1):
         """FileOps.reschedule() -> None"""
         self.backendCommand('RESCHEDULE_RECORDINGS '+str(recordid))
+
+    def fileExists(self, file, sgroup='Default'):
+        """FileOps.fileExists() -> file path"""
+        res = self.backendCommand(BACKEND_SEP.join((\
+                    'QUERY_FILE_EXISTS',file,sgroup))).split(BACKEND_SEP)
+        if int(res[0]) == 0:
+            return None
+        else:
+            return res[1]
 
 class Record( DBDataWrite ):
     """
