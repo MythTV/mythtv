@@ -155,31 +155,32 @@ class databaseSearch( object ):
 
 class MythBE( FileOps ):
     __doc__ = FileOps.__doc__+"""
-        getPendingRecordings()  - returns a list of scheduled recordings
-        getScheduledRecordings()- returns a list of scheduled recordings
-        getUpcomingRecordings() - returns a list of scheduled recordings
-        getRecorderList()       - returns a list of all recorder ids
-        getFreeRecorderList()   - returns a list of free recorder ids
-        lockTuner()             - requests a lock of a recorder
-        freeTuner()             - requests an unlock of a recorder
-        getCheckfile()          - returns the location of a recording
-        getExpiring()           - returns a list of expiring recordings
-        getFreeSpace()          - returns a list of FreeSpace objects
-        getFreeSpaceSummary()   - returns a tuple of total and used space
-        getLastGuideData()      - returns the last date of guide data
-        getLoad()               - returns a tuple of load averages
-        getRecordings()         - returns a list of all recordings
-        getSGFile()             - returns information on a single file
-        getSGList()             - returns lists of directories, 
-                                  files, and sizes
-        getUptime()             - returns system uptime in seconds
-        isActiveBackend()       - determines whether backend is
-                                  currently active
-        isRecording             - determinds whether recorder is
-                                  currently recording
-        walkSG()                - walks a storage group tree, similarly
-                                  to os.walk(). returns a tuple of dirnames
-                                  and dictionary of filenames with sizes
+        getPendingRecordings()    - returns a list of scheduled recordings
+        getScheduledRecordings()  - returns a list of scheduled recordings
+        getUpcomingRecordings()   - returns a list of scheduled recordings
+        getConflictedRecordings() - returns a list of conflicting recordings
+        getRecorderList()         - returns a list of all recorder ids
+        getFreeRecorderList()     - returns a list of free recorder ids
+        lockTuner()               - requests a lock of a recorder
+        freeTuner()               - requests an unlock of a recorder
+        getCheckfile()            - returns the location of a recording
+        getExpiring()             - returns a list of expiring recordings
+        getFreeSpace()            - returns a list of FreeSpace objects
+        getFreeSpaceSummary()     - returns a tuple of total and used space
+        getLastGuideData()        - returns the last date of guide data
+        getLoad()                 - returns a tuple of load averages
+        getRecordings()           - returns a list of all recordings
+        getSGFile()               - returns information on a single file
+        getSGList()               - returns lists of directories, 
+                                    files, and sizes
+        getUptime()               - returns system uptime in seconds
+        isActiveBackend()         - determines whether backend is
+                                    currently active
+        isRecording               - determinds whether recorder is
+                                    currently recording
+        walkSG()                  - walks a storage group tree, similarly
+                                    to os.walk(). returns a tuple of dirnames
+                                    and dictionary of filenames with sizes
     """
 
     locked_tuners = []
