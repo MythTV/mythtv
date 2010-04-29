@@ -533,8 +533,8 @@ static int mpegps_read_packet(AVFormatContext *s,
     if (codec_id != CODEC_ID_PCM_S16BE)
         st->need_parsing = AVSTREAM_PARSE_FULL;
 
-    /* notify the callback of the change in streams for non Audio streams*/
-    if (s->streams_changed && type != CODEC_TYPE_AUDIO) {
+    /* notify the callback of the change in streams */
+    if (s->streams_changed) {
         s->streams_changed(s->stream_change_data);
     }
 
@@ -565,12 +565,6 @@ static int mpegps_read_packet(AVFormatContext *s,
         else if (st->codec->bits_per_coded_sample == 28)
             return AVERROR(EINVAL);
     }
-
-    /* notify the callback of the change in streams for Audio streams*/
-    if (s->streams_changed && type == CODEC_TYPE_AUDIO) {
-        s->streams_changed(s->stream_change_data);
-    }
-
     av_new_packet(pkt, len);
     get_buffer(s->pb, pkt->data, pkt->size);
     pkt->pts = pts;
