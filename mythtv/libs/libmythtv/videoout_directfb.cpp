@@ -1101,7 +1101,7 @@ QStringList VideoOutputDirectfb::GetAllowedRenderers(
 DFBEnumerationResult layer_cb(
     unsigned int id, DFBDisplayLayerDescription desc, void *data)
 {
-    struct DirectfbData *vodata = (DirectfbData*) data;
+    class DirectfbData *vodata = (DirectfbData*) data;
 
     if (id == DLID_PRIMARY)
         return DFENUM_OK;

@@ -10,7 +10,7 @@
 // doesn't get any extra responses, so it is disabled by default.
 //#define SEARCH_BUTTON
 
-class DatabaseParams;
+struct DatabaseParams;
 
 class ListBoxDevice : public QListWidgetItem
 {

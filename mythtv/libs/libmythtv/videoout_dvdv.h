@@ -7,7 +7,7 @@
 #include "frame.h"
 
 class QSize;
-class AVCodecContext;
+struct AVCodecContext;
 struct DVDV_Private;
 struct AVCodecContext;
 
