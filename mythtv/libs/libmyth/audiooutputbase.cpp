@@ -1205,8 +1205,8 @@ void AudioOutputBase::GetBufferStatus(uint &fill, uint &total)
 void AudioOutputBase::OutputAudioLoop(void)
 {
     int space_on_soundcard, last_space_on_soundcard;
-    unsigned char zeros[fragment_size];
-    unsigned char fragment[fragment_size];
+    unsigned char *zeros    = new unsigned char[fragment_size];
+    unsigned char *fragment = new unsigned char[fragment_size];
 
     bzero(zeros, fragment_size);
     last_space_on_soundcard = 0;
@@ -1330,6 +1330,9 @@ void AudioOutputBase::OutputAudioLoop(void)
         if (GetAudioData(fragment, fragment_size, true))
             WriteAudio(fragment, fragment_size);
     }
+
+    delete[] zeros;
+    delete[] fragment;
 
     VERBOSE(VB_AUDIO, LOC + "OutputAudioLoop: Stop Event");
     OutputEvent e(OutputEvent::Stopped);
