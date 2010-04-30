@@ -9,7 +9,6 @@
 class QSize;
 struct AVCodecContext;
 struct DVDV_Private;
-struct AVCodecContext;
 
 /** \class DVDV
  *  This class manages the support for Apple's counterpart
