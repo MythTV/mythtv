@@ -205,6 +205,7 @@ int MythMainWindowPrivate::TranslateKeyNum(QKeyEvent* e)
 
 static MythMainWindow *mainWin = NULL;
 static QMutex mainLock;
+static QThread *UIThread = NULL;
 
 /**
  * \brief Return the existing main window, or create one
@@ -224,6 +225,8 @@ MythMainWindow *MythMainWindow::getMainWindow(const bool useDB)
     if (!mainWin)
         mainWin = new MythMainWindow(useDB);
 
+    UIThread = QThread::currentThread();
+
     return mainWin;
 }
 
@@ -231,6 +234,11 @@ void MythMainWindow::destroyMainWindow(void)
 {
     delete mainWin;
     mainWin = NULL;
+}
+
+bool IsUIThread(void)
+{
+    return (QThread::currentThread() == UIThread);
 }
 
 MythMainWindow *GetMythMainWindow(void)

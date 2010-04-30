@@ -135,6 +135,7 @@ class MPUBLIC MythMainWindow : public QWidget
     MythMainWindowPrivate *d;
 };
 
+MPUBLIC bool IsUIThread();
 MPUBLIC MythMainWindow *GetMythMainWindow();
 MPUBLIC bool HasMythMainWindow();
 MPUBLIC void DestroyMythMainWindow();
