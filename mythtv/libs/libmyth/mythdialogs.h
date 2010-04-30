@@ -199,7 +199,7 @@ class MPUBLIC MythPopupBox : public MythDialog
     virtual void reject(void);
 
   signals:
-    virtual void popupDone(int);
+    void popupDone(int);
 
   protected:
     ~MythPopupBox() {} // use deleteLater() instead for thread safety
