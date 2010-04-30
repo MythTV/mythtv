@@ -6672,7 +6672,7 @@ QString TV::GetQueuedChanNum(void) const
     queuedChanNum = queuedChanNum.right(queuedChanNum.length() - i);
 
     // strip whitespace at end of string
-    queuedChanNum.trimmed();
+    queuedChanNum = queuedChanNum.trimmed();
 
     QString ret = queuedChanNum;
     ret.detach();
