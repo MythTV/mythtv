@@ -4,7 +4,6 @@
 #include "TDStretch.h"
 #include "inttypes.h"
 
-using namespace std;
 using namespace soundtouch;
 
 static uint64_t ones = 0x0001ffff0001ffffULL;
