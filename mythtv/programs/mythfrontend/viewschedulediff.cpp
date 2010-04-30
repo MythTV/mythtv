@@ -287,8 +287,8 @@ void ViewScheduleDiff::updateUIList(void)
 {
     for (uint i = 0; i < m_recList.size(); i++)
     {
-        struct ProgramStruct s = m_recList[i];
-        struct ProgramInfo *pginfo = s.after;
+        class ProgramStruct s = m_recList[i];
+        class ProgramInfo *pginfo = s.after;
         if (!pginfo)
             pginfo = s.before;
 

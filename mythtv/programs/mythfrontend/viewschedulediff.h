@@ -63,7 +63,7 @@ class ViewScheduleDiff : public MythScreenType
     MythUIText       *m_titleText;
     MythUIText       *m_noChangesText;
 
-    vector<struct ProgramStruct> m_recList;
+    vector<class ProgramStruct> m_recList;
 
     int m_recordid; ///< recordid that differs from master (-1 = assume all)
 
