@@ -1840,9 +1840,9 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
 {
     VERBOSE(VB_COMMFLAG, "CommDetect::BuildBlankFrameCommList()");
 
-    long long bframes[blankFrameMap.count()*2];
-    long long c_start[blankFrameMap.count()];
-    long long c_end[blankFrameMap.count()];
+    long long *bframes = new long long[blankFrameMap.count()*2];
+    long long *c_start = new long long[blankFrameMap.count()];
+    long long *c_end   = new long long[blankFrameMap.count()];
     int frames = 0;
     int commercials = 0;
     int i, x;
@@ -1970,6 +1970,10 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
     blankCommMap[c_start[i]] = MARK_COMM_START;
     blankCommMap[c_end[i]] = MARK_COMM_END;
 
+    delete[] c_start;
+    delete[] c_end;
+    delete[] bframes;
+
     VERBOSE(VB_COMMFLAG, "Blank-Frame Commercial Map" );
     for(it = blankCommMap.begin(); it != blankCommMap.end(); ++it)
         VERBOSE(VB_COMMFLAG, QString("    %1:%2")
@@ -1988,7 +1992,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
 {
     int section_start = -1;
     int seconds = (int)(framesProcessed / fps);
-    int sc_histogram[seconds+1];
+    int *sc_histogram = new int[seconds+1];
 
     sceneCommBreakMap.clear();
 
@@ -2047,6 +2051,7 @@ void ClassicCommDetector::BuildSceneChangeCommList(void)
             }
         }
     }
+    delete[] sc_histogram;
 
     if (section_start >= 0)
         sceneCommBreakMap[framesProcessed] = MARK_COMM_END;
