@@ -128,7 +128,7 @@ const DisplayResVector& DisplayResX::GetVideoModes(void) const
     t_screenrate screenmap;
     int nvidiarate = GetNvidiaRates(screenmap);
 
-    if (nvidiarate > 0);
+    if (nvidiarate > 0)
     {
         // Update existing DisplayResScreen vector, and update it with new frequencies
         for (uint i=0; i < m_video_modes.size(); i++)
