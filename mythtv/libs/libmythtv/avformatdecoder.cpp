@@ -3782,8 +3782,7 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                     }
                 }
 
-                if ((video_width > 0 && video_width != current_width) ||
-                    dvd_video_codec_changed)
+                if ((video_width > 0) && dvd_video_codec_changed)
                 {
                     VERBOSE(VB_PLAYBACK, LOC + QString("DVD Stream/Codec Change "
                                 "video_width %1 current_width %2 "
