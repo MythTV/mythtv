@@ -247,7 +247,7 @@ void MythUITextEdit::InsertText(const QString &text)
 bool MythUITextEdit::InsertCharacter(const QString &character)
 {
     if (m_maxLength != 0 && m_Message.length() == m_maxLength)
-        return true;
+        return false;
 
     QString newmessage = m_Message;
 
