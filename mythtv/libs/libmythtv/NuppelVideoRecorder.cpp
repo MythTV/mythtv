@@ -1318,6 +1318,7 @@ bool NuppelVideoRecorder::SetFormatV4L2(void)
     return true;
 }
 
+#define MAX_VIDEO_BUFFERS 5
 void NuppelVideoRecorder::DoV4L2(void)
 {
     struct v4l2_buffer     vbuf;
@@ -1401,7 +1402,7 @@ void NuppelVideoRecorder::DoV4L2(void)
         hardware_encode = true;
     }
 
-    uint numbuffers = 5;
+    uint numbuffers = MAX_VIDEO_BUFFERS;
 
     vrbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     vrbuf.memory = V4L2_MEMORY_MMAP;
@@ -1421,8 +1422,8 @@ void NuppelVideoRecorder::DoV4L2(void)
 
     numbuffers = vrbuf.count;
 
-    unsigned char *buffers[numbuffers];
-    int bufferlen[numbuffers];
+    unsigned char *buffers[MAX_VIDEO_BUFFERS];
+    int bufferlen[MAX_VIDEO_BUFFERS];
 
     for (uint i = 0; i < numbuffers; i++)
     {
