@@ -89,7 +89,7 @@ template <class BASE> class MHStack: protected MHSequence<BASE> {
             return MHSequence<BASE>::m_Values[--MHSequence<BASE>::m_VecSize];
         }
         // Push an element on the stack.
-        void Push(BASE b) { Append(b); }
+        void Push(BASE b) { this->Append(b); }
         // Return the top of the stack.
         BASE Top() { 
             MHASSERT(MHSequence<BASE>::m_VecSize > 0);
