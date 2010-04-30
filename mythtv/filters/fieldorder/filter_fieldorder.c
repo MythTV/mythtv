@@ -142,7 +142,7 @@ static void filter_func(struct ThisFilter *p, uint8_t *dst,
             int     field = parity ^ tff;
             if (((y ^ (1 - field)) & 1) && !parity)
             {
-                src = &p->ref[nr_p][i][y * refs], w;
+                src = &p->ref[nr_p][i][y * refs];
                 do_copy = 1;
             }
             if (do_copy)
