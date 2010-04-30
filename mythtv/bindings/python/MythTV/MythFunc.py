@@ -514,6 +514,200 @@ class BEEventMonitor( BEEvent ):
             return re.compile('BACKEND_MESSAGE')
         self.log(MythLog.ALL, event)
 
+class MythSystemEvent( BEEvent ):
+    class systemeventhandler( object ):
+        # decorator class for system events
+        def __init__(self, func):
+            self.func = func
+            self.__doc__ = self.func.__doc__
+            self.__name__ = self.func.__name__
+            self.__module__ = self.func.__module__
+
+            bs = BACKEND_SEP.replace('[','\[').replace(']','\]')
+
+            self.re_search = re.compile('BACKEND_MESSAGE%sSYSTEM_EVENT %s' %\
+                                (bs, self.__name__.upper()))
+            self.re_process = re.compile(bs.join([
+                'BACKEND_MESSAGE',
+                'SYSTEM_EVENT (?P<event>[A-Z_]*)'
+                    '( HOSTNAME (?P<hostname>[a-zA-Z0-9_\.]*))?'
+                    '( SENDER (?P<sender>[a-zA-Z0-9_\.]*))?'
+                    '( CARDID (?P<cardid>[0-9]*))?'
+                    '( CHANID (?P<chanid>[0-9]*))?'
+                    '( STARTTIME (?P<starttime>[0-9-]*T[0-9-]))?'
+                    '( SECS (?P<secs>[0-9]*))?',
+                'empty']))
+        def __get__(self, inst, own):
+            self.inst = inst
+            return self
+        def __call__(self, event=None):
+            if event is None:
+                return self.re_search
+            match = self.re_process.match(event)
+            event = {}
+            for a in ('event','hostname','sender','cardid','secs'):
+                if match.group(a) is not None:
+                    event[a] = match.group(a)
+            if (match.group('chanid') is not None) and \
+               (match.group('starttime') is not None):
+                    be = MythBE(self.inst.hostname)
+                    event['program'] = be.getRecording(\
+                          (match.group('chanid'),match.group('starttime')))
+            self.func(self.inst, event)
+
+    def _listhandlers(self):
+        return [self.client_connected, self.client_disconnected,
+                self.rec_pending, self.rec_started, self.rec_finished,
+                self.rec_deleted, self.rec_expired, self.livetv_started,
+                self.play_started, self.play_paused, self.play_stopped,
+                self.play_unpaused, self.play_changed, self.master_started,
+                self.master_shutdown, self.slave_connected,
+                self.slave_disconnected, self.net_ctrl_connected,
+                self.net_ctrl_disconnected, self.mythfilldatabase_ran,
+                self.scheduler_ran, self.settings_cache_cleared, self.user_1,
+                self.user_2, self.user_3, self.user_4, self.user_5,
+                self.user_6, self.user_7, self.user_8, self.user_9]
+
+    def __init__(self, backend=None, noshutdown=False, generalevents=False, \
+                       db=None, opts=None):
+        if opts is None:
+            opts = BEConnection.BEConnOpts(noshutdown,\
+                             True, generalevents)
+        BEEvent.__init__(self, backend, db=db, opts=opts)
+
+    @systemeventhandler
+    def client_connected(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def client_disconnected(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def rec_pending(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def rec_started(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def rec_finished(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def rec_deleted(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def rec_expired(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def livetv_started(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def play_started(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def play_stopped(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def play_paused(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def play_unpaused(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def play_changed(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def master_started(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def master_shutdown(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def slave_connected(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def slave_disconnected(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def net_ctrl_connected(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def net_ctrl_disconnected(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def mythfilldatabase_ran(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def scheduler_ran(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def settings_cache_cleared(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_1(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_2(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_3(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_4(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_5(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_6(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_7(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_8(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+    @systemeventhandler
+    def user_9(self, event):
+        SystemEvent(event['event'], self.db).command(event)
+
+class SystemEvent( System ):
+    """
+    SystemEvent(eventname, db=None) -> SystemEvent object
+
+    External function handler for system event messages.
+        'eventname' is the event name sent in the BACKEND_MESSAGE message.
+    """
+    def __init__(self, event, db=None):
+        setting = 'EventCmd'+''.join(\
+                            [e.capitalize() for e in event.split('_')])
+        try:
+            System.__init__(self, setting=setting, db=db)
+        except MythError:
+            # no event handler registered
+            self.path = ''
+        except:
+            raise
+
+    def command(self, eventdata):
+        """
+        obj.command(eventdata) -> output string
+
+        Executes external command, substituting event information into the
+            command string. If call exits with a code not 
+            equal to 0, a MythError will be raised. The error code and
+            stderr will be available in the exception and this object
+            as attributes 'returncode' and 'stderr'.
+        """
+        if self.path is '':
+            return
+        cmd = self.path
+        if 'program' in eventdata:
+            cmd = eventdata['program'].formatJob(cmd)
+        for a in ('sender','cardid','secs'):
+            if a in eventdata:
+                cmd = cmd.replace('%%%s%%' % a, eventdata[a])
+        return self._runcmd(cmd)
+
+
 class Frontend(object):
     isConnected = False
     socket = None

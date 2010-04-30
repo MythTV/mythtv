@@ -658,6 +658,67 @@ class Program( DictData ):
         rec.type = type
         return rec.create()
 
+    def formatPath(self, path, replace=None):
+        """
+        Program.formatPath(path, replace=None) -> formatted path string
+                'path' string is formatted as per mythrename.pl syntax
+        """
+        for (tag, data) in (('T','title'), ('S','subtitle'),
+                            ('R','description'), ('C','category'),
+                            ('U','recgroup'), ('hn','hostname'),
+                            ('c','chanid') ):
+            tmp = unicode(self[data]).replace('/','-')
+            path = path.replace('%'+tag, tmp)
+        for (data, pre) in (   ('recstartts','%'), ('recendts','%e'),
+                               ('starttime','%p'),('endtime','%pe') ):
+            for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
+                                  ('j','%d'),('d','%d'),('g','%I'),('G','%H'),
+                                  ('h','%I'),('H','%H'),('i','%M'),('s','%S'),
+                                  ('a','%p'),('A','%p') ):
+                path = path.replace(pre+tag, self[data].strftime(format))
+        airdate = date(*[int(a) for a in self.airdate.split('-')])
+        for (tag, format) in (('y','%y'),('Y','%Y'),('n','%m'),('m','%m'),
+                              ('j','%d'),('d','%d')):
+            path = path.replace('%o'+tag, airdate.strftime(format))
+        path = path.replace('%-','-')
+        path = path.replace('%%','%')
+        path += '.'+self.filename.split('.')[-1]
+
+        # clean up for windows
+        if replace is not None:
+            for char in ('\\',':','*','?','"','<','>','|'):
+                path = path.replace(char, replace)
+        return path
+
+    def formatJob(self, cmd):
+        """
+        Program.formatPath(cmd) -> formatted command string
+                'cmd' string is formatted as per MythJobQueue syntax
+        """
+        for tag in ('chanid','title','subtitle','description','hostname',
+                    'category','recgroup','playgroup','parentid','findid',
+                    'recstatus','rectype'):
+            cmd = cmd.replace('%%%s%%' % tag.upper(), str(self[tag]))
+        for (tag, data) in (('STARTTIME','recstartts'),('ENDTIME','recendts'),
+                            ('PROGSTART','starttime'),('PROGEND','endtime')):
+            cmd = cmd.replace('%%%s%%' % tag, \
+                        self[data].strftime('%Y%m%d%H%M%S'))
+            cmd = cmd.replace('%%%sISO%%' % tag, \
+                        self[data].isoformat())
+            cmd = cmd.replace('%%%sISOUTC%%' % tag, \
+                        (self[data]+timedelta(0,altzone)).isoformat())
+        cmd = cmd.replace('%VERBOSELEVEL%', MythLog._parselevel())
+        cmd = cmd.replace('%RECID%', str(self.recordid))
+
+        path = FileOps(self.hostname, db=self._db).fileExists(\
+                        self.filename.rsplit('/',1)[1], self.storagegroup)
+        cmd = cmd.replace('%DIR%', path.rsplit('/',1)[0])
+        cmd = cmd.replace('%FILE%',path.rsplit('/',1)[1])
+        cmd = cmd.replace('%REACTIVATE%', str(OldRecorded(\
+                    (self.chanid, self.recstartts),db=self._db).reactivate))
+        return cmd
+
+
 class Recorded( DBDataWrite ):
     """
     Recorded(data=None, db=None, raw=None) -> Recorded object

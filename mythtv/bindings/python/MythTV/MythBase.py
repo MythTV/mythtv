@@ -1863,33 +1863,41 @@ class MythLog( object ):
         if (logfile is not None) and (self.LOGFILE is None):
             self.LOGFILE = open(logfile,'w')
 
+    @staticmethod
     def _setlevel(lstr=None, lbit=None):
         if lstr:
             MythLog.LOGLEVEL = MythLog._parselevel(lstr)
         elif lbit:
             MythLog.LOGLEVEL = lbit
-    _setlevel = staticmethod(_setlevel)
 
-    def _parselevel(lstr):
-        level = MythLog.NONE
+    @staticmethod
+    def _parselevel(lstr=None):
         bwlist = (  'important','general','record','playback','channel','osd',
                     'file','schedule','network','commflag','audio','libav',
                     'jobqueue','siparser','eit','vbi','database','dsmcc',
                     'mheg','upnp','socket','xmltv','dvbcam','media','idle',
                     'channelscan','extra','timestamp')
-        for l in lstr.split(','):
-            if l in ('all','most','none'):
-                # set initial bitfield
-                level = eval('MythLog.'+l.upper())
-            elif l in bwlist:
-                # update bitfield OR
-                level |= eval('MythLog.'+l.upper())
-            elif len(l) > 2:
-                if l[0:2] == 'no':
-                    if l[2:] in bwlist:
-                        # update bitfield NOT
-                        level &= level^eval('MythLog.'+l[2:].upper())
-        return level
+        if lstr:
+            level = MythLog.NONE
+            for l in lstr.split(','):
+                if l in ('all','most','none'):
+                    # set initial bitfield
+                    level = eval('MythLog.'+l.upper())
+                elif l in bwlist:
+                    # update bitfield OR
+                    level |= eval('MythLog.'+l.upper())
+                elif len(l) > 2:
+                    if l[0:2] == 'no':
+                        if l[2:] in bwlist:
+                            # update bitfield NOT
+                            level &= level^eval('MythLog.'+l[2:].upper())
+            return level
+        else:
+            level = []
+            for l in range(len(bwlist)):
+                if MythLog.LOGLEVEL&2**l:
+                    level.append(bwlist[l])
+            return ','.join(level)
     _parselevel = staticmethod(_parselevel)
 
     def log(self, level, message, detail=None, dblevel=None):
@@ -2137,4 +2145,5 @@ class System( DBCache ):
         if self.returncode:
             raise MythError(MythError.SYSTEM,self.returncode,cmd,self.stderr)
         return stdout
+
 class Grabber( System ): pass    

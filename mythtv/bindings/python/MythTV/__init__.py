@@ -12,10 +12,10 @@ __all__ = ['MythStatic', \
            'Guide', 'Video', 'VideoGrabber', 'NetVisionRSSItem', \
            'NetVisionTreeItem', 'NetVisionSite', 'NetVisionGrabber', \
             \
-           'MythBE', 'BEEventMonitor', 'Frontend', 'MythDB', 'MythVideo', \
-           'MythXML']
+           'MythBE', 'BEEventMonitor', 'MythSystemEvent', 'SystemEvent', \
+           'Frontend', 'MythDB', 'MythVideo', 'MythXML']
 
-__version__ = (0,23,0,5)
+__version__ = (0,23,0,6)
 
 import26 = """
 import warnings
