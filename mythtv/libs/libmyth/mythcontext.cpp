@@ -151,8 +151,6 @@ class MythContextPrivate : public QObject
     MythUIHelper *m_ui;
     MythContextSlotHandler *m_sh;
 
-    QThread *m_UIThread;
-
   private:
     MythConfirmationDialog *MBEconnectPopup;
     MythConfirmationDialog *MBEversionPopup;
@@ -258,7 +256,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
       m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
       m_database(GetMythDB()), m_ui(NULL),
       m_sh(new MythContextSlotHandler(this)),
-      m_UIThread(QThread::currentThread()),
       MBEconnectPopup(NULL),
       MBEversionPopup(NULL)
 {
@@ -1987,7 +1984,7 @@ void MythContext::OverrideSettingForSession(const QString &key,
 bool MythContext::SendReceiveStringList(QStringList &strlist,
                                         bool quickTimeout, bool block)
 {
-    if (!IsBackend() && QThread::currentThread() == d->m_UIThread)
+    if (HasMythMainWindow() && IsUIThread())
     {
         QString msg = "SendReceiveStringList(";
         for (uint i=0; i<(uint)strlist.size() && i<2; i++)
