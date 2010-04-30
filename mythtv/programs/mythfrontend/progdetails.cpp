@@ -86,8 +86,7 @@ QString ProgDetails::getRatings(bool recorded, uint chanid, QDateTime startts)
         main_ratings[query.value(0).toString()] = query.value(1).toString();
     }
 
-    if (!advisory.length() > 2)
-        advisory.left(advisory.length() - 2);
+    advisory = advisory.left(advisory.length() - 2);
 
     if (main_ratings.empty())
         return advisory;

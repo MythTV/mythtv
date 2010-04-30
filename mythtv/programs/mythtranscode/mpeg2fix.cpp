@@ -1669,8 +1669,7 @@ int MPEG2fixup::ConvertToI(Q3PtrList<MPEG2frame> *orderedFrames, int headPos)
                 return 1;
             VERBOSE(MPF_GENERAL,
                     QString("Converting frame #%1 from %2 to I %3")
-                           .arg(i).arg(GetFrameTypeT(spare))
-                           .arg(fname.isNull() ? "" : "(" + fname + ")"));
+                           .arg(i).arg(GetFrameTypeT(spare)).arg(fname));
         }
         spare->set_pkt(&pkt);
         av_free(pkt.data);

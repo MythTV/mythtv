@@ -356,7 +356,6 @@ inline QString toString(PictureAttributeSupported supported)
     if (kPictureAttributeSupported_Volume & supported)
         ret += "Volume, ";
 
-    ret = (ret.isEmpty()) ? "" : ret.left(ret.length() - 2);
     ret.detach();
     return ret;
 }
