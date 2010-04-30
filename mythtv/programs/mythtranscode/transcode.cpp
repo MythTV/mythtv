@@ -1,8 +1,6 @@
 #include <fcntl.h>
 #include <math.h>
 
-using namespace std;
-
 #include <QStringList>
 #include <QMap>
 #include <QRegExp>
@@ -26,6 +24,8 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 }
+
+using namespace std;
 
 #define LOC QString("Transcode: ")
 #define LOC_ERR QString("Transcode, Error: ")
