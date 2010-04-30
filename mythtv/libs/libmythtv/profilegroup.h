@@ -16,13 +16,13 @@ class ProfileGroupStorage : public SimpleDBStorage
                         const ProfileGroup &_parentProfile,
                         QString             _name) :
         SimpleDBStorage(_user, "profilegroups", _name),
-        parent(_parentProfile)
+        m_parent(_parentProfile)
     {
     }
 
     virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
-    const ProfileGroup& parent;
+    const ProfileGroup& m_parent;
 };
 
 class ProfileGroup : public ConfigurationWizard

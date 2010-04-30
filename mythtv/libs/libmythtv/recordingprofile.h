@@ -22,14 +22,14 @@ class RecordingProfileStorage : public SimpleDBStorage
                             const RecordingProfile &parentProfile,
                             QString name) :
         SimpleDBStorage(_setting, "recordingprofiles", name),
-        parent(parentProfile)
+        m_parent(parentProfile)
     {
         _setting->setName(name);
     }
 
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
-    const RecordingProfile &parent;
+    const RecordingProfile &m_parent;
 };
 
 class ImageSize;

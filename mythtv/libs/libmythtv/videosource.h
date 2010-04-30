@@ -57,14 +57,14 @@ class VideoSourceDBStorage : public SimpleDBStorage
     VideoSourceDBStorage(StorageUser       *_user,
                          const VideoSource &_parent,
                          const QString     &name) :
-        SimpleDBStorage(_user, "videosource", name), parent(_parent)
+        SimpleDBStorage(_user, "videosource", name), m_parent(_parent)
     {
     }
 
     virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
-    const VideoSource& parent;
+    const VideoSource& m_parent;
 };
 
 class VideoSourceSelector : public ComboBoxSetting, public TransientStorage
@@ -319,7 +319,7 @@ class CaptureCardDBStorage : public SimpleDBStorage
     CaptureCardDBStorage(StorageUser       *_user,
                          const CaptureCard &_parent,
                          const QString     &_name) :
-        SimpleDBStorage(_user, "capturecard", _name), parent(_parent)
+        SimpleDBStorage(_user, "capturecard", _name), m_parent(_parent)
     {
     }
 
@@ -329,7 +329,7 @@ protected:
     virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 private:
-    const CaptureCard& parent;
+    const CaptureCard& m_parent;
 };
 
 class TunerCardInput : public ComboBoxSetting, public CaptureCardDBStorage
@@ -664,7 +664,7 @@ class CardInputDBStorage : public SimpleDBStorage
     CardInputDBStorage(StorageUser     *_user,
                        const CardInput &_parent,
                        QString          _name) :
-        SimpleDBStorage(_user, "cardinput", _name), parent(_parent)
+        SimpleDBStorage(_user, "cardinput", _name), m_parent(_parent)
     {
     }
 
@@ -676,7 +676,7 @@ protected:
     virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 private:
-    const CardInput& parent;
+    const CardInput& m_parent;
 };
 
 class MPUBLIC CaptureCardEditor : public QObject, public ConfigurationDialog

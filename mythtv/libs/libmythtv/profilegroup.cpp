@@ -11,7 +11,7 @@ QString ProfileGroupStorage::GetWhereClause(MSqlBindings &bindings) const
     QString idTag(":WHEREID");
     QString query("id = " + idTag);
 
-    bindings.insert(idTag, parent.getProfileNum());
+    bindings.insert(idTag, m_parent.getProfileNum());
 
     return query;
 }
@@ -24,7 +24,7 @@ QString ProfileGroupStorage::GetSetClause(MSqlBindings &bindings) const
     QString query("id = " + idTag + ", " +
             GetColumnName() + " = " + colTag);
 
-    bindings.insert(idTag, parent.getProfileNum());
+    bindings.insert(idTag, m_parent.getProfileNum());
     bindings.insert(colTag, user->GetDBValue());
 
     return query;

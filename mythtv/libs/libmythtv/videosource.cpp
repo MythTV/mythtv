@@ -142,7 +142,7 @@ QString VideoSourceDBStorage::GetWhereClause(MSqlBindings &bindings) const
 
     QString query("sourceid = " + sourceidTag);
 
-    bindings.insert(sourceidTag, parent.getSourceID());
+    bindings.insert(sourceidTag, m_parent.getSourceID());
 
     return query;
 }
@@ -155,7 +155,7 @@ QString VideoSourceDBStorage::GetSetClause(MSqlBindings& bindings) const
     QString query("sourceid = " + sourceidTag + ", " +
             GetColumnName() + " = " + colTag);
 
-    bindings.insert(sourceidTag, parent.getSourceID());
+    bindings.insert(sourceidTag, m_parent.getSourceID());
     bindings.insert(colTag, user->GetDBValue());
 
     return query;
@@ -167,7 +167,7 @@ QString CaptureCardDBStorage::GetWhereClause(MSqlBindings& bindings) const
 
     QString query("cardid = " + cardidTag);
 
-    bindings.insert(cardidTag, parent.getCardID());
+    bindings.insert(cardidTag, m_parent.getCardID());
 
     return query;
 }
@@ -180,7 +180,7 @@ QString CaptureCardDBStorage::GetSetClause(MSqlBindings& bindings) const
     QString query("cardid = " + cardidTag + ", " +
             GetColumnName() + " = " + colTag);
 
-    bindings.insert(cardidTag, parent.getCardID());
+    bindings.insert(cardidTag, m_parent.getCardID());
     bindings.insert(colTag, user->GetDBValue());
 
     return query;
@@ -2796,7 +2796,7 @@ QString CardInputDBStorage::GetWhereClause(MSqlBindings &bindings) const
 
     QString query("cardinputid = " + cardinputidTag);
 
-    bindings.insert(cardinputidTag, parent.getInputID());
+    bindings.insert(cardinputidTag, m_parent.getInputID());
 
     return query;
 }
@@ -2809,7 +2809,7 @@ QString CardInputDBStorage::GetSetClause(MSqlBindings &bindings) const
     QString query("cardinputid = " + cardinputidTag + ", " +
             GetColumnName() + " = " + colTag);
 
-    bindings.insert(cardinputidTag, parent.getInputID());
+    bindings.insert(cardinputidTag, m_parent.getInputID());
     bindings.insert(colTag, user->GetDBValue());
 
     return query;
@@ -2881,12 +2881,12 @@ void CardInput::Save(void)
 
 int CardInputDBStorage::getInputID(void) const
 {
-    return parent.getInputID();
+    return m_parent.getInputID();
 }
 
 int CaptureCardDBStorage::getCardID(void) const
 {
-    return parent.getCardID();
+    return m_parent.getCardID();
 }
 
 CaptureCardEditor::CaptureCardEditor() : listbox(new ListBoxSetting(this))

@@ -16,7 +16,7 @@ QString RecordingProfileStorage::GetWhereClause(MSqlBindings &bindings) const
     QString idTag(":WHEREID");
     QString query("id = " + idTag);
 
-    bindings.insert(idTag, parent.getProfileNum());
+    bindings.insert(idTag, m_parent.getProfileNum());
 
     return query;
 }
@@ -28,7 +28,7 @@ class CodecParamStorage : public SimpleDBStorage
                       const RecordingProfile &parentProfile,
                       QString name) :
         SimpleDBStorage(_setting, "codecparams", "value"),
-        parent(parentProfile), codecname(name)
+        m_parent(parentProfile), codecname(name)
     {
         _setting->setName(name);
     }
@@ -36,7 +36,7 @@ class CodecParamStorage : public SimpleDBStorage
     virtual QString GetSetClause(MSqlBindings &bindings) const;
     virtual QString GetWhereClause(MSqlBindings &bindings) const;
 
-    const RecordingProfile &parent;
+    const RecordingProfile &m_parent;
     QString codecname;
 };
 
@@ -49,7 +49,7 @@ QString CodecParamStorage::GetSetClause(MSqlBindings &bindings) const
     QString query("profile = " + profileTag + ", name = " + nameTag
             + ", value = " + valueTag);
 
-    bindings.insert(profileTag, parent.getProfileNum());
+    bindings.insert(profileTag, m_parent.getProfileNum());
     bindings.insert(nameTag, codecname);
     bindings.insert(valueTag, user->GetDBValue());
 
@@ -63,7 +63,7 @@ QString CodecParamStorage::GetWhereClause(MSqlBindings &bindings) const
 
     QString query("profile = " + profileTag + " AND name = " + nameTag);
 
-    bindings.insert(profileTag, parent.getProfileNum());
+    bindings.insert(profileTag, m_parent.getProfileNum());
     bindings.insert(nameTag, codecname);
 
     return query;
