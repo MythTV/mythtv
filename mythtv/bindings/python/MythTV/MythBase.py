@@ -1900,7 +1900,6 @@ class MythLog( object ):
                 if MythLog.LOGLEVEL&2**l:
                     level.append(bwlist[l])
             return ','.join(level)
-    _parselevel = staticmethod(_parselevel)
 
     def log(self, level, message, detail=None, dblevel=None):
         """
