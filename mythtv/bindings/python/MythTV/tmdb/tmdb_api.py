@@ -19,7 +19,7 @@ metadata and image URLs from TMDB. These routines are based on the v2.1 TMDB api
 for this api are published at http://api.themoviedb.org/2.1/
 '''
 
-__version__="v0.1.8"
+__version__="v0.1.9"
 # 0.1.0 Initial development
 # 0.1.1 Alpha Release
 # 0.1.2 Added removal of any line-feeds from data
@@ -31,6 +31,8 @@ __version__="v0.1.8"
 # 0.1.6 Improved displayed error messages on an exception abort
 # 0.1.7 Fixed issues with interactive movie selection
 # 0.1.8 Fixed the error message reporting when the machines Internet connection or DNS is not working
+# 0.1.9 Fixed an abort with the People data logic due to empty data (e.g. biography) being passed by TMDB
+#       Included in this change are a number of other potential empty data checks.
 
 import os, struct, sys, time
 import urllib, urllib2
@@ -693,16 +695,20 @@ class MovieDb(object):
                         for poster in image.getchildren():
                             key = poster.get('size')
                             if key in cur_poster.keys():
-                                cur_poster[key.strip()].append(poster.get('url').strip())
+                                if poster.get('url'):
+                                    cur_poster[key.strip()].append(poster.get('url').strip())
                             else:
-                                cur_poster[key.strip()] = [poster.get('url').strip()]
+                                if poster.get('url'):
+                                    cur_poster[key.strip()] = [poster.get('url').strip()]
                     elif image.tag == u"backdrop":
                         for backdrop in image.getchildren():
                             key = backdrop.get('size')
                             if key in cur_backdrop.keys():
-                                cur_backdrop[key.strip()].append(backdrop.get('url').strip())
+                                if backdrop.get('url'):
+                                    cur_backdrop[key.strip()].append(backdrop.get('url').strip())
                             else:
-                                cur_backdrop[key.strip()] = [backdrop.get('url').strip()]
+                                if backdrop.get('url'):
+                                    cur_backdrop[key.strip()] = [backdrop.get('url').strip()]
         images = {}
         if cur_poster.keys():
             for cur_size in [u"original", u"mid", u"cover", u"thumb"]:
@@ -763,11 +769,13 @@ class MovieDb(object):
                 person = {}
                 for p in item.getchildren():
                     if p.tag != u'images':
-                        person[p.tag] = self.textUtf8(p.text.strip())
+                        if p.text != None:
+                            person[p.tag] = self.textUtf8(p.text.strip())
                     elif len(p.getchildren()):
                         person[p.tag] = {}
                         for image in p.getchildren():
-                            person[p.tag][image.get('size')] = image.get('url').strip()
+                            if image.get('url') != None and image.get('size') != None:
+                                person[p.tag][image.get('size')] = image.get('url').strip()
                 people.append(person)
 
         # Check if no ui has been requested and therefore just return the raw search results.
@@ -817,30 +825,35 @@ class MovieDb(object):
                     for a in elem.getchildren():
                         if a.text:
                             alias.append(self.textUtf8(a.text.strip()).replace(u'\n',u' '))
-                    if alias:
+                    if len(alias):
                         person[elem.tag] = alias
                 elif elem.tag == 'filmography':
                     movies = []
                     for a in elem.getchildren():
                         details = {}
                         for get in ['url', 'name', 'character', 'job', 'id']:
-                            details[get] = a.get(get).strip()
-                        if details:
+                            if a.get(get):
+                                details[get] = a.get(get).strip()
+                        if len(details):
                             movies.append(details)
-                    if movies:
+                    if len(movies):
                         person[elem.tag] = movies
                 elif len(elem.getchildren()):
                     images = {}
                     for image in elem.getchildren():
+                        if image.get('url') == None:
+                            continue
                         (dirName, fileName) = os.path.split(image.get('url'))
                         (fileBaseName, fileExtension) = os.path.splitext(fileName)
                         if not fileExtension[1:] in self.config[u'image_extentions']:
                             continue
                         if image.get('size') in images.keys():
-                            images[image.get('size')]+= u',%s' % image.get('url').strip()
+                            if image.get('url'):
+                                images[image.get('size')]+= u',%s' % image.get('url').strip()
                         else:
-                            images[image.get('size')] = u'%s' % image.get('url').strip()
-                    if images:
+                            if image.get('url') and image.get('size'):
+                                images[image.get('size')] = u'%s' % image.get('url').strip()
+                    if len(images):
                         person[elem.tag] = images
             else:
                 if elem.text:

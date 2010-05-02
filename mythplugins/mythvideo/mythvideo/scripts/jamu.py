@@ -47,7 +47,7 @@ Users of this script are encouraged to populate both themoviedb.com and thetvdb.
 fan art and banners and meta data. The richer the source the more valuable the script.
 '''
 
-__version__=u"v0.7.4"
+__version__=u"v0.7.5"
  # 0.1.0 Initial development
  # 0.2.0 Inital beta release
  # 0.3.0 Add mythvideo metadata updating including movie graphics through
@@ -303,6 +303,7 @@ __version__=u"v0.7.4"
  # 0.7.3 Fixed a bug where a user selected TMDB# was not being used.
  #       Minor change to fuzzy matching of a file named parsed title with those from TMDB and TVDB.
  # 0.7.4 Update for changes in Python bindings
+ # 0.7.5 Added the TMDB MovieRating as videometadata table "rating" field
 
 
 usage_txt=u'''
@@ -3868,6 +3869,9 @@ class MythTvMetaData(VideoFiles):
                     meta_dict['length'] = long(data)
                 except:
                     pass
+                continue
+            if key == 'movierating':
+                meta_dict['rating'] = data
                 continue
         if meta_dict.has_key('rating'):
             if meta_dict['rating'] == '':
