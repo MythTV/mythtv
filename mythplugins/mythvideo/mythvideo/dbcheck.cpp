@@ -88,7 +88,7 @@ namespace
     const QString lastMythDVDDBVersion = "1002";
     const QString lastMythVideoVersion = "1010";
 
-    const QString currentDatabaseVersion = "1033";
+    const QString currentDatabaseVersion = "1034";
 
     const QString OldMythVideoVersionName = "VideoDBSchemaVer";
     const QString OldMythDVDVersionName = "DVDDBSchemaVer";
@@ -1183,6 +1183,25 @@ QString("ALTER DATABASE %1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;")
                 return false;
 
             dbver = "1033";
+        }
+
+        if (dbver == "1033")
+        {
+            AddFileType("ogv");
+            AddFileType("BDMV");
+            AddFileType("nut");
+            AddFileType("mxf");
+            AddFileType("m4v");
+            AddFileType("rm");
+            AddFileType("ts");
+            AddFileType("swf");
+            AddFileType("f4v");
+            AddFileType("nuv");
+
+            if (!UpdateDBVersionNumber(MythVideoVersionName, "1034"))
+                return false;
+
+            dbver = "1034";
         }
 
         return true;

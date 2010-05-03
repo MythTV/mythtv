@@ -80,7 +80,9 @@ namespace
                 add_as_file = false;
 
                 dir_tester.setPath(p->absoluteFilePath() + "/VIDEO_TS");
-                if (dir_tester.exists())
+                QDir bd_dir_tester;
+                bd_dir_tester.setPath(p->absoluteFilePath() + "/BDMV");
+                if (dir_tester.exists() || bd_dir_tester.exists())
                 {
                     add_as_file = true;
                 }

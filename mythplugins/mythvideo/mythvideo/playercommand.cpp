@@ -257,6 +257,9 @@ class VideoPlayerCommandPrivate
         QDir dir_test(QString("%1/VIDEO_TS").arg(filename));
         if (dir_test.exists())
             extension = "VIDEO_TS";
+        QDir bd_dir_test(QString("%1/BDMV").arg(filename));
+        if (bd_dir_test.exists())
+            extension = "BDMV";
 
         QString play_command = gContext->GetSetting("VideoDefaultPlayer");
 
