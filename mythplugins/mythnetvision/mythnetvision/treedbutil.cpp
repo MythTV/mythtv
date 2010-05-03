@@ -214,11 +214,12 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.prepare("INSERT INTO netvisiontreeitems (feedtitle, path, paththumb, "
                   " title, description, url, thumbnail, mediaURL, author, "
                   "date, time, rating, filesize, player, playerargs, download, "
-                  "downloadargs, width, height, language, downloadable, countries) "
+                  "downloadargs, width, height, language, downloadable, countries, "
+                  "season, episode) "
             "VALUES( :FEEDTITLE, :PATH, :PATHTHUMB, :TITLE, :DESCRIPTION, :URL, "
             ":THUMBNAIL, :MEDIAURL, :AUTHOR, :DATE, :TIME, :RATING, :FILESIZE, "
             ":PLAYER, :PLAYERARGS, :DOWNLOAD, :DOWNLOADARGS, :WIDTH, :HEIGHT, "
-            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES);");
+            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES, :SEASON, :EPISODE);");
     query.bindValue(":FEEDTITLE", feedtitle);
     query.bindValue(":PATH", path);
     query.bindValue(":PATHTHUMB", paththumb);
@@ -246,6 +247,8 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.bindValue(":LANGUAGE", item->GetLanguage());
     query.bindValue(":DOWNLOADABLE", item->GetDownloadable());
     query.bindValue(":COUNTRIES", item->GetCountries().join(" "));
+    query.bindValue(":SEASON", item->GetSeason());
+    query.bindValue(":EPISODE", item->GetEpisode());
 
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("netvision: inserting article in DB", query);
@@ -264,7 +267,8 @@ QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &f
                   "thumbnail, mediaURL, author, date, time, "
                   "rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, "
-                  "downloadable, countries, path, paththumb FROM netvisiontreeitems "
+                  "downloadable, countries, season, episode, "
+                  "path, paththumb FROM netvisiontreeitems "
                   "WHERE feedtitle = :FEEDTITLE ORDER BY title DESC;");
     query.bindValue(":FEEDTITLE", feedtitle);
     if (!query.exec() || !query.isActive()) {
@@ -293,15 +297,18 @@ QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &f
         QString     language = query.value(16).toString();
         bool        downloadable = query.value(17).toBool();
         QStringList countries = query.value(18).toString().split(" ");
+        uint        season = query.value(19).toUInt();
+        uint        episode = query.value(20).toUInt();
 
-        QString     path = query.value(19).toString();
-        QString     paththumb = query.value(20).toString();
+        QString     path = query.value(21).toString();
+        QString     paththumb = query.value(22).toString();
 
         QPair<QString,QString> pair(path,paththumb);
         ret.insert(pair, new ResultVideo(title, desc, URL, thumbnail,
                    mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
-                   width, height, language, downloadable, countries));
+                   width, height, language, downloadable, countries,
+                   season, episode));
     }
 
     return ret;

@@ -114,7 +114,8 @@ class ResultVideo
               const QString& player, const QStringList& playerargs,
               const QString& download, const QStringList& downloadargs,
               const uint& width, const uint& height, const QString& language,
-              const bool& downloadable, const QStringList& countries);
+              const bool& downloadable, const QStringList& countries,
+              const uint& season, const uint& episode);
     ResultVideo();
     ~ResultVideo();
 
@@ -137,6 +138,8 @@ class ResultVideo
     const QString& GetLanguage() const { return m_language; }
     const bool& GetDownloadable() const { return m_downloadable; }
     const QStringList& GetCountries() const { return m_countries; }
+    const uint& GetSeason() const { return m_season; }
+    const uint& GetEpisode() const { return m_episode; }
 
   private:
     QString      m_title;
@@ -158,6 +161,8 @@ class ResultVideo
     QString      m_language;
     bool         m_downloadable;
     QStringList  m_countries;
+    uint         m_season;
+    uint         m_episode;
 };
 Q_DECLARE_METATYPE(ResultVideo*)
 

@@ -309,7 +309,9 @@ void RSSSite::process(void)
                (*i)->GetHeight(),
                (*i)->GetLanguage(),
                (*i)->GetDownloadable(),
-               (*i)->GetCountries()));
+               (*i)->GetCountries(),
+               (*i)->GetSeason(),
+               (*i)->GetEpisode()));
         }
         return;
     }

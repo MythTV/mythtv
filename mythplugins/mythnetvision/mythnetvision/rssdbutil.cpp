@@ -176,11 +176,12 @@ bool insertArticleInDB(const QString &feedtitle, ResultVideo *item)
     query.prepare("INSERT INTO netvisionrssitems (feedtitle, title, "
                   "description, url, thumbnail, mediaURL, author, date, time, "
                   "rating, filesize, player, playerargs, download, "
-                  "downloadargs, width, height, language, downloadable, countries) "
+                  "downloadargs, width, height, language, downloadable, countries, "
+                  "season, episode) "
             "VALUES( :FEEDTITLE, :TITLE, :DESCRIPTION, :URL, :THUMBNAIL, "
             ":MEDIAURL, :AUTHOR, :DATE, :TIME, :RATING, :FILESIZE, :PLAYER, "
             ":PLAYERARGS, :DOWNLOAD, :DOWNLOADARGS, :WIDTH, :HEIGHT, "
-            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES);");
+            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES, :SEASON, :EPISODE);");
     query.bindValue(":FEEDTITLE", feedtitle);
     query.bindValue(":TITLE", item->GetTitle());
     query.bindValue(":DESCRIPTION", item->GetDescription());
@@ -206,6 +207,8 @@ bool insertArticleInDB(const QString &feedtitle, ResultVideo *item)
     query.bindValue(":LANGUAGE", item->GetLanguage());
     query.bindValue(":DOWNLOADABLE", item->GetDownloadable());
     query.bindValue(":COUNTRIES", item->GetCountries());
+    query.bindValue(":SEASON", item->GetSeason());
+    query.bindValue(":EPISODE", item->GetEpisode());
 
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("netvision: inserting article in DB", query);
@@ -224,7 +227,8 @@ ResultVideo::resultList getRSSArticles(const QString &feedtitle)
                   "thumbnail, mediaURL, author, date, time, "
                   "rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, "
-                  "downloadable, countries FROM netvisionrssitems "
+                  "downloadable, countries, season, episode "
+                  "FROM netvisionrssitems "
                   "WHERE feedtitle = :FEEDTITLE ORDER BY "
                   "date DESC;");
     query.bindValue(":FEEDTITLE", feedtitle);
@@ -254,11 +258,14 @@ ResultVideo::resultList getRSSArticles(const QString &feedtitle)
         QString     language = query.value(16).toString();
         bool        downloadable = query.value(17).toBool();
         QStringList countries = query.value(18).toString().split(" ");
+        uint        season = query.value(19).toUInt();
+        uint        episode = query.value(20).toUInt();
 
         ret.append(new ResultVideo(title, desc, URL, thumbnail,
                    mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
-                   width, height, language, downloadable, countries));
+                   width, height, language, downloadable, countries,
+                   season, episode));
     }
 
     return ret;

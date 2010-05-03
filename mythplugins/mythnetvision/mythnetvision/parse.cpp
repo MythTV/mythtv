@@ -25,7 +25,8 @@ ResultVideo::ResultVideo(const QString& title, const QString& desc,
               const QString& download, const QStringList& downloadargs,
               const uint& width, const uint& height,
               const QString& language, const bool& downloadable,
-              const QStringList& countries)
+              const QStringList& countries, const uint& season,
+              const uint& episode)
 {
     m_title = title;
     m_desc = desc;
@@ -46,6 +47,8 @@ ResultVideo::ResultVideo(const QString& title, const QString& desc,
     m_language = language;
     m_downloadable = downloadable;
     m_countries = countries;
+    m_season = season;
+    m_episode = episode;
 }
 
 ResultVideo::ResultVideo()
@@ -204,7 +207,10 @@ private:
              else
                  entry.Lang = QString();
 
-             entry.Rating = d.Rating;
+             if (!en.attribute("rating").isNull())
+                 entry.Rating = d.Rating;
+             else
+                 entry.Rating = QString();
              entry.RatingScheme = d.RatingScheme;
              entry.Title = d.Title;
              entry.Description = d.Description;
@@ -620,7 +626,7 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
     QString title, description, url, author, duration, rating,
             thumbnail, mediaURL, player, language, download = NULL;
     off_t filesize = 0;
-    uint width, height = 0;
+    uint width, height, season, episode = 0;
     QDateTime date;
     QStringList playerargs, downloadargs, countries;
     bool downloadable = true;
@@ -678,6 +684,18 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
         }
     }
 
+    QDomNodeList seas = item.elementsByTagNameNS(MythRSS, "season");
+    if (seas.size())
+    {
+        season = seas.at(0).toElement().text().toUInt();
+    }
+
+    QDomNodeList ep = item.elementsByTagNameNS(MythRSS, "episode");
+    if (ep.size())
+    {
+        episode = ep.at(0).toElement().text().toUInt();
+    }
+
     QList<MRSSEntry> enclosures = GetMediaRSS(item);
 
     if (enclosures.size())
@@ -728,7 +746,8 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
               mediaURL, author, date, duration,
               rating, filesize, player, playerargs,
               download, downloadargs, width, height,
-              language, downloadable, countries));
+              language, downloadable, countries, season,
+              episode));
 }
 
 QString Parse::GetLink(const QDomElement& parent) const
