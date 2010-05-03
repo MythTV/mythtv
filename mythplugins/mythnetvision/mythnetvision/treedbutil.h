@@ -26,6 +26,7 @@ bool needsUpdate(GrabberScript *script, uint updateFreq);
 QDateTime lastUpdate(GrabberScript* script);
 
 bool clearTreeItems(const QString &feedtitle);
+bool isTreeInUse(const QString &feedtitle);
 bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
                        const QString &paththumb, ResultVideo *item);
 QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &feedtitle);

@@ -186,6 +186,24 @@ bool clearTreeItems(const QString &feedtitle)
     return (query.numRowsAffected() > 0);
 }
 
+bool isTreeInUse(const QString &feedtitle)
+{
+    if (feedtitle.isEmpty())
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT * FROM netvisiontreegrabbers "
+        "WHERE name = :FEEDTITLE;");
+    query.bindValue(":FEEDTITLE", feedtitle);
+
+    if (!query.exec() || !query.isActive()) {
+        MythDB::DBError("Netvision:  isTreeInUse", query);
+        return false;
+    }
+
+    return query.next();
+}
+
 bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
                        const QString &paththumb, ResultVideo *item)
 {

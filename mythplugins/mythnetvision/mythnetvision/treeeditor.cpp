@@ -222,14 +222,13 @@ void TreeEditor::toggleItem(MythUIButtonListItem *item)
     if (!script)
         return;
 
-    m_changed = true;
-
     bool checked = (item->state() == MythUIButtonListItem::FullChecked);
 
     if (!checked)
     {
         if (insertTreeInDB(script))
         {
+            m_changed = true;
             item->setChecked(MythUIButtonListItem::FullChecked);
         }
     }
@@ -237,6 +236,9 @@ void TreeEditor::toggleItem(MythUIButtonListItem *item)
     {
         if (removeTreeFromDB(script))
         {
+            if (!isTreeInUse(script->GetTitle()))
+                clearTreeItems(script->GetTitle());
+            m_changed = true;
             item->setChecked(MythUIButtonListItem::NotChecked);
         }
     }
