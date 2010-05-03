@@ -146,7 +146,7 @@ public:
     {
         QList<MRSSEntry> result;
 
-        QDomNodeList groups = item.elementsByTagNameNS(QString("http://search.yahoo.com/mrss/"),
+        QDomNodeList groups = item.elementsByTagNameNS(Parse::MediaRSS,
             "group");
 
         for (int i = 0; i < groups.size(); ++i)
@@ -580,6 +580,7 @@ const QString Parse::ITunes = "http://www.itunes.com/dtds/podcast-1.0.dtd";
 const QString Parse::GeoRSSSimple = "http://www.georss.org/georss";
 const QString Parse::GeoRSSW3 = "http://www.w3.org/2003/01/geo/wgs84_pos#";
 const QString Parse::MediaRSS = "http://search.yahoo.com/mrss/";
+const QString Parse::MythRSS = "http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format";
 
 Parse::Parse()
 {

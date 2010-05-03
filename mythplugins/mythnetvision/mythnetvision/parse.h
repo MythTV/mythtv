@@ -199,7 +199,7 @@ class Parse : public QObject
     static const QString GeoRSSSimple;
     static const QString GeoRSSW3;
     static const QString MediaRSS;
-
+    static const QString MythRSS;
 };
 
 #endif
