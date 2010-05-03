@@ -1182,14 +1182,11 @@ void NetTree::slotItemChanged()
             {
                 m_thumbImage->SetFilename(sFilename);
                 m_thumbImage->Load();
-
-                if (!m_thumbImage->IsVisible())
-                    m_thumbImage->Show();
             }
 
         }
         else if (m_thumbImage)
-            m_thumbImage->SetVisible(false);
+            m_thumbImage->Reset();
 
         if (m_downloadable)
         {
@@ -1215,12 +1212,9 @@ void NetTree::slotItemChanged()
         {
             m_thumbImage->SetFilename(site->GetImage());
             m_thumbImage->Load();
-
-            if (!m_thumbImage->IsVisible())
-                m_thumbImage->Show();
         }
         else if (m_thumbImage)
-            m_thumbImage->SetVisible(false);
+            m_thumbImage->Reset();
         if (m_mediaurl)
             m_mediaurl->SetText("");
         if (m_date)
@@ -1304,12 +1298,9 @@ void NetTree::slotItemChanged()
                 {
                     m_thumbImage->SetFilename(thumb);
                     m_thumbImage->Load();
-
-                    if (!m_thumbImage->IsVisible())
-                        m_thumbImage->Show();
                 }
                 else
-                    m_thumbImage->SetVisible(false);
+                    m_thumbImage->Reset();
             }
             else
             {
@@ -1350,18 +1341,14 @@ void NetTree::slotItemChanged()
                 {
                     m_thumbImage->SetFilename(sFilename);
                     m_thumbImage->Load();
-
-                    if (!m_thumbImage->IsVisible())
-                        m_thumbImage->Show();
                 }
+                else
+                    m_thumbImage->Reset();
             }
         }
-        else if (m_thumbImage)
-        {
-            m_thumbImage->SetVisible(false);
-        }
+
         if (m_downloadable)
-            m_downloadable->SetVisible(false);
+            m_downloadable->Reset();
     }
 }
 
