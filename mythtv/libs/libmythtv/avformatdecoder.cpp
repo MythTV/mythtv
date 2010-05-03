@@ -2224,9 +2224,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             AVMetadataTag *metatag = av_metadata_get(ic->streams[i]->metadata,
                                                      "language", NULL, 0);
             int lang = metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
-            int lang_indx = lang_aud_cnt[lang];
-            lang_indx = lang_sub_cnt[lang];
-            lang_sub_cnt[lang]++;
+            int lang_indx = lang_sub_cnt[lang]++;
 
             tracks[kTrackTypeSubtitle].push_back(
                 StreamInfo(i, lang, lang_indx, ic->streams[i]->id));
@@ -2251,13 +2249,13 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 lang = metatag ? get_canonical_lang(metatag->value) : iso639_str3_to_key("und");
             }
 
-            int lang_indx = lang_aud_cnt[lang];
-            lang_aud_cnt[lang]++;
+            int lang_indx = lang_aud_cnt[lang]++;
 
             if (ic->streams[i]->codec->avcodec_dual_language)
             {
                 tracks[kTrackTypeAudio].push_back(
                     StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 0));
+                lang_indx = lang_aud_cnt[lang]++;
                 tracks[kTrackTypeAudio].push_back(
                     StreamInfo(i, lang, lang_indx, ic->streams[i]->id, 1));
             }
