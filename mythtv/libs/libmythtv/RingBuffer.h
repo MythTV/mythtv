@@ -21,6 +21,7 @@ class RemoteFile;
 class RemoteEncoder;
 class ThreadedFileWriter;
 class DVDRingBufferPriv;
+class BDRingBufferPriv;
 class LiveTVChain;
 
 class MPUBLIC RingBuffer
@@ -97,6 +98,11 @@ class MPUBLIC RingBuffer
     DVDRingBufferPriv *DVD() { return dvdPriv; }
     bool InDVDMenuOrStillFrame(void);
 
+    // BDRingBuffer proxies
+    /// Returns true if this is a Blu-ray backed RingBuffer.
+    inline bool isBD(void) const { return bdPriv; }
+    BDRingBufferPriv *BD() { return bdPriv; }
+
     long long SetAdjustFilesize(void);
     void SetTimeout(bool fast) { oldfile = fast; }
 
@@ -106,6 +112,7 @@ class MPUBLIC RingBuffer
 
   private:
     void CalcReadAheadThresh(void);
+    int safe_read_bd(void *data, uint sz);
     int safe_read_dvd(void *data, uint sz);
     int safe_read(int fd, void *data, uint sz);
     int safe_read(RemoteFile *rf, void *data, uint sz);
@@ -175,6 +182,7 @@ class MPUBLIC RingBuffer
     bool commserror;
 
     DVDRingBufferPriv *dvdPriv;
+    BDRingBufferPriv  *bdPriv;
 
     bool oldfile;
 

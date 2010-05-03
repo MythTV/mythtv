@@ -23,6 +23,7 @@ DEPENDPATH  += .
 DEPENDPATH  += ../libmyth ../libavcodec ../libavformat ../libavutil ../libswscale
 DEPENDPATH  += ../libmythmpeg2 ../libmythdb ../libmythhdhomerun
 DEPENDPATH  += ../libmythdvdnav/
+DEPENDPATH  += ../libmythbdnav/
 DEPENDPATH  += ./dvbdev ./mpeg ./iptv ./channelscan
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment/include
 DEPENDPATH  += ../libmythlivemedia/BasicUsageEnvironment
@@ -41,14 +42,14 @@ INCLUDEPATH += $$POSTINC
 LIBS += -L../libmyth -L../libavutil -L../libavcodec -L../libavformat
 LIBS += -L../libswscale
 LIBS += -L../libmythui -L../libmythupnp
-LIBS += -L../libmythmpeg2 -L../libmythdvdnav
+LIBS += -L../libmythmpeg2 -L../libmythdvdnav -L../libmythbdnav
 LIBS += -L../libmythdb
 LIBS += -lmyth-$$LIBVERSION         -lmythavutil-$$LIBVERSION
 LIBS += -lmythavcodec-$$LIBVERSION  -lmythavformat-$$LIBVERSION
 LIBS += -lmythswscale-$$LIBVERSION
 LIBS += -lmythui-$$LIBVERSION       -lmythupnp-$$LIBVERSION
 LIBS += -lmythmpeg2-$$LIBVERSION    -lmythdvdnav-$$LIBVERSION
-LIBS += -lmythdb-$$LIBVERSION
+LIBS += -lmythbdnav-$$LIBVERSION    -lmythdb-$$LIBVERSION
 using_mheg: LIBS += -L../libmythfreemheg -lmythfreemheg-$$LIBVERSION
 using_live: LIBS += -L../libmythlivemedia -lmythlivemedia-$$LIBVERSION
 using_hdhomerun: LIBS += -L../libmythhdhomerun -lmythhdhomerun-$$LIBVERSION
@@ -61,6 +62,7 @@ TARGETDEPS += ../libavcodec/libmythavcodec-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libavformat/libmythavformat-$${MYTH_SHLIB_EXT}
 TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${MYTH_LIB_EXT}
 TARGETDEPS += ../libmythdvdnav/libmythdvdnav-$${MYTH_LIB_EXT}
+TARGETDEPS += ../libmythbdnav/libmythbdnav-$${MYTH_LIB_EXT}
 using_mheg: TARGETDEPS += ../libmythfreemheg/libmythfreemheg-$${MYTH_SHLIB_EXT}
 using_live: TARGETDEPS += ../libmythlivemedia/libmythlivemedia-$${MYTH_SHLIB_EXT}
 using_hdhomerun: TARGETDEPS += ../libmythhdhomerun/libmythhdhomerun-$${MYTH_SHLIB_EXT}
@@ -241,11 +243,11 @@ using_frontend {
 
     # Video playback
     HEADERS += tv_play.h                NuppelVideoPlayer.h
-    HEADERS += DVDRingBuffer.h          playercontext.h
-    HEADERS += tv_play_win.h
+    HEADERS += DVDRingBuffer.h          BDRingBuffer.h
+    HEADERS += playercontext.h          tv_play_win.h
     SOURCES += tv_play.cpp              NuppelVideoPlayer.cpp
-    SOURCES += DVDRingBuffer.cpp        playercontext.cpp
-    SOURCES += tv_play_win.cpp
+    SOURCES += DVDRingBuffer.cpp        BDRingBuffer.cpp
+    SOURCES += playercontext.cpp        tv_play_win.cpp
 
     # Text subtitle parser
     HEADERS += textsubtitleparser.h     xine_demux_sputext.h

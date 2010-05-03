@@ -28,6 +28,7 @@ using namespace std;
 #include "ThreadedFileWriter.h"
 #include "livetvchain.h"
 #include "DVDRingBuffer.h"
+#include "BDRingBuffer.h"
 #include "util.h"
 #include "compat.h"
 #include "mythverbose.h"
@@ -129,9 +130,9 @@ RingBuffer::RingBuffer(const QString &lfilename,
       fill_threshold(65536),    fill_min(-1),
       readblocksize(CHUNK),     wanttoread(0),
       numfailures(0),           commserror(false),
-      dvdPriv(NULL),            oldfile(false),
-      livetvchain(NULL),        ignoreliveeof(false),
-      readAdjust(0)
+      dvdPriv(NULL),            bdPriv(NULL),
+      oldfile(false),           livetvchain(NULL),
+      ignoreliveeof(false),     readAdjust(0)
 {
     filename.detach();
     pthread_rwlock_init(&rwlock, NULL);
@@ -293,21 +294,34 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     bool is_local = false;
     bool is_dvd = false;
     (void) is_dvd; // not used when frontend is disabled.
+    bool is_bd = false;
+    (void) is_bd;
 
-    if ((filename.left(1) == "/") ||
-        (QFile::exists(filename)))
+    QDir dvd_test_dir;
+    QDir bd_test_dir;
+
+    dvd_test_dir.setPath(filename + "/VIDEO_TS");
+    bd_test_dir.setPath(filename + "/BDMV");
+
+    if (dvd_test_dir.exists())
+        is_dvd = true;
+
+    if (bd_test_dir.exists())
+        is_bd = true;
+
+    if (((filename.left(1) == "/") && !is_dvd && !is_bd) ||
+        (QFile::exists(filename) && !is_dvd && !is_bd))
         is_local = true;
-#ifdef USING_FRONTEND
-    else if (filename.left(4) == "dvd:")
+    else if (filename.left(4) == "dvd:" || is_dvd)
     {
         is_dvd = true;
         dvdPriv = new DVDRingBufferPriv();
         startreadahead = false;
 
-        if (filename.left(6) == "dvd://")  // 'Play DVD' sends "dvd:/" + dev
-            filename.remove(0,5);          //             e.g. "dvd://dev/sda"
-        else                               // Less correct URI "dvd:" + path
-            filename.remove(0,4);          //             e.g. "dvd:/videos/ET"
+        if (filename.left(6) == "dvd://")    // 'Play DVD' sends "dvd:/" + dev
+            filename.remove(0,5);            //             e.g. "dvd://dev/sda"
+        else if (filename.startsWith("dvd:")) // Less correct URI "dvd:" + path
+            filename.remove(0,4);            //             e.g. "dvd:/videos/ET"
 
         if (QFile::exists(filename))
             VERBOSE(VB_PLAYBACK, "OpenFile() trying DVD at " + filename);
@@ -316,7 +330,24 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             filename = "/dev/dvd";
         }
     }
-#endif // USING_FRONTEND
+    else if (filename.left(3) == "bd:" || is_bd)
+    {
+        is_bd = true;
+        bdPriv = new BDRingBufferPriv();
+        startreadahead = false;
+
+        if (filename.left(5) == "bd://")    // 'Play DVD' sends "bd:/" + dev
+            filename.remove(0,4);           //             e.g. "bd://dev/sda"
+        else if (filename.startsWith("bd:/"))// Less correct URI "bd:" + path
+            filename.remove(0,3);           //             e.g. "bd:/videos/ET"
+
+        if (QFile::exists(filename))
+            VERBOSE(VB_PLAYBACK, "OpenFile() trying BD at " + filename);
+        else
+        {
+            filename = "/dev/dvd";
+        }
+    }
 
     if (is_local)
     {
@@ -399,6 +430,13 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
         readblocksize = DVD_BLOCK_SIZE * 62;
         pthread_rwlock_unlock(&rwlock);
     }
+    else if (is_bd)
+    {
+        bdPriv->OpenFile(filename);
+        pthread_rwlock_wrlock(&rwlock);
+        readblocksize = BD_BLOCK_SIZE * 62;
+        pthread_rwlock_unlock(&rwlock);
+    }
 #endif // USING_FRONTEND
     else
     {
@@ -461,7 +499,8 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 bool RingBuffer::IsOpen(void) const
 {
 #ifdef USING_FRONTEND
-    return tfw || (fd2 > -1) || remotefile || (dvdPriv && dvdPriv->IsOpen());
+    return tfw || (fd2 > -1) || remotefile || (dvdPriv && dvdPriv->IsOpen()) ||
+           (bdPriv && bdPriv->IsOpen());
 #else // if !USING_FRONTEND
     return tfw || (fd2 > -1) || remotefile;
 #endif // !USING_FRONTEND
@@ -498,6 +537,10 @@ RingBuffer::~RingBuffer(void)
     if (dvdPriv)
     {
         delete dvdPriv;
+    }
+    if (bdPriv)
+    {
+        delete bdPriv;
     }
 #endif // USING_FRONTEND
 
@@ -722,7 +765,7 @@ void RingBuffer::CalcReadAheadThresh(void)
     fill_min       = 1;
 
 #ifdef USING_FRONTEND
-    if (dvdPriv)
+    if (dvdPriv || bdPriv)
     {
         const uint KB32  =  32*1024;
         const uint KB64  =  64*1024;
@@ -1013,6 +1056,11 @@ void RingBuffer::ReadAheadThread(void)
                 ret = dvdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
                 internalreadpos += ret;
             }
+            else if (bdPriv)
+            {
+                ret = bdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
+                internalreadpos += ret;
+            }
 #endif // USING_FRONTEND
             else
             {
@@ -1121,6 +1169,11 @@ int RingBuffer::Peek(void *buf, int count)
             // back to exactly where we were, but we can't do
             // that with the DVDRingBuffer
             dvdPriv->NormalSeek(0);
+        }
+        else if (ret > 0 && bdPriv)
+        {
+            // No idea if this will work.
+            bdPriv->Seek(0);
         }
         else
 #endif // USING_FRONTEND
@@ -1301,7 +1354,7 @@ int RingBuffer::ReadFromBuf(void *buf, int count, bool peek)
 /** \fn RingBuffer::Read(void*, int)
  *  \brief This is the public method for reading from a file,
  *         it calls the appropriate read method if the file
- *         is remote or buffered, or a DVD.
+ *         is remote or buffered, or a BD/DVD.
  *  \param buf   Pointer to where data will be written
  *  \param count Number of bytes to read
  *  \return Returns number of bytes read
@@ -1329,6 +1382,11 @@ int RingBuffer::Read(void *buf, int count)
         else if (dvdPriv)
         {
             ret = dvdPriv->safe_read(buf, count);
+            readpos += ret;
+        }
+        else if (bdPriv)
+        {
+            ret = bdPriv->safe_read(buf, count);
             readpos += ret;
         }
 #endif // USING_FRONTEND
@@ -1440,6 +1498,11 @@ long long RingBuffer::Seek(long long pos, int whence)
         dvdPriv->NormalSeek(pos);
         ret = pos;
     }
+    else if (bdPriv)
+    {
+        bdPriv->Seek(pos);
+        ret = pos;
+    }
 #endif // USING_FRONTEND
     else
     {
@@ -1540,6 +1603,8 @@ long long RingBuffer::GetReadPosition(void) const
 #ifdef USING_FRONTEND
     if (dvdPriv)
         return dvdPriv->GetReadPosition();
+    else if (bdPriv)
+        return bdPriv->GetReadPosition();
 #endif // USING_FRONTEND
 
     return readpos;

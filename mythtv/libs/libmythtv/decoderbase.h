@@ -161,6 +161,9 @@ class DecoderBase
     long long DVDFindPosition(long long desiredFrame);
     void UpdateDVDFramesPlayed(void);
 
+    long long BDFindPosition(long long desiredFrame);
+    void UpdateBDFramesPlayed(void);
+
     // Audio/Subtitle/EIA-608/EIA-708 stream selection
     virtual QStringList GetTracks(uint type) const;
     virtual uint GetTrackCount(uint type) const
