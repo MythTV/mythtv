@@ -1028,8 +1028,8 @@ built-in to MythTV.  You <em>do not</em> need to install XMLTV (so you may
 skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
 or higher.
 
-Get XMLTV from <url url="http://xmltv.sourceforge.net"
-name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.51).
+Get XMLTV from <url url="http://www.xmltv.org"
+name="http://www.xmltv.org">.  Download the latest version (0.5.57).
 
 <sect1>Configuring the Schedules Direct service <label id="ConfigureSD">
 <p>Schedules Direct is a non-profit organization which has licensed
@@ -6600,8 +6600,8 @@ Although RTjpeg is an option for video codec there is no reason to transcode
 <em>to</em> this format because it will produce larger files than MPEG-4 and
 the recording will take <em>more</em> CPU power to play back.  The MPEG-4
 settings are described in the documentation for the <bf>ffmpeg</bf> project
-at <url url="http://ffmpeg.sourceforge.net/ffmpeg-doc.html"
-name="http://ffmpeg.sourceforge.net/ffmpeg-doc.html">.  It's a matter of
+at <url url="http://ffmpeg.org/ffmpeg-doc.html"
+name="http://ffmpeg.org/ffmpeg-doc.html">.  It's a matter of
 trial and error to discover which settings achieve a good compromise between
 size and quality.
 
