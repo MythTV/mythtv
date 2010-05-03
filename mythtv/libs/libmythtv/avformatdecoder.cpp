@@ -1401,8 +1401,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     }
 
     enc->opaque = (void *)this;
-    enc->get_buffer = avcodec_default_get_buffer;
-    enc->release_buffer = avcodec_default_release_buffer;
+    enc->get_buffer = get_avf_buffer;
+    enc->release_buffer = release_avf_buffer;
     enc->draw_horiz_band = NULL;
     enc->slice_flags = 0;
 
@@ -1419,11 +1419,15 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
         codec = find_vdpau_decoder(codec, enc->codec_id);
 
-    if (selectedStream &&
+    if (selectedStream)
+    {
+        directrendering = true;
+        if (
         !gContext->GetNumSetting("DecodeExtraAudio", 0) &&
         !CODEC_IS_HWACCEL(codec))
     {
         SetLowBuffers(false);
+    }
     }
 
     if (CODEC_IS_XVMC(codec))
@@ -1435,8 +1439,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->draw_horiz_band = render_slice_xvmc;
         enc->slice_flags = SLICE_FLAG_CODED_ORDER |
             SLICE_FLAG_ALLOW_FIELD;
-        if (selectedStream)
-            directrendering = true;
     }
     else if (CODEC_IS_DVDV(codec))
     {
@@ -1447,7 +1449,6 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->get_buffer       = get_avf_buffer;
         enc->release_buffer   = release_avf_buffer;
         enc->draw_horiz_band  = NULL;
-        directrendering      |= selectedStream;
     }
     else if (CODEC_IS_VDPAU(codec))
     {
@@ -1456,20 +1457,15 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
         enc->release_buffer  = release_avf_buffer_vdpau;
         enc->draw_horiz_band = render_slice_vdpau;
         enc->slice_flags     = SLICE_FLAG_CODED_ORDER | SLICE_FLAG_ALLOW_FIELD;
-        directrendering     |= selectedStream;
     }
-    else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
-             IS_DR1_PIX_FMT(enc->pix_fmt))
+    else if (codec && codec->capabilities & CODEC_CAP_DR1)
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
-        enc->get_buffer      = get_avf_buffer;
-        enc->release_buffer  = release_avf_buffer;
-        enc->draw_horiz_band = NULL;
-        if (selectedStream)
-            directrendering = true;
     }
     else
     {
+        if (selectedStream)
+            directrendering = false;
         VERBOSE(VB_PLAYBACK, LOC +
                 QString("Using software scaling to convert pixel format %1 for "
                         "codec %2").arg(enc->pix_fmt)
@@ -2448,6 +2444,13 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
 
+    if (!IS_DR1_PIX_FMT(c->pix_fmt))
+    {
+        nd->directrendering = false;
+        return avcodec_default_get_buffer(c, pic);
+    }
+    nd->directrendering = true;
+
     VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(true);
 
     if (!frame)
@@ -3197,6 +3200,13 @@ bool AvFormatDecoder::ProcessVideoPacket(AVStream *curstream, AVPacket *pkt)
             GetNVP()->DiscardVideoFrame(xf);
         }
     }
+    else if (!picframe)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "NULL videoframe - direct rendering not"
+                "correctly initialized.");
+        return false;
+    }
+
 
     long long temppts = pts;
 
