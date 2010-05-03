@@ -94,7 +94,7 @@ int JoystickMenuThread::Init(QString &config_file)
     rc = ReadConfig(config_file);
     if (rc)
     {
-        VERBOSE(VB_GENERAL, LOC_ERROR + QString("Joystick disabled - Failed "
+        VERBOSE(VB_GENERAL, LOC + QString("Joystick disabled - Failed "
                                                 "to read %1")
                                                 .arg(config_file));
         return(rc);
