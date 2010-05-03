@@ -478,6 +478,8 @@ const char* MythMediaDevice::MediaTypeString(MediaType type)
         return "MEDIATYPE_AUDIO";
     if (type & MEDIATYPE_DVD)
         return "MEDIATYPE_DVD";
+    if (type & MEDIATYPE_BD)
+        return "MEDIATYPE_BD";
     if (type & MEDIATYPE_VCD)
         return "MEDIATYPE_VCD";
     if (type & MEDIATYPE_MMUSIC)

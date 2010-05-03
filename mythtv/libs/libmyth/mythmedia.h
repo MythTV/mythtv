@@ -29,7 +29,8 @@ typedef enum {
     MEDIATYPE_MMUSIC   = 0x0040,
     MEDIATYPE_MVIDEO   = 0x0080,
     MEDIATYPE_MGALLERY = 0x0100,
-    MEDIATYPE_END      = 0x0200,
+    MEDIATYPE_BD       = 0x0200,
+    MEDIATYPE_END      = 0x0400,
 } MediaType;
 
 typedef enum {

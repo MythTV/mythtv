@@ -20,7 +20,7 @@
 #define PATHTO_BAD_DVD_MOUNT "/video_ts"
 
 #define PATHTO_DVD_DETECT "/VIDEO_TS"
-
+#define PATHTO_BD_DETECT "/BDMV"
 #define PATHTO_VCD_DETECT "/vcd"
 #define PATHTO_SVCD_DETECT "/svcd"
 
@@ -64,6 +64,7 @@ void MythCDROM::onDeviceMounted()
     QDir       svcd = QDir(m_MountPath  + PATHTO_SVCD_DETECT);
     QDir        vcd = QDir(m_MountPath  + PATHTO_VCD_DETECT);
     QDir    bad_dvd = QDir(m_MountPath  + PATHTO_BAD_DVD_MOUNT);
+    QDir         bd = QDir(m_MountPath  + PATHTO_BD_DETECT);
 
     // Default is data media
     m_MediaType = MEDIATYPE_DATA;
@@ -76,6 +77,12 @@ void MythCDROM::onDeviceMounted()
         VERBOSE(VB_MEDIA, "Probable DVD detected.");
         m_MediaType = MEDIATYPE_DVD;
         m_Status = MEDIASTAT_USEABLE; 
+    }
+    if (bd.exists())
+    {
+        VERBOSE(VB_MEDIA, "Probable Blu-ray detected.");
+        m_MediaType = MEDIATYPE_BD;
+        m_Status = MEDIASTAT_USEABLE;
     }
     else if (audio.exists())
     {
@@ -111,7 +118,8 @@ void MythCDROM::onDeviceMounted()
     if (m_AllowEject)
     {
         unlock();
-        if (m_MediaType == MEDIATYPE_DVD || m_MediaType == MEDIATYPE_VCD) 
+        if (m_MediaType == MEDIATYPE_DVD || m_MediaType == MEDIATYPE_VCD ||
+            m_MediaType == MEDIATYPE_BD)
             unmount();
     }
 }
