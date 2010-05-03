@@ -76,6 +76,8 @@ class NetSearch : public MythScreenType
     MythUIText         *m_countries;
     MythUIText         *m_season;
     MythUIText         *m_episode;
+    MythUIText         *m_s00e00;
+    MythUIText         *m_00x00;
 
     MythUIImage        *m_thumbImage;
     MythUIStateType    *m_downloadable;

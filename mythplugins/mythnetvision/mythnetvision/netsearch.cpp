@@ -21,6 +21,7 @@
 
 #include "search.h"
 #include "netsearch.h"
+#include "netutils.h"
 #include "parse.h"
 #include "rssdbutil.h"
 #include "rsseditor.h"
@@ -42,7 +43,8 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_noSites(NULL),               m_width(NULL),
       m_height(NULL),                m_resolution(NULL),
       m_countries(NULL),             m_season(NULL),
-      m_episode(NULL),               m_thumbImage(NULL),
+      m_episode(NULL),               m_s00e00(NULL),
+      m_00x00(NULL),                 m_thumbImage(NULL),
       m_downloadable(NULL),          m_progress(NULL),
       m_busyPopup(NULL),             m_okPopup(NULL),
       m_popupStack(),                m_netSearch(),
@@ -95,6 +97,8 @@ bool NetSearch::Create()
     m_countries = dynamic_cast<MythUIText *> (GetChild("countries"));
     m_season = dynamic_cast<MythUIText *> (GetChild("season"));
     m_episode = dynamic_cast<MythUIText *> (GetChild("episode"));
+    m_s00e00 = dynamic_cast<MythUIText *> (GetChild("s##e##"));
+    m_00x00 = dynamic_cast<MythUIText *> (GetChild("##x##"));
 
     m_thumbImage = dynamic_cast<MythUIImage *> (GetChild("preview"));
 
@@ -594,6 +598,14 @@ void NetSearch::populateResultList(ResultVideo::resultList list)
             item->SetText((*i)->GetCountries().join(","), "countries");
             item->SetText(QString::number((*i)->GetSeason()), "season");
             item->SetText(QString::number((*i)->GetEpisode()), "episode");
+            item->SetText(QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                             ((*i)->GetSeason(), 2)).arg(
+                             GetDisplaySeasonEpisode((*i)->GetEpisode(), 2)),
+                             "s##e##");
+            item->SetText(QString("%1x%2").arg(GetDisplaySeasonEpisode
+                             ((*i)->GetSeason(), 1)).arg(
+                             GetDisplaySeasonEpisode((*i)->GetEpisode(), 2)),
+                             "##x##");
 
             off_t bytes = (*i)->GetFilesize();
             if (bytes > 0)

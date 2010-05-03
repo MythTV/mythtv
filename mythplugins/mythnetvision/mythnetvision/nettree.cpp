@@ -17,6 +17,7 @@
 #include "treeeditor.h"
 #include "parse.h"
 #include "nettree.h"
+#include "netutils.h"
 #include "rssdbutil.h"
 #include "rsseditor.h"
 #include "rssmanager.h"
@@ -52,6 +53,7 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
       m_width(NULL),                 m_height(NULL),
       m_resolution(NULL),            m_countries(NULL),
       m_season(NULL),                m_episode(NULL),
+      m_s00e00(NULL),                m_00x00(NULL),
       m_thumbImage(NULL),            m_downloadable(NULL),
       m_busyPopup(NULL),             m_menuPopup(NULL),
       m_popupStack(),                m_externaldownload(NULL),
@@ -118,6 +120,8 @@ bool NetTree::Create()
     UIUtilW::Assign(this, m_countries, "countries");
     UIUtilW::Assign(this, m_season, "season");
     UIUtilW::Assign(this, m_episode, "episode");
+    UIUtilW::Assign(this, m_s00e00, "s##e##");
+    UIUtilW::Assign(this, m_00x00, "##x##");
 
     UIUtilW::Assign(this, m_thumbImage, "preview");
 
@@ -353,6 +357,14 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         item->SetText(QString::number(video->GetSeason()), "season");
         item->SetText(QString::number(video->GetEpisode()), "episode");
 
+        item->SetText(QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                             (video->GetSeason(), 2)).arg(
+                             GetDisplaySeasonEpisode(video->GetEpisode(), 2)),
+                             "s##e##");
+        item->SetText(QString("%1x%2").arg(GetDisplaySeasonEpisode
+                             (video->GetSeason(), 1)).arg(
+                             GetDisplaySeasonEpisode(video->GetEpisode(), 2)),
+                             "##x##");
         off_t bytes = video->GetFilesize();
         item->SetText(QString::number(bytes), "filesize");
         QString tmpSize;
@@ -1097,6 +1109,14 @@ void NetTree::slotItemChanged()
             m_season->SetText(QString::number(item->GetSeason()));
         if (m_episode)
             m_episode->SetText(QString::number(item->GetEpisode()));
+        if (m_s00e00)
+            m_s00e00->SetText(QString("s%1e%2").arg(GetDisplaySeasonEpisode
+                             (item->GetSeason(), 2)).arg(
+                             GetDisplaySeasonEpisode(item->GetEpisode(), 2)));
+        if (m_00x00)
+            m_00x00->SetText(QString("%1x%2").arg(GetDisplaySeasonEpisode
+                             (item->GetSeason(), 1)).arg(
+                             GetDisplaySeasonEpisode(item->GetEpisode(), 2)));
 
 
         if (m_filesize || m_filesize_str)
