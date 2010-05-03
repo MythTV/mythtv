@@ -703,7 +703,7 @@ class Videos(object):
         try:
             etree = XmlHandler(url).getEt()
         except Exception, errormsg:
-            sys.stderr.write(self.error_messages['MTVUrlError'] % (url, errormsg))
+            sys.stderr.write(self.error_messages['MtvUrlError'] % (url, errormsg))
             return dictionaries
 
         if etree is None:
