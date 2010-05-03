@@ -50,11 +50,12 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
       m_filesize(NULL),              m_filesize_str(NULL),
       m_rating(NULL),                m_noSites(NULL),
       m_width(NULL),                 m_height(NULL),
-      m_resolution(NULL),            m_thumbImage(NULL),
-      m_downloadable(NULL),          m_busyPopup(NULL),
-      m_menuPopup(NULL),             m_popupStack(),
-      m_externaldownload(NULL),      m_type(type),
-      m_lock(QMutex::Recursive)
+      m_resolution(NULL),            m_countries(NULL),
+      m_season(NULL),                m_episode(NULL),
+      m_thumbImage(NULL),            m_downloadable(NULL),
+      m_busyPopup(NULL),             m_menuPopup(NULL),
+      m_popupStack(),                m_externaldownload(NULL),
+      m_type(type),                  m_lock(QMutex::Recursive)
 {
     m_download = new DownloadManager(this);
     m_imageDownload = new ImageDownloadManager(this);
@@ -114,6 +115,9 @@ bool NetTree::Create()
     UIUtilW::Assign(this, m_width, "width");
     UIUtilW::Assign(this, m_height, "height");
     UIUtilW::Assign(this, m_resolution, "resolution");
+    UIUtilW::Assign(this, m_countries, "countries");
+    UIUtilW::Assign(this, m_season, "season");
+    UIUtilW::Assign(this, m_episode, "episode");
 
     UIUtilW::Assign(this, m_thumbImage, "preview");
 
@@ -345,6 +349,9 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         item->SetText(QString::number(video->GetHeight()), "height");
         item->SetText(QString("%1x%2").arg(video->GetWidth())
                       .arg(video->GetHeight()), "resolution");
+        item->SetText(video->GetCountries().join(","), "countries");
+        item->SetText(QString::number(video->GetSeason()), "season");
+        item->SetText(QString::number(video->GetEpisode()), "episode");
 
         off_t bytes = video->GetFilesize();
         item->SetText(QString::number(bytes), "filesize");
@@ -1084,6 +1091,13 @@ void NetTree::slotItemChanged()
         if (m_resolution)
             m_resolution->SetText(QString("%1x%2")
                           .arg(item->GetWidth()).arg(item->GetHeight()));
+        if (m_countries)
+            m_countries->SetText(item->GetCountries().join(","));
+        if (m_season)
+            m_season->SetText(QString::number(item->GetSeason()));
+        if (m_episode)
+            m_episode->SetText(QString::number(item->GetEpisode()));
+
 
         if (m_filesize || m_filesize_str)
         {

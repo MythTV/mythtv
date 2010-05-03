@@ -117,6 +117,9 @@ class NetTree : public MythScreenType
     MythUIText         *m_width;
     MythUIText         *m_height;
     MythUIText         *m_resolution;
+    MythUIText         *m_countries;
+    MythUIText         *m_season;
+    MythUIText         *m_episode;
 
     MythUIImage        *m_thumbImage;
 

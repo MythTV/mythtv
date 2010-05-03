@@ -41,13 +41,14 @@ NetSearch::NetSearch(MythScreenStack *parent, const char *name)
       m_rating(NULL),                m_pageText(NULL),
       m_noSites(NULL),               m_width(NULL),
       m_height(NULL),                m_resolution(NULL),
-      m_thumbImage(NULL),            m_downloadable(NULL),
-      m_progress(NULL),              m_busyPopup(NULL),
-      m_okPopup(NULL),               m_popupStack(),
-      m_netSearch(),                 m_currentSearch(NULL),
-      m_currentGrabber(0),           m_currentCmd(NULL),
-      m_currentDownload(NULL),       m_pagenum(0),
-      m_lock(QMutex::Recursive)
+      m_countries(NULL),             m_season(NULL),
+      m_episode(NULL),               m_thumbImage(NULL),
+      m_downloadable(NULL),          m_progress(NULL),
+      m_busyPopup(NULL),             m_okPopup(NULL),
+      m_popupStack(),                m_netSearch(),
+      m_currentSearch(NULL),         m_currentGrabber(0),
+      m_currentCmd(NULL),            m_currentDownload(NULL),
+      m_pagenum(0),                  m_lock(QMutex::Recursive)
 {
     m_playing = false;
     m_netSearch = new Search();
@@ -91,6 +92,9 @@ bool NetSearch::Create()
     m_width = dynamic_cast<MythUIText *> (GetChild("width"));
     m_height = dynamic_cast<MythUIText *> (GetChild("height"));
     m_resolution = dynamic_cast<MythUIText *> (GetChild("resolution"));
+    m_countries = dynamic_cast<MythUIText *> (GetChild("countries"));
+    m_season = dynamic_cast<MythUIText *> (GetChild("season"));
+    m_episode = dynamic_cast<MythUIText *> (GetChild("episode"));
 
     m_thumbImage = dynamic_cast<MythUIImage *> (GetChild("preview"));
 
@@ -587,6 +591,9 @@ void NetSearch::populateResultList(ResultVideo::resultList list)
             item->SetText(QString::number((*i)->GetHeight()), "height");
             item->SetText(QString("%1x%2").arg((*i)->GetWidth())
                       .arg((*i)->GetHeight()), "resolution");
+            item->SetText((*i)->GetCountries().join(","), "countries");
+            item->SetText(QString::number((*i)->GetSeason()), "season");
+            item->SetText(QString::number((*i)->GetEpisode()), "episode");
 
             off_t bytes = (*i)->GetFilesize();
             if (bytes > 0)
@@ -876,6 +883,12 @@ void NetSearch::slotItemChanged()
         if (m_resolution)
             m_resolution->SetText(QString("%1x%2")
                           .arg(item->GetWidth()).arg(item->GetHeight()));
+        if (m_countries)
+            m_countries->SetText(item->GetCountries().join(","));
+        if (m_season)
+            m_season->SetText(QString::number(item->GetSeason()));
+        if (m_episode)
+            m_episode->SetText(QString::number(item->GetEpisode()));
 
         if (m_filesize || m_filesize_str)
         {
