@@ -731,6 +731,7 @@ int internal_play_media(const QString &mrl, const QString &plot,
 
     QFile checkFile(mrl);
     if ((!checkFile.exists() && !mrl.startsWith("dvd:")
+         && !mrl.startsWith("bd:")
          && !mrl.startsWith("myth:")))
     {
         QString errorText = QObject::tr("Failed to open \n '%1' in %2 \n"
@@ -759,6 +760,12 @@ int internal_play_media(const QString &mrl, const QString &plot,
         d.exists())
     {
         pginfo->pathname = QString("dvd:%1").arg(mrl);
+    }
+
+    QDir bd(mrl + "/BDMV");
+    if (bd.exists())
+    {
+        pginfo->pathname = QString("bd:%1").arg(mrl);
     }
 
     if (!director.isEmpty())

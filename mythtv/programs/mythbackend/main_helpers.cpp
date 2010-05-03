@@ -351,11 +351,16 @@ int preview_helper(const QString &chanid, const QString &starttime,
                 pginfo->isVideo = true;
 
                 QDir d(infile + "/VIDEO_TS");
+                QDir bd(infile + "/BDMV");
                 if ((infile.section('.', -1) == "iso") ||
                     (infile.section('.', -1) == "img") ||
                     d.exists())
                 {
                     pginfo->pathname = QString("dvd:%1").arg(infile);
+                }
+                else if (bd.exists())
+                {
+                    pginfo->pathname = QString("bd:%1").arg(infile);
                 }
                 else
                 {
