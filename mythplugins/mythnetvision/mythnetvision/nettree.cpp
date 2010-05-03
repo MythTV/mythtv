@@ -1229,6 +1229,16 @@ void NetTree::slotItemChanged()
             m_time->SetText("");
         if (m_rating)
             m_rating->SetText("");
+        if (m_countries)
+            m_countries->SetText("");
+        if (m_season)
+            m_season->SetText("");
+        if (m_episode)
+            m_episode->SetText("");
+        if (m_s00e00)
+            m_s00e00->SetText("");
+        if (m_00x00)
+            m_00x00->SetText("");
         if (m_filesize)
             m_filesize->SetText("");
         if (m_filesize_str)
@@ -1261,6 +1271,16 @@ void NetTree::slotItemChanged()
             m_rating->SetText("");
         if (m_filesize)
             m_filesize->SetText("");
+        if (m_countries)
+            m_countries->SetText("");
+        if (m_season)
+            m_season->SetText("");
+        if (m_episode)
+            m_episode->SetText("");
+        if (m_s00e00)
+            m_s00e00->SetText("");
+        if (m_00x00)
+            m_00x00->SetText("");
         if (m_filesize_str)
             m_filesize_str->SetText("");
         if (m_thumbImage)
