@@ -297,22 +297,12 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     bool is_bd = false;
     (void) is_bd;
 
-    QDir dvd_test_dir;
-    QDir bd_test_dir;
-
-    dvd_test_dir.setPath(filename + "/VIDEO_TS");
-    bd_test_dir.setPath(filename + "/BDMV");
-
-    if (dvd_test_dir.exists())
-        is_dvd = true;
-
-    if (bd_test_dir.exists())
-        is_bd = true;
-
-    if (((filename.left(1) == "/") && !is_dvd && !is_bd) ||
-        (QFile::exists(filename) && !is_dvd && !is_bd))
+    if ((filename.left(1) == "/") ||
+        (QFile::exists(filename)))
         is_local = true;
-    else if (filename.left(4) == "dvd:" || is_dvd)
+
+#ifdef USING_FRONTEND
+    else if (filename.left(4) == "dvd:")
     {
         is_dvd = true;
         dvdPriv = new DVDRingBufferPriv();
@@ -320,7 +310,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 
         if (filename.left(6) == "dvd://")    // 'Play DVD' sends "dvd:/" + dev
             filename.remove(0,5);            //             e.g. "dvd://dev/sda"
-        else if (filename.startsWith("dvd:")) // Less correct URI "dvd:" + path
+        else                                 // Less correct URI "dvd:" + path
             filename.remove(0,4);            //             e.g. "dvd:/videos/ET"
 
         if (QFile::exists(filename))
@@ -338,7 +328,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 
         if (filename.left(5) == "bd://")    // 'Play DVD' sends "bd:/" + dev
             filename.remove(0,4);           //             e.g. "bd://dev/sda"
-        else if (filename.startsWith("bd:/"))// Less correct URI "bd:" + path
+        else                                // Less correct URI "bd:" + path
             filename.remove(0,3);           //             e.g. "bd:/videos/ET"
 
         if (QFile::exists(filename))
@@ -348,6 +338,7 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
             filename = "/dev/dvd";
         }
     }
+#endif // USING_FRONTEND
 
     if (is_local)
     {
