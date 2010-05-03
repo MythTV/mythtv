@@ -308,7 +308,8 @@ void RSSSite::process(void)
                (*i)->GetWidth(),
                (*i)->GetHeight(),
                (*i)->GetLanguage(),
-               (*i)->GetDownloadable()));
+               (*i)->GetDownloadable(),
+               (*i)->GetCountries()));
         }
         return;
     }

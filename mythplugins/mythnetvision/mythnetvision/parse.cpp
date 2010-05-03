@@ -24,7 +24,8 @@ ResultVideo::ResultVideo(const QString& title, const QString& desc,
               const QString& player, const QStringList& playerargs,
               const QString& download, const QStringList& downloadargs,
               const uint& width, const uint& height,
-              const QString& language, const bool& downloadable)
+              const QString& language, const bool& downloadable,
+              const QStringList& countries)
 {
     m_title = title;
     m_desc = desc;
@@ -44,6 +45,7 @@ ResultVideo::ResultVideo(const QString& title, const QString& desc,
     m_height = height;
     m_language = language;
     m_downloadable = downloadable;
+    m_countries = countries;
 }
 
 ResultVideo::ResultVideo()
@@ -620,7 +622,7 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
     off_t filesize = 0;
     uint width, height = 0;
     QDateTime date;
-    QStringList playerargs, downloadargs;
+    QStringList playerargs, downloadargs, countries;
     bool downloadable = true;
 
     title = item.firstChildElement("title").text();
@@ -664,6 +666,17 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
     playerargs = item.firstChildElement("playerargs").text().split(" ");
     download = item.firstChildElement("download").text();
     downloadargs = item.firstChildElement("downloadargs").text().split(" ");
+
+    QDomNodeList cties = item.elementsByTagNameNS(MythRSS, "country");
+    if (cties.size())
+    {
+        int i = 0;
+        while (i < cties.size())
+        {
+            countries.append(cties.at(i).toElement().text());
+            i++;
+        }
+    }
 
     QList<MRSSEntry> enclosures = GetMediaRSS(item);
 
@@ -715,7 +728,7 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
               mediaURL, author, date, duration,
               rating, filesize, player, playerargs,
               download, downloadargs, width, height,
-              language, downloadable));
+              language, downloadable, countries));
 }
 
 QString Parse::GetLink(const QDomElement& parent) const

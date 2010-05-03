@@ -114,7 +114,7 @@ class ResultVideo
               const QString& player, const QStringList& playerargs,
               const QString& download, const QStringList& downloadargs,
               const uint& width, const uint& height, const QString& language,
-              const bool& downloadable);
+              const bool& downloadable, const QStringList& countries);
     ResultVideo();
     ~ResultVideo();
 
@@ -136,26 +136,28 @@ class ResultVideo
     const uint& GetHeight() const { return m_height; }
     const QString& GetLanguage() const { return m_language; }
     const bool& GetDownloadable() const { return m_downloadable; }
+    const QStringList& GetCountries() const { return m_countries; }
 
   private:
-    QString   m_title;
-    QString   m_desc;
-    QString   m_URL;
-    QString   m_thumbnail;
-    QString   m_mediaURL;
-    QString   m_enclosure;
-    QDateTime m_date;
-    QString   m_time;
-    QString   m_rating;
-    off_t     m_filesize;
-    QString   m_player;
+    QString      m_title;
+    QString      m_desc;
+    QString      m_URL;
+    QString      m_thumbnail;
+    QString      m_mediaURL;
+    QString      m_enclosure;
+    QDateTime    m_date;
+    QString      m_time;
+    QString      m_rating;
+    off_t        m_filesize;
+    QString      m_player;
     QStringList  m_playerargs;
-    QString   m_download;
+    QString      m_download;
     QStringList  m_downloadargs;
-    uint      m_width;
-    uint      m_height;
-    QString   m_language;
-    bool      m_downloadable;
+    uint         m_width;
+    uint         m_height;
+    QString      m_language;
+    bool         m_downloadable;
+    QStringList  m_countries;
 };
 Q_DECLARE_METATYPE(ResultVideo*)
 

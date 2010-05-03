@@ -214,11 +214,11 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.prepare("INSERT INTO netvisiontreeitems (feedtitle, path, paththumb, "
                   " title, description, url, thumbnail, mediaURL, author, "
                   "date, time, rating, filesize, player, playerargs, download, "
-                  "downloadargs, width, height, language, downloadable) "
+                  "downloadargs, width, height, language, downloadable, countries) "
             "VALUES( :FEEDTITLE, :PATH, :PATHTHUMB, :TITLE, :DESCRIPTION, :URL, "
             ":THUMBNAIL, :MEDIAURL, :AUTHOR, :DATE, :TIME, :RATING, :FILESIZE, "
             ":PLAYER, :PLAYERARGS, :DOWNLOAD, :DOWNLOADARGS, :WIDTH, :HEIGHT, "
-            ":LANGUAGE, :DOWNLOADABLE);");
+            ":LANGUAGE, :DOWNLOADABLE, :COUNTRIES);");
     query.bindValue(":FEEDTITLE", feedtitle);
     query.bindValue(":PATH", path);
     query.bindValue(":PATHTHUMB", paththumb);
@@ -245,6 +245,7 @@ bool insertTreeArticleInDB(const QString &feedtitle, const QString &path,
     query.bindValue(":HEIGHT", item->GetHeight());
     query.bindValue(":LANGUAGE", item->GetLanguage());
     query.bindValue(":DOWNLOADABLE", item->GetDownloadable());
+    query.bindValue(":COUNTRIES", item->GetCountries().join(" "));
 
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("netvision: inserting article in DB", query);
@@ -263,7 +264,7 @@ QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &f
                   "thumbnail, mediaURL, author, date, time, "
                   "rating, filesize, player, playerargs, download, "
                   "downloadargs, width, height, language, "
-                  "downloadable, path, paththumb FROM netvisiontreeitems "
+                  "downloadable, countries, path, paththumb FROM netvisiontreeitems "
                   "WHERE feedtitle = :FEEDTITLE ORDER BY title DESC;");
     query.bindValue(":FEEDTITLE", feedtitle);
     if (!query.exec() || !query.isActive()) {
@@ -291,15 +292,16 @@ QMultiMap<QPair<QString,QString>, ResultVideo*> getTreeArticles(const QString &f
         uint        height = query.value(15).toUInt();
         QString     language = query.value(16).toString();
         bool        downloadable = query.value(17).toBool();
+        QStringList countries = query.value(18).toString().split(" ");
 
-        QString     path = query.value(18).toString();
-        QString     paththumb = query.value(19).toString();
+        QString     path = query.value(19).toString();
+        QString     paththumb = query.value(20).toString();
 
         QPair<QString,QString> pair(path,paththumb);
         ret.insert(pair, new ResultVideo(title, desc, URL, thumbnail,
                    mediaURL, author, date, time, rating, filesize,
                    player, playerargs, download, downloadargs,
-                   width, height, language, downloadable));
+                   width, height, language, downloadable, countries));
     }
 
     return ret;
