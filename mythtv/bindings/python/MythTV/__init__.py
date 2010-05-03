@@ -15,8 +15,6 @@ __all__ = ['MythStatic', \
            'MythBE', 'BEEventMonitor', 'MythSystemEvent', 'SystemEvent', \
            'Frontend', 'MythDB', 'MythVideo', 'MythXML']
 
-__version__ = (0,23,0,6)
-
 import26 = """
 import warnings
 with warnings.catch_warnings():
@@ -39,6 +37,8 @@ if version_info >= (2, 6): # 2.6 or newer
     exec(import26)
 else:
     exec(import25)
+
+__version__ = OWN_VERSION
 
 if __name__ == '__main__':
     banner = 'MythTV Python interactive shell.'
