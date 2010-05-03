@@ -113,7 +113,7 @@ def ftopen(file, mode, forceremote=False, nooverwrite=False, db=None, \
                                     db, chanid, starttime)
 
         # prefer local storage for new files
-        for i in reversed(range(len(sgs))):
+        for i in reversed(xrange(len(sgs))):
             if not sgs[i].local:
                 sgs.pop(i)
             else:
@@ -596,7 +596,7 @@ class Program( DictData ):
 
             raw = []
             defs = (0,0,0,'',0)
-            for i in range(len(self._field_order)):
+            for i in xrange(len(self._field_order)):
                 if self._field_order[i] in dat:
                     raw.append(dat[self._field_order[i]])
                 else:
@@ -1276,7 +1276,7 @@ class Video( DBDataWrite ):
         def add(self, member): DBDataCRef.add(self,(member,))
         def delete(self, member): DBDataCRef.delete(self,(member,))
         def clean(self):
-            for member in self:
+            for member in list(self):
                 self.delete(member.cast)
 
     class _Genre( DBDataCRef ):
@@ -1299,7 +1299,7 @@ class Video( DBDataWrite ):
         def add(self, genre): DBDataCRef.add(self,(genre,))
         def delete(self, genre): DBDataCRef.delete(self,(genre,))
         def clean(self):
-            for member in self:
+            for member in list(self):
                 self.delete(member.genre)
 
     class _Country( DBDataCRef ):
@@ -1322,7 +1322,7 @@ class Video( DBDataWrite ):
         def add(self, country): DBDataCRef.add(self,(country,))
         def delete(self, country): DBDataCRef.delete(self,(country,))
         def clean(self):
-            for member in self:
+            for member in list(self):
                 self.delete(member.country)
 
     class _Markup( DBDataRef ):

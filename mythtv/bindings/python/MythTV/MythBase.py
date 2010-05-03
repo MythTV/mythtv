@@ -58,12 +58,17 @@ class DictData( object ):
             self.index = 0
             self.mode = mode
             self.data = parent
+            self.field_order = parent._field_order
+            self.length = len(parent._field_order)
         def __iter__(self): return self
         def next(self):
-            self.index += 1
-            if self.index > len(self.data._field_order):
+            i = self.index
+            if i >= self.length:
                 raise StopIteration
-            key = self.data._field_order[self.index-1]
+
+            self.index += 1
+
+            key = self.field_order[i]
             if self.mode == 1:
                 return key
             elif self.mode == 2:
@@ -184,7 +189,7 @@ class DictData( object ):
 
     def _process(self, data):
         data = list(data)
-        for i in range(len(data)):
+        for i in xrange(len(data)):
             if data[i] == '':
                 data[i] = None
             elif self._field_type == 'Pass':
@@ -203,7 +208,7 @@ class DictData( object ):
 
     def _deprocess(self):
         data = self.values()
-        for i in range(len(data)):
+        for i in xrange(len(data)):
             if data[i] is None:
                 data[i] = ''
             elif self._field_type == 'Pass':
@@ -357,9 +362,9 @@ class DBData( DictData ):
 
     def _fillNone(self):
         """Fills out dictionary fields with empty data"""
-        self._field_order = self._db.tablefields[self._table]
-        for field in self._field_order:
-            self._data[field] = None
+        field_order = self._db.tablefields[self._table]
+        self._field_order = field_order
+        self._data = dict(zip(field_order, [None]*len(field_order)))
 
 class DBDataWrite( DBData ):
     """
@@ -620,7 +625,7 @@ class DBDataRef( object ):
         """obj.delete(data) -> None"""
         if self.data is None:
             self._fill()
-        if index not in range(0, len(self.data)):
+        if index not in xrange(len(self.data)):
             return
 
         where = ' AND '.join(['%s=%%s' % d for d in self.wfield+self.dfield])
@@ -728,7 +733,7 @@ class DBDataCRef( object ):
         return tuple([sub[key] for key in self.r_add+['cross']]+list(self.w_dat))
 
     def _search(self, sub):
-        for i in range(len(self.data)):
+        for i in xrange(len(self.data)):
             if self.data[i] == sub:
                 return i
 
@@ -790,6 +795,7 @@ class DBDataCRef( object ):
         # remove local entry
         index = self._search(dat)
         dat = self.data.pop(index)
+        del self.hash[index]
         
         # remove database cross reference
         fields = self.r_add+[self.r_ref]+self.w_field
@@ -805,10 +811,6 @@ class DBDataCRef( object ):
             c.execute("""DELETE FROM %s WHERE %s=%%s""" \
                                 % (self.table, self.t_ref), dat.cross)
         c.close()
-
-        index = self.hash.index[dat]
-        del self.hash[index]
-        del self.data[index]
 
 class LoggedCursor( MySQLdb.cursors.Cursor ):
     """
@@ -852,8 +854,8 @@ class DBConnection( object ):
 
     def __init__(self, dbconn):
         self.log = MythLog('Python Database Connection')
-        self.tablefields = {}
-        self.settings = {}
+        self.tablefields = None
+        self.settings = None
         try:
             self.log(MythLog.DATABASE, "Attempting connection", 
                                                 str(dbconn))
@@ -946,7 +948,6 @@ class DBCache( object ):
             QuickDictData.__init__(self, ())
             self._db = db
             self._log = log
-            self._data = self._db.tablefields
             self._field_order = self._data.keys()
 
         def __getitem__(self,key):
@@ -1041,12 +1042,11 @@ class DBCache( object ):
         _localvars = QuickDictData._localvars+['_db']
         def __str__(self): return str(list(self))
         def __repr__(self): return str(self).encode('utf-8')
-        def __iter__(self): return self.DictIterator(1,self)
+        def __iter__(self): return self._DictIterator(1,self)
         def __init__(self, db, log):
             QuickDictData.__init__(self, ())
             self._db = db
             self._log = log
-            self._data = self._db.settings
             self._field_order = self._data.keys()
 
         def __getitem__(self, key):
@@ -1127,7 +1127,7 @@ class DBCache( object ):
                 fp = open(mythdir+'/config.xml', 'w')
                 fp.write(config)
                 fp.close()
-                
+
         if 'DBPort' not in dbconn:
             dbconn['DBPort'] = 3306
         else:
@@ -1139,7 +1139,7 @@ class DBCache( object ):
         self.ident = "sql://%s@%s:%d/" % \
                 (dbconn['DBName'],dbconn['DBHostName'],dbconn['DBPort'])
         if self.ident in self.shared:
-            # reuse existing database connection and update count
+            # reuse existing database connection
             self.db = self.shared[self.ident]
         else:
             # attempt new connection
@@ -1150,10 +1150,12 @@ class DBCache( object ):
 
             # add connection to cache
             self.shared[self.ident] = self.db
+            self.db.tablefields = self._TableFields(self.db, self.db.log)
+            self.db.settings = self._Settings(self.db, self.db.log)
 
         # connect to table name cache
-        self.tablefields = self._TableFields(self.shared[self.ident], self.log)
-        self.settings = self._Settings(self.shared[self.ident], self.log)
+        self.tablefields = self.db.tablefields
+        self.settings = self.db.settings
 
     def _listenUPNP(self, pin, timeout):
         # open outbound socket
@@ -1424,8 +1426,8 @@ class BEConnection( object ):
         # loop until necessary data has been received
         while size - len(data) > 0:
             # wait for data on the socket
-            while len(select([self.socket],[],[], 0)[0]) == 0:
-                sleep(0.001)
+            while len(select([self.socket],[],[], 0.001)[0]) == 0:
+                pass
             # append response to buffer
             data += self.socket.recv(size-len(data))
         return data
@@ -1857,11 +1859,12 @@ class MythLog( object ):
 
     def __init__(self, module='pythonbindings', lstr=None, lbit=None, \
                     db=None, logfile=None):
-        self._setlevel(lstr, lbit)
+        if lstr or lbit:
+            self._setlevel(lstr, lbit)
         self.module = module
         self.db = db
-        if self.db:
-            self.db = DBCache(self.db)
+        if db:
+            self.db = DBCache(db)
         if (logfile is not None) and (self.LOGFILE is None):
             self.LOGFILE = open(logfile,'w')
 
@@ -1896,7 +1899,7 @@ class MythLog( object ):
             return level
         else:
             level = []
-            for l in range(len(bwlist)):
+            for l in xrange(len(bwlist)):
                 if MythLog.LOGLEVEL&2**l:
                     level.append(bwlist[l])
             return ','.join(level)

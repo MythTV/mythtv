@@ -191,7 +191,7 @@ class MythBE( FileOps ):
     def _getPrograms(self, query, recstatus=None, header=0):
         programs = []
         res = self.backendCommand(query).split(BACKEND_SEP)
-        for i in range(header):
+        for i in xrange(header):
             res.pop(0)
 
         num_progs = int(res.pop(0))
@@ -302,7 +302,7 @@ class MythBE( FileOps ):
                 myth.close()
 
         if id is None:
-            for i in range(len(self.locked_tuners)):
+            for i in xrange(len(self.locked_tuners)):
                 free(self,self.locked_tuners.pop())
         else:
             try:
@@ -385,7 +385,7 @@ class MythBE( FileOps ):
             command = 'QUERY_FREE_SPACE_LIST'
         res = self.backendCommand(command).split(BACKEND_SEP)
         dirs = []
-        for i in range(0,len(res)/10):
+        for i in xrange(len(res)/10):
             dirs.append(FreeSpace(res[i*10:i*10+10]))
         return dirs
 
@@ -1185,61 +1185,58 @@ class MythVideo( DBCache ):
         # pull available types
         c = self.cursor(self.log)
         c.execute("""SELECT extension FROM videotypes WHERE f_ignore=False""")
-        extensions = [a[0] for a in c.fetchall()]
+        extensions = [a[0].lower() for a in c.fetchall()]
         c.close()
-        for i in range(len(extensions)):
-            extensions[i] = extensions[i].lower()
 
         # filter local videos, only work on SG content
-        for i in range(len(curvids)-1, -1, -1):
+        for i in reversed(xrange(len(curvids))):
             if curvids[i].host in ('', None):
                 del curvids[i]
 
-        # index by file path
-        curvids = dict([(curvids[i].filename, curvids[i]) \
-                            for i in range(len(curvids))])
-
-        # loop through all storage groups on all hosts
+        # connect to backends
+        backends = {}
         for sg in groups:
-            if sg.hostname not in newvids:
-                newvids[sg.hostname] = []
-            try:
-                be = MythBE(backend=sg.hostname, db=self)
-            except:
-                # skip any offline backends
-                curvids = curvids.values()
-                for i in range(len(curvids)-1, -1, -1):
-                    if curvids[i].host == sg.hostname:
-                        del curvids[i]
-                curvids = dict([(curvids[i].filename, curvids[i]) \
-                                    for i in range(len(curvids))])
-                continue
-            folders = be.walkSG(sg.hostname, 'Videos', '/')
+            hostname = sg.hostname
+            if hostname not in backends:
+                try:
+                    backends[hostname] = MythBE(backend=hostname, db=self)
+                    newvids[hostname] = []
+                except:
+                    # skip offline backend
+                    for i in reversed(xrange(len(curvids))):
+                        if curvids[i].host == hostname:
+                            del curvids[i]
+
+        # index by file path
+        curvids = dict([(a.filename, a) for a in curvids])
+
+        # loop through all accessible backends
+        for hostname, be in backends.iteritems():
+            folders = be.walkSG(hostname, 'Videos', '/')
             # loop through each folder
             for sgfold in folders:
+                prepend = ''
+                if sgfold[0] != '/':
+                    prepend = '%s/' % sgfold[0][1:]
                 # loop through each file
                 for sgfile in sgfold[2]:
-                    if sgfold[0] == '/':
-                        tpath = sgfile
-                    else:
-                        tpath = sgfold[0][1:]+'/'+sgfile
-
                     # filter by extension
-                    if tpath.rsplit('.',1)[1].lower() not in extensions:
-                        #print 'skipping: '+tpath
+                    if sgfile.rsplit('.',1)[1].lower() not in extensions:
                         continue
 
+                    tpath = prepend+sgfile
                     # existing file in existing location
                     if tpath in curvids:
-                        #print 'matching file: '+tpath
+                        # update if moved to alternate host
+                        if hostname != curvids[tpath].host:
+                            curvids[tpath].update({'host':hostname})
                         del curvids[tpath]
                     else:
-                        newvids[sg.hostname].append(tpath)
+                        newvids[hostname].append(tpath)
 
         # re-index by hash value
-        curvids = curvids.values()
-        curvids = dict([(curvids[i].hash, curvids[i]) \
-                            for i in range(len(curvids))])
+        curvids = dict([(a.hash, a) for a in curvids.itervalues()])
+
         # loop through unmatched videos for missing files
         newvidlist = []
         for hostname in newvids:
