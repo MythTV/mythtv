@@ -279,12 +279,12 @@ static HostLineEdit *MythArchiveGrowisofsCmd()
     return gc;
 };
 
-static HostLineEdit *MythArchiveTcrequantCmd()
+static HostLineEdit *MythArchiveM2VRequantiserCmd()
 {
-    HostLineEdit *gc = new HostLineEdit("MythArchiveTcrequantCmd");
-    gc->setLabel(QObject::tr("tcrequant command"));
-    gc->setValue("tcrequant");
-    gc->setHelpText(QObject::tr("Command to run tcrequant (Part of transcode package). Optional - leave blank if you don't have the transcode package installed.")); 
+    HostLineEdit *gc = new HostLineEdit("MythArchiveM2VRequantiserCmd");
+    gc->setLabel(QObject::tr("M2VRequantiser command"));
+    gc->setValue("M2VRequantiser");
+    gc->setHelpText(QObject::tr("Command to run M2VRequantiser. Optional - leave blank if you don't have M2VRequantiser installed.")); 
     return gc;
 };
 
@@ -370,7 +370,7 @@ ArchiveSettings::ArchiveSettings()
     vcg5->setLabel(QObject::tr("MythArchive External Commands (2)"));
     vcg5->addChild(MythArchiveMkisofsCmd());
     vcg5->addChild(MythArchiveGrowisofsCmd());
-    vcg5->addChild(MythArchiveTcrequantCmd());
+    vcg5->addChild(MythArchiveM2VRequantiserCmd());
     vcg5->addChild(MythArchiveJpeg2yuvCmd());
     vcg5->addChild(MythArchiveProjectXCmd());
     addChild(vcg5);

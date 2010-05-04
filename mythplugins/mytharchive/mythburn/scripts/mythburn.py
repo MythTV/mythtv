@@ -24,8 +24,8 @@
 #dvd+rw-tools - v5.21.4.10.8
 #cdrtools - v2.01
 
-#Optional (only needed for tcrequant)
-#transcode - v1.0.2
+#Optional for shrink-to-fit requantisation 
+#M2VRequantiser (from flexion, based on the newer code from Metakine) 
 
 #Optional (for Right To Left languages)
 #pyfribidi
@@ -38,7 +38,7 @@
 #******************************************************************************
 
 # version of script - change after each update
-VERSION="0.1.20090139-1"
+VERSION="0.1.20100502-1"
 
 # keep all temporary files for debugging purposes
 # set this to True before a first run through when testing
@@ -815,7 +815,7 @@ def getDefaultParametersFromMythTVDB():
                         'MythArchiveMplexCmd',
                         'MythArchiveDvdauthorCmd',
                         'MythArchiveMkisofsCmd',
-                        'MythArchiveTcrequantCmd',
+                        'MythArchiveM2VRequantiserCmd',
                         'MythArchiveMpg123Cmd',
                         'MythArchiveProjectXCmd',
                         'MythArchiveDVDLocation',
@@ -2223,7 +2223,7 @@ def ts2pts(time):
     h = int(time[0:2]) * 3600 * 90000
     m = int(time[3:5]) * 60 * 90000
     s = int(time[6:8]) * 90000
-    ms = int(time[9:11])
+    ms = int(time[9:11]) * 90
 
     return h + m + s + ms
 
@@ -2710,19 +2710,30 @@ def deMultiplexMPEG2File(folder, mediafile, video, audio1, audio2):
         fatalError("Failed while running mythreplex. Command was %s" % command)
 
 #############################################################
-# Run tcrequant
+# Run M2VRequantiser
 
-def runTcrequant(source,destination,percentage):
-    checkCancelFlag()
+def runM2VRequantiser(source,destination,factor):
+    mega=1024.0*1024.0
+    M2Vsize0 = os.path.getsize(source)
+    write("Initial M2Vsize is %.2f Mb , target is %.2f Mb" % ( (float(M2Vsize0)/mega), (float(M2Vsize0)/(factor*mega)) ))
 
-    write (path_tcrequant[0] + " %s %s %s" % (source,destination,percentage))
-    result=os.spawnlp(os.P_WAIT, path_tcrequant[0],path_tcrequant[1],
-            "-i",source,
-            "-o",destination,
-            "-d","2",
-            "-f","%s" % percentage)
+    command = path_M2VRequantiser[0]   
+    command += " %.5f "  % factor
+    command += " %s "  % M2Vsize0
+    command += " <  %s " % source
+    command += " >  %s " % destination
+ 
+    write("Running: " + command)
+    result = runCommand(command)
+
+    M2Vsize1 = os.path.getsize(destination)
+       
+    write("M2Vsize after requant is  %.2f Mb " % (float(M2Vsize1)/mega))
+    fac1=float(M2Vsize0) / float(M2Vsize1)
+    write("Factor demanded %.5f, achieved %.5f, ratio %.5f " % ( factor, fac1, fac1/factor))
+            
     if result<>0:
-        fatalError("Failed while running tcrequant")
+        fatalError("Failed while running M2VRequantiser. Command was %s" % command)
 
 #############################################################
 # Calculates the total size of all the video, audio and menu files 
@@ -2740,84 +2751,140 @@ def calculateFileSizes(files):
         folder=getItemTempPath(filecount)
         #Process this file
         file=os.path.join(folder,"stream.mv2")
-        #Get size of video in MBytes
-        totalvideosize+=os.path.getsize(file) / 1024 / 1024
+        #Get size of vobfile in MBytes
+        totalvideosize+=os.path.getsize(file) 
 
         #Get size of audio track 1
         if doesFileExist(os.path.join(folder,"stream0.ac3")):
-            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.ac3")) / 1024 / 1024
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.ac3")) 
         if doesFileExist(os.path.join(folder,"stream0.mp2")):
-            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.mp2")) / 1024 / 1024
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream0.mp2")) 
 
         #Get size of audio track 2 if available 
         if doesFileExist(os.path.join(folder,"stream1.ac3")):
-            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.ac3")) / 1024 / 1024
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.ac3")) 
         if doesFileExist(os.path.join(folder,"stream1.mp2")):
-            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.mp2")) / 1024 / 1024
+            totalaudiosize+=os.path.getsize(os.path.join(folder,"stream1.mp2")) 
 
         # add chapter menu if available
         if doesFileExist(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)):
-            totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)) / 1024 / 1024
+            totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"chaptermenu-%s.mpg" % filecount)) 
 
         # add details page if available
         if doesFileExist(os.path.join(getTempPath(),"details-%s.mpg" % filecount)):
-            totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"details-%s.mpg" % filecount)) / 1024 / 1024
+            totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"details-%s.mpg" % filecount))
 
     filecount=1
     while doesFileExist(os.path.join(getTempPath(),"menu-%s.mpg" % filecount)):
-        totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"menu-%s.mpg" % filecount)) / 1024 / 1024
+        totalmenusize+=os.path.getsize(os.path.join(getTempPath(),"menu-%s.mpg" % filecount))
         filecount+=1
 
     return totalvideosize,totalaudiosize,totalmenusize
 
-#############################################################
-# Uses tcrequant if available to shrink the video streams so 
+########################################
+#returns total size of bitrate-limited m2v files
+
+def total_mv2_brl(files,rate): 
+    tvsize=0  
+    filecount=0
+    for node in files:
+        filecount+=1
+        folder=getItemTempPath(filecount)
+        progduration=getLengthOfVideo(filecount)
+        file=os.path.join(folder,"stream.mv2")
+        progvsize=os.path.getsize(file)
+        progvbitrate=progvsize/progduration
+        if progvbitrate>rate : 
+            tvsize+=progduration*rate
+        else:
+            tvsize+=progvsize
+
+    return tvsize    
+
+#########################################
+# Uses requantiser if available to shrink the video streams so 
 # they will fit on a DVD
 
 def performMPEG2Shrink(files,dvdrsize):
     checkCancelFlag()
+    mega=1024.0*1024.0
+    fudge_pack=1.04  # for mpeg packing
+    fudge_requant=1.05 # for requant shrinkage uncertainty
 
     totalvideosize,totalaudiosize,totalmenusize=calculateFileSizes(files)
+    allfiles=totalvideosize+totalaudiosize+totalmenusize
 
     #Report findings
-    write( "Total size of video files, before multiplexing, is %s Mbytes, audio is %s MBytes, menus are %s MBytes." % (totalvideosize,totalaudiosize,totalmenusize))
+    write( "Total video  %.2f Mb, audio %.2f Mb, menus %.2f Mb." % (totalvideosize/mega,totalaudiosize/mega,totalmenusize/mega))
 
-    #Subtract the audio and menus from the size of the disk (we cannot shrink this further)
-    dvdrsize-=totalaudiosize
-    dvdrsize-=totalmenusize
+    #Subtract the audio, menus and packaging overhead from the size of the disk (we cannot shrink this further)
+    mv2space=((dvdrsize*mega-totalmenusize)/fudge_pack)-totalaudiosize
+ 
+    if mv2space<0:
+        fatalError("Audio and menu files are too big. No room for video. Giving up!")
 
-    #Add a little bit for the multiplexing stream data
-    totalvideosize=totalvideosize*1.08
+    if totalvideosize>mv2space:
+        write( "Video files are %.1f Mb too big. Need to shrink." % ((totalvideosize - mv2space)/mega) )
 
-    if dvdrsize<0:
-        fatalError("Audio and menu files are greater than the size of a recordable DVD disk.  Giving up!")
+        if path_M2VRequantiser[0] == "":
+            fatalError("M2VRequantiser is not available to resize the files.  Giving up!")
 
-    if totalvideosize>dvdrsize:
-        write( "Need to shrink MPEG2 video files to fit onto recordable DVD, video is %s MBytes too big." % (totalvideosize - dvdrsize))
-        scalepercentage=totalvideosize/dvdrsize
-        write( "Need to scale by %s" % scalepercentage)
-
-        if scalepercentage>3:
-            write( "Large scale to shrink, may not work!")
-
-        #tcrequant (transcode) is an optional install so may not be available
-        if path_tcrequant[0] == "":
-            fatalError("tcrequant is not available to resize the files.  Giving up!")
-
+        vsize=0
+        duration=0
         filecount=0
         for node in files:
             filecount+=1
-            runTcrequant(os.path.join(getItemTempPath(filecount),"stream.mv2"),os.path.join(getItemTempPath(filecount),"video.small.m2v"),scalepercentage)
-            os.remove(os.path.join(getItemTempPath(filecount),"stream.mv2"))
-            os.rename(os.path.join(getItemTempPath(filecount),"video.small.m2v"),os.path.join(getItemTempPath(filecount),"stream.mv2"))
+            folder=getItemTempPath(filecount)
+            file=os.path.join(folder,"stream.mv2")
+            vsize+=os.path.getsize(file)
+            duration+=getLengthOfVideo(filecount)
 
-        totalvideosize,totalaudiosize,totalmenusize=calculateFileSizes(files)
-        write( "Total DVD size AFTER TCREQUANT is %s MBytes" % (totalaudiosize + totalmenusize + (totalvideosize*1.05)))
+        #We need to shrink the video files to fit into the space available.  It seems sensible 
+        #to do this by imposing a common upper limit on the mean video bit-rate of each recording; 
+        #this will not further reduce the visual quality of any that were transmitted at lower bit-rates.
 
+        #Now find the bit-rate limit by iteration between initially defined upper and lower bounds. 
+        #The code is based on 'rtbis' from Numerical Recipes by W H Press et al., CUP.
+        
+        #A small multiple of the average input bit-rate should be ok as the initial upper bound,
+        #(although a fixed value or one related to the max value could be used), and zero as the lower bound.
+        #The function relating bit-rate upper limit to total file size is smooth and monotonic,
+        #so there should be no convergence problem. 
+     
+        vrLo=0.0
+        vrHi=3.0*float(vsize)/duration
+        
+        vrate=vrLo
+        vrinc=vrHi-vrLo
+        count=0
+
+        while count<30 :
+            count+=1
+            vrinc=vrinc*0.5
+            vrtest=vrate+vrinc
+            testsize=total_mv2_brl(files,vrtest)
+            if (testsize<mv2space):
+                vrate=vrtest
+           
+        write("vrate %.3f kb/s, testsize %.4f , mv2space %.4f Mb " % ((vrate)/1000.0, (testsize)/mega, (mv2space)/mega) )
+        filecount=0
+        for node in files:
+            filecount+=1
+            folder=getItemTempPath(filecount)
+            file=os.path.join(folder,"stream.mv2")
+            progvsize=os.path.getsize(file)
+            progduration=getLengthOfVideo(filecount)
+            progvbitrate=progvsize/progduration
+            write( "File %s, size %.2f Mb, rate %.2f, limit %.2f kb/s " %( filecount, float(progvsize)/mega, progvbitrate/1000.0, vrate/1000.0 ))
+            if progvbitrate>vrate :
+                scalefactor=1.0+(fudge_requant*float(progvbitrate-vrate)/float(vrate))
+                if scalefactor>3.0 :
+                    write( "Large shrink factor. You may not like the result! ")
+                runM2VRequantiser(os.path.join(getItemTempPath(filecount),"stream.mv2"),os.path.join(getItemTempPath(filecount),"stream.small.mv2"),scalefactor)
+                os.remove(os.path.join(getItemTempPath(filecount),"stream.mv2"))
+                os.rename(os.path.join(getItemTempPath(filecount),"stream.small.mv2"),os.path.join(getItemTempPath(filecount),"stream.mv2"))
     else:
-        dvdrsize-=totalvideosize
-        write( "Video will fit onto DVD. %s MBytes of space remaining on recordable DVD." % dvdrsize)
-
+        write( "Unpackaged total %.2f Mb. About %.0f Mb will be unused." % ((allfiles/mega),(mv2space-totalvideosize)/mega))
 
 #############################################################
 # Creates the DVDAuthor xml file used to create a standard DVD with menus
@@ -3113,7 +3180,7 @@ def createDVDAuthorXML(screensize, numberofitems):
                                                    chapterLength, 
                                                    getLengthOfVideo(itemnum)))
 
-            vob.setAttribute("file",os.path.join(getItemTempPath(itemnum),"final.mpg"))
+            vob.setAttribute("file",os.path.join(getItemTempPath(itemnum),"final.vob"))
             pgc.appendChild(vob)
 
             post = dvddom.createElement("post")
@@ -3357,7 +3424,7 @@ def createDVDAuthorXMLNoMenus(screensize, numberofitems):
         pgc = dvddom.createElement("pgc")
 
         vob = dvddom.createElement("vob")
-        vob.setAttribute("file", os.path.join(getItemTempPath(itemNum), "final.mpg"))
+        vob.setAttribute("file", os.path.join(getItemTempPath(itemNum), "final.vob"))
         vob.setAttribute("chapters", createVideoChaptersFixedLength(itemNum,
                                                                     chapterLength,
                                                                     getLengthOfVideo(itemNum)))
@@ -5186,7 +5253,7 @@ def processJob(job):
                 pid=multiplexMPEGStream(os.path.join(folder,'stream.mv2'),
                         os.path.join(folder,'stream0'),
                         os.path.join(folder,'stream1'),
-                        os.path.join(folder,'final.mpg'),
+                        os.path.join(folder,'final.vob'),
                         calcSyncOffset(filecount))
 
             #Now all the files are completed and ready to be burnt
@@ -5270,7 +5337,7 @@ def main():
     global preferredlang2, useFIFO, encodetoac3, alwaysRunMythtranscode
     global copyremoteFiles, mainmenuAspectRatio, chaptermenuAspectRatio, dateformat
     global timeformat, clearArchiveTable, nicelevel, drivespeed, path_mplex, path_ffmpeg
-    global path_dvdauthor, path_mkisofs, path_growisofs, path_tcrequant, addSubtitles
+    global path_dvdauthor, path_mkisofs, path_growisofs, path_M2VRequantiser, addSubtitles
     global path_jpeg2yuv, path_spumux, path_mpeg2enc, path_projectx, useprojectx, progresslog
     global progressfile, jobfile
 
@@ -5366,7 +5433,7 @@ def main():
     path_dvdauthor = [defaultsettings["MythArchiveDvdauthorCmd"], os.path.split(defaultsettings["MythArchiveDvdauthorCmd"])[1]]
     path_mkisofs = [defaultsettings["MythArchiveMkisofsCmd"], os.path.split(defaultsettings["MythArchiveMkisofsCmd"])[1]]
     path_growisofs = [defaultsettings["MythArchiveGrowisofsCmd"], os.path.split(defaultsettings["MythArchiveGrowisofsCmd"])[1]]
-    path_tcrequant = [defaultsettings["MythArchiveTcrequantCmd"], os.path.split(defaultsettings["MythArchiveTcrequantCmd"])[1]]
+    path_M2VRequantiser = [defaultsettings["MythArchiveM2VRequantiserCmd"], os.path.split(defaultsettings["MythArchiveM2VRequantiserCmd"])[1]]
     path_jpeg2yuv = [defaultsettings["MythArchiveJpeg2yuvCmd"], os.path.split(defaultsettings["MythArchiveJpeg2yuvCmd"])[1]]
     path_spumux = [defaultsettings["MythArchiveSpumuxCmd"], os.path.split(defaultsettings["MythArchiveSpumuxCmd"])[1]]
     path_mpeg2enc = [defaultsettings["MythArchiveMpeg2encCmd"], os.path.split(defaultsettings["MythArchiveMpeg2encCmd"])[1]]

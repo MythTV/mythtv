@@ -25,7 +25,7 @@ ffmpeg version 0.4.9-pre1
 DVDAuthor::dvdauthor, version 0.6.11
 mkisofs 2.01a34-unofficial-iconv
 growisofs
-tcrequant (optional)
+M2vRequantiser (optional)
 
 COMPILE AND INSTALL MYTHARCHIVE
 ===============================
