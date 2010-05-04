@@ -23,7 +23,8 @@ void BDRingBufferPriv::close(void)
 {
     if (bdnav)
     {
-        bd_free_title_info(m_currentTitleInfo);
+        if (m_currentTitleInfo)
+            bd_free_title_info(m_currentTitleInfo);
         bd_close(bdnav);
         bdnav = NULL;
     }
