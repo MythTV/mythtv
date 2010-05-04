@@ -35,7 +35,7 @@ uint64_t BDRingBufferPriv::Seek(uint64_t pos)
 //    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Seeking to %1.")
 //                .arg(pos));
 
-    bd_seek(bdnav, pos);
+    bd_seek_time(bdnav, pos);
     return GetReadPosition();
 }
 

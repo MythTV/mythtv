@@ -905,7 +905,7 @@ long long DecoderBase::BDFindPosition(long long desiredFrame)
 
         if (desiredTimePos < 0)
             desiredTimePos = 0;
-        return (desiredTimePos * 90000LL);
+        return (desiredFrame * 90000LL / fps);
     }
     return current_speed;
 }
