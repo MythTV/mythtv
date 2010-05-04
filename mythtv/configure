@@ -3194,6 +3194,9 @@ elif enabled ppc; then
         check_cflags -maltivec -mabi=altivec &&
         { check_header altivec.h && inc_altivec_h="#include <altivec.h>" ; } ||
         check_cflags -faltivec
+        check_cxxflags -maltivec -mabi=altivec &&
+        { check_header altivec.h && inc_altivec_h="#include <altivec.h>" ; } ||
+        check_cxxflags -faltivec
 
         # check if our compiler supports Motorola AltiVec C API
         check_cc <<EOF || disable altivec
