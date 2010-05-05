@@ -25,6 +25,7 @@
 #include <util.h>
 #include <mythdirs.h>
 #include <mythdb.h>
+#include <mythuihelper.h>
 
 // mythgallery
 #include "config.h"
@@ -466,7 +467,7 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, bool scaleMa
     QSize sz = src;
 
     // calculate screen pixel aspect ratio
-    double pixelAspect = MythGetPixelAspectRatio();
+    double pixelAspect = GetMythUI()->GetPixelAspectRatio();
 
     // calculate image aspect ratio
     double imageAspect = 1.0;
@@ -500,7 +501,7 @@ QSize GalleryUtil::ScaleToDest(const QSize &src, const QSize &dest, bool scaleMa
         }
     }
 
-    sz.scale(scaleWidth, scaleHeight, Qt::KeepAspectRatio);
+    sz.scale(scaleWidth, scaleHeight, Qt::IgnoreAspectRatio);
     return sz;
 }
 
