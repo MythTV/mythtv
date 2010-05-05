@@ -120,6 +120,9 @@
                     </statetype>
                 </state>
                 <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>1,-3,552,30</area>
+                    </shape>
                 </state>
                 <state name="selectedactive" from="active">
                     <textarea name="titlesubtitle" from="buttontext">

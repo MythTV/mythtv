@@ -1374,7 +1374,7 @@
         </shape>
 
         <shape name="select_background">
-            <area>28,410,744,32</area>
+            <area>28,414,744,32</area>
             <type>roundbox</type>
             <fill color="#00FF00" alpha="48" />
             <line color="#FFFFFF" alpha="128" width="2"/>
@@ -1402,7 +1402,11 @@
                         <area>0,0,0,0</area>
                     </shape>
                 </state>
-                <state name="selectedinactive" from="active"/>
+                <state name="selectedinactive" from="active">
+                    <shape name="selectbar">
+                        <area>0,0,0,0</area>
+                    </shape>
+                </state>
             </statetype>
             <statetype name="upscrollarrow">
                 <state type="off">
