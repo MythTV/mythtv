@@ -457,7 +457,7 @@ void Scheduler::PrintList(RecList &list, bool onlyFutureRecordings)
     QDateTime now = QDateTime::currentDateTime();
 
     cout << "--- print list start ---\n";
-    cout << "Title - Subtitle                Ch Station "
+    cout << "Title - Subtitle                    Ch Station "
         "Day Start  End   S C I  T N Pri" << endl;
 
     RecIter i = list.begin();
@@ -487,7 +487,8 @@ void Scheduler::PrintRec(const RecordingInfo *p, const char *prefix)
     QString episode = p->title;
     if (!p->subtitle.isEmpty() && (p->subtitle != " "))
         episode = QString("%1 - \"%2\"").arg(p->title).arg(p->subtitle);
-    episode = episode.leftJustified(30, ' ', true);
+    episode = episode.leftJustified(34 - (prefix ? strlen(prefix) : 0), 
+                                    ' ', true);
 
     QString outstr = QString("%1 %2 %3 %4-%5  %6 %7 %8  ")
         .arg(episode)
@@ -1051,7 +1052,7 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
         if (samePriority)
             PrintRec(q, "     %");
         else
-            PrintRec(q, "     #");
+            PrintRec(q, "     $");
 
         bool failedLiveCheck = false;
         if (preserveLive)
@@ -1122,6 +1123,19 @@ bool Scheduler::TryAnotherShowing(RecordingInfo *p, bool samePriority,
 void Scheduler::SchedNewRecords(void)
 {
     VERBOSE(VB_SCHEDULE, "Scheduling:");
+
+    if (VERBOSE_LEVEL_CHECK(VB_SCHEDULE))
+    {
+        cout << "+ = schedule this showing to be recorded" << endl;
+        cout << "# = could not schedule this showing, retry later" << endl;
+        cout << "! = conflict caused by this showing" << endl;
+        cout << "/ = retry this showing, same priority pass" << endl;
+        cout << "? = retry this showing, lower priority pass" << endl;
+        cout << "> = try another showing for this program" << endl;
+        cout << "% = found another showing, same priority required" << endl;
+        cout << "$ = found another showing, lower priority allowed" << endl;
+        cout << "- = unschedule a showing in favor of another one" << endl;
+    }
 
     bool openEnd = (bool)gContext->GetNumSetting("SchedOpenEnd", 0);
 
