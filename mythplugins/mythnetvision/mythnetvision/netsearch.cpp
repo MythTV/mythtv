@@ -604,7 +604,6 @@ void NetSearch::populateResultList(ResultVideo::resultList list)
                 format = ":ss";
             item->SetText(fin.toString(format), "time");
 
-            item->SetText((*i)->GetTime(), "time");
             item->SetText((*i)->GetRating(), "rating");
             item->SetText(QString::number((*i)->GetWidth()), "width");
             item->SetText(QString::number((*i)->GetHeight()), "height");
