@@ -250,7 +250,13 @@
                     <cornerradius>4</cornerradius>
                 </shape>
             </state>
-            <state name="selectedinactive" from="active" /> 
+            <state name="selectedinactive" from="selectedactive">
+                <shape name="selectbar">
+                    <line color="#00FF00" alpha="50" width="1" />
+                    <fill color="#43b038" alpha="30" />
+                    <cornerradius>4</cornerradius>
+                </shape>
+            </state>
         </statetype>
         <statetype name="upscrollarrow">
             <position>710,268</position>
