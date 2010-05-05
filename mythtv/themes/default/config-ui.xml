@@ -17,7 +17,7 @@
                     <area>0,0,250,60</area>
                     <imagetype name="buttonbackground">
                         <area>0,0,250,60</area>
-                        <gradient start="#666666" end="#333333" alpha="200" />
+                        <gradient start="#505050" end="#000000" alpha="200" />
                     </imagetype>
                     <imagetype name="icon">
                         <area>0,5,80,50</area>
@@ -31,10 +31,14 @@
                 </state>
                 <state name="selectedactive" from="active">
                     <imagetype name="buttonbackground">
-                        <gradient start="#669966" end="#339933" alpha="200" />
+                        <gradient start="#52CA38" end="#349838" alpha="255" />
                     </imagetype>
                 </state>
-                <state name="selectedinactive" from="active" />
+                <state name="selectedinactive" from="selectedactive">
+                    <imagetype name="buttonbackground">
+                        <gradient start="#52CA38" end="#349838" alpha="175" />
+                    </imagetype>
+                </state>
             </statetype>
             <statetype name="upscrollarrow">
                 <position>700,425</position>
