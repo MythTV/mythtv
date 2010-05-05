@@ -52,29 +52,14 @@ class DictData( object ):
         obj['field_name']
     """
 
-    class _DictIterator( object ):
-        def __init__(self, mode, parent):
-            # modes = 1:keys, 2:values, 3:items
-            self.index = 0
-            self.mode = mode
-            self.data = parent
-            self.field_order = parent._field_order
-            self.length = len(parent._field_order)
-        def __iter__(self): return self
-        def next(self):
-            i = self.index
-            if i >= self.length:
-                raise StopIteration
-
-            self.index += 1
-
-            key = self.field_order[i]
-            if self.mode == 1:
-                return key
-            elif self.mode == 2:
-                return self.data[key]
-            elif self.mode == 3:
-                return (key, self.data[key])
+    def _DictIterator(self, mode):
+        for key in self._field_order:
+            if mode == 1:
+                yield key
+            elif mode == 2:
+                yield self[key]
+            elif mode == 3:
+                yield (key, self[key])
 
     _logmodule = 'Python DictData'
     # class emulation methods
@@ -119,28 +104,28 @@ class DictData( object ):
         return bool(item in self._data.keys())
 
     def __iter__(self):
-        return self._DictIterator(2,self)
+        return self._DictIterator(2)
         
     def iterkeys(self):
         """
         obj.iterkeys() -> an iterator over the keys of obj
                                                 ordered by self.field_order
         """
-        return self._DictIterator(1,self)
+        return self._DictIterator(1)
         
     def itervalues(self):
         """
         obj.itervalues() -> an iterator over the values of obj
                                                 ordered by self.field_order
         """
-        return self._DictIterator(2,self)
+        return self._DictIterator(2)
     
     def iteritems(self):
         """
         obj.iteritems() -> an iterator of over the (key,value) pairs of obj
                                                 ordered by self.field_order
         """
-        return self._DictIterator(3,self)
+        return self._DictIterator(3)
 
     def keys(self):
         """obj.keys() -> list of self.field_order"""
@@ -153,8 +138,8 @@ class DictData( object ):
         """obj.values() -> list of values, ordered by self.field_order"""
         return list(self.itervalues())
         
-    def get(self,key):
-        return self._data[key]
+    def get(self, key, default=None):
+        return self._data.get(key, default)
         
     def items(self):
         """
@@ -924,7 +909,7 @@ class DBCache( object ):
         class _FieldData( QuickDictData ):
             def __str__(self): return str(list(self))
             def __repr__(self): return str(self).encode('utf-8')
-            def __iter__(self): return self._DictIterator(1,self)
+            def __iter__(self): return self._DictIterator(1)
             def __init__(self, result):
                 data = [(row[0],
                          QuickDictData(zip( \
@@ -943,7 +928,7 @@ class DBCache( object ):
         _localvars = QuickDictData._localvars+['_db']
         def __str__(self): return str(list(self))
         def __repr__(self): return str(self).encode('utf-8')
-        def __iter__(self): return self._DictIterator(1,self)
+        def __iter__(self): return self._DictIterator(1)
         def __init__(self, db, log):
             QuickDictData.__init__(self, ())
             self._db = db
@@ -972,7 +957,7 @@ class DBCache( object ):
             _localvars = QuickDictData._localvars+['_db','_host']
             def __str__(self): return str(list(self))
             def __repr__(self): return str(self).encode('utf-8')
-            def __iter__(self): return self._DictIterator(1,self)
+            def __iter__(self): return self._DictIterator(1)
             def __init__(self, db, log, host):
                 QuickDictData.__init__(self, ())
                 self._db = db
@@ -1006,10 +991,13 @@ class DBCache( object ):
                     self.__getitem__(key)
                 c = self._db.cursor(self._log)
                 if self._data[key] is None:
+                    host = self._host
+                    if host is 'NULL':
+                        host = None
                     c.execute("""INSERT INTO settings
                                         (value, data, hostname)
                                  VALUES (%s,%s,%s)""",
-                                 (key, value, self._host))
+                                 (key, value, host))
                 else:
                     if self._host == 'NULL':
                         where = 'IS NULL'
@@ -1042,7 +1030,7 @@ class DBCache( object ):
         _localvars = QuickDictData._localvars+['_db']
         def __str__(self): return str(list(self))
         def __repr__(self): return str(self).encode('utf-8')
-        def __iter__(self): return self._DictIterator(1,self)
+        def __iter__(self): return self._DictIterator(1)
         def __init__(self, db, log):
             QuickDictData.__init__(self, ())
             self._db = db
@@ -1212,7 +1200,7 @@ class DBCache( object ):
             dbconn = xml.getConnectionInfo(pin)
             if self._check_dbconn(dbconn):
                 break
-            
+
         else:
             sock.close()
             raise MythDBError(MythError.DB_CREDENTIALS)
