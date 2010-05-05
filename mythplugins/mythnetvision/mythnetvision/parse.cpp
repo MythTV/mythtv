@@ -193,7 +193,10 @@ private:
              entry.Framerate = en.attribute("framerate").toDouble();
              entry.SamplingRate = en.attribute("samplingrate").toDouble();
              entry.Channels = en.attribute("channels").toInt();
-             entry.Duration = en.attribute("duration").toInt();
+             if (!en.attribute("duration").isNull())
+                 entry.Duration = en.attribute("duration").toInt();
+             else
+                 entry.Duration = 0;
              if (!en.attribute("width").isNull())
                  entry.Width = en.attribute("width").toInt();
              else
@@ -624,55 +627,109 @@ ResultVideo::resultList Parse::parseRSS(QDomDocument domDoc)
 ResultVideo* Parse::ParseItem(const QDomElement& item) const
 {
     QString title, description, url, author, duration, rating,
-            thumbnail, mediaURL, player, language, download = NULL;
+            thumbnail, mediaURL, player, language, download;
     off_t filesize = 0;
-    uint width, height, season, episode = 0;
+    uint width = 0, height = 0, season = 0, episode = 0;
     QDateTime date;
     QStringList playerargs, downloadargs, countries;
     bool downloadable = true;
 
+    // Get the title of the article/video
     title = item.firstChildElement("title").text();
     title = UnescapeHTML(title);
     if (title.isEmpty())
         title = "";
 
-    description = item.firstChildElement("description").text();
+    // Parse the description of the article/video
+    QDomElement descriptiontemp = item.firstChildElement("description");
+    if (!descriptiontemp.isNull())
+        description = descriptiontemp.text();
     if (description.isEmpty())
     {
         QDomNodeList nodes = item.elementsByTagNameNS(ITunes, "summary");
         if (nodes.size())
             description = nodes.at(0).toElement().text();
     }
+    // Unescape and remove HTML tags from the description.
     if (description.isEmpty())
         description = "";
     else
         description = UnescapeHTML(description);
 
+    // Get the link (web playable)
     url = item.firstChildElement("link").text();
 
-    author = item.firstChildElement("author").text();
+    // Parse the item author
+    QDomElement authortemp = item.firstChildElement("author");
+    if (!authortemp.isNull())
+        author = authortemp.text();
     if (author.isEmpty())
         author = GetAuthor(item);
 
+    // Turn the RFC-822 pubdate into a QDateTime
     date = RFC822TimeToQDateTime(item.firstChildElement("pubDate").text());
     if (!date.isValid() || date.isNull())
         date = GetDCDateTime(item);
     if (!date.isValid() || date.isNull())
         date = QDateTime::currentDateTime();
 
+    // Parse the insane iTunes duration (HH:MM:SS or H:MM:SS or MM:SS or M:SS or SS)
     QDomNodeList dur = item.elementsByTagNameNS(ITunes, "duration");
     if (dur.size())
     {
-        duration = dur.at(0).toElement().text();
+        QString itunestime = dur.at(0).toElement().text();
+        QString dateformat;
+
+        if (itunestime.count() == 8)
+            dateformat = "hh:mm:ss";
+        else if (itunestime.count() == 7)
+            dateformat = "h:mm:ss";
+        else if (itunestime.count() == 5)
+            dateformat = "mm:ss";
+        else if (itunestime.count() == 4)
+            dateformat = "m:ss";
+        else if (itunestime.count() == 2)
+            dateformat = "ss";
+        else
+            duration = "0";
+
+        if (!dateformat.isNull())
+        {
+            QTime itime = QTime::fromString(itunestime, dateformat);
+            if (itime.isValid())
+            {
+                int seconds = itime.second() + (itime.minute() * 60) + (itime.hour() * 3600);
+                duration = QString::number(seconds);
+            }
+        }
     }
 
-    rating = item.firstChildElement("rating").text();
+    // Get the rating
+    QDomElement ratingtemp = item.firstChildElement("rating");
+    if (!ratingtemp.isNull())
+        rating = ratingtemp.text();
 
-    player = item.firstChildElement("player").text();
-    playerargs = item.firstChildElement("playerargs").text().split(" ");
-    download = item.firstChildElement("download").text();
-    downloadargs = item.firstChildElement("downloadargs").text().split(" ");
+    // Get the external player binary
+    QDomElement playertemp = item.firstChildElement("player");
+    if (!playertemp.isNull())
+        player = playertemp.text();
 
+    // Get the arguments to pass to the external player
+    QDomElement playerargstemp = item.firstChildElement("playerargs");
+    if (!playerargstemp.isNull())
+        playerargs = playerargstemp.text().split(" ");
+
+    // Get the external downloader binary/script
+    QDomElement downloadtemp = item.firstChildElement("download");
+    if (!downloadtemp.isNull())
+        download = downloadtemp.text();
+
+    // Get the arguments to pass to the external downloader
+    QDomElement downloadargstemp = item.firstChildElement("downloadargs");
+    if (!downloadargstemp.isNull())
+        downloadargs = downloadargstemp.text().split(" ");
+
+    // Get the countries in which this item is playable
     QDomNodeList cties = item.elementsByTagNameNS(MythRSS, "country");
     if (cties.size())
     {
@@ -684,12 +741,14 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
         }
     }
 
+    // Get the season number of this item.
     QDomNodeList seas = item.elementsByTagNameNS(MythRSS, "season");
     if (seas.size())
     {
         season = seas.at(0).toElement().text().toUInt();
     }
 
+    // Get the Episode number of this item.
     QDomNodeList ep = item.elementsByTagNameNS(MythRSS, "episode");
     if (ep.size())
     {
@@ -716,7 +775,8 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
         language = media.Lang;
 
         if (duration.isEmpty())
-            duration = media.Duration;
+            duration = QString::number(media.Duration);
+
 
         if (filesize == 0)
             filesize = media.Size;
