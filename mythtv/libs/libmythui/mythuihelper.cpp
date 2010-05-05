@@ -14,6 +14,7 @@
 #include <QDesktopWidget>
 #include <QStyleFactory>
 #include <QThreadPool>
+#include <QSize>
 
 #include "mythdirs.h"
 #include "mythverbose.h"
@@ -1638,7 +1639,12 @@ QThreadPool *MythUIHelper::GetImageThreadPool(void)
     return d->m_imageThreadPool;
 }
 
-double MythUIHelper::GetPixelAspectRatio(void)
+double MythUIHelper::GetPixelAspectRatio(void) const
 {
     return d->GetPixelAspectRatio();
+}
+
+QSize MythUIHelper::GetBaseSize(void) const
+{
+    return QSize(d->m_baseWidth, d->m_baseHeight);
 }

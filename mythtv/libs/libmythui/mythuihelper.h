@@ -18,6 +18,7 @@ class QImage;
 class QWidget;
 class Settings;
 class QPixmap;
+class QSize;
 
 typedef enum ImageCacheMode
 {
@@ -129,7 +130,8 @@ class MPUBLIC MythUIHelper
 
     QThreadPool *GetImageThreadPool(void);
 
-    double GetPixelAspectRatio(void);
+    double GetPixelAspectRatio(void) const;
+    QSize GetBaseSize(void) const;
 
   protected:
     MythUIHelper();
