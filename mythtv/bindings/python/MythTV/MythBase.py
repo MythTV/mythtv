@@ -923,8 +923,11 @@ class MythDBBase( object ):
                     self.__getitem__(key)
                 c = self._db.cursor(self._log)
                 if key not in self._db.settings[self._host]:
+                    host = self._host
+                    if host is 'NULL':
+                        host = None
                     c.execute("""INSERT INTO settings (value,data,hostname)
-                             VALUES (%s,%s,%s)""", (key, value, self._host))
+                             VALUES (%s,%s,%s)""", (key, value, host))
                 else:
                     query = """UPDATE settings SET data=%s
                                 WHERE value=%s AND"""
