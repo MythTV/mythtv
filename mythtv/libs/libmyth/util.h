@@ -42,8 +42,6 @@ MPUBLIC QString createTempFile(QString name_template = "/tmp/mythtv_XXXXXX",
                                bool dir = false);
 MPUBLIC void makeFileAccessible(QString filename);
 
-MPUBLIC double MythGetPixelAspectRatio(void);
-
 MPUBLIC QString getResponse(const QString &query, const QString &def);
 MPUBLIC int     intResponse(const QString &query, int def);
 

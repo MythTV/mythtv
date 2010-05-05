@@ -1032,15 +1032,6 @@ void makeFileAccessible(QString filename)
     chmod(fname.constData(), 0666);
 }
 
-double MythGetPixelAspectRatio(void)
-{
-    float pixelAspect = 1.0;
-#ifdef USING_X11
-    pixelAspect = MythXGetPixelAspectRatio();
-#endif // USING_X11
-    return pixelAspect;
-}
-
 /**
  * In an interactive shell, prompt the user to input a string
  */
