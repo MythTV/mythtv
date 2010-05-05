@@ -2071,7 +2071,9 @@ void Scheduler::RunScheduler(void)
                         if (idleIter != reclist.end())
                         {
                             if (curtime.secsTo((*idleIter)->recstartts) -
-                                prerollseconds > idleWaitForRecordingTime * 60)
+                                prerollseconds >
+                                (idleWaitForRecordingTime * 60) +
+                                idleTimeoutSecs)
                             {
                                 idleSince = curtime;
                             }

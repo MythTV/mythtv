@@ -29,15 +29,15 @@
 
 WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
               :MythScreenType(parent, name),
-    m_status_text(NULL),       m_recording_text(NULL), m_scheduled_text(NULL),
-    m_warning_text(NULL),      m_startfrontend_button(NULL), 
-    m_menuPopup(NULL),         m_updateStatusTimer(new QTimer(this)),
+    m_status_text(NULL),        m_recording_text(NULL), m_scheduled_text(NULL),
+    m_warning_text(NULL),       m_startfrontend_button(NULL), 
+    m_menuPopup(NULL),          m_updateStatusTimer(new QTimer(this)),
     m_updateScreenTimer(new QTimer(this)),             m_isRecording(false),      
-    m_hasConflicts(false),     m_bWillShutdown(false),
-    m_secondsToShutdown(-1),   m_preRollSeconds(0),    m_idleWaitForRecordingTime(0),
-    m_screenTunerNo(0),        m_screenScheduledNo(0), m_statusListNo(0),
-    m_frontendIsRunning(false),m_pendingRecListUpdate(false),
-    m_pendingSchedUpdate(false)
+    m_hasConflicts(false),      m_bWillShutdown(false),
+    m_secondsToShutdown(-1),    m_preRollSeconds(0),    m_idleWaitForRecordingTime(0),
+    m_screenTunerNo(0),         m_screenScheduledNo(0), m_statusListNo(0),
+    m_frontendIsRunning(false), m_pendingRecListUpdate(false),
+    m_pendingSchedUpdate(false),m_idleTimeoutSecs(0)
 {
     gContext->addListener(this);
 
@@ -52,6 +52,8 @@ WelcomeDialog::WelcomeDialog(MythScreenStack *parent, const char *name)
 
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
     m_bWillShutdown = (gContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
+    
+    m_idleTimeoutSecs = gContext->GetNumSetting("idleTimeoutSecs", 0);
 
     connect(m_updateStatusTimer, SIGNAL(timeout()),
             this, SLOT(updateStatus()));
@@ -517,8 +519,8 @@ void WelcomeDialog::updateStatusMessage(void)
     QDateTime curtime = QDateTime::currentDateTime();
 
     if (!m_isRecording && !m_nextRecordingStart.isNull() && 
-            curtime.secsTo(m_nextRecordingStart) - 
-            m_preRollSeconds < m_idleWaitForRecordingTime * 60)
+        curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds < 
+        (m_idleWaitForRecordingTime * 60) + m_idleTimeoutSecs)
     {
          m_statusList.append(tr("MythTV is about to start recording."));
     }
@@ -664,8 +666,8 @@ void WelcomeDialog::shutdownNow(void)
 
     // don't shutdown if we are about to start recording
     if (!m_nextRecordingStart.isNull() && 
-            curtime.secsTo(m_nextRecordingStart) -
-            m_preRollSeconds < m_idleWaitForRecordingTime * 60)
+        curtime.secsTo(m_nextRecordingStart) - m_preRollSeconds < 
+        (m_idleWaitForRecordingTime * 60) + m_idleTimeoutSecs)
     {
         MythPopupBox::showOkPopup(gContext->GetMainWindow(), "Cannot shutdown",
                 tr("Cannot shutdown because MythTV is about to start recording"));
