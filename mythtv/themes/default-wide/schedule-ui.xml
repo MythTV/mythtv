@@ -875,15 +875,15 @@
             <area>340,400,600,100</area>
             <statetype name="background">
                 <state name="active">
-                    <imagetype name="background">
+                    <shape name="background">
                         <area>0,0,600,100</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                        <fill color="#FFFFFF" alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
@@ -1584,15 +1584,15 @@
             <area>100,340,1080,150</area>
             <statetype name="background">
                 <state name="active">
-                    <imagetype name="background">
+                    <shape name="background">
                         <area>0,0,1080,150</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                        <fill color="#FFFFFF" alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
@@ -1616,15 +1616,15 @@
             <area>300,520,880,85</area>
             <statetype name="background">
                 <state name="active">
-                    <imagetype name="background">
+                    <shape name="background">
                         <area>0,0,880,85</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                        <fill color="#FFFFFF" alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
