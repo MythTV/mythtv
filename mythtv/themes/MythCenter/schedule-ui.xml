@@ -586,7 +586,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="icon">
-                        <area>0,0,25,25</area>
+                        <area>10,-2,25,25</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="status">
@@ -599,7 +599,7 @@
                         <area>120,1,200,24</area>
                     </textarea>
                     <textarea name="name" from="channum">
-                        <area>330,1,300,24</area>
+                        <area>330,1,380,24</area>
                     </textarea>
                     <textarea name="priority" from="channum">
                         <area>720,1,30,24</area>
@@ -1267,7 +1267,6 @@
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>5,-1,751,27</area>
-                        <font>basesmallbold</font>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
