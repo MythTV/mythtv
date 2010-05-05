@@ -589,6 +589,21 @@ void NetSearch::populateResultList(ResultVideo::resultList list)
             item->SetText((*i)->GetDate().toString(
                gContext->GetSetting("DateFormat",
                "yyyy-MM-dd hh:mm")), "date");
+
+            QTime time(0,0,0,0);
+            int secs = (*i)->GetTime().toInt();
+            QTime fin = time.addSecs(secs);
+            QString format;
+            if (secs >= 3600)
+                format = "H:mm:ss";
+            else if (secs >= 600)
+                format = "mm:ss";
+            else if (secs >= 60)
+                format = "m:ss";
+            else
+                format = ":ss";
+            item->SetText(fin.toString(format), "time");
+
             item->SetText((*i)->GetTime(), "time");
             item->SetText((*i)->GetRating(), "rating");
             item->SetText(QString::number((*i)->GetWidth()), "width");
@@ -885,7 +900,21 @@ void NetSearch::slotItemChanged()
                     gContext->GetSetting("DateFormat",
                     "yyyy-MM-dd hh:mm")));
         if (m_time)
-            m_time->SetText(item->GetTime());
+        {
+            QTime time(0,0,0,0);
+            int secs = item->GetTime().toInt();
+            QTime fin = time.addSecs(secs);
+            QString format;
+            if (secs >= 3600)
+                format = "H:mm:ss";
+            else if (secs >= 600)
+                format = "mm:ss";
+            else if (secs >= 60)
+                format = "m:ss";
+            else
+                format = ":ss";
+            m_time->SetText(fin.toString(format));
+        }
         if (m_rating)
             m_rating->SetText(item->GetRating());
         if (m_width)

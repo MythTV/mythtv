@@ -347,6 +347,21 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         item->SetText(video->GetAuthor(), "author");
         item->SetText(video->GetDate().toString(gContext->
                     GetSetting("DateFormat", "yyyy-MM-dd hh:mm")), "date");
+
+        QTime time(0,0,0,0);
+        int secs = video->GetTime().toInt();
+        QTime fin = time.addSecs(secs);
+        QString format;
+        if (secs >= 3600)
+            format = "H:mm:ss";
+        else if (secs >= 600)
+            format = "mm:ss";
+        else if (secs >= 60)
+            format = "m:ss";
+        else
+            format = ":ss";
+        item->SetText(fin.toString(format), "time");
+
         item->SetText(video->GetDescription(), "description");
         item->SetText(video->GetURL(), "url");
         item->SetText(QString::number(video->GetWidth()), "width");
@@ -1093,7 +1108,21 @@ void NetTree::slotItemChanged()
             m_date->SetText(item->GetDate().toString(gContext->
                     GetSetting("DateFormat", "yyyy-MM-dd hh:mm")));
         if (m_time)
-            m_time->SetText(item->GetTime());
+        {
+            QTime time(0,0,0,0);
+            int secs = item->GetTime().toInt();
+            QTime fin = time.addSecs(secs);
+            QString format;
+            if (secs >= 3600)
+                format = "H:mm:ss";
+            else if (secs >= 600)
+                format = "mm:ss";
+            else if (secs >= 60)
+                format = "m:ss";
+            else
+                format = ":ss";
+            m_time->SetText(fin.toString(format));
+        }
         if (m_rating)
             m_rating->SetText(item->GetRating());
         if (m_width)
