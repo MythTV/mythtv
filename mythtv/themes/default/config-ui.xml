@@ -15,10 +15,14 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,250,60</area>
-                    <imagetype name="buttonbackground">
+                    <shape name="background">
                         <area>0,0,250,60</area>
-                        <gradient start="#505050" end="#000000" alpha="200" />
-                    </imagetype>
+                        <type>roundbox</type>
+                        <cornerradius>4</cornerradius>
+                        <fill style="gradient">
+                            <gradient start="#505050" end="#000000" alpha="200" direction="vertical" />
+                        </fill>
+                    </shape>
                     <imagetype name="icon">
                         <area>0,5,80,50</area>
                         <preserveaspect>true</preserveaspect>
@@ -30,14 +34,18 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="255" />
+                        </fill>
+                    </shape>
                 </state>
                 <state name="selectedinactive" from="selectedactive">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#52CA38" end="#349838" alpha="175" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill style="gradient">
+                            <gradient start="#52CA38" end="#349838" alpha="175" />
+                        </fill>
+                    </shape>
                 </state>
             </statetype>
             <statetype name="upscrollarrow">
@@ -105,15 +113,14 @@
             <area>10,39,780,275</area>
         </shape>
 
-        <imagetype name="channum_column">
-            <area>51,50,60,260</area>
-            <gradient start="#333333" end="#333333" alpha="180" />
-        </imagetype>
+        <shape name="channum_column">
+            <area>51,43,60,267</area>
+            <fill color="#333333" alpha="180" />
+        </shape>
 
-        <imagetype name="sourcename_background">
-            <area>515,50,219,260</area>
-            <gradient start="#333333" end="#333333" alpha="180" />
-        </imagetype>
+        <shape name="sourcename_background" from="channum_column">
+            <area>515,43,219,267</area>
+        </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">
             <position>19,50</position>
