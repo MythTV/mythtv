@@ -72,6 +72,7 @@ class WelcomeDialog : public MythScreenType
     QDateTime      m_nextRecordingStart;
     int            m_preRollSeconds;
     int            m_idleWaitForRecordingTime;
+    int            m_idleTimeoutSecs;
     uint           m_screenTunerNo;
     uint           m_screenScheduledNo;
     uint           m_statusListNo;
