@@ -30,7 +30,7 @@ The source of all cover art and screen shots are from those downloaded and maint
 Miro v2.0.3 or later must already be installed and configured and capable of downloading videos.
 '''
 
-__version__=u"v0.5.8"
+__version__=u"v0.6.0"
 # 0.1.0 Initial development
 # 0.2.0 Initial Alpha release for internal testing only
 # 0.2.1 Fixes from initial alpha test
@@ -182,6 +182,8 @@ __version__=u"v0.5.8"
 #       Added better system error messages when an IOError exception occurs
 # 0.5.8 Add support for Miro version 3.0
 # 0.5.9 Update for changes in Python Bindings
+# 0.6.0 Fixed a issue when a Miro video's metadata does not have a title. It was being re-added and the
+#       database title fields in several records was being left empty.
 
 
 examples_txt=u'''
@@ -230,6 +232,8 @@ imagemagick = True
 mythcommflag_recordings = u'%s -c %%s -s "%%s" --rebuild' # or u'mythcommflag -f "%s" --rebuild'
 mythcommflag_videos = u'%s --rebuild --video "%%s"'
 filename_char_filter = u"/%\000"
+emptyTitle = u'_NO_TITLE_From_Miro'
+emptySubTitle = u'_NO_SUBTITLE_From_Miro'
 
 
 # Initalize Report Statistics:
@@ -300,6 +304,7 @@ try:
     try:
         '''Create an instance of each: MythDB, MythVideo
         '''
+        MythLog._setlevel('important,general') # Set the proper bindings alert level
         mythdb = MythDB()
         mythvideo = MythVideo(db=mythdb)
     except MythError, e:
@@ -2398,6 +2403,22 @@ def main():
     #
     app.cli_interpreter.do_mythtv_getwatched(u'')
     watched = app.cli_interpreter.videofiles
+
+    #
+    # Massage empty titles and subtitles from Miro
+    #
+    for item in unwatched:
+        # Deal with empty titles and subtitles from Miro
+        if not item[u'channelTitle']:
+            item[u'channelTitle'] = emptyTitle
+        if not item[u'title']:
+            item[u'title'] = emptySubTitle
+    for item in watched:
+        # Deal with empty titles and subtitles from Miro
+        if not item[u'channelTitle']:
+            item[u'channelTitle'] = emptyTitle
+        if not item[u'title']:
+            item[u'title'] = emptySubTitle
 
     #
     # Remove any duplicate Miro videoes from the unwatched or watched list of Miro videos
