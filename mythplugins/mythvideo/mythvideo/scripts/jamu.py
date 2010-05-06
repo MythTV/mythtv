@@ -3868,6 +3868,9 @@ class MythTvMetaData(VideoFiles):
                 except:
                     pass
                 continue
+            if key == 'movierating':
+                meta_dict['rating'] = data
+                continue
         if meta_dict.has_key('rating'):
             if meta_dict['rating'] == '':
                 meta_dict['rating'] = 'Unknown'
