@@ -229,6 +229,8 @@ imagemagick = True
 mythcommflag_recordings = u'%s -c %%s -s "%%s" --rebuild' # or u'mythcommflag -f "%s" --rebuild'
 mythcommflag_videos = u'%s --rebuild --video "%%s"'
 filename_char_filter = u"/%\000"
+emptyTitle = u'_NO_TITLE_From_Miro'
+emptySubTitle = u'_NO_SUBTITLE_From_Miro'
 
 
 # Initalize Report Statistics:
@@ -2397,6 +2399,22 @@ def main():
     #
     app.cli_interpreter.do_mythtv_getwatched(u'')
     watched = app.cli_interpreter.videofiles
+
+    #
+    # Massage empty titles and subtitles from Miro
+    #
+    for item in unwatched:
+        # Deal with empty titles and subtitles from Miro
+        if not item[u'channelTitle']:
+            item[u'channelTitle'] = emptyTitle
+        if not item[u'title']:
+            item[u'title'] = emptySubTitle
+    for item in watched:
+        # Deal with empty titles and subtitles from Miro
+        if not item[u'channelTitle']:
+            item[u'channelTitle'] = emptyTitle
+        if not item[u'title']:
+            item[u'title'] = emptySubTitle
 
     #
     # Remove any duplicate Miro videoes from the unwatched or watched list of Miro videos
