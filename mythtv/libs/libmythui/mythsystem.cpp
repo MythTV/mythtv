@@ -189,7 +189,7 @@ uint myth_system(const QString &command, int flags)
     {
         VERBOSE(VB_IMPORTANT, (LOC_ERR + "CreateProcess() failed because %1")
                 .arg(::GetLastError()));
-        return MYTHSYSTEM__EXIT__EXECL_ERROR;
+        result = MYTHSYSTEM__EXIT__EXECL_ERROR;
     }
     else
     {
@@ -204,7 +204,7 @@ uint myth_system(const QString &command, int flags)
                     .arg(::GetLastError()));
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
-        return exitcode;
+        result = exitcode;
     }
 #endif
 
