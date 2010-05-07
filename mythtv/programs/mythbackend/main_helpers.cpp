@@ -6,8 +6,10 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <signal.h>
+#ifndef _WIN32
 #include <pwd.h>
 #include <grp.h>
+#endif
 
 #include "mythconfig.h"
 #if CONFIG_DARWIN
@@ -444,6 +446,10 @@ bool setUser(const QString &username)
     if (username.isEmpty())
         return true;
 
+#ifdef _WIN32
+    VERBOSE(VB_IMPORTANT, "--user option is not supported on Windows");
+    return false;
+#else // ! _WIN32
     struct passwd *user_info = getpwnam(username.toLocal8Bit().constData());
     const uid_t user_id = geteuid();
 
@@ -489,6 +495,7 @@ bool setUser(const QString &username)
         return false;
     }
     return true;
+#endif // ! _WIN32
 }
 
 int handle_command(const MythCommandLineParser &cmdline)
