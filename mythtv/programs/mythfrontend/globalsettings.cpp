@@ -3154,7 +3154,7 @@ static GlobalComboBox *GRSchedOpenEnd()
 {
     GlobalComboBox *bc = new GlobalComboBox("SchedOpenEnd");
     bc->setLabel(QObject::tr("Avoid back to back recordings"));
-    bc->setHelpText(QObject::tr("Selectss the situations where the scheduler "
+    bc->setHelpText(QObject::tr("Selects the situations where the scheduler "
                     "will avoid assigning shows to the same card if their "
                     "end time and start time match. This will be allowed "
                     "when necessary in order to resolve conflicts."));
