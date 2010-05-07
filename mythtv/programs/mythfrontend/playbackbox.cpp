@@ -4403,7 +4403,8 @@ void PlaybackBox::ShowRecGroupChanger(bool use_playlist)
         else if (dispGroup == "Deleted")
             dispGroup = tr("Deleted");
 
-        displayNames.push_back(tr("%1 [%n item(s)]", "", query.value(1).toInt()));
+        displayNames.push_back(tr("%1 [%n item(s)]", "", query.value(1).toInt())
+                               .arg(dispGroup));
     }
 
     QString label = tr("Select Recording Group") +
