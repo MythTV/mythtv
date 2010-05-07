@@ -6,8 +6,6 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <signal.h>
-#include <pwd.h>
-#include <grp.h>
 
 #include "mythconfig.h"
 #if CONFIG_DARWIN
