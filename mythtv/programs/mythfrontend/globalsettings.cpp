@@ -3150,16 +3150,18 @@ static GlobalCheckBox *GRSchedMoveHigher()
     return bc;
 }
 
-static GlobalCheckBox *GRSchedOpenEnd()
+static GlobalComboBox *GRSchedOpenEnd()
 {
-    GlobalCheckBox *bc = new GlobalCheckBox("SchedOpenEnd");
-    bc->setLabel(QObject::tr("Avoid back to back recordings from different "
-                    "channels"));
-    bc->setHelpText(QObject::tr("If set, the scheduler will avoid assigning "
-                    "shows from different channels to the same card if their "
+    GlobalComboBox *bc = new GlobalComboBox("SchedOpenEnd");
+    bc->setLabel(QObject::tr("Avoid back to back recordings"));
+    bc->setHelpText(QObject::tr("Selectss the situations where the scheduler "
+                    "will avoid assigning shows to the same card if their "
                     "end time and start time match. This will be allowed "
                     "when necessary in order to resolve conflicts."));
-    bc->setValue(false);
+    bc->addSelection(QObject::tr("Never"), "0");
+    bc->addSelection(QObject::tr("Different Channels"), "1");
+    bc->addSelection(QObject::tr("Always"), "2");
+    bc->setValue(0);
     return bc;
 }
 

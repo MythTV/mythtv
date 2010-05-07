@@ -828,7 +828,7 @@ bool Scheduler::FindNextConflict(
     const RecList     &cardlist,
     const RecordingInfo *p,
     RecConstIter      &j,
-    bool               openEnd) const
+    int               openEnd) const
 {
     bool is_conflict_dbg = false;
 
@@ -854,7 +854,7 @@ bool Scheduler::FindNextConflict(
             continue;
         }
 
-        if (openEnd && p->chanid != q->chanid)
+        if (openEnd == 2 || (openEnd == 1 && p->chanid != q->chanid))
         {
             if (p->recendts < q->recstartts || p->recstartts > q->recendts)
             {
@@ -906,7 +906,7 @@ bool Scheduler::FindNextConflict(
 const RecordingInfo *Scheduler::FindConflict(
     const QMap<int, RecList> &reclists,
     const RecordingInfo        *p,
-    bool openend) const
+    int openend) const
 {
     bool is_conflict_dbg = false;
 
@@ -1136,7 +1136,7 @@ void Scheduler::SchedNewRecords(void)
         cout << "- = unschedule a showing in favor of another one" << endl;
     }
 
-    bool openEnd = (bool)gContext->GetNumSetting("SchedOpenEnd", 0);
+    int openEnd = gContext->GetNumSetting("SchedOpenEnd", 0);
 
     RecIter i = worklist.begin();
     while (i != worklist.end())

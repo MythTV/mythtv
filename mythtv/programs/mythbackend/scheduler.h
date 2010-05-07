@@ -114,9 +114,9 @@ class Scheduler : public QObject
 
     bool FindNextConflict(const RecList &cardlist,
                           const RecordingInfo *p, RecConstIter &iter,
-                          bool openEnd = false) const;
+                          int openEnd = 0) const;
     const RecordingInfo *FindConflict(const QMap<int, RecList> &reclists,
-                                    const RecordingInfo *p, bool openEnd = false) const;
+                                    const RecordingInfo *p, int openEnd = 0) const;
     void MarkOtherShowings(RecordingInfo *p);
     void MarkShowingsList(RecList &showinglist, RecordingInfo *p);
     void BackupRecStatus(void);
