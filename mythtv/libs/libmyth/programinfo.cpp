@@ -1310,16 +1310,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
     QDateTime recstartts;
     if (!starttime.contains("-") && starttime.length() == 14)
     {
-        // must be in YYYYMMDDhhmmss format, convert to ISODate
-        QString isodate =
-            QString("%1-%2-%3T%4:%5:%6")
-            .arg(starttime.mid( 0,4), 4, QLatin1Char('0'))
-            .arg(starttime.mid( 4,2), 2, QLatin1Char('0'))
-            .arg(starttime.mid( 6,2), 2, QLatin1Char('0'))
-            .arg(starttime.mid( 8,2), 2, QLatin1Char('0'))
-            .arg(starttime.mid(10,2), 2, QLatin1Char('0'))
-            .arg(starttime.mid(12,2), 2, QLatin1Char('0'));
-        recstartts = QDateTime::fromString(isodate, Qt::ISODate);
+        // must be in yyyyMMddhhmmss format
+        recstartts = QDateTime::fromString(starttime, "yyyyMMddhhmmss");
     }
     else
         recstartts = QDateTime::fromString(starttime, Qt::ISODate);

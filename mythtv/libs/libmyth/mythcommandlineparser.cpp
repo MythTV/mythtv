@@ -583,7 +583,7 @@ bool MythCommandLineParser::Parse(
         if ((argc - 1) > argpos)
         {
             QString tmp = QString(argv[argpos+1]).trimmed();
-            starttime = QDateTime::fromString(tmp, "yyyyMMddHHmmss");
+            starttime = QDateTime::fromString(tmp, "yyyyMMddhhmmss");
             if (!starttime.isValid() && tmp.length() == 19)
             {
                 starttime = QDateTime::fromString(tmp, Qt::ISODate);
