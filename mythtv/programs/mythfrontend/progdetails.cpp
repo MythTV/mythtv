@@ -423,7 +423,23 @@ void ProgDetails::loadPage(void)
             while(query.next())
             {
                 role = query.value(0).toString();
-                pname = query.value(1).toString();
+                /* The people.name column uses utf8_bin collation.
+                 * Qt-MySQL drivers use QVariant::ByteArray for string-type
+                 * MySQL fields marked with the BINARY attribute (those using a
+                 * *_bin collation) and QVariant::String for all others.
+                 * Since QVariant::toString() uses QString::fromAscii()
+                 * (through QVariant::convert()) when the QVariant's type is
+                 * QVariant::ByteArray, we have to use QString::fromUtf8()
+                 * explicitly to prevent corrupting characters.
+                 * The following code should be changed to use the simpler
+                 * toString() approach, as above, if we do a DB update to
+                 * coalesce the people.name values that differ only in case and
+                 * change the collation to utf8_general_ci, to match the
+                 * majority of other columns, or we'll have the same problem in
+                 * reverse.
+                 */
+                pname = QString::fromUtf8(query.value(1)
+                                          .toByteArray().constData());
 
                 if (rstr == role)
                     plist += ", " + pname;
