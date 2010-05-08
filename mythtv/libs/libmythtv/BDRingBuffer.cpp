@@ -32,10 +32,10 @@ void BDRingBufferPriv::close(void)
 
 uint64_t BDRingBufferPriv::Seek(uint64_t pos)
 {
-//    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Seeking to %1.")
-//                .arg(pos));
-
+    VERBOSE(VB_PLAYBACK|VB_EXTRA, LOC + QString("Seeking to %1.")
+                .arg(pos));
     bd_seek_time(bdnav, pos);
+
     return GetReadPosition();
 }
 
@@ -54,9 +54,6 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
 
         if (!bdnav)
             return false;
-
-        VERBOSE(VB_IMPORTANT, LOC + QString("Opened BD device at %1")
-                .arg(filename));
 
         // Return an index of relevant titles (excludes dupe clips + titles)
         uint32_t numTitles = bd_get_titles(bdnav, TITLES_RELEVANT);
@@ -80,12 +77,15 @@ bool BDRingBufferPriv::OpenFile(const QString &filename)
             }
         }
 
-        VERBOSE(VB_IMPORTANT, LOC + QString("Longest title was index %1, with duration %2.")
-                .arg(m_mainTitle).arg(m_mainTitleLength));
-
         // Now that we've settled on which index the main title is, get info.
         m_currentTitleInfo = bd_get_title_info(bdnav, m_mainTitle);
         bd_select_title(bdnav, m_mainTitle);
+
+        VERBOSE(VB_IMPORTANT, LOC + QString("Longest title: index %1. Duration: %2. "
+                                            "Number of Chapters: %3")
+                                            .arg(m_mainTitle).arg(m_mainTitleLength)
+                                            .arg(m_currentTitleInfo->chapter_count));
+
         m_titlesize = bd_get_title_size(bdnav);
 
         return true;
