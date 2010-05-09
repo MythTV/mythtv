@@ -36,6 +36,7 @@ class EditMetadataDialog : public MythScreenType
     void SaveAndExit();
     void SetTitle();
     void SetSubtitle();
+    void SetTagline();
     void SetRating();
     void SetDirector();
     void SetInetRef();
@@ -76,6 +77,7 @@ class EditMetadataDialog : public MythScreenType
 
     MythUITextEdit      *m_titleEdit;
     MythUITextEdit      *m_subtitleEdit;
+    MythUITextEdit      *m_taglineEdit;
     MythUITextEdit      *m_playerEdit;
     MythUITextEdit      *m_ratingEdit;
     MythUITextEdit      *m_directorEdit;

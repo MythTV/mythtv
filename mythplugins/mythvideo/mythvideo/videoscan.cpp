@@ -299,6 +299,7 @@ class VideoScannerThread : public QThread
                                      VIDEO_FANART_DEFAULT,
                                      Metadata::FilenameToMeta(p->first, 1),
                                      Metadata::FilenameToMeta(p->first, 4),
+                                     QString(),
                                      VIDEO_YEAR_DEFAULT,
                                      QDate::fromString("0000-00-00","YYYY-MM-DD"), 
                                      VIDEO_INETREF_DEFAULT, QString(),

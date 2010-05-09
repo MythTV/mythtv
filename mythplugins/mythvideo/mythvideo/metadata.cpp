@@ -94,8 +94,9 @@ class MetadataImp
   public:
     MetadataImp(const QString &filename, const QString &hash, const QString &trailer,
              const QString &coverfile, const QString &screenshot, const QString &banner,
-             const QString &fanart, const QString &title, const QString &subtitle, int year,
-             const QDate &releasedate, const QString &inetref, const QString &homepage,
+             const QString &fanart, const QString &title, const QString &subtitle,
+             const QString &tagline, int year, const QDate &releasedate,
+             const QString &inetref, const QString &homepage,
              const QString &director, const QString &plot, float userrating,
              const QString &rating, int length,
              int season, int episode, const QDate &insertdate,
@@ -106,7 +107,7 @@ class MetadataImp
              const country_list &countries,
              const cast_list &cast,
              const QString &host = "") :
-        m_title(title), m_subtitle(subtitle),
+        m_title(title), m_subtitle(subtitle), m_tagline(tagline),
         m_inetref(inetref), m_homepage(homepage), m_director(director), m_plot(plot),
         m_rating(rating), m_playcommand(playcommand), m_category(category),
         m_genres(genres), m_countries(countries), m_cast(cast),
@@ -137,6 +138,7 @@ class MetadataImp
         {
             m_title = rhs.m_title;
             m_subtitle = rhs.m_subtitle;
+            m_tagline = rhs.m_tagline;
             m_inetref = rhs.m_inetref;
             m_homepage = rhs.m_homepage;
             m_director = rhs.m_director;
@@ -198,6 +200,9 @@ class MetadataImp
 
     const QString &getSubtitle() const { return m_subtitle; }
     void SetSubtitle(const QString &subtitle) { m_subtitle = subtitle; }
+
+    const QString &GetTagline() const { return m_tagline; }
+    void SetTagline(const QString &tagline) { m_tagline = tagline; }
 
     const QString &GetInetRef() const { return m_inetref; }
     void SetInetRef(const QString &inetRef) { m_inetref = inetRef; }
@@ -330,6 +335,7 @@ class MetadataImp
   private:
     QString m_title;
     QString m_subtitle;
+    QString m_tagline;
     QString m_inetref;
     QString m_homepage;
     QString m_director;
@@ -440,7 +446,7 @@ void MetadataImp::Reset()
 {
     MetadataImp tmp(m_filename, Metadata::VideoFileHash(m_filename, m_host), VIDEO_TRAILER_DEFAULT,
                     VIDEO_COVERFILE_DEFAULT, VIDEO_SCREENSHOT_DEFAULT, VIDEO_BANNER_DEFAULT,
-                    VIDEO_FANART_DEFAULT, Metadata::FilenameToMeta(m_filename, 1),
+                    VIDEO_FANART_DEFAULT, Metadata::FilenameToMeta(m_filename, 1), QString(),
                     Metadata::FilenameToMeta(m_filename, 4), VIDEO_YEAR_DEFAULT, 
                     QDate(), VIDEO_INETREF_DEFAULT, QString(), VIDEO_DIRECTOR_DEFAULT, 
                     VIDEO_PLOT_DEFAULT, 0.0,
@@ -549,10 +555,11 @@ void MetadataImp::fromDBRow(MSqlQuery &query)
     m_banner = query.value(22).toString();
     m_fanart = query.value(23).toString();
     m_subtitle = query.value(24).toString();
-    m_season = query.value(25).toInt();
-    m_episode = query.value(26).toInt();
-    m_host = query.value(27).toString();
-    m_insertdate = query.value(28).toDate();
+    m_tagline = query.value(25).toString();
+    m_season = query.value(26).toInt();
+    m_episode = query.value(27).toInt();
+    m_host = query.value(28).toString();
+    m_insertdate = query.value(29).toDate();
 
     VideoCategory::GetCategory().get(m_categoryID, m_category);
 
@@ -609,11 +616,11 @@ void MetadataImp::saveToDatabase()
 
         m_watched = 0;
 
-        query.prepare("INSERT INTO videometadata (title,subtitle,director,plot,"
+        query.prepare("INSERT INTO videometadata (title,subtitle, tagline,director,plot,"
                       "rating,year,userrating,length,season,episode,filename,hash,"
                       "showlevel,coverfile,inetref,homepage,browse,watched,trailer,"
                       "screenshot,banner,fanart,host) VALUES (:TITLE, :SUBTITLE, "
-                      ":DIRECTOR, :PLOT, :RATING, :YEAR, :USERRATING, "
+                      ":TAGLINE, :DIRECTOR, :PLOT, :RATING, :YEAR, :USERRATING, "
                       ":LENGTH, :SEASON, :EPISODE, :FILENAME, :HASH, :SHOWLEVEL, "
                       ":COVERFILE, :INETREF, :HOMEPAGE, :BROWSE, :WATCHED, "
                       ":TRAILER, :SCREENSHOT, :BANNER, :FANART, :HOST)");
@@ -621,7 +628,7 @@ void MetadataImp::saveToDatabase()
     else
     {
         query.prepare("UPDATE videometadata SET title = :TITLE, subtitle = :SUBTITLE, "
-                      "director = :DIRECTOR, plot = :PLOT, rating= :RATING, "
+                      "tagline = :TAGLINE, director = :DIRECTOR, plot = :PLOT, rating= :RATING, "
                       "year = :YEAR, releasedate = :RELEASEDATE, userrating = :USERRATING, "
                       "length = :LENGTH, season = :SEASON, episode = :EPISODE, "
                       "filename = :FILENAME, hash = :HASH, trailer = :TRAILER, "
@@ -639,6 +646,7 @@ void MetadataImp::saveToDatabase()
 
     query.bindValue(":TITLE", m_title);
     query.bindValue(":SUBTITLE", m_subtitle);
+    query.bindValue(":TAGLINE", m_tagline);
     query.bindValue(":DIRECTOR", m_director);
     query.bindValue(":PLOT", m_plot);
     query.bindValue(":RATING", m_rating);
@@ -1027,9 +1035,9 @@ QString Metadata::TrimTitle(const QString &title, bool ignore_case)
 
 Metadata::Metadata(const QString &filename, const QString &hash,
              const QString &trailer, const QString &coverfile,
-             const QString &screenshot, const QString &banner, const QString &fanart, 
-             const QString &title, const QString &subtitle, int year,
-             const QDate &releasedate, const QString &inetref,
+             const QString &screenshot, const QString &banner, const QString &fanart,
+             const QString &title, const QString &subtitle, const QString &tagline,
+             int year, const QDate &releasedate, const QString &inetref,
              const QString &homepage, const QString &director,
              const QString &plot, float userrating, const QString &rating,
              int length, int season, int episode, const QDate &insertdate,
@@ -1042,8 +1050,8 @@ Metadata::Metadata(const QString &filename, const QString &hash,
              const QString &host)
 {
     m_imp = new MetadataImp(filename, hash, trailer, coverfile, screenshot, banner,
-                            fanart, title, subtitle, year, releasedate, inetref, homepage,
-                            director, plot, userrating, rating, length, season, episode,
+                            fanart, title, subtitle, tagline, year, releasedate, inetref,
+                            homepage, director, plot, userrating, rating, length, season, episode,
                             insertdate, id, showlevel, categoryID, childID, browse, watched, 
                             playcommand, category, genres, countries, cast, host);
 }
@@ -1116,6 +1124,16 @@ const QString &Metadata::GetSubtitle() const
 void Metadata::SetSubtitle(const QString &subtitle)
 {
     m_imp->SetSubtitle(subtitle);
+}
+
+const QString &Metadata::GetTagline() const
+{
+    return m_imp->GetTagline();
+}
+
+void Metadata::SetTagline(const QString &tagline)
+{
+    m_imp->SetTagline(tagline);
 }
 
 int Metadata::GetYear() const

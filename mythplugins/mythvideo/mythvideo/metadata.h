@@ -62,6 +62,7 @@ class Metadata
              const QString &fanart = QString(),
              const QString &title = QString(),
              const QString &subtitle = QString(),
+             const QString &tagline = QString(),
              int year = VIDEO_YEAR_DEFAULT,
              const QDate &releasedate = QDate(),
              const QString &inetref = QString(),
@@ -104,6 +105,9 @@ class Metadata
 
     const QString &GetSubtitle() const;
     void SetSubtitle(const QString &subtitle);
+
+    const QString &GetTagline() const;
+    void SetTagline(const QString &tagline);
 
     int GetYear() const;
     void SetYear(int year);

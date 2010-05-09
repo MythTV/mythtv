@@ -1141,6 +1141,7 @@ namespace
             tmp["filename"] = metadata->GetFilename();
             tmp["title"] = metadata->GetTitle();
             tmp["subtitle"] = metadata->GetSubtitle();
+            tmp["tagline"] = GetDisplayRating(metadata->GetTagline());
             tmp["director"] = metadata->GetDirector();
             tmp["description"] = metadata->GetPlot();
             tmp["genres"] = GetDisplayGenres(*metadata);
@@ -1226,6 +1227,7 @@ namespace
         h.handleText("filename");
         h.handleText("title");
         h.handleText("subtitle");
+        h.handleText("tagline");
         h.handleText("director");
         h.handleText("description");
         h.handleText("genres");
@@ -4503,8 +4505,10 @@ void VideoDialog::OnVideoSearchByUIDDone(bool normal_exit, QStringList output,
         // Allows for partial fill.  Reset Metadata for full fill.
 
         metadata->SetTitle(data["Title"]);
-        metadata->SetSubtitle(data["Subtitle"]);        
+        metadata->SetSubtitle(data["Subtitle"]);
 
+        if (metadata->GetTagline().isEmpty())
+            metadata->SetTagline(data["Tagline"]);
         if (metadata->GetYear() == 1895 || metadata->GetYear() == 0)
             metadata->SetYear(data["Year"].toInt());
         if (metadata->GetReleaseDate() == QDate())

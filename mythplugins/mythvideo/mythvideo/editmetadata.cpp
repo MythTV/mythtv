@@ -27,13 +27,13 @@ EditMetadataDialog::EditMetadataDialog(MythScreenStack *lparent,
         QString lname, Metadata *source_metadata,
         const MetadataListManager &cache) : MythScreenType(lparent, lname),
     m_origMetadata(source_metadata), m_titleEdit(0), m_subtitleEdit(0),
-    m_playerEdit(0), m_ratingEdit(0), m_directorEdit(0), m_inetrefEdit(0),
-    m_homepageEdit(0), m_plotEdit(0), m_seasonSpin(0), m_episodeSpin(0),
-    m_yearSpin(0), m_userRatingSpin(0), m_lengthSpin(0), m_categoryList(0),
-    m_levelList(0), m_childList(0), m_browseCheck(0), m_watchedCheck(0),
-    m_coverartButton(0), m_coverartText(0), m_screenshotButton(0),
-    m_screenshotText(0), m_bannerButton(0), m_bannerText(0),
-    m_fanartButton(0), m_fanartText(0),
+    m_taglineEdit(0), m_playerEdit(0), m_ratingEdit(0), m_directorEdit(0),
+    m_inetrefEdit(0), m_homepageEdit(0), m_plotEdit(0), m_seasonSpin(0),
+    m_episodeSpin(0), m_yearSpin(0), m_userRatingSpin(0), m_lengthSpin(0),
+    m_categoryList(0), m_levelList(0), m_childList(0), m_browseCheck(0),
+    m_watchedCheck(0), m_coverartButton(0), m_coverartText(0),
+    m_screenshotButton(0), m_screenshotText(0), m_bannerButton(0),
+    m_bannerText(0), m_fanartButton(0), m_fanartText(0),
     m_trailerButton(0), m_trailerText(0),
     m_coverart(0), m_screenshot(0),
     m_banner(0), m_fanart(0),
@@ -88,6 +88,7 @@ bool EditMetadataDialog::Create()
         return false;
     }
 
+    UIUtilW::Assign(this, m_taglineEdit, "tagline_edit");
     UIUtilW::Assign(this, m_ratingEdit, "rating_edit");
     UIUtilW::Assign(this, m_directorEdit, "director_edit");
     UIUtilW::Assign(this, m_inetrefEdit, "inetref_edit");
@@ -111,6 +112,11 @@ bool EditMetadataDialog::Create()
     connect(m_subtitleEdit, SIGNAL(valueChanged()), SLOT(SetSubtitle()));
     m_subtitleEdit->SetMaxLength(0);
     connect(m_playerEdit, SIGNAL(valueChanged()), SLOT(SetPlayer()));
+    if (m_taglineEdit)
+    {
+        connect(m_taglineEdit, SIGNAL(valueChanged()), SLOT(SetTagline()));
+        m_taglineEdit->SetMaxLength(255);
+    }
     if (m_ratingEdit)
     {
         connect(m_ratingEdit, SIGNAL(valueChanged()), SLOT(SetRating()));
@@ -399,6 +405,8 @@ void EditMetadataDialog::fillWidgets()
     m_fanartText->SetText(m_workingMetadata->GetFanart());
     m_trailerText->SetText(m_workingMetadata->GetTrailer());
     m_playerEdit->SetText(m_workingMetadata->GetPlayCommand());
+    if (m_taglineEdit)
+        m_taglineEdit->SetText(m_workingMetadata->GetTagline());
     if (m_ratingEdit)
         m_ratingEdit->SetText(m_workingMetadata->GetRating());
     if (m_directorEdit)
@@ -528,6 +536,11 @@ void EditMetadataDialog::SetCategory(MythUIButtonListItem *item)
 void EditMetadataDialog::SetRating()
 {
     m_workingMetadata->SetRating(m_ratingEdit->GetText());
+}
+
+void EditMetadataDialog::SetTagline()
+{
+    m_workingMetadata->SetTagline(m_taglineEdit->GetText());
 }
 
 void EditMetadataDialog::SetDirector()
