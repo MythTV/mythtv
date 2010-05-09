@@ -1,0 +1,195 @@
+<!-- Parameter entities to avoid repetition -->
+<!ENTITY % common_attributes "name CDATA #REQUIRED
+                              from CDATA #IMPLIED" >
+<!ENTITY % widgets "(textarea|imagetype|statetype|button|buttonlist|buttontree|
+                    textedit|checkbox|spinbox|progressbar|clock|webbrowser|
+                    shape|guidegrid)" >
+<!ENTITY % widget_common "(area|position|alpha)" >
+
+<!-- MythUI Theme Root -->
+<!ELEMENT mythuitheme (window|fontdef|%widgets;)*>
+
+<!-- Font Definition -->
+<!ELEMENT fontdef (pixelsize|size|color|shadowcolor|shadowoffset|shadowalpha|
+                   outlinecolor|outlinesize|outlinealpha|italics|weight|bold|
+                   letterspacing|wordspacing|decoration)*>
+<!ATTLIST fontdef %common_attributes;
+                  face CDATA #IMPLIED>
+<!ELEMENT pixelsize  (#PCDATA)>
+<!ELEMENT size  (#PCDATA)>
+<!ELEMENT color  (#PCDATA)>
+<!ELEMENT shadowcolor  (#PCDATA)>
+<!ELEMENT shadowoffset  (#PCDATA)>
+<!ELEMENT shadowalpha  (#PCDATA)>
+<!ELEMENT outlinecolor  (#PCDATA)>
+<!ELEMENT outlinesize  (#PCDATA)>
+<!ELEMENT outlinealpha  (#PCDATA)>
+<!ELEMENT italics  (#PCDATA)>
+<!ELEMENT weight  (#PCDATA)>
+<!ELEMENT bold (#PCDATA)> <!-- DEPRECATED -->
+<!ELEMENT underline (#PCDATA)> <!-- DEPRECATED -->
+<!ELEMENT letterspacing  (#PCDATA)>
+<!ELEMENT wordspacing  (#PCDATA)>
+<!ELEMENT decoration  (#PCDATA)>
+
+<!-- Window/Screen -->
+<!ELEMENT window (%widget_common;|fontdef|%widgets;)*>
+<!ATTLIST window %common_attributes;>
+
+<!-- Generic Elements -->
+<!ELEMENT area (#PCDATA)>
+<!ELEMENT position (#PCDATA)>
+<!ELEMENT alpha (#PCDATA)>
+
+<!-- Textarea Widget -->
+<!ENTITY % textarea_elements "(case|font|cutdown|multiline|align|colorcycle|
+                              value|template)">
+<!ELEMENT textarea (%widget_common;|%textarea_elements;|%widgets;)*>
+<!ATTLIST textarea %common_attributes;>
+<!ELEMENT case (#PCDATA)>
+<!ELEMENT font (#PCDATA)>
+<!ATTLIST font state CDATA #IMPLIED>
+<!ELEMENT cutdown (#PCDATA)>
+<!ELEMENT multiline (#PCDATA)>
+<!ELEMENT align (#PCDATA)>
+<!ELEMENT colorcycle (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+<!ATTLIST value lang CDATA #IMPLIED>
+<!ELEMENT template (#PCDATA)>
+
+<!-- Imagetype Widget -->
+<!ELEMENT imagetype (%widget_common;|filename|alpha|preserveaspect|crop|
+                     mask|reflection|grayscale|filepattern|delay|%widgets;)*>
+<!ATTLIST imagetype %common_attributes;>
+<!ELEMENT filename (#PCDATA)>
+<!ELEMENT preserveaspect (#PCDATA)>
+<!ELEMENT crop (#PCDATA)>
+<!ELEMENT mask (#PCDATA)>
+<!ELEMENT reflection EMPTY>
+<!ATTLIST reflection axis CDATA "horizontal"
+                     shear CDATA "0"
+                     scale CDATA "100"
+                     length CDATA "100">
+<!ELEMENT grayscale (#PCDATA)>
+<!ELEMENT filepattern (#PCDATA)>
+<!ATTLIST filepattern low CDATA "0"
+                       high CDATA #REQUIRED
+                       cycle (start|reverse) "start"
+                       delay CDATA "500">
+<!ELEMENT delay (#PCDATA)>  <!-- DEPRECATED -->
+
+<!-- Shape Widget -->
+<!ELEMENT shape (%widget_common;|type|cornerradius|fill|line|%widgets;)*>
+<!ATTLIST shape %common_attributes;>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT fill (gradient*)>
+<!ATTLIST fill color CDATA #IMPLIED
+               alpha CDATA #IMPLIED
+               style (solid|gradient) "solid">
+<!ELEMENT gradient (stop*)>
+<!ATTLIST gradient start CDATA #IMPLIED
+                   end CDATA #IMPLIED
+                   alpha CDATA #IMPLIED
+                   direction (vertical|horizontal|diagonal) "vertical">
+<!ELEMENT stop (#PCDATA)>
+<!ATTLIST stop position CDATA #REQUIRED
+               color CDATA #REQUIRED
+               alpha CDATA #IMPLIED>
+<!ELEMENT line (#PCDATA)>
+<!ATTLIST line color CDATA "#000000"
+               alpha CDATA "255"
+               width CDATA "1">
+<!ELEMENT cornerradius (#PCDATA)>
+
+<!-- Statetype Widget -->
+<!ELEMENT statetype (%widget_common;|showempty|state|%widgets;)*>
+<!ATTLIST statetype %common_attributes;>
+<!ELEMENT showempty (#PCDATA)>
+<!ELEMENT state (%widget_common;|fontdef|%widgets;)*>
+<!ATTLIST state name CDATA #IMPLIED
+                type CDATA #IMPLIED
+                from CDATA #IMPLIED>
+
+<!-- Clock Widget -->
+<!ELEMENT clock (%widget_common;|%textarea_elements;|format|secondflash|
+                 %widgets;)*>
+<!ATTLIST clock %common_attributes;>
+<!ELEMENT format (#PCDATA)>  <!-- DEPRECATED Use template instead? -->
+<!ELEMENT secondflash (#PCDATA)>
+
+<!-- Button Widget -->
+<!ELEMENT button (%widget_common;|value|%widgets;)*> <!-- statetype -->
+<!ATTLIST button %common_attributes;>
+
+<!-- Buttonlist Widget -->
+<!ENTITY % buttonlist_elements "layout|spacing|arrange|align|scrollstyle|
+                                wrapstyle|showarrow|buttonarea">
+<!ELEMENT buttonlist (%widget_common;|%buttonlist_elements;|%widgets;)*> <!-- statetype -->
+<!ATTLIST buttonlist %common_attributes;>
+<!ELEMENT layout (#PCDATA)>
+<!ELEMENT spacing (#PCDATA)>
+<!ELEMENT arrange (#PCDATA)>
+<!ELEMENT scrollstyle (#PCDATA)>
+<!ELEMENT wrapstyle (#PCDATA)>
+<!ELEMENT showarrow (#PCDATA)>
+<!ELEMENT buttonarea (#PCDATA)>
+
+<!-- Buttontree Widget -->
+<!ELEMENT buttontree (%widget_common;|numlists|spacing|%widgets;)*> <!-- buttonlist -->
+<!ATTLIST buttontree %common_attributes;>
+<!ELEMENT numlists  (#PCDATA)>
+
+<!-- Textedit Widget -->
+<!ELEMENT textedit (%widget_common;|%widgets;)*> <!-- textarea|statetype|imagetype -->
+<!ATTLIST textedit %common_attributes;>
+   
+<!-- Checkbox Widget -->
+<!ELEMENT checkbox (%widget_common;|%widgets;)*> <!-- statetype -->
+<!ATTLIST checkbox %common_attributes;>
+
+<!-- Spinbox Widget -->
+<!ELEMENT spinbox (%widget_common;|%buttonlist_elements;|%widgets;)*> <!-- statetype -->
+<!ATTLIST spinbox %common_attributes;>
+
+<!-- Progressbar Widget -->
+<!ELEMENT progressbar (%widget_common;|layout|style|%widgets;)*> <!-- imagetype -->
+<!ATTLIST progressbar %common_attributes;>
+<!ELEMENT style (#PCDATA)>
+
+<!-- Guidegrid Widget -->
+<!ELEMENT guidegrid (%widget_common;|layout|channels|timeslots|solidcolor|
+                     selector|showcategories|categoryalpha|recordingcolor|
+                     conflictingcolor|cutdown|multiline|textoffset|recordstatus|
+                     arrow|font|%widgets;)*>
+<!ATTLIST guidegrid %common_attributes;>
+<!ELEMENT channels  (#PCDATA)>
+<!ELEMENT timeslots  (#PCDATA)>
+<!ELEMENT solidcolor  (#PCDATA)>
+<!ELEMENT selector EMPTY>
+<!ATTLIST selector type (highlight|box|roundbox) #IMPLIED
+                   linecolor CDATA #IMPLIED
+                   fillcolor CDATA #IMPLIED>
+<!ELEMENT showcategories  (#PCDATA)>
+<!ELEMENT categoryalpha  (#PCDATA)>
+<!ELEMENT recordingcolor  (#PCDATA)>
+<!ELEMENT conflictingcolor  (#PCDATA)>
+<!ELEMENT textoffset  (#PCDATA)>
+<!ELEMENT recordstatus EMPTY>
+<!ATTLIST recordstatus type (SingleRecord|TimeslotRecord|ChannelRecord|
+                             AllRecord|WeekslotRecord|FindOneRecord|
+                             OverrideRecord) #REQUIRED
+                       image CDATA #REQUIRED>
+<!ELEMENT arrow EMPTY>
+<!ATTLIST arrow direction (left|right) #REQUIRED
+                image CDATA #REQUIRED>
+
+<!-- Webbrowser Widget -->
+<!ELEMENT webbrowser (%widget_common;|url|zoom|background|updateinterval|
+                     %widgets;)*>
+<!ATTLIST webbrowser %common_attributes;>
+<!ELEMENT url (#PCDATA)>
+<!ELEMENT zoom (#PCDATA)>
+<!ELEMENT background (#PCDATA)>
+<!ATTLIST background color CDATA #REQUIRED
+                     alpha CDATA #IMPLIED>
+<!ELEMENT updateinterval (#PCDATA)>
