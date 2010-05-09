@@ -1475,7 +1475,7 @@ class BEConnection( object ):
                     event = self._recv()
                     signal.alarm(0)
                 except ValueError:
-                    # header read failed
+                    # header read failed, terminate alarm
                     signal.alarm(0)
                     return u''
                 except MythBEError:

@@ -429,22 +429,10 @@ class FileOps( BEEvent ):
         else:
             return res[1]
 
-class Record( DBDataWrite ):
+class Record( DBDataWrite, RECTYPE ):
     """
     Record(id=None, db=None, raw=None) -> Record object
     """
-
-    kNotRecording       = 0
-    kSingleRecord       = 1
-    kTimeslotRecord     = 2
-    kChannelRecord      = 3
-    kAllRecord          = 4
-    kWeekslotRecord     = 5
-    kFindOneRecord      = 6
-    kOverrideRecord     = 7
-    kDontRecord         = 8
-    kFindDailyRecord    = 9
-    kFindWeeklyRecord   = 10
 
     _table = 'record'
     _where = 'recordid=%s'
@@ -503,30 +491,8 @@ class FreeSpace( DictData ):
 
 #### RECORDING ACCESS ####
 
-class Program( DictData ):
+class Program( DictData, RECSTATUS ):
     """Represents a program with all detail returned by the backend."""
-
-    # recstatus
-    TUNERBUSY           = -8
-    LOWDISKSPACE        = -7
-    CANCELLED           = -6
-    DELETED             = -5
-    ABORTED             = -4
-    RECORDED            = -3
-    RECORDING           = -2
-    WILLRECORD          = -1
-    UNKNOWN             = 0
-    DONTRECORD          = 1
-    PREVIOUSRECORDING   = 2
-    CURRENTRECORDING    = 3
-    EARLIERSHOWING      = 4
-    TOOMANYRECORDINGS   = 5
-    NOTLISTED           = 6
-    CONFLICT            = 7
-    LATERSHOWING        = 8
-    REPEAT              = 9
-    INACTIVE            = 10
-    NEVERRECORD         = 11
 
     _field_order = [ 'title',        'subtitle',     'description',
                      'category',     'chanid',       'channum',
@@ -758,11 +724,11 @@ class Recorded( DBDataWrite ):
                 cast.append(member.name)
             return ', '.join(cast).encode('utf-8')
 
-    class _Seek( DBDataRef ):
+    class _Seek( DBDataRef, MARKUP ):
         table = 'recordedseek'
         wfield = ['chanid','starttime']
 
-    class _Markup( DBDataRef ):
+    class _Markup( DBDataRef, MARKUP ):
         table = 'recordedmarkup'
         wfield = ['chanid','starttime']
         
@@ -889,36 +855,11 @@ class RecordedProgram( DBDataWrite ):
         self._pull()
         return self
 
-class OldRecorded( DBDataWrite ):
+class OldRecorded( DBDataWrite, RECSTATUS ):
     """
     OldRecorded(data=None, db=None, raw=None) -> OldRecorded object
             'data' is a tuple containing (chanid, storagegroup)
     """
-
-    #recstatus
-    rsFailed            = -9
-    rsTunerBusy         = -8
-    rsLowDiskSpace      = -7
-    rsCancelled         = -6
-    rsMissed            = -5
-    rsAborted           = -4
-    rsRecorded          = -3
-    rsRecording         = -2
-    rsWillRecord        = -1
-    rsUnknown           = 0
-    rsDontRecord        = 1
-    rsPreviousRecording = 2
-    rsCurrentRecording  = 3
-    rsEarlierShowing    = 4
-    rsTooManyRecordings = 5
-    rsNotListed         = 6
-    rsConflict          = 7
-    rsLaterShowing      = 8
-    rsRepeat            = 9
-    rsInactive          = 10
-    rsNeverRecord       = 11
-    rsOffline           = 12
-    rsOtherShowing      = 13
 
     _table = 'oldrecorded'
     _where = 'chanid=%s AND starttime=%s'
@@ -964,48 +905,11 @@ class OldRecorded( DBDataWrite ):
         """OldRecorded entries cannot be deleted"""
         return
 
-class Job( DBDataWrite ):
+class Job( DBDataWrite, JOBTYPE, JOBCMD, JOBFLAG, JOBSTATUS ):
     """
     Job(id=None, chanid=None, starttime=None, db=None, raw=None) -> Job object
             Can be initialized with a Job id, or chanid and starttime.
     """
-    # types
-    NONE         = 0x0000
-    SYSTEMJOB    = 0x00ff
-    TRANSCODE    = 0x0001
-    COMMFLAG     = 0x0002
-    USERJOB      = 0xff00
-    USERJOB1     = 0x0100
-    USERJOB2     = 0x0200
-    USERJOB3     = 0x0300
-    USERJOB4     = 0x0400
-    # cmds
-    RUN          = 0x0000
-    PAUSE        = 0x0001
-    RESUME       = 0x0002
-    STOP         = 0x0004
-    RESTART      = 0x0008
-    # flags
-    NO_FLAGS     = 0x0000
-    USE_CUTLIST  = 0x0001
-    LIVE_REC     = 0x0002
-    EXTERNAL     = 0x0004
-    # statuses
-    UNKNOWN      = 0x0000
-    QUEUED       = 0x0001
-    PENDING      = 0x0002
-    STARTING     = 0x0003
-    RUNNING      = 0x0004
-    STOPPING     = 0x0005
-    PAUSED       = 0x0006
-    RETRY        = 0x0007
-    ERRORING     = 0x0008
-    ABORTING     = 0x0008
-    DONE         = 0x0100
-    FINISHED     = 0x0110
-    ABORTED      = 0x0120
-    ERRORED      = 0x0130
-    CANCELLED    = 0x0140
 
     _table = 'jobqueue'
     _logmodule = 'Python Jobqueue'
