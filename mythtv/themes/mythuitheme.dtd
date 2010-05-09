@@ -67,7 +67,7 @@
                      end CDATA #IMPLIED
                      steps CDATA #IMPLIED>
 <!ELEMENT scroll (#PCDATA)> <!-- Not yet working -->
-<!ATTLIST scroll direction (left|right|up|down)>
+<!ATTLIST scroll direction (left|right|up|down) "left">
 <!ELEMENT value (#PCDATA)>
 <!ATTLIST value lang CDATA #IMPLIED>
 <!ELEMENT template (#PCDATA)>
