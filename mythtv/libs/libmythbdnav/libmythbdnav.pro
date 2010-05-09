@@ -20,20 +20,12 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # bdnav
-HEADERS += bluray.h
-HEADERS += libbdnav/bdparse.h  libbdnav/clpi_parse.h  libbdnav/mpls_parse.h  libbdnav/navigation.h
-HEADERS += file/configfile.h  file/dir.h  file/dl.h  file/file.h
-HEADERS += util/attributes.h  util/bits.h  util/logging.h  util/macro.h  util/strutl.h
+HEADERS += bluray.h libdbdnav/*.h util/*.h file/*.h
 
-SOURCES += bluray.c
-SOURCES += libbdnav/clpi_parse.c  libbdnav/mpls_parse.c  libbdnav/navigation.c
-SOURCES += file/configfile.c  file/dir_posix.c  file/dl_posix.c  file/file_posix.c
-SOURCES +=util/logging.c  util/strutl.c
+SOURCES += bluray.c libbdnav/*.c file/*.c util/*.c
 
 inc_bdnav.path = $${PREFIX}/include/mythtv/bdnav
-inc_bdnav.files = libbdnav/bdparse.h  libbdnav/clpi_parse.h  libbdnav/mpls_parse.h  libbdnav/navigation.h  bluray.h
-inc_bdnav.files += file/configfile.h  file/dir.h  file/dl.h  file/file.h
-inc_bdnav.files += util/attributes.h  util/bits.h  util/logging.h  util/macro.h  util/strutl.h
+inc_bdnav.files = bluray.h libbdnav/*.h file/*.h util/*.h
 
 INSTALLS += target inc_bdnav
 
