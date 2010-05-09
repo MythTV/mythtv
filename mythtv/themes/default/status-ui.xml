@@ -10,7 +10,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>20,100,760,275</area>
+            <area>15,100,770,280</area>
         </shape>
 
         <buttonlist name="category">
@@ -67,7 +67,7 @@
         </buttonlist>
 
         <buttonlist name="log" from="basebuttonlist2">
-            <area>5,108,760,320</area>
+            <area>20,108,760,320</area>
             <buttonarea>0,0,760,270</buttonarea>
 
             <statetype name="upscrollarrow">

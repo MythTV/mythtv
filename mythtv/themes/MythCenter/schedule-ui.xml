@@ -577,7 +577,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>15,50,770,332</area>
+            <area>15,50,770,342</area>
         </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">
@@ -586,7 +586,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="icon">
-                        <area>10,-2,25,25</area>
+                        <area>10,0,25,25</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="status">
@@ -1231,7 +1231,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>15,55,770,330</area>
+            <area>15,55,770,350</area>
         </shape>
 
         <textarea name="curview" from="basetextarea">
@@ -1272,10 +1272,10 @@
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>700,330</position>
+                <position>700,350</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>730,330</position>
+                <position>730,350</position>
             </statetype>
         </buttonlist>
 
