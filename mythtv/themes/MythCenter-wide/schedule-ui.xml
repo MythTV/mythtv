@@ -130,8 +130,7 @@
             <area>1090,30,150,32</area>
             <align>right,vcenter</align>
             <format>%TIME%</format>
-            <font>clock</font>
-            <secondflash>no</secondflash>
+            <font>basemedium</font>
         </clock>
 
         <imagetype name="channelicon">
@@ -139,7 +138,7 @@
         </imagetype>
 
         <textarea name="title" from="basetextarea">
-            <area>40,22,1000,50</area>
+            <area>100,22,980,50</area>
             <align>left,vcenter</align>
             <font>baselarge</font>
         </textarea>
@@ -354,7 +353,6 @@
             <area>1090,14,150,32</area>
             <align>right,vcenter</align>
             <format>%TIME%</format>
-            <secondflash>yes</secondflash>
         </clock>
 
         <imagetype name="channelicon">
