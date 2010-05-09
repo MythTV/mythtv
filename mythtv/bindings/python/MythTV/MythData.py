@@ -437,10 +437,10 @@ class Record( DBDataWrite, RECTYPE ):
     _table = 'record'
     _where = 'recordid=%s'
     _setwheredat = 'self.recordid,'
-    _defaults = {'recordid':None,    'type':kAllRecord,      'title':u'Unknown',
-                 'subtitle':'',      'description':'',       'category':'',
-                 'station':'',       'seriesid':'',          'search':0,
-                 'last_record':datetime(1900,1,1),
+    _defaults = {'recordid':None,    'type':RECTYPE.kAllRecord,
+                 'title':u'Unknown', 'subtitle':'',      'description':'',
+                 'category':'',      'station':'',       'seriesid':'',
+                 'search':0,         'last_record':datetime(1900,1,1),
                  'next_record':datetime(1900,1,1),
                  'last_delete':datetime(1900,1,1)}
     _logmodule = 'Python Record'
@@ -1130,7 +1130,7 @@ class Video( DBDataWrite ):
             self.cast = self._Cast((self.intid,), self._db)
             self.genre = self._Genre((self.intid,), self._db)
             self.country = self._Country((self.intid,), self._db)
-            self.markup = self._Markup((self.intid,), self._db)
+            self.markup = self._Markup((self.filename,), self._db)
 
     def create(self, data=None):
         """Video.create(data=None) -> Video object"""
@@ -1155,7 +1155,7 @@ class Video( DBDataWrite ):
         self.cast = self._Cast((self.intid,), self._db)
         self.genre = self._Genre((self.intid,), self._db)
         self.country = self._Country((self.intid,), self._db)
-        self.markup = self._Markup((self.intid,), self._db)
+        self.markup = self._Markup((self.filename,), self._db)
         return self
 
     class _Cast( DBDataCRef ):
@@ -1174,8 +1174,8 @@ class Video( DBDataWrite ):
         _cref = ['idcountry','intid']
 
     class _Markup( DBDataRef, MARKUP ):
-        table = 'filemarkup'
-        wfield = ['filename',]
+        _table = 'filemarkup'
+        _ref = ['filename',]
 
     def _open(self, type, mode='r',nooverwrite=False):
         """
