@@ -20,7 +20,9 @@ class MPUBLIC MythObservable
     void dispatch(const MythEvent &event);
     void dispatchNow(const MythEvent &event) MDEPRECATED;
 
-  private:
+    bool hasListeners(void) { return !m_listeners.isEmpty(); }
+
+  protected:
     QMutex         *m_lock;
     QSet<QObject*>  m_listeners;
 };
