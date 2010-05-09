@@ -4,7 +4,8 @@
 <!ENTITY % widgets "(textarea|imagetype|statetype|button|buttonlist|buttontree|
                     textedit|checkbox|spinbox|progressbar|clock|webbrowser|
                     shape|guidegrid)" >
-<!ENTITY % widget_common "(area|position|alpha|helptext)" >
+<!ENTITY % widget_common "(area|position|alpha|alphapulse|helptext|focusorder|
+                           minsize|loadondemand)" >
 
 <!-- MythUI Theme Root -->
 <!ELEMENT mythuitheme (window|fontdef|%widgets;)*>
@@ -40,12 +41,19 @@
 <!ELEMENT area (#PCDATA)>
 <!ELEMENT position (#PCDATA)>
 <!ELEMENT alpha (#PCDATA)>
-<!ELEMENT helptext  (#PCDATA)>
+<!ELEMENT alphapulse EMPTY>
+<!ATTLIST alphapulse min CDATA "0"
+                     max CDATA "255"
+                     change CDATA "5">
+<!ELEMENT helptext (#PCDATA)>
 <!ATTLIST helptext lang CDATA #IMPLIED>
+<!ELEMENT focusorder (#PCDATA)>
+<!ELEMENT minsize (#PCDATA)>
+<!ELEMENT loadondemand (#PCDATA)>
 
 <!-- Textarea Widget -->
 <!ENTITY % textarea_elements "(case|font|cutdown|multiline|align|colorcycle|
-                              value|template)">
+                               scroll|value|template)">
 <!ELEMENT textarea (%widget_common;|%textarea_elements;|%widgets;)*>
 <!ATTLIST textarea %common_attributes;>
 <!ELEMENT case (#PCDATA)>
@@ -55,6 +63,11 @@
 <!ELEMENT multiline (#PCDATA)>
 <!ELEMENT align (#PCDATA)>
 <!ELEMENT colorcycle (#PCDATA)>
+<!ATTLIST colorcycle start CDATA #IMPLIED
+                     end CDATA #IMPLIED
+                     steps CDATA #IMPLIED>
+<!ELEMENT scroll (#PCDATA)> <!-- Not yet working -->
+<!ATTLIST scroll direction (left|right|up|down)>
 <!ELEMENT value (#PCDATA)>
 <!ATTLIST value lang CDATA #IMPLIED>
 <!ELEMENT template (#PCDATA)>
@@ -72,8 +85,10 @@
 <!ATTLIST reflection axis CDATA "horizontal"
                      shear CDATA "0"
                      scale CDATA "100"
-                     length CDATA "100">
+                     length CDATA "100"
+                     spacing CDATA "0">
 <!ELEMENT grayscale (#PCDATA)>
+<!ELEMENT greyscale (#PCDATA)>
 <!ELEMENT filepattern (#PCDATA)>
 <!ATTLIST filepattern low CDATA "0"
                        high CDATA #REQUIRED
@@ -101,7 +116,8 @@
 <!ELEMENT line (#PCDATA)>
 <!ATTLIST line color CDATA "#000000"
                alpha CDATA "255"
-               width CDATA "1">
+               width CDATA "1"
+               style (solid) "solid">
 <!ELEMENT cornerradius (#PCDATA)>
 
 <!-- Statetype Widget -->
@@ -126,7 +142,7 @@
 
 <!-- Buttonlist Widget -->
 <!ENTITY % buttonlist_elements "layout|spacing|arrange|align|scrollstyle|
-                                wrapstyle|showarrow|buttonarea">
+                                wrapstyle|showarrow|buttonarea|drawfrombottom">
 <!ELEMENT buttonlist (%widget_common;|%buttonlist_elements;|%widgets;)*> <!-- statetype -->
 <!ATTLIST buttonlist %common_attributes;>
 <!ELEMENT layout (#PCDATA)>
@@ -136,6 +152,7 @@
 <!ELEMENT wrapstyle (#PCDATA)>
 <!ELEMENT showarrow (#PCDATA)>
 <!ELEMENT buttonarea (#PCDATA)>
+<!ELEMENT drawfrombottom (#PCDATA)>
 
 <!-- Buttontree Widget -->
 <!ELEMENT buttontree (%widget_common;|numlists|spacing|%widgets;)*> <!-- buttonlist -->
@@ -187,12 +204,13 @@
                 image CDATA #REQUIRED>
 
 <!-- Webbrowser Widget -->
-<!ELEMENT webbrowser (%widget_common;|url|zoom|background|updateinterval|
-                     %widgets;)*>
+<!ELEMENT webbrowser (%widget_common;|url|zoom|background|userstylesheet|
+                      updateinterval|%widgets;)*>
 <!ATTLIST webbrowser %common_attributes;>
 <!ELEMENT url (#PCDATA)>
 <!ELEMENT zoom (#PCDATA)>
 <!ELEMENT background (#PCDATA)>
 <!ATTLIST background color CDATA #REQUIRED
                      alpha CDATA #IMPLIED>
+<!ELEMENT userstylesheet (#PCDATA)> 
 <!ELEMENT updateinterval (#PCDATA)>
