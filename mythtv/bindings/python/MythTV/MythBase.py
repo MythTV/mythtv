@@ -1447,7 +1447,7 @@ class BEConnection( object ):
 
         # lock socket access
         with self._socklock:
-            signal.signal(signal.SIGALRM, alrm
+            signal.signal(signal.SIGALRM, alrm)
             # loop waiting for proper response
             while timerem >= 0:
                 # wait timeout for data to be received on the socket
