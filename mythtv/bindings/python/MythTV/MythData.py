@@ -1370,7 +1370,8 @@ class VideoGrabber( Grabber ):
                     'Runtime':'length',     'Season':'season',
                     'Episode':'episode',    'Seriesid':'inetref',
                     'Coverart':'coverfile', 'Fanart':'fanart',
-                    'Banner':'banner',      'Screenshot':'screenshot'}
+                    'Banner':'banner',      'Screenshot':'screenshot',
+                    'Tagline':'tagline'}
         dat = {}
         cast = ()
         genre = ()
