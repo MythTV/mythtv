@@ -1080,24 +1080,24 @@
         <imagetype name="backimg">
           <filename>ui/background.png</filename>
         </imagetype>
-    
-        <font name="medium" face="Droid Sans">
+
+        <fontdef name="medium" face="Droid Sans">
             <color>#FFFFFF</color>
             <pixelsize>26</pixelsize>
             <bold>yes</bold>
-        </font>
-    
-        <font name="large" face="Liberation Sans">
+        </fontdef>
+
+        <fontdef name="large" face="Liberation Sans">
              <color>#FFFFFF</color>
              <pixelsize>28</pixelsize>
              <bold>yes</bold>
-        </font>
-    
-        <font name="clock" face="Liberation Sans">
+        </fontdef>
+
+        <fontdef name="clock" face="Liberation Sans">
              <color>#FFFFFF</color>
              <pixelsize>26</pixelsize>
              <bold>yes</bold>
-        </font>
+        </fontdef>
     </window>
 
 </mythuitheme>
