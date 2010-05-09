@@ -180,12 +180,7 @@ bool MythUIButtonTree::UpdateList(MythUIButtonList *list, MythGenericTree *node)
         if (!childnode->IsVisible())
             continue;
 
-        MythUIButtonListItem *item = new MythUIButtonListItem(list,
-                                                        childnode->getString());
-        item->SetData(qVariantFromValue(childnode));
-
-        if (childnode->visibleChildCount() > 0)
-            item->setDrawArrow(true);
+        MythUIButtonListItem *item = childnode->CreateListButton(list);
 
         if (childnode == selectedNode)
             selectedItem = item;

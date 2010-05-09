@@ -11,6 +11,8 @@
 #include "mythexp.h"
 
 class SortableMythGenericTreeList;
+class MythUIButtonList;
+class MythUIButtonListItem;
 
 class MPUBLIC MythGenericTree
 {
@@ -102,6 +104,8 @@ class MPUBLIC MythGenericTree
 
     // only changes m_subnodes.  resort it if you want the others to change
     void MoveItemUpDown(MythGenericTree *item, bool flag);
+
+    virtual MythUIButtonListItem *CreateListButton(MythUIButtonList *list);
 
   private:
     void reorderSubnodes(void);

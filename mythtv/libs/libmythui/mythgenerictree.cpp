@@ -1,6 +1,7 @@
 
 // Mythui headers
 #include "mythgenerictree.h"
+#include "mythuibuttonlist.h"
 
 // Myth headers
 #include "mythverbose.h"
@@ -732,3 +733,13 @@ void MythGenericTree::SetVisible(bool visible)
         m_parent->DecVisibleCount();
 }
 
+MythUIButtonListItem *MythGenericTree::CreateListButton(MythUIButtonList *list)
+{
+    MythUIButtonListItem *item = new MythUIButtonListItem(list, getString());
+    item->SetData(qVariantFromValue(this));
+
+    if (visibleChildCount() > 0)
+        item->setDrawArrow(true);
+
+    return item;
+}
