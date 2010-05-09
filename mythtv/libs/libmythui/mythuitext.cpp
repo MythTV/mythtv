@@ -590,8 +590,8 @@ bool MythUIText::ParseElement(
         SetArea(parseRect(element));
         m_OrigDisplayRect = m_Area;
     }
-    else if (element.tagName() == "altarea")
-        m_AltDisplayRect = parseRect(element);
+//    else if (element.tagName() == "altarea") // Unused, but maybe in future?
+//        m_AltDisplayRect = parseRect(element);
     else if (element.tagName() == "font")
     {
         QString fontname = getFirstText(element);
@@ -671,8 +671,7 @@ bool MythUIText::ParseElement(
         else
             m_colorCycling = false;
 
-        if (!element.attribute("disable").isEmpty())
-            m_colorCycling = false;
+        m_colorCycling = parseBool(element.attribute("disable"));
     }
     else if (element.tagName() == "scroll")
     {
