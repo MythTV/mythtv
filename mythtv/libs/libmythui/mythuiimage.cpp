@@ -977,6 +977,8 @@ bool MythUIImage::ParseElement(
     }
     else if (element.tagName() == "gradient")
     {
+        VERBOSE(VB_GENERAL, LOC_WARN + "Use of gradient in an imagetype is "
+                            "deprecated, see shape gradients instead.");
         m_gradient = true;
         m_gradientStart = QColor(element.attribute("start", "#505050"));
         m_gradientEnd = QColor(element.attribute("end", "#000000"));
