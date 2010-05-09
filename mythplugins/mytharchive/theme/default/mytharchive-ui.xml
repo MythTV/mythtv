@@ -77,7 +77,6 @@ Common MythArchive window definitions
             <value>Free Space:</value>
         </textarea>
         <textarea name="freespace_text" from="basetextarea">
-            <context>1</context>
             <area>215,280,200,50</area>
             <font>description</font>
             <value>0.00Gb</value>

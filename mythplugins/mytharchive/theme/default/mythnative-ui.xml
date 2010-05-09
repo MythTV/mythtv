@@ -105,7 +105,6 @@ MythTV Archive GUI theme
         </textarea>
 
         <textarea name="filesize" from="basetextarea">
-            <context>2</context>
             <area>550,505,100,40</area>
             <font>detail</font>
             <align>right</align>
