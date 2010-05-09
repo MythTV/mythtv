@@ -219,7 +219,7 @@ void XMLParseBase::ParseChildren(const QString &filename,
             if (parent->ParseElement(filename, info, showWarnings))
             {
             }
-            else if (type == "font")
+            else if (type == "font" || type == "fontdef")
             {
                 bool global = (GetGlobalObjectStore() == parent);
                 MythFontProperties *font = MythFontProperties::ParseFromXml(
@@ -405,7 +405,7 @@ MythUIType *XMLParseBase::ParseUIType(
             if (uitype->ParseElement(filename, info, showWarnings))
             {
             }
-            else if (info.tagName() == "font")
+            else if (info.tagName() == "font" || info.tagName() == "fontdef")
             {
                 bool global = (GetGlobalObjectStore() == parent);
                 MythFontProperties *font = MythFontProperties::ParseFromXml(
@@ -590,7 +590,7 @@ bool XMLParseBase::doLoad(const QString &windowname,
             if (!onlywindows)
             {
                 QString type = e.tagName();
-                if (type == "font")
+                if (type == "font" || type == "fontdef")
                 {
                     bool global = (GetGlobalObjectStore() == parent);
                     MythFontProperties *font = MythFontProperties::ParseFromXml(

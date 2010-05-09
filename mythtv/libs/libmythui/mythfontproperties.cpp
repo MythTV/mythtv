@@ -140,6 +140,10 @@ MythFontProperties *MythFontProperties::ParseFromXml(
     MythFontProperties *newFont = new MythFontProperties();
     newFont->Freeze();
 
+    if (element.tagName() == "font")
+        VERBOSE(VB_GENERAL, LOC_WARN + "Use of 'font' is deprecated in favour "
+                                       "of 'fontdef'");
+    
     QString name = element.attribute("name", "");
     if (name.isEmpty())
     {
