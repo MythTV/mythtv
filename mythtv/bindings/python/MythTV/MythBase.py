@@ -14,6 +14,7 @@ import socket
 import sys
 import locale
 import weakref
+import signal
 import xml.etree.cElementTree as etree
 from datetime import datetime
 from time import sleep, time, mktime
@@ -1438,13 +1439,19 @@ class BEConnection( object ):
             created. If 'data' is None, the method will return any events
             in the receive buffer.
         """
+
+        def alrm():
+            raise MythBEError('Socket Timeout Reached')
+
         # return if not connected
         if not self.connected:
             return u''
 
         # pull default timeout
         if timeout is None:
-            timeout = self.timeout
+            timerem = self.timeout
+        else:
+            timerem = timeout
 
         # send command string
         if data is not None:
@@ -1452,18 +1459,27 @@ class BEConnection( object ):
 
         # lock socket access
         with self._socklock:
+            signal.signal(signal.SIGALRM, alrm
             # loop waiting for proper response
-            while True:
+            while timerem >= 0:
                 # wait timeout for data to be received on the socket
+                tic = time()
                 if len(select([self.socket],[],[], timeout)[0]) == 0:
                     # no data, return
                     return u''
+                timerem -= time()-tic
 
                 try:
                     # pull available socket data
+                    signal.alarm(int(timerem)+1)
                     event = self._recv()
+                    signal.alarm(0)
                 except ValueError:
                     # header read failed
+                    signal.alarm(0)
+                    return u''
+                except MythBEError:
+                    # timeout reached, alarm triggered
                     return u''
 
                 # convert to unicode
