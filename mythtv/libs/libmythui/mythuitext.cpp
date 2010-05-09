@@ -105,6 +105,45 @@ void MythUIText::SetText(const QString &text)
     SetRedraw();
 }
 
+void MythUIText::SetTextFromMap(QHash<QString, QString> &map)
+{
+    if (!IsVisible())
+        return;
+
+    if (map.contains(objectName()))
+    {
+        QString newText = GetTemplateText();
+        if (newText.isEmpty())
+            newText = GetDefaultText();
+        QRegExp regexp("%(\\|(.))?([^\\|]+)(\\|(.))?%");
+        regexp.setMinimal(true);
+        if (newText.contains(regexp))
+        {
+            int pos = 0;
+            QString tempString = newText;
+            while ((pos = regexp.indexIn(newText, pos)) != -1)
+            {
+                QString key = regexp.cap(3).toLower().trimmed();
+                QString replacement;
+                if (!map.value(key).isEmpty())
+                {
+                    replacement = QString("%1%2%3")
+                                            .arg(regexp.cap(2))
+                                            .arg(map.value(key))
+                                            .arg(regexp.cap(5));
+                }
+                tempString.replace(regexp.cap(0), replacement);
+                pos += regexp.matchedLength();
+            }
+            newText = tempString;
+        }
+        else
+            newText = map.value(objectName());
+
+        SetText(newText);
+    }
+}
+
 QString MythUIText::GetText(void) const
 {
     return m_Message;
