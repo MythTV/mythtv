@@ -4,7 +4,7 @@
 <!ENTITY % widgets "(textarea|imagetype|statetype|button|buttonlist|buttontree|
                     textedit|checkbox|spinbox|progressbar|clock|webbrowser|
                     shape|guidegrid)" >
-<!ENTITY % widget_common "(area|position|alpha)" >
+<!ENTITY % widget_common "(area|position|alpha|helptext)" >
 
 <!-- MythUI Theme Root -->
 <!ELEMENT mythuitheme (window|fontdef|%widgets;)*>
@@ -36,10 +36,12 @@
 <!ELEMENT window (%widget_common;|fontdef|%widgets;)*>
 <!ATTLIST window %common_attributes;>
 
-<!-- Generic Elements -->
+<!-- Elements common to all widgets -->
 <!ELEMENT area (#PCDATA)>
 <!ELEMENT position (#PCDATA)>
 <!ELEMENT alpha (#PCDATA)>
+<!ELEMENT helptext  (#PCDATA)>
+<!ATTLIST helptext lang CDATA #IMPLIED>
 
 <!-- Textarea Widget -->
 <!ENTITY % textarea_elements "(case|font|cutdown|multiline|align|colorcycle|
@@ -56,6 +58,7 @@
 <!ELEMENT value (#PCDATA)>
 <!ATTLIST value lang CDATA #IMPLIED>
 <!ELEMENT template (#PCDATA)>
+<!ATTLIST template type CDATA #IMPLIED>
 
 <!-- Imagetype Widget -->
 <!ELEMENT imagetype (%widget_common;|filename|alpha|preserveaspect|crop|
@@ -148,7 +151,7 @@
 <!ATTLIST checkbox %common_attributes;>
 
 <!-- Spinbox Widget -->
-<!ELEMENT spinbox (%widget_common;|%buttonlist_elements;|%widgets;)*> <!-- statetype -->
+<!ELEMENT spinbox (%widget_common;|%buttonlist_elements;|template|%widgets;)*> <!-- statetype -->
 <!ATTLIST spinbox %common_attributes;>
 
 <!-- Progressbar Widget -->
