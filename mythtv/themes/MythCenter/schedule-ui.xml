@@ -123,7 +123,6 @@
             <area>670,15,100,60</area>
             <align>right,vcenter</align>
             <format>%TIME%</format>
-            <secondflash>yes</secondflash>
         </clock>
 
         <imagetype name="channelicon">
@@ -577,7 +576,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>15,50,770,332</area>
+            <area>15,50,770,342</area>
         </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">
@@ -586,7 +585,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <imagetype name="icon">
-                        <area>0,0,25,25</area>
+                        <area>10,0,25,25</area>
                         <preserveaspect>true</preserveaspect>
                     </imagetype>
                     <statetype name="status">
@@ -599,7 +598,7 @@
                         <area>120,1,200,24</area>
                     </textarea>
                     <textarea name="name" from="channum">
-                        <area>330,1,300,24</area>
+                        <area>330,1,380,24</area>
                     </textarea>
                     <textarea name="priority" from="channum">
                         <area>720,1,30,24</area>
@@ -719,7 +718,6 @@
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>3,-2,755,30</area>
-                        <font>basesmallbold</font>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
@@ -1231,7 +1229,7 @@
         </textarea>
 
         <shape name="list_background" from="basebackground">
-            <area>15,55,770,330</area>
+            <area>15,55,770,350</area>
         </shape>
 
         <textarea name="curview" from="basetextarea">
@@ -1273,10 +1271,10 @@
                 <state name="selectedinactive" from="active" />
             </statetype>
             <statetype name="upscrollarrow">
-                <position>700,330</position>
+                <position>700,350</position>
             </statetype>
             <statetype name="downscrollarrow">
-                <position>730,330</position>
+                <position>730,350</position>
             </statetype>
         </buttonlist>
 

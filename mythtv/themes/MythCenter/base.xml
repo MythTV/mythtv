@@ -220,7 +220,7 @@
     </buttonlist>
 
 
-    <!-- Base definition of a buttonlist in wide configuration -->
+    <!-- Base definition of a buttonlist -->
     <buttonlist name="basebuttonlist2">
         <area>0,0,760,305</area>
         <layout>vertical</layout>
@@ -231,7 +231,7 @@
             <area>0,0,760,25</area>
             <state name="active">
                 <textarea name="buttontext">
-                    <area>1,1,730,24</area>
+                    <area>2,0,730,25</area>
                     <font>basesmall</font>
                     <font state="disabled">basesmallgrey</font>
                     <font state="error">basesmallyellow</font>
@@ -243,7 +243,7 @@
             </state>
             <state name="selectedactive" from="active">
                 <shape name="selectbar">
-                    <area>5,-4,750,29</area>
+                    <area>0,0,760,25</area>
                     <type>roundbox</type>
                     <line color="#00FF00" alpha="255" width="1" />
                     <fill color="#43b038" alpha="128" />
