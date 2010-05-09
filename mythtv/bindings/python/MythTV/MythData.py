@@ -1130,6 +1130,7 @@ class Video( DBDataWrite ):
             self.cast = self._Cast((self.intid,), self._db)
             self.genre = self._Genre((self.intid,), self._db)
             self.country = self._Country((self.intid,), self._db)
+            self.markup = self._Markup((self.intid,), self._db)
 
     def create(self, data=None):
         """Video.create(data=None) -> Video object"""
@@ -1154,6 +1155,7 @@ class Video( DBDataWrite ):
         self.cast = self._Cast((self.intid,), self._db)
         self.genre = self._Genre((self.intid,), self._db)
         self.country = self._Country((self.intid,), self._db)
+        self.markup = self._Markup((self.intid,), self._db)
         return self
 
     class _Cast( DBDataCRef ):

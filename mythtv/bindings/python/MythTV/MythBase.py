@@ -250,9 +250,16 @@ class QuickDictData( DictData ):
             self._field_order.append(key)
         self._data[key] = value
 
+    def __delitem__(self, key):
+        self._field_order.remove(key)
+        del self._data[key]
+
     def clear(self):
         self._field_order = []
         self._data.clear()
+
+    def copy(self):
+        return self.__class__(self.items())
 
 class DBData( DictData ):
     """
@@ -1403,8 +1410,7 @@ class BEConnection( object ):
         # loop until necessary data has been received
         while size - len(data) > 0:
             # wait for data on the socket
-            while len(select([self.socket],[],[], 0.001)[0]) == 0:
-                pass
+            select([self.socket],[],[])
             # append response to buffer
             data += self.socket.recv(size-len(data))
         return data
@@ -1629,8 +1635,12 @@ class BEEvent( BECache ):
         # must be done to retain hard reference
         self._events = self._listhandlers()
         for func in self._events:
+            self.registerevent(func)
+
+    def registerevent(self, func, regex=None):
+        if regex is None:
             regex = func()
-            self.be.registerevent(regex, func)
+        self.be.registerevent(regex, func)
 
 class XMLConnection( object ):
     """
