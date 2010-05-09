@@ -707,22 +707,9 @@ class Recorded( DBDataWrite ):
     _logmodule = 'Python Recorded'
 
     class _Cast( DBDataCRef ):
-        table = 'people'
-        rtable = 'recordedcredits'
-        t_ref = 'person'
-        t_add = ['name']
-        r_ref = 'person'
-        r_add = ['role']
-        w_field = ['chanid','starttime']
-        def __repr__(self):
-            if self.data is None:
-                self._fill()
-            if len(self.data) == 0:
-                return 'No cast'
-            cast = []
-            for member in self.data:
-                cast.append(member.name)
-            return ', '.join(cast).encode('utf-8')
+        _table = ['recordedcredits','people']
+        _ref = ['chanid','starttime']
+        _cref = ['person']
 
     class _Seek( DBDataRef, MARKUP ):
         table = 'recordedseek'
@@ -747,6 +734,12 @@ class Recorded( DBDataWrite ):
             self.cast = self._Cast(self._wheredat, self._db)
             self.seek = self._Seek(self._wheredat, self._db)
             self.markup = self._Markup(self._wheredat, self._db)
+
+    def _push(self):
+        DBDataWrite._push(self)
+        self.cast.commit()
+        self.seek.commit()
+        self.markup.commit()
 
     def create(self, data=None):
         """Recorded.create(data=None) -> Recorded object"""
@@ -1111,6 +1104,9 @@ class Video( DBDataWrite ):
         self.category = self._category_map[0][name]
         DBDataWrite._push(self)
         self.category = name
+        self.cast.commit()
+        self.genre.commit()
+        self.country.commit()
 
     def __repr__(self):
         return str(self).encode('utf-8')
@@ -1161,75 +1157,21 @@ class Video( DBDataWrite ):
         return self
 
     class _Cast( DBDataCRef ):
-        table = 'videocast'
-        rtable = 'videometadatacast'
-        t_ref = 'intid'
-        t_add = ['cast']
-        r_ref = 'idcast'
-        r_add = []
-        w_field = ['idvideo']
-        def __repr__(self):
-            if self.data is None:
-                self._fill()
-            if len(self.data) == 0:
-                return ''
-            cast = []
-            for member in self.data:
-                cast.append(member.cast)
-            return u', '.join(cast).encode('utf-8')
-        def add(self, member): DBDataCRef.add(self,(member,))
-        def delete(self, member): DBDataCRef.delete(self,(member,))
-        def clean(self):
-            for member in list(self):
-                self.delete(member.cast)
+        _table = ['videometadatacast','videocast']
+        _ref = ['idvideo']
+        _cref = ['idcast','intid']
 
     class _Genre( DBDataCRef ):
-        table = 'videogenre'
-        rtable = 'videometadatagenre'
-        t_ref = 'intid'
-        t_add = ['genre']
-        r_ref = 'idgenre'
-        r_add = []
-        w_field = ['idvideo']
-        def __repr__(self):
-            if self.data is None:
-                self._fill()
-            if len(self.data) == 0:
-                return ''
-            genre = []
-            for member in self.data:
-                genre.append(member.genre)
-            return ', '.join(genre).encode('utf-8')
-        def add(self, genre): DBDataCRef.add(self,(genre,))
-        def delete(self, genre): DBDataCRef.delete(self,(genre,))
-        def clean(self):
-            for member in list(self):
-                self.delete(member.genre)
+        _table = ['videometadatagenre','videogenre']
+        _ref = ['idvideo']
+        _cref = ['idgenre','intid']
 
     class _Country( DBDataCRef ):
-        table = 'videocountry'
-        rtable = 'videometadatacountry'
-        t_ref = 'intid'
-        t_add = ['country']
-        r_ref = 'idcountry'
-        r_add = []
-        w_field = ['idvideo']
-        def __repr__(self):
-            if self.data is None:
-                self._fill()
-            if len(self.data) == 0:
-                return ''
-            country = []
-            for member in self.data:
-                country.append(member.country)
-            return ', '.join(country).encode('utf-8')
-        def add(self, country): DBDataCRef.add(self,(country,))
-        def delete(self, country): DBDataCRef.delete(self,(country,))
-        def clean(self):
-            for member in list(self):
-                self.delete(member.country)
+        _table = ['videometadatacountry','videocountry']
+        _ref = ['idvideo']
+        _cref = ['idcountry','intid']
 
-    class _Markup( DBDataRef ):
+    class _Markup( DBDataRef, MARKUP ):
         table = 'filemarkup'
         wfield = ['filename',]
 

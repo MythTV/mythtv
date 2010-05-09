@@ -505,298 +505,286 @@ class DBDataRef( object ):
 
     Class for managing lists of referenced data, such as recordedmarkup
     Subclasses must provide:
-        table
+        _table
             Name of database table to be accessed
-        wfield
+        _ref
             list of fields for WHERE argument in lookup
-
-    Can be populated by supplying a tuple, matching the fields specified in wfield
     """
-    logmodule = 'Python DBDataRef'
+    class Data( QuickDictData ):
+        # this is the full list of matching entries
+        def _rehash(self, key=None):
+            if key is not None:
+                k = self._field_order[key]
+                v = self._data[k]
+                h = hash(v)
+                if k != h:
+                    del self._data[k]
+                    self._data[h] = v
+                    self._field_order[key] = h
+            else:
+                for key in range(len(self)):
+                    self._rehash(key)
+                    
+        def __xor__(self, other):
+            res = self.__class__(())
+            for k,v in self.items():
+                if k not in other:
+                    res[k] = v
+            for k,v in other.items():
+                if k not in self:
+                    res[k] = v
+            return res
 
-    class SubData( DictData ):
-        def _setDefs(self):
-            self.__dict__['_field_order'] = []
-            DictData._setDefs(self)
+        def __and__(self, other):
+            res = self.__class__(())
+            for k,v in self.items():
+                if k in other:
+                    res[k] = v
+            return res
+
+    class SubData( QuickDictData ):
+        # this is one matching entry
+        def __str__(self):
+            return str(self.items())
         def __repr__(self):
-            return str(tuple(self))
-        def __init__(self,data,fields):
-            self._setDefs()
-            self._field_order = fields
-            self._field_type = 'Pass'
-            self._data.update(self._process(data))
+            return str(self).encode('utf-8')
         def __hash__(self):
-            dat = self._data.copy()
-            keys = dat.keys()
-            keys.sort()
-            return hash(str([hash(dat[k]) for k in keys]))
-        def __cmp__(self, x):
-            return cmp(hash(self),hash(x))
+            return hash(str(self.values()))
 
-    def _setDefs(self):
-        self.data = None
-        self.hash = None
-        self.log = MythLog(self.logmodule, db=self.db)
-
+    def __str__(self):
+        return str(list(self))
     def __repr__(self):
-        if self.data is None:
-            self._fill()
-        return "<DBDataRef '%s' at %s>" % \
-                        (str(tuple(self.data)), hex(id(self)))
+        return str(self).encode('utf-8')
 
-    def __getitem__(self,index):
-        if self.data is None:
-            self._fill()
-        if index in range(-len(self.data),0)+range(len(self.data)):
-            return self.data[index]
-        else:
-            raise IndexError
+    def __getitem__(self, key):
+        self._populate()
+        return self._data[self._data._field_order[key]]
+
+    def __setitem__(self, key, value):
+        self._populate()
+        if key not in range(len(self._data)):
+            raise KeyError
+        self._data[self._data._field_order[key]] = \
+                    self.SubData(zip(self._datfields, list(value)))
+        self._data._rehash(key)
+
+    def __delitem__(self, key):
+        self._populate()
+        del self._data[self._data._field_order[key]]
 
     def __iter__(self):
-        self.field = 0
-        if self.data is None:
-            self._fill()
-        return self
+        self._populate()
+        return iter(self._data)
 
-    def next(self):
-        if self.field == len(self.data):
-            del self.field
-            raise StopIteration
-        self.field += 1
-        return self[self.field-1]
+    def __init__(self, where, db=None):
+        self._db = DBCache(db)
+        self._refdat = where
 
-    def __init__(self,where,db=None):
-        self.db = DBCache(db)
-        self._setDefs()
-        self.where = tuple(where)
-        self.dfield = list(self.db.tablefields[self.table])
-        for field in self.wfield:
-            del self.dfield[self.dfield.index(field)]
+        fields = list(self._db.tablefields[self._table])
+        for f in self._ref:
+            if f in fields:
+                fields.remove(f)
+        self._datfields = fields
+        self._data = None
 
-    def _fill(self):
-        self.data = []
-        self.hash = []
-        fields = ','.join(self.dfield)
-        where = ' AND '.join('%s=%%s' % d for d in self.wfield)
-        c = self.db.cursor(self.log)
-        c.execute("""SELECT %s FROM %s WHERE %s""" \
-                            % (fields, self.table, where), self.where)
-        for entry in c.fetchall():
-            self.data.append(self.SubData(entry, self.dfield))
-            self.hash.append(hash(self.data[-1]))
-
-    def add(self, data):
-        """obj.add(data) -> None"""
-        if self.data is None:
-            self._fill()
-        if len(data) != len(self.wfield):
+    def _populate(self, force=False):
+        if not ((self._data is None) or force):
             return
-
-        dat = self.SubData(data, self.dfield)
-        if hash(dat) in self.hash:
-            return
-
-        c = self.db.cursor(self.log)
-        fields = ', '.join(self.wfield+self.dfield)
-        format = ', '.join(['%s' for d in fields])
-        c.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
-                                % (self.table, fields, format),
-                                self.where+list(data))
+        self._data = self.Data(())
+        c = self._db.cursor()
+        c.execute("""SELECT %s FROM %s WHERE %s""" % \
+                         (','.join(self._datfields),
+                          self._table,
+                          ' AND '.join(['%s=%%s' % f for f in self._ref])),
+                    self._refdat)
+        for row in c.fetchall():
+            sd = self.SubData(zip(self._datfields, row))
+            self._data[hash(sd)] = sd
         c.close()
+        self._origdata = self._data.copy()
 
-        self.data.append(dat)
-        self.hash.append(hash(dat))
+    def revert(self):
+        """Delete all local changes to database."""
+        self._populate()
+        self._data = self._origdata.copy()
 
-    def delete(self, index):
-        """obj.delete(data) -> None"""
-        if self.data is None:
-            self._fill()
-        if index not in xrange(len(self.data)):
+    def commit(self):
+        """Push all local changes to database."""
+        if self._data is None:
             return
+        # push changes to database
+        self._data._rehash()
+        diff = self._data^self._origdata
+        if len(diff) == 0:
+            return
+        c = self._db.cursor()
+        fields = list(self._ref)+list(self._datfields)
 
-        where = ' AND '.join(['%s=%%s' % d for d in self.wfield+self.dfield])
-        values = self.where+list(self.data[index])
-        c = self.db.cursor(self.log)
-        c.execute("""DELETE FROM %s WHERE %s""" \
-                            % (self.table, where), values)
+        # remove old entries
+        for v in (self._origdata&diff):
+            data = list(self._refdat)+v.values()
+            wf = []
+            for i in range(len(data)):
+                if data[i] is None:
+                    wf.append('%s IS %%s' % fields[i])
+                else:
+                    wf.append('%s=%%s' % fields[i])
+            c.execute("""DELETE FROM %s WHERE %s""" % \
+                        (self._table, ' AND '.join(wf)), data)
+
+        # add new entries
+        data = []
+        for v in (self._data&diff):
+            # add new entries
+            data.append(list(self._refdat)+v.values())
+        if len(data) > 0:
+            c.executemany("""INSERT INTO %s (%s) VALUES(%s)""" % \
+                            (self._table,
+                             ','.join(fields),
+                             ','.join(['%s' for a in fields])), data)
         c.close()
+        self._origdata = self._data.copy()
 
-        del self.data[index]
-        del self.hash[index]
+    def add(self, *data):
+        """Adds a list of data matching those specified in '_datfields'."""
+        # add new entry to local copy
+        self._populate()
+        sd = self.SubData(zip(self._datfields, data))
+        self._data[hash(sd)] = sd
 
+    def delete(self, *data):
+        """Deletes an entry matching the provided list of data."""
+        # delete entry from local copy
+        self._populate()
+        sd = self.SubData(zip(self._datfields, data))
+        del self._data[hash(sd)]
 
-class DBDataCRef( object ):
+    def clear(self):
+        """Remove all entries and commit."""
+        # clear all and commit
+        self._populate()
+        self._data.clear()
+        self.commit()
+
+class DBDataCRef( DBDataRef ):
     """
     DBDataRef.__init__(where, db=None) --> DBDataRef object
 
-    Class for managing lists of crossreferenced data, such as recordedcredits
+    Class for managing lists of referenced data, such as recordedmarkup
     Subclasses must provide:
-        table   - primary data table
-        rtable  - cross reference table
-        t_ref   - primary table field to align with cross reference table
-        r_ref   - cross reference table field to align with primary table
-        t_add   - list of fields for data stored in primary table
-        r_add   - list of fields for data stored in cross reference table
-        w_field - list of fields for WHERE argument in lookup
+        _table
+            List of database tables to be accessed
+        _ref
+            List of fields for WHERE argument in lookup
+        _cref
+            2-list of fields used for cross reference
     """
-    logmodule = 'Python DBDataCRef'
 
-    class SubData( DictData ):
-        def _setDefs(self):
-            self.__dict__['_field_order'] = []
-            DictData._setDefs(self)
-        def __repr__(self):
-            return str(tuple(self._data.values()))
-        def __init__(self,data,fields):
-            self._setDefs()
-            self._field_order = ['cross']+fields
-            self._field_type = 'Pass'
-            self._data.update(self._process(data))
-        def __hash__(self):
-            dat = self._data.copy()
-            del dat['cross']
-            keys = dat.keys()
-            keys.sort()
-            return hash(str([hash(dat[k]) for k in keys]))
-        def __cmp__(self, x):
-            return cmp(hash(self),hash(x))
+    class SubData( DBDataRef.SubData ):
+        _localvars = DBDataRef.SubData._localvars+['_cref']
 
-    def _setDefs(self):
-        self.data = None
-        self.hash = None
-        self.log = MythLog(self.logmodule, db=self.db)
+    def __init__(self, where, db=None):
+        self._db = DBCache(db)
+        self._refdat = list(where)
 
-    def __repr__(self):
-        if self.data is None:
-            self._fill()
-        return "<DBDataCRef '%s' at %s>" % \
-                        (str(tuple(self.data)), hex(id(self)))
+        rfields = list(self._db.tablefields[self._table[0]])
+        crfields = list(self._db.tablefields[self._table[1]])
+        for f in self._ref+self._cref[:1]:
+            if f in rfields:
+                rfields.remove(f)
+        if self._cref[-1] in crfields:
+            crfields.remove(self._cref[-1])
 
-    def __getitem__(self,index):
-        if self.data is None:
-            self._fill()
-        if index in range(-len(self.data),0)+range(len(self.data)):
-            return self.data[index]
-        else:
-            raise IndexError
+        self._rdatfields = rfields
+        self._crdatfields = crfields
+        self._datfields = crfields+rfields
+        self._data = None
 
-    def __iter__(self):
-        self.field = 0
-        if self.data is None:
-            self._fill()
-        return self
-
-    def next(self):
-        if self.field == len(self.data):
-            del self.field
-            raise StopIteration
-        self.field += 1
-        return self[self.field-1]
-
-    def __init__(self,where,db=None):
-        self.db = DBCache(db)
-        self._setDefs()
-        self.w_dat = tuple(where)
-
-    def _fill(self):
-        self.data = []
-        self.hash = []
-        fields = ','.join([self.table+'.'+self.t_ref]+self.t_add+self.r_add)
-        where = ' AND '.join('%s=%%s' % d for d in self.w_field)
-        join = '%s.%s=%s.%s' % (self.table,self.t_ref,self.rtable,self.r_ref)
-        c = self.db.cursor(self.log)
-        c.execute("""SELECT %s FROM %s JOIN %s ON %s WHERE %s"""\
-                            % (fields, self.table, self.rtable, join, where),
-                            self.w_dat)
-        for entry in c.fetchall():
-            self.data.append(self.SubData(entry, self.t_add+self.r_add))
-            self.hash.append(hash(self.data[-1]))
-
-    def _tdata(self, sub):
-        return tuple([sub[key] for key in self.t_add])
-
-    def _rdata(self, sub):
-        return tuple([sub[key] for key in self.r_add+['cross']]+list(self.w_dat))
-
-    def _search(self, sub):
-        for i in xrange(len(self.data)):
-            if self.data[i] == sub:
-                return i
-
-    def add(self,data):
-        """obj.add(data) -> None"""
-        if self.data is None:
-            self._fill()
-        if len(data) != len(self.t_add+self.r_add):
+    def _populate(self, force=False):
+        if not ((self._data is None) or force):
             return
+        self._data = self.Data(())
+        self._crdata = {}
+        datfields = self._datfields
+        reffield = '%s.%s' % (self._table[1],self._cref[-1])
 
-        # check for existing
-        dat = self.SubData([0]+list(data),self.t_add+self.r_add)
-        if dat in self.data:
-            return
+        c = self._db.cursor()
+        c.execute("""SELECT %s FROM %s JOIN %s ON %s WHERE %s""" % \
+                        (','.join(datfields+[reffield]),
+                         self._table[0],
+                         self._table[1],
+                         '%s.%s=%s.%s' % \
+                                (self._table[0], self._cref[0],
+                                 self._table[1], self._cref[-1]),
+                         ' AND '.join(['%s=%%s' % f for f in self._ref])),
+                    self._refdat)
 
-        tdata = self._tdata(dat)
+        for row in c.fetchall():
+            sd = self.SubData(zip(datfields, row[:-1]))
+            sd._cref = row[-1]
+            self._data[hash(sd)] = sd
 
-        c = self.db.cursor(self.log)
-        # search for existing table data, add if needed
-        where = ' AND '.join('%s=%%s' % d for d in self.t_add)
-        if c.execute("""SELECT %s FROM %s WHERE %s""" \
-                                    % (self.t_ref, self.table, where),
-                                    self._tdata(dat)) > 0:
-            id = c.fetchone()[0]
-        else:
-            fields = ', '.join(self.t_add)
-            format = ', '.join(['%s' for d in self.t_add])
-            c.execute("""INSERT INTO %s (%s) VALUES(%s)""" \
-                        % (self.table, fields, format), self._tdata(dat))
-            id = c.lastrowid
-
-        dat = self.SubData([id]+list(data),self.t_add+self.r_add)
-
-        # double check for existing
-        fields = self.r_add+[self.r_ref]+self.w_field
-        where = ' AND '.join('%s=%%s' % d for d in fields)
-        if c.execute("""SELECT * FROM %s WHERE %s""" % (self.rtable, where),
-                                                    self._rdata(dat)) > 0:
-            return
-
-        # add cross reference
-        fields = ', '.join(self.r_add+[self.r_ref]+self.w_field)
-        format = ', '.join(['%s' for d in fields.split(', ')])
-        c.execute("""INSERT INTO %s (%s) VALUES(%s)"""\
-                            % (self.rtable, fields, format), self._rdata(dat))
         c.close()
+        self._origdata = self._data.copy()
 
-        # add local entry
-        self.data.append(dat)
-
-    def delete(self,data):
-        """obj.delete(data) -> None"""
-        if self.data is None:
-            self._fill()
-        # check for local entry
-        dat = self.SubData([0]+list(data),self.t_add+self.r_add)
-        if dat not in self.data:
+    def commit(self):
+        if self._data is None:
             return
-        # remove local entry
-        index = self._search(dat)
-        dat = self.data.pop(index)
-        del self.hash[index]
-        
-        # remove database cross reference
-        fields = self.r_add+[self.r_ref]+self.w_field
-        where = ' AND '.join('%s=%%s' % d for d in fields)
-        c = self.db.cursor(self.log)
-        c.execute("""DELETE FROM %s WHERE %s""" % (self.rtable, where),
-                                                    self._rdata(dat))
+        # push changes to database
+        self._data._rehash()
+        diff = self._data^self._origdata
+        if len(diff) == 0:
+            return
+        c = self._db.cursor()
 
-        # remove primary entry if unused
-        if c.execute("""SELECT %s FROM %s WHERE %s=%%s""" \
-                                % (self.r_ref, self.rtable, self.r_ref),
-                                dat.cross) == 0:
-            c.execute("""DELETE FROM %s WHERE %s=%%s""" \
-                                % (self.table, self.t_ref), dat.cross)
-        c.close()
+        # add new cross-references
+        newdata = self._data&diff
+        for d in newdata:
+            data = [d[a] for a in self._crdatfields]
+            fields = self._crdatfields
+            count = c.execute("""SELECT %s FROM %s WHERE %s""" % \
+                        (self._cref[-1], self._table[1],
+                         ' AND '.join(['%s=%%s' % f for f in fields])),
+                    data)
+            if count == 1:
+                # match found
+                d._cref = c.fetchone()[0]
+            else:
+                c.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
+                        (self._table[1],
+                         ','.join(self._crdatfields),
+                         ','.join(['%s' for a in data])),
+                    data)
+                d._cref = c.lastrowid
+        # add new references
+        for d in newdata:
+            data = [d[a] for a in self._rdatfields]+[d._cref]+self._refdat
+            fields = self._rdatfields+self._cref[:1]+self._ref
+            c.execute("""INSERT INTO %s (%s) VALUES(%s)""" % \
+                        (self._table[0], 
+                         ','.join(fields),
+                         ','.join(['%s' for a in data])),
+                    data)
+
+        # remove old references
+        olddata = self._origdata&diff
+        crefs = [d._cref for d in olddata]
+        for d in olddata:
+            data = [d[a] for a in self._rdatfields]+[d._cref]+self._refdat
+            fields = self._rdatfields+self._cref[:1]+self._ref
+            c.execute("""DELETE FROM %s WHERE %s""" % \
+                        (self._table[0],
+                         ' AND '.join(['%s=%%s' % f for f in fields])),
+                    data)
+        # remove unused cross-references
+        for cr in crefs:
+            c.execute("""SELECT COUNT(1) FROM %s WHERE %s=%%s""" % \
+                        (self._table[0], self._cref[0]), cr)
+            if c.fetchone()[0] == 0:
+                c.execute("""DELETE FROM %s WHERE %s=%%s""" % \
+                        (self._table[1], self._cref[-1]), cr)
+
+        self._origdata = self._data.copy()
 
 class LoggedCursor( MySQLdb.cursors.Cursor ):
     """
