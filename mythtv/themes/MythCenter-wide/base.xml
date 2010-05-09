@@ -2,139 +2,139 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="Droid Sans">
+    <fontdef name="basesmall" face="Droid Sans">
         <pixelsize>22</pixelsize>
         <color>#EEEEEE</color>
         <bold>yes</bold>
-    </font>
+    </fontdef>
   
-    <font name="basesmallbold" from="basesmall">
+    <fontdef name="basesmallbold" from="basesmall">
         <bold>yes</bold>
-    </font>
+    </fontdef>
 
-    <font name="small" from="basesmall">
+    <fontdef name="small" from="basesmall">
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>2,2</shadowoffset>
         <shadowalpha>0</shadowalpha>
-    </font>
+    </fontdef>
 
-    <font name="basemedium" from="basesmall" face="Liberation Sans">
+    <fontdef name="basemedium" from="basesmall" face="Liberation Sans">
         <pixelsize>26</pixelsize>
-    </font>
+    </fontdef>
 
-    <font name="basemediumbold" from="basemedium">
+    <fontdef name="basemediumbold" from="basemedium">
         <pixelsize>26</pixelsize>
         <bold>yes</bold>
-    </font>
+    </fontdef>
 
-    <font name="baselarge" from="basemedium">
+    <fontdef name="baselarge" from="basemedium">
         <pixelsize>30</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
-    </font>
+    </fontdef>
 
-    <font name="baselargenormal" from="baselarge">
+    <fontdef name="baselargenormal" from="baselarge">
         <bold>no</bold>
-    </font>
+    </fontdef>
 
-    <font name="baseextralarge" from="baselarge">
+    <fontdef name="baseextralarge" from="baselarge">
         <pixelsize>34</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
-    </font>
+    </fontdef>
 
     <!-- State variations on small font -->
-    <font name="basesmall_normal_selected" from="basesmallbold">
+    <fontdef name="basesmall_normal_selected" from="basesmallbold">
         <color>#FFFFFF</color>
-    </font>
-    <font name="basesmall_normal" from="basesmall">
+    </fontdef>
+    <fontdef name="basesmall_normal" from="basesmall">
         <color>#9999cc</color>
-    </font>
-    <font name="basesmall_normal_inactive" from="basesmall">
+    </fontdef>
+    <fontdef name="basesmall_normal_inactive" from="basesmall">
         <color>#666666</color>
-    </font>
-    <font name="basesmall_warning_selected" from="basesmallbold">
+    </fontdef>
+    <fontdef name="basesmall_warning_selected" from="basesmallbold">
         <color>#dddd44</color>
-    </font>
-    <font name="basesmall_warning" from="basesmall">
+    </fontdef>
+    <fontdef name="basesmall_warning" from="basesmall">
         <color>#bbbb33</color>
-    </font>
-    <font name="basesmall_favourite_selected" from="basesmallbold">
+    </fontdef>
+    <fontdef name="basesmall_favourite_selected" from="basesmallbold">
         <color>#dddd44</color>
-    </font>
-    <font name="basesmall_favourite" from="basesmall">
+    </fontdef>
+    <fontdef name="basesmall_favourite" from="basesmall">
         <color>#bbbb33</color>
-    </font>
-    <font name="basesmall_favourite_unavailable" from="basesmall"> 
+    </fontdef>
+    <fontdef name="basesmall_favourite_unavailable" from="basesmall">
         <color>#9999cc</color>
-    </font>
-    <font name="basesmall_error_selected" from="basesmallbold">
+    </fontdef>
+    <fontdef name="basesmall_error_selected" from="basesmallbold">
         <color>#900800</color>
-    </font>
-    <font name="basesmall_error" from="basesmall">
+    </fontdef>
+    <fontdef name="basesmall_error" from="basesmall">
         <color>#700700</color>
-    </font>
-    <font name="basesmall_disabled_selected" from="basesmallbold">
+    </fontdef>
+    <fontdef name="basesmall_disabled_selected" from="basesmallbold">
         <color>#888888</color>
-    </font>
-    <font name="basesmall_disabled" from="basesmall">
+    </fontdef>
+    <fontdef name="basesmall_disabled" from="basesmall">
         <color>#666666</color>
-    </font>
-    <font name="basesmall_running_selected" from="basesmallbold">
+    </fontdef>
+    <fontdef name="basesmall_running_selected" from="basesmallbold">
         <color>#00FF00</color>
-    </font>
-    <font name="basesmall_running" from="basesmall">
+    </fontdef>
+    <fontdef name="basesmall_running" from="basesmall">
         <color>#11DD11</color>
-    </font>
-    <font name="basesmall_textedit" from="basesmall">
+    </fontdef>
+    <fontdef name="basesmall_textedit" from="basesmall">
         <color>#000000</color>
-    </font>
-    <font name="basesmall_normal_button" from="basesmallbold">
+    </fontdef>
+    <fontdef name="basesmall_normal_button" from="basesmallbold">
         <color>#FFFFFF</color>
-    </font>
-    <font name="basesmall_selected_button" from="basesmallbold">
+    </fontdef>
+    <fontdef name="basesmall_selected_button" from="basesmallbold">
         <color>#FFFFFF</color>
-    </font>
-    <font name="basesmall_disabled_button" from="basesmallbold">
+    </fontdef>
+    <fontdef name="basesmall_disabled_button" from="basesmallbold">
         <color>#9999cc</color>
-    </font>
+    </fontdef>
     <!-- State variations on medium font -->
-    <font name="basemedium_normal" from="basemediumbold">
+    <fontdef name="basemedium_normal" from="basemediumbold">
         <color>#9999cc</color>
-    </font>
-    <font name="basemedium_normal_selected" from="basemedium">
+    </fontdef>
+    <fontdef name="basemedium_normal_selected" from="basemedium">
         <color>#FFFFFF</color>
-    </font>
-    <font name="basemedium_disabled" from="basemedium">
+    </fontdef>
+    <fontdef name="basemedium_disabled" from="basemedium">
         <color>#666666</color>
-    </font>
-    <font name="basemedium_highlight" from="basemediumbold">
+    </fontdef>
+    <fontdef name="basemedium_highlight" from="basemediumbold">
         <color>#FFFF33</color>
-    </font>
-    <font name="basemedium_normal_button" from="basemediumbold">
+    </fontdef>
+    <fontdef name="basemedium_normal_button" from="basemediumbold">
         <color>#FFFFFF</color>
-    </font>
-    <font name="basemedium_selected_button" from="basemediumbold">
+    </fontdef>
+    <fontdef name="basemedium_selected_button" from="basemediumbold">
         <color>#FFFFFF</color>
-    </font>
-    <font name="basemedium_disabled_button" from="basemediumbold">
+    </fontdef>
+    <fontdef name="basemedium_disabled_button" from="basemediumbold">
         <color>#9999cc</color>
-    </font>
+    </fontdef>
 
     <!-- Fonts for specific screens -->
-    <font name="deleterecordings_filesize_font" from="basemedium">
+    <fontdef name="deleterecordings_filesize_font" from="basemedium">
         <pixelsize>40</pixelsize>
         <color>#bbbb33</color>
         <bold>yes</bold>
-    </font>
-    <font name="baseguide" from="basesmall">
+    </fontdef>
+    <fontdef name="baseguide" from="basesmall">
         <pixelsize>20</pixelsize>
         <bold>no</bold>
-    </font>
+    </fontdef>
 
     <!-- Base definition of a shape used as a background on many screens -->
     <shape name="basebackground">

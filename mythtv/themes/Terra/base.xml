@@ -2,89 +2,83 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="Arial">
+    <fontdef name="basesmall" face="Liberation Sans">
         <pixelsize>19</pixelsize>
         <color>#DDDDDD</color>
-    </font>
+    </fontdef>
 
-    <font name="basemedium" from="basesmall">
+    <fontdef name="basemedium" from="basesmall">
         <pixelsize>22</pixelsize>
-    </font>
+    </fontdef>
 
-    <font name="baselarge" from="basesmall">
+    <fontdef name="baselarge" from="basesmall">
         <pixelsize>29</pixelsize>
-    </font>
+    </fontdef>
 
-    <font name="baseextralarge" from="basesmall">
+    <fontdef name="baseextralarge" from="basesmall">
         <pixelsize>31</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
-    </font>
+    </fontdef>
 
     <!-- Colour variations on base fonts -->
-    <font name="basesmallbrown" from="basesmall">
+    <fontdef name="basesmallbrown" from="basesmall">
         <color>#484537</color>
-<!--        <outlinecolor>#6C6753</outlinecolor>
-        <outlinesize>1</outlinesize>-->
-    </font>
+    </fontdef>
 
-    <font name="basesmallgrey" from="basesmall">
+    <fontdef name="basesmallgrey" from="basesmall">
         <color>#999999</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallpurple" from="basesmall">
+    <fontdef name="basesmallpurple" from="basesmall">
         <color>#9999cc</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallblack" from="basesmall">
+    <fontdef name="basesmallblack" from="basesmall">
         <color>#000000</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallyellow" from="basesmall">
+    <fontdef name="basesmallyellow" from="basesmall">
         <color>#FFFF33</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallgreen" from="basesmall">
+    <fontdef name="basesmallgreen" from="basesmall">
         <color>#80d400</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallblue" from="basesmall">
+    <fontdef name="basesmallblue" from="basesmall">
         <color>#0492A7</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallred" from="basesmall">
+    <fontdef name="basesmallred" from="basesmall">
         <color>#800900</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumgrey" from="basemedium">
+    <fontdef name="basemediumgrey" from="basemedium">
         <color>#999999</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumgreen" from="basemedium">
+    <fontdef name="basemediumgreen" from="basemedium">
         <color>#80d400</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumred" from="basemedium">
+    <fontdef name="basemediumred" from="basemedium">
         <color>#800900</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumpurple" from="basemedium">
+    <fontdef name="basemediumpurple" from="basemedium">
         <color>#9999cc</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumbrown" from="basemedium">
+    <fontdef name="basemediumbrown" from="basemedium">
         <color>#484537</color>
-<!--        <outlinecolor>#6C6753</outlinecolor>
-        <outlinesize>1</outlinesize>-->
-    </font>
+    </fontdef>
 
-    <font name="baselargebrown" from="baselarge">
+    <fontdef name="baselargebrown" from="baselarge">
         <color>#484537</color>
-<!--        <outlinecolor>#6C6753</outlinecolor>
-        <outlinesize>1</outlinesize>-->
-    </font>
+    </fontdef>
 
     <textarea name="baseheading">
         <area>20,4,650,36</area>
@@ -476,14 +470,14 @@
             <filename>backgrounds/bottombar.png</filename>
         </imagetype>
 
-        <font name="datefont" from="baselargebrown">
+        <fontdef name="datefont" from="baselargebrown">
             <pixelsize>21</pixelsize>
-        </font>
+        </fontdef>
 
-        <font name="timefont" from="datefont">
+        <fontdef name="timefont" from="datefont">
             <pixelsize>26</pixelsize>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
         <clock name="date">
             <area>825,689,350,30</area>
@@ -800,13 +794,13 @@
             <statetype name="upscrollarrow">
                 <position>985,270</position>
                 <state type="full">
-                    // Arrow Image
+                    <!-- Arrow Image -->
                 </state>
             </statetype>
             <statetype name="downscrollarrow">
                 <position>985,270</position>
                 <state type="full">
-                    // Arrow Image
+                    <!-- Arrow Image -->
                 </state>
             </statetype>
         </buttonlist>

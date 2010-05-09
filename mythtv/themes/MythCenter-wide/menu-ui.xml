@@ -2,18 +2,18 @@
 <mythuitheme>
     <window name="mainmenu">
 
-        <font name="menufont" face="Liberation Sans">
+        <fontdef name="menufont" face="Liberation Sans">
             <color>#FFFFFF</color>
             <pixelsize>30</pixelsize>
             <bold>yes</bold>
             <shadowcolor>#000000</shadowcolor>
             <shadowoffset>2,2</shadowoffset>
             <shadowalpha>50</shadowalpha>
-        </font>
+        </fontdef>
 
-        <font name="clock" from="small">
+        <fontdef name="clock" from="small">
             <pixelsize>28</pixelsize>
-        </font>
+        </fontdef>
 
         <clock name="clock">
             <area>780,40,480,40</area>

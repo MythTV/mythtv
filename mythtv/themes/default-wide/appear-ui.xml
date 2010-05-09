@@ -2,11 +2,11 @@
 <mythuitheme>
     <window name="appearance">
 
-        <font name="title" face="DejaVu Sans">
+        <fontdef name="title" face="DejaVu Sans">
             <color>#ffffff</color>
             <size>18</size>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
         <textarea name="part">
             <font>title</font>

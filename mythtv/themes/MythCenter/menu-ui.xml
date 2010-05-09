@@ -2,18 +2,18 @@
 <mythuitheme>
     <window name="mainmenu">
 
-        <font name="menufont" face="Trebuchet MS">
+        <fontdef name="menufont" face="Trebuchet MS">
             <color>#FFFFFF</color>
             <size>16</size>
             <bold>yes</bold>
             <shadowcolor>#000000</shadowcolor>
             <shadowoffset>2,2</shadowoffset>
             <shadowalpha>50</shadowalpha>
-        </font>
+        </fontdef>
 
-        <font name="clock" from="menufont">
+        <fontdef name="clock" from="menufont">
             <size>20</size>
-        </font>
+        </fontdef>
 
         <clock name="clock">
             <area>280,525,500,40</area>

@@ -2,75 +2,75 @@
 <mythuitheme>
 
     <!-- Base Font Definitions -->
-    <font name="basesmall" face="DejaVu Sans">
+    <fontdef name="basesmall" face="DejaVu Sans">
         <pixelsize>22</pixelsize>
         <color>#FFFFFF</color>
-    </font>
+    </fontdef>
 
-    <font name="basemedium" from="basesmall">
+    <fontdef name="basemedium" from="basesmall">
         <pixelsize>25</pixelsize>
-    </font>
+    </fontdef>
 
-    <font name="baselarge" from="basesmall">
+    <fontdef name="baselarge" from="basesmall">
         <pixelsize>28</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
-    </font>
+    </fontdef>
 
-    <font name="baseextralarge" from="basesmall">
+    <fontdef name="baseextralarge" from="basesmall">
         <pixelsize>33</pixelsize>
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
         <bold>yes</bold>
-    </font>
+    </fontdef>
 
-    <!-- Colour variations on base fonts -->
-    <font name="basesmallgrey" from="basesmall">
+    <!-- Colour variations on base fontdefs -->
+    <fontdef name="basesmallgrey" from="basesmall">
         <color>#666666</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallpurple" from="basesmall">
+    <fontdef name="basesmallpurple" from="basesmall">
         <color>#9999cc</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallblack" from="basesmall">
+    <fontdef name="basesmallblack" from="basesmall">
         <color>#000000</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallyellow" from="basesmall">
+    <fontdef name="basesmallyellow" from="basesmall">
         <color>#FFFF33</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallgreen" from="basesmall">
+    <fontdef name="basesmallgreen" from="basesmall">
         <color>#80d400</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallblue" from="basesmall">
+    <fontdef name="basesmallblue" from="basesmall">
         <color>#0492A7</color>
-    </font>
+    </fontdef>
 
-    <font name="basesmallred" from="basesmall">
+    <fontdef name="basesmallred" from="basesmall">
         <color>#800900</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumgrey" from="basemedium">
+    <fontdef name="basemediumgrey" from="basemedium">
         <color>#666666</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumgreen" from="basemedium">
+    <fontdef name="basemediumgreen" from="basemedium">
         <color>#80d400</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumred" from="basemedium">
+    <fontdef name="basemediumred" from="basemedium">
         <color>#800900</color>
-    </font>
+    </fontdef>
 
-    <font name="basemediumpurple" from="basemedium">
+    <fontdef name="basemediumpurple" from="basemedium">
         <color>#9999cc</color>
-    </font>
+    </fontdef>
 
     <!-- Base definition of a shape used as a background on many screens -->
     <shape name="basebackground">

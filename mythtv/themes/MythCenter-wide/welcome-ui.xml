@@ -6,47 +6,47 @@
         <!--
             First, define all the fonts we need on this screen
         -->
-        <font name="title" from="baselarge">>
+        <fontdef name="title" from="baselarge">
             <color>#ffff00</color>
             <dropcolor>#000000</dropcolor>
             <pixelsize>34</pixelsize>
             <shadow>2,2</shadow>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="time" from="basesmall">
+        <fontdef name="time" from="basesmall">
             <color>#9999cc</color>
             <pixelsize>20</pixelsize>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="label" from="basesmall">
+        <fontdef name="label" from="basesmall">
             <color>#ffff00</color>
             <dropcolor>#000000</dropcolor>
             <pixelsize>26</pixelsize>
             <shadow>2,2</shadow>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="info" from="basesmall">
+        <fontdef name="info" from="basesmall">
             <color>#ffffff</color>
             <pixelsize>22</pixelsize>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="warning" from="basesmall">
+        <fontdef name="warning" from="basesmall">
             <color>#ff0000</color>
             <dropcolor>#000000</dropcolor>
             <pixelsize>22</pixelsize>
             <shadow>2,2</shadow>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
-        <font name="buttons" from="basesmall">
+        <fontdef name="buttons" from="basesmall">
             <color>#ffff00</color>
             <pixelsize>20</pixelsize>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
 
         <textarea name="title" from="basetextarea">

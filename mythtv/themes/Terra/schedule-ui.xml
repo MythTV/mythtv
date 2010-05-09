@@ -1245,7 +1245,7 @@
             </statetype>
         </buttonlist>
 
-        <shape name="guidebackground"> // Transparent guide bars don't work against custom background
+        <shape name="guidebackground"> <!-- Transparent guide bars don't work against custom background -->
             <area>250,99,1030,357</area>
             <fill color="#484537" />
         </shape>

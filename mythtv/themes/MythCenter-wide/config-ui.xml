@@ -17,9 +17,8 @@
             <fill color="#333333" alpha="180" />
         </shape>
 
-        <shape name="sourcename_background">
+        <shape name="sourcename_background" from="channum_column">
             <area>854,42,290,356</area>
-            <fill color="#333333" alpha="180" />
         </shape>
 
         <buttonlist name="channels" from="basebuttonlist2">

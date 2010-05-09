@@ -2,11 +2,11 @@
 <mythuitheme>
     <window name="appearance">
 
-        <font name="title" face="Droid Sans">
+        <fontdef name="title" face="Droid Sans">
             <color>#ffffff</color>
             <pixelsize>26</pixelsize>
             <bold>yes</bold>
-        </font>
+        </fontdef>
 
         <textarea name="part">
             <font>title</font>
