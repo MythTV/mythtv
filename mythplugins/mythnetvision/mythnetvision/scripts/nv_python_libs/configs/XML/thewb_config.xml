@@ -1,0 +1,47 @@
+<Configuration>
+    <!-- Name of the user's config file for a specific source -->
+    <userPreferenceFile>~/.mythtv/MythNetvision/userGrabberPrefs/thewb.xml</userPreferenceFile>
+
+    <!--
+        Revision3 search URL(s). This is a search generic URL, do not modify
+        NOTE: Only one URL is supported at this time.
+    -->
+    <searchURLS>
+        <urls>
+            <!--
+                Elements:
+                    "name" of the grabber directory
+                    "href" Generic URL for the source of the information
+                    "filter" filter(s) used to select the elements of interest to appear in the XML/XHTML
+                             structure
+                    "pageFilter" optional filter that determines if there are any more pages to display
+                    "parserType" The type of data the URL will return ('xml', 'html', 'xhtml')
+             -->
+            <url>
+                <name>The WB.com Search</name>
+                <href>http://www.thewb.com/search/all/episodes/</href>
+                <filter>//div[@class='all_episode_search_result']</filter>
+                <pageFilter>//p[@class="pagination" and a="next »"]</pageFilter>
+                <parserType>html</parserType>
+            </url>
+        </urls>
+    </searchURLS>
+
+    <!-- URLs that provide the source details for the treeviews, do not modify -->
+    <treeviewUrls>
+        <!--
+            Three attributes:
+                "name" of the tree view directory
+                "href" URL for the source of the information
+                "filter" filter used to select the elements of interest
+                 that will appear in the XML structure
+                "parserType" The type of data the URL will return ('xml', 'html', 'xhtml')
+         -->
+        <url>
+            <name>Show Episodes</name>
+            <href>http://www.thewb.com/shows/</href>
+            <filter>//p[@class='footershows']//a</filter>
+            <parserType>html</parserType>
+        </url>
+    </treeviewUrls>
+</Configuration>

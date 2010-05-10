@@ -1,0 +1,8 @@
+Apr 20th, 2010
+README for the default MythNetvision grabber user preference files
+
+The files found in this directory are the default user preferences for a number of MythNetVision grabbers.
+The first time a grabber is used or if the user preferences xml file is missing these default files are copied to "~/.mythtv/MythNetvision/userGrabberPrefs". That directory will be created if it does not exist.
+
+Do not modify these files to set your user preferences. Modify the copied file in
+"~/.mythtv/MythNetvision/userGrabberPrefs" instead as those will be the settings used to guide the processing of the related grabber.

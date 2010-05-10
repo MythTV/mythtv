@@ -1,0 +1,38 @@
+<Configuration>
+    <!-- The relative file path and filename that contains the user specific preferences for this mashup -->
+    <userPreferenceFile>~/.mythtv/MythNetvision/userGrabberPrefs/bbciplayer.xml</userPreferenceFile>
+    <!--
+        BBC iPlayer search URL(s). This is a search generic URL, do not modify
+        NOTE: Only one URL is supported at this time.
+    -->
+    <searchURLS>
+        <urls>
+            <!--
+                Attributes:
+                    "name" of the grabber directory
+                    "href" Generic URL for the source of the information
+                    "filter" filter(s) used to select the elements of interest to appear in the XML/XHTML
+                             structure
+                    "pageFilter" optional filter that determines if there are any more pages to display
+                    "parserType" The type of data the URL will return ('xml', 'html', 'xhtml')
+             -->
+            <url>
+                <name>BBC iPlayer Search</name>
+                <href>http://www.bbc.co.uk/iplayer/search</href>
+                <filter>//div[@class='search result-wrapper']//ul</filter>
+                <filter>//div[@id='results-container']//ul</filter>
+                <pageFilter>//a/@class[starts-with(.,'last page')]/..</pageFilter>
+                <parserType>html</parserType>
+            </url>
+        </urls>
+    </searchURLS>
+
+    <!--
+        XSLT style sheets used to translate input XML data into MNV compliant formats.
+        NOTE: Sometimes mashup macros are used for data translation instead of stylesheets.
+    -->
+    <XSLTstyleSheets>
+        <channel></channel>
+        <item></item>
+    </XSLTstyleSheets>
+</Configuration>

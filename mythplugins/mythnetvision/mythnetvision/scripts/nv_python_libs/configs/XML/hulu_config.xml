@@ -1,0 +1,35 @@
+<Configuration>
+    <!-- The relative file path and filename that contains the user specific preferences for this mashup -->
+    <userPreferenceFile>~/.mythtv/MythNetvision/userGrabberPrefs/hulu.xml</userPreferenceFile>
+
+    <!-- Hulu Video search URL(s). Do not modify these values -->
+    <searchURLS>
+        <urls>
+            <!--
+                Attributes:
+                    "name" of the grabber directory
+                    "href" Generic URL for the source of the information
+                    "filter" filter(s) used to select the elements of interest to appear in the XML/XHTML
+                             structure
+                    "pageFilter" optional filter that determines if there are any more pages to display
+                    "parserType" The type of data the URL will return ('xml', 'html', 'xhtml')
+             -->
+            <url>
+                <name>Hulu Search</name>
+                <href>http://www.hulu.com/search?&amp;page=PAGENUM&amp;query=SEARCHTERM&amp;sort_by=relevance&amp;st=0</href>
+                <filter>//a[@alt='Go to the last page']</filter>
+                <filter>//div[@class='home-play-container relative']/span/a</filter>
+                <parserType>html</parserType>
+            </url>
+        </urls>
+    </searchURLS>
+
+    <!--
+        XSLT style sheets used to translate input XML data into MNV compliant formats.
+        NOTE: Sometimes mashup macros are used for data translation instead of stylesheets.
+    -->
+    <XSLTstyleSheets>
+        <channel></channel>
+        <item></item>
+    </XSLTstyleSheets>
+</Configuration>

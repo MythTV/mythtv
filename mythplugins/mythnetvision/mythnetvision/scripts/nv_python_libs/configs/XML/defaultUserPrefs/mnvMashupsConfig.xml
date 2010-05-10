@@ -1,0 +1,33 @@
+<feConfiguration>
+    <!--
+        This file contains a MythTV Front-end's configuration settings.
+        The location and name of the file must be:
+        "~/.mythtv/MythNetvision/userGrabberPrefs/mnvMashupsConfig.xml"
+    -->
+
+    <!--
+        If you do not have MythTV front end(s) separate from your MythTV backend then leave this option
+        set to "true".
+        Indicates whether the MNV grabbers are run on a MythTV FE or from a Web server
+        The default is grabbers run locally on the FE
+        'true'  run on the local FE
+        'false' run from a Web sever whose URL is derived from the URL elements (ip_hostname and port)
+    -->
+    <local>true</local>
+
+    <!--
+        Information used to build a URL to call the MNV grabbers that run on a Web server
+        Most frequently the Web server is the same server where MythWeb is installed
+        The value of this option is to have one central place where the MNV grabbers are run which is only
+        relevant when one or more FE's are on separate computers.
+        These values are only used if the "local" element is set to "false"
+        "ip_hostname"    The IP address or hostname of the Web server where the MNV grabbers were installed
+        "port"           The port of the MNV grabber Web server CGI application
+        The ip_hostname and port values here are just examples and need to be changed to your specific
+        set up.
+    -->
+    <URL>
+        <ip_hostname>192.168.0.100</ip_hostname>
+        <port>80</port>
+    </URL>
+</feConfiguration>

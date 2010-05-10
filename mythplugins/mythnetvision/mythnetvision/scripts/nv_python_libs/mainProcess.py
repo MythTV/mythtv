@@ -21,12 +21,13 @@
 #-------------------------------------
 __title__ ="Netvision Common Query Processing";
 __author__="R.D.Vaughan"
-__version__="v0.2.0"
+__version__="v0.2.1"
 # 0.1.0 Initial development
 # 0.1.1 Refining the code like the additional of a grabber specifing the maximum number of items to return
 # 0.1.2 Added the Tree view option
 # 0.1.3 Updated deocumentation
 # 0.2.0 Public release
+# 0.2.1 Added the ability to have a mashup name independant of the mashup title
 
 import sys, os
 from optparse import OptionParser
@@ -134,7 +135,8 @@ xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule"
 xmlns:media="http://search.yahoo.com/mrss/"
 xmlns:atom="http://www.w3.org/2005/Atom"
 xmlns:amp="http://www.adobe.com/amp/1.0"
-xmlns:dc="http://purl.org/dc/elements/1.1/">""", 'channel': """
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">""", 'channel': """
     <channel>
         <title>%(channel_title)s</title>
         <link>%(channel_link)s</link>
@@ -167,7 +169,8 @@ xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule"
 xmlns:media="http://search.yahoo.com/mrss/"
 xmlns:atom="http://www.w3.org/2005/Atom"
 xmlns:amp="http://www.adobe.com/amp/1.0"
-xmlns:dc="http://purl.org/dc/elements/1.1/">""", 'start_channel': """
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:mythtv="http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format">""", 'start_channel': """
     <channel>
         <title>%(channel_title)s</title>
         <link>%(channel_link)s</link>
@@ -202,6 +205,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">""", 'start_channel': """
         self.firstVideo = True
         self.config['target'].page_limit = self.page_limit
         self.config['target'].grabber_title = self.grabber_title
+        self.config['target'].mashup_title = self.mashup_title
 
         data_sets = self.config['target'].searchForVideos(search_text, pagenumber)
         if data_sets == None:
@@ -228,6 +232,7 @@ xmlns:dc="http://purl.org/dc/elements/1.1/">""", 'start_channel': """
         self.firstVideo = True
         self.config['target'].page_limit = self.page_limit
         self.config['target'].grabber_title = self.grabber_title
+        self.config['target'].mashup_title = self.mashup_title
 
         data_sets = self.config['target'].displayTreeView()
         if data_sets == None:
@@ -370,13 +375,24 @@ class mainProcess:
             else:
                 Queries.grabber_title = self.grabber_title
 
+        # Set the mashup title
+        if not 'mashup_title' in dir(self):
+            Queries.mashup_title = Queries.grabber_title
+        else:
+            if search:
+                if opts.search:
+                    Queries.mashup_title = self.mashup_title + "search"
+            if treeview:
+                if opts.treeview:
+                    Queries.mashup_title = self.mashup_title + "treeview"
+
         # Process requested option
         if search:
             if opts.search:                 # Video search -S
                 Queries.searchForVideos(args[0], opts.pagenumber)
 
         if treeview:
-            if opts.treeview:               # Video search -M
+            if opts.treeview:               # Video treeview -T
                 Queries.displayTreeView()
 
         sys.exit(0)

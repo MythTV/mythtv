@@ -777,7 +777,6 @@ ResultVideo* Parse::ParseItem(const QDomElement& item) const
         if (duration.isEmpty())
             duration = QString::number(media.Duration);
 
-
         if (filesize == 0)
             filesize = media.Size;
 

@@ -22,12 +22,33 @@ installscripts.files = scripts/*.py scripts/*.sh scripts/*.pl
 installpylibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs
 installpylibs.files = scripts/nv_python_libs/*.py
 
+installbbclibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/bbciplayer
+installbbclibs.files = scripts/nv_python_libs/bbciplayer/*.py
 installbliptvlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/bliptv
 installbliptvlibs.files = scripts/nv_python_libs/bliptv/*.py
+installcommonlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/common
+installcommonlibs.files = scripts/nv_python_libs/common/*.py
+installconfiglibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/configs
+installconfigHTMLlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/HTML
+installconfigHTMLlibs.files = scripts/nv_python_libs/configs/HTML/*.html
+installconfigXMLlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/XML
+installconfigXMLlibs.files = scripts/nv_python_libs/configs/XML/*.xml
+installconfigXMLdeflibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/XML/defaultUserPrefs
+installconfigXMLdeflibs.files = scripts/nv_python_libs/configs/XML/defaultUserPrefs/*.xml
+installconfigXSLTlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/configs/XSLT
+installconfigXSLTlibs.files = scripts/nv_python_libs/configs/XSLT/*.xsl
 installdailymotionlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/dailymotion
 installdailymotionlibs.files = scripts/nv_python_libs/dailymotion/*.py
+installhululibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/hulu
+installhululibs.files = scripts/nv_python_libs/hulu/*.py
+installmnvsearchlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/mnvsearch
+installmnvsearchlibs.files = scripts/nv_python_libs/mnvsearch/*.py
 installmtvlibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/mtv
 installmtvlibs.files = scripts/nv_python_libs/mtv/*.py
+installrev3libs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/rev3
+installrev3libs.files = scripts/nv_python_libs/rev3/*.py
+installthewblibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/thewb
+installthewblibs.files = scripts/nv_python_libs/thewb/*.py
 installtmdblibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/tmdb
 installtmdblibs.files = scripts/nv_python_libs/tmdb/*.py
 installvimeolibs.path = $${PREFIX}/share/mythtv/mythnetvision/scripts/nv_python_libs/vimeo
@@ -48,8 +69,10 @@ installmusicicons.path = $${PREFIX}/share/mythtv/mythnetvision/icons/directories
 installmusicicons.files = icons/directories/music_genres/*.png icons/directories/music_genres/*.jpg
 
 INSTALLS += installfiles installscripts installicons installpylibs
-INSTALLS += installbliptvlibs installdailymotionlibs
-INSTALLS += installmtvlibs installtmdblibs installvimeolibs installvimeooauth installyoutubelibs
+INSTALLS += installbbclibs installbliptvlibs installcommonlibs installconfiglibs installconfigHTMLlibs
+INSTALLS += installconfigXMLlibs installconfigXMLdeflibs installconfigXSLTlibs installdailymotionlibs
+INSTALLS += installhululibs installmnvsearchlibs installmtvlibs installrev3libs installthewblibs
+INSTALLS += installtmdblibs installvimeolibs installvimeooauth installyoutubelibs
 INSTALLS += installdiricons installtopicicons installfilmicons installmusicicons
 
 # Input

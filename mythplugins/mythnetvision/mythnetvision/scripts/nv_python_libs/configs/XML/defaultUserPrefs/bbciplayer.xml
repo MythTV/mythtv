@@ -1,0 +1,81 @@
+<Configuration>
+    <!--
+        This file contains the mashup's user specific preferences such as the rss feeds of interest,
+        userid and passwords to source sites.
+    -->
+    <!-- Default parameters for this mashup, usually the elements are specific to the mashup -->
+    <!--
+        This option specifies the Web page link that MythBrowser will display.
+        "fullscreen" Displays the video MythBrowser full web page automatically.  This
+                    is the default and will be used if no other format has been specified.
+                    Of all the link types this one has the largest playback video display.
+        "bbcweb"    Displays the web page that you would see if you surfed the BBC iPlayer web site.
+        "bigscreen" Displays a web page that supports game consoles like the Wii and
+                    PS3 called "bigscreen". Video window is smaller but screen is less cluttered then a Web
+                    page and has larger buttons and controls which are a little more remote friendly.
+    -->
+    <displayURL>fullscreen</displayURL>
+
+    <!--
+        BBC Treeview video RSS feeds.
+        "globalmax" (optional) Is a way to limit the number of items processed per RSS feed for all
+                    treeview URLs. A value of zero (0) means there are no limitions.
+        "max" (optional)  Is a way to limit the number of items processed for an individual RSS feed.
+              This value will override any "globalmax" setting. A value of zero (0) means
+              there are no limitions and would be the same if the attribute was no included at all.
+        "enabled" If you want to remove a RSS feed then change the "enabled" attribute to "false". Do not
+                  delete the element.
+    -->
+    <treeviewURLS globalmax="0">
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/highlights/tv</url>
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/popular/tv</url>
+        <url enabled="true" max="50">http://feeds.bbc.co.uk/iplayer/cbeebies/list</url>
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/bbc_news24/list</url>
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/categories/drama/tv/list</url>
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/categories/entertainment/tv/list</url>
+        <url enabled="true" max="50">http://feeds.bbc.co.uk/iplayer/categories/factual/tv/list</url>
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/categories/signed/tv/list</url>
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/bbc_one/drama/list</url>
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/bbc_two/comedy/list</url>
+        <url enabled="true">http://feeds.bbc.co.uk/iplayer/bbc_three/factual/health_and_wellbeing/list</url>
+    </treeviewURLS>
+
+    <!-- User customized options for a treeview -->
+    <userSearchStrings>
+        <!--
+            You can have none, one or more specific search terms that will be presented as individual
+            directories in your BBC tree view. With each search you need a "dirName" and the
+            "searchTerm". Use the BBC's regular web page search to verify that your search term actually
+            produces results.
+            The BBC search is at the top of this web page: http://www.bbc.co.uk/iplayer/
+            The searches below are just examples and have been commented out for distribution purposes.
+        -->
+<!--        <userSearch>-->
+<!--            <dirName>Doctor Who Episodes</dirName>-->
+<!--            <searchTerm>Doctor Who</searchTerm>-->
+<!--        </userSearch>-->
+<!--        <userSearch>-->
+<!--            <dirName>Eastenders Episodes</dirName>-->
+<!--            <searchTerm>Eastenders</searchTerm>-->
+<!--        </userSearch>-->
+    </userSearchStrings>
+
+    <userFeeds globalmax="50">
+        <!--
+            You can have one or more specific RSS Feed URL(s) that will be presented as individual
+            directories in your BBC tree view. With each RSS URL you need a "name" and the
+            "url". Use the BBC feed selection web page to select a specific RSS URL. Cut and
+            paste the URL text (bottom of the web page) as the "url".
+            The BBC "All feeds" selection page is at: http://www.bbc.co.uk/iplayer/feeds/
+            Make sure you click on the "All feeds" tab.
+            The urls below are just examples and have been commented out for distribution purposes.
+            "globalmax" (optional) Is a way to limit the number of items processed per RSS feed for all
+                        treeview URLs. A value of zero (0) means there are no limitions.
+            "max" (optional)  Is a way to limit the number of items processed for an individual RSS feed.
+                  This value will override any "globalmax" setting. A value of zero (0) means
+                  there are no limitions.
+        -->
+<!--        <url max="5" name="Children's Drama">http://feeds.bbc.co.uk/iplayer/categories/childrens/drama/tv/list</url>-->
+<!--        <url name="Most Popular Comedy">http://feeds.bbc.co.uk/iplayer/categories/comedy/tv/popular</url>-->
+    </userFeeds>
+</Configuration>

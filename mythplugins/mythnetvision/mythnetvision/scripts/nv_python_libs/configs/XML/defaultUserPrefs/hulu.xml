@@ -1,0 +1,47 @@
+<Configuration>
+    <!--
+        This file contains the mashup's user specific preferences such as the rss feeds of interest,
+        userid and passwords to source sites.
+    -->
+    <!--
+        Hulu default Video RSS feeds
+        "globalmax" (optional) Is a way to limit the number of items processed per RSS feed for all
+                    treeview URLs. A value of zero (0) means there are no limitions.
+        "max" (optional)  Is a way to limit the number of items processed for an individual RSS feed.
+              This value will override any "globalmax" setting. A value of zero (0) means
+              there are no limitions and would be the same if the attribute was no included at all.
+        "enabled" If you want to remove a RSS feed then change the "enabled" attribute to "false". Do not
+                  delete the element.
+    -->
+    <treeviewURLS globalmax="0">
+        <url enabled="true" max="0">http://www.hulu.com/feed/recent/videos</url>
+        <url enabled="true">http://www.hulu.com/feed/recent/shows</url>
+        <url enabled="true">http://www.hulu.com/feed/recent/movies</url>
+        <url enabled="true">http://www.hulu.com/feed/highest_rated/videos</url>
+        <url enabled="true">http://www.hulu.com/feed/popular/videos/today</url>
+        <url enabled="true">http://www.hulu.com/feed/popular/videos/this_week</url>
+        <url enabled="true">http://www.hulu.com/feed/popular/videos/this_month</url>
+        <url enabled="true">http://www.hulu.com/feed/popular/videos/all_time</url>
+        <url enabled="true">http://www.hulu.com/feed/expiring/videos</url>
+    </treeviewURLS>
+
+    <!-- Default parameters for this mashup, usually the elements are specific to the mashup -->
+    <userSearchStrings>
+        <!--
+            You can have one or more specific search terms that will be presented as individual
+            directories in your Hulu tree view. With each search you need a "dirName" and the
+            "searchTerm". Use the Hulu advanced search web page to create your specific search. Cut and
+            paste the search text (bottom of the web page) as the "searchTerm".
+            Hulu advance search is at: http://www.hulu.com/search/advanced_search
+            The searches below are just examples and have been commented out for distribution purposes.
+        -->
+<!--        <userSearch>-->
+<!--            <dirName>Burn Notice Season 1</dirName>-->
+<!--            <searchTerm>"Burn Notice" season:1</searchTerm>-->
+<!--        </userSearch>-->
+<!--        <userSearch>-->
+<!--            <dirName>Burn Notice Season 2</dirName>-->
+<!--            <searchTerm>"Burn Notice" season:2</searchTerm>-->
+<!--        </userSearch>-->
+    </userSearchStrings>
+</Configuration>

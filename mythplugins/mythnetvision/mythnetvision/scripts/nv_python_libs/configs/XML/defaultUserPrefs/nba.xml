@@ -1,0 +1,29 @@
+<Configuration>
+    <!--
+        This file contains the mashup's user specific preferences such as the rss feeds of interest,
+        userid and passwords to source sites.
+    -->
+    <!--
+        NBA Video RSS feeds
+        If you want to disable any of these feeds then change the "enabled" attribute to "false". Do not
+        delete the element as that would prevent you from enabling it at a later date.
+    -->
+    <treeviewURLS>
+        <url enabled="true">http://www.nba.com/topvideo/rss.xml</url>
+        <url enabled="true">http://www.nba.com/rss/highlights.rss</url>
+        <url enabled="true">http://www.nba.com/rss/editorspick.rss</url>
+        <url enabled="true">http://www.nba.com/rss/barkleyzone.rss</url>
+        <url enabled="true">http://www.nba.com/broadband/tnt_overtime.xml</url>
+        <url enabled="true">http://www.nba.com/nbatvtop10/rss.xml</url>
+        <url enabled="true">http://www.nba.com/playoftheday/rss.xml</url>
+        <url enabled="true">http://www.nba.com/dunkofthenight/rss.xml</url>
+        <url enabled="true">http://www.nba.com/assistofthenight/rss.xml</url>
+    </treeviewURLS>
+    <!-- Default parameters for this mashup, usually the elements are specific to the mashup -->
+    <parmDefaults>
+        <!-- Search terms that a user wants to use when selecting videos for their "Favourites" directory -->
+        <!--
+        <favteam>Lakers</favteam>
+        -->
+    </parmDefaults>
+</Configuration>
