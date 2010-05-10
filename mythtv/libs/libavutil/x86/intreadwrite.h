@@ -63,7 +63,7 @@ static av_always_inline void AV_ZERO64(void *d)
 #ifdef __SSE__
 
 #define AV_COPY128 AV_COPY128
-static av_always_inline av_unused void AV_COPY128(void *d, const void *s)
+static av_always_inline void AV_COPY128(void *d, const void *s)
 {
     struct v {uint64_t v[2];};
 
@@ -79,7 +79,7 @@ static av_always_inline av_unused void AV_COPY128(void *d, const void *s)
 #ifdef __SSE2__
 
 #define AV_ZERO128 AV_ZERO128
-static av_always_inline av_unused void AV_ZERO128(void *d)
+static av_always_inline void AV_ZERO128(void *d)
 {
     struct v {uint64_t v[2];};
 

@@ -29,7 +29,7 @@
 #include "libavutil/common.h"
 
 #define bswap_16 bswap_16
-static av_always_inline av_unused av_const uint16_t bswap_16(uint16_t x)
+static av_always_inline av_const uint16_t bswap_16(uint16_t x)
 {
     __asm__("rorw $8, %0" : "+r"(x));
     return x;

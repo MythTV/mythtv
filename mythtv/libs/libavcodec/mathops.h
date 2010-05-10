@@ -48,13 +48,13 @@
 //gcc 3.4 creates an incredibly bloated mess out of this
 //#    define MULH(a,b) (((int64_t)(a) * (int64_t)(b))>>32)
 
-static av_always_inline av_unused int MULH(int a, int b){
+static av_always_inline int MULH(int a, int b){
     return ((int64_t)(a) * (int64_t)(b))>>32;
 }
 #endif
 
 #ifndef UMULH
-static av_always_inline av_unused unsigned UMULH(unsigned a, unsigned b){
+static av_always_inline unsigned UMULH(unsigned a, unsigned b){
     return ((uint64_t)(a) * (uint64_t)(b))>>32;
 }
 #endif

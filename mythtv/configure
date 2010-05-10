@@ -4416,7 +4416,7 @@ test -n "$malloc_prefix" &&
 
 if enabled small || disabled optimizations; then
     echo "#undef  av_always_inline"  >> $TMPH
-    echo "#define av_always_inline"  >> $TMPH
+    echo "#define av_always_inline av_unused"  >> $TMPH
 fi
 
 if enabled mac_corevideo; then
