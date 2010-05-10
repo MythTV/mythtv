@@ -51,8 +51,10 @@ void MythCDROMDarwin::setSpeed(const char *device, int speed)
         ioctl(fd, DKIOCDVDSETSPEED, &spd) == -1)
     {
         VERBOSE(VB_MEDIA, (LOC_ERR + "setSpeed() failed: ") + strerror(errno));
+        close(fd);
         return;
     }
     VERBOSE(VB_MEDIA, LOC + ":setSpeed() - CD/DVD Speed Set to "
                           + QString::number(spd));
+    close(fd);
 }

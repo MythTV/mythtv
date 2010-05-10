@@ -671,6 +671,7 @@ void MythCDROMLinux::setSpeed(const char *device, int speed)
     switch(speed)
     {
         case 0: // don't touch speed setting
+            close(fd);
             return;
         case -1: // restore default value
         {
