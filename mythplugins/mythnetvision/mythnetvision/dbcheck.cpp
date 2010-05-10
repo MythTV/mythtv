@@ -12,7 +12,7 @@
 // MythNetvision headers
 #include "dbcheck.h"
 
-const QString currentDatabaseVersion = "1006";
+const QString currentDatabaseVersion = "1007";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -215,6 +215,18 @@ bool UpgradeNetvisionDatabaseSchema(void)
             ""
         };
         if (!performActualUpdate(updates, "1006", dbver))
+            return false;
+    }
+
+    if (dbver == "1006")
+    {
+        const QString updates[] =
+        {
+            "UPDATE netvisiontreegrabbers SET thumbnail = "
+            "SUBSTRING_INDEX(thumbnail, '/', -1);",
+            ""
+        };
+        if (!performActualUpdate(updates, "1007", dbver))
             return false;
     }
 

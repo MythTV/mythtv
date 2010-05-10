@@ -119,6 +119,8 @@ class NetSearch : public MythScreenType
     void showMenu(void);
     void getMoreResults();
     void getLastResults();
+    void runSearchEditor();
+    void doListRefresh();
 
     void doSearch(void);
     void searchFinished(Search *item);

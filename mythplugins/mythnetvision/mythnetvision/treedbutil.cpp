@@ -1,6 +1,8 @@
+#include <QFileInfo>
+
 // Myth headers
 #include <mythdb.h>
-
+#include <mythdirs.h>
 #include <mythcontext.h>
 
 // MythNetvision headers
@@ -53,7 +55,8 @@ GrabberScript* findTreeGrabberByCommand(const QString& commandline)
     }
 
     QString title = query.value(0).toString();
-    QString image  = query.value(1).toString();
+    QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
+                        .arg(query.value(1).toString());
     QString command = query.value(2).toString();
 
     GrabberScript *tmp = new GrabberScript(title, image, 0, 1,
@@ -75,7 +78,8 @@ GrabberScript* findSearchGrabberByCommand(const QString& commandline)
     }
 
     QString title = query.value(0).toString();
-    QString image  = query.value(1).toString();
+    QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
+                        .arg(query.value(1).toString());
     QString command = query.value(2).toString();
 
     GrabberScript *tmp = new GrabberScript(title, image, 0, 1,
@@ -99,7 +103,8 @@ GrabberScript::scriptList findAllDBTreeGrabbers(void)
     while (query.next())
     {
         QString title = query.value(0).toString();
-        QString image  = query.value(1).toString();
+        QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
+                            .arg(query.value(1).toString());
         QString commandline = query.value(2).toString();
 
         GrabberScript *script = new GrabberScript(title, image, 0, 1,
@@ -114,7 +119,7 @@ GrabberScript::scriptList findAllDBSearchGrabbers(void)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT name,thumbnail,commandline "
-                  "FROM netvisiontsearchgrabbers "
+                  "FROM netvisionsearchgrabbers "
                   "WHERE host = :HOST ORDER BY name;");
     query.bindValue(":HOST", gContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
@@ -126,7 +131,8 @@ GrabberScript::scriptList findAllDBSearchGrabbers(void)
     while (query.next())
     {
         QString title = query.value(0).toString();
-        QString image  = query.value(1).toString();
+        QString image = QString("%1/mythnetvision/icons/%2").arg(GetShareDir())
+                            .arg(query.value(1).toString());
         QString commandline = query.value(2).toString();
 
         GrabberScript *script = new GrabberScript(title, image, 0, 1,
@@ -159,12 +165,15 @@ bool insertTreeInDB(const QString &name, const QString &thumbnail,
     if (findTreeGrabberInDB(commandline))
         return false;
 
+    QFileInfo fi(thumbnail);
+    QString thumbbase = fi.fileName();
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO netvisiontreegrabbers (name,thumbnail,commandline,"
                   "updated,host) "
             "VALUES( :NAME, :THUMBNAIL, :COMMAND, :UPDATED, :HOST);");
     query.bindValue(":NAME", name);
-    query.bindValue(":THUMBNAIL", thumbnail);
+    query.bindValue(":THUMBNAIL", thumbbase);
     query.bindValue(":COMMAND", commandline);
     query.bindValue(":UPDATED", QDateTime());
     query.bindValue(":HOST", gContext->GetHostName());
@@ -182,12 +191,15 @@ bool insertSearchInDB(const QString &name, const QString &thumbnail,
     if (findSearchGrabberInDB(commandline))
         return false;
 
+    QFileInfo fi(thumbnail);
+    QString thumbbase = fi.fileName();  
+
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO netvisionsearchgrabbers (name,thumbnail,commandline,"
                   "host) "
             "VALUES( :NAME, :THUMBNAIL, :COMMAND, :HOST);");
     query.bindValue(":NAME", name);
-    query.bindValue(":THUMBNAIL", thumbnail);
+    query.bindValue(":THUMBNAIL", thumbbase);
     query.bindValue(":COMMAND", commandline);
     query.bindValue(":HOST", gContext->GetHostName());
     if (!query.exec() || !query.isActive()) {

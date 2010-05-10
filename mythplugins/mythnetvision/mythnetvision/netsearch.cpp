@@ -24,7 +24,9 @@
 #include "netutils.h"
 #include "parse.h"
 #include "rssdbutil.h"
+#include "treedbutil.h"
 #include "rsseditor.h"
+#include "searcheditor.h"
 
 using namespace std;
 
@@ -144,7 +146,9 @@ bool NetSearch::Create()
 
 void NetSearch::Load()
 {
-    m_grabberList = fillGrabberList();
+    m_grabberList = findAllDBSearchGrabbers();
+    if (m_grabberList.isEmpty())
+        m_grabberList = fillGrabberList();
 }
 
 void NetSearch::Init()
@@ -248,50 +252,55 @@ void NetSearch::showMenu(void)
     MythDialogBox *menuPopup = new MythDialogBox(label, m_popupStack,
                                                     "mythnetvisionmenupopup");
 
-    if (m_searchResultList->GetCount() > 0 && menuPopup->Create())
+    if (menuPopup->Create())
     {
         m_popupStack->AddScreen(menuPopup);
 
         menuPopup->SetReturnEvent(this, "options");
 
-        ResultVideo *item =
-              qVariantValue<ResultVideo *>(m_searchResultList->GetDataValue());
-
-        QString filename;
-        bool exists;
-
-        if (item)
+        if (m_searchResultList->GetCount() > 0)
         {
-            menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
+            ResultVideo *item =
+                  qVariantValue<ResultVideo *>(m_searchResultList->GetDataValue());
 
-            filename = getDownloadFilename(item);
+            QString filename;
+            bool exists;
 
-            if (filename.startsWith("myth://"))
-                exists = RemoteFile::Exists(filename);
-            else
-                exists = QFile::exists(filename);
+            if (item)
+            {
+                menuPopup->AddButton(tr("Open Web Link"), SLOT(showWebVideo()));
+
+                filename = getDownloadFilename(item);
+
+                if (filename.startsWith("myth://"))
+                    exists = RemoteFile::Exists(filename);
+                else
+                    exists = QFile::exists(filename);
+            }
+
+            if (item && item->GetDownloadable() &&
+                GetFocusWidget() == m_searchResultList)
+            {
+                if (exists)
+                    menuPopup->AddButton(tr("Play"), SLOT(doPlayVideo()));
+                else
+                    menuPopup->AddButton(tr("Save This Video"), SLOT(doDownloadAndPlay()));
+            }
+
+            if (item && item->GetDownloadable() &&
+                GetFocusWidget() == m_searchResultList &&
+                exists)
+            {
+                menuPopup->AddButton(tr("Delete"), SLOT(slotDeleteVideo()));
+            }
+
+
+            if (m_pagenum > 1)
+                menuPopup->AddButton(tr("Previous Page"), SLOT(getLastResults()));
+            if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage)
+                menuPopup->AddButton(tr("Next Page"), SLOT(getMoreResults()));
         }
-
-        if (item && item->GetDownloadable() &&
-            GetFocusWidget() == m_searchResultList)
-        {
-            if (exists)
-                menuPopup->AddButton(tr("Play"), SLOT(doPlayVideo()));
-            else
-                menuPopup->AddButton(tr("Save This Video"), SLOT(doDownloadAndPlay()));
-        }
-
-        if (item && item->GetDownloadable() &&
-            GetFocusWidget() == m_searchResultList &&
-            exists)
-        {
-            menuPopup->AddButton(tr("Delete"), SLOT(slotDeleteVideo()));
-        }
-
-        if (m_pagenum > 1)
-            menuPopup->AddButton(tr("Previous Page"), SLOT(getLastResults()));
-        if (m_searchResultList->GetCount() > 0 && m_pagenum < m_maxpage)
-            menuPopup->AddButton(tr("Next Page"), SLOT(getMoreResults()));
+        menuPopup->AddButton(tr("Manage Search Scripts"), SLOT(runSearchEditor()));
 
     }
     else
@@ -385,6 +394,8 @@ GrabberScript::scriptList NetSearch::fillGrabberList()
 void NetSearch::fillGrabberButtonList()
 {
     QMutexLocker locker(&m_lock);
+
+    m_siteList->Reset();
 
     for (GrabberScript::scriptList::iterator i = m_grabberList.begin();
             i != m_grabberList.end(); ++i)
@@ -790,6 +801,34 @@ void NetSearch::doDeleteVideo(bool remove)
         QFile file(filename);
         file.remove();
     }
+}
+
+void NetSearch::runSearchEditor()
+{
+    MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
+
+    SearchEditor *searchedit = new SearchEditor(mainStack, "mythnetsearchedit");
+
+    if (searchedit->Create())
+    {
+        connect(searchedit, SIGNAL(itemsChanged()), this,
+                       SLOT(doListRefresh()));
+
+        mainStack->AddScreen(searchedit);
+    }
+    else
+    {
+        delete searchedit;
+    }
+}
+
+void NetSearch::doListRefresh()
+{
+    m_grabberList = findAllDBSearchGrabbers();
+    if (m_grabberList.isEmpty())
+        m_grabberList = fillGrabberList();
+
+    loadData();
 }
 
 void NetSearch::doDownloadAndPlay()
