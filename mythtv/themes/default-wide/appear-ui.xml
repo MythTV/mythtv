@@ -6,7 +6,7 @@
         <fontdef name="title" face="DejaVu Sans">
             <color>#ffffff</color>
             <size>18</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <textarea name="part">

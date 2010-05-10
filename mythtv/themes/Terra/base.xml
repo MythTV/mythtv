@@ -21,7 +21,7 @@
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
-        <bold>yes</bold>
+        <weight>bold</weight>
     </fontdef>
 
     <!-- Colour variations on base fonts -->
@@ -477,7 +477,7 @@
 
         <fontdef name="timefont" from="datefont">
             <pixelsize>26</pixelsize>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <clock name="date">

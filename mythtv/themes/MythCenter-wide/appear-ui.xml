@@ -6,7 +6,7 @@
         <fontdef name="title" face="Droid Sans">
             <color>#ffffff</color>
             <pixelsize>26</pixelsize>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <textarea name="part">

@@ -7,7 +7,7 @@
         <fontdef name="menufont" face="Trebuchet MS">
             <color>#FFFFFF</color>
             <size>16</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
             <shadowcolor>#000000</shadowcolor>
             <shadowoffset>2,2</shadowoffset>
             <shadowalpha>50</shadowalpha>

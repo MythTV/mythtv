@@ -12,13 +12,13 @@
             <dropcolor>#000000</dropcolor>
             <size>24</size>
             <shadow>3,3</shadow>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="time" from="basesmall">
             <color>#9999cc</color>
             <size>14</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="label" from="basesmall">
@@ -26,13 +26,13 @@
             <dropcolor>#000000</dropcolor>
             <size>18</size>
             <shadow>3,3</shadow>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="info" from="basesmall">
             <color>#ffffff</color>
             <size>16</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="warning" from="basesmall">
@@ -40,13 +40,13 @@
             <dropcolor>#000000</dropcolor>
             <size>16</size>
             <shadow>2,2</shadow>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
         <fontdef name="buttons" from="basesmall">
             <color>#ffff00</color>
             <size>14</size>
-            <bold>yes</bold>
+            <weight>bold</weight>
         </fontdef>
 
 

@@ -17,7 +17,7 @@
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
-        <bold>yes</bold>
+        <weight>bold</weight>
     </fontdef>
 
     <fontdef name="baseextralarge" from="basesmall">
@@ -25,7 +25,7 @@
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
-        <bold>yes</bold>
+        <weight>bold</weight>
     </fontdef>
 
     <!-- Colour variations on base fontdefs -->

@@ -6,11 +6,11 @@
     <fontdef name="basesmall" face="Arial">
         <pixelsize>22</pixelsize>
         <color>#EEEEEE</color>
-        <bold>yes</bold>
+        <weight>bold</weight>
     </fontdef>
   
     <fontdef name="basesmallbold" from="basesmall">
-        <bold>yes</bold>
+        <weight>bold</weight>
     </fontdef>
 
     <fontdef name="basesmallboldblue" from="basesmallbold">
@@ -40,11 +40,11 @@
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
-        <bold>yes</bold>
+        <weight>bold</weight>
     </fontdef>
 
     <fontdef name="baselargenormal" from="baselarge">
-        <bold>no</bold>
+        <weight>normal</weight>
     </fontdef>
 
     <fontdef name="baseextralarge" from="basesmall">
@@ -52,7 +52,7 @@
         <shadowcolor>#000000</shadowcolor>
         <shadowoffset>4,4</shadowoffset>
         <shadowalpha>64</shadowalpha>
-        <bold>yes</bold>
+        <weight>bold</weight>
     </fontdef>
 
     <!-- Colour variations on base fontdefs -->
@@ -992,25 +992,25 @@
         <fontdef name="small" face="Thorndale">
           <color>#FFFFFF</color>
           <pixelsize>19</pixelsize>
-          <bold>yes</bold>
+          <weight>bold</weight>
         </fontdef>
     
         <fontdef name="medium" face="Thorndale">
           <color>#FFFFFF</color>
           <pixelsize>22</pixelsize>
-          <bold>yes</bold>
+          <weight>bold</weight>
         </fontdef>
     
         <fontdef name="large" face="Thorndale">
           <color>#FFFFFF</color>
           <pixelsize>28</pixelsize>
-          <bold>yes</bold>
+          <weight>bold</weight>
         </fontdef>
     
         <fontdef name="clock" face="Thorndale">
              <color>#FFFFFF</color>
              <pixelsize>25</pixelsize>
-             <bold>yes</bold>
+             <weight>bold</weight>
         </fontdef>
     </window>
 
