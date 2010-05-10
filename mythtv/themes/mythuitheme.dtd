@@ -27,8 +27,6 @@
 <!ELEMENT outlinealpha  (#PCDATA)>
 <!ELEMENT italics  (#PCDATA)>
 <!ELEMENT weight  (#PCDATA)>
-<!ELEMENT bold (#PCDATA)> <!-- DEPRECATED -->
-<!ELEMENT underline (#PCDATA)> <!-- DEPRECATED -->
 <!ELEMENT letterspacing  (#PCDATA)>
 <!ELEMENT wordspacing  (#PCDATA)>
 <!ELEMENT decoration  (#PCDATA)>
@@ -133,7 +131,6 @@
 <!ELEMENT clock (%widget_common;|%textarea_elements;|format|secondflash|
                  %widgets;)*>
 <!ATTLIST clock %common_attributes;>
-<!ELEMENT format (#PCDATA)>  <!-- DEPRECATED Use template instead? -->
 <!ELEMENT secondflash (#PCDATA)>
 
 <!-- Button Widget -->
