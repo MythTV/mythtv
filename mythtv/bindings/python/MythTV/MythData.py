@@ -18,9 +18,9 @@ from socket import gethostbyaddr, gethostname
 
 #### FILE ACCESS ####
 
-def findfile(file, sgroup, db=None):
+def findfile(filename, sgroup, db=None):
     """
-    findfile(file, sgroup, db=None) -> StorageGroup object
+    findfile(filename, sgroup, db=None) -> StorageGroup object
 
     Will search through all matching storage groups, searching for file.
     Returns matching storage group upon success.
