@@ -903,10 +903,12 @@
                 </state>
                 <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
+                    <shape name="buttonbackground">
                         <area>0,0,165,105</area>
-                        <gradient start="#999999" end="#666666" alpha="220" />
-                    </imagetype>
+                        <fill style="gradient">
+                            <gradient start="#999999" end="#666666" alpha="220" />
+                        </fill>
+                    </shape>
                 </state>
             </statetype>
         </buttonlist>

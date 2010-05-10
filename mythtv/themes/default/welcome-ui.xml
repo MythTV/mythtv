@@ -9,9 +9,9 @@
         -->
         <fontdef name="title" from="baselarge">
             <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
             <size>24</size>
-            <shadow>3,3</shadow>
+            <shadowcolor>#000000</shadowcolor>
+            <shadowoffset>3,3</shadowoffset>
             <weight>bold</weight>
         </fontdef>
 
@@ -23,9 +23,9 @@
 
         <fontdef name="label" from="basesmall">
             <color>#ffff00</color>
-            <dropcolor>#000000</dropcolor>
             <size>18</size>
-            <shadow>3,3</shadow>
+            <shadowcolor>#000000</shadowcolor>
+            <shadowoffset>3,3</shadowoffset>
             <weight>bold</weight>
         </fontdef>
 
@@ -37,9 +37,9 @@
 
         <fontdef name="warning" from="basesmall">
             <color>#ff0000</color>
-            <dropcolor>#000000</dropcolor>
             <size>16</size>
-            <shadow>2,2</shadow>
+            <shadowcolor>#000000</shadowcolor>
+            <shadowoffset>2,2</shadowoffset>
             <weight>bold</weight>
         </fontdef>
 

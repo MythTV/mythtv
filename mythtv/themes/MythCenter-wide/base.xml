@@ -37,7 +37,7 @@
     </fontdef>
 
     <fontdef name="baselargenormal" from="baselarge">
-        <weight>normal</weight>
+        <weight>normal</weight> 
     </fontdef>
 
     <fontdef name="baseextralarge" from="baselarge">
@@ -165,11 +165,15 @@
         <spacing>4</spacing>
         <buttonarea>0,0,100%,97%</buttonarea>
         <statetype name="buttonitem">
+            <area>0,0,100%,30</area>
             <state name="active">
-                <area>0,0,100%,30</area>
-                <imagetype name="buttonbackground">
-                    <gradient start="#505050" end="#000000" alpha="200" />
-                </imagetype>
+                <area>0,0,100%,100%</area>
+                <shape name="background">
+                    <area>0,0,100%,100%</area>
+                    <fill style="gradient">
+                        <gradient start="#505050" end="#000000" alpha="200" />
+                    </fill>
+                </shape>
                 <textarea name="buttontext">
                     <area>6,0,85%,30</area>
                     <font>basesmall</font>
@@ -200,14 +204,18 @@
                 </imagetype>
             </state>
             <state name="selectedactive" from="active">
-                <imagetype name="buttonbackground">
-                    <gradient start="#52CA38" end="#349838" alpha="255" />
-                </imagetype>
+                <shape name="background">
+                    <fill style="gradient">
+                        <gradient start="#52CA38" end="#349838" alpha="255" />
+                    </fill>
+                </shape>
             </state>
             <state name="selectedinactive" from="active">
-                <imagetype name="buttonbackground">
-                    <gradient start="#52CA38" end="#349838" alpha="100" />
-                </imagetype>
+                <shape name="background">
+                    <fill style="gradient">
+                        <gradient start="#52CA38" end="#349838" alpha="100" />
+                    </fill>
+                </shape>
                 <textarea name="buttontext">
                     <font>basesmall_normal_inactive</font>
                 </textarea>
@@ -982,8 +990,9 @@
             <layout>grid</layout>
             <buttonarea>0,0,500,430</buttonarea>
             <statetype name="buttonitem">
+                <area>0,0,166,106</area>
                 <state name="active">
-                    <area>0,0,166,106</area>
+                    <area>0,0,100%,100%</area>
                     <imagetype name="buttonbackground" />
                     <statetype name="nodetype">
                         <state name="folder">
@@ -1020,10 +1029,12 @@
                 </state>
                 <state name="selectedinactive" from="active" />
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <area>0,0,166,106</area>
-                        <gradient start="#999999" end="#666666" alpha="220" />
-                    </imagetype>
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <fill style="gradient">
+                            <gradient start="#999999" end="#666666" alpha="220" />
+                        </fill>
+                    </shape>
                 </state>
             </statetype>
         </buttonlist>

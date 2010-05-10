@@ -519,7 +519,6 @@
                     </textarea>
                     <shape name="selectbar">
                         <area>5,-3,751,30</area>
-                        <font>basesmallbold</font>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
@@ -719,7 +718,6 @@
                 <state name="selectedactive" from="active">
                     <shape name="selectbar">
                         <area>3,-2,755,30</area>
-                        <font>basesmallbold</font>
                     </shape>
                 </state>
                 <state name="selectedinactive" from="active" />
@@ -980,16 +978,18 @@
         <textedit name="description">
             <area>100,400,600,100</area>
             <statetype name="background">
+                <area>0,0,100%,100%</area>
                 <state name="active">
-                    <imagetype name="background">
-                        <area>0,0,600,100</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                    <area>0,0,100%,100%</area>
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#FFFFFF" alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
@@ -1565,16 +1565,18 @@
         <textedit name="description">
             <area>54,290,692,130</area>
             <statetype name="background">
+                <area>0,0,100%,100%</area>
                 <state name="active">
-                    <imagetype name="background">
-                        <area>0,0,692,130</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                    <area>0,0,100%,100%</area>
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#FFFFFF" alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
@@ -1597,16 +1599,18 @@
         <textedit name="subtitle">
             <area>250,430,496,75</area>
             <statetype name="background">
+                <area>0,0,100%,100%</area>
                 <state name="active">
-                    <imagetype name="background">
-                        <area>0,0,496,75</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                    <area>0,0,100%,100%</area>
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#FFFFFF" alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
