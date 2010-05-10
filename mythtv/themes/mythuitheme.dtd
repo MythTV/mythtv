@@ -1,11 +1,11 @@
 <!-- Parameter entities to avoid repetition -->
 <!ENTITY % common_attributes "name CDATA #REQUIRED
                               from CDATA #IMPLIED" >
-<!ENTITY % widgets "(textarea|imagetype|statetype|button|buttonlist|buttontree|
+<!ENTITY % widgets "textarea|imagetype|statetype|button|buttonlist|buttontree|
                     textedit|checkbox|spinbox|progressbar|clock|webbrowser|
-                    shape|guidegrid)" >
-<!ENTITY % widget_common "(area|position|alpha|alphapulse|helptext|focusorder|
-                           minsize|loadondemand)" >
+                    shape|guidegrid" >
+<!ENTITY % widget_common "area|position|alpha|alphapulse|helptext|focusorder|
+                           minsize|loadondemand" >
 
 <!-- MythUI Theme Root -->
 <!ELEMENT mythuitheme (window|fontdef|%widgets;)*>
