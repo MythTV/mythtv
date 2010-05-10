@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Checking prerequisites.</TITLE>
  <LINK HREF="mythtv-HOWTO-4.html" REL=next>
  <LINK HREF="mythtv-HOWTO-2.html" REL=previous>
@@ -44,17 +44,27 @@ post a question to the list.</P>
 hardware selection, mainly because there are so many tradeoffs which can be
 made.  For example, if you have plenty of CPU, you can use higher bitrates
 or capture sizes, etc.</P>
-<P>MythTV has two modes of operation.  First, it can function as a software
-video encoder, which means that it uses a fairly generic "dumb" video
-capture card to get frames of video, encodes them using the CPU on your
-motherboard and writes them to disk.  High-end video capture cards and
-devices like the TiVo and ReplayTV have dedicated encoder chips which use
-specialized hardware to convert the video stream to the MPEG-2 format
-without using the motherboard CPU.  The main CPU has the responsibility of
-running the Operating System and reading and writing the encoded frames to
-the disk.  These tasks have fairly low CPU requirements compared to encoding
-video, which is why a device like a Series 1 TiVo can run with only 16MB of
-RAM and a 54MHz CPU.</P>
+
+<H3>Software / CPU-based encoding.</H3>
+
+<P>MythTV has two modes of operation for capturing video.  First, it can
+function as a software video encoder, which means that it can use a fairly
+generic "dumb" video capture card to get frames of video, encodes them using
+the CPU on your motherboard and writes them to disk.  High-end video capture
+cards and devices like the TiVo and ReplayTV have dedicated encoder chips
+which use specialized hardware to convert the video stream to the MPEG-2
+format without using the motherboard CPU.  The main CPU has the
+responsibility of running the Operating System and reading and writing the
+encoded frames to the disk.  These tasks have fairly low CPU requirements
+compared to encoding video, which is why a device like a Series 1 TiVo can
+run with only 16MB of RAM and a 54MHz CPU.</P>
+<P>That being said, due to the digital conversion in the United States, there
+are fewer sources of NTSC analog video, and cheap silicon has
+made it easier to include MPEG-2 encoders into hardware capture cards.  In
+addition, the sale of "analog-only" cards has been severely curtailed in the
+United States, and one vendor received a fine for failing to include
+notification that their device was analog-only.  
+<A HREF="http://hraunfoss.fcc.gov/edocs_public/attachmatch/DA-08-493A1.txt">http://hraunfoss.fcc.gov/edocs_public/attachmatch/DA-08-493A1.txt</A></P>
 <P>There are many variables that go into the question: "How fast a CPU do I
 need to run MythTV"?  Obviously, the faster your CPU, the better your
 experience will be with MythTV.  If you are using the software MPEG-4
@@ -82,21 +92,25 @@ created on a different system with 30% CPU usage.</LI>
 simultaneously serve content to a remote frontend.</LI>
 </UL>
 </P>
+
+<H3>Hardware based encoding.</H3>
+
 <P>The second mode of operation is where MythTV is paired with a hardware-based
 video encoder, in which case MythTV will primarily be I/O bound.  There are
 several examples of such devices, like the Hauppauge
-WinTV-PVR-150/250/350/500 series, the Hauppauge HD-PVR, or the Silicon Dust
-HDHomerun.  In this mode, because the video encoding is being done by a
-dedicated video processor (the Hauppauges), or the device is simply writing
-the data to disk (the HDHR and other digital devices, such as DVB cards) the
-host CPU requirements are quite low.  See the 
+WinTV-PVR-150/250/350/500 series, the Hauppauge HD-PVR (H.264 High-Def
+capture using Component inputs), or the Silicon Dust HDHomerun.  In this mode,
+because the video encoding is being done by a dedicated video processor (the
+Hauppauge encoders), or the device is simply writing the data to disk (the
+HDHR and other digital devices, such as DVB cards) the host CPU requirements
+are quite low.  See the 
 <A HREF="#video_capture_device">Video Capture Device</A> section for details.</P>
 <P>Primary development in MythTV has transitioned to supporting MPEG-2 capture
-devices and HDTV, so if given the option, go with the hardware MPEG-2
-encoder or ATSC.  Because of the transition to digital broadcast in
-the United States, most television stations are now digital-only.  There are
-still analog stations in the U.S., but a majority are low-powered.  Canada
-still has analog broadcasts.  </P>
+devices, H.264 and HDTV, so if given the option, go with the hardware encoder or
+choose a ATSC capture device.  Because of the transition to digital
+broadcast in the United States, most television stations are now
+digital-only.  There are still analog stations in the U.S., but a majority
+are low-powered.  Canada still has analog broadcasts.</P>
 <P>Analog encoding or hardware MPEG-2 encoding may still be required if you are
 trying to capture standard definition video sources, such as set-top-boxes.</P>
 
@@ -113,24 +127,11 @@ may be useful if you are running multiple encoders.</P>
 on the encoding scheme, the size of the raw images and the frames per
 second, but typical values for MythTV range from 700 megabytes/hour for
 MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7 GB/hour for ATSC HDTV.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
-choppy or jittery video.  Not all distributions enable DMA at boot time.
-See the Troubleshooting Section for 
-<A HREF="mythtv-HOWTO-22.html#Setting_DMA">instructions</A> on how to do this.</CAPTION>
-</FIGURE>
-</P>
 <P>Writing video to disk is sensitive to timing issues; RTjpeg requires less
 CPU with the tradeoff being larger files and needing to write to the disk
 faster.  MPEG-4 requires more CPU, but the files are smaller.  At the
 default resolution, MPEG-2 creates the largest files of all with almost no
 CPU impact.</P>
-<P>See the Troubleshooting 
-<A HREF="mythtv-HOWTO-22.html#Setting_DMA">section</A> for more
-information.</P>
 
 <H3>Filesystems</H3>
 
@@ -186,31 +187,6 @@ more information and for specific hardware questions.</P>
 <P>The most common inexpensive cards available use the Bt848, Bt878 or CX2388x
 series of video capture chips; examples are the "Hauppauge WinTV Go" card and
 the "AverTV Desktop PVR" card, both of which use the bttv kernel module.</P>
-<P>
-<HR>
-<PRE>
-NOTE:  The ATI TV Wonder series and the ATI All-in-Wonder series of cards
-are not the same.  The All-in-Wonder cards will not work with MythTV.
-</PRE>
-<HR>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-</FIGURE>
-
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: The ATI All-in-Wonder cards (which are not the same
-as the ATI TV Wonder, TV Wonder VE or TV Wonder Pro) <EM>will not</EM> work
-as a MythTV capture device because the GATOS 
-<A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
-drivers that are available provide only a limited subset of the V4L API.
-The TV Wonder series of cards are supported by the Bt8x8 Video4Linux driver.</CAPTION>
-</FIGURE>
-</P>
 <P>After you have installed a suitable capture device, you can check that
 the kernel sees it with <CODE>lspci</CODE>. Look for an entry labeled "Multimedia
 video controller". To get more detailed information about the card, use
@@ -257,25 +233,25 @@ for Live TV at 416x480.</LI>
 <H3>DVB capture cards.</H3>
 
 <P>DVB is a video standard primarily found in Europe (where it comes in
-DVB-C, DVB-T and DVB-S varieties for Cable, Terrestrial and Satellite) and
-is also used as the programming interface for HDTV capture cards in Linux.
-To see if your DVB card is supported, see the list of cards in the
-"Supported Hardware" section of the DVB Wiki at 
+DVB-C, DVB-T and DVB-S and -S2 varieties for Cable, Terrestrial and
+Satellite) and is also used as the programming interface for HDTV capture
+cards in Linux.  To see if your DVB card is supported, see the list of cards
+in the "Supported Hardware" section of the DVB Wiki at 
 <A HREF="http://www.linuxtv.org/wiki/index.php/Main_Page">http://www.linuxtv.org/wiki/index.php/Main_Page</A> for more
 information.</P>
 <P>In the United States, you may use a card such as the TwinHan to obtain
 unencrypted Free-To-Air satellite channels.  See 
 <A HREF="http://www.lyngsat.com/">http://www.lyngsat.com/</A> for the types
-of content which is available.</P>
+of content which are available.</P>
 
 <H3>HDTV.</H3>
 
 <P>There are a number of HDTV cards with Linux drivers which are known to
 operate in the United States; a complete list of cards with DVB drivers can
 be found at 
-<A HREF="http://www.linuxtv.org/">http://www.linuxtv.org/</A> Some cards support
-capture of unencrypted digital cable TV (utilizing QAM256), others will only
-work with Over The Air signals captured with an antenna (with 8VSB).</P>
+<A HREF="http://www.linuxtv.org/">http://www.linuxtv.org/</A> Some cards support capture of unencrypted
+digital cable TV (utilizing QAM64 or QAM256), others will only work with
+Over The Air signals captured with an antenna (with 8VSB).</P>
 <P><EM>None</EM> of the capture devices listed above
 perform any encoding; they merely allow your computer to save a copy of a
 HDTV stream which has already been converted to MPEG-2 at the broadcast
@@ -307,17 +283,20 @@ deinterlacing, or if you have an NVIDIA card with video decode acceleration. </P
 <H3>Playback of HDTV using VDPAU</H3>
 
 <P>NVIDIA now incorporates MPEG-2 and H.264 decode acceleration in their
-binary driver; this is now officially supported in MythTV 0.22.  Use of
+binary driver; this is now officially supported in MythTV 0.22 or later.  Use of
 VDPAU offloads the decompression and deinterlacing of video to the video GPU
 rather than the CPU of the frontend, so the CPU requirements are drastically
-lowered.  A fanless frontend using an Intel Atom CPU running a single-core at
-1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264.</P>
+lowered.  A fanless frontend using an Intel Atom CPU running a single-core
+at 1.6Ghz is sufficient to decode and deinterlace MPEG-2 and H.264 if it has
+VDPAU supported video.</P>
 
 <H3>Firewire.</H3>
 
-<P>You may use the Firewire output of the Motorola DCT6200 or the SA3250.
+<P>You may use the Firewire output of the Motorola DCT6200 or the SA3250. 
 If your provider uses 5C encryption on a particular channel, you won't be
-able to get any content.</P>
+able to get any content.  Many users have resorted to using Firewire to
+change channels on their set-top-box and capture the High Def video using
+the Component output fed into a Hauppauge HD PVR.</P>
 
 <H3>DBoxII or other devices running Neutrino</H3>
 
@@ -410,7 +389,7 @@ only supported on the VGA output, and not on the TV output.</P>
 
 <H3>Cards with TV-out</H3>
 
-<P>The next section deals with a number of cards that are known to have
+<P>This section deals with a number of cards that are known to have
 TV-out ports.  The list is unlikely to be complete, so if you know of
 others, please post a message to the mythtv-users mailing list so the
 information can be included in future versions of the HOWTO. The list is
@@ -420,26 +399,6 @@ mythtv-users mailing list, so if you need configuration details, please
 search the archives at 
 <A HREF="http://www.gossamer-threads.com/lists/mythtv/">http://www.gossamer-threads.com/lists/mythtv/</A> using
 the card name in your search string.</P>
-
-<H3>ATI</H3>
-
-<P>ATI makes many cards with TV-out capability, but only offers Linux
-drivers for Radeon 8500 and above cards.  See the Drivers and Software
-section of 
-<A HREF="http://www.ati.com/">http://www.ati.com</A> for the
-driver and additional information.</P>
-<P>The enhanced ati.2 X driver created by the GATOS 
-<A HREF="http://gatos.sourceforge.net">http://gatos.sourceforge.net</A>
-project offers some support for TV-out on other ATI cards, but only in its
-"experimental" version, available through CVS. There have been reports from
-people who say they have made this driver work with one or another ATI card.
-For example, Bruce Markey 
-<A HREF="mailto:bjm@lvcm.com">mailto:bjm@lvcm.com</A> writes (on the
-mythtv-users mailing list): "I got this to work. You can quote me on that.
-I've used TV-out on several models of ATI cards both All-In-Wonder and
-regular cards with TV-out." See the "Adventurous Setup" section of 
-<A HREF="http://gatos.sourceforge.net/watching_tv.php">http://gatos.sourceforge.net/watching_tv.php</A> for details. Also see
-<A HREF="http://www.retinalburn.net/linux/tvout.html">http://www.retinalburn.net/linux/tvout.html</A> for more information.</P>
 
 <H3>NVIDIA</H3>
 
@@ -458,13 +417,6 @@ NVIDIA drivers; they have excellent support for XvMC and ship with a good
 configuration utility.  XvMC provides MPEG-2 hardware acceleration, which is
 important if you want to display HDTV.  VDPAU is another new feature and it
 provides an API for offloading MPEG-2 and H.264 to the GPU.</P>
-
-
-<H3><A NAME="PVR-350"></A> Hauppauge PVR-350 </H3>
-
-<P>As of MythTV 0.22, the  TV-out and MPEG-2 decoder functions of the
-PVR-350 are no longer supported.  This functionality is currently
-unmaintained, and will be removed in MythTV 0.23.</P>
 
 <H3>External Adapters</H3>
 
@@ -532,56 +484,7 @@ Fedora Core can be found in Jarod Wilson's (
 <A HREF="mailto:jcw@wilsonet.com">mailto:jcw@wilsonet.com</A>) HOWTO at 
 <A HREF="http://wilsonet.com/mythtv/">http://wilsonet.com/mythtv/</A> Just
 like 3rd-party packages, any 3rd-party documentation problems should be
-brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).  The
-installation instructions which follow should be used as a guide only; refer
-to Jarod's guide.</P>
-<P>Red Hat Linux and Fedora Core packages for MythTV and all of its add-on
-modules and some themes have been packaged by 
-<A HREF="mailto:Axel.Thimm@ATrpms.net">mailto:Axel.Thimm@ATrpms.net</A> and
-are available at 
-<A HREF="http://ATrpms.net/topic/multimedia/">http://ATrpms.net/topic/multimedia/</A>. All of the prerequisites for
-MythTV (such as XMLTV) are available as RPM packages. If you have problems
-with the RPMs, please contact the ATrpms lists at 
-<A HREF="http://lists.ATrpms.net/">http://lists.ATrpms.net/</A> or file a
-bug against 
-<A HREF="http://bugzilla.ATrpms.net/">http://bugzilla.ATrpms.net/</A>.</P>
-<P>Given the large number of dependent RPMs you are advised to use tools like
-apt or yum for automatic retrieval and installation of the required RPMs.
-(
-<A HREF="http://ATrpms.net/install.html">http://ATrpms.net/install.html</A>) In this case a
-special meta-package called mythtv-suite will allow you to install all of
-MythTV and its add-ons, plus all dependencies.</P>
-<P>If you don't have <B>apt</B> or <B>yum</B> on your machine, download and
-install the atrpms-kickstart package from 
-<A HREF="http://ATrpms.net/name/atrpms-kickstart/">http://ATrpms.net/name/atrpms-kickstart/</A>.
-Install the package with:
-<BLOCKQUOTE><CODE>
-<PRE>
-# rpm -Uvh atrpms-kickstart*
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Then run:
-<BLOCKQUOTE><CODE>
-<PRE>
-# apt-get update
-# apt-get dist-upgrade
-# apt-get update
-</PRE>
-</CODE></BLOCKQUOTE>
-
-And finally:
-<BLOCKQUOTE><CODE>
-<PRE>
-# apt-get install mythtv-suite
-</PRE>
-</CODE></BLOCKQUOTE>
-
-These steps however, do NOT perform the installation of any drivers required
-for <B>ALSA</B>, capture cards, <B>lirc kernel modules</B>, etc., nor do
-they set up your MythTV database. Check 
-<A HREF="http://ATrpms.net/topic/multimedia/">http://ATrpms.net/topic/multimedia/</A> for the drivers you
-need.</P>
+brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).</P>
 
 <H3>Debian</H3>
 

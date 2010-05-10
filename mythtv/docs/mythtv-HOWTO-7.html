@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Configuring Sound.</TITLE>
  <LINK HREF="mythtv-HOWTO-8.html" REL=next>
  <LINK HREF="mythtv-HOWTO-6.html" REL=previous>
@@ -14,24 +14,21 @@
 <HR>
 <H2><A NAME="s7">7.</A> <A HREF="mythtv-HOWTO.html#toc7">Configuring Sound.</A></H2>
 
-<P>If your video doesn't appear to be in-sync with your audio and you're
-using an analog video capture card and a soundcard to capture audio, it
-could be because you are listening to the real-time audio from your video
-card rather than after it's been processed and synchronized to the video by
-MythTV.  Because MythTV is a personal video recorder, "Live TV" isn't really
-live - to let you pause live TV, MythTV is actually encoding the video,
-saving to disk, and then playing it back.  This procedure puts your MythTV
-"live" TV about 2 seconds behind real-time, so it's important that you're
-not listening to the live audio.  However, if you're having an issue where
-the audio and video aren't synchronized by small but varying amount, it's
-most likely because the sound driver that you're using doesn't have the
-DSP_CAP_REALTIME capability.  This was the case with ALSA (0.5), but not
-with newer versions.  See the 
-<A HREF="mythtv-HOWTO-22.html#Troubleshooting_Audio">Troubleshooting Audio</A> section for more information if you're having
-issues with sound.  Also, ensure that no other programs are grabbing the
-audio output, like <B>arts</B> or <B>esd</B>.</P>
-<P>What you need to do is to mute the "line-in" of your sound card and also
-set it as the recording source.</P>
+<P>In the past, when analog frame buffer video capture cards were the primary
+means of obtaining video, many did not include audio capture circuitry, so a
+sound card was required to record the audio.  Now that most users will have
+a hardware capture device which multiplexes the audio and video into a
+single stream this is not as great a concern as it once was.</P>
+<P><B>NOTE</B>: This portion of the HOWTO will be removed in MythTV v0.23.</P>
+<P>See the 
+<A HREF="mythtv-HOWTO-22.html#Troubleshooting_Audio">Troubleshooting Audio</A>
+section for more information if you're having issues with sound.  Also,
+ensure that no other programs are grabbing the audio output, like
+<B>arts</B> or <B>esd</B>.</P>
+<P>You must mute the "line-in" of your sound card and also set it as the
+recording source.  Muting the line-in will ensure that you don't hear a
+time-delayed version of any live programs you may be watching if you have a
+combined frontend/backend system.</P>
 <P>There are two ways to do this.  Graphically, and from the command line.</P>
 
 <H2><A NAME="ss7.1">7.1</A> <A HREF="mythtv-HOWTO.html#toc7.1">Graphically setting up the mixer</A>

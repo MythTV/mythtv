@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Miscellaneous.</TITLE>
  <LINK HREF="mythtv-HOWTO-24.html" REL=next>
  <LINK HREF="mythtv-HOWTO-22.html" REL=previous>
@@ -415,15 +415,17 @@ want to edit your <CODE>/etc/exports</CODE> file and use something like:
 add something like:
 <BLOCKQUOTE><CODE>
 <PRE>
-masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3,actimeo=0
+masterbackend:/var/video /var/video nfs hard,intr,nfsvers=3,actimeo=0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>Then run <CODE># mount -a</CODE> to re-read the file to mount the file system.</P>
+<P><B>NOTE</B>:  Previous versions of this HOWTO gave specific values for 
+variables like the "rsize".  Best common practice at this point is to <EM>not</EM>
+specify these and allow the server and the client to autonegotiate.</P>
 <P>In this case, the source is a machine called "masterbackend" which is
 exporting the directory "/var/video", which we're mounting locally at
-"/var/video".  The rsize and wsize options are used to increase the
-performance of NFS; "hard,intr" is there because that's the recommendation
+"/var/video".  "hard,intr" is there because that's the recommendation
 of the NFS-HOWTO, the nfsvers is required for filesizes over 2GB and actimeo
 is used to turn off file attribute caching.  Attribute caching for a shared
 media point causes problems; you always want to see the latest state of the
@@ -475,31 +477,43 @@ session.screen0.focusModel:     SloppyFocus
 
 <H3>Red Hat And Mandriva</H3>
 
-<P>A method for automatically starting mythbackend submitted by Mike
+<P>Here's a method for automatically starting mythbackend submitted by Mike
 Thomson (
 <A HREF="mailto:linux@m-thomson.net">mailto:linux@m-thomson.net</A>) and Stu Tomlinson (
-<A HREF="mailto:stu@nosnilmot.com">mailto:stu@nosnilmot.com</A>) has subsequently been updated by Axel Thimm (<A HREF="mailto:axel.thimm@atrpms.net">mailto:axel.thimm@atrpms.net</A>) and is now maintained by the MythTV Development Team.</P>
-<P>Copy the files from the MythTV <CODE>contrib</CODE> directory as follows (the paths in this example are based on the locations used in MythBuntu, yours may vary):</P>
+<A HREF="mailto:stu@nosnilmot.com">mailto:stu@nosnilmot.com</A>).</P>
+<P>Copy the files from the MythTV <CODE>contrib</CODE> directory or from Mike's web
+site (
+<A HREF="http://m-thomson.net/mythtv/">http://m-thomson.net/mythtv/</A>) as follows:</P>
+<P><CODE>etc.rc.d.init.mythbackend</CODE> should be made executable and copied to
+<CODE>/etc/rc.d/init.d/</CODE>:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd /usr/share/doc/mythtv-backend/contrib/Linux/init_scripts/
+$ cd contrib
 $ su
-# gunzip fedora.init.myth*
-# cp fedora.init.mythbackend /etc/init.d/mythbackend
-# cp fedora.init.mythjobqueue /etc/init.d/mythjobqueue
-# chmod u+x /etc/init.d/myth*
-# cp fedora.sysconfig.mythbackend /etc/sysconfig/mythbackend
-# cp fedora.sysconfig.mythjobqueue /etc/sysconfig/mythjobqueue
+# chmod a+x etc.rc.d.init.d.mythbackend
+# cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
 </PRE>
 </CODE></BLOCKQUOTE>
-<P>Review the contents of <CODE>/etc/sysconfig/mythbackend</CODE> and <CODE>/etc/sysconfig/mythjobqueue</CODE> then edit them if you want to change any of the defaults</P>
-<P>Use <B>chkconfig</B> to make sure the scripts are called when
+</P>
+<P><CODE>etc.sysconfig.mythbackend</CODE> should be copied to
+<CODE>/etc/sysconfig/</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd contrib
+$ su
+# cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Edit <CODE>/etc/sysconfig/mythbackend</CODE> if you want to change the defaults
+(the userid that should start mythbackend, location of the logfile and (if
+required) the name and location of the mythbackend binary).</P>
+<P>Use <B>chkconfig</B> to make sure the script is called when
 entering runlevels 3, 4 or 5:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
 # chkconfig --level 345 mythbackend on
-# chkconfig --level 345 mythjobqueue on
 # exit
 $
 </PRE>
@@ -792,7 +806,7 @@ Although RTjpeg is an option for video codec there is no reason to transcode
 the recording will take <EM>more</EM> CPU power to play back.  The MPEG-4
 settings are described in the documentation for the <B>ffmpeg</B> project
 at 
-<A HREF="http://ffmpeg.org/ffmpeg-doc.html">http://ffmpeg.org/ffmpeg-doc.html</A>.  It's a matter of
+<A HREF="http://ffmpeg.sourceforge.net/ffmpeg-doc.html">http://ffmpeg.sourceforge.net/ffmpeg-doc.html</A>.  It's a matter of
 trial and error to discover which settings achieve a good compromise between
 size and quality.</P>
 <P>If you wish to return to the default settings, they are Bitrate: 2200-2500,
@@ -1056,21 +1070,18 @@ not connected to any output jacks, and there doesn't appear to be any way to
 pull decoded video from the card, so it's a fairly useless feature.</P>
 <P>The PVR-350 (model 990) has the features of the PVR-250 as well as being
 able to decode MPEG-2.  The encode and decode functions may be used
-simultaneously.  The MPEG-2 decoder function gives superior video quality
-compared to what you'll find on a standard video card.  However, the decoder
-function is only available once Linux has started, so you will not see any
-boot-time messages.  Also, the card is not capable of resolutions higher
-than 720x480, so it cannot be used with HDTV.  Make a conscious decision
-(and ask for advice on the mailing list) that you want to tradeoff potential
-HDTV use in the future compared to video quality.</P>
+simultaneously.  However, the decoder function is only available once Linux
+has started, so you will not see any boot-time messages.  Also, the card is
+not capable of resolutions higher than 720x480, so it cannot be used with
+HDTV.  Make a conscious decision (and ask for advice on the mailing list)
+that you want to tradeoff potential HDTV use in the future compared to video
+quality.  Finally, support for the MPEG-2 video decoding offload has been
+removed from within MythTV.</P>
 <P>The X-driver for the PVR-350 support playback using Xv efficiently but does
 not support any other 2D or 3D acceleration. For some application this may
 place a large load on the host CPU, some will run without any problem and
 others (mplayer, xine, xmame etc.) should be configured to utilize the Xv
 interface.</P>
-<P>Note that for the PVR-350 there are some 
-<A HREF="mythtv-HOWTO-3.html#PVR-350">considerations</A>
-regarding the way audio is handled.</P>
 <P>The PVR-500 is a dual-encoder version of the PVR-150 card, so you can
 simultaneously record two different programs at the same time, because there
 are two encoder chips on the PCI card.  Hauppuage has also installed an

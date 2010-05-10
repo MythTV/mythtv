@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: MySQL.</TITLE>
  <LINK HREF="mythtv-HOWTO-7.html" REL=next>
  <LINK HREF="mythtv-HOWTO-5.html" REL=previous>
@@ -22,30 +22,6 @@ replication and deleting these files regularly.</P>
 <H2><A NAME="ss6.1">6.1</A> <A HREF="mythtv-HOWTO.html#toc6.1">Distribution-specific information</A>
 </H2>
 
-<H3>Mandriva</H3>
-
-<P>If this is the system maintaining the database, make sure that MySQL is
-running and started at boot.  Click on Mandriva Control
-Center->System->Services, find MySQL and click the "On Boot" button and the
-"Start" button if the MySQL status shows that it isn't running yet.</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  There have been reports that MySQL isn't starting at boot.
-If this is happening to you, try running the following commands.</CAPTION>
-</FIGURE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# chkconfig --level 35 mysql on
-# /etc/rc.d/init.d/mysql start
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
 <H3>Red Hat Linux and Fedora Core</H3>
 
 <P>If this is the system maintaining the database, make sure that MySQL is
@@ -61,10 +37,6 @@ Click Save, then close the window.</P>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H3>Gentoo</H3>
-
-<P>After installing MySQL you need to initialize the database by running
-<B>mysql_install_db</B> as root.</P>
 <H2><A NAME="setupdb"></A> <A NAME="ss6.2">6.2</A> <A HREF="mythtv-HOWTO.html#toc6.2">Setting up the initial database </A>
 </H2>
 
@@ -87,7 +59,7 @@ $ mysql -u root &lt; mc.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H3>Debian 3.0</H3>
+<H3>Debian</H3>
 
 <P>
 <BLOCKQUOTE><CODE>
@@ -119,9 +91,9 @@ Instructions for doing so can be found on MySQL's web site at
 <P>If you're going to have multiple systems accessing a master database,
 you must grant access to the database from remote systems.  By default, the
 <CODE>mc.sql</CODE> script is only granting access to the local host.</P>
-<P>To allow other hosts access to your master database, you can either set it
-up for no security at all, or with more granularity.  Note that the "%" is
-the wildcard character in MySQL.</P>
+<P>To allow other hosts access to your master database, you can either
+configure MySQL database access with no security or with additional
+granularity. </P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
@@ -129,8 +101,9 @@ the wildcard character in MySQL.</P>
 <CAPTION><B>NOTE</B>:  The "no security" option is <EM>very</EM> dangerous unless
 you're in a controlled environment.</CAPTION>
 </FIGURE>
-
-This example has no security at all, and allows access from any host.
+</P>
+<P>The "%" is the wildcard character in MySQL.</P>
+<P>This example has no security at all, and allows access from any host.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ mysql -u root mythconverg
@@ -161,10 +134,10 @@ mysql> flush privileges;
 </CODE></BLOCKQUOTE>
 </P>
 <P>You'll also need to check that the "networking" feature of MySQL is turned
-on. Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
-<CODE>skip-networking</CODE>.  If it does, remove it.  Also verify that
-<CODE>bind-address</CODE> is set to your IP address instead of
-<CODE>127.0.0.1</CODE>.  If you change either of these items, restart
+on.  Check that <CODE>/etc/mysql/my.cnf</CODE> <EM>does not</EM> contain
+<CODE>skip-networking</CODE>.  If it does, either remove that line or comment it
+out.  Also verify that <CODE>bind-address</CODE> is set to your IP address
+instead of <CODE>127.0.0.1</CODE>.  If you change either of these items, restart
 <B>MySQL</B>.</P>
 <P><B>NOTE</B>:  Your distribution may have a customized MySQL configuration
 file; in Mandriva, check <CODE>/etc/sysconfig/mysqld</CODE> for additional

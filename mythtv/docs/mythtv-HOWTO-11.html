@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Using MythTV.</TITLE>
  <LINK HREF="mythtv-HOWTO-12.html" REL=next>
  <LINK HREF="mythtv-HOWTO-10.html" REL=previous>
@@ -191,12 +191,12 @@ Home/End </TD><TD> move the highlight left or right by one day </TD></TR><TR><TD
 Ctrl+Left or &lt; </TD><TD> move the highlight left by one page </TD></TR><TR><TD>
 Ctrl+Right or &gt; </TD><TD> move the highlight right by one page </TD></TR><TR><TD>
 9, 3, 7, 1 </TD><TD> (like a numeric keypad) perform the same as PageUp, PageDown,&nbsp;Home and End </TD></TR><TR><TD>
-I </TD><TD> bring up more information about a show, and allow you to&nbsp;schedule a recording. If you select "Record this showing"&nbsp;while watching Live TV you can "Instant Record" a program. </TD></TR><TR><TD>
-Space/Enter </TD><TD> allow you resolve conflicts or change overrides. If the&nbsp;program is not already scheduled to record, it will instead act like&nbsp;pressing 'I'. </TD></TR><TR><TD>
-M </TD><TD> when on a channel will change to that channel </TD></TR><TR><TD>
+U </TD><TD> bring up more information about a show </TD></TR><TR><TD>
+I </TD><TD> allow you to schedule a recording. If you select "Record&nbsp;this showing" while watching Live TV you can "Instant&nbsp;Record" a program. </TD></TR><TR><TD>
+Space/Enter </TD><TD> when watching LiveTV will change to that channel and exit the&nbsp;EPG if the selected show is in progress or starts within 15&nbsp;minutes; or otherwise will allow you to resolve conflicts&nbsp;or change overrides. If the program is not already scheduled&nbsp;to record, it will instead act like pressing I </TD></TR><TR><TD>
+X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
 ESC or C </TD><TD> exits without changing the channel </TD></TR><TR><TD>
 R </TD><TD> change the current item from Recording/Not-Recording.&nbsp;Successive keypresses cycle through the scheduled recording&nbsp;type list. </TD></TR><TR><TD>
-X </TD><TD> change the channel to the currently selected channel without&nbsp;leaving the EPG (Most useful in the alternate EPG) </TD></TR><TR><TD>
 ? </TD><TD> mark/unmark the current channel as a "favorite" </TD></TR><TR><TD>
 / or 4 </TD><TD> toggle the guide listing between all channels and filtered&nbsp;"favorites"
 </TD></TR></TABLE>
@@ -312,8 +312,8 @@ functionality.  Download the MythThemes tarball from the website and untar it:</
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf myththemes-0.22.tar.bz2
-$ cd ~/myththemes-0.22
+$ tar -xjf myththemes-0.23.tar.bz2
+$ cd ~/myththemes-0.23
 $ qmake myththemes.pro
 $ su -
 # make install
@@ -361,10 +361,10 @@ will discuss in detail two possibilities:</P>
 <LI>Use another server that runs 24/7 and have it send a WakeOnLAN (WOL)
 packet to wake the Master backend.  This assumes that you have the WOL tools
 installed, and that your Master backend motherboard supports WOL.</LI>
-<LI>Use your motherboard's BIOS wakeup capability.  You'll need a motherboard
-that supports BIOS wakeup, and some tools.  Two that work are: 
-<A HREF="http://sourceforge.net/projects/nvram-wakeup">http://sourceforge.net/projects/nvram-wakeup</A> and 
-<A HREF="http://www.malloc.de/tools/wakeup_clock.html">http://www.malloc.de/tools/wakeup_clock.html</A></LI>
+<LI>Use your motherboard's BIOS wakeup capability.  You'll need a
+motherboard that supports BIOS wakeup, and some tools.  See 
+<A HREF="http://www.mythtv.org/wiki/ACPI_Wakeup">http://www.mythtv.org/wiki/ACPI_Wakeup</A> for details on the best ways
+to accomplish this.</LI>
 </UL>
 </P>
 
@@ -531,9 +531,9 @@ allows 3rd parties to run arbitrary code on your server!</P>
 
 <H3>Using BIOS wakeup to wake your Master backend.</H3>
 
-<P>Since I don't use this, I cannot say much about this. If your motherboard
-supports any wakeup tool you have to call that tool as "Set wakeuptime
-command" with the "Wakeup time format" suitable for that tool.</P>
+<P>See 
+<A HREF="http://www.mythtv.org/wiki/ACPI_Wakeup">http://www.mythtv.org/wiki/ACPI_Wakeup</A>
+for the best ways to accomplish this.</P>
 <H3>Wakeup the MySQL server using WOL</H3>
 
 <P>If your MySQL server and your Master backend are not on the same machine,

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Setting up a remote control.</TITLE>
  <LINK HREF="mythtv-HOWTO-9.html" REL=next>
  <LINK HREF="mythtv-HOWTO-7.html" REL=previous>
@@ -16,51 +16,26 @@
 
 <P>MythTV does not have native remote control receiver and decoder software
 built-in.  Instead, remote control functions are implemented by cooperating
-with <B>lirc</B>, the Linux Infrared Remote Control program.  <B>lirc</B>
-handles the IR hardware and passes keystrokes to MythTV, which then acts as
-if the user had pressed the keys on the keyboard.  The file
+with <B>lirc</B>, the Linux Infrared Remote Control program. 
+<B>lirc</B> handles the IR hardware and passes keystrokes to MythTV, which
+then acts as if the user had pressed the keys on the keyboard.  The file
 <CODE>keys.txt</CODE> describes the keys used to control MythTV.</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>: If you are running Mandriva, you may install
-<B>lirc</B> by executing: <CODE># urpmi lirc lirc-remotes</CODE> and bypass
-the manual compilation steps described below by jumping to the 
-<@@ref>completing_lirc_installCompleting the lirc install</A> section.
-See the contrib/mandrake91.etc.sysconfig.lircd file for an example of how to
-configure lircd.</CAPTION>
-</FIGURE>
-</P>
-<P>Some IR devices require a kernel recompile, and some don't. However, all at
-least require having the kernel source available as a resource for the lirc
-build process.</P>
-
-<H2><A NAME="ss8.1">8.1</A> <A HREF="mythtv-HOWTO.html#toc8.1">Gentoo</A>
-</H2>
-
-<P>To install lirc on Gentoo, all you need to do is:
-<BLOCKQUOTE><CODE>
-<PRE>
-# emerge lirc
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-
-<P>The third option is to dispense with lirc altogether by purchasing an IR
-keyboard (various options exist, although Chicony appears to work for some
-people) and a learning remote control.  The IR keyboard receiver plugs into
-the PS/2 keyboard port on your PC and you would train your learning remote
-to emulate the various keystrokes from <CODE>keys.txt</CODE> of your IR
-keyboard.  Using this method removes lirc entirely from the picture - your
-remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
-
-
-
-
-<P>pulses may correlate to "Channel Up".  The <CODE>lircd.conf</CODE> file will
-then contain a line that looks something like this:</P>
+<P>Compilation of lirc is outside the scope of this document.</P>
+<P>You can dispense with lirc altogether by purchasing an IR keyboard and a
+learning remote control.  The IR keyboard receiver plugs into your PC and
+you would train your learning remote to emulate the various keystrokes from
+<CODE>keys.txt</CODE> of your IR keyboard.  Using this method removes lirc
+entirely from the picture - your remote will be sending keypresses that your
+PC "sees" on the keyboard port.</P>
+<P>The "Big Picture" for lirc is that there are a few different things that fit
+together.</P>
+<P>First, lirc has a portion which is connected to an IR receiver.  The IR
+receiver senses the pulses and sends them to the lirc daemon.  The lircd
+loads a file called <CODE>lircd.conf</CODE> which instructs it how interpret the
+IR pulses that it received and convert them to a human-readable name.</P>
+<P>For example, the hardware may receive pulses may correlate to "Channel Up". 
+The <CODE>lircd.conf</CODE> file will then contain a line that looks something
+like this:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -69,8 +44,8 @@ then contain a line that looks something like this:</P>
 </CODE></BLOCKQUOTE>
 </P>
 <P>The <CODE>lircd.conf</CODE> file can have multiple remote controls defined.</P>
-<P>The second file is <CODE>lircrc</CODE>, which takes the name of the button which
-was pressed ("ChannelUp") in the above example, and correlates that to an
+<P>The second part is <CODE>lircrc</CODE>, which takes the name of the button which
+was pressed ("ChannelUp") in the above example, and associates that to an
 action to be performed by a program using the remote control.  So in MythTV,
 ChannelUp means one thing, while in <B>mplayer</B> it means something
 different.  <CODE>lircrc</CODE> gives you the flexibility of taking the name of
@@ -82,13 +57,12 @@ community, and there is no standard for the common button names.  One
 "ChannelUp", while another may contain a definition for "Chan+".  Your
 <CODE>lircrc</CODE> file must therefore be configured appropriately, or it won't
 work.</P>
-<P>If this fails, complaining of a missing <CODE>lircd.conf</CODE> file, then you
-must find or make one. First look for a pre-made configuration file at 
-<A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  Mandriva 9.1 users, look in
-<CODE>/usr/share/lirc-remotes</CODE>. If you find one your remotes either on the
-website or in <CODE>/usr/share</CODE>, download or copy the file, name it
-<CODE>lircd.conf</CODE> and put it in your <CODE>/etc</CODE> directory. If you
-couldn't find your remote, you must make your own <CODE>lircd.conf</CODE> file.</P>
+<P>Look for pre-made lircd.conf configuration files at 
+<A HREF="http://lirc.sourceforge.net/remotes/">http://lirc.sourceforge.net/remotes/</A>.  If you find one of your remotes
+either on the website or on your system, download or copy the file,
+name it <CODE>lircd.conf</CODE> and put it in your <CODE>/etc</CODE> directory.  If
+you couldn't find your remote, you must make your own <CODE>lircd.conf</CODE>
+file.</P>
 <P>To make your own <CODE>lircd.conf</CODE> file
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -113,29 +87,6 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Now, we're going to add the commands necessary for lircd to run each time we
-boot. Mandriva 9.1 users, you can execute:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# chkconfig --level 35 lircd on
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>All other distributions:
-<BLOCKQUOTE><CODE>
-<PRE>
-# cd /etc/rc.d
-# cat >> rc.local
-echo "Starting lircd"
-/usr/local/sbin/lircd
-^D
-# exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <P>This takes care of the lircd portion, which "listens" for the IR signals. If
 everything went well, the install script for lircd put an appropriate
 configuration file for your remote into <CODE>/etc/lircd.conf</CODE> This file
@@ -143,11 +94,11 @@ maps the buttons on the remote control to the IR pulses coming from the
 receiver.</P>
 <P>The next step is to convert those signals into something that can be used
 to control MythTV.  MythTV now includes native support for lirc and can
-interact directly with</P>
+interact directly with it.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythtv-0.22/contrib/configfiles
+$ cd mythtv/contrib/config_files/lirc
 $ cp lircrc.example ~/.lircrc
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -187,7 +138,7 @@ $ irxevent &amp;
 If <B>irxevent</B> isn't running, then MythTV will not respond to your remote
 control unless you're using native lirc support.</P>
 
-<H2><A NAME="ss8.2">8.2</A> <A HREF="mythtv-HOWTO.html#toc8.2">Additional information for lirc</A>
+<H2><A NAME="ss8.1">8.1</A> <A HREF="mythtv-HOWTO.html#toc8.1">Additional information for lirc</A>
 </H2>
 
 <P>Take a look at the lircrc.example files in the <CODE>contrib/configfiles/</CODE>
@@ -242,7 +193,7 @@ end
 
 which took care of basic functionality.  Because the PCTV Studio remote
 has additional buttons, look at the
-<CODE>contrib/configfiles/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
+<CODE>contrib/config_files/lirc/lircrc.example.pinnaclestudiopctv</CODE> for an example of how
 to define additional buttons, and how to debug potential button name
 conflicts between the <CODE>lircrc.example</CODE> file and how <B>your</B>
 remote defines the button names.</P>
@@ -255,126 +206,6 @@ program to pass through every third keypress.  By default, <CODE>lirc</CODE>
 will only send one keypress to the application, even if you're holding down
 the key.  The actual <B>repeat =</B> number will vary from system to
 system, so experiment and see which value works best for you.</P>
-
-<H2><A NAME="ss8.3">8.3</A> <A HREF="mythtv-HOWTO.html#toc8.3">Configuring lirc for use with an IR blaster</A>
-</H2>
-
-<P>Lirc has support for various IR transmitters. A popular model is the Actisys
-IR-200L 
-<A HREF="http://store.snapstreamstore.com/accessories.html">http://store.snapstreamstore.com/accessories.html</A>. It was
-originally designed for IRDA communication, but can be used to transmit A/V remote
-control codes. By using the lirc SIR driver, this device can easily be
-integrated with MythTV. I have tested this device with an AT&amp;T DCT2000
-digital cable box but the instructions can be used to configure other IRDA
-devices and A/V remotes.</P>
-<P>Follow the steps in the previous section.  When you run setup.sh, select
-option 1, driver configuration. From here select option 6, IrDA hardware.
-Select your appropriate device and the corresponding serial port, then Save
-configuration &amp; run configure from the main menu. Once configure is done
-type:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ make
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Please note: unlike the Pinnacle receiver above you will be compiling lircd
-in addition to a kernel module for the SIR transmitter. Depending on whether
-you have your serial port driver configured as a kernel module you might see
-the following message during make:
-<BLOCKQUOTE><CODE>
-<PRE>
-lirc_sir.c:56:2: warning: #warning
-"******************************************"
-
-lirc_sir.c:57:2: warning: #warning "Your serial port driver is compiled into "
-
-lirc_sir.c:58:2: warning: #warning "the kernel. You will have to release the "
-
-lirc_sir.c:59:2: warning: #warning "port you want to use for LIRC with:"
-
-lirc_sir.c:60:2: warning: #warning "setserial /dev/ttySx uart none"
-
-lirc_sir.c:61:2: warning: #warning
-"******************************************"
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you do receive this statement make sure to run the <B>setserial</B> command
-before you load the lirc_sir module. Follow this with the install:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# make install
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>You will notice that lirc installs the kernel module in
-<CODE>/lib/modules/uname -a/misc</CODE>.</P>
-<P>The configuration for starting <B>lircd</B> differs if you're going to be
-sending and receiving IR versus just receiving.
-<BLOCKQUOTE><CODE>
-<PRE>
-# cd /etc/rc.d
-# cat >> rc.local
-echo "Starting lircd"
-setserial /dev/ttySx uart none        # (if required)
-modprobe lirc_sir
-/usr/local/sbin/lircd
-^D
-# exit
-$
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>At this point you have to populate the <CODE>/etc/lircd.conf</CODE> file with the proper
-codes for your A/V remote. You should be able to find your remote within the
-lirc remote tar file located at 
-<A HREF="http://www.lirc.org/remotes.tar.bz2">http://www.lirc.org/remotes.tar.bz2</A>. In my case I
-extracted the file from remotes/motorola/DCT2000 (gi-motorola-dct2000)</P>
-<P>To test the lirc_sir module you can run <B>irw</B> to verify the codes are being
-received. If everything is configured correctly
-you should see something similar to the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ irw
-0000000000007ff0 00 1 gi-motorola-dct2000
-000000000000bff8 00 2 gi-motorola-dct2000
-000000000000f7f0 00 ENTER gi-motorola-dct2000
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Once you've verified lirc is working you can press <B>CTRL-C</B> to exit
-<B>irw</B> and configure the channel changing script.</P>
-<P>The path to the channel changing script will need to be entered on the
-mythtv-setup screen for Input Connections.</P>
-<P>This csh script will be called each time MythTV needs to change the channel.
-Below is a copy of the script followed by the corresponding perl script.
-Make sure both are in your path. Also make sure you leave the #!/bin/csh
-setting and not change it to Bourne or bash. This will create a frustrating
-symptom to diagnose where MythTV cannot open /dev/device. Unlike Bourne or
-bash, csh scripts automatically close parent file descriptors before they
-start.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd /usr/local/bin
-# su
-# cat > change_channel.csh
-#!/bin/csh
-echo "changing to $1"
-/usr/local/bin/channel.pl $1 &amp;
-^D
-# chmod a+x change_channel.csh
-# exit
-$ exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>See <CODE>contrib/channel.pl</CODE> for the actual file.  Copy it to
-<CODE>/usr/local/bin/</CODE></P>
-<P>The last statement within the perl script is the lirc rc command. This is
-the command that transmits the code to your cable/DSS box. Make sure to have
-the IRDA device within a few feet of the box.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-9.html">Next</A>

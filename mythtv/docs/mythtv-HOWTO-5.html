@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <HTML>
 <HEAD>
- <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.50">
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
  <TITLE>Installing and using MythTV: Downloading and compiling. </TITLE>
  <LINK HREF="mythtv-HOWTO-6.html" REL=next>
  <LINK HREF="mythtv-HOWTO-4.html" REL=previous>
@@ -17,29 +17,29 @@
 <P>Get MythTV from the 
 <A HREF="http://www.mythtv.org">http://www.mythtv.org</A> web site.  There are two installation methods
 you may choose from.  The first is to download the latest release in tarball
-format and compile.  The tarball release of MythTV should work on a wide
-variety of systems and should be the preferred method for new users.  If you
-wish to use the <B>subversion</B> copy of MythTV you may obtain it from
-<A HREF="http://svn.mythtv.org">http://svn.mythtv.org</A></P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: If you are going to use <B>subversion</B> to
-compile MythTV rather than using the distribution tarball, you <EM>must</EM>
+format and compile, but this is really only valid if you're reading this
+HOWTO on the very first day that a new release has been made, because the
+tarball is a static file and won't include any fixes for issues discovered
+after the tarball was created.</P>
+<P>The recommended solution is to download the source using
+<B>subversion</B> to ensure that you've got the latest fixes.</P>
+<P>When using subversion, there are some other choices that need to be made:
+<UL>
+<LI>Do you want to run the stable release of MythTV?  If yes, download from the "release-0-22-fixes" branch.</LI>
+<LI>Do you want to run the absolute latest developer code?  If yes, you <EM>must</EM>
 join the 
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">http://www.mythtv.org/mailman/listinfo/mythtv-commits/</A> and 
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">http://www.mythtv.org/mailman/listinfo/mythtv-dev/</A> mailing lists to
 keep up to date with the current status of the code.  Code obtained from
-subversion has no guarantees regarding stability, etc.</CAPTION>
-</FIGURE>
+subversion has no guarantees regarding stability, etc.  The latest code will be in "trunk".</LI>
+</UL>
 </P>
 <P>If you are in North America you will use the Schedules Direct grabber which is
 built-in to MythTV.  You <EM>do not</EM> need to install XMLTV (so you may
 skip XMLTV-related instructions), but you need <B>wget</B> version 1.9.1
 or higher.</P>
 <P>Get XMLTV from 
-<A HREF="http://wiki.xmltv.org/index.php/Main_Page">http://wiki.xmltv.org/index.php/Main_Page</A>.  Download the latest version (0.5.57).</P>
+<A HREF="http://xmltv.sourceforge.net">http://xmltv.sourceforge.net</A>.  Download the latest version (0.5.51).</P>
 
 <H2><A NAME="ConfigureSD"></A> <A NAME="ss5.1">5.1</A> <A HREF="mythtv-HOWTO.html#toc5.1">Configuring the Schedules Direct service </A>
 </H2>
@@ -61,42 +61,43 @@ program.</P>
 </H2>
 
 <P>If you are going to use <B>subversion</B>, execute the following
-instructions to obtain the latest trunk version of MythTV:</P>
+instructions to obtain the latest <EM>trunk</EM> version of MythTV.</P>
+<P>To use the <EM>release</EM> version, you can execute the following.  You are
+strongly encouraged to use the release version.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mkdir mythtv
-$ svn co http://svn.mythtv.org/svn/trunk/ mythtv
-$ cd mythtv
+$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-0.23
+$ cd mythtv-0.23
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>To use a release version, you can execute:
+<P>To download trunk:</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mkdir mythtv-release-0.22-fixes
-$ svn co http://svn.mythtv.org/svn/branches/release-0-22-fixes/ mythtv-release-0.22-fixes
-$ cd mythtv-release-0.22-fixes
+$ svn co http://svn.mythtv.org/svn/trunk/ mythtv-trunk
+$ cd mythtv-trunk
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P><B>NOTE</B>:  Using a svn version of the code allows you to stay
-up-to-date with changes.  So, if there's an update to the 0.22 release and
+up-to-date with changes.  So, if there's an update to the 0.23 release and
 you originally obtained it using svn, you could enter the
-mythtv-release-0.22-fixes directory and type "svn up", which will update your copy
+mythtv-0.23 directory and type "svn up", which will update your copy
 with the fixed version from the website.  You would then recompile and
-install the updated 0.22 code.</P>
+install the updated 0.23 code.</P>
 <P>If you are using the tarball, then unpack it:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf mythtv-0.22.tar.bz2
-$ cd mythtv-0.22
+$ tar -xjf mythtv-0.23.tar.bz2
+$ cd mythtv-0.23
 $ ./configure
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 <P>If you wish to change options, run <B>./configure --help</B> to
-see what is available and to override and automatically detected options.
+see what is available and to override any automatically detected options.
 See the <CODE>config.log</CODE> file after running <B>configure</B> to see
 previous runs.</P>
 <P>To compile:
@@ -113,33 +114,10 @@ In the above example, we had two concurrent jobs executing, which is
 recommended for a single CPU system.  Do not set the number of jobs too
 high, or your compile will actually take longer to complete than it would if
 you did a "normal" build.</P>
-<P>If you are using <B>distcc</B>, and you had two other host machines (red, blue)
-participating, you would do something like:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ export DISTCC_HOSTS='localhost red blue'
-$ make -j 6 CXX=distcc
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>The actual speed-up, if any, is dependant on a number of factors, such as
-number of CPUs / hosts, etc.  The <B>distcc</B> documentation recommends
-using a <CODE>-j</CODE> value of twice the number of CPUs available to keep all
-of them busy.</P>
-<P>Some timing information.  The following should only be used for
-illustration; your actual results may vary.  The test involves a complete
-<CODE>make distclean</CODE> to the final binary.
-<UL>
-<LI>P4 3.2Ghz HT: "standard" make: 12m 49s</LI>
-<LI>P4 3.2Ghz HT: make -j 2: 11m 24s</LI>
-</UL>
-</P>
-<P>In the above example, we see that with a single CPU, a multi-stage
-<B>make</B> does not significantly decrease compile time.</P>
 <P>Once the compile is done, switch to superuser:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ su
+$ sudo bash
 # make install
 # exit
 </PRE>
@@ -165,10 +143,10 @@ video display smoother, especially if you are decoding HDTV.</P>
 <H3>rlimits</H3>
 
 <P>The rlimits method is the preferred method and is included in Linux
-2.6.12 and above. Unfortunately, you need PAM version 0.79 or above, which
-may not be supported by your distribution yet. Assuming anyone running
-<B>mythfrontend</B> is in the audio group and rlimits are supported, all
-you need to do is place this in your <CODE>/etc/security/limits.conf</CODE></P>
+2.6.12 and above and requires PAM version 0.79 or above.  Assuming anyone
+running <B>mythfrontend</B> is in the audio group and rlimits are
+supported, all you need to do is place this in your
+<CODE>/etc/security/limits.conf</CODE></P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
@@ -183,7 +161,7 @@ you need to do is place this in your <CODE>/etc/security/limits.conf</CODE></P>
 <H3>realtime module</H3>
 
 <P>The second option is to use the Linux realtime kernel module.
-This is will be phased out over time, but is currently supported
+This will be phased out over time, but is currently supported
 by many distributions that do not yet support rlimits. If you are
 not using the distribution kernel you must configure your kernel
 with:
@@ -222,7 +200,7 @@ rlimits or the realtime module. This does not work on modern
 distributions either, and is <B><EM>not recommended</EM></B>
 on any system connected to the Internet. This may also make it
 impossible to debug MythTV without running <B>gdb</B> as root. If you
-would still like to do this, you just need to run this as root:
+would still like to do this, do the following as root:
 <BLOCKQUOTE><CODE>
 <PRE>
 # chmod a+s /usr/local/bin/mythfrontend /usr/local/bin/mythtv
@@ -250,7 +228,7 @@ access libraries.</P>
 <P>Once MythTV is compiled and installed:
 <LI>Run the mythtv-setup program on your Master backend. Under the "General"
 menu, change the IP address of the current machine (by default, "127.0.0.1")
-to the real external IP address - 127.0.0.1 is the loopback address and no
+to the real external IP address - 127.0.0.1 is the internal loopback address and no
 external machine can access it. Change the Master Server IP setting to the
 same IP address as well.</LI>
 <LI>Run the mythfrontend program on your frontend machine,
@@ -258,26 +236,6 @@ and a "Database Configuration" screen should appear.
 Set the "Host name" field to point to your Master backend's IP address.</LI>
 </P>
 
-<H2><A NAME="Gentoo_build"></A> <A NAME="ss5.3">5.3</A> <A HREF="mythtv-HOWTO.html#toc5.3">Gentoo </A>
-</H2>
-
-<P>Installation of MythTV on Gentoo consists of simply emerging the desired
-ebuild because all of the packages are now part of the official Portage tree.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su -
-# emerge --sync # make sure portage is up to date.
-# vi /etc/make.conf
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Add mysql to your USE variable.  i.e. <CODE>USE="mysql ...."</CODE>
-<BLOCKQUOTE><CODE>
-<PRE>
-# emerge mythtv
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <HR>
 <A HREF="mythtv-HOWTO-6.html">Next</A>
 <A HREF="mythtv-HOWTO-4.html">Previous</A>
