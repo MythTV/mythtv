@@ -351,7 +351,7 @@ void ProgFinder::updateInfo(void)
             if (m_help1Text)
                 m_help1Text->SetText(tr("Select a letter..."));
             if (m_help2Text)
-                m_help2Text->SetText(tr("Pick the letter in which the show starts with, "
+                m_help2Text->SetText(tr("Pick the first letter of the program name, "
                                         "then press SELECT or the right arrow."));
         }
 
