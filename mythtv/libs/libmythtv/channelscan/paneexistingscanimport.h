@@ -44,7 +44,7 @@ class PaneExistingScanImport : public VerticalConfigurationGroup
         VerticalConfigurationGroup(false,false,true,false),
         sourceid(0), scanSelect(new TransComboBoxSetting())
     {
-        scanSelect->setLabel(tr("Scan to Import"));
+        scanSelect->setLabel(QObject::tr("Scan to Import"));
         addChild(scanSelect);
     }
 

@@ -143,7 +143,7 @@ void ScanWizard::SetPage(const QString &pageTitle)
 
         MythPopupBox::showOkPopup(
             gContext->GetMainWindow(), tr("ScanWizard"),
-            "Programmer Error, see console");
+            tr("Programmer Error, see console"));
     }
 
     // Just verify what we get from the UI...
