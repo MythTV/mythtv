@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
     <window name="programguide">
@@ -129,7 +130,7 @@
         <clock name="time">
             <area>1090,30,150,32</area>
             <align>right,vcenter</align>
-            <format>%TIME%</format>
+            <template>%TIME%</template>
             <font>basemedium</font>
         </clock>
 
@@ -352,7 +353,7 @@
         <clock name="time">
             <area>1090,14,150,32</area>
             <align>right,vcenter</align>
-            <format>%TIME%</format>
+            <template>%TIME%</template>
         </clock>
 
         <imagetype name="channelicon">

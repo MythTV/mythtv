@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
     <window name="programguide">
@@ -6,35 +7,35 @@
         <shape name="shape1">
             <area>15,15,770,150</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>15</cornerradius>
         </shape>
 
         <shape name="shape2">
             <area>20,110,760,50</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape3">
             <area>20,75,380,30</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape4">
             <area>400,75,380,30</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape5">
             <area>15,170,770,415</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>15</cornerradius>
         </shape>
 
@@ -121,7 +122,7 @@
         <clock name="time">
             <area>670,15,100,60</area>
             <align>right,vcenter</align>
-            <format>%TIME%</format>
+            <template>%TIME%</template>
             <secondflash>yes</secondflash>
         </clock>
 
@@ -160,42 +161,42 @@
         <shape name="shape1">
             <area>15,15,770,210</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>15</cornerradius>
         </shape>
 
         <shape name="shape2">
             <area>25,135,530,80</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape3">
             <area>25,75,530,30</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape4">
             <area>25,105,530,30</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>10</cornerradius>
         </shape>
 
         <shape name="shape5">
             <area>15,240,770,340</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="30"></fill>
+            <fill color="#000000" alpha="30" />
             <cornerradius>15</cornerradius>
         </shape>
 
         <shape name="shape6">
             <area>565,75,210,140</area>
             <type>roundbox</type>
-            <fill color="#000000" alpha="255"></fill>
+            <fill color="#000000" alpha="255" />
             <cornerradius>6</cornerradius>
         </shape>
 
@@ -338,7 +339,7 @@
         <clock name="time">
             <area>655,12,120,60</area>
             <align>right,vcenter</align>
-            <format>%TIME%</format>
+            <template>%TIME%</template>
             <secondflash>yes</secondflash>
         </clock>
 
@@ -951,15 +952,15 @@
             <area>100,400,600,100</area>
             <statetype name="background">
                 <state name="active">
-                    <imagetype name="background">
+                    <shape name="background">
                         <area>0,0,600,100</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                        <fill color="#FFFFFF"  alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
@@ -1511,15 +1512,15 @@
             <area>54,290,692,130</area>
             <statetype name="background">
                 <state name="active">
-                    <imagetype name="background">
+                    <shape name="background">
                         <area>0,0,692,130</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                        <fill color="#FFFFFF" alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>
@@ -1543,15 +1544,15 @@
             <area>250,430,496,75</area>
             <statetype name="background">
                 <state name="active">
-                    <imagetype name="background">
+                    <shape name="background">
                         <area>0,0,496,75</area>
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="180" />
-                    </imagetype>
+                        <fill color="#FFFFFF" alpha="180" />
+                    </shape>
                 </state>
                 <state name="selected" from="active">
-                    <imagetype name="background">
-                        <gradient start="#FFFFFF" end="#FFFFFF" alpha="255" />
-                    </imagetype>
+                    <shape name="background">
+                        <fill alpha="255" />
+                    </shape>
                 </state>
                 <state name="inactive" from="active" />
             </statetype>

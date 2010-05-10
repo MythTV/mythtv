@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
     <window name="iconimport">
@@ -25,10 +26,12 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,240,60</area>
-                    <imagetype name="buttonbackground">
+                    <shape name="background">
                         <area>0,0,240,60</area>
-                        <gradient start="#a8ac93" end="#8a916f" alpha="255" />
-                    </imagetype>
+                        <fill style="gradient">
+                            <gradient start="#a8ac93" end="#8a916f" alpha="255" />
+                        </fill>
+                    </shape>
                     <imagetype name="icon">
                         <area>0,5,80,50</area>
                         <preserveaspect>true</preserveaspect>
@@ -86,7 +89,7 @@
             <value>Channel Editor</value>
         </textarea>
 
-        <buttonlist name="channels" focusorder="0">
+        <buttonlist name="channels">
             <area>39,97,600,588</area>
             <layout>vertical</layout>
             <spacing>0</spacing>
@@ -228,7 +231,7 @@
             <filename>recordings/groupframe.png</filename>
         </imagetype>
 
-        <buttonlist name="source" focusorder="8">
+        <buttonlist name="source">
             <area>12,60,1260,40</area>
             <spacing>15</spacing>
             <scrollstyle>center</scrollstyle>
@@ -286,7 +289,7 @@
             <align>vcenter</align>
         </textarea>
 
-        <buttonlist name="sorting" from="baseselector" focusorder="2">
+        <buttonlist name="sorting" from="baseselector">
             <position>850,193</position>
         </buttonlist>
 
@@ -296,11 +299,11 @@
             <multiline>yes</multiline>
         </textarea>
 
-        <checkbox name="nochannum" from="basecheckbox" focusorder="3">
+        <checkbox name="nochannum" from="basecheckbox">
             <position>740,241</position>
         </checkbox>
 
-        <button name="delete" from="basebutton" focusorder="4">
+        <button name="delete" from="basebutton">
             <position>850,290</position>
             <value>Delete All</value>
         </button>
@@ -321,17 +324,17 @@
             <value>Global Options</value>
         </textarea>
 
-        <button name="scan" from="basewidebutton" focusorder="5">
+        <button name="scan" from="basewidebutton">
             <position>778,445</position>
             <value>Channel Scan</value>
         </button>
 
-        <button name="importicons" from="basewidebutton" focusorder="6">
+        <button name="importicons" from="basewidebutton">
             <position>778,520</position>
             <value>Icon Download</value>
         </button>
 
-        <button name="edittransport" from="basewidebutton" focusorder="7">
+        <button name="edittransport" from="basewidebutton">
             <position>778,600</position>
             <value>Edit Transports</value>
         </button>

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
   <window name="gameui">
@@ -21,9 +22,10 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,100%,30</area>
-                    <imagetype name="buttonbackground">
-                        <gradient start="#4b4b3e" end="#4b4b3e" alpha="255"/>
-                    </imagetype>
+                    <shape name="background">
+                        <area>0,0,100%,100%</area>
+                        <fill color="#4b4b3e" alpha="255" />
+                    </shape>
                     <textarea name="buttontext">
                         <area>5,0,85%,30</area>
                         <font>basesmall</font>
@@ -32,9 +34,9 @@
                     </textarea>
                 </state>
                 <state name="selectedactive" from="active">
-                    <imagetype name="buttonbackground">
-                        <gradient start="#8a916f" end="#8a916f" alpha="255"/>
-                    </imagetype>
+                    <shape name="background">
+                        <fill color="#8a916f" />
+                    </shape>
                     <textarea name="buttontext">
                         <area>5,0,85%,30</area>
                         <font>basesmallbrown</font>

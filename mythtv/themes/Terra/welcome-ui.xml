@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
     <window name="welcome_screen">
@@ -54,7 +56,6 @@
         <textarea name="conflicts_text" from="basetextarea">
             <area>32,568,1216,36</area>
             <font>basesmallyellow</font>
-            <pixelsize>22</pixelsize>
             <align>hcenter</align>
             <value>WARNING: There are conflicting scheduled recordings!</value>
         </textarea>

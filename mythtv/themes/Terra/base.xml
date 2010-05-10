@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
     <!-- Base Font Definitions -->
@@ -482,14 +483,14 @@
         <clock name="date">
             <area>825,689,350,30</area>
             <font>datefont</font>
-            <format>%DATE%</format>
+            <template>%DATE%</template>
             <align>right,vcenter</align>
         </clock>
 
         <clock name="time">
             <area>1185,688,80,30</area>
             <font>timefont</font>
-            <format>hh:mm</format>
+            <template>hh:mm</template>
             <align>left,vcenter</align>
             <cutdown>no</cutdown>
         </clock>

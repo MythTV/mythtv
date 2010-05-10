@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
 <mythuitheme>
 
     <window name="welcome_screen">
@@ -61,14 +63,14 @@
         <clock name="date">
             <area>32,24,304,84</area>
             <font>time</font>
-            <format>dddd\ndd MMMM yyyy</format>
+            <template>dddd\ndd MMMM yyyy</template>
             <align>left,top</align>
             <cutdown>true</cutdown>
         </clock>
 
         <clock name="time" from="date">
             <area>1072,24,176,36</area>
-            <format>%TIME%</format>
+            <template>%TIME%</template>
             <align>right</align>
         </clock>
 

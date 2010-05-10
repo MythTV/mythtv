@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mythuitheme SYSTEM "../mythuitheme.dtd">
+
 <!-- theme.xml for the MythCenter theme - by Jeroen Brosens -->
 <mythuitheme>
     <window name="mainmenu">
@@ -18,7 +21,7 @@
         <clock name="clock">
             <area>780,40,480,40</area>
             <font>clock</font>
-            <format>%DATE%, %TIME%</format>
+            <template>%DATE%, %TIME%</template>
             <align>center</align>
         </clock>
 
