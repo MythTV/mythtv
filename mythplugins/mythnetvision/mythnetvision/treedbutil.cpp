@@ -14,8 +14,25 @@ bool findTreeGrabberInDB(const QString& commandline)
                   "commandline = :COMMAND AND host = :HOST;");
     query.bindValue(":COMMAND", commandline);
     query.bindValue(":HOST", gContext->GetHostName());
-    if (!query.exec() || !query.isActive()) {
+    if (!query.exec() || !query.isActive())
+    {
         MythDB::DBError("Tree find in db", query);
+        return false;
+    }
+
+    return query.size() > 0;
+}
+
+bool findSearchGrabberInDB(const QString& commandline)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT * FROM netvisionsearchgrabbers WHERE "
+                  "commandline = :COMMAND AND host = :HOST;");
+    query.bindValue(":COMMAND", commandline);
+    query.bindValue(":HOST", gContext->GetHostName());
+    if (!query.exec() || !query.isActive()) 
+    {
+        MythDB::DBError("Search find in db", query);
         return false;
     }
 
@@ -33,6 +50,28 @@ GrabberScript* findTreeGrabberByCommand(const QString& commandline)
     query.bindValue(":HOST", gContext->GetHostName());
     if (!query.exec() || !query.isActive()) {
         MythDB::DBError("Tree find in db", query);
+    }
+
+    QString title = query.value(0).toString();
+    QString image  = query.value(1).toString();
+    QString command = query.value(2).toString();
+
+    GrabberScript *tmp = new GrabberScript(title, image, 0, 1,
+                                     command);
+    return tmp;
+}
+
+GrabberScript* findSearchGrabberByCommand(const QString& commandline)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT name,thumbnail,commandline "
+                  "FROM netvisionsearchgrabbers "
+                  "WHERE commandline = :COMMAND AND "
+                  "host = :HOST;");
+    query.bindValue(":COMMAND", commandline);
+    query.bindValue(":HOST", gContext->GetHostName());
+    if (!query.exec() || !query.isActive()) {
+        MythDB::DBError("Search find in db", query);
     }
 
     QString title = query.value(0).toString();
@@ -71,11 +110,46 @@ GrabberScript::scriptList findAllDBTreeGrabbers(void)
     return tmp;
 }
 
+GrabberScript::scriptList findAllDBSearchGrabbers(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT name,thumbnail,commandline "
+                  "FROM netvisiontsearchgrabbers "
+                  "WHERE host = :HOST ORDER BY name;");
+    query.bindValue(":HOST", gContext->GetHostName());
+    if (!query.exec() || !query.isActive()) {
+        MythDB::DBError("Search find in db", query);
+    }
+
+    GrabberScript::scriptList tmp;
+
+    while (query.next())
+    {
+        QString title = query.value(0).toString();
+        QString image  = query.value(1).toString();
+        QString commandline = query.value(2).toString();
+
+        GrabberScript *script = new GrabberScript(title, image, 0, 1,
+                                         commandline);
+        tmp.append(script);
+    }
+
+    return tmp;
+}
+
 bool insertTreeInDB(GrabberScript* script)
 {
     if (!script) return false;
 
     return insertTreeInDB(script->GetTitle(), script->GetImage(),
+                      script->GetCommandline());
+}
+
+bool insertSearchInDB(GrabberScript* script)
+{
+    if (!script) return false;
+
+    return insertSearchInDB(script->GetTitle(), script->GetImage(),
                       script->GetCommandline());
 }
 
@@ -102,11 +176,40 @@ bool insertTreeInDB(const QString &name, const QString &thumbnail,
     return (query.numRowsAffected() > 0);
 }
 
+bool insertSearchInDB(const QString &name, const QString &thumbnail,
+                const QString &commandline)
+{
+    if (findSearchGrabberInDB(commandline))
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("INSERT INTO netvisionsearchgrabbers (name,thumbnail,commandline,"
+                  "host) "
+            "VALUES( :NAME, :THUMBNAIL, :COMMAND, :HOST);");
+    query.bindValue(":NAME", name);
+    query.bindValue(":THUMBNAIL", thumbnail);
+    query.bindValue(":COMMAND", commandline);
+    query.bindValue(":HOST", gContext->GetHostName());
+    if (!query.exec() || !query.isActive()) {
+        MythDB::DBError("netvision: inserting in DB", query);
+        return false;
+    }
+
+    return (query.numRowsAffected() > 0);
+}
+
 bool removeTreeFromDB(GrabberScript* script)
 {
     if (!script) return false;
 
     return removeTreeFromDB(script->GetCommandline());
+}
+
+bool removeSearchFromDB(GrabberScript* script)
+{
+    if (!script) return false;
+
+    return removeSearchFromDB(script->GetCommandline());
 }
 
 bool removeTreeFromDB(const QString &commandline)
@@ -124,6 +227,20 @@ bool removeTreeFromDB(const QString &commandline)
     return (query.numRowsAffected() > 0);
 }
 
+bool removeSearchFromDB(const QString &commandline)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM netvisionsearchgrabbers WHERE commandline = :COMMAND "
+                  "AND host = :HOST ;");
+    query.bindValue(":COMMAND", commandline);
+    query.bindValue(":HOST", gContext->GetHostName());
+    if (!query.exec() || !query.isActive()) {
+        MythDB::DBError("netvision: delete from db", query);
+        return false;
+    }
+
+    return (query.numRowsAffected() > 0);
+}
 
 bool markTreeUpdated(GrabberScript* script, QDateTime curTime)
 {
