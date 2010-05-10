@@ -712,12 +712,12 @@ class Recorded( DBDataWrite ):
         _cref = ['person']
 
     class _Seek( DBDataRef, MARKUP ):
-        table = 'recordedseek'
-        wfield = ['chanid','starttime']
+        _table = 'recordedseek'
+        _ref = ['chanid','starttime']
 
     class _Markup( DBDataRef, MARKUP ):
-        table = 'recordedmarkup'
-        wfield = ['chanid','starttime']
+        _table = 'recordedmarkup'
+        _ref = ['chanid','starttime']
         
     def __str__(self):
         if self._wheredat is None:

@@ -13,6 +13,35 @@ import re
 import socket
 from datetime import datetime
 
+def schemaUpdate(func, db=None):
+    # decorator class for database updates
+    # TODO: do locking and lock checking
+    #       if interactive terminal, ask for update permission
+    #       perform database backup (partial?)
+    if db is None:
+        db = DBCache()
+    log = MythLog('Schema Update')
+
+    schemaname = func(-1)
+    while True:
+        try:
+            updates, newver = func(db.settings.NULL[schemaname])
+        except StopIteration:
+            break
+
+        log(log.IMPORTANT, 'Updating %s from %s to %s' % \
+                    (schemaname, db.settings.NULL[schemaname], newver))
+        c = db.cursor()
+
+        try:
+            for sql, values in updates:
+                c.execute(sql, values)
+        except Exception, e:
+            log(log.IMPORTANT, 'Update of %s failed' % schemaname)
+            raise MythDBError(MythError.DB_SCHEMAUPDATE, e.args)
+
+        c.close()
+        db.settings.NULL[schemaname] = newver
 
 class databaseSearch( object ):
     # decorator class for database searches
@@ -57,9 +86,14 @@ class databaseSearch( object ):
                 continue
             # let function process remaining queries
             res = self.func(self.inst, key=key, value=val)
+            errstr = "%s got an unexpected keyword arguemnt '%s'"
             if res is None:
-                raise TypeError("%s got an unexpected keyword arguemnt '%s'" \
-                                    % (self.__name__, key))
+                if 'not' not in key:
+                    raise TypeError(errstr % (self.__name__, key))
+                res = list(self.func(self.inst, key=key[3:], value=val))
+                if res is None:
+                    raise TypeError(errstr % (self.__name__, key))
+                res[0] = 'NOT '+res[0]
 
             if len(res) == 3:
                 where.append(res[0])
@@ -227,14 +261,14 @@ class MythBE( FileOps ):
         record status of WillRecord.
         """
         return self._getPrograms('QUERY_GETALLPENDING', \
-                                recstatus=Program.WILLRECORD, header=1)
+                                recstatus=Program.rsWillRecord, header=1)
 
     def getConflictedRecordings(self):
         """
         Retuns a list of Program objects subject to conflicts in the schedule.
         """
         return self._getPrograms('QUERY_GETALLPENDING', \
-                                recstatus=Program.CONFLICT, header=1)
+                                recstatus=Program.rsConflict, header=1)
 
     def getRecorderList(self):
         """

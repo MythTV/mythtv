@@ -1964,6 +1964,7 @@ class MythError( Exception ):
     DB_CREDENTIALS      = 52
     DB_SETTING          = 53
     DB_SCHEMAMISMATCH   = 54
+    DB_SCHEMAUPDATE     = 55
     PROTO_CONNECTION    = 100
     PROTO_ANNOUNCE      = 101
     PROTO_MISMATCH      = 102
@@ -2009,6 +2010,16 @@ class MythError( Exception ):
             self.args = ("Mismatched schema version for '%s': " % self.setting \
                             + "database speaks version %d, we speak version %d"\
                                     % (self.remote, self.local),)
+        elif args[0] == self.DB_SCHEMAUPDATE:
+            self.ename = 'DB_SCHEMAUPDATE'
+            self.ecode, sqlerr = args
+            if len(sqlerr) == 1:
+                self.sqlcode = 0
+                self.sqlerr = sqlerr[0]
+                self.args = ("Schema update failure: %s" % self.sqlerr)
+            else:
+                self.sqlcode, self.sqlerr = sqlerr
+                self.args = ("Schema update failure %d: %s" % sqlerr,)
         elif args[0] == self.PROTO_CONNECTION:
             self.ename = 'PROTO_CONNECTION'
             self.ecode, self.backend, self.port = args
