@@ -146,7 +146,7 @@
         <statetype name="buttonitem">
             <area>0,0,100%,30</area>
             <state name="active">
-                <area>0,0,100%,100%</area>
+                <area>0,0,100%,30</area>
                 <shape name="background">
                     <area>0,0,100%,100%</area>
                     <fill style="gradient">
@@ -899,7 +899,7 @@
             <statetype name="buttonitem">
                 <state name="active">
                     <area>0,0,165,105</area>
-                    <imagetype name="buttonbackground" />
+                    <shape name="background" />
                     <statetype name="nodetype">
                         <state name="folder">
                             <imagetype name="icon">
