@@ -6,6 +6,7 @@
 #include <QDomDocument>
 #include <QFontMetrics>
 #include <QString>
+#include <QHash>
 
 #include "mythverbose.h"
 
