@@ -113,9 +113,8 @@ zoneminder
 
 CONFIG_LIST="
 opengl
-visual
-fftw_lib
-fftw_lib3
+libvisual
+fftw
 sdl
 exif
 newexif
@@ -170,8 +169,8 @@ MythGame related options:
 
 MythMusic related options:
   --enable-mythmusic       build the mythmusic plugin [$music]
-  --enable-libvisual       enable libvisual visualizers [$visual]
-  --enable-fftw            enable fftw visualizers [$fftw_lib]
+  --enable-libvisual       enable libvisual visualizers [$libvisual]
+  --enable-fftw            enable fftw visualizers [$fftw]
   --enable-sdl             use SDL for the synaesthesia output [$sdl]
 
 MythNews related options:
@@ -248,38 +247,23 @@ for opt do
       die_unknown $opt
   fi
   ;;
-  --enable-opengl) opengl="yes"
+  --enable-new-exif)  enable exif newexif
   ;;
-  --disable-opengl) opengl="no"
-  ;;
-  --enable-libvisual) visual="yes"
-  ;;
-  --disable-libvisual) visual="no"
-  ;;
-  --enable-fftw) fftw_lib="yes"
-                 fftw_lib3="yes"
-  ;;
-  --disable-fftw) fftw_lib="no"
-                  fftw_lib3="no"
-  ;;
-  --enable-sdl) sdl="yes"
-  ;;
-  --disable-sdl) sdl="no"
-  ;;
-  --enable-exif) exif="yes"
-  ;;
-  --enable-new-exif)  newexif="yes"
-                      exif="yes"
-  ;;
-  --disable-new-exif) newexif="no"
-  ;;
-  --disable-exif) exif="no"
+  --disable-new-exif) disable neexif
   ;;
   --enable-all)
       enable $PLUGIN_LIST $CONFIG_LIST
   ;;
   --disable-all)
       disable $PLUGIN_LIST $CONFIG_LIST
+  ;;
+  --enable-?*|--disable-?*)
+  eval $(echo "$opt" | sed 's/--/action=/;s/-/ option=/;s/-/_/g')
+  if is_in $option $CONFIG_LIST; then
+      $action $option
+  else
+      die_unknown $opt
+  fi
   ;;
   *)
   optname="${opt%%=*}"
@@ -388,32 +372,32 @@ if test "$opengl" != "no" ; then
     fi
 fi
 
-if test "$visual" != "no" ; then
-    visual="no"
+if ! disabled libvisual; then
+    disable libvisual
     if has_library libvisual-0.4 ; then
         if has_header libvisual-0.4/libvisual/libvisual.h ; then
-            visual="yes"
+            enable libvisual
         fi
     fi
 fi
 
-if test "$fftw_lib3" != "no" ; then
-    fftw_lib3="no"
+if ! disabled fftw; then
+    disable fftw_lib3
     if has_library libfftw3f_threads ; then
         if has_library libfftw3_threads ; then
             if has_header fftw3.h ; then
-                fftw_lib3="yes"
+                enable fftw_lib3
             fi
         fi
     fi
 fi
 
-if test "$fftw_lib" != "no" ; then
-    fftw_lib="no"
+if ! disabled fftw; then
+    disable fftw_lib
     if has_library libfftw ; then
         if has_library librfftw ; then
             if has_header fftw.h ; then
-                fftw_lib="yes"
+                enable fftw_lib
             fi
         fi
     fi
@@ -758,8 +742,8 @@ if test "$music" = "yes" ; then
         echo "        OpenGL         support will not be included in MythMusic"
     fi
 
-    if test "$visual" = "yes" ; then
-        if test "$sdl" = "yes" ; then
+    if enabled libvisual; then
+        if enabled sdl; then
             echo "        libvisual      support will be included in MythMusic"
             echo "#define LIBVISUAL_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
             echo "INCLUDEPATH += /usr/include/libvisual-0.4" >> ./mythmusic/mythmusic/config.pro
@@ -767,24 +751,20 @@ if test "$music" = "yes" ; then
         else
             echo "        libvisual      support will not be included in MythMusic (requires SDL support)"
         fi
-    fi
-
-    if test "$visual" = "no" ; then
+    else
         echo "        libvisual      support will not be included in MythMusic"
     fi
 
-    if test "$fftw_lib3" = "yes" ; then
+    if enabled fftw_lib3; then
         echo "        FFTW v.3       support will be included in MythMusic"
         echo "#define FFTW3_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lfftw3 -lm" >> \
              ./mythmusic/mythmusic/config.pro
-    elif test "$fftw_lib" = "yes" ; then
+    elif enabled fftw_lib; then
         echo "        FFTW v.2       support will be included in MythMusic"
         echo "#define FFTW2_SUPPORT 1" >> ./mythmusic/mythmusic/config.h
         echo "LIBS += -lrfftw -lfftw" >> ./mythmusic/mythmusic/config.pro
-    fi
-
-    if test "$fftw_lib" = "no" -a "$fftw_lib3" = "no" ; then
+    else
         echo "        FFTW           support will not be included in MythMusic"
     fi
 
