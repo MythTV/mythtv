@@ -125,10 +125,9 @@ Advanced options (experts only):
   --disable-xvmc           disable XvMC     (Linux/BSD MPEG accel.)
   --disable-xvmcw          disable XvMC Wrapper
                            (use --xvmc-lib if autodetection fails)
-  --enable-xvmc-pro        enable XvMC for the Unichrome Pro chipset
-                           (NOT Unichrome chipset)
-  --enable-vdpau           enable NVidia VDPAU hardware acceleration.
+  --enable-xvmc-vld        enable XvMC VLD accel. for the Unichrome (Pro) chipset
   --xvmc-lib=LIB           XvMC library override (for crosscompiling)
+  --enable-vdpau           enable NVidia VDPAU hardware acceleration.
   --disable-opengl-video   disable OpenGL based video display
   --enable-mac-accel       enable Mac OS X MPEG acceleration
   --disable-opengl-vsync   disable OpenGL vsync method
@@ -1335,7 +1334,6 @@ MYTHTV_LIST='
     proc_opt
     silent_cc
     symbol_visibility
-    xvmc_pro
 '
 
 USING_LIST='
@@ -1686,7 +1684,6 @@ v4l_deps="backend"
 xrandr_deps="x11"
 xv_deps="x11"
 xvmc_deps="xv X11_extensions_XvMClib_h"
-xvmc_pro_deps="xvmc X11_extensions_vldXvMC_h"
 xvmc_vld_deps="xvmc X11_extensions_vldXvMC_h"
 xvmcw_deps="xvmc"
 
@@ -3855,48 +3852,40 @@ fi
 enabled opengl && check_libx glu_lib GL/glu.h gluBeginSurface -lGLU || disable opengl
 
 VENDOR_XVMC_LIBS=""
-enabled xvmcw && check_lib X11/extensions/XvMClib.h XvMCQueryExtension -lXvMCW || disable xvmcw
-enabled xvmcw && check_lib X11/extensions/XvMClib.h XvMCQueryVersion -lXvMCW || disable xvmcw
-check_header X11/extensions/vldXvMC.h
 
-if test x"$xvmc_lib" != x""; then
-    VENDOR_XVMC_LIBS="-l"$xvmc_lib
-    disable xvmcw
+check_xvmc_lib(){
+    log check_xvmc_lib "$@"
+    headers=$1
+    func=$2
+    shift 2
+    check_libx VENDOR_XVMC_LIBS "$headers" $func "$@"
+}
+
+if test -n "$xvmc_lib"; then
+    check_xvmc_lib "X11/Xlib.h X11/extensions/XvMClib.h" XvMCQueryExtension "-l${xvmc_lib}" && disable xvmcw || disable xvmc
+    check_xvmc_lib "X11/Xlib.h X11/extensions/vldXvMC.h" XvMCBeginSurface   "-l${xvmc_lib}" || disable xvmc_vld
 elif enabled xvmcw; then
-    VENDOR_XVMC_LIBS="-lXvMCW $ldl"
-elif enabled xvmc_pro; then
-    if has_library libviaXvMCPro ; then
-        VENDOR_XVMC_LIBS="-lviaXvMCPro"
-    elif has_library libchromeXvMCPro ; then
-        VENDOR_XVMC_LIBS="-lchromeXvMCPro"
-    else
-        disable xvmc_pro
-    fi
+    check_xvmc_lib "X11/Xlib.h X11/extensions/XvMClib.h" XvMCQueryExtension "-lXvMCW"
+    check_xvmc_lib "X11/Xlib.h X11/extensions/XvMClib.h" XvMCQueryVersion   "-lXvMCW"
+    check_xvmc_lib "X11/Xlib.h X11/extensions/vldXvMC.h" XvMCBeginSurface   "-lXvMCW" || disable xvmc_vld
+    test -n "$VENDOR_XVMC_LIBS" || disable xvmcw
 elif enabled xvmc_vld; then
-    if has_library libviaXvMC ; then
-        VENDOR_XVMC_LIBS="-lviaXvMC"
-    elif has_library libchromeXvMC ; then
-        VENDOR_XVMC_LIBS="-lchromeXvMC"
-    else
-        disable xvmc_pro
-    fi
-elif has_library libXvMCNVIDIA ; then
-    VENDOR_XVMC_LIBS="-lXvMCNVIDIA"
-elif has_library libI810XvMC ; then
-    VENDOR_XVMC_LIBS="-lI810XvMC"
+    check_xvmc_lib "X11/Xlib.h X11/extensions/vldXvMC.h" XvMCBeginSurface -lchromeXvMCPro || \
+    check_xvmc_lib "X11/Xlib.h X11/extensions/vldXvMC.h" XvMCBeginSurface -lviaXvMCPro    || \
+    check_xvmc_lib "X11/Xlib.h X11/extensions/vldXvMC.h" XvMCBeginSurface -lchromeXvMC    || \
+    check_xvmc_lib "X11/Xlib.h X11/extensions/vldXvMC.h" XvMCBeginSurface -lviaXvMC       || \
+    disable xvmc_vld
 else
-    disable xvmc xvmcw
+    check_xvmc_lib "X11/Xlib.h X11/extensions/XvMClib.h" XvMCQueryExtension "-lXvMCNVIDIA" || \
+    check_xvmc_lib "X11/Xlib.h X11/extensions/XvMClib.h" XvMCQueryExtension "-lIntelXvMC"  || \
+    check_xvmc_lib "X11/Xlib.h X11/extensions/XvMClib.h" XvMCQueryExtension "-lI810XvMC"
 fi
 
-if test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
-    disable xvmc_vld xvmc_pro
+if test -z "$VENDOR_XVMC_LIBS"; then
+    disable xvmc xvmcw xvmc_vld
+elif test x"$VENDOR_XVMC_LIBS" = x"-lXvMCNVIDIA" ; then
+    disable xvmc_vld
 fi
-
-if test x"$VENDOR_XVMC_LIBS" = x"" ; then
-    disable xvmc xvmcw xvmc_vld xvmc_pro
-fi
-
-enabled xvmc_pro && enable xvmc_vld
 
 # Can only do Mac accel on Mac platform
 enabled dvdv && test $target_os = darwin || disable dvdv
@@ -4231,7 +4220,6 @@ if enabled x11 ; then
   echo "xv support                ${xv-no}"
   echo "XvMC support              ${xvmc-no}"
   echo "XvMC VLD support          ${xvmc_vld-no}"
-  echo "XvMC pro support          ${xvmc_pro-no}"
 if test "$VENDOR_XVMC_LIBS" != "" ; then
   echo "XvMC libs                 $VENDOR_XVMC_LIBS"
 fi
