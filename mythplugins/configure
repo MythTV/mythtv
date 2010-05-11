@@ -6,6 +6,21 @@
 ###
 # functions from ffmpeg'sconfigure
 
+log(){
+    echo "$@" >> $logfile
+}
+
+log_file(){
+    log BEGIN $1
+    pr -n -t $1 >> $logfile
+    log END $1
+}
+
+echolog(){
+    log "$@"
+    echo "$@"
+}
+
 set_all(){
     value=$1
     shift
@@ -57,6 +72,20 @@ disabled_any(){
     return 1
 }
 
+is_in(){
+    value=$1
+    shift
+    for var in $*; do
+        [ $var = $value ] && return 0
+    done
+    return 1
+}
+
+check_cmd(){
+    log "$@"
+    "$@" >> $logfile 2>&1
+}
+
 #
 #    default parameters for all plugins
 #
@@ -64,6 +93,8 @@ disabled_any(){
 prefix="/usr/local"
 libdir_name="lib"
 sysroot=""
+
+logfile="config.ep"
 
 music="yes"
 video="yes"
@@ -80,6 +111,7 @@ netvision="yes"
 
 cc="gcc"
 qmake="qmake"
+python="python"
 
 opengl="yes"
 visual="yes"
@@ -103,6 +135,7 @@ Generic options:
   --prefix=PREFIX          MythTV install location PREFIX [$prefix]
   --sysroot=SYSROOT        MythTV sysroot location SYSROOT [$sysroot]
   --qmake=QMAKE            use specified qmake [$qmake]
+  --python=PATH            Force a specific python executable to use [$python]
   --libdir-name=LIBNAME    install/look for libs in PREFIX/LIBNAME [$libdir_name]
   --help                   print this message
   --enable-all             Enable all options
@@ -172,6 +205,14 @@ if [ -e config.log ] ; then
     fi
 fi
 
+
+CMDLINE_SET="
+    logfile
+    qmake
+    python
+    sysroot
+"
+
 CONFIGURATION_OPTS=""
 for opt do
   CONFIGURATION_OPTS="$CONFIGURATION_OPTS ""$opt"
@@ -181,12 +222,9 @@ date >> config.log
 echo "   $0$CONFIGURATION_OPTS" >> config.log
 
 for opt do
+  optval="${opt#*=}"
   case "$opt" in
   --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
-  ;;
-  --sysroot=*) sysroot=$(echo $opt | cut -d '=' -f 2)
-  ;;
-  --qmake=*) qmake=`echo $opt | cut -d '=' -f 2`
   ;;
   --libdir-name=*) libdir_name=`echo $opt | cut -d '=' -f 2`;
   ;;
@@ -304,6 +342,14 @@ for opt do
                  exif="no";
                  festival="no";
                  archive="no";
+  ;;
+  *)
+  optname="${opt%%=*}"
+  optname="${optname#--}"
+  optname=$(echo "$optname" | sed 's/-/_/g')
+  if is_in $optname $CMDLINE_SET; then
+      eval $optname='$optval'
+  fi
   esac
 done
 
@@ -374,7 +420,8 @@ is_qmake4()
 }
 
 check_py_lib(){
-    python <<EOF
+    log check_py_lib "$@"
+    check_cmd $python <<EOF
 import sys
 try:
     import ${1}
