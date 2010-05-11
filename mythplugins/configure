@@ -86,6 +86,12 @@ check_cmd(){
     "$@" >> $logfile 2>&1
 }
 
+die_unknown(){
+    echo "Unknown option \"$1\"."
+    echo "See $0 --help for available options."
+    exit 1
+}
+
 #
 #    default parameters for all plugins
 #
@@ -234,49 +240,13 @@ for opt do
   ;;
   --libdir-name=*) libdir_name=`echo $opt | cut -d '=' -f 2`;
   ;;
-  --enable-mytharchive) archive="yes"
-  ;;
-  --disable-mytharchive) archive="no"
-  ;;
-  --enable-mythmusic) music="yes"
-  ;;
-  --disable-mythmusic) music="no"
-  ;;
-  --enable-mythvideo) video="yes"
-  ;;
-  --disable-mythvideo) video="no"
-  ;;
-  --enable-mythweather) weather="yes"
-  ;;
-  --disable-mythweather) weather="no"
-  ;;
-  --enable-mythgallery) gallery="yes"
-  ;;
-  --disable-mythgallery) gallery="no"
-  ;;
-  --enable-mythgame) game="yes"
-  ;;
-  --disable-mythgame) game="no"
-  ;;
-  --enable-mythnews) news="yes"
-  ;;
-  --disable-mythnews) news="no"
-  ;;
-  --enable-mythbrowser) browser="yes"
-  ;;
-  --disable-mythbrowser) browser="no"
-  ;;
-  --enable-mythzoneminder) zoneminder="yes"
-  ;;
-  --disable-mythzoneminder) zoneminder="no"
-  ;;
-  --enable-mythmovies) movies="yes"
-  ;;
-  --disable-mythmovies) movies="no"
-  ;;
-  --enable-mythnetvision) netvision="yes"
-  ;;
-  --disable-mythnetvision) netvision="no"
+  --enable-myth?*|--disable-myth?*)
+  eval $(echo "$opt" | sed 's/--/action=/;s/-myth/ option=/;s/-/_/g')
+  if is_in $option $PLUGIN_LIST; then
+      $action $option
+  else
+      die_unknown $opt
+  fi
   ;;
   --enable-opengl) opengl="yes"
   ;;
