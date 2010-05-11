@@ -671,6 +671,18 @@ check_cmd(){
     "$@" >> $logfile 2>&1
 }
 
+check_py_lib(){
+    log check_py_lib "$@"
+    check_cmd $python <<EOF
+import sys
+try:
+    import ${1}
+except:
+    sys.exit(1)
+sys.exit(0)
+EOF
+}
+
 check_cc(){
     log check_cc "$@"
     cat > $TMPC
@@ -3932,6 +3944,10 @@ if enabled gprof; then
     add_cflags  -p
     add_ldflags -p
 fi
+
+# Check for python dependencies
+enabled bindings_python && check_py_lib MySQLdb || disable bindings_python
+enabled bindings_python && check_py_lib lxml    || disable bindings_python
 
 # Find out if the .align argument is a power of two or not.
 check_asm asmalign_pot '".align 3"'
