@@ -3,6 +3,60 @@
 # Configure script for mythplugins
 #
 
+###
+# functions from ffmpeg'sconfigure
+
+set_all(){
+    value=$1
+    shift
+    for var in $*; do
+        eval $var=$value
+    done
+}
+
+enable(){
+    set_all yes $*
+}
+
+disable(){
+    set_all no $*
+}
+
+enabled(){
+    test "${1#!}" = "$1" && op== || op=!=
+    eval test "x\$${1#!}" $op "xyes"
+}
+
+disabled(){
+    test "${1#!}" = "$1" && op== || op=!=
+    eval test "x\$${1#!}" $op "xno"
+}
+
+enabled_all(){
+    for opt; do
+        enabled $opt || return 1
+    done
+}
+
+disabled_all(){
+    for opt; do
+        disabled $opt || return 1
+    done
+}
+
+enabled_any(){
+    for opt; do
+        enabled $opt && return 0
+    done
+}
+
+disabled_any(){
+    for opt; do
+        disabled $opt && return 0
+    done
+    return 1
+}
+
 #
 #    default parameters for all plugins
 #
@@ -396,66 +450,22 @@ if test "$exif" != "no" ; then
     fi
 fi
 
-if test "$netvision" != "no" ; then
-    mythbindings="no"
-    check_py_lib MythTV
-    if test $? != 1 ; then
-        mythbindings="yes"
-    else
-        echo "MythNetvision requires that the MythTV Python bindings be installed and properly configured."
-    fi
+if ! disabled netvision; then
+    disable_netvision(){
+        msg="$1"
+        echo "MythNetvision requires the $msg"
+        disable netvision
+    }
 
-    pcurl="no"
-    check_py_lib pycurl
-    if test $? != 1 ; then
-        pcurl="yes"
-    else
-        echo "MythNetvision requires the Python pycurl library (pycurl) installed."
-    fi
+    check_py_lib MythTV  || disable_netvision "MythTV Python bindings (MythTV)"
+    check_py_lib pycurl  || disable_netvision "Python pycurl library (pycurl)"
+    check_py_lib lxml    || disable_netvision "Python lxml library (lxml)"
+    check_py_lib xml     || disable_netvision "Python XML library (xml)"
+    check_py_lib urllib  || disable_netvision "Python URL library (urllib)"
+    check_py_lib urllib2 || disable_netvision "Python URL library 2 (urllib2)"
+    check_py_lib oauth   || disable_netvision "Python OAuth library (oauth)"
 
-    plxml="no"
-    check_py_lib lxml
-    if test $? != 1 ; then
-        plxml="yes"
-    else
-        echo "MythNetvision requires the Python lxml library (lxml) installed."
-    fi
-
-    pxml="no"
-    check_py_lib xml
-    if test $? != 1 ; then
-        pxml="yes"
-    else
-        echo "MythNetvision requires the Python XML library (xml) installed."
-    fi
-
-    purl="no"
-    check_py_lib urllib
-    if test $? != 1 ; then
-        purl="yes"
-    else
-        echo "MythNetvision requires the Python URL library (urllib) installed."
-    fi
-
-    purl2="no"
-    check_py_lib urllib2
-    if test $? != 1 ; then
-        purl2="yes"
-    else
-        echo "MythNetvision requires the Python URL library 2 (urllib2) installed."
-    fi
-
-    poauth="no"
-    check_py_lib oauth
-    if test $? != 1 ; then
-        poauth="yes"
-    else
-        echo "MythNetvision requires the Python OAuth library (oauth) installed."
-    fi
-
-    if test "$mythbindings" = "no" -o "$pcurl" = "no" -o "$plxml" = "no" -o "$pxml" = "no" -o "$purl" = "no" -o "$purl2" = "no" -o "$poauth" = "no"; then
-        echo "Disabling MythNetvision due to missing dependencies."
-        netvision="no"
+    disabled netvision && echo "Disabling MythNetvision due to missing dependencies."
     fi
 fi
 
