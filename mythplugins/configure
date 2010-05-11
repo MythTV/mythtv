@@ -90,37 +90,45 @@ check_cmd(){
 #    default parameters for all plugins
 #
 
+PLUGIN_LIST="
+archive
+browser
+flix
+gallery
+game
+movies
+music
+netvision
+news
+video
+weather
+zoneminder
+"
+
+CONFIG_LIST="
+opengl
+visual
+fftw_lib
+fftw_lib3
+sdl
+exif
+newexif
+festival
+"
+
+enable $PLUGIN_LIST $CONFIG_LIST
+disable festival # no config detection/setup routine
+
+
 prefix="/usr/local"
 libdir_name="lib"
 sysroot=""
 
 logfile="config.ep"
 
-music="yes"
-video="yes"
-weather="yes"
-gallery="yes"
-game="yes"
-news="yes"
-browser="yes"
-flix="yes"
-archive="yes"
-zoneminder="yes"
-movies="yes"
-netvision="yes"
-
 cc="gcc"
 qmake="qmake"
 python="python"
-
-opengl="yes"
-visual="yes"
-fftw_lib="yes"
-fftw_lib3="yes"
-sdl="yes"
-exif="yes"
-newexif="yes"
-festival="no"     # no config detection/setup routine
 
 targetos=`uname -s`
 
@@ -303,45 +311,11 @@ for opt do
   ;;
   --disable-festival) festival="no"
   ;;
-  --enable-all)  music="yes";
-                 video="yes";
-                 weather="yes";
-                 gallery="yes";
-                 game="yes";
-                 news="yes";
-                 browser="yes";
-                 zoneminder="yes";
-                 flix="yes";
-                 movies="yes";
-                 netvision="yes";
-                 sdl="yes";
-                 opengl="yes";
-                 visual="yes";
-                 fftw_lib="yes";
-                 fftw_lib3="yes";
-                 exif="yes";
-                 festival="yes";
-                 archive="yes";
+  --enable-all)
+      enable $PLUGIN_LIST $CONFIG_LIST
   ;;
-  --disable-all) music="no";
-                 video="no";
-                 weather="no";
-                 gallery="no";
-                 game="no";
-                 news="no";
-                 browser="no";
-                 zoneminder="no";
-                 flix="no";
-                 movies="no";
-                 netvision="no";
-                 sdl="no";
-                 opengl="no";
-                 visual="no";
-                 fftw_lib="no";
-                 fftw_lib3="no";
-                 exif="no";
-                 festival="no";
-                 archive="no";
+  --disable-all)
+      disable $PLUGIN_LIST $CONFIG_LIST
   ;;
   *)
   optname="${opt%%=*}"
