@@ -682,6 +682,11 @@ sys.exit(0)
 EOF
 }
 
+check_pl_lib(){
+    log check_pl_lib "$@"
+    check_cmd perl -e "use ${1};"
+}
+
 check_cc(){
     log check_cc "$@"
     cat > $TMPC
@@ -3931,6 +3936,24 @@ fi
 # Check for python dependencies
 enabled bindings_python && check_py_lib MySQLdb || disable bindings_python
 enabled bindings_python && check_py_lib lxml    || disable bindings_python
+
+# Check for perl dependencies
+# Modules distributed in Perl core
+enabled bindings_perl && check_pl_lib "ExtUtils::MakeMaker" ||
+    disable bindings_perl
+enabled bindings_perl && check_pl_lib Config || disable bindings_perl
+enabled bindings_perl && check_pl_lib Exporter || disable bindings_perl
+enabled bindings_perl && check_pl_lib Fcntl || disable bindings_perl
+enabled bindings_perl && check_pl_lib "File::Copy" || disable bindings_perl
+enabled bindings_perl && check_pl_lib "Sys::Hostname" || disable bindings_perl
+# Modules not distributed in Perl core
+enabled bindings_perl && check_pl_lib DBI || disable bindings_perl
+enabled bindings_perl && check_pl_lib "HTTP::Request" || disable bindings_perl
+enabled bindings_perl && check_pl_lib "LWP::UserAgent" || disable bindings_perl
+enabled bindings_perl && check_pl_lib "Net::UPnP::QueryResponse" ||
+    disable bindings_perl
+enabled bindings_perl && check_pl_lib "Net::UPnP::ControlPoint" ||
+    disable bindings_perl
 
 # Find out if the .align argument is a power of two or not.
 check_asm asmalign_pot '".align 3"'
