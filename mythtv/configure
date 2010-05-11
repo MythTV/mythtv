@@ -3852,6 +3852,7 @@ fi
 if ! enabled windows; then
     check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
 fi
+enabled opengl && check_libx glu_lib GL/glu.h gluBeginSurface -lGLU || disable opengl
 
 VENDOR_XVMC_LIBS=""
 enabled xvmcw && check_lib X11/extensions/XvMClib.h XvMCQueryExtension -lXvMCW || disable xvmcw
@@ -4569,7 +4570,7 @@ if enabled directfb; then
 fi
 
 if ! enabled darwin && enabled opengl; then
-  echo "CONFIG_OPENGL_LIBS=-lGL -lGLU" >> $MYTH_CONFIG_MAK
+  echo "CONFIG_OPENGL_LIBS=$gl_lib $glu_lib" >> $MYTH_CONFIG_MAK
 fi
 
 if test x"$CCONFIG" != x"" ; then
