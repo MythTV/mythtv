@@ -75,8 +75,8 @@ using_vdpau {
 
 using_x11 {
     DEFINES += USING_X11
-    HEADERS += screensaver-x11.h
-    SOURCES += screensaver-x11.cpp
+    HEADERS += screensaver-x11.h screensaver-xdg.h
+    SOURCES += screensaver-x11.cpp screensaver-xdg.cpp
     LIBS += $$EXTRA_LIBS
 }
 
