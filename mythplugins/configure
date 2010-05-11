@@ -113,11 +113,9 @@ fftw_lib3
 sdl
 exif
 newexif
-festival
 "
 
 enable $PLUGIN_LIST $CONFIG_LIST
-disable festival # no config detection/setup routine
 
 
 prefix="/usr/local"
@@ -306,10 +304,6 @@ for opt do
   --disable-new-exif) newexif="no"
   ;;
   --disable-exif) exif="no"
-  ;;
-  --enable-festival) festival="yes"
-  ;;
-  --disable-festival) festival="no"
   ;;
   --enable-all)
       enable $PLUGIN_LIST $CONFIG_LIST
