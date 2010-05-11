@@ -477,7 +477,6 @@ using_backend {
         }
 
         DEFINES += USING_FIREWIRE
-        using_libavc_5_3:DEFINES += USING_LIBAVC_5_3
     }
 
     # Support for MPEG2 TS streams (including FreeBox http://adsl.free.fr/)

@@ -995,40 +995,6 @@ cp_if_changed(){
 }
 
 
-#deprecated, use check_lib or check_lib2 instead
-has_library()
-{
-    if test -f /etc/ld.so.conf ; then
-        LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
-    else
-        LIBPATHS=''
-    fi
-
-    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
-    # Mac OS X has a different variable for this:
-    LIBPATHS="$LIBPATHS `echo $DYLD_LIBRARY_PATH | sed s/':'/' '/g` "
-
-    # recurse down just one level, should be enough in most cases
-    if test -f /etc/ld.so.conf ; then
-        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "^include"`
-        SRCH=`echo "$INCL" | sed '{ s/^include \//\//; s/^include /\/etc\//}'`
-        for x in $SRCH ; do
-            LP_APPEND=`cat $x | grep -v "#" | grep -v "^include"`
-            LIBPATHS="$LIBPATHS $LP_APPEND"
-        done
-    fi
-
-    LIBPATHS="`echo $LIBPATHS /$libdir_name /usr/$libdir_name /usr/local/$libdir_name /usr/X11R6/$libdir_name | sed s/'\/ '/' '/g` "
-
-    HAS_IT="no"
-    for LIBPATH in $LIBPATHS ; do
-        if test x`ls $LIBPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
-            HAS_IT="yes"
-        fi
-    done
-    expr $HAS_IT : "yes" > /dev/null
-}
-
 x86_mmx_cpus="pentium-mmx,pentium2,pentium3,pentium3m,pentium-m"
 x86_mmx_cpus="$x86_mmx_cpus,pentium4,pentium4m,prescott"
 x86_mmx_cpus="$x86_mmx_cpus,athlon,athlon-xp,athlon-tbird,athlon-4,athlon-mp,"
@@ -3802,22 +3768,9 @@ check_cxx ${qt_inc} ${qt_inc}/QtDBus <<EOF && enable qtdbus
 EOF
 
 if enabled firewire; then
-    firewire="no"
-    libavc_5_3="no"
-    if has_library libiec61883 -a \
-       has_library libavc1394 -a \
-       has_library librom1394; then
-        if test x`which pkg-config 2>/dev/null` != x"" ; then
-            if `pkg-config --atleast-version 0.5.0 libavc1394` ; then
-                if `pkg-config --atleast-version 1.0.0 libiec61883` ; then
-                    firewire="yes"
-                    if `pkg-config --atleast-version 0.5.3 libavc1394` ; then
-                        libavc_5_3="yes"
-                    fi
-                fi
-            fi
-        fi
-    fi
+    fwlibs=""
+    check_libx fwlibs libavc1394/avc1394.h avc1394_transaction_block2 -lavc1394 && check_libx fwlibs libiec61883/iec61883.h iec61883_cmp_reconnect -liec61883 || disable firewire
+
     if test $target_os = darwin; then
         # This should pick the newest. e.g. FireWireSDK21 instead of 20
         # Unfortunately, the location keeps changing:
@@ -4511,9 +4464,6 @@ if enabled firewire; then
       echo "CONFIG_MAC_AVC=$mac_avc" >>  $MYTH_CONFIG_MAK
   else
       echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394 -lrom1394" >>  $MYTH_CONFIG_MAK
-      if enabled libavc_5_3; then
-        append CCONFIG "using_libavc_5_3"
-      fi
   fi
 fi
 

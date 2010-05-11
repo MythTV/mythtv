@@ -89,15 +89,9 @@ bool LinuxAVCInfo::SendAVCCommand(
 
     uint result_length = 0;
 
-#ifdef USING_LIBAVC_5_3
     uint32_t *ret = avc1394_transaction_block2(
         fw_handle, node, cmdbuf, cmd.size() >> 2,
         &result_length, retry_cnt);
-#else // if !USING_LIBAVC_5_3
-    uint32_t *ret = avc1394_transaction_block(
-        fw_handle, node, cmdbuf, cmd.size() >> 2, retry_cnt);
-    result_length = cmd.size() >> 2;
-#endif // !USING_LIBAVC_5_3
 
     if (!ret)
         return false;
@@ -110,9 +104,7 @@ bool LinuxAVCInfo::SendAVCCommand(
         result.push_back((ret[i])     & 0xff);
     }
 
-#ifdef USING_LIBAVC_5_3
     avc1394_transaction_block_close(fw_handle);
-#endif // USING_LIBAVC_5_3
 
     return true;
 }
