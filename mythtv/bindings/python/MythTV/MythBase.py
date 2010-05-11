@@ -666,7 +666,7 @@ class DBDataRef( object ):
         sd = self.SubData(zip(self._datfields, data))
         del self._data[hash(sd)]
 
-    def clear(self):
+    def clean(self):
         """Remove all entries and commit."""
         # clear all and commit
         self._populate()
