@@ -366,7 +366,6 @@ Include the log file "$logfile" produced by configure as this will help
 solving the problem.
 EOF
     fi
-    rm -f $TMPCXX
     exit 1
 }
 
@@ -1918,23 +1917,6 @@ if [ -e config.log ] ; then
     fi
 fi
 
-# set temporary file name
-if test ! -z "$TMPDIR" ; then
-    TMPDIR1="${TMPDIR}"
-elif test ! -z "$TEMPDIR" ; then
-    TMPDIR1="${TEMPDIR}"
-else
-    TMPDIR1="/tmp"
-fi
-
-TMPC="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.c"
-TMPE="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}${EXESUF}"
-TMPH="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.h"
-TMPO="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.o"
-TMPS="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.S"
-TMPSH="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.sh"
-TMPCXX="${TMPDIR1}/mythtv-conf-${RANDOM}-$$-${RANDOM}.c"
-
 for opt do
     optval="${opt#*=}"
     case "$opt" in
@@ -2128,6 +2110,7 @@ tmpfile TMPO  .o
 tmpfile TMPS  .S
 tmpfile TMPV  .ver
 tmpfile TMPSH .sh
+tmpfile TMPCXX .cpp
 
 unset -f mktemp
 
@@ -4600,9 +4583,6 @@ print_config AV_HAVE_ $TMPH /dev/null $HAVE_LIST_PUB
 echo "#endif /* AVUTIL_AVCONFIG_H */" >> $TMPH
 
 cp_if_changed $TMPH libs/libavutil/avconfig.h
-
-rm -f $TMPC $TMPE $TMPH $TMPO $TMPS $TMPSH
-rm -f $TMPCXX
 
 # Create a special cleanup makefile that will allow make clean to work
 if [ ! -e config ] ; then
