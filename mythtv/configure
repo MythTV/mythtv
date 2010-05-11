@@ -629,6 +629,16 @@ append(){
     eval "$var=\"\$$var $*\""
 }
 
+append_uniq(){
+    log append_uniq "$@"
+    var=$1
+    shift
+    for value; do
+        eval tmpvar='$'$var
+        echo "$tmpvar" | grep -q ".$value" || append $var $value
+    done
+}
+
 add_cppflags(){
     append CPPFLAGS $($filter_cppflags "$@")
 }
@@ -730,12 +740,12 @@ EOF
 
 check_ld_cxx(){
     log check_ld_cxx "$@"
-    check_cxx || return
     flags=''
     libs=''
     for f; do
         test "${f}" = "${f#-l}" && flags="$flags $f" || libs="$libs $f"
     done
+    check_cxx $($filter_cflags $flags) || return
     check_cmd $cxx $LDFLAGS $flags -o $TMPE $TMPO $extralibs $libs
 }
 
@@ -846,6 +856,15 @@ check_lib2(){
     func="$2"
     shift 2
     check_func_headers "$headers" $func "$@" && add_extralibs "$@"
+}
+
+check_libx(){
+    log check_libx "$@"
+    libvar="$1"
+    headers="$2"
+    func="$3"
+    shift 3
+    check_func_headers "$headers" $func "$@" && append_uniq $libvar "$@"
 }
 
 check_exec(){
@@ -3830,9 +3849,8 @@ if enabled x11; then
     require libXext X11/extensions/Xext.h XMissingExtension -lXext
 fi
 
-check_header GL/gl.h
 if ! enabled windows; then
-    has_library libGL || has_library libopengl32 || disable opengl
+    check_libx gl_lib GL/gl.h glBegin -lGL || check_libx gl_lib GL/gl.h glBegin -lopengl32 || disable opengl
 fi
 
 VENDOR_XVMC_LIBS=""
