@@ -1948,6 +1948,9 @@ for opt do
     ;;
     --xvmc-lib=*) xvmc_lib=$optval
     ;;
+    --*able-xvmc-pro)
+    echo "$opt is deprecated. XvMC Pro is autodetected if xvmc-vld is enabled"
+    ;;
     --enable-glx-procaddrarb) enable glx_proc_addr_arb
     ;;
     --disable-glx-procaddrarb) disable glx_proc_addr_arb
