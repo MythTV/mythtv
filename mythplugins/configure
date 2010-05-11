@@ -466,7 +466,6 @@ if ! disabled netvision; then
     check_py_lib oauth   || disable_netvision "Python OAuth library (oauth)"
 
     disabled netvision && echo "Disabling MythNetvision due to missing dependencies."
-    fi
 fi
 
 
