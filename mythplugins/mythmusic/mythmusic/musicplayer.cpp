@@ -931,6 +931,15 @@ MuteState MusicPlayer::getMuteState(void) const
     return kMuteAll;
 }
 
+void MusicPlayer::toMap(QHash<QString, QString> &map)
+{
+    map["volumemute"] = QString("%1%").arg(getVolume()) + 
+                        (isMuted() ? " (" + tr("Muted") + ")" : "");
+    map["volume"] = QString("%1").arg(getVolume());
+    map["volumepercent"] = QString("%1%").arg(getVolume());
+    map["mute"] = isMuted() ? tr("Muted") : "";
+}
+
 void MusicPlayer::playlistChanged(int trackID, bool deleted)
 {
     if (trackID == -1)
