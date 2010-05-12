@@ -1418,6 +1418,8 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     enc->rate_emu = 0;
     enc->error_rate = 0;
 
+    directrendering = false;
+
     AVCodec *codec = avcodec_find_decoder(enc->codec_id);
     // look for a vdpau capable codec
     if (codec_is_vdpau(video_codec_id) && !CODEC_IS_VDPAU(codec))
@@ -1465,7 +1467,7 @@ void AvFormatDecoder::InitVideoCodec(AVStream *stream, AVCodecContext *enc,
     else if (codec && codec->capabilities & CODEC_CAP_DR1 &&
              (IS_DR1_PIX_FMT(enc->pix_fmt) /* HACK -- begin */
              /*   allow unknown pixel format to avoid regressions*/
-             || (enc->pix_fmt == PIX_FMT_NONE && ringBuffer->isDVD()))
+             ||  enc->pix_fmt == PIX_FMT_NONE)
 	     /* HACK -- end*/)
     {
         enc->flags          |= CODEC_FLAG_EMU_EDGE;
@@ -2401,6 +2403,13 @@ void AvFormatDecoder::SetupAudioStreamSubIndexes(int streamIndex)
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+
+    if (!IS_DR1_PIX_FMT(c->pix_fmt))
+    {
+        nd->directrendering = false;
+        return avcodec_default_get_buffer(c, pic);
+    }
+    nd->directrendering = true;
 
     VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(true);
 
@@ -4360,6 +4369,12 @@ bool AvFormatDecoder::GetFrame(DecodeType decodetype)
                             xf->frameNumber = framesPlayed;
                             GetNVP()->DiscardVideoFrame(xf);
                         }
+                    }
+                    else if (!picframe)
+                    {
+                        VERBOSE(VB_IMPORTANT, LOC_ERR + "NULL videoframe - "
+                                "direct rendering not correctly initialized.");
+                        return false;
                     }
 
                     long long temppts = pts;
