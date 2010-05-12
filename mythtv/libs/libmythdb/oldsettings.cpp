@@ -83,7 +83,7 @@ float Settings::GetFloatSetting(QString strSetting, float defaultvalue)
             retval = defaultvalue;
     }
 
-    return defaultvalue; // property doesn't exist
+    return retval; // property doesn't exist
 }
 
 // Setting Setting functions
