@@ -174,7 +174,7 @@ bool Metadata::isInDatabase()
         m_id = query.value(8).toUInt();
         m_rating = query.value(9).toInt();
         m_playcount = query.value(10).toInt();
-        m_lastplay = query.value(11).toString();
+        m_lastplay = query.value(11).toDateTime();
         m_compilation = (query.value(12).toInt() > 0);
         m_format = query.value(13).toString();
 
@@ -542,8 +542,9 @@ void Metadata::checkEmptyFields()
 {
     if (m_artist.isEmpty())
         m_artist = QObject::tr("Unknown Artist");
-    if (m_compilation_artist.isEmpty())
-        m_compilation_artist = m_artist; // This should be the same as Artist if blank.
+    // This should be the same as Artist if it's a compilation track or blank
+    if (!m_compilation || m_compilation_artist.isEmpty())
+        m_compilation_artist = m_artist; 
     if (m_album.isEmpty())
         m_album = QObject::tr("Unknown Album");
     if (m_title.isEmpty())
@@ -614,10 +615,6 @@ void Metadata::setField(const QString &field, const QString &data)
 {
     if (field == "artist")
         m_artist = data;
-    // myth@colin.guthr.ie: Not sure what calls this method as I can't seem
-    //                      to find anything that does!
-    //                      I've added the compilation_artist stuff here for
-    //                      completeness.
     else if (field == "compilation_artist")
       m_compilation_artist = data;
     else if (field == "album")
@@ -639,8 +636,8 @@ void Metadata::setField(const QString &field, const QString &data)
 
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("Something asked me to return data "
-                              "about a field called %1").arg(field));
+        VERBOSE(VB_IMPORTANT, QString("Something asked me to set data "
+                              "for a field called %1").arg(field));
     }
 }
 
@@ -662,6 +659,38 @@ void Metadata::getField(const QString &field, QString *data)
     }
 }
 
+void Metadata::toMap(MetadataMap &metadataMap)
+{
+    metadataMap["artist"] = m_artist;
+    metadataMap["formatartist"] = FormatArtist();
+    metadataMap["compilationartist"] = m_compilation_artist;
+    metadataMap["album"] = m_album;
+    metadataMap["title"] = m_title;
+    metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "N/A");
+    metadataMap["genre"] = m_genre;
+    metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "N/A");
+    metadataMap["titleartist"] = m_title + " " + QObject::tr("by") + " " + m_artist;
+
+    int len = m_length / 1000;
+    int eh = len / 3600;
+    int em = (len / 60) % 60;
+    int es = len % 60;
+    if (eh > 0)
+        metadataMap["length"] = QString().sprintf("%d:%02d:%02d", eh, em, es);
+    else
+        metadataMap["length"] = QString().sprintf("%02d:%02d", em, es);
+
+    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString fullDateFormat = dateFormat;
+    if (!fullDateFormat.contains("yyyy"))
+        fullDateFormat += " yyyy";
+    metadataMap["lastplayed"] = m_lastplay.toString(fullDateFormat);
+
+    metadataMap["playcount"] = QString("%1").arg(m_playcount);
+    metadataMap["filename"] = m_filename;
+}
+
+
 void Metadata::decRating()
 {
     if (m_rating > 0)
@@ -680,20 +709,14 @@ void Metadata::incRating()
     m_changed = true;
 }
 
-double Metadata::LastPlay()
+QDateTime Metadata::LastPlay()
 {
-    QString timestamp = m_lastplay;
-    timestamp = timestamp.replace(':', "");
-    timestamp = timestamp.replace('T', "");
-    timestamp = timestamp.replace('-', "");
-
-    return timestamp.toDouble();
+    return m_lastplay;
 }
 
 void Metadata::setLastPlay()
 {
-    QDateTime cTime = QDateTime::currentDateTime();
-    m_lastplay = cTime.toString("yyyyMMddhhmmss");
+    m_lastplay = QDateTime::currentDateTime();
     m_changed = true;
 }
 
@@ -799,6 +822,39 @@ QImage Metadata::getAlbumArt(ImageType type)
     return image;
 }
 
+QString Metadata::getAlbumArtFile(void)
+{
+    AlbumArtImages albumArt(this);
+    ImageType type;
+    AlbumArtImage *albumart_image = NULL;
+
+    if ((albumart_image = albumArt.getImage(IT_FRONTCOVER)))
+        return albumart_image->filename;
+    else if ((albumart_image = albumArt.getImage(IT_UNKNOWN)))
+        return albumart_image->filename;
+    else if ((albumart_image = albumArt.getImage(IT_BACKCOVER)))
+        return albumart_image->filename;
+    else if ((albumart_image = albumArt.getImage(IT_INLAY)))
+        return albumart_image->filename;
+    else if ((albumart_image = albumArt.getImage(IT_CD)))
+        return albumart_image->filename;
+
+    return QString("");
+}
+
+QString Metadata::getAlbumArtFile(ImageType type)
+{
+    AlbumArtImages albumArt(this);
+
+    QImage image;
+
+    AlbumArtImage *albumart_image = albumArt.getImage(type);
+    if (albumart_image)
+        return albumart_image->filename;
+
+    return QString("");
+}
+
 // static function to get a metadata object given a track id
 // it's upto the caller to delete the returned object when finished
 Metadata *Metadata::getMetadataFromID(int id)
@@ -819,7 +875,7 @@ Metadata *Metadata::getMetadataFromID(int id)
                      "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
                      "WHERE music_songs.song_id = :TRACKID;";
 
-    QString filename, artist, album, title;
+    QString filename;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(aquery);
@@ -831,34 +887,22 @@ Metadata *Metadata::getMetadataFromID(int id)
         if (!filename.contains("://"))
             filename = m_startdir + filename;
 
-        artist = query.value(1).toString();
-        if (artist.isEmpty())
-            artist = QObject::tr("Unknown Artist");
-
-        album = query.value(3).toString();
-        if (album.isEmpty())
-            album = QObject::tr("Unknown Album");
-
-        title = query.value(4).toString();
-        if (title.isEmpty())
-            title = QObject::tr("Unknown Title");
-
         meta = new Metadata(
             filename,
-            artist,
-            query.value(2).toString(),
-            album,
-            title,
-            query.value(5).toString(),
-            query.value(6).toInt(),
-            query.value(7).toInt(),
-            query.value(8).toInt(),
-            query.value(0).toInt(),
-            query.value(10).toInt(), //rating
-            query.value(11).toInt(), //playcount
-            query.value(12).toString(), //lastplay
-            (query.value(13).toInt() > 0), //compilation
-            query.value(14).toString()); //format
+            query.value(1).toString(),     // artist
+            query.value(2).toString(),     // compilation artist
+            query.value(3).toString(),     // album
+            query.value(4).toString(),     // title
+            query.value(5).toString(),     // genre
+            query.value(6).toInt(),        // year
+            query.value(7).toInt(),        // track no.
+            query.value(8).toInt(),        // length
+            query.value(0).toInt(),        // id
+            query.value(10).toInt(),       // rating
+            query.value(11).toInt(),       // playcount
+            query.value(12).toDateTime(),  // lastplay
+            (query.value(13).toInt() > 0), // compilation
+            query.value(14).toString());   // format
     }
     else
     {
@@ -983,7 +1027,7 @@ void AllMusic::resync()
                      "LEFT JOIN music_genres ON music_songs.genre_id=music_genres.genre_id "
                      "ORDER BY music_songs.song_id;";
 
-    QString filename, artist, album, title;
+    QString filename, artist, album, title, compartist;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.exec(aquery))
@@ -1003,34 +1047,22 @@ void AllMusic::resync()
             if (!filename.contains("://"))
                 filename = m_startdir + filename;
 
-            artist = query.value(1).toString();
-            if (artist.isEmpty())
-                artist = QObject::tr("Unknown Artist");
-
-            album = query.value(3).toString();
-            if (album.isEmpty())
-                album = QObject::tr("Unknown Album");
-
-            title = query.value(4).toString();
-            if (title.isEmpty())
-                title = QObject::tr("Unknown Title");
-
             Metadata *temp = new Metadata(
                 filename,
-                artist,
-                query.value(2).toString(),
-                album,
-                title,
-                query.value(5).toString(),
-                query.value(6).toInt(),
-                query.value(7).toInt(),
-                query.value(8).toInt(),
-                query.value(0).toInt(),
-                query.value(10).toInt(), //rating
-                query.value(11).toInt(), //playcount
-                query.value(12).toString(), //lastplay
-                (query.value(13).toInt() > 0), //compilation
-                query.value(14).toString()); //format
+                query.value(1).toString(),     // artist
+                query.value(2).toString(),     // compilation artist
+                query.value(3).toString(),     // album
+                query.value(4).toString(),     // title
+                query.value(5).toString(),     // genre
+                query.value(6).toInt(),        // year
+                query.value(7).toInt(),        // track no.
+                query.value(8).toInt(),        // length
+                query.value(0).toInt(),        // id
+                query.value(10).toInt(),       // rating
+                query.value(11).toInt(),       // playcount
+                query.value(12).toDateTime(),  // lastplay
+                (query.value(13).toInt() > 0), // compilation
+                query.value(14).toString());   // format
 
             //  Don't delete temp, as PtrList now owns it
             m_all_music.append(temp);
@@ -1039,12 +1071,12 @@ void AllMusic::resync()
             if (query.at() == 0)
             { // first song
                 m_playcountMin = m_playcountMax = temp->PlayCount();
-                m_lastplayMin  = m_lastplayMax  = temp->LastPlay();
+                m_lastplayMin  = m_lastplayMax  = temp->LastPlay().toTime_t();
             }
             else
             {
                 int playCount = temp->PlayCount();
-                double lastPlay = temp->LastPlay();
+                double lastPlay = temp->LastPlay().toTime_t();
 
                 m_playcountMin = min(playCount, m_playcountMin);
                 m_playcountMax = max(playCount, m_playcountMax);
@@ -1408,7 +1440,7 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
         //
         int rating = (*it)->Rating();
         int playcount = (*it)->PlayCount();
-        double lastplaydbl = (*it)->LastPlay();
+        double lastplaydbl = (*it)->LastPlay().toTime_t();
         double ratingValue = (double)(rating) / 10;
         double playcountValue, lastplayValue;
 

@@ -86,19 +86,8 @@ void EditMetadataDialog::fillWidgets()
 
     if (lastplay_text)
     {
-        QString timestamp = m_metadata->LastPlayStr();
-
-        if (!timestamp.contains('-'))
-        {
-            timestamp.insert(4, '-');
-            timestamp.insert(7, '-');
-            timestamp.insert(10, 'T');
-            timestamp.insert(13, ':');
-            timestamp.insert(16, ':');
-        }
-
-        QDateTime dt = QDateTime::fromString(timestamp, Qt::ISODate);
-        lastplay_text->SetText(dt.toString(gContext->GetSetting("dateformat") +
+        lastplay_text->SetText(m_metadata->LastPlay()
+                               .toString(gContext->GetSetting("dateformat") +
                                " " + gContext->GetSetting("timeformat")));
     }
 

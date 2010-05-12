@@ -41,6 +41,7 @@ typedef struct AlbumArtImage
     bool      embedded;
 } AlbumArtImage;
 
+typedef QHash<QString,QString> MetadataMap;
 
 class Metadata
 {
@@ -48,7 +49,7 @@ class Metadata
     Metadata(QString lfilename = "", QString lartist = "", QString lcompilation_artist = "",
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
              int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
-             int lrating = 0, int lplaycount = 0, QString llastplay = "",
+             int lrating = 0, int lplaycount = 0, QDateTime llastplay = QDateTime(),
              bool lcompilation = false, QString lformat = "")
                 : m_artist(lartist),
                    m_compilation_artist(lcompilation_artist),
@@ -153,8 +154,7 @@ class Metadata
     void incRating();
     void setRating(int lrating) { m_rating = lrating; }
 
-    double LastPlay();
-    QString LastPlayStr() const { return m_lastplay; }
+    QDateTime LastPlay();
     void setLastPlay();
 
     int PlayCount() const { return m_playcount; }
@@ -179,6 +179,8 @@ class Metadata
     void dumpToDatabase(void);
     void setField(const QString &field, const QString &data);
     void getField(const QString& field, QString *data);
+    void toMap(MetadataMap &metadataMap);
+
     void persist();
     bool hasChanged() {return m_changed;}
     int compare(const Metadata *other) const;
@@ -194,6 +196,11 @@ class Metadata
     QImage getAlbumArt(void);
     // this looks only for the given image type
     QImage getAlbumArt(ImageType type);
+
+    // this looks for any image available - preferring a front cover if available
+    QString getAlbumArtFile(void);
+    // this looks only for the given image type
+    QString getAlbumArtFile(ImageType type);
 
   private:
     void setCompilationFormatting(bool cd = false);
@@ -217,8 +224,8 @@ class Metadata
     int m_compartistid;
     int m_albumid;
     int m_genreid;
-    QString m_lastplay;
-    int m_playcount;
+    QDateTime m_lastplay;
+    int  m_playcount;
     bool m_compilation;
     QList<struct AlbumArtImage> m_albumart;
 
@@ -433,5 +440,7 @@ class AlbumArtImages
     Metadata  *m_parent;
     ImageList  m_imageList;
 };
+
+Q_DECLARE_METATYPE(AlbumArtImage*);
 
 #endif

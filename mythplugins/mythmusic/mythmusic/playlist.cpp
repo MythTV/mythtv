@@ -887,7 +887,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                         if (0 == idx)
                         { // first song
                             playcountMin = playcountMax = tmpdata->PlayCount();
-                            lastplayMin = lastplayMax = tmpdata->LastPlay();
+                            lastplayMin = lastplayMax = tmpdata->LastPlay().toTime_t();
                         }
                         else
                         {
@@ -896,10 +896,10 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                             else if (tmpdata->PlayCount() > playcountMax)
                                 playcountMax = tmpdata->PlayCount();
 
-                            if (tmpdata->LastPlay() < lastplayMin)
-                                lastplayMin = tmpdata->LastPlay();
-                            else if (tmpdata->LastPlay() > lastplayMax)
-                                lastplayMax = tmpdata->LastPlay();
+                            if (tmpdata->LastPlay().toTime_t() < lastplayMin)
+                                lastplayMin = tmpdata->LastPlay().toTime_t();
+                            else if (tmpdata->LastPlay().toTime_t() > lastplayMax)
+                                lastplayMax = tmpdata->LastPlay().toTime_t();
                         }
                     }
                     // pre-fill the album-map with the album name.
@@ -971,7 +971,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
 
                     int rating = tmpdata->Rating();
                     int playcount = tmpdata->PlayCount();
-                    double lastplaydbl = tmpdata->LastPlay();
+                    double lastplaydbl = tmpdata->LastPlay().toTime_t();
                     double ratingValue = (double)(rating) / 10;
                     double playcountValue, lastplayValue;
 
