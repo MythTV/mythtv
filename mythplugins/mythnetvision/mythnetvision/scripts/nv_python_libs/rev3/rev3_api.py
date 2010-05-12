@@ -20,8 +20,11 @@ meta data, video and image URLs from rev3. These routines process RSS feeds prov
 a user XML preference file usually found at "~/.mythtv/MythNetvision/userGrabberPrefs/rev3.xml"
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
+# 0.1.1 Changed the search functionality to be "Videos" only rather than the site search.
+#       Added support for Revision3's Personal RSS feed
+#       Changed the logger to only output to stderr rather than a file
 
 import os, struct, sys, re, time, datetime, urllib, re
 import logging
@@ -170,7 +173,7 @@ class Videos(object):
         self.common.debug = debug   # Set the common function debug level
 
         self.log_name = u'Rev3_Grabber'
-        self.common.logger = self.common.initLogger(path=u'/tmp', log_name=self.log_name)
+        self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
         self.config['custom_ui'] = custom_ui
@@ -324,6 +327,23 @@ class Videos(object):
 -->
 <!-- Number of days between updates to the config file -->
 <updateDuration>3</updateDuration>
+
+<!--
+    Personal RSS feed.
+    "globalmax" (optional) Is a way to limit the number of items processed per RSS feed for all
+                treeview URLs. A value of zero (0) means there are no limitions.
+    "max" (optional) Is a way to limit the number of items processed for an individual RSS feed.
+          This value will override any "globalmax" setting. A value of zero (0) means
+          there are no limitions and would be the same if the attribute was no included at all.
+    "enabled" If you want to remove a RSS feed then change the "enabled" attribute to "false".
+
+    See details: http://revision3.com/blog/2010/03/11/pick-your-favorite-shows-create-a-personalized-feed/
+    Once you sign up and create your personal RSS feed replace the url in the example below with the
+    Revision3 "Your RSS Feed Address" URL and change the "enabled" element attribute to "true".
+-->
+<treeviewURLS globalmax="0">
+    <url enabled="false">http://revision3.com/feed/user/EXAMPLE</url>
+</treeviewURLS>
 </userRev3>
 ''')
 
@@ -537,9 +557,9 @@ class Videos(object):
         return
         '''
         try:
-            searchVar = u'/page?type=page&q=%s&limit=15&page=%s' % (urllib.quote(title.encode("utf-8")).replace(u' ', u'+'), pagenumber)
+            searchVar = u'?q=%s' % (urllib.quote(title.encode("utf-8")).replace(u' ', u'+'))
         except UnicodeDecodeError:
-            searchVar = u'/page?type=page&q=%s&limit=15&page=%s' % (urllib.quote(title).replace(u' ', u'+'), pagenumber)
+            searchVar = u'?q=%s' % (urllib.quote(title).replace(u' ', u'+'))
         url = self.rev3_config.find('searchURLS').xpath(".//href")[0].text+searchVar
 
         if self.config['debug_enabled']:
@@ -557,7 +577,7 @@ class Videos(object):
         if resultTree is None:
             raise Rev3VideoNotFound(u"No Rev3 Video matches found for search value (%s)" % title)
 
-        searchResults = resultTree.xpath('//result//p')
+        searchResults = resultTree.xpath('//result//li[@class="video"]')
         if not len(searchResults):
             raise Rev3VideoNotFound(u"No Rev3 Video matches found for search value (%s)" % title)
 
@@ -569,36 +589,33 @@ class Videos(object):
         pubDate = datetime.datetime.now().strftime(self.common.pubDateFormat)
 
         # Translate the search results into MNV RSS item format
-        linkFilter = etree.XPath('.//a/@href')
+        thumbnailFilter = etree.XPath('.//a[@class="thumbnail"]/img/@src')
+        titleFilter = etree.XPath('.//a[@class="title"]')
+        descFilter = etree.XPath('.//div[@class="description"]')
+        itemThumbNail = etree.XPath('.//media:thumbnail', namespaces=self.common.namespaces)
+        itemDwnLink = etree.XPath('.//media:content', namespaces=self.common.namespaces)
         itemDict = {}
         for result in searchResults:
-            if len(linkFilter(result)):   # Make sure that this result actually has a video
+            if len(titleFilter(result)):   # Make sure that this result actually has a video
                 rev3Item = etree.XML(self.common.mnvItem)
                 # Extract and massage data
-                text = etree.tostring(result, method="text", encoding=unicode)
-                tmptitle = etree.tostring(result.find('a'), method="text", with_tail=False, encoding=unicode)
-                description = text.replace(tmptitle, u'')
-                if not tmptitle.find(u':') == -1:
-                    title = tmptitle[:tmptitle.find(u':')]
-                else:
-                    title = tmptitle
-                index = title.find(u'>')
-                if index == -1:
-                    index = 0
-                else:
-                    index+=1
-                author = self.common.massageText((u'%s %s' % (title[:index].strip(),u'Revision3')).strip())
-                title = self.common.massageText(title[index:].strip())
-                description = self.common.massageText(description[description.find(u':')+1:].strip())
-                link = self.common.ampReplace(linkFilter(result)[0])
+                thumbNail = self.common.ampReplace(thumbnailFilter(result)[0])
+                title = self.common.massageText(titleFilter(result)[0].text.strip())
+                tmpDesc = etree.tostring(descFilter(result)[0], method="text", encoding=unicode).strip()
+                index = tmpDesc.find(u'¬ñ')
+                if index != -1:
+                    tmpDesc = tmpDesc[index+1:].strip()
+                description = self.common.massageText(tmpDesc)
+                link = self.common.ampReplace(titleFilter(result)[0].attrib['href'])
+                author = u'Revision3'
                 # Insert data into a new item element
                 rev3Item.find('title').text = title
                 rev3Item.find('author').text = author
                 rev3Item.find('pubDate').text = pubDate
                 rev3Item.find('description').text = description
                 rev3Item.find('link').text = link
-                rev3Item.xpath('.//media:thumbnail', namespaces=self.common.namespaces)[0].attrib['url'] = self.common.ampReplace(self.channel_icon)
-                rev3Item.xpath('.//media:content', namespaces=self.common.namespaces)[0].attrib['url'] = link
+                itemThumbNail(rev3Item)[0].attrib['url'] = thumbNail
+                itemDwnLink(rev3Item)[0].attrib['url'] = link
                 s_e = self.getSeasonEpisode(title, None)
                 if s_e[0]:
                     etree.SubElement(rev3Item, "{http://www.mythtv.org/wiki/MythNetvision_Grabber_Script_Format}season").text = s_e[0]
@@ -681,6 +698,8 @@ class Videos(object):
         '''Gather the Revision3 feeds then get a max page of videos meta data in each of them
         Display the results and exit
         '''
+        personalFeed = u"Personal Feed" # A label used to identify processing of a personal RSS feed
+
         # Get the user preferences that specify which shows and formats they want to be in the treeview
         try:
             self.getUserPreferences()
@@ -695,17 +714,28 @@ class Videos(object):
 
         # Verify that there is at least one RSS feed that user wants to download
         rssFeeds = self.userPrefs.xpath("//mp4Format[@enabled='true']")
-        if not len(rssFeeds):
-            sys.stderr.write(u'There are no mp4Format elements "enabled" in your "rev3.xml" user preferences\nfile (%s)\n' % self.rev3_config.find('userPreferenceFile').text)
+        personalFeeds = self.userPrefs.xpath("//treeviewURLS//url[@enabled='true']")
+        if not len(rssFeeds) and not len(personalFeeds):
+            sys.stderr.write(u'There are no mp4Format or personal RSS feed elements "enabled" in your "rev3.xml" user preferences\nfile (%s)\n' % self.rev3_config.find('userPreferenceFile').text)
             sys.exit(1)
 
         # Create a structure of feeds that can be concurrently downloaded
         showData = etree.XML(u'<xml></xml>')
+        for feed in personalFeeds:
+            rssFeeds.append(feed)
+        count = 0
         for rssFeed in rssFeeds:
-            uniqueName = u'%s:%s:%s' % (rssFeed.getparent().getparent().attrib['name'], rssFeed.getparent().attrib['name'], rssFeed.attrib['name'])
+            if rssFeed.getparent().tag == 'treeviewURLS':
+                uniqueName = u'%s:%s' % (personalFeed, count)
+                count+=1
+            else:
+                uniqueName = u'%s:%s:%s' % (rssFeed.getparent().getparent().attrib['name'], rssFeed.getparent().attrib['name'], rssFeed.attrib['name'])
             url = etree.XML(u'<url></url>')
             etree.SubElement(url, "name").text = uniqueName
-            etree.SubElement(url, "href").text = rssFeed.attrib['rss']
+            if uniqueName.startswith(personalFeed):
+                etree.SubElement(url, "href").text = rssFeed.text
+            else:
+                etree.SubElement(url, "href").text = rssFeed.attrib['rss']
             etree.SubElement(url, "filter").text = u"//channel"
             etree.SubElement(url, "parserType").text = u'xml'
             showData.append(url)
@@ -764,16 +794,22 @@ class Videos(object):
                 if categoryDir != None:
                     channelTree.append(categoryElement)
                 categoryElement = etree.XML(u'<directory></directory>')
-                categoryElement.attrib['name'] = names[0]
+                if names[0] == personalFeed:
+                    categoryElement.attrib['name'] = channel.find('title').text
+                else:
+                    categoryElement.attrib['name'] = names[0]
                 categoryElement.attrib['thumbnail'] = self.channel_icon
                 categoryDir = names[0]
             if names[1] != showDir:
-                showElement = etree.SubElement(categoryElement, u"directory")
-                if names[2] == 'Web Only':
-                    showElement.attrib['name'] = u'%s' % (names[1])
+                if names[0] == personalFeed:
+                    showElement = categoryElement
                 else:
-                    showElement.attrib['name'] = u'%s: %s' % (names[1], names[2])
-                showElement.attrib['thumbnail'] = channelThumbnail
+                    showElement = etree.SubElement(categoryElement, u"directory")
+                    if names[2] == 'Web Only':
+                        showElement.attrib['name'] = u'%s' % (names[1])
+                    else:
+                        showElement.attrib['name'] = u'%s: %s' % (names[1], names[2])
+                    showElement.attrib['thumbnail'] = channelThumbnail
                 showDir = names[1]
 
             if self.config['debug_enabled']:
@@ -791,14 +827,14 @@ class Videos(object):
                 link = self.common.ampReplace(itemData.find('link').text)
                 downLoadLink = self.common.ampReplace(itemData.xpath(itemDwnLink, namespaces=self.common.namespaces)[0].attrib['url'])
 
-                # If this is one of the main shows then get a full screen video id
-                if names[0] == 'Shows':
+                # If this is one of the main shows or from the personal RSS feed
+                # then get a full screen video id
+                if names[0] == 'Shows' or names[0] == personalFeed:
                     fullScreenVideoID = self.getVideoID(itemData.find('link').text)
                     if fullScreenVideoID:
                         if link == downLoadLink:
                             downLoadLink = self.common.ampReplace(self.FullScreen % fullScreenVideoID)
                         link = self.common.ampReplace(self.FullScreen % fullScreenVideoID)
-
 
                 rev3Item.find('link').text = self.common.ampReplace(link)
                 rev3Item.xpath(itemDwnLink, namespaces=self.common.namespaces)[0].attrib['url'] = downLoadLink

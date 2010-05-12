@@ -20,8 +20,9 @@ provided by Hulu (http://www.hulu.com/). The specific Hulu RSS feeds that are pr
 "~/.mythtv/MythNetvision/userGrabberPrefs/hulu.xml"
 '''
 
-__version__="v0.1.0"
+__version__="v0.1.1"
 # 0.1.0 Initial development
+# 0.1.1 Changed the logger to only output to stderr rather than a file
 
 import os, struct, sys, re, time, datetime, shutil, urllib
 from string import capitalize
@@ -172,7 +173,7 @@ class Videos(object):
         self.common.debug = debug   # Set the common function debug level
 
         self.log_name = u'Hulu_Grabber'
-        self.common.logger = self.common.initLogger(path=u'/tmp', log_name=self.log_name)
+        self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
         self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
         self.config['custom_ui'] = custom_ui

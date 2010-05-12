@@ -18,7 +18,7 @@ MythNetvision Mashups scripts that run as a Web application and global functions
 MNV grabbers.
 '''
 
-__version__="v0.1.3"
+__version__="v0.1.4"
 # 0.0.1 Initial development
 # 0.1.0 Alpha release
 # 0.1.1 Added the ability to have a mashup name independant of the mashup title
@@ -29,6 +29,8 @@ __version__="v0.1.3"
 #       disabled. Unless a safe work around can be found the feature may need to be removed entierly.
 # 0.1.3 Modifications to support calling grabbers that run on a Web server
 #       Added a class of global functions that could be used by all grabbers
+# 0.1.4 Changed the rating item element to default to be empty rather than "0.0"
+#       Changed the default logger to stderr
 
 import os, struct, sys, re, time, subprocess
 import urllib
@@ -157,7 +159,8 @@ class Videos(object):
         self.common.debug = debug    # Set the common function debug level
 
         self.log_name = "WebCGI_Mashups"
-        self.logger = self.common.initLogger(path=u'/tmp', log_name=self.log_name)
+        self.common.logger = self.common.initLogger(path=sys.stderr, log_name=self.log_name)
+        self.logger = self.common.logger # Setups the logger (self.log.debug() etc)
 
         self.config['search_all_languages'] = search_all_languages
 
@@ -336,7 +339,7 @@ class Common(object):
         <media:thumbnail url=''/>
         <media:content url='' length='' duration='' width='' height='' lang=''/>
     </media:group>
-    <rating>0.0</rating>
+    <rating></rating>
 </item>
 '''
     # end __init__()
@@ -375,14 +378,14 @@ class Common(object):
     # end massageText()
 
 
-    def initLogger(self, path=sys.stdout, log_name=u'MNV_Grabber'):
+    def initLogger(self, path=sys.stderr, log_name=u'MNV_Grabber'):
         """Setups a logger using the logging module, returns a logger object
         """
         logger = logging.getLogger(log_name)
         formatter = logging.Formatter('%(asctime)s-%(levelname)s: %(message)s', '%Y-%m-%dT%H:%M:%S')
 
-        if path == sys.stdout:
-            hdlr = logging.StreamHandler(sys.stdout)
+        if path == sys.stderr:
+            hdlr = logging.StreamHandler(sys.stderr)
         else:
             hdlr = logging.FileHandler(u'%s/%s.log' % (path, log_name))
 

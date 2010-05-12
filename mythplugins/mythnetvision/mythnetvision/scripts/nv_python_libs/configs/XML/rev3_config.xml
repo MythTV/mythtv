@@ -20,8 +20,8 @@
             <url>
                 <name>Revision3 Search</name>
                 <href>http://revision3.com/search</href>
-                <filter>//div[@class='resultContent']//p</filter>
-                <pageFilter>//span[@class='next']</pageFilter>
+                <filter>//li[@class='video']</filter>
+                <pageFilter></pageFilter>
                 <parserType>html</parserType>
             </url>
         </urls>
