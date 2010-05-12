@@ -36,7 +36,7 @@ enum frameFormats {
 
 static QString toStringFrameMaskValues(int mask, bool verbose)
 {
-    QString msg = "";
+    QString msg;
 
     if (verbose)
     {
@@ -1860,7 +1860,12 @@ void ClassicCommDetector::BuildBlankFrameCommList(void)
         bframes[frames++] = it.key();
 
     if (frames == 0)
+    {
+        delete[] c_start;
+        delete[] c_end;
+        delete[] bframes;
         return;
+    }
 
     // detect individual commercials from blank frames
     // commercial end is set to frame right before ending blank frame to
