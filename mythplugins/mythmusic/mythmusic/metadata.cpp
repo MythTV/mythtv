@@ -666,11 +666,13 @@ void Metadata::toMap(MetadataMap &metadataMap)
     metadataMap["compilationartist"] = m_compilation_artist;
     metadataMap["album"] = m_album;
     metadataMap["title"] = m_title;
-    metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "N/A");
+    metadataMap["tracknum"] = (m_tracknum > 0 ? QString("%1").arg(m_tracknum) : "");
     metadataMap["genre"] = m_genre;
     metadataMap["year"] = (m_year > 0 ? QString("%1").arg(m_year) : "N/A");
-    metadataMap["titleartist"] = m_title + " " + QObject::tr("by") + " " + m_artist;
-
+    metadataMap["artisttitle"] = QObject::tr("%1  by  %2", 
+                                             "Music track 'title by artist'")
+                                             .arg(FormatTitle())
+                                             .arg(FormatArtist());
     int len = m_length / 1000;
     int eh = len / 3600;
     int em = (len / 60) % 60;
@@ -689,7 +691,6 @@ void Metadata::toMap(MetadataMap &metadataMap)
     metadataMap["playcount"] = QString("%1").arg(m_playcount);
     metadataMap["filename"] = m_filename;
 }
-
 
 void Metadata::decRating()
 {
