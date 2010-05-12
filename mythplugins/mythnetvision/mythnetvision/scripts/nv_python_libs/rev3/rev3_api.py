@@ -20,11 +20,12 @@ meta data, video and image URLs from rev3. These routines process RSS feeds prov
 a user XML preference file usually found at "~/.mythtv/MythNetvision/userGrabberPrefs/rev3.xml"
 '''
 
-__version__="v0.1.1"
+__version__="v0.1.2"
 # 0.1.0 Initial development
 # 0.1.1 Changed the search functionality to be "Videos" only rather than the site search.
 #       Added support for Revision3's Personal RSS feed
 #       Changed the logger to only output to stderr rather than a file
+# 0.1.2 Fixed an abort when no RSS feed data was returned
 
 import os, struct, sys, re, time, datetime, urllib, re
 import logging
@@ -776,6 +777,7 @@ class Videos(object):
         itemLanguage = './/media:content'
         categoryDir = None
         showDir = None
+        categoryElement = etree.XML(u'<directory></directory>')
         itemAuthor = u'Revision3'
         for result in resultTree.findall('results'):
             names = result.find('name').text.split(':')
