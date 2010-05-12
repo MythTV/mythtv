@@ -830,6 +830,7 @@ void MusicPlayer::updateLastplay()
         {
             m_currentMetadata->incPlayCount();
             m_currentMetadata->setLastPlay();
+            sendMetadataChangedEvent(m_currentMetadata->ID());
         }
         // if all_music is still in scope we need to keep that in sync
         if (gMusicData->all_music)
