@@ -279,6 +279,20 @@ void Playlist::removeTrack(int the_track, bool cd_flag)
     }
 }
 
+void Playlist::moveTrackUpDown(bool flag, int where_its_at)
+{
+    Track *the_track = songs.at(where_its_at);
+
+    if (!the_track)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "A playlist was asked to move a "
+                                        "track, but can't find it");
+        return;
+    }
+
+    moveTrackUpDown(flag, the_track);
+}
+
 void Playlist::moveTrackUpDown(bool flag, Track *the_track)
 {
     uint insertion_point = 0;
@@ -374,6 +388,30 @@ void Playlist::describeYourself(void) const
     VERBOSE(VB_IMPORTANT, LOC + msg);
 }
 
+void Playlist::getStats(int *trackCount, int *totalLength, int currenttrack, int *playedLength) const
+{
+    *trackCount = songs.size();
+    *totalLength = 0;
+    if (playedLength)
+        *playedLength = 0;
+
+    if (currenttrack < 0 || currenttrack >= songs.size())
+        currenttrack = 0;
+
+    int track = 0;
+    SongList::const_iterator it = songs.begin();
+    for (; it != songs.end(); ++it, ++track)
+    {
+        int trackID = (*it)->getValue();
+        Metadata *mdata = gMusicData->all_music->getMetadata(trackID);
+        if (mdata)
+        {
+            *totalLength += mdata->Length();
+            if (playedLength && track < currenttrack)
+                *playedLength += mdata->Length();
+        }
+    }
+}
 
 void Playlist::loadPlaylist(QString a_name, QString a_host)
 {
@@ -1110,6 +1148,14 @@ bool Playlist::containsReference(int to_check, int depth)
         }
     }
     return ref_exists;
+}
+
+Track* Playlist::getSongAt(int pos)
+{
+    if (pos >= 0 && pos < songs.size())
+        return songs.at(pos);
+
+    return NULL;
 }
 
 // Here begins CD Writing things. ComputeSize, CreateCDMP3 & CreateCDAudio

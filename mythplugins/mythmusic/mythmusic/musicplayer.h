@@ -96,12 +96,19 @@ class MusicPlayer : public QObject, public MythObservable
     void         setCurrentNode(GenericTree *node) { m_currentNode = node; }
     GenericTree *getCurrentNode(void) { return m_currentNode; }
 
+    void         loadPlaylist(void);
+    Playlist    *getPlaylist(void) { return m_currentPlaylist; }
+
+    int          getCurrentTrackPos(void) { return m_currentTrack; }
+    void         setCurrentTrackPos(int pos);
+
     void         playlistChanged(int trackID, bool deleted);
 
     QString      getRouteToCurrent(void);
 
     void         savePosition(void);
-    void         restorePosition(const QString &position);
+    void         restorePosition(const QString &position); //TODO remove
+    void         restorePosition(int position);
     void         seek(int pos);
 
     Metadata    *getCurrentMetadata(void);
@@ -154,6 +161,9 @@ class MusicPlayer : public QObject, public MythObservable
     QString getFilenameFromID(int id);
     void updateLastplay(void);
     void sendVolumeChangedEvent(void);
+
+    Playlist    *m_currentPlaylist;
+    int          m_currentTrack;
 
     GenericTree *m_playlistTree;
 

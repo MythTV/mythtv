@@ -116,6 +116,10 @@ class Playlist
                                        int currentTrackID = 0);
     QString  getSonglist(void) { return raw_songlist; }
 
+    QList<Track*> getSongs(void) { return songs; }
+    Track* getSongAt(int pos);
+
+    void moveTrackUpDown(bool flag, int where_its_at);
     void moveTrackUpDown(bool flag, Track *the_track);
 
     bool checkTrack(int a_track_id, bool cd_flag) const;
@@ -141,6 +145,9 @@ class Playlist
     bool    containsReference(int to_check, int depth);
     void    ripOutAllCDTracksNow();
 
+    void    getStats(int *trackCount, int *totalLength, int currentTrack = 0, 
+                     int *playedLength = NULL) const;
+    
     void computeSize(double &size_in_MB, double &size_in_sec);
     int CreateCDMP3(void);
     int CreateCDAudio(void);

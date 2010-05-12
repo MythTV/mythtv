@@ -628,6 +628,18 @@ QString MusicPlayer::getFilenameFromID(int id)
     return filename;
 }
 
+void MusicPlayer::loadPlaylist(void)
+{
+    // wait for loading to complete
+    while (!gMusicData->all_playlists->doneLoading() || !gMusicData->all_music->doneLoading())
+    {
+        usleep(500);
+    }
+
+    m_currentPlaylist  = gMusicData->all_playlists->getActive();
+    setCurrentTrackPos(0);
+}
+
 GenericTree *MusicPlayer::constructPlaylist(void)
 {
     QString position;
@@ -651,6 +663,8 @@ GenericTree *MusicPlayer::constructPlaylist(void)
     if (!position.isEmpty()) //|| m_currentNode == NULL)
         restorePosition(position);
 
+    m_currentPlaylist  = gMusicData->all_playlists->getActive();
+
     return active_playlist_node;
 }
 
@@ -671,6 +685,20 @@ QString MusicPlayer::getRouteToCurrent(void)
     return route.join(",");
 }
 
+void MusicPlayer::setCurrentTrackPos(int pos)
+{
+    if (pos < 0 || pos >= m_currentPlaylist->getSongs().size())
+        return;
+
+    m_currentTrack = pos;
+
+    QString filename = getFilenameFromID(m_currentPlaylist->getSongAt(m_currentTrack)->getValue());
+    if (!filename.isEmpty())
+        playFile(filename);
+    else
+        stop();
+}
+
 void MusicPlayer::savePosition(void)
 {
     if (m_resumeMode != RESUME_OFF)
@@ -680,6 +708,18 @@ void MusicPlayer::savePosition(void)
             gContext->SaveSetting("MusicBookmarkPosition", m_currentTime);
     }
 }
+
+#if 0
+void MusicPlayer::savePosition(void)
+{
+    if (m_resumeMode != RESUME_OFF)
+    {
+        gContext->SaveSetting("MusicBookmark", m_currentTrack);
+        if (m_resumeMode == RESUME_EXACT)
+        gContext->SaveSetting("MusicBookmarkPosition", m_currentTime);
+    }
+}
+#endif
 
 void MusicPlayer::restorePosition(const QString &position)
 {
@@ -715,6 +755,27 @@ void MusicPlayer::restorePosition(const QString &position)
                 play();
         }
     }
+}
+
+void MusicPlayer::restorePosition(int position)
+{
+    if (position < 0 || position >= m_currentPlaylist->getSongs().size())
+    {
+        // cannot find the track so move to first track
+        m_currentTrack = 0;
+    }
+    else
+    {
+        m_currentTrack = position;
+    }
+    
+    m_currentFile.clear();
+    Track *track = m_currentPlaylist->getSongAt(m_currentTrack);
+    if (track)
+        m_currentFile = getFilenameFromID(track->getValue());
+    
+    if (!m_currentFile.isEmpty())
+        play();
 }
 
 void MusicPlayer::seek(int pos)
