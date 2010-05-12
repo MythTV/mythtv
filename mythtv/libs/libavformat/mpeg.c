@@ -60,13 +60,14 @@ static int mpegps_probe(AVProbeData *p)
     for(i=0; i<p->buf_size; i++){
         code = (code<<8) + p->buf[i];
         if ((code & 0xffffff00) == 0x100) {
+            int length = p->buf[i+1] << 8 + p->buf[i+2];
             int pes= check_pes(p->buf+i, p->buf+p->buf_size);
 
             if(code == SYSTEM_HEADER_START_CODE) sys++;
-            else if(code == PRIVATE_STREAM_1)    priv1++;
+            else if(code == PRIVATE_STREAM_1)    {priv1++; i+=length;}
             else if(code == PACK_START_CODE)     pspack++;
-            else if((code & 0xf0) == VIDEO_ID &&  pes) vid++;
-            else if((code & 0xe0) == AUDIO_ID &&  pes) audio++;
+            else if((code & 0xf0) == VIDEO_ID &&  pes) {vid++; i+=length;}
+            else if((code & 0xe0) == AUDIO_ID &&  pes) {audio++; i+=length;}
 
             else if((code & 0xf0) == VIDEO_ID && !pes) invalid++;
             else if((code & 0xe0) == AUDIO_ID && !pes) invalid++;
