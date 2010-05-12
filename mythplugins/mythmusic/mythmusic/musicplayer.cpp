@@ -484,7 +484,7 @@ void MusicPlayer::nextAuto(void)
         MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-        MiniPlayer *miniplayer = new MiniPlayer(popupStack, this);
+        MiniPlayer *miniplayer = new MiniPlayer(popupStack);
 
         if (miniplayer->Create())
             popupStack->AddScreen(miniplayer);
@@ -801,7 +801,7 @@ void MusicPlayer::showMiniPlayer(void)
         MythScreenStack *popupStack =
                             GetMythMainWindow()->GetStack("popup stack");
 
-        MiniPlayer *miniplayer = new MiniPlayer(popupStack, this);
+        MiniPlayer *miniplayer = new MiniPlayer(popupStack);
 
         if (miniplayer->Create())
             popupStack->AddScreen(miniplayer);
