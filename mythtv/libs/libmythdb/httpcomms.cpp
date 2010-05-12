@@ -48,10 +48,8 @@ void HttpComms::init()
  //   m_curRequest = NULL;
     m_authNeeded = false;
     http = new QHttp();
-    m_redirectedURL = "";
     m_done = false;
     m_statusCode = 0;
-    m_responseReason = "";
     m_timer = NULL;
     m_timeout = false;
 
@@ -294,9 +292,9 @@ QString HttpComms::getHttp(QString     &url,
 {
     int redirectCount = 0;
     int timeoutCount = 0;
-    QString res = "";
+    QString res;
     HttpComms *httpGrabber = NULL; 
-    QString hostname = "";
+    QString hostname;
 
     while (1) 
     {
@@ -308,8 +306,7 @@ QString HttpComms::getHttp(QString     &url,
         
         VERBOSE(VB_NETWORK, QString("getHttp: grabbing: %1").arg(qurl.toString()));
 
-        if (httpGrabber != NULL)
-            delete httpGrabber; 
+        delete httpGrabber;
         
         httpGrabber = new HttpComms;
         
@@ -395,7 +392,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
     QByteArray data(0);
     bool res = false;
     HttpComms *httpGrabber = NULL;
-    QString hostname = "";
+    QString hostname;
 
     while (1)
     {
@@ -409,8 +406,7 @@ bool HttpComms::getHttpFile(const QString& filename, QString& url, int timeoutMS
         VERBOSE(VB_NETWORK, QString("getHttp: grabbing: '%1'")
                                     .arg(qurl.toString()));
 
-        if (httpGrabber != NULL)
-            delete httpGrabber;
+        delete httpGrabber;
         
         httpGrabber = new HttpComms;
         
@@ -526,9 +522,9 @@ QString HttpComms::postHttp(QUrl               &url         ,
 {
     int redirectCount = 0;
     int timeoutCount = 0;
-    QString res = "";
+    QString res;
     HttpComms *httpGrabber = NULL; 
-    QString hostname = "";
+    QString hostname;
 
     QHttpRequestHeader header( "POST", url.path() + url.encodedQuery());
 
@@ -566,8 +562,7 @@ QString HttpComms::postHttp(QUrl               &url         ,
         
         VERBOSE(VB_NETWORK, QString("postHttp: grabbing: %1").arg(url.toString()));
 
-        if (httpGrabber != NULL)
-            delete httpGrabber; 
+        delete httpGrabber;
         
         httpGrabber = new HttpComms;
         
