@@ -38,7 +38,7 @@ MiniPlayer::MiniPlayer(MythScreenStack *parent, MusicPlayer *parentPlayer)
 
 MiniPlayer::~MiniPlayer(void)
 {
-    gPlayer->setListener(NULL);
+    gPlayer->removeListener(this);
 
     // Timers are deleted by Qt
     m_displayTimer->disconnect();
@@ -75,7 +75,7 @@ bool MiniPlayer::Create(void)
                 .arg((int) gPlayer->getOutput()->GetCurrentVolume()));
     }
 
-    gPlayer->setListener(this);
+    gPlayer->addListener(this);
 
     if (gPlayer->getCurrentMetadata())
     {

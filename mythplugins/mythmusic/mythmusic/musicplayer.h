@@ -3,6 +3,7 @@
 
 #include <mythdialogs.h>
 #include <audiooutput.h>
+#include <mythobservable.h>
 
 #include "metadata.h"
 
@@ -10,7 +11,7 @@ class Decoder;
 class AudioOutput;
 class MainVisual;
 
-class MusicPlayer : public QObject
+class MusicPlayer : public QObject, public MythObservable
 {
     Q_OBJECT
 
@@ -20,8 +21,12 @@ class MusicPlayer : public QObject
     void playFile(const QString &filename);
     void playFile(const Metadata &meta);
 
-    void setListener(QObject *listener);
-    void setVisual(MainVisual *visual);
+    void addListener(QObject *listener);
+    void removeListener(QObject *listener);
+
+    void addVisual(MainVisual *visual);
+    void removeVisual(MainVisual *visual);
+
     void setCDDevice(const QString &dev) { m_CDdevice = dev; }
 
     void mute(void) {};
@@ -42,7 +47,7 @@ class MusicPlayer : public QObject
     void nextAuto(void);
 
     bool isPlaying(void) { return m_isPlaying; }
-    bool hasClient(void) { return (m_listener != NULL); }
+    bool hasClient(void) { return hasListeners(); }
 
     /// This will allow/disallow the mini player showing on track changes
     void autoShowPlayer(bool autoShow) { m_autoShowPlayer = autoShow; }
@@ -127,8 +132,7 @@ class MusicPlayer : public QObject
     AudioOutput *m_output;
     Decoder     *m_decoder;
 
-    QObject     *m_listener;
-    MainVisual  *m_visual;
+    QSet<QObject*>  m_visualisers;
 
     QString      m_CDdevice;
 

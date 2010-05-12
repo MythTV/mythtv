@@ -51,7 +51,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     playlist_popup = NULL;
     progress = NULL;
 
-    gPlayer->setListener(this);
+    gPlayer->addListener(this);
 
     tree_is_done = false;
     first_playlist_check = true;
@@ -169,8 +169,6 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
         mainvisual->setGeometry(screenwidth + 10, screenheight + 10, 160, 160);
     mainvisual->show();
 
-    gPlayer->setVisual(mainvisual);
-
     fullscreen_blank = false;
 
     visual_modes = gContext->GetSetting("VisualMode")
@@ -215,6 +213,9 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
 PlaybackBoxMusic::~PlaybackBoxMusic(void)
 {
+    gPlayer->removeListener(this);
+    gPlayer->removeVisual(mainvisual);
+
     if (progress)
     {
         progress->Close();
@@ -390,8 +391,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
             {
                 if (exit_action == "play")
                 {
-                    gPlayer->setListener(NULL);
-                    gPlayer->setVisual(NULL);
+                    gPlayer->removeListener(this);
+                    gPlayer->removeVisual(mainvisual);
                     done(kDialogCodeAccepted);
                 }
                 else
@@ -428,8 +429,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 }
                 else if (res == kDialogCodeButton1)
                 {
-                    gPlayer->setListener(NULL);
-                    gPlayer->setVisual(NULL);
+                    gPlayer->removeListener(this);
+                    gPlayer->removeVisual(mainvisual);
                     done(kDialogCodeAccepted);
                 }
                 else
@@ -1125,6 +1126,7 @@ void PlaybackBoxMusic::checkForPlaylists()
                 else
                     setContext(2);
                 updateForeground();
+                gPlayer->addVisual(mainvisual);
                 mainvisual->setVisual(visual_modes[current_visual]);
 
                 if (curMeta)
@@ -1770,7 +1772,8 @@ void PlaybackBoxMusic::restorePosition(const QString &position)
             // sanity check - if we are not in 'show whole tree' mode we
             // should only restore the position if it points to a track
             // in the active play queue
-            if (branches_to_current_node[0] == 0 &&
+            if (branches_to_current_node.size() >= 3 && 
+                branches_to_current_node[0] == 0 &&
                 branches_to_current_node[1] == 1 &&
                 branches_to_current_node[2] == 0)
             {

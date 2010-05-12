@@ -40,9 +40,6 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     m_currentNode = NULL;
     m_currentMetadata = NULL;
 
-    m_listener = NULL;
-    m_visual = NULL;
-
     m_isAutoplay = false;
     m_isPlaying = false;
     m_canShowPlayer = true;
@@ -127,39 +124,57 @@ MusicPlayer::~MusicPlayer()
                           (m_autoShowPlayer ? "1" : "0"));
 }
 
-void MusicPlayer::setListener(QObject *listener)
+void MusicPlayer::addListener(QObject *listener)
 {
-    if (m_listener && m_output)
-        m_output->removeListener(m_listener);
+    if (listener && m_output)
+        m_output->addListener(listener);
 
-    if (m_listener && m_decoder)
-        m_decoder->removeListener(m_listener);
+    if (listener && m_decoder)
+        m_decoder->addListener(listener);
 
-    m_listener = listener;
+    MythObservable::addListener(listener);
 
-    if (m_listener && m_output)
-        m_output->addListener(m_listener);
-
-    if (m_listener && m_decoder)
-        m_decoder->addListener(m_listener);
-
-    (listener == NULL) ? m_isAutoplay = true :  m_isAutoplay = false;
+    m_isAutoplay = !hasListeners();
 }
 
-void MusicPlayer::setVisual(MainVisual *visual)
+void MusicPlayer::removeListener(QObject *listener)
 {
-    if (m_visual && m_output)
+    if (listener && m_output)
+        m_output->removeListener(listener);
+
+    if (listener && m_decoder)
+        m_decoder->removeListener(listener);
+
+    MythObservable::removeListener(listener);
+
+    m_isAutoplay = !hasListeners();
+}
+
+void MusicPlayer::addVisual(MainVisual *visual)
+{
+    if (visual)
     {
-        m_output->removeListener(m_visual);
-        m_output->removeVisual(m_visual);
+        if (m_output)
+        {
+            m_output->addListener(visual);
+            m_output->addVisual(visual);
+        }
+ 
+        m_visualisers.insert(visual);
     }
+}
 
-    m_visual = visual;
-
-    if (m_visual && m_output)
+void MusicPlayer::removeVisual(MainVisual *visual)
+{
+    if (visual)
     {
-        m_output->addListener(m_visual);
-        m_output->addVisual(m_visual);
+        if (m_output)
+        {
+            m_output->removeListener(visual);
+            m_output->removeVisual(visual);
+        }
+
+        m_visualisers.remove(visual);
     }
 }
 
@@ -198,28 +213,15 @@ void MusicPlayer::stop(bool stopAll)
     if (stopAll && m_decoder)
     {
         m_decoder->removeListener(this);
-        if (m_listener)
-            m_decoder->removeListener(m_listener);
-
         delete m_decoder;
         m_decoder = NULL;
-        m_listener = NULL;
     }
 
     if (stopAll && m_output)
     {
         m_output->removeListener(this);
-        if (m_listener)
-            m_output->removeListener(m_listener);
-
-        if (m_visual)
-        {
-            m_output->removeListener(m_visual);
-            m_output->removeVisual(m_visual);
-        }
         delete m_output;
         m_output = NULL;
-        m_visual = NULL;
     }
 }
 
@@ -254,10 +256,6 @@ void MusicPlayer::play(void)
     if (m_decoder && !m_decoder->factory()->supports(m_currentFile))
     {
         m_decoder->removeListener(this);
-
-        if (m_listener)
-            m_decoder->removeListener(m_listener);
-
         delete m_decoder;
         m_decoder = NULL;
     }
@@ -278,9 +276,15 @@ void MusicPlayer::play(void)
         m_decoder->setBlockSize(2 * 1024);
 
         m_decoder->addListener(this);
-
-        if (m_listener)
-            m_decoder->addListener(m_listener);
+        // add any listeners to the decoder
+        {
+            QMutexLocker locker(m_lock);
+            QSet<QObject*>::const_iterator it = m_listeners.begin();
+            for (; it != m_listeners.end() ; ++it)
+            {
+                m_decoder->addListener(*it);
+            }
+        }
     }
     else
     {
@@ -366,13 +370,19 @@ void MusicPlayer::openOutputDevice(void)
 
     m_output->addListener(this);
 
-    if (m_listener)
-        m_output->addListener(m_listener);
-
-    if (m_visual)
+    // add any visuals to the audio output
+    QSet<QObject*>::const_iterator it = m_visualisers.begin();
+    for (; it != m_visualisers.end() ; ++it)
     {
-        m_output->addListener((QObject*) m_visual);
-        m_output->addVisual(m_visual);
+        m_output->addVisual((MythTV::Visual*)(*it));
+    }
+
+    // add any listeners to the audio output
+    QMutexLocker locker(m_lock);
+    it = m_listeners.begin();
+    for (; it != m_listeners.end() ; ++it)
+    {
+        m_output->addListener(*it);
     }
 }
 
