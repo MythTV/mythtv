@@ -1246,7 +1246,7 @@
 
         <imagetype name="mm_blackhole_border">
             <filename>mm_blackhole_border.png</filename>
-            <area>20,20,146,148</area>
+            <area>20,20,148,148</area>
         </imagetype>
 
         <textarea name="title" from="basetextarea">

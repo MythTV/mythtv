@@ -16,7 +16,7 @@ using namespace std;
 #include <mythuiimage.h>
 #include <mythdialogbox.h>
 #include <mythuibuttonlist.h>
-#include <mythuivideo.h>
+//#include <mythuivideo.h>
 #include <audiooutput.h>
 #include <compat.h>
 
