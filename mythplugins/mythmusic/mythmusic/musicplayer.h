@@ -55,13 +55,18 @@ class MusicPlayer : public QObject, public MythObservable
 
     void setCDDevice(const QString &dev) { m_CDdevice = dev; }
 
-    void mute(void) {};
-    void unMute(void) {};
-    void setVolume(void) {};
+    void      toggleMute(void);
+    MuteState getMuteState(void) const;
+    bool      isMuted(void) const { return getMuteState() == kMuteAll; }
 
-    void setSpeed(float speed);
-    void incSpeed();
-    void decSpeed();
+    void setVolume(int volume);
+    void incVolume(void);
+    void decVolume(void);
+    uint getVolume(void) const;
+
+    void  setSpeed(float speed);
+    void  incSpeed();
+    void  decSpeed();
     float getSpeed() { return m_playSpeed; }
 
     void play(void);
@@ -85,9 +90,6 @@ class MusicPlayer : public QObject, public MythObservable
 
     Decoder     *getDecoder(void) { return m_decoder; }
     AudioOutput *getOutput(void) { return m_output; }
-    MuteState    GetMuteState(void) const;
-    uint         GetVolume(void) const;
-    bool         IsMuted(void) const { return GetMuteState() == kMuteAll; }
 
     GenericTree *constructPlaylist(void);
     GenericTree *getPlaylistTree() { return m_playlistTree; }

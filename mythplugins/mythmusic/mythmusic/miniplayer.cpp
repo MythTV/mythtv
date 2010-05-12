@@ -72,7 +72,7 @@ bool MiniPlayer::Create(void)
     {
         m_volFormat = m_volText->GetText();
         m_volText->SetText(QString(m_volFormat)
-                .arg((int) gPlayer->getOutput()->GetCurrentVolume()));
+                .arg((int) gPlayer->getVolume()));
     }
 
     gPlayer->addListener(this);
@@ -195,7 +195,7 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
                 if (m_infoText)
                 {
                     m_showingInfo = true;
-                    if (gPlayer->IsMuted())
+                    if (gPlayer->isMuted())
                         m_infoText->SetText(tr("Mute: On"));
                     else
                         m_infoText->SetText(tr("Mute: Off"));
@@ -209,11 +209,11 @@ bool MiniPlayer::keyPressEvent(QKeyEvent *event)
 
                 if (m_volText)
                 {
-                    if (gPlayer->IsMuted())
+                    if (gPlayer->isMuted())
                         m_volText->SetText(QString(m_volFormat).arg(0));
                     else
                         m_volText->SetText(QString(m_volFormat)
-                                .arg((int) gPlayer->getOutput()->GetCurrentVolume()));
+                                .arg((int) gPlayer->getVolume()));
                 }
             }
         }
@@ -634,8 +634,8 @@ void MiniPlayer::showAutoMode(void)
 
 void MiniPlayer::showVolume(void)
 {
-    float level = (float)gPlayer->getOutput()->GetCurrentVolume();
-    bool muted = gPlayer->IsMuted();
+    float level = (float)gPlayer->getVolume();
+    bool muted = gPlayer->isMuted();
 
     if (m_infoText)
     {

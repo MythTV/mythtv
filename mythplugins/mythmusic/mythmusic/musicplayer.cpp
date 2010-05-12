@@ -871,7 +871,7 @@ void MusicPlayer::decSpeed()
 
 void MusicPlayer::sendVolumeChangedEvent(void)
 {
-    MusicPlayerEvent me(MusicPlayerEvent::VolumeChangeEvent, GetVolume(), IsMuted());
+    MusicPlayerEvent me(MusicPlayerEvent::VolumeChangeEvent, getVolume(), isMuted());
     dispatch(me);
 }
 
@@ -881,14 +881,50 @@ void MusicPlayer::sendMetadataChangedEvent(int trackID)
     dispatch(me);
 }
 
-uint MusicPlayer::GetVolume(void) const
+void MusicPlayer::incVolume()
+{
+    if (getOutput())
+    {
+        getOutput()->AdjustCurrentVolume(2);
+        sendVolumeChangedEvent();
+    }
+}
+
+void MusicPlayer::decVolume()
+{
+    if (getOutput())
+    {
+        getOutput()->AdjustCurrentVolume(-2);
+        sendVolumeChangedEvent();
+    }
+}
+
+void MusicPlayer::setVolume(int volume)
+{
+    if (getOutput())
+    {
+        getOutput()->SetCurrentVolume(volume);
+        sendVolumeChangedEvent();
+    }
+}
+
+uint MusicPlayer::getVolume(void) const
 {
     if (m_output)
         return m_output->GetCurrentVolume();
     return 0;
 }
 
-MuteState MusicPlayer::GetMuteState(void) const
+void MusicPlayer::toggleMute(void)
+{
+    if (m_output)
+    {
+        m_output->ToggleMute();
+        sendVolumeChangedEvent();
+    }
+}
+
+MuteState MusicPlayer::getMuteState(void) const
 {
     if (m_output)
         return m_output->GetMuteState();
