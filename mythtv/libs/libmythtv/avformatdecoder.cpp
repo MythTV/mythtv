@@ -1024,6 +1024,10 @@ bool AvFormatDecoder::CanHandle(char testbuf[kDecoderProbeBufferSize],
         probe.buf_size = kDecoderProbeBufferSize - AVPROBE_PADDING_SIZE;
         score = 0;
     }
+    else if (testbufsize*2 >= kDecoderProbeBufferSize)
+    {
+        score--;
+    }
 
     if (av_probe_input_format2(&probe, true, &score))
         return true;

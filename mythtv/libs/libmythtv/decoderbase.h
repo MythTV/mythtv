@@ -17,7 +17,7 @@ class RingBuffer;
 class TeletextViewer;
 class NuppelVideoPlayer;
 
-const int kDecoderProbeBufferSize = 1024 * 1024;
+const int kDecoderProbeBufferSize = 128 * 1024;
 
 /// Track types
 typedef enum TrackTypes
