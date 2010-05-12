@@ -28,6 +28,13 @@ MusicPlayer  *gPlayer = NULL;
 
 ////////////////////////////////////////////////////////////////
 
+QEvent::Type MusicPlayerEvent::TrackChangeEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::VolumeChangeEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::TrackAddedEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::TrackRemovedEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::AllTracksRemovedEvent = (QEvent::Type) QEvent::registerEventType();
+QEvent::Type MusicPlayerEvent::MetadataChangedEvent = (QEvent::Type) QEvent::registerEventType();
+
 MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     :QObject(parent)
 {
@@ -223,6 +230,11 @@ void MusicPlayer::stop(bool stopAll)
         delete m_output;
         m_output = NULL;
     }
+
+    // because we don't actually stop the audio output we have to fake a Stopped
+    // event so any listeners can act on it
+    OutputEvent oe(OutputEvent::Stopped);
+    dispatch(oe);
 }
 
 void MusicPlayer::pause(void)
@@ -319,6 +331,9 @@ void MusicPlayer::play(void)
                         -m_currentNode->getInt());
             }
         }
+
+        MusicPlayerEvent me(MusicPlayerEvent::TrackChangeEvent, m_currentNode->getInt());
+        dispatch(me);
     }
 }
 
@@ -853,6 +868,18 @@ void MusicPlayer::decSpeed()
     setSpeed(m_playSpeed);
 }
 
+void MusicPlayer::sendVolumeChangedEvent(void)
+{
+    MusicPlayerEvent me(MusicPlayerEvent::VolumeChangeEvent, GetVolume(), IsMuted());
+    dispatch(me);
+}
+
+void MusicPlayer::sendMetadataChangedEvent(int trackID)
+{
+    MusicPlayerEvent me(MusicPlayerEvent::MetadataChangedEvent, trackID);
+    dispatch(me);
+}
+
 uint MusicPlayer::GetVolume(void) const
 {
     if (m_output)
@@ -865,4 +892,28 @@ MuteState MusicPlayer::GetMuteState(void) const
     if (m_output)
         return m_output->GetMuteState();
     return kMuteAll;
+}
+
+void MusicPlayer::playlistChanged(int trackID, bool deleted)
+{
+    if (trackID == -1)
+    {
+        // all tracks were removed
+        stop();
+        MusicPlayerEvent me(MusicPlayerEvent::AllTracksRemovedEvent, 0);
+        dispatch(me);
+    }
+    else
+    {
+        if (deleted)
+        {
+            MusicPlayerEvent me(MusicPlayerEvent::TrackRemovedEvent, trackID);
+            dispatch(me);
+        }
+        else
+        {
+            MusicPlayerEvent me(MusicPlayerEvent::TrackAddedEvent, trackID);
+            dispatch(me);
+        }
+    }
 }

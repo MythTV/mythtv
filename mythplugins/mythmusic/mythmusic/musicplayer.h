@@ -11,6 +11,32 @@ class Decoder;
 class AudioOutput;
 class MainVisual;
 
+class MusicPlayerEvent : public MythEvent
+{
+    public:
+        MusicPlayerEvent(Type t, int id) :
+        MythEvent(t), TrackID(id), Volume(0), IsMuted(false) {}
+        MusicPlayerEvent(Type t, uint vol, bool muted) :
+        MythEvent(t), TrackID(0), Volume(vol), IsMuted(muted) {}
+        ~MusicPlayerEvent() {}
+        
+        virtual MythEvent *clone(void) const { return new MusicPlayerEvent(*this); }
+        
+        // for track changed/added/deleted/metadata changed events
+        int TrackID;
+        
+        // for volume changed event
+        uint Volume;
+        bool IsMuted;
+        
+        static Type TrackChangeEvent;
+        static Type VolumeChangeEvent;
+        static Type TrackAddedEvent;
+        static Type TrackRemovedEvent;
+        static Type AllTracksRemovedEvent;
+        static Type MetadataChangedEvent;
+};
+
 class MusicPlayer : public QObject, public MythObservable
 {
     Q_OBJECT
@@ -53,7 +79,7 @@ class MusicPlayer : public QObject, public MythObservable
     void autoShowPlayer(bool autoShow) { m_autoShowPlayer = autoShow; }
     bool getAutoShowPlayer(void) { return m_autoShowPlayer; }
 
-    /// This will allow/disallow the minplayer showing even using its jumppoint
+    /// This will allow/disallow the mini player showing even using its jumppoint
     void canShowPlayer(bool canShow) { m_canShowPlayer = canShow; }
     bool getCanShowPlayer(void) { return m_canShowPlayer; }
 
@@ -68,6 +94,8 @@ class MusicPlayer : public QObject, public MythObservable
     void         setCurrentNode(GenericTree *node) { m_currentNode = node; }
     GenericTree *getCurrentNode(void) { return m_currentNode; }
 
+    void         playlistChanged(int trackID, bool deleted);
+
     QString      getRouteToCurrent(void);
 
     void         savePosition(void);
@@ -76,6 +104,7 @@ class MusicPlayer : public QObject, public MythObservable
 
     Metadata    *getCurrentMetadata(void);
     void         refreshMetadata(void);
+    void         sendMetadataChangedEvent(int trackID);
 
     void showMiniPlayer(void);
 
@@ -120,6 +149,7 @@ class MusicPlayer : public QObject, public MythObservable
     void openOutputDevice(void);
     QString getFilenameFromID(int id);
     void updateLastplay(void);
+    void sendVolumeChangedEvent(void);
 
     GenericTree *m_playlistTree;
 
