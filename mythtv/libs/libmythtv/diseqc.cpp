@@ -81,6 +81,8 @@
 #define TO_RADS (M_PI / 180.0)
 #define TO_DEC  (180.0 / M_PI)
 
+#define EPS     1E-4
+
 #define LOC      QString("DiSEqCDevTree: ")
 #define LOC_WARN QString("DiSEqCDevTree, Warning: ")
 #define LOC_ERR  QString("DiSEqCDevTree, Error: ")
@@ -1940,7 +1942,7 @@ bool DiSEqCDevRotor::ExecuteRotor(const DiSEqCDevSettings&, const DTVMultiplex&,
                                   double angle)
 {
     // determine stored position from position map
-    dbl_to_uint_t::const_iterator it = m_posmap.find(angle);
+    dbl_to_uint_t::const_iterator it = m_posmap.lowerBound(angle - EPS);
     unsigned char index = (uint) angle;
     if (it != m_posmap.end())
     {
