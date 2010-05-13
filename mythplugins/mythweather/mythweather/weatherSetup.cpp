@@ -63,11 +63,11 @@ bool GlobalSetup::Create()
 
 void GlobalSetup::loadData()
 {
-    int setting = gContext->GetNumSetting("weatherbackgroundfetch", 0);
+    int setting = gCoreContext->GetNumSetting("weatherbackgroundfetch", 0);
     if (setting == 1)
         m_backgroundCheckbox->SetCheckState(MythUIStateType::Full);
 
-    m_timeout = gContext->GetNumSetting("weatherTimeout", 10);
+    m_timeout = gCoreContext->GetNumSetting("weatherTimeout", 10);
     m_timeoutSpinbox->SetRange(5, 120, 5);
     m_timeoutSpinbox->SetValue(m_timeout);
 }
@@ -75,12 +75,12 @@ void GlobalSetup::loadData()
 void GlobalSetup::saveData()
 {
     int timeout = m_timeoutSpinbox->GetIntValue();
-    gContext->SaveSetting("weatherTimeout", timeout);
+    gCoreContext->SaveSetting("weatherTimeout", timeout);
 
     int checkstate = 0;
     if (m_backgroundCheckbox->GetCheckState() == MythUIStateType::Full)
         checkstate = 1;
-    gContext->SaveSetting("weatherbackgroundfetch", checkstate);
+    gCoreContext->SaveSetting("weatherbackgroundfetch", checkstate);
     Close();
 }
 
@@ -331,7 +331,7 @@ void ScreenSetup::loadData()
         "AND weathersourcesettings.sourceid = weatherdatalayout.weathersourcesettings_sourceid "
         "ORDER BY weatherscreens.draworder;";
     db.prepare(query);
-    db.bindValue(":HOST", gContext->GetHostName());
+    db.bindValue(":HOST", gCoreContext->GetHostName());
     if (!db.exec())
     {
         VERBOSE(VB_IMPORTANT, db.lastError().text());
@@ -427,7 +427,7 @@ void ScreenSetup::saveData()
     MSqlQuery db2(MSqlQuery::InitCon());
     QString query = "DELETE FROM weatherscreens WHERE hostname=:HOST";
     db.prepare(query);
-    db.bindValue(":HOST", gContext->GetHostName());
+    db.bindValue(":HOST", gCoreContext->GetHostName());
     if (!db.exec())
         MythDB::DBError("ScreenSetup::saveData - delete weatherscreens", db);
 
@@ -443,7 +443,7 @@ void ScreenSetup::saveData()
         db.bindValue(":DRAW", draworder);
         db.bindValue(":CONT", si->name);
         db.bindValue(":UNITS", si->units);
-        db.bindValue(":HOST", gContext->GetHostName());
+        db.bindValue(":HOST", gCoreContext->GetHostName());
         if (db.exec())
         {
             // TODO see comment in dbcheck.cpp for way to improve
@@ -451,7 +451,7 @@ void ScreenSetup::saveData()
                     "WHERE draworder = :DRAW AND hostname = :HOST;";
             db2.prepare(query2);
             db2.bindValue(":DRAW", draworder);
-            db2.bindValue(":HOST", gContext->GetHostName());
+            db2.bindValue(":HOST", gCoreContext->GetHostName());
             if (!db2.exec())
             {
                 VERBOSE(VB_IMPORTANT, db2.executedQuery());
@@ -804,7 +804,7 @@ bool SourceSetup::loadData()
          "WHERE weathersourcesettings.sourceid = weatherdatalayout.weathersourcesettings_sourceid "
          "AND hostname=:HOST;";
     db.prepare(query);
-    db.bindValue(":HOST", gContext->GetHostName());
+    db.bindValue(":HOST", gCoreContext->GetHostName());
     if (!db.exec())
     {
         VERBOSE(VB_IMPORTANT, db.lastError().text());

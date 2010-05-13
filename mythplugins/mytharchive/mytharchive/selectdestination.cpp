@@ -163,19 +163,19 @@ void SelectDestination::loadConfiguration(void)
 
     if (m_nativeMode)
     {
-        bCreateISO = (gContext->GetSetting("MythNativeCreateISO", "0") == "1");
-        bDoBurn = (gContext->GetSetting("MythNativeBurnDVDr", "1") == "1");
-        bEraseDvdRw = (gContext->GetSetting("MythNativeEraseDvdRw", "0") == "1");
-        saveFilename = gContext->GetSetting("MythNativeSaveFilename", "");
-        destinationType = gContext->GetNumSetting("MythNativeDestinationType", 0);
+        bCreateISO = (gCoreContext->GetSetting("MythNativeCreateISO", "0") == "1");
+        bDoBurn = (gCoreContext->GetSetting("MythNativeBurnDVDr", "1") == "1");
+        bEraseDvdRw = (gCoreContext->GetSetting("MythNativeEraseDvdRw", "0") == "1");
+        saveFilename = gCoreContext->GetSetting("MythNativeSaveFilename", "");
+        destinationType = gCoreContext->GetNumSetting("MythNativeDestinationType", 0);
     }
     else
     {
-        bCreateISO = (gContext->GetSetting("MythBurnCreateISO", "0") == "1");
-        bDoBurn = (gContext->GetSetting("MythBurnBurnDVDr", "1") == "1");
-        bEraseDvdRw = (gContext->GetSetting("MythBurnEraseDvdRw", "0") == "1");
-        saveFilename = gContext->GetSetting("MythBurnSaveFilename", "");
-        destinationType = gContext->GetNumSetting("MythBurnDestinationType", 0);
+        bCreateISO = (gCoreContext->GetSetting("MythBurnCreateISO", "0") == "1");
+        bDoBurn = (gCoreContext->GetSetting("MythBurnBurnDVDr", "1") == "1");
+        bEraseDvdRw = (gCoreContext->GetSetting("MythBurnEraseDvdRw", "0") == "1");
+        saveFilename = gCoreContext->GetSetting("MythBurnSaveFilename", "");
+        destinationType = gCoreContext->GetNumSetting("MythBurnDestinationType", 0);
     }
 
     m_createISOCheck->SetCheckState((bCreateISO ? MythUIStateType::Full : MythUIStateType::Off));
@@ -192,25 +192,25 @@ void SelectDestination::saveConfiguration(void)
 {
     if (m_nativeMode)
     {
-        gContext->SaveSetting("MythNativeCreateISO",
+        gCoreContext->SaveSetting("MythNativeCreateISO",
             (m_createISOCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-        gContext->SaveSetting("MythNativeBurnDVDr",
+        gCoreContext->SaveSetting("MythNativeBurnDVDr",
             (m_doBurnCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-        gContext->SaveSetting("MythNativeEraseDvdRw",
+        gCoreContext->SaveSetting("MythNativeEraseDvdRw",
             (m_eraseDvdRwCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-        gContext->SaveSetting("MythNativeSaveFilename", m_filenameEdit->GetText());
-        gContext->SaveSetting("MythNativeDestinationType", m_destinationSelector->GetCurrentPos());
+        gCoreContext->SaveSetting("MythNativeSaveFilename", m_filenameEdit->GetText());
+        gCoreContext->SaveSetting("MythNativeDestinationType", m_destinationSelector->GetCurrentPos());
     }
     else
     {
-        gContext->SaveSetting("MythBurnCreateISO",
+        gCoreContext->SaveSetting("MythBurnCreateISO",
             (m_createISOCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-        gContext->SaveSetting("MythBurnBurnDVDr",
+        gCoreContext->SaveSetting("MythBurnBurnDVDr",
             (m_doBurnCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-        gContext->SaveSetting("MythBurnEraseDvdRw",
+        gCoreContext->SaveSetting("MythBurnEraseDvdRw",
             (m_eraseDvdRwCheck->GetCheckState() == MythUIStateType::Full ? "1" : "0"));
-        gContext->SaveSetting("MythBurnSaveFilename", m_filenameEdit->GetText());
-        gContext->SaveSetting("MythBurnDestinationType", m_destinationSelector->GetCurrentPos());
+        gCoreContext->SaveSetting("MythBurnSaveFilename", m_filenameEdit->GetText());
+        gCoreContext->SaveSetting("MythBurnDestinationType", m_destinationSelector->GetCurrentPos());
     }
 }
 

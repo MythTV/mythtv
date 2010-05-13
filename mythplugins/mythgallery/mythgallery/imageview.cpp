@@ -69,7 +69,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
     // --------------------------------------------------------------------
 
-    bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    bool recurse = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
 
     ThumbItem *origItem = NULL;
     if (m_pos < m_itemList.size())
@@ -100,7 +100,7 @@ ImageView::ImageView(const ThumbList &itemList,
 
     // --------------------------------------------------------------------
 
-    m_slideshow_frame_delay = gContext->GetNumSetting("SlideshowDelay", 0);
+    m_slideshow_frame_delay = gCoreContext->GetNumSetting("SlideshowDelay", 0);
     m_slideshow_frame_delay = (!m_slideshow_frame_delay) ?
         2 : m_slideshow_frame_delay;
     m_slideshow_frame_delay_state = m_slideshow_frame_delay * 1000;

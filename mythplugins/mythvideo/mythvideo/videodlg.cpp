@@ -122,7 +122,7 @@ namespace
         {
             m_id = m_http.get(m_url.toEncoded(), &m_data_buffer);
 
-            m_timer.start(gContext->GetNumSetting("PosterDownloadTimeout", 60)
+            m_timer.start(gCoreContext->GetNumSetting("PosterDownloadTimeout", 60)
                           * 1000);
         }
 
@@ -489,7 +489,7 @@ namespace
                     .arg(GetShareDir())
                     .arg("mythvideo/scripts/Television/ttvdb.py"));
 
-                cmd = gContext->GetSetting("mythvideo.TVGrabber",
+                cmd = gCoreContext->GetSetting("mythvideo.TVGrabber",
                                                         def_cmd);
                 cmd.append(QString(" -l %1 -M").arg(GetMythUI()->GetLanguage()));
             }
@@ -499,7 +499,7 @@ namespace
                     .arg(GetShareDir())
                     .arg("mythvideo/scripts/Movie/tmdb.py"));
 
-                cmd = gContext->GetSetting("mythvideo.MovieGrabber", def_cmd);
+                cmd = gCoreContext->GetSetting("mythvideo.MovieGrabber", def_cmd);
                 cmd.append(QString(" -l %1 -M").arg(GetMythUI()->GetLanguage()));
             }
                 QStringList args;
@@ -547,7 +547,7 @@ namespace
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
                     .arg("mythvideo/scripts/Television/ttvdb.py"));
-                cmd = gContext->GetSetting("mythvideo.TVGrabber",
+                cmd = gCoreContext->GetSetting("mythvideo.TVGrabber",
                                                         def_cmd);
                 cmd.append(" -N");
                 QStringList args;
@@ -601,7 +601,7 @@ namespace
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
                     .arg("mythvideo/scripts/Television/ttvdb.py"));
-                QString cmd = gContext->GetSetting("mythvideo.TVGrabber",
+                QString cmd = gCoreContext->GetSetting("mythvideo.TVGrabber",
                                                         def_cmd);
                 cmd.append(QString(" -l %1 -D").arg(GetMythUI()->GetLanguage()));
                 QStringList args;
@@ -614,7 +614,7 @@ namespace
                 const QString def_cmd = QDir::cleanPath(QString("%1/%2")
                     .arg(GetShareDir())
                     .arg("mythvideo/scripts/Movie/tmdb.py"));
-                QString cmd = gContext->GetSetting("mythvideo.MovieGrabber",
+                QString cmd = gCoreContext->GetSetting("mythvideo.MovieGrabber",
                                                         def_cmd);
                 cmd.append(QString(" -l %1 -D").arg(GetMythUI()->GetLanguage()));
                 StartRun(cmd, QStringList(video_uid), "Video Data Query");
@@ -1151,7 +1151,7 @@ namespace
             tmp["length"] = GetDisplayLength(metadata->GetLength());
             tmp["year"] = GetDisplayYear(metadata->GetYear());
 
-            QString formatLongDate = gContext->GetSetting("DateFormat", "ddd MMMM d");
+            QString formatLongDate = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
             tmp["releasedate"] = metadata->GetReleaseDate().toString(formatLongDate);
 
             tmp["userrating"] = GetDisplayUserRating(metadata->GetUserRating());
@@ -1178,7 +1178,7 @@ namespace
             tmp["videolevel"] = ParentalLevelToState(metadata->GetShowLevel());
 
             tmp["insertdate"] = metadata->GetInsertdate()
-                                     .toString(gContext->GetSetting("DateFormat"));
+                                     .toString(gCoreContext->GetSetting("DateFormat"));
             tmp["inetref"] = metadata->GetInetRef();
             tmp["homepage"] = metadata->GetHomepage();
             tmp["child_id"] = QString::number(metadata->GetChildID());
@@ -1390,13 +1390,13 @@ class VideoDialogPrivate
         m_currentNode(0), m_treeLoaded(false), m_isFlatList(false),
         m_type(type), m_browse(browse), m_scanner(0)
     {
-        if (gContext->GetNumSetting("mythvideo.ParentalLevelFromRating", 0))
+        if (gCoreContext->GetNumSetting("mythvideo.ParentalLevelFromRating", 0))
         {
             for (ParentalLevel sl(ParentalLevel::plLowest);
                 sl.GetLevel() <= ParentalLevel::plHigh && sl.good(); ++sl)
             {
                 QString ratingstring =
-                        gContext->GetSetting(QString("mythvideo.AutoR2PL%1")
+                        gCoreContext->GetSetting(QString("mythvideo.AutoR2PL%1")
                                 .arg(sl.GetLevel()));
                 QStringList ratings =
                         ratingstring.split(':', QString::SkipEmptyParts);
@@ -1412,18 +1412,18 @@ class VideoDialogPrivate
         }
 
         m_rememberPosition =
-                gContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
+                gCoreContext->GetNumSetting("mythvideo.VideoTreeRemember", 0);
 
-        m_isFileBrowser = gContext->GetNumSetting("VideoDialogNoDB", 0);
-        m_groupType = gContext->GetNumSetting("mythvideo.db_group_type", 0); 
+        m_isFileBrowser = gCoreContext->GetNumSetting("VideoDialogNoDB", 0);
+        m_groupType = gCoreContext->GetNumSetting("mythvideo.db_group_type", 0); 
 
         m_altPlayerEnabled = 
-                    gContext->GetNumSetting("mythvideo.EnableAlternatePlayer");
+                    gCoreContext->GetNumSetting("mythvideo.EnableAlternatePlayer");
 
-        m_artDir = gContext->GetSetting("VideoArtworkDir");
-        m_sshotDir = gContext->GetSetting("mythvideo.screenshotDir");
-        m_fanDir = gContext->GetSetting("mythvideo.fanartDir");
-        m_banDir = gContext->GetSetting("mythvideo.bannerDir");
+        m_artDir = gCoreContext->GetSetting("VideoArtworkDir");
+        m_sshotDir = gCoreContext->GetSetting("mythvideo.screenshotDir");
+        m_fanDir = gCoreContext->GetSetting("mythvideo.fanartDir");
+        m_banDir = gCoreContext->GetSetting("mythvideo.bannerDir");
     }
 
     ~VideoDialogPrivate()
@@ -1433,7 +1433,7 @@ class VideoDialogPrivate
 
         if (m_rememberPosition && m_lastTreeNodePath.length())
         {
-            gContext->SaveSetting("mythvideo.VideoTreeLastActive",
+            gCoreContext->SaveSetting("mythvideo.VideoTreeLastActive",
                     m_lastTreeNodePath);
         }
     }
@@ -1601,9 +1601,9 @@ bool VideoDialog::Create()
     if (m_d->m_type == DLG_DEFAULT)
     {
         m_d->m_type = static_cast<DialogType>(
-                gContext->GetNumSetting("Default MythVideo View", DLG_GALLERY));
+                gCoreContext->GetNumSetting("Default MythVideo View", DLG_GALLERY));
         m_d->m_browse = static_cast<BrowseType>(
-                gContext->GetNumSetting("mythvideo.db_group_type", BRS_FOLDER));
+                gCoreContext->GetNumSetting("mythvideo.db_group_type", BRS_FOLDER));
     }
 
     if (!IsValidDialogType(m_d->m_type))
@@ -1628,7 +1628,7 @@ bool VideoDialog::Create()
             break;
         case DLG_MANAGER:
             m_d->m_isFlatList =
-                    gContext->GetNumSetting("mythvideo.db_folder_view", 1);
+                    gCoreContext->GetNumSetting("mythvideo.db_folder_view", 1);
             windowName = "manager";
             flatlistDefault = 1;
             break;
@@ -1670,7 +1670,7 @@ bool VideoDialog::Create()
     }
 
     m_d->m_isFlatList =
-            gContext->GetNumSetting(QString("mythvideo.folder_view_%1")
+            gCoreContext->GetNumSetting(QString("mythvideo.folder_view_%1")
                     .arg(m_d->m_type), flatlistDefault);
 
     if (!LoadWindowFromXML("video-ui.xml", windowName, this))
@@ -1740,7 +1740,7 @@ bool VideoDialog::Create()
 void VideoDialog::Init()
 {
 
-    m_d->m_parentalLevel.SetLevel(ParentalLevel(gContext->
+    m_d->m_parentalLevel.SetLevel(ParentalLevel(gCoreContext->
                     GetNumSetting("VideoDefaultParentalLevel",
                             ParentalLevel::plLowest)));
 }
@@ -1798,7 +1798,7 @@ void VideoDialog::loadData()
             if (m_d->m_rememberPosition)
             {
                 QStringList route =
-                        gContext->GetSetting("mythvideo.VideoTreeLastActive",
+                        gCoreContext->GetSetting("mythvideo.VideoTreeLastActive",
                                 "").split("\n");
                 m_videoButtonTree->SetNodeByString(route);
             }
@@ -2005,7 +2005,7 @@ QString VideoDialog::RemoteImageCheck(QString host, QString filename)
             list << "Videos";
             list << fname;
 
-            bool ok = gContext->SendReceiveStringList(list);
+            bool ok = gCoreContext->SendReceiveStringList(list);
 
             if (!ok || list.at(0).startsWith("SLAVE UNREACHABLE"))
             {
@@ -2957,7 +2957,7 @@ void VideoDialog::VideoMenu()
     if (node && node->getInt() >= 0)
     {
         if (!metadata->GetTrailer().isEmpty() ||
-                gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0) ||
+                gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0) ||
                 m_d->m_altPlayerEnabled)
             m_menuPopup->AddButton(tr("Play..."), SLOT(PlayMenu()), true);
         else
@@ -3004,7 +3004,7 @@ void VideoDialog::PlayMenu()
         m_menuPopup->AddButton(tr("Play in Alternate Player"), SLOT(playVideoAlt()));
     } 
 
-    if (gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
+    if (gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0))
     {
          m_menuPopup->AddButton(tr("Play With Trailers"),
               SLOT(playVideoWithTrailers()));
@@ -3294,7 +3294,7 @@ void VideoDialog::ManageMenu()
 void VideoDialog::ToggleBrowseMode()
 {
     m_d->m_isFileBrowser = !m_d->m_isFileBrowser;
-    gContext->SaveSetting("VideoDialogNoDB",
+    gCoreContext->SaveSetting("VideoDialogNoDB",
             QString("%1").arg((int)m_d->m_isFileBrowser));
     reloadData();
 }
@@ -3306,7 +3306,7 @@ void VideoDialog::ToggleBrowseMode()
 void VideoDialog::ToggleFlatView()
 {
     m_d->m_isFlatList = !m_d->m_isFlatList;
-    gContext->SaveSetting(QString("mythvideo.folder_view_%1").arg(m_d->m_type),
+    gCoreContext->SaveSetting(QString("mythvideo.folder_view_%1").arg(m_d->m_type),
                          QString("%1").arg((int)m_d->m_isFlatList));
     // TODO: This forces a complete tree rebuild, this is SLOW and shouldn't
     // be necessary since MythGenericTree can do a flat view without a rebuild,
@@ -3495,8 +3495,8 @@ void VideoDialog::SwitchLayout(DialogType type, BrowseType browse)
 
     if (mythvideo->Create())
     {
-        gContext->SaveSetting("Default MythVideo View", type);
-        gContext->SaveSetting("mythvideo.db_group_type", browse);
+        gCoreContext->SaveSetting("Default MythVideo View", type);
+        gCoreContext->SaveSetting("mythvideo.db_group_type", browse);
         MythScreenStack *screenStack = GetScreenStack();
         screenStack->AddScreen(mythvideo);
         screenStack->PopScreen(this, false, false);
@@ -3572,8 +3572,8 @@ void VideoDialog::ShowHomepage()
     if (url.isEmpty())
         return;
 
-    QString browser = gContext->GetSetting("WebBrowserCommand", "");
-    QString zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.0");
+    QString browser = gCoreContext->GetSetting("WebBrowserCommand", "");
+    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
 
     if (browser.isEmpty())
     {
@@ -3598,7 +3598,7 @@ void VideoDialog::ShowHomepage()
 
         GetMythMainWindow()->AllowInput(false);
         myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        gContext->GetMainWindow()->AllowInput(true);
+        GetMythMainWindow()->AllowInput(true);
         return;
     }
 }
@@ -3719,14 +3719,14 @@ void VideoDialog::playVideoWithTrailers()
     Metadata *metadata = GetMetadata(GetItemCurrent());
     if (!metadata) return;
 
-    QStringList trailers = GetTrailersInDirectory(gContext->
+    QStringList trailers = GetTrailersInDirectory(gCoreContext->
             GetSetting("mythvideo.TrailersDir"));
 
     if (trailers.isEmpty())
         return;
 
     const int trailersToPlay =
-            gContext->GetNumSetting("mythvideo.TrailersRandomCount");
+            gCoreContext->GetNumSetting("mythvideo.TrailersRandomCount");
 
     int i = 0;
     while (trailers.size() && i < trailersToPlay)

@@ -194,7 +194,7 @@ bool createISOImage(QString &sourceDirectory)
 
     tempDirectory += "work/";
 
-    QString mkisofs = gContext->GetSetting("MythArchiveMkisofsCmd", "mkisofs");
+    QString mkisofs = gCoreContext->GetSetting("MythArchiveMkisofsCmd", "mkisofs");
     QString command = mkisofs + " -R -J -V 'MythTV Archive' -o ";
     command += tempDirectory + "mythburn.iso " + sourceDirectory;
 
@@ -214,16 +214,16 @@ bool createISOImage(QString &sourceDirectory)
 
 int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 {
-    QString dvdDrive = gContext->GetSetting("MythArchiveDVDLocation",
+    QString dvdDrive = gCoreContext->GetSetting("MythArchiveDVDLocation",
                                             "/dev/dvd");
     VERBOSE(VB_JOBQUEUE, "Burning ISO image to " + dvdDrive);
 
-    int     driveSpeed    = gContext->GetNumSetting("MythArchiveDriveSpeed");
+    int     driveSpeed    = gCoreContext->GetNumSetting("MythArchiveDriveSpeed");
     QString tempDirectory = getTempDirectory();
 
     tempDirectory += "work/";
 
-    QString command = gContext->GetSetting("MythArchiveGrowisofsCmd",
+    QString command = gCoreContext->GetSetting("MythArchiveGrowisofsCmd",
                                            "growisofs");
 
     if (driveSpeed)
@@ -271,15 +271,15 @@ int burnISOImage(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 
 int doBurnDVD(int mediaType, bool bEraseDVDRW, bool nativeFormat)
 {
-    gContext->SaveSetting("MythArchiveLastRunStart",
+    gCoreContext->SaveSetting("MythArchiveLastRunStart",
         QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
-    gContext->SaveSetting("MythArchiveLastRunStatus", "Running");
+    gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
     int res = burnISOImage(mediaType, bEraseDVDRW, nativeFormat);
 
-    gContext->SaveSetting("MythArchiveLastRunEnd",
+    gCoreContext->SaveSetting("MythArchiveLastRunEnd",
         QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
-    gContext->SaveSetting("MythArchiveLastRunStatus", "Success");
+    gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Success");
     return res;
 }
 
@@ -420,7 +420,7 @@ int NativeArchive::exportRecording(QDomElement   &itemNode,
 {
     QString chanID, startTime, title = "", filename = "";
     bool doDelete = false;
-    QString dbVersion = gContext->GetSetting("DBSchemaVer", "");
+    QString dbVersion = gCoreContext->GetSetting("DBSchemaVer", "");
 
     title = itemNode.attribute("title");
     filename = itemNode.attribute("filename");
@@ -805,7 +805,7 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
 {
     QString title = "", filename = "";
     bool doDelete = false;
-    QString dbVersion = gContext->GetSetting("DBSchemaVer", "");
+    QString dbVersion = gCoreContext->GetSetting("DBSchemaVer", "");
     int intID = 0, categoryID = 0;
     QString coverFile = "";
 
@@ -903,8 +903,8 @@ int NativeArchive::exportVideo(QDomElement   &itemNode,
 
         // remove the VideoStartupDir part of the filename
         QString fname = query.value(10).toString();
-        if (fname.startsWith(gContext->GetSetting("VideoStartupDir")))
-            fname = fname.remove(gContext->GetSetting("VideoStartupDir"));
+        if (fname.startsWith(gCoreContext->GetSetting("VideoStartupDir")))
+            fname = fname.remove(gCoreContext->GetSetting("VideoStartupDir"));
 
         elem = doc.createElement("filename");
         text = doc.createTextNode(fname);
@@ -1102,7 +1102,7 @@ int NativeArchive::doImportArchive(const QString &xmlFile, int chanID)
 
         VERBOSE(VB_JOBQUEUE,
                 QString("Archive DB version: %1, Local DB version: %2")
-                .arg(dbVersion).arg(gContext->GetSetting("DBSchemaVer")));
+                .arg(dbVersion).arg(gCoreContext->GetSetting("DBSchemaVer")));
     }
     else
     {
@@ -1170,7 +1170,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     query.prepare("SELECT dirname FROM storagegroup "
             "WHERE groupname = :GROUPNAME AND hostname = :HOSTNAME;");
     query.bindValue(":GROUPNAME", "Default");
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     if (query.exec())
     {
         query.first();
@@ -1219,7 +1219,7 @@ int NativeArchive::importRecording(const QDomElement &itemNode,
     query.bindValue(":SUBTITLE", findNodeText(recordedNode, "subtitle"));
     query.bindValue(":DESCRIPTION", findNodeText(recordedNode, "description"));
     query.bindValue(":CATEGORY", findNodeText(recordedNode, "category"));
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
     query.bindValue(":BOOKMARK", findNodeText(recordedNode, "bookmark"));
     query.bindValue(":EDITING", findNodeText(recordedNode, "editing"));
     query.bindValue(":CUTLIST", findNodeText(recordedNode, "cutlist"));
@@ -1372,7 +1372,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     QDomElement videoNode = n.toElement();
 
     // copy file to video directory
-    QString path = gContext->GetSetting("VideoStartupDir");
+    QString path = gCoreContext->GetSetting("VideoStartupDir");
     QString origFilename = findNodeText(videoNode, "filename");
     QStringList dirList = origFilename.split("/", QString::SkipEmptyParts);
     QDir dir;
@@ -1396,7 +1396,7 @@ int NativeArchive::importVideo(const QDomElement &itemNode, const QString &xmlFi
     }
 
     // copy cover image to Video Artwork dir
-    QString artworkDir = gContext->GetSetting("VideoArtworkDir");
+    QString artworkDir = gCoreContext->GetSetting("VideoArtworkDir");
     // get archive path
     fileInfo.setFile(videoFile);
     QString archivePath = fileInfo.absolutePath();
@@ -1744,14 +1744,14 @@ void clearArchiveTable(void)
 
 int doNativeArchive(const QString &jobFile)
 {
-    gContext->SaveSetting("MythArchiveLastRunType", "Native Export");
-    gContext->SaveSetting("MythArchiveLastRunStart", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
-    gContext->SaveSetting("MythArchiveLastRunStatus", "Running");
+    gCoreContext->SaveSetting("MythArchiveLastRunType", "Native Export");
+    gCoreContext->SaveSetting("MythArchiveLastRunStart", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
     NativeArchive na;
     int res = na.doNativeArchive(jobFile);
-    gContext->SaveSetting("MythArchiveLastRunEnd", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
-    gContext->SaveSetting("MythArchiveLastRunStatus", (res == 0 ? "Success" : "Failed"));
+    gCoreContext->SaveSetting("MythArchiveLastRunEnd", QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm"));
+    gCoreContext->SaveSetting("MythArchiveLastRunStatus", (res == 0 ? "Success" : "Failed"));
 
     // clear the archiveitems table if succesful
     if (res == 0)
@@ -2408,7 +2408,7 @@ int getDBParamters(QString outFile)
     t << params.dbUserName << endl;
     t << params.dbPassword << endl;
     t << params.dbName << endl;
-    t << gContext->GetHostName() << endl;
+    t << gCoreContext->GetHostName() << endl;
     t << GetInstallPrefix() << endl;
     f.close();
 
@@ -2501,7 +2501,6 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv, false);
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {

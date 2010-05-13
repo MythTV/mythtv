@@ -55,8 +55,8 @@ MythNews::MythNews(MythScreenStack *parent, QString name) :
     if (!dir.exists())
         dir.mkdir(fileprefix);
 
-    m_zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4");
-    m_browser = gContext->GetSetting("WebBrowserCommand", "");
+    m_zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4");
+    m_browser = gCoreContext->GetSetting("WebBrowserCommand", "");
 
     // Initialize variables
 
@@ -69,14 +69,14 @@ MythNews::MythNews(MythScreenStack *parent, QString name) :
     m_TimerTimeout = 10*60*1000;
     m_httpGrabber = NULL;
 
-    m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    m_dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
+    m_dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
 
     // Now do the actual work
     m_RetrieveTimer = new QTimer(this);
     connect(m_RetrieveTimer, SIGNAL(timeout()),
             this, SLOT(slotRetrieveNews()));
-    m_UpdateFreq = gContext->GetNumSetting("NewsUpdateFrequency", 30);
+    m_UpdateFreq = gCoreContext->GetNumSetting("NewsUpdateFrequency", 30);
 
     m_RetrieveTimer->stop();
     m_RetrieveTimer->setSingleShot(false);
@@ -823,7 +823,7 @@ void MythNews::slotViewArticle(MythUIButtonListItem *articlesListItem)
 
             GetMythMainWindow()->AllowInput(false);
             myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-            gContext->GetMainWindow()->AllowInput(true);
+            GetMythMainWindow()->AllowInput(true);
             return;
         }
     }
@@ -962,15 +962,15 @@ void MythNews::deleteNewsSite(void)
 // does not need locking
 void MythNews::playVideo(const QString &filename)
 {
-    QString command_string = gContext->GetSetting("VideoDefaultPlayer");
+    QString command_string = gCoreContext->GetSetting("VideoDefaultPlayer");
 
-    gContext->sendPlaybackStart();
+    sendPlaybackStart();
 
     if ((command_string.indexOf("Internal", 0, Qt::CaseInsensitive) > -1) ||
         (command_string.length() < 1))
     {
         command_string = "Internal";
-        gContext->GetMainWindow()->HandleMedia(command_string, filename);
+        GetMythMainWindow()->HandleMedia(command_string, filename);
     }
     else
     {
@@ -980,7 +980,7 @@ void MythNews::playVideo(const QString &filename)
         myth_system(command_string);
     }
 
-    gContext->sendPlaybackEnd();
+    sendPlaybackEnd();
 }
 
 // does not need locking

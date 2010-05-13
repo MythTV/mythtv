@@ -928,7 +928,7 @@ void DVDTranscodeThread::run(void)
         wipeClean();
 
 #ifndef DEBUG_STAGE_2
-    if (!gContext->GetNumSetting("mythdvd.mtd.SaveTranscodeIntermediates", 0))
+    if (!gCoreContext->GetNumSetting("mythdvd.mtd.SaveTranscodeIntermediates", 0))
     {
         // remove any temporary titles that are now transcoded
         std::for_each(output_files.begin(), output_files.end(), delete_file());
@@ -951,7 +951,7 @@ void DVDTranscodeThread::Cancel(bool chatty)
 
 bool DVDTranscodeThread::makeWorkingDirectory(void)
 {
-    QString dir_name = gContext->GetSetting("DVDRipLocation");
+    QString dir_name = gCoreContext->GetSetting("DVDRipLocation");
     if (dir_name.isEmpty())
     {
         SendProblemEvent("could not find rip directory in settings");
@@ -1006,7 +1006,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
         return false;
     }
 
-    tc_command = gContext->GetSetting("TranscodeCommand");
+    tc_command = gCoreContext->GetSetting("TranscodeCommand");
     if (tc_command.isEmpty())
     {
         SendProblemEvent(
@@ -1131,7 +1131,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
     tc_arguments.push_back("-g");
     tc_arguments.push_back(QString("%1x%2").arg(input_hsize).arg(input_vsize));
 
-    if (!gContext->GetNumSetting("mythvideo.TrustTranscodeFRDetect"))
+    if (!gCoreContext->GetNumSetting("mythvideo.TrustTranscodeFRDetect"))
     {
         tc_arguments.push_back("-f");
         tc_arguments.push_back(QString("0,%1").arg(fr_code));
@@ -1179,7 +1179,7 @@ bool DVDTranscodeThread::buildTranscodeCommandLine(int which_run)
         return false;
     }
 
-    if (codec.contains("divx") && gContext->GetNumSetting("MTDxvidFlag"))
+    if (codec.contains("divx") && gCoreContext->GetNumSetting("MTDxvidFlag"))
     {
         codec = "xvid";
     }

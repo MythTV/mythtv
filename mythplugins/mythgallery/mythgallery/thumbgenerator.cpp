@@ -346,20 +346,20 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
 // static function
 QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
 {
-    QString galleryDir = gContext->GetSetting("GalleryDir");
+    QString galleryDir = gCoreContext->GetSetting("GalleryDir");
 
     // For directory "/my/images/january", this function either returns
     // "/my/images/january/.thumbcache" or "~/.mythtv/mythgallery/january/.thumbcache"
     QString aPath = inDir + QString("/.thumbcache/");
     QDir dir(aPath);
-    if (gContext->GetNumSetting("GalleryThumbnailLocation") &&
+    if (gCoreContext->GetNumSetting("GalleryThumbnailLocation") &&
         !dir.exists() &&
         inDir.startsWith(galleryDir))
     {
         dir.mkpath(aPath);
     }
 
-    if (!gContext->GetNumSetting("GalleryThumbnailLocation") ||
+    if (!gCoreContext->GetNumSetting("GalleryThumbnailLocation") ||
         !dir.exists() ||
         !inDir.startsWith(galleryDir))
     {

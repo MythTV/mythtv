@@ -45,8 +45,8 @@ ZMEvents::~ZMEvents()
         delete m_eventList;
 
     // remember how the user wants to display the event list
-    gContext->SaveSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
-    gContext->SaveSetting("ZoneMinderGridLayout",  m_layout);
+    gCoreContext->SaveSetting("ZoneMinderOldestFirst", (m_oldestFirst ? "1" : "0"));
+    gCoreContext->SaveSetting("ZoneMinderGridLayout",  m_layout);
 }
 
 bool ZMEvents::Create(void)
@@ -98,8 +98,8 @@ bool ZMEvents::Create(void)
 
     getEventList();
 
-    m_oldestFirst = (gContext->GetNumSetting("ZoneMinderOldestFirst", 1) == 1);
-    setGridLayout(gContext->GetNumSetting("ZoneMinderGridLayout", 1));
+    m_oldestFirst = (gCoreContext->GetNumSetting("ZoneMinderOldestFirst", 1) == 1);
+    setGridLayout(gCoreContext->GetNumSetting("ZoneMinderGridLayout", 1));
 
     return true;
 }
@@ -363,7 +363,7 @@ void ZMEvents::getDateList(void)
 
         zm->getEventDates(monitorName, m_oldestFirst, m_dateList);
 
-        QString dateFormat = gContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
+        QString dateFormat = gCoreContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
 
         new MythUIButtonListItem(m_dateSelector, tr("All Dates"));
 

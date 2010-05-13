@@ -90,30 +90,30 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings,
     // do nothing yet
     if (loaddefaultsettings)
     {
-        category = gContext->GetNumSetting(QString("%1Category").arg(prefix),
+        category = gCoreContext->GetNumSetting(QString("%1Category").arg(prefix),
                                            kCategoryFilterAll);
-        genre = gContext->GetNumSetting(QString("%1Genre").arg(prefix),
+        genre = gCoreContext->GetNumSetting(QString("%1Genre").arg(prefix),
                                         kGenreFilterAll);
-        country = gContext->GetNumSetting(QString("%1Country").arg(prefix),
+        country = gCoreContext->GetNumSetting(QString("%1Country").arg(prefix),
                                           kCountryFilterAll);
-        cast = gContext->GetNumSetting(QString("%1Cast").arg(prefix),
+        cast = gCoreContext->GetNumSetting(QString("%1Cast").arg(prefix),
                                         kCastFilterAll);
-        year = gContext->GetNumSetting(QString("%1Year").arg(prefix),
+        year = gCoreContext->GetNumSetting(QString("%1Year").arg(prefix),
                                        kYearFilterAll);
-        runtime = gContext->GetNumSetting(QString("%1Runtime").arg(prefix),
+        runtime = gCoreContext->GetNumSetting(QString("%1Runtime").arg(prefix),
                                           kRuntimeFilterAll);
         userrating =
-                gContext->GetNumSetting(QString("%1Userrating").arg(prefix),
+                gCoreContext->GetNumSetting(QString("%1Userrating").arg(prefix),
                                         kUserRatingFilterAll);
-        browse = gContext->GetNumSetting(QString("%1Browse").arg(prefix),
+        browse = gCoreContext->GetNumSetting(QString("%1Browse").arg(prefix),
                                          kBrowseFilterAll);
-        watched = gContext->GetNumSetting(QString("%1Watched").arg(prefix),
+        watched = gCoreContext->GetNumSetting(QString("%1Watched").arg(prefix),
                                          kWatchedFilterAll);
-        m_inetref = gContext->GetNumSetting(QString("%1InetRef").arg(prefix),
+        m_inetref = gCoreContext->GetNumSetting(QString("%1InetRef").arg(prefix),
                 kInetRefFilterAll);
-        m_coverfile = gContext->GetNumSetting(QString("%1CoverFile")
+        m_coverfile = gCoreContext->GetNumSetting(QString("%1CoverFile")
                 .arg(prefix), kCoverFileFilterAll);
-        orderby = (ordering)gContext->GetNumSetting(QString("%1Orderby")
+        orderby = (ordering)gCoreContext->GetNumSetting(QString("%1Orderby")
                                                     .arg(prefix),
                                                     kOrderByTitle);
     }
@@ -230,19 +230,19 @@ VideoFilterSettings::operator=(const VideoFilterSettings &rhs)
 
 void VideoFilterSettings::saveAsDefault()
 {
-    gContext->SaveSetting(QString("%1Category").arg(prefix), category);
-    gContext->SaveSetting(QString("%1Genre").arg(prefix), genre);
-    gContext->SaveSetting(QString("%1Cast").arg(prefix), cast);
-    gContext->SaveSetting(QString("%1Country").arg(prefix), country);
-    gContext->SaveSetting(QString("%1Year").arg(prefix), year);
-    gContext->SaveSetting(QString("%1Runtime").arg(prefix), runtime);
-    gContext->SaveSetting(QString("%1Userrating").arg(prefix), userrating);
-    gContext->SaveSetting(QString("%1Browse").arg(prefix), browse);
-    gContext->SaveSetting(QString("%1Watched").arg(prefix), watched);
-    gContext->SaveSetting(QString("%1InetRef").arg(prefix), m_inetref);
-    gContext->SaveSetting(QString("%1CoverFile").arg(prefix), m_coverfile);
-    gContext->SaveSetting(QString("%1Orderby").arg(prefix), orderby);
-    gContext->SaveSetting(QString("%1Filter").arg(prefix), textfilter);
+    gCoreContext->SaveSetting(QString("%1Category").arg(prefix), category);
+    gCoreContext->SaveSetting(QString("%1Genre").arg(prefix), genre);
+    gCoreContext->SaveSetting(QString("%1Cast").arg(prefix), cast);
+    gCoreContext->SaveSetting(QString("%1Country").arg(prefix), country);
+    gCoreContext->SaveSetting(QString("%1Year").arg(prefix), year);
+    gCoreContext->SaveSetting(QString("%1Runtime").arg(prefix), runtime);
+    gCoreContext->SaveSetting(QString("%1Userrating").arg(prefix), userrating);
+    gCoreContext->SaveSetting(QString("%1Browse").arg(prefix), browse);
+    gCoreContext->SaveSetting(QString("%1Watched").arg(prefix), watched);
+    gCoreContext->SaveSetting(QString("%1InetRef").arg(prefix), m_inetref);
+    gCoreContext->SaveSetting(QString("%1CoverFile").arg(prefix), m_coverfile);
+    gCoreContext->SaveSetting(QString("%1Orderby").arg(prefix), orderby);
+    gCoreContext->SaveSetting(QString("%1Filter").arg(prefix), textfilter);
 }
 
 bool VideoFilterSettings::matches_filter(const Metadata &mdata) const

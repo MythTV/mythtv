@@ -12,7 +12,7 @@ const QString currentDatabaseVersion = "1005";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
-    if (!gContext->SaveSettingOnHost("WeatherDBSchemaVer",newnumber,NULL))
+    if (!gCoreContext->SaveSettingOnHost("WeatherDBSchemaVer",newnumber,NULL))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("DB Error (Setting new DB version number): %1\n")
@@ -65,7 +65,7 @@ static bool performActualUpdate(const QStringList updates, QString version,
  */
 bool InitializeDatabase()
 {
-    QString dbver = gContext->GetSetting("WeatherDBSchemaVer");
+    QString dbver = gCoreContext->GetSetting("WeatherDBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
         return true;

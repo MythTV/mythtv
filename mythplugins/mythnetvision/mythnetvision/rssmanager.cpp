@@ -22,7 +22,7 @@ using namespace std;
 
 RSSManager::RSSManager()
 {
-    m_updateFreq = (gContext->GetNumSetting(
+    m_updateFreq = (gCoreContext->GetNumSetting(
                        "mythNetvision.updateFreq", 6) * 3600 * 1000);
 
     m_timer = new QTimer();

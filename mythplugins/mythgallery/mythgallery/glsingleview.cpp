@@ -96,7 +96,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
       m_effect_cube_yrot(0.0f),
       m_effect_cube_zrot(0.0f)
 {
-    m_scaleMax = (gContext->GetNumSetting("GalleryScaleMax", 0) > 0);
+    m_scaleMax = (gCoreContext->GetNumSetting("GalleryScaleMax", 0) > 0);
 
     m_slideshow_timer = new QTimer(this);
     RegisterEffects();
@@ -107,7 +107,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
 
     // --------------------------------------------------------------------
 
-    QString transType = gContext->GetSetting("SlideshowOpenGLTransition");
+    QString transType = gCoreContext->GetSetting("SlideshowOpenGLTransition");
     if (!transType.isEmpty() && m_effect_map.contains(transType))
         m_effect_method = m_effect_map[transType];
 
@@ -117,7 +117,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
         m_effect_random = true;
     }
 
-    SetTransitionTimeout(gContext->GetNumSetting(
+    SetTransitionTimeout(gCoreContext->GetNumSetting(
                              "SlideshowOpenGLTransitionLength", 2000));
 
     // --------------------------------------------------------------------
@@ -139,7 +139,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int *pos, int slideShow,
 GLSingleView::~GLSingleView()
 {
     // save the current m_scaleMax setting so we can restore it later
-    gContext->SaveSetting("GalleryScaleMax", (m_scaleMax ? "1" : "0"));
+    gCoreContext->SaveSetting("GalleryScaleMax", (m_scaleMax ? "1" : "0"));
     CleanUp();
 }
 
@@ -203,13 +203,13 @@ void GLSingleView::paintGL(void)
         {
             m_movieState = 2;
             ThumbItem* item = m_itemList.at(m_pos);
-            QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
+            QString cmd = gCoreContext->GetSetting("GalleryMoviePlayerCmd");
 
             if ((cmd.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
                 (cmd.length() < 1))
             {
                 cmd = "Internal";
-                gContext->GetMainWindow()->HandleMedia(cmd, item->GetPath());
+                GetMythMainWindow()->HandleMedia(cmd, item->GetPath());
             }
             else
             {

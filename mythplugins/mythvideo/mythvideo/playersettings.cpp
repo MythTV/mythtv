@@ -54,21 +54,21 @@ bool PlayerSettings::Create()
         return false;
     }
 
-    int setting = gContext->GetNumSetting("mythvideo.EnableAlternatePlayer", 0);
+    int setting = gCoreContext->GetNumSetting("mythvideo.EnableAlternatePlayer", 0);
     if (setting == 1)
         m_altCheck->SetCheckState(MythUIStateType::Full);
 
-    m_defaultPlayerEdit->SetText(gContext->GetSetting("VideoDefaultPlayer",
+    m_defaultPlayerEdit->SetText(gCoreContext->GetSetting("VideoDefaultPlayer",
                            "Internal"));
-    m_dvdPlayerEdit->SetText(gContext->GetSetting("mythdvd.DVDPlayerCommand",
+    m_dvdPlayerEdit->SetText(gCoreContext->GetSetting("mythdvd.DVDPlayerCommand",
                            "Internal"));
-    m_dvdDriveEdit->SetText(gContext->GetSetting("DVDDeviceLocation",
+    m_dvdDriveEdit->SetText(gCoreContext->GetSetting("DVDDeviceLocation",
                            "default"));
-    m_vcdPlayerEdit->SetText(gContext->GetSetting("VCDPlayerCommand",
+    m_vcdPlayerEdit->SetText(gCoreContext->GetSetting("VCDPlayerCommand",
                            "mplayer vcd:// -cdrom-device %d -fs -zoom -vo xv"));
-    m_vcdDriveEdit->SetText(gContext->GetSetting("VCDDeviceLocation",
+    m_vcdDriveEdit->SetText(gCoreContext->GetSetting("VCDDeviceLocation",
                            "default"));
-    m_altPlayerEdit->SetText(gContext->GetSetting(
+    m_altPlayerEdit->SetText(gCoreContext->GetSetting(
                            "mythvideo.VideoAlternatePlayer", "Internal"));
 
     if (m_altCheck->GetCheckState() == MythUIStateType::Full)
@@ -103,17 +103,17 @@ PlayerSettings::~PlayerSettings()
 
 void PlayerSettings::slotSave(void)
 {
-    gContext->SaveSetting("VideoDefaultPlayer", m_defaultPlayerEdit->GetText());
-    gContext->SaveSetting("mythdvd.DVDPlayerCommand", m_dvdPlayerEdit->GetText());
-    gContext->SaveSetting("DVDDeviceLocation", m_dvdDriveEdit->GetText());
-    gContext->SaveSetting("VCDPlayerCommand", m_vcdPlayerEdit->GetText());
-    gContext->SaveSetting("VCDDeviceLocation", m_vcdDriveEdit->GetText());
-    gContext->SaveSetting("mythvideo.VideoAlternatePlayer", m_altPlayerEdit->GetText());
+    gCoreContext->SaveSetting("VideoDefaultPlayer", m_defaultPlayerEdit->GetText());
+    gCoreContext->SaveSetting("mythdvd.DVDPlayerCommand", m_dvdPlayerEdit->GetText());
+    gCoreContext->SaveSetting("DVDDeviceLocation", m_dvdDriveEdit->GetText());
+    gCoreContext->SaveSetting("VCDPlayerCommand", m_vcdPlayerEdit->GetText());
+    gCoreContext->SaveSetting("VCDDeviceLocation", m_vcdDriveEdit->GetText());
+    gCoreContext->SaveSetting("mythvideo.VideoAlternatePlayer", m_altPlayerEdit->GetText());
 
     int checkstate = 0;
     if (m_altCheck->GetCheckState() == MythUIStateType::Full)
         checkstate = 1;
-    gContext->SaveSetting("mythvideo.EnableAlternatePlayer", checkstate);
+    gCoreContext->SaveSetting("mythvideo.EnableAlternatePlayer", checkstate);
 
     Close();
 }

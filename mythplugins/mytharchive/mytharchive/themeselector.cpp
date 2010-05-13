@@ -228,7 +228,7 @@ QString ThemeSelector::loadFile(const QString &filename)
 
 void ThemeSelector::loadConfiguration(void)
 {
-    QString theme = gContext->GetSetting("MythBurnMenuTheme", "");
+    QString theme = gCoreContext->GetSetting("MythBurnMenuTheme", "");
     theme = theme.replace(QString("_"), QString(" "));
     theme_selector->MoveToNamedPosition(theme);
 }
@@ -237,5 +237,5 @@ void ThemeSelector::saveConfiguration(void)
 {
     QString theme = theme_selector->GetValue();
     theme = theme.replace(QString(" "), QString("_"));
-    gContext->SaveSetting("MythBurnMenuTheme", theme);
+    gCoreContext->SaveSetting("MythBurnMenuTheme", theme);
 }

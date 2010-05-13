@@ -68,7 +68,7 @@ MusicCommon::MusicCommon(MythScreenStack *parent, const QString &name)
     m_moveTrackMode = false;
     m_movingTrack = false;
 
-    m_cycleVisualizer = gContext->GetNumSetting("VisualCycleOnSongChange", 0);
+    m_cycleVisualizer = gCoreContext->GetNumSetting("VisualCycleOnSongChange");
 
     if (class LCD *lcd = LCD::Get())
     {
@@ -174,7 +174,7 @@ bool MusicCommon::CreateCommon(void)
     if (!gPlayer->isPlaying())
     {
         gPlayer->loadPlaylist();
-        gPlayer->restorePosition(gContext->GetNumSetting("MusicBookmark", 0));
+        gPlayer->restorePosition(gCoreContext->GetNumSetting("MusicBookmark"));
     }
 
     m_currentTrack = gPlayer->getCurrentTrackPos();
@@ -205,11 +205,11 @@ bool MusicCommon::CreateCommon(void)
 
         m_visualModes = MainVisual::visualizers;
 
-        m_randomVisualizer = gContext->GetNumSetting("VisualRandomize", 0);
+        m_randomVisualizer = gCoreContext->GetNumSetting("VisualRandomize");
 
         m_currentVisual = MainVisual::currentVisualizer;
 
-        QString visual_delay = gContext->GetSetting("VisualModeDelay");
+        QString visual_delay = gCoreContext->GetSetting("VisualModeDelay");
         bool delayOK;
         m_visualModeDelay = visual_delay.toInt(&delayOK);
         if (!delayOK)
@@ -228,7 +228,7 @@ bool MusicCommon::CreateCommon(void)
     }
 #endif
 
-    m_controlVolume = gContext->GetNumSetting("MythControlsVolume", 0);
+    m_controlVolume = gCoreContext->GetNumSetting("MythControlsVolume");
     updateVolume(gPlayer->getVolume(), gPlayer->isMuted());
 
     if (m_movingTracksState)
@@ -370,7 +370,8 @@ bool MusicCommon::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
         {
-            QString exit_action = gContext->GetSetting("MusicExitAction", "prompt");
+            QString exit_action = gCoreContext->GetSetting("MusicExitAction",
+                                                           "prompt");
 
             if (!gPlayer->isPlaying() || GetMythMainWindow()->IsExitingToMain())
             {
@@ -954,7 +955,7 @@ void MusicCommon::customEvent(QEvent *event)
         VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
             .arg(*aoe->errorMessage()));
         //TODO change to mythui
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+        MythPopupBox::showOkPopup(GetMythMainWindow(),
                                     statusString,
                                     QString("MythMusic has encountered the following error:\n%1")
                                     .arg(*aoe->errorMessage()));
@@ -991,7 +992,7 @@ void MusicCommon::customEvent(QEvent *event)
         VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
             .arg(*dxe->errorMessage()));
         //TODO change to mythui
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+        MythPopupBox::showOkPopup(GetMythMainWindow(),
                                     statusString,
                                     QString("MythMusic has encountered the following error:\n%1")
                                     .arg(*dxe->errorMessage()));

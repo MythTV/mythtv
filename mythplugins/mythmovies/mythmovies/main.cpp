@@ -61,23 +61,23 @@ void runConfig()
 
 int mythplugin_run(void)
 {
-    gContext->ActivateSettingsCache(false);
-    if (gContext->GetSetting("MythMovies.ZipCode") == "" ||
-        gContext->GetSetting("MythMovies.Radius") == "" ||
-        gContext->GetSetting("MythMovies.Grabber") == "")
+    gCoreContext->ActivateSettingsCache(false);
+    if (gCoreContext->GetSetting("MythMovies.ZipCode") == "" ||
+        gCoreContext->GetSetting("MythMovies.Radius") == "" ||
+        gCoreContext->GetSetting("MythMovies.Grabber") == "")
     {
         runConfig();
     }
-    if (gContext->GetSetting("MythMovies.ZipCode") == "" ||
-        gContext->GetSetting("MythMovies.Radius") == "" ||
-        gContext->GetSetting("MythMovies.Grabber") == "")
+    if (gCoreContext->GetSetting("MythMovies.ZipCode") == "" ||
+        gCoreContext->GetSetting("MythMovies.Radius") == "" ||
+        gCoreContext->GetSetting("MythMovies.Grabber") == "")
     {
         VERBOSE(VB_IMPORTANT,
                 QString("MythMovies: Invalid configuration options supplied."));
-        gContext->ActivateSettingsCache(true);
+        gCoreContext->ActivateSettingsCache(true);
         return -1;
     }
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
     return runMovies();
 }
 
@@ -91,10 +91,10 @@ int setupDatabase()
 {
     //we just throw away the old tables rather than worry about a database upgrade since movie times data
     //is highly transient and losing it isn't harmful
-    if (dbVersion == gContext->GetSetting("MythMovies.DatabaseVersion"))
+    if (dbVersion == gCoreContext->GetSetting("MythMovies.DatabaseVersion"))
         return 0;
 
-    gContext->SaveSetting("MythMovies.LastGrabDate", "");
+    gCoreContext->SaveSetting("MythMovies.LastGrabDate", "");
 
     VERBOSE(VB_GENERAL, "Setting Up MythMovies Database Tables");
 
@@ -128,7 +128,7 @@ int setupDatabase()
         }
         else
         {
-            gContext->SaveSetting("MythMovies.DatabaseVersion", dbVersion);
+            gCoreContext->SaveSetting("MythMovies.DatabaseVersion", dbVersion);
             VERBOSE(VB_GENERAL, "MythMovies Database Setup Complete");
             return 0;
         }

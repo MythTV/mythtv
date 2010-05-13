@@ -229,7 +229,7 @@ void GameHandler::promptForRemoval(QString filename, QString RomPath)
 
 
     DialogCode result = MythPopupBox::ShowButtonPopup(
-        gContext->GetMainWindow(), 
+        GetMythMainWindow(), 
         QObject::tr("File Missing"),
         QString(QObject::tr("%1 appears to be missing.\nRemove it"
                             " from the database?")).arg(filename),
@@ -405,9 +405,9 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     QString Publisher, Version, Fanart, Boxart, ScreenShot;
     QString thequery, queryvalues;
 
-    int removalprompt = gContext->GetSetting("GameRemovalPrompt").toInt();
-    int indepth = gContext->GetSetting("GameDeepScan").toInt();
-    QString screenShotPath = gContext->GetSetting("mythgame.screenshotdir");
+    int removalprompt = gCoreContext->GetSetting("GameRemovalPrompt").toInt();
+    int indepth = gCoreContext->GetSetting("GameDeepScan").toInt();
+    QString screenShotPath = gCoreContext->GetSetting("mythgame.screenshotdir");
 
     for (iter = m_GameMap.begin(); iter != m_GameMap.end(); ++iter)
     {
@@ -608,7 +608,7 @@ void GameHandler::clearAllGameData(void)
     buttonText += QObject::tr("Yes");
 
     DialogCode result = MythPopupBox::ShowButtonPopup(
-        gContext->GetMainWindow(),
+        GetMythMainWindow(),
         QObject::tr("Are you sure?"),
         QString(QObject::tr("This will clear all Game Meta Data\n"
                             "from the database. Are you sure you\n"

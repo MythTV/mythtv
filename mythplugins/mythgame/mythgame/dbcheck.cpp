@@ -15,7 +15,7 @@ const QString currentDatabaseVersion = "1016";
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("GameDBSchemaVer",newnumber,NULL))
+    if (!gCoreContext->SaveSettingOnHost("GameDBSchemaVer",newnumber,NULL))
     {
         VERBOSE(VB_IMPORTANT, QString("DB Error (Setting new DB version number): %1\n")
                               .arg(newnumber));
@@ -132,7 +132,7 @@ bool InitializeDatabase(void)
 
 bool UpgradeGameDatabaseSchema(void)
 {
-    QString dbver = gContext->GetSetting("GameDBSchemaVer");
+    QString dbver = gCoreContext->GetSetting("GameDBSchemaVer");
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (dbver == currentDatabaseVersion)
@@ -196,7 +196,7 @@ bool UpgradeGameDatabaseSchema(void)
     if (dbver == "1006")
     {
 
-        if (!gContext->GetSetting("GameAllTreeLevels").isEmpty())
+        if (!gCoreContext->GetSetting("GameAllTreeLevels").isEmpty())
             if (!query.exec("UPDATE settings SET data = 'system gamename' "
                             "WHERE value = 'GameAllTreeLevels'; "))
                 MythDB::DBError("update GameAllTreeLevels", query);

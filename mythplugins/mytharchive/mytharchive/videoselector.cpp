@@ -542,8 +542,8 @@ void VideoSelector::setParentalLevel(int which_level)
 bool VideoSelector::checkParentPassword()
 {
     QDateTime curr_time = QDateTime::currentDateTime();
-    QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
-    QString password = gContext->GetSetting("VideoAdminPassword");
+    QString last_time_stamp = gCoreContext->GetSetting("VideoPasswordTime");
+    QString password = gCoreContext->GetSetting("VideoAdminPassword");
     if (password.length() < 1)
     {
         return true;
@@ -562,8 +562,8 @@ bool VideoSelector::checkParentPassword()
         {
             //  Two minute window
             last_time_stamp = curr_time.toString(Qt::TextDate);
-            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
-            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            gCoreContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gCoreContext->SaveSetting("VideoPasswordTime", last_time_stamp);
             return true;
         }
     }
@@ -575,15 +575,15 @@ bool VideoSelector::checkParentPassword()
         MythPasswordDialog *pwd = new MythPasswordDialog(tr("Parental Pin:"),
                 &ok,
                 password,
-                gContext->GetMainWindow());
+                GetMythMainWindow());
         pwd->exec();
         pwd->deleteLater();
         if (ok)
         {
             //  All is good
             last_time_stamp = curr_time.toString(Qt::TextDate);
-            gContext->SetSetting("VideoPasswordTime", last_time_stamp);
-            gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+            gCoreContext->SetSetting("VideoPasswordTime", last_time_stamp);
+            gCoreContext->SaveSetting("VideoPasswordTime", last_time_stamp);
             return true;
         }
     }

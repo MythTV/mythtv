@@ -91,14 +91,14 @@ SingleView::SingleView(
       m_effect_milti_circle_out_points(4),
       m_effect_circle_out_points(4)
 {
-    m_scaleMax = (gContext->GetNumSetting("GalleryScaleMax", 0) > 0);
+    m_scaleMax = (gCoreContext->GetNumSetting("GalleryScaleMax", 0) > 0);
 
     m_slideshow_timer = new QTimer(this);
     RegisterEffects();
 
     // --------------------------------------------------------------------
 
-    QString transType = gContext->GetSetting("SlideshowTransition");
+    QString transType = gCoreContext->GetSetting("SlideshowTransition");
     if (!transType.isEmpty() && m_effect_map.contains(transType))
         m_effect_method = m_effect_map[transType];
     
@@ -110,7 +110,7 @@ SingleView::SingleView(
 
     // ---------------------------------------------------------------
 
-    m_caption_show = gContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_caption_show = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
     m_caption_show = min(m_slideshow_frame_delay, m_caption_show);
 
     if (m_caption_show)
@@ -122,7 +122,7 @@ SingleView::SingleView(
     // --------------------------------------------------------------------
 
     setNoErase();
-    QString bgtype = gContext->GetSetting("SlideshowBackground");
+    QString bgtype = gCoreContext->GetSetting("SlideshowBackground");
     if (bgtype != "theme" && !bgtype.isEmpty())
         setPalette(QPalette(QColor(bgtype)));
 
@@ -173,7 +173,7 @@ SingleView::~SingleView()
     }
 
     // save the current m_scaleMax setting so we can restore it later
-    gContext->SaveSetting("GalleryScaleMax", (m_scaleMax ? "1" : "0"));
+    gCoreContext->SaveSetting("GalleryScaleMax", (m_scaleMax ? "1" : "0"));
 }
 
 void SingleView::paintEvent(QPaintEvent *)
@@ -184,13 +184,13 @@ void SingleView::paintEvent(QPaintEvent *)
         {
             m_movieState = 2;
             ThumbItem *item = m_itemList.at(m_pos);
-            QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
+            QString cmd = gCoreContext->GetSetting("GalleryMoviePlayerCmd");
 
             if ((cmd.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
                 (cmd.length() < 1))
             {
                 cmd = "Internal";
-                gContext->GetMainWindow()->HandleMedia(cmd, item->GetPath());
+                GetMythMainWindow()->HandleMedia(cmd, item->GetPath());
             }
             else
             {

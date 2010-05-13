@@ -68,26 +68,26 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     visualizer_status = 0;
     curMeta = NULL;
 
-    menufilters = gContext->GetNumSetting("MusicMenuFilters", 0);
+    menufilters = gCoreContext->GetNumSetting("MusicMenuFilters", 0);
 
     cd_reader_thread = NULL;
     cd_watcher = NULL;
-    scan_for_cd = gContext->GetNumSetting("AutoPlayCD", 0);
+    scan_for_cd = gCoreContext->GetNumSetting("AutoPlayCD", 0);
     m_CDdevice = dev;
 
     // Get some user set options
 
-    show_whole_tree = gContext->GetNumSetting("ShowWholeTree", 1);
-    keyboard_accelerators = gContext->GetNumSetting("KeyboardAccelerators", 1);
+    show_whole_tree = gCoreContext->GetNumSetting("ShowWholeTree", 1);
+    keyboard_accelerators = gCoreContext->GetNumSetting("KeyboardAccelerators", 1);
     if (!keyboard_accelerators)
         show_whole_tree = false;
 
-    showrating = gContext->GetNumSetting("MusicShowRatings", 0);
-    listAsShuffled = gContext->GetNumSetting("ListAsShuffled", 0);
-    cycle_visualizer = gContext->GetNumSetting("VisualCycleOnSongChange", 0);
-    show_album_art = gContext->GetNumSetting("VisualAlbumArtOnSongChange", 0);
-    random_visualizer = gContext->GetNumSetting("VisualRandomize", 0);
-    exit_action = gContext->GetSetting("MusicExitAction", "prompt");
+    showrating = gCoreContext->GetNumSetting("MusicShowRatings", 0);
+    listAsShuffled = gCoreContext->GetNumSetting("ListAsShuffled", 0);
+    cycle_visualizer = gCoreContext->GetNumSetting("VisualCycleOnSongChange", 0);
+    show_album_art = gCoreContext->GetNumSetting("VisualAlbumArtOnSongChange", 0);
+    random_visualizer = gCoreContext->GetNumSetting("VisualRandomize", 0);
+    exit_action = gCoreContext->GetSetting("MusicExitAction", "prompt");
 
     m_pushedButton = NULL;
 
@@ -100,7 +100,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     volume_control = false;
     volume_display_timer = new QTimer(this);
-    if (gContext->GetNumSetting("MythControlsVolume", 0))
+    if (gCoreContext->GetNumSetting("MythControlsVolume", 0))
     {
         volume_control = true;
     }
@@ -171,7 +171,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     fullscreen_blank = false;
 
-    visual_modes = gContext->GetSetting("VisualMode")
+    visual_modes = gCoreContext->GetSetting("VisualMode")
         .split(';', QString::SkipEmptyParts);
 
     if (!visual_modes.count())
@@ -179,7 +179,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 
     current_visual = random_visualizer ? rand() % visual_modes.count() : 0;
 
-    QString visual_delay = gContext->GetSetting("VisualModeDelay");
+    QString visual_delay = gCoreContext->GetSetting("VisualModeDelay");
     bool delayOK;
     visual_mode_delay = visual_delay.toInt(&delayOK);
     if (!delayOK)
@@ -411,7 +411,7 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                     res = kDialogCodeButton1;
                 else
                 {
-                        DialogBox *dialog = new DialogBox(gContext->GetMainWindow(),
+                        DialogBox *dialog = new DialogBox(GetMythMainWindow(),
                                     tr("Exiting Music Player\n"
                                         "Do you want to continue playing in the background?"));
                         dialog->AddButton(tr("No - Exit, Stop Playing"));
@@ -603,7 +603,7 @@ void PlaybackBoxMusic::showMenu()
     if (playlist_popup)
         return;
 
-    playlist_popup = new MythPopupBox(gContext->GetMainWindow(),
+    playlist_popup = new MythPopupBox(GetMythMainWindow(),
                                       "playlist_popup");
 
     if (menufilters)
@@ -685,7 +685,7 @@ void PlaybackBoxMusic::showSmartPlaylistDialog()
 
     closePlaylistPopup();
 
-    SmartPlaylistDialog dialog(gContext->GetMainWindow(), "smartplaylistdialog");
+    SmartPlaylistDialog dialog(GetMythMainWindow(), "smartplaylistdialog");
     dialog.setSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
 
     DialogCode res = dialog.ExecPopup();
@@ -704,7 +704,7 @@ void PlaybackBoxMusic::showSearchDialog()
 
     closePlaylistPopup();
 
-    SearchDialog dialog(gContext->GetMainWindow(), "searchdialog");
+    SearchDialog dialog(GetMythMainWindow(), "searchdialog");
 
     DialogCode res = dialog.ExecPopupAtXY(-1, 20);
 
@@ -1019,7 +1019,7 @@ void PlaybackBoxMusic::showEditMetadataDialog()
     if (!editMeta)
         return;
 
-    EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
+    EditMetadataDialog editDialog(editMeta, GetMythMainWindow(),
                       "edit_metadata", "music-", "edit metadata");
     if (kDialogCodeRejected != editDialog.exec())
     {
@@ -1115,7 +1115,7 @@ void PlaybackBoxMusic::checkForPlaylists()
                 else
                 {
                     if (resumemode > MusicPlayer::RESUME_OFF)
-                        restorePosition(gContext->GetSetting("MusicBookmark", ""));
+                        restorePosition(gCoreContext->GetSetting("MusicBookmark", ""));
                     else
                         music_tree_list->moveToNodesFirstChild(branches_to_current_node);
                 }
@@ -1343,10 +1343,10 @@ void PlaybackBoxMusic::play()
     if (gPlayer->isPlaying())
     {
         if (resumemode == MusicPlayer::RESUME_EXACT &&
-                gContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
+                gCoreContext->GetNumSetting("MusicBookmarkPosition", 0) > 0)
         {
-            seek(gContext->GetNumSetting("MusicBookmarkPosition", 0));
-            gContext->SaveSetting("MusicBookmarkPosition", 0);
+            seek(gCoreContext->GetNumSetting("MusicBookmarkPosition", 0));
+            gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
         }
     }
 
@@ -1752,8 +1752,8 @@ void PlaybackBoxMusic::savePosition(uint position)
 
     s.remove(0, 1);
 
-    gContext->SaveSetting("MusicBookmark", s);
-    gContext->SaveSetting("MusicBookmarkPosition", position);
+    gCoreContext->SaveSetting("MusicBookmark", s);
+    gCoreContext->SaveSetting("MusicBookmarkPosition", position);
 }
 
 void PlaybackBoxMusic::restorePosition(const QString &position)
@@ -1878,7 +1878,7 @@ void PlaybackBoxMusic::editPlaylist()
     }
 
     visual_mode_timer->stop();
-    DatabaseBox dbbox(gContext->GetMainWindow(), m_CDdevice,
+    DatabaseBox dbbox(GetMythMainWindow(), m_CDdevice,
                       "music_select", "music-", "database box");
 
     if (cd_watcher)
@@ -1997,7 +1997,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
         VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
                 .arg(*aoe->errorMessage()));
         MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             statusString,
             QString("MythMusic has encountered the following error:\n%1")
             .arg(*aoe->errorMessage()));
@@ -2025,7 +2025,7 @@ void PlaybackBoxMusic::customEvent(QEvent *event)
         VERBOSE(VB_IMPORTANT, QString("%1 %2").arg(statusString)
                 .arg(*dxe->errorMessage()));
         MythPopupBox::showOkPopup(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             statusString,
             QString("MythMusic has encountered the following error:\n%1")
             .arg(*dxe->errorMessage()));
@@ -2337,7 +2337,7 @@ void PlaybackBoxMusic::wireUpTheme()
 bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
                                           PlayPLOption &playOption, bool &bRemoveDups)
 {
-    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+    MythPopupBox *popup = new MythPopupBox(GetMythMainWindow(),
                                       "playlist_popup");
 
     QLabel *caption = popup->addLabel(tr("Update Playlist Options"), MythPopupBox::Medium);

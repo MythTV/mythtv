@@ -213,11 +213,11 @@ class ParentalLevelChangeCheckerPrivate : public QObject
     ParentalLevelChangeCheckerPrivate(QObject *lparent) : QObject(lparent)
     {
         m_pm.Add(ParentalLevel::plHigh,
-                gContext->GetSetting("VideoAdminPassword"));
+                gCoreContext->GetSetting("VideoAdminPassword"));
         m_pm.Add(ParentalLevel::plMedium,
-                gContext->GetSetting("VideoAdminPasswordThree"));
+                gCoreContext->GetSetting("VideoAdminPasswordThree"));
         m_pm.Add(ParentalLevel::plLow,
-                gContext->GetSetting("VideoAdminPasswordTwo"));
+                gCoreContext->GetSetting("VideoAdminPasswordTwo"));
     }
 
     void Check(ParentalLevel::Level fromLevel, ParentalLevel::Level toLevel)
@@ -254,8 +254,8 @@ class ParentalLevelChangeCheckerPrivate : public QObject
             return true;
 
         // See if we recently (and successfully) asked for a password
-        QString last_time_stamp = gContext->GetSetting("VideoPasswordTime");
-        int last_parent_lvl = gContext->GetNumSetting("VideoPasswordLevel", -1);
+        QString last_time_stamp = gCoreContext->GetSetting("VideoPasswordTime");
+        int last_parent_lvl = gCoreContext->GetNumSetting("VideoPasswordLevel", -1);
 
         if (!last_time_stamp.length() || last_parent_lvl == -1)
         {
@@ -275,8 +275,8 @@ class ParentalLevelChangeCheckerPrivate : public QObject
             {
                 // Two minute window
                 last_time_stamp = curr_time.toString(Qt::ISODate);
-                gContext->SetSetting("VideoPasswordTime", last_time_stamp);
-                gContext->SaveSetting("VideoPasswordTime", last_time_stamp);
+                gCoreContext->SetSetting("VideoPasswordTime", last_time_stamp);
+                gCoreContext->SaveSetting("VideoPasswordTime", last_time_stamp);
                 return true;
             }
         }
@@ -329,8 +329,8 @@ class ParentalLevelChangeCheckerPrivate : public QObject
                 QString time_stamp =
                         QDateTime::currentDateTime().toString(Qt::ISODate);
 
-                gContext->SaveSetting("VideoPasswordTime", time_stamp);
-                gContext->SaveSetting("VideoPasswordLevel", m_toLevel);
+                gCoreContext->SaveSetting("VideoPasswordTime", time_stamp);
+                gCoreContext->SaveSetting("VideoPasswordLevel", m_toLevel);
 
                 break;
             }

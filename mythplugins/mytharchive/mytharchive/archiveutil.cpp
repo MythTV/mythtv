@@ -68,7 +68,7 @@ QString formatSize(long long sizeKB, int prec)
 
 QString getTempDirectory(bool showError)
 {
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+    QString tempDir = gCoreContext->GetSetting("MythArchiveTempDir", "");
 
     if (tempDir == "" && showError)
         ShowOkPopup(QObject::tr("Cannot find the MythArchive work directory.\n"
@@ -82,7 +82,7 @@ QString getTempDirectory(bool showError)
     if (!tempDir.endsWith("/"))
     {
         tempDir += "/";
-        gContext->SaveSetting("MythArchiveTempDir", tempDir);
+        gCoreContext->SaveSetting("MythArchiveTempDir", tempDir);
     }
 
     return tempDir;
@@ -204,7 +204,7 @@ ProgramInfo *getProgramInfoForFile(const QString &inFile)
 
 bool getFileDetails(ArchiveItem *a)
 {
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+    QString tempDir = gCoreContext->GetSetting("MythArchiveTempDir", "");
 
     if (!tempDir.endsWith("/"))
         tempDir += "/";

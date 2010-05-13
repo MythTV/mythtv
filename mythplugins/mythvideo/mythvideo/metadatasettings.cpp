@@ -56,18 +56,18 @@ bool MetadataSettings::Create()
         return false;
     }
 
-    int unknownSetting = gContext->GetNumSetting("VideoListUnknownFiletypes", 0);
+    int unknownSetting = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
     if (unknownSetting == 1)
         m_unknownFileCheck->SetCheckState(MythUIStateType::Full);
-    int loadMetaSetting = gContext->GetNumSetting("VideoTreeLoadMetaData", 0);
+    int loadMetaSetting = gCoreContext->GetNumSetting("VideoTreeLoadMetaData", 0);
     if (loadMetaSetting == 1)
         m_treeLoadsMetaCheck->SetCheckState(MythUIStateType::Full);
-    int trailerSetting = gContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0);
+    int trailerSetting = gCoreContext->GetNumSetting("mythvideo.TrailersRandomEnabled", 0);
     if (trailerSetting == 1)
         m_randomTrailerCheck->SetCheckState(MythUIStateType::Full);
 
     m_trailerSpin->SetRange(0,100,1);
-    m_trailerSpin->SetValue(gContext->GetNumSetting(
+    m_trailerSpin->SetValue(gCoreContext->GetNumSetting(
                            "mythvideo.TrailersRandomCount"));
 
     if (m_randomTrailerCheck->GetCheckState() == MythUIStateType::Full)
@@ -125,10 +125,10 @@ void MetadataSettings::loadData(void)
     QStringList TVScripts = TVScriptPath.entryList(QDir::Files);
     QDir MovieScriptPath = QString("%1/mythvideo/scripts/Movie/").arg(GetShareDir());
     QStringList MovieScripts = MovieScriptPath.entryList(QDir::Files);
-    QString currentTVGrabber = gContext->GetSetting("mythvideo.TVGrabber",
+    QString currentTVGrabber = gCoreContext->GetSetting("mythvideo.TVGrabber",
                                          QString("%1mythvideo/scripts/Television/%2")
                                          .arg(GetShareDir()).arg("ttvdb.py"));
-    QString currentMovieGrabber = gContext->GetSetting("mythvideo.MovieGrabber",
+    QString currentMovieGrabber = gCoreContext->GetSetting("mythvideo.MovieGrabber",
                                          QString("%1mythvideo/scripts/Movie/%2")
                                          .arg(GetShareDir()).arg("tmdb.py"));
 
@@ -186,24 +186,24 @@ void MetadataSettings::loadData(void)
 
 void MetadataSettings::slotSave(void)
 {
-    gContext->SaveSetting("mythvideo.TrailersRandomCount", m_trailerSpin->GetValue());
-    gContext->SaveSetting("mythvideo.TVGrabber", m_tvGrabberButtonList->GetDataValue().toString());
-    gContext->SaveSetting("mythvideo.MovieGrabber", m_movieGrabberButtonList->GetDataValue().toString());
+    gCoreContext->SaveSetting("mythvideo.TrailersRandomCount", m_trailerSpin->GetValue());
+    gCoreContext->SaveSetting("mythvideo.TVGrabber", m_tvGrabberButtonList->GetDataValue().toString());
+    gCoreContext->SaveSetting("mythvideo.MovieGrabber", m_movieGrabberButtonList->GetDataValue().toString());
 
     int listUnknownState = 0;
     if (m_unknownFileCheck->GetCheckState() == MythUIStateType::Full)
         listUnknownState = 1;
-    gContext->SaveSetting("VideoListUnknownFiletypes", listUnknownState);
+    gCoreContext->SaveSetting("VideoListUnknownFiletypes", listUnknownState);
 
     int loadMetaState = 0;
     if (m_treeLoadsMetaCheck->GetCheckState() == MythUIStateType::Full)
         loadMetaState = 1;
-    gContext->SaveSetting("VideoTreeLoadMetaData", loadMetaState);
+    gCoreContext->SaveSetting("VideoTreeLoadMetaData", loadMetaState);
 
     int trailerState = 0;
     if (m_randomTrailerCheck->GetCheckState() == MythUIStateType::Full)
         trailerState = 1;
-    gContext->SaveSetting("mythvideo.TrailersRandomEnabled", trailerState);
+    gCoreContext->SaveSetting("mythvideo.TrailersRandomEnabled", trailerState);
 
     Close();
 }

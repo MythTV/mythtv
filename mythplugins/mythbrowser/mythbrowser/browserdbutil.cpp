@@ -14,7 +14,7 @@ const QString currentDatabaseVersion = "1002";
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("BrowserDBSchemaVer", newnumber, NULL))
+    if (!gCoreContext->SaveSettingOnHost("BrowserDBSchemaVer", newnumber, NULL))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("DB Error (Setting new DB version number): %1\n")
@@ -63,7 +63,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
 bool UpgradeBrowserDatabaseSchema(void)
 {
-    QString dbver = gContext->GetSetting("BrowserDBSchemaVer");
+    QString dbver = gCoreContext->GetSetting("BrowserDBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
         return true;

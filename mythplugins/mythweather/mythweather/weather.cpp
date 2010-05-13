@@ -42,7 +42,7 @@ Weather::Weather(MythScreenStack *parent, const QString &name, SourceManager *sr
 
     m_pauseText = m_headerText = m_updatedText = NULL;
 
-    m_nextpageInterval = gContext->GetNumSetting("weatherTimeout", 10);
+    m_nextpageInterval = gCoreContext->GetNumSetting("weatherTimeout", 10);
 
     m_nextpage_Timer = new QTimer(this);
     connect(m_nextpage_Timer, SIGNAL(timeout()), SLOT(nextpage_timeout()) );
@@ -125,7 +125,7 @@ void Weather::setupScreens()
             "SELECT screen_id, container, units, draworder FROM weatherscreens "
             " WHERE hostname = :HOST ORDER BY draworder;";
     db.prepare(query);
-    db.bindValue(":HOST", gContext->GetHostName());
+    db.bindValue(":HOST", gCoreContext->GetHostName());
     if (!db.exec())
     {
         MythDB::DBError("Selecting weather screens.", db);

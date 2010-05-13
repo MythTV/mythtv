@@ -41,15 +41,15 @@ void showLogViewer(void)
 LogViewer::LogViewer(MythScreenStack *parent)
           : MythScreenType(parent, "logviewer")
 {
-    m_updateTime = gContext->GetNumSetting("LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
+    m_updateTime = gCoreContext->GetNumSetting("LogViewerUpdateTime", DEFAULT_UPDATE_TIME);
     m_updateTimer = NULL;
-    m_autoUpdate = (gContext->GetNumSetting("LogViewerAutoUpdate", 1) == 1);
+    m_autoUpdate = (gCoreContext->GetNumSetting("LogViewerAutoUpdate", 1) == 1);
 }
 
 LogViewer::~LogViewer(void)
 {
-    gContext->SaveSetting("LogViewerUpdateTime", m_updateTime);
-    gContext->SaveSetting("LogViewerAutoUpdate", (m_autoUpdate ? "1" : "0"));
+    gCoreContext->SaveSetting("LogViewerUpdateTime", m_updateTime);
+    gCoreContext->SaveSetting("LogViewerAutoUpdate", (m_autoUpdate ? "1" : "0"));
 
     if (m_updateTimer)
         delete m_updateTimer;
@@ -150,7 +150,7 @@ void LogViewer::updateLogItem(MythUIButtonListItem *item)
 
 void LogViewer::cancelClicked(void)
 {
-    QString tempDir = gContext->GetSetting("MythArchiveTempDir", "");
+    QString tempDir = gCoreContext->GetSetting("MythArchiveTempDir", "");
 
     QString command("echo Cancel > " + tempDir + "/logs/mythburncancel.lck");
     int res = system(qPrintable(command));
@@ -208,7 +208,7 @@ QString LogViewer::getSetting(const QString &key)
         query.prepare("SELECT data FROM settings WHERE value = :VALUE "
                 "AND hostname = :HOSTNAME ;");
         query.bindValue(":VALUE", key);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
+        query.bindValue(":HOSTNAME", gCoreContext->GetHostName());
 
         if (query.exec() && query.isActive() && query.size() > 0)
         {

@@ -116,14 +116,14 @@ MythTranscodeDaemon::MythTranscodeDaemon(int port, bool log_stdout) :
     have_disc(false),
     thread_cleaning_timer(new QTimer(this)),
     disc_checking_timer(new QTimer(this)),
-    dvd_device(gContext->GetSetting("DVDDeviceLocation")),
+    dvd_device(gCoreContext->GetSetting("DVDDeviceLocation")),
     dvd_probe(new DVDProbe(dvd_device)),
     disc_checking_thread(NULL),
-    nice_level(gContext->GetNumSetting("MTDNiceLevel", 20)),
+    nice_level(gCoreContext->GetNumSetting("MTDNiceLevel", 20)),
     concurrent_transcodings_mutex(new QMutex()),
     concurrent_transcodings(0),
     max_concurrent_transcodings(
-        gContext->GetNumSetting("MTDConcurrentTranscodings", 1))
+        gCoreContext->GetNumSetting("MTDConcurrentTranscodings", 1))
 {
     myth_nice(nice_level);
 

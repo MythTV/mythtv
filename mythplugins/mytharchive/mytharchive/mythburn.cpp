@@ -249,7 +249,7 @@ void MythBurn::loadEncoderProfiles()
     // first look in the ConfDir (~/.mythtv)
     QString filename = GetConfDir() +
             "/MythArchive/ffmpeg_dvd_" +
-            ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
+            ((gCoreContext->GetSetting("MythArchiveVideoFormat", "pal")
                 .toLower() == "ntsc") ? "ntsc" : "pal") + ".xml";
 
     if (!QFile::exists(filename))
@@ -257,7 +257,7 @@ void MythBurn::loadEncoderProfiles()
         // not found yet so use the default profiles
         filename = GetShareDir() +
             "mytharchive/encoder_profiles/ffmpeg_dvd_" +
-            ((gContext->GetSetting("MythArchiveVideoFormat", "pal")
+            ((gCoreContext->GetSetting("MythArchiveVideoFormat", "pal")
                 .toLower() == "ntsc") ? "ntsc" : "pal") + ".xml";
     }
 
@@ -535,7 +535,7 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
     if (item->videoCodec.toLower() == "mpeg2video")
     {
         // does the file already have a valid DVD resolution?
-        if (gContext->GetSetting("MythArchiveVideoFormat", "pal").toLower()
+        if (gCoreContext->GetSetting("MythArchiveVideoFormat", "pal").toLower()
                     == "ntsc")
         {
             if ((item->videoWidth == 720 && item->videoHeight == 480) ||
@@ -564,7 +564,7 @@ EncoderProfile *MythBurn::getDefaultProfile(ArchiveItem *item)
     {
         // file needs re-encoding - use default profile setting
         QString defaultProfile =
-                gContext->GetSetting("MythArchiveDefaultEncProfile", "SP");
+                gCoreContext->GetSetting("MythArchiveDefaultEncProfile", "SP");
 
         for (int x = 0; x < m_profileList.size(); x++)
             if (m_profileList.at(x)->name == defaultProfile)
@@ -664,11 +664,11 @@ void MythBurn::createConfigFile(const QString &filename)
 
 void MythBurn::loadConfiguration(void)
 {
-    m_theme = gContext->GetSetting("MythBurnMenuTheme", "");
-    m_bCreateISO = (gContext->GetSetting("MythBurnCreateISO", "0") == "1");
-    m_bDoBurn = (gContext->GetSetting("MythBurnBurnDVDr", "1") == "1");
-    m_bEraseDvdRw = (gContext->GetSetting("MythBurnEraseDvdRw", "0") == "1");
-    m_saveFilename = gContext->GetSetting("MythBurnSaveFilename", "");
+    m_theme = gCoreContext->GetSetting("MythBurnMenuTheme", "");
+    m_bCreateISO = (gCoreContext->GetSetting("MythBurnCreateISO", "0") == "1");
+    m_bDoBurn = (gCoreContext->GetSetting("MythBurnBurnDVDr", "1") == "1");
+    m_bEraseDvdRw = (gCoreContext->GetSetting("MythBurnEraseDvdRw", "0") == "1");
+    m_saveFilename = gCoreContext->GetSetting("MythBurnSaveFilename", "");
 
     while (!m_archiveList.isEmpty())
          delete m_archiveList.takeFirst();
@@ -938,7 +938,7 @@ void MythBurn::runScript()
     commandline += " -l " + logDir + "/progress.log";           // progress log
     commandline += " > "  + logDir + "/mythburn.log 2>&1 &";    // Logs
 
-    gContext->SaveSetting("MythArchiveLastRunStatus", "Running");
+    gCoreContext->SaveSetting("MythArchiveLastRunStatus", "Running");
 
     int state = system(qPrintable(commandline));
 
@@ -1004,7 +1004,7 @@ void MythBurn::handleAddVideo()
 
 void MythBurn::handleAddFile()
 {
-    QString filter = gContext->GetSetting("MythArchiveFileFilter",
+    QString filter = gCoreContext->GetSetting("MythArchiveFileFilter",
                                           "*.mpg *.mpeg *.mov *.avi *.nuv");
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -1122,7 +1122,7 @@ BurnMenu::~BurnMenu(void)
 
 void BurnMenu::start(void)
 {
-    if (!gContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
+    if (!gCoreContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
     {
         showWarningDialog(QObject::tr("Cannot burn a DVD.\n"
                                       "The last run failed to create a DVD."));
@@ -1185,7 +1185,7 @@ void BurnMenu::doBurn(int mode)
 
     QString sArchiveFormat = QString::number(mode);
     QString sEraseDVDRW = (mode == 2) ? "1" : "0";
-    QString sNativeFormat = (gContext->GetSetting("MythArchiveLastRunType")
+    QString sNativeFormat = (gCoreContext->GetSetting("MythArchiveLastRunType")
                              .startsWith("Native") ? "1" : "0");
 
     commandline = "mytharchivehelper -b " + sArchiveFormat +

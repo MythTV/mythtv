@@ -308,10 +308,10 @@ void ExportNative::getArchiveList(void)
 
 void ExportNative::loadConfiguration(void)
 {
-    m_bCreateISO = (gContext->GetSetting("MythNativeCreateISO", "0") == "1");
-    m_bDoBurn = (gContext->GetSetting("MythNativeBurnDVDr", "1") == "1");
-    m_bEraseDvdRw = (gContext->GetSetting("MythNativeEraseDvdRw", "0") == "1");
-    m_saveFilename = gContext->GetSetting("MythNativeSaveFilename", "");
+    m_bCreateISO = (gCoreContext->GetSetting("MythNativeCreateISO", "0") == "1");
+    m_bDoBurn = (gCoreContext->GetSetting("MythNativeBurnDVDr", "1") == "1");
+    m_bEraseDvdRw = (gCoreContext->GetSetting("MythNativeEraseDvdRw", "0") == "1");
+    m_saveFilename = gCoreContext->GetSetting("MythNativeSaveFilename", "");
 }
 
 void ExportNative::saveConfiguration(void)

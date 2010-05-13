@@ -57,8 +57,8 @@ bool ZMClient::setupZMClient(void)
         m_server_unavailable = false;
     }
 
-    zmserver_host = gContext->GetSetting("ZoneMinderServerIP", "localhost");
-    zmserver_port = gContext->GetNumSetting("ZoneMinderServerPort", 6548);
+    zmserver_host = gCoreContext->GetSetting("ZoneMinderServerIP", "localhost");
+    zmserver_port = gCoreContext->GetNumSetting("ZoneMinderServerPort", 6548);
 
     class ZMClient *zmclient = ZMClient::get();
     if (zmclient->connectToHost(zmserver_host, zmserver_port) == false) 
@@ -315,8 +315,8 @@ void ZMClient::getEventList(const QString &monitorName, bool oldestFirst,
         return;
     }
 
-    QString dateFormat = gContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
-    QString timeFormat = gContext->GetSetting("ZoneMinderTimeFormat", "hh:mm:ss");
+    QString dateFormat = gCoreContext->GetSetting("ZoneMinderDateFormat", "ddd - dd/MM");
+    QString timeFormat = gCoreContext->GetSetting("ZoneMinderTimeFormat", "hh:mm:ss");
 
     QStringList::Iterator it = strList.begin();
     it++; it++;

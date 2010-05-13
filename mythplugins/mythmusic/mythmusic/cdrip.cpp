@@ -192,8 +192,8 @@ void CDRipperThread::run(void)
         new RipStatusEvent(RipStatusEvent::kTrackProgressEvent, 0));
 
     QString textstatus;
-    QString encodertype = gContext->GetSetting("EncoderType");
-    bool mp3usevbr = gContext->GetNumSetting("Mp3UseVBR", 0);
+    QString encodertype = gCoreContext->GetSetting("EncoderType");
+    bool mp3usevbr = gCoreContext->GetNumSetting("Mp3UseVBR", 0);
 
     m_totalSectors = 0;
     m_totalSectorsDone = 0;
@@ -319,7 +319,7 @@ void CDRipperThread::run(void)
         }
     }
 
-    QString PostRipCDScript = gContext->GetSetting("PostCDRipScript");
+    QString PostRipCDScript = gCoreContext->GetSetting("PostCDRipScript");
 
     if (!PostRipCDScript.isEmpty())
     {
@@ -369,7 +369,7 @@ int CDRipperThread::ripTrack(QString &cddevice, Encoder *encoder, int tracknum)
     long int end = cdda_track_lastsector(device, tracknum);
 
     cdrom_paranoia *paranoia = paranoia_init(device);
-    if (gContext->GetSetting("ParanoiaLevel") == "full")
+    if (gCoreContext->GetSetting("ParanoiaLevel") == "full")
         paranoia_modeset(paranoia, PARANOIA_MODE_FULL |
                 PARANOIA_MODE_NEVERSKIP);
     else
@@ -554,7 +554,7 @@ bool Ripper::Create(void)
     new MythUIButtonListItem(m_qualityList, tr("High"), qVariantFromValue(2));
     new MythUIButtonListItem(m_qualityList, tr("Perfect"), qVariantFromValue(3));
     m_qualityList->SetValueByData(qVariantFromValue(
-                        gContext->GetNumSetting("DefaultRipQuality", 1)));
+                        gCoreContext->GetNumSetting("DefaultRipQuality", 1)));
 
     QTimer::singleShot(500, this, SLOT(startScanCD()));
 
@@ -673,7 +673,7 @@ void Ripper::startScanCD(void)
                     else
                     {
                         DialogBox *dlg = new DialogBox(
-                            gContext->GetMainWindow(),
+                            GetMythMainWindow(),
                             tr("Artist: %1\n"
                                "Album: %2\n"
                                "Track: %3\n\n"
@@ -860,7 +860,7 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
         QString filename = query.value(1).toString();
 
         // delete file
-        QString musicdir = gContext->GetSetting("MusicLocation");
+        QString musicdir = gCoreContext->GetSetting("MusicLocation");
         musicdir = QDir::cleanPath(musicdir);
         if (!musicdir.endsWith("/"))
             musicdir += "/";
@@ -880,15 +880,15 @@ void Ripper::deleteTrack(QString& artist, QString& album, QString& title)
 // if createDir is true then the directory structure will be created
 QString Ripper::filenameFromMetadata(Metadata *track, bool createDir)
 {
-    QString musicdir = gContext->GetSetting("MusicLocation");
+    QString musicdir = gCoreContext->GetSetting("MusicLocation");
     musicdir = QDir::cleanPath(musicdir);
     if (!musicdir.endsWith("/"))
         musicdir += "/";
 
     QDir directoryQD(musicdir);
     QString filename;
-    QString fntempl = gContext->GetSetting("FilenameTemplate");
-    bool no_ws = gContext->GetNumSetting("NoWhitespace", 0);
+    QString fntempl = gCoreContext->GetSetting("FilenameTemplate");
+    bool no_ws = gCoreContext->GetNumSetting("NoWhitespace", 0);
 
     QRegExp rx_ws("\\s{1,}");
     QRegExp rx("(GENRE|ARTIST|ALBUM|TRACK|TITLE|YEAR)");
@@ -1147,7 +1147,7 @@ void Ripper::switchTitlesAndArtists()
 
 void Ripper::reject()
 {
-    if (!gContext->GetMainWindow()->IsExitingToMain())
+    if (!GetMythMainWindow()->IsExitingToMain())
         startEjectCD();
 
     Close();
@@ -1181,7 +1181,7 @@ void Ripper::RipComplete(bool result)
 {
     if (result == true)
     {
-        bool EjectCD = gContext->GetNumSetting("EjectCDAfterRipping", 1);
+        bool EjectCD = gCoreContext->GetNumSetting("EjectCDAfterRipping", 1);
         if (EjectCD)
             startEjectCD();
 
@@ -1218,7 +1218,7 @@ void Ripper::startEjectCD()
 
 void Ripper::ejectCD()
 {
-    bool bEjectCD = gContext->GetNumSetting("EjectCDAfterRipping",1);
+    bool bEjectCD = gCoreContext->GetNumSetting("EjectCDAfterRipping",1);
     if (bEjectCD)
     {
 #ifdef HAVE_CDAUDIO
@@ -1351,7 +1351,7 @@ bool Ripper::showList(QString caption, QString &value)
     bool res = false;
 
     MythSearchDialog *searchDialog
-        = new MythSearchDialog(gContext->GetMainWindow(), "");
+        = new MythSearchDialog(GetMythMainWindow(), "");
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
     searchDialog->setItems(m_searchList);
@@ -1374,7 +1374,7 @@ void Ripper::showEditMetadataDialog(MythUIButtonListItem *item)
 
     Metadata *editMeta = qVariantValue<Metadata *>(item->GetData());
 
-    EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
+    EditMetadataDialog editDialog(editMeta, GetMythMainWindow(),
                                   "edit_metadata", "music-", "edit metadata");
     editDialog.setSaveMetadataOnly();
 
@@ -1489,7 +1489,7 @@ bool RipStatus::keyPressEvent(QKeyEvent *event)
         {
             if (m_ripperThread && m_ripperThread->isRunning())
             {
-                if (MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+                if (MythPopupBox::showOkCancelPopup(GetMythMainWindow(),
                     "Stop Rip?",
                     tr("Are you sure you want to cancel ripping the CD?"),
                     false))

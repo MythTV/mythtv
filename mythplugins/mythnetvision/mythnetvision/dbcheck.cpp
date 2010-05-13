@@ -17,7 +17,7 @@ const QString currentDatabaseVersion = "1007";
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("NetvisionDBSchemaVer", newnumber, NULL))
+    if (!gCoreContext->SaveSettingOnHost("NetvisionDBSchemaVer", newnumber, NULL))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("DB Error (Setting new DB version number): %1\n")
@@ -67,7 +67,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
 bool UpgradeNetvisionDatabaseSchema(void)
 {
-    QString dbver = gContext->GetSetting("NetvisionDBSchemaVer");
+    QString dbver = gCoreContext->GetSetting("NetvisionDBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
         return true;

@@ -28,7 +28,7 @@ MTDLogger::MTDLogger(bool log_stdout) :
 
 bool MTDLogger::Init(void)
 {
-    QString logfile_name = gContext->GetSetting("DVDRipLocation");
+    QString logfile_name = gCoreContext->GetSetting("DVDRipLocation");
     if (logfile_name.isEmpty())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +

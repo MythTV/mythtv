@@ -76,7 +76,7 @@ QStringList GetVideoDirsByHost(QString host)
 
     if (host.isEmpty())
     {
-        QStringList tmp3 = gContext->GetSetting("VideoStartupDir",
+        QStringList tmp3 = gCoreContext->GetSetting("VideoStartupDir",
                     DEFAULT_VIDEOSTARTUP_DIR).split(":", QString::SkipEmptyParts);
         for (QStringList::iterator p = tmp3.begin(); p != tmp3.end(); ++p)
         {
@@ -234,7 +234,7 @@ QString nearestName(const QString& actual, const QStringList& candidates, bool m
 {
     int deltaBest = 10000;
     int numBest = 0;
-    int tolerance = gContext->GetNumSetting("mythvideo.lookupTolerance", 10);
+    int tolerance = gCoreContext->GetNumSetting("mythvideo.lookupTolerance", 10);
     QString best;
     QString bestKey;
     QStringList possibles; 

@@ -76,7 +76,7 @@ bool GameUI::Create()
     connect(m_gameUITree, SIGNAL(nodeChanged(MythGenericTree*)),
             this, SLOT(nodeChanged(MythGenericTree*)));
 
-    m_gameShowFileName = gContext->GetSetting("GameShowFileNames").toInt();
+    m_gameShowFileName = gCoreContext->GetSetting("GameShowFileNames").toInt();
 
     m_gameTree = new MythGenericTree("game root", 0, false);
 
@@ -103,20 +103,20 @@ bool GameUI::Create()
     else
         systemFilter += ")";
 
-    m_showHashed = gContext->GetSetting("GameTreeView").toInt();
+    m_showHashed = gCoreContext->GetSetting("GameTreeView").toInt();
 
     //  create a few top level nodes - this could be moved to a config based
     //  approach with multiple roots if/when someone has the time to create
     //  the relevant dialog screens
 
-    QString levels = gContext->GetSetting("GameFavTreeLevels");
+    QString levels = gCoreContext->GetSetting("GameFavTreeLevels");
 
     MythGenericTree *new_node = new MythGenericTree(tr("Favorites"), 1, true);
     new_node->SetData(qVariantFromValue(
                 new GameTreeInfo(levels, systemFilter + " and favorite=1")));
     m_favouriteNode = m_gameTree->addNode(new_node);
 
-    levels = gContext->GetSetting("GameAllTreeLevels");
+    levels = gCoreContext->GetSetting("GameAllTreeLevels");
 
     if (m_showHashed)
     {

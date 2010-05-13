@@ -229,7 +229,7 @@ namespace
 
     bool IsCombinedSchema()
     {
-        QString dbver = gContext->GetSetting(MythVideoVersionName);
+        QString dbver = gCoreContext->GetSetting(MythVideoVersionName);
 
         return dbver.size();
     }
@@ -239,7 +239,7 @@ namespace
         if (IsCombinedSchema())
             return true;  // already upgraded before it was combined?
 
-        QString dbver = gContext->GetSetting(OldMythVideoVersionName);
+        QString dbver = gCoreContext->GetSetting(OldMythVideoVersionName);
 
         if (dbver == lastMythVideoVersion)
             return true;
@@ -649,7 +649,7 @@ namespace
         if (IsCombinedSchema())
             return true;  // already upgraded before it was combined?
 
-        QString dbver = gContext->GetSetting(OldMythDVDVersionName);
+        QString dbver = gCoreContext->GetSetting(OldMythDVDVersionName);
 
         if (dbver == lastMythDVDDBVersion)
             return true;
@@ -687,8 +687,8 @@ namespace
 
     bool DoVideoDatabaseSchemaUpgrade()
     {
-        QString dvdver = gContext->GetSetting(OldMythDVDVersionName);
-        QString oldmythvideover = gContext->GetSetting(OldMythVideoVersionName);
+        QString dvdver = gCoreContext->GetSetting(OldMythDVDVersionName);
+        QString oldmythvideover = gCoreContext->GetSetting(OldMythVideoVersionName);
 
         if (dvdver == lastMythDVDDBVersion &&
             oldmythvideover == lastMythVideoVersion)
@@ -759,7 +759,7 @@ namespace
 
             // handle DialogType value change
             const QString setting("Default MythVideo View");
-            int view = gContext->GetNumSetting(setting, -1);
+            int view = gCoreContext->GetNumSetting(setting, -1);
             if (view != -1)
             {
                 switch (view)
@@ -769,7 +769,7 @@ namespace
                     case 1:
                     default: view = VideoDialog::DLG_GALLERY; break;
                 }
-                gContext->SaveSetting(setting, view);
+                gCoreContext->SaveSetting(setting, view);
             }
             if (!UpdateDBVersionNumber(MythVideoVersionName, "1013"))
                 return false;

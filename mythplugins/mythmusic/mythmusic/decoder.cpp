@@ -164,14 +164,14 @@ QString Decoder::musiclocation;
 
 void Decoder::SetLocationFormatUseTags(void)
 {
-    QString startdir = gContext->GetSetting("MusicLocation");
+    QString startdir = gCoreContext->GetSetting("MusicLocation");
     startdir = QDir::cleanPath(startdir);
     if (!startdir.endsWith("/"))
         startdir += "/";
 
     musiclocation = startdir;
 
-    ignore_id3 = gContext->GetNumSetting("Ignore_ID3", 0);
+    ignore_id3 = gCoreContext->GetNumSetting("Ignore_ID3", 0);
 }
 
 static QList<DecoderFactory*> *factories = NULL;

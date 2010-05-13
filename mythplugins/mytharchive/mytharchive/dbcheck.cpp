@@ -17,7 +17,7 @@ const QString currentDatabaseVersion = "1005";
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("ArchiveDBSchemaVer",newnumber,NULL))
+    if (!gCoreContext->SaveSettingOnHost("ArchiveDBSchemaVer",newnumber,NULL))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("DB Error (Setting new DB version number): %1\n")
@@ -66,7 +66,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
 bool UpgradeArchiveDatabaseSchema(void)
 {
-    QString dbver = gContext->GetSetting("ArchiveDBSchemaVer");
+    QString dbver = gCoreContext->GetSetting("ArchiveDBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
         return true;

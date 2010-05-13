@@ -87,8 +87,8 @@ void EditMetadataDialog::fillWidgets()
     if (lastplay_text)
     {
         lastplay_text->SetText(m_metadata->LastPlay()
-                               .toString(gContext->GetSetting("dateformat") +
-                               " " + gContext->GetSetting("timeformat")));
+                               .toString(gCoreContext->GetSetting("dateformat")
+                                 + " " + gCoreContext->GetSetting("timeformat")));
     }
 
     if (filename_text)
@@ -513,7 +513,7 @@ bool EditMetadataDialog::showList(QString caption, QString &value)
 {
     bool res = false;
 
-    MythSearchDialog *searchDialog = new MythSearchDialog(gContext->GetMainWindow(), "");
+    MythSearchDialog *searchDialog = new MythSearchDialog(GetMythMainWindow(), "");
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
     searchDialog->setItems(searchList);
@@ -602,7 +602,7 @@ void EditMetadataDialog::closeDialog()
 
 void EditMetadataDialog::showSaveMenu()
 {
-    popup = new MythPopupBox(gContext->GetMainWindow(), "Menu");
+    popup = new MythPopupBox(GetMythMainWindow(), "Menu");
 
     QLabel *label = popup->addLabel(tr("Save Changes?"), MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
@@ -667,7 +667,7 @@ void EditMetadataDialog::saveToFile()
 {
     cancelPopup();
 
-    if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+    if (!MythPopupBox::showOkCancelPopup(GetMythMainWindow(),
                                          "Save To File",
                                          tr("Are you sure you want to save the "
                                          "modified metadata to the file?"),
@@ -689,7 +689,7 @@ void EditMetadataDialog::saveAll()
 {
     cancelPopup();
 
-    if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+    if (!MythPopupBox::showOkCancelPopup(GetMythMainWindow(),
                                          "Save To File",
                                          tr("Are you sure you want to save the "
                                          "modified metadata to the file?"),
@@ -713,7 +713,7 @@ void EditMetadataDialog::showMenu()
     if (coverart_grid->getItemCount() == 0)
         return;
 
-    MythPopupBox *menu = new MythPopupBox(gContext->GetMainWindow(), "menu");
+    MythPopupBox *menu = new MythPopupBox(GetMythMainWindow(), "menu");
 
     QLabel *caption = menu->addLabel(tr("Change Image Type"), MythPopupBox::Medium);
     caption->setAlignment(Qt::AlignCenter);

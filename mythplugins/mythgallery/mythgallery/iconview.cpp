@@ -112,11 +112,11 @@ IconView::IconView(MythScreenStack *parent, const char *name,
     m_thumbGen = new ThumbGenerator(this, 0, 0);
     m_childCountThread = new ChildCountThread(this);
 
-    m_showcaption = gContext->GetNumSetting("GalleryOverlayCaption", 0);
-    m_sortorder = gContext->GetNumSetting("GallerySortOrder", 0);
-    m_useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL", 0);
-    m_recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
-    m_paths = gContext->GetSetting("GalleryImportDirs").split(":");
+    m_showcaption = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_sortorder = gCoreContext->GetNumSetting("GallerySortOrder", 0);
+    m_useOpenGL = gCoreContext->GetNumSetting("SlideshowUseOpenGL", 0);
+    m_recurse = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    m_paths = gCoreContext->GetSetting("GalleryImportDirs").split(":");
     m_errorStr = QString::null;
 
     m_captionText = NULL;
@@ -349,7 +349,7 @@ void IconView::SetupMediaMonitor(void)
         }
         else
         {
-//             DialogBox *dlg = new DialogBox(gContext->GetMainWindow(),
+//             DialogBox *dlg = new DialogBox(GetMythMainWindow(),
 //                              tr("Failed to mount device: ") +
 //                              m_currDevice->getDevicePath() + "\n\n" +
 //                              tr("Showing the default MythGallery directory."));
@@ -570,14 +570,14 @@ bool IconView::HandleImageSelect(const QString &action)
     {
         GLSDialog gv(m_itemList, &pos,
                         slideShow, m_sortorder,
-                        gContext->GetMainWindow());
+                        GetMythMainWindow());
         gv.exec();
     }
     else
 #endif
     {
         SingleView sv(m_itemList, &pos, slideShow, m_sortorder,
-                      gContext->GetMainWindow());
+                      GetMythMainWindow());
         sv.exec();
     }
 
@@ -1003,14 +1003,14 @@ void IconView::HandleSettings(void)
 {
     GallerySettings settings;
     settings.exec();
-    gContext->ClearSettingsCache();
+    gCoreContext->ClearSettingsCache();
 
     // reload settings
-    m_showcaption = gContext->GetNumSetting("GalleryOverlayCaption", 0);
-    m_sortorder   = gContext->GetNumSetting("GallerySortOrder", 0);
-    m_useOpenGL   = gContext->GetNumSetting("SlideshowUseOpenGL", 0);
-    m_recurse     = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
-    m_paths       = gContext->GetSetting("GalleryImportDirs").split(":");
+    m_showcaption = gCoreContext->GetNumSetting("GalleryOverlayCaption", 0);
+    m_sortorder   = gCoreContext->GetNumSetting("GallerySortOrder", 0);
+    m_useOpenGL   = gCoreContext->GetNumSetting("SlideshowUseOpenGL", 0);
+    m_recurse     = gCoreContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    m_paths       = gCoreContext->GetSetting("GalleryImportDirs").split(":");
 
     // reload directory
     MediaMonitor *mon = MediaMonitor::GetMediaMonitor();
@@ -1039,7 +1039,7 @@ void IconView::HandleImport(void)
     QDir importdir;
 
 //     DialogBox *importDlg = new DialogBox(
-//         gContext->GetMainWindow(), tr("Import pictures?"));
+//         GetMythMainWindow(), tr("Import pictures?"));
 //
 //     importDlg->AddButton(tr("No"));
 //     importDlg->AddButton(tr("Yes"));
@@ -1082,7 +1082,7 @@ void IconView::HandleImport(void)
     if (importdir.count() == 0)
     {
 //         DialogBox *nopicsDlg = new DialogBox(
-//             gContext->GetMainWindow(), tr("Nothing found to import"));
+//             GetMythMainWindow(), tr("Nothing found to import"));
 //
 //         nopicsDlg->AddButton(tr("OK"));
 //         nopicsDlg->exec();

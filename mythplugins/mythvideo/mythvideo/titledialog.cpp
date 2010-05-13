@@ -288,7 +288,7 @@ void TitleDialog::toggleAC3()
 
 void TitleDialog::viewTitle()
 {
-    QString player_string = gContext->GetSetting("TitlePlayCommand");
+    QString player_string = gCoreContext->GetSetting("TitlePlayCommand");
     if(player_string.length() < 1)
     {
         VERBOSE(VB_IMPORTANT, "No title player command defined");
@@ -324,7 +324,7 @@ void TitleDialog::viewTitle()
 
     if(m_currentTitle->getSubTitle() > -1)
     {
-        QString player_append = gContext->GetSetting("SubTitleCommand");
+        QString player_append = gCoreContext->GetSetting("SubTitleCommand");
         if(player_append.length() > 1)
         {
             player_append = player_append.replace(QRegExp("%s"), QString("%1").arg(m_currentTitle->getSubTitle()));
@@ -374,13 +374,13 @@ void TitleDialog::ripTitles()
             //
 
             QString destination_directory =
-                    gContext->GetSetting("mythdvd.LocalRipDirectory");
+                    gCoreContext->GetSetting("mythdvd.LocalRipDirectory");
 
             if (!destination_directory.length())
             {
                 // Assume import directory is first video scan directory
                 QStringList videodirs =
-                        gContext->GetSetting("VideoStartupDir").split(":",
+                        gCoreContext->GetSetting("VideoStartupDir").split(":",
                                            QString::SkipEmptyParts);
                 if (videodirs.size())
                     destination_directory = videodirs[0];

@@ -215,7 +215,7 @@ private:
             } 
             else 
             {
-                QString artistGrouping = gContext->GetSetting("ArtistTreeGroups", "none");
+                QString artistGrouping = gCoreContext->GetSetting("ArtistTreeGroups", "none");
                 if (artistGrouping == "2") 
                 {
                     int split_max = kSplitArray29_Max;
@@ -283,7 +283,7 @@ class MusicDirectoryTreeBuilder : public MusicTreeBuilder
   public:
     MusicDirectoryTreeBuilder() 
     {
-        m_startdir = gContext->GetSetting("MusicLocation");
+        m_startdir = gCoreContext->GetSetting("MusicLocation");
     }
 
     ~MusicDirectoryTreeBuilder() 

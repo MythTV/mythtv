@@ -69,7 +69,7 @@ bool SearchEditor::Create(void)
     loadData();
 
     QString icondir = QString("%1/mythnetvision/icons/").arg(GetShareDir());
-    gContext->SaveSetting("mythnetvision.iconDir", icondir);
+    gCoreContext->SaveSetting("mythnetvision.iconDir", icondir);
 
     return true;
 }
@@ -152,7 +152,8 @@ GrabberScript::scriptList SearchEditor::fillGrabberList()
         QStringList sfn;
 
         QString icondir = QString("%1/mythnetvision/icons/").arg(GetShareDir());
-        QString dbIconDir = gContext->GetSetting("mythnetvision.iconDir", icondir);
+        QString dbIconDir = gCoreContext->GetSetting("mythnetvision.iconDir",
+                                                     icondir);
 
         for (image_type_list::const_iterator ext = image_exts.begin();
                 ext != image_exts.end(); ++ext)

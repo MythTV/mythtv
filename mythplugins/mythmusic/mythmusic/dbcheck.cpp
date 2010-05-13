@@ -18,7 +18,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver);
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("MusicDBSchemaVer",newnumber,NULL))
+    if (!gCoreContext->SaveSettingOnHost("MusicDBSchemaVer",newnumber,NULL))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("DB Error (Setting new DB version number): %1\n")
@@ -144,7 +144,7 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
 
     if (dbver == "1000")
     {
-        QString startdir = gContext->GetSetting("MusicLocation");
+        QString startdir = gCoreContext->GetSetting("MusicLocation");
         startdir = QDir::cleanPath(startdir);
         if (!startdir.endsWith("/"))
             startdir += "/";
@@ -611,10 +611,10 @@ static bool doUpgradeMusicDatabaseSchema(QString &dbver)
         const QString updates[] = {"", ""};
 
         // update the VisualMode setting to the new format
-        QString setting = gContext->GetSetting("VisualMode");
+        QString setting = gCoreContext->GetSetting("VisualMode");
         setting = setting.simplified();
         setting = setting.replace(' ', ";");
-        gContext->SaveSetting("VisualMode", setting);
+        gCoreContext->SaveSetting("VisualMode", setting);
 
         if (!performActualUpdate(updates, "1011", dbver))
             return false;

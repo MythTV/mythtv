@@ -116,7 +116,7 @@ ZMConsole::ZMConsole(MythScreenStack *parent)
 
     m_monitorList = NULL;
 
-    m_timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    m_timeFormat = gCoreContext->GetSetting("TimeFormat", "h:mm AP");
 
     m_timeTimer = new QTimer(this);
     connect(m_timeTimer, SIGNAL(timeout()), this,

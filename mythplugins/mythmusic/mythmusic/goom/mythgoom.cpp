@@ -40,8 +40,8 @@ Goom::Goom(long int winid)
 
     goom_init(800, 600, 0);
 
-    scalew = gContext->GetNumSetting("VisualScaleWidth", 2);
-    scaleh = gContext->GetNumSetting("VisualScaleHeight", 2);
+    scalew = gCoreContext->GetNumSetting("VisualScaleWidth", 2);
+    scaleh = gCoreContext->GetNumSetting("VisualScaleHeight", 2);
 
     if (scaleh > 2)
         scaleh = 2;

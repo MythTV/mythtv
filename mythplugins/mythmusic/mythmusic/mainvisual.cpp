@@ -214,7 +214,7 @@ void MainVisual::add(uchar *b, unsigned long b_len, unsigned long w, int c, int 
 void MainVisual::timeout()
 {
     bool process = true;
-    if (parent() != gContext->GetMainWindow()->currentWidget())
+    if (parent() != GetMythMainWindow()->currentWidget())
     {
         process = false;
         return;

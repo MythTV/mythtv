@@ -124,13 +124,13 @@ void ZMLivePlayer::initMonitorLayout()
         return;
     }
 
-    setMonitorLayout(gContext->GetNumSetting("ZoneMinderLiveLayout", 1), true);
+    setMonitorLayout(gCoreContext->GetNumSetting("ZoneMinderLiveLayout", 1), true);
     m_frameTimer->start(FRAME_UPDATE_TIME);
 }
 
 ZMLivePlayer::~ZMLivePlayer()
 {
-    gContext->SaveSetting("ZoneMinderLiveLayout", m_monitorLayout);
+    gCoreContext->SaveSetting("ZoneMinderLiveLayout", m_monitorLayout);
 
     GetMythUI()->DoRestoreScreensaver();
 
@@ -147,12 +147,12 @@ ZMLivePlayer::~ZMLivePlayer()
             s += QString("%1").arg(p->getMonitor()->id);
         }
 
-        gContext->SaveSetting("ZoneMinderLiveCameras", s);
+        gCoreContext->SaveSetting("ZoneMinderLiveCameras", s);
 
         delete m_players;
     }
     else
-        gContext->SaveSetting("ZoneMinderLiveCameras", "");
+        gCoreContext->SaveSetting("ZoneMinderLiveCameras", "");
 
     if (m_monitors)
         delete m_monitors;
@@ -301,7 +301,7 @@ void ZMLivePlayer::stopPlayers()
 
 void ZMLivePlayer::setMonitorLayout(int layout, bool restore)
 {
-    QStringList monList = gContext->GetSetting("ZoneMinderLiveCameras", "").split(",");
+    QStringList monList = gCoreContext->GetSetting("ZoneMinderLiveCameras", "").split(",");
     m_monitorLayout = layout;
 
     if (m_players)

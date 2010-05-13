@@ -1,6 +1,7 @@
 #include <QKeyEvent>
 
 #include "mythcontext.h"
+#include "mythmainwindow.h"
 #include "mythlistbox-qt3.h"
 
 Q3MythListBox::Q3MythListBox(QWidget* parent): Q3ListBox(parent)
@@ -70,7 +71,7 @@ void Q3MythListBox::keyPressEvent(QKeyEvent* e)
 {
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

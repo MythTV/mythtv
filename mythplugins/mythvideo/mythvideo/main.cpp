@@ -55,7 +55,7 @@ namespace
         }
     
         VideoDialog::BrowseType browse = static_cast<VideoDialog::BrowseType>(
-                             gContext->GetNumSetting("mythvideo.db_group_type", 
+                             gCoreContext->GetNumSetting("mythvideo.db_group_type", 
                                                      VideoDialog::BRS_FOLDER));
 
         if (!video_list)
@@ -90,7 +90,7 @@ namespace
     {
         // MTD could check this and log an error,
         // but informing the user here/now is probably better
-        QString ripDir = gContext->GetSetting("DVDRipLocation");
+        QString ripDir = gCoreContext->GetSetting("DVDRipLocation");
         if (ripDir.length() && !QDir(ripDir).exists())
             ShowOkPopup(QObject::tr("No directory %1 - DVD importing will fail")
                         .arg(ripDir));
@@ -118,7 +118,7 @@ namespace
         //
         //  Get the command string to play a VCD
         //
-        QString command_string = gContext->GetSetting("VCDPlayerCommand");
+        QString command_string = gCoreContext->GetSetting("VCDPlayerCommand");
 
         GetMythUI()->AddCurrentLocation("playvcd");
 
@@ -152,13 +152,13 @@ namespace
                 command_string = command_string.replace(QRegExp("%d"),
                         MediaMonitor::defaultVCDdevice());
             }
-            gContext->sendPlaybackStart();
+            sendPlaybackStart();
             myth_system(command_string);
-            gContext->sendPlaybackEnd();
-            gContext->GetMainWindow()->raise();
-            gContext->GetMainWindow()->activateWindow();
-            if (gContext->GetMainWindow()->currentWidget())
-                gContext->GetMainWindow()->currentWidget()->setFocus();
+            sendPlaybackEnd();
+            GetMythMainWindow()->raise();
+            GetMythMainWindow()->activateWindow();
+            if (GetMythMainWindow()->currentWidget())
+                GetMythMainWindow()->currentWidget()->setFocus();
         }
         GetMythUI()->RemoveCurrentLocation();
     }
@@ -170,7 +170,7 @@ namespace
         //
 
         QString command_string =
-                gContext->GetSetting("mythdvd.DVDPlayerCommand");
+                gCoreContext->GetSetting("mythdvd.DVDPlayerCommand");
         //    , "Internal");
         QString dvd_device = gDVDdevice;
 
@@ -196,7 +196,7 @@ namespace
             filename += dvd_device;
 
             command_string = "Internal";
-            gContext->GetMainWindow()->HandleMedia(command_string, filename);
+            GetMythMainWindow()->HandleMedia(command_string, filename);
             GetMythUI()->RemoveCurrentLocation();
 
             return;
@@ -211,15 +211,15 @@ namespace
                 command_string =
                         command_string.replace(QRegExp("%d"), dvd_device);
             }
-            gContext->sendPlaybackStart();
+            sendPlaybackStart();
             myth_system(command_string);
-            gContext->sendPlaybackEnd();
-            if (gContext->GetMainWindow())
+            sendPlaybackEnd();
+            if (GetMythMainWindow())
             {
-                gContext->GetMainWindow()->raise();
-                gContext->GetMainWindow()->activateWindow();
-                if (gContext->GetMainWindow()->currentWidget())
-                    gContext->GetMainWindow()->currentWidget()->setFocus();
+                GetMythMainWindow()->raise();
+                GetMythMainWindow()->activateWindow();
+                if (GetMythMainWindow()->currentWidget())
+                    GetMythMainWindow()->currentWidget()->setFocus();
             }
         }
         GetMythUI()->RemoveCurrentLocation();
@@ -268,7 +268,7 @@ namespace
             return;
         }
 
-        switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
+        switch (gCoreContext->GetNumSetting("DVDOnInsertDVD", 1))
         {
             case 0 : // Do nothing
                 break;
@@ -292,7 +292,7 @@ namespace
         if (!vcd || !vcd->isUsable())
             return;
 
-        switch (gContext->GetNumSetting("DVDOnInsertDVD", 1))
+        switch (gCoreContext->GetNumSetting("DVDOnInsertDVD", 1))
         {
             case 0 : // Do nothing
                 break;
@@ -437,7 +437,7 @@ namespace
             runScreen(VideoDialog::DLG_GALLERY);
         else if (sel == "settings_general")
         {
-            RunSettingsCompletion::Create(gContext->
+            RunSettingsCompletion::Create(gCoreContext->
                     GetNumSetting("VideoAggressivePC", 0));
         }
         else if (sel == "settings_player")
@@ -524,9 +524,9 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     bool upgraded = UpgradeVideoDatabaseSchema();
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     if (!upgraded)
     {

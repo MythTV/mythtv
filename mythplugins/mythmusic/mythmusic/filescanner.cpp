@@ -240,7 +240,7 @@ void FileScanner::AddFileToDB(const QString &filename)
     directory.remove(0, m_startdir.length());
     directory = directory.section( '/', 0, -2);
 
-    QString nameFilter = gContext->GetSetting("AlbumArtFilter",
+    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
     // If this file is an image, insert the details into the music_albumart table
@@ -436,7 +436,7 @@ void FileScanner::RemoveFileFromDB (const QString &filename)
 
     QString extension = sqlfilename.section( '.', -1 ) ;
 
-    QString nameFilter = gContext->GetSetting("AlbumArtFilter",
+    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
     if (nameFilter.indexOf(extension) > -1)

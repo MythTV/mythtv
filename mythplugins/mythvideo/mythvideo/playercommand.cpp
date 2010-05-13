@@ -6,6 +6,7 @@
 #include <mythsystem.h>
 #include <remoteutil.h>
 #include <lcddevice.h>
+#include <util.h>
 
 #include "dbaccess.h"
 #include "metadata.h"
@@ -37,7 +38,7 @@ namespace
         if (tmp.contains("%d"))
         {
             QString default_handler =
-                    gContext->GetSetting("VideoDefaultPlayer");
+                    gCoreContext->GetSetting("VideoDefaultPlayer");
             if (tmp.contains("%s") && default_handler.contains("%s"))
                 default_handler = default_handler.replace(QRegExp("%s"), "");
             tmp.replace(QRegExp("%d"), default_handler);
@@ -99,7 +100,7 @@ class VideoPlayHandleMedia : public VideoPlayProc
 
     bool Play() const
     {
-        return gContext->GetMainWindow()->HandleMedia(m_handler, m_mrl,
+        return GetMythMainWindow()->HandleMedia(m_handler, m_mrl,
                 m_plot, m_title, m_subtitle, m_director, m_season,
                 m_episode, m_length, m_year);
     }
@@ -148,9 +149,9 @@ class VideoPlayMythSystem : public VideoPlayProc
 
     bool Play() const
     {
-        gContext->sendPlaybackStart();
+        sendPlaybackStart();
         myth_system(m_play_command);
-        gContext->sendPlaybackEnd();
+        sendPlaybackEnd();
 
         return true;
     }
@@ -199,7 +200,7 @@ class VideoPlayerCommandPrivate
         if (item)
         {
             QString play_command = 
-                   gContext->GetSetting("mythvideo.VideoAlternatePlayer");
+                   gCoreContext->GetSetting("mythvideo.VideoAlternatePlayer");
             QString filename;
 
             if (item->IsHostSet())
@@ -261,7 +262,7 @@ class VideoPlayerCommandPrivate
         if (bd_dir_test.exists())
             extension = "BDMV";
 
-        QString play_command = gContext->GetSetting("VideoDefaultPlayer");
+        QString play_command = gCoreContext->GetSetting("VideoDefaultPlayer");
 
         const FileAssociations::association_list fa_list =
                 FileAssociations::getFileAssociation().getList();
@@ -402,10 +403,10 @@ void VideoPlayerCommand::Play() const
         lcd->setFunctionLEDs(FUNC_MOVIE, true);
     }
     m_d->Play();
-    gContext->GetMainWindow()->raise();
-    gContext->GetMainWindow()->activateWindow();
-    if (gContext->GetMainWindow()->currentWidget())
-        gContext->GetMainWindow()->currentWidget()->setFocus();
+    GetMythMainWindow()->raise();
+    GetMythMainWindow()->activateWindow();
+    if (GetMythMainWindow()->currentWidget())
+        GetMythMainWindow()->currentWidget()->setFocus();
     if (lcd)
         lcd->setFunctionLEDs(FUNC_MOVIE, false);
 }

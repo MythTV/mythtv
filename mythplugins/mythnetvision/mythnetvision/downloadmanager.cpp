@@ -65,7 +65,7 @@ void DownloadManager::run()
 
             downloadargs.replaceInStrings("%FILE%", filename);
             downloadargs.replaceInStrings("%HOMEDIR%", QDir::homePath());
-            QStringList videoDirs = gContext->GetSetting("VideoStartupDir").split(":");
+            QStringList videoDirs = gCoreContext->GetSetting("VideoStartupDir").split(":");
             if (videoDirs.size())
                 downloadargs.replaceInStrings("%VIDEODIR%",
                              videoDirs.takeFirst());

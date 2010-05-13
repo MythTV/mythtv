@@ -113,7 +113,6 @@ int main(int argc, char **argv)
     //  Get the Myth context and db hooks
     //
 
-    gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
@@ -127,15 +126,15 @@ int main(int argc, char **argv)
         return MTD_EXIT_DB_ERROR;
     }
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     UpgradeVideoDatabaseSchema();
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     //
     //  Figure out port to listen on
     //
 
-    int assigned_port = gContext->GetNumSetting("MTDPort", 2442);
+    int assigned_port = gCoreContext->GetNumSetting("MTDPort", 2442);
     if (special_port > 0)
     {
         assigned_port = special_port;
@@ -146,7 +145,7 @@ int main(int argc, char **argv)
     //
 
     bool log_stdout = false;
-    if (gContext->GetNumSetting("MTDLogFlag", 0))
+    if (gCoreContext->GetNumSetting("MTDLogFlag", 0))
     {
         log_stdout = true;
     }

@@ -46,25 +46,25 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     if (!UpgradeNetvisionDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade netvision database to new schema, exiting.");
         return -1;
     }
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
 
     setupKeys();
 
-    if (gContext->GetNumSetting("mythnetvision.backgroundFetch", 0))
+    if (gCoreContext->GetNumSetting("mythnetvision.backgroundFetch", 0))
     {
         grabMan = new GrabberManager();
         grabMan->startTimer();
         grabMan->doUpdate();
     }
 
-    if (gContext->GetNumSetting("mythnetvision.rssBackgroundFetch", 0))
+    if (gCoreContext->GetNumSetting("mythnetvision.rssBackgroundFetch", 0))
     {
 //        rssMan = new RSSManager();
 //        rssMan->startTimer();
@@ -111,7 +111,7 @@ int RunNetTree(void)
 {
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
-    DialogType type = static_cast<DialogType>(gContext->GetNumSetting(
+    DialogType type = static_cast<DialogType>(gCoreContext->GetNumSetting(
                        "mythnetvision.ViewMode", DLG_TREE));
 
     NetTree *nettree = new NetTree(type, mainStack, "mythnettree");

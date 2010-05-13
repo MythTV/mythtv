@@ -82,7 +82,7 @@ void SearchDialog::runQuery(QString searchText)
     bool substringSearch = true;
     bool isNumber = false;
     searchText.toULongLong(&isNumber);
-    QString searchLimit = gContext->GetSetting("MaxSearchResults");
+    QString searchLimit = gCoreContext->GetSetting("MaxSearchResults");
     searchText.replace("'", "''");
 
     if (!isNumber)

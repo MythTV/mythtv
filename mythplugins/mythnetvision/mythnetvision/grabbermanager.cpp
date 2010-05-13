@@ -117,7 +117,7 @@ void GrabberScript::parseDBTree(const QString &feedtitle, const QString &path,
 
 GrabberManager::GrabberManager() :     m_lock(QMutex::Recursive)
 {
-    m_updateFreq = (gContext->GetNumSetting(
+    m_updateFreq = (gCoreContext->GetNumSetting(
                        "mythNetvision.updateFreq", 24) * 3600 * 1000);
     m_timer = new QTimer();
     m_runningCount = 0;
@@ -184,7 +184,7 @@ void GrabberDownloadThread::refreshAll()
 void GrabberDownloadThread::run()
 {
     m_scripts = findAllDBTreeGrabbers();
-    uint updateFreq = gContext->GetNumSetting(
+    uint updateFreq = gCoreContext->GetNumSetting(
                "mythNetvision.updateFreq", 24);
 
     while (m_scripts.count())

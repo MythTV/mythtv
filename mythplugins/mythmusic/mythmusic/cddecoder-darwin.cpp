@@ -192,7 +192,7 @@ void CdDecoder::lookupCDDB(const QString &hexID, uint totalTracks)
     if (helloID.isEmpty())
         helloID = "anon";
     helloID += QString("+%1+MythTV+%2+")
-               .arg(gContext->GetHostName()).arg(MYTH_BINARY_VERSION);
+               .arg(gCoreContext->GetHostName()).arg(MYTH_BINARY_VERSION);
 
     queryID += QString("%1+%2+").arg(hexID).arg(totalTracks);
     for (trk = 0; trk < totalTracks; ++trk)

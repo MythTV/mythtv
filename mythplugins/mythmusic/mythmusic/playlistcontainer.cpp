@@ -54,10 +54,10 @@ PlaylistContainer::PlaylistContainer(AllMusic *all_music, const QString &host_na
     playlists_loader(new PlaylistLoadingThread(this, all_music)),
     done_loading(false),        my_host(host_name),
 
-    RatingWeight(   gContext->GetNumSetting("IntelliRatingWeight",    2)),
-    PlayCountWeight(gContext->GetNumSetting("IntelliPlayCountWeight", 2)),
-    LastPlayWeight( gContext->GetNumSetting("IntelliLastPlayWeight",  2)),
-    RandomWeight(   gContext->GetNumSetting("IntelliRandomWeight",    2))
+    RatingWeight(   gCoreContext->GetNumSetting("IntelliRatingWeight",    2)),
+    PlayCountWeight(gCoreContext->GetNumSetting("IntelliPlayCountWeight", 2)),
+    LastPlayWeight( gCoreContext->GetNumSetting("IntelliLastPlayWeight",  2)),
+    RandomWeight(   gCoreContext->GetNumSetting("IntelliRandomWeight",    2))
 {
     playlists_loader->start();
 }
@@ -141,7 +141,7 @@ void PlaylistContainer::load()
 
     pending_writeback_index = 0;
 
-    int x = gContext->GetNumSetting("LastMusicPlaylistPush");
+    int x = gCoreContext->GetNumSetting("LastMusicPlaylistPush");
     setPending(x);
     done_loading = true;
 }

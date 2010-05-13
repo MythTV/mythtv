@@ -201,13 +201,13 @@ void runShowLog(void)
 
 void runTestDVD(void)
 {
-    if (!gContext->GetSetting("MythArchiveLastRunType").startsWith("DVD"))
+    if (!gCoreContext->GetSetting("MythArchiveLastRunType").startsWith("DVD"))
     {
         showWarningDialog(QObject::tr("Last run did not create a playable DVD."));
         return;
     }
 
-    if (!gContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
+    if (!gCoreContext->GetSetting("MythArchiveLastRunStatus").startsWith("Success"))
     {
         showWarningDialog(QObject::tr("Last run failed to create a DVD."));
         return;
@@ -219,14 +219,14 @@ void runTestDVD(void)
         return;
 
     QString filename = tempDir + "work/dvd/";
-    QString command = gContext->GetSetting("MythArchiveDVDPlayerCmd", "");
+    QString command = gCoreContext->GetSetting("MythArchiveDVDPlayerCmd", "");
 
     if ((command.indexOf("internal", 0, Qt::CaseInsensitive) > -1) ||
          (command.length() < 1))
     {
         filename = QString("dvd:/") + filename;
         command = "Internal";
-        gContext->GetMainWindow()->HandleMedia(command, filename);
+        GetMythMainWindow()->HandleMedia(command, filename);
         return;
     }
     else
@@ -317,14 +317,14 @@ int mythplugin_init(const char *libversion)
         return -1;
     }
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     if (!UpgradeArchiveDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");
         return -1;
     }
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
 
     ArchiveSettings settings;
     settings.Load();

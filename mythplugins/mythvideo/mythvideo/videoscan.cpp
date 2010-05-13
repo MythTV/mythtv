@@ -82,7 +82,7 @@ class VideoScannerThread : public QThread
         MetadataListManager::loadAllFromDatabase(ml);
         m_dbmetadata->setList(ml);
 
-        m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFiletypes", 0);
+        m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFiletypes", 0);
     }
 
     ~VideoScannerThread()
@@ -177,7 +177,7 @@ class VideoScannerThread : public QThread
     //     buttonText += QObject::tr("Yes to all");
     //
     //     DialogCode result = MythPopupBox::ShowButtonPopup(
-    //         gContext->GetMainWindow(),
+    //         GetMythMainWindow(),
     //         QObject::tr("File Missing"),
     //         QObject::tr("%1 appears to be missing.\n"
     //                     "Remove it from the database?").arg(filename),

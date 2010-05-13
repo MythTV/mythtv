@@ -620,7 +620,7 @@ void SmartPLCriteriaRow::editDate(MythComboBox *combo)
 {
     bool res = false;
 
-    SmartPLDateDialog *dateDialog = new SmartPLDateDialog(gContext->GetMainWindow(), "");
+    SmartPLDateDialog *dateDialog = new SmartPLDateDialog(GetMythMainWindow(), "");
     dateDialog->setDate(combo->currentText());
     if (kDialogCodeAccepted == dateDialog->ExecPopup())
     {
@@ -637,7 +637,7 @@ bool SmartPLCriteriaRow::showList(QString caption, QString &value)
 {
     bool res = false;
 
-    MythSearchDialog *searchDialog = new MythSearchDialog(gContext->GetMainWindow(), "");
+    MythSearchDialog *searchDialog = new MythSearchDialog(GetMythMainWindow(), "");
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
     searchDialog->setItems(searchList);
@@ -1094,12 +1094,12 @@ SmartPlaylistEditor::SmartPlaylistEditor(MythMainWindow *parent, const char *nam
     category_popup = NULL;
     bPlaylistIsValid = false;
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 SmartPlaylistEditor::~SmartPlaylistEditor(void)
 {
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
     while (!criteriaRows.empty())
     {
         delete criteriaRows.back();
@@ -1319,7 +1319,7 @@ void SmartPlaylistEditor::showCategoryPopup()
     if (category_popup)
         return;
 
-    category_popup = new MythPopupBox(gContext->GetMainWindow(), "category_popup");
+    category_popup = new MythPopupBox(GetMythMainWindow(), "category_popup");
 
     category_popup->addLabel(tr("Smart Playlist Categories"));
 
@@ -1400,7 +1400,7 @@ void SmartPlaylistEditor::deleteCategory(void)
     if (category.isEmpty())
         return;
 
-    if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+    if (!MythPopupBox::showOkCancelPopup(GetMythMainWindow(),
             "Delete Category",
             tr("Are you sure you want to delete this Category?")
             + "\n\n\"" + category + "\"\n\n"
@@ -1496,7 +1496,7 @@ void SmartPlaylistEditor::showResultsClicked(void)
     QString sql = getSQL("song_id, music_artists.artist_name, album_name, "
                          "name, genre, music_songs.year, track");
 
-    SmartPLResultViewer *resultViewer = new SmartPLResultViewer(gContext->GetMainWindow(), "resultviewer");
+    SmartPLResultViewer *resultViewer = new SmartPLResultViewer(GetMythMainWindow(), "resultviewer");
     resultViewer->setSQL(sql);
     resultViewer->exec();
     delete resultViewer;
@@ -1506,7 +1506,7 @@ void SmartPlaylistEditor::showResultsClicked(void)
 
 void SmartPlaylistEditor::orderByClicked(void)
 {
-    SmartPLOrderByDialog *orderByDialog = new SmartPLOrderByDialog(gContext->GetMainWindow(), "SmartPLOrderByDialog");
+    SmartPLOrderByDialog *orderByDialog = new SmartPLOrderByDialog(GetMythMainWindow(), "SmartPLOrderByDialog");
 
     orderByDialog->setFieldList(orderByCombo->currentText());
 
@@ -1749,7 +1749,7 @@ void SmartPLResultViewer::setSQL(QString sql)
 SmartPlaylistDialog::SmartPlaylistDialog(MythMainWindow *parent, const char *name)
                  :MythPopupBox(parent, name)
 {
-    bool keyboard_accelerators = gContext->GetNumSetting("KeyboardAccelerators", 1);
+    bool keyboard_accelerators = gCoreContext->GetNumSetting("KeyboardAccelerators", 1);
 
     // we have to create a parentless layout because otherwise MythPopupbox
     // complains about already having a layout
@@ -1925,7 +1925,7 @@ void SmartPlaylistDialog::keyPressEvent(QKeyEvent *e)
 
 void SmartPlaylistDialog::newPressed(void)
 {
-    SmartPlaylistEditor* editor = new SmartPlaylistEditor(gContext->GetMainWindow(), "SmartPlaylistEditor");
+    SmartPlaylistEditor* editor = new SmartPlaylistEditor(GetMythMainWindow(), "SmartPlaylistEditor");
     editor->newSmartPlaylist(categoryCombo->currentText());
 
     editor->exec();
@@ -1957,7 +1957,7 @@ void SmartPlaylistDialog::deletePressed(void)
     QString category = categoryCombo->currentText();
     QString name = listbox->selectedItem()->text();
 
-    if (!MythPopupBox::showOkCancelPopup(gContext->GetMainWindow(),
+    if (!MythPopupBox::showOkCancelPopup(GetMythMainWindow(),
             "Delete SmartPlaylist",
             tr("Are you sure you want to delete this SmartPlaylist?")
             + "\n\n\"" + name + "\"", false))
@@ -1984,7 +1984,7 @@ void SmartPlaylistDialog::editPressed(void)
     QString category = categoryCombo->currentText();
     QString name = listbox->currentText();
 
-    SmartPlaylistEditor* editor = new SmartPlaylistEditor(gContext->GetMainWindow(), "SmartPlaylistEditor");
+    SmartPlaylistEditor* editor = new SmartPlaylistEditor(GetMythMainWindow(), "SmartPlaylistEditor");
     editor->editSmartPlaylist(category, name);
 
     editor->exec();
@@ -2069,7 +2069,7 @@ void SmartPlaylistDialog::getSmartPlaylist(QString &category, QString &name)
 SmartPLOrderByDialog::SmartPLOrderByDialog(MythMainWindow *parent, const char *name)
                  :MythPopupBox(parent, name)
 {
-    bool keyboard_accelerators = gContext->GetNumSetting("KeyboardAccelerators", 1);
+    bool keyboard_accelerators = gCoreContext->GetNumSetting("KeyboardAccelerators", 1);
 
     // we have to create a parent less layout because otherwise MythPopupbox
     // complains about already having a layout

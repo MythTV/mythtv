@@ -55,10 +55,10 @@ bool BrowserConfig::Create()
         return false;
     }
 
-    m_commandEdit->SetText(gContext->GetSetting("WebBrowserCommand",
+    m_commandEdit->SetText(gCoreContext->GetSetting("WebBrowserCommand",
                            "Internal"));
 
-    m_zoomEdit->SetText(gContext->GetSetting("WebBrowserZoomLevel", "1.4"));
+    m_zoomEdit->SetText(gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4"));
 
     connect(m_okButton, SIGNAL(Clicked()), this, SLOT(slotSave()));
     connect(m_cancelButton, SIGNAL(Clicked()), this, SLOT(Close()));
@@ -86,8 +86,8 @@ void BrowserConfig::slotSave(void)
         zoom = 5.0;
     if (zoom < 0.3)
         zoom = 0.3; 
-    gContext->SaveSetting("WebBrowserZoomLevel", QString("%1").arg(zoom));
-    gContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
+    gCoreContext->SaveSetting("WebBrowserZoomLevel", QString("%1").arg(zoom));
+    gCoreContext->SaveSetting("WebBrowserCommand", m_commandEdit->GetText());
 
     Close();
 }
@@ -354,8 +354,8 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
 
     m_savedBookmark = *site;
 
-    QString cmd = gContext->GetSetting("WebBrowserCommand", "Internal");
-    QString zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4");
+    QString cmd = gCoreContext->GetSetting("WebBrowserCommand", "Internal");
+    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4");
     QStringList urls;
 
     urls.append(site->url);
@@ -382,9 +382,9 @@ void BookmarkManager::slotBookmarkClicked(MythUIButtonListItem *item)
         cmd.replace("&","\\&");
         cmd.replace(";","\\;");
 
-        gContext->GetMainWindow()->AllowInput(false);
+        GetMythMainWindow()->AllowInput(false);
         myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        gContext->GetMainWindow()->AllowInput(true);
+        GetMythMainWindow()->AllowInput(true);
 
         // we need to reload the bookmarks incase the user added/deleted
         // any while in MythBrowser
@@ -569,8 +569,8 @@ void BookmarkManager::slotShowMarked(void)
        m_savedBookmark = *site;
     }
 
-    QString cmd = gContext->GetSetting("WebBrowserCommand", "Internal");
-    QString zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4");
+    QString cmd = gCoreContext->GetSetting("WebBrowserCommand", "Internal");
+    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4");
     QStringList urls;
 
     for (int x = 0; x < m_siteList.size(); x++)
@@ -602,9 +602,9 @@ void BookmarkManager::slotShowMarked(void)
         cmd.replace("&","\\&");
         cmd.replace(";","\\;");
 
-        gContext->GetMainWindow()->AllowInput(false);
+        GetMythMainWindow()->AllowInput(false);
         myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        gContext->GetMainWindow()->AllowInput(true);
+        GetMythMainWindow()->AllowInput(true);
 
         // we need to reload the bookmarks incase the user added/deleted
         // any while in MythBrowser

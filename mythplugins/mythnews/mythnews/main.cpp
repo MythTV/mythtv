@@ -42,14 +42,14 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     if (!UpgradeNewsDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");
         return -1;
     }
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
 
     setupKeys();
 

@@ -46,13 +46,13 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     InitializeDatabase();
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     setupKeys();
 
-    if (gContext->GetNumSetting("weatherbackgroundfetch", 0))
+    if (gCoreContext->GetNumSetting("weatherbackgroundfetch", 0))
     {
         srcMan = new SourceManager();
         srcMan->startTimers();
@@ -123,7 +123,7 @@ void WeatherCallback(void *data, QString &selection)
             mainStack->AddScreen(srcsetup);
         else
             delete srcsetup;
-//             MythPopupBox::showOkPopup(gContext->GetMainWindow(), "no sources",
+//             MythPopupBox::showOkPopup(GetMythMainWindow(), "no sources",
 //                     QObject::tr("No Sources defined, Sources are defined by"
 //                                 " adding screens in Screen Setup."));
     }
@@ -136,7 +136,7 @@ int mythplugin_config()
 
     MythThemedMenu *menu = new MythThemedMenu(
         themedir, menuname,
-        gContext->GetMainWindow()->GetMainStack(), "weather menu");
+        GetMythMainWindow()->GetMainStack(), "weather menu");
 
     menu->setCallback(WeatherCallback, 0);
     menu->setKillable();

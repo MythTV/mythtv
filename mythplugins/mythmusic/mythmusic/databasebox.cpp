@@ -48,9 +48,9 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
 
     //  Do we check the CD?
     cd_checking_flag = false;
-    cd_checking_flag = gContext->GetNumSetting("AutoLookupCD");
+    cd_checking_flag = gCoreContext->GetNumSetting("AutoLookupCD");
 
-    QString treelev = gContext->GetSetting("TreeLevels", "artist album title");
+    QString treelev = gCoreContext->GetSetting("TreeLevels", "artist album title");
     QStringList treelevels = treelev.toLower().split(" ", QString::SkipEmptyParts);
 
     active_popup = NULL;
@@ -65,7 +65,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
     if (!tree)
     {
         DialogBox *dlg = new DialogBox(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             QObject::tr(
                 "The theme you are using does not contain the "
                 "%1 element. Please contact the theme creator "
@@ -93,7 +93,7 @@ DatabaseBox::DatabaseBox(MythMainWindow *parent,
     if (m_lines.size() < 6)
     {
         DialogBox *dlg = new DialogBox(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             tr("The theme you are using does not contain enough info "
                "lines in the music element. Please contact the theme "
                "creator and ask if they could please update it."));
@@ -170,8 +170,8 @@ DatabaseBox::~DatabaseBox()
 
     delete rootNode;
 
-    gContext->SaveSetting("MusicBookmark", "");
-    gContext->SaveSetting("MusicBookmarkPosition", 0);
+    gCoreContext->SaveSetting("MusicBookmark", "");
+    gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
 }
 
 void DatabaseBox::showWaiting()
@@ -383,7 +383,7 @@ void DatabaseBox::ErrorPopup(const QString &msg)
     if (error_popup)
         return;
 
-    error_popup = new MythPopupBox(gContext->GetMainWindow(),
+    error_popup = new MythPopupBox(GetMythMainWindow(),
                                    "playlist_popup");
 
     error_popup->addLabel(msg);
@@ -416,7 +416,7 @@ void DatabaseBox::BlankCDRW()
     closeActivePopup();
 
     // Check & get global settings
-    if (!gContext->GetNumSetting("CDWriterEnabled"))
+    if (!gCoreContext->GetNumSetting("CDWriterEnabled"))
     {
         VERBOSE(VB_GENERAL, "Writer is not enabled. We cannot be here!");
         return;
@@ -434,7 +434,7 @@ void DatabaseBox::BlankCDRW()
     record_progress = new MythProgressDialog(tr("CD-RW Blanking Progress"), 10);
 
     // Run CD Record
-    QString blanktype=gContext->GetSetting("CDBlankType");
+    QString blanktype=gCoreContext->GetSetting("CDBlankType");
 
     record_progress->setProgress(1);
 
@@ -814,7 +814,7 @@ void DatabaseBox::doPlaylistPopup(TreeCheckItem *item_ptr)
         return;
 
     // Popup for all other playlists (up top)
-    playlist_popup = new MythPopupBox(gContext->GetMainWindow(),
+    playlist_popup = new MythPopupBox(GetMythMainWindow(),
                                       "playlist_popup");
 
     QAbstractButton *mac_b = playlist_popup->addButton(tr("Move to Active Play Queue"),
@@ -851,7 +851,7 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
         return;
 
     //  Popup for active playlist
-    active_popup = new MythPopupBox(gContext->GetMainWindow(),
+    active_popup = new MythPopupBox(GetMythMainWindow(),
                                     "active_popup");
     active_pl_edit = new MythRemoteLineEdit(active_popup);
     active_popup->addWidget(active_pl_edit);
@@ -870,7 +870,7 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
 
     bool cdwriter = false;
 
-    if (gContext->GetNumSetting("CDWriterEnabled"))
+    if (gCoreContext->GetNumSetting("CDWriterEnabled"))
     {
         QString scsidev = MediaMonitor::defaultCDWriter();
         if (!scsidev.isEmpty())
@@ -902,7 +902,7 @@ void DatabaseBox::doActivePopup(PlaylistTitle *item_ptr)
         double size_in_sec = 0.0;
         active_playlist->computeSize(size_in_MB, size_in_sec);
 
-        int disksize = gContext->GetNumSetting("CDDiskSize", 2);
+        int disksize = gCoreContext->GetNumSetting("CDDiskSize", 2);
 
         double max_size_in_MB;
         double max_size_in_min;

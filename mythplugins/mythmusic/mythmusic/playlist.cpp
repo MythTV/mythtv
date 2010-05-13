@@ -1218,7 +1218,7 @@ void Playlist::computeSize(double &size_in_MB, double &size_in_sec)
 int Playlist::CreateCDMP3(void)
 {
     // Check & get global settings
-    if (!gContext->GetNumSetting("CDWriterEnabled"))
+    if (!gCoreContext->GetNumSetting("CDWriterEnabled"))
     {
         VERBOSE(VB_GENERAL, "CD Writer is not enabled.");
         return 1;
@@ -1231,9 +1231,9 @@ int Playlist::CreateCDMP3(void)
         return 1;
     }
 
-    int disksize = gContext->GetNumSetting("CDDiskSize", 2);
-    QString writespeed = gContext->GetSetting("CDWriteSpeed", "2");
-    bool MP3_dir_flag = gContext->GetNumSetting("CDCreateDir", 1);
+    int disksize = gCoreContext->GetNumSetting("CDDiskSize", 2);
+    QString writespeed = gCoreContext->GetSetting("CDWriteSpeed", "2");
+    bool MP3_dir_flag = gCoreContext->GetNumSetting("CDCreateDir", 1);
 
     double size_in_MB = 0.0;
 

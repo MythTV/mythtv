@@ -11,7 +11,7 @@
  */
 MetaIO::MetaIO()
 {
-    mFilenameFormat = gContext->GetSetting("NonID3FileNameFormat").toUpper();
+    mFilenameFormat = gCoreContext->GetSetting("NonID3FileNameFormat").toUpper();
 }
 
 /*!

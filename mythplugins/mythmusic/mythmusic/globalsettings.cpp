@@ -626,7 +626,7 @@ MusicPlayerSettings::MusicPlayerSettings(void)
 void MusicPlayerSettings::showVisEditor(void)
 {
     VisualizationsEditor *dialog = new VisualizationsEditor(visModesEdit->getValue(),
-            gContext->GetMainWindow(), "viseditor");
+            GetMythMainWindow(), "viseditor");
     if (kDialogCodeAccepted == dialog->exec())
         visModesEdit->setValue(dialog->getSelectedModes());
 

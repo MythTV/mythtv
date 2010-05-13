@@ -55,7 +55,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
 
     m_playSpeed = 1.0;
 
-    QString playmode = gContext->GetSetting("PlayMode", "none");
+    QString playmode = gCoreContext->GetSetting("PlayMode", "none");
     if (playmode.toLower() == "random")
         setShuffleMode(SHUFFLE_RANDOM);
     else if (playmode.toLower() == "intelligent")
@@ -67,7 +67,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     else
         setShuffleMode(SHUFFLE_OFF);
 
-    QString repeatmode = gContext->GetSetting("RepeatMode", "all");
+    QString repeatmode = gCoreContext->GetSetting("RepeatMode", "all");
     if (repeatmode.toLower() == "track")
         setRepeatMode(REPEAT_TRACK);
     else if (repeatmode.toLower() == "all")
@@ -75,7 +75,7 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     else
         setRepeatMode(REPEAT_OFF);
 
-    QString resumestring = gContext->GetSetting("ResumeMode", "off");
+    QString resumestring = gCoreContext->GetSetting("ResumeMode", "off");
     if (resumestring.toLower() == "off")
         m_resumeMode = RESUME_OFF;
     else if (resumestring.toLower() == "track")
@@ -83,12 +83,12 @@ MusicPlayer::MusicPlayer(QObject *parent, const QString &dev)
     else
         m_resumeMode = RESUME_EXACT;
 
-    m_lastplayDelay = gContext->GetNumSetting("MusicLastPlayDelay",
+    m_lastplayDelay = gCoreContext->GetNumSetting("MusicLastPlayDelay",
                                               LASTPLAY_DELAY);
 
-    m_autoShowPlayer = (gContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
+    m_autoShowPlayer = (gCoreContext->GetNumSetting("MusicAutoShowPlayer", 1) > 0);
 
-    gContext->addListener(this);
+    gCoreContext->addListener(this);
 }
 
 MusicPlayer::~MusicPlayer()
@@ -96,7 +96,7 @@ MusicPlayer::~MusicPlayer()
     if (!hasClient())
         savePosition();
 
-    gContext->removeListener(this);
+    gCoreContext->removeListener(this);
 
     stop(true);
 
@@ -110,24 +110,24 @@ MusicPlayer::~MusicPlayer()
     }
 
     if (m_shuffleMode == SHUFFLE_INTELLIGENT)
-        gContext->SaveSetting("PlayMode", "intelligent");
+        gCoreContext->SaveSetting("PlayMode", "intelligent");
     else if (m_shuffleMode == SHUFFLE_RANDOM)
-        gContext->SaveSetting("PlayMode", "random");
+        gCoreContext->SaveSetting("PlayMode", "random");
     else if (m_shuffleMode == SHUFFLE_ALBUM)
-        gContext->SaveSetting("PlayMode", "album");
+        gCoreContext->SaveSetting("PlayMode", "album");
     else if (m_shuffleMode == SHUFFLE_ARTIST)
-        gContext->SaveSetting("PlayMode", "artist");
+        gCoreContext->SaveSetting("PlayMode", "artist");
     else
-        gContext->SaveSetting("PlayMode", "none");
+        gCoreContext->SaveSetting("PlayMode", "none");
 
     if (m_repeatMode == REPEAT_TRACK)
-        gContext->SaveSetting("RepeatMode", "track");
+        gCoreContext->SaveSetting("RepeatMode", "track");
     else if (m_repeatMode == REPEAT_ALL)
-        gContext->SaveSetting("RepeatMode", "all");
+        gCoreContext->SaveSetting("RepeatMode", "all");
     else
-        gContext->SaveSetting("RepeatMode", "none");
+        gCoreContext->SaveSetting("RepeatMode", "none");
 
-    gContext->SaveSetting("MusicAutoShowPlayer",
+    gCoreContext->SaveSetting("MusicAutoShowPlayer",
                           (m_autoShowPlayer ? "1" : "0"));
 }
 
@@ -369,17 +369,17 @@ void MusicPlayer::openOutputDevice(void)
 {
     QString adevice, pdevice;
 
-    if (gContext->GetSetting("MusicAudioDevice") == "default")
-        adevice = gContext->GetSetting("AudioOutputDevice");
+    if (gCoreContext->GetSetting("MusicAudioDevice") == "default")
+        adevice = gCoreContext->GetSetting("AudioOutputDevice");
     else
-        adevice = gContext->GetSetting("MusicAudioDevice");
+        adevice = gCoreContext->GetSetting("MusicAudioDevice");
 
-    pdevice = gContext->GetSetting("PassThruOutputDevice");
+    pdevice = gCoreContext->GetSetting("PassThruOutputDevice");
 
     // TODO: Error checking that device is opened correctly!
     m_output = AudioOutput::OpenAudio(adevice, pdevice, 16, 2, 0, 44100,
                                       AUDIOOUTPUT_MUSIC, true, false,
-                                      gContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
+                                      gCoreContext->GetNumSetting("MusicDefaultUpmix", 0) + 1);
     m_output->setBufferSize(256 * 1024);
     m_output->SetBlocking(false);
 
@@ -504,7 +504,7 @@ void MusicPlayer::customEvent(QEvent *event)
             VERBOSE(VB_IMPORTANT, QString("Output Error - %1")
                     .arg(*aoe->errorMessage()));
             MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(),
+                GetMythMainWindow(),
                 "Output Error:",
                 QString("MythMusic has encountered"
                         " the following error:\n%1")
@@ -526,7 +526,7 @@ void MusicPlayer::customEvent(QEvent *event)
             VERBOSE(VB_IMPORTANT, QString("Decoder Error - %1")
                     .arg(*dxe->errorMessage()));
             MythPopupBox::showOkPopup(
-                gContext->GetMainWindow(), "Decoder Error",
+                GetMythMainWindow(), "Decoder Error",
                 QString("MythMusic has encountered the following error:\n%1")
                 .arg(*dxe->errorMessage()));
         }
@@ -538,7 +538,7 @@ void MusicPlayer::customEvent(QEvent *event)
                 m_wasPlaying = m_isPlaying;
                 QString hostname = me->Message().mid(15);
 
-                if (hostname == gContext->GetHostName())
+                if (hostname == gCoreContext->GetHostName())
                 {
                     if (m_isPlaying)
                         savePosition();
@@ -551,13 +551,13 @@ void MusicPlayer::customEvent(QEvent *event)
                 if (m_wasPlaying)
                 {
                     QString hostname = me->Message().mid(13);
-                    if (hostname == gContext->GetHostName())
+                    if (hostname == gCoreContext->GetHostName())
                     {
                         play();
-                        seek(gContext->GetNumSetting(
+                        seek(gCoreContext->GetNumSetting(
                                  "MusicBookmarkPosition", 0));
-                        gContext->SaveSetting("MusicBookmark", "");
-                        gContext->SaveSetting("MusicBookmarkPosition", 0);
+                        gCoreContext->SaveSetting("MusicBookmark", "");
+                        gCoreContext->SaveSetting("MusicBookmarkPosition", 0);
                     }
 
                     m_wasPlaying = false;
@@ -703,9 +703,9 @@ void MusicPlayer::savePosition(void)
 {
     if (m_resumeMode != RESUME_OFF)
     {
-        gContext->SaveSetting("MusicBookmark", getRouteToCurrent());
+        gCoreContext->SaveSetting("MusicBookmark", getRouteToCurrent());
         if (m_resumeMode == RESUME_EXACT)
-            gContext->SaveSetting("MusicBookmarkPosition", m_currentTime);
+            gCoreContext->SaveSetting("MusicBookmarkPosition", m_currentTime);
     }
 }
 

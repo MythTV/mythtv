@@ -113,14 +113,14 @@ int mythplugin_init(const char *libversion)
         return -1;
     }
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     if (!UpgradeGameDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");
         return -1;
     }
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     MythGamePlayerSettings settings;
 //    settings.Load();

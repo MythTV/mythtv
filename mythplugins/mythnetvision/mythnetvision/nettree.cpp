@@ -63,11 +63,11 @@ NetTree::NetTree(DialogType type, MythScreenStack *parent, const char *name)
     m_imageDownload = new ImageDownloadManager(this);
     m_gdt = new GrabberDownloadThread(this);
     m_popupStack = GetMythMainWindow()->GetStack("popup stack");
-    m_updateFreq = gContext->GetNumSetting(
+    m_updateFreq = gCoreContext->GetNumSetting(
                        "mythNetTree.updateFreq", 6);
-    m_rssAutoUpdate = gContext->GetNumSetting(
+    m_rssAutoUpdate = gCoreContext->GetNumSetting(
                        "mythnetvision.rssBackgroundFetch", 0);
-    m_treeAutoUpdate = gContext->GetNumSetting(
+    m_treeAutoUpdate = gCoreContext->GetNumSetting(
                        "mythnetvision.backgroundFetch", 0);
 }
 
@@ -345,7 +345,7 @@ void NetTree::UpdateItem(MythUIButtonListItem *item)
         item->SetText(video->GetTitle());
         item->SetText(video->GetTitle(), "title");
         item->SetText(video->GetAuthor(), "author");
-        item->SetText(video->GetDate().toString(gContext->
+        item->SetText(video->GetDate().toString(gCoreContext->
                     GetSetting("DateFormat", "yyyy-MM-dd hh:mm")), "date");
 
         QTime time(0,0,0,0);
@@ -675,7 +675,7 @@ void NetTree::switchView()
 
     if (nettree->Create())
     {
-        gContext->SaveSetting("mythnetvision.ViewMode", m_type);
+        gCoreContext->SaveSetting("mythnetvision.ViewMode", m_type);
         MythScreenStack *screenStack = GetScreenStack();
         screenStack->AddScreen(nettree);
         screenStack->PopScreen(this, false, false);
@@ -860,8 +860,8 @@ void NetTree::showWebVideo()
     if (url.isEmpty())
         return;
 
-    QString browser = gContext->GetSetting("WebBrowserCommand", "");
-    QString zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.0");
+    QString browser = gCoreContext->GetSetting("WebBrowserCommand", "");
+    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
 
     if (browser.isEmpty())
     {
@@ -886,7 +886,7 @@ void NetTree::showWebVideo()
 
         GetMythMainWindow()->AllowInput(false);
         myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        gContext->GetMainWindow()->AllowInput(true);
+        GetMythMainWindow()->AllowInput(true);
         return;
     }
 }
@@ -1105,7 +1105,7 @@ void NetTree::slotItemChanged()
         if (m_author)
             m_author->SetText(item->GetAuthor());
         if (m_date)
-            m_date->SetText(item->GetDate().toString(gContext->
+            m_date->SetText(item->GetDate().toString(gCoreContext->
                     GetSetting("DateFormat", "yyyy-MM-dd hh:mm")));
         if (m_time)
         {
@@ -1469,14 +1469,14 @@ void NetTree::updateTrees()
 void NetTree::toggleRSSUpdates()
 {
     m_rssAutoUpdate = !m_rssAutoUpdate;
-    gContext->SaveSetting("mythnetvision.rssBackgroundFetch",
+    gCoreContext->SaveSetting("mythnetvision.rssBackgroundFetch",
                          m_rssAutoUpdate);
 }
 
 void NetTree::toggleTreeUpdates()
 {
     m_treeAutoUpdate = !m_treeAutoUpdate;
-    gContext->SaveSetting("mythnetvision.backgroundFetch",
+    gCoreContext->SaveSetting("mythnetvision.backgroundFetch",
                          m_treeAutoUpdate);
 }
 

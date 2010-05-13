@@ -258,7 +258,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
             "path, author, version, email, types FROM weathersourcesettings "
             "WHERE hostname = :HOST AND source_name = :NAME;";
     db.prepare(query);
-    db.bindValue(":HOST", gContext->GetHostName());
+    db.bindValue(":HOST", gCoreContext->GetHostName());
     db.bindValue(":NAME", info.name);
 
     if (!db.exec())
@@ -327,7 +327,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         }
         db.prepare(query);
         db.bindValue(":NAME", info.name);
-        db.bindValue(":HOST", gContext->GetHostName());
+        db.bindValue(":HOST", gCoreContext->GetHostName());
         db.bindValue(":UPDATETO", QString::number(info.updateTimeout / 1000));
         db.bindValue(":RETTO", QString::number(info.scriptTimeout / 1000));
         db.bindValue(":PATH", info.fileInfo.absoluteFilePath());
@@ -346,7 +346,7 @@ ScriptInfo *WeatherSource::ProbeScript(const QFileInfo &fi)
         // a little annoying, but look at what we just inserted to get the id
         // number, not sure if we really need it, but better safe than sorry.
         db.prepare(query);
-        db.bindValue(":HOST", gContext->GetHostName());
+        db.bindValue(":HOST", gCoreContext->GetHostName());
         db.bindValue(":NAME", info.name);
         if (!db.exec())
         {

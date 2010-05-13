@@ -485,35 +485,35 @@ void Metadata::setArtistAndTrackFormats()
 {
     QString tmp;
 
-    tmp = gContext->GetSetting("MusicFormatNormalFileArtist");
+    tmp = gCoreContext->GetSetting("MusicFormatNormalFileArtist");
     if (!tmp.isEmpty())
         m_formatnormalfileartist = tmp;
 
-    tmp = gContext->GetSetting("MusicFormatNormalFileTrack");
+    tmp = gCoreContext->GetSetting("MusicFormatNormalFileTrack");
     if (!tmp.isEmpty())
         m_formatnormalfiletrack = tmp;
 
-    tmp = gContext->GetSetting("MusicFormatNormalCDArtist");
+    tmp = gCoreContext->GetSetting("MusicFormatNormalCDArtist");
     if (!tmp.isEmpty())
         m_formatnormalcdartist = tmp;
 
-    tmp = gContext->GetSetting("MusicFormatNormalCDTrack");
+    tmp = gCoreContext->GetSetting("MusicFormatNormalCDTrack");
     if (!tmp.isEmpty())
         m_formatnormalcdtrack = tmp;
 
-    tmp = gContext->GetSetting("MusicFormatCompilationFileArtist");
+    tmp = gCoreContext->GetSetting("MusicFormatCompilationFileArtist");
     if (!tmp.isEmpty())
         m_formatcompilationfileartist = tmp;
 
-    tmp = gContext->GetSetting("MusicFormatCompilationFileTrack");
+    tmp = gCoreContext->GetSetting("MusicFormatCompilationFileTrack");
     if (!tmp.isEmpty())
         m_formatcompilationfiletrack = tmp;
 
-    tmp = gContext->GetSetting("MusicFormatCompilationCDArtist");
+    tmp = gCoreContext->GetSetting("MusicFormatCompilationCDArtist");
     if (!tmp.isEmpty())
         m_formatcompilationcdartist = tmp;
 
-    tmp = gContext->GetSetting("MusicFormatCompilationCDTrack");
+    tmp = gCoreContext->GetSetting("MusicFormatCompilationCDTrack");
     if (!tmp.isEmpty())
         m_formatcompilationcdtrack = tmp;
 }
@@ -682,7 +682,7 @@ void Metadata::toMap(MetadataMap &metadataMap)
     else
         metadataMap["length"] = QString().sprintf("%02d:%02d", em, es);
 
-    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
+    QString dateFormat = gCoreContext->GetSetting("DateFormat", "ddd MMMM d");
     QString fullDateFormat = dateFormat;
     if (!fullDateFormat.contains("yyyy"))
         fullDateFormat += " yyyy";
@@ -1374,10 +1374,10 @@ void MusicNode::SetStaticData(const QString &startdir, const QString &paths)
 {
     m_startdir = startdir;
     m_paths = paths;
-    m_RatingWeight = gContext->GetNumSetting("IntelliRatingWeight", 2);
-    m_PlayCountWeight = gContext->GetNumSetting("IntelliPlayCountWeight", 2);
-    m_LastPlayWeight = gContext->GetNumSetting("IntelliLastPlayWeight", 2);
-    m_RandomWeight = gContext->GetNumSetting("IntelliRandomWeight", 2);
+    m_RatingWeight = gCoreContext->GetNumSetting("IntelliRatingWeight", 2);
+    m_PlayCountWeight = gCoreContext->GetNumSetting("IntelliPlayCountWeight", 2);
+    m_LastPlayWeight = gCoreContext->GetNumSetting("IntelliLastPlayWeight", 2);
+    m_RandomWeight = gCoreContext->GetNumSetting("IntelliRandomWeight", 2);
 }
 
 void MusicNode::putYourselfOnTheListView(TreeCheckItem *parent, bool show_node)

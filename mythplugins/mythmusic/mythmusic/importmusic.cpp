@@ -90,7 +90,7 @@ ImportMusicDialog::ImportMusicDialog(MythScreenStack *parent)
 ImportMusicDialog::~ImportMusicDialog()
 {
     if (m_locationEdit)
-        gContext->SaveSetting("MythMusicLastImportDir", m_locationEdit->GetText());
+        gCoreContext->SaveSetting("MythMusicLastImportDir", m_locationEdit->GetText());
 
     delete m_tracks;
 }
@@ -271,7 +271,7 @@ bool ImportMusicDialog::Create()
 
     BuildFocusList();
 
-    m_locationEdit->SetText(gContext->GetSetting("MythMusicLastImportDir", "/"));
+    m_locationEdit->SetText(gCoreContext->GetSetting("MythMusicLastImportDir", "/"));
 
     return true;
 }
@@ -519,7 +519,7 @@ void ImportMusicDialog::showEditMetadataDialog()
 
     Metadata *editMeta = m_tracks->at(m_currentTrack)->metadata;
 
-    EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
+    EditMetadataDialog editDialog(editMeta, GetMythMainWindow(),
                                   "edit_metadata", "music-", "edit metadata");
     editDialog.setSaveMetadataOnly();
 
@@ -907,7 +907,7 @@ void ImportCoverArtDialog::scanDirectory()
     if (!d.exists())
         return;
 
-    QString nameFilter = gContext->GetSetting("AlbumArtFilter",
+    QString nameFilter = gCoreContext->GetSetting("AlbumArtFilter",
                                               "*.png;*.jpg;*.jpeg;*.gif;*.bmp");
 
     QFileInfoList list = d.entryInfoList(nameFilter);

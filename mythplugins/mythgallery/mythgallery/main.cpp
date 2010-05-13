@@ -18,7 +18,7 @@
 
 static int run(MythMediaDevice *dev = NULL)
 {
-    QDir startdir(gContext->GetSetting("GalleryDir"));
+    QDir startdir(gCoreContext->GetSetting("GalleryDir"));
     if (startdir.exists() && startdir.isReadable())
     {
         MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
@@ -116,9 +116,9 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     UpgradeGalleryDatabaseSchema();
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     GallerySettings settings;
     settings.Load();

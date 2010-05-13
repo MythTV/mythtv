@@ -746,7 +746,7 @@ Gears::Gears(QWidget *parent, const char *name) :
     //int screenwidth = 0, screenheight = 0;
     //float wmult = 0.0, hmult = 0.0;
 
-    //gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
+    //gCoreContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
     setGeometry(0, 0, parent->width(), parent->height());
     //setGeometry(0, 0, 400, 300);
     //setFixedSize(QSize(screenwidth, screenheight));

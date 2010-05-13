@@ -17,7 +17,7 @@ const QString currentDatabaseVersion = "1003";
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
 
-    if (!gContext->SaveSettingOnHost("GalleryDBSchemaVer",newnumber,NULL))
+    if (!gCoreContext->SaveSettingOnHost("GalleryDBSchemaVer",newnumber,NULL))
     {
         VERBOSE(VB_IMPORTANT,
                 QString("DB Error (Setting new DB version number): %1\n")
@@ -67,7 +67,7 @@ static bool performActualUpdate(const QString updates[], QString version,
 
 bool UpgradeGalleryDatabaseSchema(void)
 {
-    QString dbver = gContext->GetSetting("GalleryDBSchemaVer");
+    QString dbver = gCoreContext->GetSetting("GalleryDBSchemaVer");
 
     if (dbver == currentDatabaseVersion)
         return true;

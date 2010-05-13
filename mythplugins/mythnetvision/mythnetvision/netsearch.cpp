@@ -68,7 +68,7 @@ bool NetSearch::Create()
 
     bool foundtheme = false;
 
-    m_type = static_cast<DialogType>(gContext->GetNumSetting(
+    m_type = static_cast<DialogType>(gCoreContext->GetNumSetting(
                        "mythnetvision.ViewMode", DLG_SEARCH));
 
     // Load the theme for this screen
@@ -368,7 +368,7 @@ GrabberScript::scriptList NetSearch::fillGrabberList()
         QStringList sfn;
 
         QString icondir = QString("%1/mythnetvision/icons/").arg(GetShareDir());
-        QString dbIconDir = gContext->GetSetting("mythnetvision.iconDir", icondir);
+        QString dbIconDir = gCoreContext->GetSetting("mythnetvision.iconDir", icondir);
 
         for (image_type_list::const_iterator ext = image_exts.begin();
                 ext != image_exts.end(); ++ext)
@@ -598,7 +598,7 @@ void NetSearch::populateResultList(ResultVideo::resultList list)
             item->SetText((*i)->GetMediaURL(), "mediaurl");
             item->SetText((*i)->GetAuthor(), "author");
             item->SetText((*i)->GetDate().toString(
-               gContext->GetSetting("DateFormat",
+               gCoreContext->GetSetting("DateFormat",
                "yyyy-MM-dd hh:mm")), "date");
 
             QTime time(0,0,0,0);
@@ -716,8 +716,8 @@ void NetSearch::showWebVideo()
     if (url.isEmpty())
         return;
 
-    QString browser = gContext->GetSetting("WebBrowserCommand", "");
-    QString zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.0");
+    QString browser = gCoreContext->GetSetting("WebBrowserCommand", "");
+    QString zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.0");
 
     if (browser.isEmpty())
     {
@@ -742,7 +742,7 @@ void NetSearch::showWebVideo()
 
         GetMythMainWindow()->AllowInput(false);
         myth_system(cmd, MYTH_SYSTEM_DONT_BLOCK_PARENT);
-        gContext->GetMainWindow()->AllowInput(true);
+        GetMythMainWindow()->AllowInput(true);
         return;
     }
 }
@@ -935,7 +935,7 @@ void NetSearch::slotItemChanged()
             m_author->SetText(item->GetAuthor());
         if (m_date)
             m_date->SetText(item->GetDate().toString(
-                    gContext->GetSetting("DateFormat",
+                    gCoreContext->GetSetting("DateFormat",
                     "yyyy-MM-dd hh:mm")));
         if (m_time)
         {

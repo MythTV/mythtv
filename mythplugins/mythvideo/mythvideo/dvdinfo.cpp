@@ -15,7 +15,7 @@ DVDTitleInfo::DVDTitleInfo() : numb_chapters(0), numb_angles(0),
     track_number(0), hours(0), minutes(0), seconds(0), is_selected(false),
     selected_quality(-1), selected_audio(1), selected_subtitle(-1)
 {
-    use_ac3 = gContext->GetNumSetting("MTDac3flag");
+    use_ac3 = gCoreContext->GetNumSetting("MTDac3flag");
 }
 
 void DVDTitleInfo::setTime(uint h, uint m, uint s)

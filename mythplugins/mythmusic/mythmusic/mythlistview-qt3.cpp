@@ -1,4 +1,5 @@
 #include "mythcontext.h"
+#include "mythmainwindow.h"
 
 #include "mythlistview-qt3.h"
 #include "Q3Header"
@@ -44,7 +45,7 @@ void Q3MythListView::keyPressEvent(QKeyEvent *e)
 
     bool handled = false;
     QStringList actions;
-    handled = gContext->TranslateKeyPress("qt", e, actions);
+    handled = GetMythMainWindow()->TranslateKeyPress("qt", e, actions);
 
     for (int i = 0; i < actions.size() && !handled; i++)
     {

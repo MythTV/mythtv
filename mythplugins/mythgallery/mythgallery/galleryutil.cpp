@@ -437,7 +437,7 @@ bool GalleryUtil::Rename(const QString &currDir, const QString &oldName,
         d.rename(oldName, newName);
     }
 
-    int prefixLen = gContext->GetSetting("GalleryDir").length();
+    int prefixLen = gCoreContext->GetSetting("GalleryDir").length();
     QString path = GetConfDir() + "/MythGallery";
     path += currDir.right(currDir.length() - prefixLen);
     path += QString("/.thumbcache/");
@@ -601,7 +601,7 @@ bool GalleryUtil::RenameDirectory(const QString &currDir, const QString &oldName
     }
 
     // also look in HOME directory for any thumbnails
-    int prefixLen = gContext->GetSetting("GalleryDir").length();
+    int prefixLen = gCoreContext->GetSetting("GalleryDir").length();
     QString path = GetConfDir() + "/MythGallery";
     path += currDir.right(currDir.length() - prefixLen) + '/';
     if (QFile::exists(path + oldName))

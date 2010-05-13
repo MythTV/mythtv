@@ -28,7 +28,7 @@ int handleMedia(const QString &url, const QString &, const QString &, const QStr
     }
 
     QStringList urls = url.split(" ", QString::SkipEmptyParts);
-    float zoom = gContext->GetSetting("WebBrowserZoomLevel", "1.4").toFloat();
+    float zoom = gCoreContext->GetSetting("WebBrowserZoomLevel", "1.4").toFloat();
 
     MythScreenStack *mainStack = GetMythMainWindow()->GetMainStack();
 
@@ -61,15 +61,15 @@ int mythplugin_init(const char *libversion)
 
     UpgradeBrowserDatabaseSchema();
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
 
-    if (gContext->GetSetting("WebBrowserCommand").isEmpty())
-        gContext->SaveSetting("WebBrowserCommand", "Internal");
+    if (gCoreContext->GetSetting("WebBrowserCommand").isEmpty())
+        gCoreContext->SaveSetting("WebBrowserCommand", "Internal");
 
-    if (gContext->GetSetting("WebBrowserZoomLevel").isEmpty())
-        gContext->SaveSetting("WebBrowserZoomLevel", "1.4");
+    if (gCoreContext->GetSetting("WebBrowserZoomLevel").isEmpty())
+        gCoreContext->SaveSetting("WebBrowserZoomLevel", "1.4");
 
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     setupKeys();
 

@@ -824,9 +824,9 @@ void VideoList::InvalidateCache()
 VideoListImp::VideoListImp() : m_metadata_view_tree("", "top"),
     m_metadata_list_type(ltNone)
 {
-    m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 0);
+    m_ListUnknown = gCoreContext->GetNumSetting("VideoListUnknownFileTypes", 0);
 
-    m_LoadMetaData = gContext->GetNumSetting("VideoTreeLoadMetaData", 0);
+    m_LoadMetaData = gCoreContext->GetNumSetting("VideoTreeLoadMetaData", 0);
 }
 
 void VideoListImp::build_generic_tree(MythGenericTree *dst, meta_dir_node *src,
@@ -1109,7 +1109,7 @@ void VideoListImp::buildGroupList(metadata_list_type whence)
             case ltDBInsertDateGroup:
             {
                 QDate date = data->GetInsertdate();
-                groups.push_back(date.toString(gContext->GetSetting("DateFormat")));
+                groups.push_back(date.toString(gCoreContext->GetSetting("DateFormat")));
                 break;
             }
             default: 

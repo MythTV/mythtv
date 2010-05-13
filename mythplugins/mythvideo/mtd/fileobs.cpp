@@ -22,7 +22,7 @@ RipFile::RipFile(const QString &a_base, const QString &an_extension,
     use_multiple_files(true),
     auto_remove_bad_rips(auto_remove_bad)
 {
-    filesize = gContext->GetNumSetting("MTDRipSize", 0) * 1024 * 1024;
+    filesize = gCoreContext->GetNumSetting("MTDRipSize", 0) * 1024 * 1024;
 }
 
 bool RipFile::open(const QIODevice::OpenMode &mode, bool multiple_files)

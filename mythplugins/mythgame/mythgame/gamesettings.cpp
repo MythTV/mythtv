@@ -301,7 +301,7 @@ void MythGamePlayerEditor::menu(void)
     else
     {
         DialogCode val = MythPopupBox::Show2ButtonPopup(
-            gContext->GetMainWindow(),
+            GetMythMainWindow(),
             "", tr("Game Player Menu"),
             tr("Edit.."), tr("Delete.."), kDialogCodeButton1);
 
@@ -326,7 +326,7 @@ void MythGamePlayerEditor::edit(void)
 void MythGamePlayerEditor::del(void)
 {
     DialogCode val = MythPopupBox::Show2ButtonPopup(
-        gContext->GetMainWindow(), "",
+        GetMythMainWindow(), "",
         tr("Are you sure you want to delete "
            "this item?"),
         tr("Yes, delete It"),

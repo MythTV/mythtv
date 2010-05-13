@@ -180,16 +180,16 @@ bool MoviesUI::Create()
 
 void MoviesUI::Load()
 {
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     QString currentDate = QDate::currentDate().toString();
-    QString lastDate = gContext->GetSetting("MythMovies.LastGrabDate");
+    QString lastDate = gCoreContext->GetSetting("MythMovies.LastGrabDate");
     if (currentDate != lastDate)
     {
         VERBOSE(VB_IMPORTANT, "Movie Data Has Expired. Refreshing.");
         updateMovieTimes();
     }
 
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     updateDataTrees();
 }
@@ -201,7 +201,7 @@ void MoviesUI::Init()
 
 void MoviesUI::updateMovieTimes()
 {
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
 
     QString currentDate = QDate::currentDate().toString();
 
@@ -213,9 +213,9 @@ void MoviesUI::updateMovieTimes()
     if (!query.exec("truncate table movies_theaters"))
         MythDB::DBError("truncating movies_theaters", query);
 
-    QString grabber = gContext->GetSetting("MythMovies.Grabber");
-    grabber.replace("%z", gContext->GetSetting("MythMovies.ZipCode"));
-    grabber.replace("%r", gContext->GetSetting("MythMovies.Radius"));
+    QString grabber = gCoreContext->GetSetting("MythMovies.Grabber");
+    grabber.replace("%z", gCoreContext->GetSetting("MythMovies.ZipCode"));
+    grabber.replace("%r", gCoreContext->GetSetting("MythMovies.Radius"));
     QStringList args = grabber.split(' ');
     QString ret = "#ERROR";
     if (args.size())
@@ -227,14 +227,14 @@ void MoviesUI::updateMovieTimes()
 
     VERBOSE(VB_IMPORTANT, "Grabber Finished. Processing Data.");
     if (populateDatabaseFromGrabber(ret))
-        gContext->SaveSetting("MythMovies.LastGrabDate", currentDate);
+        gCoreContext->SaveSetting("MythMovies.LastGrabDate", currentDate);
     else
     {
         ShowOkPopup(QObject::tr("Failed to process the grabber data!"));
         VERBOSE(VB_IMPORTANT, "Failed to process the grabber data!");
     }
 
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 }
 
 MovieVector MoviesUI::buildMovieDataTree()

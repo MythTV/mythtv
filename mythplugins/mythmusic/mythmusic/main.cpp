@@ -107,7 +107,7 @@ void SavePending(int pending)
                   "WHERE value = :LASTPUSH "
                   "AND hostname = :HOST ;");
     query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-    query.bindValue(":HOST", gContext->GetHostName());
+    query.bindValue(":HOST", gCoreContext->GetHostName());
 
     if (query.exec() && query.size() == 0)
     {
@@ -116,7 +116,7 @@ void SavePending(int pending)
                          "(:LASTPUSH, :DATA, :HOST );");
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
         query.bindValue(":DATA", pending);
-        query.bindValue(":HOST", gContext->GetHostName());
+        query.bindValue(":HOST", gCoreContext->GetHostName());
 
         if (!query.exec())
             MythDB::DBError("SavePending - inserting LastMusicPlaylistPush",
@@ -130,7 +130,7 @@ void SavePending(int pending)
                          "AND hostname = :HOST ;");
         query.bindValue(":DATA", pending);
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        query.bindValue(":HOST", gContext->GetHostName());
+        query.bindValue(":HOST", gCoreContext->GetHostName());
 
         if (!query.exec())
             MythDB::DBError("SavePending - updating LastMusicPlaylistPush",
@@ -145,7 +145,7 @@ void SavePending(int pending)
                          "WHERE value = :LASTPUSH "
                          "AND hostname = :HOST ;");
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
-        query.bindValue(":HOST", gContext->GetHostName());
+        query.bindValue(":HOST", gCoreContext->GetHostName());
         if (!query.exec())
             MythDB::DBError("SavePending - deleting LastMusicPlaylistPush",
                             query);
@@ -154,7 +154,7 @@ void SavePending(int pending)
                          "(:LASTPUSH, :DATA, :HOST );");
         query.bindValue(":LASTPUSH", "LastMusicPlaylistPush");
         query.bindValue(":DATA", pending);
-        query.bindValue(":HOST", gContext->GetHostName());
+        query.bindValue(":HOST", gCoreContext->GetHostName());
 
         if (!query.exec())
             MythDB::DBError("SavePending - inserting LastMusicPlaylistPush (2)",
@@ -165,7 +165,7 @@ void SavePending(int pending)
 void startPlayback(void)
 {
     PlaybackBoxMusic *pbb;
-    pbb = new PlaybackBoxMusic(gContext->GetMainWindow(),
+    pbb = new PlaybackBoxMusic(GetMythMainWindow(),
                                "music_play", "music-", chooseCD(), "music_playback");
     pbb->exec();
     qApp->processEvents();
@@ -175,7 +175,7 @@ void startPlayback(void)
 
 void startDatabaseTree(void)
 {
-    DatabaseBox *dbbox = new DatabaseBox(gContext->GetMainWindow(),
+    DatabaseBox *dbbox = new DatabaseBox(GetMythMainWindow(),
                          chooseCD(), "music_select", "music-", "music database");
     dbbox->exec();
     delete dbbox;
@@ -366,7 +366,7 @@ void handleMedia(MythMediaDevice *cd)
         return;
     }
 
-    if (gContext->GetNumSetting("AutoPlayCD", 0))
+    if (gCoreContext->GetNumSetting("AutoPlayCD", 0))
         runMusicPlayback();
     else
         mythplugin_run();
@@ -444,9 +444,9 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
-    gContext->ActivateSettingsCache(false);
+    gCoreContext->ActivateSettingsCache(false);
     bool upgraded = UpgradeMusicDatabaseSchema();
-    gContext->ActivateSettingsCache(true);
+    gCoreContext->ActivateSettingsCache(true);
 
     if (!upgraded)
     {
@@ -496,7 +496,7 @@ static void preMusic()
     }
 
     //  Load all available info about songs (once!)
-    QString startdir = gContext->GetSetting("MusicLocation");
+    QString startdir = gCoreContext->GetSetting("MusicLocation");
     startdir = QDir::cleanPath(startdir);
     if (!startdir.endsWith("/"))
         startdir += "/";
@@ -515,7 +515,7 @@ static void preMusic()
         delete fscan;
     }
 
-    QString paths = gContext->GetSetting("TreeLevels");
+    QString paths = gCoreContext->GetSetting("TreeLevels");
 
     // Set the various track formatting modes
     Metadata::setArtistAndTrackFormats();
@@ -524,7 +524,7 @@ static void preMusic()
 
     //  Load all playlists into RAM (once!)
     PlaylistContainer *all_playlists = new PlaylistContainer(
-        all_music, gContext->GetHostName());
+        all_music, gCoreContext->GetHostName());
 
     gMusicData->paths = paths;
     gMusicData->startdir = startdir;
@@ -575,8 +575,8 @@ int mythplugin_run(void)
 int mythplugin_config(void)
 {
     gMusicData->runPost = false;
-    gMusicData->paths = gContext->GetSetting("TreeLevels");
-    gMusicData->startdir = gContext->GetSetting("MusicLocation");
+    gMusicData->paths = gCoreContext->GetSetting("TreeLevels");
+    gMusicData->startdir = gCoreContext->GetSetting("MusicLocation");
     gMusicData->startdir = QDir::cleanPath(gMusicData->startdir);
 
     if (!gMusicData->startdir.endsWith("/"))

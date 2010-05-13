@@ -95,7 +95,7 @@ namespace
 
 DVDRipBox::DVDRipBox(MythScreenStack *lparent, QString lname, QString device) :
     MythScreenType(lparent, lname),
-    m_mtdPort(gContext->GetNumSetting("MTDPort", 2442)),
+    m_mtdPort(gCoreContext->GetNumSetting("MTDPort", 2442)),
     m_clientSocket(this),
     m_triedMTDLaunch(false), m_connected(false), m_firstRun(true),
     m_haveDisc(false),

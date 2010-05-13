@@ -37,7 +37,7 @@ MythNewsConfig::MythNewsConfig(MythScreenStack *parent, const QString name)
       m_priv(new MythNewsConfigPriv), m_categoriesList(NULL),
       m_siteList(NULL),               m_helpText(NULL),
       m_contextText(NULL),
-      m_updateFreq(gContext->GetNumSetting("NewsUpdateFrequency", 30))
+      m_updateFreq(gCoreContext->GetNumSetting("NewsUpdateFrequency", 30))
 {
     populateSites();
 }
