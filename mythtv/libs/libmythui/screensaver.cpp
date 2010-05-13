@@ -4,7 +4,6 @@
 
 #ifdef USING_X11
 #include "screensaver-x11.h"
-#include "screensaver-xdg.h"
 #endif // USING_X11
 
 #if CONFIG_DARWIN
@@ -22,10 +21,7 @@ ScreenSaverControl* ScreenSaverControl::get(void)
     {
   
 #if defined(USING_X11)
-        if (ScreenSaverXDG::IsXDGInstalled())
-            ScreenSaverSingleton = new ScreenSaverXDG();
-        else
-            ScreenSaverSingleton = new ScreenSaverX11();
+        ScreenSaverSingleton = new ScreenSaverX11();
 #elif CONFIG_DARWIN
         ScreenSaverSingleton = new ScreenSaverOSX();
 #else
