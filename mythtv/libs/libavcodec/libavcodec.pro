@@ -21,11 +21,10 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 # -fomit-frame-pointer frees it. gcc-4 enables "location lists"
 # which allows debugging without frame pointer
 debug:contains(ARCH_X86_32, yes) {
-        QMAKE_CFLAGS_SHLIB =
         QMAKE_CFLAGS_DEBUG += -fomit-frame-pointer
 }
-# "-Os" can not compiled with PIC
-contains(CONFIG_SMALL, yes):contains(ARCH_X86_32, yes) {
+# gcc-4.2 and newer can not compile with PIC on x86
+contains(ARCH_X86_32, yes) {
 	QMAKE_CFLAGS_SHLIB =
 }
 
