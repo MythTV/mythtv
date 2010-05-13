@@ -20,7 +20,6 @@ class MPUBLIC MiniPlayer : public MusicCommon
 
   public slots:
     void timerTimeout(void);
-    void showInfoTimeout(void);
 
   private:
     QTimer       *m_displayTimer;

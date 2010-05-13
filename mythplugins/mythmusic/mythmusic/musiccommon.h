@@ -51,14 +51,8 @@ class MPUBLIC MusicCommon : public MythScreenType
     void seekback(void);
     void seek(int);
     void stopAll(void);
-    void setShuffleMode(MusicPlayer::ShuffleMode mode);
-    void toggleShuffle(void);
     void increaseRating(void);
     void decreaseRating(void);
-    void setRepeatMode(MusicPlayer::RepeatMode mode);
-    void toggleRepeat(void);
-    void editPlaylist(void);
-    void nextAuto(void);
 
     void showViewMenu(void);
     void showPlaylistMenu(void);
