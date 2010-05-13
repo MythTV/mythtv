@@ -888,12 +888,6 @@ void MythMainWindow::Init(void)
         flags |= Qt::FramelessWindowHint;
     }
 
-    if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
-    {
-        VERBOSE(VB_GENERAL, "Using Full Screen Window");
-        setWindowState(Qt::WindowFullScreen);
-    }
-
     // Workarounds for Qt/Mac bugs
 #ifdef Q_WS_MACX
     if (d->does_fill_screen)
@@ -907,6 +901,12 @@ void MythMainWindow::Init(void)
 #endif
 
     setWindowFlags(flags);
+
+    if (d->does_fill_screen && !GetMythUI()->IsGeometryOverridden())
+    {
+        VERBOSE(VB_GENERAL, "Using Full Screen Window");
+        setWindowState(Qt::WindowFullScreen);
+    }
 
     d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     d->uiScreenRect = QRect(0, 0, d->screenwidth, d->screenheight);
