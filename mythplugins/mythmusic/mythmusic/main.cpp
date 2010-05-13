@@ -473,6 +473,8 @@ int mythplugin_init(const char *libversion)
 
     gPlayer = new MusicPlayer(NULL, chooseCD());
     gMusicData = new MusicData();
+    gMusicData->all_music = NULL;
+    gMusicData->all_playlists = NULL;
 
     return 0;
 }
@@ -648,6 +650,9 @@ void runScan(void)
 
 void showMiniPlayer(void)
 {
+    if (!gMusicData->all_music)
+        return;
+
     // only show the miniplayer if there isn't already a client attached
     if (!gPlayer->hasClient())
         gPlayer->showMiniPlayer();
