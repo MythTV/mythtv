@@ -5417,7 +5417,7 @@ QString MainServer::LocalFilePath(const QUrl &url, const QString &wantgroup)
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("SELECT icon FROM channel WHERE icon LIKE :FILENAME ;");
-        query.bindValue(":FILENAME", QString("%") + file);
+        query.bindValue(":FILENAME", QString("%/") + file);
 
         if (query.exec() && query.isActive() && query.size())
         {
